@@ -1,0 +1,19 @@
+<div class="modal-header">
+  <h4 class="modal-title">Please confirm your choice</h4>
+  <button type="button" class="close pull-right" aria-label="Close" (click)="close();">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+
+<div class="modal-body text-center">
+
+  <i class="fas fa-exclamation-triangle fa-2x" style="color: #bababa; margin-bottom: 20px;"></i><h3 style="color: #bababa; display: inline-block;"> Hey,</h3>
+
+  <br><p>{{message}}</p><br>
+
+  <div class="button-equalizer">
+    <button (click)="close();" class="btn btn-default">Cancel</button>
+    <button (click)="confirm();" class="btn btn-default btn-gradient">Confirm</button>
+  </div>
+
+</div>

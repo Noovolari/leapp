@@ -1,0 +1,17 @@
+<div class="container-fluid flex-container text-center">
+  <h4 style="margin: 60px 20px 14px 20px; color: #606061">Type your workspace</h4>
+
+  <form [formGroup]="form" (submit)="submit()" class="workspace-form">
+    <div style="position: relative; display: block;">
+      <input formControlName="name" type="text" placeholder="write your workspace name">
+    </div>
+    <br>
+    <br>
+    <p class="gray-text"><i>*check the email you received for Workspace name.</i></p>
+    <a href="mailto:support@noovolari.com" class="dark-link"><i>Mail not received? Contact us!</i></a>
+    <br>
+    <br>
+    <button type="submit" class="btn btn-default submit {{(form.controls['name'].value === '') ? '' : 'btn-gradient'}}" [disabled]="(form.controls['name'].value === '')">Connect</button>
+  </form>
+
+</div>

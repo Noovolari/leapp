@@ -1,0 +1,12 @@
+<div class="profile">
+
+  <div class="portrait" (click)="toggleProfile();">
+    <div class="avatar">
+      <b *ngIf="!havePortrait" class="" style="font-size: 24px; margin: 12px 0; color: #ffffff; display: inline-block; width: 100%; text-align: center;">{{emailData.substr(0, 2).toUpperCase()}}</b>
+      <img src="data:image/png;base64,{{portrait}}" *ngIf="havePortrait" width="60" />
+    </div>
+    <div class="ed {{emailData.indexOf('@') > -1 ? '' : 'red-ws'}}">{{emailData.indexOf('@') > -1 ? 'online' : 'offline'}}</div>
+    <div class="ws">{{((emailData.length > 19) ? emailData.substr(0, 18) + '&hellip;' : emailData)}}</div>
+  </div>
+
+</div>

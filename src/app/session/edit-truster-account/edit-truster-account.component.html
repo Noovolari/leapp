@@ -1,0 +1,71 @@
+<div class="container-fluid">
+  <app-profile-sidebar></app-profile-sidebar>
+
+  <h1 style="margin-top: 0;"><i class="fa fa-chevron-left pointer" (click)="goToList();"></i> - Edit {{account.accountName}} - TA</h1>
+
+  <div class="form-group" style="width: 100%; display: none;">
+    <label>Federated Account<span class="danger-text">*</span></label>
+    <ng-select class="mt-2" bindLabel="accountName" bindValue="accountNumber" [items]="accounts" [(ngModel)]="selectedAccountNumber" placeholder="Select Federated Account" (change)="changeRoles($event);"></ng-select>
+  </div>
+
+  <form [formGroup]="form" class="form center-vertical text-left">
+
+    <div class="toggable {{toggleOpen ? 'opened' : 'closed'}}">
+      <div class="titable" title="Account Details" (click)="$event.stopPropagation(); toggleOpen = !toggleOpen;"></div>
+      <div class="shrinkable">
+
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Account Number<span class="danger-text">*</span></label>
+          <input formControlName="accountNumber" type="text" class="form-control" [(ngModel)]="account.accountNumber" placeholder="Account Number *" readonly="true">
+          <small class="text-error" *ngIf="(form.controls['accountNumber'].dirty || form.controls['accountNumber'].touched) && form.controls['accountNumber'].errors">Insert the Account Number</small>
+        </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Account Alias<span class="danger-text">*</span></label>
+          <input formControlName="name" type="text" class="form-control" [(ngModel)]="account.accountName" placeholder="Account Alias *">
+          <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
+        </div>
+
+        <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;">
+          <label style="margin-bottom: 0;">Federated Role<span class="danger-text">*</span><i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
+          <ng-select class="mt-2" formControlName="federatedRole" bindLabel="name" bindValue="name" dropdownPosition="top" [items]="roles" [(ngModel)]="selectedRole"></ng-select>
+        </div>
+
+        <div style="width: 2%; height: 1px; display: inline-block;"></div>
+
+        <div class="form-group" style="width: 49%; display: inline-block;">
+          <label>AWS Region<span class="danger-text">*</span></label>
+          <ng-select formControlName="myRegion" bindLabel="region" bindValue="region" [items]="regions" dropdownPosition="top" [(ngModel)]="selectedRegion"></ng-select>
+        </div>
+
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="toggable {{!toggleOpen ? 'opened' : 'closed'}}">
+      <div class="titable" title="Role Details" (click)="$event.stopPropagation(); toggleOpen = !toggleOpen;"></div>
+      <div class="shrinkable">
+
+        <h1 style="margin-top: 10px;">Role names*</h1>
+        <label class="orange-color"><small>*The role name must coincide with the Role in the IAM section. Remember to press <b>enter</b> to save the Role name.</small></label>
+
+        <div class="form-group" style="width: 100%; display: inline-block; position: relative; height: auto;">
+          <input #roleInput class="form-control" (keyup)="setRoleName($event);" placeholder="Write Role name here and press Enter" style="padding-right: 35px;"/>
+          <button type="button" (click)="setRoleName({ code: 'Enter'});" class="adder-btn {{ checkDisabled ? '' : 'disabled'}}"><i class="fa fa-plus"></i></button>
+          <ul>
+            <li *ngFor="let role of rolesT">
+              <span>{{role}} <i class="fa fa-times" (click)="removeRole(role);"></i></span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <button type="button" (click)="saveAccount();" [disabled]="!form.valid" [ngClass]="(!form.valid) ? 'btn btn-default pull-right': 'btn btn-default btn-gradient pull-right'">Save</button>
+
+  </form>
+
+
+</div>

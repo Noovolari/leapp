@@ -1,0 +1,27 @@
+.confirm-modal {
+  max-width: 300px;
+  width: 100%;
+}
+
+h4 { color: #707070; }
+
+.btn-gradient {
+  color: white!important;
+  background:linear-gradient(-90deg, rgb(249, 212, 35) 0%, rgb(230, 92, 0) 80%)!important;
+}
+
+.button-equalizer { height: 36px; }
+.button-equalizer button:first-child { float: left; }
+.button-equalizer button:last-child { float: right; }
+
+p { color: #707070; }
+
+.modal-header {
+  color: white!important;
+  background: #bababa;
+
+  .close {
+    font-size: 36px;
+    color: white!important;
+  }
+}

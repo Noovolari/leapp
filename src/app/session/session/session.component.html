@@ -1,0 +1,206 @@
+<div class="container-fluid">
+
+  <app-profile-sidebar></app-profile-sidebar>
+
+  <ul class="ssm-cards">
+
+    <li class="session-card selected-session-card" *ngFor="let session of sessions">
+      <ng-container *ngIf="session.active">
+        <div class="{{openSsm ? 'ssm-tray opened' : 'ssm-tray'}}">
+
+          <b class="gray-text mini-title">Ec2 Instance connect</b>
+          <ng-select bindLabel="region" bindValue="region" [items]="ssmRegions" [(ngModel)]="selectedSsmRegion"
+                     placeholder="Select a Region for finding instances"
+                     (change)="changeSsmRegion($event);"></ng-select>
+
+          <div class="loader" *ngIf="ssmloading"><i class="fa fa-spinner fa-spin"></i></div>
+          <div class="list-of-ssm" *ngIf="!ssmloading">
+            <ul class="ssm-ul">
+              <li *ngFor="let instance of instances" class="ssm-card">
+                <div><b>{{instance.Name}}</b><br>{{instance.IPAddress}}</div>
+                <div>
+                  <button class="btn btn-xs btn-primary btn-gradient" (click)="startSsmSession(instance.InstanceId)">
+                    Start Session
+                  </button>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="{{session.color}} mycard">
+          <div class="button-area">
+            <ng-container dropdown placement="right">
+              <a dropdownToggle aria-controls="drop-list"><i
+                class="fa fa-ellipsis-v"></i></a>
+
+
+              <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right"
+                   role="menu" aria-labelledby="button-basic">
+                <a (click)="openSsmTray($event);">Aws SSM start session</a>
+                <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
+                <a (click)="copyCredentials(session, 4);">Copy Role Arn</a>
+              </div>
+            </ng-container>
+
+            <a (click)="stopSession()" *ngIf="!loading"><i class="fa fa-stop"></i></a>
+            <a *ngIf="loading"><i class="fa fa-spin fa-spinner"></i></a>
+          </div>
+
+          <div class="button-area-2" *ngIf="openSsm">
+            <a (click)="openSsm = false;"><i class="fa fa-chevron-up"></i></a>
+            ,
+          </div>
+
+          <div *ngIf="session.showTray" class="drop-list">
+            <a (click)="openSsmTray($event);">Aws SSM start session</a>
+            <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
+            <a (click)="copyCredentials(session, 4);">Copy Role Arn</a>
+          </div>
+
+          <span>Account:</span><br>
+          <h1>{{session.accountData.accountName}}</h1>
+          <span>Role:</span><br>
+          <h1>{{session.roleData.name}}</h1>
+        </div>
+      </ng-container>
+    </li>
+
+    <li class="session-card {{openSsm ? 'ssm-tray-opened' : ''}}" *ngFor="let session of sessions">
+      <ng-container *ngIf="!session.active">
+        <div class="{{session.color}}">
+          <div class="button-area">
+            <a (click)="removeSession(session);"><i class="fa fa-times"></i></a>
+            <ng-container dropdown placement="right">
+              <a dropdownToggle aria-controls="drop-list-inactive"><i
+                class="fa fa-ellipsis-v"></i></a>
+
+
+              <div id="drop-list-inactive" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right"
+                   role="menu" aria-labelledby="button-basic">
+                <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
+                <a (click)="copyCredentials(session, 4);">Copy Role Arn</a>
+              </div>
+            </ng-container>
+            <a (click)="startSession(session)"><i class="fa fa-play"></i></a>
+          </div>
+
+
+          <h3>{{session.accountData.accountName}}</h3>
+          <h4>{{session.roleData.name}}</h4>
+        </div>
+      </ng-container>
+    </li>
+
+    <li
+      class="session-card plus-card text-center orange-color {{openSsm ? 'ssm-tray-opened' : ''}} {{sessions.length >= 5 ? 'grayedout' : ''}}"
+      (click)="showAddAccountModal(addAccountToListTemplate);">
+      <div *ngIf="!isGettingConf">
+        <i class="fa fa-plus"></i>
+        <br>
+        <span>Add Session to Quick List by choosing account and role</span>
+      </div>
+      <div *ngIf="isGettingConf">
+        <i class="fa fa-spin fa-spinner"></i>
+        <br>
+        <span>Getting configuration, please wait...</span>
+      </div>
+    </li>
+
+  </ul>
+
+  <a (click)="gotToAccountManagement();" tooltip="Go to Account Management" class="round-btn" *ngIf="liteClient"><img src="assets/images/cogs-light.png" width="18"/></a>
+</div>
+
+<ng-template #addAccountToListTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left cut">Add Session to the Quick List</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide(); selectedToRemove = null;">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="sub-menu" *ngIf="sessions.length >= 5">
+
+      <div>
+
+        <p class="full-text">
+          Actually, you can’t have more than<br>
+          Four session in a row. To add a new<br>
+          Session, please, select one to delete!
+        </p>
+
+        <div class="account-to-remove">
+          <table class="table table-condensed table-hover">
+            <tr *ngFor="let sremove of sessions" (click)="selectedToRemove = sremove;">
+              <ng-container *ngIf="sremove">
+                <td
+                  class="{{selectedToRemove && sremove.accountData.accountNumber === selectedToRemove.accountData.accountNumber && sremove.roleData.name === selectedToRemove.roleData.name ? 'clicked' : ''}}">
+                  <span class="colored {{sremove.color}}"></span></td>
+                <td
+                  class="{{selectedToRemove && sremove.accountData.accountNumber === selectedToRemove.accountData.accountNumber && sremove.roleData.name === selectedToRemove.roleData.name ? 'clicked' : ''}}">
+                  <span class="name">{{sremove.accountData.accountName}}</span></td>
+                <td
+                  class="{{selectedToRemove && sremove.accountData.accountNumber === selectedToRemove.accountData.accountNumber && sremove.roleData.name === selectedToRemove.roleData.name ? 'clicked' : ''}}">
+                  <span class="role">{{sremove.roleData.name}}</span></td>
+              </ng-container>
+            </tr>
+          </table>
+        </div>
+
+      </div>
+
+      <br>
+
+      <div class="button-equalizer text-center">
+        <button type="button" (click)="removeSession(selectedToRemove);"
+                class="btn {{(!selectedToRemove) ? 'btn-default' : 'btn-default btn-gradient'}}"
+                [disabled]="!selectedToRemove">Remove
+        </button>
+      </div>
+
+    </div>
+    <div class="sub-menu" *ngIf="sessions.length < 5">
+      <div>
+
+        <b class="gray-text">Choose an Account with a specific role to Add to the Quick List <i
+          class="fa fa-question-circle"
+          tooltip="By adding an Account to the Quick List, you'll have the possibility to quickly start and stop
+        a session as well as the ability to switch fast between Accounts. Adding an Account to the Quick
+          List also gives you access to different quick actions as well."></i></b>
+
+        <hr style="margin: 30px 0">
+
+        <b class="gray-text">Select AWS account</b>
+        <ng-select bindLabel="accountName" bindValue="accountNumber" [items]="modalAccounts" [(ngModel)]="currentSelectedAccountNumber" placeholder="Select an Account" (change)="changeRoles($event);"></ng-select>
+
+        <br>
+        <b class="gray-text">Select IAM role</b>
+        <ng-select bindLabel="name" bindValue="name" [items]="modalRoles" [(ngModel)]="currentSelectedRole" placeholder="Select a Role"></ng-select>
+
+        <br>
+        <b class="gray-text">Choose a color</b>
+        <div class="color-cards">
+          <a (click)="setBackgroundColor(0);" class="{{currentSelectedColor === 0 ? 'selected' : ''}}"><span class="background random"></span></a>
+          <a *ngIf="!checkIFColorIsOccupied(1);" (click)="setBackgroundColor(1);" class="{{currentSelectedColor === 1 ? 'selected' : ''}}"><span class="background background-1"></span></a>
+          <a *ngIf="!checkIFColorIsOccupied(2);" (click)="setBackgroundColor(2);" class="{{currentSelectedColor === 2 ? 'selected' : ''}}"><span class="background background-2"></span></a>
+          <a *ngIf="!checkIFColorIsOccupied(3);" (click)="setBackgroundColor(3);" class="{{currentSelectedColor === 3 ? 'selected' : ''}}"><span class="background background-3"></span></a>
+          <a *ngIf="!checkIFColorIsOccupied(4);" (click)="setBackgroundColor(4);" class="{{currentSelectedColor === 4 ? 'selected' : ''}}"><span class="background background-4"></span></a>
+          <a *ngIf="!checkIFColorIsOccupied(5);" (click)="setBackgroundColor(5);" class="{{currentSelectedColor === 5 ? 'selected' : ''}}"><span class="background background-5"></span></a>
+          <a *ngIf="!checkIFColorIsOccupied(6);" (click)="setBackgroundColor(6);" class="{{currentSelectedColor === 6 ? 'selected' : ''}}"><span class="background background-6"></span></a>
+          <a *ngIf="!checkIFColorIsOccupied(7);" (click)="setBackgroundColor(7);" class="{{currentSelectedColor === 7 ? 'selected' : ''}}"><span class="background background-7"></span></a>
+          <a *ngIf="!checkIFColorIsOccupied(8);" (click)="setBackgroundColor(8);" class="{{currentSelectedColor === 8 ? 'selected' : ''}}"><span class="background background-8"></span></a>
+        </div>
+
+      </div>
+
+      <br>
+
+      <div class="button-equalizer text-center">
+        <button type="button" (click)="addAccount();" class="btn {{(currentSelectedColor === null || !currentSelectedAccountNumber || !currentSelectedRole) ? 'btn-default' : 'btn-default btn-gradient'}}" [disabled]="currentSelectedColor === null || !currentSelectedAccountNumber || !currentSelectedRole">Add</button>
+      </div>
+    </div>
+
+  </div>
+</ng-template>

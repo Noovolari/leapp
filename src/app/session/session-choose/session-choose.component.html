@@ -1,0 +1,18 @@
+<div class="container-fluid">
+
+  <br>
+  <b class="gray-text">Select AWS account</b>
+  <ng-select bindLabel="accountNameMod" bindValue="accountNumber" [items]="accounts" [(ngModel)]="selectedAccountNumber" placeholder="Select an Account" (change)="changeRoles($event);"></ng-select>
+
+  <br>
+  <b class="gray-text">Select IAM role</b>
+  <ng-select bindLabel="name" bindValue="name" [items]="roles" [(ngModel)]="selectedRole" placeholder="Select a Role"></ng-select>
+
+  <br>
+  <div style="text-align: center">
+    <button [disabled]="!selectedAccount && !selectedRole" (click)="goToSession();" [ngClass]="(!selectedAccount && !selectedRole) ? 'btn btn-default': 'btn btn-default btn-gradient'">Start</button>
+  </div>
+
+  <a (click)="goToListAccount();" tooltip="Go to Federated Account list" class="round-btn"><img src="assets/images/list-light2.png" width="18"/></a>
+
+</div>

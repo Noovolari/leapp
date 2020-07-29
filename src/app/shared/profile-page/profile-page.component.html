@@ -1,0 +1,52 @@
+<app-profile [workspaceName]="name" [emailData]="email"></app-profile>
+
+<div class="container-fluid">
+  <app-profile-sidebar></app-profile-sidebar>
+
+  <h1>Update Your Ipd Url</h1>
+  <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveIdpUrl();">
+
+    <div class="form-group" style="width: 70%; display: inline-block;">
+      <label>Idp Url<span class="danger-text">*</span></label>
+      <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url *" [value]="idpUrlValue" >
+      <small class="text-error" *ngIf="(form.controls['idpUrl'].dirty || form.controls['idpUrl'].touched) && form.controls['idpUrl'].errors">Insert the Idp Url</small>
+    </div>
+
+    <div class="form-group" style="width: 30%; display: inline-block; padding-top: 36px; padding-left: 20px;">
+      <button type="button" (click)="saveIdpUrl();" [disabled]="!form.valid" [ngClass]="(!form.valid) ? 'btn btn-default': 'btn btn-default btn-gradient'">Save</button>
+    </div>
+
+    <br><br>
+    <br><br>
+    <br><br>
+
+    <div class="form-group" style="width: 40%; display: inline-block;">
+      <button type="button" (click)="showWorkspaceJson(jsonViewTemplate);" class="btn btn-default btn-gradient">Show Workspace</button>
+    </div>
+
+    <div class="form-group" style="width: 2%; display: inline-block;"></div>
+
+    <div class="form-group" style="width: 29%; display: inline-block;"></div>
+
+    <div class="form-group" style="width: 1%; display: inline-block;"></div>
+
+    <div class="form-group" style="width: 26%; display: inline-block; padding-left: 14px;">
+      <button type="button" (click)="goBack();" class="btn btn-secondary btn-outline-secondary">Back</button>
+    </div>
+
+  </form>
+</div>
+
+<ng-template #jsonViewTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left cut">Workspace Json</h4>
+    <button type="button" class="close" aria-label="Close" (click)="modalRef.hide();">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body" style="overflow: auto; font-size: 10px!important">
+
+    <ngx-json-viewer [json]="workspaceData"></ngx-json-viewer>
+
+  </div>
+</ng-template>

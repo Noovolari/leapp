@@ -1,0 +1,5 @@
+<ul>
+  <li class="li-home"><a (click)="goToQuickList();"><i class="icon fa fa-home"></i></a></li>
+  <li class="{{!account ? 'selected' : ''}}"><a (click)="gotToAccountManagement();" style="color: #707070;">Federated Accounts</a></li>
+  <li *ngIf="account"><a style="color: #707070;">{{account}}</a></li>
+</ul>

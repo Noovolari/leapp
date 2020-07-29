@@ -1,0 +1,4 @@
+provider: s3
+bucket: lookauth.clients
+region: eu-west-1
+updaterCacheDirName: lookauthlite-updater

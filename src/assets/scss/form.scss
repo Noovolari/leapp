@@ -1,0 +1,134 @@
+.btn {
+  border: none!important;
+}
+.form-group {
+  height: 62px;
+  margin-bottom: 20px;
+  vertical-align: middle;
+}
+.form-group small { float: right; }
+
+.no-data {
+  position: absolute;
+  top: 21px;
+  height: 90vh;
+  width: 89%;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  justify-content: center;
+  align-items: center;
+  color: #707070;
+  font-size: 16px;
+}
+
+input {
+  height: 36px!important;
+}
+
+.ng-untouched:not(.ng-select-opened) .ng-placeholder { top: 11px!important; }
+.ng-placeholder { color: #cfcfd0; font-size: 12px; position: absolute; top: 16px!important; }
+.ng-select-opened .ng-placeholder { position: absolute; top: 16px!important; }
+.ng-select-opened .ng-placeholder { opacity: 0.4; }
+
+.ng-arrow {
+  top: 4px!important;
+  border-color: transparent transparent #999;
+  border-width: 0 5px 5px;
+}
+
+.ng-option {
+  box-sizing: border-box;
+  cursor: pointer;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: 12px;
+  text-overflow: ellipsis;
+}
+
+.ng-select .ng-clear-wrapper { display: none; }
+
+.ng-select span { font-size: 12px; }
+
+.ng-untouched:not(.ng-select-opened) .ng-value-label { font-size: 12px; position: absolute; top: 11px; }
+.ng-value-label { font-size: 12px; position: absolute; top: 16px; }
+
+form button {
+  position: relative;
+  bottom: 5px;
+}
+
+.toggable {
+  position: relative;
+  margin-top: 30px; /* 10px more than before height */
+  cursor: pointer;
+}
+.toggable.opened > div.shrinkable {
+  height: auto;
+  transition: height 0.4s ease-in;
+}
+.toggable.closed > div.shrinkable {
+  height: 0;
+  transition: height 0.4s ease-out;
+}
+.toggable > div.titable::before {
+  position: absolute;
+  top: -20px;
+  left: 0;
+  right: 0;
+  content: attr(title);
+  height: 20px;
+  background: #ededed;
+  color: #707070;
+  font-weight: bold;
+  font-size: 12px;
+  padding: 2px 10px;
+}
+.toggable.opened > div.titable::after {
+  z-index: 1;
+  position: absolute;
+  right: 10px;
+  top: -20px;
+  content: '\25BE';
+  transform: rotate(180deg);
+}
+.toggable.closed > div.titable::after {
+  z-index: 1;
+  position: absolute;
+  right: 10px;
+  top: -23px;
+  content: '\25BE';
+}
+.toggable > div.shrinkable {
+  overflow: hidden;
+}
+
+hr {
+  margin: 10px 0;
+}
+
+.ng-dropdown-panel .ng-dropdown-panel-items {
+  max-height: 188px!important;
+}
+
+.adder-btn {
+  outline: none;
+  min-width: 30px;
+  max-width: 30px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  position: absolute;
+  right: 3px;
+  top: 3px;
+  border-radius: 30px;
+  background: linear-gradient(-90deg, #f9d423 0%, #e65c00 80%) !important;;
+
+  i {
+    color: white;
+  }
+}
+.adder-btn.disabled {
+  background: #bababa!important;
+}

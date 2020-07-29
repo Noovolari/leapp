@@ -1,0 +1,234 @@
+
+@mixin transition($args...) {
+  -webkit-transition: $args;
+  -moz-transition: $args;
+  -ms-transition: $args;
+  -o-transition: $args;
+  transition: $args;
+}
+
+@mixin round-div-with-input($width: 150px, $color: $light-grey) {
+  @include transition(0.3s all ease);
+  text-align: center;
+  i {
+    position: relative;
+    top: calc(50% - 10px);
+  }
+  input {
+    @include transition(0.3s all ease);
+    margin-left: 25px;
+    margin-top: -15px;
+    display: none;
+    font-weight: bold;
+    background: none;
+    border: none;
+    border-bottom: 1px solid $color;
+    color: $color;
+    outline: none;
+    visibility: hidden;
+    opacity: 0;
+    width: 80%;
+  }
+  &:hover {
+    width: $width;
+    text-align: left;
+    input {
+      display: block;
+      visibility: visible;
+      opacity: 1;
+      animation: show 1s;
+    }
+  }
+}
+
+@mixin round-btn-with-label($width: 150px, $color: $primary-text-color) {
+  @include transition(0.3s all ease);
+  text-align: center;
+  i {
+    position: relative;
+    top: calc(50% - 10px);
+  }
+  span {
+    @include transition(0.3s all ease);
+    margin-left: 25px;
+    margin-top: -15px;
+    display: none;
+    font-weight: bold;
+    color: $color;
+    visibility: hidden;
+    opacity: 0;
+  }
+  &:hover {
+    width: $width;
+    text-align: left;
+    span {
+      display: block;
+      visibility: visible;
+      opacity: 1;
+      animation: show 1s;
+    }
+  }
+}
+
+@keyframes show {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@mixin can-toggle-branding(
+  $can-toggle-off-color: #777,
+  $can-toggle-on-color: $primary-color,
+  $can-toggle-inactive-text: rgba(white, 0.5),
+  $can-toggle-transition: cubic-bezier(0, 1, 0.5, 1)
+) {
+  input[type="checkbox"] {
+    &[disabled] ~ label {
+      color: rgba($can-toggle-off-color, 0.5);
+    }
+
+    &:focus ~ label,
+    &:hover ~ label {
+      .can-toggle__switch {
+        background-color: $can-toggle-off-color;
+        &:after {
+          color: darken($can-toggle-off-color, 10%);
+        }
+      }
+    }
+    &:hover ~ label {
+      color: darken($can-toggle-off-color, 5%);
+    }
+    &:checked {
+      ~ label {
+        &:hover {
+          color: darken($can-toggle-on-color, 3%);
+        }
+
+        .can-toggle__switch {
+          background-color: lighten($can-toggle-on-color, 5%);
+          &:after {
+            color: darken($can-toggle-on-color, 5%);
+          }
+        }
+      }
+
+      &:focus,
+      &:hover {
+        ~ label {
+          .can-toggle__switch {
+            background-color: $can-toggle-on-color;
+            &:after {
+              color: darken($can-toggle-on-color, 10%);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  label {
+    .can-toggle__label-text {
+      flex: 1;
+    }
+
+    .can-toggle__switch {
+      transition: background-color 0.3s $can-toggle-transition;
+      background: lighten($can-toggle-off-color, 5%);
+      &:before {
+        color: $can-toggle-inactive-text;
+      }
+      &:after {
+        // Autoprefixer choked here, so making the prefixes explicit
+        -webkit-transition: -webkit-transform 0.3s $can-toggle-transition;
+        transition: transform 0.3s $can-toggle-transition;
+        color: $can-toggle-off-color;
+      }
+    }
+  }
+}
+
+@mixin can-toggle-appearance(
+  $can-toggle-width: 134px,
+  $can-toggle-height: 36px,
+  $can-toggle-border-radius: 4px,
+  $can-toggle-offset: 2px,
+  $can-toggle-label-font-size: 14px,
+  $can-toggle-switch-font-size: 12px,
+  $can-toggle-shadow: 0 3px 3px rgba(black, 0.4)
+) {
+  $can-toggle-switch-width: $can-toggle-width/2;
+
+  input[type="checkbox"] {
+    &:focus ~ label,
+    &:hover ~ label {
+      .can-toggle__switch {
+        &:after {
+          box-shadow: $can-toggle-shadow;
+        }
+      }
+    }
+
+    &:checked {
+      ~ label {
+        .can-toggle__switch {
+          &:after {
+            transform: translate3d(
+              $can-toggle-width -
+                ($can-toggle-switch-width + $can-toggle-offset),
+              0,
+              0
+            );
+          }
+        }
+      }
+      &:focus,
+      &:hover {
+        ~ label {
+          .can-toggle__switch {
+            &:after {
+              box-shadow: $can-toggle-shadow;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  label {
+    font-size: $can-toggle-label-font-size;
+
+    .can-toggle__switch {
+      height: $can-toggle-height;
+      flex: 0 0 $can-toggle-width;
+      border-radius: $can-toggle-border-radius;
+
+      &:before {
+        left: $can-toggle-width/2;
+        font-size: $can-toggle-switch-font-size;
+        line-height: $can-toggle-height;
+        width: $can-toggle-width/2;
+        padding: 0 12px;
+      }
+
+      &:after {
+        top: $can-toggle-offset;
+        left: $can-toggle-offset;
+        border-radius: $can-toggle-border-radius/2;
+        width: $can-toggle-switch-width - $can-toggle-offset;
+        line-height: $can-toggle-height - ($can-toggle-offset * 2);
+        font-size: $can-toggle-switch-font-size;
+      }
+
+      &:hover {
+        &:after {
+          box-shadow: $can-toggle-shadow;
+        }
+      }
+    }
+  }
+}

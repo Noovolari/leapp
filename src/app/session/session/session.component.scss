@@ -1,0 +1,399 @@
+.timer {
+  font-size: 35px;
+  font-weight: bold;
+  color: #707070;
+}
+
+.fake-input {
+  margin-top: 5px;
+  padding: 10px;
+  border-radius: 4px;
+  height: 40px;
+  display: block;
+  border: 1px solid #dededf;
+  color: #707070;
+}
+.btn-gradient {
+  color: white!important;
+  background: linear-gradient(-90deg, rgb(249, 212, 35) 0%, rgb(230, 92, 0) 80%)!important;
+}
+b {
+  display: inline-block;
+  margin-bottom: 5px;
+  color: #707070;
+}
+.container-fluid { height: 100%; padding: 0 25px; }
+
+.round-btn { position: absolute; bottom: 15px; right: 15px; display: flex; align-items: center; justify-content: center; }
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+.session-card {
+  width: 80%;
+  margin: 10px auto;
+  text-align: left;
+  position: relative;
+  transition: all 0.4s ease;
+  color: white;
+
+  .button-area {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+
+    a {
+      display: inline-block;
+      width: 27px;
+      height: 27px;
+      border-radius: 15px;
+      border: 1px solid white;
+      margin-left: 5px;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+
+    span {
+      cursor: pointer;
+    }
+
+    .drop-list {
+      position: absolute;
+      background: white;
+      box-shadow: 0 0 42px -14px rgba(0, 0, 0, 0.49);
+      border-radius: 4px;
+      width: 100%;
+      max-width: 200px;
+      z-index: 10;
+      cursor: pointer;
+    }
+
+    .drop-list a {
+      display: inline-block;
+      width: 100%;
+      padding: 5px 10px;
+      border-bottom: 1px solid #f9f9f9;
+      color: #707070;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+      border-radius: 0;
+      height: auto;
+      margin-left: 0;
+    }
+
+    .drop-list a:last-child {
+      border-bottom: none !important;
+    }
+
+    .drop-list a:hover {
+      opacity: 0.8;
+      background: linear-gradient(-90deg, rgb(249, 212, 35) 0%, rgb(230, 92, 0) 80%) !important;;
+      color: #ffffff !important;
+    }
+
+    .drop-list:after {
+      position: absolute;
+      top: -5px;
+      right: 40px;
+      content: '';
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-bottom: 5px solid white;
+    }
+  }
+
+  .button-area-2 {
+    position: absolute;
+    top: 92px;
+    right: 10px;
+
+    a {
+      display: inline-block;
+      width: 27px;
+      height: 27px;
+      border-radius: 15px;
+      border: 1px solid white;
+      margin-left: 5px;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+    }
+
+    span {
+      cursor: pointer;
+    }
+  }
+
+  span { font-size: 14px; }
+  h1 { font-size: 20px; }
+  h3 { font-size: 12px; }
+  h4 { font-size: 10px; }
+}
+
+.session-card > div {
+  padding: 8px;
+  border-radius: 4px;
+  box-shadow: 0 0 20px -14px rgba(0,0,0,0.49);
+}
+
+.selected-session-card {
+  width: 90%;
+  text-align: center;
+}
+
+.plus-card > div {
+  color: #fd9d20;
+  border: 1px solid white;
+  background: #FFFBF3;
+
+  cursor: pointer;
+
+  span {
+    font-size: 10px;
+  }
+}
+
+.orange-color {
+  color: #fd9d20;
+}
+
+.background { box-shadow: 0 0 42px -14px rgba(0,0,0,0.49); }
+
+.background-1 { background:linear-gradient(-90deg, rgb(19, 189, 81) 0%, rgb(12, 117, 50) 80%)!important; }
+.background-2 { background:linear-gradient(-90deg, #F9D423 0%, #ff9e39 80%)!important; }
+.background-3 { background:linear-gradient(-90deg, #13c6b5 0%, #0c7a70 80%)!important; }
+.background-4 { background:linear-gradient(-90deg, #3e2af0 0%, #281992 80%)!important; }
+.background-5 { background:linear-gradient(-90deg, #D8B0FA 0%, #4A13C6 80%)!important; }
+.background-6 { background:linear-gradient(-90deg, #0073FA 0%, #005cc4 80%)!important; }
+.background-7 { background:linear-gradient(-90deg, #EA53C9 0%, #9b3689 80%)!important; }
+.background-8 { background:linear-gradient(-90deg, #13C6B5 0%, #281992 80%)!important; }
+
+.color-cards {
+  margin-top: 0;
+}
+
+.color-cards a {
+  display: inline-block;
+  cursor: pointer;
+}
+.color-cards a span {
+  width: 22px;
+  height: 22px;
+  margin-right: 10px;
+  border: 3px solid white;
+  border-radius: 16px;
+  display: inline-block;
+  transition: border 0.3s ease;
+
+}
+.color-cards a.selected span {
+  border: 3px solid #02B0EF;
+}
+
+h3 {
+  font-size: 22px;
+}
+
+.modal-header {
+  color: white!important;
+  background: #bababa;
+
+  .close {
+    font-size: 36px;
+    color: white !important;
+  }
+}
+
+.ssm-tray {
+  border-radius: 0 0 10px 10px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  display: none;
+  height: 0;
+  transition: top 0.3s ease;
+  margin: 0;
+  background: white;
+  z-index: 1;
+  animation-name: moveUp;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+
+  table {
+    font-size: 12px!important;
+  }
+}
+
+.ssm-tray.opened {
+  display: block;
+  height: 50vh;
+  animation-name: moveDown;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes moveDown {
+  from {
+    transform: translate3d(0, -120px, 0);
+  }
+  to {
+    transform: translate3d(0, 120px, 0);
+  }
+}
+
+
+@keyframes moveUp {
+  from {
+    transform: translate3d(0, 120px, 0);
+  }
+  to {
+    transform: translate3d(0, -120px, 0);
+  }
+}
+
+.mycard {
+  position: relative;
+  z-index: 1;
+}
+.ssm-card {
+  border-radius: 4px;
+  background: white;
+  box-shadow: 0 0 42px -14px rgba(0, 0, 0, 0.49);
+  color: #707070;
+  font-size: 12px;
+  padding: 9px;
+  border: 1px solid #ddd;
+  height: 50px;
+  margin: 5px 0;
+
+  button {
+    font-size: 12px;
+    float: right;
+  }
+}
+
+.ssm-card > div:first-child {
+  float: left;
+  color: #707070;
+  text-align: left;
+}
+
+.list-of-ssm {
+  overflow-y: auto;
+  height: 35vh;
+}
+
+.ssm-ul {
+  height: 28vh
+}
+
+.ssm-tray-opened {
+  animation-name: moveDown;
+  animation-duration: 0.5s;
+  animation-fill-mode: forwards;
+}
+
+.ssm-cards {
+  overflow-y: hidden;
+  height: 420px;
+}
+
+.grayedout {
+  background: #dddddd;
+  color: #707070;
+  border-radius: 4px;
+}
+
+/* CIRCLE RANDOM */
+$cirle-width: 20px;
+
+// You can play with these for a little variation
+$shadow-depth: $cirle-width * 0.4;
+$shadow-depth-hover-ratio: 2;
+$shadow-blur: $shadow-depth * 0;
+$shadow-spread: $shadow-depth * 0;
+
+$y-offset: $shadow-depth * .5;
+$x-offset: $y-offset * 1.7320508076; // √3
+
+$red:    rgba(255,   0,   0, .45);
+$orange: rgba(253, 127,  11, .54);
+$yellow: rgba(235, 255,   0, .54);
+$green:  rgba( 22, 243,   3, .55);
+$blue:   rgba(  0, 133, 255, .53);
+$purple: rgba(190,  11, 224, .55);
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.random {
+  position: relative;
+  width: $cirle-width;
+  border-radius: 50%;
+  transition: all .3s ease;
+
+  box-shadow:
+    inset $x-offset (-$y-offset) $shadow-blur $shadow-spread $red,
+    inset (-$x-offset) (-$y-offset) $shadow-blur $shadow-spread $yellow,
+    inset 0 $shadow-depth $shadow-blur $shadow-spread $blue,
+    inset (-$x-offset) $y-offset $shadow-blur $shadow-spread $green,
+    inset $x-offset $y-offset $shadow-blur $shadow-spread $purple,
+    inset 0 (-$shadow-depth) $shadow-blur $shadow-spread $orange,
+  ;
+
+  animation: spin 120s linear infinite;
+
+  &:before {
+    content: "";
+    display: block;
+    padding-top: 100%;
+  }
+}
+
+.mini-title {
+  margin: 5px 0;
+}
+
+.full-text {
+  color: #707070;
+  font-size: 12px;
+  text-align: center;
+  margin: 20px 0 35px 0;
+}
+
+.account-to-remove {
+  padding: 10px;
+  height: 50vh;
+}
+
+.colored {
+  width: 20px;
+  height: 20px;
+}
+
+.colored, .role, .name {
+  color: #707070;
+  display: block;
+}
+
+.account-to-remove table {
+  width: 100%;
+  font-size: 10px;
+  cursor: pointer!important;
+}
+
+.account-to-remove tr td {
+  padding: 10px 15px;
+  border: 1px solid #bababa;
+}
+
+.account-to-remove tr:hover td, .clicked {
+  background: rgba(255, 248, 186, 0.34);
+}

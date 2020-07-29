@@ -1,0 +1,7 @@
+<div class="profile {{profileOpen ? 'extended' : ''}}">
+  <span class="close-profile" (click)="closeProfile();"><i class="fa fa-times"></i></span>
+
+  <a class="menu-item" (click)="goToProfile();"><i class="fa fa-user"></i>&nbsp;Profile</a>
+  <a class="menu-item" (click)="gotToAccountManagement();" *ngIf="liteClient"><i class="fa fa-cogs"></i>&nbsp;Account Management</a>
+  <a class="menu-item" (click)="logout();"><i class="fa fa-sign-out-alt"></i>&nbsp;Idp Logout</a>
+</div>

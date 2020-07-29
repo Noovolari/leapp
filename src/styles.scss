@@ -1,0 +1,36 @@
+
+/**
+Custom Global styles
+*/
+@import "./assets/scss/palette";
+@import "./assets/scss/mixins/utility";
+@import "./assets/scss/fonts";
+@import "./assets/scss/table";
+@import "./assets/scss/form";
+@import "./assets/scss/toast";
+@import "./assets/scss/global";
+
+/**
+Bootstrap theme override
+ */
+$body-color: $charcoal-grey;
+
+$theme-colors: (
+  'primary': $charcoal-grey,
+  'success': $sick-green,
+  'danger': $copper,
+  'light': #ffffff
+);
+
+/**
+Library scss
+*/
+@import "https://use.fontawesome.com/releases/v5.6.1/css/all.css";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+@import "~bootstrap/dist/css/bootstrap.css";
+
+/**
+Ng Select theme material
+ */
+@import "~@ng-select/ng-select/themes/default.theme.css";
+

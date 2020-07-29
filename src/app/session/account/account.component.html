@@ -1,0 +1,36 @@
+<div class="container-fluid" (click)="showTray($event, null);">
+  <app-profile-sidebar></app-profile-sidebar>
+
+  <app-breadcrumbs [account]="account.accountName"></app-breadcrumbs>
+
+  <h3>Truster Account List</h3>
+  <small>Accounts Trusted from <b>{{account.accountName}}</b> federated account.</small>
+
+  <ul class="cards">
+
+    <li *ngFor="let acc of accounts">
+      <div>
+        <span>
+          <b>{{ ((acc.accountName.length > 27) ? acc.accountName.substr(0, 26) + '&hellip;' : acc.accountName) }}</b>
+          <br>
+          <small>{{acc.accountNumber}}</small>
+        </span>
+
+        <a class="ellipsis" (click)="showTray($event, acc.accountNumber);"><i class="fa fa-ellipsis-v"></i></a>
+        <div  *ngIf="acc.showTray" class="drop-list">
+          <button type="button" (click)="editAccount(acc);"><i class="fa fa-edit"></i>&nbsp;Edit</button>
+          <br>
+          <button type="button" (click)="deleteAccount(acc);"><i class="fa fa-trash"></i>&nbsp;Delete</button>
+        </div>
+      </div>
+    </li>
+
+  </ul>
+
+  <div class="no-data" *ngIf="accounts.length === 0">
+    <span>No account configured.<br>Use the <img src="assets/images/plus-light.png" width="18"/> button to create a new one.</span>
+  </div>
+
+  <app-dropdown [voices]="voices"></app-dropdown>
+
+</div>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <base href="/">
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800&display=swap" rel="stylesheet">
+</head>
+<body>
+<div style="
+    position: fixed;
+    top: 0;
+    left:  0;
+    right:  0;
+    height: 20px;
+    -webkit-user-select: none;
+    -webkit-app-region: drag;
+"></div>
+  <app-root></app-root>
+
+<script>
+  window.log = require('electron-log');
+  window.fs = require('fs');
+  window.rimraf = require('rimraf');
+  window.os = require('os');
+  window.ini = require('ini');
+  window.ipcRenderer = require('electron').ipcRenderer;
+  window.md5File = require('md5-file');
+  window.path = require('path');
+  window.app = require('electron').remote.app;
+  window.currentWindow = require('electron').remote.getCurrentWindow();
+  window.session = require('electron').remote.session;
+  window.dialog = require('electron').remote.dialog;
+  window.exec = require('child_process').exec;
+  window.url = require('url');
+  window.unzip = require('extract-zip');
+  window.copydir = require('copy-dir');
+  window.sudo = require('sudo-prompt');
+  window.semver = require('semver');
+  window.browserWindow = require('electron').remote.BrowserWindow;
+  window.powerMonitor = require('electron').powerMonitor;
+  window.process = process;
+  window.mousetrap = require('mousetrap');
+  window.shell = require('electron').shell;
+  window.Menu = require('electron').remote.Menu;
+  window.Tray = require('electron').remote.Tray;
+  window.MachineId = require('node-machine-id').machineIdSync();
+
+  // Customerly
+  !function(){function e(){let e=t.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://widget.customerly.io/widget/7e213f2a";let r=t.getElementsByTagName("script")[0];r.parentNode.insertBefore(e,r)}let r=window,t=document,n=function(){n.c(arguments)};r.customerly_queue=[],n.c=function(e){r.customerly_queue.push(e)},r.customerly=n,r.attachEvent?r.attachEvent("onload",e):r.addEventListener("load",e,!1)}();
+  window.customerly = customerly;
+
+
+  // Add Blur after Focus effect
+  document.addEventListener('click', function(e) {
+    if(document.activeElement.toString() == '[object HTMLButtonElement]'){
+      document.activeElement.blur();
+    }
+  });
+
+  // Remove manual refresh
+  window.mousetrap.bind(['command+r', 'ctrl+r', 'f5'], function(){ return false; });
+</script>
+</body>
+</html>

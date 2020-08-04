@@ -29,6 +29,7 @@ export class CreateFederatedAccountComponent implements OnInit {
   @Input() selectedRegion;
   @ViewChild('roleInput', { static: false }) roleInput: ElementRef;
 
+  /* Create a new Federated Account */
   constructor(
     private configurationService: ConfigurationService,
     private workspaceService: WorkspaceService,
@@ -42,13 +43,22 @@ export class CreateFederatedAccountComponent implements OnInit {
     this.selectedRegion = this.regions[0].region;
   }
 
+  /**
+   * Set the account number directly from the Idp Arn
+   * @param event - UI event, contains the target which contains a text value
+   */
   setAccountNumber(event) {
     this.form.controls['accountNumber'].setValue(this.appService.extractAccountNumberFromIdpArn(event.target.value));
   }
 
+  /**
+   * Save the new account
+   */
   saveAccount() {
     if (this.form.valid && this.roles.length > 0) {
       try {
+        // Use the service for Federated Account and try creating a new account:
+        // the service retuirn a boolean indicating if the operation went well or not
         const accountCreated = this.fedAccountService.addFederatedAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
@@ -67,6 +77,10 @@ export class CreateFederatedAccountComponent implements OnInit {
     }
   }
 
+  /**
+   * Remove a role from the UI
+   * @param roleName - the role to remove by name
+   */
   removeRole(roleName: string) {
     const index = this.roles.indexOf(roleName);
     if (index > -1) {
@@ -74,17 +88,26 @@ export class CreateFederatedAccountComponent implements OnInit {
     }
   }
 
+  /**
+   * Set a Role from the UI in the Row array for the save method
+   * @param keyEvent - a return key
+   */
   setRoleName(keyEvent) {
     const roleName = this.roleInput.nativeElement.value;
     this.checkDisabled = (roleName !== '');
-
+    // It accept the enter key as a valid input to accept the new role in the array
     if (keyEvent.code === 'Enter' && this.roles.indexOf(roleName) === -1 && roleName !== '') {
       this.roles.push(roleName);
+      // Clean the text area
       this.roleInput.nativeElement.value = null;
       this.checkDisabled = false;
     }
   }
 
+  /**
+   * A decorator that create the roleArn for each role
+   * @param accountNumber - the account number to generate the
+   */
   generateRolesFromNames(accountNumber) {
     const awsRoles = [];
     this.roles.forEach(role => {

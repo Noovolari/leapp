@@ -150,28 +150,44 @@ export class ConfigurationService extends NativeService {
   // ==================== CONFIGURATION FILE ==================== //
   // ============================================================ //
 
+  /**
+   * Verify if the configuration file exists
+   */
   public existsConfigurationFile() {
     return this.fs.exists(environment.lockFileDestination);
   }
 
+  /**
+   * Update the configuration file synchronously
+   * @param config - the configuration object
+   */
   public updateConfigurationFileSync(config: Configuration) {
     return this.fileService.writeFileSync(this.os.homedir() + '/' + environment.lockFileDestination, this.fileService.encryptText(JSON.stringify(config, null, 2)));
   }
 
+  /**
+   * Get the configuration file
+   */
   public getConfigurationFile(): Observable<Configuration> {
     return this.fileService.readFile(this.os.homedir() + '/' + environment.lockFileDestination).pipe(map(result => JSON.parse(this.fileService.decryptText(result))));
   }
 
+  /**
+   * Get the configuration file synchronously
+   */
   public getConfigurationFileSync(): Configuration {
     return JSON.parse(this.fileService.decryptText(this.fileService.readFileSync(this.os.homedir() + '/' + environment.lockFileDestination)));
   }
 
+  /**
+   * Clean the data in the program
+   */
   public cleanData() {
     try {
       // Cleaning Library Electron Cache
       // Get app directory
       // on OSX it's /Users/Yourname/Library/Application Support/AppName
-      const getAppPath = this.path.join(this.app.getPath('appData'), `LookAuth${environment.liteClient ? 'Lite' : ''}`);
+      const getAppPath = this.path.join(this.app.getPath('appData'), `Leapp`);
       this.rimraf.sync(getAppPath);
 
       // Clean localStorage
@@ -179,12 +195,15 @@ export class ConfigurationService extends NativeService {
     } catch (err) {}
   }
 
+  /**
+   * Create a new configuration file synchronously
+   */
   public newConfigurationFileSync() {
     try {
       // Cleaning Library Electron Cache
       // Get app directory
       // on OSX it's /Users/Yourname/Library/Application Support/AppName
-      const getAppPath = this.path.join(this.app.getPath('appData'), `LookAuth${environment.liteClient ? 'Lite' : ''}`);
+      const getAppPath = this.path.join(this.app.getPath('appData'), `Leapp`);
       this.rimraf.sync(getAppPath);
 
       // Clean localStorage
@@ -198,7 +217,7 @@ export class ConfigurationService extends NativeService {
       }, 2000);
 
     } catch (err) {
-      this.appService.toast(_(`LookAuth ${environment.liteClient ? 'Lite' : ''} has an error re-creating your configuration file and cache.`), ToastLevel.ERROR, _('Cleaning configuration file'));
+      this.appService.toast(_(`Leapp has an error re-creating your configuration file and cache.`), ToastLevel.ERROR, _('Cleaning configuration file'));
     }
   }
 

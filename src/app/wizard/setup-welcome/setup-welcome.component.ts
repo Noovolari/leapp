@@ -7,7 +7,7 @@ import {Router} from '@angular/router';
   styleUrls: ['./setup-welcome.component.scss']
 })
 export class SetupWelcomeComponent implements OnInit {
-
+  /* Just send the user to setup federation url */
   constructor(
     private router: Router
   ) { }

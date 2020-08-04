@@ -32,6 +32,9 @@ export class EditFederatedAccountComponent extends AntiMemLeak implements OnInit
   @Input() selectedRegion;
   @ViewChild('roleInput', { static: false }) roleInput: ElementRef;
 
+  /**
+   * Edit a federated account changing  its parameters
+   */
   constructor(
     private configurationService: ConfigurationService,
     private appService: AppService,
@@ -57,10 +60,17 @@ export class EditFederatedAccountComponent extends AntiMemLeak implements OnInit
     this.selectedRegion = this.account.region ? this.account.region : this.regions[0].region;
   }
 
+  /**
+   * Set the new account number directly from the Idp Arn
+   * @param event - the change event
+   */
   setAccountNumber(event) {
     this.form.controls['accountNumber'].setValue(this.appService.extractAccountNumberFromIdpArn(event.target.value));
   }
 
+  /**
+   * Save the edited federated account
+   */
   saveAccount() {
     if (this.form.valid && this.roles.length > 0) {
       try {
@@ -92,6 +102,10 @@ export class EditFederatedAccountComponent extends AntiMemLeak implements OnInit
     }
   }
 
+  /**
+   * Remove the role from the UI
+   * @param roleName - the role name to remove
+   */
   removeRole(roleName: string) {
     const index = this.roles.indexOf(roleName);
     if (index > -1) {
@@ -99,10 +113,14 @@ export class EditFederatedAccountComponent extends AntiMemLeak implements OnInit
     }
   }
 
+  /**
+   * Set the new role name in the array of roles for saving
+   * @param keyEvent - the key event that we listen to
+   */
   setRoleName(keyEvent) {
     const roleName = this.roleInput.nativeElement.value;
     this.checkDisabled = (roleName !== '');
-
+    // Set the role if we press enter
     if (keyEvent.code === 'Enter' && this.roles.indexOf(roleName) === -1 && roleName !== '') {
       this.roles.push(roleName);
       this.roleInput.nativeElement.value = null;
@@ -110,6 +128,7 @@ export class EditFederatedAccountComponent extends AntiMemLeak implements OnInit
     }
   }
 
+  // Decorate the roles with the arn
   generateRolesFromNames(accountNumber) {
     const awsRoles = [];
     this.roles.forEach(role => {
@@ -121,6 +140,7 @@ export class EditFederatedAccountComponent extends AntiMemLeak implements OnInit
     return awsRoles;
   }
 
+  // Return to the list of accounts
   goToList() {
     // Return to list
     this.router.navigate(['/sessions', 'list-accounts']);

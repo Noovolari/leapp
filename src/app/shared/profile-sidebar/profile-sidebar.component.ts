@@ -13,13 +13,10 @@ import {HttpClient} from '@angular/common/http';
 })
 export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
 
-  // tell us if we are in lite client mode or not
-  liteClient = environment.liteClient;
-
   profileOpen = false;
-
   test: any;
 
+  /* Profile Sidebar with links */
   constructor(
     private appService: AppService,
     private configurationService: ConfigurationService,
@@ -38,7 +35,7 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
   }
 
   /**
-   * logout from LookAuth
+   * logout from Leapp
    */
   logout() {
     this.httpClient.get('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe(res => {}, err => {

@@ -13,7 +13,6 @@ import {EditTrusterAccountComponent} from './edit-truster-account/edit-truster-a
 import {EditFederatedAccountComponent} from './edit-federated-account/edit-federated-account.component';
 import {AccountComponent} from './account/account.component';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
-import {SessionChooseComponent} from './session-choose/session-choose.component';
 
 
 @NgModule({
@@ -25,8 +24,7 @@ import {SessionChooseComponent} from './session-choose/session-choose.component'
     ListAccountsComponent,
     EditTrusterAccountComponent,
     EditFederatedAccountComponent,
-    AccountComponent,
-    SessionChooseComponent
+    AccountComponent
   ],
   imports: [
     CommonModule,

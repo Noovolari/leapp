@@ -10,9 +10,9 @@ exports.default = async function notarizing(context) {
   const appName = context.packager.appInfo.productFilename;
 
   return await notarize({
-    appBundleId: 'com.noovolari.lookauth',
+    appBundleId: 'com.noovolari.leapp',
     appPath: `${appOutDir}/${appName}.app`,
     appleId: "mobile@besharp.it",
-    appleIdPassword: `@keychain:LookAuth`,
+    appleIdPassword: `@keychain:Leapp`,
   });
 };

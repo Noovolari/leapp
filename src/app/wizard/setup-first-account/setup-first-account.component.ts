@@ -31,6 +31,7 @@ export class SetupFirstAccountComponent implements OnInit {
     myRegion: new FormControl('', [Validators.required])
   });
 
+  /* Setup the first account for the application */
   constructor(
     private configurationService: ConfigurationService,
     private appService: AppService,
@@ -63,18 +64,21 @@ export class SetupFirstAccountComponent implements OnInit {
         const workspace = this.configurationService.getDefaultWorkspaceSync();
         const configuration = this.configurationService.getConfigurationFileSync();
 
+        // Add a federation Account to the workspace
         this.fedAccountService.addFederatedAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
           this.generateRolesFromNames(this.form.value.accountNumber),
           this.form.value.idpArn, this.form.value.myRegion);
 
+        // When you create an account you also define a possible session: in this case, being the only one we default it to true
         this.sessionService.addSession(
           this.form.value.accountNumber,
           this.generateRolesFromNames(this.form.value.accountNumber)[0].name,
           `background-1`,
           true);
 
+        // When we define a new session and we want to activate it: use the refresh credential emit
         this.credentialsService.refreshCredentialsEmit.emit();
 
         // Then go to the dashboard

@@ -11,6 +11,7 @@ export class BreadcrumbsComponent implements OnInit {
   @Input()
   account;
 
+  /* Just a simple component to show breadcrumbs in the create session list */
   constructor(private router: Router) { }
 
   ngOnInit() {

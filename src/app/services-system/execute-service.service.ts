@@ -67,8 +67,8 @@ export class ExecuteServiceService extends NativeService {
           command = command.substring(5, command.length);
         }
 
-        exec(command, {name: 'LookAuth'}, (err, stdout, stderr) => {
-          this.log.info('execute from LookAuth: ', {error: err, standardout: stdout, standarderror: stderr});
+        exec(command, {name: 'Leapp'}, (err, stdout, stderr) => {
+          this.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
           if (err) {
             subscriber.error(err);
           } else {

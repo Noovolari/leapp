@@ -1,4 +1,4 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Workspace} from '../../models/workspace';
 import {AppService} from '../../services-system/app.service';
@@ -13,10 +13,12 @@ export class SessionWalletComponent implements OnInit {
   name = '';
   email = '';
 
+  /* Used a layout to contain all the sesison in the main screen and can be extended in the future with extra functionality */
   constructor(
     private appService: AppService,
     private configurationService: ConfigurationService
   ) { }
+
 
   ngOnInit() {
     const workspaceData: Workspace = this.configurationService.getDefaultWorkspaceSync();
@@ -28,7 +30,7 @@ export class SessionWalletComponent implements OnInit {
 
   /**
    * Simple method to go to noovolari website
-   * @param - url - noovolari suite url
+   * @param url - noovolari suite url
    */
   goToWebsite(url) {
     this.appService.openExternalUrl(url);

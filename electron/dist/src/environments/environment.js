@@ -4,8 +4,8 @@
 // The list of file replacements can be found in `angular.json`.
 Object.defineProperty(exports, "__esModule", { value: true });
 var environment = {
+    appName: 'Leapp',
     sessionDuration: 1200,
-    liteClient: true,
     lockFileDestination: '',
     python3Version: '3.4.0',
     production: false,
@@ -34,5 +34,5 @@ var environment = {
     }
 };
 exports.environment = environment;
-environment.lockFileDestination = ".LookAuth" + (environment.liteClient ? 'Lite' : '') + "/LookAuth" + (environment.liteClient ? 'Lite' : '') + "-lock.json";
+environment.lockFileDestination = ".Leapp/Leapp-lock.json";
 //# sourceMappingURL=environment.js.map

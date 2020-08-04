@@ -9,16 +9,23 @@ import {TrusterAccountService} from './truster-account.service';
 })
 export class FederatedAccountService extends NativeService {
 
-  constructor(
-    private configurationService: ConfigurationService,
-    private trusterAccountService: TrusterAccountService) {
+  constructor(private configurationService: ConfigurationService) {
     super();
   }
 
+  /**
+   * Add a new Federated Account to workspace
+   * @param accountNumber - the account number
+   * @param accountName - the account name
+   * @param awsRoles - the list of roles [] to add to the account
+   * @param idpArn - the idp arn as it is federated
+   * @param region - the default region to use when selected for credentials
+   */
   addFederatedAccountToWorkSpace(accountNumber: number, accountName: string, awsRoles: any[], idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
+    // Verify it not exists
     const test = workspace.accountRoleMapping.accounts.filter(a => a.accountNumber === accountNumber);
     if (!test || test.length === 0) {
       // add new account
@@ -43,16 +50,27 @@ export class FederatedAccountService extends NativeService {
     }
   }
 
+  /**
+   * List all federated account in the workspace
+   */
   listFederatedAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     return workspace.accountRoleMapping.accounts.filter(ele => (ele.parent === undefined && ele.awsRoles[0].parent === undefined));
   }
 
+  /**
+   * Get A federated account given the account number
+   * @param accountNumber - the account number to filter the account
+   */
   getFederatedAccountInWorkSpace(accountNumber: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     return workspace.accountRoleMapping.accounts.filter(ele => (ele.accountNumber === accountNumber))[0];
   }
 
+  /**
+   * Delete a federated account
+   * @param accountNumber - account number of the account to delete
+   */
   deleteFederatedAccount(accountNumber: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === accountNumber));
@@ -67,7 +85,11 @@ export class FederatedAccountService extends NativeService {
       }
 
       // delete sessions active session
-      workspace.currentSessionList = workspace.currentSessionList.filter(session => (session.accountData.accountNumber.toString() !== accountNumber.toString()));
+      let sessionIndex = workspace.currentSessionList.indexOf(session => (session.accountData.accountNumber !== accountNumber));
+      while (sessionIndex !== -1) {
+        workspace.currentSessionList.splice(sessionIndex, 1);
+        sessionIndex = workspace.currentSessionList.indexOf(session => (session.accountData.accountNumber !== accountNumber));
+      }
       this.configurationService.updateWorkspaceSync(workspace);
       return true;
     } else {
@@ -76,6 +98,10 @@ export class FederatedAccountService extends NativeService {
 
   }
 
+  /**
+   * Update a federated account
+   * @param account - the account to be updated
+   */
   updateFederatedAccount(account: AwsAccount) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === account.accountNumber));

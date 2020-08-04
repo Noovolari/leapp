@@ -42,6 +42,9 @@ export class EditTrusterAccountComponent extends AntiMemLeak implements OnInit {
     federatedRole: new FormControl('', [Validators.required]),
   });
 
+  /**
+   * Edit a truster account
+   */
   constructor(
     private configurationService: ConfigurationService,
     private appService: AppService,
@@ -52,18 +55,24 @@ export class EditTrusterAccountComponent extends AntiMemLeak implements OnInit {
   ) {
     super();
 
+    // Get all the registered federated accounts
     this.accounts = this.federatedAccountService.listFederatedAccountInWorkSpace();
 
+    // Wait until the the active route is ready...
     const sub = this.activatedRoute.queryParams.subscribe(params => {
       this.account = this.trusterAccountService.getTrusterAccountInWorkSpace(params['accountId']);
 
+      // Select the current truster account
       this.selectedAccount = this.account;
+      // Get the account number  verifying the parent: this is done to maintain old client configuration
       this.selectedAccountNumber = (this.account.parent || this.account.awsRoles[0].parent);
+      // Get the role
       this.selectedRole = (this.account.parentRole || this.account.awsRoles[0].parentRole);
-
+      // Obtain parent account id
       const parentAccount = this.federatedAccountService.getFederatedAccountInWorkSpace(this.account.awsRoles[0].parent);
       this.parentAccountId = parentAccount.accountId;
 
+      // Finally get the roles' name
       this.roles = parentAccount.awsRoles;
       this.rolesT = this.account.awsRoles.map(r => r.name);
 
@@ -78,10 +87,15 @@ export class EditTrusterAccountComponent extends AntiMemLeak implements OnInit {
     this.selectedRegion = this.account.region ? this.account.region : this.regions[0].region;
   }
 
+  /**
+   * Change the roles based on the selected account
+   * @param event - the change event
+   */
   changeRoles(event) {
     this.roles = event.awsRoles;
   }
 
+  // Save the edited account
   saveAccount() {
     if (this.form.valid && this.rolesT.length > 0) {
 
@@ -107,6 +121,10 @@ export class EditTrusterAccountComponent extends AntiMemLeak implements OnInit {
     }
   }
 
+  /**
+   * Remove a role
+   * @param roleName - role name to remove
+   */
   removeRole(roleName: string) {
     const index = this.rolesT.indexOf(roleName);
     if (index > -1) {
@@ -114,6 +132,10 @@ export class EditTrusterAccountComponent extends AntiMemLeak implements OnInit {
     }
   }
 
+  /**
+   * Set the new role name when the user press enter
+   * @param keyEvent - the key event we listen to, contains the pressed key
+   */
   setRoleName(keyEvent) {
     const roleName = this.roleInput.nativeElement.value;
     this.checkDisabled = (roleName !== '');
@@ -125,6 +147,10 @@ export class EditTrusterAccountComponent extends AntiMemLeak implements OnInit {
     }
   }
 
+  /**
+   * Generate the Aws Roles
+   * @param accountNumber - the account number we use to define the role arn
+   */
   generateRolesFromNames(accountNumber) {
     const awsRoles = [];
     this.rolesT.forEach(role => {
@@ -139,6 +165,9 @@ export class EditTrusterAccountComponent extends AntiMemLeak implements OnInit {
     return awsRoles;
   }
 
+  /**
+   * Return to the account list
+   */
   goToList() {
     // Return to list
     this.router.navigate(['/sessions', 'account'], { queryParams: { accountId: this.parentAccountId }});

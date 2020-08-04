@@ -11,8 +11,6 @@ import {SetupFirstAccountComponent} from './setup-first-account/setup-first-acco
 import {SetFederationUrlComponent} from './set-federation-url/set-federation-url.component';
 import {SetupSpinnerForLoginComponent} from './setup-spinner-for-login/setup-spinner-for-login.component';
 import {WelcomeFirstAccountComponent} from './welcome-first-account/welcome-first-account.component';
-import {SetupWorkspaceComponent} from './setup-workspace/setup-workspace.component';
-import {SetupLicenceComponent} from './setup-licence/setup-licence.component';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
 
 @NgModule({
@@ -22,9 +20,7 @@ import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
     SetupFirstAccountComponent,
     SetFederationUrlComponent,
     SetupSpinnerForLoginComponent,
-    WelcomeFirstAccountComponent,
-    SetupWorkspaceComponent,
-    SetupLicenceComponent],
+    WelcomeFirstAccountComponent],
   imports: [
     CommonModule,
     WizardRoutingModule,

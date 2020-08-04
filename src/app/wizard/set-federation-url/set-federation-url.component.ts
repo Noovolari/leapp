@@ -15,6 +15,7 @@ export class SetFederationUrlComponent implements OnInit {
     federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
   });
 
+  /* Set federation url serves as a way to set the Federation url for the applicatioon which is saved and used in all the app */
   constructor(
     private appService: AppService,
     private configurationService: ConfigurationService,

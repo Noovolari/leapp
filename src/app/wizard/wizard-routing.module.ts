@@ -6,41 +6,31 @@ import { SetupFirstAccountComponent } from './setup-first-account/setup-first-ac
 import { SetFederationUrlComponent } from './set-federation-url/set-federation-url.component';
 import { SetupSpinnerForLoginComponent } from './setup-spinner-for-login/setup-spinner-for-login.component';
 import { WelcomeFirstAccountComponent } from './welcome-first-account/welcome-first-account.component';
-import {SetupWorkspaceComponent} from './setup-workspace/setup-workspace.component';
-import {SetupLicenceComponent} from './setup-licence/setup-licence.component';
 
 const routes: Routes = [
   {
     path: 'dependencies',
-    component: DependenciesPageComponent
+    component: DependenciesPageComponent // Used to check for evewntual dependencies and anything necessary to make the app running; is also the place where you can put validation checks
   },
   {
     path: 'setup-welcome',
-    component: SetupWelcomeComponent
-  },
-  {
-    path: 'setup-licence',
-    component: SetupLicenceComponent
+    component: SetupWelcomeComponent // Just a welcome page
   },
   {
     path: 'setup-first-account',
-    component: SetupFirstAccountComponent
+    component: SetupFirstAccountComponent // Setup the first account
   },
   {
     path: 'setup-federation-url',
-    component: SetFederationUrlComponent
+    component: SetFederationUrlComponent // Page for setting the Federation Url
   },
   {
     path: 'setup-spinner-for-login',
-    component: SetupSpinnerForLoginComponent
+    component: SetupSpinnerForLoginComponent // This page is used when a strategy is doing SSO so a spinner waiting for Google response runs
   },
   {
     path: 'welcome-first-account',
-    component: WelcomeFirstAccountComponent
-  },
-  {
-    path: 'setup-workspace',
-    component: SetupWorkspaceComponent
+    component: WelcomeFirstAccountComponent // Setup the first account
   }
 ];
 

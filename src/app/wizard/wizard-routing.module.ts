@@ -10,7 +10,7 @@ import { WelcomeFirstAccountComponent } from './welcome-first-account/welcome-fi
 const routes: Routes = [
   {
     path: 'dependencies',
-    component: DependenciesPageComponent // Used to check for evewntual dependencies and anything necessary to make the app running; is also the place where you can put validation checks
+    component: DependenciesPageComponent // Used to check for eventual dependencies and anything necessary to make the app running; is also the place where you can put validation checks
   },
   {
     path: 'setup-welcome',

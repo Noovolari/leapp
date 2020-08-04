@@ -7,9 +7,6 @@ import {Observable} from 'rxjs';
 import {AppService, LoggerLevel, ToastLevel} from './app.service';
 import {Workspace} from '../models/workspace';
 import {Configuration} from '../models/configuration';
-import {initialConfiguration} from '../core/initial-configuration';
-import * as CryptoJS from 'crypto-js';
-import {aesPassword} from '../core/enc';
 import {_} from '../core/translation-marker';
 
 
@@ -227,7 +224,7 @@ export class ConfigurationService extends NativeService {
 
   /**
    * Get a filtered Workspace
-   * @param config - the configuration file called .be-auth.lock
+   * @param config - the configuration file called .Leapp-lock
    * @param name - the workspace to search
    * @returns the {Workspace} or null if nothing is found
    */

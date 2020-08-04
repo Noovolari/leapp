@@ -6,7 +6,7 @@
 export const environment = {
   python3Version: '3.4.0',
   production: false,
-  lockFileDestination: '.look-auth/look-auth-lock.json',
+  lockFileDestination: '.leapp/leapp-lock.json',
   allEndpoint: '/all',
   tosApiG: '/term-of-service',
   adminToolApiG: '/admin-tools',

@@ -51,7 +51,7 @@ const setupWorkspace = () => {
       fs.mkdirSync(os.homedir() + '/.aws');
     } catch (err) {
 
-      log.warn('directory look-auth or aws already exist');
+      log.warn('directory leapp or aws already exist');
     } finally {
       try {
 

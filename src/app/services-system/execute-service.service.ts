@@ -9,7 +9,7 @@ export class ExecuteServiceService extends NativeService {
 
   // This is used to interrupt an install procedure
   private interrupted = false;
-
+  // TODO: needed? don't think so
   // The commands for installing the dependencies in the different operative system
   // Now the are not used as per MVP request we only check for aws_cli_check
   private commands = {

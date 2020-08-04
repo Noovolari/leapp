@@ -61,6 +61,7 @@ export class WorkspaceService extends NativeService {
    * @param workspaceName - parameter that we use to identify our workspace a.k.a. our company, this is defined by the admin.
    * @returns - {Observable<{idpUrl: string; cognitoUrl: string}>} this is the structure of the response call
    */
+  // TODO: why we still call API Gateway?
   getIdpUrl(workspaceName: string) {
     const baseUrl = environment.apiGateway.url + environment.apiGateway.authUrl;
     return this.httpClient.get<{idpUrl: string, responseType: string}>(baseUrl + '/get', {

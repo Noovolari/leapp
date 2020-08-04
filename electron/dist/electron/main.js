@@ -37,7 +37,7 @@ var windowDefaultConfig = {
         width: 430,
         height: 600,
         title: "",
-        icon: path.join(__dirname, "assets/images/LookAuth.png"),
+        icon: path.join(__dirname, "assets/images/Leapp.png"),
         resizable: false,
         titleBarStyle: 'hidden',
         webPreferences: {
@@ -50,11 +50,11 @@ var windowDefaultConfig = {
 // Define the aws credentials path from config file in *src/environments*
 var workspacePath = os.homedir() + '/' + environment_1.environment.lockFileDestination;
 var awsCredentialsPath = os.homedir() + '/' + environment_1.environment.credentialsDestination;
-// Setup the first workspace in order to define the .LookAuthLite directory and the .aws one
+// Setup the first workspace in order to define the .Leapp directory and the .aws one
 var setupWorkspace = function () {
     try {
-        // Generate .LookAuthLite and .aws directories for future works
-        fs.mkdirSync(os.homedir() + '/.LookAuth' + (environment_1.environment.liteClient ? 'Lite' : ''));
+        // Generate .Leapp and .aws directories for future works
+        fs.mkdirSync(os.homedir() + '/.Leapp');
         fs.mkdirSync(os.homedir() + '/.aws');
     }
     catch (err) {

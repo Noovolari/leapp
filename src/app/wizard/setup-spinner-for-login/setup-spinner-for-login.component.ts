@@ -13,8 +13,6 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 })
 export class SetupSpinnerForLoginComponent extends AntiMemLeak implements OnInit {
 
-  liteClient = environment.liteClient;
-
   constructor(
     private appService: AppService,
     private workspaceService: WorkspaceService,
@@ -44,29 +42,15 @@ export class SetupSpinnerForLoginComponent extends AntiMemLeak implements OnInit
    * When the data from Google is received, generate a new workspace or check errors, etc.
    */
   createNewWorkspace(googleToken, federationUrl, responseType) {
-    const name = this.liteClient ? 'default' : localStorage.getItem('workspace');
+
+    const name = 'default';
     const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, name, responseType);
     if (result) {
       // Go to first account page
-      if (this.liteClient) {
-
-        this.router.navigate(['/wizard', 'welcome-first-account']);
-      } else {
-
-        // Retrieve the entire configuration using the google token we have generated just before
-        this.workspaceService.getConfiguration().subscribe(res => {
-
-          this.router.navigate(['/sessions', 'session-selected']);
-        }, err => {
-          // Error: return to dependencies page
-          this.appService.toast('Error retrieving remote configuration, please retry', ToastLevel.WARN, 'Remote Configuration Retrieval Error');
-          this.router.navigate(['/wizard', 'dependencies']);
-        });
-      }
+      this.router.navigate(['/wizard', 'welcome-first-account']);
     } else {
       // Error: return to dependencies page
       this.router.navigate(['/wizard', 'dependencies']);
     }
-
   }
 }

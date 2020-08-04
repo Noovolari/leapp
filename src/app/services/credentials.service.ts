@@ -34,7 +34,6 @@ export class CredentialsService extends NativeService {
   private refreshCredentials() {
     // Get all the info we need
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    console.log();
 
     if (!workspace.idpUrl) {
       return 'workspace not set';
@@ -58,9 +57,9 @@ export class CredentialsService extends NativeService {
         this.workspaceService.sendSessionUpdateToBackend(null);
       }
 
-
       // Start Calculating time here once credentials are actually retrieved
       this.startTime = new Date();
+
       // If the timer is not set, set the unique timer object and fix the starting time
       if (this.timer === undefined || this.timer === null) {
         this.timer = setInterval(() => {
@@ -87,6 +86,9 @@ export class CredentialsService extends NativeService {
     }
   }
 
+  /**
+   * Process the actual refresh credential check: if we are over the sessionDuration parameters we need to refresh credentials
+   */
   private processRefreshCredentials() {
     if (this.startTime) {
       const currentTime = new Date();
@@ -98,6 +100,10 @@ export class CredentialsService extends NativeService {
     }
   }
 
+  /**
+   * Method that is launched when credential are emitted by the workspace service
+   * @param res - contain the status the operation
+   */
   private processCredentials(res: any) {
     if (res.status === 'ok') {
       this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');

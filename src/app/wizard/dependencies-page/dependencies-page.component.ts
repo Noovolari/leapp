@@ -6,7 +6,6 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
-import {LicenceService} from '../../services/licence.service';
 
 @Component({
   selector: 'app-wizard-page',
@@ -15,13 +14,9 @@ import {LicenceService} from '../../services/licence.service';
 })
 export class DependenciesPageComponent extends AntiMemLeak implements OnInit, AfterViewInit {
 
-  // tell us if we are in lite client mode or not
-  liteClient = environment.liteClient;
-
   private OS: string;
 
   @Input() versionLabel = '...';
-  @Input() licenceLabel = '...';
 
   enabled = false;
   showCLiError = false;
@@ -30,16 +25,17 @@ export class DependenciesPageComponent extends AntiMemLeak implements OnInit, Af
   cliError = false;
 
   loading = true;
-
   licenceErrorMessage;
 
+  /**
+   * Dependencies Page is used to check if we already have the correct configuratrion and send you to the session page or to the setup wizard otherwise
+   */
   constructor(
     private router: Router,
     private exec: ExecuteServiceService,
     public app: AppService,
     private configurationService: ConfigurationService,
     private workspaceService: WorkspaceService,
-    private licenceService: LicenceService
   ) {
     super();
 
@@ -81,69 +77,33 @@ export class DependenciesPageComponent extends AntiMemLeak implements OnInit, Af
   resolveDependenciesMvp() {
     this.loading = true;
 
-    // Resolve licence here
-    console.log();
-
-
-    let sub = this.licenceService.checkLicence().subscribe(licenceOk => {
-
-      // Valid Licence already go on as always
-      sub = this.exec.execute(this.exec.getAwsCliCheck(this.OS), true).subscribe(ok => {
-        const workspace = this.configurationService.getDefaultWorkspaceSync();
-        if (workspace.accountRoleMapping &&
-            workspace.accountRoleMapping.accounts &&
-            workspace.accountRoleMapping.accounts.length > 0) {
-          // Stop the loader
-          this.loading = false;
-          // We already have at least one default account to start, let's go to session page
-          this.router.navigate(['/sessions', 'session-selected']);
-        } else {
-          // We need to setup at least on e Principal Account and Role (aka Federated one)
-          // But we also check for the new liteClient variable: if true we go to the setup,
-          // otherwise we go directly to the session download as we need the list
-          if (this.liteClient) {
-            // Stop the loader
-            this.loading = false;
-            this.router.navigate(['/wizard', 'setup-welcome']);
-          } else {
-            // Stop the loader
-            this.loading = false;
-            this.router.navigate(['/wizard', 'setup-workspace']);
-          }
-        }
-      }, ko => {
+    // Valid Licence already go on as always
+    const sub = this.exec.execute(this.exec.getAwsCliCheck(this.OS), true).subscribe(ok => {
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      if (workspace.accountRoleMapping &&
+          workspace.accountRoleMapping.accounts &&
+          workspace.accountRoleMapping.accounts.length > 0) {
         // Stop the loader
         this.loading = false;
-        // Show the cli error subpage
-        this.licenceError = false;
-        this.genericError = false;
-        this.cliError = true;
-        this.showCLiError = true;
-        this.app.logger('user does not have aws cli installed: ' + ko, LoggerLevel.WARN);
-
-      });
-
-      this.subs.add(sub);
-    }, licenceKo => {
+        // We already have at least one default account to start, let's go to session page
+        this.router.navigate(['/sessions', 'session-selected']);
+      } else {
+        // We need to setup at least on e Principal Account and Role (aka Federated one)
+        // But we also check for the new liteClient variable: if true we go to the setup,
+        // otherwise we go directly to the session download as we need the list
+        // Stop the loader
+        this.loading = false;
+        this.router.navigate(['/wizard', 'setup-welcome']);
+      }
+    }, ko => {
       // Stop the loader
       this.loading = false;
-
-      // Here we are checking the licence as we:
-      // a) don't have a licence yet - go to the licence page
-      // b) have a generic error in the licence for whatever reasons - show the licence error subpage
-      if (licenceKo.newLicence) {
-        // Go to new licence page
-        this.router.navigate(['/wizard', 'setup-licence']);
-
-      } else {
-        // Show the licence error subpage
-        this.licenceErrorMessage = licenceKo.message;
-        this.licenceError = true;
-        this.genericError = false;
-        this.cliError = false;
-        this.showCLiError = true;
-        this.app.logger('user does not have valid licence installed: ' + licenceKo.message, LoggerLevel.WARN);
-      }
+      // Show the cli error subpage
+      this.licenceError = false;
+      this.genericError = false;
+      this.cliError = true;
+      this.showCLiError = true;
+      this.app.logger('user does not have aws cli installed: ' + ko, LoggerLevel.WARN);
     });
 
     this.subs.add(sub);

@@ -8,25 +8,20 @@ import { ListAccountsComponent } from './list-accounts/list-accounts.component';
 import { EditFederatedAccountComponent } from './edit-federated-account/edit-federated-account.component';
 import { EditTrusterAccountComponent } from './edit-truster-account/edit-truster-account.component';
 import { AccountComponent } from './account/account.component';
-import { SessionChooseComponent } from './session-choose/session-choose.component';
 
 
 const routes: Routes = [
   {
     path: '',
-    component: SessionWalletComponent,
+    component: SessionWalletComponent, // Used as a layout for the sessions
     children: [
       {
         path: 'account',
-        component: AccountComponent
+        component: AccountComponent // Used to define the account list when in a specific account
       },
       {
         path: 'session-selected',
-        component: SessionComponent
-      },
-      {
-        path: 'session-chooser',
-        component: SessionChooseComponent
+        component: SessionComponent // the actual screen where you manage the session credentials
       },
       {
         path: 'create-federated-account',

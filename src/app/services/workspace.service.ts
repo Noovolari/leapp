@@ -224,35 +224,6 @@ export class WorkspaceService extends NativeService {
   }
 
   refreshSessionUpdateToBackend(accountName: string) {
-    const liteClient = environment.liteClient;
-    if (!liteClient) {
-
-      const status = accountName ? SessionStatus.START : SessionStatus.STOP;
-
-      return this.cognitoService.getCognitoAuthorizationToken(this.idpWindow).pipe(switchMap(
-        (cognitoAuth) => this.httpClient.post(
-          environment.apiGateway.url + 'users/work_on',
-          {accountName},
-          {headers: new HttpHeaders({Authorization: 'Bearer ' + cognitoAuth.id_token, 'token-id': cognitoAuth.id_token})})),
-        tap(res => {
-          this.appService.logger(`Sent account ${SessionStatus[status]} signal for ${accountName} to backend at ${new Date().toString()}`, LoggerLevel.INFO);
-          this.sentSessionUpdateEvent.emit({
-            accountName,
-            status,
-            message: `Sent account ${SessionStatus[status]} signal for ${accountName} to backend at ${new Date().toString()}`
-          });
-        }),
-        catchError((err) => {
-          this.appService.logger(`Sent account ${SessionStatus[status]} signal error for ${accountName}: ${err.message.toString()}`, LoggerLevel.ERROR);
-          this.sentSessionUpdateEvent.emit({
-            accountName,
-            status: SessionStatus.ERROR,
-            message: `Sent account ${SessionStatus[status]} signal error for ${accountName}: ${err.message.toString()}`
-          });
-          return of(err);
-        })
-      );
-    }
     return of(null);
   }
 

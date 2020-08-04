@@ -19,7 +19,6 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   name = '';
   email = '';
   idpUrlValue;
-
   workspaceData: Workspace;
 
   // Modal Reference and data
@@ -29,6 +28,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     idpUrl: new FormControl('', [Validators.required]),
   });
 
+  /* Simple profile page: shows the Idp Url and the workspace json */
   constructor(
     private configurationService: ConfigurationService,
     private appService: AppService,

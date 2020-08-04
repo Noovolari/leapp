@@ -20,9 +20,6 @@ import {SessionService} from '../../services/session.service';
 })
 export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
-  // tell us if we are in lite client mode or not
-  liteClient = environment.liteClient;
-
   // Session Data
   sessions: SessionObject[] = [];
 
@@ -188,17 +185,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   refreshRoleMapping(template) {
 
     this.currentSelectedRole = null;
-
-    // If we are in pro mode we call the get configuration here to update the default workspace
-    if (!this.liteClient) {
-      this.getConfigurationIfPro(template);
-    } else {
-      // Do it now!
-      this.refreshRoleMappingOperation();
-      this.currentSelectedColor = 0;
-      this.modalRef = this.modalService.show(template);
-      this.isGettingConf = false;
-    }
+    // Do it now: refresh role mapping!
+    this.refreshRoleMappingOperation();
+    this.currentSelectedColor = 0;
+    this.modalRef = this.modalService.show(template);
+    this.isGettingConf = false;
   }
 
   /**

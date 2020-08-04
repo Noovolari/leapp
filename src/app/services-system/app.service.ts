@@ -6,11 +6,6 @@ import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirm
 import {BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
-import {initialConfiguration} from '../core/initial-configuration';
-import {aesPassword} from '../core/enc';
-import {SessionService} from '../services/session.service';
-import {CredentialsService} from '../services/credentials.service';
-import {WorkspaceService} from '../services/workspace.service';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +18,7 @@ export class AppService extends NativeService {
 
   currentTray;
 
+  /* This service is defined to provide different app wide methods as utilities */
   constructor(
     private fileService: FileService,
     private toastr: ToastrService,
@@ -31,10 +27,16 @@ export class AppService extends NativeService {
     super();
   }
 
+  /**
+   * Return the app object from node
+   */
   getApp() {
     return this.app;
   }
 
+  /**
+   * Return Electron ipcRenderer
+   */
   getIpcRenderer() {
     return this.ipcRenderer;
   }
@@ -158,7 +160,8 @@ export class AppService extends NativeService {
         y: y + 50
       });
     }
-    return new this.browserWindow(opts);
+    const newWin = new this.browserWindow(opts);
+    return newWin;
   }
 
   /**
@@ -189,6 +192,7 @@ export class AppService extends NativeService {
    * Show a toast message with different styles for different type of toast
    * @param message - the message to show
    * @param type - the type of message from Toast Level
+   * @param title - [optional]
    */
   toast(message, type, title?: string) {
     switch (type) {
@@ -247,8 +251,8 @@ export class AppService extends NativeService {
 
   /**
    * Confirmation dialog popup!
-   * @param - {string} message - the message to show
-   * @param - callback - the callback for the ok button to launch
+   * @param message - the message to show
+   * @param callback - the callback for the ok button to launch
    */
   confirmDialog(message: string, callback: any) {
     this.modalService.show(ConfirmationDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { message, callback}});
@@ -256,7 +260,7 @@ export class AppService extends NativeService {
 
   /**
    * With this one you can open an url in an external browser
-   * @param - url - url to open
+   * @param url - url to open
    */
   openExternalUrl(url) {
     this.shell.openExternal(url);
@@ -275,7 +279,7 @@ export class AppService extends NativeService {
 
   /**
    * Extract an account number from a AWS arn
-   * @param - value - arn value
+   * @param value - arn value
    * @returns - {any} - the
    */
   extractAccountNumberFromIdpArn(value) {
@@ -298,7 +302,7 @@ export class AppService extends NativeService {
 
   /**
    * Get all typical EC2 regions
-   * @param - {boolean} useDefault - to show no region
+   * @param useDefault - to show no region
    * @returns - {{region: string}[]} - all the regions in array format
    */
   getRegions(useDefault?: boolean) {
@@ -351,13 +355,13 @@ export class AppService extends NativeService {
     const contextMenu = this.Menu.buildFromTemplate([
 
       { label: 'Show', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); } },
-      { label: 'About', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); this.dialog.showMessageBox({ icon: __dirname + `/assets/images/LookAuth.png`, message: `Noovolari LookAuth${environment.liteClient ? ' Lite.' : '.'}\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok'] }); } },
+      { label: 'About', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); this.dialog.showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Noovolari Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 noovolari srl.', buttons: ['Ok'] }); } },
       { type: 'separator' },
       { label: 'Quit', type: 'normal', click: (menuItem, browserWindow, event) => { this.fs.writeFileSync(awsCredentialsPath, ''); this.app.exit(0); } },
     ]);
 
-    this.currentTray = new this.Tray(__dirname + `/assets/images/LookAuthMini.png`);
-    this.currentTray.setToolTip('LookAuth Lite');
+    this.currentTray = new this.Tray(__dirname + `/assets/images/LeappMini.png`);
+    this.currentTray.setToolTip('Leapp');
     this.currentTray.setContextMenu(contextMenu);
   }
 
@@ -381,7 +385,9 @@ export enum LoggerLevel {
   WARN,
   ERROR
 }
-
+/*
+* External enum to the toast level so we can use this to define the type of log
+*/
 export enum ToastLevel {
   INFO,
   WARN,

@@ -19,6 +19,7 @@ export class AccountComponent extends AntiMemLeak implements OnInit {
   public fullAccounts;
   public workspace;
 
+  /* Account component si the page where we have the main account chooser */
   constructor(
     private appService: AppService,
     private router: Router,
@@ -28,14 +29,21 @@ export class AccountComponent extends AntiMemLeak implements OnInit {
   ) { super(); }
 
   ngOnInit() {
+    // Get the default workspace
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
+    // When you are routed to the current page...
     const sub = this.activatedRoute.queryParams.subscribe(params => {
+      // Retrieve the information about account id
+      // Get the accounts stored in the current configurations
+      // Get the current active account if any
+      // Get the truster accounts given the current accounts if any
       const accountId = params['accountId'];
       this.fullAccounts = this.configurationService.getDefaultWorkspaceSync().accountRoleMapping.accounts;
       this.account = this.fullAccounts.filter(el => el.accountId.toString() === accountId.toString())[0];
       this.accounts = this.trusterAccountService.listTrusterAccountInWorkSpace(accountId);
 
+      // Voices for the dropdown menu
       this.voices = [
         {route: ['/sessions', 'create-truster-account'], label: 'Truster Account', queryParams: { accountId: this.account.accountId }},
       ];
@@ -44,22 +52,29 @@ export class AccountComponent extends AntiMemLeak implements OnInit {
     this.subs.add(sub);
   }
 
+  /**
+   * Delete the selected account
+   * @param account - Aws Account to remove
+   */
   deleteAccount(account: AwsAccount) {
     this.appService.confirmDialog('do you really want to delete this account?', () => {
       this.trusterAccountService.deleteTrusterAccount(account.accountNumber);
-      this.accounts = this.trusterAccountService.listTrusterAccountInWorkSpace(this.account.accountId);
     });
   }
 
+  /**
+   * Go to the Edit Account Page
+   * @param account - Aws Account to edit
+   */
   editAccount(account: AwsAccount) {
     const editAccount = (account.parent || account.awsRoles[0].parent) ? 'edit-truster-account' : 'edit-federated-account';
     this.router.navigate(['/sessions', editAccount], { queryParams: { accountId: account.accountId }});
   }
 
-  listRoles(account: AwsAccount) {
-    this.router.navigate(['/sessions', 'list-roles'], { queryParams: { accountId: account.accountId }});
-  }
-
+  /**
+   * Get the number of roles in a specific Accounts
+   * @param account - the Aws Account to get the roles count
+   */
   getRoleNumber(account: AwsAccount) {
     return account.awsRoles.length;
   }
@@ -76,6 +91,7 @@ export class AccountComponent extends AntiMemLeak implements OnInit {
       event.stopPropagation();
     }
 
+    // With this we set to visible only on the chosen account
     this.accounts.forEach(s => {
       s.showTray = (s.accountNumber === accountNumber);
     });

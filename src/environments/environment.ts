@@ -4,8 +4,8 @@
 
 
 const environment = {
+  appName: 'Leapp',
   sessionDuration: 1200,
-  liteClient: true,
   lockFileDestination: '',
   python3Version: '3.4.0',
   production: false,
@@ -34,5 +34,5 @@ const environment = {
   }
 };
 
-environment.lockFileDestination = `.LookAuth${environment.liteClient ? 'Lite' : ''}/LookAuth${environment.liteClient ? 'Lite' : ''}-lock.json`;
+environment.lockFileDestination = `.Leapp/Leapp-lock.json`;
 export { environment };

@@ -9,6 +9,7 @@ import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.ser
   styleUrls: ['./workspace-bar.component.scss']
 })
 export class WorkspaceBarComponent implements OnInit {
+
   workspaces: Workspace[];
   currentWorkspace: string;
 

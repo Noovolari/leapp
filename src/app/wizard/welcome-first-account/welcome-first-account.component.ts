@@ -7,7 +7,7 @@ import { Router } from '@angular/router';
   styleUrls: ['./welcome-first-account.component.scss']
 })
 export class WelcomeFirstAccountComponent implements OnInit {
-
+  /* Just used to welcome to the setup phase */
   constructor(private router: Router) { }
 
   ngOnInit() {}

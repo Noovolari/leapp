@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {registerLocaleData} from '@angular/common';
 import localeEn from '@angular/common/locales/en';
 import localeIt from '@angular/common/locales/it';
@@ -20,7 +20,7 @@ import {tap} from 'rxjs/operators';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-
+  /* Main app file: launches the Angular framework inside Electron app */
   constructor(
     private translateService: TranslateService,
     private router: Router,
@@ -36,8 +36,9 @@ export class AppComponent implements OnInit {
 
     // Initial starting point for DEBUG
     this.router.navigate(['/wizard', 'dependencies']);
+    // Use ngx bootstrap 4
     setTheme('bs4');
-    // Register locale languages and set the default one
+    // Register locale languages and set the default one: we currently use only en
     this.translateService.setDefaultLang('en');
     registerLocaleData(localeEn, 'en');
     registerLocaleData(localeIt, 'it');
@@ -62,19 +63,27 @@ export class AppComponent implements OnInit {
       }
     });
 
+    // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
       this.beforeCloseInstructions().subscribe(() => ipc.send('closed'));
     });
 
+    // We start the current session if there is one
     this.activateSession();
   }
 
+  /**
+   * Activate the current session by launching an emit signal to the refresh credential service
+   */
   activateSession() {
     console.log('activating session...');
     this.credentialsService.refreshCredentialsEmit.emit();
   }
 
+  /**
+   * This is an hook on the closing app to remove credential file and force stop using them
+   */
   beforeCloseInstructions() {
     // Send a STOP signal to backend
     return this.workspaceService.refreshSessionUpdateToBackend(null).pipe(

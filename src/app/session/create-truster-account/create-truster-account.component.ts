@@ -41,6 +41,7 @@ export class CreateTrusterAccountComponent extends AntiMemLeak implements OnInit
     federatedRole: new FormControl('', [Validators.required])
   });
 
+  /* Create a new truster account given the correct form */
   constructor(
     private configurationService: ConfigurationService,
     private appService: AppService,
@@ -54,14 +55,20 @@ export class CreateTrusterAccountComponent extends AntiMemLeak implements OnInit
     const sub = this.activatedRoute.queryParams.subscribe(params => {
       this.accountId = params['accountId'];
 
+      // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
       this.accounts = this.federatedAccountService.listFederatedAccountInWorkSpace();
+
+      // Get the appropriate roles
       const account = this.accounts.filter(acc => (acc.accountId === this.accountId))[0];
       this.roles = account.awsRoles;
+
+      // Set the federated role automatically
       this.selectedAccount = account.accountNumber;
       this.selectedAccountNumber = account.accountNumber;
       this.selectedRole = this.roles[0].name;
 
+      // Get all the regions and set the first one in the UI
       this.regions = this.appService.getRegions();
       this.selectedRegion = this.regions[0].region;
     });
@@ -69,13 +76,21 @@ export class CreateTrusterAccountComponent extends AntiMemLeak implements OnInit
     this.subs.add(sub);
   }
 
+  /**
+   * Changes the roles whenever we change the federated account
+   * @param event
+   */
   changeRoles(event) {
     this.roles = event.awsRoles;
   }
 
+  /**
+   * Save the account
+   */
   saveAccount() {
     if (this.form.valid && this.rolesT.length > 0) {
       try {
+        // Try to create the truster account
         const created = this.trusterAccountService.addTrusterAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
@@ -96,6 +111,10 @@ export class CreateTrusterAccountComponent extends AntiMemLeak implements OnInit
     }
   }
 
+  /**
+   * Remove the role from the UI
+   * @param roleName- the role to remove
+   */
   removeRole(roleName: string) {
     const index = this.rolesT.indexOf(roleName);
     if (index > -1) {
@@ -103,6 +122,10 @@ export class CreateTrusterAccountComponent extends AntiMemLeak implements OnInit
     }
   }
 
+  /**
+   * Set the new role name in the array of roles for the
+   * @param keyEvent
+   */
   setRoleName(keyEvent) {
     const roleName = this.roleInput.nativeElement.value;
     this.checkDisabled = (roleName !== '');
@@ -114,6 +137,10 @@ export class CreateTrusterAccountComponent extends AntiMemLeak implements OnInit
     }
   }
 
+  /**
+   * Prepare the array of roles adding the role Arn given the account number
+   * @param accountNumber - the account number to use to generate the arn
+   */
   generateRolesFromNames(accountNumber) {
     const awsRoles = [];
     this.rolesT.forEach(role => {
@@ -127,6 +154,9 @@ export class CreateTrusterAccountComponent extends AntiMemLeak implements OnInit
     return awsRoles;
   }
 
+  /**
+   * Return to the account list
+   */
   goToList() {
     // Return to list
     this.router.navigate(['/sessions', 'account'], { queryParams: { accountId: this.accountId }});

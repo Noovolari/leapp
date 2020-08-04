@@ -1,4 +1,4 @@
 provider: s3
-bucket: lookauth.clients
+bucket: leapp.clients
 region: eu-west-1
-updaterCacheDirName: lookauthlite-updater
+updaterCacheDirName: leapp-updater

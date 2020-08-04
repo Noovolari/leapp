@@ -2,7 +2,7 @@
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 
-
+// TODO: remove sensible data.
 const environment = {
   appName: 'Leapp',
   sessionDuration: 1200,

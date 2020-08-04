@@ -1,3 +1,4 @@
+// TODO: Cognito token is needed?
 export interface CognitoAuth {
   access_token: string;
   expires_in: number;

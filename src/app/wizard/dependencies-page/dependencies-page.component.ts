@@ -74,6 +74,7 @@ export class DependenciesPageComponent extends AntiMemLeak implements OnInit, Af
 
   // MVP: we use this to just check if aws cli is installed in order to proceed to
   // step 3: when going off MVP return to correct method above
+  // TODO: needed?
   resolveDependenciesMvp() {
     this.loading = true;
 

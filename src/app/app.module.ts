@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+// TODO: Why translate module?
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ModalModule, TooltipModule } from 'ngx-bootstrap';
 import { ToastrModule } from 'ngx-toastr';

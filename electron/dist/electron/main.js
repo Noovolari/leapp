@@ -31,6 +31,7 @@ app.disableHardwareAcceleration();
 // Main Window configuration: set here tyhe options to make it works with your app
 // Electron is the application wrapper so NOT log is prompted when we build an
 // application, we need to log to a file instead
+// TODO: noovolari-eddie-client to replace
 var windowDefaultConfig = {
     dir: path.join(__dirname, "/../../../dist/noovolari-eddie-client"),
     browserWindow: {
@@ -58,7 +59,7 @@ var setupWorkspace = function () {
         fs.mkdirSync(os.homedir() + '/.aws');
     }
     catch (err) {
-        log.warn('directory look-auth or aws already exist');
+        log.warn('directory leapp or aws already exist');
     }
     finally {
         try {

@@ -1,6 +1,6 @@
 // Karma configuration file, see link for more information
 // https://karma-runner.github.io/1.0/config/configuration-file.html
-
+// TODO: noovolari-eddie-client needs to be removed
 module.exports = function (config) {
   config.set({
     basePath: '',

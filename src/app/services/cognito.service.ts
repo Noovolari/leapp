@@ -20,6 +20,7 @@ export class CognitoService {
    * token for authentication with our backend calls
    * @returns an observable with type of {Observable<CognitoAuth>}
    */
+  // TODO: getCognitoToken contain Eddie manager api. It should not. It's needed?
   getCognitoAuthorizationToken(window: any): Observable<CognitoAuth> {
     return this.getAuthorizeCode()
       .pipe(
@@ -81,6 +82,7 @@ export class CognitoService {
    * @param authCode - the Authorization Code for cognito from the Idp provider which is the same as the one for the federation
    * @returns an observable with the same data {Observable<CognitoAuth>} as the return of the post itself
    */
+  // TODO: getCognitoToken is needed.
   private getCognitoToken(authCode): Observable<CognitoAuth> {
     // Auth code
     this.appService.logger('AuthCode: ' + authCode, LoggerLevel.INFO);

@@ -1,4 +1,5 @@
 "use strict";
+// TODO: Are we sure that we want generate password like this?
 Object.defineProperty(exports, "__esModule", { value: true });
 // Just a simple utility used to encrypt app data
 exports.aesPassword = function () {

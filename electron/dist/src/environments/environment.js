@@ -1,9 +1,9 @@
 "use strict";
-// TODO: Cognito cannot stay here
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
 Object.defineProperty(exports, "__esModule", { value: true });
+// TODO: remove sensible data.
 var environment = {
     appName: 'Leapp',
     sessionDuration: 1200,

@@ -181,10 +181,6 @@ export class WorkspaceService extends NativeService {
     });
   }
 
-
-
-
-
   /**
    * Generic response hook, this one is used to generally retrieve a response from an idp Url.
    * @param details - the detail of the response for the call to the idp url

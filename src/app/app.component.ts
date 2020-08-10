@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {registerLocaleData} from '@angular/common';
 import localeEn from '@angular/common/locales/en';
-import localeIt from '@angular/common/locales/it';
 import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../environments/environment';
 import {ConfigurationService} from './services-system/configuration.service';

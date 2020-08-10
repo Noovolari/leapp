@@ -48,11 +48,6 @@
   window.Menu = require('electron').remote.Menu;
   window.Tray = require('electron').remote.Tray;
   window.MachineId = require('node-machine-id').machineIdSync();
-  // TODO: cusotmerly not needed. We won't track user who download the client
-  // Customerly
-  !function(){function e(){let e=t.createElement("script");e.type="text/javascript",e.async=!0,e.src="https://widget.customerly.io/widget/7e213f2a";let r=t.getElementsByTagName("script")[0];r.parentNode.insertBefore(e,r)}let r=window,t=document,n=function(){n.c(arguments)};r.customerly_queue=[],n.c=function(e){r.customerly_queue.push(e)},r.customerly=n,r.attachEvent?r.attachEvent("onload",e):r.addEventListener("load",e,!1)}();
-  window.customerly = customerly;
-
 
   // Add Blur after Focus effect
   document.addEventListener('click', function(e) {

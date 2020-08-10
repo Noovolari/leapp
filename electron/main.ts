@@ -1,8 +1,8 @@
 import * as path from 'path';
 import {environment} from '../src/environments/environment';
 import * as CryptoJS from 'crypto-js';
-import {aesPassword} from '../src/app/core/enc';
 import {initialConfiguration} from '../src/app/core/initial-configuration';
+import {machineIdSync} from 'node-machine-id';
 
 const {app, BrowserWindow} = require('electron');
 const url = require('url');
@@ -61,7 +61,7 @@ const setupWorkspace = () => {
         }
 
         // Write workspace file
-        fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initialConfiguration, null, 2), aesPassword()).toString());
+        fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initialConfiguration, null, 2), machineIdSync()).toString());
         // Write credential file
         fs.writeFileSync(awsCredentialsPath, '');
       } catch (e) {
@@ -178,7 +178,7 @@ const initWorkspace = () => {
     process.env.XDG_CURRENT_DESKTOP = 'Unity';
   }
 
-  const workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, {encoding: 'utf-8'}), aesPassword()).toString(CryptoJS.enc.Utf8)) : undefined;
+  const workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, {encoding: 'utf-8'}), machineIdSync()).toString(CryptoJS.enc.Utf8)) : undefined;
 
   if (workspace === undefined) {
     // Setup your first workspace and then run createWindow

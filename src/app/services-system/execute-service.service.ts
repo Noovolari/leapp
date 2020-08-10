@@ -7,43 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class ExecuteServiceService extends NativeService {
 
-  // This is used to interrupt an install procedure
-  private interrupted = false;
-  // TODO: needed? don't think so
-  // The commands for installing the dependencies in the different operative system
-  // Now the are not used as per MVP request we only check for aws_cli_check
-  private commands = {
-    mac: {
-      aws_cli_check: {command: '/usr/local/bin/aws --version'},
-      python_check: {command: 'python --version'},
-      commands: [
-        {label: 'Getting Aws Cli Bundled', command: 'curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"'},
-        {label: 'Extracting the bundle', command: 'unzip awscli-bundle.zip'},
-        {label: 'Personal Aws Cli Install', command: './awscli-bundle/install -i ~/.local/eddie && ~/.local/eddie/bin/pip install --no-cache-dir --no-index --find-links=file:///Users/urz9999/Projects/Javascript/noovolari-eddie-client/awscli-bundle/packages/ awscli'},
-        {label: 'Clear all temp files', command: 'rm -Rf aws-cli-bundle.zip && rm -Rf aws-cli-bundle'}
-      ]
-    },
-    windows: {
-      aws_cli_check: {command: '"C:\\Program Files\\Amazon\\AWSCLI\\bin\\aws" --version'},
-      python_check: {command: 'python --version'},
-      commands: [
-        {label: 'python3', command: 'bitsadmin /transfer myDownloadJob /download /priority normal https://www.python.org/ftp/python/3.7.4/python-3.7.4-amd64.exe "c:\\Users\\%username%\\Desktop\\python-3.7.4-amd64.exe"'},
-        {label: 'install', command: '"c:\\Users\\%username%\\Desktop\\python-3.7.4-amd64.exe"'},
-        {label: 'aws-cli', command: 'pip install awscli'},
-        {label: 'upgrade', command: 'pip install --user --upgrade awscli'}
-      ]
-    },
-    linux: {
-      aws_cli_check: {command: 'whoami && ~/.local/bin/aws --version'},
-      python_check: {command: 'python --version'},
-      commands: [
-        {label: 'Getting Aws Cli Bundled', command: 'curl "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip" > /dev/null 2>&1 || wget "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -O "awscli-bundle.zip" > /dev/null 2>&1'},
-        {label: 'Extracting the bundle', command: 'unzip awscli-bundle.zip'},
-        {label: 'Personal Aws Cli Install', command: './awscli-bundle/install -i ~/.local/eddie'},
-        {label: 'Clear all temp files', command: 'rm -Rf aws-cli-bundle.zip && rm -Rf aws-cli-bundle'}
-      ]
-    }
-  };
+
 
   /**
    * Execute a command: if the command contains sudo the system launch it with sudo prompt.
@@ -90,36 +54,5 @@ export class ExecuteServiceService extends NativeService {
                               do script \\"${command}\\"
                               end tell"`);
 
-  }
-
-  /* ============================================================================================= */
-  /* Wizard helpers methods we use these to simplify the use of different commands on different OS */
-  /* ============================================================================================= */
-  public getAwsCliCheck(os: string) {
-    return this.commands[os].aws_cli_check.command;
-  }
-
-  public getPythonCheck(os: string) {
-    return this.commands[os].python_check.command;
-  }
-
-  public getCommand(os: string, index: number) {
-    return this.commands[os].commands[index].command;
-  }
-
-  public getCommandLabel(os: string, index: number) {
-    return this.commands[os].commands[index].label;
-  }
-
-  public getCommandLabels(os: string) {
-    return this.commands[os].commands.map((i) => i.label);
-  }
-
-  public getCommandsLength(os: string) {
-    return this.commands[os].commands.length;
-  }
-
-  public toggleInterrupted(interrupt: boolean) {
-    this.interrupted = interrupt;
   }
 }

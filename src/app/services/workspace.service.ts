@@ -6,7 +6,6 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
 import {Observable, of} from 'rxjs';
-import {CognitoService} from './cognito.service';
 import {environment} from '../../environments/environment';
 import {catchError, switchMap, tap} from 'rxjs/operators';
 
@@ -45,8 +44,7 @@ export class WorkspaceService extends NativeService {
   constructor(
     private httpClient: HttpClient,
     private appService: AppService,
-    private configurationService: ConfigurationService,
-    private cognitoService: CognitoService
+    private configurationService: ConfigurationService
   ) {
     super();
   }
@@ -54,22 +52,6 @@ export class WorkspaceService extends NativeService {
   /* ====================================== */
   /* =========< IDP MANAGEMENTS >========== */
   /* ====================================== */
-
-  /**
-   * Make a request to the defined idp url to check for a idp url response which will
-   * contain the idp url and the cognito url for authentication with our backend
-   * @param workspaceName - parameter that we use to identify our workspace a.k.a. our company, this is defined by the admin.
-   * @returns - {Observable<{idpUrl: string; cognitoUrl: string}>} this is the structure of the response call
-   */
-  // TODO: why we still call API Gateway?
-  getIdpUrl(workspaceName: string) {
-    const baseUrl = environment.apiGateway.url + environment.apiGateway.authUrl;
-    return this.httpClient.get<{idpUrl: string, responseType: string}>(baseUrl + '/get', {
-      params: {
-        domain: workspaceName
-      }
-    });
-  }
 
   /**
    * Get the Idp Token to save, in the MVP case the SAML response
@@ -142,85 +124,6 @@ export class WorkspaceService extends NativeService {
     this.httpClient.get('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe(() => {
     }, () => {
       this.idpWindow.loadURL(idpUrl);
-    });
-  }
-
-  getFederationUrl(workspaceName: string): Observable<string> {
-    return new Observable<string>(observer => {
-      try {
-
-        // Obtain the configuration file
-        // Save the new federation url
-        // Update Configuration
-        const config = this.configurationService.getConfigurationFileSync();
-
-        this.getIdpUrl(workspaceName).subscribe(data => {
-
-          config.federationUrl = data.idpUrl;
-          this.configurationService.updateConfigurationFileSync(config);
-
-          observer.next(config.federationUrl);
-          observer.complete();
-        }, e => {
-
-          console.log();
-          observer.error(e);
-          observer.complete();
-        });
-
-      } catch (err) {
-        observer.error(err.toString());
-        observer.complete();
-      }
-    });
-  }
-
-  getConfiguration(): Observable<string> {
-    return new Observable<string>(observer => {
-
-      try {
-        if (this.timeout !== null && this.timeout !== undefined) {
-          clearInterval(this.timeout);
-        }
-        this.timeout = setTimeout(() => {
-          clearInterval(this.timeout);
-          observer.error('Timeout in get configuration.');
-          observer.complete();
-        }, 10000);
-
-        this.cognitoService.getCognitoAuthorizationToken(this.idpWindow).subscribe(cognitoAuth => {
-
-          console.log();
-          this.httpClient.get(environment.apiGateway.url + 'configurations/get', {headers: new HttpHeaders({Authorization: 'Bearer ' + cognitoAuth.id_token, 'token-id': cognitoAuth.id_token})}).subscribe((res: any) => {
-
-            const workspace = this.configurationService.getDefaultWorkspaceSync();
-
-            const accounts = [];
-            res.accounts.forEach(acc => {
-              acc.awsRoles = acc.awsRoles.map(role => {
-                role.name = role.arn.split('/')[1];
-                return role;
-              });
-              accounts.push(acc);
-            });
-
-            workspace.accountRoleMapping.accounts = accounts;
-            this.configurationService.updateWorkspaceSync(workspace);
-
-            observer.next('ok');
-            observer.complete();
-          }, e => {
-
-            observer.error(e.toString());
-            observer.complete();
-          });
-
-        });
-
-      } catch (err) {
-        observer.error(err.toString());
-        observer.complete();
-      }
     });
   }
 

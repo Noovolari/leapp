@@ -41,8 +41,6 @@ export class AppComponent implements OnInit {
     // Register locale languages and set the default one: we currently use only en
     this.translateService.setDefaultLang('en');
     registerLocaleData(localeEn, 'en');
-    // TODO: Why register locale IT?
-    registerLocaleData(localeIt, 'it');
 
     if (environment.production) {
       // Clear both info and warn message in production mode without removing them from code actually

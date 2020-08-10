@@ -34,7 +34,6 @@ export class SessionService extends NativeService {
       active,
       accountData,
       roleData,
-      showTray: false,
       color
     };
 

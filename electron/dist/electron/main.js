@@ -14,8 +14,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var path = require("path");
 var environment_1 = require("../src/environments/environment");
 var CryptoJS = require("crypto-js");
-var enc_1 = require("../src/app/core/enc");
 var initial_configuration_1 = require("../src/app/core/initial-configuration");
+var node_machine_id_1 = require("node-machine-id");
 var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow;
 var url = require('url');
 var copydir = require('copy-dir');
@@ -67,7 +67,7 @@ var setupWorkspace = function () {
                 fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.bkp');
             }
             // Write workspace file
-            fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initial_configuration_1.initialConfiguration, null, 2), enc_1.aesPassword()).toString());
+            fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initial_configuration_1.initialConfiguration, null, 2), node_machine_id_1.machineIdSync()).toString());
             // Write credential file
             fs.writeFileSync(awsCredentialsPath, '');
         }
@@ -171,7 +171,7 @@ var initWorkspace = function () {
     if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
         process.env.XDG_CURRENT_DESKTOP = 'Unity';
     }
-    var workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, { encoding: 'utf-8' }), enc_1.aesPassword()).toString(CryptoJS.enc.Utf8)) : undefined;
+    var workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, { encoding: 'utf-8' }), node_machine_id_1.machineIdSync()).toString(CryptoJS.enc.Utf8)) : undefined;
     if (workspace === undefined) {
         // Setup your first workspace and then run createWindow
         log.info('Setupping workspace for the first time');

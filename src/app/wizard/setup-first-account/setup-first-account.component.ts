@@ -57,7 +57,6 @@ export class SetupFirstAccountComponent implements OnInit {
   /**
    * Save the first account in the workspace
    */
-  // TODO: Use configuration service
   saveFirstAccount() {
     if (this.form.valid && this.roles.length > 0) {
       try {

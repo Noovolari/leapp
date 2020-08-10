@@ -15,7 +15,7 @@ export class AppService extends NativeService {
   isResuming: EventEmitter<boolean> = new EventEmitter<boolean>();
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
   avatarSelected: EventEmitter<{havePortrait: boolean, portrait: string}> = new EventEmitter<{havePortrait: boolean, portrait: string}>();
-  // TODO: current Tray is needed?
+  // Used to define the only tray we want as active expecially in linux context
   currentTray;
 
   /* This service is defined to provide different app wide methods as utilities */
@@ -305,13 +305,14 @@ export class AppService extends NativeService {
    * @param useDefault - to show no region
    * @returns - {{region: string}[]} - all the regions in array format
    */
-  // TODO: aggiungere region Milano
+
   getRegions(useDefault?: boolean) {
     const regions = [
       { region: 'no region necessary'},
       { region: 'eu-west-1' },
       { region: 'eu-west-2' },
       { region: 'eu-west-3' },
+      { region: 'eu-south-1' },
       { region: 'eu-central-1' },
       { region: 'us-east-2' },
       { region: 'us-east-1' },

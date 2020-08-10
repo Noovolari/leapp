@@ -7,7 +7,6 @@ import {HttpClient} from '@angular/common/http';
 import {SessionObject} from '../../models/sessionData';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
-import {environment} from '../../../environments/environment';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
 import {CredentialsService} from '../../services/credentials.service';
@@ -157,26 +156,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   gotToAccountManagement() {
     // Go!
     this.router.navigate(['/sessions', 'list-accounts']);
-  }
-
-  /**
-   * Retrieve the remote configuration if we are in pro mode
-   */
-  getConfigurationIfPro(template) {
-    const sub = this.workspaceService.getConfiguration().subscribe(() => {
-      // We got all the new configuration elements, proceed to remove or update all the elements
-      this.sessions = this.sessionService.listSessions();
-
-      this.refreshRoleMappingOperation();
-      this.currentSelectedColor = 0;
-      this.modalRef = this.modalService.show(template);
-      this.isGettingConf = false;
-    }, err => {
-      this.appService.toast(err, ToastLevel.WARN, 'Unable to retrieve remote configuration');
-      this.isGettingConf = false;
-    });
-
-    this.subs.add(sub);
   }
 
   /**

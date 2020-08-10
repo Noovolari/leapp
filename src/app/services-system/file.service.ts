@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {NativeService} from './native-service';
 import {Observable} from 'rxjs';
 import * as CryptoJS from 'crypto-js';
-import {aesPassword} from '../core/enc';
 
 @Injectable({
   providedIn: 'root'
@@ -219,13 +218,13 @@ export class FileService extends NativeService {
    * Encrypt Text
    */
   encryptText(text: string): string {
-    return CryptoJS.AES.encrypt(text.trim(), aesPassword()).toString();
+    return CryptoJS.AES.encrypt(text.trim(), this.MachineId).toString();
   }
 
   /**
    * Decrypt Text
    */
   decryptText(text: string): string {
-    return CryptoJS.AES.decrypt(text.trim(), aesPassword()).toString(CryptoJS.enc.Utf8);
+    return CryptoJS.AES.decrypt(text.trim(), this.MachineId).toString(CryptoJS.enc.Utf8);
   }
 }

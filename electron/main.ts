@@ -22,7 +22,7 @@ app.disableHardwareAcceleration();
 // Electron is the application wrapper so NOT log is prompted when we build an
 // application, we need to log to a file instead
 const windowDefaultConfig = {
-  dir: path.join(__dirname, `/../../../dist/noovolari-eddie-client`),
+  dir: path.join(__dirname, `/../../../dist/leapp-client`),
   browserWindow: {
     width: 430,
     height: 600,

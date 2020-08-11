@@ -1,6 +1,6 @@
 {
     "name": "Leapp",
-    "version": "0.16.4",
+    "version": "0.16.11",
     "author": {
         "name": "noovolari",
         "email": "info@noovolari.com"
@@ -23,13 +23,13 @@
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
-        "build": "rm -rf electron/dist && cp src/assets/icons/* dist/noovolari-eddie-client/ && ng build --base-href ./",
+        "build": "rm -rf electron/dist && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
         "test": "ng test",
         "lint": "ng lint",
         "extract": "ngx-translate-extract --input ./src --output ./src/assets/i18n/en.json ./src/assets/i18n/it.json --clean --sort --format namespaced-json --marker _",
-        "electron-dev": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/noovolari-eddie-client && cp -a src/assets/icons/* dist/noovolari-eddie-client/ && ng build --aot --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
-        "electron-stag": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/noovolari-eddie-client && cp -a src/assets/icons/* dist/noovolari-eddie-client/ && ng build --configuration staging --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
-        "electron-prod": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/noovolari-eddie-client && cp -a src/assets/icons/* dist/noovolari-eddie-client/ && ng build --configuration production --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
+        "electron-dev": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --aot --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
+        "electron-stag": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration staging --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
+        "electron-prod": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration production --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
         "electron-win": "DEL /Q electron\\dist && ng build --base-href ./ && tsc --p electron && electron .",
         "e2e": "ng e2e",
         "pack": "electron-builder --dir",
@@ -51,15 +51,18 @@
         "productName": "Leapp",
         "icon": "src/assets/icons/icon.icns",
         "files": [
-            "dist/noovolari-eddie-client/*",
-            "dist/noovolari-eddie-client/**/*",
+            "dist/leapp-client/*",
+            "dist/leapp-client/**/*",
             "node_modules/**/*",
             "package.json",
             "electron/dist/*",
             "electron/dist/**/*",
             "dist/icon.icns",
             "dist/icon.ico",
-            "dist/icon.png"
+            "dist/icon.png",
+            "dist/assets/images/Leapp.icns",
+            "dist/assets/images/Leapp.ico",
+            "dist/assets/images/Leapp.png"
         ],
         "directories": {
             "output": "release",

@@ -19,7 +19,7 @@ export class AccountComponent extends AntiMemLeak implements OnInit {
   public fullAccounts;
   public workspace;
 
-  /* Account component si the page where we have the main account chooser */
+  /* Account component is the page where we have the truster account list for a main account */
   constructor(
     private appService: AppService,
     private router: Router,

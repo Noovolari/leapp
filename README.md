@@ -5,7 +5,7 @@
 - Website: [https://noovolari.github.io/leapp-website/](https://noovolari.github.io/leapp-website/#features)
 - Documentation: [https://noovolari.github.io/leapp-website/documentation](https://noovolari.github.io/leapp-website/documentation)
 
-[]()
+![logo](readme-1.png)
 
 ## Introduction
 
@@ -61,7 +61,7 @@ If you'd like to contribute to our project, please follow the guidelines propose
 
 ### Project Structure
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/27bf221c-3d36-43cf-b9c6-c6e73123675a/Screenshot_2020-07-24_at_16.05.58.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/27bf221c-3d36-43cf-b9c6-c6e73123675a/Screenshot_2020-07-24_at_16.05.58.png)
+![readme-2.png](readme-2.png)
 
 Here we present all the differents folder of the projects as well as the files in order to explain what each directory and file does and how you can modify these files according to your necessities
 

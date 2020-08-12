@@ -1,29 +1,263 @@
-# TODO: CHANGE README 
+# Leapp
 
-# NoovolariEddieClient
+---
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.1.0.
+- Website: [https://noovolari.github.io/leapp-website/](https://noovolari.github.io/leapp-website/#features)
+- Documentation: [https://noovolari.github.io/leapp-website/documentation](https://noovolari.github.io/leapp-website/documentation)
 
-## Development server
+[]()
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+## Introduction
 
-## Code scaffolding
+Read about what is Leapp to better understand how the idea born and what can you use it for.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+### What is Leapp?
 
-## Build
+Leapp is a tool designed to generate and store credentials used to access a Multi-Cloud environment.
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+### Why do you need to use Leapp?
 
-## Running unit tests
+Leapp is intended to be used by Developers and DevOps that need to access an ecosystem of accounts, belonging to different Service Providers, on a daily basis. These account could be independent or part of an organization. Leapp may become your everyday companion if you're continuously struggling to generate and rotate credentials on which your specific Service Provider's CLI relies on.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+### What does it support now?
 
-## Running end-to-end tests
+Leapp currently support AWS as service provider and Google as Identity Provider. In the near future it will support Azure as an other Idp. Follow the [roadmap](https://github.com/Noovolari/leapp/projects/1).
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+## Key features
 
-## Further help
+- **Federated Single Sign-On to your multi-cloud environment:** inside Leapp, you can configure the SAML SSO URL against which you can authenticate with your IdP-hosted identity, and retrieve the SAML assertion that allows federated access to your Service Provider.
+- **Credentials management:** Leapp lifts you up from the task of generating, rotating, and deleting credentials retrieved from the Service Provider to access your Cloud Resources. In case the Service Provider is AWS, credentials are generated invoking the assume-role API, that requires the SAML Assertion to be provided in the payload. Generated credentials will be rotated periodically. Once you stop the current session, credentials will be deleted for security purposes. In case the Service Provider is AWS, the credentials file will be deleted. That file will be recreated once you start a new session.
+- **Access configuration:** you can set up access to a Federated Account or to a Truster Account. A Federated Account is the one that contains information about the IdP, while the Truster Account is the one that you can access from the Federated Account. You can configure an Access Quick List, that allows you to generate a new set of credentials in a click.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+## Installation
+
+To install the compiled version, choose the one for your **OS** and simply **double-click** on the executable. 
+Get the latest release [here](https://github.com/Noovolari/leapp/releases/latest)
+
+## Quick start
+
+Leapp is a Desktop application build in [Electron](https://www.electronjs.org/) + [Angular 8](https://angular.io/) that manage and rotate your credentials while keeping them secure by encrypting all the information and removing the credential file and closing the session when the program is closed.
+
+### Tutorials
+
+Here is a list of curated **tutorials** to **help you get started**.
+
+- [Gsuite Federation Setup](https://noovolari.github.io/leapp-website/documentation/guide/tutorials/gsuite-federation-setup)
+- [Aws Federation Setup](https://noovolari.github.io/leapp-website/documentation/guide/tutorials/aws-federation-setup)
+- [Enable role federated access](https://noovolari.github.io/leapp-website/documentation/guide/tutorials/enable-role-federated-access)
+- [Assign role to G Suite Principal](https://noovolari.github.io/leapp-website/documentation/guide/tutorials/assign-role-to-gsuite-principal)
+
+## Documentation
+
+Here's the link to the documentation where you can find other information about the system.
+
+- [https://noovolari.github.io/leapp-website/documentation](https://noovolari.github.io/leapp-website/documentation)
+
+## Contributing
+
+If you'd like to contribute to our project, please follow the guidelines proposed in our **contributing** document.
+
+- [CONTRIBUTING.md](./.github/CONTRIBUTING.md)
+
+### Project Structure
+
+![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/27bf221c-3d36-43cf-b9c6-c6e73123675a/Screenshot_2020-07-24_at_16.05.58.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/27bf221c-3d36-43cf-b9c6-c6e73123675a/Screenshot_2020-07-24_at_16.05.58.png)
+
+Here we present all the differents folder of the projects as well as the files in order to explain what each directory and file does and how you can modify these files according to your necessities
+
+### build and dist
+
+**build** and **dist** are generated by the solution when a user request a build from npm using a command like this one in example: `npm run dist mac dev` . You don't have to manage the content of these folders by yourself.
+
+### e2e
+
+**e2e is another folder which is part of the project itself and doesn't need to be managed.**
+
+### electron
+
+Is the folder generated by Electron and contains the **main.ts** file which drives the application setup and start. This is created after the Angular project has been setupped.
+
+### node_modules
+
+No need to add explanations here. Just your regular black hole of libraries.
+
+### release
+
+Release contains your built app for the OS you have asked for with the commands:
+
+- `npm run dist mac dev / npm run dist mac prod`
+- `npm run dist deb dev / npm run dist deb prod`
+- `npm run dist win dev / npm run dist win prod`
+
+The package is ready to be distributed but for the time being the release is done locally by developers previous QA and acceptance.
+
+
+### scripts
+
+Contains 2 scripts:
+
+- **changeProductName.js:** that we use for managing the app versioning following the rules of semantic versioning
+- **notarize.js:** is created to allow notarizing of Apple apps, in order to avoid requesting validation from the user before actual running the application
+
+### src/app
+
+Inside we put the actual application code written for Angular 8. The application itself is already divided in folders to help recognise the different content and maintain the solution organised.
+
+— **core**
+
+Core contains all the typescript files that are not directly related to Angular Components or Module and they typically are helpers functions or core logic methods. If you need to create something that does not belongs to another folder, put it here.
+
+— **layout**
+
+Layout contains all the layouts used by component to standardise some aspects of the applications. At this moment we don't have a particular layout and the application show pages directly from the `<app-root>` tag in the **index.html**
+
+— **models**
+
+in models we put all the interfaces that defines models for our application. We use them to simplify description of types for complex objects in typescript as well as defining specific templates to interpret data managed by the services. An example:
+
+- Configuration
+
+```tsx
+export interface Configuration {
+  uid: string;
+  language: string;
+  defaultWorkspace: string;
+  avatar: string;
+  federationUrl: string;
+  workspaces: Workspace[];
+}
+```
+
+— **services**
+
+Services are used to define the logic behind our client and are called by the actual components when they need it. All services extends the **NativeService** one as it allows to access Electron specific libraries and methods inside Angular application. A simple one:
+
+- ExecuteService
+
+```tsx
+import { Injectable } from '@angular/core';
+import { NativeService } from './native-service';
+import { Observable } from 'rxjs';
+
+@Injectable({ providedIn: 'root' })
+export class ExecuteServiceService extends NativeService {
+  /**
+   * Execute a command: if the command contains sudo the system launch it with sudo prompt.
+   * Note: with the current version of Electron the sandbox option for Chromium don't allow for sudo prompt on Ubuntu machines 16+
+   * Remove the note whenever a fix is found.
+   * @param command - the command to launch
+   * @returns an {Observable<any>} to use for subscribing to success or error event on the command termination:
+   *          the default unix standard is used so 0 represent a success code, everything elese is an error code
+   */
+  public execute(command: string, force?: boolean): Observable<any> {
+    return new Observable(
+      subscriber => {
+        if (force) {
+          subscriber.next('');
+          subscriber.complete();
+        }
+
+        let exec = this.exec;
+        if (command.startsWith('sudo')) {
+          exec = this.sudo.exec;
+          command = command.substring(5, command.length);
+        }
+
+        exec(command, {name: 'Leapp'}, (err, stdout, stderr) => {
+          this.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
+          if (err) {
+            subscriber.error(err);
+          } else {
+            subscriber.next(stdout ? stdout : stderr);
+          }
+          subscriber.complete();
+        });
+      }
+    );
+  }
+
+  /**
+   * Open a command terminal and launch a generic command
+   * @param command - the command to launch in terminal
+   * @returns an {Observable<any>} to subscribe to
+   */
+  public openTerminal(command: string): Observable<any> {
+    return this.execute(`osascript -e "tell app \\"Terminal\\"
+                              do script \\"${command}\\"
+                              end tell"`);
+  }
+}
+```
+
+— **session**
+
+Contains all the **components** needed to manage all session related actions and screens. This is the list with a little explanation for everyone.
+
+- **account**: here we have a page to manage all the **truster accounts** see [glossary](https://noovolari.github.io/leapp-website/documentation/glossary) of a **federated account.**
+- **create-federated-account**: here we have the page to add a new federated account.
+- **create-truster-account**: here we have the page to add a new truster account.
+- **edit-federated-account:** here we have the page to edit a federated account.
+- **edit-truster-account:** here we have the page to edit the truster account.
+- **list-accounts:** here we have the page to manage all the federated accounts.
+- **session:** the page we you have access to the quick list and can start and stop a specific session, thus creating or removing credentials.
+- **session-wallet:** is simply a component that give access to the actual session component as well as simply setting the email of the logged user.
+
+— **shared** 
+
+Shared is the area where all the shared component/helpers are located and ready to be used in other components. Remember to add them to the shared module in order to make them visibile in the application.
+
+— **wizard**
+
+Wizard contains all the components used for the first setup and the entry point of the application. The list of component here:
+
+- **dependencies-page:** the page is used as an entry point to the actual app: it checks if you already have a compatible configuration file or not, in case it launches the first time wizard setup.
+- **set-federation-url:** this page is used to set the google federation url.
+- **setup-first-account:** setup the first federated account: this is the bare minimum to use the program.
+- **setup-spinner-for-login:** this is used to define a component that listen for google frame and spins a loader until logged in.
+- **setup-welcome:** just a text page to welcome the user.
+- **welcome-first-account**: a page to describe the first account setup.
+
+the other files inside the directory are defined by the application itself, there are simple configurations to make them work but basically can be left untouched.
+
+— **assets**
+
+assets contains all the graphics of the application.
+
+— **environments**
+
+Contains 3 files: each one represent a configuration for one of the 3 possible builds: dev, stag and prod.
+
+### index.html
+
+This can be used to inject some Electron specific libraries in the actual Angular application. Follow this example:
+
+- Locate this area in the page:
+
+```html
+<script>
+  window.log = require('electron-log');
+  window.fs = require('fs');
+  window.rimraf = require('rimraf');
+  window.os = require('os');
+  window.ini = require('ini');
+```
+
+- add your new library in the format:
+
+```html
+window.<unique_name> = require('your-library');
+```
+
+- Now go to the **native-service.ts** and add your new library mimicking the other ones in the page:
+
+```html
+protected <unique_name>: any;
+...
+this.<unique_name> = (window as any).<unique_name>;
+```
+
+## License
+
+You can find our licence here
+
+- [LICENSE.md](http://license.md) (mpl-2)

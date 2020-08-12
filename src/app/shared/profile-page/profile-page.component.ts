@@ -64,11 +64,4 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   goBack() {
     this.router.navigate(['/', 'sessions', 'session-selected']);
   }
-
-  /**
-   * open a workspace viewer
-   */
-  showWorkspaceJson(template) {
-    this.modalRef = this.modalService.show(template);
-  }
 }

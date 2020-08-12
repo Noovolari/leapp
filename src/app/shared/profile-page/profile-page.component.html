@@ -20,10 +20,6 @@
     <br><br>
     <br><br>
 
-    <div class="form-group" style="width: 40%; display: inline-block;">
-      <button type="button" (click)="showWorkspaceJson(jsonViewTemplate);" class="btn btn-default btn-gradient">Show Workspace</button>
-    </div>
-
     <div class="form-group" style="width: 2%; display: inline-block;"></div>
 
     <div class="form-group" style="width: 29%; display: inline-block;"></div>
@@ -36,17 +32,3 @@
 
   </form>
 </div>
-
-<ng-template #jsonViewTemplate>
-  <div class="modal-header">
-    <h4 class="modal-title pull-left cut">Workspace Json</h4>
-    <button type="button" class="close" aria-label="Close" (click)="modalRef.hide();">
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body" style="overflow: auto; font-size: 10px!important">
-
-    <ngx-json-viewer [json]="workspaceData"></ngx-json-viewer>
-
-  </div>
-</ng-template>

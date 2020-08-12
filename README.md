@@ -260,4 +260,4 @@ this.<unique_name> = (window as any).<unique_name>;
 
 You can find our licence here
 
-- [LICENSE.md](http://license.md) (mpl-2)
+- [LICENSE.md](./LICENCE.md) (mpl-2)

@@ -1,11 +1,9 @@
 # Leapp
 
----
-
 - Website: [https://noovolari.github.io/leapp-website/](https://noovolari.github.io/leapp-website/#features)
 - Documentation: [https://noovolari.github.io/leapp-website/documentation](https://noovolari.github.io/leapp-website/documentation)
 
-![logo](readme-1.png)
+![logo](.github/images/README-1.png)
 
 ## Introduction
 
@@ -42,10 +40,15 @@ Leapp is a Desktop application build in [Electron](https://www.electronjs.org/) 
 
 Here is a list of curated **tutorials** to **help you get started**.
 
-- [Gsuite Federation Setup](https://noovolari.github.io/leapp-website/documentation/guide/tutorials/gsuite-federation-setup)
-- [Aws Federation Setup](https://noovolari.github.io/leapp-website/documentation/guide/tutorials/aws-federation-setup)
-- [Enable role federated access](https://noovolari.github.io/leapp-website/documentation/guide/tutorials/enable-role-federated-access)
-- [Assign role to G Suite Principal](https://noovolari.github.io/leapp-website/documentation/guide/tutorials/assign-role-to-gsuite-principal)
+- Federation between G Suite and AWS
+    - [G Suite Federation Setup](.github/tutorials/G_SUITE_FEDERATION_SETUP.md)
+    - [AWS Federation Setup](.github/tutorials/AWS_FEDERATION_SETUP.md)
+- [Enable role federated access](.github/tutorials/ENABLE_ROLE_FEDERATED_ACCESS.md)
+- [Assign role to G Suite Principal](.github/tutorials/ASSIGN_ROLE_TO_G_SUITE_PRINCIPAL.md)
+- [Configure your SAML Application SSO URL](.github/tutorials/CONFIGURE_YOUR_SAML_APPLICATION_SSO_URL.md)
+- [Manage Federated Accounts and Federated Roles](.github/tutorials/MANAGE_FEDERATED_ACCOUNTS_AND_FEDERATED_ROLES.md)
+- [Manage Truster Accounts and Truster Roles](.github/tutorials/MANAGE_TRUSTER_ACCOUNTS_AND_TRUSTER_ROLES.md)
+- [Manage Quick List](.github/tutorials/MANAGE_QUICK_LIST.md)
 
 ## Documentation
 
@@ -61,7 +64,7 @@ If you'd like to contribute to our project, please follow the guidelines propose
 
 ### Project Structure
 
-![readme-2.png](readme-2.png)
+![readme-2.png](.github/images/README-2.png)
 
 Here we present all the differents folder of the projects as well as the files in order to explain what each directory and file does and how you can modify these files according to your necessities
 

@@ -10,7 +10,7 @@ Go to the IAM console in your AWS Account and select Roles from the left-side co
 ### 2. Create role
 Click on **Create Role** and select **SAML 2.0 federation** as the type of trusted entity; from the SAML provider drop-down menu, select the IAM Identity Provider created in the previous step.
 
-![table1](../images/ENABLE_ROLE_FEDERATED_ACCESS.png)
+![table1](../images/ENABLE_ROLE_FEDERATED_ACCESS-1.png)
 
 ### 3. Allow Programmatic and AWS Management Console access
 Select **Allow programmatic and AWS Management Console access** and click on **Next: Permissions*** button.

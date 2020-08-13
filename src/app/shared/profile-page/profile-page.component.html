@@ -3,13 +3,13 @@
 <div class="container-fluid">
   <app-profile-sidebar></app-profile-sidebar>
 
-  <h1>Update Your Ipd Url</h1>
+  <h1>Update Your IdP URL</h1>
   <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveIdpUrl();">
 
     <div class="form-group" style="width: 70%; display: inline-block;">
-      <label>Idp Url<span class="danger-text">*</span></label>
+      <label>IdP URL<span class="danger-text">*</span></label>
       <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url *" [value]="idpUrlValue" >
-      <small class="text-error" *ngIf="(form.controls['idpUrl'].dirty || form.controls['idpUrl'].touched) && form.controls['idpUrl'].errors">Insert the Idp Url</small>
+      <small class="text-error" *ngIf="(form.controls['idpUrl'].dirty || form.controls['idpUrl'].touched) && form.controls['idpUrl'].errors">Insert the IdP URL</small>
     </div>
 
     <div class="form-group" style="width: 30%; display: inline-block; padding-top: 36px; padding-left: 20px;">

@@ -37,9 +37,9 @@
 
               <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right"
                    role="menu" aria-labelledby="button-basic">
-                <a (click)="openSsmTray($event);">Aws SSM start session</a>
+                <a (click)="openSsmTray($event);">AWS SSM start session</a>
                 <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
-                <a (click)="copyCredentials(session, 4);">Copy Role Arn</a>
+                <a (click)="copyCredentials(session, 4);">Copy Role ARN</a>
               </div>
             </ng-container>
 
@@ -53,9 +53,9 @@
           </div>
 
           <div *ngIf="session.showTray" class="drop-list">
-            <a (click)="openSsmTray($event);">Aws SSM start session</a>
+            <a (click)="openSsmTray($event);">AWS SSM start session</a>
             <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
-            <a (click)="copyCredentials(session, 4);">Copy Role Arn</a>
+            <a (click)="copyCredentials(session, 4);">Copy Role ARN</a>
           </div>
 
           <span>Account:</span><br>
@@ -79,7 +79,7 @@
               <div id="drop-list-inactive" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right"
                    role="menu" aria-labelledby="button-basic">
                 <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
-                <a (click)="copyCredentials(session, 4);">Copy Role Arn</a>
+                <a (click)="copyCredentials(session, 4);">Copy Role ARN</a>
               </div>
             </ng-container>
             <a (click)="startSession(session)"><i class="fa fa-play"></i></a>
@@ -164,7 +164,7 @@
     <div class="sub-menu" *ngIf="sessions.length < 5">
       <div>
 
-        <b class="gray-text">Choose an Account with a specific role to Add to the Quick List <i
+        <b class="gray-text">Choose an Account with a specific Role to Add to the Quick List <i
           class="fa fa-question-circle"
           tooltip="By adding an Account to the Quick List, you'll have the possibility to quickly start and stop
         a session as well as the ability to switch fast between Accounts. Adding an Account to the Quick
@@ -172,11 +172,11 @@
 
         <hr style="margin: 30px 0">
 
-        <b class="gray-text">Select AWS account</b>
+        <b class="gray-text">Select AWS Account</b>
         <ng-select bindLabel="accountName" bindValue="accountNumber" [items]="modalAccounts" [(ngModel)]="currentSelectedAccountNumber" placeholder="Select an Account" (change)="changeRoles($event);"></ng-select>
 
         <br>
-        <b class="gray-text">Select IAM role</b>
+        <b class="gray-text">Select IAM Role</b>
         <ng-select bindLabel="name" bindValue="name" [items]="modalRoles" [(ngModel)]="currentSelectedRole" placeholder="Select a Role"></ng-select>
 
         <br>

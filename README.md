@@ -1,7 +1,3 @@
-# Leapp
-
-- Website: [https://noovolari.github.io/leapp-website/](https://noovolari.github.io/leapp-website/#features)
-
 ![logo](.github/images/README-1.png)
 
 ## Introduction

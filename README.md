@@ -1,7 +1,6 @@
 # Leapp
 
 - Website: [https://noovolari.github.io/leapp-website/](https://noovolari.github.io/leapp-website/#features)
-- Documentation: [https://noovolari.github.io/leapp-website/documentation](https://noovolari.github.io/leapp-website/documentation)
 
 ![logo](.github/images/README-1.png)
 
@@ -50,11 +49,11 @@ Here is a list of curated **tutorials** to **help you get started**.
 - [Manage Truster Accounts and Truster Roles](.github/tutorials/MANAGE_TRUSTER_ACCOUNTS_AND_TRUSTER_ROLES.md)
 - [Manage Quick List](.github/tutorials/MANAGE_QUICK_LIST.md)
 
-## Documentation
+## Glossary
 
-Here's the link to the documentation where you can find other information about the system.
+Here's the link to the glossary where you can find other information about the system.
 
-- [https://noovolari.github.io/leapp-website/documentation](https://noovolari.github.io/leapp-website/documentation)
+- [Glossary](.github/GLOSSARY.md)
 
 ## Contributing
 

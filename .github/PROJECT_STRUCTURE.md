@@ -1,6 +1,6 @@
 # Project Structure
 
-![readme-2.png](.github/images/README-2.png)
+![readme-2.png](images/README-2.png)
 
 Here we present all the different folders of the project as well as the files in order to explain what each directory and file does and how you can modify these files according to your necessities
 

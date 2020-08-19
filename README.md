@@ -1,35 +1,43 @@
 ![logo](.github/images/README-1.png)
 
-## Introduction
-
-Read about what is Leapp to better understand how the idea born and what can you use it for.
-
 ### What is Leapp?
 
-Leapp is a tool designed to generate and store credentials used to access a Multi-Cloud environment.
+Leapp is your everyday companion to access your cloud; designed to work with multiple Identity Providers and Cloud Providers APIs, CLIs, and SDKs.
+It's a software that securely stores your access information and generates temporary credential sets to access your cloud ecosystem from your local machine.
 
 ### Why do you need to use Leapp?
 
-Leapp is intended to be used by Developers and DevOps that need to access an ecosystem of accounts, belonging to different Service Providers, on a daily basis. These account could be independent or part of an organization. Leapp may become your everyday companion if you're continuously struggling to generate and rotate credentials on which your specific Service Provider's CLI relies on.
+Leapp is intended to be used by Developers and DevOps that need to access an ecosystem of accounts, belonging to different Service Providers, on a daily basis.
+For example, while using the AWS CLI it may become annoying to switch to a different profile or use the --profile argument before issuing every command. Leapp lets you have a new set of credentials and give access to that account with a click.
 
-### What does it support now?
+### What does it support?
 
-Leapp currently support AWS as service provider and Google as Identity Provider. In the near future it will support Azure as an other Idp. Follow the [roadmap](https://github.com/Noovolari/leapp/projects/1).
+Cloud Providers:
+- **AWS** - :white_check_mark:
+- **AZURE** - :cyclone:
+- **GCP** - :cyclone:
+
+Identity Providers:
+- **G Suite** - :white_check_mark:
+- **AZURE AD** - :cyclone:
+- **AWS SSO** - :cyclone:
+
+Follow the [roadmap](https://github.com/Noovolari/leapp/projects/1) to stay up to date.
 
 ## Key features
 
 - **Federated Single Sign-On to your multi-cloud environment:** inside Leapp, you can configure the SAML SSO URL against which you can authenticate with your IdP-hosted identity, and retrieve the SAML assertion that allows federated access to your Service Provider.
-- **Credentials management:** Leapp lifts you up from the task of generating, rotating, and deleting credentials retrieved from the Service Provider to access your Cloud Resources. In case the Service Provider is AWS, credentials are generated invoking the assume-role API, that requires the SAML Assertion to be provided in the payload. Generated credentials will be rotated periodically. Once you stop the current session, credentials will be deleted for security purposes. In case the Service Provider is AWS, the credentials file will be deleted. That file will be recreated once you start a new session.
-- **Access configuration:** you can set up access to a Federated Account or to a Truster Account. A Federated Account is the one that contains information about the IdP, while the Truster Account is the one that you can access from the Federated Account. You can configure an Access Quick List, that allows you to generate a new set of credentials in a click.
+- **Credentials management:** Leapp relieves you from generating, rotating, and deleting credentials retrieved from the Service Provider to access your Cloud Resources. In case the Service Provider is AWS, credentials are generated invoking the assume-role API, that requires the SAML Assertion to be provided in the payload. Generated credentials will be rotated periodically. Once you stop the current session, credentials will be deleted for security purposes. In case the Service Provider is AWS, the credentials file will be deleted. That file will be recreated once you start a new session.
+- **Access configuration:** you can set up access to a Federated Account or to a Truster Account. A Federated Account is one that contains information about the IdP, while the Truster Account is the one that you can access from the Federated Account. You can configure an Access Quick List, that allows you to generate a new set of credentials in a click.
 
 ## Installation
 
 To install the compiled version, choose the one for your **OS** and simply **double-click** on the executable. 
 Get the latest release [here](https://github.com/Noovolari/leapp/releases/latest)
 
-## Quick start
+## Quickstart
 
-Leapp is a Desktop application build in [Electron](https://www.electronjs.org/) + [Angular 8](https://angular.io/) that manage and rotate your credentials while keeping them secure by encrypting all the information and removing the credential file and closing the session when the program is closed.
+Leapp is a desktop application build in [Electron](https://www.electronjs.org/) + [Angular 8](https://angular.io/) that manage and rotate your credentials while keeping them secure by encrypting all the information and removing the credential file and closing the session when the program is closed.
 
 ### Tutorials
 
@@ -61,11 +69,11 @@ If you'd like to contribute to our project, please follow the guidelines propose
 
 ![readme-2.png](.github/images/README-2.png)
 
-Here we present all the differents folder of the projects as well as the files in order to explain what each directory and file does and how you can modify these files according to your necessities
+Here we present all the different folders of the project as well as the files in order to explain what each directory and file does and how you can modify these files according to your necessities
 
 ### build and dist
 
-**build** and **dist** are generated by the solution when a user request a build from npm using a command like this one in example: `npm run dist mac dev` . You don't have to manage the content of these folders by yourself.
+**build** and **dist** are generated by the solution when a user requests a build with npm. For example: `npm run dist mac dev` . The content of these folders is auto-generated so you don't need to manage yourself.
 
 ### e2e
 
@@ -73,7 +81,7 @@ Here we present all the differents folder of the projects as well as the files i
 
 ### electron
 
-Is the folder generated by Electron and contains the **main.ts** file which drives the application setup and start. This is created after the Angular project has been setupped.
+Is the folder generated by Electron and contains the **main.ts** file which drives the application setup and start. This is created after the Angular project has been set up.
 
 ### node_modules
 
@@ -87,7 +95,7 @@ Release contains your built app for the OS you have asked for with the commands:
 - `npm run dist deb dev / npm run dist deb prod`
 - `npm run dist win dev / npm run dist win prod`
 
-The package is ready to be distributed but for the time being the release is done locally by developers previous QA and acceptance.
+The package is ready to be distributed but for the time being the release is done locally by developer previous QA and acceptance.
 
 
 ### scripts
@@ -95,23 +103,23 @@ The package is ready to be distributed but for the time being the release is don
 Contains 2 scripts:
 
 - **changeProductName.js:** that we use for managing the app versioning following the rules of semantic versioning
-- **notarize.js:** is created to allow notarizing of Apple apps, in order to avoid requesting validation from the user before actual running the application
+- **notarize.js:** is created to allow notarizing of Apple apps, in order to avoid requesting validation from the user before actually running the application
 
 ### src/app
 
-Inside we put the actual application code written for Angular 8. The application itself is already divided in folders to help recognise the different content and maintain the solution organised.
+Inside we put the actual application code written for Angular 8. The application itself is already divided into folders to help recognize the different content and maintain the solution organized.
 
 — **core**
 
-Core contains all the typescript files that are not directly related to Angular Components or Module and they typically are helpers functions or core logic methods. If you need to create something that does not belongs to another folder, put it here.
+**Core** contains all the typescript files that are not directly related to Angular Components or Module and they typically are helpers functions or core logic methods. If you need to create something that does not belong to another folder, put it in here.
 
 — **layout**
 
-Layout contains all the layouts used by component to standardise some aspects of the applications. At this moment we don't have a particular layout and the application show pages directly from the `<app-root>` tag in the **index.html**
+**Layout** contains all the layouts used by components to standardize some aspects of the applications. At this moment we don't have a particular layout and the application show pages directly from the `<app-root>` tag in the **index.html**
 
 — **models**
 
-in models we put all the interfaces that defines models for our application. We use them to simplify description of types for complex objects in typescript as well as defining specific templates to interpret data managed by the services. An example:
+In **models** we put all the interfaces that define models for our application. We use them to simplify description of types for complex objects in typescript as well as defining specific templates to interpret data managed by the services. An example:
 
 - Configuration
 
@@ -128,7 +136,7 @@ export interface Configuration {
 
 — **services**
 
-Services are used to define the logic behind our client and are called by the actual components when they need it. All services extends the **NativeService** one as it allows to access Electron specific libraries and methods inside Angular application. A simple one:
+**Services** are used to define the logic behind the client and are called by the actual components when they need it. All services extends the **NativeService** one as it allows to access Electron specific libraries and methods inside Angular application. A simple one:
 
 - ExecuteService
 
@@ -145,7 +153,7 @@ export class ExecuteServiceService extends NativeService {
    * Remove the note whenever a fix is found.
    * @param command - the command to launch
    * @returns an {Observable<any>} to use for subscribing to success or error event on the command termination:
-   *          the default unix standard is used so 0 represent a success code, everything elese is an error code
+   *          the default Unix standard is used so 0 represent a success code, everything else is an error code
    */
   public execute(command: string, force?: boolean): Observable<any> {
     return new Observable(
@@ -197,21 +205,21 @@ Contains all the **components** needed to manage all session related actions and
 - **edit-federated-account:** here we have the page to edit a federated account.
 - **edit-truster-account:** here we have the page to edit the truster account.
 - **list-accounts:** here we have the page to manage all the federated accounts.
-- **session:** the page we you have access to the quick list and can start and stop a specific session, thus creating or removing credentials.
-- **session-wallet:** is simply a component that give access to the actual session component as well as simply setting the email of the logged user.
+- **session:** the page we have access to the quick list and can start and stop a specific session, thus creating or removing credentials.
+- **session-wallet:** is simply a component that gives access to the actual session component as well as simply setting the email of the logged user.
 
 — **shared** 
 
-Shared is the area where all the shared component/helpers are located and ready to be used in other components. Remember to add them to the shared module in order to make them visibile in the application.
+Shared is the area where all the shared component/helpers are located and ready to be used in other components. Remember to add them to the shared module in order to make them visible in the application.
 
 — **wizard**
 
-Wizard contains all the components used for the first setup and the entry point of the application. The list of component here:
+**Wizard** contains all the components used for the first setup and the entry point of the application. The list of component here:
 
 - **dependencies-page:** the page is used as an entry point to the actual app: it checks if you already have a compatible configuration file or not, in case it launches the first time wizard setup.
-- **set-federation-url:** this page is used to set the google federation url.
+- **set-federation-url:** this page is used to set the google federation URL.
 - **setup-first-account:** setup the first federated account: this is the bare minimum to use the program.
-- **setup-spinner-for-login:** this is used to define a component that listen for google frame and spins a loader until logged in.
+- **setup-spinner-for-login:** this is used to define a component that listens for google frame and spins a loader until logged in.
 - **setup-welcome:** just a text page to welcome the user.
 - **welcome-first-account**: a page to describe the first account setup.
 
@@ -219,11 +227,11 @@ the other files inside the directory are defined by the application itself, ther
 
 — **assets**
 
-assets contains all the graphics of the application.
+assets contain all the graphics of the application.
 
 — **environments**
 
-Contains 3 files: each one represent a configuration for one of the 3 possible builds: dev, stag and prod.
+Contains 3 files: each one represents a configuration for one of the 3 possible builds: dev, stag, and prod.
 
 ### index.html
 
@@ -256,6 +264,6 @@ this.<unique_name> = (window as any).<unique_name>;
 
 ## License
 
-You can find our licence here
+You can find our license here
 
-- [LICENSE](LICENCE) (mpl-2)
+- [LICENSE](LICENSE) (mpl-2)

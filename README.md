@@ -56,32 +56,13 @@ Leapp is a desktop application build in [Electron](https://www.electronjs.org/) 
 - [Manage Truster Accounts and Truster Roles](.github/tutorials/MANAGE_TRUSTER_ACCOUNTS_AND_TRUSTER_ROLES.md)
 - [Manage Quick List](.github/tutorials/MANAGE_QUICK_LIST.md)
 
-## Glossary
+## Links
 
-Here's the link to the glossary where you can find other information about the system.
+- [Glossary](.github/GLOSSARY.md): find other information about the system
+- [Roadmap](https://github.com/Noovolari/leapp/projects/1): view our next steps and stay up to date
+- [Contributing](./.github/CONTRIBUTING.md): follow the guidelines if you'd like to contribute to the project
+- [Project Structure](./.github/PROJECT_STRUCTURE.md): check how we structured the project and where to find the files
 
-- [Glossary](.github/GLOSSARY.md)
+## License
 
-## Contributing
-
-If you'd like to contribute to our project, please follow the guidelines proposed in our **contributing** document.
-
-- [CONTRIBUTING.md](./.github/CONTRIBUTING.md)
-
-## Project Structure
-
-To learn how we structured the project and where to check for contributing refer to **project structure* document.
-
-- [PROJECT_STRUCTURE.md](./.github/PROJECT_STRUCTURE.md)
-
-## Roadmap
-
-To check our next steps and stay up to date, refer to our project roadmap.
-
-- [Roadmap](https://github.com/Noovolari/leapp/projects/1)
-
-# License
-
-You can find our license here
-
-- [LICENSE](LICENSE) (mpl-2)
+[Mozilla Public License v2.0](https://github.com/Noovolari/leapp/blob/master/LICENSE)

@@ -14,9 +14,12 @@ For example, while using the AWS CLI it may become annoying to switch to a diffe
 
 # Key features
 
-- **Federated Single Sign-On to your multi-cloud environment:** inside Leapp, you can configure the SAML SSO URL against which you can authenticate with your IdP-hosted identity, and retrieve the SAML assertion that allows federated access to your Service Provider.
-- **Credentials management:** Leapp relieves you from generating, rotating, and deleting credentials retrieved from the Service Provider to access your Cloud Resources. In case the Service Provider is AWS, credentials are generated invoking the assume-role API, that requires the SAML Assertion to be provided in the payload. Generated credentials will be rotated periodically. Once you stop the current session, credentials will be deleted for security purposes. In case the Service Provider is AWS, the credentials file will be deleted. That file will be recreated once you start a new session.
-- **Access configuration:** you can set up access to a Federated Account or to a Truster Account. A Federated Account is one that contains information about the IdP, while the Truster Account is the one that you can access from the Federated Account. You can configure an Access Quick List, that allows you to generate a new set of credentials in a click.
+- **Switch account with a click**: Collect all your cloud accounts access data in a single place and connect straight away. Leverage cloud RBAC to impersonate your roles in a click, and don’t waste time manually manage or edit your credentials file.
+- **Straight programmatic access via SSO**: Leverage your company identity to access your environment through federated single sign-on. No more credentials management. Leapp allows you to get to your cloud resources with your company email and password. Scroll down for our [supported use cases](#supported-cloud-providers).
+- **Clean credentials file**: Ever wondered what someone can do by stealing your credentials file? We got you covered. We erase these files when you close Leapp and regenerate them when you open it! Leave your desk and get a coffee at ease.
+- **Automatic credentials management**: Move freely across your multi-cloud environment as Leapp automatically manages your access credentials for you. It handles temporary keys generation, rotation, and auto-renew to comply with security best-practices.
+- **Ease federation with truster accounts**: federating each account is a pain so why don’t use truster accounts to grant access easier and painlessly? We use your federated role as a gateway to all trusted roles in all other accounts! Seems great, isn’t it? See our [documentation](https://github.com/Noovolari/leapp/blob/master/.github/GLOSSARY.md#trusting) to get more info.
+
 
 ## Supported Cloud Providers
 - **AWS** - :white_check_mark:

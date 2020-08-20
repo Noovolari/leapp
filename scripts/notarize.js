@@ -13,6 +13,7 @@ exports.default = async function notarizing(context) {
     appBundleId: 'com.noovolari.leapp',
     appPath: `${appOutDir}/${appName}.app`,
     appleId: "mobile@besharp.it",
-    appleIdPassword: `@keychain:Leapp`,
+    appleIdPassword: process.env.APPLE_NOTARISATION_PASSWORD ? process.env.APPLE_NOTARISATION_PASSWORD :
+      "@keychain:Leapp",
   });
 };

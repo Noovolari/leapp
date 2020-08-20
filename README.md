@@ -23,13 +23,13 @@ For example, while using the AWS CLI it may become annoying to switch to a diffe
 
 ## Supported Cloud Providers
 - **AWS** - :white_check_mark:
-- **AZURE** - :cyclone:
-- **GCP** - :cyclone:
+- **AZURE** - :construction:
+- **GCP** - :construction:
 
 ## Supported Identity Providers
 - **G Suite** - :white_check_mark:
-- **AZURE AD** - :cyclone:
-- **AWS SSO** - :cyclone:
+- **AZURE AD** - :construction:
+- **AWS SSO** - :construction:
 
 # Installation
 

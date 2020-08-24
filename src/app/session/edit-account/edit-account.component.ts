@@ -8,10 +8,10 @@ import {FederatedAccountService} from '../../services/federated-account.service'
 
 @Component({
   selector: 'app-edit-federated-account',
-  templateUrl: './edit-federated-account.component.html',
-  styleUrls: ['./edit-federated-account.component.scss']
+  templateUrl: './edit-account.component.html',
+  styleUrls: ['./edit-account.component.scss']
 })
-export class EditFederatedAccountComponent extends AntiMemLeak implements OnInit {
+export class EditAccountComponent extends AntiMemLeak implements OnInit {
 
   toggleOpen = true;
 

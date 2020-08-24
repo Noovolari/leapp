@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { WorkspaceBarComponent } from './workspace-bar.component';
+import { EditAccountComponent } from './edit-account.component';
 
-describe('WorkspaceBarComponent', () => {
-  let component: WorkspaceBarComponent;
-  let fixture: ComponentFixture<WorkspaceBarComponent>;
+describe('EditFederatedAccountComponent', () => {
+  let component: EditAccountComponent;
+  let fixture: ComponentFixture<EditAccountComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ WorkspaceBarComponent ]
+      declarations: [ EditAccountComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(WorkspaceBarComponent);
+    fixture = TestBed.createComponent(EditAccountComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

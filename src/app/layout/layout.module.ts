@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import {BsDropdownModule, TabsModule, TooltipModule} from 'ngx-bootstrap';
 import {TranslateModule} from '@ngx-translate/core';
 import {RouterModule} from '@angular/router';
-import { WorkspaceBarComponent } from './workspace-bar/workspace-bar.component';
+import {SessionLayoutComponent} from './session-layout/session-layout.component';
+import {SharedModule} from '../shared/shared.module';
+
 
 @NgModule({
-  declarations: [ WorkspaceBarComponent ],
+  declarations: [ SessionLayoutComponent ],
   exports: [],
   imports: [
     CommonModule,
@@ -14,7 +16,8 @@ import { WorkspaceBarComponent } from './workspace-bar/workspace-bar.component';
     TranslateModule,
     BsDropdownModule.forRoot(),
     RouterModule,
-    TooltipModule
+    TooltipModule,
+    SharedModule
   ]
 })
 export class LayoutModule { }

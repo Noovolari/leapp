@@ -8,6 +8,7 @@ export interface Workspace {
 
   lastIDPToken?: string;
   idpUrl?: string;
+  idpUrlAzure?: string;
 
   currentSessionList: SessionObject[];
 

@@ -1,0 +1,36 @@
+<div class="content flex-container column page-container" *ngIf="!loading">
+
+    <h1><img src="assets/images/welcome-icon.svg"/>&nbsp;Hello</h1>
+    <p>Setup your first account</p>
+    <br>
+    <a href="mailto:support@noovolari.com" class="dark-link"><i>Need help? Contact us!</i></a>
+    <br>
+    <button [disabled]="!this.enabled" (click)="resolveDependenciesMvp();" class="btn btn-default btn-gradient">Start</button>
+
+</div>
+
+<div class="content flex-container column page-container" *ngIf="loading">
+
+  <div class="app-loading">
+    <img src="assets/images/be-auth-logo.svg" width="100" />
+    <svg class="spinner" viewBox="25 25 50 50">
+      <defs>
+        <linearGradient id="linearColors1">
+          <stop offset="0%" stop-color="#F3AB1C"></stop>
+          <stop offset="100%" stop-color="#E15200"></stop>
+        </linearGradient>
+      </defs>
+      <circle
+        class="path"
+        cx="50"
+        cy="50"
+        r="20"
+        fill="none"
+        stroke-width="2"
+        stroke-miterlimit="10"
+        stroke="url(#linearColors1)"
+      />
+    </svg>
+  </div>
+
+</div>

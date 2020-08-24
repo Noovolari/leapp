@@ -8,10 +8,10 @@ import {FederatedAccountService} from '../../services/federated-account.service'
 
 @Component({
   selector: 'app-create-federated-account',
-  templateUrl: './create-federated-account.component.html',
-  styleUrls: ['./create-federated-account.component.scss']
+  templateUrl: './create-account.component.html',
+  styleUrls: ['./create-account.component.scss']
 })
-export class CreateFederatedAccountComponent implements OnInit {
+export class CreateAccountComponent implements OnInit {
 
   toggleOpen = true;
 

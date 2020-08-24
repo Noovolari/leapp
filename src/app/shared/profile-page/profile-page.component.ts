@@ -2,12 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {Workspace} from '../../models/workspace';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
-import {Configuration} from '../../models/configuration';
+import {AppService} from '../../services-system/app.service';
 import {FileService} from '../../services-system/file.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 
 @Component({
   selector: 'app-profile-page',
@@ -19,13 +17,12 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   name = '';
   email = '';
   idpUrlValue;
+  idpUrlValueAzure;
   workspaceData: Workspace;
-
-  // Modal Reference and data
-  modalRef: BsModalRef;
 
   public form = new FormGroup({
     idpUrl: new FormControl('', [Validators.required]),
+    idpUrlAzure: new FormControl('', [Validators.required]),
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -33,15 +30,16 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     private configurationService: ConfigurationService,
     private appService: AppService,
     private fileService: FileService,
-    private router: Router,
-    private modalService: BsModalService
+    private router: Router
   ) { super(); }
 
   ngOnInit() {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData.name && this.workspaceData.name !== '') {
       this.idpUrlValue = this.workspaceData.idpUrl;
+      this.idpUrlValueAzure = this.workspaceData.idpUrlAzure;
       this.form.controls['idpUrl'].setValue(this.idpUrlValue);
+      this.form.controls['idpUrlAzure'].setValue(this.idpUrlValueAzure);
       this.name = this.workspaceData.name;
       this.email = localStorage.getItem('hook_email') || 'not logged in yet';
       this.appService.validateAllFormFields(this.form);
@@ -51,9 +49,10 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   /**
    * Save the idp-url again
    */
-  saveIdpUrl() {
+  saveIdpUrls() {
     if (this.form.valid) {
       this.workspaceData.idpUrl = this.form.value.idpUrl;
+      this.workspaceData.idpUrlAzure = this.form.value.idpUrlAzure;
       this.configurationService.updateWorkspaceSync(this.workspaceData);
     }
   }

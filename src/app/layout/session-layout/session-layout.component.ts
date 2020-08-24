@@ -5,10 +5,10 @@ import {AppService} from '../../services-system/app.service';
 
 @Component({
   selector: 'app-session-wallet',
-  templateUrl: './session-wallet.component.html',
-  styleUrls: ['./session-wallet.component.scss']
+  templateUrl: './session-layout.component.html',
+  styleUrls: ['./session-layout.component.scss']
 })
-export class SessionWalletComponent implements OnInit {
+export class SessionLayoutComponent implements OnInit {
 
   name = '';
   email = '';

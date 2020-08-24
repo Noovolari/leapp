@@ -1,18 +1,17 @@
 import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {AppService} from '../../services-system/app.service';
 import {Router} from '@angular/router';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {WorkspaceService} from '../../services/workspace.service';
-import {environment} from '../../../environments/environment';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 
 @Component({
   selector: 'app-wizard-page',
-  templateUrl: './dependencies-page.component.html',
-  styleUrls: ['./dependencies-page.component.scss']
+  templateUrl: './start-screen.component.html',
+  styleUrls: ['./start-screen.component.scss']
 })
-export class DependenciesPageComponent extends AntiMemLeak implements OnInit, AfterViewInit {
+export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterViewInit {
 
   private OS: string;
 
@@ -77,7 +76,7 @@ export class DependenciesPageComponent extends AntiMemLeak implements OnInit, Af
       // otherwise we go directly to the session download as we need the list
       // Stop the loader
       this.loading = false;
-      this.router.navigate(['/wizard', 'setup-welcome']);
+      this.router.navigate(['/wizard', 'setup-federation-url']);
     }
   }
 

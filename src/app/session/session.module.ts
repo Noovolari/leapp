@@ -4,27 +4,21 @@ import {SessionRoutingModule} from './session-routing.module';
 import {SessionComponent} from './session/session.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../shared/shared.module';
-import {SessionWalletComponent} from './session-wallet/session-wallet.component';
-import {CreateFederatedAccountComponent} from './create-federated-account/create-federated-account.component';
-import {CreateTrusterAccountComponent} from './create-truster-account/create-truster-account.component';
-import {ListAccountsComponent} from './list-accounts/list-accounts.component';
+import {CreateAccountComponent} from './create-account/create-account.component';
 import {NgSelectModule} from '@ng-select/ng-select';
 import {EditTrusterAccountComponent} from './edit-truster-account/edit-truster-account.component';
-import {EditFederatedAccountComponent} from './edit-federated-account/edit-federated-account.component';
-import {AccountComponent} from './account/account.component';
+import {EditAccountComponent} from './edit-account/edit-account.component';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
+import {CreateTrusterAccountComponent} from './create-truster-account/create-truster-account.component';
 
 
 @NgModule({
   declarations: [
-    SessionWalletComponent,
     SessionComponent,
-    CreateFederatedAccountComponent,
+    CreateAccountComponent,
     CreateTrusterAccountComponent,
-    ListAccountsComponent,
     EditTrusterAccountComponent,
-    EditFederatedAccountComponent,
-    AccountComponent
+    EditAccountComponent
   ],
   imports: [
     CommonModule,

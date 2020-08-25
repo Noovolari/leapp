@@ -76,7 +76,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
       // otherwise we go directly to the session download as we need the list
       // Stop the loader
       this.loading = false;
-      this.router.navigate(['/wizard', 'setup-federation-url']);
+      this.router.navigate(['/wizard', 'setup-first-account']);
     }
   }
 

@@ -1,22 +1,30 @@
 <div class="container-fluid">
   <h1>Create Your First Account</h1>
 
-  <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveFirstAccount();">
+  <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveAccount();">
 
     <div class="toggable {{toggleOpen ? 'opened' : 'closed'}}">
-      <div class="titable" title="Account Details" (click)="$event.stopPropagation(); toggleOpen = !toggleOpen;"></div>
+      <div class="titable" title="Generals" (click)="$event.stopPropagation(); toggleOpen = !toggleOpen;"></div>
       <div class="shrinkable">
-        <div class="form-group" style="width: 100%; display: inline-block;">
-          <label>IdP ARN<span class="danger-text">*</span></label>
-          <input formControlName="idpArn" type="text" class="form-control" placeholder="Idp Arn *" (blur)="setAccountNumber($event);">
-          <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the IdP ARN</small>
-        </div>
 
         <div class="form-group" style="width: 100%; display: inline-block;">
           <label>Account Alias<span class="danger-text">*</span></label>
           <input formControlName="name" type="text" class="form-control" placeholder="Account Alias *">
           <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
         </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>SSO Url<span class="danger-text">*</span></label>
+          <input formControlName="federationUrl" type="url" class="form-control" placeholder="single sign-on url *">
+          <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.controls['federationUrl'].errors">Insert the SSO url</small>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="toggable {{toggleOpen ? 'opened' : 'closed'}}">
+      <div class="titable" title="Account Details" (click)="$event.stopPropagation(); toggleOpen = !toggleOpen;"></div>
+      <div class="shrinkable">
 
         <div class="form-group" style="width: 49%; display: inline-block;">
           <label>Account Number<span class="danger-text">*</span></label>
@@ -27,13 +35,23 @@
         <div style="width: 2%; height: 1px; display: inline-block;"></div>
 
         <div class="form-group" style="width: 49%; display: inline-block;">
-          <label>AWS Region</label>
-          <ng-select formControlName="myRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
+          <label>Federated or truster?</label>
+          <ng-select formControlName="federatedOrTruster" bindLabel="type" bindValue="type" [items]="types" [(ngModel)]="selectedType" dropdownPosition="bottom" ></ng-select>
         </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="selectedType == 'federated'">
+          <label>IdP ARN<span class="danger-text">*</span></label>
+          <input formControlName="idpArn" type="text" class="form-control" placeholder="Idp Arn *" (blur)="setAccountNumber($event);">
+          <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the IdP ARN</small>
+        </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block; position: relative; top: -1px;" *ngIf="selectedType == 'truster'">
+          <label style="margin-bottom: 0;">Federated Role<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
+          <ng-select class="mt-2" formControlName="federatedRole" bindLabel="name" bindValue="name" dropdownPosition="top" [items]="federatedRoles" [(ngModel)]="selectedRole"></ng-select>
+        </div>
+
       </div>
     </div>
-
-    <hr>
 
     <div class="toggable {{!toggleOpen ? 'opened' : 'closed'}}">
       <div class="titable" title="Role Details" (click)="$event.stopPropagation(); toggleOpen = !toggleOpen;"></div>
@@ -56,7 +74,7 @@
       </div>
     </div>
 
-    <button type="button" (click)="saveFirstAccount();" [disabled]="!(form.valid && this.roles.length > 0)" [ngClass]="!(form.valid && this.roles.length > 0) ? 'btn btn-default pull-right': 'btn btn-default btn-gradient pull-right'">Save</button>
+    <button type="button" (click)="saveAccount();" [disabled]="!(form.valid && this.roles.length > 0)" [ngClass]="!(form.valid && this.roles.length > 0) ? 'btn btn-default pull-right': 'btn btn-default btn-gradient pull-right'">Save</button>
 
   </form>
 

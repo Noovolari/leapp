@@ -2,10 +2,12 @@ import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AppService, ToastLevel} from '../../services-system/app.service';
-import {Router} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
 import {FederatedAccountService} from '../../services/federated-account.service';
+import {Workspace} from '../../models/workspace';
+import {AwsAccount} from '../../models/aws-account';
 
 @Component({
   selector: 'app-setup-first-account',
@@ -15,20 +17,34 @@ import {FederatedAccountService} from '../../services/federated-account.service'
 export class SetupFirstAccountComponent implements OnInit {
 
   toggleOpen = true;
-
-  regions = [];
   roles: string[] = [];
-
   checkDisabled = false;
 
-  @Input() selectedRegion;
+  @Input() selectedAccount = '';
+  @Input() selectedAccountNumber = '';
+  @Input() selectedRole = '';
+
+  @Input() fedUrl = '';
+  @Input() fedUrlAzure = '';
+
+  types = [{type: 'federated'}, {type: 'truster'}];
+  federatedRoles: { name: string, roleArn: string }[] = [];
+
+  workspace: Workspace;
+  accounts: AwsAccount[];
+  accountId;
+
+  @Input() selectedType;
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
   public form = new FormGroup({
     idpArn: new FormControl('', [Validators.required]),
     accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
     name: new FormControl('', [Validators.required]),
-    myRegion: new FormControl('', [Validators.required])
+    ssoUrl: new FormControl('', [Validators.required]),
+    federatedOrTruster: new FormControl('', [Validators.required]),
+    federatedRole: new FormControl('', [Validators.required]),
+    federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
   });
 
   /* Setup the first account for the application */
@@ -36,14 +52,35 @@ export class SetupFirstAccountComponent implements OnInit {
     private configurationService: ConfigurationService,
     private appService: AppService,
     private router: Router,
+    private activatedRoute: ActivatedRoute,
     private credentialsService: CredentialsService,
     private sessionService: SessionService,
     private fedAccountService: FederatedAccountService) {
   }
 
   ngOnInit() {
-    this.regions = this.appService.getRegions();
-    this.selectedRegion = this.regions[0].region;
+    const sub = this.activatedRoute.queryParams.subscribe(params => {
+      this.accountId = params['accountId'];
+      if (!this.accountId.isEmpty) {
+        // Get the workspace and the accounts you need
+        this.workspace = this.configurationService.getDefaultWorkspaceSync();
+        this.accounts = this.fedAccountService.listFederatedAccountInWorkSpace();
+
+        // Get the appropriate roles
+        const account = this.accounts.filter(acc => (acc.accountId === this.accountId))[0];
+        this.federatedRoles = account.awsRoles;
+
+        // Set the federated role automatically
+        this.selectedAccount = account.accountNumber;
+        this.selectedAccountNumber = account.accountNumber;
+        this.selectedRole = this.federatedRoles[0].name;
+
+        // Check if we already have the fed Url: [this and many other element: we must decide if we want to create a simple create and a edit separately or fuse them together, i'm keeping them here until the refactoring is done]
+        const config = this.configurationService.getConfigurationFileSync();
+        this.fedUrl = config.federationUrl;
+        this.fedUrlAzure = config.federationUrlAzure;
+      }
+    });
   }
 
   /**
@@ -57,7 +94,7 @@ export class SetupFirstAccountComponent implements OnInit {
   /**
    * Save the first account in the workspace
    */
-  saveFirstAccount() {
+  saveAccount() {
     if (this.form.valid && this.roles.length > 0) {
       try {
         // If the form is valid we save the first account in the configuration
@@ -78,11 +115,18 @@ export class SetupFirstAccountComponent implements OnInit {
           `background-1`,
           true);
 
+        // Update Configuration
+        const config = this.configurationService.getConfigurationFileSync();
+        config.federationUrl = this.form.value.federationUrl;
+        this.configurationService.updateConfigurationFileSync(config);
+
         // When we define a new session and we want to activate it: use the refresh credential emit
         this.credentialsService.refreshCredentialsEmit.emit();
 
+        // Then go to next page: in this case we go to the spinning are for first token and workspace definition in the normal version we use the url below
+        this.router.navigate(['/wizard', 'setup-spinner-for-login']);
         // Then go to the dashboard
-        this.router.navigate(['/sessions', 'session-selected'], {queryParams: {firstAccount: true}});
+        // this.router.navigate(['/sessions', 'session-selected'], {queryParams: {firstAccount: true}});
       } catch (err) {
         this.appService.toast(err, ToastLevel.ERROR);
       }

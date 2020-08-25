@@ -20,7 +20,7 @@ export class SetupFirstAccountComponent implements OnInit {
   roles: string[] = [];
   checkDisabled = false;
 
-  @Input() selectedAccount = '';
+  @Input() selectedAccount;
   @Input() selectedAccountNumber = '';
   @Input() selectedRole = '';
 
@@ -29,12 +29,13 @@ export class SetupFirstAccountComponent implements OnInit {
 
   types = [{type: 'federated'}, {type: 'truster'}];
   federatedRoles: { name: string, roleArn: string }[] = [];
+  federatedAccounts: AwsAccount[] = [];
 
   workspace: Workspace;
   accounts: AwsAccount[];
   accountId;
 
-  @Input() selectedType;
+  @Input() selectedType = 'federated';
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
   public form = new FormGroup({
@@ -44,6 +45,7 @@ export class SetupFirstAccountComponent implements OnInit {
     ssoUrl: new FormControl('', [Validators.required]),
     federatedOrTruster: new FormControl('', [Validators.required]),
     federatedRole: new FormControl('', [Validators.required]),
+    federatedAccount: new FormControl('', [Validators.required]),
     federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
   });
 
@@ -59,28 +61,29 @@ export class SetupFirstAccountComponent implements OnInit {
   }
 
   ngOnInit() {
-    const sub = this.activatedRoute.queryParams.subscribe(params => {
-      this.accountId = params['accountId'];
-      if (!this.accountId.isEmpty) {
-        // Get the workspace and the accounts you need
-        this.workspace = this.configurationService.getDefaultWorkspaceSync();
-        this.accounts = this.fedAccountService.listFederatedAccountInWorkSpace();
 
-        // Get the appropriate roles
-        const account = this.accounts.filter(acc => (acc.accountId === this.accountId))[0];
-        this.federatedRoles = account.awsRoles;
+    // Get the workspace and the accounts you need
+    this.workspace = this.configurationService.getDefaultWorkspaceSync();
+    this.accounts = this.fedAccountService.listFederatedAccountInWorkSpace();
 
-        // Set the federated role automatically
-        this.selectedAccount = account.accountNumber;
-        this.selectedAccountNumber = account.accountNumber;
-        this.selectedRole = this.federatedRoles[0].name;
+    // Show the federated accounts
+    this.federatedAccounts = this.accounts;
 
-        // Check if we already have the fed Url: [this and many other element: we must decide if we want to create a simple create and a edit separately or fuse them together, i'm keeping them here until the refactoring is done]
-        const config = this.configurationService.getConfigurationFileSync();
-        this.fedUrl = config.federationUrl;
-        this.fedUrlAzure = config.federationUrlAzure;
-      }
-    });
+    // Check if we already have the fed Url: [this and many other element: we must decide if we want to create a simple create and a edit separately or fuse them together, i'm keeping them here until the refactoring is done]
+    const config = this.configurationService.getConfigurationFileSync();
+    this.fedUrl = config.federationUrl;
+    this.fedUrlAzure = config.federationUrlAzure;
+
+  }
+
+  getFedRoles() {
+    // Get the appropriate roles
+    const account = this.accounts.filter(acc => (acc.accountId === this.selectedAccount))[0];
+    this.federatedRoles = account.awsRoles;
+
+    // Set the federated role automatically
+    this.selectedAccountNumber = account.accountNumber;
+    this.selectedRole = this.federatedRoles[0].name;
   }
 
   /**

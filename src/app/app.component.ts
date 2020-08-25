@@ -34,7 +34,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
 
     // Initial starting point for DEBUG
-    this.router.navigate(['/wizard', 'dependencies']);
+    this.router.navigate(['/wizard', 'start-screen']);
     // Use ngx bootstrap 4
     setTheme('bs4');
     // Register locale languages and set the default one: we currently use only en

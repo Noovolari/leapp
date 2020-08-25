@@ -45,9 +45,20 @@
           <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the IdP ARN</small>
         </div>
 
-        <div class="form-group" style="width: 100%; display: inline-block; position: relative; top: -1px;" *ngIf="selectedType == 'truster'">
-          <label style="margin-bottom: 0;">Federated Role<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
-          <ng-select class="mt-2" formControlName="federatedRole" bindLabel="name" bindValue="name" dropdownPosition="top" [items]="federatedRoles" [(ngModel)]="selectedRole"></ng-select>
+        <div *ngIf="selectedType == 'truster'">
+
+          <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
+            <label style="margin-bottom: 0;">Federated Account<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
+            <ng-select class="mt-2" formControlName="federatedAccount" bindLabel="accountName" bindValue="accountNumber" dropdownPosition="top" [items]="federatedAccounts" [(ngModel)]="selectedAccount" (change)="getFedRoles();"></ng-select>
+          </div>
+
+          <div style="width: 2%; height: 1px; display: inline-block;"></div>
+
+          <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;">
+            <label style="margin-bottom: 0;">Federated Role<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
+            <ng-select class="mt-2" formControlName="federatedRole" bindLabel="name" bindValue="name" dropdownPosition="top" [items]="federatedRoles" [(ngModel)]="selectedRole"></ng-select>
+          </div>
+
         </div>
 
       </div>

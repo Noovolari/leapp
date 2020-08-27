@@ -11,7 +11,7 @@
     margin-top: 30px;
     font-size: 22px;
     font-weight: 400;
-    margin-bottom: 19px;
+    margin-bottom: 40px;
     color: #707070;
     text-align: left;
   }
@@ -94,7 +94,7 @@
   background:linear-gradient(-90deg, rgb(249, 212, 35) 0%, rgb(230, 92, 0) 80%)!important;
 }
 
-label { font-size: 14px; }
+label { font-size: 12px; }
 
 .orange-color {
   color: #fd9d20;
@@ -160,4 +160,19 @@ li:last-child {
 
 .ng-dropdown-panel .ng-dropdown-panel-items {
   max-height: 188px;
+}
+
+.account-type {
+  border: 1px solid #222222;
+  outline: none;
+  background: #ffffff;
+  color: #222222;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+.account-type:hover {
+  background: #cfd2d3;
+}
+.account-type.selected {
+  background: #ff9e39;
 }

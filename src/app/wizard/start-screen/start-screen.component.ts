@@ -1,9 +1,8 @@
 import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
-import {AppService} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {Router} from '@angular/router';
 import {ConfigurationService} from '../../services-system/configuration.service';
-import {WorkspaceService} from '../../services/workspace.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 
 @Component({
@@ -18,13 +17,9 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
   @Input() versionLabel = '...';
 
   enabled = false;
-  showCLiError = false;
-  genericError = false;
-  licenceError = false;
   cliError = false;
-
-  loading = true;
-  licenceErrorMessage;
+  loading = false;
+  workspace;
 
   /**
    * Dependencies Page is used to check if we already have the correct configuratrion and send you to the session page or to the setup wizard otherwise
@@ -33,39 +28,45 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     private router: Router,
     private exec: ExecuteServiceService,
     public app: AppService,
-    private configurationService: ConfigurationService,
-    private workspaceService: WorkspaceService,
+    private configurationService: ConfigurationService
   ) {
     super();
 
     this.OS = this.app.detectOs();
     this.app.enablePowerMonitorFeature();
+    this.workspace = this.configurationService.getDefaultWorkspaceSync();
   }
 
-  ngOnInit() {
-    this.resolveDirectly();
-  }
+  ngOnInit() {}
 
   ngAfterViewInit() {
+    // Generate the contextual menu
     this.app.generateMenu();
+    // Check if we need to go directly to the session list
+    if (this.isAlreadyConfigured()) {
+      // We already have at least one default account to start, let's go to session page
+      this.router.navigate(['/sessions', 'session-selected']);
+    }
   }
 
-  resolveDirectly() {
-    this.enabled = true;
-    this.loading = false;
-    this.resolveDependenciesMvp();
+  /**
+   * Is the app already configured or not?
+   */
+  isAlreadyConfigured() {
+    return this.workspace.accountRoleMapping &&
+      this.workspace.accountRoleMapping.accounts &&
+      this.workspace.accountRoleMapping.accounts.length > 0;
   }
 
   // MVP: we use this to just check if aws cli is installed in order to proceed to
   // step 3: when going off MVP return to correct method above
   resolveDependenciesMvp() {
+    // Prepare variables to start doing things
     this.loading = true;
-
+    this.enabled = true;
     // Valid Licence already go on as always
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace.accountRoleMapping &&
-        workspace.accountRoleMapping.accounts &&
-        workspace.accountRoleMapping.accounts.length > 0) {
+
+    if (this.isAlreadyConfigured()) {
       // Stop the loader
       this.loading = false;
       // We already have at least one default account to start, let's go to session page

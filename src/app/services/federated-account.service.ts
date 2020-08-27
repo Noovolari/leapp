@@ -55,7 +55,11 @@ export class FederatedAccountService extends NativeService {
    */
   listFederatedAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    return workspace.accountRoleMapping.accounts.filter(ele => (ele.parent === undefined && ele.awsRoles[0].parent === undefined));
+    if (workspace && workspace.accountRoleMapping) {
+      return workspace.accountRoleMapping.accounts.filter(ele => (ele.parent === undefined && ele.awsRoles[0].parent === undefined));
+    } else {
+      return [];
+    }
   }
 
   /**

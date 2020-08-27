@@ -5,6 +5,7 @@ import {AppService, ToastLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FederatedAccountService} from '../../services/federated-account.service';
+import {AwsAccount} from '../../models/aws-account';
 
 @Component({
   selector: 'app-edit-federated-account',
@@ -88,7 +89,7 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
           type: 'AWS'
         };
 
-        this.fedAccountService.updateFederatedAccount(acc);
+        this.fedAccountService.updateFederatedAccount(acc as AwsAccount);
 
 
         // Then go to next page

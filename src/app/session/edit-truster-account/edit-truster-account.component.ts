@@ -110,7 +110,7 @@ export class EditTrusterAccountComponent extends AntiMemLeak implements OnInit {
         region: this.form.value.myRegion,
       };
 
-      const updated = this.trusterAccountService.updateTrusterAccount(tacc);
+      const updated = this.trusterAccountService.updateTrusterAccount(tacc as AwsAccount);
       if (updated) {
         this.router.navigate(['/sessions', 'account'], {queryParams: {accountId: this.parentAccountId}});
       } else {

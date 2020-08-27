@@ -11,7 +11,6 @@ import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
 import {WorkspaceService} from './services/workspace.service';
 import {SessionService} from './services/session.service';
-import {tap} from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -64,7 +63,7 @@ export class AppComponent implements OnInit {
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
-      this.beforeCloseInstructions().subscribe(() => ipc.send('closed'));
+      this.beforeCloseInstructions();
     });
 
     // We start the current session if there is one
@@ -83,19 +82,7 @@ export class AppComponent implements OnInit {
    * This is an hook on the closing app to remove credential file and force stop using them
    */
   beforeCloseInstructions() {
-    // Send a STOP signal to backend
-    return this.workspaceService.refreshSessionUpdateToBackend(null).pipe(
-      tap(() => {
-        // Check if we are here
-        this.app.logger('Closing app...', LoggerLevel.INFO);
-        // Stop the session...
-        this.sessionService.stopSession();
-        // Stop credentials to be used
-        this.credentialsService.refreshCredentialsEmit.emit();
-        // Clean the config file
-        this.app.cleanCredentialFile();
-      })
-    );
+    this.app.cleanBeforeExit();
   }
 }
 

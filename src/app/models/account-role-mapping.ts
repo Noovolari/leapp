@@ -1,5 +1,5 @@
-import {AwsAccount} from './aws-account';
+import {Account} from './account';
 
 export interface AccountRoleMapping {
-  accounts: AwsAccount[];
+  accounts: Account[];
 }

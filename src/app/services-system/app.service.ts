@@ -6,6 +6,8 @@ import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirm
 import {BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
+import {SessionService} from '../services/session.service';
+import {CredentialsService} from '../services/credentials.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +24,9 @@ export class AppService extends NativeService {
   constructor(
     private fileService: FileService,
     private toastr: ToastrService,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private sessionService: SessionService,
+    private credentialsService: CredentialsService
   ) {
     super();
   }
@@ -359,7 +363,7 @@ export class AppService extends NativeService {
       { label: 'Show', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); } },
       { label: 'About', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); this.dialog.showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Noovolari Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 noovolari srl.', buttons: ['Ok'] }); } },
       { type: 'separator' },
-      { label: 'Quit', type: 'normal', click: (menuItem, browserWindow, event) => { this.fs.writeFileSync(awsCredentialsPath, ''); this.app.exit(0); } },
+      { label: 'Quit', type: 'normal', click: (menuItem, browserWindow, event) => { this.cleanBeforeExit(); } },
     ]);
 
     this.currentTray = new this.Tray(__dirname + `/assets/images/LeappMini.png`);
@@ -375,6 +379,29 @@ export class AppService extends NativeService {
     } catch (e) {
       this.logger(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.WARN);
     }
+  }
+
+  /**
+   * Remove session and credential file before exiting program
+   */
+  cleanBeforeExit() {
+    // Check if we are here
+    this.logger('Closing app...', LoggerLevel.INFO);
+
+    // We need the Try/Catch as we have a the possibility to call the method without sessions
+    try {
+      // Stop the session...
+      this.sessionService.stopSession();
+      // Stop credentials to be used
+      this.credentialsService.refreshCredentialsEmit.emit();
+      // Clean the config file
+      this.cleanCredentialFile();
+    } catch (err) {
+      this.logger('No sessions to stop, skipping...', LoggerLevel.INFO);
+    }
+
+    // Finally quit
+    this.quit();
   }
 
 }

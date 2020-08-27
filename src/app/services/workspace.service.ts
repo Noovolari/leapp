@@ -1,14 +1,12 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {HttpClient, HttpHeaders} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
 import {Observable, of} from 'rxjs';
-import {environment} from '../../environments/environment';
-import {catchError, switchMap, tap} from 'rxjs/operators';
-
+import {AwsAccount} from '../models/aws-account';
 // Import AWS node style
 const AWS = require('aws-sdk');
 
@@ -306,7 +304,7 @@ export class WorkspaceService extends NativeService {
 
     let parentAccount;
     let parentRole;
-    const selectedAccount = workspace.accountRoleMapping.accounts.filter(account => account.accountNumber === obtainerObject.accountNumber)[0];
+    const selectedAccount = workspace.accountRoleMapping.accounts.filter(account => (account as AwsAccount).accountNumber === obtainerObject.accountNumber)[0] as AwsAccount;
     const selectedRole = selectedAccount.awsRoles.filter(role => role.name === obtainerObject.roleId)[0];
     const roleName = selectedRole.name;
 
@@ -316,7 +314,7 @@ export class WorkspaceService extends NativeService {
     if (selectedAccount.parent || selectedRole.parent) {
       const selectedElement = selectedAccount.parent || selectedRole.parent;
       const selectedParentRole = selectedAccount.parentRole || selectedRole.parentRole;
-      parentAccount = workspace.accountRoleMapping.accounts.filter(account => selectedElement === account.accountNumber)[0];
+      parentAccount = workspace.accountRoleMapping.accounts.filter(account => selectedElement === (account as AwsAccount).accountNumber)[0];
       parentRole = parentAccount.awsRoles.filter(role => role.name === selectedParentRole)[0];
     }
 
@@ -440,7 +438,7 @@ export class WorkspaceService extends NativeService {
   constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, accountNumber: string): AwsCredentials {
 
     // Get account and check for region request
-    const account = workspace.accountRoleMapping.accounts.filter(acc => acc.accountNumber === accountNumber)[0];
+    const account = workspace.accountRoleMapping.accounts.filter(acc => (acc as AwsAccount).accountNumber === accountNumber)[0] as AwsAccount;
     const region = account.region;
 
     // these are the standard STS response types

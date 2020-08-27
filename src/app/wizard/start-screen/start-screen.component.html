@@ -1,12 +1,12 @@
 <div class="content flex-container column page-container" *ngIf="!loading">
 
-    <h1><img src="assets/images/welcome-icon.svg"/>&nbsp;Hello</h1>
+    <img src="assets/images/Leapp.png" width="200"/>
+    <br>
     <p>Setup your first account</p>
     <br>
-    <a href="mailto:support@noovolari.com" class="dark-link"><i>Need help? Contact us!</i></a>
+    <button (click)="resolveDependenciesMvp();" class="btn btn-default btn-gradient">Create your first account</button>
     <br>
-    <button [disabled]="!this.enabled" (click)="resolveDependenciesMvp();" class="btn btn-default btn-gradient">Start</button>
-
+    <a href="mailto:support@noovolari.com" class="dark-link"><i>Need help? Contact us!</i></a>
 </div>
 
 <div class="content flex-container column page-container" *ngIf="loading">

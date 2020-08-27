@@ -1,6 +1,7 @@
 export interface AccountData {
   accountName: string;
-  accountNumber: string;
+  accountNumber?: string;
+  subscriptionId?: string;
 }
 
 export interface RoleData {

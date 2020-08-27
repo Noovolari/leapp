@@ -1,4 +1,4 @@
-export interface AwsAccount {
+export interface AwsAccount extends Account {
   accountId: number;
   accountName: string;
   accountNumber: string;

@@ -7,16 +7,12 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../shared/shared.module';
 import {SetupFirstAccountComponent} from './setup-first-account/setup-first-account.component';
-import {SetFederationUrlComponent} from './set-federation-url/set-federation-url.component';
-import {SetupSpinnerForLoginComponent} from './setup-spinner-for-login/setup-spinner-for-login.component';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
 
 @NgModule({
   declarations: [
     StartScreenComponent,
-    SetupFirstAccountComponent,
-    SetFederationUrlComponent,
-    SetupSpinnerForLoginComponent
+    SetupFirstAccountComponent
   ],
   imports: [
     CommonModule,

@@ -4,16 +4,13 @@ import { SessionLayoutComponent } from '../layout/session-layout/session-layout.
 import { SessionComponent } from './session/session.component';
 import { CreateAccountComponent } from './create-account/create-account.component';
 import { EditAccountComponent } from './edit-account/edit-account.component';
+import {NoAppbarLayoutComponent} from '../layout/noappbar-layout/noappbar-layout.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: SessionLayoutComponent, // Used as a layout for the sessions
+    component: NoAppbarLayoutComponent, // Used as a layout for the sessions
     children: [
-      {
-        path: 'session-selected',
-        component: SessionComponent // the actual screen where you manage the session credentials
-      },
       {
         path: 'create-account',
         component: CreateAccountComponent
@@ -21,6 +18,16 @@ const routes: Routes = [
       {
         path: 'edit-account',
         component: EditAccountComponent
+      },
+      {
+        path: '',
+        component: SessionLayoutComponent,
+        children: [
+          {
+            path: 'session-selected',
+            component: SessionComponent // the actual screen where you manage the session credentials
+          }
+        ]
       }
     ]
   }

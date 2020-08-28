@@ -4,6 +4,7 @@ import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {Router} from '@angular/router';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
+import {MenuService} from '../../services/menu.service';
 
 @Component({
   selector: 'app-wizard-page',
@@ -27,13 +28,14 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
   constructor(
     private router: Router,
     private exec: ExecuteServiceService,
-    public app: AppService,
-    private configurationService: ConfigurationService
+    private appService: AppService,
+    private configurationService: ConfigurationService,
+    private menuService: MenuService
   ) {
     super();
 
-    this.OS = this.app.detectOs();
-    this.app.enablePowerMonitorFeature();
+    this.OS = this.appService.detectOs();
+    this.appService.enablePowerMonitorFeature();
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
   }
 
@@ -41,7 +43,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
 
   ngAfterViewInit() {
     // Generate the contextual menu
-    this.app.generateMenu();
+    this.menuService.generateMenu();
     // Check if we need to go directly to the session list
     if (this.isAlreadyConfigured()) {
       // We already have at least one default account to start, let's go to session page

@@ -153,9 +153,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   /**
    * Go to Account Management
    */
-  gotToAccountManagement() {
+  createAccount() {
     // Go!
-    this.router.navigate(['/sessions', 'list-accounts']);
+    this.router.navigate(['/sessions', 'create-account']);
   }
 
   /**

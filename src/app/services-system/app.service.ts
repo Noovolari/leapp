@@ -17,16 +17,12 @@ export class AppService extends NativeService {
   isResuming: EventEmitter<boolean> = new EventEmitter<boolean>();
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
   avatarSelected: EventEmitter<{havePortrait: boolean, portrait: string}> = new EventEmitter<{havePortrait: boolean, portrait: string}>();
-  // Used to define the only tray we want as active expecially in linux context
-  currentTray;
 
   /* This service is defined to provide different app wide methods as utilities */
   constructor(
     private fileService: FileService,
     private toastr: ToastrService,
     private modalService: BsModalService,
-    private sessionService: SessionService,
-    private credentialsService: CredentialsService
   ) {
     super();
   }
@@ -355,21 +351,7 @@ export class AppService extends NativeService {
     });
   }
 
-  generateMenu() {
-    const version = this.app.getVersion();
-    const awsCredentialsPath = this.os.homedir() + '/' + environment.credentialsDestination;
-    const contextMenu = this.Menu.buildFromTemplate([
 
-      { label: 'Show', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); } },
-      { label: 'About', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); this.dialog.showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Noovolari Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 noovolari srl.', buttons: ['Ok'] }); } },
-      { type: 'separator' },
-      { label: 'Quit', type: 'normal', click: (menuItem, browserWindow, event) => { this.cleanBeforeExit(); } },
-    ]);
-
-    this.currentTray = new this.Tray(__dirname + `/assets/images/LeappMini.png`);
-    this.currentTray.setToolTip('Leapp');
-    this.currentTray.setContextMenu(contextMenu);
-  }
 
   cleanCredentialFile() {
     try {
@@ -379,29 +361,6 @@ export class AppService extends NativeService {
     } catch (e) {
       this.logger(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.WARN);
     }
-  }
-
-  /**
-   * Remove session and credential file before exiting program
-   */
-  cleanBeforeExit() {
-    // Check if we are here
-    this.logger('Closing app...', LoggerLevel.INFO);
-
-    // We need the Try/Catch as we have a the possibility to call the method without sessions
-    try {
-      // Stop the session...
-      this.sessionService.stopSession();
-      // Stop credentials to be used
-      this.credentialsService.refreshCredentialsEmit.emit();
-      // Clean the config file
-      this.cleanCredentialFile();
-    } catch (err) {
-      this.logger('No sessions to stop, skipping...', LoggerLevel.INFO);
-    }
-
-    // Finally quit
-    this.quit();
   }
 
 }

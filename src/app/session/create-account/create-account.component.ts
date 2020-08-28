@@ -1,73 +1,174 @@
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {Router} from '@angular/router';
-import {AppService, ToastLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
-import {WorkspaceService} from '../../services/workspace.service';
+import {AppService, ToastLevel} from '../../services-system/app.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {CredentialsService} from '../../services/credentials.service';
+import {SessionService} from '../../services/session.service';
 import {FederatedAccountService} from '../../services/federated-account.service';
+import {Workspace} from '../../models/workspace';
+import {AwsAccount} from '../../models/aws-account';
+import {TrusterAccountService} from '../../services/truster-account.service';
+import {AzureAccountService} from '../../services/azure-account.service';
+import {WorkspaceService} from '../../services/workspace.service';
 
 @Component({
-  selector: 'app-create-federated-account',
+  selector: 'app-create-account',
   templateUrl: './create-account.component.html',
   styleUrls: ['./create-account.component.scss']
 })
 export class CreateAccountComponent implements OnInit {
 
   toggleOpen = true;
+  roles: string[] = [];
+  checkDisabled = false;
+
+  accountType = 'AWS';
+
+  @Input() selectedAccount;
+  @Input() selectedAccountNumber = '';
+  @Input() selectedRole = '';
+
+  @Input() fedUrl = '';
+  @Input() fedUrlAzure = '';
+
+  federatedRoles: { name: string, roleArn: string }[] = [];
+  federatedAccounts: AwsAccount[] = [];
+
+  workspace: Workspace;
+  accounts: AwsAccount[];
+  accountId;
+
+  @Input() selectedType = 'federated';
+  @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
   public form = new FormGroup({
     idpArn: new FormControl('', [Validators.required]),
     accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
+    subscriptionId: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
-    myRegion: new FormControl('', [Validators.required])
+    federatedOrTruster: new FormControl('', [Validators.required]),
+    federatedRole: new FormControl('', [Validators.required]),
+    federatedAccount: new FormControl('', [Validators.required]),
+    federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
   });
 
-  checkDisabled = false;
-
-  regions = [];
-  roles: string[] = [];
-  @Input() selectedRegion;
-  @ViewChild('roleInput', { static: false }) roleInput: ElementRef;
-
-  /* Create a new Federated Account */
+  /* Setup the first account for the application */
   constructor(
     private configurationService: ConfigurationService,
-    private workspaceService: WorkspaceService,
     private appService: AppService,
+    private router: Router,
+    private ngZone: NgZone,
+    private activatedRoute: ActivatedRoute,
+    private credentialsService: CredentialsService,
+    private sessionService: SessionService,
+    private workspaceService: WorkspaceService,
+    private trusterAccountService: TrusterAccountService,
     private fedAccountService: FederatedAccountService,
-    private router: Router
-  ) { }
+    private azureAccountService: AzureAccountService) {
+
+  }
 
   ngOnInit() {
-    this.regions = this.appService.getRegions();
-    this.selectedRegion = this.regions[0].region;
+    // Get the workspace and the accounts you need
+    this.workspace = this.configurationService.getDefaultWorkspaceSync();
+    this.accounts = this.fedAccountService.listFederatedAccountInWorkSpace();
+
+    // Show the federated accounts
+    this.federatedAccounts = this.accounts;
+
+    // Check if we already have the fed Url: [this and many other element: we must decide if we want to create a simple create and a edit separately or fuse them together, i'm keeping them here until the refactoring is done]
+    const config = this.configurationService.getConfigurationFileSync();
+    if (config !== undefined && config !== null) {
+      this.fedUrl = config.federationUrl;
+      this.fedUrlAzure = config.federationUrlAzure;
+    }
+  }
+
+  getFedRoles() {
+    // Get the appropriate roles
+    const account = this.accounts.filter(acc => (acc.accountId === this.selectedAccount))[0];
+
+    if (account !== undefined && account !== null) {
+
+      this.federatedRoles = account.awsRoles;
+
+      // Set the federated role automatically
+      this.selectedAccountNumber = account.accountNumber;
+      this.selectedRole = this.federatedRoles[0].name;
+    }
   }
 
   /**
-   * Set the account number directly from the Idp Arn
-   * @param event - UI event, contains the target which contains a text value
+   * Set the account number when the event is called
+   * @param event - the event to call
    */
   setAccountNumber(event) {
     this.form.controls['accountNumber'].setValue(this.appService.extractAccountNumberFromIdpArn(event.target.value));
   }
 
   /**
-   * Save the new account
+   * Save the first account in the workspace
    */
   saveAccount() {
-    if (this.form.valid && this.roles.length > 0) {
+    if (this.accountType === 'AWS') {
+      if (this.selectedType === 'federated') {
+        this.saveAwsFederatedAccount();
+      } else {
+        this.saveAwsTrusterAccount();
+      }
+    } else {
+      this.saveAzureAccount();
+    }
+  }
+
+  saveAzureAccount() {
+    if (this.formValid()) {
       try {
-        // Use the service for Federated Account and try creating a new account:
-        // the service retuirn a boolean indicating if the operation went well or not
-        const accountCreated = this.fedAccountService.addFederatedAccountToWorkSpace(
+        // Try to create the truster account
+        const created = this.azureAccountService.addAzureAccountToWorkSpace(
+          this.form.value.subscriptionId,
+          this.form.value.name);
+
+        // When you create an account you also define a possible session: in this case, being the only one we default it to true
+        this.sessionService.addSession(
+          this.form.value.subscriptionId,
+          null,
+          `background-1`,
+          true);
+
+        if (created) {
+          // Then go to next page
+          this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
+        } else {
+          this.appService.toast('Subscription Id must be unique', ToastLevel.WARN, 'Add Account');
+        }
+      } catch (err) {
+        this.appService.toast(err, ToastLevel.ERROR);
+      }
+    } else {
+      this.appService.toast('Missing required parameters for account', ToastLevel.WARN, 'Add required elements to Account');
+    }
+  }
+
+  /**
+   * This will be removed after created the correct file also in normal mode
+   */
+  saveAwsTrusterAccount() {
+    if (this.formValid()) {
+      try {
+        // Try to create the truster account
+        const created = this.trusterAccountService.addTrusterAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
           this.generateRolesFromNames(this.form.value.accountNumber),
-          this.form.value.idpArn, this.form.value.myRegion);
-        if (!accountCreated) {
-          this.appService.toast('Account number must be unique', ToastLevel.WARN, 'Add Account');
+          this.form.value.idpArn,
+          this.form.value.myRegion);
+        if (created) {
+          // Then go to next page
+          this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
         } else {
-          this.router.navigate(['/sessions', 'list-accounts']);
+          this.appService.toast('Account number must be unique', ToastLevel.WARN, 'Add Account');
         }
       } catch (err) {
         this.appService.toast(err, ToastLevel.ERROR);
@@ -77,9 +178,38 @@ export class CreateAccountComponent implements OnInit {
     }
   }
 
+  saveAwsFederatedAccount() {
+    if (this.formValid()) {
+      try {
+        // Add a federation Account to the workspace
+        this.fedAccountService.addFederatedAccountToWorkSpace(
+          this.form.value.accountNumber,
+          this.form.value.name,
+          this.generateRolesFromNames(this.form.value.accountNumber),
+          this.form.value.idpArn, this.form.value.myRegion);
+
+        // When you create an account you also define a possible session: in this case, being the only one we default it to true
+        this.sessionService.addSession(
+          this.form.value.accountNumber,
+          this.generateRolesFromNames(this.form.value.accountNumber)[0].name,
+          `background-1`,
+          true);
+
+        // Then go to next page
+        this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
+        // Then go to the dashboard
+        // this.router.navigate(['/sessions', 'session-selected'], {queryParams: {firstAccount: true}});
+      } catch (err) {
+        this.appService.toast(err, ToastLevel.ERROR);
+      }
+    } else {
+      this.appService.toast('Add at least one role to the account', ToastLevel.WARN, 'Add Role to Account');
+    }
+  }
+
   /**
-   * Remove a role from the UI
-   * @param roleName - the role to remove by name
+   * Remove a role given a name
+   * @param roleName - {string} to check against
    */
   removeRole(roleName: string) {
     const index = this.roles.indexOf(roleName);
@@ -89,26 +219,26 @@ export class CreateAccountComponent implements OnInit {
   }
 
   /**
-   * Set a Role from the UI in the Row array for the save method
-   * @param keyEvent - a return key
+   * Set a role name when Return is called
+   * @param keyEvent - the keyevent which is calle don keyup
    */
   setRoleName(keyEvent) {
     const roleName = this.roleInput.nativeElement.value;
     this.checkDisabled = (roleName !== '');
-    // It accept the enter key as a valid input to accept the new role in the array
+
     if (keyEvent.code === 'Enter' && this.roles.indexOf(roleName) === -1 && roleName !== '') {
       this.roles.push(roleName);
-      // Clean the text area
       this.roleInput.nativeElement.value = null;
       this.checkDisabled = false;
     }
   }
 
   /**
-   * A decorator that create the roleArn for each role
-   * @param accountNumber - the account number to generate the
+   * By using the names we create the corresponding roles to be pushed inside the account configuration
+   * @param accountNumber - the account number we use to construct the role arn
+   * @returns - {any[]} - returns a list of aws roles
    */
-  generateRolesFromNames(accountNumber) {
+  generateRolesFromNames(accountNumber: string) {
     const awsRoles = [];
     this.roles.forEach(role => {
       awsRoles.push({
@@ -119,8 +249,47 @@ export class CreateAccountComponent implements OnInit {
     return awsRoles;
   }
 
-  goToList() {
-    // Return to list
-    this.router.navigate(['/sessions', 'list-accounts']);
+  /**
+   * Because the form is complex we need a custom form validation
+   * In the future we will put this in a service to create validation factory:
+   * this way depending on new accounts we jkust need to pass the form object to the validator
+   */
+  formValid() {
+    // First check the type of account we are creating
+    if (this.accountType === 'AWS') {
+
+      // Both have roles check
+      const checkRoles = this.roles.length > 0;
+
+      // We are in AWS check if we are saving a Federated or a Truster
+      if (this.selectedType === 'federated') {
+        // Check Federated fields
+        const checkFields = this.form.controls['name'].valid &&
+          this.form.controls['federationUrl'].valid &&
+          this.form.controls['accountNumber'].valid &&
+          this.form.controls['idpArn'].valid;
+
+        return checkRoles && checkFields;
+      } else {
+        // Check Truster fields
+        const checkFields = this.form.controls['name'].valid &&
+          this.form.controls['federationUrl'].valid &&
+          this.form.controls['accountNumber'].valid &&
+          this.form.controls['federatedAccount'].valid &&
+          this.form.controls['federatedRole'].valid;
+
+        return checkRoles && checkFields;
+      }
+    } else {
+      // Check Azure fields
+      return this.form.controls['name'].valid &&
+        this.form.controls['federationUrl'].valid &&
+        this.form.controls['subscriptionId'].valid;
+    }
+    return false;
+  }
+
+  setAccountType(name) {
+    this.accountType = name;
   }
 }

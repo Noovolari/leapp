@@ -9,14 +9,12 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import {EditTrusterAccountComponent} from './edit-truster-account/edit-truster-account.component';
 import {EditAccountComponent} from './edit-account/edit-account.component';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
-import {CreateTrusterAccountComponent} from './create-truster-account/create-truster-account.component';
 
 
 @NgModule({
   declarations: [
     SessionComponent,
     CreateAccountComponent,
-    CreateTrusterAccountComponent,
     EditTrusterAccountComponent,
     EditAccountComponent
   ],

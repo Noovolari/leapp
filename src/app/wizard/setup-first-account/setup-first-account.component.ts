@@ -1,4 +1,4 @@
-import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AppService, ToastLevel} from '../../services-system/app.service';
@@ -10,6 +10,7 @@ import {Workspace} from '../../models/workspace';
 import {AwsAccount} from '../../models/aws-account';
 import {TrusterAccountService} from '../../services/truster-account.service';
 import {AzureAccountService} from '../../services/azure-account.service';
+import {IdpResponseType, WorkspaceService} from '../../services/workspace.service';
 
 @Component({
   selector: 'app-setup-first-account',
@@ -57,9 +58,11 @@ export class SetupFirstAccountComponent implements OnInit {
     private configurationService: ConfigurationService,
     private appService: AppService,
     private router: Router,
+    private ngZone: NgZone,
     private activatedRoute: ActivatedRoute,
     private credentialsService: CredentialsService,
     private sessionService: SessionService,
+    private workspaceService: WorkspaceService,
     private trusterAccountService: TrusterAccountService,
     private fedAccountService: FederatedAccountService,
     private azureAccountService: AzureAccountService) {
@@ -111,6 +114,42 @@ export class SetupFirstAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveAccount() {
+    // Before we need to save the first workspace and call google: this is done only the first ime so it is not used in other classes
+    // Now we get the default configuration to obtain the previously saved idp url
+    const configuration = this.configurationService.getConfigurationFileSync();
+    // Update Configuration
+    configuration.federationUrl = this.form.value.federationUrl;
+    this.configurationService.updateConfigurationFileSync(configuration);
+
+    // Set our response type
+    const responseType = IdpResponseType.SAML;
+
+    // When the token is received save it and go to the setup page for the first account
+    const sub = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, configuration.federationUrl, responseType)));
+
+    // Call the service for working on the first login event to the user idp
+    // We add the helper for account choosing just to be sure to give the possibility to call the correct user
+    this.workspaceService.getIdpTokenInSetup(configuration.federationUrl, responseType);
+  }
+
+  /**
+   * When the data from Google is received, generate a new workspace or check errors, etc.
+   */
+  createNewWorkspace(googleToken, federationUrl, responseType) {
+    console.log(federationUrl);
+
+    const name = 'default';
+    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, name, responseType);
+    if (result) {
+      this.decideSavingMethodAndSave();
+    } else {
+      // Error: return to dependencies page
+      this.appService.toast('Can\'t create a new workspace for first account', ToastLevel.ERROR, 'Creation error');
+    }
+
+  }
+
+  decideSavingMethodAndSave() {
     if (this.accountType === 'AWS') {
       if (this.selectedType === 'federated') {
         this.saveAwsFederatedAccount();
@@ -130,17 +169,16 @@ export class SetupFirstAccountComponent implements OnInit {
           this.form.value.subscriptionId,
           this.form.value.name);
 
-        // Update Configuration
-        const config = this.configurationService.getConfigurationFileSync();
-        config.federationUrl = this.form.value.federationUrl;
-        this.configurationService.updateConfigurationFileSync(config);
+        // When you create an account you also define a possible session: in this case, being the only one we default it to true
+        this.sessionService.addSession(
+          this.form.value.subscriptionId,
+          null,
+          `background-1`,
+          true);
 
         if (created) {
-          // When we define a new session and we want to activate it: use the refresh credential emit
-          this.credentialsService.refreshCredentialsEmit.emit();
-
-          // Then go to next page: in this case we go to the spinning are for first token and workspace definition in the normal version we use the url below
-          this.router.navigate(['/wizard', 'setup-spinner-for-login']);
+          // Then go to next page
+          this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
         } else {
           this.appService.toast('Subscription Id must be unique', ToastLevel.WARN, 'Add Account');
         }
@@ -182,10 +220,6 @@ export class SetupFirstAccountComponent implements OnInit {
   saveAwsFederatedAccount() {
     if (this.formValid()) {
       try {
-        // If the form is valid we save the first account in the configuration
-        const workspace = this.configurationService.getDefaultWorkspaceSync();
-        const configuration = this.configurationService.getConfigurationFileSync();
-
         // Add a federation Account to the workspace
         this.fedAccountService.addFederatedAccountToWorkSpace(
           this.form.value.accountNumber,
@@ -200,16 +234,8 @@ export class SetupFirstAccountComponent implements OnInit {
           `background-1`,
           true);
 
-        // Update Configuration
-        const config = this.configurationService.getConfigurationFileSync();
-        config.federationUrl = this.form.value.federationUrl;
-        this.configurationService.updateConfigurationFileSync(config);
-
-        // When we define a new session and we want to activate it: use the refresh credential emit
-        this.credentialsService.refreshCredentialsEmit.emit();
-
-        // Then go to next page: in this case we go to the spinning are for first token and workspace definition in the normal version we use the url below
-        this.router.navigate(['/wizard', 'setup-spinner-for-login']);
+        // Then go to next page
+        this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
         // Then go to the dashboard
         // this.router.navigate(['/sessions', 'session-selected'], {queryParams: {firstAccount: true}});
       } catch (err) {

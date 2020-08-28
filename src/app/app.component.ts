@@ -11,6 +11,7 @@ import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
 import {WorkspaceService} from './services/workspace.service';
 import {SessionService} from './services/session.service';
+import {MenuService} from './services/menu.service';
 
 @Component({
   selector: 'app-root',
@@ -26,8 +27,7 @@ export class AppComponent implements OnInit {
     private fileService: FileService,
     private app: AppService,
     private credentialsService: CredentialsService,
-    private workspaceService: WorkspaceService,
-    private sessionService: SessionService
+    private menuService: MenuService
   ) {}
 
   ngOnInit() {
@@ -82,7 +82,7 @@ export class AppComponent implements OnInit {
    * This is an hook on the closing app to remove credential file and force stop using them
    */
   beforeCloseInstructions() {
-    this.app.cleanBeforeExit();
+    this.menuService.cleanBeforeExit();
   }
 }
 

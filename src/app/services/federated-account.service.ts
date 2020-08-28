@@ -23,10 +23,16 @@ export class FederatedAccountService extends NativeService {
    */
   addFederatedAccountToWorkSpace(accountNumber: number, accountName: string, awsRoles: any[], idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
+
+    console.log('workspace:', workspace);
+
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
-    const test = workspace.accountRoleMapping.accounts.filter(a => a.accountNumber === accountNumber);
+    const test = workspace.accountRoleMapping.accounts.filter(a => (a as AwsAccount).accountNumber === accountNumber.toString());
+
+    console.log('test', test);
+
     if (!test || test.length === 0) {
       // add new account
       workspace.accountRoleMapping.accounts.push({
@@ -44,6 +50,8 @@ export class FederatedAccountService extends NativeService {
       this.configurationService.updateWorkspaceSync(workspace);
       // Set it as default
       this.configurationService.setDefaultWorkspaceSync(workspace.name);
+
+      console.log('config', this.configurationService.getConfigurationFileSync());
       return true;
     } else {
       return false;

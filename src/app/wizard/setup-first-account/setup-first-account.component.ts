@@ -117,29 +117,36 @@ export class SetupFirstAccountComponent implements OnInit {
     // Before we need to save the first workspace and call google: this is done only the first ime so it is not used in other classes
     // Now we get the default configuration to obtain the previously saved idp url
     const configuration = this.configurationService.getConfigurationFileSync();
+
     // Update Configuration
-    configuration.federationUrl = this.form.value.federationUrl;
+    if (this.accountType === 'AWS') {
+      configuration.federationUrl = this.form.value.federationUrl;
+      configuration.federationUrlAzure = '';
+    } else {
+      configuration.federationUrl = '';
+      configuration.federationUrlAzure = this.form.value.federationUrl;
+    }
     this.configurationService.updateConfigurationFileSync(configuration);
 
     // Set our response type
     const responseType = IdpResponseType.SAML;
 
     // When the token is received save it and go to the setup page for the first account
-    const sub = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, configuration.federationUrl, responseType)));
+    const sub = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, configuration.federationUrl, configuration.federationUrlAzure, responseType)));
 
     // Call the service for working on the first login event to the user idp
     // We add the helper for account choosing just to be sure to give the possibility to call the correct user
-    this.workspaceService.getIdpTokenInSetup(configuration.federationUrl, responseType);
+    this.workspaceService.getIdpTokenInSetup(this.form.value.federationUrl, responseType);
   }
 
   /**
    * When the data from Google is received, generate a new workspace or check errors, etc.
    */
-  createNewWorkspace(googleToken, federationUrl, responseType) {
+  createNewWorkspace(googleToken, federationUrl, federationAzureUrl, responseType) {
     console.log(federationUrl);
 
     const name = 'default';
-    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, name, responseType);
+    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, federationAzureUrl, name, responseType);
     if (result) {
       this.decideSavingMethodAndSave();
     } else {
@@ -200,6 +207,8 @@ export class SetupFirstAccountComponent implements OnInit {
         const created = this.trusterAccountService.addTrusterAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
+          this.selectedAccount,
+          this.selectedRole,
           this.generateRolesFromNames(this.form.value.accountNumber),
           this.form.value.idpArn,
           this.form.value.myRegion);

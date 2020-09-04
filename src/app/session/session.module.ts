@@ -6,7 +6,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../shared/shared.module';
 import {CreateAccountComponent} from './create-account/create-account.component';
 import {NgSelectModule} from '@ng-select/ng-select';
-import {EditTrusterAccountComponent} from './edit-truster-account/edit-truster-account.component';
 import {EditAccountComponent} from './edit-account/edit-account.component';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
 
@@ -15,7 +14,6 @@ import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
   declarations: [
     SessionComponent,
     CreateAccountComponent,
-    EditTrusterAccountComponent,
     EditAccountComponent
   ],
   imports: [

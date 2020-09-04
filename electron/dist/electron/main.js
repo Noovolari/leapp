@@ -75,7 +75,7 @@ var setupWorkspace = function () {
             log.error(e);
             app.exit(0);
         }
-        // Launch initWorkspace again, now it will beloaded correctly because the file and directories are there
+        // Launch initWorkspace again, now it will be loaded correctly because the file and directories are there
         initWorkspace();
     }
 };
@@ -178,6 +178,13 @@ var initWorkspace = function () {
         setupWorkspace();
     }
     else {
+        // Check and activate proxy pass if necessary
+        if (workspace.workspaces[0] !== undefined && workspace.workspaces[0].proxyUrl) {
+            console.log('workspace in main, check proxy url:', workspace);
+            process.env.HTTP_PROXY = workspace.workspaces[0].proxyUrl;
+            var globalTunnel = require('global-tunnel');
+            globalTunnel.initialize();
+        }
         // Generate the main window
         generateMainWindow();
     }

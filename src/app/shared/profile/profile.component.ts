@@ -25,6 +25,9 @@ export class ProfileComponent extends AntiMemLeak implements OnInit {
   private federationUrl;
   private profileIsOpen = false;
 
+  @Input() onlineAws = false;
+  @Input() onlineAzure = false;
+
   /* The header that we shows on the app */
   constructor(
     private fileService: FileService,
@@ -60,6 +63,13 @@ export class ProfileComponent extends AntiMemLeak implements OnInit {
         this.havePortrait = data.havePortrait;
       })
     ).subscribe();
+    this.subs.add(sub);
+
+    // Send the aws event
+    sub = this.workspaceService.awsStatusEmit.pipe(tap((aws: boolean) => this.onlineAws = aws)).subscribe();
+    this.subs.add(sub);
+
+    sub = this.workspaceService.awsStatusEmit.pipe(tap((aws: boolean) => this.onlineAws = aws)).subscribe();
     this.subs.add(sub);
 
     // Send the info about the email

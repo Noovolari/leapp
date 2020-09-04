@@ -83,25 +83,19 @@ export class FederatedAccountService extends NativeService {
    * Delete a federated account
    * @param accountNumber - account number of the account to delete
    */
-  deleteFederatedAccount(accountNumber: string) {
+  deleteFederatedAccount(accountNumber: string, roleName: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === accountNumber));
+    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === accountNumber && acc.awsRoles.find((val) => val.name === roleName)));
     if (index !== -1) {
       workspace.accountRoleMapping.accounts.splice(index, 1);
 
       // cascade delete on truster accounts
-      let accountIndex = workspace.accountRoleMapping.accounts.findIndex(account => (account.awsRoles.findIndex(role => (role.parent === accountNumber)) !== -1));
+      let accountIndex = workspace.accountRoleMapping.accounts.findIndex(account => (account.awsRoles.findIndex(role => (role.parent === accountNumber && role.parentRole === roleName)) !== -1));
       while (accountIndex !== -1) {
         workspace.accountRoleMapping.accounts.splice(accountIndex, 1);
-        accountIndex = workspace.accountRoleMapping.accounts.findIndex(account => (account.awsRoles.findIndex(role => (role.parent === accountNumber)) !== -1));
+        accountIndex = workspace.accountRoleMapping.accounts.findIndex(account => (account.awsRoles.findIndex(role => (role.parent === accountNumber && role.parentRole === roleName)) !== -1));
       }
 
-      // delete sessions active session
-      let sessionIndex = workspace.currentSessionList.indexOf(session => (session.accountData.accountNumber !== accountNumber));
-      while (sessionIndex !== -1) {
-        workspace.currentSessionList.splice(sessionIndex, 1);
-        sessionIndex = workspace.currentSessionList.indexOf(session => (session.accountData.accountNumber !== accountNumber));
-      }
       this.configurationService.updateWorkspaceSync(workspace);
       return true;
     } else {
@@ -116,7 +110,7 @@ export class FederatedAccountService extends NativeService {
    */
   updateFederatedAccount(account: AwsAccount) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === account.accountNumber));
+    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountId === account.accountId));
     if (index !== -1) {
       workspace.accountRoleMapping.accounts[index] = account;
 

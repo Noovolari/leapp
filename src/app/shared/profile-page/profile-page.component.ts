@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Workspace} from '../../models/workspace';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService} from '../../services-system/app.service';
+import {AppService, ToastLevel} from '../../services-system/app.service';
 import {FileService} from '../../services-system/file.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
@@ -18,11 +18,13 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   email = '';
   idpUrlValue;
   idpUrlValueAzure;
+  proxyUrl;
   workspaceData: Workspace;
 
   public form = new FormGroup({
     idpUrl: new FormControl('', [Validators.required]),
     idpUrlAzure: new FormControl('', [Validators.required]),
+    proxyUrl: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -38,8 +40,10 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     if (this.workspaceData.name && this.workspaceData.name !== '') {
       this.idpUrlValue = this.workspaceData.idpUrl;
       this.idpUrlValueAzure = this.workspaceData.idpUrlAzure;
+      this.proxyUrl = this.workspaceData.proxyUrl;
       this.form.controls['idpUrl'].setValue(this.idpUrlValue);
       this.form.controls['idpUrlAzure'].setValue(this.idpUrlValueAzure);
+      this.form.controls['proxyUrl'].setValue(this.proxyUrl);
       this.name = this.workspaceData.name;
       this.email = localStorage.getItem('hook_email') || 'not logged in yet';
       this.appService.validateAllFormFields(this.form);
@@ -53,7 +57,21 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     if (this.form.valid) {
       this.workspaceData.idpUrl = this.form.value.idpUrl;
       this.workspaceData.idpUrlAzure = this.form.value.idpUrlAzure;
+
+      if (this.form.controls['proxyUrl'].value !== undefined &&
+          this.form.controls['proxyUrl'].value !== null &&
+          this.form.controls['proxyUrl'].value !== '') {
+            this.workspaceData.proxyUrl = this.form.controls['proxyUrl'].value;
+      }
+
       this.configurationService.updateWorkspaceSync(this.workspaceData);
+
+      if (this.form.controls['proxyUrl'].value !== undefined &&
+        this.form.controls['proxyUrl'].value !== null &&
+        this.form.controls['proxyUrl'].value !== '') {
+        this.appService.toast('You\'ve set a proxy url: the app must be restarted to update the configuration.', ToastLevel.WARN, 'Force restart');
+        this.appService.restart();
+      }
     }
   }
 

@@ -11,6 +11,10 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
+import {AzureAccountService} from '../../services/azure-account.service';
+import {FederatedAccountService} from '../../services/federated-account.service';
+import {TrusterAccountService} from '../../services/truster-account.service';
+import {MenuService} from '../../services/menu.service';
 
 @Component({
   selector: 'app-session',
@@ -44,7 +48,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   instances = [];
 
   // Connection retries
+  allSessions;
   retries = 0;
+  showOnly = 'ALL';
 
   constructor(
     private router: Router,
@@ -57,7 +63,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private ssmService: SsmService,
     private fileService: FileService,
     private credentialsService: CredentialsService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private azureAccountService: AzureAccountService,
+    private fedAccountService: FederatedAccountService,
+    private trusterAccountService: TrusterAccountService,
+    private menuService: MenuService
   ) { super(); }
 
   ngOnInit() {
@@ -75,21 +85,24 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
     // Set loading to false when a credential is emitted: if result is false stop the current session!
     this.credentialsService.refreshReturnStatusEmit.subscribe((res) => {
-      this.loading = false;
       if (!res) {
         // problem: stop session now!
         this.stopSession();
       }
     });
 
+    this.menuService.redrawList.subscribe(r => {
+      this.sessions = this.sessionService.listSessions();
+    });
   }
 
   /**
-   * Remove the current Session Object form the visualized list
+   * Remove the current Session Object form the visualized list and remove it from workspace
    * @param session - SessionObject
    */
   removeSession(session) {
     this.sessionService.removeSession(session);
+    this.sessionService.deleteSessionFromWorkspace(session);
     this.sessions = this.sessionService.listSessions();
   }
 
@@ -102,7 +115,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
     // Start a new session with the selected one
     this.sessionService.startSession(session);
-    this.loading = true;
 
     // automatically check if there is an active session and get session list again
     this.credentialsService.refreshCredentialsEmit.emit();
@@ -278,6 +290,26 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.modalRef.hide();
   }
 
+  editAccount(session) {
+    this.router.navigate(['/sessions', 'edit-account'], { queryParams: { accountId: (session.accountData.accountNumber || session.accountData.subscriptionId), roleName: session.roleData.name } });
+  }
+
+  removeAccount(session) {
+    this.appService.confirmDialog('do you really want to delete this account?', () => {
+
+      if (session.accountData.accountNumber) {
+        this.trusterAccountService.deleteTrusterAccount(session.accountData.accountNumber, session.roleData.name);
+        this.fedAccountService.deleteFederatedAccount(session.accountData.accountNumber, session.roleData.name);
+      } else {
+        this.azureAccountService.deleteAzureAccount(session.accountData.subscriptionId);
+      }
+
+      this.removeSession(session);
+      this.sessionService.deleteSessionFromWorkspace(session);
+      this.sessionService.listSessions();
+    });
+  }
+
   /**
    * Open the tray behind the active card
    * @param event - click event, we prevent propagation because we also check for the click behind
@@ -316,5 +348,19 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       toCheck = toCheck || (session.color === ('background-' + num));
     });
     return toCheck;
+  }
+
+  filterSessions(query) {
+    console.log('kjk', query.value);
+
+    this.allSessions = this.sessionService.listSessions();
+    this.sessions = this.allSessions;
+    if (query.value !== '') {
+      this.sessions = this.sessions.filter(s => s.accountData.accountName.indexOf(query.value) > -1);
+    }
+  }
+
+  setVisibility(name) {
+    this.showOnly = name;
   }
 }

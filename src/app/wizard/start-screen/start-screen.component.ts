@@ -13,8 +13,6 @@ import {MenuService} from '../../services/menu.service';
 })
 export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterViewInit {
 
-  private OS: string;
-
   @Input() versionLabel = '...';
 
   enabled = false;
@@ -34,8 +32,6 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
   ) {
     super();
 
-    this.OS = this.appService.detectOs();
-    this.appService.enablePowerMonitorFeature();
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
   }
 
@@ -55,7 +51,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
    * Is the app already configured or not?
    */
   isAlreadyConfigured() {
-    return this.workspace.accountRoleMapping &&
+    return this.workspace && this.workspace.accountRoleMapping &&
       this.workspace.accountRoleMapping.accounts &&
       this.workspace.accountRoleMapping.accounts.length > 0;
   }

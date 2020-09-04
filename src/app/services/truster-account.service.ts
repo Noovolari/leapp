@@ -20,7 +20,7 @@ export class TrusterAccountService extends NativeService {
    * @param idpArn - the idArn used for the federatyed account
    * @param region - the default region to use
    */
-  addTrusterAccountToWorkSpace(accountNumber: number, accountName: string, awsRoles: any[], idpArn: string, region: string) {
+  addTrusterAccountToWorkSpace(accountNumber: number, accountName: string, parentName: string, parentRole: string, awsRoles: any[], idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
@@ -34,6 +34,8 @@ export class TrusterAccountService extends NativeService {
         accountNumber,
         awsRoles,
         idpArn,
+        parent: parentName,
+        parentRole,
         idpUrl: configuration.federationUrl,
         region,
         type: 'AWS'
@@ -71,18 +73,12 @@ export class TrusterAccountService extends NativeService {
    * Delete the truster account
    * @param accountNumber - the account number we use to delete the truster account
    */
-  deleteTrusterAccount(accountNumber: string) {
+  deleteTrusterAccount(accountNumber: string, roleName: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === accountNumber));
+    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === accountNumber && acc.awsRoles.find((val) => val.name === roleName)));
     // if there is an actual account with that number
     if (index !== -1) {
       workspace.accountRoleMapping.accounts.splice(index, 1);
-      let sessionIndex = workspace.currentSessionList.indexOf(session => (session.accountData.accountNumber !== accountNumber));
-      // Remove all the copies of the specified account as it may exists with different roles
-      while (sessionIndex !== -1) {
-        workspace.currentSessionList.splice(sessionIndex, 1);
-        sessionIndex = workspace.currentSessionList.indexOf(session => (session.accountData.accountNumber !== accountNumber));
-      }
       this.configurationService.updateWorkspaceSync(workspace);
       return true;
     } else {
@@ -98,7 +94,7 @@ export class TrusterAccountService extends NativeService {
     // Get the default workspace
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     // Verify we have found the account we need
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === account.accountNumber));
+    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountId === account.accountId));
     if (index !== -1) {
 
       workspace.accountRoleMapping.accounts[index] = account;

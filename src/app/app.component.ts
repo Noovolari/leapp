@@ -9,8 +9,6 @@ import {AppService, LoggerLevel} from './services-system/app.service';
 import {Router} from '@angular/router';
 import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
-import {WorkspaceService} from './services/workspace.service';
-import {SessionService} from './services/session.service';
 import {MenuService} from './services/menu.service';
 
 @Component({
@@ -31,9 +29,6 @@ export class AppComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-
-    // Initial starting point for DEBUG
-    this.router.navigate(['/wizard', 'start-screen']);
     // Use ngx bootstrap 4
     setTheme('bs4');
     // Register locale languages and set the default one: we currently use only en
@@ -50,7 +45,7 @@ export class AppComponent implements OnInit {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace.awsCredentials) {
       this.fileService.iniWriteSync(this.fileService.homeDir() + '/.aws/credentials', workspace.awsCredentials);
-      this.app.logger('workspace set correctly at app start', LoggerLevel.INFO);
+      this.app.logger('workspace set correctly at app start', LoggerLevel.WARN);
     }
 
     // Prevent Dev Tool to show on production mode
@@ -68,6 +63,9 @@ export class AppComponent implements OnInit {
 
     // We start the current session if there is one
     this.activateSession();
+
+    // Initial starting point for DEBUG
+    this.router.navigate(['/wizard', 'start-screen']);
   }
 
   /**

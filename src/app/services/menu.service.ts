@@ -28,9 +28,17 @@ export class MenuService extends NativeService {
     private appService: AppService) {
 
     super();
+
+    this.redrawList.subscribe(res => {
+      this.generateMenu();
+    });
   }
 
   generateMenu() {
+    if (this.currentTray) {
+      this.currentTray.destroy();
+    }
+
     const version = this.appService.getApp().getVersion();
 
     let voices = [];

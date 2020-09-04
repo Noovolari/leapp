@@ -69,7 +69,7 @@ export class AzureAccountService extends NativeService {
    * Delete a azure account
    * @param subscriptionId - account subscriptionId of the account to delete
    */
-  deleteFederatedAccount(subscriptionId: string) {
+  deleteAzureAccount(subscriptionId: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const index = workspace.accountRoleMapping.accounts.findIndex(acc => ((acc as AzureAccount).subscriptionId === subscriptionId));
     if (index !== -1) {
@@ -93,9 +93,9 @@ export class AzureAccountService extends NativeService {
    * Update a azure account
    * @param account - the account to be updated
    */
-  updateFederatedAccount(account: AzureAccount) {
+  updateAzureAccount(account: AzureAccount) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => ((acc as AzureAccount).subscriptionId === account.subscriptionId));
+    const index = workspace.accountRoleMapping.accounts.findIndex(acc => ((acc as AzureAccount).accountId === account.accountId));
     if (index !== -1) {
       workspace.accountRoleMapping.accounts[index] = account;
 

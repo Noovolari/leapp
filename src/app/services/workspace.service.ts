@@ -36,6 +36,10 @@ export class WorkspaceService extends NativeService {
   // First Time Google Token obtained
   public googleEmit: EventEmitter<string> = new EventEmitter<string>();
 
+  // Aws and Azure status
+  public awsStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
+  public azureStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
+
   // Credential refreshed
   public credentialEmit: EventEmitter<{status: string, accountName: string}> = new EventEmitter<{status: string, accountName: string}>();
 
@@ -464,7 +468,7 @@ export class WorkspaceService extends NativeService {
   /* ======< WORKSPACE MANAGEMENTS >======= */
   /* ====================================== */
 
-  createNewWorkspace(googleToken: string, federationUrl: string, name: string, responseType: string) {
+  createNewWorkspace(googleToken: string, federationUrl: string, federationAzureUrl: string, name: string, responseType: string) {
     try {
       // Create a standard workspace to use as default
       const workspace: Workspace = {
@@ -472,6 +476,7 @@ export class WorkspaceService extends NativeService {
         name,
         lastIDPToken: googleToken,
         idpUrl: federationUrl,
+        idpUrlAzure: federationAzureUrl,
         principalAccountNumber: null,
         accountRoleMapping: {accounts: []},
         currentSessionList: []

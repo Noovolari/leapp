@@ -9,6 +9,7 @@ export interface Workspace {
   lastIDPToken?: string;
   idpUrl?: string;
   idpUrlAzure?: string;
+  proxyUrl?: string;
 
   currentSessionList: SessionObject[];
 

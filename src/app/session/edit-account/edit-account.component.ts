@@ -6,6 +6,12 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FederatedAccountService} from '../../services/federated-account.service';
 import {AwsAccount} from '../../models/aws-account';
+import {Workspace} from '../../models/workspace';
+import {SessionService} from '../../services/session.service';
+import {WorkspaceService} from '../../services/workspace.service';
+import {TrusterAccountService} from '../../services/truster-account.service';
+import {AzureAccountService} from '../../services/azure-account.service';
+import {AzureAccount} from '../../models/azure-account';
 
 @Component({
   selector: 'app-edit-federated-account',
@@ -15,22 +21,41 @@ import {AwsAccount} from '../../models/aws-account';
 export class EditAccountComponent extends AntiMemLeak implements OnInit {
 
   toggleOpen = true;
+  checkDisabled = false;
 
   public form = new FormGroup({
     idpArn: new FormControl('', [Validators.required]),
     accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
+    subscriptionId: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
-    myRegion: new FormControl('', [Validators.required])
+    federatedOrTruster: new FormControl('', [Validators.required]),
+    federatedRole: new FormControl('', [Validators.required]),
+    federatedAccount: new FormControl('', [Validators.required]),
+    federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
   });
 
-  public account;
+  @Input() selectedAccount;
+  @Input() selectedAccountNumber = '';
+  @Input() selectedRole = '';
 
-  regions = [];
-  roles: string[] = [];
+  @Input() fedUrl = '';
+  @Input() fedUrlAzure = '';
 
-  checkDisabled = false;
+  federatedRoles: { name: string, roleArn: string }[] = [];
+  federatedAccounts: AwsAccount[] = [];
 
-  @Input() selectedRegion;
+  workspace: Workspace;
+  accounts: AwsAccount[];
+  accountId;
+  accountIdLocked;
+
+  // Holds an account for filling the form
+  account;
+  accountType = 'AWS';
+  roles = [];
+
+  selectedType = 'federated';
+
   @ViewChild('roleInput', { static: false }) roleInput: ElementRef;
 
   /**
@@ -41,24 +66,61 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private fedAccountService: FederatedAccountService
+    private sessionService: SessionService,
+    private workspaceService: WorkspaceService,
+    private trusterAccountService: TrusterAccountService,
+    private fedAccountService: FederatedAccountService,
+    private azureAccountService: AzureAccountService
   ) {
     super();
   }
 
   ngOnInit() {
     const sub = this.activatedRoute.queryParams.subscribe(params => {
+      // Need also a Role Name for Fed e Trust account, for Azure only subscription Id is required
       const accountId = params['accountId'];
-      const accounts = this.configurationService.getDefaultWorkspaceSync().accountRoleMapping.accounts;
-      this.account = accounts.filter(el => el.accountId.toString() === accountId.toString())[0];
-      this.roles = this.account.awsRoles.map(role => role.name);
+      const roleName = params['roleName'];
+
+      this.accounts = this.configurationService.getDefaultWorkspaceSync().accountRoleMapping.accounts;
+      this.account = this.accounts.filter(el =>
+        (el.accountId.toString() === accountId.toString() && el.awsRoles && el.awsRoles[0].name === roleName) ||
+        (el.awsRoles === undefined && el.accountId.toString() === accountId.toString())
+      )[0];
+
+      this.accountIdLocked = this.account.accountId;
+
+      this.accountType = this.account.type;
+      this.selectedType = !this.account.parent ? 'federated' : 'truster';
+
+      if (this.account.type === 'AWS' && this.account.parent) {
+        this.federatedAccounts = this.accounts.filter(el => el.type === 'AWS' && el.parent === undefined);
+        this.selectedAccount = this.account.parent;
+        this.getFedRoles();
+        this.selectedRole = this.account.parentRole;
+      }
+
+      if (this.account.awsRoles) {
+        this.roles = this.account.awsRoles.map(role => role.name);
+      }
+
       this.appService.validateAllFormFields(this.form);
     });
 
     this.subs.add(sub);
+  }
 
-    this.regions = this.appService.getRegions();
-    this.selectedRegion = this.account.region ? this.account.region : this.regions[0].region;
+  getFedRoles() {
+    // Get the appropriate roles
+    const account = this.accounts.filter(acc => (acc.accountId === this.selectedAccount))[0];
+
+    if (account !== undefined && account !== null) {
+
+      this.federatedRoles = account.awsRoles;
+
+      // Set the federated role automatically
+      this.selectedAccountNumber = account.accountNumber;
+      this.selectedRole = this.federatedRoles[0].name;
+    }
   }
 
   /**
@@ -70,32 +132,115 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
   }
 
   /**
-   * Save the edited federated account
+   * Save the first account in the workspace
    */
   saveAccount() {
-    if (this.form.valid && this.roles.length > 0) {
-      try {
-        const configuration = this.configurationService.getConfigurationFileSync();
+    if (this.accountType === 'AWS') {
+      if (this.selectedType === 'federated') {
+        this.saveAwsFederatedAccount();
+      } else {
+        this.saveAwsTrusterAccount();
+      }
+    } else {
+      this.saveAzureAccount();
+    }
+  }
 
-        // edit account
+  saveAzureAccount() {
+    if (this.formValid()) {
+      try {
+        // Try to create the truster account
         const acc = {
-          accountId: this.form.value.accountNumber,
+          accountId: this.accountIdLocked,
+          accountName: this.form.value.name,
+          subscriptionId: this.form.value.subscriptionId,
+          idpUrl: this.form.value.federationUrl,
+          type: 'AZURE'
+        };
+        const updated = this.azureAccountService.updateAzureAccount(acc as AzureAccount);
+
+        // When you create an account you also define a possible session: in this case, being the only one we default it to true
+        this.sessionService.addSession(
+          this.form.value.subscriptionId,
+          null,
+          `background-1`,
+          true);
+
+        if (updated) {
+          // Then go to next page
+          this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
+        } else {
+          this.appService.toast('Subscription Id must be unique', ToastLevel.WARN, 'Edit Account');
+        }
+      } catch (err) {
+        this.appService.toast(err, ToastLevel.ERROR);
+      }
+    } else {
+      this.appService.toast('Missing required parameters for account', ToastLevel.WARN, 'Add required elements to Account');
+    }
+  }
+
+  /**
+   * This will be removed after created the correct file also in normal mode
+   */
+  saveAwsTrusterAccount() {
+    if (this.formValid()) {
+      try {
+        const acc = {
+          accountId: this.accountIdLocked,
           accountName: this.form.value.name,
           accountNumber: this.form.value.accountNumber,
-          awsRoles: this.generateRolesFromNames(this.form.value.accountNumber),
-          idpArn: this.form.value.idpArn,
-          idpUrl: configuration.federationUrl,
-          region: this.form.value.myRegion,
-          type: 'AWS'
+          idpUrl: this.form.value.federationUrl,
+          type: 'AWS',
+          idpArn: undefined,
+          region: undefined,
+          parent: this.selectedAccount,
+          parentRole: this.selectedRole,
+          awsRoles: this.generateRolesFromNames(this.form.value.accountNumber)
         };
 
-        this.fedAccountService.updateFederatedAccount(acc as AwsAccount);
+        const updated = this.trusterAccountService.updateTrusterAccount(acc as AwsAccount);
 
-
-        // Then go to next page
-        this.router.navigate(['/sessions', 'list-accounts']);
-
+        if (updated) {
+          // Then go to next page
+          this.router.navigate(['/sessions', 'session-selected']);
+        } else {
+          this.appService.toast('Account number must be unique', ToastLevel.WARN, 'Edit Account');
+        }
       } catch (err) {
+        this.appService.toast(err, ToastLevel.ERROR);
+      }
+    } else {
+      this.appService.toast('Add at least one role to the account', ToastLevel.WARN, 'Add Role to Account');
+    }
+  }
+
+  saveAwsFederatedAccount() {
+    if (this.formValid()) {
+      try {
+        // Add a federation Account to the workspace
+        const acc = {
+          accountId: this.accountIdLocked,
+          accountNumber: this.form.value.accountNumber,
+          accountName: this.form.value.name,
+          awsRoles: this.generateRolesFromNames(this.form.value.accountNumber),
+          idpArn: this.form.value.idpArn,
+          idpUrl: this.form.value.federationUrl,
+          region: undefined,
+          parent: undefined,
+          parentRole: this.selectedRole,
+          type: 'AWS'
+        };
+        const updated = this.fedAccountService.updateFederatedAccount(acc as AwsAccount);
+
+        if (updated) {
+          // Then go to next page
+          this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
+
+        } else {
+          this.appService.toast('Something went wrong with updating the account', ToastLevel.WARN, 'Update account');
+        }
+       } catch (err) {
         this.appService.toast(err, ToastLevel.ERROR);
       }
     } else {
@@ -145,5 +290,57 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
   goToList() {
     // Return to list
     this.router.navigate(['/sessions', 'list-accounts']);
+  }
+
+  /**
+   * Because the form is complex we need a custom form validation
+   * In the future we will put this in a service to create validation factory:
+   * this way depending on new accounts we jkust need to pass the form object to the validator
+   */
+  formValid() {
+    // First check the type of account we are creating
+    if (this.accountType === 'AWS') {
+
+      // Both have roles check
+      const checkRoles = this.roles.length > 0;
+
+      // We are in AWS check if we are saving a Federated or a Truster
+      if (this.selectedType === 'federated') {
+        // Check Federated fields
+        const checkFields = this.form.controls['name'].valid &&
+          this.form.controls['federationUrl'].valid &&
+          this.form.controls['accountNumber'].valid &&
+          this.form.controls['idpArn'].valid;
+
+        return checkRoles && checkFields;
+      } else {
+        // Check Truster fields
+        const checkFields = this.form.controls['name'].valid &&
+          this.form.controls['federationUrl'].valid &&
+          this.form.controls['accountNumber'].valid &&
+          this.form.controls['federatedAccount'].valid &&
+          this.form.controls['federatedRole'].valid;
+
+        return checkRoles && checkFields;
+      }
+    } else {
+      // Check Azure fields
+      return this.form.controls['name'].valid &&
+        this.form.controls['federationUrl'].valid &&
+        this.form.controls['subscriptionId'].valid;
+    }
+    return false;
+  }
+
+  setAccountType(name) {
+    this.accountType = name;
+    this.form.controls['federationUrl'].setValue(this.fedUrl);
+    if (name === 'AZURE') {
+      this.form.controls['federationUrl'].setValue(this.fedUrlAzure);
+    }
+  }
+
+  cancel() {
+    this.router.navigate(['/sessions', 'session-selected']);
   }
 }

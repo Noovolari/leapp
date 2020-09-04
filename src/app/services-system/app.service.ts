@@ -35,6 +35,13 @@ export class AppService extends NativeService {
   }
 
   /**
+   * Return the app process
+   */
+  getProcess() {
+    return this.process;
+  }
+
+  /**
    * Return Electron ipcRenderer
    */
   getIpcRenderer() {
@@ -64,7 +71,7 @@ export class AppService extends NativeService {
         this.log.info(message);
         break;
       case LoggerLevel.WARN:
-        this.log.warn();
+        this.log.warn(message);
         break;
       case LoggerLevel.ERROR:
         this.log.error(message);
@@ -73,6 +80,10 @@ export class AppService extends NativeService {
         this.log.info(message);
         break;
     }
+  }
+
+  getLog() {
+    return this.log;
   }
 
   /**

@@ -82,6 +82,7 @@ export class CreateAccountComponent implements OnInit {
     if (config !== undefined && config !== null) {
       this.fedUrl = config.federationUrl;
       this.fedUrlAzure = config.federationUrlAzure;
+      this.form.controls['federationUrl'].setValue(this.fedUrl);
     }
   }
 
@@ -135,7 +136,7 @@ export class CreateAccountComponent implements OnInit {
           this.form.value.subscriptionId,
           null,
           `background-1`,
-          true);
+          false);
 
         if (created) {
           // Then go to next page
@@ -161,9 +162,17 @@ export class CreateAccountComponent implements OnInit {
         const created = this.trusterAccountService.addTrusterAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
+          this.selectedAccount,
+          this.selectedRole,
           this.generateRolesFromNames(this.form.value.accountNumber),
           this.form.value.idpArn,
-          this.form.value.myRegion);
+          undefined);
+
+        this.sessionService.addSession(
+          this.form.value.accountNumber,
+          this.generateRolesFromNames(this.form.value.accountNumber)[0].name,
+          `background-1`,
+          false);
         if (created) {
           // Then go to next page
           this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
@@ -193,7 +202,7 @@ export class CreateAccountComponent implements OnInit {
           this.form.value.accountNumber,
           this.generateRolesFromNames(this.form.value.accountNumber)[0].name,
           `background-1`,
-          true);
+          false);
 
         // Then go to next page
         this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
@@ -291,5 +300,13 @@ export class CreateAccountComponent implements OnInit {
 
   setAccountType(name) {
     this.accountType = name;
+    this.form.controls['federationUrl'].setValue(this.fedUrl);
+    if (name === 'AZURE') {
+      this.form.controls['federationUrl'].setValue(this.fedUrlAzure);
+    }
+  }
+
+  cancel() {
+    this.router.navigate(['/sessions', 'session-selected']);
   }
 }

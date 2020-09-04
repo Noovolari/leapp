@@ -3,6 +3,11 @@ import {NativeService} from '../services-system/native-service';
 import {AppService, LoggerLevel} from '../services-system/app.service';
 import {SessionObject} from '../models/sessionData';
 import {ConfigurationService} from '../services-system/configuration.service';
+import {AwsAccount} from '../models/aws-account';
+import {AzureAccount} from '../models/azure-account';
+import {AzureAccountService} from './azure-account.service';
+import {FederatedAccountService} from './federated-account.service';
+import {TrusterAccountService} from './truster-account.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +16,10 @@ export class SessionService extends NativeService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   constructor(
     private appService: AppService,
-    private configurationService: ConfigurationService) { super(); }
+    private configurationService: ConfigurationService,
+    private azureAccountService: AzureAccountService,
+    private awsFederatedAccountService: FederatedAccountService,
+    private awsTrusterAccountService: TrusterAccountService) { super(); }
 
   /**
    * Add a new session: for us a session is a container for data usaful to generate and maintain a set of credentials when the app is running
@@ -25,16 +33,17 @@ export class SessionService extends NativeService {
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
-    const account = workspace.accountRoleMapping.accounts.filter(acc => (acc.accountNumber === accountNumber))[0];
-    const accountData = { accountName: account.accountName, accountNumber: account.accountNumber };
+    const account = workspace.accountRoleMapping.accounts.filter(acc => ((acc as AwsAccount).accountNumber === accountNumber || ((acc as AzureAccount).subscriptionId)))[0];
+    const accountData = { accountName: account.accountName, accountNumber: account.accountNumber, subscriptionId: account.subscriptionId };
 
-    const roleData = { name: roleName };
+    const roleData = { name: roleName }; // can be null for Azure so we also have this information to discriminate
 
     const sessionData: SessionObject = {
       active,
       accountData,
       roleData,
-      color
+      color,
+      loading: false
     };
 
     const alreadyExist = workspace.currentSessionList.filter(session => (session.accountData === sessionData.accountData && session.roleData === sessionData.roleData));
@@ -56,14 +65,32 @@ export class SessionService extends NativeService {
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.currentSessionList;
-    const sessionExist = sessions.filter(ses => (ses.roleData.name === session.roleData.name && ses.accountData.accountNumber === session.accountData.accountNumber));
+    const sessionExist = sessions.findIndex(ses => (ses.roleData.name === session.roleData.name && (ses.accountData.accountNumber === session.accountData.accountNumber || ses.accountData.subscriptionId === session.accountData.subscriptionId)));
 
-    if (sessionExist.length > 0) {
-      workspace.currentSessionList = sessions.filter(ses => (!(ses.roleData.name === session.roleData.name && ses.accountData.accountNumber === session.accountData.accountNumber)));
+    if (sessionExist > 0) {
+      sessions.splice(sessionExist, 1);
+      workspace.currentSessionList = sessions;
       this.configurationService.updateWorkspaceSync(workspace);
     } else {
       this.appService.logger('the Selected Session does not exist', LoggerLevel.WARN);
       return false;
+    }
+  }
+
+  deleteSessionFromWorkspace(session) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const accounts = workspace.accountRoleMapping;
+    const sessionExist = accounts.accounts.filter(ses => ((ses as AwsAccount).accountNumber === session.accountData.accountNumber || (ses as AzureAccount).subscriptionId === session.accountData.subscriptionId));
+
+    if (sessionExist.length > 0) {
+      // Ok we have the account, now remove it
+      if (session.accountData.accountNumber) {
+        // is one or the other, we can launch both method as they fail gracefully if no account is found
+        this.awsFederatedAccountService.deleteFederatedAccount(session.accountData.accountNumber, session.roleData.name);
+        this.awsTrusterAccountService.deleteTrusterAccount(session.accountData.accountNumber, session.roleData.name);
+      } else {
+        this.azureAccountService.deleteAzureAccount(session.accountData.subscriptionId);
+      }
     }
   }
 
@@ -85,14 +112,14 @@ export class SessionService extends NativeService {
     // Get the session list
     const sessions = workspace.currentSessionList;
     // Verify the session exists or not: we do this by checking the role name and the account number
-    const sessionExist = sessions.filter(ses => (ses.roleData.name === session.roleData.name && ses.accountData.accountNumber === session.accountData.accountNumber));
+    const sessionExist = sessions.filter(ses => (ses.roleData.name === session.roleData.name && (ses.accountData.accountNumber === session.accountData.accountNumber || ses.accountData.subscriptionId === session.accountData.subscriptionId)));
     if (sessionExist.length > 0) {
       // Set the session as false for all sessions as a starting point
       sessions.map(sess => (sess.active = false));
       // Set active only the selected one
       sessions.map(sess => {
-        console.log(sess.accountData.accountNumber === session.accountData.accountNumber && sess.roleData.name === session.roleData.name);
-        if (sess.accountData.accountNumber === session.accountData.accountNumber && sess.roleData.name === session.roleData.name) {
+        console.log((sess.accountData.accountNumber === session.accountData.accountNumber || sess.accountData.subscriptionId === session.accountData.subscriptionId) && sess.roleData.name === session.roleData.name);
+        if ((sess.accountData.accountNumber === session.accountData.accountNumber || sess.accountData.subscriptionId === session.accountData.subscriptionId) && sess.roleData.name === session.roleData.name) {
           sess.active = true;
         }
       });
@@ -128,7 +155,7 @@ export class SessionService extends NativeService {
     const sessions = this.listSessions();
     const accountRoleMappings = workspace.accountRoleMapping;
     return accountRoleMappings.accounts.filter(acc => {
-      const usedRoles = sessions.filter(acc2 => acc2.accountData.accountNumber === acc.accountNumber).map(sf => sf.roleData.name);
+      const usedRoles = sessions.filter(acc2 => (acc2.accountData.accountNumber === acc.accountNumber || acc2.accountData.subscriptionId === acc.subscriptionId)).map(sf => sf.roleData.name);
       acc.awsRoles = acc.awsRoles.filter(r => usedRoles.indexOf(r.name) === -1);
       return acc.awsRoles.length > 0;
     });

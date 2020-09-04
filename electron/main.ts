@@ -3,6 +3,7 @@ import {environment} from '../src/environments/environment';
 import * as CryptoJS from 'crypto-js';
 import {initialConfiguration} from '../src/app/core/initial-configuration';
 import {machineIdSync} from 'node-machine-id';
+import {Workspace} from '../src/app/models/workspace';
 
 const {app, BrowserWindow} = require('electron');
 const url = require('url');
@@ -70,7 +71,7 @@ const setupWorkspace = () => {
         app.exit(0);
       }
 
-      // Launch initWorkspace again, now it will beloaded correctly because the file and directories are there
+      // Launch initWorkspace again, now it will be loaded correctly because the file and directories are there
       initWorkspace();
     }
 };
@@ -110,7 +111,6 @@ const generateMainWindow = () => {
       win.destroy();
       app.quit();
     });
-
   };
 
   autoUpdater.on('checking-for-update', () => {
@@ -185,6 +185,13 @@ const initWorkspace = () => {
     log.info('Setupping workspace for the first time');
     setupWorkspace();
   } else {
+    // Check and activate proxy pass if necessary
+    if (workspace.workspaces[0] !== undefined && (workspace.workspaces[0] as Workspace).proxyUrl) {
+      console.log('workspace in main, check proxy url:', workspace);
+      process.env.HTTP_PROXY = (workspace.workspaces[0] as Workspace).proxyUrl;
+      const globalTunnel = require('global-tunnel');
+      globalTunnel.initialize();
+    }
     // Generate the main window
     generateMainWindow();
   }

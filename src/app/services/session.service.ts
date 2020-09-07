@@ -112,14 +112,16 @@ export class SessionService extends NativeService {
     // Get the session list
     const sessions = workspace.currentSessionList;
     // Verify the session exists or not: we do this by checking the role name and the account number
-    const sessionExist = sessions.filter(ses => (ses.roleData.name === session.roleData.name && (ses.accountData.accountNumber === session.accountData.accountNumber || ses.accountData.subscriptionId === session.accountData.subscriptionId)));
+
+    console.log('sessions', sessions);
+
+    const sessionExist = sessions.filter(ses => (ses.roleData.name === session.roleData.name && ses.accountData.accountNumber === session.accountData.accountNumber) || (session.accountData.subscriptionId && ses.accountData.subscriptionId === session.accountData.subscriptionId));
     if (sessionExist.length > 0) {
       // Set the session as false for all sessions as a starting point
       sessions.map(sess => (sess.active = false));
       // Set active only the selected one
       sessions.map(sess => {
-        console.log((sess.accountData.accountNumber === session.accountData.accountNumber || sess.accountData.subscriptionId === session.accountData.subscriptionId) && sess.roleData.name === session.roleData.name);
-        if ((sess.accountData.accountNumber === session.accountData.accountNumber || sess.accountData.subscriptionId === session.accountData.subscriptionId) && sess.roleData.name === session.roleData.name) {
+        if ((sess.accountData.accountNumber === session.accountData.accountNumber && sess.roleData.name === session.roleData.name) || (session.accountData.subscriptionId && sess.accountData.subscriptionId === session.accountData.subscriptionId)) {
           sess.active = true;
         }
       });

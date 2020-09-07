@@ -118,6 +118,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
     // automatically check if there is an active session and get session list again
     this.credentialsService.refreshCredentialsEmit.emit();
+
     this.sessions = this.sessionService.listSessions();
     this.menuService.redrawList.emit(true);
   }

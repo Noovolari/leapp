@@ -32,6 +32,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
   ) {
     super();
 
+    // Use the default workspace and set it as a class global
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
   }
 
@@ -58,7 +59,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
 
   // MVP: we use this to just check if aws cli is installed in order to proceed to
   // step 3: when going off MVP return to correct method above
-  resolveDependenciesMvp() {
+  resolveDependencies() {
     // Prepare variables to start doing things
     this.loading = true;
     this.enabled = true;

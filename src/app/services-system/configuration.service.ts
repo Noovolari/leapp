@@ -177,6 +177,13 @@ export class ConfigurationService extends NativeService {
   }
 
   /**
+   * Get the Azure Profile
+   */
+  public getAzureProfileSync() {
+    return JSON.parse(this.fileService.readFileSync(this.os.homedir() + '/' + environment.azureProfile));
+  }
+
+  /**
    * Clean the data in the program
    */
   public cleanData() {

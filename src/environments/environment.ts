@@ -8,7 +8,9 @@ const environment = {
   lockFileDestination: '',
   python3Version: '3.4.0',
   production: false,
-  credentialsDestination: '.aws/credentials'
+  credentialsDestination: '.aws/credentials',
+  azureAccessTokens: '.azure/accessTokens.json',
+  azureProfile: '.azure/azureProfile.json'
 };
 
 environment.lockFileDestination = `.Leapp/Leapp-lock.json`;

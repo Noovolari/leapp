@@ -26,7 +26,7 @@ export class ExecuteServiceService extends NativeService {
           command = command.substring(5, command.length);
         }
 
-        exec(command, {name: 'Leapp'}, (err, stdout, stderr) => {
+        exec(command, {name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
           this.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
           if (err) {
             subscriber.error(err);

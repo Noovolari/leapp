@@ -11,6 +11,7 @@ import {AwsAccount} from '../../models/aws-account';
 import {TrusterAccountService} from '../../services/truster-account.service';
 import {AzureAccountService} from '../../services/azure-account.service';
 import {WorkspaceService} from '../../services/workspace.service';
+import {AccountType} from '../../models/AccountType';
 
 @Component({
   selector: 'app-create-account',
@@ -23,7 +24,7 @@ export class CreateAccountComponent implements OnInit {
   roles: string[] = [];
   checkDisabled = false;
 
-  accountType = 'AWS';
+  accountType = AccountType.AWS;
 
   @Input() selectedAccount;
   @Input() selectedAccountNumber = '';
@@ -38,6 +39,8 @@ export class CreateAccountComponent implements OnInit {
   workspace: Workspace;
   accounts: AwsAccount[];
   accountId;
+
+  eAccountType = AccountType;
 
   @Input() selectedType = 'federated';
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
@@ -112,7 +115,7 @@ export class CreateAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveAccount() {
-    if (this.accountType === 'AWS') {
+    if (this.accountType === AccountType.AWS) {
       if (this.selectedType === 'federated') {
         this.saveAwsFederatedAccount();
       } else {
@@ -265,7 +268,7 @@ export class CreateAccountComponent implements OnInit {
    */
   formValid() {
     // First check the type of account we are creating
-    if (this.accountType === 'AWS') {
+    if (this.accountType === AccountType.AWS) {
 
       // Both have roles check
       const checkRoles = this.roles.length > 0;
@@ -301,7 +304,7 @@ export class CreateAccountComponent implements OnInit {
   setAccountType(name) {
     this.accountType = name;
     this.form.controls['federationUrl'].setValue(this.fedUrl);
-    if (name === 'AZURE') {
+    if (name === AccountType.AZURE) {
       this.form.controls['federationUrl'].setValue(this.fedUrlAzure);
     }
   }

@@ -180,7 +180,32 @@ export class ConfigurationService extends NativeService {
    * Get the Azure Profile
    */
   public getAzureProfileSync() {
-    return JSON.parse(this.fileService.readFileSync(this.os.homedir() + '/' + environment.azureProfile));
+    return this.fileService.readFileSync(this.os.homedir() + '/' + environment.azureProfile);
+  }
+
+  /**
+   * Update the access token file synchronously
+   * @param azureProfile - the configuration object
+   */
+  public updateAzureProfileFileSync(azureProfile) {
+    return this.fileService.writeFileSync(this.os.homedir() + '/' + environment.azureProfile, azureProfile);
+  }
+
+
+  public getAzureConfigSync() {
+    return this.fileService.readFileSync(this.os.homedir() + '/' + environment.azureAccessTokens);
+  }
+
+  /**
+   * Update the access token file synchronously
+   * @param azureConfig - the configuration object
+   */
+  public updateAzureAccessTokenFileSync(azureConfig) {
+    return this.fileService.writeFileSync(this.os.homedir() + '/' + environment.azureAccessTokens, azureConfig);
+  }
+
+  public isAzureConfigPresent() {
+    return this.fileService.exists(this.os.homedir() + '/' + environment.azureAccessTokens);
   }
 
   /**

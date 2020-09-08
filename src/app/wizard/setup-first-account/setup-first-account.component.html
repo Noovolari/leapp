@@ -13,11 +13,13 @@
           <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
         </div>
 
+        <ng-container *ngIf="accountType === eAccountType.AWS">
         <div class="form-group" style="width: 100%; display: inline-block;">
           <label>SSO Url<span class="danger-text">*</span></label>
           <input formControlName="federationUrl" type="url" class="form-control" placeholder="single sign-on url *">
           <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.controls['federationUrl'].errors">Insert the SSO url</small>
         </div>
+        </ng-container>
 
       </div>
     </div>

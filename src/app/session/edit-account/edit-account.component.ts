@@ -12,6 +12,7 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {TrusterAccountService} from '../../services/truster-account.service';
 import {AzureAccountService} from '../../services/azure-account.service';
 import {AzureAccount} from '../../models/azure-account';
+import {AccountType} from '../../models/AccountType';
 
 @Component({
   selector: 'app-edit-federated-account',
@@ -51,7 +52,8 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
 
   // Holds an account for filling the form
   account;
-  accountType = 'AWS';
+  accountType = AccountType.AWS;
+  eAccountType = AccountType;
   roles = [];
 
   selectedType = 'federated';
@@ -89,10 +91,10 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
 
       this.accountIdLocked = this.account.accountId;
 
-      this.accountType = this.account.type;
+      this.accountType = this.account.type === 'AWS' ? AccountType.AWS : AccountType.AZURE;
       this.selectedType = !this.account.parent ? 'federated' : 'truster';
 
-      if (this.account.type === 'AWS' && this.account.parent) {
+      if (this.accountType === AccountType.AWS && this.account.parent) {
         this.federatedAccounts = this.accounts.filter(el => el.type === 'AWS' && el.parent === undefined);
         this.selectedAccount = this.account.parent;
         this.getFedRoles();
@@ -135,7 +137,7 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
    * Save the first account in the workspace
    */
   saveAccount() {
-    if (this.accountType === 'AWS') {
+    if (this.accountType === AccountType.AWS) {
       if (this.selectedType === 'federated') {
         this.saveAwsFederatedAccount();
       } else {
@@ -154,17 +156,9 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
           accountId: this.accountIdLocked,
           accountName: this.form.value.name,
           subscriptionId: this.form.value.subscriptionId,
-          idpUrl: this.form.value.federationUrl,
           type: 'AZURE'
         };
         const updated = this.azureAccountService.updateAzureAccount(acc as AzureAccount);
-
-        // When you create an account you also define a possible session: in this case, being the only one we default it to true
-        this.sessionService.addSession(
-          this.form.value.subscriptionId,
-          null,
-          `background-1`,
-          true);
 
         if (updated) {
           // Then go to next page
@@ -299,7 +293,7 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
    */
   formValid() {
     // First check the type of account we are creating
-    if (this.accountType === 'AWS') {
+    if (this.accountType === AccountType.AWS) {
 
       // Both have roles check
       const checkRoles = this.roles.length > 0;
@@ -326,7 +320,6 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
     } else {
       // Check Azure fields
       return this.form.controls['name'].valid &&
-        this.form.controls['federationUrl'].valid &&
         this.form.controls['subscriptionId'].valid;
     }
     return false;
@@ -335,9 +328,6 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
   setAccountType(name) {
     this.accountType = name;
     this.form.controls['federationUrl'].setValue(this.fedUrl);
-    if (name === 'AZURE') {
-      this.form.controls['federationUrl'].setValue(this.fedUrlAzure);
-    }
   }
 
   cancel() {

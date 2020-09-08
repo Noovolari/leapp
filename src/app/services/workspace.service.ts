@@ -468,7 +468,7 @@ export class WorkspaceService extends NativeService {
   /* ======< WORKSPACE MANAGEMENTS >======= */
   /* ====================================== */
 
-  createNewWorkspace(googleToken: string, federationUrl: string, federationAzureUrl: string, name: string, responseType: string) {
+  createNewWorkspace(googleToken: string, federationUrl: string, name: string, responseType: string) {
     try {
       // Create a standard workspace to use as default
       const workspace: Workspace = {
@@ -476,7 +476,6 @@ export class WorkspaceService extends NativeService {
         name,
         lastIDPToken: googleToken,
         idpUrl: federationUrl,
-        idpUrlAzure: federationAzureUrl,
         principalAccountNumber: null,
         accountRoleMapping: {accounts: []},
         currentSessionList: []

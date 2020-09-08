@@ -31,7 +31,6 @@ export class SetupFirstAccountComponent implements OnInit {
   @Input() selectedRole = '';
 
   @Input() fedUrl = '';
-  @Input() fedUrlAzure = '';
 
   federatedRoles: { name: string, roleArn: string }[] = [];
   federatedAccounts: AwsAccount[] = [];
@@ -82,7 +81,6 @@ export class SetupFirstAccountComponent implements OnInit {
     const config = this.configurationService.getConfigurationFileSync();
     if (config !== undefined && config !== null) {
       this.fedUrl = config.federationUrl;
-      this.fedUrlAzure = config.federationUrlAzure;
     }
 
     // only for start screen

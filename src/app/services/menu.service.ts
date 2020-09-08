@@ -47,11 +47,11 @@ export class MenuService extends NativeService {
         { label: session.accountData.accountName + ' - ' + (session.active ? 'active' : 'not active'), type: 'normal', click: (menuItem, browserWindow, event) => {
             if (!session.active) {
               this.sessionService.startSession(session);
-              this.credentialService.refreshCredentialsEmit.emit();
+              this.credentialService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
 
             } else {
-              this.credentialService.refreshCredentialsEmit.emit();
-              this.sessionService.stopSession();
+              this.credentialService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
+              this.sessionService.stopSession(session);
             }
             this.redrawList.emit(true);
             this.currentTray.destroy();
@@ -87,9 +87,9 @@ export class MenuService extends NativeService {
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Stop the session...
-      this.sessionService.stopSession();
+      this.sessionService.stopAllSession();
       // Stop credentials to be used
-      this.credentialService.refreshCredentialsEmit.emit();
+      this.credentialService.refreshCredentialsEmit.emit(null);
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {

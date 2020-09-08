@@ -31,7 +31,6 @@ export class CreateAccountComponent implements OnInit {
   @Input() selectedRole = '';
 
   @Input() fedUrl = '';
-  @Input() fedUrlAzure = '';
 
   federatedRoles: { name: string, roleArn: string }[] = [];
   federatedAccounts: AwsAccount[] = [];
@@ -84,7 +83,6 @@ export class CreateAccountComponent implements OnInit {
     const config = this.configurationService.getConfigurationFileSync();
     if (config !== undefined && config !== null) {
       this.fedUrl = config.federationUrl;
-      this.fedUrlAzure = config.federationUrlAzure;
       this.form.controls['federationUrl'].setValue(this.fedUrl);
     }
   }
@@ -295,7 +293,6 @@ export class CreateAccountComponent implements OnInit {
     } else {
       // Check Azure fields
       return this.form.controls['name'].valid &&
-        this.form.controls['federationUrl'].valid &&
         this.form.controls['subscriptionId'].valid;
     }
     return false;
@@ -304,9 +301,6 @@ export class CreateAccountComponent implements OnInit {
   setAccountType(name) {
     this.accountType = name;
     this.form.controls['federationUrl'].setValue(this.fedUrl);
-    if (name === AccountType.AZURE) {
-      this.form.controls['federationUrl'].setValue(this.fedUrlAzure);
-    }
   }
 
   cancel() {

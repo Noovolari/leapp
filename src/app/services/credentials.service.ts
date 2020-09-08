@@ -6,6 +6,8 @@ import {FileService} from '../services-system/file.service';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {environment} from '../../environments/environment';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
+import {SessionObject} from '../models/sessionData';
+import {AccountType} from '../models/AccountType';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,7 @@ import {ExecuteServiceService} from '../services-system/execute-service.service'
 export class CredentialsService extends NativeService {
 
   // Emitters
-  public refreshCredentialsEmit: EventEmitter<{havePortrait: boolean, portrait: string}> = new EventEmitter<{havePortrait: boolean, portrait: string}>();
+  public refreshCredentialsEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
   public refreshReturnStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   // Unique timer object and time data
@@ -29,38 +31,48 @@ export class CredentialsService extends NativeService {
 
     super();
 
-    this.refreshCredentialsEmit.subscribe(() => this.refreshCredentials());
+    this.refreshCredentialsEmit.subscribe((isAws) => this.refreshCredentials(isAws));
     this.workspaceService.credentialEmit.subscribe(res => this.processCredentials(res));
   }
 
-  refreshCredentials() {
+  refreshCredentials(isAws) {
     // Get all the info we need
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const session = (workspace && workspace.currentSessionList) ? workspace.currentSessionList.filter(acc => acc.active === true)[0] : undefined;
 
-    if (session) {
-      if (session.accountData.accountNumber) {
-        this.awsCredentialProcess(workspace, session);
-      } else if (session.accountData.subscriptionId) {
-        this.azureCredentialProcess(workspace, session);
+    const awsSession   = workspace.currentSessionList.filter(sess => sess.accountData.accountNumber !== null && sess.accountData.accountNumber !== undefined && sess.active)[0];
+    const azureSession = workspace.currentSessionList.filter(sess => sess.accountData.subscriptionId !== null && sess.accountData.subscriptionId !== undefined && sess.active)[0];
+
+    // Check if there are AWS sessions
+    if ((isAws || null)) {
+      if (awsSession) {
+        this.awsCredentialProcess(workspace, awsSession);
       } else {
-        this.cleanCredentialProcess(workspace, session);
+        this.cleanCredentialProcess(workspace, awsSession, AccountType.AWS);
       }
-    } else {
-      this.cleanCredentialProcess(workspace, session);
+    }
+
+    // Check if there are AZURE sessions
+    if ((!isAws || null)) {
+      if (azureSession) {
+        this.azureCredentialProcess(workspace, azureSession);
+      } else {
+        this.cleanCredentialProcess(workspace, azureSession, AccountType.AZURE);
+      }
     }
   }
 
-  cleanCredentialProcess(workspace, session) {
-    if (workspace && session) {
+  cleanCredentialProcess(workspace, session, accountType) {
+    if (workspace) {
 
       // if there are not active sessions stop session.
-      if (session.accountData.accountNumber) {
+      if (accountType === AccountType.AWS) {
         workspace.principalAccountNumber = null;
         workspace.principalRoleName = null;
         workspace.awsCredentials = {};
         this.configurationService.updateWorkspaceSync(workspace);
-      } else if (session.accountData.subscriptionId) {
+      }
+      if (accountType === AccountType.AZURE) {
+        console.log('inside cleanCred - azure');
         // Clean Azure Credential file
         this.cleanAzureCredentialFile();
       }
@@ -75,33 +87,47 @@ export class CredentialsService extends NativeService {
   }
 
   azureCredentialProcess(workspace, session) {
-    this.executeService.execute('az login 2>&1').subscribe(res => {
-      // We can use Json in res to save account information
-      this.executeService.execute(`az account set --subscription ${session.accountData.subscriptionId} 2>&1`).subscribe(acc => {
-        // Set email of the user
-        const azureProfile = this.configurationService.getAzureProfileSync();
-
-        // console.log('azure', azureProfile);
-        // this.workspaceService.emailEmit.emit(azureProfile.subscriptions[0].user.name);
-
-        // Start Calculating time here once credentials are actually retrieved
-        this.startTime = new Date();
-
-        // If the timer is not set, set the unique timer object and fix the starting time
-        if (this.timer === undefined || this.timer === null) {
-          this.timer = setInterval(() => {
-            // process time check for session
-            this.processRefreshCredentials();
-          }, 1000);
-        }
-
-        // Emit return credentials
-        this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');
-        this.refreshReturnStatusEmit.emit(true);
-      }, err2 => {
+    if (workspace.azureConfig !== null && workspace.azureConfig !== undefined) {
+      // Already have tokens
+      // 1) Write accessToken e profile again
+      this.configurationService.updateAzureProfileFileSync(workspace.azureProfile);
+      this.configurationService.updateAzureAccessTokenFileSync(workspace.azureConfig);
+      // 2) Apply set subscription
+      this.azureSetSubscription(session);
+    } else {
+      // First time playing with Azure credentials
+      this.executeService.execute('az login 2>&1').subscribe(res => {
+        this.azureSetSubscription(session);
+      }, err => {
 
       });
-    }, err => {
+    }
+  }
+
+  azureSetSubscription(session: SessionObject) {
+    // We can use Json in res to save account information
+    this.executeService.execute(`az account set --subscription ${session.accountData.subscriptionId} 2>&1`).subscribe(acc => {
+      // Set email of the user
+      const azureProfile = this.configurationService.getAzureProfileSync();
+
+      // console.log('azure', azureProfile);
+      // this.workspaceService.emailEmit.emit(JSON.parse(azureProfile).subscriptions[0].user.name);
+
+      // Start Calculating time here once credentials are actually retrieved
+      this.startTime = new Date();
+
+      // If the timer is not set, set the unique timer object and fix the starting time
+      if (this.timer === undefined || this.timer === null) {
+        this.timer = setInterval(() => {
+          // process time check for session
+          this.processRefreshCredentials();
+        }, 1000);
+      }
+
+      // Emit return credentials
+      this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');
+      this.refreshReturnStatusEmit.emit(true);
+    }, err2 => {
 
     });
   }
@@ -145,7 +171,7 @@ export class CredentialsService extends NativeService {
       const seconds = (currentTime.getTime() - this.startTime.getTime()) / 1000;
       const timeToRefresh = (seconds > environment.sessionDuration);
       if (timeToRefresh) {
-        this.refreshCredentials();
+        this.refreshCredentials(null);
       }
     }
   }
@@ -167,6 +193,18 @@ export class CredentialsService extends NativeService {
   }
 
   private cleanAzureCredentialFile() {
-    // TODO: include clean Azure ACcount
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    if (workspace && this.configurationService.isAzureConfigPresent()) {
+      workspace.azureProfile = this.configurationService.getAzureProfileSync();
+      workspace.azureConfig = this.configurationService.getAzureConfigSync();
+      if (workspace.azureConfig === '[]') {
+        // Anomalous condition revert to normal az login procedure
+        workspace.azureProfile = null;
+        workspace.azureConfig = null;
+      }
+
+      this.configurationService.updateWorkspaceSync(workspace);
+    }
+    this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
 }

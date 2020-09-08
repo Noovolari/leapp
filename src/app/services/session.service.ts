@@ -111,14 +111,20 @@ export class SessionService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     // Get the session list
     const sessions = workspace.currentSessionList;
+
     // Verify the session exists or not: we do this by checking the role name and the account number
-
-    console.log('sessions', sessions);
-
+    // Get the session
     const sessionExist = sessions.filter(ses => (ses.roleData.name === session.roleData.name && ses.accountData.accountNumber === session.accountData.accountNumber) || (session.accountData.subscriptionId && ses.accountData.subscriptionId === session.accountData.subscriptionId));
     if (sessionExist.length > 0) {
       // Set the session as false for all sessions as a starting point
-      sessions.map(sess => (sess.active = false));
+      sessions.map(sess => {
+        if (sess.active && this.appService.isAzure(sess) && this.appService.isAzure(session)) {
+          sess.active = false;
+        }
+        if (sess.active && !this.appService.isAzure(sess) && !this.appService.isAzure(session)) {
+          sess.active = false;
+        }
+      });
       // Set active only the selected one
       sessions.map(sess => {
         if ((sess.accountData.accountNumber === session.accountData.accountNumber && sess.roleData.name === session.roleData.name) || (session.accountData.subscriptionId && sess.accountData.subscriptionId === session.accountData.subscriptionId)) {
@@ -140,13 +146,25 @@ export class SessionService extends NativeService {
   /**
    * Stop the current session, setting it to false and updating the workspace
    */
-  stopSession() {
+  stopSession(session: SessionObject) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.currentSessionList;
-    sessions.map(sess => (sess.active = false));
+    sessions.map(sess => {
+      if (
+        session === null ||
+        (session.accountData.subscriptionId === sess.accountData.subscriptionId) ||
+        (session.accountData.accountNumber === sess.accountData.accountNumber && session.roleData.name === sess.roleData.name)
+      ) {
+        sess.active = false;
+      }
+    });
     workspace.currentSessionList = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
     return true;
+  }
+
+  stopAllSession() {
+    this.stopSession(null);
   }
 
   /**

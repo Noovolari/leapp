@@ -73,7 +73,8 @@ export class AppComponent implements OnInit {
    */
   activateSession() {
     console.log('activating session...');
-    this.credentialsService.refreshCredentialsEmit.emit();
+    // Activate all active session
+    this.credentialsService.refreshCredentialsEmit.emit(null);
   }
 
   /**

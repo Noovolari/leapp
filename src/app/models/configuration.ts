@@ -10,6 +10,5 @@ export interface Configuration {
   defaultWorkspace: string;
   avatar: string;
   federationUrl: string;
-  federationUrlAzure: string;
   workspaces: Workspace[];
 }

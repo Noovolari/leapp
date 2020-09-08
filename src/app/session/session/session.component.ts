@@ -81,13 +81,13 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.sessions = this.sessionService.listSessions();
 
     // automatically check if there is an active session and get session list again
-    this.credentialsService.refreshCredentialsEmit.emit();
+    this.credentialsService.refreshCredentialsEmit.emit(null);
 
     // Set loading to false when a credential is emitted: if result is false stop the current session!
     this.credentialsService.refreshReturnStatusEmit.subscribe((res) => {
       if (!res) {
         // problem: stop session now!
-        this.stopSession();
+        this.stopSession(null);
       }
     });
 
@@ -117,7 +117,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.sessionService.startSession(session);
 
     // automatically check if there is an active session and get session list again
-    this.credentialsService.refreshCredentialsEmit.emit();
+    this.credentialsService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
 
     this.sessions = this.sessionService.listSessions();
     this.menuService.redrawList.emit(true);
@@ -126,13 +126,13 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   /**
    * Stop session
    */
-  stopSession() {
+  stopSession(session: SessionObject) {
     // Eventually close the tray
-    this.sessionService.stopSession();
+    this.sessionService.stopSession(session);
     this.openSsm = false;
 
     // automatically check if there is an active session or stop it
-    this.credentialsService.refreshCredentialsEmit.emit();
+    this.credentialsService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
     this.sessions = this.sessionService.listSessions();
     this.menuService.redrawList.emit(true);
   }

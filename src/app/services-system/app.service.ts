@@ -374,6 +374,7 @@ export class AppService extends NativeService {
     }
   }
 
+  isAzure(s) { return s.accountData.subscriptionId !== null && s.accountData.subscriptionId !== undefined; }
 }
 
 /*

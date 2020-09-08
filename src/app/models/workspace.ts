@@ -8,8 +8,10 @@ export interface Workspace {
 
   lastIDPToken?: string;
   idpUrl?: string;
-  idpUrlAzure?: string;
   proxyUrl?: string;
+
+  azureConfig?: string;
+  azureProfile?: string;
 
   currentSessionList: SessionObject[];
 

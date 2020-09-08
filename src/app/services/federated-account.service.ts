@@ -3,6 +3,7 @@ import {NativeService} from '../services-system/native-service';
 import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {TrusterAccountService} from './truster-account.service';
+import {AccountType} from '../models/AccountType';
 
 @Injectable({
   providedIn: 'root'
@@ -64,7 +65,7 @@ export class FederatedAccountService extends NativeService {
   listFederatedAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace && workspace.accountRoleMapping) {
-      return workspace.accountRoleMapping.accounts.filter(ele => (ele.parent === undefined && ele.awsRoles[0].parent === undefined));
+      return workspace.accountRoleMapping.accounts.filter(ele => (ele.type === 'AWS' && ele.parent === undefined && ele.awsRoles[0].parent === undefined));
     } else {
       return [];
     }

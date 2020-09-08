@@ -23,7 +23,6 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
   public form = new FormGroup({
     idpUrl: new FormControl('', [Validators.required]),
-    idpUrlAzure: new FormControl('', [Validators.required]),
     proxyUrl: new FormControl('')
   });
 
@@ -39,10 +38,8 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData.name && this.workspaceData.name !== '') {
       this.idpUrlValue = this.workspaceData.idpUrl;
-      this.idpUrlValueAzure = this.workspaceData.idpUrlAzure;
       this.proxyUrl = this.workspaceData.proxyUrl;
       this.form.controls['idpUrl'].setValue(this.idpUrlValue);
-      this.form.controls['idpUrlAzure'].setValue(this.idpUrlValueAzure);
       this.form.controls['proxyUrl'].setValue(this.proxyUrl);
       this.name = this.workspaceData.name;
       this.email = localStorage.getItem('hook_email') || 'not logged in yet';
@@ -56,7 +53,6 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   saveIdpUrls() {
     if (this.form.valid) {
       this.workspaceData.idpUrl = this.form.value.idpUrl;
-      this.workspaceData.idpUrlAzure = this.form.value.idpUrlAzure;
 
       if (this.form.controls['proxyUrl'].value !== undefined &&
           this.form.controls['proxyUrl'].value !== null &&

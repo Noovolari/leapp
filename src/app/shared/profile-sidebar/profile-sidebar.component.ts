@@ -5,6 +5,7 @@ import {Router} from '@angular/router';
 import {environment} from '../../../environments/environment';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {HttpClient} from '@angular/common/http';
+import {ExecuteServiceService} from '../../services-system/execute-service.service';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -21,7 +22,8 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     private appService: AppService,
     private configurationService: ConfigurationService,
     private router: Router,
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private executeService: ExecuteServiceService
   ) { super(); }
 
   /**
@@ -38,9 +40,16 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
    * logout from Leapp
    */
   logout() {
+    // Google clean
     this.httpClient.get('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe(res => {}, err => {
       this.configurationService.newConfigurationFileSync();
     });
+    // Azure Clean
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    workspace.azureProfile = null;
+    workspace.azureConfig = null;
+    this.configurationService.updateWorkspaceSync(workspace);
+    this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
 
   /**

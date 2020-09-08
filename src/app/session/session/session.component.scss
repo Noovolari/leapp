@@ -270,6 +270,8 @@ h3 {
 .ssm-cards {
   height: 478px;
   margin: 0!important;
+  overflow: auto;
+  width: 100%;
 }
 
 .grayedout {
@@ -421,7 +423,7 @@ $purple: rgba(190,  11, 224, .55);
 
   display: inline-block;
   width: 185px;
-  border-radius: 10px;
+  border-radius: 15px;
   border: 1px solid #222222;
   height: 27px;
   margin-right: 23px;

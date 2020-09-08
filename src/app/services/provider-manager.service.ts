@@ -87,10 +87,8 @@ export class ProviderManagerService {
     // Update Configuration
     if (accountType === AccountType.AWS) {
       configuration.federationUrl = form.value.federationUrl;
-      configuration.federationUrlAzure = '';
     } else {
       configuration.federationUrl = '';
-      configuration.federationUrlAzure = form.value.federationUrl;
     }
     this.configurationService.updateConfigurationFileSync(configuration);
 
@@ -98,7 +96,7 @@ export class ProviderManagerService {
     const responseType = IdpResponseType.SAML;
 
     // When the token is received save it and go to the setup page for the first account
-    const sub = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, configuration.federationUrl, configuration.federationUrlAzure, responseType)));
+    const sub = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, configuration.federationUrl, responseType)));
 
     // Call the service for working on the first login event to the user idp
     // We add the helper for account choosing just to be sure to give the possibility to call the correct user
@@ -111,10 +109,10 @@ export class ProviderManagerService {
   /**
    * When the data from Google is received, generate a new workspace or check errors, etc.
    */
-  createNewWorkspace(googleToken, federationUrl, federationAzureUrl, responseType) {
+  createNewWorkspace(googleToken, federationUrl, responseType) {
 
     const name = 'default';
-    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, federationAzureUrl, name, responseType);
+    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, name, responseType);
     if (result) {
       this.decideSavingMethodAndSave();
     } else {
@@ -261,7 +259,6 @@ export class ProviderManagerService {
     } else {
       // Check Azure fields
       return form.controls['name'].valid &&
-        form.controls['federationUrl'].valid &&
         form.controls['subscriptionId'].valid;
     }
     return false;

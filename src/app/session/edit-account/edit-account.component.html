@@ -13,11 +13,13 @@
           <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
         </div>
 
+        <ng-container *ngIf="accountType === eAccountType.AWS">
         <div class="form-group" style="width: 100%; display: inline-block;">
           <label>SSO Url<span class="danger-text">*</span></label>
           <input formControlName="federationUrl" type="url" class="form-control" placeholder="single sign-on url *" [(ngModel)]="account.idpUrl">
           <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.controls['federationUrl'].errors">Insert the SSO url</small>
         </div>
+        </ng-container>
 
       </div>
     </div>
@@ -29,12 +31,12 @@
         <div class="form-group" style="width: 100%; display: inline-block;">
           <label>Choose your account type<span class="danger-text">*</span></label>
           <br>
-          <button type="button" class="account-type {{accountType === 'AWS' ? 'selected' : ''}}" (click)="setAccountType('AWS');">AWS</button>
-          <button type="button" class="account-type {{accountType === 'AZURE' ? 'selected' : ''}}" (click)="setAccountType('AZURE');">AZURE</button>
+          <button type="button" class="account-type {{accountType === eAccountType.AWS ? 'selected' : ''}}" (click)="setAccountType(eAccountType.AWS);">AWS</button>
+          <button type="button" class="account-type {{accountType === eAccountType.AZURE ? 'selected' : ''}}" (click)="setAccountType(eAccountType.AZURE);">AZURE</button>
         </div>
 
 
-        <ng-container *ngIf="accountType === 'AWS'">
+        <ng-container *ngIf="accountType === eAccountType.AWS">
           <div class="form-group" style="width: 49%; display: inline-block;">
             <label>Account Number<span class="danger-text">*</span></label>
             <input formControlName="accountNumber" type="text" class="form-control" placeholder="Account Number *" [(ngModel)]="account.accountNumber">
@@ -71,10 +73,10 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="accountType === 'AZURE'">
+        <ng-container *ngIf="accountType === eAccountType.AZURE">
           <div class="form-group" style="width: 100%; display: inline-block;">
             <label>Subscription Id<span class="danger-text">*</span></label>
-            <input formControlName="subscriptionId" type="text" class="form-control" placeholder="Subscription Id *">
+            <input formControlName="subscriptionId" type="text" class="form-control" placeholder="Subscription Id *" [(ngModel)]="account.subscriptionId">
             <small class="text-error" *ngIf="(form.controls['subscriptionId'].dirty || form.controls['subscriptionId'].touched) && form.controls['subscriptionId'].errors">Insert the Subscription Id</small>
           </div>
         </ng-container>
@@ -82,7 +84,7 @@
       </div>
     </div>
 
-    <ng-container *ngIf="accountType === 'AWS'">
+    <ng-container *ngIf="accountType === eAccountType.AWS">
       <div class="toggable {{!toggleOpen ? 'opened' : 'closed'}}">
         <div class="titable" title="Role Details" (click)="$event.stopPropagation(); toggleOpen = !toggleOpen;"></div>
         <div class="shrinkable">

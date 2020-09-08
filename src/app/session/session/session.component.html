@@ -4,7 +4,7 @@
 
   <div class="menu-bar">
     <a class="btn-group {{showOnly === 'AWS' ? 'active' : ''}} btn-left" (click)="setVisibility('AWS');">AWS</a>
-    <a class="btn-group {{showOnly === 'AZURE' ? 'active' : ''}} btn-center" (click)="setVisibility('AZURE');">AZR</a>
+    <a class="btn-group {{showOnly === 'AZR' ? 'active' : ''}} btn-center" (click)="setVisibility('AZR');">AZR</a>
     <a class="btn-group {{showOnly === 'ALL' ? 'active' : ''}} btn-right" (click)="setVisibility('ALL');">ALL</a>
 
     <a (click)="createAccount();" tooltip="Create Account" class="small-btn"><img src="assets/images/plus-light.png" width="14"/></a>
@@ -36,7 +36,7 @@
               </div>
             </ng-container>
 
-            <a (click)="stopSession()" *ngIf="!session.loading && session.active"><i class="fa fa-stop"></i></a>
+            <a (click)="stopSession(session)" *ngIf="!session.loading && session.active"><i class="fa fa-stop"></i></a>
             <a (click)="startSession(session)" *ngIf="!session.loading && !session.active"><i class="fa fa-play"></i></a>
             <a *ngIf="session.loading"><i class="fa fa-spin fa-spinner"></i></a>
 

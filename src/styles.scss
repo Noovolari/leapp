@@ -2,13 +2,13 @@
 /**
 Custom Global styles
 */
-@import "./assets/scss/palette";
-@import "./assets/scss/mixins/utility";
-@import "./assets/scss/fonts";
-@import "./assets/scss/table";
-@import "./assets/scss/form";
-@import "./assets/scss/toast";
-@import "./assets/scss/global";
+@import "palette";
+@import "assets/scss/mixins/utility";
+@import "assets/scss/fonts";
+@import "assets/scss/table";
+@import "assets/scss/form";
+@import "assets/scss/toast";
+@import "assets/scss/global";
 
 /**
 Bootstrap theme override
@@ -17,7 +17,7 @@ $body-color: $charcoal-grey;
 
 $theme-colors: (
   'primary': $charcoal-grey,
-  'success': $sick-green,
+  'success': $success,
   'danger': $copper,
   'light': #ffffff
 );

@@ -1,86 +1,21 @@
+@import 'palette';
 .profile {
-  clear: both;
-  padding: 20px 25px;
-  height: 40px;
-  width: 25%;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  position: relative;
-  z-index: 3;
-  cursor: pointer;
-}
-
-.avatar {
-  border-radius: 4px;
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  background: white;
-  border: 1px solid rgba(0,0,0,0.49);
-  position: relative;
-  overflow: hidden;
-  transition: opacity 0.5s ease;
-  box-shadow: 0 0 42px -14px rgba(0,0,0,0.49);
-  cursor: pointer;
-}
-
-.avatar:hover {
-  opacity: 0.6;
+  position: absolute;
+  top: 15px;
+  left: 15px;
 }
 
 .portrait {
   position: relative;
-  float: left;
-  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  background: $focused-background;
 }
-.logout {
-  float: right;
+
+.centered-div {
   position: relative;
-  top: 14px;
-  cursor: pointer;
-  transition: opacity 0.5s ease;
+  display: flex;
+  justify-content: center;
 }
-.logout:hover {
-  opacity: 0.6;
-}
-
-.portrait .ws {
-  font-size: 14px;
-  color: #707070;
-  font-weight: bold;
-  display: block;
-  position: absolute;
-  left: 40px;
-  top: 0;
-  width: 56vw;
-  cursor: pointer;
-}
-
-
-.portrait .ed {
-  font-size: 9px;
-  color: #707070;
-  display: inline-block;
-  position: absolute;
-  left: 95px;
-  top: 34px;
-  cursor: pointer;
-}
-
-.portrait .ed:before {
-  content: '';
-  position: absolute;
-  top: 3px;
-  left: -14px;
-  width: 10px;
-  height: 10px;
-  border-radius: 10px;
-  background: #8fc92a;
-  cursor: pointer;
-}
-
-.portrait .ed.red-ws:before {
-  background: #d64123;
-}
-
-.go-back { position: absolute; top: 83px; left: -7px; z-index: 1; cursor: pointer; }

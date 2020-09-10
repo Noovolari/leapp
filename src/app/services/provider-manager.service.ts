@@ -107,6 +107,30 @@ export class ProviderManagerService {
   }
 
   /**
+   * Save the first account of the Application
+   * @param accountId - the account Id that we are creating
+   * @param accountType - the account Type you have chosen
+   * @param selectedAccount - the selected account as a parent for
+   * @param selectedRole - the selected role of the parent
+   * @param selectedType - the type of AWS account, if any, that you have selected
+   * @param roles - the roles for AWS accounts
+   * @param form - the form to use
+   */
+  saveAccount(accountId, accountType, selectedAccount, selectedRole, selectedType, roles, form) {
+    // Set our variable to avoid sending them to all methods;
+    // besides the scope of this service is to manage saving and editing
+    // of multi providers so having some helper class variables is ok
+    this.accountId = accountId;
+    this.accountType = accountType;
+    this.selectedType = selectedType;
+    this.selectedAccount = selectedAccount;
+    this.selectedRole = selectedRole;
+    this.form = form;
+    this.roles = roles;
+    this.decideSavingMethodAndSave();
+  }
+
+  /**
    * When the data from Google is received, generate a new workspace or check errors, etc.
    */
   createNewWorkspace(googleToken, federationUrl, responseType) {

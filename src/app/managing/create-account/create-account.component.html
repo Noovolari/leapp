@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <h1>Create Account</h1>
+  <h1>Create Your First Account</h1>
 
   <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveAccount();">
 
@@ -14,11 +14,11 @@
         </div>
 
         <ng-container *ngIf="accountType === eAccountType.AWS">
-        <div class="form-group" style="width: 100%; display: inline-block;">
-          <label>SSO Url<span class="danger-text">*</span></label>
-          <input formControlName="federationUrl" type="url" class="form-control" placeholder="single sign-on url *">
-          <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.controls['federationUrl'].errors">Insert the SSO url</small>
-        </div>
+          <div class="form-group" style="width: 100%; display: inline-block;">
+            <label>SSO Url<span class="danger-text">*</span></label>
+            <input formControlName="federationUrl" type="url" class="form-control" placeholder="single sign-on url *">
+            <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.controls['federationUrl'].errors">Insert the SSO url</small>
+          </div>
         </ng-container>
 
       </div>
@@ -107,7 +107,6 @@
       </div>
     </ng-container>
 
-    <button type="button" (click)="cancel();" class="btn btn-default pull-left">Cancel</button>
     <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'btn btn-default pull-right': 'btn btn-default btn-gradient pull-right'">Save</button>
 
   </form>

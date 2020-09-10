@@ -76,7 +76,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
       // otherwise we go directly to the session download as we need the list
       // Stop the loader
       this.loading = false;
-      this.router.navigate(['/managing', 'setup-first-account']);
+      this.router.navigate(['/managing', 'create-account'], { queryParams: { firstTime: true }});
     }
   }
 

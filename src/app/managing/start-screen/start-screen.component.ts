@@ -21,7 +21,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
   workspace;
 
   /**
-   * Dependencies Page is used to check if we already have the correct configuratrion and send you to the session page or to the setup wizard otherwise
+   * Dependencies Page is used to check if we already have the correct configuratrion and send you to the session page or to the setup managing otherwise
    */
   constructor(
     private router: Router,
@@ -76,7 +76,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
       // otherwise we go directly to the session download as we need the list
       // Stop the loader
       this.loading = false;
-      this.router.navigate(['/wizard', 'setup-first-account']);
+      this.router.navigate(['/managing', 'setup-first-account']);
     }
   }
 

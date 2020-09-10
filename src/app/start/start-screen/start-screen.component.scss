@@ -1,97 +1,100 @@
-@import "../../../assets/scss/palette";
 @import "../../../assets/scss/mixins/utility";
 
 .container-fluid {
   background: white;
   color: #222222;
-  font-family: "Open Sans", sans-serif;
+  font-family: "AvenirNext", "Open Sans", sans-serif;
   padding: 40px;
-  h1 {
-    font-size: 25px;
-    font-weight: 400;
-    margin-bottom: 5px;
-    color: #707070;
-  }
-
-  .terminal-actions {
-    background: #222222;
-    color: green;
-    overflow: scroll;
-    width: 100%;
-    height: 200px;
-  }
 }
 
-.hover {
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 99999;
-  }
-  &.success {
-    &:before {
-      background-color: rgba(26, 23, 120, 0.8);
-      background-image: url("../../../assets/images/check.svg");
-    }
-  }
-}
-
-.dependencies-list { list-style: none; }
-.dependencies-list li { font-size: 10px; }
-.little-circle {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 4px;
-  float: left;
-}
-
-.mountain-keeper {
-  position: relative;
-  overflow-x: hidden;
-  height: 94px;
-}
-
-.seamless-anim {
+.background {
   position: absolute;
-  display: inline-block;
-  width: 928px;
-  height: 94px;
-  padding: 0;
   top: 0;
-}
-.seamless-anim img {
-  width: 928px;
-  height: 94px;
-  margin: 0;
-  padding: 0;
+  left: 0;
 }
 
-.chara {
-  width: 100px;
-  height: 100px;
+h1 {
+  font-size: 40px;
+  font-weight: normal;
+  font-family: "AvenirNext", "Open Sans", sans-serif;
+  color: #ffffff;
+  border-bottom: 1px solid #ffffff;
+
+  padding: 15px;
+
   position: absolute;
-  left: calc(50% - 50px);
+  top: 165px;
+  left: 50px;
+
+  strong {
+    font-family: "AvenirNextBold", "Open Sans", sans-serif;
+    font-weight: bold;
+  }
 }
 
-.dark-link {
-  color: #707070;
+p {
+  font-size: 16px;
+  font-weight: normal;
+  font-family: "AvenirNext", "Open Sans", sans-serif;
+  color: #ffffff;
+
+  position: absolute;
+  top: 315px;
+  left: 50px;
+  right: 50px;
+}
+
+button {
+  background-color: #73E0CF;
+  color: #080B38;
+  border-radius: 4px;
+  border: 2px solid #73E0CF!important;
+
+  font-family: "Lato", "Open Sans", sans-serif;
+  font-size: 19px;
+  font-weight: bold;
+
+  transition: all 0.3s ease;
+
+  min-width: 160px;
+  padding: 10px;
+}
+button:hover {
+  background-color: transparent;
+  color: #73E0CF;
+  border: 2px solid #73E0CF!important;
+}
+
+a {
+  font-size: 12px;
+  font-family: "AvenirNext", "Open Sans", sans-serif;
+  font-weight: normal;
+  color: #73E0CF;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+a:hover {
+  color: #73E0CF;
   text-decoration: underline;
-  cursor: pointer;
 }
 
-.btn-gradient {
-  color: white!important;
-  background:linear-gradient(-90deg, rgb(249, 212, 35) 0%, rgb(230, 92, 0) 80%)!important;
+button {
+  position: absolute;
+  top: 380px;
+  left: 130px;
 }
 
-.gray-text { color: #828283; }
+span {
+  font-size: 12px;
+  font-weight: normal;
+  color: #ffffff;
+
+  position: absolute;
+  top: 434px;
+  left: 130px;
+}
+
+
 .app-loading {
   position: relative;
   border: none;

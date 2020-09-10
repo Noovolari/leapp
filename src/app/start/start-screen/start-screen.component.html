@@ -1,18 +1,20 @@
 <div class="content flex-container column page-container" *ngIf="!loading">
 
-    <img src="/assets/images/Leapp.png" width="200"/>
-    <br>
-    <p>Setup your first account</p>
-    <br>
-    <button (click)="resolveDependencies();" class="btn btn-default btn-gradient">Create your first account</button>
-    <br>
-    <a href="mailto:support@noovolari.com" class="dark-link"><i>Need help? Contact us!</i></a>
+    <img src="assets/images/start-screen.png" class="background" />
+
+    <h1>If it's <strong>ON</strong><br>you are <strong>IN</strong></h1>
+
+    <p>Collega subito il tuo primo account e comincia ad immergerti nel tuo lavoro.</p>
+
+    <button (click)="resolveDependencies();" class="btn btn-default btn-gradient">Inizia Subito!</button>
+
+    <span>Dubbi? Segui la nostra <a href="mailto:support@noovolari.com" class="dark-link">guida</a>.</span>
 </div>
 
 <div class="content flex-container column page-container" *ngIf="loading">
 
   <div class="app-loading">
-    <img src="/assets/images/be-auth-logo.svg" width="100" />
+    <img src="assets/images/be-auth-logo.svg" width="100" />
     <svg class="spinner" viewBox="25 25 50 50">
       <defs>
         <linearGradient id="linearColors1">

@@ -7,8 +7,7 @@ html, body {
 }
 
 * {
-  font-family: 'Open Sans', sans-serif;
-
+  font-family: 'AvenirNext', 'Open Sans', sans-serif;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -20,13 +19,7 @@ h1, h2, h3, h4, h5, h6 {
 .column {flex-direction: column}
 .page-container {height: 100vh}
 
-button {
-  color: rgba(0,0,0,0.6);
-  background: #E0E1E2;
-  font-size: 13px;
-  padding: 5px 30px;
-  border-radius: 4px;
-}
+
 
 .btn-default {
   min-width: 94px;

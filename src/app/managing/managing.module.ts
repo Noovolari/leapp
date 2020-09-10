@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ManagingRoutingModule} from './managing-routing.module';
-import {StartScreenComponent} from './start-screen/start-screen.component';
 import {LayoutModule} from '../layout/layout.module';
 import {NgSelectModule} from '@ng-select/ng-select';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
@@ -15,7 +14,6 @@ import {EditAccountComponent} from './edit-account/edit-account.component';
   declarations: [
     CreateAccountComponent,
     EditAccountComponent,
-    StartScreenComponent,
     SetupFirstAccountComponent
   ],
   imports: [

@@ -4,17 +4,13 @@ import {SessionRoutingModule} from './session-routing.module';
 import {SessionComponent} from './session/session.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../shared/shared.module';
-import {CreateAccountComponent} from './create-account/create-account.component';
 import {NgSelectModule} from '@ng-select/ng-select';
-import {EditAccountComponent} from './edit-account/edit-account.component';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
 
 
 @NgModule({
   declarations: [
-    SessionComponent,
-    CreateAccountComponent,
-    EditAccountComponent
+    SessionComponent
   ],
   imports: [
     CommonModule,

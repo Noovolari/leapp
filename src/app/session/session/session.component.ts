@@ -170,7 +170,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    */
   createAccount() {
     // Go!
-    this.router.navigate(['/sessions', 'create-account']);
+    this.router.navigate(['/managing', 'create-account']);
   }
 
   /**
@@ -294,7 +294,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   }
 
   editAccount(session) {
-    this.router.navigate(['/sessions', 'edit-account'], { queryParams: { accountId: (session.accountData.accountNumber || session.accountData.subscriptionId), roleName: session.roleData.name } });
+    this.router.navigate(['/managing', 'edit-account'], { queryParams: { accountId: (session.accountData.accountNumber || session.accountData.subscriptionId), roleName: session.roleData.name } });
   }
 
   removeAccount(session) {

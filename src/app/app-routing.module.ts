@@ -7,8 +7,12 @@ const routes: Routes = [
     path: '',
     children: [
       {
-        path: 'wizard',
-        loadChildren: './wizard/wizard.module#WizardModule' // contains all the components that defines the initial setup
+        path: 'start',
+        loadChildren: './start/start.module#StartModule' // contains all the components that defines the initial setup
+      },
+      {
+        path: 'managing',
+        loadChildren: './managing/managing.module#ManagingModule' // contains all the components that defines the initial setup
       },
       {
         path: 'profile',

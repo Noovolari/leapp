@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
     this.activateSession();
 
     // Initial starting point for DEBUG
-    this.router.navigate(['/wizard', 'start-screen']);
+    this.router.navigate(['/start']);
   }
 
   /**

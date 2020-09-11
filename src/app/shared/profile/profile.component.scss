@@ -1,8 +1,8 @@
 @import 'palette';
 .profile {
   position: absolute;
-  top: 15px;
-  left: 15px;
+  top: 24px;
+  left: 24px;
 }
 
 .portrait {
@@ -11,11 +11,13 @@
   justify-content: center;
   align-items: center;
   padding: 10px;
-  background: $focused-background;
+  background: $main-color-light;
+  border-radius: 4px;
 }
 
 .centered-div {
   position: relative;
   display: flex;
   justify-content: center;
+  margin: 16px;
 }

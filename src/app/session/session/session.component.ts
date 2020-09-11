@@ -364,6 +364,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   }
 
   setVisibility(name) {
-    this.showOnly = name;
+    if (this.showOnly === name) {
+      this.showOnly = 'ALL';
+    } else {
+      this.showOnly = name;
+    }
+    console.log(this.showOnly);
   }
 }

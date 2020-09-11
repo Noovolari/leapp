@@ -1,3 +1,5 @@
+@import "palette";
+
 .btn {
   border: none!important;
 }
@@ -22,9 +24,7 @@
   font-size: 16px;
 }
 
-input {
-  height: 36px!important;
-}
+input { height: 36px!important; }
 
 .ng-untouched:not(.ng-select-opened) .ng-placeholder { top: 11px!important; }
 .ng-placeholder { color: #cfcfd0; font-size: 12px; position: absolute; top: 16px!important; }
@@ -57,6 +57,12 @@ input {
 form button {
   position: relative;
   bottom: 5px;
+}
+
+.form-control:focus {
+  outline: 0;
+  border: 1px solid $main-color-light;
+  box-shadow: 0 0 0 0.2rem $focused-element;
 }
 
 .toggable {

@@ -4,7 +4,7 @@
 .container-fluid {
   background: white;
   color: #222222;
-  font-family: "Open Sans", sans-serif;
+  font-family: "AvenirNext", "Open Sans", sans-serif;
   padding: 0 25px;
 
   h1 {
@@ -22,26 +22,6 @@
     overflow: scroll;
     width: 100%;
     height: 200px;
-  }
-}
-
-.hover {
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 99999;
-  }
-  &.success {
-    &:before {
-      background-color: rgba(26, 23, 120, 0.8);
-      background-image: url("../../../assets/images/check.svg");
-    }
   }
 }
 

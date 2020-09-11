@@ -3,181 +3,208 @@
 
 .container-fluid {
   background: white;
-  color: #222222;
-  font-family: "Open Sans", sans-serif;
+  color: $text-color;
+  font-family: "AvenirNext", "Open Sans", sans-serif;
   padding: 0 25px;
 
-  h1 {
-    margin-top: 30px;
-    font-size: 22px;
-    font-weight: 400;
-    margin-bottom: 19px;
-    color: #707070;
-    text-align: left;
-  }
-
-  .terminal-actions {
-    background: #222222;
-    color: green;
-    overflow: scroll;
-    width: 100%;
-    height: 200px;
-  }
-}
-
-.hover {
-  &:before {
-    content: '';
+  .pull-right {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 99999;
+    right: 25px;
+    bottom: 25px;
   }
-  &.success {
-    &:before {
-      background-color: rgba(26, 23, 120, 0.8);
-      background-image: url("../../../assets/images/check.svg");
+
+  .pull-left {
+    position: absolute;
+    left: 25px;
+    bottom: 25px;
+  }
+
+  .pull-center {
+    display: inline-block;
+    position: absolute;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .ng-dropdown-panel .ng-dropdown-panel-items {
+    max-height: 188px;
+  }
+
+  h1 {
+    margin: 30px auto 19px auto;
+
+    font-family: "AvenirNextDemiBold", "Open Sans", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: $text-color;
+    text-align: center;
+    display: block;
+  }
+
+  h2 {
+    font-family: "AvenirNextDemiBold", "Open Sans", sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: $text-color;
+    text-align: center;
+    display: block;
+    background: $white-text-color;
+    position: relative;
+    top: 8px;
+  }
+  h2:before {
+    position: relative;
+    top: 8px;
+    float: left;
+    content: '';
+    display: inline-block;
+    width: 100px;
+    height: 2px;
+    background: $main-color-light;
+  }
+  h2:after {
+    position: relative;
+    top: 8px;
+    float: right;
+    content: '';
+    display: inline-block;
+    width: 100px;
+    height: 2px;
+    background: $main-color-light;
+  }
+
+  p {
+    font-size: 16px;
+    font-weight: normal;
+    font-family: "AvenirNext", "Open Sans", sans-serif;
+    color: $text-color;
+  }
+  p.smaller {
+    font-size: 12px;
+  }
+
+  label {
+    font-size: 12px;
+    font-weight: bold;
+    font-family: "AvenirNextBold", "Open Sans", sans-serif;
+    color: $text-color;
+  }
+
+  button {
+    background-color: #73E0CF;
+    color: #080B38;
+    border-radius: 4px;
+    border: 2px solid #73E0CF!important;
+
+    font-family: "Lato", "Open Sans", sans-serif;
+    font-size: 19px;
+    font-weight: bold;
+
+    transition: all 0.3s ease;
+
+    min-width: 160px;
+    padding: 10px;
+  }
+  button:hover {
+    background-color: transparent;
+    color: #73E0CF;
+    border: 2px solid #73E0CF!important;
+  }
+  button.disabled {
+    background: $light-grey;
+    color: $charcoal-grey;
+    border: 2px solid $charcoal-grey!important;
+  }
+
+  .providers {
+    display: inline-block;
+    width: 174px;
+    padding: 10px;
+    margin: 0 8px;
+    text-align: center;
+    vertical-align: middle;
+
+    font-size: 12px;
+    font-family: "AvenirNext", "Open Sans", sans-serif;
+    color: $text-color;
+
+    border-radius: 4px;
+    border: 2px solid $text-color!important;
+    background-color: $white-text-color;
+
+    transition: all 0.3s ease;
+  }
+  .providers:hover {
+    background: $focused-element;
+    border: 2px solid $main-color-light;
+  }
+  .providers.extended {
+    margin-left: 7px;
+    margin-right: 0;
+    padding: 10px;
+    background: $focused-element;
+    border: 2px solid $main-color-light!important;
+
+    animation: expanding 0.3s normal forwards ease-in-out;
+    animation-iteration-count: 1;
+  }
+  .providers.hide {
+    display: none;
+  }
+  .providers.disabled {
+    background: $light-grey;
+    color: $charcoal-grey;
+    border: 2px solid $charcoal-grey!important;
+  }
+  .providers.selected {
+    background: $focused-element;
+    border: 2px solid $main-color-light!important;
+  }
+  .back {
+    padding: 5px 10px;
+    text-decoration: none;
+    cursor: pointer;
+    color: $text-color;
+  }
+  .note {
+    font-size: 10px;
+    font-weight: normal;
+    font-family: "AvenirNext", "Open Sans", sans-serif;
+    color: $text-color;
+    margin-top: 10px;
+  }
+  .correct-top {
+    margin-top: 4px;
+  }
+  .correct-top-second-step {
+    margin-top: -3px;
+  }
+  .second-step-fix {
+    margin-bottom: 9px;
+  }
+  .back-link {
+    text-decoration: none;
+    color: $text-color;
+    i {
+      position: relative;
+      left: 0;
+      color: $main-color-light;
+    }
+  }
+  .back-link:hover {
+    i {
+      animation: moving 0.3s normal forwards ease-in-out;
     }
   }
 }
 
-.dependencies-list { list-style: none; }
-.dependencies-list li { font-size: 10px; }
-.little-circle {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 4px;
-  float: left;
+@keyframes expanding {
+  from { width: 174px; }
+  to { width: 90%; }
 }
 
-.mountain-keeper {
-  position: relative;
-  overflow-x: hidden;
-  height: 94px;
-}
-
-.seamless-anim {
-  position: absolute;
-  display: inline-block;
-  width: 928px;
-  height: 94px;
-  padding: 0;
-  top: 0;
-}
-.seamless-anim img {
-  width: 928px;
-  height: 94px;
-  margin: 0;
-  padding: 0;
-}
-
-.chara {
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  left: calc(50% - 50px);
-}
-
-.dark-link {
-  color: #707070;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.btn-gradient {
-  color: white!important;
-  background:linear-gradient(-90deg, rgb(249, 212, 35) 0%, rgb(230, 92, 0) 80%)!important;
-}
-
-label { font-size: 14px; }
-
-.orange-color {
-  color: #fd9d20;
-}
-
-.pull-right {
-  position: absolute;
-  right: 25px;
-  bottom: 25px;
-}
-
-.pull-left {
-  position: absolute;
-  left: 25px;
-  bottom: 25px;
-}
-
-ul {
-  padding: 10px 0;
-  margin: 0;
-}
-
-li {
-  list-style: none;
-  border-radius: 20px;
-  padding: 2px 30px 2px 15px;
-  background: linear-gradient(-90deg, #f9d423 0%, #e65c00 80%) !important;
-  display: inline-block;
-  margin: 5px;
-  color: white;
-  position: relative;
-
-  span {
-    font-size: 14px;
-    display:  inline-block;
-    position: relative;
-    top: -1px;
-  }
-
-  i {
-    background: white;
-    color: #707070;
-    border-radius: 20px;
-    display: inline-block;
-    height: 15px;
-    width: 15px;
-    opacity: 1;
-    transition: opacity 0.3s ease;
-    font-size: 10px;
-    padding: 2px 0 5px 0;
-    text-align: center;
-    position: absolute;
-    right: -23px;
-    top: 3px;
-  }
-
-  i:hover {
-    opacity: 0.8;
-  }
-}
-
-li:first-child {
-  margin-left: 0!important;
-}
-li:last-child {
-  margin-right: 0!important;
-}
-
-.ng-dropdown-panel .ng-dropdown-panel-items {
-  max-height: 188px;
-}
-
-.account-type {
-  border: 1px solid #222222;
-  outline: none;
-  background: #ffffff;
-  color: #222222;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-}
-.account-type:hover {
-  background: #cfd2d3;
-}
-.account-type.selected {
-  background: #ff9e39;
+@keyframes moving {
+  from { left: 0; }
+  to { left: -10px; }
 }

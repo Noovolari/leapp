@@ -20,9 +20,10 @@ export class CreateAccountComponent implements OnInit {
 
   toggleOpen = true;
   roles: string[] = [];
-  checkDisabled = false;
-  accountType = AccountType.AWS;
+  accountType;
   firstTime = false;
+  ssoInserted = false;
+  providerSelected = false;
 
   @Input() selectedAccount;
   @Input() selectedAccountNumber = '';
@@ -47,6 +48,7 @@ export class CreateAccountComponent implements OnInit {
     accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
     subscriptionId: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
+    role: new FormControl('', [Validators.required]),
     federatedOrTruster: new FormControl('', [Validators.required]),
     federatedRole: new FormControl('', [Validators.required]),
     federatedAccount: new FormControl('', [Validators.required]),
@@ -69,11 +71,14 @@ export class CreateAccountComponent implements OnInit {
   ngOnInit() {
 
     this.activatedRoute.queryParams.subscribe(params => {
-      this.firstTime = params['firstTime'];
 
       // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
       this.accounts = this.providerManagerService.getFederatedAccounts();
+
+      // Add parameters to check what to do with form data
+      this.firstTime = params['firstTime'];
+      this.ssoInserted = (this.workspace.idpUrl !== undefined && this.workspace.idpUrl !== null);
 
       // Show the federated accounts
       this.federatedAccounts = this.accounts;
@@ -123,7 +128,6 @@ export class CreateAccountComponent implements OnInit {
         this.selectedAccount,
         this.selectedRole,
         this.selectedType,
-        this.roles,
         this.form
       );
     } else {
@@ -133,44 +137,22 @@ export class CreateAccountComponent implements OnInit {
         this.selectedAccount,
         this.selectedRole,
         this.selectedType,
-        this.roles,
         this.form
       );
     }
 
   }
 
-  /**
-   * Remove a role given a name
-   * @param roleName - {string} to check against
-   */
-  removeRole(roleName: string) {
-    const index = this.roles.indexOf(roleName);
-    if (index > -1) {
-      this.roles.splice(index, 1);
-    }
-  }
-
-  /**
-   * Set a role name when Return is called
-   * @param keyEvent - the keyevent which is calle don keyup
-   */
-  setRoleName(keyEvent) {
-    const roleName = this.roleInput.nativeElement.value;
-    this.checkDisabled = (roleName !== '');
-
-    if (keyEvent.code === 'Enter' && this.roles.indexOf(roleName) === -1 && roleName !== '') {
-      this.roles.push(roleName);
-      this.roleInput.nativeElement.value = null;
-      this.checkDisabled = false;
-    }
-  }
-
   setAccountType(name) {
     this.accountType = name;
+    this.providerSelected = true;
   }
 
   formValid() {
-    return this.providerManagerService.formValid(this.form, this.roles);
+    return this.providerManagerService.formValid(this.form, this.accountType, this.selectedType);
+  }
+
+  goBack() {
+    // this.router.navigate(['/sessions', 'session-selected']);
   }
 }

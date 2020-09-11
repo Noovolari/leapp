@@ -4,7 +4,7 @@
 .container-fluid {
   background: white;
   color: #222222;
-  font-family: "Open Sans", sans-serif;
+  font-family: "AvenirNext", "Open Sans", sans-serif;
   padding: 0 25px;
 
   h1 {
@@ -25,25 +25,6 @@
   }
 }
 
-.hover {
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 99999;
-  }
-  &.success {
-    &:before {
-      background-color: rgba(26, 23, 120, 0.8);
-      background-image: url("../../../assets/images/check.svg");
-    }
-  }
-}
 
 .dependencies-list { list-style: none; }
 .dependencies-list li { font-size: 10px; }
@@ -53,34 +34,6 @@
   height: 10px;
   border-radius: 4px;
   float: left;
-}
-
-.mountain-keeper {
-  position: relative;
-  overflow-x: hidden;
-  height: 94px;
-}
-
-.seamless-anim {
-  position: absolute;
-  display: inline-block;
-  width: 928px;
-  height: 94px;
-  padding: 0;
-  top: 0;
-}
-.seamless-anim img {
-  width: 928px;
-  height: 94px;
-  margin: 0;
-  padding: 0;
-}
-
-.chara {
-  width: 100px;
-  height: 100px;
-  position: absolute;
-  left: calc(50% - 50px);
 }
 
 .dark-link {

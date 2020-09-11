@@ -1,0 +1,25 @@
+.mycard {
+  position: relative;
+}
+.ssm-card {
+  border-radius: 4px;
+  background: white;
+  color: #707070;
+  font-size: 12px;
+  padding: 9px;
+  border-bottom: 1px solid #acacac;
+  height: 50px;
+  margin: 5px 0;
+
+  button {
+    font-size: 12px;
+    float: right;
+  }
+}
+
+.ssm-cards {
+  height: 478px;
+  margin: 0!important;
+  overflow: auto;
+  width: 100%;
+}

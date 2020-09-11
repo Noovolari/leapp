@@ -9,7 +9,6 @@ export interface RoleData {
 }
 
 export interface SessionObject {
-  color: string;
   active: boolean;
   loading: boolean;
   roleData: RoleData;

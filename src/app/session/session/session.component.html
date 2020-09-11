@@ -35,7 +35,7 @@
     </li>
 
     <ng-container *ngFor="let session of activeSessions">
-      <li class="session-card" *ngIf="(showOnly === 'ALL') || (session.accountData.subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+      <li *ngIf="(showOnly === 'ALL') || (session.accountData.subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session" (sessionsChanged)='getSessions()'></app-session-card>
       </li>
     </ng-container>
@@ -45,7 +45,7 @@
     </li>
 
     <ng-container *ngFor="let session of notActiveSessions">
-      <li class="session-card" *ngIf="(showOnly === 'ALL') || (session.accountData.subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+      <li *ngIf="(showOnly === 'ALL') || (session.accountData.subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session" (sessionsChanged)='getSessions()'></app-session-card>
       </li>
     </ng-container>

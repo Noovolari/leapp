@@ -67,23 +67,6 @@ export class SessionCardComponent implements OnInit {
     this.menuService.redrawList.emit(true);
   }
 
-  /**
-   * Add a new Account to the quick list
-   */
-  addAccount() {
-
-    // Add a session
-    this.sessionService.addSession(
-      this.session.accountData.accountNumber,
-      this.session.roleData.name,
-      false);
-
-    // Refresh the sessions
-    this.sessionsChanged.emit();
-
-    // Close the modal
-    // TODO refactor this.modalRef.hide();
-  }
 
   removeAccount(session) {
     this.appService.confirmDialog('do you really want to delete this account?', () => {

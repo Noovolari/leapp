@@ -1,3 +1,4 @@
+@import "palette";
 .tip {
   position: absolute;
   bottom: 7px;
@@ -5,3 +6,5 @@
   color: #707070;
   font-size: 10px;
 }
+
+.background { background: $background}

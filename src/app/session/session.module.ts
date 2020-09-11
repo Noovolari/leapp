@@ -6,11 +6,13 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../shared/shared.module';
 import {NgSelectModule} from '@ng-select/ng-select';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
+import { SessionCardComponent } from './session-card/session-card.component';
 
 
 @NgModule({
   declarations: [
-    SessionComponent
+    SessionComponent,
+    SessionCardComponent
   ],
   imports: [
     CommonModule,

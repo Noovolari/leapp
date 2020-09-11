@@ -1,3 +1,5 @@
+@import "palette";
+
 .profile {
   position: absolute;
   left: 0;
@@ -46,4 +48,8 @@
 
 .menu-item:hover {
   opacity: 0.7;
+}
+
+.close-profile i {
+  color: $white-text-color;
 }

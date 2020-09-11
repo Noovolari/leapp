@@ -18,7 +18,7 @@
 
   .btn-left, .btn-right  {
     display: inline-block;
-    padding: 7px;
+    padding: 5px;
     cursor: pointer;
     background: $light-color;
     border-top: 2px solid $light-color;
@@ -29,10 +29,10 @@
   .btn-left {
     border-left: 2px solid $light-color;
     border-radius: $border-radius 0 0 $border-radius;
-    padding: 7px 0 7px 7px!important;
+    padding: 5px 0 5px 5px!important;
     a {
       border-right: 2px solid $main-color-light;
-      padding-right: 7px;
+      padding-right: 5px;
     }
   }
 
@@ -63,6 +63,60 @@
     a {border: none}
   }
   }
+
+
+
+.search-bar {
+  background: white;
+  display: inline-block;
+  width: 245px;
+  border-radius: 5px;
+  border: 2px solid white;
+  height: 37px;
+  margin-right: 15px;
+  overflow: hidden;
+  float: right;
+  padding: 0 0;
+
+  input {
+    border: none;
+    outline: none;
+    display: inline-block;
+    width: 86%;
+    position: relative;
+  }
+
+  i {
+    border-radius: $border-radius;
+    background: $main-color-light;
+    color: $white-text-color;
+    padding: 6px;
+  }
+}
+
+.small-btn i {
+  border-radius: $border-radius;
+  background: $main-color-light;
+  color: $white-text-color;
+  padding: 6px 9px;
+  font-size: 24px;
+}
+
+
+.small-btn {float: right;}
+
+.menu-bar {
+  margin-bottom: 5px;
+}
+
+.with-scroll {
+  padding-right: 10px!important;
+  overflow-y: scroll;
+}
+
+
+
+
 
 
 .fake-input {
@@ -309,31 +363,7 @@ h3 {
   }
 }
 
-.mycard {
-  position: relative;
-}
-.ssm-card {
-  border-radius: 4px;
-  background: white;
-  color: #707070;
-  font-size: 12px;
-  padding: 9px;
-  border-bottom: 1px solid #acacac;
-  height: 50px;
-  margin: 5px 0;
 
-  button {
-    font-size: 12px;
-    float: right;
-  }
-}
-
-.ssm-cards {
-  height: 478px;
-  margin: 0!important;
-  overflow: auto;
-  width: 100%;
-}
 
 .grayedout {
   background: #dddddd;
@@ -430,14 +460,6 @@ $purple: rgba(190,  11, 224, .55);
   background: rgba(255, 248, 186, 0.34);
 }
 
-
-.small-btn {
-  border-radius: 4px;
-  border: 1px solid #222222;
-  padding: 0 5px;
-  float: right;
-}
-
 .dot {
   display: inline-block;
   width: 8px;
@@ -449,32 +471,8 @@ $purple: rgba(190,  11, 224, .55);
   background: #8fc92a;
 }
 
-.search-bar {
 
-  display: inline-block;
-  width: 185px;
-  border-radius: 15px;
-  border: 1px solid #222222;
-  height: 27px;
-  margin-right: 23px;
-  overflow: hidden;
-  float: right;
-  padding: 0 10px 0 10px;
 
-  input {
-    border: none;
-    outline: none;
-    height: 14px;
-    display: inline-block;
-    width: 100%;
-    position: relative;
-    top: -5px;
-  }
-}
-
-.menu-bar {
-  clear: both;
-}
 
 .information {
   display: inline-block;

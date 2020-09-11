@@ -18,43 +18,36 @@
     </div>
 
 
-    <a (click)="createAccount();" tooltip="Create Account" class="small-btn"><img src="assets/images/plus-light.png" width="14"/></a>
+    <a (click)="createAccount();" tooltip="Create Account" class="small-btn"><i class="far fa-plus"></i></a>
 
     <span class="search-bar">
-      <input type="text" (change)="filterSessions($event.target)" placeholder="search..."/>
+      <input type="text" (change)="filterSessions($event.target)" placeholder="Find an account..."/>
+      <i class="far fa-search"></i>
     </span>
   </div>
+</div>
+
+<div class="container-fluid with-scroll">
 
   <ul class="ssm-cards">
-    <ng-container *ngFor="let session of sessions">
-    <li class="session-card" *ngIf="(showOnly === 'ALL') || (session.accountData.subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
-        <div class="mycard">
-          <div class="button-area">
-            <span class="information">
-              {{session.accountData.subscriptionId ? 'AZR' : 'AWS'}} |
-              {{session.accountData.accountName}} |
-              {{session.roleData.name ? session.roleData.name.substr(0, 13) : session.accountData.subscriptionId.substr(0, 13)}}
-            </span>
-            <ng-container dropdown placement="right">
-              <a dropdownToggle aria-controls="drop-list"><i
-                class="fa fa-ellipsis-v"></i></a>
-              <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right"
-                   role="menu" aria-labelledby="button-basic">
-                <a (click)="editAccount(session);">Edit account</a>
-                <a (click)="removeAccount(session);">Remove account</a>
-                <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
-                <a (click)="copyCredentials(session, 4);">Copy Role ARN</a>
-              </div>
-            </ng-container>
-
-            <a (click)="stopSession(session)" *ngIf="!session.loading && session.active"><i class="fa fa-stop"></i></a>
-            <a (click)="startSession(session)" *ngIf="!session.loading && !session.active"><i class="fa fa-play"></i></a>
-            <a *ngIf="session.loading"><i class="fa fa-spin fa-spinner"></i></a>
-
-            <span><i class="dot {{session.active ? 'green' : 'gray'}}"></i></span>
-          </div>
-        </div>
+    <li *ngIf="activeSessions.length !== 0">
+      <h3>Active Accounts</h3>
     </li>
+
+    <ng-container *ngFor="let session of activeSessions">
+      <li class="session-card" *ngIf="(showOnly === 'ALL') || (session.accountData.subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+        <app-session-card [session]="session" (sessionsChanged)='getSessions()'></app-session-card>
+      </li>
+    </ng-container>
+
+    <li>
+      <h3>All other Accounts</h3>
+    </li>
+
+    <ng-container *ngFor="let session of notActiveSessions">
+      <li class="session-card" *ngIf="(showOnly === 'ALL') || (session.accountData.subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+        <app-session-card [session]="session" (sessionsChanged)='getSessions()'></app-session-card>
+      </li>
     </ng-container>
   </ul>
 

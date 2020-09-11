@@ -24,7 +24,6 @@ import {MenuService} from '../../services/menu.service';
 export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   // Session Data
-  sessions: SessionObject[] = [];
   activeSessions: SessionObject[] = [];
   notActiveSessions: SessionObject[] = [];
 
@@ -95,18 +94,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     });
 
     this.menuService.redrawList.subscribe(r => {
-      this.sessions = this.sessionService.listSessions();
+      this.getSessions();
     });
-  }
-
-  /**
-   * Remove the current Session Object form the visualized list and remove it from workspace
-   * @param session - SessionObject
-   */
-  removeSession(session) {
-    this.sessionService.removeSession(session);
-    this.sessionService.deleteSessionFromWorkspace(session);
-    this.sessions = this.sessionService.listSessions();
   }
 
 
@@ -212,60 +201,12 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Open Add Account Modal
-   * @param template - the template to use
-   */
-  showAddAccountModal(template) {
-
-    // clear modal roles for a new call
-    this.modalRoles = [];
-
-    // We check some parameters for good sake of the layout: we don't want to allow more than 4 sessions in the quick list
-    if (this.sessions.length < 5) {
-      // Refresh the account/role mapping and show the modal
-      if (!this.isGettingConf) {
-        this.isGettingConf = true;
-        this.refreshRoleMapping(template);
-      }
-    }
-  }
-
-
-  /**
-   * Open the tray behind the active card
-   * @param event - click event, we prevent propagation because we also check for the click behind
-   */
-  openSsmTray(event) {
-    // Prevent event bubbling on document to avoid the tray keep opening and closing
-    if (event) {
-      event.stopPropagation();
-    }
-
-    // Set some parameters for the modal
-    this.openSsm = true;
-    this.selectedSsmRegion = this.ssmRegions[1];
-    this.instances = [];
-    this.ssmloading = true;
-  }
-
-  /**
-   * Start a new ssm session
-   * @param instanceId - instance id to start ssm session
-   */
-  startSsmSession(instanceId) {
-    this.ssmService.startSession(instanceId);
-    this.openSsm = false;
-    this.ssmloading = false;
-  }
-
   filterSessions(query) {
     console.log('kjk', query.value);
-
-    this.allSessions = this.sessionService.listSessions();
-    this.sessions = this.allSessions;
+    this.getSessions();
     if (query.value !== '') {
-      this.sessions = this.sessions.filter(s => s.accountData.accountName.indexOf(query.value) > -1);
+      this.activeSessions = this.activeSessions.filter(s => s.accountData.accountName.indexOf(query.value) > -1);
+      this.notActiveSessions = this.notActiveSessions.filter(s => s.accountData.accountName.indexOf(query.value) > -1);
     }
   }
 

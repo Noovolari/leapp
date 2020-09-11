@@ -6,6 +6,10 @@
 
 }
 
+.provider-selector.active a {
+  border: none!important;
+}
+
 .provider-selector {
   span {
     width: 1px;
@@ -17,10 +21,13 @@
     padding: 7px;
     cursor: pointer;
     background: $light-color;
+    border-top: 2px solid $light-color;
+    border-bottom: 2px solid $light-color;
   }
 
 
   .btn-left {
+    border-left: 2px solid $light-color;
     border-radius: $border-radius 0 0 $border-radius;
     padding: 7px 0 7px 7px!important;
     a {
@@ -29,18 +36,33 @@
     }
   }
 
-  .btn-right {border-radius: 0 $border-radius $border-radius 0}
+  .btn-right {
+    border-radius: 0 $border-radius $border-radius 0;
+    border-right: 2px solid $light-color;
+  }
 
   .btn-left:hover, .btn-right:hover {
     text-decoration: none;
     background: $focused-element;
+    border-top: 2px solid $focused-element;
+    border-bottom: 2px solid $focused-element;
   }
+
+  .btn-left:hover {
+    border-left: 2px solid $focused-element;
+  }
+
+  .btn-right:hover {
+    border-right: 2px solid $focused-element;
+  }
+
+
   .btn-left.active, .btn-right.active  {
     background: $focused-element;
-    border: 1px solid $main-color-light;
+    border: 2px solid $main-color-light;
     a {border: none}
   }
-}
+  }
 
 
 .fake-input {

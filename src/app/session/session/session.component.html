@@ -3,7 +3,7 @@
   <app-profile-sidebar></app-profile-sidebar>
 
   <div class="menu-bar">
-    <div class="provider-selector">
+    <div class="provider-selector {{showOnly !== 'ALL' ? 'active' : ''}}">
       <div class="btn-left {{showOnly === 'AWS' ? 'active' : ''}}  ">
         <a (click)="setVisibility('AWS');">
           <img src="assets/images/aws-logo.svg">

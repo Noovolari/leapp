@@ -156,7 +156,6 @@ export class ProviderManagerService {
         this.sessionService.addSession(
           this.form.value.subscriptionId,
           null,
-          `background-1`,
           true);
 
         return created;
@@ -211,7 +210,6 @@ export class ProviderManagerService {
         this.sessionService.addSession(
           this.form.value.accountNumber,
           this.generateRolesFromNames(this.form.value.accountNumber)[0].name,
-          `background-1`,
           true);
 
         return created;

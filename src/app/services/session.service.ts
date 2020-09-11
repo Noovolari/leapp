@@ -25,13 +25,14 @@ export class SessionService extends NativeService {
    * Add a new session: for us a session is a container for data usaful to generate and maintain a set of credentials when the app is running
    * @param accountNumber - the account number of the account
    * @param roleName - the role we want to assume
-   * @param color - the color to give to the session to identify it in the UI
    * @param active - is the currently active session?
    * @return the result of the operation of adding a session
    */
-  addSession(accountNumber: string, roleName: string, color: string, active: boolean = false): boolean {
+  addSession(accountNumber: string, roleName: string, active: boolean = false): boolean {
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
+
+
 
     const account = workspace.accountRoleMapping.accounts.filter(acc => ((acc as AwsAccount).accountNumber === accountNumber || ((acc as AzureAccount).subscriptionId)))[0];
     const accountData = { accountName: account.accountName, accountNumber: account.accountNumber, subscriptionId: account.subscriptionId };
@@ -42,7 +43,6 @@ export class SessionService extends NativeService {
       active,
       accountData,
       roleData,
-      color,
       loading: false
     };
 

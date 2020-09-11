@@ -25,6 +25,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   // Session Data
   sessions: SessionObject[] = [];
+  activeSessions: SessionObject[] = [];
+  notActiveSessions: SessionObject[] = [];
+
 
   selectedToRemove = null;
   loading = false;
@@ -74,11 +77,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     // Set retries
     this.retries = 0;
 
+    // retrieve Active and not active sessions
+    this.getSessions();
+
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions(false);
-
-    // Get all saved sessions
-    this.sessions = this.sessionService.listSessions();
 
     // automatically check if there is an active session and get session list again
     this.credentialsService.refreshCredentialsEmit.emit(null);
@@ -108,62 +111,35 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
 
   /**
-   * Start the selected session
-   * @param session - {SessionObject} - the session object we want to login to
-   */
-  startSession(session: SessionObject) {
-
-    // Start a new session with the selected one
-    this.sessionService.startSession(session);
-
-    // automatically check if there is an active session and get session list again
-    this.credentialsService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
-
-    this.sessions = this.sessionService.listSessions();
-    this.menuService.redrawList.emit(true);
-  }
-
-  /**
-   * Stop session
+   * Stop the current session, setting it to false and updating the workspace
    */
   stopSession(session: SessionObject) {
-    // Eventually close the tray
-    this.sessionService.stopSession(session);
-    this.openSsm = false;
-
-    // automatically check if there is an active session or stop it
-    this.credentialsService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
-    this.sessions = this.sessionService.listSessions();
-    this.menuService.redrawList.emit(true);
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const sessions = workspace.currentSessionList;
+    sessions.map(sess => {
+      if (
+          session === null ||
+          (session.accountData.subscriptionId === sess.accountData.subscriptionId) ||
+          (session.accountData.accountNumber === sess.accountData.accountNumber && session.roleData.name === sess.roleData.name)
+      ) {
+        sess.active = false;
+      }
+    });
+    workspace.currentSessionList = sessions;
+    this.configurationService.updateWorkspaceSync(workspace);
+    return true;
   }
+
 
   /**
-   * Copy credentials in the clipboard
+   * getSession
    */
-  copyCredentials(session: SessionObject, type: number) {
-    try {
-
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
-      if (workspace) {
-        const awsCredentials = workspace.awsCredentials;
-
-        const texts = {
-          1: (awsCredentials ? awsCredentials['default'].aws_access_key_id : 'not set yet'),
-          2: (awsCredentials ? awsCredentials['default'].aws_secret_access_key : 'not set yet'),
-          3: session.accountData.accountNumber,
-          4: `arn:aws:iam::${session.accountData.accountNumber}:role/${session.roleData.name}`
-        };
-
-        const text = texts[type];
-
-        this.appService.copyToClipboard(text);
-        this.appService.toast('Your information have been successfully copied!', ToastLevel.SUCCESS, 'Information copied!');
-      }
-    } catch (err) {
-      this.appService.toast(err, ToastLevel.WARN);
-      this.appService.logger(err, LoggerLevel.WARN);
-    }
+  getSessions() {
+    this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
+    this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
   }
+
+
 
   /**
    * Go to Account Management
@@ -255,63 +231,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Set the current color for the Add Account Method below
-   * @param colorNumber - the number representing the different background styles
-   */
-  setBackgroundColor(colorNumber) {
-    this.currentSelectedColor = colorNumber;
-  }
-
-  /**
-   * Retry a random color until we get one
-   * @returns - {any} - the value
-   */
-  retryRandomColor() {
-    let value = Math.floor(Math.random() * 8 + 1);
-    while (this.checkIFColorIsOccupied(value)) {
-      value = Math.floor(Math.random() * 8 + 1);
-    }
-    return value;
-  }
-
-  /**
-   * Add a new Account to the quick list
-   */
-  addAccount() {
-    // Add a session
-    this.sessionService.addSession(
-      this.currentSelectedAccountNumber,
-      this.currentSelectedRole,
-      `background-${this.currentSelectedColor > 0 ? this.currentSelectedColor : this.retryRandomColor()}`,
-      false);
-
-    // Refresh the sessions
-    this.sessions = this.sessionService.listSessions();
-
-    // Close the modal
-    this.modalRef.hide();
-  }
-
-  editAccount(session) {
-    this.router.navigate(['/managing', 'edit-account'], { queryParams: { accountId: (session.accountData.accountNumber || session.accountData.subscriptionId), roleName: session.roleData.name } });
-  }
-
-  removeAccount(session) {
-    this.appService.confirmDialog('do you really want to delete this account?', () => {
-
-      if (session.accountData.accountNumber) {
-        this.trusterAccountService.deleteTrusterAccount(session.accountData.accountNumber, session.roleData.name);
-        this.fedAccountService.deleteFederatedAccount(session.accountData.accountNumber, session.roleData.name);
-      } else {
-        this.azureAccountService.deleteAzureAccount(session.accountData.subscriptionId);
-      }
-
-      this.removeSession(session);
-      this.sessionService.deleteSessionFromWorkspace(session);
-      this.sessionService.listSessions();
-    });
-  }
 
   /**
    * Open the tray behind the active card
@@ -338,19 +257,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.ssmService.startSession(instanceId);
     this.openSsm = false;
     this.ssmloading = false;
-  }
-
-  /**
-   * Check if the color is already used
-   * @param num - the num to check
-   * @returns - {boolean}
-   */
-  checkIFColorIsOccupied(num) {
-    let toCheck = false;
-    this.sessions.forEach(session => {
-      toCheck = toCheck || (session.color === ('background-' + num));
-    });
-    return toCheck;
   }
 
   filterSessions(query) {

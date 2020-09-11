@@ -136,7 +136,6 @@ export class CreateAccountComponent implements OnInit {
         this.sessionService.addSession(
           this.form.value.subscriptionId,
           null,
-          `background-1`,
           false);
 
         if (created) {
@@ -172,7 +171,6 @@ export class CreateAccountComponent implements OnInit {
         this.sessionService.addSession(
           this.form.value.accountNumber,
           this.generateRolesFromNames(this.form.value.accountNumber)[0].name,
-          `background-1`,
           false);
         if (created) {
           // Then go to next page
@@ -202,7 +200,6 @@ export class CreateAccountComponent implements OnInit {
         this.sessionService.addSession(
           this.form.value.accountNumber,
           this.generateRolesFromNames(this.form.value.accountNumber)[0].name,
-          `background-1`,
           false);
 
         // Then go to next page

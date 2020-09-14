@@ -3,11 +3,10 @@ import {WorkspaceService} from './workspace.service';
 import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {FileService} from '../services-system/file.service';
-import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
-import {environment} from '../../environments/environment';
+import {AppService, LoggerLevel} from '../services-system/app.service';
 import {SessionService} from './session.service';
 import {CredentialsService} from './credentials.service';
-import {SessionObject} from '../models/sessionData';
+import {Session} from '../models/session';
 
 @Injectable({
   providedIn: 'root'
@@ -42,9 +41,9 @@ export class MenuService extends NativeService {
     const version = this.appService.getApp().getVersion();
 
     let voices = [];
-    this.sessionService.listSessions().slice(0, 5).forEach((session: SessionObject) => {
+    this.sessionService.listSessions().slice(0, 5).forEach((session: Session) => {
       voices.push(
-        { label: session.accountData.accountName + ' - ' + (session.active ? 'active' : 'not active'), type: 'normal', click: (menuItem, browserWindow, event) => {
+        { label: session.account.accountName + ' - ' + (session.active ? 'active' : 'not active'), type: 'normal', click: (menuItem, browserWindow, event) => {
             if (!session.active) {
               this.sessionService.startSession(session);
               this.credentialService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));

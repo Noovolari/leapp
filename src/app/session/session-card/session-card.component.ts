@@ -111,4 +111,16 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
+  switchCredentials() {
+    if (this.session.active) {
+      this.stopSession(this.session);
+    } else {
+      this.startSession(this.session);
+    }
+  }
+
+  openDropDown(event) {
+    console.log('dropdown')
+    event.stopPropagation();
+  }
 }

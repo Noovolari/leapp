@@ -1,10 +1,10 @@
-<div class="session-card button-area  {{session.accountData.subscriptionId ? 'azr' : 'aws'}}">
+<div class="session-card button-area  {{session.accountData.subscriptionId ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" (click)="switchCredentials()">
   <span class="information">
-    {{session.accountData.accountName}} |
+    <b>{{session.accountData.accountName}}</b> -
     {{session.roleData.name ? session.roleData.name.substr(0, 13) : session.accountData.subscriptionId.substr(0, 13)}}
   </span>
   <ng-container dropdown placement="right">
-    <a dropdownToggle aria-controls="drop-list"><i
+    <a dropdownToggle class="drop-list" aria-controls="drop-list" (click)="openDropDown($event);"><i
       class="fa fa-ellipsis-v"></i></a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right"
          role="menu" aria-labelledby="button-basic">
@@ -14,9 +14,6 @@
     </div>
   </ng-container>
 
-  <a (click)="stopSession(session);" *ngIf="!session.loading && session.active"><i class="fa fa-stop"></i></a>
-  <a (click)="startSession(session)" *ngIf="!session.loading && !session.active"><i class="fa fa-play"></i></a>
-  <a *ngIf="session.loading"><i class="fa fa-spin fa-spinner"></i></a>
+  <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}"></i>
 
-  <span><i class="dot {{session.active ? 'green' : 'gray'}}"></i></span>
 </div>

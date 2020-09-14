@@ -143,7 +143,9 @@ ul {
 }
 
 h3 {
-  font-size: 22px;
+  font-size: 15px;
+  font-weight: 800;
+  color: $text-color;
 }
 
 .modal-header {
@@ -206,4 +208,12 @@ h3 {
 .information {
   display: inline-block;
   width: 286px;
+}
+
+.fixed-status {
+  position: absolute;
+  right: 27px;
+  font-size: 11px;
+  top: 135px;
+  color: $text-color;
 }

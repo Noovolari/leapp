@@ -83,7 +83,7 @@
           <h2>Federated setting</h2>
           <div class="form-group" style="width: 100%; display: inline-block;">
             <label>IdP ARN<span class="danger-text">*</span></label>
-            <input formControlName="idpArn" type="text" class="form-control" placeholder="Idp Arn *" (blur)="setAccountNumber($event);">
+            <input formControlName="idpArn" type="text" class="form-control" placeholder="Idp Arn *">
             <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the IdP ARN</small>
           </div>
         </ng-container>

@@ -25,7 +25,6 @@
 
 .session-card {
   width: 100%;
-  margin: 0;
   padding: 10px;
   background: $light-color;
   text-align: left;
@@ -33,6 +32,22 @@
   transition: all 0.4s ease;
   color: $text-color;
   border-radius: $border-radius;
+  margin: 0 0 15px;
+  cursor: pointer;
+
+  .drop-list {
+    padding: 6px 10px 3px;
+    background: $main-color-light;
+    border-radius: $border-radius;
+    position: absolute;
+    right: 52px;
+    top: 8px;
+    font-size: 14px;
+
+    i {
+      color: $white-text-color;
+    }
+  }
 
   .button-area {
     a {
@@ -49,52 +64,6 @@
 
     span {
       cursor: pointer;
-    }
-
-    .drop-list {
-      position: absolute;
-      background: white;
-      box-shadow: 0 0 42px -14px rgba(0, 0, 0, 0.49);
-      border-radius: 4px;
-      width: 100%;
-      max-width: 200px;
-      z-index: 10;
-      cursor: pointer;
-    }
-
-    .drop-list a {
-      display: inline-block;
-      width: 100%;
-      padding: 5px 10px;
-      border-bottom: 1px solid #f9f9f9;
-      color: #707070;
-      transition: opacity 0.3s ease;
-      cursor: pointer;
-      border-radius: 0;
-      height: auto;
-      margin-left: 0;
-    }
-
-    .drop-list a:last-child {
-      border-bottom: none !important;
-    }
-
-    .drop-list a:hover {
-      opacity: 0.8;
-      background: $focused-element;
-      color:$text-color!important;
-    }
-
-    .drop-list:after {
-      position: absolute;
-      top: -5px;
-      right: 40px;
-      content: '';
-      width: 0;
-      height: 0;
-      border-left: 5px solid transparent;
-      border-right: 5px solid transparent;
-      border-bottom: 5px solid white;
     }
   }
 
@@ -130,3 +99,38 @@
 .session-card.azr {
   border-left: 5px solid $azr;
 }
+
+.session-card:hover {
+  background: $focused-element;
+}
+
+.session-card.aws.active {
+    border-top: 1px solid $aws;
+    border-bottom: 1px solid $aws;
+    border-right: 1px solid $aws;
+  }
+
+.session-card.azr.active {
+  border-top: 1px solid $azr;
+  border-bottom: 1px solid $azr;
+  border-right: 1px solid $azr;
+
+}
+
+.status-item {
+  position: absolute;
+  right: 12px;
+  font-size: 10px;
+  top: 18px;
+  color: #DAE7E7;
+}
+
+.session-card.aws .status-item.active {
+  color: $aws
+}
+
+.session-card.azr .status-item.active {
+  color: $azr
+}
+
+

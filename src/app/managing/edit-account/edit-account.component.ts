@@ -13,6 +13,7 @@ import {TrusterAccountService} from '../../services/truster-account.service';
 import {AzureAccountService} from '../../services/azure-account.service';
 import {AzureAccount} from '../../models/azure-account';
 import {AccountType} from '../../models/AccountType';
+import {ProviderManagerService} from '../../services/provider-manager.service';
 
 @Component({
   selector: 'app-edit-federated-account',
@@ -73,7 +74,8 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
     private workspaceService: WorkspaceService,
     private trusterAccountService: TrusterAccountService,
     private fedAccountService: FederatedAccountService,
-    private azureAccountService: AzureAccountService
+    private azureAccountService: AzureAccountService,
+    private providerManagerService: ProviderManagerService
   ) {
     super();
   }
@@ -94,6 +96,8 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
 
       this.accountType = this.account.type === 'AWS' ? AccountType.AWS : AccountType.AZURE;
       this.selectedType = !this.account.parent ? 'federated' : 'truster';
+      this.providerSelected = true;
+      this.ssoInserted = true;
 
       if (this.accountType === AccountType.AWS && this.account.parent) {
         this.federatedAccounts = this.accounts.filter(el => el.type === 'AWS' && el.parent === undefined);
@@ -107,6 +111,7 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
       }
 
       this.appService.validateAllFormFields(this.form);
+      this.formValid();
     });
 
     this.subs.add(sub);
@@ -124,14 +129,6 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
       this.selectedAccountNumber = account.accountNumber;
       this.selectedRole = this.federatedRoles[0].name;
     }
-  }
-
-  /**
-   * Set the new account number directly from the Idp Arn
-   * @param event - the change event
-   */
-  setAccountNumber(event) {
-    this.form.controls['accountNumber'].setValue(this.appService.extractAccountNumberFromIdpArn(event.target.value));
   }
 
   /**
@@ -243,48 +240,14 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
     }
   }
 
-  /**
-   * Remove the role from the UI
-   * @param roleName - the role name to remove
-   */
-  removeRole(roleName: string) {
-    const index = this.roles.indexOf(roleName);
-    if (index > -1) {
-      this.roles.splice(index, 1);
-    }
-  }
-
-  /**
-   * Set the new role name in the array of roles for saving
-   * @param keyEvent - the key event that we listen to
-   */
-  setRoleName(keyEvent) {
-    const roleName = this.roleInput.nativeElement.value;
-    this.checkDisabled = (roleName !== '');
-    // Set the role if we press enter
-    if (keyEvent.code === 'Enter' && this.roles.indexOf(roleName) === -1 && roleName !== '') {
-      this.roles.push(roleName);
-      this.roleInput.nativeElement.value = null;
-      this.checkDisabled = false;
-    }
-  }
-
   // Decorate the roles with the arn
   generateRolesFromNames(accountNumber) {
     const awsRoles = [];
-    this.roles.forEach(role => {
-      awsRoles.push({
-        name: role,
-        roleArn: `arn:aws:iam::${accountNumber}:role/${role}`
-      });
+    awsRoles.push({
+      name: this.form.value.role,
+      roleArn: `arn:aws:iam::${accountNumber}:role/${this.form.value.role}`
     });
     return awsRoles;
-  }
-
-  // Return to the list of accounts
-  goToList() {
-    // Return to list
-    this.router.navigate(['/sessions', 'list-accounts']);
   }
 
   /**
@@ -293,37 +256,7 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
    * this way depending on new accounts we jkust need to pass the form object to the validator
    */
   formValid() {
-    // First check the type of account we are creating
-    if (this.accountType === AccountType.AWS) {
-
-      // Both have roles check
-      const checkRoles = this.roles.length > 0;
-
-      // We are in AWS check if we are saving a Federated or a Truster
-      if (this.selectedType === 'federated') {
-        // Check Federated fields
-        const checkFields = this.form.controls['name'].valid &&
-          this.form.controls['federationUrl'].valid &&
-          this.form.controls['accountNumber'].valid &&
-          this.form.controls['idpArn'].valid;
-
-        return checkRoles && checkFields;
-      } else {
-        // Check Truster fields
-        const checkFields = this.form.controls['name'].valid &&
-          this.form.controls['federationUrl'].valid &&
-          this.form.controls['accountNumber'].valid &&
-          this.form.controls['federatedAccount'].valid &&
-          this.form.controls['federatedRole'].valid;
-
-        return checkRoles && checkFields;
-      }
-    } else {
-      // Check Azure fields
-      return this.form.controls['name'].valid &&
-        this.form.controls['subscriptionId'].valid;
-    }
-    return false;
+    return this.providerManagerService.formValid(this.form, this.accountType, this.selectedType);
   }
 
   setAccountType(name) {

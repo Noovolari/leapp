@@ -153,8 +153,9 @@ export class CreateAccountComponent implements OnInit {
   }
 
   goBack() {
+    this.accountType = undefined;
     this.ssoInserted = false;
-    this.firstTime = true;
     this.providerSelected = false;
+    this.firstTime = true;
   }
 }

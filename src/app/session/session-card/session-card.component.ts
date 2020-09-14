@@ -33,7 +33,7 @@ export class SessionCardComponent implements OnInit {
               private configurationService: ConfigurationService) { }
 
   ngOnInit() {
-    console.log(this.session);
+
   }
 
 
@@ -70,7 +70,6 @@ export class SessionCardComponent implements OnInit {
 
   removeAccount(session) {
     this.appService.confirmDialog('do you really want to delete this account?', () => {
-
       if (session.accountData.accountNumber) {
         this.trusterAccountService.deleteTrusterAccount(session.accountData.accountNumber, session.roleData.name);
         this.federatedAccountService.deleteFederatedAccount(session.accountData.accountNumber, session.roleData.name);

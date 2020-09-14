@@ -71,7 +71,7 @@ export class AzureAccountService extends NativeService {
    */
   deleteAzureAccount(subscriptionId: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => ((acc as AzureAccount).subscriptionId === subscriptionId));
+    const index = workspace.accountRoleMapping.accounts.indexOf(acc => ((acc as AzureAccount).subscriptionId === subscriptionId));
     if (index !== -1) {
       workspace.accountRoleMapping.accounts.splice(index, 1);
 

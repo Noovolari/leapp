@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import {NoAppbarLayoutComponent} from '../layout/noappbar-layout/noappbar-layout.component';
 import {CreateAccountComponent} from './create-account/create-account.component';
-import {EditAccountComponent} from './edit-account/edit-account.component';
 
 const routes: Routes = [
   {
@@ -12,10 +11,6 @@ const routes: Routes = [
       {
         path: 'create-account',
         component: CreateAccountComponent
-      },
-      {
-        path: 'edit-account',
-        component: EditAccountComponent
       }
     ]
   }

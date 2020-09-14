@@ -84,10 +84,6 @@ export class SessionCardComponent implements OnInit {
     });
   }
 
-  editAccount(session) {
-    this.router.navigate(['/managing', 'edit-account'], { queryParams: { accountId: (session.accountData.accountNumber || session.accountData.subscriptionId), roleName: session.roleData.name } });
-  }
-
   /**
    * Copy credentials in the clipboard
    */

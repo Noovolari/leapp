@@ -2,9 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 import { SessionLayoutComponent } from '../layout/session-layout/session-layout.component';
 import { SessionComponent } from './session/session.component';
-import { CreateAccountComponent } from '../managing/create-account/create-account.component';
-import { EditAccountComponent } from '../managing/edit-account/edit-account.component';
-import {NoAppbarLayoutComponent} from '../layout/noappbar-layout/noappbar-layout.component';
 
 const routes: Routes = [
   {

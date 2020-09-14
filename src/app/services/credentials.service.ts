@@ -6,8 +6,9 @@ import {FileService} from '../services-system/file.service';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {environment} from '../../environments/environment';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
-import {SessionObject} from '../models/sessionData';
+import {Session} from '../models/session';
 import {AccountType} from '../models/AccountType';
+import {AzureAccount} from '../models/azure-account';
 
 @Injectable({
   providedIn: 'root'
@@ -104,9 +105,9 @@ export class CredentialsService extends NativeService {
     }
   }
 
-  azureSetSubscription(session: SessionObject) {
+  azureSetSubscription(session: Session) {
     // We can use Json in res to save account information
-    this.executeService.execute(`az account set --subscription ${session.accountData.subscriptionId} 2>&1`).subscribe(acc => {
+    this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).subscribe(acc => {
       // Set email of the user
       const azureProfile = this.configurationService.getAzureProfileSync();
 

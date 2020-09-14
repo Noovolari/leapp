@@ -1,7 +1,7 @@
-<div class="session-card button-area  {{session.accountData.subscriptionId ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" (click)="switchCredentials()">
+<div class="session-card button-area  {{session.account.type === 'AZURE' ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" (click)="switchCredentials()">
   <span class="information">
-    <b>{{session.accountData.accountName}}</b> -
-    {{session.roleData.name ? session.roleData.name.substr(0, 13) : session.accountData.subscriptionId.substr(0, 13)}}
+    <b>{{session.account.accountName}}</b> -
+    {{$any(session.account).role.name ? $any(session.account).role.name.substr(0, 13) : $any(session.account).subscriptionId.substr(0, 13)}}
   </span>
   <ng-container dropdown placement="right">
     <a dropdownToggle class="drop-list" aria-controls="drop-list" (click)="openDropDown($event);"><i

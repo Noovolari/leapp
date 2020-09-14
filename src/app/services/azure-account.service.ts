@@ -1,15 +1,18 @@
 import {Injectable} from '@angular/core';
 import {NativeService} from '../services-system/native-service';
-import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AzureAccount} from '../models/azure-account';
+import {SessionService} from './session.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AzureAccountService extends NativeService {
 
-  constructor(private configurationService: ConfigurationService) {
+  constructor(
+    private configurationService: ConfigurationService,
+    private sessionService: SessionService
+  ) {
     super();
   }
 
@@ -23,21 +26,15 @@ export class AzureAccountService extends NativeService {
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
-    const test = workspace.accountRoleMapping.accounts.filter(a => (a as AzureAccount).subscriptionId === subscriptionId);
+    const test = workspace.sessions.filter(sess => (sess.account as AzureAccount).subscriptionId === subscriptionId);
     if (!test || test.length === 0) {
       // add new account
-      workspace.accountRoleMapping.accounts.push({
+      this.sessionService.addSession({
         accountId: subscriptionId,
         accountName,
         subscriptionId,
-        idpUrl: configuration.federationUrl,
         type: 'AZURE'
-      });
-
-      // Save the workspace
-      this.configurationService.updateWorkspaceSync(workspace);
-      // Set it as default
-      this.configurationService.setDefaultWorkspaceSync(workspace.name);
+      } as AzureAccount, false);
       return true;
     } else {
       return false;
@@ -49,8 +46,8 @@ export class AzureAccountService extends NativeService {
    */
   listAzureAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace && workspace.accountRoleMapping) {
-      return workspace.accountRoleMapping.accounts.filter(ele => (ele.parent === undefined && ele.awsRoles[0].parent === undefined && ele.type === 'AZURE'));
+    if (workspace && workspace.sessions && workspace.sessions.length > 0) {
+      return workspace.sessions.filter(sess => (sess.account.parent === undefined && sess.account.awsRoles === undefined && sess.account.type === 'AZURE'));
     } else {
       return [];
     }
@@ -61,8 +58,12 @@ export class AzureAccountService extends NativeService {
    * @param subscriptionId - the account subscriptionId to filter the account
    */
   getAzureAccountInWorkSpace(subscriptionId: string) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    return workspace.accountRoleMapping.accounts.filter(ele => ((ele as AzureAccount).subscriptionId === subscriptionId))[0] as AzureAccount;
+    try {
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      return workspace.sessions.filter(sess => ((sess.account as AzureAccount).subscriptionId === subscriptionId))[0] as AzureAccount;
+    } catch (err) {
+      return null;
+    }
   }
 
   /**
@@ -71,16 +72,11 @@ export class AzureAccountService extends NativeService {
    */
   deleteAzureAccount(subscriptionId: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.indexOf(acc => ((acc as AzureAccount).subscriptionId === subscriptionId));
+    const sessions = workspace.sessions;
+    const index = sessions.indexOf(sess => ((sess.account as AzureAccount).subscriptionId === subscriptionId));
     if (index !== -1) {
-      workspace.accountRoleMapping.accounts.splice(index, 1);
-
-      // delete sessions active session
-      let sessionIndex = workspace.currentSessionList.indexOf(session => (session.accountData.subscriptionId !== subscriptionId));
-      while (sessionIndex !== -1) {
-        workspace.currentSessionList.splice(sessionIndex, 1);
-        sessionIndex = workspace.currentSessionList.indexOf(session => (session.accountData.subscriptionId !== subscriptionId));
-      }
+      sessions.splice(index, 1);
+      workspace.sessions = sessions;
       this.configurationService.updateWorkspaceSync(workspace);
       return true;
     } else {
@@ -88,22 +84,4 @@ export class AzureAccountService extends NativeService {
     }
 
   }
-
-  /**
-   * Update a azure account
-   * @param account - the account to be updated
-   */
-  updateAzureAccount(account: AzureAccount) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => ((acc as AzureAccount).accountId === account.accountId));
-    if (index !== -1) {
-      workspace.accountRoleMapping.accounts[index] = account;
-
-      this.configurationService.updateWorkspaceSync(workspace);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
 }

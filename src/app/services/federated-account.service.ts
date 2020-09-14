@@ -2,15 +2,16 @@ import {Injectable} from '@angular/core';
 import {NativeService} from '../services-system/native-service';
 import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
-import {TrusterAccountService} from './truster-account.service';
-import {AccountType} from '../models/AccountType';
+import {SessionService} from './session.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FederatedAccountService extends NativeService {
 
-  constructor(private configurationService: ConfigurationService) {
+  constructor(
+    private configurationService: ConfigurationService,
+    private sessionService: SessionService) {
     super();
   }
 
@@ -22,37 +23,28 @@ export class FederatedAccountService extends NativeService {
    * @param idpArn - the idp arn as it is federated
    * @param region - the default region to use when selected for credentials
    */
-  addFederatedAccountToWorkSpace(accountNumber: number, accountName: string, awsRoles: any[], idpArn: string, region: string) {
+  addFederatedAccountToWorkSpace(accountNumber: string, accountName: string, role: any, idpArn: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-
-    console.log('workspace:', workspace);
-
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
-    const test = workspace.accountRoleMapping.accounts.filter(a => (a as AwsAccount).accountNumber === accountNumber.toString());
-
-    console.log('test', test);
-
+    const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber.toString() === accountNumber.toString());
     if (!test || test.length === 0) {
       // add new account
-      workspace.accountRoleMapping.accounts.push({
+      this.sessionService.addSession({
         accountId: accountNumber,
         accountName,
         accountNumber,
-        awsRoles,
+        role,
         idpArn,
         idpUrl: configuration.federationUrl,
-        region,
-        type: 'AWS'
-      });
+        type: 'AWS',
+        parent: undefined,
+        parentRole: undefined
+      } as unknown as AwsAccount, false);
 
       // Save the workspace
       this.configurationService.updateWorkspaceSync(workspace);
-      // Set it as default
-      this.configurationService.setDefaultWorkspaceSync(workspace.name);
-
-      console.log('config', this.configurationService.getConfigurationFileSync());
       return true;
     } else {
       return false;
@@ -64,8 +56,8 @@ export class FederatedAccountService extends NativeService {
    */
   listFederatedAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace && workspace.accountRoleMapping) {
-      return workspace.accountRoleMapping.accounts.filter(ele => (ele.type === 'AWS' && ele.parent === undefined && ele.awsRoles[0].parent === undefined));
+    if (workspace && workspace.sessions && workspace.sessions.length > 0) {
+      return workspace.sessions.filter(sess => (sess.account.type === 'AWS' && sess.account.parent === undefined && sess.account.awsRoles[0].parent === undefined));
     } else {
       return [];
     }
@@ -77,56 +69,24 @@ export class FederatedAccountService extends NativeService {
    */
   getFederatedAccountInWorkSpace(accountNumber: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    return workspace.accountRoleMapping.accounts.filter(ele => (ele.accountNumber === accountNumber))[0];
+    return workspace.sessions.filter(sess => (sess.account.accountNumber === accountNumber))[0];
   }
 
   /**
    * Delete a federated account
-   * @param accountNumber - account number of the account to delete
+   * @param sessionId - account number of the account to delete
    */
-  deleteFederatedAccount(accountNumber: string, roleName: string) {
+  deleteFederatedAccount(sessionId: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === accountNumber && acc.awsRoles.find((val) => val.name === roleName)));
+    const index = workspace.sessions.findIndex(sess => sess.id === sessionId);
     if (index !== -1) {
-      workspace.accountRoleMapping.accounts.splice(index, 1);
-
-      // cascade delete on truster accounts
-      let accountIndex = workspace.accountRoleMapping.accounts.findIndex(account => (account.awsRoles.findIndex(role => (role.parent === accountNumber && role.parentRole === roleName)) !== -1));
-      while (accountIndex !== -1) {
-        workspace.accountRoleMapping.accounts.splice(accountIndex, 1);
-        accountIndex = workspace.accountRoleMapping.accounts.findIndex(account => (account.awsRoles.findIndex(role => (role.parent === accountNumber && role.parentRole === roleName)) !== -1));
-      }
-
+      workspace.sessions.splice(index, 1);
       this.configurationService.updateWorkspaceSync(workspace);
       return true;
     } else {
       return false;
     }
 
-  }
-
-  /**
-   * Update a federated account
-   * @param account - the account to be updated
-   */
-  updateFederatedAccount(account: AwsAccount) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountId === account.accountId));
-    if (index !== -1) {
-      workspace.accountRoleMapping.accounts[index] = account;
-
-      // remove unused roles from session
-      let sessionIndex = workspace.currentSessionList.findIndex(session => (session.accountData.accountNumber === account.accountNumber && (account.awsRoles.findIndex(role => (role.name === session.roleData.name)) === -1)));
-      while (sessionIndex !== -1) {
-        workspace.currentSessionList.splice(sessionIndex, 1);
-        sessionIndex = workspace.currentSessionList.findIndex(session => (session.accountData.accountNumber === account.accountNumber && (account.awsRoles.findIndex(role => (role.name === session.roleData.name)) === -1)));
-      }
-
-      this.configurationService.updateWorkspaceSync(workspace);
-      return true;
-    } else {
-      return false;
-    }
   }
 
 }

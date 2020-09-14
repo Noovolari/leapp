@@ -168,12 +168,6 @@ export class ProviderManagerService {
           this.form.value.subscriptionId,
           this.form.value.name);
 
-        // When you create an account you also define a possible session: in this case, being the only one we default it to true
-        this.sessionService.addSession(
-          this.form.value.subscriptionId,
-          null,
-          false);
-
         return created;
       } catch (err) {
         this.appService.toast(err, ToastLevel.ERROR);
@@ -201,12 +195,6 @@ export class ProviderManagerService {
           this.form.value.idpArn,
           this.form.value.myRegion);
 
-        // When you create an account you also define a possible session: in this case, being the only one we default it to true
-        this.sessionService.addSession(
-          this.form.value.accountNumber,
-          this.generateRolesFromNames(this.form)[0].name,
-          false);
-
         return created;
       } catch (err) {
         this.appService.toast(err, ToastLevel.ERROR);
@@ -226,13 +214,7 @@ export class ProviderManagerService {
           this.form.value.accountNumber,
           this.form.value.name,
           this.generateRolesFromNames(this.form),
-          this.form.value.idpArn, this.form.value.myRegion);
-
-        // When you create an account you also define a possible session: in this case, being the only one we default it to true
-        this.sessionService.addSession(
-          this.form.value.accountNumber,
-          this.generateRolesFromNames(this.form)[0].name,
-          false);
+          this.form.value.idpArn);
 
         return created;
       } catch (err) {

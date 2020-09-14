@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
-import {SessionObject} from '../../models/sessionData';
+import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {CredentialsService} from '../../services/credentials.service';
 import {MenuService} from '../../services/menu.service';
@@ -9,6 +9,7 @@ import {TrusterAccountService} from '../../services/truster-account.service';
 import {FederatedAccountService} from '../../services/federated-account.service';
 import {AzureAccountService} from '../../services/azure-account.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
+import {AwsAccount} from '../../models/aws-account';
 
 @Component({
   selector: 'app-session-card',
@@ -19,7 +20,7 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 
 export class SessionCardComponent implements OnInit {
 
-  @Input() session: SessionObject;
+  @Input() session: Session;
   @Output() sessionsChanged = new EventEmitter();
 
   constructor(private sessionService: SessionService,
@@ -41,7 +42,7 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    * @param session - {SessionObject} - the session object we want to login to
    */
-  startSession(session: SessionObject) {
+  startSession(session: Session) {
 
     // Start a new session with the selected one
     this.sessionService.startSession(session);
@@ -56,7 +57,7 @@ export class SessionCardComponent implements OnInit {
   /**
    * Stop session
    */
-  stopSession(session: SessionObject) {
+  stopSession(session: Session) {
     // Eventually close the tray
     this.sessionService.stopSession(session);
     // TODO refactor this.openSsm = false;
@@ -71,8 +72,8 @@ export class SessionCardComponent implements OnInit {
   removeAccount(session) {
     this.appService.confirmDialog('do you really want to delete this account?', () => {
       if (session.accountData.accountNumber) {
-        this.trusterAccountService.deleteTrusterAccount(session.accountData.accountNumber, session.roleData.name);
-        this.federatedAccountService.deleteFederatedAccount(session.accountData.accountNumber, session.roleData.name);
+        this.trusterAccountService.deleteTrusterAccount(session.id);
+        this.federatedAccountService.deleteFederatedAccount(session.id);
       } else {
         this.azureAccountService.deleteAzureAccount(session.accountData.subscriptionId);
       }
@@ -86,7 +87,7 @@ export class SessionCardComponent implements OnInit {
   /**
    * Copy credentials in the clipboard
    */
-  copyCredentials(session: SessionObject, type: number) {
+  copyCredentials(session: Session, type: number) {
     try {
 
       const workspace = this.configurationService.getDefaultWorkspaceSync();
@@ -96,8 +97,8 @@ export class SessionCardComponent implements OnInit {
         const texts = {
           1: (awsCredentials ? awsCredentials['default'].aws_access_key_id : 'not set yet'),
           2: (awsCredentials ? awsCredentials['default'].aws_secret_access_key : 'not set yet'),
-          3: session.accountData.accountNumber,
-          4: `arn:aws:iam::${session.accountData.accountNumber}:role/${session.roleData.name}`
+          3: (session.account as AwsAccount).accountNumber,
+          4: `arn:aws:iam::${(session.account as AwsAccount).accountNumber}:role/${(session.account as AwsAccount).role.name}`
         };
 
         const text = texts[type];
@@ -120,7 +121,6 @@ export class SessionCardComponent implements OnInit {
   }
 
   openDropDown(event) {
-    console.log('dropdown')
     event.stopPropagation();
   }
 }

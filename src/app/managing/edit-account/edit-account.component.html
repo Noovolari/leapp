@@ -113,3 +113,97 @@
   </form>
 
 </div>
+
+
+
+
+
+
+<div class="container-fluid">
+  <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveAccount();">
+
+    <ng-container *ngIf="(providerSelected && accountType === eAccountType.AZURE) || (providerSelected && ssoInserted && accountType === eAccountType.AWS)">
+      <h1>Crea il tuo Account!</h1>
+      <p class="smaller">Figata. Ci siamo quasi. Inizia subito a lavorare. Crea il tuo account.</p>
+
+      <ng-container *ngIf="accountType === eAccountType.AWS">
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Seleziona la tipologia di Account</label>
+          <br>
+          <div class="correct-top-second-step">
+            <button type="button" class="providers {{selectedType === 'federated' ? 'selected' : ''}}" (click)="selectedType = 'federated'">
+              <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated
+            </button>
+            <button type="button" class="providers {{selectedType === 'truster' ? 'selected' : ''}}" (click)="selectedType = 'truster'" *ngIf="!firstTime">
+              <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
+            </button>
+          </div>
+        </div>
+      </ng-container>
+
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label>Account Alias<span class="danger-text">*</span></label>
+        <br>
+        <input formControlName="name" type="text" class="form-control" placeholder="Account Alias *" [(ngModel)]="account.accountName">
+        <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
+      </div>
+
+      <ng-container *ngIf="accountType === eAccountType.AWS">
+        <!-- ====================== -->
+        <!-- AWS ACCOUNT PROPERTIES -->
+        <!-- ====================== -->
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Account Number<span class="danger-text">*</span></label>
+          <input formControlName="accountNumber" type="text" class="form-control" placeholder="Account Number *" [(ngModel)]="account.accountNumber">
+          <small class="text-error" *ngIf="(form.controls['accountNumber'].dirty || form.controls['accountNumber'].touched) && form.controls['accountNumber'].errors">Insert the Account Number</small>
+        </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Role<span class="danger-text">*</span></label>
+          <input formControlName="role" type="text" class="form-control" placeholder="Role name" [(ngModel)]="account.awsRoles[0].name">
+          <small class="text-error" *ngIf="(form.controls['role'].dirty || form.controls['role'].touched) && form.controls['role'].errors">Insert the Role</small>
+        </div>
+
+        <ng-container *ngIf="selectedType == 'federated'">
+          <h2>Federated setting</h2>
+          <div class="form-group" style="width: 100%; display: inline-block;">
+            <label>IdP ARN<span class="danger-text">*</span></label>
+            <input formControlName="idpArn" type="text" class="form-control" placeholder="Idp Arn *" [(ngModel)]="account.idpArn">
+            <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the IdP ARN</small>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="selectedType == 'truster'">
+          <h2>Truster setting</h2>
+          <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
+            <label style="margin-bottom: 0;">Federated Account<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
+            <ng-select class="mt-2" formControlName="federatedAccount" bindLabel="accountName" bindValue="accountNumber" dropdownPosition="top" [items]="federatedAccounts" [(ngModel)]="selectedAccount" (change)="getFedRoles();" [disabled]="true"></ng-select>
+          </div>
+
+          <div style="width: 2%; height: 1px; display: inline-block;"></div>
+
+          <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;">
+            <label style="margin-bottom: 0;">Federated Role<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
+            <ng-select class="mt-2" formControlName="federatedRole" bindLabel="name" bindValue="name" dropdownPosition="top" [items]="federatedRoles" [(ngModel)]="selectedRole"></ng-select>
+          </div>
+
+        </ng-container>
+      </ng-container>
+
+      <ng-container *ngIf="accountType === eAccountType.AZURE">
+        <!-- ====================== -->
+        <!-- AWS ACCOUNT PROPERTIES -->
+        <!-- ====================== -->
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Subscription Id<span class="danger-text">*</span></label>
+          <input formControlName="subscriptionId" type="text" class="form-control" placeholder="Subscription Id *" [(ngModel)]="account.subscriptionId">
+          <small class="text-error" *ngIf="(form.controls['subscriptionId'].dirty || form.controls['subscriptionId'].touched) && form.controls['subscriptionId'].errors">Insert the Subscription Id</small>
+        </div>
+      </ng-container>
+
+      <a class="back-link pull-left" (click)="goBack();"><i class="fas fa-arrow-left"></i>&nbsp;back</a>
+      <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="selectedType">Save</button>
+    </ng-container>
+
+  </form>
+</div>

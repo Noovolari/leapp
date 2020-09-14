@@ -21,14 +21,12 @@ import {AccountType} from '../../models/AccountType';
 })
 export class EditAccountComponent extends AntiMemLeak implements OnInit {
 
-  toggleOpen = true;
-  checkDisabled = false;
-
   public form = new FormGroup({
     idpArn: new FormControl('', [Validators.required]),
     accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
     subscriptionId: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
+    role: new FormControl('', [Validators.required]),
     federatedOrTruster: new FormControl('', [Validators.required]),
     federatedRole: new FormControl('', [Validators.required]),
     federatedAccount: new FormControl('', [Validators.required]),
@@ -38,9 +36,7 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
   @Input() selectedAccount;
   @Input() selectedAccountNumber = '';
   @Input() selectedRole = '';
-
   @Input() fedUrl = '';
-  @Input() fedUrlAzure = '';
 
   federatedRoles: { name: string, roleArn: string }[] = [];
   federatedAccounts: AwsAccount[] = [];
@@ -57,6 +53,11 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
   roles = [];
 
   selectedType = 'federated';
+  toggleOpen = true;
+  checkDisabled = false;
+  firstTime = false;
+  ssoInserted = false;
+  providerSelected = false;
 
   @ViewChild('roleInput', { static: false }) roleInput: ElementRef;
 
@@ -330,7 +331,7 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
     this.form.controls['federationUrl'].setValue(this.fedUrl);
   }
 
-  cancel() {
+  goBack() {
     this.router.navigate(['/sessions', 'session-selected']);
   }
 }

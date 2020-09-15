@@ -1,6 +1,5 @@
 import { AwsCredentials } from './credential';
-import { AccountRoleMapping } from './account-role-mapping';
-import { SessionObject } from './sessionData';
+import { Session } from './session';
 
 export interface Workspace {
   type?: string;
@@ -13,11 +12,9 @@ export interface Workspace {
   azureConfig?: string;
   azureProfile?: string;
 
-  currentSessionList: SessionObject[];
-
   principalAccountNumber?: string; // Default to use on opening
   principalRoleName?: string;      // Default to use on opening
 
-  accountRoleMapping?: AccountRoleMapping;
+  sessions?: Session[];
   awsCredentials?: AwsCredentials;
 }

@@ -308,18 +308,15 @@ export class WorkspaceService extends NativeService {
 
     let parentAccount;
     let parentRole;
-    const selectedAccount = workspace.accountRoleMapping.accounts.filter(account => (account as AwsAccount).accountNumber === obtainerObject.accountNumber)[0] as AwsAccount;
-    const selectedRole = selectedAccount.awsRoles.filter(role => role.name === obtainerObject.roleId)[0];
+    const selectedAccount = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === obtainerObject.accountNumber)[0].account as AwsAccount;
+    const selectedRole = selectedAccount.role;
     const roleName = selectedRole.name;
-
-    // console.log(obtainerObject);
-    // console.log(workspace.lastIDPToken);
 
     if (selectedAccount.parent || selectedRole.parent) {
       const selectedElement = selectedAccount.parent || selectedRole.parent;
       const selectedParentRole = selectedAccount.parentRole || selectedRole.parentRole;
-      parentAccount = workspace.accountRoleMapping.accounts.filter(account => selectedElement === (account as AwsAccount).accountNumber)[0];
-      parentRole = parentAccount.awsRoles.filter(role => role.name === selectedParentRole)[0];
+      parentAccount = workspace.sessions.filter(sess => selectedElement === (sess.account as AwsAccount).accountNumber)[0].account;
+      parentRole = parentAccount.role;
     }
 
     const idpArn = parentAccount ? parentAccount.idpArn : selectedAccount.idpArn;
@@ -440,11 +437,6 @@ export class WorkspaceService extends NativeService {
    * @returns an object of type {AwsCredential}
    */
   constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, accountNumber: string): AwsCredentials {
-
-    // Get account and check for region request
-    const account = workspace.accountRoleMapping.accounts.filter(acc => (acc as AwsAccount).accountNumber === accountNumber)[0] as AwsAccount;
-    const region = account.region;
-
     // these are the standard STS response types
     const accessKeyId = stsResponse.Credentials.AccessKeyId;
     const secretAccessKey = stsResponse.Credentials.SecretAccessKey;
@@ -455,10 +447,6 @@ export class WorkspaceService extends NativeService {
     credential.aws_access_key_id = accessKeyId;
     credential.aws_secret_access_key = secretAccessKey;
     credential.aws_session_token = sessionToken;
-
-    if (region && region !== 'no region necessary') {
-      credential.region = region;
-    }
 
     // Return it!
     return {default: credential};
@@ -477,8 +465,7 @@ export class WorkspaceService extends NativeService {
         lastIDPToken: googleToken,
         idpUrl: federationUrl,
         principalAccountNumber: null,
-        accountRoleMapping: {accounts: []},
-        currentSessionList: []
+        sessions: []
       };
       // Save and set as default
       this.configurationService.addWorkspaceSync(workspace);

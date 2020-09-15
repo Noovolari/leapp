@@ -153,9 +153,13 @@ export class CreateAccountComponent implements OnInit {
   }
 
   goBack() {
-    this.accountType = undefined;
-    this.ssoInserted = false;
-    this.providerSelected = false;
-    this.firstTime = true;
+    if (this.firstTime) {
+      this.router.navigate(['/sessions', 'session-selected']);
+    } else {
+      this.accountType = undefined;
+      this.ssoInserted = false;
+      this.providerSelected = false;
+      this.firstTime = true;
+    }
   }
 }

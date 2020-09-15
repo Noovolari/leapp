@@ -2,13 +2,17 @@ import {Injectable} from '@angular/core';
 import {NativeService} from '../services-system/native-service';
 import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
+import {SessionService} from './session.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrusterAccountService extends NativeService {
 
-  constructor(private configurationService: ConfigurationService) {
+  constructor(
+    private configurationService: ConfigurationService,
+    private sessionService: SessionService
+  ) {
     super();
   }
 
@@ -16,35 +20,31 @@ export class TrusterAccountService extends NativeService {
    * Add a truster account to the workspace
    * @param accountNumber - the account number of the truster account
    * @param accountName - the account name
-   * @param awsRoles - the AWS roles to assign to the account
+   * @param role - the AWS roles to assign to the account
    * @param idpArn - the idArn used for the federatyed account
    * @param region - the default region to use
    */
-  addTrusterAccountToWorkSpace(accountNumber: number, accountName: string, parentName: string, parentRole: string, awsRoles: any[], idpArn: string, region: string) {
+  addTrusterAccountToWorkSpace(accountNumber: number, accountName: string, parentName: string, parentRole: string, role: any, idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // if the account doesn't exists
-    const test = workspace.accountRoleMapping.accounts.filter(a => a.accountNumber === accountNumber);
+    const test = workspace.sessions.filter(sess => sess.account.accountNumber === accountNumber && sess.account.role.name === role.name);
     if (!test || test.length === 0) {
       // add new account
-      workspace.accountRoleMapping.accounts.push({
+      this.sessionService.addSession({
         accountId: accountNumber,
         accountName,
         accountNumber,
-        awsRoles,
+        role,
         idpArn,
         parent: parentName,
         parentRole,
         idpUrl: configuration.federationUrl,
-        region,
         type: 'AWS'
-      });
-
+      } as unknown as AwsAccount, false);
       // Save the workspace
       this.configurationService.updateWorkspaceSync(workspace);
-      // Set it as default
-      this.configurationService.setDefaultWorkspaceSync(workspace.name);
       return true;
     } else {
       return false;
@@ -53,57 +53,31 @@ export class TrusterAccountService extends NativeService {
 
   /**
    * List the truster accounts in the parent account
-   * @param parentAccountNumber - the parent account number
    */
-  listTrusterAccountInWorkSpace(parentAccountNumber: string) {
+  listTrusterAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    return workspace.accountRoleMapping.accounts.filter(ele => ((ele.awsRoles[0].parent === parentAccountNumber)));
+    return workspace.sessions.filter(ele => ((ele.account.parent !== undefined && ele.account.type === 'AWS')));
   }
 
   /**
    * Get the truster account in the workspace givent the account number
-   * @param accountNumber - the account number used to retrieve the truster account
+   * @param sessionId - the sessionId used to retrieve the truster account
    */
-  getTrusterAccountInWorkSpace(accountNumber: string) {
+  getTrusterAccountInWorkSpace(sessionId: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    return workspace.accountRoleMapping.accounts.filter(ele => ((ele.accountNumber === accountNumber)))[0];
+    return workspace.sessions.filter(ele => ((ele.id === sessionId)))[0];
   }
 
   /**
    * Delete the truster account
-   * @param accountNumber - the account number we use to delete the truster account
+   * @param sessionId - the asession id we use to delete the truster account
    */
-  deleteTrusterAccount(accountNumber: string, roleName: string) {
+  deleteTrusterAccount(sessionId: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountNumber === accountNumber && acc.awsRoles.find((val) => val.name === roleName)));
+    const index = workspace.sessions.findIndex(sess => sess.id === sessionId);
     // if there is an actual account with that number
     if (index !== -1) {
-      workspace.accountRoleMapping.accounts.splice(index, 1);
-      this.configurationService.updateWorkspaceSync(workspace);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * Update a Truster Account given the Aws Account
-   * @param account - the aws account we want to update
-   */
-  updateTrusterAccount(account: AwsAccount) {
-    // Get the default workspace
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    // Verify we have found the account we need
-    const index = workspace.accountRoleMapping.accounts.findIndex(acc => (acc.accountId === account.accountId));
-    if (index !== -1) {
-
-      workspace.accountRoleMapping.accounts[index] = account;
-      // find session with non existing roles of this account
-      let sessionTrusterIndex = workspace.currentSessionList.findIndex(session => (session.accountData.accountNumber === account.accountNumber && (account.awsRoles.findIndex(role => (role.name === session.roleData.name)) === -1)));
-      while (sessionTrusterIndex !== -1) {
-        workspace.currentSessionList.splice(sessionTrusterIndex, 1);
-        sessionTrusterIndex = workspace.currentSessionList.findIndex(session => (session.accountData.accountNumber === account.accountNumber && (account.awsRoles.findIndex(role => (role.name === session.roleData.name)) === -1)));
-      }
+      workspace.sessions.splice(index, 1);
       this.configurationService.updateWorkspaceSync(workspace);
       return true;
     } else {

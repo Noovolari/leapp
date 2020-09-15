@@ -42,6 +42,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     // Generate the contextual menu
     this.menuService.generateMenu();
     // Check if we need to go directly to the session list
+    console.log('workspace', this.workspace);
     if (this.isAlreadyConfigured()) {
       // We already have at least one default account to start, let's go to session page
       this.router.navigate(['/sessions', 'session-selected']);
@@ -52,9 +53,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
    * Is the app already configured or not?
    */
   isAlreadyConfigured() {
-    return this.workspace && this.workspace.accountRoleMapping &&
-      this.workspace.accountRoleMapping.accounts &&
-      this.workspace.accountRoleMapping.accounts.length > 0;
+    return this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0;
   }
 
   // MVP: we use this to just check if aws cli is installed in order to proceed to

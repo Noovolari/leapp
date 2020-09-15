@@ -1,13 +1,12 @@
 <div class="session-card button-area  {{session.account.type === 'AZURE' ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" (click)="switchCredentials()">
   <span class="information">
     <b>{{session.account.accountName}}</b> -
-    {{$any(session.account).role.name ? $any(session.account).role.name.substr(0, 13) : $any(session.account).subscriptionId.substr(0, 13)}}
+    {{$any(session.account).role ? $any(session.account).role.name.substr(0, 13) : $any(session.account).subscriptionId.substr(0, 13)}}
   </span>
   <ng-container dropdown placement="right">
     <a dropdownToggle class="drop-list" aria-controls="drop-list" (click)="openDropDown($event);"><i
       class="fa fa-ellipsis-v"></i></a>
-    <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right"
-         role="menu" aria-labelledby="button-basic">
+    <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
       <a (click)="removeAccount(session);">Remove account</a>
       <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
       <a (click)="copyCredentials(session, 4);">Copy Role ARN</a>

@@ -58,12 +58,11 @@ export class WorkspaceService extends NativeService {
   /**
    * Get the Idp Token to save, in the MVP case the SAML response
    * @param idpUrl - the idp url that is given by the backend
-   * @param account - the account to link the request to when setting the credentials directly
-   * @param role - the role that we want to assume after getting the credentials
+   * @param session - the session to link the request to when setting the credentials directly
    * @param type - the Idp Response Type of the request
    * @param callbackUrl - the callback url that can be given always by the backend in case is missing we setup a default one
    */
-  getIdpToken(idpUrl: string, account: any, role: string, type: string, callbackUrl?: string) {
+  getIdpToken(idpUrl: string, session: any, type: string, callbackUrl?: string) {
     this.checkForShowingTheLoginWindow(idpUrl).subscribe(res => {
       // We generate a new browser window to host for the Idp Login form
       // Note: this is due to the fact that electron + angular gives problem with embedded webview
@@ -81,7 +80,7 @@ export class WorkspaceService extends NativeService {
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response
       this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-        this.idpResponseHook(details, type, idpUrl, account.accountNumber, role, callback);
+        this.idpResponseHook(details, type, idpUrl, session, callback);
       });
 
       this.idpWindow.loadURL(idpUrl);
@@ -95,7 +94,7 @@ export class WorkspaceService extends NativeService {
       }
 
       // Sometimes it can arrive here (tested) so the REAL way to block everiything no is use the credential emit element!!!
-      this.credentialEmit.emit({status: err.stack, accountName: account.accountName});
+      this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
       throw new Error(err);
     });
   }
@@ -145,13 +144,12 @@ export class WorkspaceService extends NativeService {
    * Credential refresh method, it cals for the entire procedure to obtain a
    * valid session token to make the assumeRoleWithSAML
    * @param idpUrl - url to use to connect to the idp
-   * @param accountNumber - the account number chosen for the credential to refresh
-   * @param role - the role selected
+   * @param session - the Session object
    */
-  refreshCredentials(idpUrl: string, account: any, role: string) {
+  refreshCredentials(idpUrl: string, session: any) {
     // Extract the Idp token passing the type of request, this method has
     // become generic so we can already prepare for multiple idp type
-    this.getIdpToken(idpUrl, account, role, IdpResponseType.SAML, null);
+    this.getIdpToken(idpUrl, session, IdpResponseType.SAML, null);
   }
 
   /**
@@ -188,11 +186,10 @@ export class WorkspaceService extends NativeService {
    * @param details - the detail of the response for the call to the idp url
    * @param type - the type of response for example SAML using the IdpResponseType.SAML
    * @param idpUrl - the SSO url
-   * @param accountNumber - the account number to obtain credentials with
-   * @param role - the role to obtain credentials with
+   * @param session - the session to obtain credentials with
    * @param callback - eventual callback to call with the response data
    */
-  idpResponseHook(details: any, type: string, idpUrl: string, accountNumber: string, role: string, callback?: any) {
+  idpResponseHook(details: any, type: string, idpUrl: string, session: any, callback?: any) {
     // Extract the token from the request and set the email for the screen
     const token = this.extract_SAML_Response(details);
 
@@ -211,7 +208,7 @@ export class WorkspaceService extends NativeService {
     this.configurationService.updateWorkspaceSync(workspace);
 
     // this is ok for now so we can save it and call sts assume role
-    this.obtainCredentials(workspace, accountNumber, role, () => {
+    this.obtainCredentials(workspace, session, () => {
       // it will throw an error as we have altered the original response
       // Setting that everything is ok if we have arrived here
       this.idpWindow.close();
@@ -283,10 +280,10 @@ export class WorkspaceService extends NativeService {
     return decodeURIComponent(rawData.substring(n + 13, n2));
   }
 
-  obtainCredentials(workspace: Workspace, account: string, role: string, callback?: any) {
+  obtainCredentials(workspace: Workspace, session: any, callback?: any) {
     switch (workspace.type) {
       case IdpResponseType.SAML:
-        this.obtainCredentialsWithSAML({ accountNumber: account, roleId: role }, workspace, callback);
+        this.obtainCredentialsWithSAML(session, workspace, callback);
         break;
     }
   }
@@ -297,31 +294,32 @@ export class WorkspaceService extends NativeService {
    * The *obtainerObject* is defined like so:
    *
    * Callback is defined here if we want to do something after SAML gives us the credentials
-   * @param obtainerObject - the object that will obtain credentials
+   * @param session - the object that will obtain credentials
    * @param workspace - the workspace with you are making the request
    * @param callback - the callback to use
    */
-  obtainCredentialsWithSAML(obtainerObject: any, workspace: Workspace, callback?: any) {
+  obtainCredentialsWithSAML(session: any, workspace: Workspace, callback?: any) {
 
     // Setup STS to generate the credentials
     const sts = new AWS.STS();
 
     let parentAccount;
     let parentRole;
-    const selectedAccount = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === obtainerObject.accountNumber)[0].account as AwsAccount;
-    const selectedRole = selectedAccount.role;
-    const roleName = selectedRole.name;
+    const selectedAccount = workspace.sessions.filter(sess => sess.id === session.id)[0].account as AwsAccount;
+    const roleName = selectedAccount.role.name;
 
-    if (selectedAccount.parent || selectedRole.parent) {
-      const selectedElement = selectedAccount.parent || selectedRole.parent;
-      const selectedParentRole = selectedAccount.parentRole || selectedRole.parentRole;
-      parentAccount = workspace.sessions.filter(sess => selectedElement === (sess.account as AwsAccount).accountNumber)[0].account;
+    if (selectedAccount.parent) {
+      const parentAccountNumber = selectedAccount.parent;
+      parentAccount = workspace.sessions.filter(sess => parentAccountNumber === (sess.account as AwsAccount).accountNumber)[0].account;
+      console.log('Parent Account', parentAccount);
       parentRole = parentAccount.role;
     }
 
     const idpArn = parentAccount ? parentAccount.idpArn : selectedAccount.idpArn;
 
     const federatedRoleArn = `arn:aws:iam::${parentAccount ? parentAccount.accountNumber : selectedAccount.accountNumber}:role/${parentRole ? parentRole.name : roleName}`;
+
+    console.log('Federated RoleArn', federatedRoleArn);
 
     // Params for the calls
     const params = {
@@ -333,7 +331,15 @@ export class WorkspaceService extends NativeService {
 
     // We try to assume role with SAML which will give us the temporary credentials for one hour
     sts.assumeRoleWithSAML(params, (err, data: any) => {
-      if (err) {
+      if (!err) {
+        // Save credentials as default in .aws/credentials and in the workspace as default ones
+        this.saveCredentialsInFileAndDefaultWorkspace(data, workspace, parentAccount !== undefined, selectedAccount, roleName);
+
+        // If we have a callback call it
+        if (callback) {
+          callback(data);
+        }
+      } else {
         // Something went wrong save it to the logger file
         this.appService.logger(err.code, LoggerLevel.ERROR);
         this.appService.logger(err.stack, LoggerLevel.ERROR);
@@ -341,14 +347,6 @@ export class WorkspaceService extends NativeService {
 
         // Emit ko
         this.credentialEmit.emit({status: err.stack, accountName: null});
-
-        // If we have a callback call it
-        if (callback) {
-          callback(data);
-        }
-      } else {
-        // Save credentials as default in .aws/credentials and in the workspace as default ones
-        this.saveCredentialsInFileAndDefaultWorkspace(data, workspace, parentAccount !== undefined, selectedAccount, roleName);
 
         // If we have a callback call it
         if (callback) {

@@ -39,12 +39,16 @@ export class CredentialsService extends NativeService {
   refreshCredentials(isAws) {
     // Get all the info we need
     const workspace = this.configurationService.getDefaultWorkspaceSync();
+    console.log('workspace in refreshCredentials', workspace);
 
-    const awsSession   = workspace.currentSessionList.filter(sess => sess.accountData.accountNumber !== null && sess.accountData.accountNumber !== undefined && sess.active)[0];
-    const azureSession = workspace.currentSessionList.filter(sess => sess.accountData.subscriptionId !== null && sess.accountData.subscriptionId !== undefined && sess.active)[0];
+    const awsSession   = workspace.sessions.filter(sess => sess.account.type === 'AWS'   && sess.active)[0];
+    const azureSession = workspace.sessions.filter(sess => sess.account.type === 'AZURE' && sess.active)[0];
+
+    console.log('aws session', awsSession);
+    console.log('azure session', azureSession);
 
     // Check if there are AWS sessions
-    if ((isAws || null)) {
+    if ((isAws === true || isAws === null)) {
       if (awsSession) {
         this.awsCredentialProcess(workspace, awsSession);
       } else {
@@ -53,7 +57,7 @@ export class CredentialsService extends NativeService {
     }
 
     // Check if there are AZURE sessions
-    if ((!isAws || null)) {
+    if ((isAws === false || isAws === null)) {
       if (azureSession) {
         this.azureCredentialProcess(workspace, azureSession);
       } else {
@@ -98,6 +102,7 @@ export class CredentialsService extends NativeService {
     } else {
       // First time playing with Azure credentials
       this.executeService.execute('az login 2>&1').subscribe(res => {
+
         this.azureSetSubscription(session);
       }, err => {
 
@@ -108,11 +113,12 @@ export class CredentialsService extends NativeService {
   azureSetSubscription(session: Session) {
     // We can use Json in res to save account information
     this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).subscribe(acc => {
-      // Set email of the user
-      const azureProfile = this.configurationService.getAzureProfileSync();
 
-      // console.log('azure', azureProfile);
-      // this.workspaceService.emailEmit.emit(JSON.parse(azureProfile).subscriptions[0].user.name);
+      // be sure to save the profile and tokens
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      workspace.azureProfile = this.configurationService.getAzureProfileSync();
+      workspace.azureConfig = this.configurationService.getAzureConfigSync();
+      this.configurationService.updateWorkspaceSync(workspace);
 
       // Start Calculating time here once credentials are actually retrieved
       this.startTime = new Date();
@@ -144,7 +150,7 @@ export class CredentialsService extends NativeService {
     this.fileService.writeFileSync(this.appService.awsCredentialPath(), '');
     try {
 
-      this.workspaceService.refreshCredentials(idpUrl, session.accountData, session.roleData.name);
+      this.workspaceService.refreshCredentials(idpUrl, session);
     } catch (e) {
 
       this.appService.logger(e, LoggerLevel.ERROR);

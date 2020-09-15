@@ -2,17 +2,15 @@ import {Injectable} from '@angular/core';
 import {NativeService} from '../services-system/native-service';
 import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
-import {SessionService} from './session.service';
+import {Session} from '../models/session';
+import {v4 as uuidv4} from 'uuid';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrusterAccountService extends NativeService {
 
-  constructor(
-    private configurationService: ConfigurationService,
-    private sessionService: SessionService
-  ) {
+  constructor(private configurationService: ConfigurationService) {
     super();
   }
 
@@ -21,10 +19,9 @@ export class TrusterAccountService extends NativeService {
    * @param accountNumber - the account number of the truster account
    * @param accountName - the account name
    * @param role - the AWS roles to assign to the account
-   * @param idpArn - the idArn used for the federatyed account
-   * @param region - the default region to use
+   * @param idpArn - the idArn used for the federated account
    */
-  addTrusterAccountToWorkSpace(accountNumber: number, accountName: string, parentName: string, parentRole: string, role: any, idpArn: string, region: string) {
+  addTrusterAccountToWorkSpace(accountNumber: number, accountName: string, parentName: string, parentRole: string, role: any, idpArn: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
@@ -32,7 +29,7 @@ export class TrusterAccountService extends NativeService {
     const test = workspace.sessions.filter(sess => sess.account.accountNumber === accountNumber && sess.account.role.name === role.name);
     if (!test || test.length === 0) {
       // add new account
-      this.sessionService.addSession({
+      const account = {
         accountId: accountNumber,
         accountName,
         accountNumber,
@@ -42,10 +39,24 @@ export class TrusterAccountService extends NativeService {
         parentRole,
         idpUrl: configuration.federationUrl,
         type: 'AWS'
-      } as unknown as AwsAccount, false);
-      // Save the workspace
-      this.configurationService.updateWorkspaceSync(workspace);
-      return true;
+      };
+
+      const session: Session = {
+        id: uuidv4(),
+        active: false,
+        loading: false,
+        account
+      };
+
+      const alreadyExist = workspace.sessions.filter(s => (session.id === s.id)).length;
+      // Once prepared the session object we verify if we can add it or not to the list and return a boolean about the operation
+      if (alreadyExist === 0) {
+        workspace.sessions.push(session);
+        this.configurationService.updateWorkspaceSync(workspace);
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }

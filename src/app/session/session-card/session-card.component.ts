@@ -71,16 +71,9 @@ export class SessionCardComponent implements OnInit {
 
   removeAccount(session) {
     this.appService.confirmDialog('do you really want to delete this account?', () => {
-      if (session.accountData.accountNumber) {
-        this.trusterAccountService.deleteTrusterAccount(session.id);
-        this.federatedAccountService.deleteFederatedAccount(session.id);
-      } else {
-        this.azureAccountService.deleteAzureAccount(session.accountData.subscriptionId);
-      }
-
-      this.sessionsChanged.emit();
-      this.sessionService.deleteSessionFromWorkspace(session);
-      this.sessionService.listSessions();
+      this.sessionService.removeSession(session);
+      this.sessionsChanged.emit('');
+      this.menuService.redrawList.emit(true);
     });
   }
 

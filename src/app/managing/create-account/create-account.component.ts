@@ -77,17 +77,14 @@ export class CreateAccountComponent implements OnInit {
       this.accounts = this.providerManagerService.getFederatedAccounts();
 
       // Add parameters to check what to do with form data
-      this.firstTime = params['firstTime'];
       this.ssoInserted = (this.workspace.idpUrl !== undefined && this.workspace.idpUrl !== null);
+      this.firstTime = params['firstTime'] || !this.ssoInserted; // This way we also fix potential incongruence when you have half saved setup
+      if (this.ssoInserted) {
+        this.fedUrl = this.workspace.idpUrl;
+      }
 
       // Show the federated accounts
       this.federatedAccounts = this.accounts;
-
-      // Check if we already have the fed Url: [this and many other element: we must decide if we want to create a simple create and a edit separately or fuse them together, i'm keeping them here until the refactoring is done]
-      const config = this.configurationService.getConfigurationFileSync();
-      if (config !== undefined && config !== null) {
-        this.fedUrl = config.federationUrl;
-      }
 
       // only for start screen
       if (this.firstTime) {
@@ -101,9 +98,9 @@ export class CreateAccountComponent implements OnInit {
    */
   getFedRoles() {
     // Get the role data
-    const roleData = this.providerManagerService.getFederatedRoles(this.accounts, this.selectedAccount);
+    const roleData = this.providerManagerService.getFederatedRole(this.accounts, this.selectedAccount);
     // Get the appropriate roles
-    this.federatedRoles = roleData.federatedRoles;
+    this.federatedRoles = [roleData.federatedRole];
     // Set the federated role automatically
     this.selectedAccountNumber = roleData.selectedAccountNumber;
     this.selectedRole = roleData.selectedrole;
@@ -153,7 +150,9 @@ export class CreateAccountComponent implements OnInit {
   }
 
   goBack() {
-    if (this.firstTime) {
+    this.workspace = this.configurationService.getDefaultWorkspaceSync();
+
+    if (this.workspace.idpUrl) {
       this.router.navigate(['/sessions', 'session-selected']);
     } else {
       this.accountType = undefined;

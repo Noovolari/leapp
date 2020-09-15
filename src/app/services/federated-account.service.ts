@@ -2,7 +2,8 @@ import {Injectable} from '@angular/core';
 import {NativeService} from '../services-system/native-service';
 import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
-import {SessionService} from './session.service';
+import { v4 as uuidv4 } from 'uuid';
+import {Session} from '../models/session';
 
 @Injectable({
   providedIn: 'root'
@@ -10,8 +11,8 @@ import {SessionService} from './session.service';
 export class FederatedAccountService extends NativeService {
 
   constructor(
-    private configurationService: ConfigurationService,
-    private sessionService: SessionService) {
+    private configurationService: ConfigurationService
+  ) {
     super();
   }
 
@@ -19,9 +20,8 @@ export class FederatedAccountService extends NativeService {
    * Add a new Federated Account to workspace
    * @param accountNumber - the account number
    * @param accountName - the account name
-   * @param awsRoles - the list of roles [] to add to the account
+   * @param role - the role to add to the account
    * @param idpArn - the idp arn as it is federated
-   * @param region - the default region to use when selected for credentials
    */
   addFederatedAccountToWorkSpace(accountNumber: string, accountName: string, role: any, idpArn: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
@@ -31,7 +31,7 @@ export class FederatedAccountService extends NativeService {
     const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber.toString() === accountNumber.toString());
     if (!test || test.length === 0) {
       // add new account
-      this.sessionService.addSession({
+      const account = {
         accountId: accountNumber,
         accountName,
         accountNumber,
@@ -41,11 +41,20 @@ export class FederatedAccountService extends NativeService {
         type: 'AWS',
         parent: undefined,
         parentRole: undefined
-      } as unknown as AwsAccount, false);
+      };
 
-      // Save the workspace
+      const session: Session = {
+        id: uuidv4(),
+        active: false,
+        loading: false,
+        account
+      };
+
+      workspace.sessions.push(session);
       this.configurationService.updateWorkspaceSync(workspace);
+      console.log('2');
       return true;
+
     } else {
       return false;
     }
@@ -57,7 +66,7 @@ export class FederatedAccountService extends NativeService {
   listFederatedAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace && workspace.sessions && workspace.sessions.length > 0) {
-      return workspace.sessions.filter(sess => (sess.account.type === 'AWS' && sess.account.parent === undefined && sess.account.awsRoles[0].parent === undefined));
+      return workspace.sessions.filter(sess => (sess.account.type === 'AWS' && sess.account.parent === undefined && sess.account.role.parent === undefined)).map(s => s.account);
     } else {
       return [];
     }
@@ -69,7 +78,7 @@ export class FederatedAccountService extends NativeService {
    */
   getFederatedAccountInWorkSpace(accountNumber: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    return workspace.sessions.filter(sess => (sess.account.accountNumber === accountNumber))[0];
+    return workspace.sessions.filter(sess => (sess.account.accountNumber === accountNumber))[0].account;
   }
 
   /**

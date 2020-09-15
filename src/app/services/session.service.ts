@@ -39,7 +39,7 @@ export class SessionService extends NativeService {
       account
     };
 
-    const alreadyExist = workspace.currentSessionList.filter(s => (session.id === s.id)).length;
+    const alreadyExist = workspace.sessions.filter(s => (session.id === s.id)).length;
     // Once prepared the session object we verify if we can add it or not to the list and return a boolean about the operation
     if (alreadyExist === 0) {
       workspace.sessions.push(session);
@@ -57,34 +57,10 @@ export class SessionService extends NativeService {
   removeSession(session) {
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const sessions = workspace.sessions;
-    const sessionExist = sessions.findIndex(ses =>  ses.id === session.id);
-
-    if (sessionExist > 0) {
-      sessions.splice(sessionExist, 1);
-      workspace.sessions = sessions;
-      this.configurationService.updateWorkspaceSync(workspace);
-    } else {
-      this.appService.logger('the Selected Session does not exist', LoggerLevel.WARN);
-      return false;
-    }
-  }
-
-  deleteSessionFromWorkspace(session) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const accounts = workspace.accountRoleMapping;
-    const sessionExist = accounts.accounts.filter(ses => ses.id === session.id);
-
-    if (sessionExist.length > 0) {
-      // Ok we have the account, now remove it
-      if (session.account.accountNumber) {
-        // is one or the other, we can launch both method as they fail gracefully if no account is found
-        this.awsFederatedAccountService.deleteFederatedAccount(session.id);
-        this.awsTrusterAccountService.deleteTrusterAccount(session.id);
-      } else {
-        this.azureAccountService.deleteAzureAccount(session.account.subscriptionId);
-      }
-    }
+    const sessions = workspace.sessions.filter(ses =>  ses.id !== session.id) || [];
+    workspace.sessions = sessions;
+    this.configurationService.updateWorkspaceSync(workspace);
+    return false;
   }
 
   /**

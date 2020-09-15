@@ -43,18 +43,18 @@ export class ProviderManagerService {
    * @param accounts - the accounts from a listFederatedAccountInWorkSpace() call
    * @param selectedAccount - the one selected to get the roles
    */
-  getFederatedRoles(accounts, selectedAccount) {
+  getFederatedRole(accounts, selectedAccount) {
     // Get the appropriate roles
     const account = accounts.filter(acc => (acc.accountId === selectedAccount))[0];
 
     if (account !== undefined && account !== null) {
 
       // The federated roles we have obtained from the filter
-      const federatedRoles = account.awsRoles;
+      const federatedRole = account.role;
       // Set the federated role automatically
-      return { federatedRoles, selectedAccountNumber: account.accountNumber, selectedrole: federatedRoles[0].name };
+      return { federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name };
     }
-    return { federatedRoles: [], selectedAccountNumber: null, selectedrole: null };
+    return { federatedRole: null, selectedAccountNumber: null, selectedrole: null };
   }
 
   /**
@@ -163,7 +163,6 @@ export class ProviderManagerService {
   saveAzureAccount() {
     if (this.formValid(this.form, this.accountType, this.selectedType)) {
       try {
-        // Try to create the truster account
         const created = this.azureAccountService.addAzureAccountToWorkSpace(
           this.form.value.subscriptionId,
           this.form.value.name);
@@ -192,8 +191,7 @@ export class ProviderManagerService {
           this.selectedAccount,
           this.selectedRole,
           this.generateRolesFromNames(this.form),
-          this.form.value.idpArn,
-          this.form.value.myRegion);
+          this.form.value.idpArn);
 
         return created;
       } catch (err) {
@@ -236,12 +234,14 @@ export class ProviderManagerService {
 
     // First check the type of account we are creating
     if (accountType === AccountType.AWS) {
+      // Get the workspace
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
 
       // We are in AWS check if we are saving a Federated or a Truster
       if (selectedType === 'federated') {
         // Check Federated fields
         const checkFields = form.controls['name'].valid &&
-          form.controls['federationUrl'].valid &&
+          (form.controls['federationUrl'].valid || workspace.idpUrl) &&
           form.controls['accountNumber'].valid &&
           form.controls['role'].valid &&
           form.controls['idpArn'].valid;
@@ -250,7 +250,7 @@ export class ProviderManagerService {
       } else {
         // Check Truster fields
         const checkFields = form.controls['name'].valid &&
-          form.controls['federationUrl'].valid &&
+          (form.controls['federationUrl'].valid || workspace.idpUrl) &&
           form.controls['accountNumber'].valid &&
           form.controls['role'].valid &&
           form.controls['federatedAccount'].valid &&
@@ -272,11 +272,9 @@ export class ProviderManagerService {
    * @returns - {any[]} - returns a list of aws roles
    */
   generateRolesFromNames(form) {
-    const awsRoles = [];
     const role = form.controls['role'].value;
     const accountNumber = form.controls['accountNumber'].value;
-    awsRoles.push({ name: role, roleArn: `arn:aws:iam::${accountNumber}:role/${role}` });
-    return awsRoles;
+    return { name: role, roleArn: `arn:aws:iam::${accountNumber}:role/${role}` };
   }
 
   getFederatedAccounts() {

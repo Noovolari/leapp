@@ -63,20 +63,8 @@ export class AppComponent implements OnInit {
       this.beforeCloseInstructions();
     });
 
-    // We start the current session if there is one
-    this.activateSession();
-
     // Initial starting point for DEBUG
     this.router.navigate(['/start']);
-  }
-
-  /**
-   * Activate the current session by launching an emit signal to the refresh credential service
-   */
-  activateSession() {
-    console.log('activating session...');
-    // Activate all active session
-    this.credentialsService.refreshCredentialsEmit.emit(null);
   }
 
   /**

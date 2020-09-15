@@ -157,7 +157,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   }
 
   filterSessions(query) {
-    console.log('kjk', query.value);
     this.getSessions();
     if (query.value !== '') {
       this.activeSessions = this.activeSessions.filter(s => s.account.accountName.indexOf(query.value) > -1);

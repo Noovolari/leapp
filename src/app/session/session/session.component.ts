@@ -4,7 +4,7 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 import {ActivatedRoute, Router} from '@angular/router';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {HttpClient} from '@angular/common/http';
-import {SessionObject} from '../../models/sessionData';
+import {Session} from '../../models/session';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
@@ -24,8 +24,8 @@ import {MenuService} from '../../services/menu.service';
 export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   // Session Data
-  activeSessions: SessionObject[] = [];
-  notActiveSessions: SessionObject[] = [];
+  activeSessions: Session[] = [];
+  notActiveSessions: Session[] = [];
 
 
   selectedToRemove = null;
@@ -102,19 +102,15 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   /**
    * Stop the current session, setting it to false and updating the workspace
    */
-  stopSession(session: SessionObject) {
+  stopSession(session: Session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.currentSessionList;
     sessions.map(sess => {
-      if (
-          session === null ||
-          (session.accountData.subscriptionId === sess.accountData.subscriptionId) ||
-          (session.accountData.accountNumber === sess.accountData.accountNumber && session.roleData.name === sess.roleData.name)
-      ) {
+      if (session === null || (session.id === sess.id)) {
         sess.active = false;
       }
     });
-    workspace.currentSessionList = sessions;
+    workspace.sessions = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
     return true;
   }
@@ -136,47 +132,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   createAccount() {
     // Go!
     this.router.navigate(['/managing', 'create-account']);
-  }
-
-  /**
-   * Prepare the data for selection
-   */
-  refreshRoleMapping(template) {
-
-    this.currentSelectedRole = null;
-    // Do it now: refresh role mapping!
-    this.refreshRoleMappingOperation();
-    this.currentSelectedColor = 0;
-    this.modalRef = this.modalService.show(template);
-    this.isGettingConf = false;
-  }
-
-  /**
-   * The actual mapping operation, we have moved it here to allow code reusing in both method above
-   */
-  refreshRoleMappingOperation() {
-    this.modalAccounts = this.sessionService.actionableSessions();
-    if (this.modalAccounts.length > 0) {
-      this.currentSelectedAccountNumber = this.modalAccounts[0].accountNumber;
-      this.changeRoles({});
-    }
-  }
-
-  /**
-   * Set the roles to select
-   * @param event - the change event, not used
-   */
-  changeRoles(event) {
-
-    const account = this.modalAccounts.filter(el => el.accountNumber === this.currentSelectedAccountNumber)[0];
-    this.modalRoles = account ? account.awsRoles : [];
-
-    if (this.modalRoles && this.modalRoles.length > 0) {
-      this.currentSelectedRole = this.modalRoles[0].name;
-    } else  {
-      this.currentSelectedRole = null;
-      this.appService.toast('Please create a role for this account.', ToastLevel.WARN, 'No roles for this account');
-    }
   }
 
   /**
@@ -205,8 +160,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     console.log('kjk', query.value);
     this.getSessions();
     if (query.value !== '') {
-      this.activeSessions = this.activeSessions.filter(s => s.accountData.accountName.indexOf(query.value) > -1);
-      this.notActiveSessions = this.notActiveSessions.filter(s => s.accountData.accountName.indexOf(query.value) > -1);
+      this.activeSessions = this.activeSessions.filter(s => s.account.accountName.indexOf(query.value) > -1);
+      this.notActiveSessions = this.notActiveSessions.filter(s => s.account.accountName.indexOf(query.value) > -1);
     }
   }
 

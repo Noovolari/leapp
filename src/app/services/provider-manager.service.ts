@@ -152,8 +152,6 @@ export class ProviderManagerService {
     if (result) {
       // Then go to next page
       this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
-    } else {
-      this.appService.toast('Subscription Id must be unique', ToastLevel.WARN, 'Add Account');
     }
   }
 
@@ -165,6 +163,7 @@ export class ProviderManagerService {
       try {
         const created = this.azureAccountService.addAzureAccountToWorkSpace(
           this.form.value.subscriptionId,
+          this.form.value.tenantId,
           this.form.value.name);
 
         return created;
@@ -261,7 +260,8 @@ export class ProviderManagerService {
     } else {
       // Check Azure fields
       return form.controls['name'].valid &&
-             form.controls['subscriptionId'].valid;
+             form.controls['subscriptionId'].valid &&
+             form.controls['tenantId'].valid;
     }
     return false;
   }

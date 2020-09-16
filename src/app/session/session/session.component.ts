@@ -27,11 +27,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   activeSessions: Session[] = [];
   notActiveSessions: Session[] = [];
 
-
-  selectedToRemove = null;
-  loading = false;
-  isGettingConf = false;
-
   // Modal Reference and data
   modalRef: BsModalRef;
 
@@ -104,7 +99,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    */
   stopSession(session: Session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const sessions = workspace.currentSessionList;
+    const sessions = workspace.sessions;
     sessions.map(sess => {
       if (session === null || (session.id === sess.id)) {
         sess.active = false;
@@ -158,9 +153,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   filterSessions(query) {
     this.getSessions();
-    if (query.value !== '') {
-      this.activeSessions = this.activeSessions.filter(s => s.account.accountName.indexOf(query.value) > -1);
-      this.notActiveSessions = this.notActiveSessions.filter(s => s.account.accountName.indexOf(query.value) > -1);
+    if (query !== '') {
+      this.notActiveSessions = this.notActiveSessions.filter(s => s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1);
     }
   }
 

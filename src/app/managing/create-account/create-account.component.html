@@ -106,13 +106,19 @@
       </ng-container>
 
       <ng-container *ngIf="accountType === eAccountType.AZURE">
-        <!-- ====================== -->
-        <!-- AWS ACCOUNT PROPERTIES -->
-        <!-- ====================== -->
+        <!-- ======================== -->
+        <!-- AZURE ACCOUNT PROPERTIES -->
+        <!-- ======================== -->
         <div class="form-group" style="width: 100%; display: inline-block;">
           <label>Subscription Id<span class="danger-text">*</span></label>
           <input formControlName="subscriptionId" type="text" class="form-control" placeholder="Subscription Id *">
           <small class="text-error" *ngIf="(form.controls['subscriptionId'].dirty || form.controls['subscriptionId'].touched) && form.controls['subscriptionId'].errors">Insert the Subscription Id</small>
+        </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Tenant Id<span class="danger-text">*</span></label>
+          <input formControlName="tenantId" type="text" class="form-control" placeholder="Tenant Id *">
+          <small class="text-error" *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert the Tenant Id</small>
         </div>
       </ng-container>
 

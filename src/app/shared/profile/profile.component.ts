@@ -29,6 +29,7 @@ export class ProfileComponent extends AntiMemLeak implements OnInit {
 
   // When we toggle profile we emit is opening status
   toggleProfile() {
+    console.log('toggleProfile');
     this.profileIsOpen = !this.profileIsOpen; // Toggle status
     this.appService.profileOpen.emit(this.profileIsOpen); // Emit event for screen
   }

@@ -4,6 +4,7 @@ import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
 import { v4 as uuidv4 } from 'uuid';
 import {Session} from '../models/session';
+import {AppService, ToastLevel} from '../services-system/app.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,7 +12,8 @@ import {Session} from '../models/session';
 export class FederatedAccountService extends NativeService {
 
   constructor(
-    private configurationService: ConfigurationService
+    private configurationService: ConfigurationService,
+    private appService: AppService
   ) {
     super();
   }
@@ -28,7 +30,7 @@ export class FederatedAccountService extends NativeService {
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
-    const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber.toString() === accountNumber.toString());
+    const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber);
     if (!test || test.length === 0) {
       // add new account
       const account = {
@@ -47,6 +49,7 @@ export class FederatedAccountService extends NativeService {
         id: uuidv4(),
         active: false,
         loading: false,
+        lastStopDate: new Date().toISOString(),
         account
       };
 
@@ -56,6 +59,7 @@ export class FederatedAccountService extends NativeService {
       return true;
 
     } else {
+      this.appService.toast('Account Number Must be unique.', ToastLevel.WARN, 'Create Account');
       return false;
     }
   }
@@ -70,15 +74,6 @@ export class FederatedAccountService extends NativeService {
     } else {
       return [];
     }
-  }
-
-  /**
-   * Get A federated account given the account number
-   * @param accountNumber - the account number to filter the account
-   */
-  getFederatedAccountInWorkSpace(accountNumber: string) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    return workspace.sessions.filter(sess => (sess.account.accountNumber === accountNumber))[0].account;
   }
 
   /**

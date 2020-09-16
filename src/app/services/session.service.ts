@@ -16,39 +16,9 @@ export class SessionService extends NativeService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   constructor(
     private appService: AppService,
-    private configurationService: ConfigurationService,
-    private azureAccountService: AzureAccountService,
-    private awsFederatedAccountService: FederatedAccountService,
-    private awsTrusterAccountService: TrusterAccountService) { super(); }
+    private configurationService: ConfigurationService
+  ) { super(); }
 
-  /**
-   * Add a new session: for us a session is a container for data usaful to generate and maintain a set of credentials when the app is running
-   * @param accountNumber - the account number of the account
-   * @param roleName - the role we want to assume
-   * @param active - is the currently active session?
-   * @return the result of the operation of adding a session
-   */
-  addSession(account: Account, active: boolean = false): boolean {
-
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-
-    const session: Session = {
-      id: uuidv4(),
-      active: false,
-      loading: false,
-      account
-    };
-
-    const alreadyExist = workspace.sessions.filter(s => (session.id === s.id)).length;
-    // Once prepared the session object we verify if we can add it or not to the list and return a boolean about the operation
-    if (alreadyExist === 0) {
-      workspace.sessions.push(session);
-      this.configurationService.updateWorkspaceSync(workspace);
-      return true;
-    } else {
-      return false;
-    }
-  }
 
   /**
    * Remove a session from the list of sessions
@@ -68,6 +38,9 @@ export class SessionService extends NativeService {
    */
   listSessions() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
+    workspace.sessions.sort((a, b) => {
+      return (a as Session).lastStopDate <= (b as Session).lastStopDate ? 1 : -1;
+    });
     return workspace.sessions;
   }
 

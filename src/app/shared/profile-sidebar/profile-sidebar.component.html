@@ -1,5 +1,5 @@
-<div class="profile {{profileOpen ? 'extended' : ''}}">
-  <span class="close-profile" (click)="closeProfile();"><i class="fa fa-times"></i></span>
+<div class="profile {{profileOpen ? 'extended' : ''}}" (click)="closeProfile();">
+  <span class="close-profile"><i class="fa fa-times"></i></span>
 
   <a class="menu-item" (click)="goToProfile();"><i class="fa fa-user"></i>&nbsp;Profile</a>
   <a class="menu-item" (click)="logout();"><i class="fa fa-sign-out-alt"></i>&nbsp;IdP Logout</a>

@@ -1,23 +1,21 @@
 @import 'palette';
 .profile {
   position: absolute;
-  top: 24px;
-  left: 24px;
-}
-
-.portrait {
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  top: 30px;
+  left: 30px;
+  z-index: 1;
+  cursor: pointer;
   padding: 10px;
   background: $main-color-light;
   border-radius: 4px;
-}
 
+  img {
+    display: block;
+  }
+}
 .centered-div {
   position: relative;
   display: flex;
   justify-content: center;
-  margin: 16px;
+  margin: 0 16px 16px 16px;
 }

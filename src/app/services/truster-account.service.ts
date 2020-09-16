@@ -4,13 +4,17 @@ import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {Session} from '../models/session';
 import {v4 as uuidv4} from 'uuid';
+import {AppService, ToastLevel} from '../services-system/app.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TrusterAccountService extends NativeService {
 
-  constructor(private configurationService: ConfigurationService) {
+  constructor(
+    private configurationService: ConfigurationService,
+    private appService: AppService
+  ) {
     super();
   }
 
@@ -26,7 +30,7 @@ export class TrusterAccountService extends NativeService {
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // if the account doesn't exists
-    const test = workspace.sessions.filter(sess => sess.account.accountNumber === accountNumber && sess.account.role.name === role.name);
+    const test = workspace.sessions.filter(sess => sess.account.accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);
     if (!test || test.length === 0) {
       // add new account
       const account = {
@@ -45,19 +49,17 @@ export class TrusterAccountService extends NativeService {
         id: uuidv4(),
         active: false,
         loading: false,
+        lastStopDate: new Date().toISOString(),
         account
       };
 
       const alreadyExist = workspace.sessions.filter(s => (session.id === s.id)).length;
       // Once prepared the session object we verify if we can add it or not to the list and return a boolean about the operation
-      if (alreadyExist === 0) {
-        workspace.sessions.push(session);
-        this.configurationService.updateWorkspaceSync(workspace);
-        return true;
-      } else {
-        return false;
-      }
+      workspace.sessions.push(session);
+      this.configurationService.updateWorkspaceSync(workspace);
+      return true;
     } else {
+      this.appService.toast('Account Number or Role Must be unique.', ToastLevel.WARN, 'Create Account');
       return false;
     }
   }

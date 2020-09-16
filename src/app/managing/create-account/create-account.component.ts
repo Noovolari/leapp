@@ -47,6 +47,7 @@ export class CreateAccountComponent implements OnInit {
     idpArn: new FormControl('', [Validators.required]),
     accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
     subscriptionId: new FormControl('', [Validators.required]),
+    tenantId: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
     role: new FormControl('', [Validators.required]),
     federatedOrTruster: new FormControl('', [Validators.required]),

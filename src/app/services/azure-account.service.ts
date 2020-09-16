@@ -4,13 +4,17 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {AzureAccount} from '../models/azure-account';
 import {Session} from '../models/session';
 import {v4 as uuidv4} from 'uuid';
+import {AppService, ToastLevel} from '../services-system/app.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AzureAccountService extends NativeService {
 
-  constructor(private configurationService: ConfigurationService) {
+  constructor(
+    private configurationService: ConfigurationService,
+    private appService: AppService
+  ) {
     super();
   }
 
@@ -19,7 +23,7 @@ export class AzureAccountService extends NativeService {
    * @param subscriptionId - the account number
    * @param accountName - the account name
    */
-  addAzureAccountToWorkSpace(subscriptionId: string, accountName: string) {
+  addAzureAccountToWorkSpace(subscriptionId: string, tenantId: string, accountName: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
@@ -31,6 +35,7 @@ export class AzureAccountService extends NativeService {
         accountId: subscriptionId,
         accountName,
         subscriptionId,
+        tenantId,
         type: 'AZURE'
       };
 
@@ -38,19 +43,16 @@ export class AzureAccountService extends NativeService {
         id: uuidv4(),
         active: false,
         loading: false,
+        lastStopDate: new Date().toISOString(),
         account
       };
 
-      const alreadyExist = workspace.sessions.filter(s => (session.id === s.id)).length;
       // Once prepared the session object we verify if we can add it or not to the list and return a boolean about the operation
-      if (alreadyExist === 0) {
-        workspace.sessions.push(session);
-        this.configurationService.updateWorkspaceSync(workspace);
-        return true;
-      } else {
-        return false;
-      }
+      workspace.sessions.push(session);
+      this.configurationService.updateWorkspaceSync(workspace);
+      return true;
     } else {
+      this.appService.toast('Subscription Must be unique.', ToastLevel.WARN, 'Create Account');
       return false;
     }
   }

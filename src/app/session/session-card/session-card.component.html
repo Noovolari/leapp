@@ -7,6 +7,7 @@
     <a dropdownToggle class="drop-list-container" aria-controls="drop-list" (click)="openDropDown($event);"><i
       class="fa fa-ellipsis-v"></i></a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
+      <a (click)="ssmModalOpen(session, $event);" *ngIf="session.account.type === 'AWS' && session.active">SSM session</a>
       <a (click)="removeAccount(session);">Remove account</a>
       <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
       <a (click)="copyCredentials(session, 4);">Copy Role ARN</a>
@@ -16,3 +17,30 @@
   <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}"></i>
 
 </div>
+
+
+<ng-template #ssmModalTemplate>
+  <div class="modal-header">
+    <button type="button" class="back" aria-label="Close" (click)="modalRef.hide();"><i class="fa fa-arrow-left"></i></button>
+    <b>{{session.account.accountName}}</b> - {{$any(session.account).role.name}} | <b>SSM</b>
+  </div>
+  <div class="modal-body">
+
+    <div class="ssm-tray">
+
+      <b class="">Seleziona una region:</b>
+      <ng-select bindLabel="region" bindValue="region" [items]="ssmRegions" [(ngModel)]="selectedSsmRegion" placeholder="Select a Region for finding instances" (change)="changeSsmRegion($event);"></ng-select>
+
+      <div class="loader" *ngIf="ssmloading"><i class="fa fa-spinner fa-spin"></i></div>
+      <div class="list-of-ssm" *ngIf="!ssmloading">
+        <b>Select an Instance:</b>
+        <ul class="ssm-ul">
+          <li *ngFor="let instance of instances" class="ssm-card">
+            <div><span><b>{{instance.Name}}</b> - {{instance.IPAddress}}</span><button class="btn" (click)="startSsmSession(instance.InstanceId)">Connect</button></div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</ng-template>

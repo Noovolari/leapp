@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {CredentialsService} from '../../services/credentials.service';
@@ -10,6 +10,8 @@ import {FederatedAccountService} from '../../services/federated-account.service'
 import {AzureAccountService} from '../../services/azure-account.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AwsAccount} from '../../models/aws-account';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap';
+import {SsmService} from '../../services/ssm.service';
 
 @Component({
   selector: 'app-session-card',
@@ -20,8 +22,19 @@ import {AwsAccount} from '../../models/aws-account';
 
 export class SessionCardComponent implements OnInit {
 
+  @ViewChild('ssmModalTemplate', { static: false })
+  ssmModalTemplate: TemplateRef<any>;
+  modalRef: BsModalRef;
+
   @Input() session: Session;
   @Output() sessionsChanged = new EventEmitter();
+
+  // Ssm instances
+  ssmloading = true;
+  selectedSsmRegion;
+  openSsm = false;
+  ssmRegions = [];
+  instances = [];
 
   constructor(private sessionService: SessionService,
               private credentialsService: CredentialsService,
@@ -31,12 +44,14 @@ export class SessionCardComponent implements OnInit {
               private trusterAccountService: TrusterAccountService,
               private federatedAccountService: FederatedAccountService,
               private azureAccountService: AzureAccountService,
-              private configurationService: ConfigurationService) { }
+              private configurationService: ConfigurationService,
+              private ssmService: SsmService,
+              private modalService: BsModalService) { }
 
   ngOnInit() {
-
+    // Set regions for ssm
+    this.ssmRegions = this.appService.getRegions(false);
   }
-
 
   /**
    * Start the selected session
@@ -115,5 +130,54 @@ export class SessionCardComponent implements OnInit {
 
   openDropDown(event) {
     event.stopPropagation();
+  }
+
+  // ============================== //
+  // ========== SSM AREA ========== //
+  // ============================== //
+
+  /**
+   * SSM Modal open given the correct session
+   * @param session - the session to check for possible ssm sessions
+   */
+  ssmModalOpen(session, event) {
+    // Prevent event bubbling on document to avoid the tray keep opening and closing
+    if (event) {
+      event.stopPropagation();
+    }
+
+    // Check the correct region
+    this.selectedSsmRegion = this.ssmRegions[1];
+    this.instances = [];
+    this.modalRef = this.modalService.show(this.ssmModalTemplate, { class: 'ssm-modal'});
+    this.changeSsmRegion(null);
+  }
+
+  /**
+   * Set the region for ssm init and launch the mopethod form the server to find instances
+   * @param event - the change select event
+   */
+  changeSsmRegion(event) {
+    if (this.selectedSsmRegion) {
+      this.ssmloading = true;
+      // Set the aws credentials to instanziate the ssm client
+      const credentials = this.configurationService.getDefaultWorkspaceSync().awsCredentials;
+      // Check the result of the call
+      this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
+        this.instances = result.instances;
+        this.ssmloading = false;
+      });
+
+    }
+  }
+
+  /**
+   * Start a new ssm session
+   * @param instanceId - instance id to start ssm session
+   */
+  startSsmSession(instanceId) {
+    this.ssmService.startSession(instanceId);
+    this.openSsm = false;
+    this.ssmloading = false;
   }
 }

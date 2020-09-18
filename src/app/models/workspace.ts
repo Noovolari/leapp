@@ -9,12 +9,9 @@ export interface Workspace {
   idpUrl?: string;
   proxyUrl?: string;
 
-  azureConfig?: string;
-  azureProfile?: string;
+  azureConfig: string;
+  azureProfile: string;
 
-  principalAccountNumber?: string; // Default to use on opening
-  principalRoleName?: string;      // Default to use on opening
-
-  sessions?: Session[];
+  sessions: Session[];
   awsCredentials?: AwsCredentials;
 }

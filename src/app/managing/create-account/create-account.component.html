@@ -122,7 +122,7 @@
         </div>
       </ng-container>
 
-      <a class="back-link pull-left" (click)="goBack();"><i class="fas fa-arrow-left"></i>&nbsp;back</a>
+      <a class="back-link pull-left" (click)="goBack();"><i class="fas fa-arrow-left"></i></a>
       <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="selectedType">Save</button>
     </ng-container>
 

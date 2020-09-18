@@ -16,7 +16,7 @@
   }
 }
 
-.ssm-cards {
+.account-cards {
   height: 478px;
   margin: 0!important;
   overflow: auto;
@@ -35,8 +35,8 @@
   margin: 0 0 15px;
   cursor: pointer;
 
-  .drop-list {
-    padding: 6px 10px 3px;
+  .drop-list-container {
+    padding: 4px 10px 3px;
     background: $main-color-light;
     border-radius: $border-radius;
     position: absolute;
@@ -138,4 +138,20 @@
   color: $azr
 }
 
+#drop-list {
+  background: $white-text-color;
+  border-radius: $border-radius;
+  padding: 15px;
 
+  a {
+    color: $text-color;
+    display: block!important;
+    transition: all 0.3s ease;
+    padding: 6px;
+  }
+
+  a:hover {
+    display: block!important;
+    background: $focused-element;
+  }
+}

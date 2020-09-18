@@ -15,8 +15,8 @@
 
   .pull-left {
     position: absolute;
-    left: 25px;
-    bottom: 25px;
+    left: 28px;
+    top: 32px;
   }
 
   .pull-center {
@@ -190,7 +190,8 @@
     i {
       position: relative;
       left: 0;
-      color: $main-color-light;
+      color: $text-color;
+      font-size: 20px;
     }
   }
   .back-link:hover {

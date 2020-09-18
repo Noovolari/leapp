@@ -4,7 +4,7 @@
     {{$any(session.account).role ? $any(session.account).role.name.substr(0, 13) : $any(session.account).subscriptionId.substr(0, 13)}}
   </span>
   <ng-container dropdown placement="right">
-    <a dropdownToggle class="drop-list" aria-controls="drop-list" (click)="openDropDown($event);"><i
+    <a dropdownToggle class="drop-list-container" aria-controls="drop-list" (click)="openDropDown($event);"><i
       class="fa fa-ellipsis-v"></i></a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
       <a (click)="removeAccount(session);">Remove account</a>

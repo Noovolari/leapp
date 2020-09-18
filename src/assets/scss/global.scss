@@ -117,3 +117,61 @@ hr { margin: 0 5px; }
 .modal-dialog {
   margin-top: 20px!important;
 }
+
+body.modal-open .background {
+  filter: blur(6px)!important;
+}
+
+.modal-dialog.ssm-modal {
+  margin: 0!important;
+  height: 100vh;
+
+  .modal-header {
+    display: block;
+    padding-left: 20px;
+    border-bottom: 0!important;
+    padding: 40px 20px 10px;
+    font-family: "AvenirNextBold", "Open Sans", sans-serif;
+
+    .back, .modal-title { display: inline-block; }
+    .back { border: none; outline: none; background: transparent; }
+  }
+
+  .modal-content {
+    height: 100vh;
+    background-color: rgba(255,255,255,0.7);
+
+    b {
+      font-size: 14px;
+      font-family: "AvenirNextBold", "Open Sans", sans-serif;
+    }
+
+    ul { list-style: none; margin: 0; padding: 0; }
+
+    .loader {
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    .list-of-ssm {
+      margin-top: 5px;
+    }
+
+    li {
+      height: 43px;
+
+      span {
+        display: inline-block;
+        margin-top: 3px;
+      }
+
+      button {
+        background: $main-color-light;
+        color: $white-text-color;
+        padding: 3px 10px;
+        display: inline-block;
+        float: right;
+      }
+    }
+  }
+}

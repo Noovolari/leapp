@@ -462,8 +462,9 @@ export class WorkspaceService extends NativeService {
         name,
         lastIDPToken: googleToken,
         idpUrl: federationUrl,
-        principalAccountNumber: null,
-        sessions: []
+        sessions: [],
+        azureProfile: null,
+        azureConfig: null
       };
       // Save and set as default
       this.configurationService.addWorkspaceSync(workspace);

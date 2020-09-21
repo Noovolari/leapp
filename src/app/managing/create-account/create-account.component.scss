@@ -121,7 +121,7 @@
     display: inline-block;
     width: 109px;
     padding: 10px;
-    margin: 0 8px;
+    margin: 0;
     text-align: center;
     vertical-align: middle;
     min-width: auto;
@@ -177,9 +177,16 @@
   }
   .correct-top {
     margin-top: 4px;
+    position: relative;
+    bottom: 5px;
+
+    .providers {
+      margin: 0 8px 0 0;
+    }
   }
   .correct-top-second-step {
-    margin-top: -3px;
+    display: flex;
+    justify-content: space-between;
   }
   .second-step-fix {
     margin-bottom: 9px;

@@ -5,6 +5,7 @@ import {AzureAccount} from '../models/azure-account';
 import {Session} from '../models/session';
 import {v4 as uuidv4} from 'uuid';
 import {AppService, ToastLevel} from '../services-system/app.service';
+import {AccountType} from '../models/AccountType';
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +37,7 @@ export class AzureAccountService extends NativeService {
         accountName,
         subscriptionId,
         tenantId,
-        type: 'AZURE'
+        type: AccountType.AZURE
       };
 
       const session: Session = {
@@ -63,7 +64,7 @@ export class AzureAccountService extends NativeService {
   listAzureAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace && workspace.sessions && workspace.sessions.length > 0) {
-      return workspace.sessions.filter(sess => (sess.account.parent === undefined && sess.account.awsRoles === undefined && sess.account.type === 'AZURE'));
+      return workspace.sessions.filter(sess => (sess.account.parent === undefined && sess.account.awsRoles === undefined && sess.account.type === AccountType.AZURE));
     } else {
       return [];
     }

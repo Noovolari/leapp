@@ -14,6 +14,7 @@ import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
 import {AzureAccount} from '../../models/azure-account';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {AccountType} from '../../models/AccountType';
 
 @Component({
   selector: 'app-session-card',
@@ -23,6 +24,8 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 
 export class SessionCardComponent implements OnInit {
+
+  eAccountType = AccountType;
 
   @ViewChild('ssmModalTemplate', { static: false })
   ssmModalTemplate: TemplateRef<any>;
@@ -55,13 +58,13 @@ export class SessionCardComponent implements OnInit {
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions(false);
     switch (this.session.account.type) {
-      case('AWS'):
+      case(AccountType.AWS):
         this.sessionDetailToShow =  (this.session.account as AwsAccount).role.name.substr(0, 13);
         break;
-      case('AZURE'):
+      case(AccountType.AZURE):
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId.substr(0, 13);
         break;
-      case('AWS_PLAIN_USER'):
+      case(AccountType.AWS_PLAIN_USER):
         this.sessionDetailToShow = (this.session.account as AwsPlainAccount).user.substr(0, 13);
         break;
     }
@@ -100,6 +103,7 @@ export class SessionCardComponent implements OnInit {
 
   removeAccount(session) {
     this.appService.confirmDialog('do you really want to delete this account?', () => {
+      this.federatedAccountService.cleanKeychainIfNecessary(session);
       this.sessionService.removeSession(session);
       this.sessionsChanged.emit('');
       this.menuService.redrawList.emit(true);

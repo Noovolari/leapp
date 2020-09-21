@@ -5,6 +5,7 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {Session} from '../models/session';
 import {v4 as uuidv4} from 'uuid';
 import {AppService, ToastLevel} from '../services-system/app.service';
+import {AccountType} from '../models/AccountType';
 
 @Injectable({
   providedIn: 'root'
@@ -42,7 +43,7 @@ export class TrusterAccountService extends NativeService {
         parent: parentName,
         parentRole,
         idpUrl: configuration.federationUrl,
-        type: 'AWS'
+        type: AccountType.AWS
       };
 
       const session: Session = {
@@ -69,7 +70,7 @@ export class TrusterAccountService extends NativeService {
    */
   listTrusterAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    return workspace.sessions.filter(ele => ((ele.account.parent !== undefined && ele.account.type === 'AWS')));
+    return workspace.sessions.filter(ele => ((ele.account.parent !== undefined && ele.account.type === AccountType.AWS)));
   }
 
   /**

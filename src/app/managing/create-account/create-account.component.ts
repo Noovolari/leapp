@@ -20,7 +20,8 @@ export class CreateAccountComponent implements OnInit {
 
   toggleOpen = true;
   roles: string[] = [];
-  accountType;
+  accountType = AccountType.AWS;
+  provider;
   firstTime = false;
   ssoInserted = false;
   providerSelected = false;
@@ -40,7 +41,6 @@ export class CreateAccountComponent implements OnInit {
 
   eAccountType = AccountType;
 
-  @Input() selectedType = 'federated';
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
   public form = new FormGroup({
@@ -128,7 +128,6 @@ export class CreateAccountComponent implements OnInit {
         this.accountType,
         this.selectedAccount,
         this.selectedRole,
-        this.selectedType,
         this.form
       );
     } else {
@@ -137,29 +136,36 @@ export class CreateAccountComponent implements OnInit {
         this.accountType,
         this.selectedAccount,
         this.selectedRole,
-        this.selectedType,
         this.form
       );
     }
 
   }
 
+  setProvider(name) {
+    this.provider = name;
+    this.providerSelected = true;
+    if (name === AccountType.AZURE) {
+      this.accountType = AccountType.AZURE;
+    }
+  }
+
   setAccountType(name) {
     this.accountType = name;
-    this.providerSelected = true;
   }
 
   formValid() {
-    return this.providerManagerService.formValid(this.form, this.accountType, this.selectedType);
+    return this.providerManagerService.formValid(this.form, this.accountType);
   }
 
   goBack() {
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
-    if (this.workspace.idpUrl) {
+    if (this.workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
     } else {
       this.accountType = undefined;
+      this.provider = undefined;
       this.ssoInserted = false;
       this.providerSelected = false;
       this.firstTime = true;

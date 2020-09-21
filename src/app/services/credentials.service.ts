@@ -48,24 +48,31 @@ export class CredentialsService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     console.log('workspace in refreshCredentials', workspace);
 
-    const awsSession   = workspace.sessions.filter(sess => sess.account.type === 'AWS'   && sess.active)[0];
-    const azureSession = workspace.sessions.filter(sess => sess.account.type === 'AZURE' && sess.active)[0];
-    const awsPlainSession  = workspace.sessions.filter(sess => sess.account.type === 'AWS_PLAIN_USER' && sess.active)[0];
+    const awsSession   = workspace.sessions.filter(sess => sess.account.type === AccountType.AWS   && sess.active)[0];
+    const azureSession = workspace.sessions.filter(sess => sess.account.type === AccountType.AZURE && sess.active)[0];
+    const awsPlainSession  = workspace.sessions.filter(sess => sess.account.type === AccountType.AWS_PLAIN_USER && sess.active)[0];
 
+    // Check if all the session are as expected
     console.log('aws session', awsSession);
+    console.log('aws plain', awsPlainSession);
     console.log('azure session', azureSession);
 
     // Check if there are AWS sessions
     if ((isAws === true || isAws === null)) {
       if (awsSession) {
-          this.awsCredentialFederatedProcess(workspace, awsSession);
+        this.awsCredentialFederatedProcess(workspace, awsSession);
       } else {
-        if (awsPlainSession !== undefined) {
-          console.log('here');
-          this.awsCredentialProcess(workspace, awsPlainSession);
-        } else {
-          this.cleanCredentialProcess(workspace, awsSession, AccountType.AWS);
-        }
+        this.cleanCredentialProcess(workspace, awsSession, AccountType.AWS);
+      }
+    }
+
+    // Check if there are AWS PLAIN sessions
+    if ((isAws === true || isAws === null)) {
+      if (awsPlainSession) {
+        console.log('here im in plain');
+        this.awsCredentialProcess(workspace, awsPlainSession);
+      } else {
+        this.cleanCredentialProcess(workspace, awsSession, AccountType.AWS_PLAIN_USER);
       }
     }
 
@@ -83,7 +90,7 @@ export class CredentialsService extends NativeService {
     if (workspace) {
 
       // if there are not active sessions stop session.
-      if (accountType === AccountType.AWS) {
+      if (accountType === AccountType.AWS || accountType === AccountType.AWS_PLAIN_USER) {
         workspace.principalAccountNumber = null;
         workspace.principalRoleName = null;
         workspace.awsCredentials = {};
@@ -216,9 +223,8 @@ export class CredentialsService extends NativeService {
   }
 
   private async awsCredentialProcess(workspace: Workspace, awsSession: Session) {
-    const accessKey = await this.keychainService.getSecret('Leapp', awsSession.account.accountName + (awsSession.account as AwsPlainAccount).user + '_accessKey');
-    console.log('access', accessKey);
-    const secretKey = await this.keychainService.getSecret('Leapp', awsSession.account.accountName + (awsSession.account as AwsPlainAccount).user + '_secretKey');
+    const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(awsSession.account.accountName, (awsSession.account as AwsPlainAccount).user));
+    const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(awsSession.account.accountName, (awsSession.account as AwsPlainAccount).user));
     const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
     this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
   }

@@ -1,5 +1,6 @@
 export enum AccountType {
-  AWS,
-  AZURE,
-  AWS_PLAIN_USER
+  AWS = 'AWS',
+  AWS_TRUSTER = 'AWS_TRUSTER',
+  AWS_PLAIN_USER = 'AWS_PLAIN_USER',
+  AZURE = 'AZURE',
 }

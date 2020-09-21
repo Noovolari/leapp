@@ -277,6 +277,10 @@ export class AppService extends NativeService {
     this.shell.openExternal(url);
   }
 
+  /**
+   * Useful to validate all form field at once if needed
+   * @param formGroup - the form formGroup
+   */
   validateAllFormFields(formGroup: FormGroup) {
     Object.keys(formGroup.controls).forEach(field => {
       const control = formGroup.get(field);
@@ -316,7 +320,6 @@ export class AppService extends NativeService {
    * @param useDefault - to show no region
    * @returns - {{region: string}[]} - all the regions in array format
    */
-
   getRegions(useDefault?: boolean) {
     const regions = [
       { region: 'no region necessary'},
@@ -362,8 +365,9 @@ export class AppService extends NativeService {
     });
   }
 
-
-
+  /**
+   * Clean the credential file helper
+   */
   cleanCredentialFile() {
     try {
       const awsCredentialsPath = this.awsCredentialPath();
@@ -374,7 +378,19 @@ export class AppService extends NativeService {
     }
   }
 
+  /**
+   * Check if the account is of type AZURE or not
+   * @param s - the session containing the account
+   */
   isAzure(s) { return s.account.subscriptionId !== null && s.account.subscriptionId !== undefined; }
+
+
+  keychainGenerateSecretString(accountName, user) {
+    return `${accountName}___${user}___secretKey`;
+  }
+  keychainGenerateAccessString(accountName, user) {
+    return `${accountName}___${user}___accessKey`;
+  }
 }
 
 /*

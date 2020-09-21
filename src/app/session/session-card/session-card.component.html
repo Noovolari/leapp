@@ -1,4 +1,4 @@
-<div class="session-card button-area  {{session.account.type === 'AZURE' ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" (click)="switchCredentials()">
+<div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" (click)="switchCredentials()">
   <span class="information">
     <b>{{session.account.accountName}}</b> -
     {{ sessionDetailToShow }}
@@ -7,7 +7,7 @@
     <a dropdownToggle class="drop-list-container" aria-controls="drop-list" (click)="openDropDown($event);"><i
       class="fa fa-ellipsis-v"></i></a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-      <a (click)="ssmModalOpen(session, $event);" *ngIf="session.account.type === 'AWS' && session.active">SSM session</a>
+      <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER) && session.active">SSM session</a>
       <a (click)="removeAccount(session);">Remove account</a>
       <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
       <a (click)="copyCredentials(session, 4);">Copy Role ARN</a>

@@ -12,6 +12,8 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 import {AwsAccount} from '../../models/aws-account';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
+import {AzureAccount} from '../../models/azure-account';
+import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 @Component({
   selector: 'app-session-card',
@@ -35,6 +37,7 @@ export class SessionCardComponent implements OnInit {
   openSsm = false;
   ssmRegions = [];
   instances = [];
+  sessionDetailToShow;
 
   constructor(private sessionService: SessionService,
               private credentialsService: CredentialsService,
@@ -51,6 +54,17 @@ export class SessionCardComponent implements OnInit {
   ngOnInit() {
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions(false);
+    switch (this.session.account.type) {
+      case('AWS'):
+        this.sessionDetailToShow =  (this.session.account as AwsAccount).role.name.substr(0, 13);
+        break;
+      case('AZURE'):
+        this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId.substr(0, 13);
+        break;
+      case('AWS_PLAIN_USER'):
+        this.sessionDetailToShow = (this.session.account as AwsPlainAccount).user.substr(0, 13);
+        break;
+    }
   }
 
   /**

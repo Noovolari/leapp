@@ -119,11 +119,12 @@
 
   .providers {
     display: inline-block;
-    width: 174px;
+    width: 109px;
     padding: 10px;
     margin: 0 8px;
     text-align: center;
     vertical-align: middle;
+    min-width: auto;
 
     font-size: 12px;
     font-family: "AvenirNext", "Open Sans", sans-serif;

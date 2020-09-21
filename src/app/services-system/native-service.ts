@@ -31,6 +31,7 @@ export class NativeService {
   protected MachineId: any;
   protected process: any;
   protected ipcRenderer: any;
+  protected keytar: any;
 
   constructor() {
     this.fs = (window as any).fs;
@@ -58,6 +59,7 @@ export class NativeService {
     this.MachineId = (window as any).MachineId;
     this.process = (window as any).process;
     this.ipcRenderer = (window as any).ipcRenderer;
+    this.keytar = (window as any).keytar;
   }
 
 }

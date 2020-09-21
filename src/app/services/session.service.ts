@@ -16,7 +16,8 @@ export class SessionService extends NativeService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   constructor(
     private appService: AppService,
-    private configurationService: ConfigurationService
+    private configurationService: ConfigurationService,
+    private federatedAccountService: FederatedAccountService
   ) { super(); }
 
 
@@ -28,6 +29,9 @@ export class SessionService extends NativeService {
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.sessions.filter(ses =>  ses.id !== session.id) || [];
+    if (session.account.type === 'AWS_PLAIN_USER') {
+      this.federatedAccountService.deleteFederatedPlainAccount(session.id);
+    }
     workspace.sessions = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
     return false;

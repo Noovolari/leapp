@@ -157,6 +157,7 @@
         "global-tunnel": "^1.2.0",
         "ini": "^1.3.5",
         "jwt-decode": "^2.2.0",
+        "keytar": "^6.0.1",
         "md5-file": "^4.0.0",
         "menubar": "^6.0.3",
         "mousetrap": "^1.6.5",

@@ -250,6 +250,8 @@ export class WorkspaceService extends NativeService {
   /* =======< RESPONSE EXTRACTORS >======== */
   /* ====================================== */
 
+
+  // TODO: to delete
   /**
    * Set the hook email based on response type
    */

@@ -8,6 +8,7 @@ import {FederatedAccountService} from './federated-account.service';
 import {TrusterAccountService} from './truster-account.service';
 import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
+import {KeychainService} from '../services-system/keychain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -140,10 +141,15 @@ export class ProviderManagerService {
   decideSavingMethodAndSave() {
     let result = true;
     if (this.accountType === AccountType.AWS) {
-      if (this.selectedType === 'federated') {
-        result = this.saveAwsFederatedAccount();
-      } else {
-        result = this.saveAwsTrusterAccount();
+      switch (this.selectedType) {
+        case('federated'):
+          result = this.saveAwsFederatedAccount();
+          break;
+        case('plain'):
+          result = this.savePlainCredentials();
+          break;
+        case('truster'):
+          result = this.saveAwsTrusterAccount();
       }
     } else {
       result = this.saveAzureAccount();
@@ -224,6 +230,16 @@ export class ProviderManagerService {
     }
   }
 
+  savePlainCredentials() {
+    this.federatedAccountService.addPlainAccountToWorkSpace(
+      this.form.value.accountNumber,
+      this.form.value.name,
+      this.form.value.plainUser,
+      this.form.value.secretKey,
+      this.form .value.accessKey);
+    return true;
+  }
+
   /**
    * Because the form is complex we need a custom form validation
    * In the future we will put this in a service to create validation factory:
@@ -237,25 +253,30 @@ export class ProviderManagerService {
       const workspace = this.configurationService.getDefaultWorkspaceSync();
 
       // We are in AWS check if we are saving a Federated or a Truster
-      if (selectedType === 'federated') {
-        // Check Federated fields
-        const checkFields = form.controls['name'].valid &&
-          (form.controls['federationUrl'].valid || workspace.idpUrl) &&
-          form.controls['accountNumber'].valid &&
-          form.controls['role'].valid &&
-          form.controls['idpArn'].valid;
+      switch (selectedType) {
+        case 'federated':
+          // Check Federated fields
+          return form.controls['name'].valid &&
+            (form.controls['federationUrl'].valid || workspace.idpUrl) &&
+            form.controls['accountNumber'].valid &&
+            form.controls['role'].valid &&
+            form.controls['idpArn'].valid;
 
-        return checkFields;
-      } else {
-        // Check Truster fields
-        const checkFields = form.controls['name'].valid &&
-          (form.controls['federationUrl'].valid || workspace.idpUrl) &&
-          form.controls['accountNumber'].valid &&
-          form.controls['role'].valid &&
-          form.controls['federatedAccount'].valid &&
-          form.controls['federatedRole'].valid;
+        case 'truster':
+          // Check Federated fields
+          return form.controls['name'].valid &&
+            (form.controls['federationUrl'].valid || workspace.idpUrl) &&
+            form.controls['accountNumber'].valid &&
+            form.controls['role'].valid &&
+            form.controls['federatedAccount'].valid &&
+            form.controls['federatedRole'].valid;
+        case 'plain':
+          return form.controls['name'].valid &&
+            (form.controls['federationUrl'].valid || workspace.idpUrl) &&
+            form.controls['accountNumber'].valid &&
+            form.controls['accessKey'].valid &&
+            form.controls['secretKey'].valid;
 
-        return checkFields;
       }
     } else {
       // Check Azure fields

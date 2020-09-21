@@ -1,4 +1,5 @@
 export enum AccountType {
   AWS,
-  AZURE
+  AZURE,
+  AWS_PLAIN_USER
 }

@@ -50,6 +50,7 @@
   window.Menu = require('electron').remote.Menu;
   window.Tray = require('electron').remote.Tray;
   window.MachineId = require('node-machine-id').machineIdSync();
+  window.keytar = require('keytar');
 
   // Add Blur after Focus effect
   document.addEventListener('click', function(e) {

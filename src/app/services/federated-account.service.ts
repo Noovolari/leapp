@@ -5,6 +5,8 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import { v4 as uuidv4 } from 'uuid';
 import {Session} from '../models/session';
 import {AppService, ToastLevel} from '../services-system/app.service';
+import {AwsPlainAccount} from '../models/aws-plain-account';
+import {KeychainService} from '../services-system/keychain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,8 @@ export class FederatedAccountService extends NativeService {
 
   constructor(
     private configurationService: ConfigurationService,
-    private appService: AppService
+    private appService: AppService,
+    private keychainService: KeychainService
   ) {
     super();
   }
@@ -65,6 +68,53 @@ export class FederatedAccountService extends NativeService {
   }
 
   /**
+   * Add a new Federated Account to workspace
+   * @param accountNumber - the account number
+   * @param accountName - the account name
+   * @param user - the Aws user added
+   * @param secretKey - secret key of the user
+   * @param accessKey - access key of the AWS user
+   */
+  addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const configuration = this.configurationService.getConfigurationFileSync();
+
+    // Verify it not exists
+    const test = workspace.sessions.filter(sess => (sess.account as AwsPlainAccount).accountNumber === accountNumber);
+    if (!test || test.length === 0) {
+      // add new account
+      const account = {
+        accountId: accountNumber,
+        accountName,
+        accountNumber,
+        type: 'AWS_PLAIN_USER',
+        user
+      };
+
+      const session: Session = {
+        id: uuidv4(),
+        active: false,
+        loading: false,
+        lastStopDate: new Date().toISOString(),
+        account
+      };
+
+      this.keychainService.saveSecret('Leapp', accountName + user + '_accessKey', accessKey);
+      this.keychainService.saveSecret('Leapp', accountName + user + '_secretKey', secretKey);
+
+      workspace.sessions.push(session);
+      this.configurationService.updateWorkspaceSync(workspace);
+      return true;
+
+    } else {
+      this.appService.toast('Account Number Must be unique.', ToastLevel.WARN, 'Create Account');
+      return false;
+    }
+  }
+
+
+
+  /**
    * List all federated account in the workspace
    */
   listFederatedAccountInWorkSpace() {
@@ -93,4 +143,18 @@ export class FederatedAccountService extends NativeService {
 
   }
 
+  deleteFederatedPlainAccount(sessionId: string) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const index = workspace.sessions.findIndex(sess => sess.id === sessionId);
+    if (index !== -1) {
+      const session = workspace.sessions[index];
+      this.keychainService.deletePassword('Leapp', session.account.accountName + (session.account as AwsPlainAccount).user + '_accessKey');
+      this.keychainService.deletePassword('Leapp', session.account.accountName + (session.account as AwsPlainAccount).user + '_secretKey');
+      this.configurationService.updateWorkspaceSync(workspace);
+      return true;
+    } else {
+      return false;
+    }
+
+  }
 }

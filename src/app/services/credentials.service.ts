@@ -10,6 +10,9 @@ import {Session} from '../models/session';
 import {AccountType} from '../models/AccountType';
 import {AzureAccount} from '../models/azure-account';
 import {MenuService} from './menu.service';
+import {Workspace} from '../models/workspace';
+import {KeychainService} from '../services-system/keychain.service';
+import {AwsPlainAccount} from '../models/aws-plain-account';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +33,8 @@ export class CredentialsService extends NativeService {
     private executeService: ExecuteServiceService,
     private fileService: FileService,
     private appService: AppService,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private keychainService: KeychainService
   ) {
 
     super();
@@ -46,6 +50,7 @@ export class CredentialsService extends NativeService {
 
     const awsSession   = workspace.sessions.filter(sess => sess.account.type === 'AWS'   && sess.active)[0];
     const azureSession = workspace.sessions.filter(sess => sess.account.type === 'AZURE' && sess.active)[0];
+    const awsPlainSession  = workspace.sessions.filter(sess => sess.account.type === 'AWS_PLAIN_USER' && sess.active)[0];
 
     console.log('aws session', awsSession);
     console.log('azure session', azureSession);
@@ -53,9 +58,14 @@ export class CredentialsService extends NativeService {
     // Check if there are AWS sessions
     if ((isAws === true || isAws === null)) {
       if (awsSession) {
-        this.awsCredentialProcess(workspace, awsSession);
+          this.awsCredentialFederatedProcess(workspace, awsSession);
       } else {
-        this.cleanCredentialProcess(workspace, awsSession, AccountType.AWS);
+        if (awsPlainSession !== undefined) {
+          console.log('here');
+          this.awsCredentialProcess(workspace, awsPlainSession);
+        } else {
+          this.cleanCredentialProcess(workspace, awsSession, AccountType.AWS);
+        }
       }
     }
 
@@ -175,7 +185,7 @@ export class CredentialsService extends NativeService {
     });
   }
 
-  awsCredentialProcess(workspace, session) {
+  awsCredentialFederatedProcess(workspace, session) {
     // Check for Aws Credentials Process
     if (!workspace.idpUrl) {
       return 'workspace not set';
@@ -203,6 +213,14 @@ export class CredentialsService extends NativeService {
         this.processRefreshCredentials();
       }, 1000);
     }
+  }
+
+  private async awsCredentialProcess(workspace: Workspace, awsSession: Session) {
+    const accessKey = await this.keychainService.getSecret('Leapp', awsSession.account.accountName + (awsSession.account as AwsPlainAccount).user + '_accessKey');
+    console.log('access', accessKey);
+    const secretKey = await this.keychainService.getSecret('Leapp', awsSession.account.accountName + (awsSession.account as AwsPlainAccount).user + '_secretKey');
+    const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
+    this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
   }
 
   /**
@@ -250,4 +268,6 @@ export class CredentialsService extends NativeService {
     }
     this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
+
+
 }

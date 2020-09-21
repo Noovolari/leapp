@@ -54,6 +54,9 @@ export class CreateAccountComponent implements OnInit {
     federatedRole: new FormControl('', [Validators.required]),
     federatedAccount: new FormControl('', [Validators.required]),
     federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
+    plainUser: new FormControl('', [Validators.required]),
+    secretKey: new FormControl('', [Validators.required]),
+    accessKey: new FormControl('', [Validators.required])
   });
 
   /* Setup the first account for the application */

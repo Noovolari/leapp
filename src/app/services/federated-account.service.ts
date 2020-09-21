@@ -2,11 +2,13 @@ import {Injectable} from '@angular/core';
 import {NativeService} from '../services-system/native-service';
 import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {Session} from '../models/session';
 import {AppService, ToastLevel} from '../services-system/app.service';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {KeychainService} from '../services-system/keychain.service';
+import {AccountType} from '../models/AccountType';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +45,7 @@ export class FederatedAccountService extends NativeService {
         role,
         idpArn,
         idpUrl: configuration.federationUrl,
-        type: 'AWS',
+        type: AccountType.AWS,
         parent: undefined,
         parentRole: undefined
       };
@@ -58,7 +60,6 @@ export class FederatedAccountService extends NativeService {
 
       workspace.sessions.push(session);
       this.configurationService.updateWorkspaceSync(workspace);
-      console.log('2');
       return true;
 
     } else {
@@ -87,7 +88,7 @@ export class FederatedAccountService extends NativeService {
         accountId: accountNumber,
         accountName,
         accountNumber,
-        type: 'AWS_PLAIN_USER',
+        type: AccountType.AWS_PLAIN_USER,
         user
       };
 
@@ -99,8 +100,8 @@ export class FederatedAccountService extends NativeService {
         account
       };
 
-      this.keychainService.saveSecret('Leapp', accountName + user + '_accessKey', accessKey);
-      this.keychainService.saveSecret('Leapp', accountName + user + '_secretKey', secretKey);
+      this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(accountName, user), accessKey);
+      this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateSecretString(accountName, user), secretKey);
 
       workspace.sessions.push(session);
       this.configurationService.updateWorkspaceSync(workspace);
@@ -120,7 +121,7 @@ export class FederatedAccountService extends NativeService {
   listFederatedAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace && workspace.sessions && workspace.sessions.length > 0) {
-      return workspace.sessions.filter(sess => (sess.account.type === 'AWS' && sess.account.parent === undefined && sess.account.role.parent === undefined)).map(s => s.account);
+      return workspace.sessions.filter(sess => (sess.account.type === AccountType.AWS && sess.account.parent === undefined && sess.account.role.parent === undefined)).map(s => s.account);
     } else {
       return [];
     }
@@ -148,13 +149,18 @@ export class FederatedAccountService extends NativeService {
     const index = workspace.sessions.findIndex(sess => sess.id === sessionId);
     if (index !== -1) {
       const session = workspace.sessions[index];
-      this.keychainService.deletePassword('Leapp', session.account.accountName + (session.account as AwsPlainAccount).user + '_accessKey');
-      this.keychainService.deletePassword('Leapp', session.account.accountName + (session.account as AwsPlainAccount).user + '_secretKey');
-      this.configurationService.updateWorkspaceSync(workspace);
+      this.keychainService.deletePassword(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user));
+      this.keychainService.deletePassword(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
       return true;
     } else {
       return false;
     }
 
+  }
+
+  cleanKeychainIfNecessary(session: Session) {
+    if (session.account.type === AccountType.AWS_PLAIN_USER) {
+      this.deleteFederatedPlainAccount(session.id);
+    }
   }
 }

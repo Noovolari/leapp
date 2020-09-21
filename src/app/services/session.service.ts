@@ -3,11 +3,8 @@ import {NativeService} from '../services-system/native-service';
 import {AppService, LoggerLevel} from '../services-system/app.service';
 import {Session} from '../models/session';
 import {ConfigurationService} from '../services-system/configuration.service';
-import {Account} from '../models/account';
-import {AzureAccountService} from './azure-account.service';
 import {FederatedAccountService} from './federated-account.service';
-import {TrusterAccountService} from './truster-account.service';
-import { v4 as uuidv4 } from 'uuid';
+import {AccountType} from '../models/AccountType';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +13,7 @@ export class SessionService extends NativeService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   constructor(
     private appService: AppService,
-    private configurationService: ConfigurationService,
-    private federatedAccountService: FederatedAccountService
+    private configurationService: ConfigurationService
   ) { super(); }
 
 
@@ -29,9 +25,6 @@ export class SessionService extends NativeService {
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.sessions.filter(ses =>  ses.id !== session.id) || [];
-    if (session.account.type === 'AWS_PLAIN_USER') {
-      this.federatedAccountService.deleteFederatedPlainAccount(session.id);
-    }
     workspace.sessions = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
     return false;

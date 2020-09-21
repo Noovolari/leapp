@@ -9,13 +9,13 @@
         <label>Choose your account type<span class="danger-text">*</span></label>
         <br>
         <div class="correct-top">
-        <button type="button" class="providers" (click)="setAccountType(eAccountType.AWS);"><img src="assets/images/aws-logo.svg" height="20"></button>
-        <button type="button" class="providers" (click)="setAccountType(eAccountType.AZURE);"><img src="assets/images/azure-logo.svg" height="20"></button>
+        <button type="button" class="providers" (click)="setProvider(eAccountType.AWS);"><img src="assets/images/aws-logo.svg" height="20"></button>
+        <button type="button" class="providers" (click)="setProvider(eAccountType.AZURE);"><img src="assets/images/azure-logo.svg" height="20"></button>
         </div>
       </div>
     </ng-container>
 
-    <ng-container *ngIf="firstTime && accountType === eAccountType.AWS && !ssoInserted">
+    <ng-container *ngIf="firstTime && provider === eAccountType.AWS && !ssoInserted && providerSelected">
       <h1>Prima di cominciare</h1>
       <p>Collega subito il tuo primo account e comincia ad immergerti nel tuo lavoro.</p>
 
@@ -34,22 +34,22 @@
       <button type="button" class="pull-center" (click)="ssoInserted = true">Inizia Subito</button>
     </ng-container>
 
-    <ng-container *ngIf="(providerSelected && accountType === eAccountType.AZURE) || (providerSelected && ssoInserted && accountType === eAccountType.AWS)">
+    <ng-container *ngIf="(providerSelected && accountType === eAccountType.AZURE) || (providerSelected && ssoInserted && (accountType !== eAccountType.AZURE))">
       <h1>Crea il tuo Account!</h1>
       <p class="smaller">Figata. Ci siamo quasi. Inizia subito a lavorare. Crea il tuo account.</p>
 
-      <ng-container *ngIf="accountType === eAccountType.AWS">
+      <ng-container *ngIf="accountType !== eAccountType.AZURE">
         <div class="form-group" style="width: 100%; display: inline-block;">
           <label>Seleziona la tipologia di Account</label>
           <br>
           <div class="correct-top-second-step">
-            <button type="button" class="providers {{selectedType === 'federated' ? 'selected' : ''}}" (click)="selectedType = 'federated'">
+            <button type="button" class="providers {{accountType === eAccountType.AWS ? 'selected' : ''}}" (click)="accountType = eAccountType.AWS;">
               <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated
             </button>
-            <button type="button" class="providers {{selectedType === 'plain' ? 'selected' : ''}}" (click)="selectedType = 'plain'">
+            <button type="button" class="providers {{accountType === eAccountType.AWS_PLAIN_USER ? 'selected' : ''}}" (click)="accountType = eAccountType.AWS_PLAIN_USER;">
               <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Plain
             </button>
-            <button type="button" class="providers {{selectedType === 'truster' ? 'selected' : ''}}" (click)="selectedType = 'truster'" *ngIf="!firstTime">
+            <button type="button" class="providers {{accountType === eAccountType.AWS_TRUSTER ? 'selected' : ''}}" (click)="accountType = eAccountType.AWS_TRUSTER;" *ngIf="!firstTime">
               <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
             </button>
             <span class="providers disabled second-step-fix" *ngIf="firstTime">
@@ -66,7 +66,7 @@
         <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
       </div>
 
-      <ng-container *ngIf="accountType === eAccountType.AWS">
+      <ng-container *ngIf="accountType !== eAccountType.AZURE">
         <!-- ====================== -->
         <!-- AWS ACCOUNT PROPERTIES -->
         <!-- ====================== -->
@@ -76,19 +76,13 @@
           <small class="text-error" *ngIf="(form.controls['accountNumber'].dirty || form.controls['accountNumber'].touched) && form.controls['accountNumber'].errors">Insert the Account Number</small>
         </div>
 
-        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="selectedType != 'plain'">
+        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="accountType !== eAccountType.AWS_PLAIN_USER">
           <label>Role<span class="danger-text">*</span></label>
           <input formControlName="role" type="text" class="form-control" placeholder="Role name" />
           <small class="text-error" *ngIf="(form.controls['role'].dirty || form.controls['role'].touched) && form.controls['role'].errors">Insert the Role</small>
         </div>
 
-        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="selectedType == 'plain'">
-          <label>User<span class="danger-text">*</span></label>
-          <input formControlName="plainUser" type="text" class="form-control" placeholder="User name" />
-          <small class="text-error" *ngIf="(form.controls['plainUser'].dirty || form.controls['plainUser'].touched) && form.controls['plainUser'].errors">Insert the User</small>
-        </div>
-
-        <ng-container *ngIf="selectedType == 'federated'">
+        <ng-container *ngIf="accountType === eAccountType.AWS">
           <h2>Federated setting</h2>
           <div class="form-group" style="width: 100%; display: inline-block;">
             <label>IdP ARN<span class="danger-text">*</span></label>
@@ -97,7 +91,13 @@
           </div>
         </ng-container>
 
-        <ng-container *ngIf="selectedType == 'plain'">
+        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="accountType === eAccountType.AWS_PLAIN_USER">
+          <label>User<span class="danger-text">*</span></label>
+          <input formControlName="plainUser" type="text" class="form-control" placeholder="User name" />
+          <small class="text-error" *ngIf="(form.controls['plainUser'].dirty || form.controls['plainUser'].touched) && form.controls['plainUser'].errors">Insert the User</small>
+        </div>
+
+        <ng-container *ngIf="accountType === eAccountType.AWS_PLAIN_USER">
           <h2>Add secret</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Access  Key<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="Add access key"></i></label>
@@ -113,7 +113,7 @@
 
         </ng-container>
 
-        <ng-container *ngIf="selectedType == 'truster'">
+        <ng-container *ngIf="accountType === eAccountType.AWS_TRUSTER">
           <h2>Truster setting</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Federated Account<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
@@ -148,7 +148,7 @@
       </ng-container>
 
       <a class="back-link pull-left" (click)="goBack();"><i class="fas fa-arrow-left"></i></a>
-      <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="selectedType">Save</button>
+      <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="accountType">Save</button>
     </ng-container>
 
   </form>

@@ -1,4 +1,6 @@
+import {AccountType} from './AccountType';
+
 export interface Account {
   accountName: string;
-  type: string;
+  type: AccountType;
 }

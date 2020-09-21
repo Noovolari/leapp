@@ -17,7 +17,6 @@ export class ProviderManagerService {
   form;
   accountType;
   accountId;
-  selectedType;
   selectedAccount;
   selectedRole;
 
@@ -67,13 +66,12 @@ export class ProviderManagerService {
    * @param selectedType - the type of AWS account, if any, that you have selected
    * @param form - the form to use
    */
-  saveFirstAccount(accountId, accountType, selectedAccount, selectedRole, selectedType, form) {
+  saveFirstAccount(accountId, accountType, selectedAccount, selectedRole, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
     this.accountId = accountId;
     this.accountType = accountType;
-    this.selectedType = selectedType;
     this.selectedAccount = selectedAccount;
     this.selectedRole = selectedRole;
     this.form = form;
@@ -82,22 +80,22 @@ export class ProviderManagerService {
     // Now we get the default configuration to obtain the previously saved idp url
     const configuration = this.configurationService.getConfigurationFileSync();
 
+    // Set our response type
+    const responseType = IdpResponseType.SAML;
+
     // Update Configuration
     if (accountType === AccountType.AWS) {
       configuration.federationUrl = form.value.federationUrl;
       this.configurationService.updateConfigurationFileSync(configuration);
 
-      // Set our response type
-      const responseType = IdpResponseType.SAML;
-
       // When the token is received save it and go to the setup page for the first account
-      const sub = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, configuration.federationUrl, responseType)));
+      this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, configuration.federationUrl, responseType)));
 
       // Call the service for working on the first login event to the user idp
       // We add the helper for account choosing just to be sure to give the possibility to call the correct user
       this.workspaceService.getIdpTokenInSetup(form.value.federationUrl, responseType);
     } else {
-      this.decideSavingMethodAndSave();
+      this.createNewWorkspace(undefined, configuration.federationUrl, responseType);
     }
   }
 
@@ -110,13 +108,12 @@ export class ProviderManagerService {
    * @param selectedType - the type of AWS account, if any, that you have selected
    * @param form - the form to use
    */
-  saveAccount(accountId, accountType, selectedAccount, selectedRole, selectedType, form) {
+  saveAccount(accountId, accountType, selectedAccount, selectedRole, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
     this.accountId = accountId;
     this.accountType = accountType;
-    this.selectedType = selectedType;
     this.selectedAccount = selectedAccount;
     this.selectedRole = selectedRole;
     this.form = form;
@@ -140,19 +137,19 @@ export class ProviderManagerService {
 
   decideSavingMethodAndSave() {
     let result = true;
-    if (this.accountType === AccountType.AWS) {
-      switch (this.selectedType) {
-        case('federated'):
-          result = this.saveAwsFederatedAccount();
-          break;
-        case('plain'):
-          result = this.savePlainCredentials();
-          break;
-        case('truster'):
-          result = this.saveAwsTrusterAccount();
-      }
-    } else {
-      result = this.saveAzureAccount();
+    switch (this.accountType) {
+      case AccountType.AWS:
+        result = this.saveAwsFederatedAccount();
+        break;
+      case AccountType.AWS_TRUSTER:
+        result = this.saveAwsTrusterAccount();
+        break;
+      case AccountType.AWS_PLAIN_USER:
+        result = this.savePlainCredentials();
+        break;
+      case AccountType.AZURE:
+        result = this.saveAzureAccount();
+        break;
     }
 
     if (result) {
@@ -165,7 +162,7 @@ export class ProviderManagerService {
    * Save azure account
    */
   saveAzureAccount() {
-    if (this.formValid(this.form, this.accountType, this.selectedType)) {
+    if (this.formValid(this.form, this.accountType)) {
       try {
         const created = this.azureAccountService.addAzureAccountToWorkSpace(
           this.form.value.subscriptionId,
@@ -187,7 +184,7 @@ export class ProviderManagerService {
    * This will be removed after created the correct file also in normal mode
    */
   saveAwsTrusterAccount() {
-    if (this.formValid(this.form, this.accountType, this.selectedType)) {
+    if (this.formValid(this.form, this.accountType)) {
       try {
         // Try to create the truster account
         const created = this.trusterAccountService.addTrusterAccountToWorkSpace(
@@ -210,7 +207,7 @@ export class ProviderManagerService {
   }
 
   saveAwsFederatedAccount() {
-    if (this.formValid(this.form, this.accountType, this.selectedType)) {
+    if (this.formValid(this.form, this.accountType)) {
       try {
         // Add a federation Account to the workspace
         const created = this.federatedAccountService.addFederatedAccountToWorkSpace(
@@ -245,16 +242,16 @@ export class ProviderManagerService {
    * In the future we will put this in a service to create validation factory:
    * this way depending on new accounts we jkust need to pass the form object to the validator
    */
-  formValid(form, accountType, selectedType) {
+  formValid(form, accountType) {
 
     // First check the type of account we are creating
-    if (accountType === AccountType.AWS) {
+    if (accountType !== AccountType.AZURE) {
       // Get the workspace
       const workspace = this.configurationService.getDefaultWorkspaceSync();
 
       // We are in AWS check if we are saving a Federated or a Truster
-      switch (selectedType) {
-        case 'federated':
+      switch (accountType) {
+        case AccountType.AWS:
           // Check Federated fields
           return form.controls['name'].valid &&
             (form.controls['federationUrl'].valid || workspace.idpUrl) &&
@@ -262,7 +259,7 @@ export class ProviderManagerService {
             form.controls['role'].valid &&
             form.controls['idpArn'].valid;
 
-        case 'truster':
+        case AccountType.AWS_TRUSTER:
           // Check Federated fields
           return form.controls['name'].valid &&
             (form.controls['federationUrl'].valid || workspace.idpUrl) &&
@@ -270,7 +267,7 @@ export class ProviderManagerService {
             form.controls['role'].valid &&
             form.controls['federatedAccount'].valid &&
             form.controls['federatedRole'].valid;
-        case 'plain':
+        case AccountType.AWS_PLAIN_USER:
           return form.controls['name'].valid &&
             (form.controls['federationUrl'].valid || workspace.idpUrl) &&
             form.controls['accountNumber'].valid &&

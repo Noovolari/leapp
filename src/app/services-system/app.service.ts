@@ -8,6 +8,8 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {SessionService} from '../services/session.service';
 import {CredentialsService} from '../services/credentials.service';
+import {Workspace} from '../models/workspace';
+import {Session} from '../models/session';
 
 @Injectable({
   providedIn: 'root'
@@ -384,13 +386,42 @@ export class AppService extends NativeService {
    */
   isAzure(s) { return s.account.subscriptionId !== null && s.account.subscriptionId !== undefined; }
 
-
+  /**
+   * Generate Secret String for keychain
+   * @param accountName - account ame we want to use
+   * @param user - the user we want to use
+   */
   keychainGenerateSecretString(accountName, user) {
     return `${accountName}___${user}___secretKey`;
   }
+
+  /**
+   * Generate Access String for keychain
+   * @param accountName - account ame we want to use
+   * @param user - the user we want to use
+   */
   keychainGenerateAccessString(accountName, user) {
     return `${accountName}___${user}___accessKey`;
   }
+
+  /**
+   * Set the hook email based on response type
+   * Now is not used but it can be very useful and we
+   * want to leave it as a possible helper function
+   * @param token - the token retrieved from google
+   * @return email - string - the email object
+   */
+  setHookEmail(token) {
+
+    const samlData = atob(token);
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(samlData, 'text/xml');
+    const email = xmlDoc.getElementsByTagName('saml2p:Response')[0].getElementsByTagName('saml2:Assertion')[0].getElementsByTagName('saml2:Subject')[0].getElementsByTagName('saml2:NameID')[0].childNodes[0].nodeValue;
+    localStorage.setItem('hook_email', email);
+
+    return email;
+  }
+
 }
 
 /*

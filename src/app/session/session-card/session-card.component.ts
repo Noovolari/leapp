@@ -82,6 +82,7 @@ export class SessionCardComponent implements OnInit {
     // automatically check if there is an active session and get session list again
     this.credentialsService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
 
+    // Redraw the list
     this.sessionsChanged.emit('');
     this.menuService.redrawList.emit(true);
   }

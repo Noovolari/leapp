@@ -7,6 +7,7 @@ import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
 import {Observable, of} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
+import {Session} from '../models/session';
 // Import AWS node style
 const AWS = require('aws-sdk');
 
@@ -93,7 +94,7 @@ export class WorkspaceService extends NativeService {
         }
       }
 
-      // Sometimes it can arrive here (tested) so the REAL way to block everiything no is use the credential emit element!!!
+      // Sometimes it can arrive here (tested) so the REAL way to block everything is to use the credential emit element!!!
       this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
       throw new Error(err);
     });
@@ -126,18 +127,6 @@ export class WorkspaceService extends NativeService {
     }, () => {
       this.idpWindow.loadURL(idpUrl);
     });
-  }
-
-  refreshSessionUpdateToBackend(accountName: string) {
-    return of(null);
-  }
-
-  /**
-   * Send and update on the session status to our backend
-   * @param accountName - the account name to update
-   */
-  sendSessionUpdateToBackend(accountName: string) {
-    this.refreshSessionUpdateToBackend(accountName).subscribe();
   }
 
   /**
@@ -193,11 +182,6 @@ export class WorkspaceService extends NativeService {
     // Extract the token from the request and set the email for the screen
     const token = this.extract_SAML_Response(details);
 
-    console.log(token);
-
-    // Set the hook email
-    this.setHookEmail(token, type);
-
     // Before doing anything we also need to authenticate VERSUS Cognito to our backend
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     workspace.type = type;
@@ -231,14 +215,10 @@ export class WorkspaceService extends NativeService {
     // Extract the token from the request and set the email for the screen
     const token = this.extract_SAML_Response(details);
 
-    // Set the hook email
-    this.setHookEmail(token, type);
-
     // Close Idp Window and emit a specific event for the page that subscribe
     // to this specific reduced version of the get credentials method
     this.googleEmit.emit(token);
     this.idpWindow.close();
-
 
     // Close the window we don't need it anymore because otherwise
     if (callback) {
@@ -250,21 +230,6 @@ export class WorkspaceService extends NativeService {
   /* =======< RESPONSE EXTRACTORS >======== */
   /* ====================================== */
 
-
-  // TODO: to delete
-  /**
-   * Set the hook email based on response type
-   */
-  setHookEmail(token, type) {
-
-    const samlData = atob(token);
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(samlData, 'text/xml');
-    const email = xmlDoc.getElementsByTagName('saml2p:Response')[0].getElementsByTagName('saml2:Assertion')[0].getElementsByTagName('saml2:Subject')[0].getElementsByTagName('saml2:NameID')[0].childNodes[0].nodeValue;
-    localStorage.setItem('hook_email', email);
-    this.emailEmit.emit(email);
-  }
-
   /**
    * Extract the saml response from the request detail this will be part of a more structured
    * data retrieve method in order to define different possible retrieval method based on
@@ -274,9 +239,6 @@ export class WorkspaceService extends NativeService {
    */
   extract_SAML_Response(requestDetails: any) {
     const rawData = requestDetails.uploadData[0].bytes.toString('utf8');
-
-    console.log();
-
     const n  = rawData.lastIndexOf('SAMLResponse=');
     const n2 = rawData.lastIndexOf('&RelayState=');
     return decodeURIComponent(rawData.substring(n + 13, n2));
@@ -313,15 +275,11 @@ export class WorkspaceService extends NativeService {
     if (selectedAccount.parent) {
       const parentAccountNumber = selectedAccount.parent;
       parentAccount = workspace.sessions.filter(sess => parentAccountNumber === (sess.account as AwsAccount).accountNumber)[0].account;
-      console.log('Parent Account', parentAccount);
       parentRole = parentAccount.role;
     }
 
     const idpArn = parentAccount ? parentAccount.idpArn : selectedAccount.idpArn;
-
     const federatedRoleArn = `arn:aws:iam::${parentAccount ? parentAccount.accountNumber : selectedAccount.accountNumber}:role/${parentRole ? parentRole.name : roleName}`;
-
-    console.log('Federated RoleArn', federatedRoleArn);
 
     // Params for the calls
     const params = {
@@ -335,7 +293,7 @@ export class WorkspaceService extends NativeService {
     sts.assumeRoleWithSAML(params, (err, data: any) => {
       if (!err) {
         // Save credentials as default in .aws/credentials and in the workspace as default ones
-        this.saveCredentialsInFileAndDefaultWorkspace(data, workspace, parentAccount !== undefined, selectedAccount, roleName);
+        this.saveCredentialsInFileAndDefaultWorkspace(data, workspace, session, parentAccount !== undefined, selectedAccount, roleName);
 
         // If we have a callback call it
         if (callback) {
@@ -366,7 +324,7 @@ export class WorkspaceService extends NativeService {
    * @param account - the account of the requester
    * @param roleName - the role name of the requester
    */
-  saveCredentialsInFileAndDefaultWorkspace(stsResponse: any, workspace: Workspace, isDoubleJump, account, roleName) {
+  saveCredentialsInFileAndDefaultWorkspace(stsResponse: any, workspace: Workspace, session: Session, isDoubleJump, account, roleName) {
     // Construct the credential object
     try {
       // Construct actual credentials
@@ -410,13 +368,13 @@ export class WorkspaceService extends NativeService {
             const credentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.accountNumber);
             workspace.awsCredentials = credentials;
             this.configurationService.updateWorkspaceSync(workspace);
-
+            this.configurationService.disableLoadingWhenReady(workspace, session);
             // Emit ok for double jump
             this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
           }
         });
       } else {
-
+        this.configurationService.disableLoadingWhenReady(workspace, session);
         // Emit ok for single jump
         this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
       }

@@ -162,6 +162,7 @@ export class CredentialsService extends NativeService {
       workspace.azureProfile = this.configurationService.getAzureProfileSync();
       workspace.azureConfig = this.configurationService.getAzureConfigSync();
       this.configurationService.updateWorkspaceSync(workspace);
+      this.configurationService.disableLoadingWhenReady(workspace, session);
 
       // Start Calculating time here once credentials are actually retrieved
       this.startTime = new Date();
@@ -251,8 +252,6 @@ export class CredentialsService extends NativeService {
     if (res.status === 'ok') {
       this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');
       this.refreshReturnStatusEmit.emit(true);
-      // Set start update to monitoring backend
-      this.workspaceService.sendSessionUpdateToBackend(res.accountName);
     } else {
       this.appService.toast('There was a problem in generating credentials..', ToastLevel.WARN, 'Credentials');
       this.refreshReturnStatusEmit.emit(false);
@@ -274,6 +273,7 @@ export class CredentialsService extends NativeService {
     }
     this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
+
 
 
 }

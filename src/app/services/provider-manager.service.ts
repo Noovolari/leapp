@@ -8,7 +8,6 @@ import {FederatedAccountService} from './federated-account.service';
 import {TrusterAccountService} from './truster-account.service';
 import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
-import {KeychainService} from '../services-system/keychain.service';
 
 @Injectable({
   providedIn: 'root'
@@ -48,11 +47,16 @@ export class ProviderManagerService {
     const account = accounts.filter(acc => (acc.accountId === selectedAccount))[0];
 
     if (account !== undefined && account !== null) {
-
-      // The federated roles we have obtained from the filter
-      const federatedRole = account.role;
-      // Set the federated role automatically
-      return { federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name };
+      if (account.type === AccountType.AWS) {
+        // The federated roles we have obtained from the filter
+        const federatedRole = account.role;
+        // Set the federated role automatically
+        return { federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name };
+      } else if (account.type === AccountType.AWS_PLAIN_USER) {
+        return { federatedRole: { name: 'no need' }, selectedAccountNumber: account.accountNumber, selectedrole: 'no need' };
+      } else {
+        return { federatedRole: null, selectedAccountNumber: null, selectedrole: null };
+      }
     }
     return { federatedRole: null, selectedAccountNumber: null, selectedrole: null };
   }
@@ -297,6 +301,14 @@ export class ProviderManagerService {
 
   getFederatedAccounts() {
     return this.federatedAccountService.listFederatedAccountInWorkSpace();
+  }
+
+  getPlainAccounts() {
+    return this.federatedAccountService.listPlainAccountsInWorkspace();
+  }
+
+  getFederatedAndPlainAccounts() {
+    return this.getFederatedAccounts().concat(this.getPlainAccounts());
   }
 }
 

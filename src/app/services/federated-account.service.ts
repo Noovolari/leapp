@@ -127,6 +127,15 @@ export class FederatedAccountService extends NativeService {
     }
   }
 
+  listPlainAccountsInWorkspace() {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    if (workspace && workspace.sessions && workspace.sessions.length > 0) {
+      return workspace.sessions.filter(sess => (sess.account.type === AccountType.AWS_PLAIN_USER)).map(s => s.account);
+    } else {
+      return [];
+    }
+  }
+
   /**
    * Delete a federated account
    * @param sessionId - account number of the account to delete

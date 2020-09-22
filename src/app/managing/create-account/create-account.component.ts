@@ -78,7 +78,7 @@ export class CreateAccountComponent implements OnInit {
 
       // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
-      this.accounts = this.providerManagerService.getFederatedAccounts();
+      this.accounts = this.providerManagerService.getFederatedAndPlainAccounts();
 
       // Add parameters to check what to do with form data
       this.ssoInserted = (this.workspace.idpUrl !== undefined && this.workspace.idpUrl !== null);

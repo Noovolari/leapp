@@ -10,8 +10,6 @@ import {Session} from '../models/session';
 import {AccountType} from '../models/AccountType';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {AwsAccount} from '../models/aws-account';
-import {AzureAccount} from '../models/azure-account';
-
 
 @Injectable({
   providedIn: 'root'

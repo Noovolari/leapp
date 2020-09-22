@@ -8,6 +8,7 @@ import {AppService, LoggerLevel, ToastLevel} from './app.service';
 import {Workspace} from '../models/workspace';
 import {Configuration} from '../models/configuration';
 import {_} from '../core/translation-marker';
+import {Session} from '../models/session';
 
 
 @Injectable({
@@ -248,6 +249,15 @@ export class ConfigurationService extends NativeService {
     } catch (err) {
       this.appService.toast(_(`Leapp has an error re-creating your configuration file and cache.`), ToastLevel.ERROR, _('Cleaning configuration file'));
     }
+  }
+
+  public disableLoadingWhenReady(workspace: Workspace, session: Session) {
+    workspace.sessions.forEach(sess => {
+      if (sess.id === session.id) {
+        sess.loading = false;
+      }
+    });
+    this.updateWorkspaceSync(workspace);
   }
 
   // ============================================================ //

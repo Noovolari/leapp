@@ -14,8 +14,8 @@
     </div>
   </ng-container>
 
-  <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}"></i>
-
+  <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
+  <i class="status-item far fa-spinner-third" *ngIf="session.loading"></i>
 </div>
 
 

@@ -3,8 +3,6 @@ import {NativeService} from '../services-system/native-service';
 import {AppService, LoggerLevel} from '../services-system/app.service';
 import {Session} from '../models/session';
 import {ConfigurationService} from '../services-system/configuration.service';
-import {FederatedAccountService} from './federated-account.service';
-import {AccountType} from '../models/AccountType';
 
 @Injectable({
   providedIn: 'root'
@@ -59,15 +57,18 @@ export class SessionService extends NativeService {
       sessions.map(sess => {
         if (sess.active && this.appService.isAzure(sess) && this.appService.isAzure(session)) {
           sess.active = false;
+          sess.loading = false;
         }
         if (sess.active && !this.appService.isAzure(sess) && !this.appService.isAzure(session)) {
           sess.active = false;
+          sess.loading = false;
         }
       });
       // Set active only the selected one
       sessions.map(sess => {
         if (sess.id === session.id) {
           sess.active = true;
+          sess.loading = true;
         }
       });
       // Refresh the session list with the new values
@@ -91,6 +92,7 @@ export class SessionService extends NativeService {
     sessions.map(sess => {
       if (session === null || session.id === sess.id) {
         sess.active = false;
+        sess.loading = false;
       }
     });
     workspace.sessions = sessions;

@@ -7,6 +7,11 @@ import {AppService, LoggerLevel} from '../services-system/app.service';
 import {SessionService} from './session.service';
 import {CredentialsService} from './credentials.service';
 import {Session} from '../models/session';
+import {AccountType} from '../models/AccountType';
+import {AwsPlainAccount} from '../models/aws-plain-account';
+import {AwsAccount} from '../models/aws-account';
+import {AzureAccount} from '../models/azure-account';
+
 
 @Injectable({
   providedIn: 'root'
@@ -42,8 +47,28 @@ export class MenuService extends NativeService {
 
     let voices = [];
     this.sessionService.listSessions().slice(0, 5).forEach((session: Session) => {
+      let icon = '';
+      let label = '';
+      switch (session.account.type) {
+        case AccountType.AWS_PLAIN_USER:
+          icon = session.active ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
+          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsPlainAccount).user;
+          break;
+        case AccountType.AWS:
+        case AccountType.AWS_TRUSTER:
+          icon = session.active ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
+          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsAccount).role.name;
+          break;
+
+        case AccountType.AZURE:
+          icon = session.active ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
+          label = '  ' + session.account.accountName;
+      }
       voices.push(
-        { label: session.account.accountName + ' - ' + (session.active ? 'active' : 'not active'), type: 'normal', click: (menuItem, browserWindow, event) => {
+        { label,
+          type: 'normal',
+          icon,
+          click: (menuItem, browserWindow, event) => {
             if (!session.active) {
               this.sessionService.startSession(session);
               this.credentialService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));

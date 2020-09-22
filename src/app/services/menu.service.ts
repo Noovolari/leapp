@@ -21,7 +21,6 @@ export class MenuService extends NativeService {
   // Used to define the only tray we want as active expecially in linux context
   currentTray;
 
-  public redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   constructor(
     private workspaceService: WorkspaceService,
@@ -33,7 +32,7 @@ export class MenuService extends NativeService {
 
     super();
 
-    this.redrawList.subscribe(res => {
+    this.appService.redrawList.subscribe(res => {
       this.generateMenu();
     });
   }
@@ -77,7 +76,7 @@ export class MenuService extends NativeService {
               this.credentialService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
               this.sessionService.stopSession(session);
             }
-            this.redrawList.emit(true);
+            this.appService.redrawList.emit(true);
             this.currentTray.destroy();
             this.generateMenu();
 

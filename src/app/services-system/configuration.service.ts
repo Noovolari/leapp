@@ -258,6 +258,7 @@ export class ConfigurationService extends NativeService {
       }
     });
     this.updateWorkspaceSync(workspace);
+    this.appService.redrawList.emit();
   }
 
   // ============================================================ //

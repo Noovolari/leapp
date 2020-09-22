@@ -18,7 +18,7 @@ export class AppService extends NativeService {
 
   isResuming: EventEmitter<boolean> = new EventEmitter<boolean>();
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
-  avatarSelected: EventEmitter<{havePortrait: boolean, portrait: string}> = new EventEmitter<{havePortrait: boolean, portrait: string}>();
+  redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /* This service is defined to provide different app wide methods as utilities */
   constructor(

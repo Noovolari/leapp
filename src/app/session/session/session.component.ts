@@ -2,7 +2,7 @@ import {Component, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
+import {AppService} from '../../services-system/app.service';
 import {HttpClient} from '@angular/common/http';
 import {Session} from '../../models/session';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
@@ -11,10 +11,6 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
-import {AzureAccountService} from '../../services/azure-account.service';
-import {FederatedAccountService} from '../../services/federated-account.service';
-import {TrusterAccountService} from '../../services/truster-account.service';
-import {MenuService} from '../../services/menu.service';
 
 @Component({
   selector: 'app-session',
@@ -27,20 +23,15 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   activeSessions: Session[] = [];
   notActiveSessions: Session[] = [];
 
-  // Modal Reference and data
-  modalRef: BsModalRef;
-
   // Data for the select
   modalAccounts = [];
   modalRoles = [];
   currentSelectedColor;
   currentSelectedAccountNumber;
-  currentSelectedRole;
 
   // Ssm instances
   ssmloading = true;
   selectedSsmRegion;
-  openSsm = false;
   ssmRegions = [];
   instances = [];
 
@@ -60,11 +51,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private ssmService: SsmService,
     private fileService: FileService,
     private credentialsService: CredentialsService,
-    private sessionService: SessionService,
-    private azureAccountService: AzureAccountService,
-    private fedAccountService: FederatedAccountService,
-    private trusterAccountService: TrusterAccountService,
-    private menuService: MenuService
+    private sessionService: SessionService
   ) { super(); }
 
   ngOnInit() {
@@ -88,7 +75,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       }
     });
 
-    this.menuService.redrawList.subscribe(r => {
+    this.appService.redrawList.subscribe(r => {
+      console.log('redraw list');
       this.getSessions();
     });
   }
@@ -116,6 +104,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    */
   getSessions() {
     this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
+    console.log('active sessions', this.activeSessions);
     this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
   }
 

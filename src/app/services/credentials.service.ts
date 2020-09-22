@@ -33,7 +33,6 @@ export class CredentialsService extends NativeService {
     private executeService: ExecuteServiceService,
     private fileService: FileService,
     private appService: AppService,
-    private menuService: MenuService,
     private keychainService: KeychainService
   ) {
 
@@ -188,7 +187,7 @@ export class CredentialsService extends NativeService {
       });
       this.configurationService.updateWorkspaceSync(workspace);
       this.refreshReturnStatusEmit.emit(false);
-      this.menuService.redrawList.emit();
+      this.appService.redrawList.emit();
       this.appService.toast('Can\'t refresh Credentials.', ToastLevel.WARN, 'Credentials');
     });
   }
@@ -228,6 +227,7 @@ export class CredentialsService extends NativeService {
     const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(awsSession.account.accountName, (awsSession.account as AwsPlainAccount).user));
     const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
     this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
+    this.configurationService.disableLoadingWhenReady(workspace, awsSession);
   }
 
   /**

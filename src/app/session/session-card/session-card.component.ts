@@ -84,7 +84,7 @@ export class SessionCardComponent implements OnInit {
 
     // Redraw the list
     this.sessionsChanged.emit('');
-    this.menuService.redrawList.emit(true);
+    this.appService.redrawList.emit(true);
   }
 
   /**
@@ -98,7 +98,7 @@ export class SessionCardComponent implements OnInit {
     // automatically check if there is an active session or stop it
     this.credentialsService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
     this.sessionsChanged.emit('');
-    this.menuService.redrawList.emit(true);
+    this.appService.redrawList.emit(true);
   }
 
 
@@ -107,7 +107,7 @@ export class SessionCardComponent implements OnInit {
       this.federatedAccountService.cleanKeychainIfNecessary(session);
       this.sessionService.removeSession(session);
       this.sessionsChanged.emit('');
-      this.menuService.redrawList.emit(true);
+      this.appService.redrawList.emit(true);
     });
   }
 

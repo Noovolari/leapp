@@ -328,9 +328,10 @@ export class WorkspaceService extends NativeService {
    */
   saveCredentialsInFileAndDefaultWorkspace(stsResponse: any, workspace: Workspace, session: Session, isDoubleJump, account, roleName) {
     // Construct the credential object
+    let credentials;
     try {
       // Construct actual credentials
-      const credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.accountNumber);
+      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.accountNumber);
 
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
@@ -348,10 +349,11 @@ export class WorkspaceService extends NativeService {
     try {
       if (isDoubleJump) {
         // Make second jump: credentials are the first one now
+        console.log('credentials before dj', credentials);
         AWS.config.update({
-          sessionToken: workspace.awsCredentials.default.aws_session_token,
-          accessKeyId: workspace.awsCredentials.default.aws_access_key_id,
-          secretAccessKey: workspace.awsCredentials.default.aws_secret_access_key
+          sessionToken: credentials.default.aws_session_token,
+          accessKeyId: credentials.default.aws_access_key_id,
+          secretAccessKey: credentials.default.aws_secret_access_key
         });
 
         const sts = new AWS.STS();
@@ -369,9 +371,9 @@ export class WorkspaceService extends NativeService {
           } else {
 
             // we set the new credentials after the first jump
-            const credentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.accountNumber);
+            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.accountNumber);
 
-            this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
+            this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
             this.configurationService.updateWorkspaceSync(workspace);
             this.configurationService.disableLoadingWhenReady(workspace, session);

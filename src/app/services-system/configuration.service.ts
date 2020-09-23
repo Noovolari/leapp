@@ -49,20 +49,8 @@ export class ConfigurationService extends NativeService {
     if (index !== -1) {
       // If the workspace is found change it
       configuration.workspaces[index] = workspace;
-
-      // If this workspace is also the default one we need to re-write the credential file default profile
-      if (configuration.defaultWorkspace === workspace.name) {
-        try {
-          if (workspace.awsCredentials !== null && workspace.awsCredentials !== undefined) {
-            this.fileService.iniWriteSync(this.appService.awsCredentialPath(), workspace.awsCredentials);
-          }
-        } catch (error) {
-          throw error;
-        }
-
-        // Everything ok so far so we can update the configuration file with the updated workspace
-        this.updateConfigurationFileSync(configuration);
-      }
+      // Everything ok so far so we can update the configuration file with the updated workspace
+      this.updateConfigurationFileSync(configuration);
     } else {
       // Add it: is a new one for some reason, then relaunch the command
       configuration.workspaces.push(workspace);

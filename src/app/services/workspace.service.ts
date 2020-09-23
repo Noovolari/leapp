@@ -8,6 +8,7 @@ import {Workspace} from '../models/workspace';
 import {Observable, of} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
+import {FileService} from '../services-system/file.service';
 // Import AWS node style
 const AWS = require('aws-sdk');
 
@@ -47,7 +48,8 @@ export class WorkspaceService extends NativeService {
   constructor(
     private httpClient: HttpClient,
     private appService: AppService,
-    private configurationService: ConfigurationService
+    private configurationService: ConfigurationService,
+    private fileService: FileService
   ) {
     super();
   }
@@ -328,7 +330,9 @@ export class WorkspaceService extends NativeService {
     // Construct the credential object
     try {
       // Construct actual credentials
-      workspace.awsCredentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.accountNumber);
+      const credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.accountNumber);
+
+      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
       // Save the federated one
       this.configurationService.updateWorkspaceSync(workspace);
@@ -366,7 +370,9 @@ export class WorkspaceService extends NativeService {
 
             // we set the new credentials after the first jump
             const credentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.accountNumber);
-            workspace.awsCredentials = credentials;
+
+            this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
+
             this.configurationService.updateWorkspaceSync(workspace);
             this.configurationService.disableLoadingWhenReady(workspace, session);
             // Emit ok for double jump
@@ -446,4 +452,3 @@ export class WorkspaceService extends NativeService {
 export enum IdpResponseType {
   SAML = 'SAML'
 }
-

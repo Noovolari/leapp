@@ -45,10 +45,6 @@ export class AppComponent implements OnInit {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     // Set it as default
     this.configurationService.setDefaultWorkspaceSync(workspace.name);
-    if (workspace.awsCredentials) {
-      this.fileService.iniWriteSync(this.fileService.homeDir() + '/.aws/credentials', workspace.awsCredentials);
-      this.app.logger('workspace set correctly at app start', LoggerLevel.WARN);
-    }
 
     // Prevent Dev Tool to show on production mode
     this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {

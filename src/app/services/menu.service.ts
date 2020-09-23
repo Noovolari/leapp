@@ -68,10 +68,10 @@ export class MenuService extends NativeService {
           click: (menuItem, browserWindow, event) => {
             if (!session.active) {
               this.sessionService.startSession(session);
-              this.credentialService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
+              this.credentialService.refreshCredentialsEmit.emit(session.account.type);
 
             } else {
-              this.credentialService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
+              this.credentialService.refreshCredentialsEmit.emit(session.account.type);
               this.sessionService.stopSession(session);
             }
             this.appService.redrawList.emit(true);

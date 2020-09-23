@@ -80,7 +80,7 @@ export class SessionCardComponent implements OnInit {
     this.sessionService.startSession(session);
 
     // automatically check if there is an active session and get session list again
-    this.credentialsService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
+    this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
 
     // Redraw the list
     this.sessionsChanged.emit('');
@@ -96,11 +96,10 @@ export class SessionCardComponent implements OnInit {
     // TODO refactor this.openSsm = false;
 
     // automatically check if there is an active session or stop it
-    this.credentialsService.refreshCredentialsEmit.emit(!this.appService.isAzure(session));
+    this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
     this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
   }
-
 
   removeAccount(session) {
     this.appService.confirmDialog('do you really want to delete this account?', () => {

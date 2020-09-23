@@ -20,7 +20,8 @@ import {AwsPlainAccount} from '../models/aws-plain-account';
 export class CredentialsService extends NativeService {
 
   // Emitters
-  public refreshCredentialsEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
+  // public refreshCredentialsEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
+  public refreshCredentialsEmit: EventEmitter<AccountType> = new EventEmitter<AccountType>();
   public refreshReturnStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   // Unique timer object and time data
@@ -38,75 +39,115 @@ export class CredentialsService extends NativeService {
 
     super();
 
-    this.refreshCredentialsEmit.subscribe((isAws) => this.refreshCredentials(isAws));
+    this.refreshCredentialsEmit.subscribe((accountType) => this.refreshCredentials(accountType));
     this.workspaceService.credentialEmit.subscribe(res => this.processCredentials(res));
   }
 
-  refreshCredentials(isAws) {
+  refreshCredentials(accountType) {
     // Get all the info we need
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     console.log('workspace in refreshCredentials', workspace);
 
-    const awsSession   = workspace.sessions.filter(sess => sess.account.type === AccountType.AWS   && sess.active)[0];
-    const azureSession = workspace.sessions.filter(sess => sess.account.type === AccountType.AZURE && sess.active)[0];
-    const awsPlainSession  = workspace.sessions.filter(sess => sess.account.type === AccountType.AWS_PLAIN_USER && sess.active)[0];
-
-    // Check if all the session are as expected
-    console.log('aws session', awsSession);
-    console.log('aws plain', awsPlainSession);
-    console.log('azure session', azureSession);
-
-    // Check if there are AWS sessions
-    if ((isAws === true || isAws === null)) {
-      if (awsSession) {
-        this.awsCredentialFederatedProcess(workspace, awsSession);
-      } else {
-        this.cleanCredentialProcess(workspace, awsSession, AccountType.AWS);
+    if (accountType !== null) {
+      switch (accountType) {
+        case AccountType.AWS: {
+          this.refreshAwsCredentials(workspace, accountType);
+          break;
+        }
+        case AccountType.AWS_PLAIN_USER: {
+          this.refreshAwsCredentials(workspace, accountType);
+          break;
+        }
+        case AccountType.AZURE: {
+          this.refreshAzureCredentials(workspace, accountType);
+          break;
+        }
       }
-    }
-
-    // Check if there are AWS PLAIN sessions
-    if ((isAws === true || isAws === null)) {
-      if (awsPlainSession) {
-        console.log('here im in plain');
-        this.awsCredentialProcess(workspace, awsPlainSession);
-      } else {
-        this.cleanCredentialProcess(workspace, awsSession, AccountType.AWS_PLAIN_USER);
-      }
-    }
-
-    // Check if there are AZURE sessions
-    if ((isAws === false || isAws === null)) {
-      if (azureSession) {
-        this.azureCredentialProcess(workspace, azureSession);
-      } else {
-        this.cleanCredentialProcess(workspace, azureSession, AccountType.AZURE);
-      }
+    } else {
+      this.refreshAwsCredentials(workspace, accountType);
+      this.refreshAzureCredentials(workspace, accountType);
     }
   }
 
-  cleanCredentialProcess(workspace, session, accountType) {
-    if (workspace) {
+  // ===================================================================================================================
 
-      // if there are not active sessions stop session.
-      if (accountType === AccountType.AWS || accountType === AccountType.AWS_PLAIN_USER) {
-        workspace.principalAccountNumber = null;
-        workspace.principalRoleName = null;
-        workspace.awsCredentials = {};
-        this.configurationService.updateWorkspaceSync(workspace);
-      }
-      if (accountType === AccountType.AZURE) {
-        console.log('inside cleanCred - azure');
-        // Clean Azure Credential file
-        this.cleanAzureCredentialFile();
-      }
+  private refreshAwsCredentials(workspace, accountType) {
+    const activeSessions = workspace.sessions.filter((sess) => {
+      return (sess.account.type === AccountType.AWS_PLAIN_USER || sess.account.type === AccountType.AWS) && sess.active;
+    });
 
-      // Stop the current timer and start date
-      if (this.timer) {
-        clearInterval(this.timer);
-        this.timer = null;
-        this.startTime = null;
+    // Check if all the session are as expected
+    console.log('active aws sessions', activeSessions);
+
+    // Refresh all active sessions credentials
+    if (activeSessions.length > 0) {
+      for (let i = 0; i < activeSessions.length; i++) {
+        const sess = activeSessions[i];
+        if (sess.account.type === AccountType.AWS_PLAIN_USER) {
+          this.awsCredentialProcess(workspace, sess);
+        } else if (sess.account.type === AccountType.AWS) {
+          this.awsCredentialFederatedProcess(workspace, sess);
+        }
       }
+    } else {
+      this.cleanAwsCredential(workspace);
+    }
+  }
+
+  private refreshAzureCredentials(workspace, accountType) {
+    const activeSessions = workspace.sessions.filter((sess) => {
+      return sess.account.type === AccountType.AZURE && sess.active;
+    });
+
+    // Check if all the session are as expected
+    console.log('active azure sessions', activeSessions);
+
+    // Refresh all active sessions credentials
+    if (activeSessions.length > 0) {
+      activeSessions.forEach(sess => {
+        this.azureCredentialProcess(workspace, sess);
+      });
+    } else {
+      this.cleanAzureCredential(workspace);
+    }
+  }
+
+  // ===================================================================================================================
+
+  private async awsCredentialProcess(workspace: Workspace, session) {
+    const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user));
+    const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
+
+    const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
+    this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
+    this.configurationService.disableLoadingWhenReady(workspace, session);
+  }
+
+  awsCredentialFederatedProcess(workspace, session) {
+    // Check for Aws Credentials Process
+    if (!workspace.idpUrl) {
+      return 'workspace not set';
+    }
+    const idpUrl = workspace.idpUrl ;
+
+    // enable current active session
+    this.fileService.writeFileSync(this.appService.awsCredentialPath(), '');
+    try {
+      this.workspaceService.refreshCredentials(idpUrl, session);
+    } catch (e) {
+      this.appService.logger(e, LoggerLevel.ERROR);
+      this.refreshReturnStatusEmit.emit(false);
+    }
+
+    // Start Calculating time here once credentials are actually retrieved
+    this.startTime = new Date();
+
+    // If the timer is not set, set the unique timer object and fix the starting time
+    if (this.timer === undefined || this.timer === null) {
+      this.timer = setInterval(() => {
+        // process time check for session
+        this.processRefreshCredentials();
+      }, 1000);
     }
   }
 
@@ -153,6 +194,72 @@ export class CredentialsService extends NativeService {
     }
   }
 
+  // ===================================================================================================================
+
+  cleanAwsCredential(workspace) {
+    if (workspace) {
+      // if there are not active sessions stop session.
+      workspace.principalAccountNumber = null;
+      workspace.principalRoleName = null;
+
+      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
+      this.configurationService.updateWorkspaceSync(workspace);
+
+      // Stop the current timer and start date
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+        this.startTime = null;
+      }
+    }
+  }
+
+  cleanAzureCredential(workspace) {
+    if (workspace) {
+      // if there are not active sessions stop session.
+      console.log('inside cleanCred - azure');
+      // Clean Azure Credential file
+      this.cleanAzureCredentialFile();
+
+      // Stop the current timer and start date
+      if (this.timer) {
+        clearInterval(this.timer);
+        this.timer = null;
+        this.startTime = null;
+      }
+    }
+  }
+
+  // ===================================================================================================================
+
+  /**
+   * Method that is launched when credential are emitted by the workspace service
+   * @param res - contain the status the operation
+   */
+  private processCredentials(res: any) {
+    if (res.status === 'ok') {
+      this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');
+      this.refreshReturnStatusEmit.emit(true);
+    } else {
+      this.appService.toast('There was a problem in generating credentials..', ToastLevel.WARN, 'Credentials');
+      this.refreshReturnStatusEmit.emit(false);
+    }
+  }
+
+  /**
+   * Process the actual refresh credential check: if we are over the sessionDuration parameters we need to refresh credentials
+   */
+  private processRefreshCredentials() {
+    if (this.startTime) {
+      const currentTime = new Date();
+      const seconds = (currentTime.getTime() - this.startTime.getTime()) / 1000;
+      const timeToRefresh = (seconds > environment.sessionDuration);
+      if (timeToRefresh) {
+        this.refreshCredentials(null);
+      }
+    }
+  }
+
   azureSetSubscription(session: Session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     // We can use Json in res to save account information
@@ -192,72 +299,6 @@ export class CredentialsService extends NativeService {
     });
   }
 
-  awsCredentialFederatedProcess(workspace, session) {
-    // Check for Aws Credentials Process
-    if (!workspace.idpUrl) {
-      return 'workspace not set';
-    }
-    const idpUrl = workspace.idpUrl ;
-
-    // enable current active session
-    this.fileService.writeFileSync(this.appService.awsCredentialPath(), '');
-    try {
-
-      this.workspaceService.refreshCredentials(idpUrl, session);
-    } catch (e) {
-
-      this.appService.logger(e, LoggerLevel.ERROR);
-      this.refreshReturnStatusEmit.emit(false);
-    }
-
-    // Start Calculating time here once credentials are actually retrieved
-    this.startTime = new Date();
-
-    // If the timer is not set, set the unique timer object and fix the starting time
-    if (this.timer === undefined || this.timer === null) {
-      this.timer = setInterval(() => {
-        // process time check for session
-        this.processRefreshCredentials();
-      }, 1000);
-    }
-  }
-
-  private async awsCredentialProcess(workspace: Workspace, awsSession: Session) {
-    const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(awsSession.account.accountName, (awsSession.account as AwsPlainAccount).user));
-    const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(awsSession.account.accountName, (awsSession.account as AwsPlainAccount).user));
-    const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
-    this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
-    this.configurationService.disableLoadingWhenReady(workspace, awsSession);
-  }
-
-  /**
-   * Process the actual refresh credential check: if we are over the sessionDuration parameters we need to refresh credentials
-   */
-  private processRefreshCredentials() {
-    if (this.startTime) {
-      const currentTime = new Date();
-      const seconds = (currentTime.getTime() - this.startTime.getTime()) / 1000;
-      const timeToRefresh = (seconds > environment.sessionDuration);
-      if (timeToRefresh) {
-        this.refreshCredentials(null);
-      }
-    }
-  }
-
-  /**
-   * Method that is launched when credential are emitted by the workspace service
-   * @param res - contain the status the operation
-   */
-  private processCredentials(res: any) {
-    if (res.status === 'ok') {
-      this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');
-      this.refreshReturnStatusEmit.emit(true);
-    } else {
-      this.appService.toast('There was a problem in generating credentials..', ToastLevel.WARN, 'Credentials');
-      this.refreshReturnStatusEmit.emit(false);
-    }
-  }
-
   private cleanAzureCredentialFile() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace && this.configurationService.isAzureConfigPresent()) {
@@ -273,7 +314,5 @@ export class CredentialsService extends NativeService {
     }
     this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
-
-
 
 }

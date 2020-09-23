@@ -180,8 +180,6 @@ export class FileService extends NativeService {
         }
       });
     });
-    console.log('iniWriteSync filePath', filePath);
-    console.log('iniWriteSync content', this.ini.stringify(content));
     return this.writeFileSync(filePath, this.ini.stringify(content));
   }
 

@@ -149,9 +149,6 @@ export class AppService extends NativeService {
    * @returns return a new browser window
    */
   newWindow(url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
-    // console.log(show);
-    // console.log(localStorage.getItem('hook_mail'));
-
     const opts = {
       width: 430,
       height: 550,
@@ -302,7 +299,6 @@ export class AppService extends NativeService {
   extractAccountNumberFromIdpArn(value) {
 
     const values = value.split(':');
-    // console.log(values);
     if (
       values.length === 6 &&
       values[0] === 'arn' &&
@@ -311,7 +307,6 @@ export class AppService extends NativeService {
       values[3] === '') {
 
       if (values[4].length === 12 && Number(values[4])) {
-        // console.log(values[4]);
         return values[4];
       } else  { return ''; }
     } else  { return ''; }

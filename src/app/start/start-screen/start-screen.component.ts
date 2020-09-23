@@ -57,7 +57,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
    * Verify the workspace is wellformed
    */
   verifyWorkspaceIsWellformed() {
-    console.log('workspace', JSON.stringify(this.workspace));
+    console.log('workspace:', JSON.stringify(this.workspace));
     let result = true;
     if (
       JSON.stringify(this.workspace) !== '{}' &&

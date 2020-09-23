@@ -76,7 +76,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     });
 
     this.appService.redrawList.subscribe(r => {
-      console.log('redraw list');
       this.getSessions();
     });
   }
@@ -104,7 +103,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    */
   getSessions() {
     this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
-    console.log('active sessions', this.activeSessions);
     this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
   }
 
@@ -130,8 +128,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       // Check the result of the call
       const sub = this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
 
-        // console.log(result);
-
         this.instances = result.instances;
         this.ssmloading = false;
       });
@@ -153,6 +149,5 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     } else {
       this.showOnly = name;
     }
-    console.log(this.showOnly);
   }
 }

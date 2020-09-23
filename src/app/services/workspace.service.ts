@@ -5,7 +5,7 @@ import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
-import {Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
@@ -150,9 +150,7 @@ export class WorkspaceService extends NativeService {
   checkForShowingTheLoginWindow(url): Observable<boolean> {
     return new Observable<boolean>(observer => {
       this.httpClient.get(url).subscribe(() => {
-        console.log();
       }, err => {
-        console.log();
         if (err.status === 500 || err.error.text === undefined) {
           observer.error('There was a problem with your connection. Please retry.');
           observer.complete();
@@ -349,7 +347,6 @@ export class WorkspaceService extends NativeService {
     try {
       if (isDoubleJump) {
         // Make second jump: credentials are the first one now
-        console.log('credentials before dj', credentials);
         AWS.config.update({
           sessionToken: credentials.default.aws_session_token,
           accessKeyId: credentials.default.aws_access_key_id,

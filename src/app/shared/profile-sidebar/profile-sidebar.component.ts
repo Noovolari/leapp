@@ -31,7 +31,6 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
    */
   ngOnInit() {
     const sub = this.appService.profileOpen.subscribe(res => {
-      console.log('profile-sidebar');
       this.profileOpen = res;
     });
     this.subs.add(sub);

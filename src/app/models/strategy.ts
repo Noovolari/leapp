@@ -19,7 +19,7 @@ export abstract class Strategy {
     });
   }
 
-  protected abstract manageSingleSession(workspace: Workspace, session: Session): void;
   protected abstract getActiveSessions(workspace: Workspace): Session[];
   protected abstract cleanCredentials(workspace: Workspace): void;
+  protected abstract manageSingleSession(workspace: Workspace, session: Session): void;
 }

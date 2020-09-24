@@ -18,13 +18,15 @@ import {AccountType} from '../../models/AccountType';
 })
 export class CreateAccountComponent implements OnInit {
 
+  firstTime = false;
+  providerSelected = false;
+  typeSelection = false;
+  ssoInserted = false;
+
   toggleOpen = true;
   roles: string[] = [];
-  accountType = AccountType.AWS;
+  accountType;
   provider;
-  firstTime = false;
-  ssoInserted = false;
-  providerSelected = false;
 
   @Input() selectedAccount;
   @Input() selectedAccountNumber = '';
@@ -148,6 +150,9 @@ export class CreateAccountComponent implements OnInit {
     if (name === AccountType.AZURE) {
       this.accountType = AccountType.AZURE;
     }
+    if (name === AccountType.AWS) {
+      this.typeSelection = true;
+    }
   }
 
   setAccountType(name) {
@@ -161,14 +166,25 @@ export class CreateAccountComponent implements OnInit {
   goBack() {
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
-    if (this.workspace.sessions.length > 0) {
+    if (this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
     } else {
       this.accountType = undefined;
       this.provider = undefined;
       this.ssoInserted = false;
       this.providerSelected = false;
+      this.typeSelection = false;
       this.firstTime = true;
     }
   }
+
+  setAccessStrategy(strategy) {
+    this.accountType = strategy;
+    this.provider = strategy;
+    this.typeSelection = false;
+  }
+
+  openAccessStrategyDocumentation() {}
+
+  openSSODocumentation() {}
 }

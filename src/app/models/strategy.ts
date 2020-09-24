@@ -1,6 +1,5 @@
 import {Workspace} from './workspace';
 import {Session} from './session';
-import {AccountType} from './AccountType';
 
 export abstract class Strategy {
   refreshCredentials(workspace: Workspace): void {

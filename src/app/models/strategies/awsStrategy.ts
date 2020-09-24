@@ -8,7 +8,7 @@ import {environment} from '../../../environments/environment';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
 import {FileService} from '../../services-system/file.service';
 import {KeychainService} from '../../services-system/keychain.service';
-import {Strategy} from '../strategy';
+import {RefreshCredentialsStrategy} from '../refreshCredentialsStrategy';
 import {TimerService} from '../../services/timer-service';
 import {Workspace} from '../workspace';
 import {WorkspaceService} from '../../services/workspace.service';
@@ -16,7 +16,7 @@ import {WorkspaceService} from '../../services/workspace.service';
 // Import AWS node style
 const AWS = require('aws-sdk');
 
-export class AwsStrategy extends Strategy {
+export class AwsStrategy extends RefreshCredentialsStrategy {
 
   constructor(
     private credentialsService: CredentialsService,

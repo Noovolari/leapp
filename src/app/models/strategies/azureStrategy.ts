@@ -1,4 +1,4 @@
-import {Strategy} from '../strategy';
+import {RefreshCredentialsStrategy} from '../refreshCredentialsStrategy';
 import {AccountType} from '../AccountType';
 import {Workspace} from '../workspace';
 import {Session} from '../session';
@@ -9,7 +9,7 @@ import {AppService, ToastLevel} from '../../services-system/app.service';
 import {TimerService} from '../../services/timer-service';
 import {CredentialsService} from '../../services/credentials.service';
 
-export class AzureStrategy extends Strategy {
+export class AzureStrategy extends RefreshCredentialsStrategy {
 
   constructor(
     private credentialsService: CredentialsService,

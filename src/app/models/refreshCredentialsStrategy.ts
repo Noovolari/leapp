@@ -1,7 +1,7 @@
 import {Workspace} from './workspace';
 import {Session} from './session';
 
-export abstract class Strategy {
+export abstract class RefreshCredentialsStrategy {
   refreshCredentials(workspace: Workspace): void {
     const activeSessions = this.getActiveSessions(workspace);
 

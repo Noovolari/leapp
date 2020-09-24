@@ -2,11 +2,11 @@
   <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveAccount();">
 
     <ng-container *ngIf="!providerSelected">
-      <h1>Prima di cominciare</h1>
-      <p>Collega subito il tuo primo account e comincia ad immergerti nel tuo lavoro.</p>
+      <h1>Choose your Provider</h1>
+      <p>To define your Access Strategy, select the Cloud Provider you need to connect to</p>
 
       <div class="form-group" style="width: 100%; display: inline-block;">
-        <label>Choose your account type<span class="danger-text">*</span></label>
+        <label>My cloud provider is:</label>
         <br>
         <div class="correct-top">
         <button type="button" class="providers" (click)="setProvider(eAccountType.AWS);"><img src="assets/images/aws-logo.svg" height="20"></button>
@@ -15,49 +15,68 @@
       </div>
     </ng-container>
 
-    <ng-container *ngIf="firstTime && provider === eAccountType.AWS && !ssoInserted && providerSelected">
-      <h1>Prima di cominciare</h1>
-      <p>Collega subito il tuo primo account e comincia ad immergerti nel tuo lavoro.</p>
-
+    <ng-container *ngIf="provider !== eAccountType.AZURE && providerSelected && typeSelection">
+      <h1>Choose your Access Strategy</h1>
+      <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
       <div class="form-group" style="width: 100%; display: inline-block;">
-        <label>Choose your account type<span class="danger-text">*</span></label>
+        <label>My Access Strategy is:</label>
         <br>
-        <a class="back" (click)="providerSelected = false; ssoInserted = false; accountType = undefined;"><i class="fa fa-chevron-left"></i></a>
-        <span class="providers extended"><img src="assets/images/aws-logo.svg" height="20"></span>
-        <br><br>
+        <ng-container *ngIf="accountType === undefined">
+            <div class="correct-top">
+              <button type="button" class="providers {{accountType === eAccountType.AWS ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.AWS);">
+                <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated
+              </button>
+              <button type="button" class="providers {{accountType === eAccountType.AWS_PLAIN_USER ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.AWS_PLAIN_USER);">
+                <i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain
+              </button>
+              <button type="button" class="providers {{accountType === eAccountType.AWS_TRUSTER ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.AWS_TRUSTER);" *ngIf="!firstTime">
+                <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
+              </button>
+              <span class="providers disabled second-step-fix" *ngIf="firstTime">
+                <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
+              </span>
+            </div>
+        </ng-container>
+      </div>
+    </ng-container>
+
+    <ng-container *ngIf="firstTime && provider === eAccountType.AWS && !ssoInserted && providerSelected && !typeSelection">
+      <h1>Choose your Access Strategy</h1>
+      <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label>My Access Strategy is:</label>
+        <br>
+        <div class="correct-top" style="width: 100%;">
+          <a class="back" (click)="goBack();"><i class="fa fa-chevron-left"></i></a>
+          <span class="providers extended"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</span>
+          <br><br>
+        </div>
         <label>SSO Url<span class="danger-text">*</span></label>
         <input formControlName="federationUrl" type="url" class="form-control" placeholder="single sign-on url *">
         <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.controls['federationUrl'].errors">Insert the SSO url</small>
-        <small class="note">*Questo passaggio è richiesto solo in fase di configurazione. Quando Cercherai di aggiungere un nuovo account non sarà più chiesto.</small>
+        <small class="note" style="float: left;">*Currently supported Identity Provider is GSuite.<br>Check the documentation on where to find the SSO URL <a (click)="openSSODocumentation();">here</a>.</small>
       </div>
-
-      <button type="button" class="pull-center" (click)="ssoInserted = true">Inizia Subito</button>
+      <button type="button" [ngClass]="form.controls['federationUrl'].valid ? 'pull-center': 'pull-center disabled'" (click)="ssoInserted = true" [disabled]="!form.controls['federationUrl'].valid">Next</button>
     </ng-container>
 
-    <ng-container *ngIf="(providerSelected && accountType === eAccountType.AZURE) || (providerSelected && ssoInserted && (accountType !== eAccountType.AZURE))">
-      <h1>Crea il tuo Account!</h1>
-      <p class="smaller">Figata. Ci siamo quasi. Inizia subito a lavorare. Crea il tuo account.</p>
+    <ng-container *ngIf="((provider !== eAccountType.AWS) || (ssoInserted && (provider === eAccountType.AWS))) && !typeSelection && providerSelected">
 
-      <ng-container *ngIf="accountType !== eAccountType.AZURE">
-        <div class="form-group" style="width: 100%; display: inline-block;">
-          <label>Seleziona la tipologia di Account</label>
-          <br>
-          <div class="correct-top-second-step">
-            <button type="button" class="providers {{accountType === eAccountType.AWS ? 'selected' : ''}}" (click)="accountType = eAccountType.AWS;">
-              <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated
-            </button>
-            <button type="button" class="providers {{accountType === eAccountType.AWS_PLAIN_USER ? 'selected' : ''}}" (click)="accountType = eAccountType.AWS_PLAIN_USER;">
-              <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Plain
-            </button>
-            <button type="button" class="providers {{accountType === eAccountType.AWS_TRUSTER ? 'selected' : ''}}" (click)="accountType = eAccountType.AWS_TRUSTER;" *ngIf="!firstTime">
-              <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
-            </button>
-            <span class="providers disabled second-step-fix" *ngIf="firstTime">
-              <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
-            </span>
-          </div>
+      <h1>Choose your Access Strategy</h1>
+      <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label>My Access Strategy is:</label>
+        <br>
+        <div class="correct-top" style="width: 100%;">
+          <a class="back" (click)="goBack();"><i class="fa fa-chevron-left"></i></a>
+          <span class="providers extended">
+            <ng-container *ngIf="accountType === eAccountType.AWS"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</ng-container>
+            <ng-container *ngIf="accountType === eAccountType.AWS_TRUSTER"><i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster</ng-container>
+            <ng-container *ngIf="accountType === eAccountType.AWS_PLAIN_USER"><i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain</ng-container>
+            <ng-container *ngIf="accountType === eAccountType.AZURE"><i class="fa fa-info" tooltip="This is a set of option to create azure accounts"></i> Azure</ng-container>
+          </span>
+          <br><br>
         </div>
-      </ng-container>
+      </div>
 
       <div class="form-group" style="width: 100%; display: inline-block;">
         <label>Account Alias<span class="danger-text">*</span></label>
@@ -147,7 +166,6 @@
         </div>
       </ng-container>
 
-      <a class="back-link pull-left" (click)="goBack();"><i class="fas fa-arrow-left"></i></a>
       <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="accountType">Save</button>
     </ng-container>
 

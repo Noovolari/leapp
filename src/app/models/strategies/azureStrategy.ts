@@ -20,22 +20,21 @@ export class AzureStrategy extends Strategy {
     super();
   }
 
-  cleanCredentials(workspace: Workspace): void {
-    if (workspace) {
-      // Clean Azure Credential file
-      this.cleanAzureCredentialFile();
-    }
-  }
-
   getActiveSessions(workspace: Workspace) {
     const activeSessions = workspace.sessions.filter((sess) => {
       return sess.account.type === AccountType.AZURE && sess.active;
     });
 
-    // Check if all the session are as expected
     console.log('active azure sessions', activeSessions);
 
     return activeSessions;
+  }
+
+  cleanCredentials(workspace: Workspace): void {
+    if (workspace) {
+      // Clean Azure Credential file
+      this.cleanAzureCredentialFile();
+    }
   }
 
   manageSingleSession(workspace, session) {

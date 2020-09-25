@@ -20,18 +20,21 @@ export class TrusterAccountService extends NativeService {
   }
 
   /**
-   * Add a truster account to the workspace
+   * Add a truster account to the workspace.
    * @param accountNumber - the account number of the truster account
    * @param accountName - the account name
+   * @param parentAccountSessionId - the parent session's id
+   * @param parentRole - the parent account's role
    * @param role - the AWS roles to assign to the account
    * @param idpArn - the idArn used for the federated account
    */
-  addTrusterAccountToWorkSpace(accountNumber: number, accountName: string, parentName: string, parentRole: string, role: any, idpArn: string) {
+  addTrusterAccountToWorkSpace(accountNumber: string, accountName: string, parentAccountSessionId: string, parentRole: string,
+                               role: any, idpArn: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // if the account doesn't exists
-    const test = workspace.sessions.filter(sess => sess.account.accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);
+    const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);
     if (!test || test.length === 0) {
       // add new account
       const account = {
@@ -40,7 +43,7 @@ export class TrusterAccountService extends NativeService {
         accountNumber,
         role,
         idpArn,
-        parent: parentName,
+        parent: parentAccountSessionId,
         parentRole,
         idpUrl: configuration.federationUrl,
         type: AccountType.AWS
@@ -60,7 +63,7 @@ export class TrusterAccountService extends NativeService {
       this.configurationService.updateWorkspaceSync(workspace);
       return true;
     } else {
-      this.appService.toast('Account Number or Role Must be unique.', ToastLevel.WARN, 'Create Account');
+      this.appService.toast('Account Number and Role Must be unique.', ToastLevel.WARN, 'Create Account');
       return false;
     }
   }

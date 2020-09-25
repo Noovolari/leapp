@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveAccount();">
+  <form [formGroup]="form" class="form center-vertical text-left">
 
     <ng-container *ngIf="!providerSelected">
       <h1>Prima di cominciare</h1>
@@ -117,7 +117,7 @@
           <h2>Truster setting</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Federated Account<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
-            <ng-select class="mt-2" formControlName="federatedAccount" bindLabel="accountName" bindValue="accountNumber" dropdownPosition="top" [items]="federatedAccounts" [(ngModel)]="selectedAccount" (change)="getFedRoles();" [disabled]="true"></ng-select>
+            <ng-select class="mt-2" formControlName="federatedAccount" bindLabel="accountName" bindValue="session" dropdownPosition="top" [items]="federatedAccounts" [(ngModel)]="selectedSession" (change)="getFedRoles();" [disabled]="true"></ng-select>
           </div>
 
           <div style="width: 2%; height: 1px; display: inline-block;"></div>

@@ -93,10 +93,10 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       return true;
     } else if (session.account.parent !== null && session.account.parent !== undefined) {
       // Here we have a truster account now we need to know the nature of the truster account
-      const parentAccountNumber = session.account.parent;
+      const parentAccountSessionId = session.account.parent;
       const workspace = this.configurationService.getDefaultWorkspaceSync();
       const sessions = workspace.sessions;
-      const parentAccountList = sessions.filter(sess => sess.account.accountNumber === parentAccountNumber);
+      const parentAccountList = sessions.filter(sess => sess.id === parentAccountSessionId);
 
       if (parentAccountList.length > 0) {
         // Parent account found: check its nature
@@ -108,14 +108,14 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   }
 
   private async doubleJumpFromFixedCredential(session) {
-    const parentAccountNumber = session.account.parent;
+    const parentAccountSessionId = session.account.parent;
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.sessions;
-    const parentAccountList = sessions.filter(sess => sess.account.accountNumber === parentAccountNumber);
+    const parentSessions = sessions.filter(sess => sess.id === parentAccountSessionId);
 
-    if (parentAccountList.length > 0) {
+    if (parentSessions.length > 0) {
       // Parent account found: do double jump
-      const parentSession = parentAccountList[0];
+      const parentSession = parentSessions[0];
 
       // First jump
       const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));

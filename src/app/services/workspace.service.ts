@@ -273,8 +273,8 @@ export class WorkspaceService extends NativeService {
     const roleName = selectedAccount.role.name;
 
     if (selectedAccount.parent) {
-      const parentAccountNumber = selectedAccount.parent;
-      parentAccount = workspace.sessions.filter(sess => parentAccountNumber === (sess.account as AwsAccount).accountNumber)[0].account;
+      const parentAccountSessionId = selectedAccount.parent;
+      parentAccount = workspace.sessions.filter(sess => parentAccountSessionId === sess.id)[0].account;
       parentRole = parentAccount.role;
     }
 

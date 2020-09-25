@@ -64,7 +64,6 @@ export class CredentialsService extends NativeService {
   refreshCredentials(accountType) {
     // Get all the info we need
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    console.log('workspace in refreshCredentials', workspace);
 
     if (accountType !== null) {
       this.strategyMap[accountType](workspace, accountType);

@@ -8,6 +8,7 @@ import {FederatedAccountService} from './federated-account.service';
 import {TrusterAccountService} from './truster-account.service';
 import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
+import {Session} from "../models/session";
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class ProviderManagerService {
   accountType;
   accountId;
   selectedAccount;
+  selectedSession;
   selectedRole;
 
   /**
@@ -38,13 +40,19 @@ export class ProviderManagerService {
   }
 
   /**
-   * Get all the federated roles of an acocunt
+   * Get all the federated roles of an account
    * @param accounts - the accounts from a listFederatedAccountInWorkSpace() call
-   * @param selectedAccount - the one selected to get the roles
+   * @param selectedSession - the one selected to get the roles
    */
-  getFederatedRole(accounts, selectedAccount) {
+  getFederatedRole(accounts, selectedSession: Session) {
+    console.log('accounts: ', accounts);
+
+    const sessionId = selectedSession.id;
+
     // Get the appropriate roles
-    const account = accounts.filter(acc => (acc.accountId === selectedAccount))[0];
+    const account = accounts.filter(acc => (acc.session.id === sessionId))[0].session.account;
+
+    console.log('account: ', account);
 
     if (account !== undefined && account !== null) {
       if (account.type === AccountType.AWS) {
@@ -65,22 +73,21 @@ export class ProviderManagerService {
    * Save the first account of the Application
    * @param accountId - the account Id that we are creating
    * @param accountType - the account Type you have chosen
-   * @param selectedAccount - the selected account as a parent for
+   * @param selectedSession - the selected session
    * @param selectedRole - the selected role of the parent
-   * @param selectedType - the type of AWS account, if any, that you have selected
    * @param form - the form to use
    */
-  saveFirstAccount(accountId, accountType, selectedAccount, selectedRole, form) {
+  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
     this.accountId = accountId;
     this.accountType = accountType;
-    this.selectedAccount = selectedAccount;
+    this.selectedSession = selectedSession;
     this.selectedRole = selectedRole;
     this.form = form;
 
-    // Before we need to save the first workspace and call google: this is done only the first ime so it is not used in other classes
+    // Before we need to save the first workspace and call google: this is done only the first time so it is not used in other classes
     // Now we get the default configuration to obtain the previously saved idp url
     const configuration = this.configurationService.getConfigurationFileSync();
 
@@ -107,18 +114,20 @@ export class ProviderManagerService {
    * Save the first account of the Application
    * @param accountId - the account Id that we are creating
    * @param accountType - the account Type you have chosen
-   * @param selectedAccount - the selected account as a parent for
+   * @param selectedSession - the selected session
    * @param selectedRole - the selected role of the parent
-   * @param selectedType - the type of AWS account, if any, that you have selected
    * @param form - the form to use
    */
-  saveAccount(accountId, accountType, selectedAccount, selectedRole, form) {
+  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
     this.accountId = accountId;
     this.accountType = accountType;
-    this.selectedAccount = selectedAccount;
+    if (selectedSession) {
+      this.selectedAccount = selectedSession.account;
+    }
+    this.selectedSession = selectedSession;
     this.selectedRole = selectedRole;
     this.form = form;
     this.decideSavingMethodAndSave();
@@ -194,7 +203,7 @@ export class ProviderManagerService {
         const created = this.trusterAccountService.addTrusterAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
-          this.selectedAccount,
+          (this.selectedSession as Session).id,
           this.selectedRole,
           this.generateRolesFromNames(this.form),
           this.form.value.idpArn);

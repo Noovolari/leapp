@@ -10,6 +10,7 @@ import {AwsAccount} from '../../models/aws-account';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
+import {Session} from '../../models/session';
 
 @Component({
   selector: 'app-create-account',
@@ -26,10 +27,9 @@ export class CreateAccountComponent implements OnInit {
   ssoInserted = false;
   providerSelected = false;
 
-  @Input() selectedAccount;
+  @Input() selectedSession;
   @Input() selectedAccountNumber = '';
   @Input() selectedRole = '';
-
   @Input() fedUrl = '';
 
   federatedRoles: { name: string, roleArn: string }[] = [];
@@ -78,7 +78,13 @@ export class CreateAccountComponent implements OnInit {
 
       // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
-      this.accounts = this.providerManagerService.getFederatedAndPlainAccounts();
+      const sessions = this.providerManagerService.getFederatedAndPlainAccounts();
+      this.accounts = sessions.map((sess: Session) => {
+        return {
+          session: sess,
+          accountName: sess.account.accountName
+        };
+      });
 
       // Add parameters to check what to do with form data
       this.ssoInserted = (this.workspace.idpUrl !== undefined && this.workspace.idpUrl !== null);
@@ -89,6 +95,8 @@ export class CreateAccountComponent implements OnInit {
 
       // Show the federated accounts
       this.federatedAccounts = this.accounts;
+
+      console.log('federatedAccounts: ', this.federatedAccounts);
 
       // only for start screen
       if (this.firstTime) {
@@ -102,7 +110,7 @@ export class CreateAccountComponent implements OnInit {
    */
   getFedRoles() {
     // Get the role data
-    const roleData = this.providerManagerService.getFederatedRole(this.accounts, this.selectedAccount);
+    const roleData = this.providerManagerService.getFederatedRole(this.accounts, this.selectedSession);
     // Get the appropriate roles
     this.federatedRoles = [roleData.federatedRole];
     // Set the federated role automatically
@@ -126,7 +134,7 @@ export class CreateAccountComponent implements OnInit {
       this.providerManagerService.saveFirstAccount(
         this.accountId,
         this.accountType,
-        this.selectedAccount,
+        this.selectedSession,
         this.selectedRole,
         this.form
       );
@@ -134,12 +142,11 @@ export class CreateAccountComponent implements OnInit {
       this.providerManagerService.saveAccount(
         this.accountId,
         this.accountType,
-        this.selectedAccount,
+        this.selectedSession,
         this.selectedRole,
         this.form
       );
     }
-
   }
 
   setProvider(name) {

@@ -35,7 +35,7 @@ export class FederatedAccountService extends NativeService {
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
-    const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber);
+    const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);
     if (!test || test.length === 0) {
       // add new account
       const account = {
@@ -63,7 +63,7 @@ export class FederatedAccountService extends NativeService {
       return true;
 
     } else {
-      this.appService.toast('Account Number Must be unique.', ToastLevel.WARN, 'Create Account');
+      this.appService.toast('Account Number and Role Must be unique.', ToastLevel.WARN, 'Create Account');
       return false;
     }
   }
@@ -81,7 +81,7 @@ export class FederatedAccountService extends NativeService {
     const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
-    const test = workspace.sessions.filter(sess => (sess.account as AwsPlainAccount).accountNumber === accountNumber);
+    const test = workspace.sessions.filter(sess => (sess.account as AwsPlainAccount).accountNumber === accountNumber && (sess.account as AwsPlainAccount).user === user);
     if (!test || test.length === 0) {
       // add new account
       const account = {
@@ -108,12 +108,10 @@ export class FederatedAccountService extends NativeService {
       return true;
 
     } else {
-      this.appService.toast('Account Number Must be unique.', ToastLevel.WARN, 'Create Account');
+      this.appService.toast('Account Number and User Must be unique.', ToastLevel.WARN, 'Create Account');
       return false;
     }
   }
-
-
 
   /**
    * List all federated account in the workspace
@@ -121,7 +119,7 @@ export class FederatedAccountService extends NativeService {
   listFederatedAccountInWorkSpace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace && workspace.sessions && workspace.sessions.length > 0) {
-      return workspace.sessions.filter(sess => (sess.account.type === AccountType.AWS && sess.account.parent === undefined && sess.account.role.parent === undefined)).map(s => s.account);
+      return workspace.sessions.filter(sess => (sess.account.type === AccountType.AWS && sess.account.parent === undefined && sess.account.role.parent === undefined)); // .map(s => s.account);
     } else {
       return [];
     }
@@ -130,7 +128,7 @@ export class FederatedAccountService extends NativeService {
   listPlainAccountsInWorkspace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace && workspace.sessions && workspace.sessions.length > 0) {
-      return workspace.sessions.filter(sess => (sess.account.type === AccountType.AWS_PLAIN_USER)).map(s => s.account);
+      return workspace.sessions.filter(sess => (sess.account.type === AccountType.AWS_PLAIN_USER)); // .map(s => s.account);
     } else {
       return [];
     }

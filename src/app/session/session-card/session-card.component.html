@@ -8,9 +8,11 @@
       class="fa fa-ellipsis-v"></i></a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
       <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER) && session.active">SSM session</a>
-      <a (click)="removeAccount(session);">Remove account</a>
-      <a (click)="copyCredentials(session, 3);">Copy Account Number</a>
-      <a (click)="copyCredentials(session, 4);">Copy Role ARN</a>
+      <a (click)="removeAccount(session, $event);">Remove account</a>
+      <ng-container *ngIf="session.account.type === eAccountType.AWS">
+      <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
+      <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
+      </ng-container>
     </div>
   </ng-container>
 

@@ -57,15 +57,19 @@ export class SessionCardComponent implements OnInit {
   ngOnInit() {
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions(false);
+    let nameToShow;
     switch (this.session.account.type) {
       case(AccountType.AWS):
-        this.sessionDetailToShow =  (this.session.account as AwsAccount).role.name.substr(0, 13);
+        nameToShow = (this.session.account as AwsAccount).role.name.length >= 13 ? `${(this.session.account as AwsAccount).role.name.substr(0, 13)}...` : (this.session.account as AwsAccount).role.name;
+        this.sessionDetailToShow = nameToShow;
         break;
       case(AccountType.AZURE):
-        this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId.substr(0, 13);
+        nameToShow = (this.session.account as AzureAccount).subscriptionId.length >= 13 ? `${(this.session.account as AzureAccount).subscriptionId.substr(0, 13)}...` : (this.session.account as AzureAccount).subscriptionId;
+        this.sessionDetailToShow = nameToShow;
         break;
       case(AccountType.AWS_PLAIN_USER):
-        this.sessionDetailToShow = (this.session.account as AwsPlainAccount).user.substr(0, 13);
+        nameToShow = (this.session.account as AwsPlainAccount).user.length >= 13 ? `${(this.session.account as AwsPlainAccount).user.substr(0, 13)}...` : (this.session.account as AwsPlainAccount).user;
+        this.sessionDetailToShow = nameToShow;
         break;
     }
   }
@@ -101,7 +105,8 @@ export class SessionCardComponent implements OnInit {
     this.appService.redrawList.emit(true);
   }
 
-  removeAccount(session) {
+  removeAccount(session, event) {
+    event.stopPropagation();
     this.appService.confirmDialog('do you really want to delete this account?', () => {
       this.federatedAccountService.cleanKeychainIfNecessary(session);
       this.sessionService.removeSession(session);
@@ -113,18 +118,14 @@ export class SessionCardComponent implements OnInit {
   /**
    * Copy credentials in the clipboard
    */
-  copyCredentials(session: Session, type: number) {
+  copyCredentials(session: Session, type: number, event) {
+    this.openDropDown(event);
     try {
-
       const workspace = this.configurationService.getDefaultWorkspaceSync();
       if (workspace) {
-        const awsCredentials = workspace.awsCredentials;
-
         const texts = {
-          1: (awsCredentials ? awsCredentials['default'].aws_access_key_id : 'not set yet'),
-          2: (awsCredentials ? awsCredentials['default'].aws_secret_access_key : 'not set yet'),
-          3: (session.account as AwsAccount).accountNumber,
-          4: `arn:aws:iam::${(session.account as AwsAccount).accountNumber}:role/${(session.account as AwsAccount).role.name}`
+          1: (session.account as AwsAccount).accountNumber,
+          2: `arn:aws:iam::${(session.account as AwsAccount).accountNumber}:role/${(session.account as AwsAccount).role.name}`
         };
 
         const text = texts[type];
@@ -136,6 +137,7 @@ export class SessionCardComponent implements OnInit {
       this.appService.toast(err, ToastLevel.WARN);
       this.appService.logger(err, LoggerLevel.WARN);
     }
+
   }
 
   switchCredentials() {

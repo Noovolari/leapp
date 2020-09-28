@@ -50,6 +50,7 @@ Other tutorials are grouped by Access Strategy.
 #### AWS Plain Access
 
 ![Plain Access Schema](.github/images/AWS_PLAIN_ACCESS_SCHEMA.png)
+
 *Plain Access Schema*
 
 - [Create a Plain Strategy with Leapp](.github/tutorials/CREATE_PLAIN_ACCOUNT.md)

@@ -89,13 +89,8 @@ Other tutorials are grouped by Access Strategy.
 - [Create an Azure Strategy with Leapp](.github/tutorials/CREATE_AZURE_ACCOUNT.md)
 
 
-# Quickstart
+# Quick List
 
-Leapp is a desktop application build in [Electron](https://www.electronjs.org/) + [Angular 8](https://angular.io/) that manage and rotate your credentials while keeping them secure by encrypting all the information and removing the credential file and closing the session when the program is closed.
-
-- [Configure your SAML Application SSO URL](.github/tutorials/CONFIGURE_YOUR_SAML_APPLICATION_SSO_URL.md)
-- [Manage Federated Accounts and Federated Roles](.github/tutorials/MANAGE_FEDERATED_ACCOUNTS_AND_FEDERATED_ROLES.md)
-- [Manage Truster Accounts and Truster Roles](.github/tutorials/MANAGE_TRUSTER_ACCOUNTS_AND_TRUSTER_ROLES.md)
 - [Manage Quick List](.github/tutorials/MANAGE_QUICK_LIST.md)
 
 ## Links

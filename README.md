@@ -49,13 +49,15 @@ Other tutorials are grouped by Access Strategy.
 
 #### AWS Plain Access
 
-[Plain Access Schema]()
+![Plain Access Schema](.github/images/AWS_PLAIN_ACCESS_SCHEMA.png)
 
 - [Create a Plain Strategy with Leapp](.github/tutorials/CREATE_PLAIN_ACCOUNT.md)
 
 #### AWS Federated Access
 
-[Federated Access Schema]()
+![Federated Access Schema](.github/images/AWS_FEDERATED_ACCESS_SCHEMA.png)
+
+*Federated Access Schema*
 
 - Federation between G Suite and AWS
     - [G Suite Federation Setup](.github/tutorials/G_SUITE_FEDERATION_SETUP.md)
@@ -66,13 +68,21 @@ Other tutorials are grouped by Access Strategy.
 
 #### AWS Truster Access
 
-[Truster Access Schema]()
+![Truster Access Schema Through Plain](.github/images/AWS_TRUSTER_THROUGH_PLAIN_ACCESS_SCHEMA.png)
+
+*Truster Access Schema Through Plain*
+
+![Truster Access Schema Through Federated](.github/images/AWS_TRUSTER_THROUGH_FEDERATED_ACCESS_SCHEMA.png)
+
+*Truster Access Schema Through Federated*
 
 - [Create a Truster Strategy with Leapp](.github/tutorials/CREATE_TRUSTER_ACCOUNT.md)
 
 #### Azure Access
 
-[Azure Access Schema]()
+![Azure Access Schema](.github/images/AZURE_FEDERATED_ACCESS_SCHEMA.png)
+
+*Azure Access Schema*
 
 - [Create an Azure Strategy with Leapp](.github/tutorials/CREATE_AZURE_ACCOUNT.md)
 

@@ -1,6 +1,6 @@
 # Project Structure
 
-![readme-2.png](images/README-2.png)
+![project-structure-1.png](images/PROJECT_STRUCTURE_1.png)
 
 Here we present all the different folders of the project as well as the files in order to explain what each directory and file does and how you can modify these files according to your necessities
 
@@ -49,6 +49,10 @@ Inside we put the actual application code written for Angular 8. The application
 — **layout**
 
 **Layout** contains all the layouts used by components to standardize some aspects of the applications. At this moment we don't have a particular layout and the application show pages directly from the `<app-root>` tag in the **index.html**
+
+- **managing**
+
+**managing** contains the create component which is used to create all type of accounts.
 
 — **models**
 
@@ -132,29 +136,18 @@ export class ExecuteServiceService extends NativeService {
 
 Contains all the **components** needed to manage all session related actions and screens. This is the list with a little explanation for everyone.
 
-- **account**: here we have a page to manage all the **truster accounts** see [glossary](https://noovolari.github.io/leapp-website/documentation/glossary) of a **federated account.**
-- **create-federated-account**: here we have the page to add a new federated account.
-- **create-truster-account**: here we have the page to add a new truster account.
-- **edit-federated-account:** here we have the page to edit a federated account.
-- **edit-truster-account:** here we have the page to edit the truster account.
-- **list-accounts:** here we have the page to manage all the federated accounts.
 - **session:** the page we have access to the quick list and can start and stop a specific session, thus creating or removing credentials.
-- **session-wallet:** is simply a component that gives access to the actual session component as well as simply setting the email of the logged user.
+- **session-card:** is simply a component that manage the single card.
 
 — **shared** 
 
 Shared is the area where all the shared component/helpers are located and ready to be used in other components. Remember to add them to the shared module in order to make them visible in the application.
 
-— **wizard**
+— **start**
 
-**Wizard** contains all the components used for the first setup and the entry point of the application. The list of component here:
+**start** contains all the components used for the first setup and the entry point of the application. The list of component here:
 
-- **dependencies-page:** the page is used as an entry point to the actual app: it checks if you already have a compatible configuration file or not, in case it launches the first time wizard setup.
-- **set-federation-url:** this page is used to set the google federation URL.
-- **setup-first-account:** setup the first federated account: this is the bare minimum to use the program.
-- **setup-spinner-for-login:** this is used to define a component that listens for google frame and spins a loader until logged in.
-- **setup-welcome:** just a text page to welcome the user.
-- **welcome-first-account**: a page to describe the first account setup.
+- **start-screen**: a page to welcome the user and verify if the initial setup is needed.
 
 the other files inside the directory are defined by the application itself, there are simple configurations to make them work but basically can be left untouched.
 

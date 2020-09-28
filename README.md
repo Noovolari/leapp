@@ -50,6 +50,7 @@ Other tutorials are grouped by Access Strategy.
 #### AWS Plain Access
 
 ![Plain Access Schema](.github/images/AWS_PLAIN_ACCESS_SCHEMA.png)
+*Plain Access Schema*
 
 - [Create a Plain Strategy with Leapp](.github/tutorials/CREATE_PLAIN_ACCOUNT.md)
 
@@ -70,11 +71,11 @@ Other tutorials are grouped by Access Strategy.
 
 ![Truster Access Schema Through Plain](.github/images/AWS_TRUSTER_THROUGH_PLAIN_ACCESS_SCHEMA.png)
 
-*Truster Access Schema Through Plain*
+*Truster Access Schema through Plain*
 
 ![Truster Access Schema Through Federated](.github/images/AWS_TRUSTER_THROUGH_FEDERATED_ACCESS_SCHEMA.png)
 
-*Truster Access Schema Through Federated*
+*Truster Access Schema through Federated*
 
 - [Create a Truster Strategy with Leapp](.github/tutorials/CREATE_TRUSTER_ACCOUNT.md)
 

@@ -23,7 +23,7 @@ For example, while using the AWS CLI it may become annoying to switch to a diffe
 
 ## Supported Cloud Providers
 - **AWS** - :white_check_mark:
-- **AZURE** - :construction:
+- **AZURE** - :white_check_mark:
 - **GCP** - :construction:
 
 ## Supported Identity Providers
@@ -39,13 +39,43 @@ To install the compiled version, choose the one for your **OS** and simply **dou
 
 # Tutorials
 
-Here is a list of curated **tutorials** to **help you setup** your environment for Leapp.
+Here is a list of curated **tutorials** to **help you setup** your environment for Leapp. 
+
+#### First access tutorial
+
+- [First access to Leapp](.github/tutorials/FIRST_SETUP.md)
+
+Other tutorials are grouped by Access Strategy.
+
+#### AWS Plain Access
+
+[Plain Access Schema]()
+
+- [Create a Plain Strategy with Leapp](.github/tutorials/CREATE_PLAIN_ACCOUNT.md)
+
+#### AWS Federated Access
+
+[Federated Access Schema]()
 
 - Federation between G Suite and AWS
     - [G Suite Federation Setup](.github/tutorials/G_SUITE_FEDERATION_SETUP.md)
     - [AWS Federation Setup](.github/tutorials/AWS_FEDERATION_SETUP.md)
 - [Enable role federated access](.github/tutorials/ENABLE_ROLE_FEDERATED_ACCESS.md)
 - [Assign role to G Suite Principal](.github/tutorials/ASSIGN_ROLE_TO_G_SUITE_PRINCIPAL.md)
+- [Create a Federated Strategy with Leapp](.github/tutorials/CREATE_FEDERATED_ACCOUNT.md)
+
+#### AWS Truster Access
+
+[Truster Access Schema]()
+
+- [Create a Truster Strategy with Leapp](.github/tutorials/CREATE_TRUSTER_ACCOUNT.md)
+
+#### Azure Access
+
+[Azure Access Schema]()
+
+- [Create an Azure Strategy with Leapp](.github/tutorials/CREATE_AZURE_ACCOUNT.md)
+
 
 # Quickstart
 

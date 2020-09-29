@@ -106,4 +106,8 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     }
   }
 
+  openDocumentation() {
+    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
+  }
+
 }

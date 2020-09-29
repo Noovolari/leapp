@@ -39,7 +39,7 @@ Other tutorials are grouped by Access Strategy.
 
 - Follow the **Federation between G Suite and AWS**, **Enable role federated access**, 
 and **Assign role to G Suite Principal** tutorials listed in **AWS Federated Access** Strategy.
-- [Create Trust Relationship between Federated Role/Cloud User and Truster Role](.github/tutorials/CREATE_TRUST_RELATIONSHIP_BETWEEN_AN_AWS_FEDERATED_ROLE_CLOUD_USER_AND_AN_AWS_TRUSTER_ROLE.md)
+- [Create Trust Relationship between Federated Role/Cloud User and Truster Role](../tutorials/CREATE_TRUST_RELATIONSHIP_BETWEEN_AN_AWS_FEDERATED_ROLE_CLOUD_USER_AND_AN_AWS_TRUSTER_ROLE.md)
 - [Create a Truster Strategy with Leapp](../tutorials/CREATE_TRUSTER_ACCOUNT.md)
 
 #### Azure Access

@@ -36,9 +36,10 @@ export class MenuService extends NativeService {
   }
 
   generateMenu() {
-    if (this.currentTray) {
-      this.currentTray.destroy();
-    }
+    // if (this.currentTray) {
+    //  this.currentTray.destroy();
+    //  this.currentTray = null;
+    // }
 
     const version = this.appService.getApp().getVersion();
 
@@ -75,7 +76,7 @@ export class MenuService extends NativeService {
               this.sessionService.stopSession(session);
             }
             this.appService.redrawList.emit(true);
-            this.currentTray.destroy();
+            //  this.currentTray.destroy();
             this.generateMenu();
 
         } },
@@ -93,7 +94,10 @@ export class MenuService extends NativeService {
     voices = voices.concat(extraInfo);
     const contextMenu = this.Menu.buildFromTemplate(voices);
 
-    this.currentTray = new this.Tray(__dirname + `/assets/images/LeappMini.png`);
+    if (!this.currentTray) {
+      this.currentTray = new this.Tray(__dirname + `/assets/images/LeappMini.png`);
+    }
+
     this.currentTray.setToolTip('Leapp');
     this.currentTray.setContextMenu(contextMenu);
   }

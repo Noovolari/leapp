@@ -86,6 +86,8 @@ Other tutorials are grouped by Access Strategy.
 
 *Azure Access Schema*
 
+- Federation between G Suite and Azure
+    - [Azure G Suite Federation](.github/tutorials/FEDERATION_BETWEEN_AZURE_AND_GSUITE.md)
 - [Create an Azure Strategy with Leapp](.github/tutorials/CREATE_AZURE_ACCOUNT.md)
 
 

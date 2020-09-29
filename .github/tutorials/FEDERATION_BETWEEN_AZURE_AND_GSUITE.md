@@ -4,7 +4,7 @@
 
 ![](../images/FEDERATION_AZURE_1.png)
 
-*G Suite SAML App setup.*
+*G Suite SAML Application setup.*
 
 ![](../images/FEDERATION_AZURE_2.png)
 
@@ -26,11 +26,15 @@ A custom domain name could be federated to G Suite only if it is not the primary
 
 ### Create <YOUR DOMAIN> Users
 
-For example, create jon@your_domain.net and doe@your_domain.net. Users' permissions should be set inside the Subscription's "Access control (IAM)" section.
+You need to create a User in Azure Active Directory for each G Suite User to whom you want to allow
+access to your Tenant's resources. Users' permissions should be set inside the Subscription's "Access control (IAM)" section.
+
+For example, create jon@your_domain.net and doe@your_domain.net. 
+We specified your_domain.net for the sake of this tutorial.
 
 ### Set Users' ImmutableId
 
-ImmutableId must be set before federating G Suite with Azure A
+ImmutableId must be set before federating G Suite with Azure Active Directory.
 
 ```jsx
 Set-MsolUser -UserPrincipalName jon@your_domain.net -ImmutableId jon@your_domain.net
@@ -47,8 +51,10 @@ Remove users from recycle bin to avoid conflicts when setting new users' Immutab
 
 - Create new custom domain; it should NOT be the primary one
 - Set users' ImmutableId
-- Run `Set-MsolDomainAuthentication` as a Member and not as a Guest user
-- Member user should have sufficient privileges to run `Connect-MsolService`
+- Run MSOnline module's `Set-MsolDomainAuthentication` as a Member and not as a Guest user
+- Member user should have sufficient privileges to run MSOnline module's `Connect-MsolService`
+
+You can find the MSOnline module's documentation [here](https://docs.microsoft.com/en-us/powershell/module/msonline/?view=azureadps-1.0#msonline).
 
 ---
 
@@ -80,10 +86,4 @@ Set-MsolDomainAuthentication `
   -PreferredAuthenticationProtocol "SAMLP"
 ```
 
-`<metadata-xml-file-path>` : path to the XML file downloaded from the G Suite SAML App.
-
-## References
-
-[Google Apps the iDP via SAML for Office 365](https://stackoverflow.com/questions/52945970/google-apps-the-idp-via-saml-for-office-365)
-
-[How To: Single Sign-On (SSO) between G Suite and Office 365 with G Suite as identity provider (IdP)](https://medium.com/@james.winegar/how-to-single-sign-on-sso-between-g-suite-and-office-365-with-g-suite-as-identity-provider-idp-5bf5031835a0)
+`<metadata-xml-file-path>`: path to the XML file downloaded from the G Suite SAML App.

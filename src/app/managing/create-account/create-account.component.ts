@@ -192,12 +192,10 @@ export class CreateAccountComponent implements OnInit {
   }
 
   openAccessStrategyDocumentation() {
-    window.open('https://github.com/Noovolari/leapp/blob/master/README.md',
-      '_blank');
+    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
 
   openSSODocumentation() {
-    window.open('https://github.com/Noovolari/leapp/blob/master/.github/tutorials/G_SUITE_FEDERATION_SETUP',
-      '_blank');
+    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/.github/tutorials/G_SUITE_FEDERATION_SETUP');
   }
 }

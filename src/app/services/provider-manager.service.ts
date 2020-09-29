@@ -256,7 +256,6 @@ export class ProviderManagerService {
    * this way depending on new accounts we jkust need to pass the form object to the validator
    */
   formValid(form, accountType) {
-
     // First check the type of account we are creating
     if (accountType !== AccountType.AZURE) {
       // Get the workspace
@@ -271,7 +270,6 @@ export class ProviderManagerService {
             form.controls['accountNumber'].valid &&
             form.controls['role'].valid &&
             form.controls['idpArn'].valid;
-
         case AccountType.AWS_TRUSTER:
           // Check Federated fields
           return form.controls['name'].valid &&
@@ -282,11 +280,9 @@ export class ProviderManagerService {
             form.controls['federatedRole'].valid;
         case AccountType.AWS_PLAIN_USER:
           return form.controls['name'].valid &&
-            (form.controls['federationUrl'].valid || workspace.idpUrl) &&
             form.controls['accountNumber'].valid &&
             form.controls['accessKey'].valid &&
             form.controls['secretKey'].valid;
-
       }
     } else {
       // Check Azure fields

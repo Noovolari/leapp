@@ -30,7 +30,7 @@ You need to create a User in Azure Active Directory for each G Suite User to who
 access to your Tenant's resources. Users' permissions should be set inside the Subscription's "Access control (IAM)" section.
 
 For example, create jon@your_domain.net and doe@your_domain.net. 
-We specified your_domain.net for the sake of this tutorial.
+We specified **your_domain.net** for the sake of this tutorial.
 
 ### Set Users' ImmutableId
 

@@ -191,7 +191,13 @@ export class CreateAccountComponent implements OnInit {
     this.typeSelection = false;
   }
 
-  openAccessStrategyDocumentation() {}
+  openAccessStrategyDocumentation() {
+    window.open('https://github.com/Noovolari/leapp/blob/master/README.md',
+      '_blank');
+  }
 
-  openSSODocumentation() {}
+  openSSODocumentation() {
+    window.open('https://github.com/Noovolari/leapp/blob/master/.github/tutorials/G_SUITE_FEDERATION_SETUP',
+      '_blank');
+  }
 }

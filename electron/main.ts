@@ -12,7 +12,6 @@ const fs = require('fs');
 const os = require('os');
 const log = require('electron-log');
 const exec = require('child_process').exec;
-const {autoUpdater} = require('electron-updater');
 const ipc = require('electron').ipcMain;
 
 // Fix for warning at startup
@@ -113,32 +112,6 @@ const generateMainWindow = () => {
     });
   };
 
-  autoUpdater.on('checking-for-update', () => {
-    log.info('Checking for update...');
-  });
-  autoUpdater.on('update-available', (info) => {
-    log.info('Update available.');
-  });
-  autoUpdater.on('update-not-available', (info) => {
-    log.info('Update not available.');
-  });
-  autoUpdater.on('error', (err) => {
-    log.info('Error in auto-updater. ' + err);
-  });
-  autoUpdater.on('download-progress', (progressObj) => {
-    let logMessage = 'Download speed: ' + progressObj.bytesPerSecond;
-    logMessage = logMessage + ' - Downloaded ' + progressObj.percent + '%';
-    logMessage = logMessage + ' (' + progressObj.transferred + '/' + progressObj.total + ')';
-    log.info(logMessage);
-  });
-  autoUpdater.on('update-downloaded', (ev, info) => {
-    // Wait 5 seconds, then quit and install
-    // In your application, you don't need to wait 5 seconds.
-    // You could call autoUpdater.quitAndInstall(); immediately
-    log.info('Update downloaded');
-    autoUpdater.quitAndInstall();
-  });
-
   app.on('activate', () => {
     if (win === null || win === undefined) {
       createWindow();
@@ -152,8 +125,8 @@ const generateMainWindow = () => {
   });
 
   app.on('ready', () => {
-    autoUpdater.checkForUpdatesAndNotify();
     createWindow();
+    require('update-electron-app')();
   });
 
   const gotTheLock = app.requestSingleInstanceLock();

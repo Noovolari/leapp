@@ -48,9 +48,9 @@ export class AppComponent implements OnInit {
 
     // Prevent Dev Tool to show on production mode
     this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
-      if (environment.production) {
+      // if (environment.production) {
         this.app.currentBrowserWindow().webContents.closeDevTools();
-      }
+      // }
     });
 
     // We get the right moment to set an hook to app close

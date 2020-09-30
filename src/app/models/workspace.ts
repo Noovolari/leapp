@@ -13,5 +13,5 @@ export interface Workspace {
   azureProfile: string;
 
   sessions: Session[];
-  awsCredentials?: AwsCredentials;
+  ssmCredentials?: any;
 }

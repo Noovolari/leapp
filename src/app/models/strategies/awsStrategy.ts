@@ -60,6 +60,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
 
+    workspace.ssmCredentials = credentials;
+    this.configurationService.updateWorkspaceSync(workspace);
+
     this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
     this.configurationService.disableLoadingWhenReady(workspace, session);
   }

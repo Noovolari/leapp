@@ -147,13 +147,19 @@ export class SsmService {
    * @param data - the credential information
    * @param region - the region for the client
    */
-  setConfig(data: { default: AwsCredential }, region) {
-    return {
+  setConfig(data: AwsCredential , region) {
+
+    return data.aws_session_token ? {
       region,
       credentials: {
-        accessKeyId: data.default.aws_access_key_id,
-        secretAccessKey: data.default.aws_secret_access_key,
-        sessionToken: data.default.aws_session_token
+        accessKeyId: data.aws_access_key_id,
+        secretAccessKey: data.aws_secret_access_key,
+        sessionToken: data.aws_session_token
+      }} : {
+      region,
+      credentials: {
+        accessKeyId: data.aws_access_key_id,
+        secretAccessKey: data.aws_secret_access_key
       }};
   }
 }

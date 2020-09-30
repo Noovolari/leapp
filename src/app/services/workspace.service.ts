@@ -411,6 +411,9 @@ export class WorkspaceService extends NativeService {
     credential.aws_secret_access_key = secretAccessKey;
     credential.aws_session_token = sessionToken;
 
+    workspace.ssmCredentials = credential;
+    this.configurationService.updateWorkspaceSync(workspace);
+
     // Return it!
     return {default: credential};
   }

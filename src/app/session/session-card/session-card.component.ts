@@ -181,7 +181,8 @@ export class SessionCardComponent implements OnInit {
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
       // Set the aws credentials to instanziate the ssm client
-      const credentials = this.configurationService.getDefaultWorkspaceSync().awsCredentials;
+      const credentials = this.configurationService.getDefaultWorkspaceSync().ssmCredentials;
+
       // Check the result of the call
       this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
         this.instances = result.instances;

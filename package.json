@@ -16,12 +16,12 @@
             "email": "paolo.diciaula@besharp.it"
         },
         {
-          "name" : "Eric Villa",
-          "email": "eric@noovolari.com"
+            "name": "Eric Villa",
+            "email": "eric@noovolari.com"
         },
         {
-          "name": "Andrea Cavagna",
-          "email": "andrea.cavagna@noovolari.com"
+            "name": "Andrea Cavagna",
+            "email": "andrea.cavagna@noovolari.com"
         }
     ],
     "repository": "https://github.com/Noovolari/leapp",
@@ -198,7 +198,7 @@
         "@types/jasminewd2": "~2.0.3",
         "@types/node": "^10.17.27",
         "codelyzer": "^5.2.2",
-        "electron": "8.5.2",
+        "electron": "^8.5.2",
         "electron-builder": "^22.7.0",
         "electron-builder-squirrel-windows": "^21.1.3",
         "electron-installer-dmg": "^3.0.0",

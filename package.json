@@ -14,8 +14,17 @@
         {
             "name": "Paolo Diciaula",
             "email": "paolo.diciaula@besharp.it"
+        },
+        {
+          "name" : "Eric Villa",
+          "email": "eric@noovolari.com"
+        },
+        {
+          "name": "Andrea Cavagna",
+          "email": "andrea.cavagna@noovolari.com"
         }
     ],
+    "repository": "https://github.com/Noovolari/leapp",
     "private": true,
     "category": "public.app-category.developer-tools",
     "homepage": "https://www.noovolari.com",
@@ -173,6 +182,7 @@
         "semver": "^6.3.0",
         "sudo-prompt": "^9.2.1",
         "tslib": "^1.13.0",
+        "update-electron-app": "^2.0.1",
         "uuid": "^8.3.0",
         "v8-compile-cache": "^2.1.1",
         "zlib": "^1.0.5",

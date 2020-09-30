@@ -26,6 +26,10 @@ export class ExecuteServiceService extends NativeService {
           command = command.substring(5, command.length);
         }
 
+        if (this.process.platform === 'darwin') {
+          command = '/usr/local/bin/' + command;
+        }
+
         exec(command, {name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
           this.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
           if (err) {

@@ -139,7 +139,6 @@ export class SsmService {
     }, err2 => {
       this.app.toast(err2.stack, ToastLevel.ERROR, 'Error in running instance via SSM');
     });
-
   }
 
   /**

@@ -27,7 +27,11 @@ export class ExecuteServiceService extends NativeService {
         }
 
         if (this.process.platform === 'darwin') {
-          command = '/usr/local/bin/' + command;
+          if (command.indexOf('osascript') === -1) {
+            command = '/usr/local/bin/' + command;
+          } else {
+            command = '/usr/bin/' + command;
+          }
         }
 
         exec(command, {name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {

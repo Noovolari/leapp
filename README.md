@@ -24,12 +24,12 @@ For example, while using the AWS CLI it may become annoying to switch to a diffe
 ## Supported Cloud Providers
 - **AWS** - :white_check_mark:
 - **AZURE** - :white_check_mark:
-- **GCP** - :construction:
+- **GCP** - :soon:
 
 ## Supported Identity Providers
 - **G Suite** - :white_check_mark:
-- **AZURE AD** - :construction:
-- **AWS SSO** - :construction:
+- **AZURE AD** - :soon:
+- **AWS SSO** - :soon:
 
 # Installation
 

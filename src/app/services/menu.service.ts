@@ -36,11 +36,6 @@ export class MenuService extends NativeService {
   }
 
   generateMenu() {
-    // if (this.currentTray) {
-    //  this.currentTray.destroy();
-    //  this.currentTray = null;
-    // }
-
     const version = this.appService.getApp().getVersion();
 
     let voices = [];

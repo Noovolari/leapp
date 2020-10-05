@@ -5,6 +5,7 @@ import {Router} from '@angular/router';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {MenuService} from '../../services/menu.service';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-wizard-page',
@@ -41,6 +42,9 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     // Check to verify the workspace object is well-formed
     // for the current version of Leapp otherwise alert the user
     const result = this.verifyWorkspaceIsWellformed();
+
+    // Show a message informing the user if we needed to make a backup of the credential file
+    this.showCredentialBackupMessageIfNeeded();
 
     if (result) {
       // Generate the contextual menu
@@ -110,4 +114,16 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
 
+  showCredentialBackupMessageIfNeeded() {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const awsCredentialsPath = this.appService.getOS().homedir() + '/' + environment.credentialsDestination + '.leapp.bkp';
+
+    if (JSON.stringify(workspace) === '{}' && this.appService.getFs().existsSync(awsCredentialsPath)) {
+      this.appService.getDialog().showMessageBox({
+        type: 'info',
+        icon: __dirname + '/assets/images/Leapp.png',
+        message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
+      });
+    }
+  }
 }

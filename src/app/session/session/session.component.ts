@@ -11,6 +11,7 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
+import {MenuService} from '../../services/menu.service';
 
 @Component({
   selector: 'app-session',
@@ -25,7 +26,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   // Data for the select
   modalAccounts = [];
-  modalRoles = [];
   currentSelectedColor;
   currentSelectedAccountNumber;
 
@@ -51,7 +51,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private ssmService: SsmService,
     private fileService: FileService,
     private credentialsService: CredentialsService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private menuService: MenuService
   ) { super(); }
 
   ngOnInit() {
@@ -77,6 +78,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
     this.appService.redrawList.subscribe(r => {
       this.getSessions();
+      this.menuService.generateMenu();
     });
   }
 

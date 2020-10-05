@@ -35,7 +35,7 @@ export class SessionService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace.sessions) {
       workspace.sessions.sort((a, b) => {
-        return (a as Session).lastStopDate <= (b as Session).lastStopDate ? 1 : -1;
+        return (a as Session).lastStopDate < (b as Session).lastStopDate ? 1 : -1;
       });
       return workspace.sessions;
     }

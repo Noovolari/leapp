@@ -161,7 +161,7 @@ const generateMainWindow = () => {
 const initWorkspace = () => {
 
   // Remove unused voices from contextual menu
-  Menu.setApplicationMenu(Menu.buildFromTemplate([
+  const template = [
     {
       label: 'Leapp',
       submenu: [
@@ -169,7 +169,11 @@ const initWorkspace = () => {
         { label: 'Quit',  role: 'quit' }
       ]
     }
-  ]));
+  ];
+  if (!environment.production) {
+    template[0].submenu.push({ label: 'Open DevTool', role: 'toggledevtools' });
+  }
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 
   if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
     process.env.XDG_CURRENT_DESKTOP = 'Unity';

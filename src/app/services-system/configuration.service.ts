@@ -9,6 +9,7 @@ import {Workspace} from '../models/workspace';
 import {Configuration} from '../models/configuration';
 import {_} from '../core/translation-marker';
 import {Session} from '../models/session';
+import {MenuService} from '../services/menu.service';
 
 
 @Injectable({

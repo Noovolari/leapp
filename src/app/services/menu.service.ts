@@ -39,22 +39,24 @@ export class MenuService extends NativeService {
     const version = this.appService.getApp().getVersion();
 
     let voices = [];
-    this.sessionService.listSessions().slice(0, 5).forEach((session: Session) => {
+    const activeSessions = this.sessionService.listSessions().filter(s => s.active);
+    const allSessions = activeSessions.concat(this.sessionService.listSessions().filter(s => !s.active).slice(0, 5 - activeSessions.length));
+    allSessions.forEach((session: Session) => {
       let icon = '';
       let label = '';
       switch (session.account.type) {
         case AccountType.AWS_PLAIN_USER:
-          icon = session.active ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
+          icon = (session.active && !session.loading) ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + (session.account as AwsPlainAccount).user;
           break;
         case AccountType.AWS:
         case AccountType.AWS_TRUSTER:
-          icon = session.active ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
+          icon = (session.active && !session.loading) ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + (session.account as AwsAccount).role.name;
           break;
 
         case AccountType.AZURE:
-          icon = session.active ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
+          icon = (session.active && !session.loading) ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
           label = '  ' + session.account.accountName;
       }
       voices.push(
@@ -71,9 +73,7 @@ export class MenuService extends NativeService {
               this.sessionService.stopSession(session);
             }
             this.appService.redrawList.emit(true);
-            //  this.currentTray.destroy();
             this.generateMenu();
-
         } },
       );
     });

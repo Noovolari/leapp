@@ -154,7 +154,7 @@ var generateMainWindow = function () {
 // Prepare and generate the main window if everything is setupped correctly
 var initWorkspace = function () {
     // Remove unused voices from contextual menu
-    Menu.setApplicationMenu(Menu.buildFromTemplate([
+    var template = [
         {
             label: 'Leapp',
             submenu: [
@@ -162,7 +162,11 @@ var initWorkspace = function () {
                 { label: 'Quit', role: 'quit' }
             ]
         }
-    ]));
+    ];
+    if (!environment_1.environment.production) {
+        template[0].submenu.push({ label: 'Open DevTool', role: 'toggledevtools' });
+    }
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
     if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
         process.env.XDG_CURRENT_DESKTOP = 'Unity';
     }

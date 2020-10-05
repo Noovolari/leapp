@@ -106,7 +106,6 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
       this.timerService.defineTimer();
 
       // Emit return credentials
-      this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');
       this.credentialsService.refreshReturnStatusEmit.emit(true);
     }, err2 => {
       workspace.sessions.forEach(sess => {

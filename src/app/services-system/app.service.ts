@@ -6,10 +6,7 @@ import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirm
 import {BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
-import {SessionService} from '../services/session.service';
-import {CredentialsService} from '../services/credentials.service';
-import {Workspace} from '../models/workspace';
-import {Session} from '../models/session';
+import {ConfigurationService} from './configuration.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +21,7 @@ export class AppService extends NativeService {
   constructor(
     private fileService: FileService,
     private toastr: ToastrService,
-    private modalService: BsModalService,
+    private modalService: BsModalService
   ) {
     super();
   }
@@ -34,6 +31,27 @@ export class AppService extends NativeService {
    */
   getApp() {
     return this.app;
+  }
+
+  /**
+   * Return the dialog native object
+   */
+  getDialog() {
+    return this.dialog;
+  }
+
+  /**
+   * Return the native os object
+   */
+  getOS() {
+    return this.os;
+  }
+
+  /**
+   * Return the fs native object
+   */
+  getFs() {
+    return this.fs;
   }
 
   /**

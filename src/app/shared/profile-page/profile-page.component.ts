@@ -17,7 +17,6 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   name = '';
   email = '';
   idpUrlValue;
-  idpUrlValueAzure;
   proxyUrl;
   workspaceData: Workspace;
 
@@ -38,7 +37,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData.name && this.workspaceData.name !== '') {
       this.idpUrlValue = this.workspaceData.idpUrl;
-      this.proxyUrl = this.workspaceData.proxyUrl;
+      this.proxyUrl = this.workspaceData.proxyUrl && this.workspaceData.proxyUrl !== 'undefined' ? this.workspaceData.proxyUrl : '';
       this.form.controls['idpUrl'].setValue(this.idpUrlValue);
       this.form.controls['proxyUrl'].setValue(this.proxyUrl);
       this.name = this.workspaceData.name;

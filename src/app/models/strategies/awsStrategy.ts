@@ -55,16 +55,39 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     }
   }
 
+  /**
+   * In this method we transform plain to temporary to avoid saving plain credential in the file
+   * @param workspace - the workspace we are working on
+   * @param session - the current sessin we use to retrieve information from
+   */
   private async awsCredentialProcess(workspace: Workspace, session) {
     const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
 
-    workspace.ssmCredentials = credentials;
-    this.configurationService.updateWorkspaceSync(workspace);
+    // Update AWS sdk with new credentials
+    AWS.config.update({
+      accessKeyId: credentials.default.aws_access_key_id,
+      secretAccessKey: credentials.default.aws_secret_access_key
+    });
 
-    this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
-    this.configurationService.disableLoadingWhenReady(workspace, session);
+
+    // Transform in temporary
+    const sts = new AWS.STS();
+
+    sts.getSessionToken({ DurationSeconds: environment.sessionDuration }, (err, data) => {
+
+      console.log('err', err);
+      console.log('cred', data);
+
+      const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.accountNumber);
+
+      workspace.ssmCredentials = tempCredentials;
+      this.configurationService.updateWorkspaceSync(workspace);
+
+      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), tempCredentials);
+      this.configurationService.disableLoadingWhenReady(workspace, session);
+    });
   }
 
   awsCredentialFederatedProcess(workspace, session) {
@@ -124,8 +147,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
-
-      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
       // Update AWS sdk with new credentials
       AWS.config.update({

@@ -41,6 +41,9 @@ export class CreateAccountComponent implements OnInit {
   accounts: AwsAccount[];
   accountId;
 
+  regions = [];
+  selectedRegion;
+
   eAccountType = AccountType;
 
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
@@ -58,7 +61,8 @@ export class CreateAccountComponent implements OnInit {
     federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
     plainUser: new FormControl('', [Validators.required]),
     secretKey: new FormControl('', [Validators.required]),
-    accessKey: new FormControl('', [Validators.required])
+    accessKey: new FormControl('', [Validators.required]),
+    awsRegion: new FormControl('')
   });
 
   /* Setup the first account for the application */
@@ -104,6 +108,9 @@ export class CreateAccountComponent implements OnInit {
       if (this.firstTime) {
         this.form.controls['federatedOrTruster'].disable({ onlySelf: true });
       }
+
+      this.regions = this.appService.getRegions();
+      this.selectedRegion = this.regions[0].region;
     });
   }
 
@@ -138,6 +145,7 @@ export class CreateAccountComponent implements OnInit {
         this.accountType,
         this.selectedSession,
         this.selectedRole,
+        this.selectedRegion,
         this.form
       );
     } else {
@@ -146,6 +154,7 @@ export class CreateAccountComponent implements OnInit {
         this.accountType,
         this.selectedSession,
         this.selectedRole,
+        this.selectedRegion,
         this.form
       );
     }

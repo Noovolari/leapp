@@ -30,7 +30,7 @@ export class FederatedAccountService extends NativeService {
    * @param role - the role to add to the account
    * @param idpArn - the idp arn as it is federated
    */
-  addFederatedAccountToWorkSpace(accountNumber: string, accountName: string, role: any, idpArn: string) {
+  addFederatedAccountToWorkSpace(accountNumber: string, accountName: string, role: any, idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
@@ -44,6 +44,7 @@ export class FederatedAccountService extends NativeService {
         accountNumber,
         role,
         idpArn,
+        region,
         idpUrl: configuration.federationUrl,
         type: AccountType.AWS,
         parent: undefined,

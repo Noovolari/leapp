@@ -338,7 +338,7 @@ export class WorkspaceService extends NativeService {
     let credentials;
     try {
       // Construct actual credentials
-      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.accountNumber);
+      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.region);
 
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
@@ -377,7 +377,7 @@ export class WorkspaceService extends NativeService {
           } else {
 
             // we set the new credentials after the first jump
-            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.accountNumber);
+            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.region);
 
             this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -405,10 +405,10 @@ export class WorkspaceService extends NativeService {
    * For simplicity we have a method that can help us extract and compose a credential object whenever we want
    * @param stsResponse - the STS response from an STs client object getTemporaryCredentials of any type
    * @param workspace - the workspace tf the request
-   * @param accountNumber - the accountNumber of the request to obtain the sts token
+   * @param region - region for aws
    * @returns an object of type {AwsCredential}
    */
-  constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, accountNumber: string): AwsCredentials {
+  constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, region: string): AwsCredentials {
     // these are the standard STS response types
     const accessKeyId = stsResponse.Credentials.AccessKeyId;
     const secretAccessKey = stsResponse.Credentials.SecretAccessKey;
@@ -422,6 +422,10 @@ export class WorkspaceService extends NativeService {
 
     workspace.ssmCredentials = credential;
     this.configurationService.updateWorkspaceSync(workspace);
+
+    if (region && region !== 'no region necessary') {
+      credential.region = region;
+    }
 
     // Return it!
     return {default: credential};

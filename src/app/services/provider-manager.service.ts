@@ -20,6 +20,7 @@ export class ProviderManagerService {
   selectedAccount;
   selectedSession;
   selectedRole;
+  selectedRegion;
 
   /**
    * Used to manage all the choices done in the app regarding the correct provider to use:
@@ -75,9 +76,10 @@ export class ProviderManagerService {
    * @param accountType - the account Type you have chosen
    * @param selectedSession - the selected session
    * @param selectedRole - the selected role of the parent
+   * @param selectedRegion - the region to select for aws
    * @param form - the form to use
    */
-  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, form) {
+  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
@@ -85,6 +87,7 @@ export class ProviderManagerService {
     this.accountType = accountType;
     this.selectedSession = selectedSession;
     this.selectedRole = selectedRole;
+    this.selectedRegion = selectedRegion;
     this.form = form;
 
     // Before we need to save the first workspace and call google: this is done only the first time so it is not used in other classes
@@ -116,9 +119,10 @@ export class ProviderManagerService {
    * @param accountType - the account Type you have chosen
    * @param selectedSession - the selected session
    * @param selectedRole - the selected role of the parent
+   * @param selectedRegion - the region to select for aws
    * @param form - the form to use
    */
-  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, form) {
+  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
@@ -129,6 +133,7 @@ export class ProviderManagerService {
     }
     this.selectedSession = selectedSession;
     this.selectedRole = selectedRole;
+    this.selectedRegion = selectedRegion;
     this.form = form;
     this.decideSavingMethodAndSave();
   }
@@ -206,7 +211,8 @@ export class ProviderManagerService {
           (this.selectedSession as Session).id,
           this.selectedRole,
           this.generateRolesFromNames(this.form),
-          this.form.value.idpArn);
+          this.form.value.idpArn,
+          this.selectedRegion);
 
         return created;
       } catch (err) {
@@ -227,7 +233,8 @@ export class ProviderManagerService {
           this.form.value.accountNumber,
           this.form.value.name,
           this.generateRolesFromNames(this.form),
-          this.form.value.idpArn);
+          this.form.value.idpArn,
+          this.selectedRegion);
 
         return created;
       } catch (err) {

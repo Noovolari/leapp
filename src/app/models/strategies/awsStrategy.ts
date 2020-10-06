@@ -80,7 +80,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       console.log('err', err);
       console.log('cred', data);
 
-      const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.accountNumber);
+      const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
 
       workspace.ssmCredentials = tempCredentials;
       this.configurationService.updateWorkspaceSync(workspace);
@@ -173,7 +173,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           this.configurationService.disableLoadingWhenReady(workspace, session);
         } else {
           // we set the new credentials after the first jump
-          const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.accountNumber);
+          const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
 
           this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 

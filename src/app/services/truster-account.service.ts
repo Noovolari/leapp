@@ -29,7 +29,7 @@ export class TrusterAccountService extends NativeService {
    * @param idpArn - the idArn used for the federated account
    */
   addTrusterAccountToWorkSpace(accountNumber: string, accountName: string, parentAccountSessionId: string, parentRole: string,
-                               role: any, idpArn: string) {
+                               role: any, idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
@@ -45,6 +45,7 @@ export class TrusterAccountService extends NativeService {
         idpArn,
         parent: parentAccountSessionId,
         parentRole,
+        region,
         idpUrl: configuration.federationUrl,
         type: AccountType.AWS
       };

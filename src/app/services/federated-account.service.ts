@@ -77,7 +77,7 @@ export class FederatedAccountService extends NativeService {
    * @param secretKey - secret key of the user
    * @param accessKey - access key of the AWS user
    */
-  addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string) {
+  addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
@@ -89,6 +89,7 @@ export class FederatedAccountService extends NativeService {
         accountId: accountNumber,
         accountName,
         accountNumber,
+        region,
         type: AccountType.AWS_PLAIN_USER,
         user
       };

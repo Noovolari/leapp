@@ -168,6 +168,13 @@ const initWorkspace = () => {
         { label: 'About',  role: 'about' },
         { label: 'Quit',  role: 'quit' }
       ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { label: 'Copy', role: 'copy' },
+        { label: 'Paste', role: 'paste' }
+      ]
     }
   ];
   if (!environment.production) {

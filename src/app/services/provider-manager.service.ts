@@ -253,7 +253,8 @@ export class ProviderManagerService {
       this.form.value.name,
       this.form.value.plainUser,
       this.form.value.secretKey,
-      this.form .value.accessKey);
+      this.form .value.accessKey,
+      this.selectedRegion);
     return true;
   }
 

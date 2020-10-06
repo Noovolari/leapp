@@ -1,4 +1,3 @@
-import { AwsCredentials } from './credential';
 import { Session } from './session';
 
 export interface Workspace {
@@ -6,12 +5,15 @@ export interface Workspace {
   name: string;
 
   lastIDPToken?: string;
+
   idpUrl?: string;
   proxyUrl?: string;
+  ssoAlias?: string;
 
   azureConfig: string;
   azureProfile: string;
 
-  sessions: Session[];
   ssmCredentials?: any;
+
+  sessions: Session[];
 }

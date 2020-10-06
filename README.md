@@ -28,8 +28,10 @@ For example, while using the AWS CLI it may become annoying to switch to a diffe
 - **GCP** - :soon:
 
 ## Supported Identity Providers
-- **G Suite** - :white_check_mark:
-- **AZURE AD** - :soon:
+- **G Suite to AWS** - :white_check_mark:
+- **G Suite to Azure** - :white_check_mark:
+- **AZURE AD to Azure** - :white_check_mark:
+- **AZURE AD to AWS** - :soon:
 - **AWS SSO** - :soon:
 
 # Installation

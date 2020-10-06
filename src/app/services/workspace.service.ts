@@ -119,6 +119,12 @@ export class WorkspaceService extends NativeService {
     // This filter is used to listen to go to a specific callback url (or the generic one)
     const filter = {urls: ['https://signin.aws.amazon.com/saml']};
 
+    // Update: now add an alias SSO url as a possible filter
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    if (workspace.ssoAliasUrl) {
+      filter.urls.push(workspace.ssoAliasUrl);
+    }
+
     // Our request filter call the generic hook filter passing the idp response type
     // to construct the ideal method to deal with the construction of the response
     this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
@@ -151,6 +157,8 @@ export class WorkspaceService extends NativeService {
     return new Observable<boolean>(observer => {
       this.httpClient.get(url).subscribe(() => {
       }, err => {
+        console.log('check for err', err);
+
         if (err.status === 500 || err.error.text === undefined) {
           observer.error('There was a problem with your connection. Please retry.');
           observer.complete();

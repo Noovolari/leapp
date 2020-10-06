@@ -18,11 +18,13 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   email = '';
   idpUrlValue;
   proxyUrl;
+  ssoAliasUrl;
   workspaceData: Workspace;
 
   public form = new FormGroup({
     idpUrl: new FormControl('', [Validators.required]),
-    proxyUrl: new FormControl('')
+    proxyUrl: new FormControl(''),
+    ssoAliasUrl: new FormControl(''),
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -38,8 +40,10 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     if (this.workspaceData.name && this.workspaceData.name !== '') {
       this.idpUrlValue = this.workspaceData.idpUrl;
       this.proxyUrl = this.workspaceData.proxyUrl && this.workspaceData.proxyUrl !== 'undefined' ? this.workspaceData.proxyUrl : '';
+      this.ssoAliasUrl = this.workspaceData.proxyUrl && this.workspaceData.proxyUrl !== 'undefined' ? this.workspaceData.proxyUrl : '';
       this.form.controls['idpUrl'].setValue(this.idpUrlValue);
       this.form.controls['proxyUrl'].setValue(this.proxyUrl);
+      this.form.controls['ssoAliasUrl'].setValue(this.ssoAliasUrl);
       this.name = this.workspaceData.name;
       this.email = localStorage.getItem('hook_email') || 'not logged in yet';
       this.appService.validateAllFormFields(this.form);
@@ -49,7 +53,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   /**
    * Save the idp-url again
    */
-  saveIdpUrls() {
+  saveOptions() {
     if (this.form.valid) {
       this.workspaceData.idpUrl = this.form.value.idpUrl;
 
@@ -57,6 +61,12 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
           this.form.controls['proxyUrl'].value !== null &&
           this.form.controls['proxyUrl'].value !== '') {
             this.workspaceData.proxyUrl = this.form.controls['proxyUrl'].value;
+      }
+
+      if (this.form.controls['ssoAliasUrl'].value !== undefined &&
+        this.form.controls['ssoAliasUrl'].value !== null &&
+        this.form.controls['ssoAliasUrl'].value !== '') {
+        this.workspaceData.proxyUrl = this.form.controls['ssoAliasUrl'].value;
       }
 
       this.configurationService.updateWorkspaceSync(this.workspaceData);
@@ -67,6 +77,8 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
         this.appService.toast('You\'ve set a proxy url: the app must be restarted to update the configuration.', ToastLevel.WARN, 'Force restart');
         this.appService.restart();
       }
+
+      this.appService.toast('Option saved.', ToastLevel.INFO, 'Options');
     }
   }
 

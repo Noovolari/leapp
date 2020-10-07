@@ -54,11 +54,13 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     if (this.form.valid) {
       this.workspaceData.idpUrl = this.form.value.idpUrl;
 
-      if (this.form.controls['proxyUrl'].value !== undefined &&
+      /* if (this.form.controls['proxyUrl'].value !== undefined &&
           this.form.controls['proxyUrl'].value !== null &&
           this.form.controls['proxyUrl'].value !== '') {
             this.workspaceData.proxyUrl = this.form.controls['proxyUrl'].value;
-      }
+      } */
+
+      this.workspaceData.proxyUrl = this.form.controls['proxyUrl'].value;
 
       this.configurationService.updateWorkspaceSync(this.workspaceData);
 

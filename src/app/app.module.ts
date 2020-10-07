@@ -7,11 +7,13 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ModalModule, TooltipModule } from 'ngx-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { LayoutModule } from './layout/layout.module';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import {SharedModule} from './shared/shared.module';
+
+import { HttpClientProxyInterceptor } from './interceptors/HttpClientProxyInterceptor';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
@@ -43,7 +45,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     }),
   ],
   entryComponents: [ConfirmationDialogComponent],
-  providers: [],
+  providers: [
+    // { provide: HTTP_INTERCEPTORS, useClass: HttpClientProxyInterceptor, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -20,7 +20,7 @@ export class NativeService {
   protected sudo: any;
   protected md5File: any;
   protected path: any;
-  protected url: any;
+  public url: any;
   protected currentWindow: any;
   protected log: any;
   protected semver: any;
@@ -32,6 +32,10 @@ export class NativeService {
   protected process: any;
   protected ipcRenderer: any;
   protected keytar: any;
+  public http: any;
+  public https: any;
+  public httpProxyAgent: any;
+  public httpsProxyAgent: any;
 
   constructor() {
     this.fs = (window as any).fs;
@@ -60,6 +64,10 @@ export class NativeService {
     this.process = (window as any).process;
     this.ipcRenderer = (window as any).ipcRenderer;
     this.keytar = (window as any).keytar;
+    this.http = (window as any).http;
+    this.https = (window as any).https;
+    this.httpProxyAgent = (window as any).httpProxyAgent;
+    this.httpsProxyAgent = (window as any).httpsProxyAgent;
   }
 
 }

@@ -281,7 +281,6 @@ export class ProviderManagerService {
         case AccountType.AWS_TRUSTER:
           // Check Federated fields
           return form.controls['name'].valid &&
-            (form.controls['federationUrl'].valid || workspace.idpUrl) &&
             form.controls['accountNumber'].valid &&
             form.controls['role'].valid &&
             form.controls['federatedAccount'].valid &&

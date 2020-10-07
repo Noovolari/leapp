@@ -22,7 +22,8 @@ export class CreateAccountComponent implements OnInit {
   firstTime = false;
   providerSelected = false;
   typeSelection = false;
-  ssoInserted = false;
+  hasOneGoodSession = false;
+  hasSsoUrl = false;
 
   toggleOpen = true;
   roles: string[] = [];
@@ -93,16 +94,13 @@ export class CreateAccountComponent implements OnInit {
       });
 
       // Add parameters to check what to do with form data
-      this.ssoInserted = (this.workspace.idpUrl !== undefined && this.workspace.idpUrl !== null);
-      this.firstTime = params['firstTime'] || !this.ssoInserted; // This way we also fix potential incongruence when you have half saved setup
-      if (this.ssoInserted) {
-        this.fedUrl = this.workspace.idpUrl;
-      }
+      this.hasOneGoodSession = sessions.length > 0;
+      this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
+      this.fedUrl = this.workspace.idpUrl;
+      this.hasSsoUrl = this.fedUrl && this.fedUrl !== '';
 
       // Show the federated accounts
       this.federatedAccounts = this.accounts;
-
-      console.log('federatedAccounts: ', this.federatedAccounts);
 
       // only for start screen
       if (this.firstTime) {
@@ -187,7 +185,8 @@ export class CreateAccountComponent implements OnInit {
     } else {
       this.accountType = undefined;
       this.provider = undefined;
-      this.ssoInserted = false;
+      this.hasOneGoodSession = false;
+      this.hasSsoUrl = false;
       this.providerSelected = false;
       this.typeSelection = false;
       this.firstTime = true;

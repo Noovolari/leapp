@@ -32,15 +32,15 @@
               <button type="button" class="providers {{accountType === eAccountType.AWS_TRUSTER ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.AWS_TRUSTER);" *ngIf="!firstTime">
                 <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
               </button>
-              <span class="providers disabled second-step-fix" *ngIf="firstTime">
-                <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
+              <span class="providers disabled second-step-fix" *ngIf="firstTime" tooltip="You need at least one Federated or Plain AWS account to unlock this feature.">
+                <i class="fa fa-info"></i> Truster
               </span>
             </div>
         </ng-container>
       </div>
     </ng-container>
 
-    <ng-container *ngIf="firstTime && provider === eAccountType.AWS && !ssoInserted && providerSelected && !typeSelection">
+    <ng-container *ngIf="provider === eAccountType.AWS && !hasSsoUrl && providerSelected && !typeSelection">
       <h1>Choose your Access Strategy</h1>
       <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
       <div class="form-group" style="width: 100%; display: inline-block;">
@@ -56,10 +56,10 @@
         <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.controls['federationUrl'].errors">Insert the SSO url</small>
         <small class="note" style="float: left;">*Currently supported Identity Provider is GSuite.<br>Check the documentation on where to find the SSO URL <a (click)="openSSODocumentation();">here</a>.</small>
       </div>
-      <button type="button" [ngClass]="form.controls['federationUrl'].valid ? 'pull-center': 'pull-center disabled'" (click)="ssoInserted = true" [disabled]="!form.controls['federationUrl'].valid">Next</button>
+      <button type="button" [ngClass]="form.controls['federationUrl'].valid ? 'pull-center': 'pull-center disabled'" (click)="hasSsoUrl = true" [disabled]="!form.controls['federationUrl'].valid">Next</button>
     </ng-container>
 
-    <ng-container *ngIf="((provider !== eAccountType.AWS) || (ssoInserted && (provider === eAccountType.AWS))) && !typeSelection && providerSelected">
+    <ng-container *ngIf="((provider !== eAccountType.AWS) || (hasSsoUrl && (provider === eAccountType.AWS))) && !typeSelection && providerSelected">
 
       <h1>Choose your Access Strategy</h1>
       <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>

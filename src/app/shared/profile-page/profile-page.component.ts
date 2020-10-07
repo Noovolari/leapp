@@ -22,7 +22,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   workspaceData: Workspace;
 
   public form = new FormGroup({
-    idpUrl: new FormControl('', [Validators.required]),
+    idpUrl: new FormControl(''),
     proxyUrl: new FormControl(''),
     ssoAliasUrl: new FormControl(''),
   });

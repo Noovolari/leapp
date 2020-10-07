@@ -153,12 +153,12 @@ var initWorkspace = function () {
     }
     else {
         // Check and activate proxy pass if necessary
-        if (workspace.workspaces[0] !== undefined && workspace.workspaces[0].proxyUrl) {
-            console.log('workspace in main, check proxy url:', workspace);
-            process.env.HTTP_PROXY = workspace.workspaces[0].proxyUrl;
-            var globalTunnel = require('global-tunnel');
-            globalTunnel.initialize();
-        }
+        /* if (workspace.workspaces[0] !== undefined && (workspace.workspaces[0] as Workspace).proxyUrl) {
+          console.log('workspace in main, check proxy url:', workspace);
+          process.env.HTTP_PROXY = (workspace.workspaces[0] as Workspace).proxyUrl;
+          const globalTunnel = require('global-tunnel');
+          globalTunnel.initialize();
+        } */
         // Generate the main window
         generateMainWindow();
     }

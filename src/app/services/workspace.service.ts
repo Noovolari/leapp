@@ -5,10 +5,12 @@ import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
-import {Observable} from 'rxjs';
+import {Observable, of, throwError} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
+import {catchError} from 'rxjs/operators';
+// import {PROXY_CONFIG} from '../../../proxy.conf';
 // Import AWS node style
 const AWS = require('aws-sdk');
 
@@ -66,7 +68,7 @@ export class WorkspaceService extends NativeService {
    * @param callbackUrl - the callback url that can be given always by the backend in case is missing we setup a default one
    */
   getIdpToken(idpUrl: string, session: any, type: string, callbackUrl?: string) {
-    this.checkForShowingTheLoginWindow(idpUrl).subscribe(res => {
+    this.checkForShowingTheLoginWindow(idpUrl).subscribe((res) => {
       // We generate a new browser window to host for the Idp Login form
       // Note: this is due to the fact that electron + angular gives problem with embedded webview
       const pos = this.currentWindow.getPosition();
@@ -77,6 +79,18 @@ export class WorkspaceService extends NativeService {
 
       this.idpWindow = this.appService.newWindow(idpUrl, res, 'IDP - Login', pos[0] + 200, pos[1] + 50);
 
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      let proxyUrl;
+      if (workspace) {
+        proxyUrl = workspace.proxyUrl;
+      }
+
+      /* if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+        this.idpWindow.webContents.session.setProxy({
+          proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
+        });
+      } */
+
       // This filter is used to listen to go to a specific callback url (or the generic one)
       const filter = {urls: ['https://signin.aws.amazon.com/saml']};
 
@@ -86,7 +100,9 @@ export class WorkspaceService extends NativeService {
         this.idpResponseHook(details, type, idpUrl, session, callback);
       });
 
+      console.log('getIdpToken');
       this.idpWindow.loadURL(idpUrl);
+
     }, err => {
       if (this.idpWindow !== undefined && this.idpWindow !== null) {
         try {
@@ -98,7 +114,8 @@ export class WorkspaceService extends NativeService {
 
       // Sometimes it can arrive here (tested) so the REAL way to block everything is to use the credential emit element!!!
       this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
-      throw new Error(err);
+
+      this.appService.toast(err.text.message, LoggerLevel.ERROR);
     });
   }
 
@@ -116,6 +133,24 @@ export class WorkspaceService extends NativeService {
     const pos = this.currentWindow.getPosition();
     this.idpWindow = this.appService.newWindow(idpUrl, true, 'IDP - Login', pos[0] + 200, pos[1] + 50);
 
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    let proxyUrl;
+
+    if (workspace) {
+      proxyUrl = workspace.proxyUrl;
+    }
+
+    /* if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+      this.idpWindow.webContents.session.setProxy({
+        proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
+      });
+      PROXY_CONFIG[0]['bypass'] = false;
+      PROXY_CONFIG[0]['target'] = proxyUrl;
+    } else {
+      PROXY_CONFIG[0]['bypass'] = true;
+      PROXY_CONFIG[0]['target'] = '';
+    } */
+
     // This filter is used to listen to go to a specific callback url (or the generic one)
     const filter = {urls: ['https://signin.aws.amazon.com/saml']};
 
@@ -125,9 +160,20 @@ export class WorkspaceService extends NativeService {
       this.idpResponseHookFirstTime(details, type, idpUrl, callback);
     });
 
-    this.httpClient.get('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe(() => {
-    }, () => {
-      this.idpWindow.loadURL(idpUrl);
+    console.log('getIdpTokenInSetup');
+    return this.httpClient.get<any>('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe((res) => {
+      console.log('res: ', res);
+    }, (err) => {
+      console.log('error: ', err);
+
+      if (err.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
+        err.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
+        err.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
+        err.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
+        this.appService.toast('There was a problem with your connection. Please retry.', LoggerLevel.ERROR);
+      } else {
+        this.idpWindow.loadURL(idpUrl);
+      }
     });
   }
 
@@ -148,26 +194,123 @@ export class WorkspaceService extends NativeService {
    * @returns - {boolean} the result of the check if we need to show the Google login window again
    */
   checkForShowingTheLoginWindow(url): Observable<boolean> {
-    return new Observable<boolean>(observer => {
-      this.httpClient.get(url).subscribe(() => {
-      }, err => {
+    return new Observable<boolean>(obs => {
+      // const proxy = 'http://34.242.151.101:3128';
+      const endpoint = url;
+      const options = this.configurationService.url.parse(endpoint);
+      // const agent = new this.configurationService.httpsProxyAgent(proxy);
+      // options.agent = agent;
+
+      this.configurationService.https.get(options, (res) => {
+        console.log(res);
+
+        let resBody = '';
+
+        res.setEncoding('utf8');
+        res.on('data', (resChunk) => {
+          resBody += resChunk;
+        });
+
+        res.on('end', () => {
+          console.log('RES BODY', resBody);
+          obs.next(true);
+          obs.complete();
+        });
+
+        // const location = res.headers.location;
+        /* const location = res.responseUrl;
+        const options2 = this.configurationService.url.parse(location);
+
+        this.configurationService.https.get(options2, (res2) => {
+          console.log('RES2: ', res2);
+
+          let res2Body = '';
+
+          res2.setEncoding('utf8');
+          res2.on('data', (res2Chunk) => {
+            res2Body += res2Chunk;
+          });
+
+          console.log('RES2 BODY: ', res2Body);
+
+          res2.on('end', () => {
+            console.log('RES2 BODY', res2Body);
+            // obs.next(resBody.indexOf('Your request did not include a SAML response.') !== -1);
+            obs.next(true);
+            obs.complete();
+          });
+
+          // obs.next(res.statusCode === 302);
+          // obs.complete();
+        }).on('error', (err2) => {
+          console.log('ERR2: ', err2);
+
+          if (err2.status === 500 || err2.error.text === undefined) {
+            obs.error('There was a problem with your connection. Please retry.');
+            obs.complete();
+          } else {
+            if (err2.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
+              err2.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
+              err2.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
+              err2.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
+              obs.error('There was a problem with your connection. Please retry.');
+              obs.complete();
+            }
+          }
+        }).end(); */
+
+        // obs.next(res.statusCode === 302);
+        // obs.complete();
+      }).on('error', (err) => {
+        console.log(err);
+
         if (err.status === 500 || err.error.text === undefined) {
-          observer.error('There was a problem with your connection. Please retry.');
-          observer.complete();
+          obs.error('There was a problem with your connection. Please retry.');
+          obs.complete();
         } else {
           if (err.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
             err.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
             err.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
             err.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
-            observer.error('There was a problem with your connection. Please retry.');
-            observer.complete();
-          } else {
-            observer.next(err.error.text.indexOf('Forwarding ...') === -1);
-            observer.complete();
+            obs.error('There was a problem with your connection. Please retry.');
+            obs.complete();
           }
         }
-      });
+      }).end();
     });
+
+    /* const workspace = this.configurationService.getDefaultWorkspaceSync();
+    let proxyUrl;
+    if (workspace) {
+      proxyUrl = workspace.proxyUrl;
+    }
+
+    if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+      PROXY_CONFIG[0]['bypass'] = false;
+      PROXY_CONFIG[0]['target'] = proxyUrl;
+    } else {
+      PROXY_CONFIG[0]['bypass'] = true;
+      PROXY_CONFIG[0]['target'] = '';
+    }
+
+    return this.httpClient.get<any>(url).pipe(
+      catchError((err) => {
+        console.log('error: ', err);
+
+        if (err.status === 500 || err.error.text === undefined) {
+          return throwError('There was a problem with your connection. Please retry.');
+        } else {
+          if (err.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
+            err.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
+            err.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
+            err.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
+            return throwError('There was a problem with your connection. Please retry.');
+          } else {
+            return of(err.error.text.indexOf('Forwarding ...') === -1);
+          }
+        }
+      })
+    ); */
   }
 
   /**
@@ -363,6 +506,7 @@ export class WorkspaceService extends NativeService {
             // Something went wrong save it to the logger file
             this.appService.logger(err.stack, LoggerLevel.ERROR);
             this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
+
             // Emit ko for double jump
             this.credentialEmit.emit({status: err.stack, accountName: account.accountName});
           } else {

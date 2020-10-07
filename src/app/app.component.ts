@@ -5,7 +5,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../environments/environment';
 import {ConfigurationService} from './services-system/configuration.service';
 import {FileService} from './services-system/file.service';
-import {AppService, LoggerLevel} from './services-system/app.service';
+import {AppService} from './services-system/app.service';
 import {Router} from '@angular/router';
 import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
@@ -70,4 +70,3 @@ export class AppComponent implements OnInit {
     this.menuService.cleanBeforeExit();
   }
 }
-

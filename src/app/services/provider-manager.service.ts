@@ -8,7 +8,7 @@ import {FederatedAccountService} from './federated-account.service';
 import {TrusterAccountService} from './truster-account.service';
 import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
-import {Session} from "../models/session";
+import {Session} from '../models/session';
 
 @Injectable({
   providedIn: 'root'
@@ -99,17 +99,18 @@ export class ProviderManagerService {
 
     // Update Configuration
     if (accountType === AccountType.AWS) {
-      configuration.federationUrl = form.value.federationUrl;
       this.configurationService.updateConfigurationFileSync(configuration);
 
+      const federationUrl = form.value.federationUrl;
+
       // When the token is received save it and go to the setup page for the first account
-      this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, configuration.federationUrl, responseType)));
+      this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, federationUrl, responseType)));
 
       // Call the service for working on the first login event to the user idp
       // We add the helper for account choosing just to be sure to give the possibility to call the correct user
-      this.workspaceService.getIdpTokenInSetup(form.value.federationUrl, responseType);
+      this.workspaceService.getIdpTokenInSetup(federationUrl, responseType);
     } else {
-      this.createNewWorkspace(undefined, configuration.federationUrl, responseType);
+      this.createNewWorkspace(undefined, undefined, responseType);
     }
   }
 
@@ -228,6 +229,12 @@ export class ProviderManagerService {
   saveAwsFederatedAccount() {
     if (this.formValid(this.form, this.accountType)) {
       try {
+        const workspace = this.configurationService.getDefaultWorkspaceSync();
+        workspace.idpUrl = this.form.value.federationUrl;
+        this.configurationService.updateWorkspaceSync(workspace);
+
+        console.log(this.configurationService.getDefaultWorkspaceSync().idpUrl);
+
         // Add a federation Account to the workspace
         const created = this.federatedAccountService.addFederatedAccountToWorkSpace(
           this.form.value.accountNumber,

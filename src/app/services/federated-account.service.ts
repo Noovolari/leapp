@@ -45,7 +45,7 @@ export class FederatedAccountService extends NativeService {
         role,
         idpArn,
         region,
-        idpUrl: configuration.federationUrl,
+        idpUrl: workspace.idpUrl,
         type: AccountType.AWS,
         parent: undefined,
         parentRole: undefined
@@ -79,7 +79,6 @@ export class FederatedAccountService extends NativeService {
    */
   addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
     const test = workspace.sessions.filter(sess => (sess.account as AwsPlainAccount).accountNumber === accountNumber && (sess.account as AwsPlainAccount).user === user);

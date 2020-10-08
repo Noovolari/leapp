@@ -46,7 +46,7 @@ export class TrusterAccountService extends NativeService {
         parent: parentAccountSessionId,
         parentRole,
         region,
-        idpUrl: configuration.federationUrl,
+        idpUrl: workspace.idpUrl,
         type: AccountType.AWS
       };
 

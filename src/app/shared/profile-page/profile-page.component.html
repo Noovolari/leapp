@@ -14,15 +14,10 @@
         <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url" [value]="" >
       </div>
 
-      <div class="form-group" style="width: 100%; display: inline-block;">
+      <!--<div class="form-group" style="width: 100%; display: inline-block;">
         <label>Proxy URL</label>
         <input formControlName="proxyUrl" type="text" class="form-control" placeholder="add a Proxy Url when needed" [value]="" >
-      </div>
-
-      <div class="form-group" style="width: 100%; display: inline-block;">
-        <label>SSO Alias URL</label>
-        <input formControlName="ssoAliasUrl" type="text" class="form-control" placeholder="use it when you have an sso alias" [value]="" >
-      </div>
+      </div>-->
 
       <button type="button" (click)="saveOptions();" [disabled]="!form.valid" [ngClass]="(!form.valid) ? 'pull-right disabled': 'pull-right'">Save</button>
       <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>

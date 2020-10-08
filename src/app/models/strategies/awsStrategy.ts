@@ -101,10 +101,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     this.fileService.writeFileSync(this.appService.awsCredentialPath(), '');
     try {
       if (this.checkIfFederatedOrTrusterWithSamlFederation(session)) {
-        console.log('in wrong place');
         this.workspaceService.refreshCredentials(idpUrl, session);
       } else {
-        console.log('in dj from plain');
         this.doubleJumpFromFixedCredential(session);
       }
     } catch (e) {

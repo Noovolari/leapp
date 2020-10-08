@@ -5,12 +5,10 @@ import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
-import {Observable, of, throwError} from 'rxjs';
+import {Observable} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
-import {catchError} from 'rxjs/operators';
-// import {PROXY_CONFIG} from '../../../proxy.conf';
 // Import AWS node style
 const AWS = require('aws-sdk');
 
@@ -69,27 +67,30 @@ export class WorkspaceService extends NativeService {
    */
   getIdpToken(idpUrl: string, session: any, type: string, callbackUrl?: string) {
     this.checkForShowingTheLoginWindow(idpUrl).subscribe((res) => {
-      // We generate a new browser window to host for the Idp Login form
-      // Note: this is due to the fact that electron + angular gives problem with embedded webview
-      const pos = this.currentWindow.getPosition();
+      console.log('BEGIN getIdpToken');
 
-      try {
-        this.idpWindow.close();
-      } catch (err) {}
-
-      this.idpWindow = this.appService.newWindow(idpUrl, res, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+      if (this.idpWindow === undefined || this.idpWindow === null) {
+        // We generate a new browser window to host for the Idp Login form
+        // Note: this is due to the fact that electron + angular gives problem with embedded webview
+        const pos = this.currentWindow.getPosition();
+        try {
+          this.idpWindow.close();
+        } catch (err) {}
+        this.idpWindow = this.appService.newWindow(idpUrl, res, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+      }
 
       const workspace = this.configurationService.getDefaultWorkspaceSync();
       let proxyUrl;
+
       if (workspace) {
         proxyUrl = workspace.proxyUrl;
       }
 
-      /* if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+      if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
         this.idpWindow.webContents.session.setProxy({
           proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
         });
-      } */
+      }
 
       // This filter is used to listen to go to a specific callback url (or the generic one)
       const filter = {urls: ['https://signin.aws.amazon.com/saml']};
@@ -100,7 +101,6 @@ export class WorkspaceService extends NativeService {
         this.idpResponseHook(details, type, idpUrl, session, callback);
       });
 
-      console.log('getIdpToken');
       this.idpWindow.loadURL(idpUrl);
 
     }, err => {
@@ -115,7 +115,7 @@ export class WorkspaceService extends NativeService {
       // Sometimes it can arrive here (tested) so the REAL way to block everything is to use the credential emit element!!!
       this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
 
-      this.appService.toast(err.text.message, LoggerLevel.ERROR);
+      console.log('END getIdpToken');
     });
   }
 
@@ -127,6 +127,7 @@ export class WorkspaceService extends NativeService {
    * @param callbackUrl - the callback url that can be given always by the backend in case is missing we setup a default one
    */
   getIdpTokenInSetup(idpUrl: string, type: string, callbackUrl?: string) {
+    console.log('BEGIN getIdpTokenInSetup');
 
     // We generate a new browser window to host for the Idp Login form
     // Note: this is due to the fact that electron + angular gives problem with embedded webview
@@ -136,20 +137,20 @@ export class WorkspaceService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     let proxyUrl;
 
+    const options = this.configurationService.url.parse('https://mail.google.com/mail/u/0/?logout&hl=en');
+
     if (workspace) {
       proxyUrl = workspace.proxyUrl;
     }
 
-    /* if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+    if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+      const agent = new this.configurationService.httpsProxyAgent(proxyUrl);
+      options.agent = agent;
+
       this.idpWindow.webContents.session.setProxy({
         proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
       });
-      PROXY_CONFIG[0]['bypass'] = false;
-      PROXY_CONFIG[0]['target'] = proxyUrl;
-    } else {
-      PROXY_CONFIG[0]['bypass'] = true;
-      PROXY_CONFIG[0]['target'] = '';
-    } */
+    }
 
     // This filter is used to listen to go to a specific callback url (or the generic one)
     const filter = {urls: ['https://signin.aws.amazon.com/saml']};
@@ -160,21 +161,14 @@ export class WorkspaceService extends NativeService {
       this.idpResponseHookFirstTime(details, type, idpUrl, callback);
     });
 
-    console.log('getIdpTokenInSetup');
-    return this.httpClient.get<any>('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe((res) => {
+    this.configurationService.https.get(options, (res) => {
       console.log('res: ', res);
-    }, (err) => {
+      this.idpWindow.loadURL(idpUrl);
+    }).on('error', (err) => {
       console.log('error: ', err);
+    }).end();
 
-      if (err.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
-        err.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
-        err.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
-        err.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
-        this.appService.toast('There was a problem with your connection. Please retry.', LoggerLevel.ERROR);
-      } else {
-        this.idpWindow.loadURL(idpUrl);
-      }
-    });
+    console.log('END getIdpTokenInSetup');
   }
 
   /**
@@ -194,123 +188,71 @@ export class WorkspaceService extends NativeService {
    * @returns - {boolean} the result of the check if we need to show the Google login window again
    */
   checkForShowingTheLoginWindow(url): Observable<boolean> {
+    console.log('BEGIN checkForShowingTheLoginWindow');
+
     return new Observable<boolean>(obs => {
-      // const proxy = 'http://34.242.151.101:3128';
-      const endpoint = url;
-      const options = this.configurationService.url.parse(endpoint);
-      // const agent = new this.configurationService.httpsProxyAgent(proxy);
-      // options.agent = agent;
+      if (this.idpWindow === undefined || this.idpWindow === null) {
+        // We generate a new browser window to host for the Idp Login form
+        // Note: this is due to the fact that electron + angular gives problem with embedded webview
+        const pos = this.currentWindow.getPosition();
+        try {
+          this.idpWindow.close();
+        } catch (err) {}
+        this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+      } else {
+        this.idpWindow = null;
+        // We generate a new browser window to host for the Idp Login form
+        // Note: this is due to the fact that electron + angular gives problem with embedded webview
+        const pos = this.currentWindow.getPosition();
+        try {
+          this.idpWindow.close();
+        } catch (err) {}
+        this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+      }
 
-      this.configurationService.https.get(options, (res) => {
-        console.log(res);
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      let proxyUrl;
 
-        let resBody = '';
+      if (workspace) {
+        proxyUrl = workspace.proxyUrl;
+      }
 
-        res.setEncoding('utf8');
-        res.on('data', (resChunk) => {
-          resBody += resChunk;
+      if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+        this.idpWindow.webContents.session.setProxy({
+          proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
         });
+      }
 
-        res.on('end', () => {
-          console.log('RES BODY', resBody);
+      // This filter is used to listen to go to a specific callback url (or the generic one)
+      const filter = {urls: ['https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
+
+      // Our request filter call the generic hook filter passing the idp response type
+      // to construct the ideal method to deal with the construction of the response
+      this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
+        if (details.url.indexOf('https://accounts.google.com/ServiceLogin') !== -1) {
+          console.log('IN https://accounts.google.com/ServiceLogin');
+          this.idpWindow = null;
           obs.next(true);
           obs.complete();
-        });
-
-        // const location = res.headers.location;
-        /* const location = res.responseUrl;
-        const options2 = this.configurationService.url.parse(location);
-
-        this.configurationService.https.get(options2, (res2) => {
-          console.log('RES2: ', res2);
-
-          let res2Body = '';
-
-          res2.setEncoding('utf8');
-          res2.on('data', (res2Chunk) => {
-            res2Body += res2Chunk;
-          });
-
-          console.log('RES2 BODY: ', res2Body);
-
-          res2.on('end', () => {
-            console.log('RES2 BODY', res2Body);
-            // obs.next(resBody.indexOf('Your request did not include a SAML response.') !== -1);
-            obs.next(true);
-            obs.complete();
-          });
-
-          // obs.next(res.statusCode === 302);
-          // obs.complete();
-        }).on('error', (err2) => {
-          console.log('ERR2: ', err2);
-
-          if (err2.status === 500 || err2.error.text === undefined) {
-            obs.error('There was a problem with your connection. Please retry.');
-            obs.complete();
-          } else {
-            if (err2.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
-              err2.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
-              err2.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
-              err2.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
-              obs.error('There was a problem with your connection. Please retry.');
-              obs.complete();
-            }
-          }
-        }).end(); */
-
-        // obs.next(res.statusCode === 302);
-        // obs.complete();
-      }).on('error', (err) => {
-        console.log(err);
-
-        if (err.status === 500 || err.error.text === undefined) {
-          obs.error('There was a problem with your connection. Please retry.');
-          obs.complete();
-        } else {
-          if (err.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
-            err.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
-            err.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
-            err.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
-            obs.error('There was a problem with your connection. Please retry.');
-            obs.complete();
-          }
         }
-      }).end();
+
+        if (details.url.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
+          console.log('IN https://signin.aws.amazon.com/saml');
+          this.idpWindow = null;
+          obs.next(false);
+          obs.complete();
+        }
+
+        callback({
+          requestHeaders: details.requestHeaders,
+          url: details.url,
+        });
+      });
+
+      this.idpWindow.loadURL(url);
     });
 
-    /* const workspace = this.configurationService.getDefaultWorkspaceSync();
-    let proxyUrl;
-    if (workspace) {
-      proxyUrl = workspace.proxyUrl;
-    }
-
-    if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-      PROXY_CONFIG[0]['bypass'] = false;
-      PROXY_CONFIG[0]['target'] = proxyUrl;
-    } else {
-      PROXY_CONFIG[0]['bypass'] = true;
-      PROXY_CONFIG[0]['target'] = '';
-    }
-
-    return this.httpClient.get<any>(url).pipe(
-      catchError((err) => {
-        console.log('error: ', err);
-
-        if (err.status === 500 || err.error.text === undefined) {
-          return throwError('There was a problem with your connection. Please retry.');
-        } else {
-          if (err.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
-            err.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
-            err.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
-            err.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
-            return throwError('There was a problem with your connection. Please retry.');
-          } else {
-            return of(err.error.text.indexOf('Forwarding ...') === -1);
-          }
-        }
-      })
-    ); */
+    console.log('END checkForShowingTheLoginWindow');
   }
 
   /**
@@ -406,7 +348,6 @@ export class WorkspaceService extends NativeService {
    * @param callback - the callback to use
    */
   obtainCredentialsWithSAML(session: any, workspace: Workspace, callback?: any) {
-
     // Setup STS to generate the credentials
     const sts = new AWS.STS();
 

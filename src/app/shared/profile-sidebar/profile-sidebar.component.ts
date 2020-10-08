@@ -5,9 +5,7 @@ import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {HttpClient} from '@angular/common/http';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
-import {PROXY_CONFIG} from "../../../../proxy.conf";
-import {catchError} from "rxjs/operators";
-import {of, throwError} from "rxjs";
+import {throwError} from 'rxjs';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -42,41 +40,33 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
    * logout from Leapp
    */
   logout() {
+    console.log('BEGIN logout');
+
     // Google clean
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     let proxyUrl;
+
+    const options = this.configurationService.url.parse('https://mail.google.com/mail/u/0/?logout&hl=en');
 
     if (workspace) {
       proxyUrl = workspace.proxyUrl;
     }
 
-    /* if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-      PROXY_CONFIG[0]['bypass'] = false;
-      PROXY_CONFIG[0]['target'] = proxyUrl;
-    } else {
-      PROXY_CONFIG[0]['bypass'] = true;
-      PROXY_CONFIG[0]['target'] = '';
-    } */
+    if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+      console.log('proxyUrl DEFINED');
+      console.log('proxyUrl: ', proxyUrl);
+      const agent = new this.configurationService.httpsProxyAgent('http://' + proxyUrl + ':3128');
+      options.agent = agent;
+    }
 
-    console.log('logout');
-    this.httpClient.get<any>('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe((res) => {
+    console.log('IN logout - BEFORE CALL');
+    this.configurationService.https.get(options, (res) => {
       console.log('res: ', res);
-    }, (err) => {
+      this.configurationService.newConfigurationFileSync();
+      console.log('END logout');
+    }).on('error', (err) => {
       console.log('error: ', err);
-
-      if (err.status === 500 || err.error.text === undefined) {
-        return throwError('There was a problem with your connection. Please retry.');
-      } else {
-        if (err.error.text.indexOf('net::ERR_NETWORK_CHANGED') > -1 ||
-          err.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
-          err.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
-          err.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
-          this.appService.toast('There was a problem with your connection. Please retry.', LoggerLevel.ERROR);
-        } else {
-          this.configurationService.newConfigurationFileSync();
-        }
-      }
-    });
+    }).end();
 
     // Azure Clean
     workspace.azureProfile = null;

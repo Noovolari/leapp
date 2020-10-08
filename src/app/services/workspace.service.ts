@@ -438,6 +438,7 @@ export class WorkspaceService extends NativeService {
         lastIDPToken: googleToken,
         idpUrl: federationUrl,
         sessions: [],
+        setupDone: true,
         azureProfile: null,
         azureConfig: null
       };

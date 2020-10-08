@@ -1,6 +1,6 @@
 <div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" (click)="switchCredentials()">
-  <span class="information" tooltip="{{session.account.accountName}} - {{ sessionDetailToShow }}">
-    <b>{{session.account.accountName.length >= 27 ? session.account.accountName.substr(0, 24) + '...' : session.account.accountName}}</b> - {{ sessionDetailToShow }}
+  <span class="information">
+    <b>{{session.account.accountName.length >= 23 ? session.account.accountName.substr(0, 20) + '...' : session.account.accountName}}</b> - {{ sessionDetailToShow }}
   </span>
   <ng-container dropdown placement="right">
     <a dropdownToggle class="drop-list-container" aria-controls="drop-list" (click)="openDropDown($event);"><i

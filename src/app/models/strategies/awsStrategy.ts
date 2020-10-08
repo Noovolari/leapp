@@ -92,7 +92,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
   awsCredentialFederatedProcess(workspace, session) {
     // Check for Aws Credentials Process
-    if (!workspace.idpUrl) {
+    if (!workspace) {
       return 'workspace not set';
     }
     const idpUrl = workspace.idpUrl ;
@@ -101,8 +101,10 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     this.fileService.writeFileSync(this.appService.awsCredentialPath(), '');
     try {
       if (this.checkIfFederatedOrTrusterWithSamlFederation(session)) {
+        console.log('in wrong place');
         this.workspaceService.refreshCredentials(idpUrl, session);
       } else {
+        console.log('in dj from plain');
         this.doubleJumpFromFixedCredential(session);
       }
     } catch (e) {
@@ -139,6 +141,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     const sessions = workspace.sessions;
     const parentSessions = sessions.filter(sess => sess.id === parentAccountSessionId);
 
+    console.log('parent sessions length:', parentSessions.length);
+
     if (parentSessions.length > 0) {
       // Parent account found: do double jump
       const parentSession = parentSessions[0];
@@ -147,6 +151,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
+
+      console.log('credentials from tt:', credentials);
 
       // Update AWS sdk with new credentials
       AWS.config.update({
@@ -172,8 +178,12 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           // Finished double jump
           this.configurationService.disableLoadingWhenReady(workspace, session);
         } else {
+          console.log('dentro truster');
+
           // we set the new credentials after the first jump
           const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
+
+          console.log('truster credentials:', trusterCredentials);
 
           this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 

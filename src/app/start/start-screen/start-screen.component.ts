@@ -79,7 +79,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
    * Is the app already configured or not?
    */
   isAlreadyConfigured() {
-    return this.workspace && this.workspace.setupDone;
+    return this.workspace && (this.workspace.setupDone || this.workspace.idpUrl || this.workspace.sessions.length > 0);
   }
 
   // MVP: we use this to just check if aws cli is installed in order to proceed to

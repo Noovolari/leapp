@@ -6,6 +6,8 @@ export interface Workspace {
 
   lastIDPToken?: string;
 
+  setupDone?: boolean;
+
   idpUrl?: string;
   proxyUrl?: string;
   ssoAlias?: string;

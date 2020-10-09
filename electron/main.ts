@@ -5,12 +5,11 @@ import {initialConfiguration} from '../src/app/core/initial-configuration';
 import {machineIdSync} from 'node-machine-id';
 import {Workspace} from '../src/app/models/workspace';
 
-const {app, BrowserWindow, globalShortcut, Menu, dialog} = require('electron');
+const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
 const url = require('url');
 const fs = require('fs');
 const os = require('os');
 const log = require('electron-log');
-const exec = require('child_process').exec;
 const ipc = require('electron').ipcMain;
 
 // Fix for warning at startup
@@ -55,7 +54,7 @@ const setupWorkspace = () => {
       try {
 
         // If it is the first time and there's a file, let's backup the file
-        if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath)) {
+        if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
           fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
         }
 

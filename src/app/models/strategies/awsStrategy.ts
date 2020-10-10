@@ -12,6 +12,7 @@ import {RefreshCredentialsStrategy} from '../refreshCredentialsStrategy';
 import {TimerService} from '../../services/timer-service';
 import {Workspace} from '../workspace';
 import {WorkspaceService} from '../../services/workspace.service';
+import {Observable} from 'rxjs';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -61,33 +62,53 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
    * @param session - the current sessin we use to retrieve information from
    */
   private async awsCredentialProcess(workspace: Workspace, session) {
+    const credentials = await this.getIamUserAccessKeysFromKeychain(session);
+
+    this.getSessionToken(credentials).subscribe((awsCredentials) => {
+        const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);
+
+        workspace.ssmCredentials = tempCredentials;
+        this.configurationService.updateWorkspaceSync(workspace);
+
+        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), tempCredentials);
+        this.configurationService.disableLoadingWhenReady(workspace, session);
+      },
+      (err) => {
+        throw new Error(err);
+    });
+  }
+
+  // TODO: move to AwsCredentialsGenerationService
+  private getSessionToken(awsCredentials: AwsCredentials): Observable<any> {
+    return new Observable<AwsCredentials>((observable) => {
+      AWS.config.update({
+        accessKeyId: awsCredentials.default.aws_access_key_id,
+        secretAccessKey: awsCredentials.default.aws_secret_access_key
+      });
+
+      const sts = new AWS.STS();
+
+      sts.getSessionToken({ DurationSeconds: environment.sessionDuration }, (err, data) => {
+        console.log('err', err);
+        console.log('cred', data);
+
+        if (data !== undefined || data !== null) {
+          observable.next(data);
+          observable.complete();
+        } else {
+          observable.error(err);
+          observable.complete();
+        }
+      });
+    });
+  }
+
+  // TODO: move to KeychainService
+  private async getIamUserAccessKeysFromKeychain(session) {
     const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
-
-    // Update AWS sdk with new credentials
-    AWS.config.update({
-      accessKeyId: credentials.default.aws_access_key_id,
-      secretAccessKey: credentials.default.aws_secret_access_key
-    });
-
-
-    // Transform in temporary
-    const sts = new AWS.STS();
-
-    sts.getSessionToken({ DurationSeconds: environment.sessionDuration }, (err, data) => {
-
-      console.log('err', err);
-      console.log('cred', data);
-
-      const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
-
-      workspace.ssmCredentials = tempCredentials;
-      this.configurationService.updateWorkspaceSync(workspace);
-
-      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), tempCredentials);
-      this.configurationService.disableLoadingWhenReady(workspace, session);
-    });
+    return credentials;
   }
 
   awsCredentialFederatedProcess(workspace, session) {

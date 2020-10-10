@@ -16,12 +16,11 @@ var environment_1 = require("../src/environments/environment");
 var CryptoJS = require("crypto-js");
 var initial_configuration_1 = require("../src/app/core/initial-configuration");
 var node_machine_id_1 = require("node-machine-id");
-var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow, globalShortcut = _a.globalShortcut, Menu = _a.Menu, dialog = _a.dialog;
+var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow, globalShortcut = _a.globalShortcut, Menu = _a.Menu;
 var url = require('url');
 var fs = require('fs');
 var os = require('os');
 var log = require('electron-log');
-var exec = require('child_process').exec;
 var ipc = require('electron').ipcMain;
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
@@ -61,7 +60,7 @@ var setupWorkspace = function () {
     finally {
         try {
             // If it is the first time and there's a file, let's backup the file
-            if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath)) {
+            if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
                 fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
             }
             // Write workspace file

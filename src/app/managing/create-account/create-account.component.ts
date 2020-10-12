@@ -63,7 +63,8 @@ export class CreateAccountComponent implements OnInit {
     plainUser: new FormControl('', [Validators.required]),
     secretKey: new FormControl('', [Validators.required]),
     accessKey: new FormControl('', [Validators.required]),
-    awsRegion: new FormControl('')
+    awsRegion: new FormControl(''),
+    mfaDevice: new FormControl('')
   });
 
   /* Setup the first account for the application */

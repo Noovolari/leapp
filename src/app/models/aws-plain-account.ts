@@ -6,5 +6,6 @@ export interface AwsPlainAccount extends Account {
   accountNumber: string;
   region?: string;
   user: string;
+  mfaDevice?: string;
   type: AccountType;
 }

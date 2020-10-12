@@ -8,12 +8,13 @@ import { ProfileSidebarComponent } from './profile-sidebar/profile-sidebar.compo
 import { ProfilePageComponent } from './profile-page/profile-page.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import {NgxJsonViewerModule} from 'ngx-json-viewer';
+import { InputDialogComponent } from './input-dialog/input-dialog.component';
 
 
 
 @NgModule({
-  declarations: [ProfileComponent, DropdownComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent],
+  declarations: [ProfileComponent, DropdownComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent],
   imports: [CommonModule, TooltipModule.forRoot(), BsDropdownModule.forRoot(), ModalModule.forRoot(), ReactiveFormsModule, FormsModule, NgxJsonViewerModule],
-  exports: [ProfileComponent, DropdownComponent, ConfirmationDialogComponent, ProfileSidebarComponent]
+  exports: [ProfileComponent, DropdownComponent, ConfirmationDialogComponent, ProfileSidebarComponent, InputDialogComponent]
 })
 export class SharedModule { }

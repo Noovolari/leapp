@@ -13,6 +13,7 @@ import {TimerService} from '../../services/timer-service';
 import {Workspace} from '../workspace';
 import {WorkspaceService} from '../../services/workspace.service';
 import {Observable} from 'rxjs';
+import {Session} from '../session';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -59,12 +60,12 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   /**
    * In this method we transform plain to temporary to avoid saving plain credential in the file
    * @param workspace - the workspace we are working on
-   * @param session - the current sessin we use to retrieve information from
+   * @param session - the current session we use to retrieve information from
    */
   private async awsCredentialProcess(workspace: Workspace, session) {
     const credentials = await this.getIamUserAccessKeysFromKeychain(session);
 
-    this.getSessionToken(credentials).subscribe((awsCredentials) => {
+    this.getSessionToken(credentials, session).subscribe((awsCredentials) => {
         const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);
 
         workspace.ssmCredentials = tempCredentials;
@@ -74,13 +75,27 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         this.configurationService.disableLoadingWhenReady(workspace, session);
       },
       (err) => {
-        throw new Error(err);
-    });
+        this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+      });
   }
 
   // TODO: move to AwsCredentialsGenerationService
-  private getSessionToken(awsCredentials: AwsCredentials): Observable<any> {
+  private getSessionToken(awsCredentials: AwsCredentials, session): Observable<any> {
     return new Observable<AwsCredentials>((observable) => {
+
+      const processData = (data, err) => {
+        console.log('err', err);
+        console.log('cred', data);
+
+        if (data !== undefined && data !== null) {
+          observable.next(data);
+          observable.complete();
+        } else {
+          observable.error(err);
+          observable.complete();
+        }
+      };
+
       AWS.config.update({
         accessKeyId: awsCredentials.default.aws_access_key_id,
         secretAccessKey: awsCredentials.default.aws_secret_access_key
@@ -88,18 +103,20 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
       const sts = new AWS.STS();
 
-      sts.getSessionToken({ DurationSeconds: environment.sessionDuration }, (err, data) => {
-        console.log('err', err);
-        console.log('cred', data);
-
-        if (data !== undefined || data !== null) {
-          observable.next(data);
-          observable.complete();
-        } else {
-          observable.error(err);
-          observable.complete();
-        }
-      });
+      const params = { DurationSeconds: environment.sessionDuration };
+      if (session.account.mfaDevice !== undefined && session.account.mfaDevice !== null && session.account.mfaDevice !== '') {
+        this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
+          params['SerialNumber'] = session.account.mfaDevice;
+          params['TokenCode'] = value;
+          sts.getSessionToken(params, (err, data) => {
+            processData(data, err);
+          });
+        });
+      } else {
+        sts.getSessionToken(params, (err, data) => {
+          processData(data, err);
+        });
+      }
     });
   }
 

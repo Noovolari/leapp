@@ -1,0 +1,27 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{title || 'Input a value' }}</h4>
+  <a class="close pull-right" aria-label="Close" (click)="close();">
+    <span aria-hidden="true">&times;</span>
+  </a>
+</div>
+
+<div class="modal-body text-center">
+
+  <br><p>{{message}}</p>
+  <form [formGroup]="form" class="form center-vertical text-left">
+
+    <div class="form-group" style="width: 100%; display: inline-block;">
+      <label>{{placeholder}}<span class="danger-text">*</span></label>
+      <br>
+      <input formControlName="value" type="text" class="form-control" placeholder="{{placeholder}}">
+      <small class="text-error" *ngIf="(form.controls['value'].dirty || form.controls['value'].touched) && form.controls['value'].errors">Insert a value</small>
+    </div>
+
+  </form>
+  <br>
+  <div class="button-equalizer">
+    <button (click)="close();" class="disabled">Cancel</button>
+    <button (click)="confirm();">Confirm</button>
+  </div>
+
+</div>

@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../services-system/app.service';
 import {HttpClient} from '@angular/common/http';
 import {Session} from '../../models/session';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
+import {BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
@@ -80,7 +80,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     });
   }
 
-
   /**
    * Stop the current session, setting it to false and updating the workspace
    */
@@ -97,7 +96,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     return true;
   }
 
-
   /**
    * getSession
    */
@@ -105,8 +103,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
     this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
   }
-
-
 
   /**
    * Go to Account Management

@@ -1,11 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {AppService} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {HttpClient} from '@angular/common/http';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
-import {throwError} from 'rxjs';
+import {ProxyService} from '../../services/proxy.service';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -23,7 +23,8 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     private configurationService: ConfigurationService,
     private router: Router,
     private httpClient: HttpClient,
-    private executeService: ExecuteServiceService
+    private executeService: ExecuteServiceService,
+    private proxyService: ProxyService
   ) { super(); }
 
   /**
@@ -40,33 +41,15 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
    * logout from Leapp
    */
   logout() {
-    console.log('BEGIN logout');
-
     // Google clean
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    let proxyUrl;
 
-    const options = this.configurationService.url.parse('https://mail.google.com/mail/u/0/?logout&hl=en');
-
-    if (workspace) {
-      proxyUrl = workspace.proxyUrl;
-    }
-
-    if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-      console.log('proxyUrl DEFINED');
-      console.log('proxyUrl: ', proxyUrl);
-      const agent = new this.configurationService.httpsProxyAgent('http://' + proxyUrl + ':3128');
-      options.agent = agent;
-    }
-
-    console.log('IN logout - BEFORE CALL');
-    this.configurationService.https.get(options, (res) => {
+    this.proxyService.get('https://mail.google.com/mail/u/0/?logout&hl=en', (res) => {
       console.log('res: ', res);
       this.configurationService.newConfigurationFileSync();
-      console.log('END logout');
-    }).on('error', (err) => {
+    }, (err) => {
       console.log('error: ', err);
-    }).end();
+    });
 
     // Azure Clean
     workspace.azureProfile = null;

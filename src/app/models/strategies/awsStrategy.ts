@@ -8,6 +8,7 @@ import {environment} from '../../../environments/environment';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
 import {FileService} from '../../services-system/file.service';
 import {KeychainService} from '../../services-system/keychain.service';
+import {ProxyService} from '../../services/proxy.service';
 import {RefreshCredentialsStrategy} from '../refreshCredentialsStrategy';
 import {TimerService} from '../../services/timer-service';
 import {Workspace} from '../workspace';
@@ -25,6 +26,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     private executeService: ExecuteServiceService,
     private fileService: FileService,
     private keychainService: KeychainService,
+    private proxyService: ProxyService,
     private timerService: TimerService,
     private workspaceService: WorkspaceService) {
     super();
@@ -127,6 +129,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
+      this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
+
       // Update AWS sdk with new credentials
       AWS.config.update({
         accessKeyId: credentials.default.aws_access_key_id,
@@ -141,6 +145,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         RoleSessionName: `truster-on-${session.account.role.name}`
       }, (err, data: any) => {
         if (err) {
+          console.log('err: ', err);
+
           // Something went wrong save it to the logger file
           this.appService.logger(err.stack, LoggerLevel.ERROR);
           this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);

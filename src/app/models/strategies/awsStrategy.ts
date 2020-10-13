@@ -177,8 +177,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     const sessions = workspace.sessions;
     const parentSessions = sessions.filter(sess => sess.id === parentAccountSessionId);
 
-    console.log('parent sessions length:', parentSessions.length);
-
     if (parentSessions.length > 0) {
       // Parent account found: do double jump
       const parentSession = parentSessions[0];
@@ -188,51 +186,63 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
 
-      console.log('credentials from tt:', credentials);
-
       // Update AWS sdk with new credentials
       AWS.config.update({
         accessKeyId: credentials.default.aws_access_key_id,
         secretAccessKey: credentials.default.aws_secret_access_key
       });
 
+      const processData = () => {
+        sts.assumeRole(params, (err, data: any) => {
+          if (err) {
+            // Something went wrong save it to the logger file
+            this.appService.logger(err.stack, LoggerLevel.ERROR);
+            this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
+
+            // Finished double jump
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+
+            // Emit ko for double jump
+            this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+          } else {
+            console.log('dentro truster');
+
+            // we set the new credentials after the first jump
+            const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
+
+            console.log('truster credentials:', trusterCredentials);
+
+            this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
+
+            this.configurationService.updateWorkspaceSync(workspace);
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+
+            // Finished double jump
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+
+            // Emit ok for double jump
+            this.workspaceService.credentialEmit.emit({status: 'ok', accountName: session.account.accountName});
+          }
+        });
+      };
+
       // Second jump
       const sts = new AWS.STS();
 
-      sts.assumeRole({
+      const params = {
         RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
         RoleSessionName: `truster-on-${session.account.role.name}`
-      }, (err, data: any) => {
-        if (err) {
-          // Something went wrong save it to the logger file
-          this.appService.logger(err.stack, LoggerLevel.ERROR);
-          this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
+      };
 
-          // Emit ko for double jump
-          this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
-
-          // Finished double jump
-          this.configurationService.disableLoadingWhenReady(workspace, session);
-        } else {
-          console.log('dentro truster');
-
-          // we set the new credentials after the first jump
-          const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
-
-          console.log('truster credentials:', trusterCredentials);
-
-          this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
-
-          this.configurationService.updateWorkspaceSync(workspace);
-          this.configurationService.disableLoadingWhenReady(workspace, session);
-
-          // Emit ok for double jump
-          this.workspaceService.credentialEmit.emit({status: 'ok', accountName: session.account.accountName});
-
-          // Finished double jump
-          this.configurationService.disableLoadingWhenReady(workspace, session);
-        }
-      });
+      if (parentSession.account.mfaDevice !== undefined && parentSession.account.mfaDevice !== null && parentSession.account.mfaDevice !== '') {
+        this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
+          params['SerialNumber'] = parentSession.account.mfaDevice;
+          params['TokenCode'] = value;
+          processData();
+        });
+      } else {
+        processData();
+      }
     }
   }
 }

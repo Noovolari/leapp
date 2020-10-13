@@ -82,7 +82,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     });
   }
 
-
   /**
    * Stop the current session, setting it to false and updating the workspace
    */
@@ -104,7 +103,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     return true;
   }
 
-
   /**
    * getSession
    */
@@ -112,8 +110,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
     this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
   }
-
-
 
   /**
    * Go to Account Management

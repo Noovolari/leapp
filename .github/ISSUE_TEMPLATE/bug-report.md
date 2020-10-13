@@ -10,6 +10,9 @@ assignees: ''
 **Describe the bug**
 A clear and concise description of what the bug is.
 
+**Leapp Version**
+Add the version of your Leapp (you can find it under taskbar -> about or Leapp -> about on MacOS X)
+
 **To Reproduce**
 Steps to reproduce the behavior:
 1. Go to '...'

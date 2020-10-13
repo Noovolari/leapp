@@ -2,7 +2,7 @@
 
 List of new feature and/or fixes here.
 
-**Bugifxes**
+**Bugfixes**
 
 Describe the fixes and specifying the issue if related.
 

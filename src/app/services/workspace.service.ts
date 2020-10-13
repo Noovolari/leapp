@@ -9,6 +9,7 @@ import {Observable} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
+import {ProxyService} from './proxy.service';
 // Import AWS node style
 const AWS = require('aws-sdk');
 
@@ -49,7 +50,8 @@ export class WorkspaceService extends NativeService {
     private httpClient: HttpClient,
     private appService: AppService,
     private configurationService: ConfigurationService,
-    private fileService: FileService
+    private fileService: FileService,
+    private proxyService: ProxyService
   ) {
     super();
   }
@@ -67,8 +69,6 @@ export class WorkspaceService extends NativeService {
    */
   getIdpToken(idpUrl: string, session: any, type: string, callbackUrl?: string) {
     this.checkForShowingTheLoginWindow(idpUrl).subscribe((res) => {
-      console.log('BEGIN getIdpToken');
-
       if (this.idpWindow === undefined || this.idpWindow === null) {
         // We generate a new browser window to host for the Idp Login form
         // Note: this is due to the fact that electron + angular gives problem with embedded webview
@@ -79,18 +79,7 @@ export class WorkspaceService extends NativeService {
         this.idpWindow = this.appService.newWindow(idpUrl, res, 'IDP - Login', pos[0] + 200, pos[1] + 50);
       }
 
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
-      let proxyUrl;
-
-      if (workspace) {
-        proxyUrl = workspace.proxyUrl;
-      }
-
-      if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-        this.idpWindow.webContents.session.setProxy({
-          proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
-        });
-      }
+      this.proxyService.configureBrowserWindow(this.idpWindow);
 
       // This filter is used to listen to go to a specific callback url (or the generic one)
       const filter = {urls: ['https://signin.aws.amazon.com/saml']};
@@ -114,8 +103,6 @@ export class WorkspaceService extends NativeService {
 
       // Sometimes it can arrive here (tested) so the REAL way to block everything is to use the credential emit element!!!
       this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
-
-      console.log('END getIdpToken');
     });
   }
 
@@ -127,30 +114,13 @@ export class WorkspaceService extends NativeService {
    * @param callbackUrl - the callback url that can be given always by the backend in case is missing we setup a default one
    */
   getIdpTokenInSetup(idpUrl: string, type: string, callbackUrl?: string) {
-    console.log('BEGIN getIdpTokenInSetup');
-
     // We generate a new browser window to host for the Idp Login form
     // Note: this is due to the fact that electron + angular gives problem with embedded webview
     const pos = this.currentWindow.getPosition();
     this.idpWindow = this.appService.newWindow(idpUrl, true, 'IDP - Login', pos[0] + 200, pos[1] + 50);
 
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    let proxyUrl;
-
-    const options = this.configurationService.url.parse('https://mail.google.com/mail/u/0/?logout&hl=en');
-
-    if (workspace) {
-      proxyUrl = workspace.proxyUrl;
-    }
-
-    if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-      const agent = new this.configurationService.httpsProxyAgent(proxyUrl);
-      options.agent = agent;
-
-      this.idpWindow.webContents.session.setProxy({
-        proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
-      });
-    }
+    this.proxyService.configureBrowserWindow(this.idpWindow);
+    const options = this.proxyService.getHttpClientOptions('https://mail.google.com/mail/u/0/?logout&hl=en');
 
     // This filter is used to listen to go to a specific callback url (or the generic one)
     const filter = {urls: ['https://signin.aws.amazon.com/saml']};
@@ -161,14 +131,12 @@ export class WorkspaceService extends NativeService {
       this.idpResponseHookFirstTime(details, type, idpUrl, callback);
     });
 
-    this.configurationService.https.get(options, (res) => {
+    this.https.get(options, (res) => {
       console.log('res: ', res);
       this.idpWindow.loadURL(idpUrl);
     }).on('error', (err) => {
       console.log('error: ', err);
     }).end();
-
-    console.log('END getIdpTokenInSetup');
   }
 
   /**
@@ -188,40 +156,33 @@ export class WorkspaceService extends NativeService {
    * @returns - {boolean} the result of the check if we need to show the Google login window again
    */
   checkForShowingTheLoginWindow(url): Observable<boolean> {
-    console.log('BEGIN checkForShowingTheLoginWindow');
-
     return new Observable<boolean>(obs => {
       if (this.idpWindow === undefined || this.idpWindow === null) {
         // We generate a new browser window to host for the Idp Login form
         // Note: this is due to the fact that electron + angular gives problem with embedded webview
         const pos = this.currentWindow.getPosition();
+
+        // Check if the next three lines are needed
         try {
           this.idpWindow.close();
         } catch (err) {}
+
         this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
       } else {
-        this.idpWindow = null;
         // We generate a new browser window to host for the Idp Login form
         // Note: this is due to the fact that electron + angular gives problem with embedded webview
         const pos = this.currentWindow.getPosition();
+
+        // Check if the next three lines are needed
         try {
           this.idpWindow.close();
         } catch (err) {}
+
+        this.idpWindow = null;
         this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
       }
 
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
-      let proxyUrl;
-
-      if (workspace) {
-        proxyUrl = workspace.proxyUrl;
-      }
-
-      if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-        this.idpWindow.webContents.session.setProxy({
-          proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
-        });
-      }
+      this.proxyService.configureBrowserWindow(this.idpWindow);
 
       // This filter is used to listen to go to a specific callback url (or the generic one)
       const filter = {urls: ['https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
@@ -230,14 +191,12 @@ export class WorkspaceService extends NativeService {
       // to construct the ideal method to deal with the construction of the response
       this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
         if (details.url.indexOf('https://accounts.google.com/ServiceLogin') !== -1) {
-          console.log('IN https://accounts.google.com/ServiceLogin');
           this.idpWindow = null;
           obs.next(true);
           obs.complete();
         }
 
         if (details.url.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
-          console.log('IN https://signin.aws.amazon.com/saml');
           this.idpWindow = null;
           obs.next(false);
           obs.complete();
@@ -251,8 +210,6 @@ export class WorkspaceService extends NativeService {
 
       this.idpWindow.loadURL(url);
     });
-
-    console.log('END checkForShowingTheLoginWindow');
   }
 
   /**
@@ -348,6 +305,8 @@ export class WorkspaceService extends NativeService {
    * @param callback - the callback to use
    */
   obtainCredentialsWithSAML(session: any, workspace: Workspace, callback?: any) {
+    this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
+
     // Setup STS to generate the credentials
     const sts = new AWS.STS();
 
@@ -437,7 +396,20 @@ export class WorkspaceService extends NativeService {
           secretAccessKey: credentials.default.aws_secret_access_key
         });
 
+        let proxyUrl;
+
+        if (workspace) {
+          proxyUrl = workspace.proxyUrl;
+        }
+
+        if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+          this.appService.currentBrowserWindow().webContents.session.setProxy({
+            proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
+          });
+        }
+
         const sts = new AWS.STS();
+
         sts.assumeRole({
           RoleArn: `arn:aws:iam::${account.accountNumber}:role/${roleName}`,
           RoleSessionName: `truster-on-${roleName}`

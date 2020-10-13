@@ -32,10 +32,10 @@ export class NativeService {
   protected process: any;
   protected ipcRenderer: any;
   protected keytar: any;
-  public http: any;
-  public https: any;
-  public httpProxyAgent: any;
-  public httpsProxyAgent: any;
+  protected http: any;
+  protected https: any;
+  protected httpProxyAgent: any;
+  protected httpsProxyAgent: any;
 
   constructor() {
     this.fs = (window as any).fs;

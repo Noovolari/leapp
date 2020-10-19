@@ -40,6 +40,14 @@ Get [here](https://github.com/Noovolari/leapp/releases/latest) the latest releas
 
 To install the compiled version, choose the one for your **OS** and simply **double-click** on the executable.
 
+# Logs
+
+By default, Leapp writes logs to the following locations:
+
+- on Linux: ~/.config/{app name}/logs/{process type}.log
+- on macOS: ~/Library/Logs/{app name}/{process type}.log
+- on Windows: %USERPROFILE%\AppData\Roaming\{app name}\logs\{process type}.log
+
 # Tutorials
 
 [Here](.github/tutorials/TUTORIALS.md) is a list of curated **tutorials** to **help you setup** your environment for Leapp.

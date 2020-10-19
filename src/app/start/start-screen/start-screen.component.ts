@@ -51,6 +51,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
       this.menuService.generateMenu();
       // If configuration is not needed go to session list
       if (this.isAlreadyConfigured()) {
+        this.appService.logger('Already configured, moving to list', LoggerLevel.INFO, this);
         // We already have at least one default account to start, let's go to session page
         this.router.navigate(['/sessions', 'session-selected']);
       }
@@ -69,6 +70,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
        this.workspace.azureProfile === undefined ||
        this.workspace.azureConfig === undefined)
     ) {
+      this.appService.logger('Leapp Workspace is outdated, please go to {home}/.Leapp and remove it', LoggerLevel.ERROR, this);
       this.appService.toast('The Leapp Workspace file is either outdated or corrupt. Please contact us opening an issue online.', ToastLevel.ERROR, 'Workspace file outdated or corrupted');
       result =  false;
     }
@@ -117,8 +119,11 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
   showCredentialBackupMessageIfNeeded() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const awsCredentialsPath = this.appService.getOS().homedir() + '/' + environment.credentialsDestination + '.leapp.bkp';
+    const check = JSON.stringify(workspace) === '{}' && this.appService.getFs().existsSync(awsCredentialsPath);
 
-    if (JSON.stringify(workspace) === '{}' && this.appService.getFs().existsSync(awsCredentialsPath)) {
+    this.appService.logger(`Check existing credential file: ${check}`, LoggerLevel.INFO, this);
+
+    if (check) {
       this.appService.getDialog().showMessageBox({
         type: 'info',
         icon: __dirname + '/assets/images/Leapp.png',

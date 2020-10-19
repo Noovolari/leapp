@@ -92,13 +92,13 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     sessions.map(sess => {
       if (session === null || (session.id === sess.id)) {
         sess.active = false;
+        sess.loading = false;
       }
     });
     workspace.sessions = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
     return true;
   }
-
 
   /**
    * getSession
@@ -108,34 +108,12 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
   }
 
-
-
   /**
    * Go to Account Management
    */
   createAccount() {
     // Go!
     this.router.navigate(['/managing', 'create-account']);
-  }
-
-  /**
-   * Set the region for ssm init and launch the mopethod form the server to find instances
-   * @param event - the change select event
-   */
-  changeSsmRegion(event) {
-    if (this.selectedSsmRegion) {
-      this.ssmloading = true;
-      // Set the aws credentials to instanziate the ssm client
-      const credentials = this.configurationService.getDefaultWorkspaceSync().awsCredentials;
-      // Check the result of the call
-      const sub = this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
-
-        this.instances = result.instances;
-        this.ssmloading = false;
-      });
-
-      this.subs.add(sub);
-    }
   }
 
   filterSessions(query) {

@@ -50,6 +50,7 @@ export class SsmService {
         new Observable(observer => {
           this.ssmClient.describeInstanceInformation({}, (err, data) => {
             if (err) {
+              this.app.logger('Error in describe instances', LoggerLevel.ERROR, this, err.stack);
               observer.error(err);
             } else {
               observer.next(data);
@@ -60,6 +61,7 @@ export class SsmService {
         new Observable(observer => {
           this.ec2Client.describeInstances({ MaxResults: 1000 }, (err, data) => {
             if (err) {
+              this.app.logger('Error in describe instances', LoggerLevel.ERROR, this, err.stack);
               observer.error(err);
             } else {
               observer.next(data);
@@ -68,6 +70,7 @@ export class SsmService {
           });
         }).pipe(
           catchError(err => {
+            this.app.logger('Generic Error in ssm starting', LoggerLevel.ERROR, this, err.stack);
             return of(err);
           })
         )
@@ -112,18 +115,20 @@ export class SsmService {
             return { status: true, instances: mythis.instances };
           } else {
             // No instances usable
+            mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.WARN, this);
             mythis.app.toast('No instances are accessible by this Role.', ToastLevel.WARN, 'No instance for SSM.');
             return { status: false, instances: mythis.instances };
           }
         } else {
           // No instances usable
+          mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.WARN, this);
           mythis.app.toast('No instances are accessible by this Role.', ToastLevel.WARN, 'No instance for SSM.');
           return { status: false, instances: mythis.instances };
         }
       }),
       catchError(err =>  {
         // A problem occured
-        this.app.logger(err.stack, LoggerLevel.ERROR);
+        this.app.logger('You are not Authorized to perform SSM with your current credentials', LoggerLevel.ERROR, this, err.stack);
         mythis.app.toast('You are not Authorized to perform this operation with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
         return of({ status: false, instances: mythis.instances });
       })
@@ -137,6 +142,7 @@ export class SsmService {
   startSession(instanceId) {
     this.exec.openTerminal(`aws ssm start-session --target '${instanceId}'\n`).subscribe(() => {
     }, err2 => {
+      this.app.logger('Start SSM session error', LoggerLevel.ERROR, this, err2.stack);
       this.app.toast(err2.stack, ToastLevel.ERROR, 'Error in running instance via SSM');
     });
   }

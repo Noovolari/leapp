@@ -37,7 +37,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     });
 
     console.log('active aws sessions', activeSessions);
-
+    this.appService.logger('Aws Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
 
@@ -74,6 +74,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         this.configurationService.disableLoadingWhenReady(workspace, session);
       },
       (err) => {
+        this.appService.logger('Error in Aws Credential process', LoggerLevel.ERROR, this, err.stack);
         throw new Error(err);
     });
   }
@@ -96,6 +97,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           observable.next(data);
           observable.complete();
         } else {
+          this.appService.logger('Error in get session token', LoggerLevel.ERROR, this, err.stack);
           observable.error(err);
           observable.complete();
         }
@@ -127,7 +129,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         this.doubleJumpFromFixedCredential(session);
       }
     } catch (e) {
-      this.appService.logger(e, LoggerLevel.ERROR);
+      this.appService.logger('Error in Aws Credential Federated Process', LoggerLevel.ERROR, this, e.stack);
       this.credentialsService.refreshReturnStatusEmit.emit(false);
     }
 
@@ -171,8 +173,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
 
-      console.log('credentials from tt:', credentials);
-
       // Update AWS sdk with new credentials
       AWS.config.update({
         accessKeyId: credentials.default.aws_access_key_id,
@@ -188,7 +188,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       }, (err, data: any) => {
         if (err) {
           // Something went wrong save it to the logger file
-          this.appService.logger(err.stack, LoggerLevel.ERROR);
+          this.appService.logger('Error in assume role from plain to truster in get session token', LoggerLevel.ERROR, this, err.stack);
           this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
 
           // Emit ko for double jump
@@ -197,12 +197,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           // Finished double jump
           this.configurationService.disableLoadingWhenReady(workspace, session);
         } else {
-          console.log('dentro truster');
-
           // we set the new credentials after the first jump
           const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
-
-          console.log('truster credentials:', trusterCredentials);
 
           this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -214,6 +210,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
           // Finished double jump
           this.configurationService.disableLoadingWhenReady(workspace, session);
+
+          this.appService.logger('Made it through Double jump from plain', LoggerLevel.INFO, this);
         }
       });
     }

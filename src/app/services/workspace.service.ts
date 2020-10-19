@@ -93,7 +93,7 @@ export class WorkspaceService extends NativeService {
         try {
           this.idpWindow.close();
         } catch (e) {
-          this.appService.logger(e, LoggerLevel.ERROR);
+          this.appService.logger(e, LoggerLevel.ERROR, this);
         }
       }
 
@@ -304,8 +304,8 @@ export class WorkspaceService extends NativeService {
         }
       } else {
         // Something went wrong save it to the logger file
-        this.appService.logger(err.code, LoggerLevel.ERROR);
-        this.appService.logger(err.stack, LoggerLevel.ERROR);
+        this.appService.logger(err.code, LoggerLevel.ERROR, this);
+        this.appService.logger(err.stack, LoggerLevel.ERROR, this);
         this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
         // Emit ko
@@ -339,7 +339,7 @@ export class WorkspaceService extends NativeService {
       // Save the federated one
       this.configurationService.updateWorkspaceSync(workspace);
     } catch (err) {
-      this.appService.logger(err, LoggerLevel.ERROR);
+      this.appService.logger(err, LoggerLevel.ERROR, this);
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
@@ -364,7 +364,7 @@ export class WorkspaceService extends NativeService {
           if (err) {
 
             // Something went wrong save it to the logger file
-            this.appService.logger(err.stack, LoggerLevel.ERROR);
+            this.appService.logger(err.stack, LoggerLevel.ERROR, this);
             this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
             // Emit ko for double jump
             this.credentialEmit.emit({status: err.stack, accountName: account.accountName});
@@ -387,7 +387,7 @@ export class WorkspaceService extends NativeService {
         this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
       }
     } catch (err) {
-      this.appService.logger(err, LoggerLevel.ERROR);
+      this.appService.logger(err, LoggerLevel.ERROR,this);
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
@@ -453,7 +453,7 @@ export class WorkspaceService extends NativeService {
 
       // Catch any error show it and return false
       this.appService.toast(err, ToastLevel.WARN, 'Create new workspace');
-      this.appService.logger(err, LoggerLevel.WARN);
+      this.appService.logger(err, LoggerLevel.WARN, this);
       return false;
     }
   }

@@ -2,7 +2,7 @@ import {Component, Input, OnInit} from '@angular/core';
 import {FileService} from '../../services-system/file.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Configuration} from '../../models/configuration';
-import {AppService} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {NavigationEnd, Router} from '@angular/router';
 import {WorkspaceService} from '../../services/workspace.service';
 import {switchMap, tap} from 'rxjs/internal/operators';
@@ -31,5 +31,6 @@ export class ProfileComponent extends AntiMemLeak implements OnInit {
   toggleProfile() {
     this.profileIsOpen = !this.profileIsOpen; // Toggle status
     this.appService.profileOpen.emit(this.profileIsOpen); // Emit event for screen
+    this.appService.logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.INFO, this);
   }
 }

@@ -1,4 +1,3 @@
-import { AwsCredentials } from './credential';
 import { Session } from './session';
 
 export interface Workspace {
@@ -7,7 +6,12 @@ export interface Workspace {
 
   lastIDPToken?: string;
   idpUrl?: string;
-  proxyUrl?: string;
+  proxyConfiguration: {
+    proxyProtocol?: string;
+    proxyUrl?: string;
+    proxyPort?: string;
+  };
+
 
   azureConfig: string;
   azureProfile: string;

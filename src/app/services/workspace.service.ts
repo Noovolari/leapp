@@ -397,14 +397,18 @@ export class WorkspaceService extends NativeService {
         });
 
         let proxyUrl;
+        let proxyPort;
+        let proxyProtocol;
 
         if (workspace) {
-          proxyUrl = workspace.proxyUrl;
+          proxyUrl = workspace.proxyConfiguration.proxyUrl;
+          proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
+          proxyPort = workspace.proxyConfiguration.proxyPort;
         }
 
         if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
           this.appService.currentBrowserWindow().webContents.session.setProxy({
-            proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
+            proxyRules: `http=${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`
           });
         }
 
@@ -487,6 +491,7 @@ export class WorkspaceService extends NativeService {
         name,
         lastIDPToken: googleToken,
         idpUrl: federationUrl,
+        proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '' },
         sessions: [],
         azureProfile: null,
         azureConfig: null

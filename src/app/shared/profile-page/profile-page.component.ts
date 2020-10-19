@@ -16,14 +16,20 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
   name = '';
   email = '';
+
   idpUrlValue;
-  idpUrlValueAzure;
+
+  proxyProtocol = 'https'; // Default
   proxyUrl;
+  proxyPort = '8080'; // Default
+
   workspaceData: Workspace;
 
   public form = new FormGroup({
     idpUrl: new FormControl('', [Validators.required]),
-    proxyUrl: new FormControl('')
+    proxyUrl: new FormControl(''),
+    proxyProtocol: new FormControl(''),
+    proxyPort: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -38,9 +44,13 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData.name && this.workspaceData.name !== '') {
       this.idpUrlValue = this.workspaceData.idpUrl;
-      this.proxyUrl = this.workspaceData.proxyUrl;
+      this.proxyProtocol = this.workspaceData.proxyConfiguration.proxyProtocol;
+      this.proxyUrl = this.workspaceData.proxyConfiguration.proxyUrl;
+      this.proxyPort = this.workspaceData.proxyConfiguration.proxyPort;
       this.form.controls['idpUrl'].setValue(this.idpUrlValue);
       this.form.controls['proxyUrl'].setValue(this.proxyUrl);
+      this.form.controls['proxyProtocol'].setValue(this.proxyProtocol);
+      this.form.controls['proxyPort'].setValue(this.proxyPort);
       this.name = this.workspaceData.name;
       this.email = localStorage.getItem('hook_email') || 'not logged in yet';
       this.appService.validateAllFormFields(this.form);
@@ -54,13 +64,9 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     if (this.form.valid) {
       this.workspaceData.idpUrl = this.form.value.idpUrl;
 
-      /* if (this.form.controls['proxyUrl'].value !== undefined &&
-          this.form.controls['proxyUrl'].value !== null &&
-          this.form.controls['proxyUrl'].value !== '') {
-            this.workspaceData.proxyUrl = this.form.controls['proxyUrl'].value;
-      } */
-
-      this.workspaceData.proxyUrl = this.form.controls['proxyUrl'].value;
+      this.workspaceData.proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
+      this.workspaceData.proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
+      this.workspaceData.proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
 
       this.configurationService.updateWorkspaceSync(this.workspaceData);
 

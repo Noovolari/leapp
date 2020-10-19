@@ -17,15 +17,20 @@ export class ProxyService extends NativeService {
 
   configureBrowserWindow(browserWindow: any): void {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
+
     let proxyUrl;
+    let proxyPort;
+    let proxyProtocol;
 
     if (workspace) {
-      proxyUrl = workspace.proxyUrl;
+      proxyUrl = workspace.proxyConfiguration.proxyUrl;
+      proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
+      proxyPort = workspace.proxyConfiguration.proxyPort;
     }
 
     if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
       browserWindow.webContents.session.setProxy({
-        proxyRules: 'http=' + proxyUrl + ':3128;https=' + proxyUrl + ':3128'
+        proxyRules: `http=${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`
       });
     }
   }
@@ -33,14 +38,19 @@ export class ProxyService extends NativeService {
   getHttpClientOptions(url: string): object {
     const options = this.configurationService.url.parse(url);
     const workspace = this.configurationService.getDefaultWorkspaceSync();
+
     let proxyUrl;
+    let proxyPort;
+    let proxyProtocol;
 
     if (workspace) {
-      proxyUrl = workspace.proxyUrl;
+      proxyUrl = workspace.proxyConfiguration.proxyUrl;
+      proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
+      proxyPort = workspace.proxyConfiguration.proxyPort;
     }
 
     if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-      const agent = new this.httpsProxyAgent('http://' + proxyUrl + ':3128');
+      const agent = new this.httpsProxyAgent(`${proxyProtocol}://${proxyUrl}:${proxyPort}`);
       options.agent = agent;
     }
 

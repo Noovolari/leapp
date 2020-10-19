@@ -1,32 +1,40 @@
 <app-profile></app-profile>
 
-<div class="container-fluid">
+<div class="container-fluid background">
   <app-profile-sidebar></app-profile-sidebar>
 
-  <h1>Update Your IdP URLs</h1>
+  <h2>Update IdP URL</h2>
   <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveIdpUrls();">
 
-    <div class="form-group" style="width: 70%; display: inline-block;">
+    <div class="form-group" style="width: 100%; display: inline-block;">
       <label>Google IdP URL<span class="danger-text">*</span></label>
       <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url *" [value]="idpUrlValue" >
       <small class="text-error" *ngIf="(form.controls['idpUrl'].dirty || form.controls['idpUrl'].touched) && form.controls['idpUrl'].errors">Insert the Google IdP URL</small>
     </div>
 
-    <div class="form-group" style="width: 70%; display: inline-block;">
+    <h2>Proxy settings</h2>
+    <div class="form-group" style="width: 16%; display: inline-block;">
+      <label>Protocol</label>
+      <select formControlName="proxyProtocol" class="form-control" [value]="proxyProtocol">
+        <option value="http">HTTP</option>
+        <option value="https">HTTPS</option>
+      </select>
+    </div>
+    <div class="form-group" style="width: 4%; display: inline-block;">://</div>
+    <div class="form-group" style="width: 56%; display: inline-block;">
       <label>Proxy URL</label>
       <input formControlName="proxyUrl" type="text" class="form-control" placeholder="Proxy Url" [value]="proxyUrl" >
     </div>
-
-    <div class="form-group" style="width: 30%; display: inline-block; padding-top: 36px; padding-left: 20px;">
-      <button type="button" (click)="saveIdpUrls();" [disabled]="!form.valid" [ngClass]="(!form.valid) ? 'btn btn-default': 'btn btn-default btn-gradient'">Save</button>
+    <div class="form-group" style="width: 4%; display: inline-block;">:</div>
+    <div class="form-group" style="width: 20%; display: inline-block;">
+      <label>Proxy Port</label>
+      <input formControlName="proxyPort" type="text" class="form-control" placeholder="Proxy Url" [value]="proxyPort" >
     </div>
 
     <br><br><br><br><br><br>
 
-    <div class="form-group" style="width: 32%; display: inline-block;"></div>
-    <div class="form-group" style="width: 26%; display: inline-block; padding-left: 14px;">
-      <button type="button" (click)="goBack();" class="btn btn-secondary btn-outline-secondary">Back</button>
-    </div>
+    <button type="button" (click)="goBack();" class="btn btn-secondary btn-outline-secondary">Back</button>
+    <button type="button" (click)="saveIdpUrls();" [disabled]="!form.valid" [ngClass]="(!form.valid) ? 'disabled': ''">Save</button>
 
   </form>
 </div>

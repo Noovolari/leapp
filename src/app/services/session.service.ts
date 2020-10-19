@@ -20,6 +20,7 @@ export class SessionService extends NativeService {
    * @param session -
    */
   removeSession(session) {
+    this.appService.logger(`Removing: ${session.account.accountName}`, LoggerLevel.INFO, this);
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.sessions.filter(ses =>  ses.id !== session.id) || [];
@@ -32,6 +33,7 @@ export class SessionService extends NativeService {
    * List sessions inside the current Session list containing all sessions
    */
   listSessions() {
+    this.appService.logger('Listing sessions...', LoggerLevel.INFO, this);
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace.sessions) {
       workspace.sessions.sort((a, b) => {
@@ -47,6 +49,8 @@ export class SessionService extends NativeService {
    * @param session - the session object to extract the parameter to generate the credentials
    */
   startSession(session: Session) {
+    this.appService.logger(`Starting Session: ${session.account.accountName}`, LoggerLevel.INFO, this);
+
     // Get the current workspace
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     // Get the session list
@@ -81,7 +85,7 @@ export class SessionService extends NativeService {
       return true;
     } else {
       // Something went wrong return false
-      this.appService.logger('the Selected Session does not exist', LoggerLevel.WARN);
+      this.appService.logger(`the Selected Session: ${session.account.accountName} does not exist`, LoggerLevel.WARN, this);
       return false;
     }
   }
@@ -96,14 +100,21 @@ export class SessionService extends NativeService {
       if (session === null || session.id === sess.id) {
         sess.active = false;
         sess.loading = false;
+        sess.lastStopDate = new Date().toISOString();
       }
     });
     workspace.sessions = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
+    if (session !== null) {
+      this.appService.logger('Stopping session', LoggerLevel.INFO, this, JSON.stringify({ timeStamp: new Date().toISOString(), id: session.id, account: session.account.accountName }, null, 3));
+    } else {
+      this.appService.logger('Stopping session', LoggerLevel.INFO, this, JSON.stringify({ timeStamp: new Date().toISOString() }, null, 3));
+    }
     return true;
   }
 
   stopAllSession() {
+    this.appService.logger('Stopping all sessions...', LoggerLevel.INFO, this);
     this.stopSession(null);
   }
 }

@@ -1,8 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {AppService} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
-import {environment} from '../../../environments/environment';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {HttpClient} from '@angular/common/http';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
@@ -41,10 +40,15 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
    */
   logout() {
     // Google clean
-    this.httpClient.get('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe(res => {}, err => {
+    this.httpClient.get('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe(res => {
+      this.appService.logger('Was not able to log user out from Google', LoggerLevel.ERROR, this);
+    }, err => {
+      this.appService.logger('Logging out...', LoggerLevel.INFO, this);
       this.configurationService.newConfigurationFileSync();
     });
+
     // Azure Clean
+    this.appService.logger('Cleaning Azure config files...', LoggerLevel.INFO, this);
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     workspace.azureProfile = null;
     workspace.azureConfig = null;

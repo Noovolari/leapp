@@ -86,6 +86,7 @@ export class SessionCardComponent implements OnInit {
     // automatically check if there is an active session and get session list again
     this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
 
+    this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
     // Redraw the list
     this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
@@ -103,6 +104,7 @@ export class SessionCardComponent implements OnInit {
     this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
     this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
+    this.appService.logger('Session Stopped', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
   }
 
   removeAccount(session, event) {
@@ -111,6 +113,7 @@ export class SessionCardComponent implements OnInit {
       this.federatedAccountService.cleanKeychainIfNecessary(session);
       this.sessionService.removeSession(session);
       this.sessionsChanged.emit('');
+      this.appService.logger('Session Removed', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
       this.appService.redrawList.emit(true);
     });
   }
@@ -135,7 +138,7 @@ export class SessionCardComponent implements OnInit {
       }
     } catch (err) {
       this.appService.toast(err, ToastLevel.WARN);
-      this.appService.logger(err, LoggerLevel.WARN);
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
     }
 
   }
@@ -187,6 +190,7 @@ export class SessionCardComponent implements OnInit {
       this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
         this.instances = result.instances;
         this.ssmloading = false;
+        this.appService.logger('Obtained instances from AWS for SSM', LoggerLevel.INFO, this);
       });
 
     }

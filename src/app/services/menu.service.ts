@@ -102,7 +102,7 @@ export class MenuService extends NativeService {
    */
   cleanBeforeExit() {
     // Check if we are here
-    this.appService.logger('Closing app...', LoggerLevel.INFO);
+    this.appService.logger('Closing app with cleaning process...', LoggerLevel.INFO, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
@@ -113,7 +113,7 @@ export class MenuService extends NativeService {
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {
-      this.appService.logger('No sessions to stop, skipping...', LoggerLevel.INFO);
+      this.appService.logger('No sessions to stop, skipping...', LoggerLevel.ERROR, this, err.stack);
     }
 
     // Finally quit

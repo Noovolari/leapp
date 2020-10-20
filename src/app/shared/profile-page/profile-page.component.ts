@@ -98,4 +98,5 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   goBack() {
     this.router.navigate(['/', 'sessions', 'session-selected']);
   }
+
 }

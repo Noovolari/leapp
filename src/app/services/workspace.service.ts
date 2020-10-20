@@ -396,31 +396,7 @@ export class WorkspaceService extends NativeService {
           secretAccessKey: credentials.default.aws_secret_access_key
         });
 
-        let proxyUrl;
-        let proxyPort;
-        let proxyProtocol;
-        let proxyUsername;
-        let proxyPassword;
-
-        if (workspace) {
-          proxyUrl = workspace.proxyConfiguration.proxyUrl;
-          proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
-          proxyPort = workspace.proxyConfiguration.proxyPort;
-          proxyUsername = workspace.proxyConfiguration.username;
-          proxyPassword = workspace.proxyConfiguration.password;
-        }
-
-        if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-          let rules = `http=${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`;
-          if (proxyUsername !== undefined && proxyUsername !== null && proxyUrl !== '' &&
-              proxyPassword !== undefined && proxyPassword !== null && proxyPassword !== '') {
-            rules = `http=${proxyUsername}:${proxyPassword}@${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`;
-          }
-
-          this.appService.currentBrowserWindow().webContents.session.setProxy({
-            proxyRules: rules
-          });
-        }
+        this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
         const sts = new AWS.STS();
 

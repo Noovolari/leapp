@@ -21,16 +21,26 @@ export class ProxyService extends NativeService {
     let proxyUrl;
     let proxyPort;
     let proxyProtocol;
+    let proxyUsername;
+    let proxyPassword;
 
     if (workspace) {
       proxyUrl = workspace.proxyConfiguration.proxyUrl;
       proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
       proxyPort = workspace.proxyConfiguration.proxyPort;
+      proxyUsername = workspace.proxyConfiguration.username;
+      proxyPassword = workspace.proxyConfiguration.password;
     }
 
     if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+      let rules = `http=${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`;
+      if (proxyUsername !== undefined && proxyUsername !== null && proxyUrl !== '' &&
+        proxyPassword !== undefined && proxyPassword !== null && proxyPassword !== '') {
+        rules = `http=${proxyUsername}:${proxyPassword}@${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`;
+      }
+
       browserWindow.webContents.session.setProxy({
-        proxyRules: `http=${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`
+        proxyRules: rules
       });
     }
   }
@@ -42,15 +52,25 @@ export class ProxyService extends NativeService {
     let proxyUrl;
     let proxyPort;
     let proxyProtocol;
+    let proxyUsername;
+    let proxyPassword;
 
     if (workspace) {
       proxyUrl = workspace.proxyConfiguration.proxyUrl;
       proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
       proxyPort = workspace.proxyConfiguration.proxyPort;
+      proxyUsername = workspace.proxyConfiguration.username;
+      proxyPassword = workspace.proxyConfiguration.password;
     }
 
     if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-      const agent = new this.httpsProxyAgent(`${proxyProtocol}://${proxyUrl}:${proxyPort}`);
+      let rule = `${proxyProtocol}://${proxyUrl}:${proxyPort}`;
+      if (proxyUsername !== undefined && proxyUsername !== null && proxyUrl !== '' &&
+        proxyPassword !== undefined && proxyPassword !== null && proxyPassword !== '') {
+        rule = `${proxyUsername}:${proxyPassword}@${proxyProtocol}://${proxyUrl}:${proxyPort}`;
+      }
+
+      const agent = new this.httpsProxyAgent(rule);
       options.agent = agent;
     }
 

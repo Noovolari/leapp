@@ -10,6 +10,8 @@ export interface Workspace {
     proxyProtocol?: string;
     proxyUrl?: string;
     proxyPort?: string;
+    username?: string;
+    password?: string;
   };
 
 

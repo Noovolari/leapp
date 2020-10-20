@@ -1,8 +1,25 @@
 @import "palette";
 @import "../../../assets/scss/mixins/utility";
 
+body {
+  background: $white-text-color;
+}
+
+.tip {
+  position: absolute;
+  bottom: 7px;
+  left: 11px;
+  color: #707070;
+  font-size: 10px;
+}
+
+.background {
+  background: $white-text-color;
+  padding-top: 30px;
+}
+
 .container-fluid {
-  background: white;
+  background: $white-text-color;
   color: $text-color;
   font-family: "AvenirNext", "Open Sans", sans-serif;
   padding: 0 25px;
@@ -15,8 +32,8 @@
 
   .pull-left {
     position: absolute;
-    left: 28px;
-    top: 32px;
+    left: 25px;
+    bottom: 25px;
   }
 
   .pull-center {
@@ -132,7 +149,7 @@
 
     border-radius: 4px;
     border: 2px solid $text-color!important;
-    background-color: $white-text-color;
+    background-color: $background;
 
     transition: all 0.3s ease;
   }

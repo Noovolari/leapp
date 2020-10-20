@@ -46,6 +46,9 @@ export class AppComponent implements OnInit {
     // Set it as default
     this.configurationService.setDefaultWorkspaceSync(workspace.name);
 
+    // Fix for retro-compatibility with old workspace configuration
+    this.verifyWorkspace();
+
     // Prevent Dev Tool to show on production mode
     this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
       if (environment.production) {
@@ -68,5 +71,19 @@ export class AppComponent implements OnInit {
    */
   beforeCloseInstructions() {
     this.menuService.cleanBeforeExit();
+  }
+
+  /**
+   * Fix for having old proxy to new configuration
+   */
+  verifyWorkspace() {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const hasNewConf = workspace.proxyConfiguration !== undefined;
+
+    if (!hasNewConf) {
+      const proxyUrl = workspace.proxyUrl ? workspace.proxyUrl : '';
+      workspace.proxyConfiguration = { proxyPort: '8080', proxyProtocol: 'https', proxyUrl, username: '', password: '' };
+      this.configurationService.updateWorkspaceSync(workspace);
+    }
   }
 }

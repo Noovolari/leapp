@@ -399,16 +399,26 @@ export class WorkspaceService extends NativeService {
         let proxyUrl;
         let proxyPort;
         let proxyProtocol;
+        let proxyUsername;
+        let proxyPassword;
 
         if (workspace) {
           proxyUrl = workspace.proxyConfiguration.proxyUrl;
           proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
           proxyPort = workspace.proxyConfiguration.proxyPort;
+          proxyUsername = workspace.proxyConfiguration.username;
+          proxyPassword = workspace.proxyConfiguration.password;
         }
 
         if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
+          let rules = `http=${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`;
+          if (proxyUsername !== undefined && proxyUsername !== null && proxyUrl !== '' &&
+              proxyPassword !== undefined && proxyPassword !== null && proxyPassword !== '') {
+            rules = `http=${proxyUsername}:${proxyPassword}@${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`;
+          }
+
           this.appService.currentBrowserWindow().webContents.session.setProxy({
-            proxyRules: `http=${proxyUrl}:${proxyPort};https=${proxyUrl}:${proxyPort}`
+            proxyRules: rules
           });
         }
 
@@ -491,7 +501,7 @@ export class WorkspaceService extends NativeService {
         name,
         lastIDPToken: googleToken,
         idpUrl: federationUrl,
-        proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '' },
+        proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
         sessions: [],
         azureProfile: null,
         azureConfig: null

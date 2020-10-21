@@ -9,10 +9,14 @@ Leapp
 
 ![logo](.github/images/README-1.png)
 
-Leapp is your everyday companion to access your cloud; designed to work with multiple Identity Providers and Cloud Providers APIs, CLIs, and SDKs.
+Leapp is your everyday companion to access your cloud; designed to work with Cloud Providers APIs, CLIs, and SDKs.
 It's a software that securely stores your access information and generates temporary credential sets to access your cloud ecosystem from your local machine.
 
-For example, while using the AWS CLI it may become annoying to switch to a different profile or use the --profile argument before issuing every command. Leapp lets you have a new set of credentials and give access to that account with a click.
+**For example, while using the AWS CLI it may become annoying to switch to a different profile or use the --profile argument before issuing every command.**
+
+Leapp lets you have a new set of credentials and give access to that account with a click.
+
+Leapp also will manage Federated access through Identity Provides.
 
 ![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
 

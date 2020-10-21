@@ -25,6 +25,10 @@ export class ProfileComponent extends AntiMemLeak implements OnInit {
   ) { super(); }
 
   ngOnInit() {
+    const sub = this.appService.profileOpen.subscribe(res => {
+      this.profileIsOpen = res;
+    });
+    this.subs.add(sub);
   }
 
   // When we toggle profile we emit is opening status

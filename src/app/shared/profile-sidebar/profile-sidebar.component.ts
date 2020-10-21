@@ -67,6 +67,7 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
   closeProfile() {
     this.profileOpen = false;
     this.appService.profileOpen.emit(false);
+    this.appService.logger(`Profile open emitting: ${this.profileOpen}`, LoggerLevel.INFO, this);
   }
 
   goToProfile() {

@@ -1,6 +1,6 @@
 Leapp
 =========
-[![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)]()
+[![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)](https://github.com/Noovolari/leapp/releases/latest)
 
 - Website: https://www.leapp.cloud/
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/1)

@@ -9,6 +9,8 @@ Leapp
 
 ![logo](.github/images/README-1.png)
 
+![Leapp App animation](.github/images/Leapp-animation.gif)
+
 Leapp is your everyday companion to access your cloud; designed to work with multiple Identity Providers and Cloud Providers APIs, CLIs, and SDKs.
 It's a software that securely stores your access information and generates temporary credential sets to access your cloud ecosystem from your local machine.
 

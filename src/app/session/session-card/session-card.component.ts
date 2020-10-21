@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Host, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {CredentialsService} from '../../services/credentials.service';
@@ -19,9 +19,8 @@ import {AccountType} from '../../models/AccountType';
 @Component({
   selector: 'app-session-card',
   templateUrl: './session-card.component.html',
-  styleUrls: ['./session-card.component.scss']
+  styleUrls: ['./session-card.component.scss'],
 })
-
 
 export class SessionCardComponent implements OnInit {
 
@@ -152,7 +151,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   openDropDown(event) {
-    event.stopPropagation();
+    //event.stopPropagation();
   }
 
   // ============================== //

@@ -14,6 +14,8 @@ It's a software that securely stores your access information and generates tempo
 
 For example, while using the AWS CLI it may become annoying to switch to a different profile or use the --profile argument before issuing every command. Leapp lets you have a new set of credentials and give access to that account with a click.
 
+![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
+
 # Key features
 
 - **Switch account with a click**: Collect all your cloud accounts access data in a single place and connect straight away. Leverage cloud RBAC to impersonate your roles in a click, and don’t waste time manually manage or edit your credentials file.

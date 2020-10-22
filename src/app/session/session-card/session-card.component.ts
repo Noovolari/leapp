@@ -168,11 +168,10 @@ export class SessionCardComponent implements OnInit {
       event.stopPropagation();
     }
 
-    // Check the correct region
-    this.selectedSsmRegion = this.ssmRegions[1];
+    // Reset things before opening the modal
     this.instances = [];
+    this.ssmloading = false;
     this.modalRef = this.modalService.show(this.ssmModalTemplate, { class: 'ssm-modal'});
-    this.changeSsmRegion(null);
   }
 
   /**
@@ -180,6 +179,8 @@ export class SessionCardComponent implements OnInit {
    * @param event - the change select event
    */
   changeSsmRegion(event) {
+    console.log('Calling change SSM region');
+
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
       // Set the aws credentials to instanziate the ssm client
@@ -189,7 +190,6 @@ export class SessionCardComponent implements OnInit {
       this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
         this.instances = result.instances;
         this.ssmloading = false;
-        this.appService.logger('Obtained instances from AWS for SSM', LoggerLevel.INFO, this);
       });
 
     }

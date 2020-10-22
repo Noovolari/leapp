@@ -37,7 +37,7 @@
       <ng-select bindLabel="region" bindValue="region" [items]="ssmRegions" [(ngModel)]="selectedSsmRegion" placeholder="Select a Region for finding instances" (change)="changeSsmRegion($event);"></ng-select>
 
       <div class="loader" *ngIf="ssmloading"><i class="fa fa-spinner fa-spin"></i></div>
-      <div class="list-of-ssm" *ngIf="!ssmloading">
+      <div class="list-of-ssm" *ngIf="!ssmloading && instances.length > 0">
         <b>Select an Instance:</b>
         <ul class="ssm-ul">
           <li *ngFor="let instance of instances" class="ssm-card">

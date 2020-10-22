@@ -151,7 +151,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   openDropDown(event) {
-    //event.stopPropagation();
+    event.stopPropagation();
   }
 
   // ============================== //

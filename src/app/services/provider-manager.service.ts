@@ -220,6 +220,7 @@ export class ProviderManagerService {
 
         return created;
       } catch (err) {
+        this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
         return false;
       }
@@ -248,6 +249,7 @@ export class ProviderManagerService {
 
         return created;
       } catch (err) {
+        this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
         return false;
       }

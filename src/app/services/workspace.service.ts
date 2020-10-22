@@ -93,12 +93,13 @@ export class WorkspaceService extends NativeService {
         try {
           this.idpWindow.close();
         } catch (e) {
-          this.appService.logger(e, LoggerLevel.ERROR, this);
+          this.appService.logger(e, LoggerLevel.ERROR, this, e.stack);
         }
       }
 
       // Sometimes it can arrive here (tested) so the REAL way to block everything is to use the credential emit element!!!
       this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
       throw new Error(err);
     });
   }
@@ -162,6 +163,8 @@ export class WorkspaceService extends NativeService {
             err.error.text.indexOf('net::ERR_NAME_NOT_RESOLVED') > -1 ||
             err.error.text.indexOf('net::ERR_INTERNET_DISCONNECTED') > -1 ||
             err.error.text.indexOf('net::ERR_NETWORK_IO_SUSPENDED') > -1) {
+
+            this.appService.logger('There was a problem with your connection', LoggerLevel.ERROR, this, err.error.text);
             observer.error('There was a problem with your connection. Please retry.');
             observer.complete();
           } else {
@@ -339,7 +342,7 @@ export class WorkspaceService extends NativeService {
       // Save the federated one
       this.configurationService.updateWorkspaceSync(workspace);
     } catch (err) {
-      this.appService.logger(err, LoggerLevel.ERROR, this);
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
@@ -387,7 +390,7 @@ export class WorkspaceService extends NativeService {
         this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
       }
     } catch (err) {
-      this.appService.logger(err, LoggerLevel.ERROR,this);
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
@@ -453,7 +456,7 @@ export class WorkspaceService extends NativeService {
 
       // Catch any error show it and return false
       this.appService.toast(err, ToastLevel.WARN, 'Create new workspace');
-      this.appService.logger(err, LoggerLevel.WARN, this);
+      this.appService.logger('create new workspace error:', LoggerLevel.WARN, this, err.stack);
       return false;
     }
   }

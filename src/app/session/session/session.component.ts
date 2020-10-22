@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -52,7 +52,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private fileService: FileService,
     private credentialsService: CredentialsService,
     private sessionService: SessionService,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private zone: NgZone
   ) { super(); }
 
   ngOnInit() {
@@ -104,8 +105,10 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    * getSession
    */
   getSessions() {
-    this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
-    this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
+    this.zone.run(() => {
+      this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
+      this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
+    });
   }
 
   /**

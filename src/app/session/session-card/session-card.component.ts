@@ -163,11 +163,6 @@ export class SessionCardComponent implements OnInit {
    * @param session - the session to check for possible ssm sessions
    */
   ssmModalOpen(session, event) {
-    // Prevent event bubbling on document to avoid the tray keep opening and closing
-    if (event) {
-      event.stopPropagation();
-    }
-
     // Reset things before opening the modal
     this.instances = [];
     this.ssmloading = false;

@@ -1,8 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
-import {forkJoin, Observable, of} from 'rxjs';
-import {catchError, map} from 'rxjs/internal/operators';
+import {Observable} from 'rxjs';
 import {AwsCredential} from '../models/credential';
 
 const AWS = require('aws-sdk');
@@ -30,7 +29,6 @@ export class SsmService {
     // Set your SSM client and EC2 client
     AWS.config.update(this.setConfig(data, region));
     this.ssmClient = new AWS.SSM();
-    this.ec2Client = new AWS.EC2();
 
     // Fix for Ec2 clients from electron app
     this.app.setFilteringForEc2Calls();

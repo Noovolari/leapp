@@ -1,11 +1,11 @@
-<div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" >
-  <span class="information" (click)="switchCredentials()">
+<div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}">
+  <div class="information" (click)="switchCredentials()">
     <b>{{session.account.accountName.length >= 23 ? session.account.accountName.substr(0, 20) + '...' : session.account.accountName}}</b> - {{ sessionDetailToShow }}
-  </span>
-  <span class="information-offset" (click)="switchCredentials()">
+  </div>
+  <div class="information-offset" (click)="switchCredentials()">
     <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
     <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading"></i>
-  </span>
+  </div>
 
   <ng-container dropdown placement="right" [autoClose]="true">
     <a dropdownToggle class="drop-list-container" aria-controls="drop-list">

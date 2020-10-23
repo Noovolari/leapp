@@ -1,6 +1,6 @@
 {
     "name": "Leapp",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "author": {
         "name": "noovolari",
         "email": "info@noovolari.com"
@@ -179,7 +179,7 @@
         "md5-file": "~4.0.0",
         "menubar": "~6.0.3",
         "mousetrap": "~1.6.5",
-        "ngx-bootstrap": "~4.2.0",
+        "ngx-bootstrap": "4.3.0",
         "ngx-json-viewer": "~2.4.0",
         "ngx-toastr": "~10.0.4",
         "node-log-rotate": "~0.1.5",

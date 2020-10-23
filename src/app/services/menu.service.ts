@@ -40,7 +40,7 @@ export class MenuService extends NativeService {
 
     let voices = [];
     const activeSessions = this.sessionService.listSessions().filter(s => s.active);
-    const allSessions = activeSessions.concat(this.sessionService.listSessions().filter(s => !s.active).slice(0, 5 - activeSessions.length));
+    const allSessions = activeSessions.concat(this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter(s => !s.active)).slice(0, 5 - activeSessions.length));
     allSessions.forEach((session: Session) => {
       let icon = '';
       let label = '';

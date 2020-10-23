@@ -37,13 +37,16 @@ export class SessionService extends NativeService {
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace.sessions) {
-      workspace.sessions.sort((a, b) => {
-        return (a as Session).lastStopDate < (b as Session).lastStopDate ? 1 : -1;
-      });
-      this.configurationService.updateWorkspaceSync(workspace);
       return workspace.sessions;
     }
     return [];
+  }
+
+  alterOrderByTime(sessions) {
+    sessions.sort((a, b) => {
+      return (a as Session).lastStopDate < (b as Session).lastStopDate ? 1 : -1;
+    });
+    return sessions;
   }
 
   /**

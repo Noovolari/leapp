@@ -4,7 +4,7 @@ import {AwsAccount} from '../models/aws-account';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {v4 as uuidv4} from 'uuid';
 import {Session} from '../models/session';
-import {AppService, ToastLevel} from '../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {KeychainService} from '../services-system/keychain.service';
 import {AccountType} from '../models/AccountType';
@@ -101,13 +101,18 @@ export class FederatedAccountService extends NativeService {
         account
       };
 
-      this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(accountName, user), accessKey);
-      this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateSecretString(accountName, user), secretKey);
+      try {
+        this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(accountName, user), accessKey);
+        this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateSecretString(accountName, user), secretKey);
 
-      workspace.sessions.push(session);
-      this.configurationService.updateWorkspaceSync(workspace);
-      return true;
-
+        workspace.sessions.push(session);
+        this.configurationService.updateWorkspaceSync(workspace);
+        return true;
+      } catch (err) {
+        this.appService.toast(`Error in saving credentials to keychain for: ${accountName}`, ToastLevel.WARN, 'Create Account');
+        this.appService.logger(`Error in saving credentials to keychain for: ${accountName}`, LoggerLevel.ERROR, this, err.stack);
+        return false;
+      }
     } else {
       this.appService.toast('Account Number and User Must be unique.', ToastLevel.WARN, 'Create Account');
       return false;

@@ -119,6 +119,27 @@ export class FederatedAccountService extends NativeService {
     }
   }
 
+    /**
+   * Add a new Federated Account to workspace
+   * @param session - the session to be edited
+   */
+  editPlainAccountToWorkSpace(session: Session, accessKey: string, secretKey: string) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(
+        session.account.accountName, session.account.user
+      ), 
+      accessKey
+    );
+    this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateSecretString(
+        session.account.accountName, session.account.user
+      ), 
+      secretKey
+    );
+
+    this.configurationService.updateWorkspaceSync(workspace);
+    return true;
+  }
+
   /**
    * List all federated account in the workspace
    */

@@ -13,6 +13,7 @@
     </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
       <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER) && session.active">SSM session</a>
+      <a *ngIf="session.account.type === eAccountType.AWS_PLAIN_USER" (click)="editAccount(session, $event);">Edit account</a>
       <a (click)="removeAccount(session, $event);">Remove account</a>
       <ng-container *ngIf="session.account.type === eAccountType.AWS">
       <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>

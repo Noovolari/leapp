@@ -117,6 +117,11 @@ export class SessionCardComponent implements OnInit {
     });
   }
 
+  editAccount(session, event) {
+    event.stopPropagation();
+    this.router.navigate(['/managing', 'edit-account'], {queryParams: { sessionId: session.id }});
+  }
+
   /**
    * Copy credentials in the clipboard
    */

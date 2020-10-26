@@ -10,6 +10,8 @@ import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
 import {Session} from '../models/session';
 
+type FormType = 'ADD' | 'EDIT'
+
 @Injectable({
   providedIn: 'root'
 })
@@ -139,11 +141,23 @@ export class ProviderManagerService {
     this.decideSavingMethodAndSave();
   }
 
+    /**
+   * Save the first account of the Application
+   * @param session - the session to be edited
+   */
+  editAccount(session: Session, form) {
+    // Set our variable to avoid sending them to all methods;
+    // besides the scope of this service is to manage saving and editing
+    // of multi providers so having some helper class variables is ok
+    this.selectedSession = session
+    this.form = form
+    this.decideSavingMethodAndSave('EDIT') 
+  }
+
   /**
    * When the data from Google is received, generate a new workspace or check errors, etc.
    */
   createNewWorkspace(googleToken, federationUrl, responseType) {
-
     const name = 'default';
     const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, name, responseType);
     if (result) {
@@ -154,21 +168,25 @@ export class ProviderManagerService {
     }
   }
 
-  decideSavingMethodAndSave() {
+  decideSavingMethodAndSave(type: FormType = 'ADD') {
     let result = true;
-    switch (this.accountType) {
-      case AccountType.AWS:
-        result = this.saveAwsFederatedAccount();
-        break;
-      case AccountType.AWS_TRUSTER:
-        result = this.saveAwsTrusterAccount();
-        break;
-      case AccountType.AWS_PLAIN_USER:
-        result = this.savePlainCredentials();
-        break;
-      case AccountType.AZURE:
-        result = this.saveAzureAccount();
-        break;
+    if (type === 'EDIT') {
+      result = this.editPlainCredentials()
+    } else {
+      switch (this.accountType) {
+        case AccountType.AWS:
+          result = this.saveAwsFederatedAccount();
+          break;
+        case AccountType.AWS_TRUSTER:
+          result = this.saveAwsTrusterAccount();
+          break;
+        case AccountType.AWS_PLAIN_USER:
+          result = this.savePlainCredentials();
+          break;
+        case AccountType.AZURE:
+          result = this.saveAzureAccount();
+          break;
+      }
     }
 
     if (result) {
@@ -265,8 +283,17 @@ export class ProviderManagerService {
       this.form.value.name,
       this.form.value.plainUser,
       this.form.value.secretKey,
-      this.form .value.accessKey,
+      this.form.value.accessKey,
       this.selectedRegion);
+    return true;
+  }
+
+  editPlainCredentials() {
+    this.federatedAccountService.editPlainAccountToWorkSpace(
+      this.selectedSession,
+      this.form.value.accessKey,
+      this.form.value.secretKey
+    ) 
     return true;
   }
 
@@ -275,7 +302,16 @@ export class ProviderManagerService {
    * In the future we will put this in a service to create validation factory:
    * this way depending on new accounts we jkust need to pass the form object to the validator
    */
-  formValid(form, accountType) {
+  formValid(form, accountType, type: FormType = 'ADD') {
+    // check if it is an edit operation
+    if(type === 'EDIT') {
+      switch (accountType) {
+        case AccountType.AWS_PLAIN_USER:
+          return form.controls['accessKey'].valid &&
+            form.controls['secretKey'].valid;
+      }
+      return false;
+    }
     // First check the type of account we are creating
     if (accountType !== AccountType.AZURE) {
       // Get the workspace

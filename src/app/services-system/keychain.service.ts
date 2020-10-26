@@ -15,7 +15,7 @@ export class KeychainService extends NativeService {
    * @param account - unique identifier
    * @param password - secret
    */
-  saveSecret(service: string, account: string, password: string): boolean {
+  saveSecret(service: string, account: string, password: string) {
     return this.keytar.setPassword(service, account, password);
   }
 
@@ -34,7 +34,7 @@ export class KeychainService extends NativeService {
    * @param service - environment.appName
    * @param account - unique identifier
    */
-  deletePassword(service: string, account: string): boolean {
+  deletePassword(service: string, account: string) {
     return this.keytar.deletePassword(service, account);
   }
 }

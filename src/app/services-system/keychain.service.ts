@@ -1,20 +1,39 @@
-import { Injectable } from '@angular/core';
-import { NativeService } from './native-service';
+import {Injectable} from '@angular/core';
+import {NativeService} from './native-service';
+import {AppService, LoggerLevel} from './app.service';
 
 @Injectable({ providedIn: 'root' })
 export class KeychainService extends NativeService {
 
-  // Save secret
+  constructor(private appService: AppService) {
+    super();
+  }
+
+  /**
+   * Save your secret in the keychain
+   * @param service - environment.appName
+   * @param account - unique identifier
+   * @param password - secret
+   */
   saveSecret(service: string, account: string, password: string) {
     return this.keytar.setPassword(service, account, password);
   }
 
-  // Retrieve the secret
+  /**
+   * Retrieve a Secret from the keychain
+   * @param service - environment.appName
+   * @param account - unique identifier
+   * @returns the secret
+   */
   getSecret(service: string, account: string): any {
     return this.keytar.getPassword(service, account);
   }
 
-  // Delete the secret
+  /**
+   * Delete a secret from the keychain
+   * @param service - environment.appName
+   * @param account - unique identifier
+   */
   deletePassword(service: string, account: string) {
     return this.keytar.deletePassword(service, account);
   }

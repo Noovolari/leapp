@@ -46,3 +46,6 @@ testem.log
 .DS_Store
 Thumbs.db
 
+# Windows certificate
+windows.pfx
+

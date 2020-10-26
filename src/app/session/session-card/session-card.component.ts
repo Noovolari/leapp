@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Host, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {CredentialsService} from '../../services/credentials.service';
@@ -19,9 +19,8 @@ import {AccountType} from '../../models/AccountType';
 @Component({
   selector: 'app-session-card',
   templateUrl: './session-card.component.html',
-  styleUrls: ['./session-card.component.scss']
+  styleUrls: ['./session-card.component.scss'],
 })
-
 
 export class SessionCardComponent implements OnInit {
 
@@ -86,6 +85,7 @@ export class SessionCardComponent implements OnInit {
     // automatically check if there is an active session and get session list again
     this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
 
+    this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
     // Redraw the list
     this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
@@ -103,6 +103,7 @@ export class SessionCardComponent implements OnInit {
     this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
     this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
+    this.appService.logger('Session Stopped', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
   }
 
   removeAccount(session, event) {
@@ -111,6 +112,7 @@ export class SessionCardComponent implements OnInit {
       this.federatedAccountService.cleanKeychainIfNecessary(session);
       this.sessionService.removeSession(session);
       this.sessionsChanged.emit('');
+      this.appService.logger('Session Removed', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
       this.appService.redrawList.emit(true);
     });
   }
@@ -140,7 +142,7 @@ export class SessionCardComponent implements OnInit {
       }
     } catch (err) {
       this.appService.toast(err, ToastLevel.WARN);
-      this.appService.logger(err, LoggerLevel.WARN);
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
     }
 
   }
@@ -166,16 +168,10 @@ export class SessionCardComponent implements OnInit {
    * @param session - the session to check for possible ssm sessions
    */
   ssmModalOpen(session, event) {
-    // Prevent event bubbling on document to avoid the tray keep opening and closing
-    if (event) {
-      event.stopPropagation();
-    }
-
-    // Check the correct region
-    this.selectedSsmRegion = this.ssmRegions[1];
+    // Reset things before opening the modal
     this.instances = [];
+    this.ssmloading = false;
     this.modalRef = this.modalService.show(this.ssmModalTemplate, { class: 'ssm-modal'});
-    this.changeSsmRegion(null);
   }
 
   /**
@@ -183,6 +179,8 @@ export class SessionCardComponent implements OnInit {
    * @param event - the change select event
    */
   changeSsmRegion(event) {
+    console.log('Calling change SSM region');
+
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
       // Set the aws credentials to instanziate the ssm client

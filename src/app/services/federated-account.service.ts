@@ -29,10 +29,10 @@ export class FederatedAccountService extends NativeService {
    * @param accountName - the account name
    * @param role - the role to add to the account
    * @param idpArn - the idp arn as it is federated
+   * @param region - the region to select as default
    */
   addFederatedAccountToWorkSpace(accountNumber: string, accountName: string, role: any, idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
     const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);
@@ -76,6 +76,7 @@ export class FederatedAccountService extends NativeService {
    * @param user - the Aws user added
    * @param secretKey - secret key of the user
    * @param accessKey - access key of the AWS user
+   * @param region - the region to set as default
    */
   addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
@@ -119,24 +120,27 @@ export class FederatedAccountService extends NativeService {
     }
   }
 
-    /**
+  /**
    * Add a new Federated Account to workspace
    * @param session - the session to be edited
+   * @param accessKey - the access key to inject in the vault, note: they are NOT saved in Leapp
+   * @param secretKey - the secret key to inject in the vault, note: they are NOT saved in Leapp
+   * @param region - the default region to use
    */
-  editPlainAccountToWorkSpace(session: Session, accessKey: string, secretKey: string) {
+  editPlainAccountToWorkSpace(session: Session, accessKey: string, secretKey: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(
-        session.account.accountName, session.account.user
-      ), 
-      accessKey
-    );
-    this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateSecretString(
-        session.account.accountName, session.account.user
-      ), 
-      secretKey
-    );
+
+    // Update the value also in the session
+    workspace.sessions.map(sess => { if (sess.id === session.id) { sess.account.region = region; return sess; } });
+
+    // Update the values in the vault
+    this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user), accessKey);
+    this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user), secretKey);
 
     this.configurationService.updateWorkspaceSync(workspace);
+
+    console.log('workspace', workspace);
+
     return true;
   }
 

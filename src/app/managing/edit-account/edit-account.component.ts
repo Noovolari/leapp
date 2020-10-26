@@ -8,6 +8,9 @@ import {AwsAccount} from '../../models/aws-account';
 import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
 import {Session} from '../../models/session';
+import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {KeychainService} from '../../services-system/keychain.service';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-edit-account',
@@ -17,10 +20,12 @@ import {Session} from '../../models/session';
 export class EditAccountComponent implements OnInit {
   accountType = AccountType.AWS_PLAIN_USER;
   provider = AccountType.AWS;
-  selectedSession: Session
+  selectedSession: Session;
 
-  @Input() selectedAccountNumber = '';
-  @Input() selectedRole = '';
+  selectedAccountNumber = '';
+  selectedRole = '';
+  selectedRegion;
+  regions = [];
 
   workspace: Workspace;
 
@@ -29,6 +34,10 @@ export class EditAccountComponent implements OnInit {
   public form = new FormGroup({
     secretKey: new FormControl('', [Validators.required]),
     accessKey: new FormControl('', [Validators.required]),
+    accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
+    name: new FormControl('', [Validators.required]),
+    awsRegion: new FormControl(''),
+    plainUser: new FormControl('', [Validators.required])
   });
 
   /* Setup the first account for the application */
@@ -37,16 +46,34 @@ export class EditAccountComponent implements OnInit {
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private providerManagerService: ProviderManagerService
+    private providerManagerService: ProviderManagerService,
+    private keychainService: KeychainService
   ) {}
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(params => {
-      // Get the workspace and the accounts you need
+      // Get the workspace and the account you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
-      this.selectedSession = this.workspace.sessions.filter(
-        session => session.id === params.sessionId
-      )[0]
+      this.selectedSession = this.workspace.sessions.filter(session => session.id === params.sessionId)[0];
+      const selectedAccount = (this.selectedSession.account as AwsPlainAccount);
+
+      // Get the region
+      this.regions = this.appService.getRegions();
+      this.selectedRegion = this.regions.filter(r => r.region === selectedAccount.region)[0].region;
+      this.form.controls['awsRegion'].setValue(this.selectedRegion);
+
+      // Get other readonly properties
+      this.form.controls['name'].setValue(selectedAccount.accountName);
+      this.form.controls['accountNumber'].setValue(selectedAccount.accountNumber);
+      this.form.controls['plainUser'].setValue(selectedAccount.user);
+
+      // Get the secrets
+      this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(selectedAccount.accountName, (selectedAccount as AwsPlainAccount).user)).then(access => {
+        this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(selectedAccount.accountName, (selectedAccount as AwsPlainAccount).user)).then(secret => {
+          this.form.controls['accessKey'].setValue(access);
+          this.form.controls['secretKey'].setValue(secret);
+        });
+      });
     });
   }
 
@@ -62,15 +89,19 @@ export class EditAccountComponent implements OnInit {
    * Save the edited account in the workspace
    */
   saveAccount() {
-    this.providerManagerService.editAccount(this.selectedSession, this.form)
+    this.providerManagerService.editPlainAwsAccount(this.selectedSession, this.selectedRegion, this.form);
   }
 
   formValid() {
-    return this.providerManagerService.formValid(this.form, this.accountType, 'EDIT');
+    return this.providerManagerService.formValid(this.form, this.accountType);
   }
 
   goBack() {
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
     this.router.navigate(['/sessions', 'session-selected']);
+  }
+
+  openAccessStrategyDocumentation() {
+    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
 }

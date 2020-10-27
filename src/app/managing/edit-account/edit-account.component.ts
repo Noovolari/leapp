@@ -89,7 +89,7 @@ export class EditAccountComponent implements OnInit {
    * Save the edited account in the workspace
    */
   saveAccount() {
-    this.providerManagerService.editPlainAwsAccount(this.selectedSession, this.selectedRegion, this.form);
+    this.providerManagerService.editAccount(this.selectedSession, this.selectedRegion, this.form);
   }
 
   formValid() {

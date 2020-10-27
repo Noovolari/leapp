@@ -140,12 +140,12 @@ export class ProviderManagerService {
   }
 
   /**
-   * Save the first account of the Application
+   * Edit the account of the Application, the system is able to understand which one to edit and how
    * @param session - the session to be edited
    * @param selectedRegion - the default region to set
    * @param form - the form to check about
    */
-  editPlainAwsAccount(session: Session, selectedRegion, form) {
+  editAccount(session: Session, selectedRegion, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok

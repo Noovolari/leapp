@@ -139,8 +139,6 @@ export class FederatedAccountService extends NativeService {
 
     this.configurationService.updateWorkspaceSync(workspace);
 
-    console.log('workspace', workspace);
-
     return true;
   }
 

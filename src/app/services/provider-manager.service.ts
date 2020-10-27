@@ -2,7 +2,7 @@ import {Injectable, NgZone} from '@angular/core';
 import {IdpResponseType, WorkspaceService} from './workspace.service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AccountType} from '../models/AccountType';
-import {AppService, ToastLevel} from '../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {SessionService} from './session.service';
 import {FederatedAccountService} from './federated-account.service';
 import {TrusterAccountService} from './truster-account.service';
@@ -46,20 +46,16 @@ export class ProviderManagerService {
    * @param selectedSession - the one selected to get the roles
    */
   getFederatedRole(accounts, selectedSession: Session) {
-    console.log('accounts: ', accounts);
-
     const sessionId = selectedSession.id;
 
     // Get the appropriate roles
     const account = accounts.filter(acc => (acc.session.id === sessionId))[0].session.account;
-
-    console.log('account: ', account);
-
     if (account !== undefined && account !== null) {
       if (account.type === AccountType.AWS) {
         // The federated roles we have obtained from the filter
         const federatedRole = account.role;
         // Set the federated role automatically
+        this.appService.logger(`Retrieved federated role for: ${sessionId}`, LoggerLevel.INFO, this, JSON.stringify({ federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name }, null, 3));
         return { federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name };
       } else if (account.type === AccountType.AWS_PLAIN_USER) {
         return { federatedRole: { name: 'no need' }, selectedAccountNumber: account.accountNumber, selectedrole: 'no need' };
@@ -104,12 +100,16 @@ export class ProviderManagerService {
       const federationUrl = form.value.federationUrl;
 
       // When the token is received save it and go to the setup page for the first account
-      this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => this.createNewWorkspace(googleToken, federationUrl, responseType)));
+      this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => {
+        this.createNewWorkspace(googleToken, federationUrl, responseType);
+        this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
+      }));
 
       // Call the service for working on the first login event to the user idp
       // We add the helper for account choosing just to be sure to give the possibility to call the correct user
       this.workspaceService.getIdpTokenInSetup(federationUrl, responseType);
     } else {
+      this.appService.logger(`Saving first account with a plain or azure account`, LoggerLevel.INFO, this);
       this.createNewWorkspace(undefined, undefined, responseType);
     }
   }
@@ -140,10 +140,26 @@ export class ProviderManagerService {
   }
 
   /**
+   * Edit the account of the Application, the system is able to understand which one to edit and how
+   * @param session - the session to be edited
+   * @param selectedRegion - the default region to set
+   * @param form - the form to check about
+   */
+  editAccount(session: Session, selectedRegion, form) {
+    // Set our variable to avoid sending them to all methods;
+    // besides the scope of this service is to manage saving and editing
+    // of multi providers so having some helper class variables is ok
+    this.selectedSession = session;
+    this.accountType = session.account.type;
+    this.selectedRegion = selectedRegion;
+    this.form = form;
+    this.decideEditingMethodAndSave();
+  }
+
+  /**
    * When the data from Google is received, generate a new workspace or check errors, etc.
    */
   createNewWorkspace(googleToken, federationUrl, responseType) {
-
     const name = 'default';
     const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, name, responseType);
     if (result) {
@@ -173,6 +189,31 @@ export class ProviderManagerService {
 
     if (result) {
       // Then go to next page
+      this.appService.logger('managed to save session', LoggerLevel.INFO, this);
+      this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
+    }
+  }
+
+  decideEditingMethodAndSave() {
+    let result = true;
+    switch (this.accountType) {
+      case AccountType.AWS:
+        result = true; // this.saveAwsFederatedAccount();
+        break;
+      case AccountType.AWS_TRUSTER:
+        result = true; // this.saveAwsTrusterAccount();
+        break;
+      case AccountType.AWS_PLAIN_USER:
+        result = this.editPlainCredentials();
+        break;
+      case AccountType.AZURE:
+        result = true; // this.saveAzureAccount();
+        break;
+    }
+
+    if (result) {
+      // Then go to next page
+      this.appService.logger('managed to edit session', LoggerLevel.INFO, this);
       this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
     }
   }
@@ -190,10 +231,12 @@ export class ProviderManagerService {
 
         return created;
       } catch (err) {
+        this.appService.logger('Error creating account', LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
         return false;
       }
     } else {
+      this.appService.logger('Missing required parameters for account', LoggerLevel.ERROR, this, JSON.stringify(this.form.getRawValue(), null, 3));
       this.appService.toast('Missing required parameters for account', ToastLevel.WARN, 'Add required elements to Account');
       return false;
     }
@@ -217,6 +260,7 @@ export class ProviderManagerService {
 
         return created;
       } catch (err) {
+        this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
         return false;
       }
@@ -245,6 +289,7 @@ export class ProviderManagerService {
 
         return created;
       } catch (err) {
+        this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
         return false;
       }
@@ -266,6 +311,16 @@ export class ProviderManagerService {
     return true;
   }
 
+  editPlainCredentials() {
+    this.federatedAccountService.editPlainAccountToWorkSpace(
+      this.selectedSession,
+      this.form.value.accessKey,
+      this.form.value.secretKey,
+      this.selectedRegion,
+    );
+    return true;
+  }
+
   /**
    * Because the form is complex we need a custom form validation
    * In the future we will put this in a service to create validation factory:
@@ -277,34 +332,44 @@ export class ProviderManagerService {
       // Get the workspace
       const workspace = this.configurationService.getDefaultWorkspaceSync();
 
+      let check;
       // We are in AWS check if we are saving a Federated or a Truster
       switch (accountType) {
         case AccountType.AWS:
           // Check Federated fields
-          return form.controls['name'].valid &&
+          check = form.controls['name'].valid &&
             (form.controls['federationUrl'].valid || workspace.idpUrl) &&
             form.controls['accountNumber'].valid &&
             form.controls['role'].valid &&
             form.controls['idpArn'].valid;
+          this.appService.logger(`AWS Form is valid: ${check}`, LoggerLevel.INFO, this);
+          return check;
         case AccountType.AWS_TRUSTER:
           // Check Federated fields
-          return form.controls['name'].valid &&
+          check = form.controls['name'].valid &&
             form.controls['accountNumber'].valid &&
             form.controls['role'].valid &&
             form.controls['federatedAccount'].valid &&
             form.controls['federatedRole'].valid;
+          this.appService.logger(`AWS TRUSTER Form is valid: ${check}`, LoggerLevel.INFO, this);
+          return check;
         case AccountType.AWS_PLAIN_USER:
-          return form.controls['name'].valid &&
+          check = form.controls['name'].valid &&
             form.controls['accountNumber'].valid &&
             form.controls['accessKey'].valid &&
             form.controls['secretKey'].valid;
+          this.appService.logger(`AWS PLAIN Form is valid: ${check}`, LoggerLevel.INFO, this);
+          return check;
       }
     } else {
       // Check Azure fields
-      return form.controls['name'].valid &&
+      const check = form.controls['name'].valid &&
              form.controls['subscriptionId'].valid &&
              form.controls['tenantId'].valid;
+      this.appService.logger(`AZURE Form is valid: ${check}`, LoggerLevel.INFO, this);
+      return check;
     }
+    this.appService.logger(`Form is not valid`, LoggerLevel.WARN, this);
     return false;
   }
 

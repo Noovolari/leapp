@@ -44,6 +44,7 @@ export class ConfigurationService extends NativeService {
    */
   public updateWorkspaceSync(workspace: Workspace) {
     const configuration = this.getConfigurationFileSync();
+    this.appService.logger(`Updating workspace synch.`, LoggerLevel.INFO, this);
 
     // Check if the workspace is in the array
     const index = configuration.workspaces.findIndex((elem) => elem.name === workspace.name);
@@ -68,10 +69,10 @@ export class ConfigurationService extends NativeService {
 
     // Remove the old version if exists go on otherwise
     if (this.workspaceExists(workspace.name)) {
-      this.appService.logger(`Workspace - ${workspace.name} - already exists, updating configuration`, LoggerLevel.WARN);
+      this.appService.logger(`Workspace - ${workspace.name} - already exists, updating configuration`, LoggerLevel.WARN, this);
       this.removeWorkspaceSync(workspace.name);
     } else {
-      this.appService.logger(`Adding Workspace - ${workspace.name} - to configuration`, LoggerLevel.INFO);
+      this.appService.logger(`Adding Workspace - ${workspace.name} - to configuration`, LoggerLevel.INFO, this);
     }
 
     // Set the configuration with the updated value
@@ -92,6 +93,7 @@ export class ConfigurationService extends NativeService {
       this.updateConfigurationFileSync(conf);
       this.changeDefaultWorkspace.emit(workspaceName);
     } catch (error) {
+      this.appService.logger(`Proble setting default workspace: ${workspaceName}.`, LoggerLevel.ERROR, this, error.stack);
       throw error;
     }
   }
@@ -211,7 +213,9 @@ export class ConfigurationService extends NativeService {
 
       // Clean localStorage
       localStorage.clear();
-    } catch (err) {}
+    } catch (err) {
+      this.appService.logger(`Leapp has an error cleaning your data.`, LoggerLevel.ERROR, this, err.stack);
+    }
   }
 
   /**
@@ -236,6 +240,7 @@ export class ConfigurationService extends NativeService {
       }, 2000);
 
     } catch (err) {
+      this.appService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.ERROR, this, err.stack);
       this.appService.toast(_(`Leapp has an error re-creating your configuration file and cache.`), ToastLevel.ERROR, _('Cleaning configuration file'));
     }
   }

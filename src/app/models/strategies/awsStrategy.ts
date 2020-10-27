@@ -38,7 +38,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     });
 
     console.log('active aws sessions', activeSessions);
-
+    this.appService.logger('Aws Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
 
@@ -75,8 +75,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         this.configurationService.disableLoadingWhenReady(workspace, session);
       },
       (err) => {
-        this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
-      });
+        this.appService.logger('Error in Aws Credential process', LoggerLevel.ERROR, this, err.stack);
+        throw new Error(err);
+    });
   }
 
   // TODO: move to AwsCredentialsGenerationService
@@ -91,6 +92,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           observable.next(data);
           observable.complete();
         } else {
+          this.appService.logger('Error in get session token', LoggerLevel.ERROR, this, err.stack);
           observable.error(err);
           observable.complete();
         }
@@ -144,7 +146,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         this.doubleJumpFromFixedCredential(session);
       }
     } catch (e) {
-      this.appService.logger(e, LoggerLevel.ERROR);
+      this.appService.logger('Error in Aws Credential Federated Process', LoggerLevel.ERROR, this, e.stack);
       this.credentialsService.refreshReturnStatusEmit.emit(false);
     }
 
@@ -192,42 +194,34 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         secretAccessKey: credentials.default.aws_secret_access_key
       });
 
+      // Second jump
+      const sts = new AWS.STS();
+
       const processData = () => {
-        sts.assumeRole(params, (err, data: any) => {
+        sts.assumeRole({
+          RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
+          RoleSessionName: `truster-on-${session.account.role.name}`
+        }, (err, data: any) => {
           if (err) {
             // Something went wrong save it to the logger file
-            this.appService.logger(err.stack, LoggerLevel.ERROR);
+            this.appService.logger('Error in assume role from plain to truster in get session token', LoggerLevel.ERROR, this, err.stack);
             this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
-
-            // Finished double jump
-            this.configurationService.disableLoadingWhenReady(workspace, session);
-
             // Emit ko for double jump
             this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
           } else {
-            console.log('dentro truster');
-
             // we set the new credentials after the first jump
             const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
-
-            console.log('truster credentials:', trusterCredentials);
 
             this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
             this.configurationService.updateWorkspaceSync(workspace);
             this.configurationService.disableLoadingWhenReady(workspace, session);
-
             // Finished double jump
             this.configurationService.disableLoadingWhenReady(workspace, session);
-
-            // Emit ok for double jump
-            this.workspaceService.credentialEmit.emit({status: 'ok', accountName: session.account.accountName});
+            this.appService.logger('Made it through Double jump from plain', LoggerLevel.INFO, this);
           }
         });
       };
-
-      // Second jump
-      const sts = new AWS.STS();
 
       const params = {
         RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,

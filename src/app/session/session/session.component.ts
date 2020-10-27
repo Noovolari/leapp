@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -52,7 +52,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private fileService: FileService,
     private credentialsService: CredentialsService,
     private sessionService: SessionService,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private zone: NgZone
   ) { super(); }
 
   ngOnInit() {
@@ -107,8 +108,10 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    * getSession
    */
   getSessions() {
-    this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
-    this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
+    this.zone.run(() => {
+      this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
+      this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter( session => session.active === false));
+    });
   }
 
   /**
@@ -117,26 +120,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   createAccount() {
     // Go!
     this.router.navigate(['/managing', 'create-account']);
-  }
-
-  /**
-   * Set the region for ssm init and launch the mopethod form the server to find instances
-   * @param event - the change select event
-   */
-  changeSsmRegion(event) {
-    if (this.selectedSsmRegion) {
-      this.ssmloading = true;
-      // Set the aws credentials to instanziate the ssm client
-      const credentials = this.configurationService.getDefaultWorkspaceSync().awsCredentials;
-      // Check the result of the call
-      const sub = this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
-
-        this.instances = result.instances;
-        this.ssmloading = false;
-      });
-
-      this.subs.add(sub);
-    }
   }
 
   filterSessions(query) {

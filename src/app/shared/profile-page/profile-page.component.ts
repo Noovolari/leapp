@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Workspace} from '../../models/workspace';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService, ToastLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {FileService} from '../../services-system/file.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
@@ -60,10 +60,13 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
       if (this.form.controls['proxyUrl'].value !== undefined &&
         this.form.controls['proxyUrl'].value !== null &&
         this.form.controls['proxyUrl'].value !== '') {
+
+        this.appService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.INFO, this);
         this.appService.toast('You\'ve set a proxy url: the app must be restarted to update the configuration.', ToastLevel.WARN, 'Force restart');
         this.appService.restart();
       }
 
+      this.appService.logger('Option saved.', LoggerLevel.INFO, this, JSON.stringify(this.form.getRawValue(), null, 3));
       this.appService.toast('Option saved.', ToastLevel.INFO, 'Options');
     }
   }

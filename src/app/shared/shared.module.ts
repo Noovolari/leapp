@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProfileComponent } from './profile/profile.component';
 import { TooltipModule, BsDropdownModule, ModalModule } from 'ngx-bootstrap';
-import { DropdownComponent } from './dropdown/dropdown.component';
 import { ConfirmationDialogComponent } from './confirmation-dialog/confirmation-dialog.component';
 import { ProfileSidebarComponent } from './profile-sidebar/profile-sidebar.component';
 import { ProfilePageComponent } from './profile-page/profile-page.component';

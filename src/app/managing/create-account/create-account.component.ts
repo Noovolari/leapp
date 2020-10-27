@@ -1,7 +1,7 @@
 import {Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ConfigurationService} from '../../services-system/configuration.service';
-import {AppService} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
@@ -103,6 +103,8 @@ export class CreateAccountComponent implements OnInit {
       // Show the federated accounts
       this.federatedAccounts = this.accounts;
 
+      console.log('federatedAccounts: ', this.federatedAccounts);
+
       // only for start screen
       if (this.firstTime) {
         this.form.controls['federatedOrTruster'].disable({ onlySelf: true });
@@ -138,6 +140,8 @@ export class CreateAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveAccount() {
+    this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
+
     if (this.firstTime) {
       this.providerManagerService.saveFirstAccount(
         this.accountId,
@@ -181,6 +185,8 @@ export class CreateAccountComponent implements OnInit {
   goBack() {
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
+    this.appService.logger(`Going back (this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0): ${this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0}`, LoggerLevel.INFO, this);
+
     if (this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
     } else {
@@ -198,6 +204,7 @@ export class CreateAccountComponent implements OnInit {
     this.accountType = strategy;
     this.provider = strategy;
     this.typeSelection = false;
+    this.appService.logger(`Setting an access strategy we want to create`, LoggerLevel.INFO, this, JSON.stringify({ strategy }, null, 3));
   }
 
   openAccessStrategyDocumentation() {

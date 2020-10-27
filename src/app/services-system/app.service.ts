@@ -6,8 +6,8 @@ import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirm
 import {BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
-import {ConfigurationService} from './configuration.service';
 import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
+
 
 @Injectable({
   providedIn: 'root'
@@ -25,6 +25,10 @@ export class AppService extends NativeService {
     private modalService: BsModalService
   ) {
     super();
+
+    // Global Configure logger
+    this.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+    this.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
   }
 
   /**
@@ -86,19 +90,31 @@ export class AppService extends NativeService {
    * @param message - the message to log
    * @param type - the LoggerLevel type
    */
-  logger(message: string, type: LoggerLevel) {
+  logger(message: any, type: LoggerLevel, instance?: any, stackTrace?: string) {
+    if (typeof message !== 'string') {
+      message = JSON.stringify(message, null, 3);
+    }
+
+    if (instance) {
+      message = `[${instance.constructor['name']}] ${message}`;
+    }
+
+    if (stackTrace) {
+      message = `${message} ${stackTrace}`;
+    }
+
     switch (type) {
       case LoggerLevel.INFO:
-        this.log.info(message);
+        if (!environment.production) { this.log.info(message); }
         break;
       case LoggerLevel.WARN:
-        this.log.warn(message);
+        if (!environment.production) { this.log.warn(message); }
         break;
       case LoggerLevel.ERROR:
         this.log.error(message);
         break;
       default:
-        this.log.info(message);
+        if (!environment.production) { this.log.info(message); }
         break;
     }
   }
@@ -143,7 +159,6 @@ export class AppService extends NativeService {
         slashes: true
     }));
     this.currentWindow.webContents.on('did-finish-load', () => {
-      console.warn();
       if (javascript) {
         this.currentWindow.webContents.executeJavaScript(javascript);
       }
@@ -401,7 +416,7 @@ export class AppService extends NativeService {
       // Rewrite credential file
       this.fs.writeFileSync(awsCredentialsPath, '');
     } catch (e) {
-      this.logger(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.WARN);
+      this.logger(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.WARN, this, e.stack);
     }
   }
 

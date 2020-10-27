@@ -37,7 +37,8 @@ export class EditAccountComponent implements OnInit {
     accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
     name: new FormControl('', [Validators.required]),
     awsRegion: new FormControl(''),
-    plainUser: new FormControl('', [Validators.required])
+    plainUser: new FormControl('', [Validators.required]),
+    mfaDevice: new FormControl('')
   });
 
   /* Setup the first account for the application */
@@ -66,6 +67,7 @@ export class EditAccountComponent implements OnInit {
       this.form.controls['name'].setValue(selectedAccount.accountName);
       this.form.controls['accountNumber'].setValue(selectedAccount.accountNumber);
       this.form.controls['plainUser'].setValue(selectedAccount.user);
+      this.form.controls['mfaDevice'].setValue(selectedAccount.mfaDevice);
 
       // Get the secrets
       this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(selectedAccount.accountName, (selectedAccount as AwsPlainAccount).user)).then(access => {

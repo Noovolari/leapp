@@ -12,8 +12,8 @@ import { InputDialogComponent } from './input-dialog/input-dialog.component';
 
 
 @NgModule({
-  declarations: [ProfileComponent, DropdownComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent],
+  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent],
   imports: [CommonModule, TooltipModule.forRoot(), BsDropdownModule.forRoot(), ModalModule.forRoot(), ReactiveFormsModule, FormsModule, NgxJsonViewerModule],
-  exports: [ProfileComponent, DropdownComponent, ConfirmationDialogComponent, ProfileSidebarComponent, InputDialogComponent]
+  exports: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, InputDialogComponent]
 })
 export class SharedModule { }

@@ -316,6 +316,7 @@ export class ProviderManagerService {
       this.selectedSession,
       this.form.value.accessKey,
       this.form.value.secretKey,
+      this.form.value.mfaDevice,
       this.selectedRegion,
     );
     return true;

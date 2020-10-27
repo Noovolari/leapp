@@ -40,10 +40,17 @@
           <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
         </div>
 
-        <div class="form-group" style="width: 100%; display: inline-block;">
+        <div class="form-group" style="width: 49%; display: inline-block;">
           <label>User<span class="danger-text">*</span></label>
           <input formControlName="plainUser" type="text" class="form-control" placeholder="User name" readonly>
           <small class="text-error" *ngIf="(form.controls['plainUser'].dirty || form.controls['plainUser'].touched) && form.controls['plainUser'].errors">Insert the User</small>
+        </div>
+
+        <div class="form-group" style="width: 2%; display: inline-block; position: relative; top: -1px;"></div>
+
+        <div class="form-group" style="width: 49%; display: inline-block;">
+          <label>Mfa Device</label>
+          <input formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
         </div>
 
         <ng-container>

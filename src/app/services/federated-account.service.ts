@@ -126,13 +126,20 @@ export class FederatedAccountService extends NativeService {
    * @param session - the session to be edited
    * @param accessKey - the access key to inject in the vault, note: they are NOT saved in Leapp
    * @param secretKey - the secret key to inject in the vault, note: they are NOT saved in Leapp
+   * @param mfaDevice - the mfaDevice (optional) to associate to the plain account
    * @param region - the default region to use
    */
-  editPlainAccountToWorkSpace(session: Session, accessKey: string, secretKey: string, region: string) {
+  editPlainAccountToWorkSpace(session: Session, accessKey: string, secretKey: string, mfaDevice: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     // Update the value also in the session
-    workspace.sessions.map(sess => { if (sess.id === session.id) { sess.account.region = region; return sess; } });
+    workspace.sessions.map(sess => {
+      if (sess.id === session.id) {
+        sess.account.region = region;
+        sess.account.mfaDevice = mfaDevice;
+        return sess;
+      }
+    });
 
     // Update the values in the vault
     this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user), accessKey);

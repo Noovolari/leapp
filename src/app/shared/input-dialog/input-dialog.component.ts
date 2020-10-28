@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {constants} from '../../core/enums/constants';
 
 @Component({
   selector: 'app-input-dialog',
@@ -40,7 +41,7 @@ export class InputDialogComponent implements OnInit {
 
   close() {
     if (this.callback) {
-      this.callback('');
+      this.callback(constants.CONFIRM_CLOSED);
     }
     this.bsModalRef.hide();
   }

@@ -1,5 +1,5 @@
-import {Workspace} from './workspace';
-import {Session} from './session';
+import {Workspace} from '../models/workspace';
+import {Session} from '../models/session';
 
 export abstract class RefreshCredentialsStrategy {
   refreshCredentials(workspace: Workspace): void {

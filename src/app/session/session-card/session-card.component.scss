@@ -25,7 +25,6 @@
 
 .session-card {
   width: 100%;
-  padding: 10px;
   background: $light-color;
   text-align: left;
   position: relative;
@@ -34,6 +33,20 @@
   border-radius: $border-radius;
   margin: 0 0 15px;
   cursor: pointer;
+
+  .information {
+    padding: 10px;
+    display: inline-block;
+    width: 77%;
+  }
+  .information-offset {
+    padding: 10px;
+    display: inline-block;
+    width: 12%;
+    margin-left: 41px;
+    float: right;
+    height: 42px;
+  }
 
   .drop-list-container {
     padding: 4px 10px 3px;

@@ -52,6 +52,7 @@ export class AppComponent implements OnInit {
     // Prevent Dev Tool to show on production mode
     this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
       if (environment.production) {
+        this.app.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
         this.app.currentBrowserWindow().webContents.closeDevTools();
       }
     });
@@ -59,6 +60,7 @@ export class AppComponent implements OnInit {
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
+      this.app.logger('Preparing for closing instruction...', LoggerLevel.INFO, this);
       this.beforeCloseInstructions();
     });
 

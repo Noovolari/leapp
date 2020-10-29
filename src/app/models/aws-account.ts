@@ -10,4 +10,5 @@ export interface AwsAccount extends Account {
   type: AccountType;
   parent?: string;
   parentRole?: string;
+  region?: string;
 }

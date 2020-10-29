@@ -7,10 +7,12 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../shared/shared.module';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
 import {CreateAccountComponent} from './create-account/create-account.component';
+import { EditAccountComponent } from './edit-account/edit-account.component';
 
 @NgModule({
   declarations: [
-    CreateAccountComponent
+    CreateAccountComponent,
+    EditAccountComponent
   ],
   imports: [
     CommonModule,

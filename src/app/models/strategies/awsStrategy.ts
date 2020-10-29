@@ -13,6 +13,7 @@ import {RefreshCredentialsStrategy} from '../refreshCredentialsStrategy';
 import {TimerService} from '../../services/timer-service';
 import {Workspace} from '../workspace';
 import {WorkspaceService} from '../../services/workspace.service';
+import {Observable} from 'rxjs';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -38,7 +39,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     });
 
     console.log('active aws sessions', activeSessions);
-
+    this.appService.logger('Aws Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
 
@@ -57,21 +58,66 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     }
   }
 
+  /**
+   * In this method we transform plain to temporary to avoid saving plain credential in the file
+   * @param workspace - the workspace we are working on
+   * @param session - the current sessin we use to retrieve information from
+   */
   private async awsCredentialProcess(workspace: Workspace, session) {
+    const credentials = await this.getIamUserAccessKeysFromKeychain(session);
+
+    this.getSessionToken(credentials).subscribe((awsCredentials) => {
+        const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);
+
+        workspace.ssmCredentials = tempCredentials;
+        this.configurationService.updateWorkspaceSync(workspace);
+
+        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), tempCredentials);
+        this.configurationService.disableLoadingWhenReady(workspace, session);
+      },
+      (err) => {
+        this.appService.logger('Error in Aws Credential process', LoggerLevel.ERROR, this, err.stack);
+        throw new Error(err);
+    });
+  }
+
+  // TODO: move to AwsCredentialsGenerationService
+  private getSessionToken(awsCredentials: AwsCredentials): Observable<any> {
+    return new Observable<AwsCredentials>((observable) => {
+      AWS.config.update({
+        accessKeyId: awsCredentials.default.aws_access_key_id,
+        secretAccessKey: awsCredentials.default.aws_secret_access_key
+      });
+
+      const sts = new AWS.STS();
+
+      sts.getSessionToken({ DurationSeconds: environment.sessionDuration }, (err, data) => {
+        console.log('err', err);
+        console.log('cred', data);
+
+        if (data !== undefined || data !== null) {
+          observable.next(data);
+          observable.complete();
+        } else {
+          this.appService.logger('Error in get session token', LoggerLevel.ERROR, this, err.stack);
+          observable.error(err);
+          observable.complete();
+        }
+      });
+    });
+  }
+
+  // TODO: move to KeychainService
+  private async getIamUserAccessKeysFromKeychain(session) {
     const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
-
-    workspace.ssmCredentials = credentials;
-    this.configurationService.updateWorkspaceSync(workspace);
-
-    this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
-    this.configurationService.disableLoadingWhenReady(workspace, session);
+    return credentials;
   }
 
   awsCredentialFederatedProcess(workspace, session) {
     // Check for Aws Credentials Process
-    if (!workspace.idpUrl) {
+    if (!workspace) {
       return 'workspace not set';
     }
     const idpUrl = workspace.idpUrl ;
@@ -85,7 +131,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         this.doubleJumpFromFixedCredential(session);
       }
     } catch (e) {
-      this.appService.logger(e, LoggerLevel.ERROR);
+      this.appService.logger('Error in Aws Credential Federated Process', LoggerLevel.ERROR, this, e.stack);
       this.credentialsService.refreshReturnStatusEmit.emit(false);
     }
 
@@ -118,6 +164,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     const sessions = workspace.sessions;
     const parentSessions = sessions.filter(sess => sess.id === parentAccountSessionId);
 
+    console.log('parent sessions length:', parentSessions.length);
+
     if (parentSessions.length > 0) {
       // Parent account found: do double jump
       const parentSession = parentSessions[0];
@@ -126,7 +174,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
-
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
       this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
@@ -148,7 +195,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           console.log('err: ', err);
 
           // Something went wrong save it to the logger file
-          this.appService.logger(err.stack, LoggerLevel.ERROR);
+          this.appService.logger('Error in assume role from plain to truster in get session token', LoggerLevel.ERROR, this, err.stack);
           this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
 
           // Emit ko for double jump
@@ -158,7 +205,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           this.configurationService.disableLoadingWhenReady(workspace, session);
         } else {
           // we set the new credentials after the first jump
-          const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.accountNumber);
+          const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
 
           this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -170,6 +217,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
           // Finished double jump
           this.configurationService.disableLoadingWhenReady(workspace, session);
+
+          this.appService.logger('Made it through Double jump from plain', LoggerLevel.INFO, this);
         }
       });
     }

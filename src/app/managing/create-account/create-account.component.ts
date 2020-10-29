@@ -1,7 +1,7 @@
 import {Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ConfigurationService} from '../../services-system/configuration.service';
-import {AppService} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
@@ -22,7 +22,8 @@ export class CreateAccountComponent implements OnInit {
   firstTime = false;
   providerSelected = false;
   typeSelection = false;
-  ssoInserted = false;
+  hasOneGoodSession = false;
+  hasSsoUrl = false;
 
   toggleOpen = true;
   roles: string[] = [];
@@ -41,6 +42,9 @@ export class CreateAccountComponent implements OnInit {
   accounts: AwsAccount[];
   accountId;
 
+  regions = [];
+  selectedRegion;
+
   eAccountType = AccountType;
 
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
@@ -58,7 +62,8 @@ export class CreateAccountComponent implements OnInit {
     federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
     plainUser: new FormControl('', [Validators.required]),
     secretKey: new FormControl('', [Validators.required]),
-    accessKey: new FormControl('', [Validators.required])
+    accessKey: new FormControl('', [Validators.required]),
+    awsRegion: new FormControl('')
   });
 
   /* Setup the first account for the application */
@@ -89,11 +94,10 @@ export class CreateAccountComponent implements OnInit {
       });
 
       // Add parameters to check what to do with form data
-      this.ssoInserted = (this.workspace.idpUrl !== undefined && this.workspace.idpUrl !== null);
-      this.firstTime = params['firstTime'] || !this.ssoInserted; // This way we also fix potential incongruence when you have half saved setup
-      if (this.ssoInserted) {
-        this.fedUrl = this.workspace.idpUrl;
-      }
+      this.hasOneGoodSession = sessions.length > 0;
+      this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
+      this.fedUrl = this.workspace.idpUrl;
+      this.hasSsoUrl = this.fedUrl && this.fedUrl !== '';
 
       // Show the federated accounts
       this.federatedAccounts = this.accounts;
@@ -104,6 +108,9 @@ export class CreateAccountComponent implements OnInit {
       if (this.firstTime) {
         this.form.controls['federatedOrTruster'].disable({ onlySelf: true });
       }
+
+      this.regions = this.appService.getRegions();
+      this.selectedRegion = this.regions[0].region;
     });
   }
 
@@ -132,12 +139,15 @@ export class CreateAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveAccount() {
+    this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
+
     if (this.firstTime) {
       this.providerManagerService.saveFirstAccount(
         this.accountId,
         this.accountType,
         this.selectedSession,
         this.selectedRole,
+        this.selectedRegion,
         this.form
       );
     } else {
@@ -146,6 +156,7 @@ export class CreateAccountComponent implements OnInit {
         this.accountType,
         this.selectedSession,
         this.selectedRole,
+        this.selectedRegion,
         this.form
       );
     }
@@ -173,12 +184,15 @@ export class CreateAccountComponent implements OnInit {
   goBack() {
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
+    this.appService.logger(`Going back (this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0): ${this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0}`, LoggerLevel.INFO, this);
+
     if (this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
     } else {
       this.accountType = undefined;
       this.provider = undefined;
-      this.ssoInserted = false;
+      this.hasOneGoodSession = false;
+      this.hasSsoUrl = false;
       this.providerSelected = false;
       this.typeSelection = false;
       this.firstTime = true;
@@ -189,6 +203,7 @@ export class CreateAccountComponent implements OnInit {
     this.accountType = strategy;
     this.provider = strategy;
     this.typeSelection = false;
+    this.appService.logger(`Setting an access strategy we want to create`, LoggerLevel.INFO, this, JSON.stringify({ strategy }, null, 3));
   }
 
   openAccessStrategyDocumentation() {

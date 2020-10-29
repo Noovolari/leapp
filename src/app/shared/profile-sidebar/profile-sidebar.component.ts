@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AppService} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
@@ -52,6 +52,8 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     });
 
     // Azure Clean
+    this.appService.logger('Cleaning Azure config files...', LoggerLevel.INFO, this);
+
     workspace.azureProfile = null;
     workspace.azureConfig = null;
     this.configurationService.updateWorkspaceSync(workspace);
@@ -69,6 +71,7 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
   closeProfile() {
     this.profileOpen = false;
     this.appService.profileOpen.emit(false);
+    this.appService.logger(`Profile open emitting: ${this.profileOpen}`, LoggerLevel.INFO, this);
   }
 
   goToProfile() {

@@ -9,6 +9,5 @@ export interface Configuration {
   language: string;
   defaultWorkspace: string;
   avatar: string;
-  federationUrl: string;
   workspaces: Workspace[];
 }

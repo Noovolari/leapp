@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -11,6 +11,7 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
+import {MenuService} from '../../services/menu.service';
 
 @Component({
   selector: 'app-session',
@@ -25,7 +26,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   // Data for the select
   modalAccounts = [];
-  modalRoles = [];
   currentSelectedColor;
   currentSelectedAccountNumber;
 
@@ -51,7 +51,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private ssmService: SsmService,
     private fileService: FileService,
     private credentialsService: CredentialsService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
+    private menuService: MenuService,
+    private zone: NgZone
   ) { super(); }
 
   ngOnInit() {
@@ -77,6 +79,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
     this.appService.redrawList.subscribe(r => {
       this.getSessions();
+      this.menuService.generateMenu();
     });
   }
 
@@ -89,6 +92,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     sessions.map(sess => {
       if (session === null || (session.id === sess.id)) {
         sess.active = false;
+        sess.loading = false;
       }
     });
     workspace.sessions = sessions;
@@ -100,8 +104,10 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    * getSession
    */
   getSessions() {
-    this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
-    this.notActiveSessions = this.sessionService.listSessions().filter( session => session.active === false);
+    this.zone.run(() => {
+      this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
+      this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter( session => session.active === false));
+    });
   }
 
   /**
@@ -110,26 +116,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   createAccount() {
     // Go!
     this.router.navigate(['/managing', 'create-account']);
-  }
-
-  /**
-   * Set the region for ssm init and launch the mopethod form the server to find instances
-   * @param event - the change select event
-   */
-  changeSsmRegion(event) {
-    if (this.selectedSsmRegion) {
-      this.ssmloading = true;
-      // Set the aws credentials to instanziate the ssm client
-      const credentials = this.configurationService.getDefaultWorkspaceSync().awsCredentials;
-      // Check the result of the call
-      const sub = this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
-
-        this.instances = result.instances;
-        this.ssmloading = false;
-      });
-
-      this.subs.add(sub);
-    }
   }
 
   filterSessions(query) {

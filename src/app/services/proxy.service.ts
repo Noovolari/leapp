@@ -21,26 +21,15 @@ export class ProxyService extends NativeService {
     let proxyUrl;
     let proxyPort;
     let proxyProtocol;
-    let proxyUsername;
-    let proxyPassword;
 
     if (workspace) {
       proxyUrl = workspace.proxyConfiguration.proxyUrl;
       proxyPort = workspace.proxyConfiguration.proxyPort;
       proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
-      proxyUsername = workspace.proxyConfiguration.username;
-      proxyPassword = workspace.proxyConfiguration.password;
     }
 
     if (proxyUrl !== undefined && proxyUrl !== null && proxyUrl !== '') {
-      let rules = `http=${proxyProtocol}://${proxyUrl}:${proxyPort};https=${proxyProtocol}://${proxyUrl}:${proxyPort}`;
-      if (proxyUsername !== undefined && proxyUsername !== null && proxyUrl !== '' &&
-        proxyPassword !== undefined && proxyPassword !== null && proxyPassword !== '') {
-        rules = `http=${proxyProtocol}://${proxyUsername}:${proxyPassword}@${proxyUrl}:${proxyPort};https=${proxyProtocol}://${proxyUsername}:${proxyPassword}@${proxyUrl}:${proxyPort}`;
-      }
-
-      console.log('RULES: ', rules);
-
+      const rules = `http=${proxyProtocol}://${proxyUrl}:${proxyPort};https=${proxyProtocol}://${proxyUrl}:${proxyPort}`;
       browserWindow.webContents.session.setProxy({
         proxyRules: rules
       });
@@ -69,7 +58,7 @@ export class ProxyService extends NativeService {
       let rule = `${proxyProtocol}://${proxyUrl}:${proxyPort}`;
       if (proxyUsername !== undefined && proxyUsername !== null && proxyUrl !== '' &&
         proxyPassword !== undefined && proxyPassword !== null && proxyPassword !== '') {
-        rule = `${proxyUsername}:${proxyPassword}@${proxyProtocol}://${proxyUrl}:${proxyPort}`;
+        rule = `${proxyProtocol}://${proxyUsername}:${proxyPassword}@${proxyUrl}:${proxyPort}`;
       }
 
       const agent = new this.httpsProxyAgent(rule);

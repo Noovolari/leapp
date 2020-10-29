@@ -15,6 +15,7 @@ import {SsmService} from '../../services/ssm.service';
 import {AzureAccount} from '../../models/azure-account';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {AccountType} from '../../models/AccountType';
+import {WorkspaceService} from '../../services/workspace.service';
 
 @Component({
   selector: 'app-session-card',
@@ -43,6 +44,7 @@ export class SessionCardComponent implements OnInit {
 
   constructor(private sessionService: SessionService,
               private credentialsService: CredentialsService,
+              private workspaceService: WorkspaceService,
               private menuService: MenuService,
               private appService: AppService,
               private router: Router,
@@ -78,7 +80,6 @@ export class SessionCardComponent implements OnInit {
    * @param session - {SessionObject} - the session object we want to login to
    */
   startSession(session: Session) {
-
     // Start a new session with the selected one
     this.sessionService.startSession(session);
 

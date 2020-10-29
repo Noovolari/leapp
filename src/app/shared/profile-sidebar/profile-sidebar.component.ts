@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
@@ -45,10 +45,14 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     this.proxyService.get('https://mail.google.com/mail/u/0/?logout&hl=en', (res) => {
-      console.log('res: ', res);
-      this.configurationService.newConfigurationFileSync();
+      this.appService.logger('logout res status code: ', LoggerLevel.INFO, this, res.statusCode);
+      if (res.statusCode !== 407) {
+        this.configurationService.newConfigurationFileSync();
+      } else {
+        this.appService.toast('Failed to logout: Proxy auth denied.', ToastLevel.WARN, 'Proxy Auth failed');
+      }
     }, (err) => {
-      console.log('error: ', err);
+      this.appService.logger('logout error: ', LoggerLevel.ERROR, this, err.stack);
     });
 
     // Azure Clean

@@ -7,7 +7,7 @@ export abstract class RefreshCredentialsStrategy {
 
     // Refresh all active sessions credentials
     if (activeSessions.length > 0) {
-        this.generateCredentials(workspace, activeSessions);
+      this.generateCredentials(workspace, activeSessions);
     } else {
       this.cleanCredentials(workspace);
     }

@@ -1,5 +1,5 @@
 import {AccountType} from '../models/AccountType';
-import {AppService, ToastLevel} from '../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {AwsStrategy} from '../models/strategies/awsStrategy';
 import {AzureStrategy} from '../models/strategies/azureStrategy';
 import {ConfigurationService} from '../services-system/configuration.service';

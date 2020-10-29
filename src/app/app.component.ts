@@ -5,11 +5,12 @@ import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../environments/environment';
 import {ConfigurationService} from './services-system/configuration.service';
 import {FileService} from './services-system/file.service';
-import {AppService} from './services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from './services-system/app.service';
 import {Router} from '@angular/router';
 import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
 import {MenuService} from './services/menu.service';
+import {WorkspaceService} from './services/workspace.service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,8 @@ export class AppComponent implements OnInit {
     private fileService: FileService,
     private app: AppService,
     private credentialsService: CredentialsService,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private workspaceService: WorkspaceService
   ) {}
 
   ngOnInit() {
@@ -64,6 +66,9 @@ export class AppComponent implements OnInit {
       this.beforeCloseInstructions();
     });
 
+    // Check for proxy authentication
+    // this.checkProxyAuthentication();
+
     // Initial starting point for DEBUG
     this.router.navigate(['/start']);
   }
@@ -71,14 +76,14 @@ export class AppComponent implements OnInit {
   /**
    * This is an hook on the closing app to remove credential file and force stop using them
    */
-  beforeCloseInstructions() {
+  private beforeCloseInstructions() {
     this.menuService.cleanBeforeExit();
   }
 
   /**
    * Fix for having old proxy to new configuration
    */
-  verifyWorkspace() {
+  private verifyWorkspace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const hasNewConf = workspace.proxyConfiguration !== undefined;
 
@@ -87,5 +92,25 @@ export class AppComponent implements OnInit {
       workspace.proxyConfiguration = { proxyPort: '8080', proxyProtocol: 'https', proxyUrl, username: '', password: '' };
       this.configurationService.updateWorkspaceSync(workspace);
     }
+  }
+
+  private checkProxyAuthentication() {
+    this.app.getApp().on('login', (event, webContents, request, authInfo, callback) => {
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      if (workspace !== undefined &&
+        workspace.proxyConfiguration !== undefined &&
+        workspace.proxyConfiguration !== null &&
+        workspace.proxyConfiguration.username &&
+        workspace.proxyConfiguration.password) {
+
+        this.app.logger(`we are inside app login with auth`, LoggerLevel.INFO, this, JSON.stringify(workspace.proxyConfiguration, null, 3));
+
+        const proxyUsername = workspace.proxyConfiguration.username;
+        const proxyPassword = workspace.proxyConfiguration.password;
+
+        // Supply credentials to server
+        callback(proxyUsername, proxyPassword);
+      }
+    });
   }
 }

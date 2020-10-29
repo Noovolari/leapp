@@ -5,7 +5,11 @@ export interface Workspace {
   name: string;
 
   lastIDPToken?: string;
+
+  setupDone?: boolean;
+
   idpUrl?: string;
+
   proxyConfiguration: {
     proxyProtocol?: string;
     proxyUrl?: string;
@@ -14,10 +18,10 @@ export interface Workspace {
     password?: string;
   };
 
-
   azureConfig: string;
   azureProfile: string;
 
-  sessions: Session[];
   ssmCredentials?: any;
+
+  sessions: Session[];
 }

@@ -4,13 +4,11 @@ import * as CryptoJS from 'crypto-js';
 import {initialConfiguration} from '../src/app/core/initial-configuration';
 import {machineIdSync} from 'node-machine-id';
 
-const {app, BrowserWindow} = require('electron');
+const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
 const url = require('url');
-const copydir = require('copy-dir');
 const fs = require('fs');
 const os = require('os');
 const log = require('electron-log');
-const exec = require('child_process').exec;
 const ipc = require('electron').ipcMain;
 
 // Fix for warning at startup
@@ -54,9 +52,9 @@ const setupWorkspace = () => {
     } finally {
       try {
 
-        // If it is the first time, let's backup the file
-        if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath)) {
-          fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.bkp');
+        // If it is the first time and there's a file, let's backup the file
+        if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
+          fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
         }
 
         // Write workspace file
@@ -81,7 +79,6 @@ const generateMainWindow = () => {
   let forceQuit = false;
 
   const createWindow = () => {
-
     // Generate the App Window
     win = new BrowserWindow({...windowDefaultConfig.browserWindow});
     win.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
@@ -108,6 +105,20 @@ const generateMainWindow = () => {
     ipc.on('closed', () => {
       win.destroy();
       app.quit();
+    });
+
+    app.on('browser-window-focus', () => {
+      globalShortcut.register('CommandOrControl+R', () => {
+        console.log('CommandOrControl+R is pressed: Shortcut Disabled');
+      });
+      globalShortcut.register('F5', () => {
+        console.log('F5 is pressed: Shortcut Disabled');
+      });
+    });
+
+    app.on('browser-window-blur', () => {
+      globalShortcut.unregister('CommandOrControl+R');
+      globalShortcut.unregister('F5');
     });
   };
 
@@ -145,6 +156,28 @@ const generateMainWindow = () => {
 
 // Prepare and generate the main window if everything is setupped correctly
 const initWorkspace = () => {
+
+  // Remove unused voices from contextual menu
+  const template = [
+    {
+      label: 'Leapp',
+      submenu: [
+        { label: 'About',  role: 'about' },
+        { label: 'Quit',  role: 'quit' }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { label: 'Copy', role: 'copy' },
+        { label: 'Paste', role: 'paste' }
+      ]
+    }
+  ];
+  if (!environment.production) {
+    template[0].submenu.push({ label: 'Open DevTool', role: 'toggledevtools' });
+  }
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
 
   if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
     process.env.XDG_CURRENT_DESKTOP = 'Unity';

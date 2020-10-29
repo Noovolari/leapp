@@ -4,7 +4,7 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {AzureAccount} from '../models/azure-account';
 import {Session} from '../models/session';
 import {v4 as uuidv4} from 'uuid';
-import {AppService, ToastLevel} from '../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {AccountType} from '../models/AccountType';
 
 @Injectable({
@@ -79,6 +79,7 @@ export class AzureAccountService extends NativeService {
       const workspace = this.configurationService.getDefaultWorkspaceSync();
       return workspace.sessions.filter(sess => ((sess.account as AzureAccount).subscriptionId === subscriptionId))[0] as AzureAccount;
     } catch (err) {
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
       return null;
     }
   }

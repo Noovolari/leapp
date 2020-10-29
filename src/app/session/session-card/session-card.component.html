@@ -1,13 +1,19 @@
-<div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}" (click)="switchCredentials()">
-  <span class="information">
-    <b>{{session.account.accountName}}</b> -
-    {{ sessionDetailToShow }}
-  </span>
-  <ng-container dropdown placement="right">
-    <a dropdownToggle class="drop-list-container" aria-controls="drop-list" (click)="openDropDown($event);"><i
-      class="fa fa-ellipsis-v"></i></a>
+<div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}">
+  <div class="information" (click)="switchCredentials()">
+    <b>{{session.account.accountName.length >= 23 ? session.account.accountName.substr(0, 20) + '...' : session.account.accountName}}</b> - {{ sessionDetailToShow }}
+  </div>
+  <div class="information-offset" (click)="switchCredentials()">
+    <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
+    <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading"></i>
+  </div>
+
+  <ng-container dropdown placement="right" [autoClose]="true">
+    <a dropdownToggle class="drop-list-container" aria-controls="drop-list">
+      <i class="fa fa-ellipsis-v"></i>
+    </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-      <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS) && session.active">SSM session</a>
+      <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER) && session.active">SSM session</a>
+      <a *ngIf="session.account.type === eAccountType.AWS_PLAIN_USER && !session.active" (click)="editAccount(session, $event);">Edit account</a>
       <a (click)="removeAccount(session, $event);">Remove account</a>
       <ng-container *ngIf="session.account.type === eAccountType.AWS">
       <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
@@ -16,8 +22,6 @@
     </div>
   </ng-container>
 
-  <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
-  <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading"></i>
 </div>
 
 
@@ -34,11 +38,11 @@
       <ng-select bindLabel="region" bindValue="region" [items]="ssmRegions" [(ngModel)]="selectedSsmRegion" placeholder="Select a Region for finding instances" (change)="changeSsmRegion($event);"></ng-select>
 
       <div class="loader" *ngIf="ssmloading"><i class="fa fa-spinner fa-spin"></i></div>
-      <div class="list-of-ssm" *ngIf="!ssmloading">
+      <div class="list-of-ssm" *ngIf="!ssmloading && instances.length > 0">
         <b>Select an Instance:</b>
         <ul class="ssm-ul">
           <li *ngFor="let instance of instances" class="ssm-card">
-            <div><span><b>{{instance.Name}}</b> - {{instance.IPAddress}}</span><button class="btn" (click)="startSsmSession(instance.InstanceId)">Connect</button></div>
+            <div tooltip="{{instance.Name}}"><span><b>{{instance.Name.length >= 24 ? instance.Name.substr(0, 21) + '...' : instance.Name}}</b> - {{instance.IPAddress}}</span><button class="btn" (click)="startSsmSession(instance.InstanceId)">Connect</button></div>
           </li>
         </ul>
       </div>

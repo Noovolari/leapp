@@ -4,6 +4,8 @@
 * - add the require in the main index.html file pointing to a window object of your choice e.g. window.mylib; use the already added libraries as reference
 * - create an entry in this file; now through native service you can inject that library everywhere in the angular code!
 */
+import * as Keytar from 'keytar';
+
 export class NativeService {
 
   protected fs: any;
@@ -31,7 +33,7 @@ export class NativeService {
   protected MachineId: any;
   protected process: any;
   protected ipcRenderer: any;
-  protected keytar: any;
+  protected keytar: typeof Keytar;
   protected http: any;
   protected https: any;
   protected httpProxyAgent: any;

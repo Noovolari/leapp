@@ -81,7 +81,6 @@ export class CredentialsService extends NativeService {
    */
   private processCredentials(res: any) {
     if (res.status === 'ok') {
-      this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');
       this.refreshReturnStatusEmit.emit(true);
     } else {
       this.appService.toast('There was a problem in generating credentials.', ToastLevel.WARN, 'Credentials');

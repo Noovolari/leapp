@@ -5,7 +5,7 @@ import {Session} from '../session';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
 import {AzureAccount} from '../azure-account';
-import {AppService, ToastLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {TimerService} from '../../services/timer-service';
 import {CredentialsService} from '../../services/credentials.service';
 
@@ -25,8 +25,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
       return sess.account.type === AccountType.AZURE && sess.active;
     });
 
-    console.log('active azure sessions', activeSessions);
-
+    this.appService.logger('active azure sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
 
@@ -62,6 +61,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
 
           this.azureSetSubscription(session);
         }, err => {
+          this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
           console.log('Error in command by Azure CLi', err);
         });
       }
@@ -71,6 +71,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
 
         this.azureSetSubscription(session);
       }, err => {
+        this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
         console.log('Error in command by Azure CLi', err);
       });
     }
@@ -106,9 +107,10 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
       this.timerService.defineTimer();
 
       // Emit return credentials
-      this.appService.toast('Credentials refreshed.', ToastLevel.INFO, 'Credentials');
       this.credentialsService.refreshReturnStatusEmit.emit(true);
     }, err2 => {
+      this.appService.logger('Error in command: set subscription by Azure Cli', LoggerLevel.ERROR, this, err2.stack);
+
       workspace.sessions.forEach(sess => {
         if (sess.id === session.id) {
           sess.active = false;
@@ -116,6 +118,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
           sess.lastStopDate = new Date().toISOString();
         }
       });
+
       this.configurationService.updateWorkspaceSync(workspace);
       this.credentialsService.refreshReturnStatusEmit.emit(false);
       this.appService.redrawList.emit();

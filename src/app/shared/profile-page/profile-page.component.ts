@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Workspace} from '../../models/workspace';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService, ToastLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {FileService} from '../../services-system/file.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
@@ -29,7 +29,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   workspaceData: Workspace;
 
   public form = new FormGroup({
-    idpUrl: new FormControl('', [Validators.required]),
+    idpUrl: new FormControl(''),
     proxyUrl: new FormControl(''),
     proxyProtocol: new FormControl(''),
     proxyPort: new FormControl(''),
@@ -49,6 +49,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData.name && this.workspaceData.name !== '') {
       this.idpUrlValue = this.workspaceData.idpUrl;
+
       this.proxyProtocol = this.workspaceData.proxyConfiguration.proxyProtocol;
       this.proxyUrl = this.workspaceData.proxyConfiguration.proxyUrl;
       this.proxyPort = this.workspaceData.proxyConfiguration.proxyPort;
@@ -62,6 +63,9 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
       this.form.controls['proxyUsername'].setValue(this.proxyUsername);
       this.form.controls['proxyPassword'].setValue(this.proxyPassword);
 
+      this.proxyUrl = this.workspaceData.proxyConfiguration.proxyUrl && this.workspaceData.proxyConfiguration.proxyUrl !== 'undefined' ?
+                              this.workspaceData.proxyConfiguration.proxyUrl : '';
+
       this.name = this.workspaceData.name;
       this.email = localStorage.getItem('hook_email') || 'not logged in yet';
       this.appService.validateAllFormFields(this.form);
@@ -71,7 +75,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   /**
    * Save the idp-url again
    */
-  saveIdpUrls() {
+  saveOptions() {
     if (this.form.valid) {
       this.workspaceData.idpUrl = this.form.value.idpUrl;
 
@@ -86,9 +90,14 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
       if (this.form.controls['proxyUrl'].value !== undefined &&
         this.form.controls['proxyUrl'].value !== null &&
         this.form.controls['proxyUrl'].value !== '') {
+
+        this.appService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.INFO, this);
         this.appService.toast('You\'ve set a proxy url: the app must be restarted to update the configuration.', ToastLevel.WARN, 'Force restart');
         this.appService.restart();
       }
+
+      this.appService.logger('Option saved.', LoggerLevel.INFO, this, JSON.stringify(this.form.getRawValue(), null, 3));
+      this.appService.toast('Option saved.', ToastLevel.INFO, 'Options');
     }
   }
 

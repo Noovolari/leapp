@@ -5,6 +5,7 @@ import {Router} from '@angular/router';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {MenuService} from '../../services/menu.service';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-wizard-page',
@@ -42,11 +43,15 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     // for the current version of Leapp otherwise alert the user
     const result = this.verifyWorkspaceIsWellformed();
 
+    // Show a message informing the user if we needed to make a backup of the credential file
+    this.showCredentialBackupMessageIfNeeded();
+
     if (result) {
       // Generate the contextual menu
       this.menuService.generateMenu();
       // If configuration is not needed go to session list
       if (this.isAlreadyConfigured()) {
+        this.appService.logger('Already configured, moving to list', LoggerLevel.INFO, this);
         // We already have at least one default account to start, let's go to session page
         this.router.navigate(['/sessions', 'session-selected']);
       }
@@ -65,6 +70,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
        this.workspace.azureProfile === undefined ||
        this.workspace.azureConfig === undefined)
     ) {
+      this.appService.logger('Leapp Workspace is outdated, please go to {home}/.Leapp and remove it', LoggerLevel.ERROR, this);
       this.appService.toast('The Leapp Workspace file is either outdated or corrupt. Please contact us opening an issue online.', ToastLevel.ERROR, 'Workspace file outdated or corrupted');
       result =  false;
     }
@@ -75,7 +81,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
    * Is the app already configured or not?
    */
   isAlreadyConfigured() {
-    return this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0;
+    return this.workspace && (this.workspace.setupDone || this.workspace.idpUrl || (this.workspace.sessions && this.workspace.sessions.length > 0));
   }
 
   // MVP: we use this to just check if aws cli is installed in order to proceed to
@@ -110,4 +116,19 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
 
+  showCredentialBackupMessageIfNeeded() {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const awsCredentialsPath = this.appService.getOS().homedir() + '/' + environment.credentialsDestination + '.leapp.bkp';
+    const check = JSON.stringify(workspace) === '{}' && this.appService.getFs().existsSync(awsCredentialsPath);
+
+    this.appService.logger(`Check existing credential file: ${check}`, LoggerLevel.INFO, this);
+
+    if (check) {
+      this.appService.getDialog().showMessageBox({
+        type: 'info',
+        icon: __dirname + '/assets/images/Leapp.png',
+        message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
+      });
+    }
+  }
 }

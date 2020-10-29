@@ -1,4 +1,0 @@
-provider: s3
-bucket: leapp.clients
-region: eu-west-1
-updaterCacheDirName: leapp-updater

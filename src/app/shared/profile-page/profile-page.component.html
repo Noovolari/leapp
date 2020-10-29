@@ -1,18 +1,17 @@
 <div class="background">
   <app-profile></app-profile>
-
   <div class="container-fluid background">
     <app-profile-sidebar></app-profile-sidebar>
 
-    <h2>Update IdP URL</h2>
-    <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveIdpUrls();">
+    <h1>Options</h1>
+    <p>Tweak various aspects of Leapp</p>
+    <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
 
       <div class="form-group" style="width: 100%; display: inline-block;">
         <label>Google IdP URL<span class="danger-text">*</span></label>
         <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url *" [value]="idpUrlValue" >
         <small class="text-error" *ngIf="(form.controls['idpUrl'].dirty || form.controls['idpUrl'].touched) && form.controls['idpUrl'].errors">Insert the Google IdP URL</small>
       </div>
-
 
       <h2>Proxy settings</h2>
       <div class="form-group" style="width: 16%; display: inline-block;">
@@ -48,8 +47,7 @@
       </div>
 
       <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
-      <button type="button" (click)="saveIdpUrls();" [disabled]="!form.valid" [ngClass]="(!form.valid) ? 'pull-right disabled': 'pull-right'">Save</button>
-
+      <button type="button" (click)="saveOptions();" [disabled]="!form.valid" [ngClass]="(!form.valid) ? 'pull-right disabled': 'pull-right'">Save</button>
     </form>
   </div>
 </div>

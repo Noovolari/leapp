@@ -1,16 +1,24 @@
 Leapp
 =========
+[![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)](https://github.com/Noovolari/leapp/releases/latest)
 
 - Website: https://www.leapp.cloud/
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/1)
 - Tutorials: [Tutorials](#tutorials)
+- Chat with us: [Discord](https://discord.gg/wHh2kyK) 
 
 ![logo](.github/images/README-1.png)
 
-Leapp is your everyday companion to access your cloud; designed to work with multiple Identity Providers and Cloud Providers APIs, CLIs, and SDKs.
+Leapp is your everyday companion to access your cloud; designed to work with Cloud Providers APIs, CLIs, and SDKs.
 It's a software that securely stores your access information and generates temporary credential sets to access your cloud ecosystem from your local machine.
 
-For example, while using the AWS CLI it may become annoying to switch to a different profile or use the --profile argument before issuing every command. Leapp lets you have a new set of credentials and give access to that account with a click.
+**For example, while using the AWS CLI it may become annoying to switch to a different profile or use the --profile argument before issuing every command.**
+
+Leapp lets you have a new set of credentials and give access to that account with a click.
+
+Leapp also will manage Federated access through Identity Provides.
+
+![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
 
 # Key features
 
@@ -21,14 +29,19 @@ For example, while using the AWS CLI it may become annoying to switch to a diffe
 - **Ease federation with truster accounts**: federating each account is a pain so why don’t use truster accounts to grant access easier and painlessly? We use your federated role as a gateway to all trusted roles in all other accounts! Seems great, isn’t it? See our [documentation](https://github.com/Noovolari/leapp/blob/master/.github/GLOSSARY.md#trusting) to get more info.
 
 
+![Leapp App animation](.github/images/Leapp-animation.gif)
+
+
 ## Supported Cloud Providers
 - **AWS** - :white_check_mark:
 - **AZURE** - :white_check_mark:
 - **GCP** - :soon:
 
 ## Supported Identity Providers
-- **G Suite** - :white_check_mark:
-- **AZURE AD** - :soon:
+- **G Suite to AWS** - :white_check_mark:
+- **G Suite to Azure** - :white_check_mark:
+- **AZURE AD to Azure** - :white_check_mark:
+- **AZURE AD to AWS** - :soon:
 - **AWS SSO** - :soon:
 
 # Installation
@@ -36,6 +49,14 @@ For example, while using the AWS CLI it may become annoying to switch to a diffe
 Get [here](https://github.com/Noovolari/leapp/releases/latest) the latest release.
 
 To install the compiled version, choose the one for your **OS** and simply **double-click** on the executable.
+
+# Logs
+
+By default, Leapp writes logs to the following locations:
+
+- on Linux: ~/.config/{app name}/logs/{process type}.log
+- on macOS: ~/Library/Logs/{app name}/{process type}.log
+- on Windows: %USERPROFILE%\AppData\Roaming\{app name}\logs\{process type}.log
 
 # Tutorials
 

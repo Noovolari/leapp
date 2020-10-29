@@ -10,6 +10,7 @@ import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
 import {ProxyService} from './proxy.service';
+
 // Import AWS node style
 const AWS = require('aws-sdk');
 
@@ -97,12 +98,14 @@ export class WorkspaceService extends NativeService {
         try {
           this.idpWindow.close();
         } catch (e) {
-          this.appService.logger(e, LoggerLevel.ERROR);
+          this.appService.logger(e, LoggerLevel.ERROR, this, e.stack);
         }
       }
 
       // Sometimes it can arrive here (tested) so the REAL way to block everything is to use the credential emit element!!!
       this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
+      throw new Error(err);
     });
   }
 
@@ -344,8 +347,8 @@ export class WorkspaceService extends NativeService {
         }
       } else {
         // Something went wrong save it to the logger file
-        this.appService.logger(err.code, LoggerLevel.ERROR);
-        this.appService.logger(err.stack, LoggerLevel.ERROR);
+        this.appService.logger(err.code, LoggerLevel.ERROR, this);
+        this.appService.logger(err.stack, LoggerLevel.ERROR, this);
         this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
         // Emit ko
@@ -372,14 +375,14 @@ export class WorkspaceService extends NativeService {
     let credentials;
     try {
       // Construct actual credentials
-      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.accountNumber);
+      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.region);
 
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
       // Save the federated one
       this.configurationService.updateWorkspaceSync(workspace);
     } catch (err) {
-      this.appService.logger(err, LoggerLevel.ERROR);
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
@@ -407,7 +410,7 @@ export class WorkspaceService extends NativeService {
           if (err) {
 
             // Something went wrong save it to the logger file
-            this.appService.logger(err.stack, LoggerLevel.ERROR);
+            this.appService.logger(err.stack, LoggerLevel.ERROR, this);
             this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
 
             // Emit ko for double jump
@@ -415,7 +418,7 @@ export class WorkspaceService extends NativeService {
           } else {
 
             // we set the new credentials after the first jump
-            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.accountNumber);
+            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.region);
 
             this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -431,7 +434,7 @@ export class WorkspaceService extends NativeService {
         this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
       }
     } catch (err) {
-      this.appService.logger(err, LoggerLevel.ERROR);
+      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
@@ -443,10 +446,10 @@ export class WorkspaceService extends NativeService {
    * For simplicity we have a method that can help us extract and compose a credential object whenever we want
    * @param stsResponse - the STS response from an STs client object getTemporaryCredentials of any type
    * @param workspace - the workspace tf the request
-   * @param accountNumber - the accountNumber of the request to obtain the sts token
+   * @param region - region for aws
    * @returns an object of type {AwsCredential}
    */
-  constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, accountNumber: string): AwsCredentials {
+  constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, region: string): AwsCredentials {
     // these are the standard STS response types
     const accessKeyId = stsResponse.Credentials.AccessKeyId;
     const secretAccessKey = stsResponse.Credentials.SecretAccessKey;
@@ -460,6 +463,10 @@ export class WorkspaceService extends NativeService {
 
     workspace.ssmCredentials = credential;
     this.configurationService.updateWorkspaceSync(workspace);
+
+    if (region && region !== 'no region necessary') {
+      credential.region = region;
+    }
 
     // Return it!
     return {default: credential};
@@ -479,6 +486,7 @@ export class WorkspaceService extends NativeService {
         idpUrl: federationUrl,
         proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
         sessions: [],
+        setupDone: true,
         azureProfile: null,
         azureConfig: null
       };
@@ -493,7 +501,7 @@ export class WorkspaceService extends NativeService {
 
       // Catch any error show it and return false
       this.appService.toast(err, ToastLevel.WARN, 'Create new workspace');
-      this.appService.logger(err, LoggerLevel.WARN);
+      this.appService.logger('create new workspace error:', LoggerLevel.WARN, this, err.stack);
       return false;
     }
   }

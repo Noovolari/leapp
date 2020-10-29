@@ -16,13 +16,11 @@ var environment_1 = require("../src/environments/environment");
 var CryptoJS = require("crypto-js");
 var initial_configuration_1 = require("../src/app/core/initial-configuration");
 var node_machine_id_1 = require("node-machine-id");
-var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow;
+var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow, globalShortcut = _a.globalShortcut, Menu = _a.Menu;
 var url = require('url');
-var copydir = require('copy-dir');
 var fs = require('fs');
 var os = require('os');
 var log = require('electron-log');
-var exec = require('child_process').exec;
 var ipc = require('electron').ipcMain;
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
@@ -61,9 +59,9 @@ var setupWorkspace = function () {
     }
     finally {
         try {
-            // If it is the first time, let's backup the file
-            if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath)) {
-                fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.bkp');
+            // If it is the first time and there's a file, let's backup the file
+            if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
+                fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
             }
             // Write workspace file
             fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initial_configuration_1.initialConfiguration, null, 2), node_machine_id_1.machineIdSync()).toString());
@@ -108,6 +106,18 @@ var generateMainWindow = function () {
             win.destroy();
             app.quit();
         });
+        app.on('browser-window-focus', function () {
+            globalShortcut.register('CommandOrControl+R', function () {
+                console.log('CommandOrControl+R is pressed: Shortcut Disabled');
+            });
+            globalShortcut.register('F5', function () {
+                console.log('F5 is pressed: Shortcut Disabled');
+            });
+        });
+        app.on('browser-window-blur', function () {
+            globalShortcut.unregister('CommandOrControl+R');
+            globalShortcut.unregister('F5');
+        });
     };
     app.on('activate', function () {
         if (win === null || win === undefined) {
@@ -142,6 +152,27 @@ var generateMainWindow = function () {
 };
 // Prepare and generate the main window if everything is setupped correctly
 var initWorkspace = function () {
+    // Remove unused voices from contextual menu
+    var template = [
+        {
+            label: 'Leapp',
+            submenu: [
+                { label: 'About', role: 'about' },
+                { label: 'Quit', role: 'quit' }
+            ]
+        },
+        {
+            label: 'Edit',
+            submenu: [
+                { label: 'Copy', role: 'copy' },
+                { label: 'Paste', role: 'paste' }
+            ]
+        }
+    ];
+    if (!environment_1.environment.production) {
+        template[0].submenu.push({ label: 'Open DevTool', role: 'toggledevtools' });
+    }
+    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
     if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
         process.env.XDG_CURRENT_DESKTOP = 'Unity';
     }

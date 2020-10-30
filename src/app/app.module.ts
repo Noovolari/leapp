@@ -1,13 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ModalModule, TooltipModule } from 'ngx-bootstrap';
 import { ToastrModule } from 'ngx-toastr';
 import { LayoutModule } from './layout/layout.module';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule} from '@angular/common/http';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';

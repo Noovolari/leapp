@@ -66,7 +66,7 @@ body {
     color: $text-color;
     text-align: center;
     display: block;
-    background: $background;
+    background: $white-text-color;
     position: relative;
     top: 8px;
   }
@@ -78,7 +78,7 @@ body {
     display: inline-block;
     width: 100px;
     height: 2px;
-    background: $background;
+    background: $main-color-light;
   }
   h2:after {
     position: relative;
@@ -88,7 +88,7 @@ body {
     display: inline-block;
     width: 100px;
     height: 2px;
-    background: $background;
+    background: $main-color-light;
   }
 
   p {

@@ -16,13 +16,25 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
   name = '';
   email = '';
+
   idpUrlValue;
+
+  showProxyAuthentication = false;
+  proxyProtocol = 'https'; // Default
   proxyUrl;
+  proxyPort = '8080'; // Default
+  proxyUsername;
+  proxyPassword;
+
   workspaceData: Workspace;
 
   public form = new FormGroup({
     idpUrl: new FormControl(''),
     proxyUrl: new FormControl(''),
+    proxyProtocol: new FormControl(''),
+    proxyPort: new FormControl(''),
+    proxyUsername: new FormControl(''),
+    proxyPassword: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -37,10 +49,22 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData.name && this.workspaceData.name !== '') {
       this.idpUrlValue = this.workspaceData.idpUrl;
-      this.proxyUrl = this.workspaceData.proxyUrl && this.workspaceData.proxyUrl !== 'undefined' ? this.workspaceData.proxyUrl : '';
+
+      this.proxyProtocol = this.workspaceData.proxyConfiguration.proxyProtocol;
+      this.proxyUrl = this.workspaceData.proxyConfiguration.proxyUrl;
+      this.proxyPort = this.workspaceData.proxyConfiguration.proxyPort;
+      this.proxyUsername = this.workspaceData.proxyConfiguration.username || '';
+      this.proxyPassword = this.workspaceData.proxyConfiguration.password || '';
 
       this.form.controls['idpUrl'].setValue(this.idpUrlValue);
       this.form.controls['proxyUrl'].setValue(this.proxyUrl);
+      this.form.controls['proxyProtocol'].setValue(this.proxyProtocol);
+      this.form.controls['proxyPort'].setValue(this.proxyPort);
+      this.form.controls['proxyUsername'].setValue(this.proxyUsername);
+      this.form.controls['proxyPassword'].setValue(this.proxyPassword);
+
+      this.proxyUrl = this.workspaceData.proxyConfiguration.proxyUrl && this.workspaceData.proxyConfiguration.proxyUrl !== 'undefined' ?
+                              this.workspaceData.proxyConfiguration.proxyUrl : '';
 
       this.name = this.workspaceData.name;
       this.email = localStorage.getItem('hook_email') || 'not logged in yet';
@@ -54,7 +78,13 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   saveOptions() {
     if (this.form.valid) {
       this.workspaceData.idpUrl = this.form.value.idpUrl;
-      this.workspaceData.proxyUrl = this.form.controls['proxyUrl'].value;
+
+      this.workspaceData.proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
+      this.workspaceData.proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
+      this.workspaceData.proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
+      this.workspaceData.proxyConfiguration.username = this.form.controls['proxyUsername'].value;
+      this.workspaceData.proxyConfiguration.password = this.form.controls['proxyPassword'].value;
+
       this.configurationService.updateWorkspaceSync(this.workspaceData);
 
       if (this.form.controls['proxyUrl'].value !== undefined &&
@@ -77,4 +107,5 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   goBack() {
     this.router.navigate(['/', 'sessions', 'session-selected']);
   }
+
 }

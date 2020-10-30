@@ -117,10 +117,17 @@
           </div>
         </ng-container>
 
-        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="accountType === eAccountType.AWS_PLAIN_USER">
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.AWS_PLAIN_USER">
           <label>User<span class="danger-text">*</span></label>
           <input formControlName="plainUser" type="text" class="form-control" placeholder="User name" />
           <small class="text-error" *ngIf="(form.controls['plainUser'].dirty || form.controls['plainUser'].touched) && form.controls['plainUser'].errors">Insert the User</small>
+        </div>
+
+        <div class="form-group" style="width: 2%; display: inline-block; position: relative; top: -1px;" *ngIf="accountType === eAccountType.AWS_PLAIN_USER"></div>
+
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.AWS_PLAIN_USER">
+          <label>Mfa Device</label>
+          <input formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
         </div>
 
         <ng-container *ngIf="accountType === eAccountType.AWS_PLAIN_USER">

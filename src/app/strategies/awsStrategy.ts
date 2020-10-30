@@ -1,18 +1,20 @@
-import {AccountType} from '../AccountType';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
-import {AwsCredentials} from '../credential';
-import {AwsPlainAccount} from '../aws-plain-account';
-import {ConfigurationService} from '../../services-system/configuration.service';
-import {CredentialsService} from '../../services/credentials.service';
-import {environment} from '../../../environments/environment';
-import {ExecuteServiceService} from '../../services-system/execute-service.service';
-import {FileService} from '../../services-system/file.service';
-import {KeychainService} from '../../services-system/keychain.service';
-import {RefreshCredentialsStrategy} from '../refreshCredentialsStrategy';
-import {TimerService} from '../../services/timer-service';
-import {Workspace} from '../workspace';
-import {WorkspaceService} from '../../services/workspace.service';
+import {AccountType} from '../models/AccountType';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
+import {AwsCredentials} from '../models/credential';
+import {AwsPlainAccount} from '../models/aws-plain-account';
+import {ConfigurationService} from '../services-system/configuration.service';
+import {CredentialsService} from '../services/credentials.service';
+import {environment} from '../../environments/environment';
+import {ExecuteServiceService} from '../services-system/execute-service.service';
+import {FileService} from '../services-system/file.service';
+import {KeychainService} from '../services-system/keychain.service';
+import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
+import {TimerService} from '../services/timer-service';
+import {Workspace} from '../models/workspace';
+import {WorkspaceService} from '../services/workspace.service';
 import {Observable} from 'rxjs';
+import {Session} from '../models/session';
+import {constants} from '../core/enums/constants';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -59,12 +61,12 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   /**
    * In this method we transform plain to temporary to avoid saving plain credential in the file
    * @param workspace - the workspace we are working on
-   * @param session - the current sessin we use to retrieve information from
+   * @param session - the current session we use to retrieve information from
    */
   private async awsCredentialProcess(workspace: Workspace, session) {
     const credentials = await this.getIamUserAccessKeysFromKeychain(session);
 
-    this.getSessionToken(credentials).subscribe((awsCredentials) => {
+    this.getSessionToken(credentials, session).subscribe((awsCredentials) => {
         const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);
 
         workspace.ssmCredentials = tempCredentials;
@@ -80,8 +82,22 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   }
 
   // TODO: move to AwsCredentialsGenerationService
-  private getSessionToken(awsCredentials: AwsCredentials): Observable<any> {
+  private getSessionToken(awsCredentials: AwsCredentials, session): Observable<any> {
     return new Observable<AwsCredentials>((observable) => {
+
+      const processData = (data, err) => {
+        if (data !== undefined && data !== null) {
+          observable.next(data);
+          observable.complete();
+        } else {
+          this.appService.logger('Error in get session token', LoggerLevel.ERROR, this, err.stack);
+          observable.error(err);
+          observable.complete();
+          // Emit ko for double jump
+          this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+        }
+      };
+
       AWS.config.update({
         accessKeyId: awsCredentials.default.aws_access_key_id,
         secretAccessKey: awsCredentials.default.aws_secret_access_key
@@ -89,19 +105,27 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
       const sts = new AWS.STS();
 
-      sts.getSessionToken({ DurationSeconds: environment.sessionDuration }, (err, data) => {
-        console.log('err', err);
-        console.log('cred', data);
+      const params = { DurationSeconds: environment.sessionDuration };
+      if (session.account.mfaDevice !== undefined && session.account.mfaDevice !== null && session.account.mfaDevice !== '') {
+        this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
 
-        if (data !== undefined || data !== null) {
-          observable.next(data);
-          observable.complete();
-        } else {
-          this.appService.logger('Error in get session token', LoggerLevel.ERROR, this, err.stack);
-          observable.error(err);
-          observable.complete();
-        }
-      });
+          if (value !== constants.CONFIRM_CLOSED) {
+            params['SerialNumber'] = session.account.mfaDevice;
+            params['TokenCode'] = value;
+            sts.getSessionToken(params, (err, data) => {
+              processData(data, err);
+            });
+          } else {
+            const workspace = this.configurationService.getDefaultWorkspaceSync();
+            workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+          }
+        });
+      } else {
+        sts.getSessionToken(params, (err, data) => {
+          processData(data, err);
+        });
+      }
     });
   }
 
@@ -162,8 +186,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     const sessions = workspace.sessions;
     const parentSessions = sessions.filter(sess => sess.id === parentAccountSessionId);
 
-    console.log('parent sessions length:', parentSessions.length);
-
     if (parentSessions.length > 0) {
       // Parent account found: do double jump
       const parentSession = parentSessions[0];
@@ -182,38 +204,47 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       // Second jump
       const sts = new AWS.STS();
 
-      sts.assumeRole({
+      const processData = (p) => {
+        sts.assumeRole(p, (err, data: any) => {
+          if (err) {
+            // Something went wrong save it to the logger file
+            this.appService.logger('Error in assume role from plain to truster in get session token', LoggerLevel.ERROR, this, err.stack);
+            // Emit ko for double jump
+            this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+          } else {
+            // we set the new credentials after the first jump
+            const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
+
+            this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
+
+            this.configurationService.updateWorkspaceSync(workspace);
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+            // Finished double jump
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+            this.appService.logger('Made it through Double jump from plain', LoggerLevel.INFO, this);
+          }
+        });
+      };
+
+      const params = {
         RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
         RoleSessionName: `truster-on-${session.account.role.name}`
-      }, (err, data: any) => {
-        if (err) {
-          // Something went wrong save it to the logger file
-          this.appService.logger('Error in assume role from plain to truster in get session token', LoggerLevel.ERROR, this, err.stack);
-          this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
+      };
 
-          // Emit ko for double jump
-          this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
-
-          // Finished double jump
-          this.configurationService.disableLoadingWhenReady(workspace, session);
-        } else {
-          // we set the new credentials after the first jump
-          const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
-
-          this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
-
-          this.configurationService.updateWorkspaceSync(workspace);
-          this.configurationService.disableLoadingWhenReady(workspace, session);
-
-          // Emit ok for double jump
-          this.workspaceService.credentialEmit.emit({status: 'ok', accountName: session.account.accountName});
-
-          // Finished double jump
-          this.configurationService.disableLoadingWhenReady(workspace, session);
-
-          this.appService.logger('Made it through Double jump from plain', LoggerLevel.INFO, this);
-        }
-      });
+      if (parentSession.account.mfaDevice !== undefined && parentSession.account.mfaDevice !== null && parentSession.account.mfaDevice !== '') {
+        this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
+          if (value !== constants.CONFIRM_CLOSED) {
+            params['SerialNumber'] = parentSession.account.mfaDevice;
+            params['TokenCode'] = value;
+            processData(params);
+          } else {
+            workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+          }
+        });
+      } else {
+        processData(params);
+      }
     }
   }
 }

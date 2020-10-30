@@ -6,6 +6,8 @@ import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirm
 import {BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
+import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
+
 
 @Injectable({
   providedIn: 'root'
@@ -298,6 +300,17 @@ export class AppService extends NativeService {
    */
   confirmDialog(message: string, callback: any) {
     this.modalService.show(ConfirmationDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { message, callback}});
+  }
+
+  /**
+   * Input dialog popup!
+   * @param title - the title of the popup
+   * @param placeholder - placeholder for the input
+   * @param message - the message to show
+   * @param callback - the callback for the ok button to launch
+   */
+  inputDialog(title: string, placeholder: string, message: string, callback: any) {
+    this.modalService.show(InputDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { title, placeholder, message, callback}});
   }
 
   /**

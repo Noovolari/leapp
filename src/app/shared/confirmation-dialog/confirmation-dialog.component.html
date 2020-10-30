@@ -1,8 +1,8 @@
 <div class="modal-header">
   <h4 class="modal-title">Please confirm your choice</h4>
-  <button type="button" class="close pull-right" aria-label="Close" (click)="close();">
+  <a class="close pull-right" aria-label="Close" (click)="close();">
     <span aria-hidden="true">&times;</span>
-  </button>
+  </a>
 </div>
 
 <div class="modal-body text-center">
@@ -12,8 +12,8 @@
   <br><p>{{message}}</p><br>
 
   <div class="button-equalizer">
-    <button (click)="close();" class="btn btn-default">Cancel</button>
-    <button (click)="confirm();" class="btn btn-default btn-gradient">Confirm</button>
+    <button (click)="close();" class="disabled">Cancel</button>
+    <button (click)="confirm();">Confirm</button>
   </div>
 
 </div>

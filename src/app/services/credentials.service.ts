@@ -1,7 +1,7 @@
 import {AccountType} from '../models/AccountType';
 import {AppService, ToastLevel} from '../services-system/app.service';
-import {AwsStrategy} from '../models/strategies/awsStrategy';
-import {AzureStrategy} from '../models/strategies/azureStrategy';
+import {AwsStrategy} from '../strategies/awsStrategy';
+import {AzureStrategy} from '../strategies/azureStrategy';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {EventEmitter, Injectable} from '@angular/core';

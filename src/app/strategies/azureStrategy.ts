@@ -1,13 +1,13 @@
-import {RefreshCredentialsStrategy} from '../refreshCredentialsStrategy';
-import {AccountType} from '../AccountType';
-import {Workspace} from '../workspace';
-import {Session} from '../session';
-import {ConfigurationService} from '../../services-system/configuration.service';
-import {ExecuteServiceService} from '../../services-system/execute-service.service';
-import {AzureAccount} from '../azure-account';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
-import {TimerService} from '../../services/timer-service';
-import {CredentialsService} from '../../services/credentials.service';
+import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
+import {AccountType} from '../models/AccountType';
+import {Workspace} from '../models/workspace';
+import {Session} from '../models/session';
+import {ConfigurationService} from '../services-system/configuration.service';
+import {ExecuteServiceService} from '../services-system/execute-service.service';
+import {AzureAccount} from '../models/azure-account';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
+import {TimerService} from '../services/timer-service';
+import {CredentialsService} from '../services/credentials.service';
 
 export class AzureStrategy extends RefreshCredentialsStrategy {
 

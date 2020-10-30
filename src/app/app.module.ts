@@ -12,6 +12,7 @@ import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import {SharedModule} from './shared/shared.module';
+import {InputDialogComponent} from './shared/input-dialog/input-dialog.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
@@ -42,7 +43,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     }),
   ],
-  entryComponents: [ConfirmationDialogComponent],
+  entryComponents: [ConfirmationDialogComponent, InputDialogComponent],
   providers: [],
   bootstrap: [AppComponent]
 })

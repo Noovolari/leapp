@@ -10,8 +10,6 @@ import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
 import {Session} from '../models/session';
 
-type FormType = 'ADD' | 'EDIT'
-
 @Injectable({
   providedIn: 'root'
 })
@@ -141,17 +139,21 @@ export class ProviderManagerService {
     this.decideSavingMethodAndSave();
   }
 
-    /**
-   * Save the first account of the Application
+  /**
+   * Edit the account of the Application, the system is able to understand which one to edit and how
    * @param session - the session to be edited
+   * @param selectedRegion - the default region to set
+   * @param form - the form to check about
    */
-  editAccount(session: Session, form) {
+  editAccount(session: Session, selectedRegion, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
-    this.selectedSession = session
-    this.form = form
-    this.decideSavingMethodAndSave('EDIT') 
+    this.selectedSession = session;
+    this.accountType = session.account.type;
+    this.selectedRegion = selectedRegion;
+    this.form = form;
+    this.decideEditingMethodAndSave();
   }
 
   /**
@@ -168,30 +170,50 @@ export class ProviderManagerService {
     }
   }
 
-  decideSavingMethodAndSave(type: FormType = 'ADD') {
+  decideSavingMethodAndSave() {
     let result = true;
-    if (type === 'EDIT') {
-      result = this.editPlainCredentials()
-    } else {
-      switch (this.accountType) {
-        case AccountType.AWS:
-          result = this.saveAwsFederatedAccount();
-          break;
-        case AccountType.AWS_TRUSTER:
-          result = this.saveAwsTrusterAccount();
-          break;
-        case AccountType.AWS_PLAIN_USER:
-          result = this.savePlainCredentials();
-          break;
-        case AccountType.AZURE:
-          result = this.saveAzureAccount();
-          break;
-      }
+    switch (this.accountType) {
+      case AccountType.AWS:
+        result = this.saveAwsFederatedAccount();
+        break;
+      case AccountType.AWS_TRUSTER:
+        result = this.saveAwsTrusterAccount();
+        break;
+      case AccountType.AWS_PLAIN_USER:
+        result = this.savePlainCredentials();
+        break;
+      case AccountType.AZURE:
+        result = this.saveAzureAccount();
+        break;
     }
 
     if (result) {
       // Then go to next page
       this.appService.logger('managed to save session', LoggerLevel.INFO, this);
+      this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
+    }
+  }
+
+  decideEditingMethodAndSave() {
+    let result = true;
+    switch (this.accountType) {
+      case AccountType.AWS:
+        result = true; // this.saveAwsFederatedAccount();
+        break;
+      case AccountType.AWS_TRUSTER:
+        result = true; // this.saveAwsTrusterAccount();
+        break;
+      case AccountType.AWS_PLAIN_USER:
+        result = this.editPlainCredentials();
+        break;
+      case AccountType.AZURE:
+        result = true; // this.saveAzureAccount();
+        break;
+    }
+
+    if (result) {
+      // Then go to next page
+      this.appService.logger('managed to edit session', LoggerLevel.INFO, this);
       this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
     }
   }
@@ -284,6 +306,7 @@ export class ProviderManagerService {
       this.form.value.plainUser,
       this.form.value.secretKey,
       this.form.value.accessKey,
+      this.form.value.mfaDevice,
       this.selectedRegion);
     return true;
   }
@@ -292,8 +315,10 @@ export class ProviderManagerService {
     this.federatedAccountService.editPlainAccountToWorkSpace(
       this.selectedSession,
       this.form.value.accessKey,
-      this.form.value.secretKey
-    ) 
+      this.form.value.secretKey,
+      this.form.value.mfaDevice,
+      this.selectedRegion,
+    );
     return true;
   }
 
@@ -302,16 +327,7 @@ export class ProviderManagerService {
    * In the future we will put this in a service to create validation factory:
    * this way depending on new accounts we jkust need to pass the form object to the validator
    */
-  formValid(form, accountType, type: FormType = 'ADD') {
-    // check if it is an edit operation
-    if(type === 'EDIT') {
-      switch (accountType) {
-        case AccountType.AWS_PLAIN_USER:
-          return form.controls['accessKey'].valid &&
-            form.controls['secretKey'].valid;
-      }
-      return false;
-    }
+  formValid(form, accountType) {
     // First check the type of account we are creating
     if (accountType !== AccountType.AZURE) {
       // Get the workspace

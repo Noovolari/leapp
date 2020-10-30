@@ -1,10 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {HttpClient} from '@angular/common/http';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
+import {ProxyService} from '../../services/proxy.service';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -22,7 +23,8 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     private configurationService: ConfigurationService,
     private router: Router,
     private httpClient: HttpClient,
-    private executeService: ExecuteServiceService
+    private executeService: ExecuteServiceService,
+    private proxyService: ProxyService
   ) { super(); }
 
   /**
@@ -40,16 +42,22 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
    */
   logout() {
     // Google clean
-    this.httpClient.get('https://mail.google.com/mail/u/0/?logout&hl=en').subscribe(res => {
-      this.appService.logger('Was not able to log user out from Google', LoggerLevel.ERROR, this);
-    }, err => {
-      this.appService.logger('Logging out...', LoggerLevel.INFO, this);
-      this.configurationService.newConfigurationFileSync();
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+
+    this.proxyService.get('https://mail.google.com/mail/u/0/?logout&hl=en', (res) => {
+      this.appService.logger('logout res status code: ', LoggerLevel.INFO, this, res.statusCode);
+      if (res.statusCode !== 407) {
+        this.configurationService.newConfigurationFileSync();
+      } else {
+        this.appService.toast('Failed to logout: Proxy auth denied.', ToastLevel.WARN, 'Proxy Auth failed');
+      }
+    }, (err) => {
+      this.appService.logger('logout error: ', LoggerLevel.ERROR, this, err.stack);
     });
 
     // Azure Clean
     this.appService.logger('Cleaning Azure config files...', LoggerLevel.INFO, this);
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
+
     workspace.azureProfile = null;
     workspace.azureConfig = null;
     this.configurationService.updateWorkspaceSync(workspace);

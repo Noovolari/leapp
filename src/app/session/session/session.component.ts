@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../services-system/app.service';
 import {HttpClient} from '@angular/common/http';
 import {Session} from '../../models/session';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
+import {BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';

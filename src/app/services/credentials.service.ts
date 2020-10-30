@@ -8,6 +8,7 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {FileService} from '../services-system/file.service';
 import {KeychainService} from '../services-system/keychain.service';
 import {NativeService} from '../services-system/native-service';
+import {ProxyService} from './proxy.service';
 import {TimerService} from './timer-service';
 import {WorkspaceService} from './workspace.service';
 
@@ -33,6 +34,7 @@ export class CredentialsService extends NativeService {
     private executeService: ExecuteServiceService,
     private fileService: FileService,
     private keychainService: KeychainService,
+    private proxyService: ProxyService,
     private timerService: TimerService,
     private workspaceService: WorkspaceService,
   ) {
@@ -54,7 +56,7 @@ export class CredentialsService extends NativeService {
     // test using Strategy instead of direct methods
     this.azureStrategy = new AzureStrategy(this, appService, timerService, executeService, configurationService);
     this.awsStrategy = new AwsStrategy(this, appService, configurationService, executeService,
-      fileService, keychainService, timerService, workspaceService);
+      fileService, keychainService, proxyService, timerService, workspaceService);
 
     this.strategyMap[AccountType.AWS] = this.awsStrategy.refreshCredentials.bind(this.awsStrategy);
     this.strategyMap[AccountType.AWS_PLAIN_USER] = this.awsStrategy.refreshCredentials.bind(this.awsStrategy);
@@ -81,7 +83,7 @@ export class CredentialsService extends NativeService {
     if (res.status === 'ok') {
       this.refreshReturnStatusEmit.emit(true);
     } else {
-      this.appService.toast('There was a problem in generating credentials..', ToastLevel.WARN, 'Credentials');
+      this.appService.toast('There was a problem in generating credentials.', ToastLevel.WARN, 'Credentials');
       this.refreshReturnStatusEmit.emit(false);
     }
   }

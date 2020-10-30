@@ -13,8 +13,8 @@ import {TimerService} from '../services/timer-service';
 import {Workspace} from '../models/workspace';
 import {WorkspaceService} from '../services/workspace.service';
 import {Observable} from 'rxjs';
-import {Session} from '../models/session';
 import {constants} from '../core/enums/constants';
+import {ProxyService} from '../services/proxy.service';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -28,6 +28,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     private executeService: ExecuteServiceService,
     private fileService: FileService,
     private keychainService: KeychainService,
+    private proxyService: ProxyService,
     private timerService: TimerService,
     private workspaceService: WorkspaceService) {
     super();
@@ -194,6 +195,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
+      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
+
+      this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
       // Update AWS sdk with new credentials
       AWS.config.update({
@@ -209,8 +213,10 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           if (err) {
             // Something went wrong save it to the logger file
             this.appService.logger('Error in assume role from plain to truster in get session token', LoggerLevel.ERROR, this, err.stack);
+
             // Emit ko for double jump
             this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+            this.configurationService.disableLoadingWhenReady(workspace, session);
           } else {
             // we set the new credentials after the first jump
             const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
@@ -219,8 +225,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
             this.configurationService.updateWorkspaceSync(workspace);
             this.configurationService.disableLoadingWhenReady(workspace, session);
+
             // Finished double jump
-            this.configurationService.disableLoadingWhenReady(workspace, session);
             this.appService.logger('Made it through Double jump from plain', LoggerLevel.INFO, this);
           }
         });

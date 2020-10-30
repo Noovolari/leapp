@@ -140,6 +140,34 @@ const generateMainWindow = () => {
     require('update-electron-app')();
   });
 
+  let loginCount = 0;
+  app.on('login', (event, webContents, request, authInfo, callback) => {
+    try {
+      let workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, {encoding: 'utf-8'}), machineIdSync()).toString(CryptoJS.enc.Utf8)) : undefined;
+      if (workspace !== undefined && workspace.workspaces[0] !== undefined) {
+        workspace = (workspace.workspaces[0] as Workspace);
+
+        if (workspace.proxyConfiguration !== undefined &&
+          workspace.proxyConfiguration !== null &&
+          workspace.proxyConfiguration.username &&
+          workspace.proxyConfiguration.password) {
+
+          if (loginCount === 0) {
+            loginCount++;
+            log.info(`we are inside app login with auth: ${JSON.stringify(workspace.proxyConfiguration, null, 3)}`);
+            const proxyUsername = workspace.proxyConfiguration.username;
+            const proxyPassword = workspace.proxyConfiguration.password;
+            // Supply credentials to server
+            callback(proxyUsername, proxyPassword);
+          } else {
+            log.error('[electron main] Proxy Auth Credentials invalid');
+            return;
+          }
+        }
+      }
+    } catch (err) {}
+  });
+
   const gotTheLock = app.requestSingleInstanceLock();
 
   if (!gotTheLock) {
@@ -153,7 +181,6 @@ const generateMainWindow = () => {
       }
     });
   }
-
 };
 
 // Prepare and generate the main window if everything is setupped correctly
@@ -191,13 +218,6 @@ const initWorkspace = () => {
     log.info('Setupping workspace for the first time');
     setupWorkspace();
   } else {
-    // Check and activate proxy pass if necessary
-    if (workspace.workspaces[0] !== undefined && (workspace.workspaces[0] as Workspace).proxyUrl) {
-      console.log('workspace in main, check proxy url:', workspace);
-      process.env.HTTP_PROXY = (workspace.workspaces[0] as Workspace).proxyUrl;
-      const globalTunnel = require('global-tunnel');
-      globalTunnel.initialize();
-    }
     // Generate the main window
     generateMainWindow();
   }

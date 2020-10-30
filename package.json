@@ -2,8 +2,8 @@
     "name": "Leapp",
     "version": "0.2.8",
     "author": {
-        "name": "noovolari",
-        "email": "info@noovolari.com"
+        "name": "besharp",
+        "email": "info@besharp.it"
     },
     "description": "Straight programmatic access via Single Sign-on to all your AWS accounts and resources.",
     "contributors": [
@@ -126,8 +126,8 @@
                 "nsis"
             ],
             "icon": "src/assets/images/Leapp.ico",
-            "legalTrademarks": "noovolari",
-            "publisherName": "noovolari",
+            "legalTrademarks": "beSharp",
+            "publisherName": "beSharp",
             "requestedExecutionLevel": "highestAvailable",
             "verifyUpdateCodeSignature": false
         },

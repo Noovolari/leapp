@@ -154,7 +154,11 @@ const generateMainWindow = () => {
 
           if (loginCount === 0) {
             loginCount++;
-            log.info(`we are inside app login with auth: ${JSON.stringify(workspace.proxyConfiguration, null, 3)}`);
+
+            const tempInfo = Object.assign({}, workspace.proxyConfiguration);
+            tempInfo.password = '******';
+
+            log.info(`we are inside app login with auth: ${JSON.stringify(tempInfo, null, 3)}`);
             const proxyUsername = workspace.proxyConfiguration.username;
             const proxyPassword = workspace.proxyConfiguration.password;
             // Supply credentials to server

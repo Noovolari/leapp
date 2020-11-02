@@ -42,7 +42,7 @@
         <b>Select an Instance:</b>
         <ul class="ssm-ul">
           <li *ngFor="let instance of instances" class="ssm-card">
-            <div tooltip="{{instance.Name}}"><span><b>{{instance.Name.length >= 24 ? instance.Name.substr(0, 21) + '...' : instance.Name}}</b> - {{instance.IPAddress}}</span><button class="btn" (click)="startSsmSession(instance.InstanceId)">Connect</button></div>
+            <div><span><b>{{instance.Name.length >= 24 ? instance.Name.substr(0, 21) + '...' : instance.Name}}</b> - {{instance.IPAddress}}</span><button class="btn" (click)="startSsmSession(instance.InstanceId)">Connect</button></div>
           </li>
         </ul>
       </div>

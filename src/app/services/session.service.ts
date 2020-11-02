@@ -33,8 +33,7 @@ export class SessionService extends NativeService {
    * List sessions inside the current Session list containing all sessions
    */
   listSessions() {
-    this.appService.logger('Listing sessions...', LoggerLevel.INFO, this);
-
+    // this.appService.logger('Listing sessions...', LoggerLevel.INFO, this);
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace.sessions) {
       return workspace.sessions;

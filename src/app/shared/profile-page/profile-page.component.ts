@@ -31,7 +31,8 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     proxyProtocol: new FormControl(''),
     proxyPort: new FormControl(''),
     proxyUsername: new FormControl(''),
-    proxyPassword: new FormControl('')
+    proxyPassword: new FormControl(''),
+    showAuthCheckbox: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */

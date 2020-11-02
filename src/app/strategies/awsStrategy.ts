@@ -213,9 +213,11 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           if (err) {
             // Something went wrong save it to the logger file
             this.appService.logger('Error in assume role from plain to truster in get session token', LoggerLevel.ERROR, this, err.stack);
+            this.appService.toast('Error assuming role from plain account, check log for details.', LoggerLevel.WARN, 'Assume role Error');
 
             // Emit ko for double jump
             this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+            workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
             this.configurationService.disableLoadingWhenReady(workspace, session);
           } else {
             // we set the new credentials after the first jump

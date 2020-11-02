@@ -194,7 +194,7 @@ export class AppService extends NativeService {
         devTools: true,
         sandbox: true,
         nodeIntegration: false,
-        allowRunningInsecureContent: true
+        allowRunningInsecureContent: true,
       }
     };
 

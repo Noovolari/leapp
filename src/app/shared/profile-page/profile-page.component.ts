@@ -6,6 +6,7 @@ import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.ser
 import {FileService} from '../../services-system/file.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
+import {constants} from '../../core/enums/constants';
 
 @Component({
   selector: 'app-profile-page',
@@ -87,18 +88,32 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
       this.configurationService.updateWorkspaceSync(this.workspaceData);
 
-      if (this.form.controls['proxyUrl'].value !== undefined &&
-        this.form.controls['proxyUrl'].value !== null &&
-        this.form.controls['proxyUrl'].value !== '') {
+      if (this.checkIfNeedDialogBox()) {
 
-        this.appService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.INFO, this);
-        this.appService.toast('You\'ve set a proxy url: the app must be restarted to update the configuration.', ToastLevel.WARN, 'Force restart');
-        this.appService.restart();
+        this.appService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
+          if (res !== constants.CONFIRM_CLOSED) {
+            this.appService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.INFO, this);
+            this.appService.restart();
+          }
+        });
+      } else {
+        this.appService.logger('Option saved.', LoggerLevel.INFO, this, JSON.stringify(this.form.getRawValue(), null, 3));
+        this.appService.toast('Option saved.', ToastLevel.INFO, 'Options');
       }
-
-      this.appService.logger('Option saved.', LoggerLevel.INFO, this, JSON.stringify(this.form.getRawValue(), null, 3));
-      this.appService.toast('Option saved.', ToastLevel.INFO, 'Options');
     }
+  }
+
+  /**
+   * Check if we need a dialog box to request restarting the application
+   */
+  checkIfNeedDialogBox() {
+    return this.form.controls['proxyUrl'].value !== undefined &&
+      this.form.controls['proxyUrl'].value !== null &&
+      (this.form.controls['proxyUrl'].dirty ||
+       this.form.controls['proxyProtocol'].dirty ||
+       this.form.controls['proxyPort'].dirty ||
+       this.form.controls['proxyUsername'].dirty ||
+       this.form.controls['proxyPassword'].dirty);
   }
 
   /**

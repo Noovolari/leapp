@@ -104,7 +104,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         secretAccessKey: awsCredentials.default.aws_secret_access_key
       });
 
-      const sts = new AWS.STS();
+      const sts = new AWS.STS(this.appService.stsOptions());
 
       const params = { DurationSeconds: environment.sessionDuration };
       if (session.account.mfaDevice !== undefined && session.account.mfaDevice !== null && session.account.mfaDevice !== '') {
@@ -206,7 +206,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       });
 
       // Second jump
-      const sts = new AWS.STS();
+      const sts = new AWS.STS(this.appService.stsOptions());
 
       const processData = (p) => {
         sts.assumeRole(p, (err, data: any) => {

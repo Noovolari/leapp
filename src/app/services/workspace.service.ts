@@ -10,6 +10,7 @@ import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
 import {ProxyService} from './proxy.service';
+import {environment} from '../../environments/environment';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -311,7 +312,7 @@ export class WorkspaceService extends NativeService {
     this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
     // Setup STS to generate the credentials
-    const sts = new AWS.STS();
+    const sts = new AWS.STS(this.appService.stsOptions());
 
     let parentAccount;
     let parentRole;
@@ -401,7 +402,7 @@ export class WorkspaceService extends NativeService {
 
         this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
-        const sts = new AWS.STS();
+        const sts = new AWS.STS(this.appService.stsOptions());
 
         sts.assumeRole({
           RoleArn: `arn:aws:iam::${account.accountNumber}:role/${roleName}`,

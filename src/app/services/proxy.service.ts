@@ -2,6 +2,7 @@ import {AppService} from '../services-system/app.service';
 import {Injectable} from '@angular/core';
 import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -63,6 +64,7 @@ export class ProxyService extends NativeService {
 
       const agent = new this.httpsProxyAgent(rule);
       options.agent = agent;
+      options.timeout = environment.timeout;
     }
 
     return options;

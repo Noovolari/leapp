@@ -33,7 +33,7 @@
       </div>
 
       <div class="form-group" style="width: 100%; display: inline-block; height: 35px; padding-top: 10px;">
-        <span><input type="checkbox" (click)="showProxyAuthentication = !showProxyAuthentication" class="d-inline-block" style="height: 20px!important;"/> Use authentication?</span>
+        <span><input formControlName="showAuthCheckbox" [(ngModel)]="showProxyAuthentication" type="checkbox" class="d-inline-block" style="height: 20px!important;"/> Use authentication?</span>
       </div>
 
       <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="showProxyAuthentication">

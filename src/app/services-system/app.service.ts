@@ -462,6 +462,10 @@ export class AppService extends NativeService {
     return email;
   }
 
+  stsOptions() {
+    return { maxRetries: 0, httpOptions: { timeout: environment.timeout }};
+  }
+
 }
 
 /*

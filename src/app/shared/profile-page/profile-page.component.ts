@@ -14,9 +14,6 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 })
 export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
-  name = '';
-  email = '';
-
   idpUrlValue;
 
   showProxyAuthentication = false;
@@ -48,8 +45,8 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   ngOnInit() {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData.name && this.workspaceData.name !== '') {
-      this.idpUrlValue = this.workspaceData.idpUrl;
 
+      this.idpUrlValue = this.workspaceData.idpUrl;
       this.proxyProtocol = this.workspaceData.proxyConfiguration.proxyProtocol;
       this.proxyUrl = this.workspaceData.proxyConfiguration.proxyUrl;
       this.proxyPort = this.workspaceData.proxyConfiguration.proxyPort;
@@ -66,8 +63,10 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
       this.proxyUrl = this.workspaceData.proxyConfiguration.proxyUrl && this.workspaceData.proxyConfiguration.proxyUrl !== 'undefined' ?
                               this.workspaceData.proxyConfiguration.proxyUrl : '';
 
-      this.name = this.workspaceData.name;
-      this.email = localStorage.getItem('hook_email') || 'not logged in yet';
+      if (this.proxyUsername || this.proxyPassword) {
+        this.showProxyAuthentication = true;
+      }
+
       this.appService.validateAllFormFields(this.form);
     }
   }

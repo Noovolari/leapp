@@ -44,43 +44,50 @@ export class SsmService {
     const mythis = this;
     this.instances = [];
     return new Observable(observer => {
-          this.ssmClient.describeInstanceInformation({}, (err, data) => {
-            if (err) {
-              this.app.logger('You are not Authorized to perform SSM Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
-              mythis.app.toast('You are not Authorized to perform SSM Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
-              observer.error({ status: false, instances: mythis.instances });
-            } else {
-              const dataSSM = data;
-              // Once we have obtained data from SSM and EC2, we verify the list are not empty
-              if (dataSSM['InstanceInformationList'] && dataSSM['InstanceInformationList'].length > 0) {
-                // filter only the instances that are currently online
-                mythis.instances = dataSSM['InstanceInformationList'].filter(i => i.PingStatus === 'Online' );
-                if (mythis.instances.length > 0) {
-                  // For every instance that fullfill we obtain...
-                  mythis.instances.forEach(instance => {
-                    // Add name if exists
-                    const instanceId = instance.InstanceId;
-                    instance['ComputerName'] = instance['ComputerName'] || instance.InstanceId;
-                    instance['Name'] = instance['ComputerName'];
-                  });
-                  // We have found and managed a list of instances
-                  this.app.logger('Obtained smm info from AWS for SSM', LoggerLevel.INFO, this);
-                  observer.next({ status: true, instances: mythis.instances });
-                } else {
-                  // No instances usable
-                  mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.WARN, this);
-                  mythis.app.toast('No instances are accessible by this Role.', ToastLevel.WARN, 'No instance for SSM.');
-                  observer.error({ status: false, instances: mythis.instances });
-                }
+      try {
+        this.ssmClient.describeInstanceInformation({}, (err, data) => {
+          if (err) {
+            this.app.logger('You are not Authorized to perform SSM Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
+            mythis.app.toast('You are not Authorized to perform SSM Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
+            observer.error({status: false, instances: mythis.instances});
+          } else {
+            const dataSSM = data;
+            // Once we have obtained data from SSM and EC2, we verify the list are not empty
+            if (dataSSM['InstanceInformationList'] && dataSSM['InstanceInformationList'].length > 0) {
+              // filter only the instances that are currently online
+              mythis.instances = dataSSM['InstanceInformationList'].filter(i => i.PingStatus === 'Online');
+              if (mythis.instances.length > 0) {
+                // For every instance that fullfill we obtain...
+                mythis.instances.forEach(instance => {
+                  // Add name if exists
+                  const instanceId = instance.InstanceId;
+                  instance['ComputerName'] = instance['ComputerName'] || instance.InstanceId;
+                  instance['Name'] = instance['ComputerName'];
+                });
+                // We have found and managed a list of instances
+                this.app.logger('Obtained smm info from AWS for SSM', LoggerLevel.INFO, this);
+                observer.next({status: true, instances: mythis.instances});
               } else {
                 // No instances usable
                 mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.WARN, this);
                 mythis.app.toast('No instances are accessible by this Role.', ToastLevel.WARN, 'No instance for SSM.');
-                observer.error({ status: false, instances: mythis.instances });
+                observer.error({status: false, instances: mythis.instances});
               }
+            } else {
+              // No instances usable
+              mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.WARN, this);
+              mythis.app.toast('No instances are accessible by this Role.', ToastLevel.WARN, 'No instance for SSM.');
+              observer.error({status: false, instances: mythis.instances});
             }
-            observer.complete();
-          });
+          }
+          observer.complete();
+        });
+      } catch (err) {
+        mythis.app.logger('Error making SSM call', LoggerLevel.WARN, this, err.stack);
+        mythis.app.toast('Error making SSM call, you\'re are not authorized to do SSM', ToastLevel.WARN, 'SSM Auth error.');
+        observer.error({status: false, instances: mythis.instances});
+        observer.complete();
+      }
     });
   }
 

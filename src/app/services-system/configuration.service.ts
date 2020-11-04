@@ -44,20 +44,9 @@ export class ConfigurationService extends NativeService {
    */
   public updateWorkspaceSync(workspace: Workspace) {
     const configuration = this.getConfigurationFileSync();
-    // this.appService.logger(`Updating workspace synch.`, LoggerLevel.INFO, this);
-
-    // Check if the workspace is in the array
-    const index = configuration.workspaces.findIndex((elem) => elem.name === workspace.name);
-    if (index !== -1) {
-      // If the workspace is found change it
-      configuration.workspaces[index] = workspace;
-      // Everything ok so far so we can update the configuration file with the updated workspace
-      this.updateConfigurationFileSync(configuration);
-    } else {
-      // Add it: is a new one for some reason, then relaunch the command
-      configuration.workspaces.push(workspace);
-      this.updateWorkspaceSync(workspace);
-    }
+    configuration.workspaces[0] = workspace;
+    // Everything ok so far so we can update the configuration file with the updated workspace
+    this.updateConfigurationFileSync(configuration);
   }
 
   /**

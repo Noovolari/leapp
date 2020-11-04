@@ -5,5 +5,6 @@ export const initialConfiguration = {
   language: 'en',         // current UI language
   defaultWorkspace: '',   // current workspace
   avatar: '',             // if needed in the future
+  name: 'default',
   workspaces: []          // collection of workspaces which define the strategies of login and their properties
 };

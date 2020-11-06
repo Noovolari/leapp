@@ -1,4 +1,3 @@
-import {AccountType} from './AccountType';
 import {Account} from './account';
 
 export interface Session {

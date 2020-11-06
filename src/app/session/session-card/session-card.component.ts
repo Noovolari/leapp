@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Host, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {CredentialsService} from '../../services/credentials.service';
@@ -16,6 +16,7 @@ import {AzureAccount} from '../../models/azure-account';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {AccountType} from '../../models/AccountType';
 import {WorkspaceService} from '../../services/workspace.service';
+import {AwsSsoAccount} from '../../models/aws-sso-account';
 
 @Component({
   selector: 'app-session-card',
@@ -70,6 +71,10 @@ export class SessionCardComponent implements OnInit {
         break;
       case(AccountType.AWS_PLAIN_USER):
         nameToShow = (this.session.account as AwsPlainAccount).user.length >= 13 ? `${(this.session.account as AwsPlainAccount).user.substr(0, 13)}...` : (this.session.account as AwsPlainAccount).user;
+        this.sessionDetailToShow = nameToShow;
+        break;
+      case(AccountType.AWS_SSO):
+        nameToShow = (this.session.account as AwsSsoAccount).role.name.length >= 13 ? `${(this.session.account as AwsSsoAccount).role.name.substr(0, 7)}...` : (this.session.account as AwsSsoAccount).role.name;
         this.sessionDetailToShow = nameToShow;
         break;
     }

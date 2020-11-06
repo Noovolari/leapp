@@ -1,6 +1,7 @@
-import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { ProfilePageComponent } from './shared/profile-page/profile-page.component';
+import {NgModule} from '@angular/core';
+import {RouterModule, Routes} from '@angular/router';
+import {ProfilePageComponent} from './shared/profile-page/profile-page.component';
+import {IntegrationsPageComponent} from './shared/integrations-page/integrations-page.component';
 
 const routes: Routes = [
     {
@@ -17,6 +18,10 @@ const routes: Routes = [
       {
         path: 'profile',
         component: ProfilePageComponent // The profile page
+      },
+      {
+        path: 'integrations',
+        component: IntegrationsPageComponent // The profile page
       },
       {
         path: 'sessions',

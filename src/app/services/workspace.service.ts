@@ -10,7 +10,6 @@ import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
 import {ProxyService} from './proxy.service';
-import {environment} from '../../environments/environment';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -91,7 +90,6 @@ export class WorkspaceService extends NativeService {
       this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
         this.idpResponseHook(details, type, idpUrl, session, callback);
       });
-
       this.idpWindow.loadURL(idpUrl);
 
     }, err => {

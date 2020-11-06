@@ -64,13 +64,6 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
 
-  /**
-   * Go to Account Management
-   */
-  gotToAccountManagement() {
-    this.closeProfile();
-    this.router.navigate(['/sessions', 'list-accounts']);
-  }
 
   closeProfile() {
     this.profileOpen = false;
@@ -81,5 +74,10 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
   goToProfile() {
     this.closeProfile();
     this.router.navigate(['/profile']);
+  }
+
+  goToIntegrations() {
+    this.closeProfile();
+    this.router.navigate(['/integrations']);
   }
 }

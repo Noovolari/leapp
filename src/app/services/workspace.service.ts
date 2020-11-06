@@ -455,12 +455,14 @@ export class WorkspaceService extends NativeService {
     const accessKeyId = stsResponse.Credentials.AccessKeyId;
     const secretAccessKey = stsResponse.Credentials.SecretAccessKey;
     const sessionToken = stsResponse.Credentials.SessionToken;
+    const refreshToken = stsResponse.Credentials.Expiration;
 
     // Construct the credential object
     const credential: AwsCredential = {};
     credential.aws_access_key_id = accessKeyId;
     credential.aws_secret_access_key = secretAccessKey;
     credential.aws_session_token = sessionToken;
+    credential.expiration = refreshToken;
 
     workspace.ssmCredentials = credential;
     this.configurationService.updateWorkspaceSync(workspace);

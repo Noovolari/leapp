@@ -15,6 +15,7 @@ import {WorkspaceService} from '../services/workspace.service';
 import {Observable} from 'rxjs';
 import {constants} from '../core/enums/constants';
 import {ProxyService} from '../services/proxy.service';
+import {Session} from '../models/session';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -70,8 +71,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     this.getSessionToken(credentials, session).subscribe((awsCredentials) => {
         const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);
 
-        workspace.ssmCredentials = tempCredentials;
-        this.configurationService.updateWorkspaceSync(workspace);
+        // we set the refresh token in vault
+        this.saveRefreshTokenInVault(tempCredentials, session);
 
         this.fileService.iniWriteSync(this.appService.awsCredentialPath(), tempCredentials);
         this.configurationService.disableLoadingWhenReady(workspace, session);
@@ -106,22 +107,31 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
       const sts = new AWS.STS(this.appService.stsOptions());
 
-      const params = { DurationSeconds: environment.sessionDuration };
-      if (session.account.mfaDevice !== undefined && session.account.mfaDevice !== null && session.account.mfaDevice !== '') {
-        this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
-
-          if (value !== constants.CONFIRM_CLOSED) {
-            params['SerialNumber'] = session.account.mfaDevice;
-            params['TokenCode'] = value;
+      const params = { DurationSeconds: environment.sessionDurationMfa };
+      if (this.checkIfMfaIsNeeded(session)) {
+        // We Need a MFA BUT Now we need to retrieve a refresh token
+        // from the vault to see if the session is still refreshable
+        try {
+          this.keychainService.getSecret(environment.appName, this.generateRefreshTokenString(session)).then(refreshTokenData => {
+            if (refreshTokenData && this.isRefreshTokenValid(refreshTokenData)) {
+              sts.getSessionToken(params, (err, data) => {
+                processData(data, err);
+              });
+            } else {
+              this.showMFAWindowAndAuthenticate(sts, params, session, () => {
+                sts.getSessionToken(params, (err, data) => {
+                  processData(data, err);
+                });
+              });
+            }
+          });
+        } catch (tokenErr) {
+          this.showMFAWindowAndAuthenticate(sts, params, session, () => {
             sts.getSessionToken(params, (err, data) => {
               processData(data, err);
             });
-          } else {
-            const workspace = this.configurationService.getDefaultWorkspaceSync();
-            workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
-            this.configurationService.disableLoadingWhenReady(workspace, session);
-          }
-        });
+          });
+        }
       } else {
         sts.getSessionToken(params, (err, data) => {
           processData(data, err);
@@ -223,6 +233,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
             // we set the new credentials after the first jump
             const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
 
+            // we set the refresh token in vault
+            this.saveRefreshTokenInVault(trusterCredentials, session);
+
             this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
             this.configurationService.updateWorkspaceSync(workspace);
@@ -236,23 +249,80 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
       const params = {
         RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
-        RoleSessionName: `truster-on-${session.account.role.name}`
+        RoleSessionName: `truster-on-${session.account.role.name}`,
+        DurationSeconds: environment.sessionDurationMfa
       };
 
-      if (parentSession.account.mfaDevice !== undefined && parentSession.account.mfaDevice !== null && parentSession.account.mfaDevice !== '') {
-        this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
-          if (value !== constants.CONFIRM_CLOSED) {
-            params['SerialNumber'] = parentSession.account.mfaDevice;
-            params['TokenCode'] = value;
-            processData(params);
-          } else {
-            workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
-            this.configurationService.disableLoadingWhenReady(workspace, session);
-          }
+      if (this.checkIfMfaIsNeeded(parentSession)) {
+        // now we need to recover from vault the refresh token if exists
+        this.showMFAWindowAndAuthenticate(sts, params, session, () => {
+          processData(params);
         });
+
+        // We Need a MFA BUT Now we need to retrieve a refresh token
+        // from the vault to see if the session is still refreshable
+        try {
+          this.keychainService.getSecret(environment.appName, this.generateRefreshTokenString(session)).then(refreshTokenData => {
+            if (refreshTokenData && this.isRefreshTokenValid(refreshTokenData)) {
+              processData(params);
+            } else {
+              this.showMFAWindowAndAuthenticate(sts, params, session, () => {
+                processData(params);
+              });
+            }
+          });
+        } catch (tokenErr) {
+          this.showMFAWindowAndAuthenticate(sts, params, session, () => {
+            processData(params);
+          });
+        }
+
       } else {
         processData(params);
       }
     }
+  }
+
+  private checkIfMfaIsNeeded(session: Session): boolean {
+    return (session.account as AwsPlainAccount).mfaDevice !== undefined &&
+      (session.account as AwsPlainAccount).mfaDevice !== null &&
+      (session.account as AwsPlainAccount).mfaDevice !== '';
+  }
+
+  private showMFAWindowAndAuthenticate(sts, params, session, callback) {
+    this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
+      if (value !== constants.CONFIRM_CLOSED) {
+        params['SerialNumber'] = session.account.mfaDevice;
+        params['TokenCode'] = value;
+        callback();
+      } else {
+        const workspace = this.configurationService.getDefaultWorkspaceSync();
+        workspace.sessions.forEach(sess => {
+          if (sess.id === session.id) {
+            sess.active = false;
+          }
+        });
+        this.configurationService.disableLoadingWhenReady(workspace, session);
+      }
+    });
+  }
+
+  private isRefreshTokenValid(refreshTokenData): boolean {
+    console.log(refreshTokenData);
+
+    const tokenDate = new Date(refreshTokenData);
+    const check = (date) => date > Date.now();
+
+    console.log('RefreshToken Date', tokenDate);
+    console.log('RefreshToken Date still valid', check(tokenDate));
+    return check(tokenDate);
+  }
+
+  private saveRefreshTokenInVault(credentials, session) {
+    this.keychainService.saveSecret(environment.appName, this.generateRefreshTokenString(session), credentials.default.expiration.toString());
+  }
+
+  private generateRefreshTokenString(session: any) {
+    return 'refresh-token-aws-' + session.account.name;
   }
 }

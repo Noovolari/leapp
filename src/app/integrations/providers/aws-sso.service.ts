@@ -1,14 +1,17 @@
 import {Injectable} from '@angular/core';
 import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest} from 'aws-sdk/clients/ssooidc';
-import SSO, {AccountInfo, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo} from 'aws-sdk/clients/sso';
+import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
 import {AppService} from '../../services-system/app.service';
-import {from, Observable} from 'rxjs';
-import {map, switchMap} from 'rxjs/operators';
+import {from, merge, Observable, of} from 'rxjs';
+import {map, switchMap, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
 import {v4 as uuidv4} from 'uuid';
+import {KeychainService} from '../../services-system/keychain.service';
+import {environment} from '../../../environments/environment';
+import {ConfigurationService} from '../../services-system/configuration.service';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -18,11 +21,13 @@ interface AuthorizeIntegrationResponse {
 
 interface GenerateSSOTokenResponse {
   accessToken: string;
+  expirationTime: Date;
 }
 
 interface LoginToAwsSSOResponse {
   accessToken: string;
   region: string;
+  expirationTime: Date;
 }
 
 
@@ -35,7 +40,9 @@ export class AwsSsoService extends NativeService {
   ssoPortal;
   ssoWindow;
 
-  constructor(private appService: AppService) {
+  constructor(private appService: AppService,
+              private keychainService: KeychainService,
+              private configurationService: ConfigurationService) {
     super();
   }
 
@@ -82,13 +89,13 @@ export class AwsSsoService extends NativeService {
     });
   }
 
-  generateSSOToken(clientId: string, clientSecret: string, deviceCode: string): Observable<GenerateSSOTokenResponse> {
+  generateSSOToken(authorizeIntegrationResponse: AuthorizeIntegrationResponse): Observable<GenerateSSOTokenResponse> {
     return new Observable(observer => {
       const createTokenRequest: CreateTokenRequest = {
-      clientId,
-      clientSecret,
+      clientId: authorizeIntegrationResponse.clientId,
+      clientSecret: authorizeIntegrationResponse.clientSecret,
       grantType: 'urn:ietf:params:oauth:grant-type:device_code',
-      deviceCode
+      deviceCode: authorizeIntegrationResponse.deviceCode
       };
 
       this.ssooidc.createToken(createTokenRequest, (err, createTokenResponse) => {
@@ -96,7 +103,9 @@ export class AwsSsoService extends NativeService {
           console.log(err);
           observer.complete();
         } else {
-          observer.next({accessToken: createTokenResponse.accessToken});
+          let expirationTime: Date = new Date();
+          expirationTime = new Date(expirationTime.getTime() + createTokenResponse.expiresIn * 1000);
+          observer.next({accessToken: createTokenResponse.accessToken, expirationTime});
           observer.complete();
         }
 
@@ -104,17 +113,74 @@ export class AwsSsoService extends NativeService {
     });
   }
 
-  loginToAwsSSO(region: string, portalUrl: string): Observable<LoginToAwsSSOResponse> {
+  firstTimeLoginToAwsSSO(region: string, portalUrl: string): Observable<LoginToAwsSSOResponse> {
     return this.authorizeIntegration(region, portalUrl).pipe(
-          switchMap(authorizeIntegrationResponse => this.generateSSOToken(
-            authorizeIntegrationResponse.clientId,
-            authorizeIntegrationResponse.clientSecret,
-            authorizeIntegrationResponse.deviceCode)),
-          map(generateSSOTokenResponse => ({ accessToken: generateSSOTokenResponse.accessToken, region}))
+      switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
+      map(generateSSOTokenResponse => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
+      // whenever try to login then save info in keychain
+      tap((response) => this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime)),
+
     );
   }
 
+  loginToAwsSSO(): Observable<LoginToAwsSSOResponse> {
+    const region = this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION');
+    console.log(region);
+    const portalUrl = this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL');
+    console.log(portalUrl);
+    return this.authorizeIntegration(region, portalUrl).pipe(
+      switchMap(authorizeIntegrationResponse => this.generateSSOToken(authorizeIntegrationResponse)),
+      map(generateSSOTokenResponse => ({accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
+      // whenever try to login then dave info in keychain
+      tap((response) => this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime))
+    );
+  }
+
+  getAwsSsoPortalCredentials(): Observable<LoginToAwsSSOResponse> {
+    const expirationTime = this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME').then(console.log);
+    console.log(expirationTime);
+    console.log(Date.parse(expirationTime));
+    if (Date.parse(expirationTime) > Date.now()) {
+      // Credentials still valid
+      const loginToAwsSSOResponse: LoginToAwsSSOResponse = {
+        accessToken: this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL'),
+        expirationTime: this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME'),
+        region: this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')
+      };
+      return of(loginToAwsSSOResponse);
+    } else {
+      // credentials are not valid
+      this.loginToAwsSSO();
+    }
+
+  }
+
+  saveAwsSsoAccessInfo( portalUrl: string, region: string, accessToken: string, expirationTime: Date) {
+    this.keychainService.saveSecret(environment.appName, 'AWS_SSO_PORTAL_URL', portalUrl);
+    this.keychainService.saveSecret(environment.appName, 'AWS_SSO_REGION', region);
+    this.keychainService.saveSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN', accessToken);
+    this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', expirationTime.toString());
+  }
+
   // PORTAL APIS
+
+  generateSessionsFromToken(observable: Observable<LoginToAwsSSOResponse>): Observable<Session[]> {
+    return observable.pipe(
+      // API portal Calls
+      switchMap((loginToAwsSSOResponse) => this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region)),
+      // Create an array of observables and then call them in parallel,
+      switchMap((response) => {
+        const arrayResponse = [];
+        response.accountList.forEach( accountInfo => {
+          const accountInfoCall = this.getSessionsFromAccount(accountInfo, response.accessToken, response.region);
+          arrayResponse.push(accountInfoCall);
+        });
+        return merge<Session>(...arrayResponse);
+      }),
+      // every call will be merged in an Array
+      toArray(),
+    ) ;
+  }
 
 
   listAccounts(accessToken: string, region: string): Observable<any> {
@@ -146,6 +212,23 @@ export class AwsSsoService extends NativeService {
   }
 
 
+  getRoleCredentials(accessToken: string, region: string, accountNumber: string, roleName: string): Observable<GetRoleCredentialsResponse> {
+    this.ssoPortal = new SSO({region});
+    const getRoleCredentialsRequest: GetRoleCredentialsRequest = {accountId: accountNumber, roleName, accessToken};
+    return from(this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise());
+  }
 
+
+  // LEAPP Integrations
+
+  addSessionsToWorkspace(AwsSsoSessions: Session[]) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+
+    // Remove all AWS SSO old session
+    workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
+    // Add new AWS SSO sessions
+    workspace.sessions.push(...AwsSsoSessions);
+    this.configurationService.updateWorkspaceSync(workspace);
+  }
 }
 

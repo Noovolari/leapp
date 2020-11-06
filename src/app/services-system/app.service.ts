@@ -426,6 +426,8 @@ export class AppService extends NativeService {
    */
   isAzure(s) { return s.account.subscriptionId !== null && s.account.subscriptionId !== undefined; }
 
+
+  // TODO MOVE TO KEYCHAIN SERVICE
   /**
    * Generate Secret String for keychain
    * @param accountName - account ame we want to use
@@ -444,6 +446,7 @@ export class AppService extends NativeService {
     return `${accountName}___${user}___accessKey`;
   }
 
+  // TODO REMOVE
   /**
    * Set the hook email based on response type
    * Now is not used but it can be very useful and we

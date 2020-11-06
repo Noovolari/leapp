@@ -11,6 +11,8 @@ import {NativeService} from '../services-system/native-service';
 import {ProxyService} from './proxy.service';
 import {TimerService} from './timer-service';
 import {WorkspaceService} from './workspace.service';
+import {AwsSsoStrategy} from '../strategies/awsSsoStrategy';
+import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,6 +29,7 @@ export class CredentialsService extends NativeService {
   // Strategies
   azureStrategy;
   awsStrategy;
+  awsSsoStrategy;
 
   constructor(
     private appService: AppService,
@@ -37,6 +40,7 @@ export class CredentialsService extends NativeService {
     private proxyService: ProxyService,
     private timerService: TimerService,
     private workspaceService: WorkspaceService,
+    private awsSsoService: AwsSsoService
   ) {
     super();
 
@@ -57,10 +61,12 @@ export class CredentialsService extends NativeService {
     this.azureStrategy = new AzureStrategy(this, appService, timerService, executeService, configurationService);
     this.awsStrategy = new AwsStrategy(this, appService, configurationService, executeService,
       fileService, keychainService, proxyService, timerService, workspaceService);
+    this.awsSsoStrategy = new AwsSsoStrategy(this, appService, fileService, timerService, awsSsoService);
 
     this.strategyMap[AccountType.AWS] = this.awsStrategy.refreshCredentials.bind(this.awsStrategy);
     this.strategyMap[AccountType.AWS_PLAIN_USER] = this.awsStrategy.refreshCredentials.bind(this.awsStrategy);
     this.strategyMap[AccountType.AZURE] = this.azureStrategy.refreshCredentials.bind(this.azureStrategy);
+    this.strategyMap[AccountType.AWS_SSO] = this.awsSsoStrategy.refreshCredentials.bind(this.awsSsoStrategy);
   }
 
   refreshCredentials(accountType) {

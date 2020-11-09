@@ -62,5 +62,4 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
     });
   }
-
 }

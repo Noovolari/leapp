@@ -117,7 +117,8 @@ export class AwsSsoService extends NativeService {
     return this.authorizeIntegration(region, portalUrl).pipe(
       switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
       map(generateSSOTokenResponse => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
-      // whenever try to login then save info in keychain
+
+      // whenever you are logged, then save info in keychain
       tap((response) => this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime)),
 
     );
@@ -127,8 +128,8 @@ export class AwsSsoService extends NativeService {
     let region;
     let portalUrl;
     return merge(
-      fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => region = res)),
-      fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => portalUrl = res))
+      fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => region = res)),
+      fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => portalUrl = res))
     ).pipe(
       switchMap(() => this.authorizeIntegration(region, portalUrl)),
       switchMap(authorizeIntegrationResponse => this.generateSSOToken(authorizeIntegrationResponse)),
@@ -157,7 +158,7 @@ export class AwsSsoService extends NativeService {
     );
   }
 
-  saveAwsSsoAccessInfo( portalUrl: string, region: string, accessToken: string, expirationTime: Date) {
+  saveAwsSsoAccessInfo(portalUrl: string, region: string, accessToken: string, expirationTime: Date) {
     this.keychainService.saveSecret(environment.appName, 'AWS_SSO_PORTAL_URL', portalUrl);
     this.keychainService.saveSecret(environment.appName, 'AWS_SSO_REGION', region);
     this.keychainService.saveSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN', accessToken);
@@ -184,11 +185,10 @@ export class AwsSsoService extends NativeService {
     );
   }
 
-
   listAccounts(accessToken: string, region: string): Observable<any> {
     this.ssoPortal = new SSO({region});
     const listAccountsRequest: ListAccountsRequest = {accessToken};
-    return from(this.ssoPortal.listAccounts(listAccountsRequest).promise()).pipe( map((response: ListAccountsResponse) => ({accountList: response.accountList , accessToken, region})));
+    return fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()).pipe( map((response: ListAccountsResponse) => ({accountList: response.accountList , accessToken, region})));
   }
 
   getSessionsFromAccount(accountInfo: AccountInfo, accessToken, region): Observable<Session> {

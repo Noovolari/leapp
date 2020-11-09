@@ -323,6 +323,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   }
 
   private generateRefreshTokenString(session: any) {
-    return 'refresh-token-aws-' + session.account.name;
+    return 'refresh-token-aws-' + session.account.accountName;
   }
+
 }

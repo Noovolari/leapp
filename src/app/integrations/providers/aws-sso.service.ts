@@ -3,7 +3,7 @@ import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthoriza
 import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
 import {AppService} from '../../services-system/app.service';
-import {from, merge, Observable, of} from 'rxjs';
+import {from, merge, Observable} from 'rxjs';
 import {map, switchMap, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
@@ -12,6 +12,7 @@ import {v4 as uuidv4} from 'uuid';
 import {KeychainService} from '../../services-system/keychain.service';
 import {environment} from '../../../environments/environment';
 import {ConfigurationService} from '../../services-system/configuration.service';
+import {fromPromise} from 'rxjs/internal-compatibility';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -54,7 +55,7 @@ export class AwsSsoService extends NativeService {
         clientType: 'public',
       };
       this.ssooidc.registerClient(registerClientRequest, (err, registerClientResponse) => {
-        if (registerClientResponse === undefined) {
+        if (!registerClientResponse) {
           console.log(err);
           observer.complete();
         } else {
@@ -65,8 +66,7 @@ export class AwsSsoService extends NativeService {
           };
           this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest, (err1, startDeviceAuthorizationResponse
           ) => {
-
-            if (startDeviceAuthorizationResponse === undefined) {
+            if (!startDeviceAuthorizationResponse) {
               console.log(err1);
             } else {
               const pos = this.currentWindow.getPosition();
@@ -124,11 +124,13 @@ export class AwsSsoService extends NativeService {
   }
 
   loginToAwsSSO(): Observable<LoginToAwsSSOResponse> {
-    const region = this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION');
-    console.log(region);
-    const portalUrl = this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL');
-    console.log(portalUrl);
-    return this.authorizeIntegration(region, portalUrl).pipe(
+    let region;
+    let portalUrl;
+    return merge(
+      fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => region = res)),
+      fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => portalUrl = res))
+    ).pipe(
+      switchMap(() => this.authorizeIntegration(region, portalUrl)),
       switchMap(authorizeIntegrationResponse => this.generateSSOToken(authorizeIntegrationResponse)),
       map(generateSSOTokenResponse => ({accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
       // whenever try to login then dave info in keychain
@@ -137,22 +139,22 @@ export class AwsSsoService extends NativeService {
   }
 
   getAwsSsoPortalCredentials(): Observable<LoginToAwsSSOResponse> {
-    const expirationTime = this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME').then(console.log);
-    console.log(expirationTime);
-    console.log(Date.parse(expirationTime));
-    if (Date.parse(expirationTime) > Date.now()) {
-      // Credentials still valid
-      const loginToAwsSSOResponse: LoginToAwsSSOResponse = {
-        accessToken: this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL'),
-        expirationTime: this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME'),
-        region: this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')
-      };
-      return of(loginToAwsSSOResponse);
-    } else {
-      // credentials are not valid
-      this.loginToAwsSSO();
-    }
-
+    const loginToAwsSSOResponse: LoginToAwsSSOResponse = {accessToken: '', expirationTime: undefined, region: ''};
+    return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(
+      switchMap((expirationTime) => {
+        if (Date.parse(expirationTime) > Date.now()) {
+          return merge(
+            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN')).pipe(tap( res => loginToAwsSSOResponse.accessToken = res)),
+            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(tap( res => loginToAwsSSOResponse.expirationTime = new Date(res))),
+            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap( res => loginToAwsSSOResponse.region = res)),
+          ).pipe(
+            toArray(),
+            map(() => loginToAwsSSOResponse)
+          );
+        }
+        return this.loginToAwsSSO();
+      })
+    );
   }
 
   saveAwsSsoAccessInfo( portalUrl: string, region: string, accessToken: string, expirationTime: Date) {
@@ -179,7 +181,7 @@ export class AwsSsoService extends NativeService {
       }),
       // every call will be merged in an Array
       toArray(),
-    ) ;
+    );
   }
 
 
@@ -215,7 +217,7 @@ export class AwsSsoService extends NativeService {
   getRoleCredentials(accessToken: string, region: string, accountNumber: string, roleName: string): Observable<GetRoleCredentialsResponse> {
     this.ssoPortal = new SSO({region});
     const getRoleCredentialsRequest: GetRoleCredentialsRequest = {accountId: accountNumber, roleName, accessToken};
-    return from(this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise());
+    return fromPromise(this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise());
   }
 
 

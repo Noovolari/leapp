@@ -15,8 +15,6 @@ export class IntegrationsService {
               private router: Router,
               private ngZone: NgZone) {}
 
-
-
   login() {
 
    this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO('eu-west-1', 'https://d-936704dee0.awsapps.com/start'))

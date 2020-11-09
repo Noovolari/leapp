@@ -1,5 +1,5 @@
 import {AccountType} from '../models/AccountType';
-import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
+import {AppService, LoggerLevel} from '../services-system/app.service';
 import {AwsCredentials} from '../models/credential';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {ConfigurationService} from '../services-system/configuration.service';
@@ -15,6 +15,7 @@ import {WorkspaceService} from '../services/workspace.service';
 import {Observable} from 'rxjs';
 import {constants} from '../core/enums/constants';
 import {ProxyService} from '../services/proxy.service';
+
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -65,7 +66,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
    * @param session - the current session we use to retrieve information from
    */
   private async awsCredentialProcess(workspace: Workspace, session) {
-    const credentials = await this.getIamUserAccessKeysFromKeychain(session);
+    const credentials = this.getIamUserAccessKeysFromKeychain(session);
 
     this.getSessionToken(credentials, session).subscribe((awsCredentials) => {
         const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);

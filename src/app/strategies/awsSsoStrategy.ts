@@ -10,8 +10,8 @@ import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {AwsSsoAccount} from '../models/aws-sso-account';
 import {switchMap} from 'rxjs/operators';
 
-// Import AWS node style
-const AWS = require('aws-sdk');
+import {AwsCredential} from '../models/credential';
+
 
 export class AwsSsoStrategy extends RefreshCredentialsStrategy {
 
@@ -51,7 +51,16 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
     // Retrieve access token and region
     this.awsSsoService.getAwsSsoPortalCredentials().pipe(
       switchMap((loginToAwsSSOResponse) =>  this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name))
-    ).subscribe(console.log);
+    ).subscribe((getRoleCredentialsResponse) => {
+      // Construct the credential object
+      const credential: AwsCredential = {};
+      credential.aws_access_key_id = getRoleCredentialsResponse.roleCredentials.accessKeyId;
+      credential.aws_secret_access_key = getRoleCredentialsResponse.roleCredentials.secretAccessKey;
+      credential.aws_session_token = getRoleCredentialsResponse.roleCredentials.sessionToken;
+      const awsSsoCredentials = {default: credential};
+      console.log(awsSsoCredentials);
+      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
+    });
   }
 
 }

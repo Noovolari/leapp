@@ -9,23 +9,29 @@ import {Router} from '@angular/router';
 })
 export class IntegrationsService {
 
-
   constructor(private awsSsoService: AwsSsoService,
               private configurationService: ConfigurationService,
               private router: Router,
               private ngZone: NgZone) {}
 
   login() {
-
    this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO('eu-west-1', 'https://d-936704dee0.awsapps.com/start'))
      .subscribe((AwsSsoSessions) => {
      // Save sessions to workspace
      this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
      this.ngZone.run(() =>  this.router.navigate(['/sessions', 'session-selected']));
    });
-
   }
 
 
+  logout() {
+    this.awsSsoService.logOutAwsSso();
+  }
 
+  syncAccounts() {
+    this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).subscribe((AwsSsoSessions) => {
+
+      this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions, true);
+    });
+  }
 }

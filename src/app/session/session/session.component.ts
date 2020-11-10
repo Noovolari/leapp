@@ -12,6 +12,8 @@ import {FileService} from '../../services-system/file.service';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
 import {MenuService} from '../../services/menu.service';
+import {IntegrationsService} from '../../integrations/integrations.service';
+import {AwsSsoService} from '../../integrations/providers/aws-sso.service';
 
 @Component({
   selector: 'app-session',
@@ -53,7 +55,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private credentialsService: CredentialsService,
     private sessionService: SessionService,
     private menuService: MenuService,
-    private zone: NgZone
+    private zone: NgZone,
+    private integrationsService: IntegrationsService,
+    private awsSsoService: AwsSsoService
   ) { super(); }
 
   ngOnInit() {
@@ -77,7 +81,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       }
     });
 
-    this.appService.redrawList.subscribe(r => {
+    this.appService.redrawList.subscribe(() => {
       this.getSessions();
       this.menuService.generateMenu();
     });
@@ -109,6 +113,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    */
   getSessions() {
     this.zone.run(() => {
+      this.awsSsoService.isAwsSsoActive().subscribe(res => {
+        if (res) {this.integrationsService.syncAccounts(); }
+      });
       this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
       this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter( session => session.active === false));
     });

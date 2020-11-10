@@ -76,7 +76,7 @@ export class AwsSsoService extends NativeService {
               this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
 
               // When the code is verified and the user has been logged in, the window can be closed
-              this.ssoWindow.webContents.session.webRequest.onBeforeRequest( {urls: ['https://*.awsapps.com/start/user-consent/login-success.html']}, (details, callback) => {
+              this.ssoWindow.webContents.session.webRequest.onBeforeRequest( {urls: ['https://*.awsapps.com/start/user-consent/login-success.html']}, () => {
                 this.ssoWindow.close();
                 this.ssoWindow = null;
                 observer.next({clientId: registerClientResponse.clientId, clientSecret: registerClientResponse.clientSecret, deviceCode: startDeviceAuthorizationResponse.deviceCode });
@@ -165,6 +165,8 @@ export class AwsSsoService extends NativeService {
     this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', expirationTime.toString());
   }
 
+
+
   // PORTAL APIS
 
   generateSessionsFromToken(observable: Observable<LoginToAwsSSOResponse>): Observable<Session[]> {
@@ -223,14 +225,39 @@ export class AwsSsoService extends NativeService {
 
   // LEAPP Integrations
 
-  addSessionsToWorkspace(AwsSsoSessions: Session[]) {
+  addSessionsToWorkspace(AwsSsoSessions: Session[], isSyncing?: boolean) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+
+    // Remove all AWS SSO old session
+    workspace.sessions = isSyncing ?
+      workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO) && (sess.active !== true))) :
+      workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO)) ;
+    const t = workspace.sessions.filter(s => s.active === true);
+    console.log('active session', t);
+    // Add new AWS SSO sessions
+    workspace.sessions.push(...AwsSsoSessions);
+    this.configurationService.updateWorkspaceSync(workspace);
+  }
+
+  logOutAwsSso() {
+    this.keychainService.deletePassword(environment.appName, 'AWS_SSO_PORTAL_URL');
+    this.keychainService.deletePassword(environment.appName, 'AWS_SSO_REGION');
+    this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN');
+    this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
+
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     // Remove all AWS SSO old session
     workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
-    // Add new AWS SSO sessions
-    workspace.sessions.push(...AwsSsoSessions);
+
     this.configurationService.updateWorkspaceSync(workspace);
+  }
+
+
+  isAwsSsoActive(): Observable<boolean> {
+    return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(
+      map((res) => !!res)
+    );
   }
 }
 

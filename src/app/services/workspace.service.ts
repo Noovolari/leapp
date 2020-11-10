@@ -10,6 +10,8 @@ import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
 import {ProxyService} from './proxy.service';
+import {environment} from '../../environments/environment';
+import {KeychainService} from '../services-system/keychain.service';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -52,7 +54,8 @@ export class WorkspaceService extends NativeService {
     private appService: AppService,
     private configurationService: ConfigurationService,
     private fileService: FileService,
-    private proxyService: ProxyService
+    private proxyService: ProxyService,
+    private keychainService: KeychainService
   ) {
     super();
   }
@@ -453,14 +456,16 @@ export class WorkspaceService extends NativeService {
     const accessKeyId = stsResponse.Credentials.AccessKeyId;
     const secretAccessKey = stsResponse.Credentials.SecretAccessKey;
     const sessionToken = stsResponse.Credentials.SessionToken;
+    const refreshToken = stsResponse.Credentials.Expiration;
 
     // Construct the credential object
     const credential: AwsCredential = {};
     credential.aws_access_key_id = accessKeyId;
     credential.aws_secret_access_key = secretAccessKey;
     credential.aws_session_token = sessionToken;
+    credential.expiration = refreshToken;
 
-    workspace.ssmCredentials = credential;
+    this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential));
     this.configurationService.updateWorkspaceSync(workspace);
 
     if (region && region !== 'no region necessary') {

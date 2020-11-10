@@ -5,7 +5,7 @@ import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../environments/environment';
 import {ConfigurationService} from './services-system/configuration.service';
 import {FileService} from './services-system/file.service';
-import {AppService, LoggerLevel, ToastLevel} from './services-system/app.service';
+import {AppService, LoggerLevel} from './services-system/app.service';
 import {Router} from '@angular/router';
 import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
@@ -45,8 +45,10 @@ export class AppComponent implements OnInit {
 
     // If we have credentials copy them from workspace file to the .aws credential file
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    // Set it as default
-    this.configurationService.setDefaultWorkspaceSync(workspace.name);
+    if (workspace) {
+      // Set it as default
+      this.configurationService.setDefaultWorkspaceSync(workspace.name);
+    }
 
     // Fix for retro-compatibility with old workspace configuration
     this.verifyWorkspace();
@@ -66,9 +68,6 @@ export class AppComponent implements OnInit {
       this.beforeCloseInstructions();
     });
 
-    // Check for proxy authentication
-    // this.checkProxyAuthentication();
-
     // Initial starting point for DEBUG
     this.router.navigate(['/start']);
   }
@@ -85,32 +84,13 @@ export class AppComponent implements OnInit {
    */
   private verifyWorkspace() {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const hasNewConf = workspace.proxyConfiguration !== undefined;
-
-    if (!hasNewConf) {
-      const proxyUrl = workspace.proxyUrl ? workspace.proxyUrl : '';
-      workspace.proxyConfiguration = { proxyPort: '8080', proxyProtocol: 'https', proxyUrl, username: '', password: '' };
-      this.configurationService.updateWorkspaceSync(workspace);
-    }
-  }
-
-  private checkProxyAuthentication() {
-    this.app.getApp().on('login', (event, webContents, request, authInfo, callback) => {
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
-      if (workspace !== undefined &&
-        workspace.proxyConfiguration !== undefined &&
-        workspace.proxyConfiguration !== null &&
-        workspace.proxyConfiguration.username &&
-        workspace.proxyConfiguration.password) {
-
-        this.app.logger(`we are inside app login with auth`, LoggerLevel.INFO, this, JSON.stringify(workspace.proxyConfiguration, null, 3));
-
-        const proxyUsername = workspace.proxyConfiguration.username;
-        const proxyPassword = workspace.proxyConfiguration.password;
-
-        // Supply credentials to server
-        callback(proxyUsername, proxyPassword);
+    if (workspace !== undefined && workspace !== null) {
+      const hasNewConf = workspace.proxyConfiguration !== undefined;
+      if (!hasNewConf) {
+        const proxyUrl = workspace.proxyUrl ? workspace.proxyUrl : '';
+        workspace.proxyConfiguration = { proxyPort: '8080', proxyProtocol: 'https', proxyUrl, username: '', password: '' };
+        this.configurationService.updateWorkspaceSync(workspace);
       }
-    });
+    }
   }
 }

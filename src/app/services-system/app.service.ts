@@ -7,6 +7,7 @@ import {BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
+import {constants} from '../core/enums/constants';
 
 
 @Injectable({
@@ -224,9 +225,9 @@ export class AppService extends NativeService {
    */
   detectOs() {
     const hrNames = {
-      linux: 'linux',
-      darwin: 'mac',
-      win32: 'windows'
+      linux: constants.LINUX,
+      darwin: constants.MAC,
+      win32: constants.WINDOWS
     };
     const os = this.os.platform();
     return hrNames[os];

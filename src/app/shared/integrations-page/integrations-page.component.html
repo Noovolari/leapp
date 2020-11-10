@@ -7,6 +7,11 @@
 
 
     <button (click)="login()">AWS SSO</button>
+    <ng-container *ngIf="isAwsSsoActive">
+      <button (click)="logout()">AWS SSO LOGOUT</button>
+      <button (click)="forceSync()"> SYNC SESSIONS</button>
+    </ng-container>
+
   </div>
 </div>
 ,

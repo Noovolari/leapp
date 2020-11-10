@@ -67,7 +67,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
    * @param session - the current session we use to retrieve information from
    */
   private async awsCredentialProcess(workspace: Workspace, session) {
-    const credentials = this.getIamUserAccessKeysFromKeychain(session);
+    const credentials = await this.getIamUserAccessKeysFromKeychain(session);
 
     this.getSessionToken(credentials, session).subscribe((awsCredentials) => {
         const tempCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);

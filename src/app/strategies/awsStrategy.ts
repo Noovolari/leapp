@@ -118,16 +118,16 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                 processData(data, err);
               });
             } else {
-              this.showMFAWindowAndAuthenticate(sts, params, session, (prm) => {
-                sts.getSessionToken(prm, (err, data) => {
+              this.showMFAWindowAndAuthenticate(sts, params, session, null, () => {
+                sts.getSessionToken(params, (err, data) => {
                   processData(data, err);
                 });
               });
             }
           });
         } catch (tokenErr) {
-          this.showMFAWindowAndAuthenticate(sts, params, session, (prm) => {
-            sts.getSessionToken(prm, (err, data) => {
+          this.showMFAWindowAndAuthenticate(sts, params, session, null, () => {
+            sts.getSessionToken(params, (err, data) => {
               processData(data, err);
             });
           });
@@ -259,16 +259,19 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         try {
           this.keychainService.getSecret(environment.appName, this.generateRefreshTokenString(session)).then(refreshTokenData => {
             if (refreshTokenData && this.isRefreshTokenValid(refreshTokenData)) {
+              console.log('Sono qua', params);
               processData(params);
             } else {
-              this.showMFAWindowAndAuthenticate(sts, params, session, (prm) => {
-                processData(prm);
+              this.showMFAWindowAndAuthenticate(sts, params, session, parentSession, () => {
+                console.log('Sono qua MFA 1', params);
+                processData(params);
               });
             }
           });
         } catch (tokenErr) {
-          this.showMFAWindowAndAuthenticate(sts, params, session, (prm) => {
-            processData(prm);
+          this.showMFAWindowAndAuthenticate(sts, params, session, parentSession, () => {
+            console.log('Sono qua MFA 2', params);
+            processData(params);
           });
         }
 
@@ -284,12 +287,12 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       (session.account as AwsPlainAccount).mfaDevice !== '';
   }
 
-  private showMFAWindowAndAuthenticate(sts, params, session, callback) {
+  private showMFAWindowAndAuthenticate(sts, params, session, parentSession, callback) {
     this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
       if (value !== constants.CONFIRM_CLOSED) {
-        params['SerialNumber'] = session.account.mfaDevice;
+        params['SerialNumber'] = session.account.mfaDevice || (parentSession !== null && parentSession.account.mfaDevice);
         params['TokenCode'] = value;
-        callback(params);
+        callback();
       } else {
         const workspace = this.configurationService.getDefaultWorkspaceSync();
         workspace.sessions.forEach(sess => {

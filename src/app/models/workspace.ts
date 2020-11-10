@@ -20,6 +20,6 @@ export interface Workspace {
 
   azureConfig: string;
   azureProfile: string;
-  
+
   sessions: Session[];
 }

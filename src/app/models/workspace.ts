@@ -1,7 +1,9 @@
-import { Session } from './session';
+import {Session} from './session';
 
 export interface Workspace {
   type?: string;
+
+  // TODO WHY there are more than one workspace
   name: string;
 
   lastIDPToken?: string;
@@ -21,6 +23,7 @@ export interface Workspace {
   azureConfig: string;
   azureProfile: string;
 
+  // TODO: WHY SSM CREDENTIALS
   ssmCredentials?: any;
 
   sessions: Session[];

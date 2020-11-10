@@ -25,8 +25,6 @@ export class CreateAccountComponent implements OnInit {
   hasOneGoodSession = false;
   hasSsoUrl = false;
 
-  toggleOpen = true;
-  roles: string[] = [];
   accountType;
   provider;
 
@@ -86,6 +84,8 @@ export class CreateAccountComponent implements OnInit {
 
       // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
+
+      // TODO: WHY SESSIONS ARE ONLY PLAIN AND FEDERATED
       const sessions = this.providerManagerService.getFederatedAndPlainAccounts();
       this.accounts = sessions.map((sess: Session) => {
         return {
@@ -98,9 +98,11 @@ export class CreateAccountComponent implements OnInit {
       this.hasOneGoodSession = sessions.length > 0;
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
       this.fedUrl = this.workspace.idpUrl;
+      // TODO REDUNDANT
       this.hasSsoUrl = this.fedUrl && this.fedUrl !== '';
 
       // Show the federated accounts
+      // TODO: REDUNDANT
       this.federatedAccounts = this.accounts;
 
       console.log('federatedAccounts: ', this.federatedAccounts);
@@ -213,5 +215,9 @@ export class CreateAccountComponent implements OnInit {
 
   openSSODocumentation() {
     this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/.github/tutorials/G_SUITE_FEDERATION_SETUP');
+  }
+
+  goToAwsSso() {
+    this.router.navigate(['/integrations']);
   }
 }

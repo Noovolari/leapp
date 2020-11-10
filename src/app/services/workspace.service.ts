@@ -264,6 +264,7 @@ export class WorkspaceService extends NativeService {
 
     // Close Idp Window and emit a specific event for the page that subscribe
     // to this specific reduced version of the get credentials method
+    // TODO: I am calling the providerManagerService?
     this.googleEmit.emit(token);
     this.idpWindow.close();
 
@@ -482,6 +483,7 @@ export class WorkspaceService extends NativeService {
 
   createNewWorkspace(googleToken: string, federationUrl: string, name: string, responseType: string) {
     try {
+      // TODO why we need a google token to create a workspace??
       // Create a standard workspace to use as default
       const workspace: Workspace = {
         type: responseType,

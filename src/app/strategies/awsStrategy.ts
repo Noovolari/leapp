@@ -118,16 +118,16 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                 processData(data, err);
               });
             } else {
-              this.showMFAWindowAndAuthenticate(sts, params, session, () => {
-                sts.getSessionToken(params, (err, data) => {
+              this.showMFAWindowAndAuthenticate(sts, params, session, (prm) => {
+                sts.getSessionToken(prm, (err, data) => {
                   processData(data, err);
                 });
               });
             }
           });
         } catch (tokenErr) {
-          this.showMFAWindowAndAuthenticate(sts, params, session, () => {
-            sts.getSessionToken(params, (err, data) => {
+          this.showMFAWindowAndAuthenticate(sts, params, session, (prm) => {
+            sts.getSessionToken(prm, (err, data) => {
               processData(data, err);
             });
           });
@@ -254,11 +254,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       };
 
       if (this.checkIfMfaIsNeeded(parentSession)) {
-        // now we need to recover from vault the refresh token if exists
-        this.showMFAWindowAndAuthenticate(sts, params, session, () => {
-          processData(params);
-        });
-
         // We Need a MFA BUT Now we need to retrieve a refresh token
         // from the vault to see if the session is still refreshable
         try {
@@ -266,14 +261,14 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
             if (refreshTokenData && this.isRefreshTokenValid(refreshTokenData)) {
               processData(params);
             } else {
-              this.showMFAWindowAndAuthenticate(sts, params, session, () => {
-                processData(params);
+              this.showMFAWindowAndAuthenticate(sts, params, session, (prm) => {
+                processData(prm);
               });
             }
           });
         } catch (tokenErr) {
-          this.showMFAWindowAndAuthenticate(sts, params, session, () => {
-            processData(params);
+          this.showMFAWindowAndAuthenticate(sts, params, session, (prm) => {
+            processData(prm);
           });
         }
 
@@ -294,7 +289,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       if (value !== constants.CONFIRM_CLOSED) {
         params['SerialNumber'] = session.account.mfaDevice;
         params['TokenCode'] = value;
-        callback();
+        callback(params);
       } else {
         const workspace = this.configurationService.getDefaultWorkspaceSync();
         workspace.sessions.forEach(sess => {

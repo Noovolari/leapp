@@ -11,6 +11,7 @@ import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
 import {ProxyService} from './proxy.service';
 import {environment} from '../../environments/environment';
+import {KeychainService} from '../services-system/keychain.service';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -53,7 +54,8 @@ export class WorkspaceService extends NativeService {
     private appService: AppService,
     private configurationService: ConfigurationService,
     private fileService: FileService,
-    private proxyService: ProxyService
+    private proxyService: ProxyService,
+    private keychainService: KeychainService
   ) {
     super();
   }
@@ -464,7 +466,7 @@ export class WorkspaceService extends NativeService {
     credential.aws_session_token = sessionToken;
     credential.expiration = refreshToken;
 
-    workspace.ssmCredentials = credential;
+    this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential));
     this.configurationService.updateWorkspaceSync(workspace);
 
     if (region && region !== 'no region necessary') {

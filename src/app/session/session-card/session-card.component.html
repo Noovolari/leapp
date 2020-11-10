@@ -42,7 +42,13 @@
         <b>Select an Instance:</b>
         <ul class="ssm-ul">
           <li *ngFor="let instance of instances" class="ssm-card">
-            <div><span><b>{{instance.Name.length >= 24 ? instance.Name.substr(0, 21) + '...' : instance.Name}}</b> - {{instance.IPAddress}}</span><button class="btn" (click)="startSsmSession(instance.InstanceId)">Connect</button></div>
+            <div>
+              <span><b>{{instance.Name.length >= 24 ? instance.Name.substr(0, 21) + '...' : instance.Name}}</b> - {{instance.IPAddress}}</span>
+              <button class="btn" (click)="startSsmSession(instance.InstanceId)">
+                <i class="fa fa-spinner fa-spin" *ngIf="instance.loading"></i>
+                <span *ngIf="!instance.loading">Connect</span>
+              </button>
+            </div>
           </li>
         </ul>
       </div>

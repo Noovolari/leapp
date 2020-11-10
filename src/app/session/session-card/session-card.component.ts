@@ -16,6 +16,8 @@ import {AzureAccount} from '../../models/azure-account';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {AccountType} from '../../models/AccountType';
 import {WorkspaceService} from '../../services/workspace.service';
+import {environment} from '../../../environments/environment';
+import {KeychainService} from '../../services-system/keychain.service';
 
 @Component({
   selector: 'app-session-card',
@@ -45,6 +47,7 @@ export class SessionCardComponent implements OnInit {
   constructor(private sessionService: SessionService,
               private credentialsService: CredentialsService,
               private workspaceService: WorkspaceService,
+              private keychainService: KeychainService,
               private menuService: MenuService,
               private appService: AppService,
               private router: Router,
@@ -185,17 +188,18 @@ export class SessionCardComponent implements OnInit {
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
       // Set the aws credentials to instanziate the ssm client
-      const credentials = this.configurationService.getDefaultWorkspaceSync().ssmCredentials;
+      this.keychainService.getSecret(environment.appName, `Leapp-ssm-data`).then(creds => {
+        const credentials = JSON.parse(creds);
 
-      // Check the result of the call
-      this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
-        this.instances = result.instances;
-        this.ssmloading = false;
-      }, err => {
-        this.instances = [];
-        this.ssmloading = false;
+        // Check the result of the call
+        this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
+          this.instances = result.instances;
+          this.ssmloading = false;
+        }, err => {
+          this.instances = [];
+          this.ssmloading = false;
+        });
       });
-
     }
   }
 
@@ -204,7 +208,14 @@ export class SessionCardComponent implements OnInit {
    * @param instanceId - instance id to start ssm session
    */
   startSsmSession(instanceId) {
+    this.instances.forEach(instance => { if (instance.InstanceId === instanceId) { instance.loading = true; } });
+
     this.ssmService.startSession(instanceId);
+
+    setTimeout(() => {
+      this.instances.forEach(instance => { if (instance.InstanceId === instanceId) { instance.loading = false; } });
+    }, 4000);
+
     this.openSsm = false;
     this.ssmloading = false;
   }

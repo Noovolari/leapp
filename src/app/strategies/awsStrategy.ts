@@ -230,11 +230,17 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
             workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
             this.configurationService.disableLoadingWhenReady(workspace, session);
           } else {
-            // we set the new credentials after the first jump
+            // We set the new credentials after the first jump
             const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
 
-            // we set the refresh token in vault
+            // We set the refresh token in vault
             this.saveRefreshTokenInVault(trusterCredentials, session);
+
+            // https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_configure-api-require.html
+            // Save the new credentials in vault because we can only request doublejump with MFA always if set. So we need to securely store
+            // a viable double jump credentials set which will be valid for the exact same time of our MFA token as per AWS options that are
+            // need to be set in the truster role
+            this.keychainService.saveSecret(environment.appName, `Leapp-dj-token-${session.account.accountName}`, JSON.stringify(trusterCredentials));
 
             this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -259,22 +265,18 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         try {
           this.keychainService.getSecret(environment.appName, this.generateRefreshTokenString(session)).then(refreshTokenData => {
             if (refreshTokenData && this.isRefreshTokenValid(refreshTokenData)) {
-              console.log('Sono qua', params);
-              processData(params);
+              this.reuseOldDoubleJumpToken(workspace, session);
             } else {
               this.showMFAWindowAndAuthenticate(sts, params, session, parentSession, () => {
-                console.log('Sono qua MFA 1', params);
                 processData(params);
               });
             }
           });
         } catch (tokenErr) {
           this.showMFAWindowAndAuthenticate(sts, params, session, parentSession, () => {
-            console.log('Sono qua MFA 2', params);
             processData(params);
           });
         }
-
       } else {
         processData(params);
       }
@@ -324,4 +326,13 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     return 'refresh-token-aws-' + session.account.accountName;
   }
 
+  private reuseOldDoubleJumpToken(workspace, session: Session) {
+    this.keychainService.getSecret(environment.appName, `Leapp-dj-token-${session.account.accountName}`).then(trusterCredentials => {
+      trusterCredentials = JSON.parse(trusterCredentials);
+      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
+
+      this.configurationService.updateWorkspaceSync(workspace);
+      this.configurationService.disableLoadingWhenReady(workspace, session);
+    });
+  }
 }

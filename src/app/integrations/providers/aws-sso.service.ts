@@ -43,7 +43,8 @@ export class AwsSsoService extends NativeService {
 
   constructor(private appService: AppService,
               private keychainService: KeychainService,
-              private configurationService: ConfigurationService) {
+              private configurationService: ConfigurationService,
+              ) {
     super();
   }
 
@@ -228,7 +229,12 @@ export class AwsSsoService extends NativeService {
   addSessionsToWorkspace(AwsSsoSessions: Session[], isSyncing?: boolean) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
-    // Remove all AWS SSO old session
+    // If sessions does not exist create the sessions array
+    // TODO: remove
+    if (!workspace.sessions) {
+      workspace.sessions = [];
+    }
+    // Remove all AWS SSO old session or create a session array
     workspace.sessions = isSyncing ?
       workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO) && (sess.active !== true))) :
       workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO)) ;

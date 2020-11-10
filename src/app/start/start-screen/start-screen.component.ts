@@ -17,7 +17,6 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
   @Input() versionLabel = '...';
 
   enabled = false;
-  cliError = false;
   loading = false;
   workspace;
 
@@ -80,10 +79,11 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
    * Is the app already configured or not?
    */
   isAlreadyConfigured() {
+    // TODO WHY IDPurl?
     return this.workspace && (this.workspace.setupDone || this.workspace.idpUrl || (this.workspace.sessions && this.workspace.sessions.length > 0));
   }
 
-  // MVP: we use this to just check if aws cli is installed in order to proceed to
+  // TODO: We are out of MVP? I think yes!..  MVP: we use this to just check if aws cli is installed in order to proceed to
   // step 3: when going off MVP return to correct method above
   resolveDependencies() {
     // Check to verify the workspace object is well-formed

@@ -6,8 +6,10 @@ import {Workspace} from './workspace';
  */
 export interface Configuration {
   uid: string;
+  // TODO: We have just one language
   language: string;
   defaultWorkspace: string;
   avatar: string;
+  // TODO: We need more than one workspace
   workspaces: Workspace[];
 }

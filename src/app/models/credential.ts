@@ -6,6 +6,7 @@ export interface AwsCredential {
   aws_access_key_id?: string;
   aws_secret_access_key?: string;
   aws_session_token?: string;
+  expiration?: string;
   consoleUsername?: string;
   accountId?: string;
   consolePassword?: string;

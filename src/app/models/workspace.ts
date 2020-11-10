@@ -20,8 +20,6 @@ export interface Workspace {
 
   azureConfig: string;
   azureProfile: string;
-
-  ssmCredentials?: any;
-
+  
   sessions: Session[];
 }

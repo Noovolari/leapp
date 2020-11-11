@@ -85,7 +85,7 @@ export class CreateAccountComponent implements OnInit {
       // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
-      // TODO: WHY SESSIONS ARE ONLY PLAIN AND FEDERATED
+      // TODO: WHY SESSIONS ARE ONLY PLAIN AND FEDERATED, This method retrieve all the trustable accounts
       const sessions = this.providerManagerService.getFederatedAndPlainAccounts();
       this.accounts = sessions.map((sess: Session) => {
         return {
@@ -95,8 +95,9 @@ export class CreateAccountComponent implements OnInit {
       });
 
       // Add parameters to check what to do with form data
-      this.hasOneGoodSession = sessions.length > 0;
+      this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
+      console.log(this.firstTime);
       this.fedUrl = this.workspace.idpUrl;
       // TODO REDUNDANT
       this.hasSsoUrl = this.fedUrl && this.fedUrl !== '';

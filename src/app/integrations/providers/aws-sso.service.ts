@@ -13,6 +13,7 @@ import {KeychainService} from '../../services-system/keychain.service';
 import {environment} from '../../../environments/environment';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {fromPromise} from 'rxjs/internal-compatibility';
+import {Workspace} from '../../models/workspace';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -227,12 +228,30 @@ export class AwsSsoService extends NativeService {
   // LEAPP Integrations
 
   addSessionsToWorkspace(AwsSsoSessions: Session[], isSyncing?: boolean) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    let workspace = this.configurationService.getDefaultWorkspaceSync();
 
     // If sessions does not exist create the sessions array
     // TODO: remove
-    if (!workspace.sessions) {
-      workspace.sessions = [];
+    if (JSON.stringify(workspace) === '{}') {
+      // Set the configuration with the updated value
+      const configuration = this.configurationService.getConfigurationFileSync();
+      // TODO: we need more than one workspace?
+      configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
+      const workspaceCreation: Workspace = {
+        type: null,
+        name: 'default',
+        lastIDPToken: null,
+        idpUrl: null,
+        proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
+        sessions: [],
+        setupDone: true,
+        azureProfile: null,
+        azureConfig: null
+      };
+      configuration.defaultWorkspace = 'default';
+      configuration.workspaces.push(workspaceCreation);
+      this.configurationService.updateConfigurationFileSync(configuration);
+      workspace = workspaceCreation;
     }
     // Remove all AWS SSO old session or create a session array
     workspace.sessions = isSyncing ?

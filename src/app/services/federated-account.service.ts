@@ -109,6 +109,7 @@ export class FederatedAccountService extends NativeService {
 
         workspace.sessions.push(session);
         this.configurationService.updateWorkspaceSync(workspace);
+
         return true;
       } catch (err) {
         this.appService.toast(`Error in saving credentials to keychain for: ${accountName}`, ToastLevel.WARN, 'Create Account');
@@ -146,6 +147,8 @@ export class FederatedAccountService extends NativeService {
     this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user), secretKey);
 
     this.configurationService.updateWorkspaceSync(workspace);
+
+    this.keychainService.deletePassword(environment.appName, this.generateSessionTokenExpirationString(session));
 
     return true;
   }
@@ -207,4 +210,9 @@ export class FederatedAccountService extends NativeService {
       this.deleteFederatedPlainAccount(session.id);
     }
   }
+
+  private generateSessionTokenExpirationString(session: any) {
+    return 'session-token-expiration-' + session.account.accountName;
+  }
+
 }

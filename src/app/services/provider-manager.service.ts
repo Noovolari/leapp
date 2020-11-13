@@ -213,7 +213,6 @@ export class ProviderManagerService {
 
     if (result) {
       // Then go to next page
-      this.appService.logger('managed to edit session', LoggerLevel.INFO, this);
       this.router.navigate(['/sessions', 'session-selected'], {queryParams: {accountId: this.accountId}});
     }
   }
@@ -343,7 +342,6 @@ export class ProviderManagerService {
             form.controls['accountNumber'].valid &&
             form.controls['role'].valid &&
             form.controls['idpArn'].valid;
-          this.appService.logger(`AWS Form is valid: ${check}`, LoggerLevel.INFO, this);
           return check;
         case AccountType.AWS_TRUSTER:
           // Check Federated fields
@@ -352,14 +350,12 @@ export class ProviderManagerService {
             form.controls['role'].valid &&
             form.controls['federatedAccount'].valid &&
             form.controls['federatedRole'].valid;
-          this.appService.logger(`AWS TRUSTER Form is valid: ${check}`, LoggerLevel.INFO, this);
           return check;
         case AccountType.AWS_PLAIN_USER:
           check = form.controls['name'].valid &&
             form.controls['accountNumber'].valid &&
             form.controls['accessKey'].valid &&
             form.controls['secretKey'].valid;
-          this.appService.logger(`AWS PLAIN Form is valid: ${check}`, LoggerLevel.INFO, this);
           return check;
       }
     } else {

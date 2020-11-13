@@ -225,13 +225,16 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
             sts.assumeRole(p, (err, data: any) => {
               if (err) {
                 // Something went wrong save it to the logger file
-                this.appService.logger('Error in assume role from plain to truster in get session token', LoggerLevel.ERROR, this, err.stack);
+                this.appService.logger('Error in assume role from plain to truster in get session token: ', LoggerLevel.ERROR, this, err.stack);
                 this.appService.toast('Error assuming role from plain account, check log for details.', LoggerLevel.WARN, 'Assume role Error');
 
                 // Emit ko for double jump
                 this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+
                 workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
                 this.configurationService.disableLoadingWhenReady(workspace, session);
+
+                this.appService.cleanCredentialFile();
               } else {
                 // We set the new credentials after the first jump
                 const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
@@ -255,28 +258,30 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           },
           (err) => {
             this.appService.logger('Error in Aws Credential process', LoggerLevel.ERROR, this, err.stack);
-            throw new Error(err);
+            this.appService.toast('Error in Aws Credential process, check log for details.', LoggerLevel.WARN, 'Aws Credential process Error');
+
+            // Emit ko for double jump
+            this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+
+            workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+
+            this.appService.cleanCredentialFile();
           });
       };
 
       if (this.checkIfMfaIsNeeded(parentSession)) {
         // We Need a MFA BUT Now we need to retrieve a refresh token
         // from the vault to see if the session is still refreshable
-        try {
-          this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
-            if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
-              this.applyTrusterAccountSessionToken(workspace, session);
-            } else {
-              this.showMFAWindowAndAuthenticate(params, session, parentSession, () => {
-                processData(params);
-              });
-            }
-          });
-        } catch (tokenErr) {
-          this.showMFAWindowAndAuthenticate(params, session, parentSession, () => {
-            processData(params);
-          });
-        }
+        this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
+          if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
+            this.applyTrusterAccountSessionToken(workspace, session);
+          } else {
+            this.showMFAWindowAndAuthenticate(params, session, parentSession, () => {
+              processData(params);
+            });
+          }
+        });
       } else {
         processData(params);
       }
@@ -318,10 +323,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   private isSessionTokenStillValid(sessionTokenData): boolean {
     const tokenDate = new Date(sessionTokenData);
     const check = (date) => date > Date.now();
-
-    console.log('RefreshToken Date', tokenDate);
-    console.log('RefreshToken Date still valid', check(tokenDate));
-
     return check(tokenDate);
   }
 

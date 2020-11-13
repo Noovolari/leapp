@@ -148,7 +148,15 @@ export class FederatedAccountService extends NativeService {
 
     this.configurationService.updateWorkspaceSync(workspace);
 
-    this.keychainService.deletePassword(environment.appName, this.generateSessionTokenExpirationString(session));
+    this.keychainService.deletePassword(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session));
+    this.keychainService.deletePassword(environment.appName, this.generatePlainAccountSessionTokenString(session));
+
+    const childSessions = workspace.sessions.filter(sess => sess.account.parent === session.id);
+
+    childSessions.forEach(sess => {
+      this.keychainService.deletePassword(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(sess));
+      this.keychainService.deletePassword(environment.appName, this.generateTrusterAccountSessionTokenString(sess));
+    });
 
     return true;
   }
@@ -211,8 +219,20 @@ export class FederatedAccountService extends NativeService {
     }
   }
 
-  private generateSessionTokenExpirationString(session: any) {
-    return 'session-token-expiration-' + session.account.accountName;
+  private generatePlainAccountSessionTokenExpirationString(session: any) {
+    return 'plain-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private generateTrusterAccountSessionTokenExpirationString(session: any) {
+    return 'truster-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private generatePlainAccountSessionTokenString(session: any) {
+    return 'plain-account-session-token-' + session.account.accountName;
+  }
+
+  private generateTrusterAccountSessionTokenString(session: any) {
+    return 'truster-account-session-token-' + session.account.accountName;
   }
 
 }

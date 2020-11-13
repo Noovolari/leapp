@@ -26,8 +26,7 @@ export class AppComponent implements OnInit {
     private fileService: FileService,
     private app: AppService,
     private credentialsService: CredentialsService,
-    private menuService: MenuService,
-    private workspaceService: WorkspaceService
+    private menuService: MenuService
   ) {}
 
   ngOnInit() {

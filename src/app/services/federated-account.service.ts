@@ -109,6 +109,7 @@ export class FederatedAccountService extends NativeService {
 
         workspace.sessions.push(session);
         this.configurationService.updateWorkspaceSync(workspace);
+
         return true;
       } catch (err) {
         this.appService.toast(`Error in saving credentials to keychain for: ${accountName}`, ToastLevel.WARN, 'Create Account');
@@ -146,6 +147,16 @@ export class FederatedAccountService extends NativeService {
     this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user), secretKey);
 
     this.configurationService.updateWorkspaceSync(workspace);
+
+    this.keychainService.deletePassword(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session));
+    this.keychainService.deletePassword(environment.appName, this.generatePlainAccountSessionTokenString(session));
+
+    const childSessions = workspace.sessions.filter(sess => sess.account.parent === session.id);
+
+    childSessions.forEach(sess => {
+      this.keychainService.deletePassword(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(sess));
+      this.keychainService.deletePassword(environment.appName, this.generateTrusterAccountSessionTokenString(sess));
+    });
 
     return true;
   }
@@ -207,4 +218,21 @@ export class FederatedAccountService extends NativeService {
       this.deleteFederatedPlainAccount(session.id);
     }
   }
+
+  private generatePlainAccountSessionTokenExpirationString(session: any) {
+    return 'plain-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private generateTrusterAccountSessionTokenExpirationString(session: any) {
+    return 'truster-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private generatePlainAccountSessionTokenString(session: any) {
+    return 'plain-account-session-token-' + session.account.accountName;
+  }
+
+  private generateTrusterAccountSessionTokenString(session: any) {
+    return 'truster-account-session-token-' + session.account.accountName;
+  }
+
 }

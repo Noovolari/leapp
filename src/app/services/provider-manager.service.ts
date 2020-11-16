@@ -276,8 +276,6 @@ export class ProviderManagerService {
         workspace.idpUrl = this.form.value.federationUrl;
         this.configurationService.updateWorkspaceSync(workspace);
 
-        console.log(this.configurationService.getDefaultWorkspaceSync().idpUrl);
-
         // Add a federation Account to the workspace
         const created = this.federatedAccountService.addFederatedAccountToWorkSpace(
           this.form.value.accountNumber,

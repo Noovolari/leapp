@@ -138,7 +138,6 @@ export class WorkspaceService extends NativeService {
     });
 
     this.https.get(options, (res) => {
-      console.log('res: ', res);
       this.idpWindow.loadURL(idpUrl);
     }).on('error', (err) => {
       console.log('error: ', err);

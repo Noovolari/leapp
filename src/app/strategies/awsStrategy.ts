@@ -40,7 +40,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       return (sess.account.type === AccountType.AWS_PLAIN_USER || sess.account.type === AccountType.AWS) && sess.active;
     });
 
-    console.log('active aws sessions', activeSessions);
     this.appService.logger('Aws Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
@@ -87,6 +86,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           });
       }
     });
+
+    // Start Calculating time here once credentials are actually retrieved
+    this.timerService.defineTimer();
   }
 
   awsCredentialFederatedProcess(workspace, session) {
@@ -138,22 +140,27 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       });
 
       const sts = new AWS.STS(this.appService.stsOptions());
+      const params = { DurationSeconds: environment.sessionTokenDuration };
 
-      const params = { DurationSeconds: environment.sessionDurationMfa };
-
-      if (this.checkIfMfaIsNeeded(session)) {
-        // We Need a MFA BUT Now we need to retrieve a refresh token
-        // from the vault to see if the session is still refreshable
-        this.showMFAWindowAndAuthenticate(params, session, null, () => {
-          sts.getSessionToken(params, (err, data) => {
-            processData(data, err);
-          });
-        });
-      } else {
-        sts.getSessionToken(params, (err, data) => {
-          processData(data, err);
-        });
-      }
+      this.keychainService.getSecret(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
+        if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
+          processData(sessionTokenData, null);
+        } else {
+          if (this.checkIfMfaIsNeeded(session)) {
+            // We Need a MFA BUT Now we need to retrieve a refresh token
+            // from the vault to see if the session is still refreshable
+            this.showMFAWindowAndAuthenticate(params, session, null, () => {
+              sts.getSessionToken(params, (err, data) => {
+                processData(data, err);
+              });
+            });
+          } else {
+            sts.getSessionToken(params, (err, data) => {
+              processData(data, err);
+            });
+          }
+        }
+      });
     });
   }
 
@@ -206,18 +213,16 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const params = {
         RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
         RoleSessionName: `truster-on-${session.account.role.name}`,
-        DurationSeconds: environment.sessionDurationMfa
+        DurationSeconds: 3600 // 1 hour for chained assume role
       };
 
       const processData = (p) => {
-        this.getPlainAccountSessionToken(credentials, session).subscribe((awsCredentials) => {
-            const tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);
-
+        this.getTrusterAccountSessionToken(credentials, parentSession, session).subscribe((awsCredentials) => {
             // Update AWS sdk with new credentials
             AWS.config.update({
-              accessKeyId: tmpCredentials.default.aws_access_key_id,
-              secretAccessKey: tmpCredentials.default.aws_secret_access_key,
-              sessionToken: tmpCredentials.default.aws_session_token
+              accessKeyId: awsCredentials.default.aws_access_key_id,
+              secretAccessKey: awsCredentials.default.aws_secret_access_key,
+              sessionToken: awsCredentials.default.aws_session_token
             });
 
             const sts = new AWS.STS(this.appService.stsOptions());
@@ -238,13 +243,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
               } else {
                 // We set the new credentials after the first jump
                 const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
-
-                // https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_configure-api-require.html
-                // Save the new credentials in vault because we can only request double-jump with MFA always if set. So we need to securely store
-                // a viable double jump credentials set which will be valid for the exact same time of our MFA token as per AWS options that are
-                // need to be set in the truster role
-                this.keychainService.saveSecret(environment.appName, `truster-account-session-token-${session.account.accountName}`, JSON.stringify(trusterCredentials));
-                this.saveTrusterAccountSessionTokenExpirationInVault(trusterCredentials, session);
 
                 this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -270,22 +268,81 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           });
       };
 
-      if (this.checkIfMfaIsNeeded(parentSession)) {
-        // We Need a MFA BUT Now we need to retrieve a refresh token
-        // from the vault to see if the session is still refreshable
-        this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
-          if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
-            this.applyTrusterAccountSessionToken(workspace, session);
+      this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
+        if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
+          this.applyTrusterAccountSessionToken(workspace, session);
+        } else {
+          processData(params);
+        }
+      });
+    }
+  }
+
+  // TODO: move to AwsCredentialsGenerationService
+  private getTrusterAccountSessionToken(awsCredentials: AwsCredentials, parentSession, session): Observable<any> {
+    return new Observable<AwsCredentials>((observable) => {
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+
+      const processData = (data, err) => {
+        if (data !== undefined && data !== null) {
+          observable.next(data);
+          observable.complete();
+        } else {
+          this.appService.logger('Error in get session token', LoggerLevel.ERROR, this, err.stack);
+          observable.error(err);
+          observable.complete();
+          // Emit ko for double jump
+          this.workspaceService.credentialEmit.emit({status: err.stack, accountName: parentSession.account.accountName});
+        }
+      };
+
+      AWS.config.update({
+        accessKeyId: awsCredentials.default.aws_access_key_id,
+        secretAccessKey: awsCredentials.default.aws_secret_access_key
+      });
+
+      const sts = new AWS.STS(this.appService.stsOptions());
+      const params = { DurationSeconds: environment.sessionTokenDuration };
+
+      this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(parentSession)).then(sessionTokenExpirationData => {
+        if (sessionTokenExpirationData && this.isSessionTokenStillValid(sessionTokenExpirationData)) {
+          this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenString(parentSession)).then(sessionTokenData => {
+            sessionTokenData = JSON.parse(sessionTokenData);
+            processData(sessionTokenData, null);
+          });
+        } else {
+          if (this.checkIfMfaIsNeeded(parentSession)) {
+            // We Need a MFA BUT Now we need to retrieve a refresh token
+            // from the vault to see if the session is still refreshable
+            this.showMFAWindowAndAuthenticate(params, parentSession, null, () => {
+              sts.getSessionToken(params, (err, data) => {
+                let tmpCredentials = null;
+
+                if (data !== undefined && data !== null) {
+                  tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, parentSession.account.region);
+                  this.keychainService.saveSecret(environment.appName, `truster-account-session-token-${session.account.accountName}`, JSON.stringify(tmpCredentials));
+                  this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
+                }
+
+                processData(tmpCredentials, err);
+              });
+            });
           } else {
-            this.showMFAWindowAndAuthenticate(params, session, parentSession, () => {
-              processData(params);
+            sts.getSessionToken(params, (err, data) => {
+              let tmpCredentials = null;
+
+              if (data !== undefined && data !== null) {
+                tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
+                this.keychainService.saveSecret(environment.appName, `truster-account-session-token-${session.account.accountName}`, JSON.stringify(tmpCredentials));
+                this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
+              }
+
+              processData(tmpCredentials, err);
             });
           }
-        });
-      } else {
-        processData(params);
-      }
-    }
+        }
+      });
+    });
   }
 
   private checkIfMfaIsNeeded(session: Session): boolean {
@@ -332,6 +389,10 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
   private generateTrusterAccountSessionTokenExpirationString(session: any) {
     return 'truster-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private generateTrusterAccountSessionTokenString(session: any) {
+    return 'truster-account-session-token-' + session.account.accountName;
   }
 
   private applyPlainAccountSessionToken(workspace, session: Session) {

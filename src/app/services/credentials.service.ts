@@ -61,7 +61,7 @@ export class CredentialsService extends NativeService {
     this.azureStrategy = new AzureStrategy(this, appService, timerService, executeService, configurationService);
     this.awsStrategy = new AwsStrategy(this, appService, configurationService, executeService,
       fileService, keychainService, proxyService, timerService, workspaceService);
-    this.awsSsoStrategy = new AwsSsoStrategy(this, appService, fileService, timerService, awsSsoService);
+    this.awsSsoStrategy = new AwsSsoStrategy(this, appService, fileService, timerService, awsSsoService, configurationService, keychainService);
 
     this.strategyMap[AccountType.AWS] = this.awsStrategy.refreshCredentials.bind(this.awsStrategy);
     this.strategyMap[AccountType.AWS_PLAIN_USER] = this.awsStrategy.refreshCredentials.bind(this.awsStrategy);

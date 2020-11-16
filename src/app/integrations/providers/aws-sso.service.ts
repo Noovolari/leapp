@@ -227,7 +227,7 @@ export class AwsSsoService extends NativeService {
 
   // LEAPP Integrations
 
-  addSessionsToWorkspace(AwsSsoSessions: Session[], isSyncing?: boolean) {
+  addSessionsToWorkspace(AwsSsoSessions: Session[]) {
     let workspace = this.configurationService.getDefaultWorkspaceSync();
 
     // If sessions does not exist create the sessions array
@@ -254,11 +254,8 @@ export class AwsSsoService extends NativeService {
       workspace = workspaceCreation;
     }
     // Remove all AWS SSO old session or create a session array
-    workspace.sessions = isSyncing ?
-      workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO) && (sess.active !== true))) :
-      workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO)) ;
-    const t = workspace.sessions.filter(s => s.active === true);
-    console.log('active session', t);
+    console.log(workspace.sessions);
+    workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
     // Add new AWS SSO sessions
     workspace.sessions.push(...AwsSsoSessions);
     this.configurationService.updateWorkspaceSync(workspace);

@@ -108,7 +108,7 @@ export class SsmService {
    * @param region - the region for the client
    */
   setConfig(data: AwsCredential , region) {
-
+    console.log(data);
     return data.aws_session_token ? {
         region,
         accessKeyId: data.aws_access_key_id,

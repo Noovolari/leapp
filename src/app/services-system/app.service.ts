@@ -17,6 +17,7 @@ export class AppService extends NativeService {
 
   isResuming: EventEmitter<boolean> = new EventEmitter<boolean>();
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
+  // TODO Why redrawList??
   redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   /* This service is defined to provide different app wide methods as utilities */

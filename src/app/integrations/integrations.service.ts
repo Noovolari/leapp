@@ -30,8 +30,7 @@ export class IntegrationsService {
 
   syncAccounts() {
     this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).subscribe((AwsSsoSessions) => {
-
-      this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions, true);
+      this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
     });
   }
 }

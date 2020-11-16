@@ -113,7 +113,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    */
   getSessions() {
     this.zone.run(() => {
-      console.log(this.sessionService.listSessions());
       this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
       this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter( session => session.active === false));
     });

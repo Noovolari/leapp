@@ -11,6 +11,9 @@ import {AwsSsoAccount} from '../models/aws-sso-account';
 import {switchMap} from 'rxjs/operators';
 
 import {AwsCredential} from '../models/credential';
+import {ConfigurationService} from '../services-system/configuration.service';
+import {environment} from '../../environments/environment';
+import {KeychainService} from '../services-system/keychain.service';
 
 
 export class AwsSsoStrategy extends RefreshCredentialsStrategy {
@@ -20,7 +23,9 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
     private appService: AppService,
     private fileService: FileService,
     private timerService: TimerService,
-    private awsSsoService: AwsSsoService) {
+    private awsSsoService: AwsSsoService,
+    private configurationService: ConfigurationService,
+    private keychainService: KeychainService) {
     super();
   }
 
@@ -59,6 +64,10 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
       credential.aws_session_token = getRoleCredentialsResponse.roleCredentials.sessionToken;
       const awsSsoCredentials = {default: credential};
       console.log(awsSsoCredentials);
+      session.active = true;
+      session.loading = false;
+      this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential));
+      this.configurationService.disableLoadingWhenReady(workspace, session);
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
     });
   }

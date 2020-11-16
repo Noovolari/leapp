@@ -210,13 +210,14 @@ export class ConfigurationService extends NativeService {
   /**
    * Create a new configuration file synchronously
    */
-  public newConfigurationFileSync() {
+  public async newConfigurationFileSync() {
     try {
       // Cleaning Library Electron Cache
       // Get app directory
       // on OSX it's /Users/Yourname/Library/Application Support/AppName
-      const getAppPath = this.path.join(this.app.getPath('appData'), `Leapp`);
-      this.rimraf.sync(getAppPath);
+      // const getAppPath = this.path.join(this.app.getPath('appData'), `Leapp`);
+      // this.rimraf.sync(getAppPath);
+      await this.session.defaultSession.clearStorageData();
 
       // Clean localStorage
       localStorage.clear();

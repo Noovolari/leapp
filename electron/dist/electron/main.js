@@ -16,6 +16,7 @@ var environment_1 = require("../src/environments/environment");
 var CryptoJS = require("crypto-js");
 var initial_configuration_1 = require("../src/app/core/initial-configuration");
 var node_machine_id_1 = require("node-machine-id");
+var leapp_updater_1 = require("../src/app/core/leapp-updater");
 var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow, globalShortcut = _a.globalShortcut, Menu = _a.Menu;
 var url = require('url');
 var fs = require('fs');
@@ -132,7 +133,9 @@ var generateMainWindow = function () {
     });
     app.on('ready', function () {
         createWindow();
-        // require('update-electron-app')();
+        leapp_updater_1.AppUpdater.build({});
+        leapp_updater_1.AppUpdater.getInstance().initUpdater();
+        leapp_updater_1.AppUpdater.getInstance().checkForUpdates();
     });
     var loginCount = 0;
     app.on('login', function (event, webContents, request, authInfo, callback) {

@@ -9,7 +9,8 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const { format } = require('util');
-const userAgent = format('%s/%s (%s: %s)', 'electron-updater-app', '4.3.5', os.platform(), os.arch());
+const packageJson = require('../../../package.json');
+const userAgent = format('%s/%s (%s: %s)', packageJson.name, packageJson.version, os.platform(), os.arch());
 const supportedPlatforms = ['darwin', 'win32'];
 const logger = require('electron-log');
 const electron = require('electron');
@@ -89,17 +90,13 @@ export class AppUpdater {
 
         const dialogOpts = {
           type: 'info',
-          buttons: ['Restart', 'Later'],
+          buttons: ['OK'],
           title: 'Application Update',
           message: process.platform === 'win32' ? releaseNotes : releaseName,
-          detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+          detail: 'A new version has been downloaded. Close and re-open Leapp to use the new version.'
         };
 
-        dialog.showMessageBox(dialogOpts).then(({response}) => {
-          if (response === 0) {
-            autoUpdater.quitAndInstall();
-          }
-        });
+        dialog.showMessageBox(dialogOpts);
       });
     }
   }

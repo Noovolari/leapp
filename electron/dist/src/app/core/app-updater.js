@@ -128,4 +128,4 @@ var AppUpdater = /** @class */ (function () {
     return AppUpdater;
 }());
 exports.AppUpdater = AppUpdater;
-//# sourceMappingURL=leapp-updater.js.map
+//# sourceMappingURL=app-updater.js.map

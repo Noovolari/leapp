@@ -313,7 +313,7 @@ export class WorkspaceService extends NativeService {
     this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
     // Setup STS to generate the credentials
-    const sts = new AWS.STS(this.appService.stsOptions());
+    const sts = new AWS.STS(this.appService.stsOptions(session));
 
     let parentAccount;
     let parentRole;
@@ -403,7 +403,7 @@ export class WorkspaceService extends NativeService {
 
         this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
-        const sts = new AWS.STS(this.appService.stsOptions());
+        const sts = new AWS.STS(this.appService.stsOptions(session));
 
         sts.assumeRole({
           RoleArn: `arn:aws:iam::${account.accountNumber}:role/${roleName}`,

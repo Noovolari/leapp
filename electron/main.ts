@@ -4,7 +4,7 @@ import * as CryptoJS from 'crypto-js';
 import {initialConfiguration} from '../src/app/core/initial-configuration';
 import {machineIdSync} from 'node-machine-id';
 import {Workspace} from '../src/app/models/workspace';
-import {AppUpdater} from '../src/app/core/leapp-updater';
+import {AppUpdater} from '../src/app/core/app-updater';
 
 const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
 const url = require('url');

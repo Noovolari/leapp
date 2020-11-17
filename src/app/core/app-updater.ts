@@ -19,20 +19,11 @@ export class AppUpdater {
   private static instance: AppUpdater;
   private opts;
 
-  private constructor(opts: UpdaterOptions = {}) {
-    // Check for bad input early, so it will be logged during development
-    this.opts = this.validateOptions(opts);
-  }
-
-  static build(opts: UpdaterOptions) {
-    if (this.instance === undefined) {
-      this.instance = new AppUpdater(opts);
-    }
-  }
+  private constructor() {}
 
   static getInstance() {
     if (this.instance === undefined) {
-      throw new Error('Call build first!');
+      this.instance = new AppUpdater();
     }
     return this.instance;
   }
@@ -41,7 +32,9 @@ export class AppUpdater {
    * Init the daemon process of checking the repo at a base interval;
    * if a new version is spotted, download it and notify the user to install it
    */
-  initUpdater() {
+  initUpdater(opts: UpdaterOptions = {}) {
+    this.opts = this.validateOptions(opts);
+
     // Don't attempt to update during development
     if (isDev) {
       const message = 'Leapp config looks good; aborting updates since app is in development mode';

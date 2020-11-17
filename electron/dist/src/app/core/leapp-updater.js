@@ -15,19 +15,11 @@ var logger = require('electron-log');
 var electron = require('electron');
 var autoUpdater = require('electron-updater').autoUpdater;
 var AppUpdater = /** @class */ (function () {
-    function AppUpdater(opts) {
-        if (opts === void 0) { opts = {}; }
-        // Check for bad input early, so it will be logged during development
-        this.opts = this.validateOptions(opts);
+    function AppUpdater() {
     }
-    AppUpdater.build = function (opts) {
-        if (this.instance === undefined) {
-            this.instance = new AppUpdater(opts);
-        }
-    };
     AppUpdater.getInstance = function () {
         if (this.instance === undefined) {
-            throw new Error('Call build first!');
+            this.instance = new AppUpdater();
         }
         return this.instance;
     };
@@ -35,7 +27,9 @@ var AppUpdater = /** @class */ (function () {
      * Init the daemon process of checking the repo at a base interval;
      * if a new version is spotted, download it and notify the user to install it
      */
-    AppUpdater.prototype.initUpdater = function () {
+    AppUpdater.prototype.initUpdater = function (opts) {
+        if (opts === void 0) { opts = {}; }
+        this.opts = this.validateOptions(opts);
         // Don't attempt to update during development
         if (isDev) {
             var message = 'Leapp config looks good; aborting updates since app is in development mode';

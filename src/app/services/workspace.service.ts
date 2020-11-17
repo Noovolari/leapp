@@ -137,7 +137,7 @@ export class WorkspaceService extends NativeService {
       this.idpResponseHookFirstTime(details, type, idpUrl, callback);
     });
 
-    this.https.get(options, (res) => {
+    this.followRedirects.https.get(options, (res) => {
       this.idpWindow.loadURL(idpUrl);
     }).on('error', (err) => {
       console.log('error: ', err);

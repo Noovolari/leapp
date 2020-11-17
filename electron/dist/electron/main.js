@@ -132,7 +132,7 @@ var generateMainWindow = function () {
     });
     app.on('ready', function () {
         createWindow();
-        require('update-electron-app')();
+        // require('update-electron-app')();
     });
     var loginCount = 0;
     app.on('login', function (event, webContents, request, authInfo, callback) {

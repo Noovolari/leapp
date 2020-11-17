@@ -137,7 +137,7 @@ const generateMainWindow = () => {
 
   app.on('ready', () => {
     createWindow();
-    require('update-electron-app')();
+    // require('update-electron-app')();
   });
 
   let loginCount = 0;

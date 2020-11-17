@@ -50,8 +50,9 @@
   window.Tray = require('electron').remote.Tray;
   window.MachineId = require('node-machine-id').machineIdSync();
   window.keytar = require('keytar');
-  window.http = require('follow-redirects/http');
-  window.https = require('follow-redirects/https');
+  // window.http = require('follow-redirects/http');
+  // window.https = require('follow-redirects/https');
+  window.followRedirects = require('follow-redirects');
   window.httpProxyAgent = require('http-proxy-agent');
   window.httpsProxyAgent = require('https-proxy-agent');
 

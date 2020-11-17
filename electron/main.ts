@@ -139,8 +139,7 @@ const generateMainWindow = () => {
 
   app.on('ready', () => {
     createWindow();
-    AppUpdater.build({});
-    AppUpdater.getInstance().initUpdater();
+    AppUpdater.getInstance().initUpdater({});
     AppUpdater.getInstance().checkForUpdates();
   });
 

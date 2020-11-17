@@ -133,8 +133,7 @@ var generateMainWindow = function () {
     });
     app.on('ready', function () {
         createWindow();
-        leapp_updater_1.AppUpdater.build({});
-        leapp_updater_1.AppUpdater.getInstance().initUpdater();
+        leapp_updater_1.AppUpdater.getInstance().initUpdater({});
         leapp_updater_1.AppUpdater.getInstance().checkForUpdates();
     });
     var loginCount = 0;

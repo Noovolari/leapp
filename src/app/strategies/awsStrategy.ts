@@ -139,7 +139,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         secretAccessKey: awsCredentials.default.aws_secret_access_key
       });
 
-      const sts = new AWS.STS(this.appService.stsOptions());
+      const sts = new AWS.STS(this.appService.stsOptions(session));
       const params = { DurationSeconds: environment.sessionTokenDuration };
 
       this.keychainService.getSecret(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
@@ -225,7 +225,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
               sessionToken: awsCredentials.default.aws_session_token
             });
 
-            const sts = new AWS.STS(this.appService.stsOptions());
+            const sts = new AWS.STS(this.appService.stsOptions(session));
 
             sts.assumeRole(p, (err, data: any) => {
               if (err) {
@@ -301,7 +301,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         secretAccessKey: awsCredentials.default.aws_secret_access_key
       });
 
-      const sts = new AWS.STS(this.appService.stsOptions());
+      const sts = new AWS.STS(this.appService.stsOptions(session));
       const params = { DurationSeconds: environment.sessionTokenDuration };
 
       this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(parentSession)).then(sessionTokenExpirationData => {

@@ -19,6 +19,27 @@ export class AppService extends NativeService {
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
   redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  stsEndpointsPerRegion = new Map([
+    ['us-east-1', 'https://sts.us-east-1.amazonaws.com'],
+    ['ap-northeast-1', 'https://sts.ap-northeast-1.amazonaws.com'],
+    ['ap-northeast-2', 'https://sts.ap-northeast-2.amazonaws.com'],
+    ['ap-northeast-3', 'https://sts.ap-northeast-3.amazonaws.com'],
+    ['ap-south-1', 'https://sts.ap-south-1.amazonaws.com'],
+    ['ap-southeast-1', 'https://sts.ap-southeast-1.amazonaws.com'],
+    ['ap-southeast-2', 'https://sts.ap-southeast-2.amazonaws.com'],
+    ['ca-central-1', 'https://sts.ca-central-1.amazonaws.com'],
+    ['eu-central-1', 'https://sts.eu-central-1.amazonaws.com'],
+    ['eu-north-1', 'https://sts.eu-north-1.amazonaws.com'],
+    ['eu-south-1', 'https://sts.eu-south-1.amazonaws.com'],
+    ['eu-west-1', 'https://sts.eu-west-1.amazonaws.com'],
+    ['eu-west-2', 'https://sts.eu-west-2.amazonaws.com'],
+    ['eu-west-3', 'https://sts.eu-west-3.amazonaws.com'],
+    ['sa-east-1', 'https://sts.sa-east-1.amazonaws.com'],
+    ['us-east-2', 'https://sts.us-east-2.amazonaws.com'],
+    ['us-west-1', 'https://sts.us-west-1.amazonaws.com'],
+    ['us-west-2', 'https://sts.us-west-2.amazonaws.com']
+  ]);
+
   /* This service is defined to provide different app wide methods as utilities */
   constructor(
     private fileService: FileService,
@@ -469,8 +490,21 @@ export class AppService extends NativeService {
     return email;
   }
 
-  stsOptions() {
-    return { maxRetries: 0, httpOptions: { timeout: environment.timeout }};
+  stsOptions(session) {
+    let options: any = {
+      maxRetries: 0,
+      httpOptions: { timeout: environment.timeout }
+    };
+
+    if (session.account.region) {
+      options = {
+        ...options,
+        endpoint: this.stsEndpointsPerRegion.get(session.account.region),
+        region: session.account.region
+      };
+    }
+
+    return options;
   }
 
 }

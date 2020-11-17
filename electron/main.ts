@@ -4,6 +4,7 @@ import * as CryptoJS from 'crypto-js';
 import {initialConfiguration} from '../src/app/core/initial-configuration';
 import {machineIdSync} from 'node-machine-id';
 import {Workspace} from '../src/app/models/workspace';
+import {AppUpdater} from '../src/app/core/leapp-updater';
 
 const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
 const url = require('url');
@@ -11,6 +12,7 @@ const fs = require('fs');
 const os = require('os');
 const log = require('electron-log');
 const ipc = require('electron').ipcMain;
+
 
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
@@ -137,7 +139,9 @@ const generateMainWindow = () => {
 
   app.on('ready', () => {
     createWindow();
-    // require('update-electron-app')();
+    AppUpdater.build({});
+    AppUpdater.getInstance().initUpdater();
+    AppUpdater.getInstance().checkForUpdates();
   });
 
   let loginCount = 0;

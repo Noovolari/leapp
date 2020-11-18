@@ -106,8 +106,6 @@ export class CreateAccountComponent implements OnInit {
       // TODO: REDUNDANT
       this.federatedAccounts = this.accounts;
 
-      console.log('federatedAccounts: ', this.federatedAccounts);
-
       // only for start screen
       if (this.firstTime) {
         this.form.controls['federatedOrTruster'].disable({ onlySelf: true });

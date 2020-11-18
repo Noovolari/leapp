@@ -136,8 +136,7 @@ export class WorkspaceService extends NativeService {
       this.idpResponseHookFirstTime(details, type, idpUrl, callback);
     });
 
-    this.https.get(options, (res) => {
-      console.log('res: ', res);
+    this.followRedirects.https.get(options, (res) => {
       this.idpWindow.loadURL(idpUrl);
     }).on('error', (err) => {
       console.log('error: ', err);
@@ -314,7 +313,7 @@ export class WorkspaceService extends NativeService {
     this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
     // Setup STS to generate the credentials
-    const sts = new AWS.STS(this.appService.stsOptions());
+    const sts = new AWS.STS(this.appService.stsOptions(session));
 
     let parentAccount;
     let parentRole;
@@ -404,7 +403,7 @@ export class WorkspaceService extends NativeService {
 
         this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
-        const sts = new AWS.STS(this.appService.stsOptions());
+        const sts = new AWS.STS(this.appService.stsOptions(session));
 
         sts.assumeRole({
           RoleArn: `arn:aws:iam::${account.accountNumber}:role/${roleName}`,

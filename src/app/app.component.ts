@@ -26,8 +26,7 @@ export class AppComponent implements OnInit {
     private fileService: FileService,
     private app: AppService,
     private credentialsService: CredentialsService,
-    private menuService: MenuService,
-    private workspaceService: WorkspaceService
+    private menuService: MenuService
   ) {}
 
   ngOnInit() {
@@ -54,12 +53,12 @@ export class AppComponent implements OnInit {
     this.verifyWorkspace();
 
     // Prevent Dev Tool to show on production mode
-    this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
-      if (environment.production) {
-        this.app.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
-        this.app.currentBrowserWindow().webContents.closeDevTools();
-      }
-    });
+//    this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
+//      if (environment.production) {
+//        this.app.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
+//        this.app.currentBrowserWindow().webContents.closeDevTools();
+//      }
+//    });
 
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();

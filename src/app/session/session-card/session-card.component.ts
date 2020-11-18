@@ -188,8 +188,6 @@ export class SessionCardComponent implements OnInit {
    * @param event - the change select event
    */
   changeSsmRegion(event) {
-    console.log('Calling change SSM region');
-
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
       // Set the aws credentials to instanziate the ssm client

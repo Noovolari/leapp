@@ -23,7 +23,7 @@ export class ProxyService extends NativeService {
     let proxyPort;
     let proxyProtocol;
 
-    if (workspace) {
+    if (workspace && workspace.proxyConfiguration) {
       proxyUrl = workspace.proxyConfiguration.proxyUrl;
       proxyPort = workspace.proxyConfiguration.proxyPort;
       proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
@@ -47,7 +47,7 @@ export class ProxyService extends NativeService {
     let proxyUsername;
     let proxyPassword;
 
-    if (workspace) {
+    if (workspace && workspace.proxyConfiguration) {
       proxyUrl = workspace.proxyConfiguration.proxyUrl;
       proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
       proxyPort = workspace.proxyConfiguration.proxyPort;
@@ -71,6 +71,6 @@ export class ProxyService extends NativeService {
 
   get(url: string, resCallback: (res: any) => any, errCallback: (err: any) => any): void {
     const options = this.getHttpClientOptions(url);
-    this.https.get(options, (res) => resCallback(res)).on('error', (err) => errCallback(err)).end();
+    this.followRedirects.https.get(options, (res) => resCallback(res)).on('error', (err) => errCallback(err)).end();
   }
 }

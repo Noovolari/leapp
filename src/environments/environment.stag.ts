@@ -4,7 +4,7 @@
 const environment = {
   appName: 'Leapp',
   sessionDuration: 3600,
-  sessionDurationMfa: 36000, // 10h
+  sessionTokenDuration: 36000, // 10h
   timeout: 10000,
   lockFileDestination: '',
   python3Version: '3.4.0',

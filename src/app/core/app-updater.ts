@@ -1,4 +1,5 @@
 import {UpdaterOptions} from '../models/updater-options';
+import {environment} from '../../environments/environment';
 
 const assert = require('assert');
 const isURL = require('is-url');
@@ -9,8 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const os = require('os');
 const { format } = require('util');
-const packageJson = require('../../../package.json');
-const userAgent = format('%s/%s (%s: %s)', packageJson.name, packageJson.version, os.platform(), os.arch());
+const userAgent = format('%s/%s (%s: %s)', environment.appName, 'latest', os.platform(), os.arch());
 const supportedPlatforms = ['darwin', 'win32'];
 const logger = require('electron-log');
 const electron = require('electron');

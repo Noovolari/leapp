@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+var environment_1 = require("../../environments/environment");
 var assert = require('assert');
 var isURL = require('is-url');
 var isDev = require('electron-is-dev');
@@ -9,7 +10,7 @@ var path = require('path');
 var fs = require('fs');
 var os = require('os');
 var format = require('util').format;
-var userAgent = format('%s/%s (%s: %s)', 'electron-updater-app', '4.3.5', os.platform(), os.arch());
+var userAgent = format('%s/%s (%s: %s)', environment_1.environment.appName, 'latest', os.platform(), os.arch());
 var supportedPlatforms = ['darwin', 'win32'];
 var logger = require('electron-log');
 var electron = require('electron');
@@ -75,17 +76,12 @@ var AppUpdater = /** @class */ (function () {
                 log('update-downloaded', [event, releaseNotes, releaseName, releaseDate, updateURL]);
                 var dialogOpts = {
                     type: 'info',
-                    buttons: ['Restart', 'Later'],
+                    buttons: ['OK'],
                     title: 'Application Update',
                     message: process.platform === 'win32' ? releaseNotes : releaseName,
-                    detail: 'A new version has been downloaded. Restart the application to apply the updates.'
+                    detail: 'A new version has been downloaded. Close and re-open Leapp to use the new version.'
                 };
-                dialog.showMessageBox(dialogOpts).then(function (_a) {
-                    var response = _a.response;
-                    if (response === 0) {
-                        autoUpdater.quitAndInstall();
-                    }
-                });
+                dialog.showMessageBox(dialogOpts);
             });
         }
     };

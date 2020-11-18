@@ -62,7 +62,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
           this.azureSetSubscription(session);
         }, err => {
           this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
-          console.log('Error in command by Azure CLi', err);
+          console.log('Error in command by Azure CLI', err);
         });
       }
     } else {
@@ -72,7 +72,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
         this.azureSetSubscription(session);
       }, err => {
         this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
-        console.log('Error in command by Azure CLi', err);
+        console.log('Error in command by Azure CLI', err);
       });
     }
   }

@@ -1,4 +1,4 @@
-import {Session} from './session';
+import { Session } from './session';
 
 export interface Workspace {
   type?: string;
@@ -22,9 +22,6 @@ export interface Workspace {
 
   azureConfig: string;
   azureProfile: string;
-
-  // TODO: WHY SSM CREDENTIALS
-  ssmCredentials?: any;
 
   sessions: Session[];
 }

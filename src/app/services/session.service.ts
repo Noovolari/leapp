@@ -100,13 +100,15 @@ export class SessionService extends NativeService {
   stopSession(session: Session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.sessions;
-    sessions.map(sess => {
-      if (session === null || session.id === sess.id) {
-        sess.active = false;
-        sess.loading = false;
-        sess.lastStopDate = new Date().toISOString();
-      }
-    });
+    if (sessions) {
+      sessions.map(sess => {
+        if (session === null || session.id === sess.id) {
+          sess.active = false;
+          sess.loading = false;
+          sess.lastStopDate = new Date().toISOString();
+        }
+      });
+    }
     workspace.sessions = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
     if (session !== null) {

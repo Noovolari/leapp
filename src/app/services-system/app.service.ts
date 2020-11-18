@@ -3,7 +3,7 @@ import {NativeService} from './native-service';
 import {FileService} from './file.service';
 import {ToastrService} from 'ngx-toastr';
 import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirmation-dialog.component';
-import {BsModalService} from 'ngx-bootstrap';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
@@ -19,6 +19,27 @@ export class AppService extends NativeService {
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
   // TODO Why redrawList??
   redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  stsEndpointsPerRegion = new Map([
+    ['us-east-1', 'https://sts.us-east-1.amazonaws.com'],
+    ['ap-northeast-1', 'https://sts.ap-northeast-1.amazonaws.com'],
+    ['ap-northeast-2', 'https://sts.ap-northeast-2.amazonaws.com'],
+    ['ap-northeast-3', 'https://sts.ap-northeast-3.amazonaws.com'],
+    ['ap-south-1', 'https://sts.ap-south-1.amazonaws.com'],
+    ['ap-southeast-1', 'https://sts.ap-southeast-1.amazonaws.com'],
+    ['ap-southeast-2', 'https://sts.ap-southeast-2.amazonaws.com'],
+    ['ca-central-1', 'https://sts.ca-central-1.amazonaws.com'],
+    ['eu-central-1', 'https://sts.eu-central-1.amazonaws.com'],
+    ['eu-north-1', 'https://sts.eu-north-1.amazonaws.com'],
+    ['eu-south-1', 'https://sts.eu-south-1.amazonaws.com'],
+    ['eu-west-1', 'https://sts.eu-west-1.amazonaws.com'],
+    ['eu-west-2', 'https://sts.eu-west-2.amazonaws.com'],
+    ['eu-west-3', 'https://sts.eu-west-3.amazonaws.com'],
+    ['sa-east-1', 'https://sts.sa-east-1.amazonaws.com'],
+    ['us-east-2', 'https://sts.us-east-2.amazonaws.com'],
+    ['us-west-1', 'https://sts.us-west-1.amazonaws.com'],
+    ['us-west-2', 'https://sts.us-west-2.amazonaws.com']
+  ]);
 
   /* This service is defined to provide different app wide methods as utilities */
   constructor(
@@ -301,6 +322,9 @@ export class AppService extends NativeService {
    * @param callback - the callback for the ok button to launch
    */
   confirmDialog(message: string, callback: any) {
+    for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
+      this.modalService.hide(i);
+    }
     this.modalService.show(ConfirmationDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { message, callback}});
   }
 
@@ -312,6 +336,9 @@ export class AppService extends NativeService {
    * @param callback - the callback for the ok button to launch
    */
   inputDialog(title: string, placeholder: string, message: string, callback: any) {
+    for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
+      this.modalService.hide(i);
+    }
     this.modalService.show(InputDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { title, placeholder, message, callback}});
   }
 
@@ -467,8 +494,21 @@ export class AppService extends NativeService {
     return email;
   }
 
-  stsOptions() {
-    return { maxRetries: 0, httpOptions: { timeout: environment.timeout }};
+  stsOptions(session) {
+    let options: any = {
+      maxRetries: 0,
+      httpOptions: { timeout: environment.timeout }
+    };
+
+    if (session.account.region) {
+      options = {
+        ...options,
+        endpoint: this.stsEndpointsPerRegion.get(session.account.region),
+        region: session.account.region
+      };
+    }
+
+    return options;
   }
 
 }

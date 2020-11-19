@@ -35,4 +35,8 @@ export class IntegrationsPageComponent implements OnInit {
     this.integrationsService.syncAccounts();
     this.router.navigate(['/sessions', 'session-selected']);
   }
+
+  goBack() {
+    this.router.navigate(['/', 'sessions', 'session-selected']);
+  }
 }

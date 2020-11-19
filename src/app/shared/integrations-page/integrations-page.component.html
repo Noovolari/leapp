@@ -6,12 +6,13 @@
     <h1>Integrations Page</h1>
 
 
-    <button (click)="login()">AWS SSO</button>
+    <button style="margin-bottom: 10px" (click)="login()">AWS SSO</button>
+    <br>
     <ng-container *ngIf="isAwsSsoActive">
-      <button (click)="logout()">AWS SSO LOGOUT</button>
+      <button  style="margin-right: 15px" (click)="logout()">AWS SSO LOGOUT</button>
       <button (click)="forceSync()"> SYNC SESSIONS</button>
     </ng-container>
-
+    <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
   </div>
 </div>
 ,

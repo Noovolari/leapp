@@ -178,18 +178,21 @@ There are 2 **environment variables** contained in Leapp which defines how a ses
 * *session duration*: defines **how often** the system will refresh your **temporary** credentials. [defaults to 1200s / 20min]
 * *session token duration* defines **how long** the **session token** will be used for each *session duration* refresh action. [defaults to 36000s / 10h] 
 
-*Note 1: because Amazon doesn't allow to set MFA token expiration for more than 1h for *
-(inserire una nota che parla dell'utilizzo del session token per MFA)
-(spiegare che le credenziali che durano 10h sono salvate nel vault, sicure, ed utilizzate 
-puntualmente per generare nuove credenziali associate all'account truster; queste ultime vengono 
-scritte nel file di credenziali, non vengono salvate nel vault)
+### Plain and Truster session token management
+**Plain session**: session tokens are generated and valid for *session token duration* (10h) time. They are also stored inside your OS vault.
+Every *session duration* (20min) time the credential file is refreshed with new temporary credentials, without having them saved in OS vault.
+MFA modal will not re-appear until the expiration time is reached.
+
+**Truster session**: 
 
 # HTTP/HTTPS in-app proxy
 Leapp allows for HTTP/HTTPS protocols, specifying a proxy server to which the in-app requests are sent. Both authenticated and non authenticated proxy are supported. In the option panel you can configure protocol, url, port, and authentication information. See image below
 ![image](.github/images/options-proxy.png)
+
 ### Note for Azure Sessions
 Leapp uses Azure CLI to authenticate the **User** to retrieve the tokens for the session. This means that you **must** configure your Azure proxy settings locally to allow the Azure CLI to do ```az login``` properly, as Leapp is no responsible for that.
 This extends generally to all CLIs and external tools that need to communicate over Internet behind a proxy configuration.
+
 # Logs
 By default, Leapp writes logs to the following locations:
 - on Linux: ~/.config/**Leapp**/logs/log.log

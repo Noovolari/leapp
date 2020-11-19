@@ -65,19 +65,19 @@ export class SessionCardComponent implements OnInit {
     let nameToShow;
     switch (this.session.account.type) {
       case(AccountType.AWS):
-        nameToShow = (this.session.account as AwsAccount).role.name.length >= 13 ? `${(this.session.account as AwsAccount).role.name.substr(0, 13)}...` : (this.session.account as AwsAccount).role.name;
+        nameToShow = (this.session.account as AwsAccount).role.name;
         this.sessionDetailToShow = nameToShow;
         break;
       case(AccountType.AZURE):
-        nameToShow = (this.session.account as AzureAccount).subscriptionId.length >= 13 ? `${(this.session.account as AzureAccount).subscriptionId.substr(0, 13)}...` : (this.session.account as AzureAccount).subscriptionId;
+        nameToShow = (this.session.account as AzureAccount).subscriptionId;
         this.sessionDetailToShow = nameToShow;
         break;
       case(AccountType.AWS_PLAIN_USER):
-        nameToShow = (this.session.account as AwsPlainAccount).user.length >= 13 ? `${(this.session.account as AwsPlainAccount).user.substr(0, 13)}...` : (this.session.account as AwsPlainAccount).user;
+        nameToShow = (this.session.account as AwsPlainAccount).user;
         this.sessionDetailToShow = nameToShow;
         break;
       case(AccountType.AWS_SSO):
-        nameToShow = (this.session.account as AwsSsoAccount).role.name.length >= 13 ? `${(this.session.account as AwsSsoAccount).role.name.substr(0, 7)}...` : (this.session.account as AwsSsoAccount).role.name;
+        nameToShow = (this.session.account as AwsSsoAccount).role.name;
         this.sessionDetailToShow = nameToShow;
         break;
     }

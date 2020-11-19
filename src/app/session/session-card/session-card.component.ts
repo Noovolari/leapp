@@ -62,23 +62,18 @@ export class SessionCardComponent implements OnInit {
   ngOnInit() {
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions(false);
-    let nameToShow;
     switch (this.session.account.type) {
       case(AccountType.AWS):
-        nameToShow = (this.session.account as AwsAccount).role.name;
-        this.sessionDetailToShow = nameToShow;
+        this.sessionDetailToShow = (this.session.account as AwsAccount).role.name;
         break;
       case(AccountType.AZURE):
-        nameToShow = (this.session.account as AzureAccount).subscriptionId;
-        this.sessionDetailToShow = nameToShow;
+        this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
         break;
       case(AccountType.AWS_PLAIN_USER):
-        nameToShow = (this.session.account as AwsPlainAccount).user;
-        this.sessionDetailToShow = nameToShow;
+        this.sessionDetailToShow = (this.session.account as AwsPlainAccount).user;
         break;
       case(AccountType.AWS_SSO):
-        nameToShow = (this.session.account as AwsSsoAccount).role.name;
-        this.sessionDetailToShow = nameToShow;
+        this.sessionDetailToShow = (this.session.account as AwsSsoAccount).role.name;
         break;
     }
   }

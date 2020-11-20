@@ -426,6 +426,7 @@ export class WorkspaceService extends NativeService {
 
             this.configurationService.updateWorkspaceSync(workspace);
             this.configurationService.disableLoadingWhenReady(workspace, session);
+
             // Emit ok for double jump
             this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
           }

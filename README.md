@@ -26,10 +26,10 @@ It's a tool that securely [**stores your access information in a secure place**]
   * [Cloud Providers](#cloud-providers)
   * [Identity Providers](#identity-providers)
 - [Use Cases](#use-cases)
-      - [AWS Plain Access](#aws-plain-access)
-      - [AWS Federated Access](#aws-federated-access)
-      - [AWS Truster Access](#aws-truster-access)
-      - [Azure Access](#azure-access)
+  * [AWS Plain Access](#aws-plain-access)
+  * [AWS Federated Access](#aws-federated-access)
+  * [AWS Truster Access](#aws-truster-access)
+  * [Azure Access](#azure-access)
 - [Rotating Credentials](#rotating-credentials)
 - [Vault Strategy](#vault-strategy)
     + [Prerequisite for using on Linux systems](#prerequisite-for-using-on-linux-systems)
@@ -52,6 +52,7 @@ It's a tool that securely [**stores your access information in a secure place**]
 - [Quick List](#quick-list)
   * [Links](#links)
   * [License](#license)
+
 
 
 # Key features

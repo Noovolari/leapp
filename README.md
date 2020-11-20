@@ -206,14 +206,20 @@ This extends generally to all CLIs and external tools that need to communicate o
 
 # Logs
 By default, Leapp writes logs to the following locations:
-- on Linux: ~/.config/**Leapp**/logs/log.log
-- on macOS: ~/Library/Logs/**Leapp**/log.log
-- on Windows: %USERPROFILE%\\AppData\\Roaming\\**Leapp**\\logs\\log.log
+
+- on Linux: `~/.config/{app name}/logs/{process type}.log`
+- on macOS: `~/Library/Logs/{app name}/{process type}.log`
+- on Windows: `%USERPROFILE%\AppData\Roaming\Leapp\log.log`
 Logs are structured in the following way:
 ```
 [YYYY-MM-DD HH:mm:ss.mmm] [LEVEL] [rendered/system] [COMPONENT] MESSAGE {Useful Object / Stacktrace Err Object}
 ```
 *Note: please always add logs whenever possible to any issue you want to fill to enable the team identify the problem quickly*
+
+# Tutorials
+
+[Here](.github/tutorials/TUTORIALS.md) is a list of curated **tutorials** to **help you setup** your environment for Leapp.
+
 # Quick List
 Quick list is the component in Leapp that helps you manage all your sessions
 together. You'll probably pass most of your time here so this is a quick 

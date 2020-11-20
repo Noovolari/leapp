@@ -46,7 +46,7 @@ you have in your company and what kind of credentials you need to get.
 #### AWS Plain Access
 Store AWS IAM User's Access Keys in your System Vault through Leapp. 
 Leapp automatically manages **Access Key ID** and **Secret Access Key** in your AWS credentials, 
-generating temporary credentials form them.
+generating temporary credentials for them.
 
 **No credentials** are stored in Leapp. 
 
@@ -173,17 +173,28 @@ when the session starts.
 *Note 1: if you need to remove MFA from a plain session, just edit it and leave the field blank.*
 *Note 2: when you setup a truster account from a plain session with MFA enabled, **Leapp** inherently associates MFA checks to it.*
 
-## About MFA and Session durations
-There are 2 **environment variables** contained in Leapp which defines how a session is managed:
+## Temporary credentials durations
+There are 2 **environment variables** contained in Leapp which define how a session is managed:
 * *session duration*: defines **how often** the system will refresh your **temporary** credentials. [defaults to 1200s / 20min]
 * *session token duration* defines **how long** the **session token** will be used for each *session duration* refresh action. [defaults to 36000s / 10h] 
 
 ### Plain and Truster session token management
-**Plain session**: session tokens are generated and valid for *session token duration* (10h) time. They are also stored inside your OS vault.
-Every *session duration* (20min) time the credential file is refreshed with new temporary credentials, without having them saved in OS vault.
-MFA modal will not re-appear until the expiration time is reached.
+**Plain session**: newly generated session tokens are valid for 10 hours, which corresponds to the value specified in the *session token duration* environment variable.
+Leapp stores session tokens inside your OS's specific vault, from which they are retrieved as long as they're valid.
+Every 20 minutes - i.e. the value specified in the *session duration* environment variable - Leapp refreshes the credential file with a valid session token, or a newly generated one.
+If you have enabled MFA for a Plain session, Leapp will prompt for an MFA token only if the session token is no more valid.
 
-**Truster session**: 
+**Truster session from Plain**: when you create a Truster session, you've to define the Federated Role or Plain IAM User that will *assume* the Truster Role specified in the Truster session.
+
+If the Truster Role is assumed by a Plain IAM User, the following two steps will be covered.
+- A session token, related to the Plain IAM User, will be generated; this session token will be managed by Leapp in the same way described in **Plain session**.
+- The session token is used to assume the Truster Role, generating new temporary credentials that will be written in the credentials file and refreshed every 20 minutes.
+
+If the Truster Role is assumed by a Federated Role, the following two steps will be covered.
+- A set of temporary credentials - associated to the Federated Role - will be generated through SAML federated Single Sign-On; 
+in particular, the Security Token Service's AssumeRoleWithSAML API is called, passing in the SAML assertion returned by the Identity Provider.
+- The temporary credentials - associated to the Federated Role - are used to assume the Truster Role, obtaining new temporary credentials associated to the Truster Role.
+This set of temporaty credentials is used to refresh the credentials file.
 
 # HTTP/HTTPS in-app proxy
 Leapp allows for HTTP/HTTPS protocols, specifying a proxy server to which the in-app requests are sent. Both authenticated and non authenticated proxy are supported. In the option panel you can configure protocol, url, port, and authentication information. See image below

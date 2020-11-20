@@ -85,7 +85,7 @@ To install the compiled version, choose the one for your **OS** and simply **dou
 Our use cases are hereby presented to give you a hint on how Leapp can be of help depending on the type of setup 
 you have in your company and what kind of credentials you need to get.
 
-#### AWS Plain Access
+## AWS Plain Access
 Store AWS IAM User's Access Keys in your System Vault through Leapp. 
 Leapp automatically manages **Access Key ID** and **Secret Access Key** in your AWS credentials, 
 generating temporary credentials for them.
@@ -100,7 +100,7 @@ See setup [tutorial](.github/tutorials/TUTORIALS.md)
 
 *Note: it's possible to assign a MFA device to a plain session. Please see [MFA section](#multi-factor-authentication) for more details.*
 
-#### AWS Federated Access
+## AWS Federated Access
 Leverage company identity to access environment through federated single sign-on. 
 Federation is established between **G Suite** and **AWS**. No more AWS credentials 
 management is needed. Leapp allows to get to cloud resources with company email and password.
@@ -109,7 +109,7 @@ management is needed. Leapp allows to get to cloud resources with company email 
 
 See setup [tutorial](.github/tutorials/TUTORIALS.md)
 
-#### AWS Truster Access
+## AWS Truster Access
 Federating each account is difficult so use truster accounts to grant access easier and painlessly.
 We use federated role as a gateway to all trusted roles in all other AWS accounts.
 In this access strategy a **truster role** is assumed by a **federated role**.
@@ -120,7 +120,7 @@ See setup [tutorial](.github/tutorials/TUTORIALS.md)
 
 *Note: it's possible to apply MFA to a truster session by setting it on the plain account it relies on. Please see [MFA section](#multi-factor-authentication) for more details.*
 
-#### Azure Access
+## Azure Access
 Use Leapp to do Single Sign On with G Suite on Azure to get access to your 
 **Subscriptions**. In this use case is **mandatory** to have defined a Federation 
 between Google and Azure. Leapp manage the login process for you to have Azure CLI 
@@ -240,6 +240,8 @@ This set of temporaty credentials is used to refresh the credentials file.
 
 # HTTP/HTTPS in-app proxy
 Leapp allows for HTTP/HTTPS protocols, specifying a proxy server to which the in-app requests are sent. Both authenticated and non authenticated proxy are supported. In the option panel you can configure protocol, url, port, and authentication information. See image below
+
+
 ![image](.github/images/options-proxy.png)
 
 ### Note for Azure Sessions

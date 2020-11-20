@@ -34,7 +34,7 @@
 
     <div class="ssm-tray">
 
-      <b class="">Seleziona una region:</b>
+      <b class="">Select a region:</b>
       <ng-select bindLabel="region" bindValue="region" [items]="ssmRegions" [(ngModel)]="selectedSsmRegion" placeholder="Select a Region for finding instances" (change)="changeSsmRegion($event);"></ng-select>
 
       <div class="loader" *ngIf="ssmloading"><i class="fa fa-spinner fa-spin"></i></div>

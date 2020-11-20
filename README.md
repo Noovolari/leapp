@@ -8,12 +8,52 @@ Leapp
 
 ![logo](.github/images/README-1.png)
 
-Leapp is your everyday companion to access your cloud; designed to work with Cloud Providers APIs, CLIs, and SDKs.
-It's a software that securely stores your access information and generates temporary credential sets to access your cloud ecosystem from your local machine.
-**For example, while using the AWS CLI it may become annoying to switch to a different profile or use the --profile argument before issuing every command.**
-Leapp lets you have a new set of credentials and give access to that account with a click.
-Leapp also will manage Federated access through Identity Provides.
+Leapp is a DevTool Desktop App designed to **manage and secure Cloud Access in multi-account environments.**
+
+The App is designed to work with Cloud Providers APIs, CLIs, and SDKs.
+
+It's a tool that securely [**stores your access information in a secure place**](#vault-strategy) and generates temporary credential sets to access your Cloud from your local machine.
+
+> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe and we prefer to store those information in an encrypted file managed by the system.
+> Credentials will be hourly rotated and accessible in those file only when they are needed, so only when Leapp is active.
+
 ![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
+# Table of Contents
+
+- [Key features](#key-features)
+- [Installation](#installation)
+- [Supported Providers](#supported-providers)
+  * [Cloud Providers](#cloud-providers)
+  * [Identity Providers](#identity-providers)
+- [Use Cases](#use-cases)
+      - [AWS Plain Access](#aws-plain-access)
+      - [AWS Federated Access](#aws-federated-access)
+      - [AWS Truster Access](#aws-truster-access)
+      - [Azure Access](#azure-access)
+- [Rotating Credentials](#rotating-credentials)
+- [Vault Strategy](#vault-strategy)
+    + [Prerequisite for using on Linux systems](#prerequisite-for-using-on-linux-systems)
+    + [Supported versions for contributors](#supported-versions-for-contributors)
+  * [Keytar documentation](#keytar-documentation)
+    + [getPassword(service, account)](#getpassword-service--account-)
+    + [setPassword(service, account, password)](#setpassword-service--account--password-)
+    + [deletePassword(service, account)](#deletepassword-service--account-)
+  * [How can I find Leapp data in the Vault?](#how-can-i-find-leapp-data-in-the-vault-)
+  * [How Keytar translate to system vaults?](#how-keytar-translate-to-system-vaults-)
+- [Multi-Factor Authentication](#multi-factor-authentication)
+  * [Setup MFA in AWS](#setup-mfa-in-aws)
+    + [MFA restricted access](#mfa-restricted-access)
+  * [Setup MFA in Leapp](#setup-mfa-in-leapp)
+  * [Temporary credentials durations](#temporary-credentials-durations)
+    + [Plain and Truster session token management](#plain-and-truster-session-token-management)
+- [HTTP/HTTPS in-app proxy](#http-https-in-app-proxy)
+    + [Note for Azure Sessions](#note-for-azure-sessions)
+- [Logs](#logs)
+- [Quick List](#quick-list)
+  * [Links](#links)
+  * [License](#license)
+
+
 # Key features
 - **Switch account with a click**: collect all your cloud accounts access data in a single place and connect straight away. Leverage cloud RBAC to impersonate your roles in a click, and don't waste time manually manage or edit your credentials file.
 - **Straight programmatic access via SSO**: leverage your company identity to access your environment through federated single sign-on. No more credentials management. Leapp allows you to get to your cloud resources with your company email and password. Scroll down for our [supported use cases](#supported-cloud-providers).
@@ -26,19 +66,21 @@ Leapp also will manage Federated access through Identity Provides.
 
 ![Leapp App animation](.github/images/Leapp-animation.gif)
 
-## Supported Cloud Providers
+
+# Installation
+Get [here](https://github.com/Noovolari/leapp/releases/latest) the latest release.
+To install the compiled version, choose the one for your **OS** and simply **double-click** on the executable.
+# Supported Providers
+## Cloud Providers
 - **AWS** - :white_check_mark:
 - **AZURE** - :white_check_mark:
 - **GCP** - :soon:
-## Supported Identity Providers
+## Identity Providers
 - **G Suite to AWS** - :white_check_mark:
 - **G Suite to Azure** - :white_check_mark:
 - **AZURE AD to Azure** - :white_check_mark:
 - **AZURE AD to AWS** - :soon:
 - **AWS SSO** - :soon:
-# Installation
-Get [here](https://github.com/Noovolari/leapp/releases/latest) the latest release.
-To install the compiled version, choose the one for your **OS** and simply **double-click** on the executable.
 # Use Cases
 Our use cases are hereby presented to give you a hint on how Leapp can be of help depending on the type of setup 
 you have in your company and what kind of credentials you need to get.
@@ -207,9 +249,9 @@ This extends generally to all CLIs and external tools that need to communicate o
 # Logs
 By default, Leapp writes logs to the following locations:
 
-- on Linux: `~/.config/**Leapp**/logs/{process type}.log`
-- on macOS: `~/Library/Logs/**Leapp**/{process type}.log`
-- on Windows: `%USERPROFILE%\\AppData\\Roaming\\**Leapp**\\log.log`
+- on Linux: `~/.config/Leapp/logs/log.log`
+- on macOS: `~/Library/Logs/Leapp/log.log`
+- on Windows: `%USERPROFILE%\\AppData\\Roaming\\Leapp\\log.log`
 Logs are structured in the following way:
 ```
 [YYYY-MM-DD HH:mm:ss.mmm] [LEVEL] [rendered/system] [COMPONENT] MESSAGE {Useful Object / Stacktrace Err Object}

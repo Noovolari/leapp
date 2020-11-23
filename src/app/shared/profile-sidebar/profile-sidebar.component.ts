@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Renderer2} from '@angular/core';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
@@ -24,7 +24,8 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     private router: Router,
     private httpClient: HttpClient,
     private executeService: ExecuteServiceService,
-    private proxyService: ProxyService
+    private proxyService: ProxyService,
+    private renderer: Renderer2
   ) { super(); }
 
   /**
@@ -33,6 +34,7 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
   ngOnInit() {
     const sub = this.appService.profileOpen.subscribe(res => {
       this.profileOpen = res;
+      this.profileOpen ? this.renderer.addClass(document.body, 'moved') : this.renderer.removeClass(document.body, 'moved');
     });
     this.subs.add(sub);
   }
@@ -69,6 +71,7 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     this.profileOpen = false;
     this.appService.profileOpen.emit(false);
     this.appService.logger(`Profile open emitting: ${this.profileOpen}`, LoggerLevel.INFO, this);
+    this.renderer.removeClass(document.body, 'moved');
   }
 
   goToProfile() {

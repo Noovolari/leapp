@@ -122,6 +122,19 @@ body.modal-open .background {
   filter: blur(6px)!important;
 }
 
+.container-fluid {
+  position: relative;
+  left: 0;
+  transition: left 0.3s ease;
+}
+.header-content {
+  left: 0;
+  transition: left 0.3s ease;
+}
+
+body.moved .container-fluid { left: 200px; }
+body.moved .header-content { left: 227px; }
+
 .modal-dialog.ssm-modal {
   margin: 0!important;
   height: 100vh;

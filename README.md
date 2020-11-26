@@ -56,13 +56,16 @@ It's a tool that securely [**stores your access information in a secure place**]
 
 
 # Key features
-- **Switch account with a click**: collect all your cloud accounts access data in a single place and connect straight away. Leverage cloud RBAC to impersonate your roles in a click, and don't waste time manually manage or edit your credentials file.
-- **Straight programmatic access via SSO**: leverage your company identity to access your environment through federated single sign-on. No more credentials management. Leapp allows you to get to your cloud resources with your company email and password. Scroll down for our [supported use cases](#supported-cloud-providers).
-- **Clean credentials file**: ever wondered what someone can do by stealing your credentials file? We got you covered. We erase these files when you close Leapp and regenerate them when you open it! Leave your desk and get a coffee at ease.
-- **Automatic credentials management**: move freely across your multi-cloud environment as Leapp automatically manages your access credentials for you. It handles temporary keys generation, rotation, and auto-renew to comply with security best-practices.
-- **Ease federation with truster accounts**: federating each account is a pain so why don't use truster accounts to grant access easier and painlessly? We use your federated role as a gateway to all trusted roles in all other accounts! Seems great, isn't it? See our [documentation](https://github.com/Noovolari/leapp/blob/master/.github/GLOSSARY.md#trusting) to get more info.
-- **MFA support enabled**: access AWS users and services even when they have MFA device enabled on AWS console.
-- **HTTP/HTTPS in-app proxy configuration:** allow Leapp to forward in-app HTTP/HTTPS traffic to the specified Proxy Server.
+### Switch account in a click
+No need to manage the credentials file. Get connected to your accounts in a click. 
+### Secure repository for your access data
+Protect your cloud accounts access data in the system vault and connect straight away.
+### Multiple cloud access strategies
+Connect with federated single sign-on, roles or static credentials. Check [here](#supported-cloud-providers) what's currently supported.
+### No static credentials
+Generate and inject only temporary credentials to comply with security best-practices.
+### Direct infrastructure connection
+Connect to your virtual machines with AWS System Manager.
 
 
 ![Leapp App animation](.github/images/Leapp-animation.gif)

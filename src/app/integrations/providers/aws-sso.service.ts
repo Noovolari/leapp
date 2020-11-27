@@ -119,7 +119,6 @@ export class AwsSsoService extends NativeService {
     return this.authorizeIntegration(region, portalUrl).pipe(
       switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
       map(generateSSOTokenResponse => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
-
       // whenever you are logged, then save info in keychain
       tap((response) => this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime)),
 
@@ -262,8 +261,6 @@ export class AwsSsoService extends NativeService {
   }
 
   logOutAwsSso() {
-    this.keychainService.deletePassword(environment.appName, 'AWS_SSO_PORTAL_URL');
-    this.keychainService.deletePassword(environment.appName, 'AWS_SSO_REGION');
     this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN');
     this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
 

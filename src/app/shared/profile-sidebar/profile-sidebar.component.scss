@@ -17,20 +17,37 @@
     margin-left: 20px;
   }
 
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+
+    li {
+      position: relative;
+      padding: 10px 40px;
+      margin: 0 -20px;
+      li {
+        position: relative;
+        padding: 10px 0 0 40px;
+      }
+    }
+
+  }
+
   a {
     position: relative;
     display: block;
     color: #909f9d;
     transition: all 0.3s ease;
-    padding: 10px 40px;
-    margin: 0 -20px;
     text-decoration: none;
-
+    padding: 0;
+    margin: 0;
     i { color: #909f9d; margin-right: 10px; }
 
     small {
       display: inline-block;
-      margin-left: 30px;
+      margin-left: 10px;
       font-size: 12px;
     }
   }
@@ -39,7 +56,7 @@
 
     i { color: #73E0CF; margin-right: 10px; }
   }
-  a:hover::before, a:visited::before {
+  ul li:hover::before, ul li:visited::before {
     content: '';
     position: absolute;
     left: 0;
@@ -49,6 +66,10 @@
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     background-color: #73E0CF;
+  }
+
+  ul li li:hover::before, ul li li:visited::before {
+    content: none;
   }
 
   .copy {

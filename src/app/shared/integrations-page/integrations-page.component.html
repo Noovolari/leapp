@@ -1,18 +1,31 @@
+<img src="assets/images/fake_blur.png" class="fake-blur" />
 <div class="background">
-  <app-profile></app-profile>
-  <div class="container-fluid background">
-    <app-profile-sidebar></app-profile-sidebar>
+  <div class="container-fluid">
+    <h1><a (click)="goBack()" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-link"></i> Integrations</h1>
 
-    <h1>Integrations Page</h1>
+    <ng-container *ngIf="!showProviderList">
+    <div class="callout" (click)="showProviders()">
+      <h2><i class="fa fa-fingerprint"></i> Identity Providers</h2>
+      <span>
+        Go take a coffe and we will fill sessions from your AWS SSO
+        profile, we are checking all the possible roles you can access to.
+      </span>
+    </div>
 
-
-    <button style="margin-bottom: 10px" (click)="login()">AWS SSO</button>
+    <h3>More integrations coming soon.</h3>
     <br>
-    <ng-container *ngIf="isAwsSsoActive">
-      <button  style="margin-right: 15px" (click)="logout()">AWS SSO LOGOUT</button>
-      <button (click)="forceSync()"> SYNC SESSIONS</button>
+    <small>Any suggestions? Reach out at info@noovolari.it</small>
     </ng-container>
-    <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
+
+    <ng-container *ngIf="showProviderList">
+
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label><strong>Identity Providers</strong></label>
+        <br>
+        <span class="form-control blue-control" (click)="goToAwsSSO()">AWS Single Sign On</span>
+      </div>
+
+    </ng-container>
+
   </div>
 </div>
-,

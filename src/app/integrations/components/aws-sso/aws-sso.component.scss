@@ -1,5 +1,5 @@
 @import "palette";
-@import "../../../assets/scss/mixins/utility";
+@import "../../../../assets/scss/mixins/utility";
 
 body {
   background: $white-text-color;
@@ -25,6 +25,14 @@ body {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   width: 100%;
+}
+
+.blue-control {
+  background: azure;
+  color: $text-color;
+  border: 1px solid $main-color-light;
+  font-size: 12px;
+  font-weight: 400;
 }
 
 .container-fluid {
@@ -60,14 +68,6 @@ body {
     a {
       margin-right: 20px;
     }
-  }
-
-  .blue-control {
-    background: azure;
-    color: $text-color;
-    border: 1px solid $main-color-light;
-    font-size: 12px;
-    font-weight: 400;
   }
 
   h2 {

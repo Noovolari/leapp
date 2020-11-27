@@ -79,8 +79,18 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     this.router.navigate(['/profile']);
   }
 
+  goToHome() {
+    this.closeProfile();
+    this.router.navigate(['/sessions', 'session-selected']);
+  }
+
   goToIntegrations() {
     this.closeProfile();
-    this.router.navigate(['/integrations']);
+    this.router.navigate(['/integrations', 'list']);
+  }
+
+  goToIdentityProvider() {
+    this.closeProfile();
+    this.router.navigate(['/integrations', 'aws-sso']);
   }
 }

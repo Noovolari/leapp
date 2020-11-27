@@ -2,6 +2,7 @@ import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {ProfilePageComponent} from './shared/profile-page/profile-page.component';
 import {IntegrationsPageComponent} from './shared/integrations-page/integrations-page.component';
+import {AwsSsoComponent} from './integrations/components/aws-sso/aws-sso.component';
 
 const routes: Routes = [
     {
@@ -21,7 +22,16 @@ const routes: Routes = [
       },
       {
         path: 'integrations',
-        component: IntegrationsPageComponent // The profile page
+        children: [
+          {
+            path: 'list',
+            component: IntegrationsPageComponent, // The Integration page
+          },
+          {
+            path: 'aws-sso',
+            component: AwsSsoComponent
+          }
+        ]
       },
       {
         path: 'sessions',

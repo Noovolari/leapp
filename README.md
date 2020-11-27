@@ -12,10 +12,10 @@ Leapp is a DevTool Desktop App designed to **manage and secure Cloud Access in m
 
 The App is designed to work with Cloud Providers APIs, CLIs, and SDKs.
 
-It's a tool that securely [**stores your access information in a secure place**](#vault-strategy) and generates temporary credential sets to access your Cloud from your local machine.
+It's a tool that securely [**stores your access information in a secure place**](https://github.com/Noovolari/leapp/tree/aws-sso#vault-strategy) and generates temporary credential sets to access your Cloud from your local machine.
 
-> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe and we prefer to store those information in an encrypted file managed by the system.
-> Credentials will be hourly rotated and accessible in those file only when they are needed, so only when Leapp is active.
+> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and we prefer to store that information in an encrypted file managed by the system. 
+> Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
 
 ![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
 # Table of Contents
@@ -47,6 +47,7 @@ It's a tool that securely [**stores your access information in a secure place**]
   * [Temporary credentials durations](#temporary-credentials-durations)
     + [Plain and Truster session token management](#plain-and-truster-session-token-management)
 - [HTTP/HTTPS in-app proxy](#http-https-in-app-proxy)
+    
     + [Note for Azure Sessions](#note-for-azure-sessions)
 - [Logs](#logs)
 - [Quick List](#quick-list)

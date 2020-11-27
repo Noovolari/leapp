@@ -225,7 +225,6 @@ export class AwsSsoService extends NativeService {
 
 
   // LEAPP Integrations
-
   addSessionsToWorkspace(AwsSsoSessions: Session[]) {
     let workspace = this.configurationService.getDefaultWorkspaceSync();
 
@@ -272,11 +271,9 @@ export class AwsSsoService extends NativeService {
     this.configurationService.updateWorkspaceSync(workspace);
   }
 
-
   isAwsSsoActive(): Observable<boolean> {
     return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(
       map((res) => !!res)
     );
   }
 }
-

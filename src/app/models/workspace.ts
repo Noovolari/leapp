@@ -5,11 +5,8 @@ export interface Workspace {
 
   // TODO WHY there are more than one workspace
   name: string;
-
   lastIDPToken?: string;
-
   setupDone?: boolean;
-
   idpUrl?: string;
 
   proxyConfiguration: {

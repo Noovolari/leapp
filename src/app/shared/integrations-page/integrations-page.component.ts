@@ -10,7 +10,7 @@ import {Router} from '@angular/router';
 })
 export class IntegrationsPageComponent implements OnInit {
 
-  isAwsSsoActive: boolean;
+  showProviderList = false;
 
   constructor(private integrationsService: IntegrationsService,
               private awsSsoService: AwsSsoService,
@@ -18,25 +18,23 @@ export class IntegrationsPageComponent implements OnInit {
 
   }
 
-  ngOnInit() {
-    this.awsSsoService.isAwsSsoActive().subscribe(res => this.isAwsSsoActive = res);
-  }
-
-  login() {
-    this.integrationsService.login();
-  }
-
-  logout() {
-    this.integrationsService.logout();
-    this.awsSsoService.isAwsSsoActive().subscribe(res => this.isAwsSsoActive = res);
-  }
-
-  forceSync() {
-    this.integrationsService.syncAccounts();
-    this.router.navigate(['/sessions', 'session-selected']);
+  ngOnInit(): void {
+    this.showProviderList = false;
   }
 
   goBack() {
-    this.router.navigate(['/', 'sessions', 'session-selected']);
+    if (this.showProviderList) {
+      this.showProviderList = false;
+    } else {
+      this.router.navigate(['/', 'sessions', 'session-selected']);
+    }
+  }
+
+  showProviders() {
+    this.showProviderList = true;
+  }
+
+  goToAwsSSO() {
+    this.router.navigate(['/', 'integrations', 'aws-sso']);
   }
 }

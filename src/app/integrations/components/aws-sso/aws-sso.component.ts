@@ -52,10 +52,8 @@ export class AwsSsoComponent implements OnInit {
 
   logout() {
     this.integrationsService.logout();
-    this.awsSsoService.isAwsSsoActive().subscribe(res => {
-      this.isAwsSsoActive = res;
-      this.setValues();
-    });
+    this.isAwsSsoActive = false;
+    this.setValues();
   }
 
   forceSync() {

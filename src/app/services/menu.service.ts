@@ -42,6 +42,8 @@ export class MenuService extends NativeService {
     const activeSessions = this.sessionService.listSessions().filter(s => s.active);
     const allSessions = activeSessions.concat(this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter(s => !s.active)).slice(0, 5 - activeSessions.length));
     allSessions.forEach((session: Session) => {
+      console.log('Sesison', session);
+
       let icon = '';
       let label = '';
       switch (session.account.type) {
@@ -51,6 +53,7 @@ export class MenuService extends NativeService {
           break;
         case AccountType.AWS:
         case AccountType.AWS_TRUSTER:
+        case AccountType.AWS_SSO:
           icon = (session.active && !session.loading) ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + (session.account as AwsAccount).role.name;
           break;

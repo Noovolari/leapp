@@ -19,8 +19,7 @@ export class TimerService extends NativeService {
     if (this.startTime) {
       const currentTime = new Date();
       const seconds = (currentTime.getTime() - this.startTime.getTime()) / 1000;
-      const bufferZone = 5;
-      const timeToRefresh = (seconds > (environment.sessionDuration - bufferZone));
+      const timeToRefresh = (seconds > environment.sessionDuration);
       if (timeToRefresh) {
         this.processRefreshByTimer.emit();
       }

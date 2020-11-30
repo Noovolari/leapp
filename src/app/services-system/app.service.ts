@@ -61,6 +61,22 @@ export class AppService extends NativeService {
     return this.app;
   }
 
+  getMenu() {
+    return this.Menu;
+  }
+
+  getTray() {
+    return this.Tray;
+  }
+
+  getCurrentWindow() {
+    return this.currentWindow;
+  }
+
+  getFollowRedirects() {
+    return this.followRedirects;
+  }
+
   /**
    * Return the dialog native object
    */

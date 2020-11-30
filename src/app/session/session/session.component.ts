@@ -83,7 +83,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
     this.appService.redrawList.subscribe(() => {
       this.getSessions();
-      this.menuService.generateMenu();
     });
   }
 

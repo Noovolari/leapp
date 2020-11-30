@@ -4,7 +4,7 @@ import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.ser
 import {Router} from '@angular/router';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
-import {MenuService} from '../../services/menu.service';
+// import {MenuService} from '../../services/menu.service';
 import {environment} from '../../../environments/environment';
 
 @Component({
@@ -28,7 +28,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     private exec: ExecuteServiceService,
     private appService: AppService,
     private configurationService: ConfigurationService,
-    private menuService: MenuService
+    // private menuService: MenuService
   ) {
     super();
     // Use the default workspace and set it as a class global
@@ -47,7 +47,7 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
 
     if (result) {
       // Generate the contextual menu
-      this.menuService.generateMenu();
+      // this.menuService.generateMenu();
       // If configuration is not needed go to session list
       if (this.isAlreadyConfigured()) {
         this.appService.logger('Already configured, moving to list', LoggerLevel.INFO, this);

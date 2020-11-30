@@ -206,8 +206,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
 
-      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
-
       this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
       const params = {
@@ -268,13 +266,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           });
       };
 
-      this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
-        if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
-          this.applyTrusterAccountSessionToken(workspace, session);
-        } else {
-          processData(params);
-        }
-      });
+      processData(params);
     }
   }
 
@@ -304,9 +296,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const sts = new AWS.STS(this.appService.stsOptions(session));
       const params = { DurationSeconds: environment.sessionTokenDuration };
 
-      this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(parentSession)).then(sessionTokenExpirationData => {
+      this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session)).then(sessionTokenExpirationData => {
         if (sessionTokenExpirationData && this.isSessionTokenStillValid(sessionTokenExpirationData)) {
-          this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenString(parentSession)).then(sessionTokenData => {
+          this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenString(session)).then(sessionTokenData => {
             sessionTokenData = JSON.parse(sessionTokenData);
             processData(sessionTokenData, null);
           });

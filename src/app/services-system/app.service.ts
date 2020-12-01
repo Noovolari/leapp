@@ -3,7 +3,7 @@ import {NativeService} from './native-service';
 import {FileService} from './file.service';
 import {ToastrService} from 'ngx-toastr';
 import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirmation-dialog.component';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
+import {BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
@@ -335,6 +335,7 @@ export class AppService extends NativeService {
    * @param callback - the callback for the ok button to launch
    */
   inputDialog(title: string, placeholder: string, message: string, callback: any) {
+    console.log('inputDialog');
     for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
       this.modalService.hide(i);
     }

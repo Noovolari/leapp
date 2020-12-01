@@ -1,6 +1,6 @@
 {
     "name": "Leapp",
-    "version": "0.3.2",
+    "version": "0.3.3",
     "author": {
         "name": "besharp",
         "email": "info@besharp.it"
@@ -8,24 +8,24 @@
     "description": "Straight programmatic access via Single Sign-on to all your AWS accounts and resources.",
     "contributors": [
         {
-            "name": "Alessandro Gaggia",
-            "email": "alex@besharp.it"
+          "name": "Andrea Cavagna",
+          "email": "andrea.cavagna@noovolari.com"
         },
         {
-            "name": "Paolo Diciaula",
-            "email": "paolo.diciaula@besharp.it"
+          "name": "Paolo Diciaula",
+          "email": "paolo.diciaula@besharp.it"
         },
         {
-            "name": "Eric Villa",
-            "email": "eric@noovolari.com"
+          "name": "Alessandro Gaggia",
+          "email": "alex@besharp.it"
         },
         {
-            "name": "Andrea Cavagna",
-            "email": "andrea.cavagna@noovolari.com"
+          "name": "Nicolò Marchesi",
+          "email": "nicolo@noovolari.com"
         },
         {
-            "name": "Nicolò Marchesi",
-            "email": "nicolo@noovolari.com"
+          "name": "Eric Villa",
+          "email": "eric@noovolari.com"
         }
     ],
     "repository": "https://github.com/Noovolari/leapp",

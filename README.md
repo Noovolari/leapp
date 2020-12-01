@@ -217,6 +217,7 @@ By default, Leapp writes logs to the following locations:
 - on Windows: %USERPROFILE%\\AppData\\Roaming\\**Leapp**\\logs\\log.log
 
 Logs are structured in the following way:
+=======
 
 ```
 [YYYY-MM-DD HH:mm:ss.mmm] [LEVEL] [rendered/system] [COMPONENT] MESSAGE {Useful Object / Stacktrace Err Object}

@@ -63,7 +63,6 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
       credential.aws_secret_access_key = getRoleCredentialsResponse.roleCredentials.secretAccessKey;
       credential.aws_session_token = getRoleCredentialsResponse.roleCredentials.sessionToken;
       const awsSsoCredentials = {default: credential};
-      console.log(awsSsoCredentials);
       session.active = true;
       session.loading = false;
       this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential));

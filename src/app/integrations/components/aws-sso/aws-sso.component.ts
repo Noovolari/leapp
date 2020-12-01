@@ -1,11 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {IntegrationsService} from '../../integrations.service';
 import {AwsSsoService} from '../../providers/aws-sso.service';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../../services-system/app.service';
 import {ConfigurationService} from '../../../services-system/configuration.service';
-import {from, merge, Observable} from 'rxjs';
+import {merge} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../../../environments/environment';
 import {tap} from 'rxjs/operators';
@@ -25,7 +25,7 @@ export class AwsSsoComponent implements OnInit {
 
   public form = new FormGroup({
     portalUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
-    awsRegion: new FormControl('')
+    awsRegion: new FormControl('', [Validators.required])
   });
 
   constructor(

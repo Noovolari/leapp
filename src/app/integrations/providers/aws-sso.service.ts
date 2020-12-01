@@ -91,6 +91,7 @@ export class AwsSsoService extends NativeService {
     });
   }
 
+  // Generate the access token that is valid for 8 hours
   generateSSOToken(authorizeIntegrationResponse: AuthorizeIntegrationResponse): Observable<GenerateSSOTokenResponse> {
     return new Observable(observer => {
       const createTokenRequest: CreateTokenRequest = {
@@ -206,10 +207,18 @@ export class AwsSsoService extends NativeService {
       map((roleInfo: RoleInfo) => {
         const account: AwsSsoAccount = {
           role: {name: roleInfo.roleName},
-          accountId: accountInfo.accountId, accountName: accountInfo.accountName, accountNumber: accountInfo.accountId, email: accountInfo.emailAddress, type: AccountType.AWS_SSO
+          accountId: accountInfo.accountId,
+          accountName: accountInfo.accountName,
+          accountNumber: accountInfo.accountId,
+          email: accountInfo.emailAddress,
+          type: AccountType.AWS_SSO
         };
         const session: Session = {
-          account, active: false, id: uuidv4(), lastStopDate: new Date().toISOString(), loading: false
+          account,
+          active: false,
+          id: uuidv4(),
+          lastStopDate: new Date().toISOString(),
+          loading: false
         };
         return session;
       })

@@ -29,75 +29,6 @@ export class MenuService extends NativeService {
     private appService: AppService) {
 
     super();
-
-    this.appService.redrawList.subscribe(res => {
-      this.generateMenu();
-    });
-  }
-
-  generateMenu() {
-    const version = this.appService.getApp().getVersion();
-
-    let voices = [];
-    const activeSessions = this.sessionService.listSessions().filter(s => s.active);
-    const allSessions = activeSessions.concat(this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter(s => !s.active)).slice(0, 5 - activeSessions.length));
-    allSessions.forEach((session: Session) => {
-      console.log('Sesison', session);
-
-      let icon = '';
-      let label = '';
-      switch (session.account.type) {
-        case AccountType.AWS_PLAIN_USER:
-          icon = (session.active && !session.loading) ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
-          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsPlainAccount).user;
-          break;
-        case AccountType.AWS:
-        case AccountType.AWS_TRUSTER:
-        case AccountType.AWS_SSO:
-          icon = (session.active && !session.loading) ? __dirname + `/assets/images/icon-online-aws.png` : __dirname + `/assets/images/icon-offline.png`;
-          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsAccount).role.name;
-          break;
-
-        case AccountType.AZURE:
-          icon = (session.active && !session.loading) ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
-          label = '  ' + session.account.accountName;
-      }
-      voices.push(
-        { label,
-          type: 'normal',
-          icon,
-          click: (menuItem, browserWindow, event) => {
-            if (!session.active) {
-              this.sessionService.startSession(session);
-              this.credentialService.refreshCredentialsEmit.emit(session.account.type);
-
-            } else {
-              this.credentialService.refreshCredentialsEmit.emit(session.account.type);
-              this.sessionService.stopSession(session);
-            }
-            this.appService.redrawList.emit(true);
-            this.generateMenu();
-        } },
-      );
-    });
-
-    const extraInfo = [
-      { type: 'separator' },
-      { label: 'Show', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); } },
-      { label: 'About', type: 'normal', click: (menuItem, browserWindow, event) => { this.currentWindow.show(); this.dialog.showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok'] }); } },
-      { type: 'separator' },
-      { label: 'Quit', type: 'normal', click: (menuItem, browserWindow, event) => { this.cleanBeforeExit(); } },
-    ];
-
-    voices = voices.concat(extraInfo);
-    const contextMenu = this.Menu.buildFromTemplate(voices);
-
-    if (!this.currentTray) {
-      this.currentTray = new this.Tray(__dirname + `/assets/images/LeappMini.png`);
-    }
-
-    this.currentTray.setToolTip('Leapp');
-    this.currentTray.setContextMenu(contextMenu);
   }
 
   /**
@@ -112,7 +43,7 @@ export class MenuService extends NativeService {
       // Stop the session...
       this.sessionService.stopAllSession();
       // Stop credentials to be used
-      this.credentialService.refreshCredentialsEmit.emit(null);
+      this.credentialService.refreshCredentials(null);
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {

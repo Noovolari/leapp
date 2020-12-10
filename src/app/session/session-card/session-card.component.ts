@@ -18,6 +18,7 @@ import {AccountType} from '../../models/AccountType';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import {KeychainService} from '../../services-system/keychain.service';
+import {AntiMemLeak} from '../../core/anti-mem-leak';
 
 @Component({
   selector: 'app-session-card',
@@ -25,7 +26,7 @@ import {KeychainService} from '../../services-system/keychain.service';
   styleUrls: ['./session-card.component.scss'],
 })
 
-export class SessionCardComponent implements OnInit {
+export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   eAccountType = AccountType;
 
@@ -56,7 +57,7 @@ export class SessionCardComponent implements OnInit {
               private azureAccountService: AzureAccountService,
               private configurationService: ConfigurationService,
               private ssmService: SsmService,
-              private modalService: BsModalService) { }
+              private modalService: BsModalService) { super(); }
 
   ngOnInit() {
     // Set regions for ssm
@@ -190,13 +191,13 @@ export class SessionCardComponent implements OnInit {
         const credentials = JSON.parse(creds);
 
         // Check the result of the call
-        this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
+        this.subs.add(this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
           this.instances = result.instances;
           this.ssmloading = false;
         }, err => {
           this.instances = [];
           this.ssmloading = false;
-        });
+        }));
       });
     }
   }

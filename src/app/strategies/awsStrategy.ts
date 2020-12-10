@@ -12,7 +12,7 @@ import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
 import {TimerService} from '../services/timer-service';
 import {Workspace} from '../models/workspace';
 import {WorkspaceService} from '../services/workspace.service';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {constants} from '../core/enums/constants';
 import {ProxyService} from '../services/proxy.service';
 import {Session} from '../models/session';
@@ -21,6 +21,8 @@ import {Session} from '../models/session';
 const AWS = require('aws-sdk');
 
 export class AwsStrategy extends RefreshCredentialsStrategy {
+  private processSubscription: Subscription;
+  private processSubscriptionTruster: Subscription;
 
   constructor(
     private credentialsService: CredentialsService,
@@ -71,7 +73,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
         this.applyPlainAccountSessionToken(workspace, session);
       } else {
-        this.getPlainAccountSessionToken(credentials, session).subscribe((awsCredentials) => {
+        if (this.processSubscription) { this.processSubscription.unsubscribe(); }
+        this.processSubscription = this.getPlainAccountSessionToken(credentials, session).subscribe((awsCredentials) => {
             const tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);
 
             this.keychainService.saveSecret(environment.appName, `plain-account-session-token-${session.account.accountName}`, JSON.stringify(tmpCredentials));
@@ -215,7 +218,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       };
 
       const processData = (p) => {
-        this.getTrusterAccountSessionToken(credentials, parentSession, session).subscribe((awsCredentials) => {
+        if (this.processSubscriptionTruster) { this.processSubscriptionTruster.unsubscribe(); }
+        this.processSubscriptionTruster = this.getTrusterAccountSessionToken(credentials, parentSession, session).subscribe((awsCredentials) => {
             // Update AWS sdk with new credentials
             AWS.config.update({
               accessKeyId: awsCredentials.default.aws_access_key_id,

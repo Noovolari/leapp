@@ -11,6 +11,7 @@ import {NativeService} from '../services-system/native-service';
 import {ProxyService} from './proxy.service';
 import {TimerService} from './timer-service';
 import {WorkspaceService} from './workspace.service';
+import {Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,10 @@ export class CredentialsService extends NativeService {
   azureStrategy;
   awsStrategy;
 
+  private refreshSubscribe: Subscription;
+  private workspaceSubscribe: Subscription;
+  private timerSubscription: Subscription;
+
   constructor(
     private appService: AppService,
     private configurationService: ConfigurationService,
@@ -40,13 +45,17 @@ export class CredentialsService extends NativeService {
   ) {
     super();
 
-    this.refreshCredentialsEmit.subscribe((accountType) => this.refreshCredentials(accountType));
-    this.workspaceService.credentialEmit.subscribe(res => this.processCredentials(res));
+    if (this.refreshSubscribe) { this.refreshSubscribe.unsubscribe(); }
+    this.refreshSubscribe = this.refreshCredentialsEmit.subscribe((accountType) => this.refreshCredentials(accountType));
+
+    if (this.workspaceSubscribe) { this.workspaceSubscribe.unsubscribe(); }
+    this.workspaceSubscribe = this.workspaceService.credentialEmit.subscribe(res => this.processCredentials(res));
 
     // =================================================
     // Subscribe to global timer manager from strategies
     // =================================================
-    this.timerService.processRefreshByTimer.subscribe(() => {
+    if (this.timerSubscription) { this.timerSubscription.unsubscribe(); }
+    this.timerSubscription = this.timerService.processRefreshByTimer.subscribe(() => {
       this.refreshCredentials(null);
     });
 

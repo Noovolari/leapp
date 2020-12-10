@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {NativeService} from './native-service';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import * as CryptoJS from 'crypto-js';
 
 @Injectable({
@@ -11,6 +11,7 @@ export class FileService extends NativeService {
   /* ====================================================
    * === Wrapper functions over the fs native library ===
    * ==================================================== */
+  private readSubscription: Subscription;
 
   /**
    * Get the home directory
@@ -190,7 +191,8 @@ export class FileService extends NativeService {
    */
   iniParse(filePath: string): Observable<any> {
     return new Observable(subscriber => {
-      this.readFile(filePath).subscribe(file => {
+      if (this.readSubscription) { this.readSubscription.unsubscribe(); }
+      this.readSubscription = this.readFile(filePath).subscribe(file => {
         try {
           subscriber.next(this.ini.parse(file));
         } catch (e) {

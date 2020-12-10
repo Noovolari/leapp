@@ -9,6 +9,7 @@ import {TrusterAccountService} from './truster-account.service';
 import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
 import {Session} from '../models/session';
+import {Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,6 +22,7 @@ export class ProviderManagerService {
   selectedSession;
   selectedRole;
   selectedRegion;
+  private googleSubscription: Subscription;
 
   /**
    * Used to manage all the choices done in the app regarding the correct provider to use:
@@ -100,7 +102,8 @@ export class ProviderManagerService {
       const federationUrl = form.value.federationUrl;
 
       // When the token is received save it and go to the setup page for the first account
-      this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => {
+      if (this.googleSubscription) { this.googleSubscription.unsubscribe(); }
+      this.googleSubscription = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => {
         this.createNewWorkspace(googleToken, federationUrl, responseType);
         this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
       }));

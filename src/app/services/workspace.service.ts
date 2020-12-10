@@ -5,7 +5,7 @@ import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
-import {Observable} from 'rxjs';
+import {Observable, Subscription} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
@@ -48,6 +48,7 @@ export class WorkspaceService extends NativeService {
 
   // Credential refreshed
   public credentialEmit: EventEmitter<{status: string, accountName: string}> = new EventEmitter<{status: string, accountName: string}>();
+  private showingSubscription: Subscription;
 
   constructor(
     private httpClient: HttpClient,
@@ -72,17 +73,14 @@ export class WorkspaceService extends NativeService {
    * @param callbackUrl - the callback url that can be given always by the backend in case is missing we setup a default one
    */
   getIdpToken(idpUrl: string, session: any, type: string, callbackUrl?: string) {
-    this.checkForShowingTheLoginWindow(idpUrl).subscribe((res) => {
-      if (this.idpWindow === undefined || this.idpWindow === null) {
-        // We generate a new browser window to host for the Idp Login form
-        // Note: this is due to the fact that electron + angular gives problem with embedded webview
-        const pos = this.currentWindow.getPosition();
-        try {
-          this.idpWindow.close();
-        } catch (err) {}
-        this.idpWindow = this.appService.newWindow(idpUrl, res, 'IDP - Login', pos[0] + 200, pos[1] + 50);
-      }
+    if (this.showingSubscription) { this.showingSubscription.unsubscribe(); }
+    this.showingSubscription = this.checkForShowingTheLoginWindow(idpUrl).subscribe((res) => {
 
+      // We generate a new browser window to host for the Idp Login form
+      // Note: this is due to the fact that electron + angular gives problem with embedded webview
+      const pos = this.currentWindow.getPosition();
+
+      this.idpWindow = this.appService.newWindow(idpUrl, res, 'IDP - Login', pos[0] + 200, pos[1] + 50);
       this.proxyService.configureBrowserWindow(this.idpWindow);
 
       // This filter is used to listen to go to a specific callback url (or the generic one)
@@ -162,31 +160,9 @@ export class WorkspaceService extends NativeService {
    */
   checkForShowingTheLoginWindow(url): Observable<boolean> {
     return new Observable<boolean>(obs => {
-      if (this.idpWindow === undefined || this.idpWindow === null) {
-        // We generate a new browser window to host for the Idp Login form
-        // Note: this is due to the fact that electron + angular gives problem with embedded webview
-        const pos = this.currentWindow.getPosition();
+      const pos = this.currentWindow.getPosition();
 
-        // Check if the next three lines are needed
-        try {
-          this.idpWindow.close();
-        } catch (err) {}
-
-        this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
-      } else {
-        // We generate a new browser window to host for the Idp Login form
-        // Note: this is due to the fact that electron + angular gives problem with embedded webview
-        const pos = this.currentWindow.getPosition();
-
-        // Check if the next three lines are needed
-        try {
-          this.idpWindow.close();
-        } catch (err) {}
-
-        this.idpWindow = null;
-        this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
-      }
-
+      this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
       this.proxyService.configureBrowserWindow(this.idpWindow);
 
       // This filter is used to listen to go to a specific callback url (or the generic one)

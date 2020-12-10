@@ -11,13 +11,14 @@ import {Session} from '../../models/session';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {KeychainService} from '../../services-system/keychain.service';
 import {environment} from '../../../environments/environment';
+import {AntiMemLeak} from '../../core/anti-mem-leak';
 
 @Component({
   selector: 'app-edit-account',
   templateUrl: './edit-account.component.html',
   styleUrls: ['./edit-account.component.scss']
 })
-export class EditAccountComponent implements OnInit {
+export class EditAccountComponent extends AntiMemLeak implements OnInit {
   accountType = AccountType.AWS_PLAIN_USER;
   provider = AccountType.AWS;
   selectedSession: Session;
@@ -49,10 +50,10 @@ export class EditAccountComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private providerManagerService: ProviderManagerService,
     private keychainService: KeychainService
-  ) {}
+  ) { super(); }
 
   ngOnInit() {
-    this.activatedRoute.queryParams.subscribe(params => {
+    this.subs.add(this.activatedRoute.queryParams.subscribe(params => {
       // Get the workspace and the account you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
       this.selectedSession = this.workspace.sessions.filter(session => session.id === params.sessionId)[0];
@@ -76,7 +77,7 @@ export class EditAccountComponent implements OnInit {
           this.form.controls['secretKey'].setValue(secret);
         });
       });
-    });
+    }));
   }
 
   /**

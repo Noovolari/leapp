@@ -10,6 +10,7 @@ import {Session} from '../models/session';
 import {AccountType} from '../models/AccountType';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {AwsAccount} from '../models/aws-account';
+import {Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class MenuService extends NativeService {
 
   // Used to define the only tray we want as active expecially in linux context
   currentTray;
+  private redrawSubscription: Subscription;
 
 
   constructor(
@@ -30,7 +32,8 @@ export class MenuService extends NativeService {
 
     super();
 
-    this.appService.redrawList.subscribe(res => {
+    if (this.redrawSubscription) { this.redrawSubscription.unsubscribe(); }
+    this.redrawSubscription = this.appService.redrawList.subscribe(res => {
       this.generateMenu();
     });
   }

@@ -70,17 +70,16 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     // this.credentialsService.refreshCredentialsEmit.emit(null);
 
     // Set loading to false when a credential is emitted: if result is false stop the current session!
-    this.credentialsService.refreshReturnStatusEmit.subscribe((res) => {
+    this.subs.add(this.credentialsService.refreshReturnStatusEmit.subscribe((res) => {
       if (!res) {
         // problem: stop session now!
         this.stopSession(null);
       }
-    });
+    }));
 
-    this.appService.redrawList.subscribe(r => {
+    this.subs.add(this.appService.redrawList.subscribe(r => {
       this.getSessions();
-      this.menuService.generateMenu();
-    });
+    }));
   }
 
   /**

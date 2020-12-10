@@ -6,6 +6,7 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {HttpClient} from '@angular/common/http';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
 import {ProxyService} from '../../services/proxy.service';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -18,6 +19,8 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
   test: any;
 
   /* Profile Sidebar with links */
+  private execSubscription: Subscription;
+
   constructor(
     private appService: AppService,
     private configurationService: ConfigurationService,
@@ -61,7 +64,8 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     workspace.azureProfile = null;
     workspace.azureConfig = null;
     this.configurationService.updateWorkspaceSync(workspace);
-    this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
+    if (this.execSubscription) { this.execSubscription.unsubscribe(); }
+    this.execSubscription = this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
 
   /**

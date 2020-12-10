@@ -8,8 +8,13 @@ import {AzureAccount} from '../models/azure-account';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {TimerService} from '../services/timer-service';
 import {CredentialsService} from '../services/credentials.service';
+import {Subscription} from 'rxjs';
 
 export class AzureStrategy extends RefreshCredentialsStrategy {
+  private processSubscription: Subscription;
+  private processSubscription2: Subscription;
+  private processSubscription3: Subscription;
+  private processSubscription4: Subscription;
 
   constructor(
     private credentialsService: CredentialsService,
@@ -57,7 +62,8 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
         this.azureSetSubscription(session);
       } else {
         // 2b) First time playing with Azure credentials
-        this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(res => {
+        if (this.processSubscription) { this.processSubscription.unsubscribe(); }
+        this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(res => {
 
           this.azureSetSubscription(session);
         }, err => {
@@ -67,7 +73,8 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
       }
     } else {
       // First time playing with Azure credentials
-      this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(res => {
+      if (this.processSubscription2) { this.processSubscription2.unsubscribe(); }
+      this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(res => {
 
         this.azureSetSubscription(session);
       }, err => {
@@ -90,13 +97,15 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
 
       this.configurationService.updateWorkspaceSync(workspace);
     }
-    this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
+    if (this.processSubscription3) { this.processSubscription3.unsubscribe(); }
+    this.processSubscription3 = this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
 
   private azureSetSubscription(session: Session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     // We can use Json in res to save account information
-    this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).subscribe(acc => {
+    if (this.processSubscription4) { this.processSubscription4.unsubscribe(); }
+    this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).subscribe(acc => {
       // be sure to save the profile and tokens
       workspace.azureProfile = this.configurationService.getAzureProfileSync();
       workspace.azureConfig = this.configurationService.getAzureConfigSync();

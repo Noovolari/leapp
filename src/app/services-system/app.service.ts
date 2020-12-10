@@ -19,6 +19,8 @@ export class AppService extends NativeService {
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
   redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
 
+  newWin;
+
   stsEndpointsPerRegion = new Map([
     ['us-east-1', 'https://sts.us-east-1.amazonaws.com'],
     ['ap-northeast-1', 'https://sts.ap-northeast-1.amazonaws.com'],
@@ -226,8 +228,15 @@ export class AppService extends NativeService {
         y: y + 50
       });
     }
-    const newWin = new this.browserWindow(opts);
-    return newWin;
+
+    if (this.newWin) {
+      this.newWin.close();
+    }
+    this.newWin = new this.browserWindow(opts);
+    this.newWin.on('closed', () => {
+      this.newWin = null;
+    });
+    return this.newWin;
   }
 
   /**

@@ -230,12 +230,13 @@ export class AppService extends NativeService {
     }
 
     if (this.newWin) {
-      this.newWin.close();
+      console.log('new win', this.newWin);
+      try {
+        this.newWin.close();
+      } catch (e) { }
+      this.newWin = null;
     }
     this.newWin = new this.browserWindow(opts);
-    this.newWin.on('closed', () => {
-      this.newWin = null;
-    });
     return this.newWin;
   }
 

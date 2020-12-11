@@ -95,14 +95,6 @@ export class WorkspaceService extends NativeService {
       this.idpWindow.loadURL(idpUrl);
 
     }, err => {
-      if (this.idpWindow !== undefined && this.idpWindow !== null) {
-        try {
-          this.idpWindow.close();
-        } catch (e) {
-          this.appService.logger(e, LoggerLevel.ERROR, this, e.stack);
-        }
-      }
-
       // Sometimes it can arrive here (tested) so the REAL way to block everything is to use the credential emit element!!!
       this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
       this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
@@ -161,9 +153,10 @@ export class WorkspaceService extends NativeService {
   checkForShowingTheLoginWindow(url): Observable<boolean> {
     return new Observable<boolean>(obs => {
       const pos = this.currentWindow.getPosition();
-
+      console.log('idp win', this.idpWindow);
       this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
       this.proxyService.configureBrowserWindow(this.idpWindow);
+      console.log('DOPOOOPO');
 
       // This filter is used to listen to go to a specific callback url (or the generic one)
       const filter = {urls: ['https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};

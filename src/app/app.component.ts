@@ -27,7 +27,8 @@ export class AppComponent implements OnInit {
     private app: AppService,
     private credentialsService: CredentialsService,
     private menuService: MenuService
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     // Use ngx bootstrap 4
@@ -38,8 +39,10 @@ export class AppComponent implements OnInit {
 
     if (environment.production) {
       // Clear both info and warn message in production mode without removing them from code actually
-      console.warn = () => {};
-      console.log = () => {};
+      console.warn = () => {
+      };
+      console.log = () => {
+      };
     }
 
     // If we have credentials copy them from workspace file to the .aws credential file
@@ -53,12 +56,12 @@ export class AppComponent implements OnInit {
     this.verifyWorkspace();
 
     // Prevent Dev Tool to show on production mode
-//    this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
-//      if (environment.production) {
-//        this.app.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
-//        this.app.currentBrowserWindow().webContents.closeDevTools();
-//      }
-//    });
+    this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
+      if (environment.production) {
+        this.app.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
+        this.app.currentBrowserWindow().webContents.closeDevTools();
+      }
+    });
 
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
@@ -87,7 +90,13 @@ export class AppComponent implements OnInit {
       const hasNewConf = workspace.proxyConfiguration !== undefined;
       if (!hasNewConf) {
         const proxyUrl = workspace.proxyUrl ? workspace.proxyUrl : '';
-        workspace.proxyConfiguration = { proxyPort: '8080', proxyProtocol: 'https', proxyUrl, username: '', password: '' };
+        workspace.proxyConfiguration = {
+          proxyPort: '8080',
+          proxyProtocol: 'https',
+          proxyUrl,
+          username: '',
+          password: ''
+        };
         this.configurationService.updateWorkspaceSync(workspace);
       }
     }

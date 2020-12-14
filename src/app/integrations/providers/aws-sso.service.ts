@@ -15,9 +15,9 @@ import SSO, {
   RoleInfo
 } from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
-import {AppService} from '../../services-system/app.service';
-import {from, merge, Observable, throwError} from 'rxjs';
-import {catchError, map, switchMap, tap, toArray} from 'rxjs/operators';
+import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
+import {from, merge, NEVER, never, Observable, of, throwError} from 'rxjs';
+import {catchError, filter, map, switchMap, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
@@ -27,6 +27,7 @@ import {environment} from '../../../environments/environment';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {Workspace} from '../../models/workspace';
+import {type} from 'os';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -181,15 +182,19 @@ export class AwsSsoService extends NativeService {
     const loginToAwsSSOResponse: LoginToAwsSSOResponse = {accessToken: '', expirationTime: undefined, region: ''};
     return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(
       switchMap((expirationTime) => {
-        if (Date.parse(expirationTime) > Date.now()) {
-          return merge(
-            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN')).pipe(tap( res => loginToAwsSSOResponse.accessToken = res)),
-            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(tap( res => loginToAwsSSOResponse.expirationTime = new Date(res))),
-            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap( res => loginToAwsSSOResponse.region = res)),
-          ).pipe(
-            toArray(),
-            map(() => loginToAwsSSOResponse)
-          );
+        try {
+          if (Date.parse(expirationTime) > Date.now()) {
+            return merge(
+              fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN')).pipe(tap( res => loginToAwsSSOResponse.accessToken = res)),
+              fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(tap( res => loginToAwsSSOResponse.expirationTime = new Date(res))),
+              fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap( res => loginToAwsSSOResponse.region = res)),
+            ).pipe(
+              toArray(),
+              map(() => loginToAwsSSOResponse)
+            );
+          }
+        } catch (err) {
+          return throwError('AWS SSO in getAwsSsoPortalCredentials.');
         }
         return this.loginToAwsSSO();
       })
@@ -213,19 +218,27 @@ export class AwsSsoService extends NativeService {
 
   generateSessionsFromToken(observable: Observable<LoginToAwsSSOResponse>): Observable<Session[]> {
     return observable.pipe(
+      catchError( (err) => {
+        return throwError(`AWS SSO generateSessionsFromToken: ${err.toString()}`);
+      }),
       // API portal Calls
       switchMap((loginToAwsSSOResponse: LoginToAwsSSOResponse) => this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region)),
       // Create an array of observables and then call them in parallel,
       switchMap((response) => {
         const arrayResponse = [];
-        response.accountList.forEach( accountInfo => {
+        console.log('HERE 1: ', response);
+        for (let i = 0; i < response.accountList.length; i++) {
+          const accountInfo = response.accountList[i];
           const accountInfoCall = this.getSessionsFromAccount(accountInfo, response.accessToken, response.region);
           arrayResponse.push(accountInfoCall);
-        });
+        }
         return merge<Session>(...arrayResponse);
       }),
       // every call will be merged in an Array
       toArray(),
+      catchError( (err) => {
+        return throwError(`AWS SSO generateSessionsFromToken: ${err.toString()}`);
+      })
     );
   }
 
@@ -241,6 +254,11 @@ export class AwsSsoService extends NativeService {
   }
 
   getSessionsFromAccount(accountInfo: AccountInfo, accessToken, region): Observable<Session> {
+    if (!accountInfo) {
+      console.log('HERE 3b');
+      return throwError('AWS SSO Get Sessions from account error: no account info');
+    }
+
     this.ssoPortal = new SSO({region});
     const listAccountRolesRequest: ListAccountRolesRequest = {
       accountId: accountInfo.accountId,
@@ -248,7 +266,14 @@ export class AwsSsoService extends NativeService {
     };
 
     return from(this.ssoPortal.listAccountRoles(listAccountRolesRequest).promise()).pipe(
-      switchMap( (listAccountRolesResponse: ListAccountRolesResponse)  => listAccountRolesResponse.roleList ),
+      switchMap( (listAccountRolesResponse: ListAccountRolesResponse)  => {
+        if (!listAccountRolesResponse) {
+          console.log('HERE 4');
+          return throwError('AWS SSO error in Get Sessions from account: null list account response');
+        }
+        console.log('quaggiù');
+        return listAccountRolesResponse.roleList;
+      }),
       map((roleInfo: RoleInfo) => {
         const account: AwsSsoAccount = {
           role: {name: roleInfo.roleName},
@@ -265,6 +290,7 @@ export class AwsSsoService extends NativeService {
           lastStopDate: new Date().toISOString(),
           loading: false
         };
+        console.log('HERE 5');
         return session;
       })
     );
@@ -283,29 +309,34 @@ export class AwsSsoService extends NativeService {
 
     // If sessions does not exist create the sessions array
     // TODO: remove
-    if (JSON.stringify(workspace) === '{}') {
-      // Set the configuration with the updated value
-      const configuration = this.configurationService.getConfigurationFileSync();
-      // TODO: we need more than one workspace?
-      configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
-      const workspaceCreation: Workspace = {
-        type: null,
-        name: 'default',
-        lastIDPToken: null,
-        idpUrl: null,
-        proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
-        sessions: [],
-        setupDone: true,
-        azureProfile: null,
-        azureConfig: null
-      };
-      configuration.defaultWorkspace = 'default';
-      configuration.workspaces.push(workspaceCreation);
-      this.configurationService.updateConfigurationFileSync(configuration);
-      workspace = workspaceCreation;
+    try {
+      if (JSON.stringify(workspace) === '{}') {
+        // Set the configuration with the updated value
+        const configuration = this.configurationService.getConfigurationFileSync();
+        // TODO: we need more than one workspace?
+        configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
+        const workspaceCreation: Workspace = {
+          type: null,
+          name: 'default',
+          lastIDPToken: null,
+          idpUrl: null,
+          proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
+          sessions: [],
+          setupDone: true,
+          azureProfile: null,
+          azureConfig: null
+        };
+        configuration.defaultWorkspace = 'default';
+        configuration.workspaces.push(workspaceCreation);
+        this.configurationService.updateConfigurationFileSync(configuration);
+        workspace = workspaceCreation;
+      }
+    } catch (err) {
+      this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
+      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+      return;
     }
     // Remove all AWS SSO old session or create a session array
-    console.log(workspace.sessions);
     workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
     // Add new AWS SSO sessions
     workspace.sessions.push(...AwsSsoSessions);
@@ -313,15 +344,20 @@ export class AwsSsoService extends NativeService {
   }
 
   logOutAwsSso() {
-    this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN');
-    this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
+    try {
+      this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN');
+      this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
 
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
 
-    // Remove all AWS SSO old session
-    workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
+      // Remove all AWS SSO old session
+      workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
 
-    this.configurationService.updateWorkspaceSync(workspace);
+      this.configurationService.updateWorkspaceSync(workspace);
+    } catch (err) {
+      this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
+      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+    }
   }
 
   isAwsSsoActive(): Observable<boolean> {

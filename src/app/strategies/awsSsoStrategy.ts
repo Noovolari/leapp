@@ -8,12 +8,13 @@ import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {AwsSsoAccount} from '../models/aws-sso-account';
-import {switchMap} from 'rxjs/operators';
+import {catchError, switchMap} from 'rxjs/operators';
 
 import {AwsCredential} from '../models/credential';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
+import {throwError} from 'rxjs';
 
 
 export class AwsSsoStrategy extends RefreshCredentialsStrategy {
@@ -55,7 +56,13 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
   private awsCredentialProcess(workspace: Workspace, session: Session) {
     // Retrieve access token and region
     this.awsSsoService.getAwsSsoPortalCredentials().pipe(
-      switchMap((loginToAwsSSOResponse) =>  this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name))
+      catchError( (err) => {
+        return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
+      }),
+      switchMap((loginToAwsSSOResponse) =>  this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name)),
+      catchError( (err) => {
+        return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
+      })
     ).subscribe((getRoleCredentialsResponse) => {
       // Construct the credential object
       const credential: AwsCredential = {};

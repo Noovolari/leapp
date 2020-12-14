@@ -1,10 +1,23 @@
 import {Injectable} from '@angular/core';
-import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest} from 'aws-sdk/clients/ssooidc';
-import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo} from 'aws-sdk/clients/sso';
+import SSOOIDC, {
+  CreateTokenRequest,
+  RegisterClientRequest,
+  StartDeviceAuthorizationRequest
+} from 'aws-sdk/clients/ssooidc';
+import SSO, {
+  AccountInfo,
+  GetRoleCredentialsRequest,
+  GetRoleCredentialsResponse,
+  ListAccountRolesRequest,
+  ListAccountRolesResponse,
+  ListAccountsRequest,
+  ListAccountsResponse,
+  RoleInfo
+} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
 import {AppService} from '../../services-system/app.service';
-import {from, merge, Observable} from 'rxjs';
-import {map, switchMap, tap, toArray} from 'rxjs/operators';
+import {from, merge, Observable, throwError} from 'rxjs';
+import {catchError, map, switchMap, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
@@ -51,78 +64,101 @@ export class AwsSsoService extends NativeService {
 
   authorizeIntegration(region: string, portalUrl: string): Observable<AuthorizeIntegrationResponse> {
     this.ssooidc = new SSOOIDC({region});
-    return new Observable(observer => {
-      const registerClientRequest: RegisterClientRequest = {
-        clientName: 'leapp',
-        clientType: 'public',
-      };
-      this.ssooidc.registerClient(registerClientRequest, (err, registerClientResponse) => {
+
+    const registerClientRequest: RegisterClientRequest = {
+      clientName: 'leapp',
+      clientType: 'public',
+    };
+
+    return fromPromise(this.ssooidc.registerClient(registerClientRequest).promise()).pipe(
+      catchError((err) => {
+        return throwError('AWS SSO client registration error.');
+      }),
+      switchMap((registerClientResponse: any) => {
         if (!registerClientResponse) {
-          console.log(err);
-          observer.complete();
+          return throwError('AWS SSO client registration error.');
         } else {
           const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
             clientId: registerClientResponse.clientId,
             clientSecret: registerClientResponse.clientSecret,
             startUrl: portalUrl
           };
-          this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest, (err1, startDeviceAuthorizationResponse
-          ) => {
-            if (!startDeviceAuthorizationResponse) {
-              console.log(err1);
-            } else {
-              const pos = this.currentWindow.getPosition();
 
-              this.ssoWindow = null;
-              this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
-              this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
+          return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(
+            catchError((err) => {
+              return throwError('AWS SSO device authorization error.');
+            }),
+            switchMap((startDeviceAuthorizationResponse: any) => {
+              return new Observable<AuthorizeIntegrationResponse>((observer) => {
+                if (!startDeviceAuthorizationResponse) {
+                  observer.error('AWS SSO device authorization error.');
+                } else {
+                  const pos = this.currentWindow.getPosition();
 
-              // When the code is verified and the user has been logged in, the window can be closed
-              this.ssoWindow.webContents.session.webRequest.onBeforeRequest( {urls: ['https://*.awsapps.com/start/user-consent/login-success.html']}, () => {
-                this.ssoWindow.close();
-                this.ssoWindow = null;
-                observer.next({clientId: registerClientResponse.clientId, clientSecret: registerClientResponse.clientSecret, deviceCode: startDeviceAuthorizationResponse.deviceCode });
-                observer.complete();
+                  this.ssoWindow = null;
+                  this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
+                  this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
+
+                  // TODO: handle webRequest error with setTimeout (webRequest on Timeout)
+
+                  // When the code is verified and the user has been logged in, the window can be closed
+                  this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: ['https://*.awsapps.com/start/user-consent/login-success.html'] }, () => {
+                    this.ssoWindow.close();
+                    this.ssoWindow = null;
+
+                    observer.next({
+                      clientId: registerClientResponse.clientId,
+                      clientSecret: registerClientResponse.clientSecret,
+                      deviceCode: startDeviceAuthorizationResponse.deviceCode
+                    });
+
+                    observer.complete();
+                  });
+                }
               });
-            }
-          });
+            })
+          );
         }
-      });
-    });
+      })
+    );
   }
 
   // Generate the access token that is valid for 8 hours
   generateSSOToken(authorizeIntegrationResponse: AuthorizeIntegrationResponse): Observable<GenerateSSOTokenResponse> {
-    return new Observable(observer => {
-      const createTokenRequest: CreateTokenRequest = {
+    const createTokenRequest: CreateTokenRequest = {
       clientId: authorizeIntegrationResponse.clientId,
       clientSecret: authorizeIntegrationResponse.clientSecret,
       grantType: 'urn:ietf:params:oauth:grant-type:device_code',
       deviceCode: authorizeIntegrationResponse.deviceCode
-      };
+    };
 
-      this.ssooidc.createToken(createTokenRequest, (err, createTokenResponse) => {
-        if (createTokenResponse === undefined) {
-          console.log(err);
-          observer.complete();
-        } else {
-          let expirationTime: Date = new Date();
-          expirationTime = new Date(expirationTime.getTime() + createTokenResponse.expiresIn * 1000);
-          observer.next({accessToken: createTokenResponse.accessToken, expirationTime});
-          observer.complete();
-        }
-
-      });
-    });
+    return fromPromise(this.ssooidc.createToken(createTokenRequest).promise()).pipe(
+      catchError((err) => {
+        return throwError('AWS SSO token creation error...');
+      }),
+      switchMap((createTokenResponse: any) => {
+        return new Observable<GenerateSSOTokenResponse>((observer) => {
+          if (!createTokenResponse) {
+            observer.error('AWS SSO token creation error...');
+          } else {
+            let expirationTime: Date = new Date();
+            expirationTime = new Date(expirationTime.getTime() + createTokenResponse.expiresIn * 1000);
+            observer.next({ accessToken: createTokenResponse.accessToken, expirationTime });
+            observer.complete();
+          }
+        });
+      })
+    );
   }
 
   firstTimeLoginToAwsSSO(region: string, portalUrl: string): Observable<LoginToAwsSSOResponse> {
     return this.authorizeIntegration(region, portalUrl).pipe(
       switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
-      map(generateSSOTokenResponse => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
-      // whenever you are logged, then save info in keychain
-      tap((response) => this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime)),
-
+      switchMap(generateSSOTokenResponse => {
+        return this.saveAwsSsoAccessInfo(portalUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
+          map(() => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime }))
+        );
+      })
     );
   }
 
@@ -161,20 +197,24 @@ export class AwsSsoService extends NativeService {
   }
 
   saveAwsSsoAccessInfo(portalUrl: string, region: string, accessToken: string, expirationTime: Date) {
-    this.keychainService.saveSecret(environment.appName, 'AWS_SSO_PORTAL_URL', portalUrl);
-    this.keychainService.saveSecret(environment.appName, 'AWS_SSO_REGION', region);
-    this.keychainService.saveSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN', accessToken);
-    this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', expirationTime.toString());
+    return merge(
+      fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_PORTAL_URL', portalUrl)),
+      fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_REGION', region)),
+      fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN', accessToken)),
+      fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', expirationTime.toString()))
+    ).pipe(
+      catchError((err) => {
+        return throwError('AWS SSO save secrets error.');
+      })
+    );
   }
-
-
 
   // PORTAL APIS
 
   generateSessionsFromToken(observable: Observable<LoginToAwsSSOResponse>): Observable<Session[]> {
     return observable.pipe(
       // API portal Calls
-      switchMap((loginToAwsSSOResponse) => this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region)),
+      switchMap((loginToAwsSSOResponse: LoginToAwsSSOResponse) => this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region)),
       // Create an array of observables and then call them in parallel,
       switchMap((response) => {
         const arrayResponse = [];
@@ -190,9 +230,14 @@ export class AwsSsoService extends NativeService {
   }
 
   listAccounts(accessToken: string, region: string): Observable<any> {
-    this.ssoPortal = new SSO({region});
-    const listAccountsRequest: ListAccountsRequest = {accessToken};
-    return fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()).pipe( map((response: ListAccountsResponse) => ({accountList: response.accountList , accessToken, region})));
+    this.ssoPortal = new SSO({ region });
+    const listAccountsRequest: ListAccountsRequest = { accessToken };
+    return fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()).pipe(
+      catchError((err) => {
+        return throwError('AWS SSO list accounts error.');
+      }),
+      map((response: ListAccountsResponse) => ({ accountList: response.accountList , accessToken, region }))
+    );
   }
 
   getSessionsFromAccount(accountInfo: AccountInfo, accessToken, region): Observable<Session> {
@@ -225,15 +270,14 @@ export class AwsSsoService extends NativeService {
     );
   }
 
-
   getRoleCredentials(accessToken: string, region: string, accountNumber: string, roleName: string): Observable<GetRoleCredentialsResponse> {
     this.ssoPortal = new SSO({region});
     const getRoleCredentialsRequest: GetRoleCredentialsRequest = {accountId: accountNumber, roleName, accessToken};
     return fromPromise(this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise());
   }
 
-
   // LEAPP Integrations
+
   addSessionsToWorkspace(AwsSsoSessions: Session[]) {
     let workspace = this.configurationService.getDefaultWorkspaceSync();
 

@@ -56,7 +56,13 @@ export class IntegrationsService {
   }
 
   syncAccounts() {
-    this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).subscribe((AwsSsoSessions) => {
+    this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).pipe(
+      catchError( (err) => {
+        this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
+        this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+        return throwError(err);
+      })
+    ).subscribe((AwsSsoSessions) => {
       this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
       this.ngZone.run(() =>  this.router.navigate(['/sessions', 'session-selected']));
     });

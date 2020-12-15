@@ -78,6 +78,7 @@ export class CredentialsService extends NativeService {
     } else {
       this.awsStrategy.refreshCredentials(workspace, accountType);
       this.azureStrategy.refreshCredentials(workspace, accountType);
+      this.awsSsoStrategy.refreshCredentials(workspace, accountType);
     }
   }
 

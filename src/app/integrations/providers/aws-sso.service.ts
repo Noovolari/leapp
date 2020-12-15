@@ -135,7 +135,7 @@ export class AwsSsoService extends NativeService {
 
     return fromPromise(this.ssooidc.createToken(createTokenRequest).promise()).pipe(
       catchError((err) => {
-        return throwError('AWS SSO token creation error...');
+        return throwError(`AWS SSO token creation error: ${err.toString()}`);
       }),
       switchMap((createTokenResponse: any) => {
         return new Observable<GenerateSSOTokenResponse>((observer) => {
@@ -170,11 +170,20 @@ export class AwsSsoService extends NativeService {
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => region = res)),
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => portalUrl = res))
     ).pipe(
+      catchError ((err)  => {
+        return throwError(`AWS SSO in loginToAwsSSO: ${err.toString()}`);
+      }),
       switchMap(() => this.authorizeIntegration(region, portalUrl)),
       switchMap(authorizeIntegrationResponse => this.generateSSOToken(authorizeIntegrationResponse)),
       map(generateSSOTokenResponse => ({accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
       // whenever try to login then dave info in keychain
-      tap((response) => this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime))
+      switchMap((response) => {
+        return this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime).pipe(
+          map(() => {
+            return { accessToken: response.accessToken, region, expirationTime: response.expirationTime };
+          })
+        );
+      })
     );
   }
 
@@ -182,20 +191,28 @@ export class AwsSsoService extends NativeService {
     const loginToAwsSSOResponse: LoginToAwsSSOResponse = {accessToken: '', expirationTime: undefined, region: ''};
     return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(
       switchMap((expirationTime) => {
+        let condition;
+
         try {
-          if (Date.parse(expirationTime) > Date.now()) {
-            return merge(
-              fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN')).pipe(tap( res => loginToAwsSSOResponse.accessToken = res)),
-              fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(tap( res => loginToAwsSSOResponse.expirationTime = new Date(res))),
-              fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap( res => loginToAwsSSOResponse.region = res)),
-            ).pipe(
-              toArray(),
-              map(() => loginToAwsSSOResponse)
-            );
-          }
+          condition = Date.parse(expirationTime) > Date.now();
         } catch (err) {
           return throwError('AWS SSO in getAwsSsoPortalCredentials.');
         }
+
+        if (condition) {
+          return merge(
+            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN')).pipe(tap( res => loginToAwsSSOResponse.accessToken = res)),
+            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(tap( res => loginToAwsSSOResponse.expirationTime = new Date(res))),
+            fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap( res => loginToAwsSSOResponse.region = res)),
+          ).pipe(
+            catchError ((err)  => {
+              return throwError(`AWS SSO in getAwsSsoPortalCredentials: ${err.toString()}`);
+            }),
+            toArray(),
+            map(() => loginToAwsSSOResponse)
+          );
+        }
+
         return this.loginToAwsSSO();
       })
     );
@@ -209,7 +226,7 @@ export class AwsSsoService extends NativeService {
       fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', expirationTime.toString()))
     ).pipe(
       catchError((err) => {
-        return throwError('AWS SSO save secrets error.');
+        return throwError(`AWS SSO save secrets error ${err.toString()}`);
       })
     );
   }
@@ -226,7 +243,6 @@ export class AwsSsoService extends NativeService {
       // Create an array of observables and then call them in parallel,
       switchMap((response) => {
         const arrayResponse = [];
-        console.log('HERE 1: ', response);
         for (let i = 0; i < response.accountList.length; i++) {
           const accountInfo = response.accountList[i];
           const accountInfoCall = this.getSessionsFromAccount(accountInfo, response.accessToken, response.region);
@@ -234,11 +250,11 @@ export class AwsSsoService extends NativeService {
         }
         return merge<Session>(...arrayResponse);
       }),
-      // every call will be merged in an Array
-      toArray(),
       catchError( (err) => {
         return throwError(`AWS SSO generateSessionsFromToken: ${err.toString()}`);
-      })
+      }),
+      // every call will be merged in an Array
+      toArray()
     );
   }
 
@@ -255,7 +271,6 @@ export class AwsSsoService extends NativeService {
 
   getSessionsFromAccount(accountInfo: AccountInfo, accessToken, region): Observable<Session> {
     if (!accountInfo) {
-      console.log('HERE 3b');
       return throwError('AWS SSO Get Sessions from account error: no account info');
     }
 
@@ -265,13 +280,11 @@ export class AwsSsoService extends NativeService {
       accessToken
     };
 
-    return from(this.ssoPortal.listAccountRoles(listAccountRolesRequest).promise()).pipe(
+    return fromPromise(this.ssoPortal.listAccountRoles(listAccountRolesRequest).promise()).pipe(
       switchMap( (listAccountRolesResponse: ListAccountRolesResponse)  => {
         if (!listAccountRolesResponse) {
-          console.log('HERE 4');
           return throwError('AWS SSO error in Get Sessions from account: null list account response');
         }
-        console.log('quaggiù');
         return listAccountRolesResponse.roleList;
       }),
       map((roleInfo: RoleInfo) => {
@@ -290,7 +303,6 @@ export class AwsSsoService extends NativeService {
           lastStopDate: new Date().toISOString(),
           loading: false
         };
-        console.log('HERE 5');
         return session;
       })
     );
@@ -361,8 +373,10 @@ export class AwsSsoService extends NativeService {
   }
 
   isAwsSsoActive(): Observable<boolean> {
-    return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(
-      map((res) => !!res)
+    return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(
+      switchMap((res) => {
+        return of(Date.parse(res) > Date.now());
+      })
     );
   }
 }

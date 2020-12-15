@@ -196,7 +196,7 @@ export class AwsSsoService extends NativeService {
         try {
           condition = Date.parse(expirationTime) > Date.now();
         } catch (err) {
-          return throwError('AWS SSO in getAwsSsoPortalCredentials.');
+          return throwError(err.toString());
         }
 
         if (condition) {
@@ -205,9 +205,6 @@ export class AwsSsoService extends NativeService {
             fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(tap( res => loginToAwsSSOResponse.expirationTime = new Date(res))),
             fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap( res => loginToAwsSSOResponse.region = res)),
           ).pipe(
-            catchError ((err)  => {
-              return throwError(`AWS SSO in getAwsSsoPortalCredentials: ${err.toString()}`);
-            }),
             toArray(),
             map(() => loginToAwsSSOResponse)
           );
@@ -235,9 +232,6 @@ export class AwsSsoService extends NativeService {
 
   generateSessionsFromToken(observable: Observable<LoginToAwsSSOResponse>): Observable<Session[]> {
     return observable.pipe(
-      catchError( (err) => {
-        return throwError(`AWS SSO generateSessionsFromToken: ${err.toString()}`);
-      }),
       // API portal Calls
       switchMap((loginToAwsSSOResponse: LoginToAwsSSOResponse) => this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region)),
       // Create an array of observables and then call them in parallel,
@@ -250,9 +244,6 @@ export class AwsSsoService extends NativeService {
         }
         return merge<Session>(...arrayResponse);
       }),
-      catchError( (err) => {
-        return throwError(`AWS SSO generateSessionsFromToken: ${err.toString()}`);
-      }),
       // every call will be merged in an Array
       toArray()
     );
@@ -262,10 +253,10 @@ export class AwsSsoService extends NativeService {
     this.ssoPortal = new SSO({ region });
     const listAccountsRequest: ListAccountsRequest = { accessToken };
     return fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()).pipe(
+      map((response: ListAccountsResponse) => ({ accountList: response.accountList , accessToken, region })),
       catchError((err) => {
-        return throwError('AWS SSO list accounts error.');
-      }),
-      map((response: ListAccountsResponse) => ({ accountList: response.accountList , accessToken, region }))
+        return throwError(err.toString());
+      })
     );
   }
 

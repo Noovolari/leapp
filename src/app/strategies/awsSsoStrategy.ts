@@ -1,5 +1,5 @@
 import {AccountType} from '../models/AccountType';
-import {AppService, LoggerLevel} from '../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {CredentialsService} from '../services/credentials.service';
 import {FileService} from '../services-system/file.service';
 import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
@@ -56,11 +56,16 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
   private awsCredentialProcess(workspace: Workspace, session: Session) {
     // Retrieve access token and region
     this.awsSsoService.getAwsSsoPortalCredentials().pipe(
-      catchError( (err) => {
-        return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
-      }),
       switchMap((loginToAwsSSOResponse) =>  this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name)),
       catchError( (err) => {
+        session.active = false;
+        session.loading = false;
+        this.configurationService.disableLoadingWhenReady(workspace, session);
+        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
+
+        this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
+        this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+
         return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
       })
     ).subscribe((getRoleCredentialsResponse) => {

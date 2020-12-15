@@ -78,6 +78,9 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
       this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential));
       this.configurationService.disableLoadingWhenReady(workspace, session);
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
+
+      // Start Calculating time here once credentials are actually retrieved
+      this.timerService.defineTimer();
     });
   }
 }

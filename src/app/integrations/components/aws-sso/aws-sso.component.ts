@@ -3,12 +3,12 @@ import {IntegrationsService} from '../../integrations.service';
 import {AwsSsoService} from '../../providers/aws-sso.service';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService} from '../../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../../services-system/app.service';
 import {ConfigurationService} from '../../../services-system/configuration.service';
-import {merge} from 'rxjs';
+import {merge, Observable} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../../../environments/environment';
-import {tap} from 'rxjs/operators';
+import {switchMap, tap, toArray} from 'rxjs/operators';
 import {KeychainService} from '../../../services-system/keychain.service';
 
 @Component({
@@ -51,9 +51,13 @@ export class AwsSsoComponent implements OnInit {
   }
 
   logout() {
-    this.integrationsService.logout();
-    this.isAwsSsoActive = false;
-    this.setValues();
+    this.integrationsService.logout().subscribe(() => {
+      this.isAwsSsoActive = false;
+      this.setValues();
+    }, (err) => {
+      this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
+      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+    });
   }
 
   forceSync() {

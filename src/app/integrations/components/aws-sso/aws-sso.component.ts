@@ -52,11 +52,9 @@ export class AwsSsoComponent implements OnInit {
 
   logout() {
     this.integrationsService.logout().subscribe(() => {
-      console.log('SUCCESS');
       this.isAwsSsoActive = false;
       this.setValues();
     }, (err) => {
-      console.log('FAILURE');
       this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
       this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
     });

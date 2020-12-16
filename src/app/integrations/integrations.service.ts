@@ -2,7 +2,7 @@ import {Injectable, NgZone} from '@angular/core';
 import {AwsSsoService} from './providers/aws-sso.service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {Router} from '@angular/router';
-import {merge, throwError} from 'rxjs';
+import {merge, Observable, throwError} from 'rxjs';
 import {catchError, switchMap, toArray} from 'rxjs/operators';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {fromPromise} from 'rxjs/internal-compatibility';
@@ -51,8 +51,8 @@ export class IntegrationsService {
       });
   }
 
-  logout() {
-    this.awsSsoService.logOutAwsSso();
+  logout(): Observable<any> {
+    return this.awsSsoService.logOutAwsSso();
   }
 
   syncAccounts() {

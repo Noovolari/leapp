@@ -355,21 +355,82 @@ export class AwsSsoService extends NativeService {
     this.configurationService.updateWorkspaceSync(workspace);
   }
 
-  logOutAwsSso() {
-    try {
-      this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN');
-      this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
+  logOutAwsSso(): Observable<any> {
+    let awsSsoAccessToken;
+    let awsSsoExpirationTime;
+    let oldSessions;
+    let workspace;
 
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
+    return fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN')).pipe(
+      switchMap((secret) => {
+        return throwError('FAKE ERROR');
+        return new Observable((observer) => {
+          console.log('Set awsSsoAccessToken');
+          awsSsoAccessToken = secret;
+          observer.next();
+          observer.complete();
+        });
+      }),
+      switchMap(() => {
+        console.log('Retrieve AWS_SSO_EXPIRATION_TIME');
+        return fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME'));
+      }),
+      switchMap((secret) => {
+        return new Observable((observer) => {
+          console.log('Set awsSsoExpirationTime and oldSessions');
+          awsSsoExpirationTime = secret;
+          workspace = this.configurationService.getDefaultWorkspaceSync();
+          oldSessions = workspace.sessions;
+          observer.next();
+          observer.complete();
+        });
+      }),
+      switchMap(() => {
+        console.log('Delete AWS_SSO_ACCESS_TOKEN and AWS_SSO_EXPIRATION_TIME');
+        return merge(
+          fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN')),
+          fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME'))
+        );
+      }),
+      toArray(),
+      switchMap(() => {
+        return new Observable((observer) => {
+          console.log('Update workspace with new sessions');
+          workspace = this.configurationService.getDefaultWorkspaceSync();
+          workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
+          this.configurationService.updateWorkspaceSync(workspace);
+          observer.next();
+          observer.complete();
+        });
+      }),
+      catchError((err) => {
+        const observables = [];
 
-      // Remove all AWS SSO old session
-      workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
+        if (awsSsoAccessToken) {
+          console.log('Restore AWS_SSO_ACCESS_TOKEN');
+          observables.push(fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN', awsSsoAccessToken)));
+        }
 
-      this.configurationService.updateWorkspaceSync(workspace);
-    } catch (err) {
-      this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
-    }
+        if (awsSsoExpirationTime) {
+          console.log('Restore AWS_SSO_EXPIRATION_TIME');
+          observables.push(fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', awsSsoExpirationTime)));
+        }
+
+        return merge(...observables).pipe(
+          toArray(),
+          switchMap(() => {
+            console.log('ROLLBACK workspace');
+            if (oldSessions) {
+              console.log('Update workspace with old sessions');
+              workspace = this.configurationService.getDefaultWorkspaceSync();
+              workspace.sessions = oldSessions;
+              this.configurationService.updateWorkspaceSync(workspace);
+            }
+            return throwError(err);
+          })
+        );
+      })
+    );
   }
 
   isAwsSsoActive(): Observable<boolean> {

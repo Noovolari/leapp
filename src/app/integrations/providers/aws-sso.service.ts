@@ -232,7 +232,8 @@ export class AwsSsoService extends NativeService {
     ).pipe(
       catchError((err) => {
         return throwError(`AWS SSO save secrets error ${err.toString()}`);
-      })
+      }),
+      toArray()
     );
   }
 

@@ -23,7 +23,6 @@ export class IntegrationsService {
               private keychainService: KeychainService) {}
 
   login(portalUrl, region) {
-    // TODO: togliere observable in input alla funzione e usare lo stream pipe
     this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO(region, portalUrl))
       .pipe(
         catchError((err) => {
@@ -46,7 +45,6 @@ export class IntegrationsService {
       .subscribe((AwsSsoSessions) => {
         // Save sessions to workspace
         this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
-        // TODO: refresh forzato della UI tramite motore di Angular.
         this.ngZone.run(() => this.router.navigate(['/sessions', 'session-selected']));
       });
   }

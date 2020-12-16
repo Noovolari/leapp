@@ -311,12 +311,11 @@ export class AwsSsoService extends NativeService {
     let workspace = this.configurationService.getDefaultWorkspaceSync();
 
     // If sessions does not exist create the sessions array
-    // TODO: remove
     try {
       if (JSON.stringify(workspace) === '{}') {
         // Set the configuration with the updated value
         const configuration = this.configurationService.getConfigurationFileSync();
-        // TODO: we need more than one workspace?
+        // TODO: do we need more than one workspace?
         configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
         const workspaceCreation: Workspace = {
           type: null,
@@ -354,21 +353,17 @@ export class AwsSsoService extends NativeService {
 
     return fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN')).pipe(
       switchMap((secret) => {
-        return throwError('FAKE ERROR');
         return new Observable((observer) => {
-          console.log('Set awsSsoAccessToken');
           awsSsoAccessToken = secret;
           observer.next();
           observer.complete();
         });
       }),
       switchMap(() => {
-        console.log('Retrieve AWS_SSO_EXPIRATION_TIME');
         return fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME'));
       }),
       switchMap((secret) => {
         return new Observable((observer) => {
-          console.log('Set awsSsoExpirationTime and oldSessions');
           awsSsoExpirationTime = secret;
           workspace = this.configurationService.getDefaultWorkspaceSync();
           oldSessions = workspace.sessions;
@@ -377,7 +372,6 @@ export class AwsSsoService extends NativeService {
         });
       }),
       switchMap(() => {
-        console.log('Delete AWS_SSO_ACCESS_TOKEN and AWS_SSO_EXPIRATION_TIME');
         return merge(
           fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN')),
           fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME'))
@@ -386,7 +380,6 @@ export class AwsSsoService extends NativeService {
       toArray(),
       switchMap(() => {
         return new Observable((observer) => {
-          console.log('Update workspace with new sessions');
           workspace = this.configurationService.getDefaultWorkspaceSync();
           workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
           this.configurationService.updateWorkspaceSync(workspace);
@@ -398,21 +391,17 @@ export class AwsSsoService extends NativeService {
         const observables = [];
 
         if (awsSsoAccessToken) {
-          console.log('Restore AWS_SSO_ACCESS_TOKEN');
           observables.push(fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN', awsSsoAccessToken)));
         }
 
         if (awsSsoExpirationTime) {
-          console.log('Restore AWS_SSO_EXPIRATION_TIME');
           observables.push(fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', awsSsoExpirationTime)));
         }
 
         return merge(...observables).pipe(
           toArray(),
           switchMap(() => {
-            console.log('ROLLBACK workspace');
             if (oldSessions) {
-              console.log('Update workspace with old sessions');
               workspace = this.configurationService.getDefaultWorkspaceSync();
               workspace.sessions = oldSessions;
               this.configurationService.updateWorkspaceSync(workspace);

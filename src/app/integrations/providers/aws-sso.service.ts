@@ -322,12 +322,11 @@ export class AwsSsoService extends NativeService {
     let workspace = this.configurationService.getDefaultWorkspaceSync();
 
     // If sessions does not exist create the sessions array
-    // TODO: remove
     try {
       if (JSON.stringify(workspace) === '{}') {
         // Set the configuration with the updated value
         const configuration = this.configurationService.getConfigurationFileSync();
-        // TODO: we need more than one workspace?
+        // TODO: do we need more than one workspace?
         configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
         const workspaceCreation: Workspace = {
           type: null,
@@ -357,21 +356,72 @@ export class AwsSsoService extends NativeService {
     this.configurationService.updateWorkspaceSync(workspace);
   }
 
-  logOutAwsSso() {
-    try {
-      this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN');
-      this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
+  logOutAwsSso(): Observable<any> {
+    let awsSsoAccessToken;
+    let awsSsoExpirationTime;
+    let oldSessions;
+    let workspace;
 
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
+    return fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN')).pipe(
+      switchMap((secret) => {
+        return new Observable((observer) => {
+          awsSsoAccessToken = secret;
+          observer.next();
+          observer.complete();
+        });
+      }),
+      switchMap(() => {
+        return fromPromise(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME'));
+      }),
+      switchMap((secret) => {
+        return new Observable((observer) => {
+          awsSsoExpirationTime = secret;
+          workspace = this.configurationService.getDefaultWorkspaceSync();
+          oldSessions = workspace.sessions;
+          observer.next();
+          observer.complete();
+        });
+      }),
+      switchMap(() => {
+        return merge(
+          fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN')),
+          fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME'))
+        );
+      }),
+      toArray(),
+      switchMap(() => {
+        return new Observable((observer) => {
+          workspace = this.configurationService.getDefaultWorkspaceSync();
+          workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
+          this.configurationService.updateWorkspaceSync(workspace);
+          observer.next();
+          observer.complete();
+        });
+      }),
+      catchError((err) => {
+        const observables = [];
 
-      // Remove all AWS SSO old session
-      workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
+        if (awsSsoAccessToken) {
+          observables.push(fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN', awsSsoAccessToken)));
+        }
 
-      this.configurationService.updateWorkspaceSync(workspace);
-    } catch (err) {
-      this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
-    }
+        if (awsSsoExpirationTime) {
+          observables.push(fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', awsSsoExpirationTime)));
+        }
+
+        return merge(...observables).pipe(
+          toArray(),
+          switchMap(() => {
+            if (oldSessions) {
+              workspace = this.configurationService.getDefaultWorkspaceSync();
+              workspace.sessions = oldSessions;
+              this.configurationService.updateWorkspaceSync(workspace);
+            }
+            return throwError(err);
+          })
+        );
+      })
+    );
   }
 
   isAwsSsoActive(): Observable<boolean> {

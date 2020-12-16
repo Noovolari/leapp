@@ -72,9 +72,6 @@ export class AwsSsoService extends NativeService {
     };
 
     return fromPromise(this.ssooidc.registerClient(registerClientRequest).promise()).pipe(
-      catchError((err) => {
-        return throwError('AWS SSO client registration error.');
-      }),
       switchMap((registerClientResponse: any) => {
         if (!registerClientResponse) {
           return throwError('AWS SSO client registration error.');
@@ -115,11 +112,25 @@ export class AwsSsoService extends NativeService {
 
                     observer.complete();
                   });
+
+                  this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
+                    console.log(details.error.toString());
+                    if (details.error.indexOf('net::ERR_ABORTED') < 0) {
+                      if (this.ssoWindow) {
+                        this.ssoWindow.close();
+                        this.ssoWindow = null;
+                      }
+                      observer.error(details.error.toString());
+                    }
+                  });
                 }
               });
             })
           );
         }
+      }),
+      catchError((err) => {
+        return throwError(err.toString());
       })
     );
   }

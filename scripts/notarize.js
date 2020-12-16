@@ -14,6 +14,6 @@ exports.default = async function notarizing(context) {
     appPath: `${appOutDir}/${appName}.app`,
     appleId: "mobile@besharp.it",
     appleIdPassword: process.env.APPLE_NOTARISATION_PASSWORD ? process.env.APPLE_NOTARISATION_PASSWORD :
-      "@keychain:AC_PASSWORD",
+      "@keychain:Leapp",
   });
 };

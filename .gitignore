@@ -49,3 +49,5 @@ Thumbs.db
 # Windows certificate
 windows.pfx
 
+package-lock.json
+

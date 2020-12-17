@@ -316,16 +316,22 @@ export class AwsSsoService extends NativeService {
 
   // LEAPP Integrations
 
-  addSessionsToWorkspace(AwsSsoSessions: Session[]) {
-    let workspace = this.configurationService.getDefaultWorkspaceSync();
+  addSessionsToWorkspace(AwsSsoSessions: Session[]): Observable<any> {
+    let oldConfiguration;
+    let oldWorkspace;
 
-    // If sessions does not exist create the sessions array
-    try {
+    return new Observable((observable) => {
+      let workspace = this.configurationService.getDefaultWorkspaceSync();
+      oldWorkspace = workspace;
+
+      // If sessions does not exist create the sessions array
       if (JSON.stringify(workspace) === '{}') {
         // Set the configuration with the updated value
         const configuration = this.configurationService.getConfigurationFileSync();
-        // TODO: do we need more than one workspace?
+        oldConfiguration = configuration;
+
         configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
+
         const workspaceCreation: Workspace = {
           type: null,
           name: 'default',
@@ -337,21 +343,27 @@ export class AwsSsoService extends NativeService {
           azureProfile: null,
           azureConfig: null
         };
+
         configuration.defaultWorkspace = 'default';
         configuration.workspaces.push(workspaceCreation);
+
         this.configurationService.updateConfigurationFileSync(configuration);
+
         workspace = workspaceCreation;
       }
-    } catch (err) {
-      this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
-      return;
-    }
-    // Remove all AWS SSO old session or create a session array
-    workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
-    // Add new AWS SSO sessions
-    workspace.sessions.push(...AwsSsoSessions);
-    this.configurationService.updateWorkspaceSync(workspace);
+
+      // Remove all AWS SSO old session or create a session array
+      workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
+      // Add new AWS SSO sessions
+      workspace.sessions.push(...AwsSsoSessions);
+      this.configurationService.updateWorkspaceSync(workspace);
+      observable.next({});
+      observable.complete();
+    }).pipe(catchError((err) => {
+      if (oldWorkspace) { this.configurationService.updateWorkspaceSync(oldWorkspace); }
+      if (oldConfiguration) { this.configurationService.updateConfigurationFileSync(oldConfiguration); }
+      return throwError(err);
+    }));
   }
 
   logOutAwsSso(): Observable<any> {

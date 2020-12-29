@@ -37,4 +37,5 @@ export class IntegrationsPageComponent implements OnInit {
   goToAwsSSO() {
     this.router.navigate(['/', 'integrations', 'aws-sso']);
   }
+
 }

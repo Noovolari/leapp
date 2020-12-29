@@ -192,6 +192,7 @@ export class SessionCardComponent implements OnInit {
         // Check the result of the call
         this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
           this.instances = result.instances;
+          console.log(this.instances);
           this.ssmloading = false;
         }, err => {
           this.instances = [];

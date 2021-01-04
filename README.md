@@ -47,7 +47,6 @@ It's a tool that securely [**stores your access information in a secure place**]
   * [Temporary credentials durations](#temporary-credentials-durations)
     + [Plain and Truster session token management](#plain-and-truster-session-token-management)
 - [HTTP/HTTPS in-app proxy](#http-https-in-app-proxy)
-    
     + [Note for Azure Sessions](#note-for-azure-sessions)
 - [Logs](#logs)
 - [Quick List](#quick-list)

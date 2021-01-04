@@ -227,14 +227,14 @@ there, because at the end of its process you'll have plain temporary credentials
 
 Do you have any issues from one or more of these libraries?
 
-- [https://github.com/rusoto/rusoto/issues/1810](https://github.com/rusoto/rusoto/issues/1810)
-- [https://github.com/hashicorp/terraform-provider-aws/issues/1085](https://github.com/hashicorp/terraform-provider-aws/issues/10851)
-- [https://github.com/certonid/certonid/discussions/8](https://github.com/certonid/certonid/discussions/8)
-- [https://github.com/tailscale/tailscale/issues/920](https://github.com/tailscale/tailscale/issues/920)
-- [https://github.com/awslabs/amazon-ecr-credential-helper/issues/229](https://github.com/awslabs/amazon-ecr-credential-helper/issues/229)
-- [https://github.com/aws/aws-sdk-go-v2/issues/705](https://github.com/aws/aws-sdk-go-v2/issues/705)
-- [https://github.com/kubernetes/kops/issues/8481](https://github.com/kubernetes/kops/issues/8481)
-- [https://github.com/awslabs/awsprocesscreds/issues/26](https://github.com/awslabs/awsprocesscreds/issues/26)
+- [Rusoto](https://github.com/rusoto/rusoto/issues/1810)
+- [Terraform Provider Aws](https://github.com/hashicorp/terraform-provider-aws/issues/10851)
+- [Certonid](https://github.com/certonid/certonid/discussions/8)
+- [Tailscale](https://github.com/tailscale/tailscale/issues/920)
+- [Amazon-ecr-credential-helper](https://github.com/awslabs/amazon-ecr-credential-helper/issues/229)
+- [Aws-sdk-go-v2](https://github.com/aws/aws-sdk-go-v2/issues/705)
+- [Kubernetes Kops](https://github.com/kubernetes/kops/issues/8481)
+- [Awsprocesscreds](https://github.com/awslabs/awsprocesscreds/issues/26)
 
 Then Leapp is the solution for you!
 

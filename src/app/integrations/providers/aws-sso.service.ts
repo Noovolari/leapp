@@ -97,21 +97,30 @@ export class AwsSsoService extends NativeService {
                   this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
                   this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
 
+                  // https://oidc.*.amazonaws.com/device_authorization/associate_token
+
                   // When the code is verified and the user has been logged in, the window can be closed
-                  this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: ['https://*.awsapps.com/start/user-consent/login-success.html'] }, () => {
-                    this.ssoWindow.close();
-                    this.ssoWindow = null;
+                  this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
+                    'https://*.awsapps.com/start/user-consent/login-success.html',
+                    ] }, (details, callback) => {
+                      this.ssoWindow.close();
+                      this.ssoWindow = null;
 
-                    observer.next({
-                      clientId: registerClientResponse.clientId,
-                      clientSecret: registerClientResponse.clientSecret,
-                      deviceCode: startDeviceAuthorizationResponse.deviceCode
-                    });
+                      observer.next({
+                        clientId: registerClientResponse.clientId,
+                        clientSecret: registerClientResponse.clientSecret,
+                        deviceCode: startDeviceAuthorizationResponse.deviceCode
+                      });
+                      observer.complete();
 
-                    observer.complete();
+                      callback({
+                        requestHeaders: details.requestHeaders,
+                        url: details.url,
+                      });
                   });
 
                   this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
+                    console.log('det', details);
                     if (details.error.indexOf('net::ERR_ABORTED') < 0) {
                       if (this.ssoWindow) {
                         this.ssoWindow.close();

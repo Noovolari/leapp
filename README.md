@@ -38,6 +38,7 @@ It's a tool that securely [**stores your access information in a secure place**]
   * [Setup MFA in Leapp](#setup-mfa-in-leapp)
   * [Temporary credentials durations](#temporary-credentials-durations)
     + [Plain and Truster session token management](#plain-and-truster-session-token-management)
+
 - [AWS SSO](#aws-sso)
 - [Integration for Leapp](#integrations-for-leapp)    
 - [HTTP/HTTPS in-app proxy](#httphttps-in-app-proxy) 
@@ -46,7 +47,6 @@ It's a tool that securely [**stores your access information in a secure place**]
 - [Quick List](#quick-list)
   * [Links](#links)
   * [License](#license)
-
 
 
 # Key features

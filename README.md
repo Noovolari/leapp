@@ -102,6 +102,8 @@ Leapp with AWS SSO offers a unique advantage: the ability to make AWS SSO compat
 tools or library that uses AWS credentials. If you are refraining from using AWS ORGANIZATION and AWS SSO 
 because of incompatibilities with any of your daily tools or/and libraries, Leapp is the tool for you.
 
+![image](.github/images/AWS_SSO_USE_CASE.png)
+
 AWS SSO let create and manage user identities in AWS SSO’s identity store, easily 
 connect to existing identity source, including Microsoft Active Directory, Okta Universal Directory, 
 and Azure AD. Finally, trough Leapp, Developers have access to all their sessions from one tool.

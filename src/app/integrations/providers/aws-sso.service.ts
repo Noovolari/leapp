@@ -84,6 +84,7 @@ export class AwsSsoService extends NativeService {
 
           return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(
             catchError((err) => {
+              this.app.logger('AWS SSO device authorization error.', LoggerLevel.ERROR, this, err.stack);
               return throwError('AWS SSO device authorization error.');
             }),
             switchMap((startDeviceAuthorizationResponse: any) => {
@@ -246,11 +247,13 @@ export class AwsSsoService extends NativeService {
       // Create an array of observables and then call them in parallel,
       switchMap((response) => {
         const arrayResponse = [];
+
         for (let i = 0; i < response.accountList.length; i++) {
           const accountInfo = response.accountList[i];
           const accountInfoCall = this.getSessionsFromAccount(accountInfo, response.accessToken, response.region);
           arrayResponse.push(accountInfoCall);
         }
+
         return merge<Session>(...arrayResponse);
       }),
       // every call will be merged in an Array
@@ -274,7 +277,7 @@ export class AwsSsoService extends NativeService {
       return throwError('AWS SSO Get Sessions from account error: no account info');
     }
 
-    this.ssoPortal = new SSO({region});
+    this.ssoPortal = new SSO({ region });
     const listAccountRolesRequest: ListAccountRolesRequest = {
       accountId: accountInfo.accountId,
       accessToken

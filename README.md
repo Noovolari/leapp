@@ -99,6 +99,10 @@ management is needed. Leapp allows you to get to cloud resources with company em
 See setup [tutorial](.github/tutorials/TUTORIALS.md)
 
 ## AWS SSO
+Leapp with AWS SSO offers a unique advantage: the ability to make AWS SSO compatible with virtually any 
+tools or library that uses AWS credentials. If you are refraining from using AWS ORGANIZATION and AWS SSO 
+because of incompatibilities with any of your daily tools or/and libraries, Leapp is the tool for you.
+
 AWS SSO let create and manage user identities in AWS SSO’s identity store, easily 
 connect to existing identity source, including Microsoft Active Directory, Okta Universal Directory, 
 and Azure AD. Finally trough Leapp, Developers have access to all their sessions from one tool.
@@ -206,6 +210,30 @@ security requirements, and assign the permissions to users or groups in the spec
 they need access. For example, you can give your security team administrative-level access to your 
 AWS accounts running your security tools, but only grant them auditor-level access to your other AWS 
 accounts for monitoring purposes.
+
+## Why Using AWS SSO with Leapp
+Whe using AWS SSO directly with tools like AWS CLI V2 a specific profile is defined for the 
+user when using *aws configure*. Because of that you lose compatibility with lots of tools 
+and libraries that uses the standard profile. Leapp believes that tools and softwares must 
+always use simple, flat, short-lived credentials, avoiding to leave any sensitive information 
+in the profile. That is why Leapp **takes care for you** of the authentication process, no matter 
+what strategy do you plan to use.
+
+Because of this, Leapp allows AWS SSO to be compatible with AWS Cli V2 and many others libraries out 
+there, because at the end of its process you'll have plain temporary credentials to use.
+
+Do you have any issues from one or more of these libraries?
+
+- [https://github.com/rusoto/rusoto/issues/1810](https://github.com/rusoto/rusoto/issues/1810)
+- [https://github.com/hashicorp/terraform-provider-aws/issues/1085](https://github.com/hashicorp/terraform-provider-aws/issues/10851)
+- [https://github.com/certonid/certonid/discussions/8](https://github.com/certonid/certonid/discussions/8)
+- [https://github.com/tailscale/tailscale/issues/920](https://github.com/tailscale/tailscale/issues/920)
+- [https://github.com/awslabs/amazon-ecr-credential-helper/issues/229](https://github.com/awslabs/amazon-ecr-credential-helper/issues/229)
+- [https://github.com/aws/aws-sdk-go-v2/issues/705](https://github.com/aws/aws-sdk-go-v2/issues/705)
+- [https://github.com/kubernetes/kops/issues/8481](https://github.com/kubernetes/kops/issues/8481)
+- [https://github.com/awslabs/awsprocesscreds/issues/26](https://github.com/awslabs/awsprocesscreds/issues/26)
+
+Then Leapp is the solution for you!
 
 ## Setup AWS SSO for Leapp
 To start using AWS SSO in Leapp you first need to retrieve two information from your AWS account: 

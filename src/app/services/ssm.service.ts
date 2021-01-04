@@ -61,7 +61,8 @@ export class SsmService {
                 mythis.instances.forEach(instance => {
                   // Add name if exists
                   const instanceId = instance.InstanceId;
-                  instance['ComputerName'] = instance['ComputerName'] || instance.InstanceId;
+                  console.log(instance);
+                  instance['ComputerName'] = instance.InstanceId;
                   instance['Name'] = instance['ComputerName'];
                 });
                 // We have found and managed a list of instances

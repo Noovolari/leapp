@@ -38,8 +38,9 @@ It's a tool that securely [**stores your access information in a secure place**]
   * [Setup MFA in Leapp](#setup-mfa-in-leapp)
   * [Temporary credentials durations](#temporary-credentials-durations)
     + [Plain and Truster session token management](#plain-and-truster-session-token-management)
-- [HTTP/HTTPS in-app proxy](#HTTP\/HTTPS-in-app-proxy)
-    
+- [AWS SSO](#aws-sso)
+- [Integration for Leapp](#integrations-for-leapp)    
+- [HTTP/HTTPS in-app proxy](#httphttps-in-app-proxy) 
     + [Note for Azure Sessions](#note-for-azure-sessions)
 - [Logs](#logs)
 - [Quick List](#quick-list)
@@ -57,6 +58,8 @@ Protect your cloud accounts access data in the system vault and connect straight
 Connect with federated single sign-on, roles or static credentials. Check [here](#supported-providers) what's currently supported.
 ### No static credentials
 Generate and inject only temporary credentials to comply with security best-practices.
+### Generate and use sessions directly from your AWS Organizations
+Centrally manage access to multiple AWS accounts with single sign-on access from one place
 ### Direct infrastructure connection
 Connect to your virtual machines with AWS System Manager.
 
@@ -96,7 +99,12 @@ management is needed. Leapp allows you to get to cloud resources with company em
 See setup [tutorial](.github/tutorials/TUTORIALS.md)
 
 ## AWS SSO
+AWS SSO let create and manage user identities in AWS SSO’s identity store, easily 
+connect to existing identity source, including Microsoft Active Directory, Okta Universal Directory, 
+and Azure AD. Finally trough Leapp, Developers have access to all their sessions from one tool.
 ![AWS SSO video](.github/images/AWS_SSO.gif)
+
+See setup [tutorial](#aws-sso)
 
 ## AWS Truster Access
 Federating each account is difficult so use truster accounts to grant access easier and painlessly.
@@ -189,6 +197,74 @@ If the Truster Role is assumed by a Federated Role, the following two steps will
 in particular, the Security Token Service's AssumeRoleWithSAML API is called, passing in the SAML assertion returned by the Identity Provider.
 - The temporary credentials - associated to the Federated Role - are used to assume the Truster Role, obtaining new temporary credentials associated to the Truster Role.
 This set of temporary credentials is used to refresh the credentials file.
+
+# AWS SSO
+With AWS SSO, you can easily manage access and user permissions to all of your accounts in 
+AWS Organizations centrally, with no additional setup within the individual accounts. You can 
+assign user permissions based on common job functions, customize them to meet your specific 
+security requirements, and assign the permissions to users or groups in the specific accounts where 
+they need access. For example, you can give your security team administrative-level access to your 
+AWS accounts running your security tools, but only grant them auditor-level access to your other AWS 
+accounts for monitoring purposes.
+
+## Setup AWS SSO for Leapp
+To start using AWS SSO in Leapp you first need to retrieve two information from your AWS account: 
+the **Portal URL** and the **AWS SSO region**.
+
+- **Portal URL**: the AWS SSO user portal is a central place where users can see and access their 
+  assigned AWS accounts, roles, and applications. Providing an AWS SSO user portal URL allows to 
+  integrate AWS and third-party applications like Leapp. 
+  To retrieve it go to **AWS Console**, then select **AWS SSO** as a service. In the **left panel** 
+  select **Settings**: you'll see the url in the page like in the screenshot below.
+  ![image](.github/images/AWS_SSO_TUTORIAL_1.png)
+  
+- **AWS SSO region**: this is the region where you have configured your AWS SSO. 
+  You can retrieve the region easily from the same selector you normally use to change region in AWS.
+  
+Now you can go to your Leapp Application and add your AWS SSO configuration in two scenarios:
+
+1) **First time access**: as you're accessing Leapp for the first time you can choose to 
+configure all of your session directly from AWS SSO. To do so press **Start** and go to the next screen.
+In the next screen select **AWS SSO** like in the picture below:
+   
+   ![image](.github/images/AWS_SSO_TUTORIAL_2.png)
+   
+In the following screen insert the **portal url** and the **region**. then press the **AWS SSO** button.
+   
+   ![image](.github/images/AWS_SSO_TUTORIAL_3.png)
+   
+if everything is correct you'll be prompted with the following screen:
+   
+   ![image](.github/images/AWS_SSO_TUTORIAL_4.png)
+   
+Click on the orange button and Leapp will connect to your AWS SSO portal retrieving all the sessions for you.
+
+![image](.github/images/AWS_SSO_TUTORIAL_5.png) 
+
+2) **You already have some sessions**: to add sessions from your AWS SSO portal, go to the **option menu** clicking on the **azure hamburger button** on the **top-left of Leapp header**.
+From the sidebar menù choose **integration - Identity Provider** like in the screenshot below:
+
+![image](.github/images/AWS_SSO_TUTORIAL_6.png)
+
+In the following screen insert the **portal url** and the **region**. then press the **AWS SSO** button.
+   
+   ![image](.github/images/AWS_SSO_TUTORIAL_3.png)
+   
+if everything is correct you'll be prompted with the following screen:
+   
+   ![image](.github/images/AWS_SSO_TUTORIAL_4.png)
+   
+Click on the orange button and Leapp will connect to your AWS SSO portal retrieving all the sessions for you.
+
+![image](.github/images/AWS_SSO_TUTORIAL_5.png)
+
+   
+# Integrations for Leapp
+Integration is a way for Leapp to develop tools and plugins to increase Leapp's functionalities and 
+ability to work in sinergy with other popular tools. For example AWS SSO is a Leapp integration that takes advantage of AWS SSO's centralised control of accounts and roles.
+to retrieve sessions in a simple and secure way for a specific developer.
+
+Integrations are developed taking into account the concept of **strategy**
 
 # HTTP/HTTPS in-app proxy
 Leapp allows for HTTP/HTTPS protocols, specifying a proxy server to which the in-app requests are sent. Both authenticated and non authenticated proxy are supported. In the option panel you can configure protocol, url, port, and authentication information. See image below

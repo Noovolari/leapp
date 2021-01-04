@@ -5,6 +5,9 @@ body {
   background: $white-text-color;
 }
 
+.btn-control {cursor:pointer!important}
+
+
 .fake-blur {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;

@@ -3,7 +3,7 @@ Leapp
 [![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)](https://github.com/Noovolari/leapp/releases/latest)
 - Website: https://www.leapp.cloud/
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/1)
-- Tutorials: [Tutorials](#tutorials)
+- Use Cases: [Use Cases](#use-cases)
 - Chat with us: [Discord](https://discord.gg/wHh2kyK)
 
 ![logo](.github/images/README-1.png)
@@ -12,7 +12,7 @@ Leapp is a DevTool Desktop App designed to **manage and secure Cloud Access in m
 
 The App is designed to work with Cloud Providers APIs, CLIs, and SDKs.
 
-It's a tool that securely [**stores your access information in a secure place**](https://github.com/Noovolari/leapp/tree/aws-sso#vault-strategy) and generates temporary credential sets to access your Cloud from your local machine.
+It's a tool that securely [**stores your access information in a secure place**](.github/vault_strategy/strategy.md) and generates temporary credential sets to access your Cloud from your local machine.
 
 > We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and we prefer to store that information in an encrypted file managed by the system. 
 > Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
@@ -22,24 +22,16 @@ It's a tool that securely [**stores your access information in a secure place**]
 
 - [Key features](#key-features)
 - [Installation](#installation)
-- [Supported Providers](#supported-providers)
-  * [Cloud Providers](#cloud-providers)
-  * [Identity Providers](#identity-providers)
 - [Use Cases](#use-cases)
   * [AWS Plain Access](#aws-plain-access)
   * [AWS Federated Access](#aws-federated-access)
+  * [AWS SSO](#aws-sso)
   * [AWS Truster Access](#aws-truster-access)
   * [Azure Access](#azure-access)
+- [Supported Providers](#supported-providers)
+  * [Cloud Providers](#cloud-providers)
+  * [Identity Providers](#identity-providers)
 - [Rotating Credentials](#rotating-credentials)
-- [Vault Strategy](#vault-strategy)
-    + [Prerequisite for using on Linux systems](#prerequisite-for-using-on-linux-systems)
-    + [Supported versions for contributors](#supported-versions-for-contributors)
-  * [Keytar documentation](#keytar-documentation)
-    + [getPassword(service, account)](#getpassword-service--account-)
-    + [setPassword(service, account, password)](#setpassword-service--account--password-)
-    + [deletePassword(service, account)](#deletepassword-service--account-)
-  * [How can I find Leapp data in the Vault?](#how-can-i-find-leapp-data-in-the-vault-)
-  * [How Keytar translate to system vaults?](#how-keytar-translate-to-system-vaults-)
 - [Multi-Factor Authentication](#multi-factor-authentication)
   * [Setup MFA in AWS](#setup-mfa-in-aws)
     + [MFA restricted access](#mfa-restricted-access)
@@ -54,14 +46,13 @@ It's a tool that securely [**stores your access information in a secure place**]
   * [License](#license)
 
 
-
 # Key features
 ### Switch account in a click
 No need to manage the credentials file. Get connected to your accounts in a click. 
 ### Secure repository for your access data
 Protect your cloud accounts access data in the system vault and connect straight away.
 ### Multiple cloud access strategies
-Connect with federated single sign-on, roles or static credentials. Check [here](#supported-cloud-providers) what's currently supported.
+Connect with federated single sign-on, roles or static credentials. Check [here](#supported-providers) what's currently supported.
 ### No static credentials
 Generate and inject only temporary credentials to comply with security best-practices.
 ### Direct infrastructure connection
@@ -73,20 +64,9 @@ Connect to your virtual machines with AWS System Manager.
 
 # Installation
 Get [here](https://github.com/Noovolari/leapp/releases/latest) the latest release.
-To install the compiled version, choose the one for your **OS** and simply **double-click** on the executable.
-# Supported Providers
-## Cloud Providers
-- **AWS** - :white_check_mark:
-- **AZURE** - :white_check_mark:
-- **GCP** - :soon:
-## Identity Providers
-- **G Suite to AWS** - :white_check_mark:
-- **G Suite to Azure** - :white_check_mark:
-- **AZURE AD to Azure** - :white_check_mark:
-- **AZURE AD to AWS** - :soon:
-- **AWS SSO** - :soon:
+
 # Use Cases
-Our use cases are hereby presented to give you a hint on how Leapp can be of help depending on the type of setup 
+Our use cases are hereby presented to give you a hint on how Leapp can be of help to depend on the type of setup 
 you have in your company and what kind of credentials you need to get.
 
 ## AWS Plain Access
@@ -96,29 +76,32 @@ generating temporary credentials for them.
 
 **No credentials** are stored in Leapp. 
 
-Please see [Vault strategy](#vault-strategy) for more information.
+Please see [Vault strategy](.github/vault_strategy/strategy.md) for more information.
 
-![Plain Access Usecase](.github/images/plain-gif.gif)
+![Plain Access Use-case](.github/images/plain-gif.gif)
 
 See setup [tutorial](.github/tutorials/TUTORIALS.md)
 
-*Note: it's possible to assign a MFA device to a plain session. Please see [MFA section](#multi-factor-authentication) for more details.*
+*Note: it's possible to assign an MFA device to a plain session. Please see [MFA section](#multi-factor-authentication) for more details.*
 
 ## AWS Federated Access
 Leverage company identity to access environment through federated single sign-on. 
 Federation is established between **G Suite** and **AWS**. No more AWS credentials 
-management is needed. Leapp allows to get to cloud resources with company email and password.
+management is needed. Leapp allows you to get to cloud resources with company email and password.
 
-![Federated Access Usecase](.github/images/federated-gif.gif)
+![Federated Access Use-case](.github/images/federated-gif.gif)
 
 See setup [tutorial](.github/tutorials/TUTORIALS.md)
+
+## AWS SSO
+![AWS SSO video](.github/images/AWS_SSO.gif)
 
 ## AWS Truster Access
 Federating each account is difficult so use truster accounts to grant access easier and painlessly.
 We use federated role as a gateway to all trusted roles in all other AWS accounts.
 In this access strategy a **truster role** is assumed by a **federated role**.
 
-![Truster Access Usecase](.github/images/truster-gif.gif)
+![Truster Access Use-case](.github/images/truster-gif.gif)
 
 See setup [tutorial](.github/tutorials/TUTORIALS.md)
 
@@ -130,64 +113,27 @@ Use Leapp to do Single Sign On with G Suite on Azure to get access to your
 between Google and Azure. Leapp manage the login process for you to have Azure CLI 
 ready to be used.
 
-![Azure Access Usecase](.github/images/azure-gif.gif)
+![Azure Access Use-case](.github/images/azure-gif.gif)
 
 See setup [tutorial](.github/tutorials/TUTORIALS.md)
+
+# Supported Providers
+## Cloud Providers
+- **AWS** - :white_check_mark:
+- **AZURE** - :white_check_mark:
+- **GCP** - :soon:
+## Identity Providers
+- **G Suite to AWS** - :white_check_mark:
+- **G Suite to Azure** - :white_check_mark:
+- **AZURE AD to Azure** - :white_check_mark:
+- **AZURE AD to AWS** - :soon:
+- **AWS SSO** - :white_check_mark:
 
 # Rotating Credentials
 Leapp is created with security in mind: that is, **NO** credentials are saved in our system whatsoever. 
 Nor in code neither in our configuration file. Everytime a credential is generated 
 is **temporary**, and **no long-term ones are ever saved** in plain accessible files or locations.
 
-# Vault Strategy
-On Leapp we use [Keytar](https://github.com/atom/node-keytar) as a library to maintain a secure vault for sensible information. 
-We use it wrapping the functions listed below.
-
-### Prerequisite for using on Linux systems
-Currently this library uses `libsecret` so you **may** need to install it before running Leapp.
-Depending on your distribution, you will need to run the following command:
-* Debian/Ubuntu: `sudo apt-get install libsecret-1-dev`
-* Red Hat-based: `sudo yum install libsecret-devel`
-* Arch Linux: `sudo pacman -S libsecret`
-
-### Supported versions for contributors
-Each release of `keytar` includes prebuilt binaries for the versions of Node and Electron that are actively supported by our project. 
-Please refer to the release documentation for [Node](https://github.com/nodejs/Release) and [Electron](https://electronjs.org/docs/tutorial/support) 
-to see what is supported currently.
-
-## Keytar documentation
-Every function in `keytar` is **asynchronous** and returns a **Promise**. The promise will be rejected with any error that occurs or 
-will be resolved within the function's `yields` value. 
-In Leapp we use the three methods listed below to save and store sensible information and to **avoid** keeping them anywhere in the code. 
-The delete function is used when an **AWS Plain** session is **updated** or **removed** from the list.
-
-### getPassword(service, account)
-Get the stored password for the `service` and `account`.
-`service` - The string service name.
-`account` - The string account name.
-Yields the string password or `null` if an entry for the given service and account was not found.
-
-### setPassword(service, account, password)
-Save the `password` for the `service` and `account` to the keychain. Adds a new entry if necessary, or updates an existing entry if one exists.
-`service` - The string service name.
-`account` - The string account name.
-`password` - The string password.
-Yields nothing.
-
-### deletePassword(service, account)
-Delete the stored password for the `service` and `account`.
-`service` - The string service name.
-`account` - The string account name.
-Yields `true` if a password was deleted, or `false` if an entry with the given service and account was not found.
-
-## How can I find Leapp data in the Vault?
-Every key stored by Leapp in the vault is named **Leapp**. The account name shows the description of the element saved by our software.
-
-## How Keytar translate to system vaults?
-Keytar translate to the following system vaults depending on the OS:
-* On **macOS** the passwords are managed by the *Keychain*. 
-* On **Linux** they are managed by the Secret Service *API/libsecret*. 
-* On **Windows** they are managed by *Credential Vault*.
 
 # Multi-Factor Authentication
 Leapp support Multi-Factor Authentication for **AWS Plain and Truster** access strategies. 
@@ -212,12 +158,12 @@ for specific actions described in a Role's policy, a `"Condition": {"Bool": {"aw
 statement must be present for action `"Action": "sts:AssumeRole"` in the role policy.
 
 ## Setup MFA in Leapp
-To assign an MFA device to a **plain account** just insert a *physical device's serial number* or an *MFA device ARN* in 
+To assign an MFA device to a **plain account** just insert a *physical device's serial number*, or an *MFA device ARN* in 
 the corresponding field of plain strategy's form. The device is then associated with that specific session, and the **MFA token** will be prompted
 when the session starts.
 
 *Note 1: if you need to remove MFA from a plain session, just edit it and leave the field blank.*
-*Note 2: when you setup a truster account from a plain session with MFA enabled, **Leapp** inherently associates MFA checks to it.*
+*Note 2: when you set up a truster account from a plain session with MFA enabled, **Leapp** inherently associates MFA checks to it.*
 
 ## Temporary credentials durations
 There are 2 **environment variables** contained in Leapp which define how a session is managed:
@@ -240,7 +186,7 @@ If the Truster Role is assumed by a Federated Role, the following two steps will
 - A set of temporary credentials - associated to the Federated Role - will be generated through SAML federated Single Sign-On; 
 in particular, the Security Token Service's AssumeRoleWithSAML API is called, passing in the SAML assertion returned by the Identity Provider.
 - The temporary credentials - associated to the Federated Role - are used to assume the Truster Role, obtaining new temporary credentials associated to the Truster Role.
-This set of temporaty credentials is used to refresh the credentials file.
+This set of temporary credentials is used to refresh the credentials file.
 
 # HTTP/HTTPS in-app proxy
 Leapp allows for HTTP/HTTPS protocols, specifying a proxy server to which the in-app requests are sent. Both authenticated and non authenticated proxy are supported. In the option panel you can configure protocol, url, port, and authentication information. See image below

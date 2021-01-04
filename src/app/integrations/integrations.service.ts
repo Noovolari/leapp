@@ -8,6 +8,7 @@ import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.servic
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
+import {Session} from '../models/session';
 
 
 @Injectable({
@@ -25,6 +26,10 @@ export class IntegrationsService {
   login(portalUrl, region) {
     this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO(region, portalUrl))
       .pipe(
+        switchMap((AwsSsoSessions: Session[]) => {
+          // Save sessions to workspace
+          return this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
+        }),
         catchError((err) => {
           this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
           this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
@@ -42,9 +47,7 @@ export class IntegrationsService {
           );
         })
       )
-      .subscribe((AwsSsoSessions) => {
-        // Save sessions to workspace
-        this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
+      .subscribe(() => {
         this.ngZone.run(() => this.router.navigate(['/sessions', 'session-selected']));
       });
   }
@@ -55,13 +58,16 @@ export class IntegrationsService {
 
   syncAccounts() {
     this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).pipe(
+      switchMap((AwsSsoSessions: Session[]) => {
+        // Save sessions to workspace
+        return this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
+      }),
       catchError( (err) => {
         this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
         return throwError(err);
       })
-    ).subscribe((AwsSsoSessions) => {
-      this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
+    ).subscribe(() => {
       this.ngZone.run(() =>  this.router.navigate(['/sessions', 'session-selected']));
     });
   }

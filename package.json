@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "author": {
     "name": "besharp",
     "email": "info@besharp.it"
@@ -129,7 +129,8 @@
       "legalTrademarks": "beSharp",
       "publisherName": "beSharp",
       "requestedExecutionLevel": "highestAvailable",
-      "verifyUpdateCodeSignature": false
+      "verifyUpdateCodeSignature": false,
+      "certificateFile": "windows_sign_certificate.pfx"
     },
     "mac": {
       "icon": "src/assets/images/Leapp.icns",

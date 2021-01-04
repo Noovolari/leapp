@@ -129,7 +129,8 @@
       "legalTrademarks": "beSharp",
       "publisherName": "beSharp",
       "requestedExecutionLevel": "highestAvailable",
-      "verifyUpdateCodeSignature": false
+      "verifyUpdateCodeSignature": false,
+      "certificateFile": "windows_sign_certificate.pfx"
     },
     "mac": {
       "icon": "src/assets/images/Leapp.icns",

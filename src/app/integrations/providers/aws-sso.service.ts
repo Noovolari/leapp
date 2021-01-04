@@ -98,21 +98,30 @@ export class AwsSsoService extends NativeService {
                   this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
                   this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
 
+                  // https://oidc.*.amazonaws.com/device_authorization/associate_token
+
                   // When the code is verified and the user has been logged in, the window can be closed
-                  this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: ['https://*.awsapps.com/start/user-consent/login-success.html'] }, () => {
-                    this.ssoWindow.close();
-                    this.ssoWindow = null;
+                  this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
+                    'https://*.awsapps.com/start/user-consent/login-success.html',
+                    ] }, (details, callback) => {
+                      this.ssoWindow.close();
+                      this.ssoWindow = null;
 
-                    observer.next({
-                      clientId: registerClientResponse.clientId,
-                      clientSecret: registerClientResponse.clientSecret,
-                      deviceCode: startDeviceAuthorizationResponse.deviceCode
-                    });
+                      observer.next({
+                        clientId: registerClientResponse.clientId,
+                        clientSecret: registerClientResponse.clientSecret,
+                        deviceCode: startDeviceAuthorizationResponse.deviceCode
+                      });
+                      observer.complete();
 
-                    observer.complete();
+                      callback({
+                        requestHeaders: details.requestHeaders,
+                        url: details.url,
+                      });
                   });
 
                   this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
+                    console.log('det', details);
                     if (details.error.indexOf('net::ERR_ABORTED') < 0) {
                       if (this.ssoWindow) {
                         this.ssoWindow.close();
@@ -319,16 +328,22 @@ export class AwsSsoService extends NativeService {
 
   // LEAPP Integrations
 
-  addSessionsToWorkspace(AwsSsoSessions: Session[]) {
-    let workspace = this.configurationService.getDefaultWorkspaceSync();
+  addSessionsToWorkspace(AwsSsoSessions: Session[]): Observable<any> {
+    let oldConfiguration;
+    let oldWorkspace;
 
-    // If sessions does not exist create the sessions array
-    try {
+    return new Observable((observable) => {
+      let workspace = this.configurationService.getDefaultWorkspaceSync();
+      oldWorkspace = workspace;
+
+      // If sessions does not exist create the sessions array
       if (JSON.stringify(workspace) === '{}') {
         // Set the configuration with the updated value
         const configuration = this.configurationService.getConfigurationFileSync();
-        // TODO: do we need more than one workspace?
+        oldConfiguration = configuration;
+
         configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
+
         const workspaceCreation: Workspace = {
           type: null,
           name: 'default',
@@ -340,21 +355,27 @@ export class AwsSsoService extends NativeService {
           azureProfile: null,
           azureConfig: null
         };
+
         configuration.defaultWorkspace = 'default';
         configuration.workspaces.push(workspaceCreation);
+
         this.configurationService.updateConfigurationFileSync(configuration);
+
         workspace = workspaceCreation;
       }
-    } catch (err) {
-      this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
-      return;
-    }
-    // Remove all AWS SSO old session or create a session array
-    workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
-    // Add new AWS SSO sessions
-    workspace.sessions.push(...AwsSsoSessions);
-    this.configurationService.updateWorkspaceSync(workspace);
+
+      // Remove all AWS SSO old session or create a session array
+      workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
+      // Add new AWS SSO sessions
+      workspace.sessions.push(...AwsSsoSessions);
+      this.configurationService.updateWorkspaceSync(workspace);
+      observable.next({});
+      observable.complete();
+    }).pipe(catchError((err) => {
+      if (oldWorkspace) { this.configurationService.updateWorkspaceSync(oldWorkspace); }
+      if (oldConfiguration) { this.configurationService.updateConfigurationFileSync(oldConfiguration); }
+      return throwError(err);
+    }));
   }
 
   logOutAwsSso(): Observable<any> {

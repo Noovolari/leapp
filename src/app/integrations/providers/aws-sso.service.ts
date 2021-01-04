@@ -121,7 +121,6 @@ export class AwsSsoService extends NativeService {
                   });
 
                   this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
-                    console.log('det', details);
                     if (details.error.indexOf('net::ERR_ABORTED') < 0) {
                       if (this.ssoWindow) {
                         this.ssoWindow.close();

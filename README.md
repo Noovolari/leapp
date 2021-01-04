@@ -38,10 +38,9 @@ It's a tool that securely [**stores your access information in a secure place**]
   * [Setup MFA in Leapp](#setup-mfa-in-leapp)
   * [Temporary credentials durations](#temporary-credentials-durations)
     + [Plain and Truster session token management](#plain-and-truster-session-token-management)
-
 - [AWS SSO](#aws-sso)
-- [Integration for Leapp](#integrations-for-leapp)    
-- [HTTP/HTTPS in-app proxy](#httphttps-in-app-proxy) 
+- [Integrations](#integrations)    
+- [HTTP/HTTPS in-app proxy](#httphttps-in-app-proxy)
     + [Note for Azure Sessions](#note-for-azure-sessions)
 - [Logs](#logs)
 - [Quick List](#quick-list)
@@ -105,7 +104,7 @@ because of incompatibilities with any of your daily tools or/and libraries, Leap
 
 AWS SSO let create and manage user identities in AWS SSO’s identity store, easily 
 connect to existing identity source, including Microsoft Active Directory, Okta Universal Directory, 
-and Azure AD. Finally trough Leapp, Developers have access to all their sessions from one tool.
+and Azure AD. Finally, trough Leapp, Developers have access to all their sessions from one tool.
 ![AWS SSO video](.github/images/AWS_SSO.gif)
 
 See setup [tutorial](#aws-sso)
@@ -147,7 +146,6 @@ See setup [tutorial](.github/tutorials/TUTORIALS.md)
 Leapp is created with security in mind: that is, **NO** credentials are saved in our system whatsoever. 
 Nor in code neither in our configuration file. Everytime a credential is generated 
 is **temporary**, and **no long-term ones are ever saved** in plain accessible files or locations.
-
 
 # Multi-Factor Authentication
 Leapp support Multi-Factor Authentication for **AWS Plain and Truster** access strategies. 
@@ -202,7 +200,12 @@ in particular, the Security Token Service's AssumeRoleWithSAML API is called, pa
 - The temporary credentials - associated to the Federated Role - are used to assume the Truster Role, obtaining new temporary credentials associated to the Truster Role.
 This set of temporary credentials is used to refresh the credentials file.
 
-# AWS SSO
+# Integrations
+The idea behind Integrations is to integrate external services into the Leapp's flow, in order to embrace your specific Use Case.
+For example, you could integrate Leapp's flow with an external Identity Provider where you store and manage your Users, or Keychain where you want your credentials to be stored in.
+Following this concept, we added support to AWS SSO; through this integration, Leapp is able to retrieve Session information and obtain temporary credentials associated to them.
+
+## AWS SSO
 With AWS SSO, you can easily manage access and user permissions to all of your accounts in 
 AWS Organizations centrally, with no additional setup within the individual accounts. You can 
 assign user permissions based on common job functions, customize them to meet your specific 
@@ -211,10 +214,10 @@ they need access. For example, you can give your security team administrative-le
 AWS accounts running your security tools, but only grant them auditor-level access to your other AWS 
 accounts for monitoring purposes.
 
-## Why Using AWS SSO with Leapp
-Whe using AWS SSO directly with tools like AWS CLI V2 a specific profile is defined for the 
+### Why Using AWS SSO with Leapp
+When using AWS SSO directly with tools like AWS CLI V2 a specific profile is defined for the 
 user when using *aws configure*. Because of that you lose compatibility with lots of tools 
-and libraries that uses the standard profile. Leapp believes that tools and softwares must 
+and libraries that uses the standard profile. Leapp believes that tools and software must 
 always use simple, flat, short-lived credentials, avoiding to leave any sensitive information 
 in the profile. That is why Leapp **takes care for you** of the authentication process, no matter 
 what strategy do you plan to use.
@@ -235,7 +238,7 @@ Do you have any issues from one or more of these libraries?
 
 Then Leapp is the solution for you!
 
-## Setup AWS SSO for Leapp
+### Setup AWS SSO for Leapp
 To start using AWS SSO in Leapp you first need to retrieve two information from your AWS account: 
 the **Portal URL** and the **AWS SSO region**.
 
@@ -286,17 +289,8 @@ Click on the orange button and Leapp will connect to your AWS SSO portal retriev
 
 ![image](.github/images/AWS_SSO_TUTORIAL_5.png)
 
-   
-# Integrations for Leapp
-Integration is a way for Leapp to develop tools and plugins to increase Leapp's functionalities and 
-ability to work in sinergy with other popular tools. For example AWS SSO is a Leapp integration that takes advantage of AWS SSO's centralised control of accounts and roles.
-to retrieve sessions in a simple and secure way for a specific developer.
-
-Integrations are developed taking into account the concept of **strategy**
-
 # HTTP/HTTPS in-app proxy
 Leapp allows for HTTP/HTTPS protocols, specifying a proxy server to which the in-app requests are sent. Both authenticated and non authenticated proxy are supported. In the option panel you can configure protocol, url, port, and authentication information. See image below
-
 
 ![image](.github/images/options-proxy.png)
 

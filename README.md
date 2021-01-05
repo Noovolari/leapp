@@ -39,6 +39,10 @@ It's a tool that securely [**stores your access information in a secure place**]
   * [Temporary credentials durations](#temporary-credentials-durations)
     + [Plain and Truster session token management](#plain-and-truster-session-token-management)
 - [AWS SSO](#aws-sso)
+  * [Why Using AWS SSO with Leapp](#why-using-aws-sso-with-leapp)
+  * [How Leapp integrates with AWS SSO](#how-leapp-integrates-with-aws-sso-under-the-hood)
+  * [Setup AWS SSO in Leapp](#setup-aws-sso-for-leapp)
+  * [FAQ](#faq)
 - [Integrations](#integrations)    
 - [HTTP/HTTPS in-app proxy](#httphttps-in-app-proxy)
     + [Note for Azure Sessions](#note-for-azure-sessions)
@@ -58,7 +62,7 @@ Connect with federated single sign-on, roles or static credentials. Check [here]
 ### No static credentials
 Generate and inject only temporary credentials to comply with security best-practices.
 ### Generate and use sessions directly from your AWS Organizations
-Centrally manage access to multiple AWS accounts with single sign-on access from one place
+Access to multiple AWS accounts with [AWS single sign-on](https://aws.amazon.com/single-sign-on/) access.
 ### Direct infrastructure connection
 Connect to your virtual machines with AWS System Manager.
 
@@ -98,8 +102,8 @@ management is needed. Leapp allows you to get to cloud resources with company em
 See setup [tutorial](.github/tutorials/TUTORIALS.md)
 
 ## AWS SSO
-Leapp with AWS SSO offers a unique advantage: the ability to make AWS SSO compatible with virtually any 
-tools or library that uses AWS credentials. If you are refraining from using AWS ORGANIZATION and AWS SSO 
+Leapp with [AWS Single Sign On](https://aws.amazon.com/single-sign-on/) offers a unique advantage: the ability to make AWS SSO compatible with virtually any 
+tool or library that uses AWS credentials. If you are refraining from using AWS ORGANIZATION and AWS SSO 
 because of incompatibilities with any of your daily tools or/and libraries, Leapp is the tool for you.
 
 ![image](.github/images/AWS_SSO_USE_CASE.png)
@@ -503,6 +507,60 @@ Click on the orange button and Leapp will connect to your AWS SSO portal retriev
 
 ![image](.github/images/AWS_SSO_TUTORIAL_5.png)
 
+### FAQ
+
+- **Q: Can I use Leapp AWS SSO with AWS Cli V2?**
+  <br>A: Yes you can, Leapp is compatible with both AWS Cli V1 and V2.
+
+- **Q: I put the portal url and the region in the AWS SSO configuration but the login keeps saying Access Denied?**
+  <br>A: Verify that are using the correct region which must be equal to the one you've registered your AWS SSO portal.
+  
+- **Q: Can I use an AWS SSO session as a federated one for making a truster account?**
+  <br>A: Yes you can, but there is currently a limit: after 8h the authentication token is refreshed, and 
+  the AWS SSO session is reloaded. So the association is lost and must be reverted by hand. We are working 
+  to overcome this limitation.
+  
+- **Q: How much the authentication token lasts?**
+  <br>A: The authentication token for AWS SSO lasts for 8h, after that period the sessions are synchronized again automatically. 
+  
+- **Q: My administrator has changed some accounts and roles but I can't see them?**
+  <br>A: Synchronizing is done when authentication token expires, you can force a manual re-synch from the AWS SSO page.
+  
+- **Q: Can I use Leapp AWS SSO session with AWS SSM?**
+  <br>A: Yes you can, just be sure to have the correct permissions AWS-side and you're good to go.
+  
+- **Q: Can I use Leapp AWS SSO sessions to issue AWS commands with my <library/program/sdk>?**
+  <br>A: Yes you can, Leapp generates under the hood plain temporary credentials in your default 
+  profile, which is the most basic setup for every AWS compatible tool. If for any reason you find
+  some incompatibilities, please fill a new [issue](https://github.com/Noovolari/leapp/issues)
+  
+- **Q: I can't find my portal URL, when I try to access AWS SSO service it points me to presentation page but there is no admin console?**
+  <br>A: To have access to AWS SSO console you must have privileges for that, please contact your administrator to obtain a portal URL.
+  
+- **Q: Do I need my Google account as for federated sessions to access AWS SSO?**
+  <br>A: No, you just need your AWS SSO username and password. At your first access you'll 
+  have to configure them. After that, just input them when requested.
+  
+- **Q: Why there are no options to edit or delete AWS SSO accounts?**
+  <br>A: AWS SSO management is done via AWS console by your administrator, you only have read access to the sessions, no need to edit or remove them.  
+    
+- **Q: I only see the name of the account and the role, can I recover other information for my work?**
+  <br>A: Yes you can, you can copy the role arn and the account number from the contextual menu.
+      
+- **Q: I've accidentaly closed Leapp with an active AWS SSO session and I've got a long time process running, am I screwed?**
+  <br>A: No, after you have generated a set of temporary credentials they are still valid through the duration of their expiration 
+  time which is 8h. The only downside is that without Leapp running there is no 20 minute credentials' rotation.
+  
+- **Q: Can I use MFA with Leapp and AWS SSO?**
+  <br>A: Yes, if your administrator has configured MFA for your AWS SSO account you'll be prompted for the code during authentication process.
+        
+- **Q: Can I use roles with MFA if they are obtained through AWS SSO?**
+  <br>A: Unfortunately not now, as Leapp needs to know the device arn, is still possible to access those roles by creating the sessions manually from Leapp. 
+  We'll do our best to autmatize the process as soon as possible.
+      
+- **Q: Can I do cross-account with AWS SSO?**
+  <br>A: Unfortunately not now, but you can rely to manual cross-account creation through Leapp.      
+  
 # HTTP/HTTPS in-app proxy
 Leapp allows for HTTP/HTTPS protocols, specifying a proxy server to which the in-app requests are sent. Both authenticated and non authenticated proxy are supported. In the option panel you can configure protocol, url, port, and authentication information. See image below
 

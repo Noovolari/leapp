@@ -14,7 +14,7 @@ The App is designed to work with Cloud Providers APIs, CLIs, and SDKs.
 
 It's a tool that securely [**stores your access information in a secure place**](.github/vault_strategy/strategy.md) and generates temporary credential sets to access your Cloud from your local machine.
 
-> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **we prefer to store that information in an encrypted file managed by the system.**
+> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **[we prefer to store that information in an encrypted file managed by the system.](https://github.com/Noovolari/leapp/wiki/vault-strategy)**
 > Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
 
 ![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
@@ -41,15 +41,15 @@ It's a tool that securely [**stores your access information in a secure place**]
 - ### Switch **Cloud Profile** in a click
   No need to manage the credentials file. Get connected to your accounts in a click. 
 - ### Secure repository for your access data
-  Protect your cloud accounts access data in the system vault and connect straight away.
+  [Protect your cloud accounts access data in the system vault](https://github.com/Noovolari/leapp/wiki/vault-strategy) and connect straight away.
 - ### Multiple cloud access strategies
-  Connect with federated single sign-on, roles or static credentials. Check [here](#supported-providers) what's currently supported.
+  Connect with [federated single sign-on](#supported-providers), roles or static credentials.
 - ### No static credentials
-  Generate and inject only temporary credentials to comply with security best-practices.
+  Generate and inject only [temporary credentials to comply with security best-practices.](https://github.com/Noovolari/leapp/wiki/rotating-credentials)
 - ### Generate and use sessions directly from your AWS Organizations
   Access to multiple AWS accounts with [AWS single sign-on](https://aws.amazon.com/single-sign-on/) access.
-- ### Direct infrastructure connection
-  Connect to your virtual machines with AWS System Manager.
+- ### Connect EC2 instances straight away
+  Connect to your EC2 Instances with AWS System Manager.
 
 
 ![Leapp App animation](.github/images/Leapp-animation.gif)
@@ -75,10 +75,9 @@ Please see [Vault strategy](https://www.github.com/Noovolari/leapp/wiki/vault-st
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 
-*Note: it's possible to assign an MFA device to a plain session. Please see [MFA section](#multi-factor-authentication) for more details.*
+*Note: it's possible to assign an MFA device to a plain session. Please see [MFA section](https://github.com/Noovolari/leapp/wiki/mfa) for more details.*
 
 ## AWS Federated Access
-Leverage company identity to access environment through federated single sign-on. 
 Federation is established between **G Suite** and **AWS**. No more AWS credentials 
 management is needed. Leapp allows you to get to cloud resources with company email and password.
 
@@ -86,18 +85,15 @@ management is needed. Leapp allows you to get to cloud resources with company em
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 
-## AWS SSO
-AWS SSO let create and manage user identities in AWS SSO’s identity store, easily 
-connect to existing identity source, including Microsoft Active Directory, Okta Universal Directory, 
-and Azure AD. Finally, trough Leapp, Developers have access to all their sessions from one tool.
+## AWS Single Sign-On
+Access to your AWS Accounts through Leapp and let the App manage all the available session to generate Temporary Access and Secret keys.
 ![AWS SSO video](.github/images/AWS_SSO.gif)
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 
 ## AWS Truster Access
-Federating each account is difficult so use truster accounts to grant access easier and painlessly.
-We use federated role as a gateway to all trusted roles in all other AWS accounts.
-In this access strategy a **truster role** is assumed by a **federated role**.
+Access to an Aws Account Role via another AWS Account role or an IAM user, thanks to a cross-account role available via [STS](https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html).
+In this access strategy a **Truster Role** or a **Plain User** is assumed by a **federated role**.
 
 ![Truster Access Use-case](.github/images/truster-gif.gif)
 
@@ -125,7 +121,7 @@ See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 - **G Suite to Azure** - :white_check_mark:
 - **AZURE AD to Azure** - :white_check_mark:
 - **AZURE AD to AWS** - :soon:
-- **AWS SSO** - :white_check_mark:
+- **AWS Single Sign-On** - :white_check_mark:
 
 # Logs
 By default, Leapp writes logs to the following locations:

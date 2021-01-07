@@ -3,7 +3,7 @@ Leapp
 [![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)](https://github.com/Noovolari/leapp/releases/latest)
 - Website: https://www.leapp.cloud/
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/1)
-- Use Cases: [Use Cases](#use-cases)
+- Wiki: [Wiki](https://github.com/Noovolari/leapp/wiki)
 - Chat with us: [Discord](https://discord.gg/wHh2kyK)
 
 ![logo](.github/images/README-1.png)
@@ -14,7 +14,7 @@ The App is designed to work with Cloud Providers APIs, CLIs, and SDKs.
 
 It's a tool that securely [**stores your access information in a secure place**](.github/vault_strategy/strategy.md) and generates temporary credential sets to access your Cloud from your local machine.
 
-> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and we prefer to store that information in an encrypted file managed by the system. 
+> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **we prefer to store that information in an encrypted file managed by the system.**
 > Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
 
 ![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
@@ -25,7 +25,7 @@ It's a tool that securely [**stores your access information in a secure place**]
 - [Use Cases](#use-cases)
   * [AWS Plain Access](#aws-plain-access)
   * [AWS Federated Access](#aws-federated-access)
-  * [AWS SSO](#aws-sso)
+  * [AWS Single Sign-On](#aws-sso)
   * [AWS Truster Access](#aws-truster-access)
   * [Azure Access](#azure-access)
 - [Supported Providers](#supported-providers)
@@ -38,18 +38,18 @@ It's a tool that securely [**stores your access information in a secure place**]
 
 
 # Key features
-### Switch account in a click
-No need to manage the credentials file. Get connected to your accounts in a click. 
-### Secure repository for your access data
-Protect your cloud accounts access data in the system vault and connect straight away.
-### Multiple cloud access strategies
-Connect with federated single sign-on, roles or static credentials. Check [here](#supported-providers) what's currently supported.
-### No static credentials
-Generate and inject only temporary credentials to comply with security best-practices.
-### Generate and use sessions directly from your AWS Organizations
-Access to multiple AWS accounts with [AWS single sign-on](https://aws.amazon.com/single-sign-on/) access.
-### Direct infrastructure connection
-Connect to your virtual machines with AWS System Manager.
+- ### Switch **Cloud Profile** in a click
+  No need to manage the credentials file. Get connected to your accounts in a click. 
+- ### Secure repository for your access data
+  Protect your cloud accounts access data in the system vault and connect straight away.
+- ### Multiple cloud access strategies
+  Connect with federated single sign-on, roles or static credentials. Check [here](#supported-providers) what's currently supported.
+- ### No static credentials
+  Generate and inject only temporary credentials to comply with security best-practices.
+- ### Generate and use sessions directly from your AWS Organizations
+  Access to multiple AWS accounts with [AWS single sign-on](https://aws.amazon.com/single-sign-on/) access.
+- ### Direct infrastructure connection
+  Connect to your virtual machines with AWS System Manager.
 
 
 ![Leapp App animation](.github/images/Leapp-animation.gif)

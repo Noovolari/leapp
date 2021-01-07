@@ -1,6 +1,7 @@
 Leapp
 =========
 [![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)](https://github.com/Noovolari/leapp/releases/latest)
+[![Discord Badge](https://img.shields.io/discord/745629705964617820)](https://discord.gg/wHh2kyK)
 - Website: https://www.leapp.cloud/
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/1)
 - Wiki: [Wiki](https://github.com/Noovolari/leapp/wiki)

@@ -53,8 +53,14 @@ export class ExecuteServiceService extends NativeService {
    * @returns an {Observable<any>} to subscribe to
    */
   public openTerminal(command: string): Observable<any> {
-    return this.execute(`osascript -e "tell app \\"Terminal\\"
+    if (this.process.platform === 'darwin') {
+      return this.execute(`osascript -e "tell app \\"Terminal\\"
                               do script \\"${command}\\"
                               end tell"`);
+    } else if (this.process.platform === 'win32') {
+      return this.execute(`start cmd /k ${command}`);
+    } else {
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`);
+    }
   }
 }

@@ -14,6 +14,8 @@ import {SessionService} from '../../services/session.service';
 import {MenuService} from '../../services/menu.service';
 import {IntegrationsService} from '../../integrations/integrations.service';
 import {AwsSsoService} from '../../integrations/providers/aws-sso.service';
+import {AwsAccount} from '../../models/aws-account';
+import {AzureAccount} from '../../models/azure-account';
 
 @Component({
   selector: 'app-session',
@@ -128,7 +130,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   filterSessions(query) {
     this.getSessions();
     if (query !== '') {
-      this.notActiveSessions = this.notActiveSessions.filter(s => s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1);
+      this.notActiveSessions = this.notActiveSessions.filter(s => {
+        return s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
+          ((s.account as AwsAccount).role && (s.account as AwsAccount).role.name.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          ((s.account as AzureAccount).subscriptionId && (s.account as AzureAccount).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);
+      });
     }
   }
 

@@ -1,21 +1,90 @@
 @import "palette";
 
 .profile {
-  position: absolute;
-  left: 0;
-  width: 0;
+  position: fixed;
+  left: -200px;
+  width: 200px;
   top: 0;
   bottom: 0;
   z-index: 2;
-  transition: width 0.3s ease;
-  box-shadow: 0 0 42px -14px rgba(0, 0, 0, 0.49);
-  background: white;
+  transition: left 0.3s ease;
+  background: #203E3A;
   overflow: hidden;
-  padding-top: 110px;
+  padding: 30px 20px 20px 20px;
+
+  img {
+    margin-bottom: 50px;
+    margin-left: 20px;
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+
+    li {
+      position: relative;
+      padding: 10px 40px;
+      margin: 0 -20px;
+      li {
+        position: relative;
+        padding: 10px 0 0 40px;
+      }
+    }
+
+  }
+
+  a {
+    position: relative;
+    display: block;
+    color: #909f9d;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    padding: 0;
+    margin: 0;
+    i { color: #909f9d; margin-right: 10px; }
+
+    small {
+      display: inline-block;
+      margin-left: 10px;
+      font-size: 12px;
+    }
+  }
+  a:hover, a:visited {
+    color: white;
+
+    i { color: #73E0CF; margin-right: 10px; }
+  }
+  ul li:hover::before, ul li:visited::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    background-color: #73E0CF;
+  }
+
+  ul li li:hover::before, ul li li:visited::before {
+    content: none;
+  }
+
+  .copy {
+    position: absolute;
+    bottom: 10px;
+    border-top: 1px solid white;
+    color: white;
+    font-size: 12px;
+    padding-top: 10px;
+  }
+
 }
 
 .extended {
-  width: 280px;
+  left: 0;
 
   .menu-item {
     opacity: 1;

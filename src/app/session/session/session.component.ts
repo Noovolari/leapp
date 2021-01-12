@@ -12,6 +12,10 @@ import {FileService} from '../../services-system/file.service';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
 import {MenuService} from '../../services/menu.service';
+import {IntegrationsService} from '../../integrations/integrations.service';
+import {AwsSsoService} from '../../integrations/providers/aws-sso.service';
+import {AwsAccount} from '../../models/aws-account';
+import {AzureAccount} from '../../models/azure-account';
 
 @Component({
   selector: 'app-session',
@@ -66,9 +70,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions(false);
 
-    // automatically check if there is an active session and get session list again
-    // this.credentialsService.refreshCredentialsEmit.emit(null);
-
     // Set loading to false when a credential is emitted: if result is false stop the current session!
     this.subs.add(this.credentialsService.refreshReturnStatusEmit.subscribe((res) => {
       if (!res) {
@@ -77,7 +78,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       }
     }));
 
-    this.subs.add(this.appService.redrawList.subscribe(r => {
+    this.subs.add(this.appService.redrawList.subscribe(() => {
       this.getSessions();
     }));
   }
@@ -124,7 +125,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   filterSessions(query) {
     this.getSessions();
     if (query !== '') {
-      this.notActiveSessions = this.notActiveSessions.filter(s => s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1);
+      this.notActiveSessions = this.notActiveSessions.filter(s => {
+        return s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
+          ((s.account as AwsAccount).role && (s.account as AwsAccount).role.name.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          ((s.account as AzureAccount).subscriptionId && (s.account as AzureAccount).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);
+      });
     }
   }
 

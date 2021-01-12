@@ -1,0 +1,53 @@
+<img src="assets/images/fake_blur.png" class="fake-blur" />
+<div class="background">
+  <div class="container-fluid">
+    <h1><a (click)="goBack()" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-fingerprint"></i> Identity Providers</h1>
+
+    <form [formGroup]="form" class="form center-vertical text-left">
+
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label><strong>Identity Provider</strong></label>
+        <br>
+        <input  type="text" class="form-control blue-control btn-control" placeholder="AWS Single Sign On" value="AWS Single Sign On" readonly>
+      </div>
+
+      <ng-container *ngIf="!isAwsSsoActive">
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label><strong>AWS SSO Url</strong><span class="danger-text">*</span></label>
+        <br>
+        <input formControlName="portalUrl" type="url" class="form-control" placeholder="AWS SSO url *">
+        <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert the AWS SSO url</small>
+      </div>
+
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label><strong>AWS Region</strong></label>
+        <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
+      </div>
+      </ng-container>
+
+      <ng-container *ngIf="isAwsSsoActive">
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label><strong>AWS SSO Url</strong></label>
+          <br>
+          <span class="form-control blue-control">{{portalUrl}}</span>
+       </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label><strong>AWS Region</strong></label>
+          <br>
+          <span class="form-control blue-control">{{selectedRegion}}</span>
+        </div>
+      </ng-container>
+    </form>
+
+  </div>
+
+  <ng-container *ngIf="!isAwsSsoActive">
+    <button class="button pull-center" (click)="login()">AWS SSO</button>
+  </ng-container>
+
+  <ng-container *ngIf="isAwsSsoActive">
+    <button class="button pull-left disabled" (click)="logout()">AWS SSO LOGOUT</button>
+    <button class="button pull-right" (click)="forceSync()"> SYNC SESSIONS</button>
+  </ng-container>
+</div>

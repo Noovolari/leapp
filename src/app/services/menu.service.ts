@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {WorkspaceService} from './workspace.service';
 import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
@@ -112,7 +112,7 @@ export class MenuService extends NativeService {
       // Stop the session...
       this.sessionService.stopAllSession();
       // Stop credentials to be used
-      this.credentialService.refreshCredentialsEmit.emit(null);
+      this.credentialService.refreshCredentials(null);
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {

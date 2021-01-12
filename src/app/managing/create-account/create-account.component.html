@@ -13,6 +13,18 @@
         <button type="button" class="providers" (click)="setProvider(eAccountType.AZURE);"><img src="assets/images/azure-logo.svg" height="20"></button>
         </div>
       </div>
+
+      <h1>Choose your Integration</h1>
+      <p>To define your Access Strategy, select your Leapp integration.</p>
+
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label>My integration is:</label>
+        <br>
+        <div class="correct-top">
+          <button type="button" class="providers" (click)="goToAwsSso()">AWS SSO</button>
+
+        </div>
+      </div>
     </ng-container>
 
     <ng-container *ngIf="provider !== eAccountType.AZURE && providerSelected && typeSelection">

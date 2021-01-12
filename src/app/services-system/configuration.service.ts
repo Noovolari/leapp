@@ -9,7 +9,6 @@ import {Workspace} from '../models/workspace';
 import {Configuration} from '../models/configuration';
 import {_} from '../core/translation-marker';
 import {Session} from '../models/session';
-import {MenuService} from '../services/menu.service';
 
 
 @Injectable({
@@ -26,6 +25,8 @@ export class ConfigurationService extends NativeService {
   // ============================================================ //
   // ======================== WORKSPACES ======================== //
   // ============================================================ //
+
+  // TODO Why here there are all the function on workspace and in workspaceService there is the create new Workspace?
 
   /**
    * Check if a workspace exists
@@ -66,6 +67,7 @@ export class ConfigurationService extends NativeService {
 
     // Set the configuration with the updated value
     const configuration = this.getConfigurationFileSync();
+    // TODO: we need more than one workspace?
     configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
     configuration.workspaces.push(workspace);
     this.updateConfigurationFileSync(configuration);
@@ -91,6 +93,7 @@ export class ConfigurationService extends NativeService {
    * Get Default Workspace
    * @returns the default {Workspace}
    */
+  // TODO: WHY IT SHOULD RETURN A EMPTY HASH??
   public getDefaultWorkspaceSync(): Workspace | any {
     const config = this.getConfigurationFileSync();
     if (config.defaultWorkspace) {

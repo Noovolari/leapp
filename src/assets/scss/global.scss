@@ -122,6 +122,21 @@ body.modal-open .background {
   filter: blur(6px)!important;
 }
 
+.container-fluid {
+  position: relative;
+  left: 0;
+  transition: left 0.3s ease;
+}
+.header-content {
+  left: 0;
+  transition: left 0.3s ease;
+}
+
+body.moved .container-fluid { left: 200px; }
+body.moved .header-content { left: 227px; }
+body .mask { display: none; }
+body.moved .mask { display: block; opacity: 0; position: fixed; z-index: 1000; left: 200px; top: 90px; right: 0; bottom: 0; }
+
 .modal-dialog.ssm-modal {
   margin: 0!important;
   height: 100vh;

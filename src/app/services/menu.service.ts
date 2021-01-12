@@ -92,7 +92,7 @@ export class MenuService extends NativeService {
     voices = voices.concat(extraInfo);
     const contextMenu = this.Menu.buildFromTemplate(voices);
 
-    if (!this.currentTray) {
+    if (this.currentTray !== null && this.currentTray !== undefined) {
       this.currentTray = new this.Tray(__dirname + `/assets/images/LeappMini.png`);
     }
 

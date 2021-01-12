@@ -62,8 +62,7 @@ export class ProxyService extends NativeService {
         rule = `${proxyProtocol}://${proxyUsername}:${proxyPassword}@${proxyUrl}:${proxyPort}`;
       }
 
-      const agent = new this.httpsProxyAgent(rule);
-      options.agent = agent;
+      options.agent = new this.httpsProxyAgent(rule);
       options.timeout = environment.timeout;
     }
 

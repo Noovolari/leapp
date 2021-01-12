@@ -12,6 +12,10 @@ import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import {SharedModule} from './shared/shared.module';
 import {InputDialogComponent} from './shared/input-dialog/input-dialog.component';
+import { AwsSsoComponent } from './integrations/components/aws-sso/aws-sso.component';
+import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {NgSelectModule} from '@ng-select/ng-select';
+import {TrayMenuComponent} from './shared/tray-menu/tray-menu.component';
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
@@ -19,7 +23,9 @@ export function HttpLoaderFactory(http: HttpClient) {
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    AwsSsoComponent,
+    TrayMenuComponent
   ],
   imports: [
     BrowserModule,
@@ -28,6 +34,9 @@ export function HttpLoaderFactory(http: HttpClient) {
     AppRoutingModule,
     HttpClientModule,
     SharedModule,
+    FormsModule,
+    ReactiveFormsModule,
+    NgSelectModule,
     LayoutModule,
     ToastrModule.forRoot({
       positionClass: 'toast-top-full-width'

@@ -2,12 +2,11 @@ import { Session } from './session';
 
 export interface Workspace {
   type?: string;
+
+  // TODO WHY there are more than one workspace
   name: string;
-
   lastIDPToken?: string;
-
   setupDone?: boolean;
-
   idpUrl?: string;
 
   proxyConfiguration: {

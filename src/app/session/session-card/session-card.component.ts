@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Host, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {CredentialsService} from '../../services/credentials.service';
@@ -19,6 +19,7 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import {KeychainService} from '../../services-system/keychain.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
+import {AwsSsoAccount} from '../../models/aws-sso-account';
 
 @Component({
   selector: 'app-session-card',
@@ -62,19 +63,18 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   ngOnInit() {
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions(false);
-    let nameToShow;
     switch (this.session.account.type) {
       case(AccountType.AWS):
-        nameToShow = (this.session.account as AwsAccount).role.name.length >= 13 ? `${(this.session.account as AwsAccount).role.name.substr(0, 13)}...` : (this.session.account as AwsAccount).role.name;
-        this.sessionDetailToShow = nameToShow;
+        this.sessionDetailToShow = (this.session.account as AwsAccount).role.name;
         break;
       case(AccountType.AZURE):
-        nameToShow = (this.session.account as AzureAccount).subscriptionId.length >= 13 ? `${(this.session.account as AzureAccount).subscriptionId.substr(0, 13)}...` : (this.session.account as AzureAccount).subscriptionId;
-        this.sessionDetailToShow = nameToShow;
+        this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
         break;
       case(AccountType.AWS_PLAIN_USER):
-        nameToShow = (this.session.account as AwsPlainAccount).user.length >= 13 ? `${(this.session.account as AwsPlainAccount).user.substr(0, 13)}...` : (this.session.account as AwsPlainAccount).user;
-        this.sessionDetailToShow = nameToShow;
+        this.sessionDetailToShow = (this.session.account as AwsPlainAccount).user;
+        break;
+      case(AccountType.AWS_SSO):
+        this.sessionDetailToShow = (this.session.account as AwsSsoAccount).role.name;
         break;
     }
   }
@@ -193,12 +193,14 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
         // Check the result of the call
         this.subs.add(this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
           this.instances = result.instances;
+          console.log(this.instances);
           this.ssmloading = false;
         }, err => {
           this.instances = [];
           this.ssmloading = false;
         }));
       });
+
     }
   }
 

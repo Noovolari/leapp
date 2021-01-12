@@ -16,6 +16,10 @@
   }
 }
 
+b {
+  font-family: "AvenirNextDemiBold", sans-serif!important;
+}
+
 .account-cards {
   height: 478px;
   margin: 0!important;
@@ -33,11 +37,15 @@
   border-radius: $border-radius;
   margin: 0 0 15px;
   cursor: pointer;
+  font-size: 13px;
 
   .information {
     padding: 10px 0 10px 10px;
     display: inline-block;
     width: 77%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .information-offset {
     padding: 10px;

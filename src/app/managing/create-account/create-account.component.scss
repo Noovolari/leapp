@@ -7,6 +7,12 @@
   font-family: "AvenirNext", "Open Sans", sans-serif;
   padding: 0 25px;
 
+  position: fixed;
+  left: 0;
+  transition: left 0.3s ease;
+  bottom: 0;
+  top: 0;
+
   .pull-right {
     position: absolute;
     right: 25px;

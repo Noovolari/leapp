@@ -26,8 +26,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
   hasOneGoodSession = false;
   hasSsoUrl = false;
 
-  toggleOpen = true;
-  roles: string[] = [];
   accountType;
   provider;
 
@@ -87,6 +85,8 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
 
       // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
+
+      // TODO: WHY SESSIONS ARE ONLY PLAIN AND FEDERATED, This method retrieve all the trustable accounts
       const sessions = this.providerManagerService.getFederatedAndPlainAccounts();
       this.accounts = sessions.map((sess: Session) => {
         return {
@@ -96,12 +96,15 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       });
 
       // Add parameters to check what to do with form data
-      this.hasOneGoodSession = sessions.length > 0;
+      this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
+      console.log(this.firstTime);
       this.fedUrl = this.workspace.idpUrl;
+      // TODO REDUNDANT
       this.hasSsoUrl = this.fedUrl && this.fedUrl !== '';
 
       // Show the federated accounts
+      // TODO: REDUNDANT
       this.federatedAccounts = this.accounts;
 
       // only for start screen
@@ -212,5 +215,9 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
 
   openSSODocumentation() {
     this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/.github/tutorials/G_SUITE_FEDERATION_SETUP');
+  }
+
+  goToAwsSso() {
+    this.router.navigate(['/integrations', 'aws-sso']);
   }
 }

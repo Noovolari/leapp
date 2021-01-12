@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, Renderer2} from '@angular/core';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
@@ -27,7 +27,8 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     private router: Router,
     private httpClient: HttpClient,
     private executeService: ExecuteServiceService,
-    private proxyService: ProxyService
+    private proxyService: ProxyService,
+    private renderer: Renderer2
   ) { super(); }
 
   /**
@@ -36,6 +37,7 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
   ngOnInit() {
     const sub = this.appService.profileOpen.subscribe(res => {
       this.profileOpen = res;
+      this.profileOpen ? this.renderer.addClass(document.body, 'moved') : this.renderer.removeClass(document.body, 'moved');
     });
     this.subs.add(sub);
   }
@@ -68,22 +70,31 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     this.execSubscription = this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }
 
-  /**
-   * Go to Account Management
-   */
-  gotToAccountManagement() {
-    this.closeProfile();
-    this.router.navigate(['/sessions', 'list-accounts']);
-  }
 
   closeProfile() {
     this.profileOpen = false;
     this.appService.profileOpen.emit(false);
     this.appService.logger(`Profile open emitting: ${this.profileOpen}`, LoggerLevel.INFO, this);
+    this.renderer.removeClass(document.body, 'moved');
   }
 
   goToProfile() {
     this.closeProfile();
     this.router.navigate(['/profile']);
+  }
+
+  goToHome() {
+    this.closeProfile();
+    this.router.navigate(['/sessions', 'session-selected']);
+  }
+
+  goToIntegrations() {
+    this.closeProfile();
+    this.router.navigate(['/integrations', 'list']);
+  }
+
+  goToIdentityProvider() {
+    this.closeProfile();
+    this.router.navigate(['/integrations', 'aws-sso']);
   }
 }

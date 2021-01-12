@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
-import {Observable, Subscription} from 'rxjs';
+import {Observable} from 'rxjs';
 import {AwsCredential} from '../models/credential';
 
 const AWS = require('aws-sdk');
@@ -14,7 +14,6 @@ export class SsmService {
   ssmClient;
   ec2Client;
   instances = [];
-  private execSubscription: Subscription;
 
   constructor(
     private app: AppService,
@@ -62,7 +61,8 @@ export class SsmService {
                 mythis.instances.forEach(instance => {
                   // Add name if exists
                   const instanceId = instance.InstanceId;
-                  instance['ComputerName'] = instance['ComputerName'] || instance.InstanceId;
+                  console.log(instance);
+                  instance['ComputerName'] = instance.InstanceId;
                   instance['Name'] = instance['ComputerName'];
                 });
                 // We have found and managed a list of instances
@@ -97,8 +97,8 @@ export class SsmService {
    * @param instanceId - the instance id of the instance to start
    */
   startSession(instanceId) {
-    if (this.execSubscription) { this.execSubscription.unsubscribe(); }
-    this.execSubscription = this.exec.openTerminal(`aws ssm start-session --target '${instanceId}'`).subscribe(() => {}, err2 => {
+    const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : '';
+    this.exec.openTerminal(`aws ssm start-session --target ${hypen}${instanceId}${hypen}`).subscribe(() => {}, err2 => {
       this.app.logger('Start SSM session error', LoggerLevel.ERROR, this, err2.stack);
       this.app.toast(err2.stack, ToastLevel.ERROR, 'Error in running instance via SSM');
     });
@@ -110,7 +110,7 @@ export class SsmService {
    * @param region - the region for the client
    */
   setConfig(data: AwsCredential , region) {
-
+    console.log(data);
     return data.aws_session_token ? {
         region,
         accessKeyId: data.aws_access_key_id,

@@ -1,6 +1,6 @@
 <div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}">
   <div class="information" (click)="switchCredentials()">
-    <b>{{session.account.accountName.length >= 23 ? session.account.accountName.substr(0, 20) + '...' : session.account.accountName}}</b> - {{ sessionDetailToShow }}
+    <b>{{session.account.accountName}}</b> - {{ sessionDetailToShow }}
   </div>
   <div class="information-offset" (click)="switchCredentials()">
     <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
@@ -12,10 +12,10 @@
       <i class="fa fa-ellipsis-v"></i>
     </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-      <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER) && session.active">SSM session</a>
+      <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO) && session.active">SSM session</a>
       <a *ngIf="session.account.type === eAccountType.AWS_PLAIN_USER && !session.active" (click)="editAccount(session, $event);">Edit account</a>
       <a (click)="removeAccount(session, $event);">Remove account</a>
-      <ng-container *ngIf="session.account.type === eAccountType.AWS">
+      <ng-container *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO)">
       <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
       <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
       </ng-container>
@@ -34,7 +34,7 @@
 
     <div class="ssm-tray">
 
-      <b class="">Seleziona una region:</b>
+      <b class="">Select a region:</b>
       <ng-select bindLabel="region" bindValue="region" [items]="ssmRegions" [(ngModel)]="selectedSsmRegion" placeholder="Select a Region for finding instances" (change)="changeSsmRegion($event);"></ng-select>
 
       <div class="loader" *ngIf="ssmloading"><i class="fa fa-spinner fa-spin"></i></div>

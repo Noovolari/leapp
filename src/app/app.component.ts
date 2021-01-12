@@ -10,7 +10,6 @@ import {Router} from '@angular/router';
 import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
 import {MenuService} from './services/menu.service';
-import {WorkspaceService} from './services/workspace.service';
 
 @Component({
   selector: 'app-root',
@@ -78,6 +77,7 @@ export class AppComponent implements OnInit {
    * This is an hook on the closing app to remove credential file and force stop using them
    */
   private beforeCloseInstructions() {
+    // TODO: Move to another component
     this.menuService.cleanBeforeExit();
   }
 

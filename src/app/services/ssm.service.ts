@@ -97,7 +97,8 @@ export class SsmService {
    * @param instanceId - the instance id of the instance to start
    */
   startSession(instanceId) {
-    this.exec.openTerminal(`aws ssm start-session --target '${instanceId}'`).subscribe(() => {}, err2 => {
+    const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : '';
+    this.exec.openTerminal(`aws ssm start-session --target ${hypen}${instanceId}${hypen}`).subscribe(() => {}, err2 => {
       this.app.logger('Start SSM session error', LoggerLevel.ERROR, this, err2.stack);
       this.app.toast(err2.stack, ToastLevel.ERROR, 'Error in running instance via SSM');
     });

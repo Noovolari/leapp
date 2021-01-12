@@ -46,8 +46,6 @@ export class StartScreenComponent extends AntiMemLeak implements OnInit, AfterVi
     this.showCredentialBackupMessageIfNeeded();
 
     if (result) {
-      // Generate the contextual menu
-      // this.menuService.generateMenu();
       // If configuration is not needed go to session list
       if (this.isAlreadyConfigured()) {
         this.appService.logger('Already configured, moving to list', LoggerLevel.INFO, this);

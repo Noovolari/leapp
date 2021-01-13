@@ -13,7 +13,7 @@ Leapp is a DevTool Desktop App designed to **manage and secure Cloud Access in m
 
 The App is designed to work with Cloud Providers APIs, CLIs, and SDKs.
 
-It's a tool that securely [**stores your access information in a secure place**](.github/vault_strategy/strategy.md) and generates temporary credential sets to access your Cloud from your local machine.
+It's a tool that securely [**stores your access information in a secure place**](https://github.com/Noovolari/leapp/wiki/vault-strategy) and generates temporary credential sets to access your Cloud from your local machine.
 
 > We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **[we prefer to store that information in an encrypted file managed by the system.](https://github.com/Noovolari/leapp/wiki/vault-strategy)**
 > Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
@@ -26,7 +26,7 @@ It's a tool that securely [**stores your access information in a secure place**]
 - [Use Cases](#use-cases)
   * [AWS Plain Access](#aws-plain-access)
   * [AWS Federated Access](#aws-federated-access)
-  * [AWS Single Sign-On](#aws-sso)
+  * [AWS Single Sign-On](#aws-single-sign-on)
   * [AWS Truster Access](#aws-truster-access)
   * [Azure Access](#azure-access)
 - [Supported Providers](#supported-providers)
@@ -100,7 +100,7 @@ In this access strategy a **Truster Role** or a **Plain User** is assumed by a *
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 
-*Note: it's possible to apply MFA to a truster session by setting it on the plain account it relies on. Please see [MFA section](#multi-factor-authentication) for more details.*
+*Note: it's possible to apply MFA to a truster session by setting it on the plain account it relies on. Please see [MFA section](https://github.com/Noovolari/leapp/wiki/mfa) for more details.*
 
 ## Azure Access
 Use Leapp to do Single Sign On with G Suite on Azure to get access to your 

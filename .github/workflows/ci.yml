@@ -23,4 +23,4 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - name: Run npm
       run: |
-        npm run build
+        npm run electron-dev

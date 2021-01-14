@@ -38,7 +38,7 @@
     "ng": "ng",
     "start": "ng serve",
     "rebuild-keytar": "electron-rebuild -f -w keytar",
-    "build": "rm -rf electron/dist && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
+    "build": "rm -rf electron/dist && mkdir -p dist/leapp-client && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
     "test": "ng test",
     "lint": "ng lint",
     "extract": "ngx-translate-extract --input ./src --output ./src/assets/i18n/en.json ./src/assets/i18n/it.json --clean --sort --format namespaced-json --marker _",

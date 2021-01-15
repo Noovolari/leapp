@@ -34,9 +34,14 @@ export class FederatedAccountService extends NativeService {
   addFederatedAccountToWorkSpace(accountNumber: string, accountName: string, role: any, idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
+    if (role.name[0] === '/') {
+      role.name = role.name.substr(1);
+    }
+
     // Verify it not exists
     const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);
     if (!test || test.length === 0) {
+
       // add new account
       const account = {
         accountId: accountNumber,

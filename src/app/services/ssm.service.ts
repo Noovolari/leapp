@@ -3,6 +3,7 @@ import {ExecuteServiceService} from '../services-system/execute-service.service'
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {Observable} from 'rxjs';
 import {AwsCredential} from '../models/credential';
+import {switchMap} from 'rxjs/operators';
 
 const AWS = require('aws-sdk');
 
@@ -29,12 +30,36 @@ export class SsmService {
     // Set your SSM client and EC2 client
     AWS.config.update(this.setConfig(data, region));
     this.ssmClient = new AWS.SSM();
+    this.ec2Client = new AWS.EC2();
 
     // Fix for Ec2 clients from electron app
     this.app.setFilteringForEc2Calls();
 
     // Get data
-    return this.submit();
+    return this.submit().pipe(
+      switchMap(response => {
+        return new Observable<SsmResult>(observer => {
+          this.ec2Client.describeInstances({}, (err, reservations) => {
+            if (err) {
+              this.app.logger('You are not Authorized to perform EC2 Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
+              this.app.toast('You are not Authorized to perform EC2 Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
+              observer.error({status: false, instances: response.instances});
+            } else {
+              response.instances.forEach(instance => {
+                const foundInstance = reservations.Reservations.filter(r => r.Instances[0].InstanceId === instance.Name);
+                if (foundInstance.length > 0) {
+                  const foundName = foundInstance[0].Instances[0].Tags.filter(t => t.Key === 'Name');
+                  if (foundName.length > 0) {
+                    instance.Name = foundName[0].Value;
+                  }
+                }
+              });
+              observer.next(response);
+            }
+          });
+        });
+      })
+    );
   }
 
   /**
@@ -43,7 +68,7 @@ export class SsmService {
   submit(): Observable<SsmResult> {
     const mythis = this;
     this.instances = [];
-    return new Observable(observer => {
+    return new Observable<SsmResult>(observer => {
       try {
         this.ssmClient.describeInstanceInformation({}, (err, data) => {
           if (err) {
@@ -60,11 +85,11 @@ export class SsmService {
                 // For every instance that fullfill we obtain...
                 mythis.instances.forEach(instance => {
                   // Add name if exists
-                  const instanceId = instance.InstanceId;
-                  console.log(instance);
                   instance['ComputerName'] = instance.InstanceId;
                   instance['Name'] = instance['ComputerName'];
+                  console.log(instance);
                 });
+
                 // We have found and managed a list of instances
                 this.app.logger('Obtained smm info from AWS for SSM', LoggerLevel.INFO, this);
                 observer.next({status: true, instances: mythis.instances});
@@ -96,9 +121,9 @@ export class SsmService {
    * Start a new ssm session given the instance id
    * @param instanceId - the instance id of the instance to start
    */
-  startSession(instanceId) {
+  startSession(instanceId, region) {
     const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : '';
-    this.exec.openTerminal(`aws ssm start-session --target ${hypen}${instanceId}${hypen}`).subscribe(() => {}, err2 => {
+    this.exec.openTerminal(`aws ssm start-session --region ${region} --target ${hypen}${instanceId}${hypen}`).subscribe(() => {}, err2 => {
       this.app.logger('Start SSM session error', LoggerLevel.ERROR, this, err2.stack);
       this.app.toast(err2.stack, ToastLevel.ERROR, 'Error in running instance via SSM');
     });

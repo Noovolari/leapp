@@ -277,7 +277,7 @@ export class AwsSsoService extends NativeService {
       expand((response: ListAccountsResponse) => {
         return (response.nextToken !== null ? fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()) : EMPTY);
       }),
-      take(100), // safety block for now
+      take(300), // safety block for now
       toArray(),
       map((response: ListAccountsResponse[]) => {
         const accountListComplete = [];

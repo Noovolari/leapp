@@ -34,8 +34,6 @@ export class NativeService {
   protected process: any;
   protected ipcRenderer: any;
   protected keytar: typeof Keytar;
-  // protected http: any;
-  // protected https: any;
   protected followRedirects: any;
   protected httpProxyAgent: any;
   protected httpsProxyAgent: any;
@@ -67,8 +65,6 @@ export class NativeService {
     this.process = (window as any).process;
     this.ipcRenderer = (window as any).ipcRenderer;
     this.keytar = (window as any).keytar;
-    // this.http = (window as any).http;
-    // this.https = (window as any).https;
     this.followRedirects = (window as any).followRedirects;
     this.httpProxyAgent = (window as any).httpProxyAgent;
     this.httpsProxyAgent = (window as any).httpsProxyAgent;

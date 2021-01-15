@@ -152,10 +152,9 @@ export class WorkspaceService extends NativeService {
   checkForShowingTheLoginWindow(url): Observable<boolean> {
     return new Observable<boolean>(obs => {
       const pos = this.currentWindow.getPosition();
-      console.log('idp win', this.idpWindow);
+
       this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
       this.proxyService.configureBrowserWindow(this.idpWindow);
-      console.log('DOPOOOPO');
 
       // This filter is used to listen to go to a specific callback url (or the generic one)
       const filter = {urls: ['https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};

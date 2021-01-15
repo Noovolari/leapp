@@ -31,7 +31,10 @@ export class TrusterAccountService extends NativeService {
   addTrusterAccountToWorkSpace(accountNumber: string, accountName: string, parentAccountSessionId: string, parentRole: string,
                                role: any, idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const configuration = this.configurationService.getConfigurationFileSync();
+
+    if (role.name[0] === '/') {
+      role.name = role.name.substr(1);
+    }
 
     // if the account doesn't exists
     const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);

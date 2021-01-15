@@ -538,6 +538,14 @@ export class AppService extends NativeService {
     return options;
   }
 
+  createRoleSessionName(role) {
+    let roleName = `${role}-trusted`;
+    console.log(roleName);
+    roleName =  roleName.substr(0, 64).replace(/\//g, '-');
+    console.log(roleName);
+    return roleName;
+  }
+
 }
 
 /*

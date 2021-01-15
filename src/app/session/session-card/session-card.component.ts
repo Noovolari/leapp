@@ -211,7 +211,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   startSsmSession(instanceId) {
     this.instances.forEach(instance => { if (instance.InstanceId === instanceId) { instance.loading = true; } });
 
-    this.ssmService.startSession(instanceId);
+    this.ssmService.startSession(instanceId, this.selectedSsmRegion);
 
     setTimeout(() => {
       this.instances.forEach(instance => { if (instance.InstanceId === instanceId) { instance.loading = false; } });

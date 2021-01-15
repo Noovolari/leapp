@@ -15,9 +15,9 @@ import SSO, {
   RoleInfo
 } from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
-import {from, merge, NEVER, never, Observable, of, throwError} from 'rxjs';
-import {catchError, filter, map, switchMap, tap, toArray} from 'rxjs/operators';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {EMPTY, empty, merge, Observable, of, throwError} from 'rxjs';
+import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
@@ -27,7 +27,6 @@ import {environment} from '../../../environments/environment';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {Workspace} from '../../models/workspace';
-import {type} from 'os';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -251,7 +250,9 @@ export class AwsSsoService extends NativeService {
   generateSessionsFromToken(observable: Observable<LoginToAwsSSOResponse>): Observable<Session[]> {
     return observable.pipe(
       // API portal Calls
-      switchMap((loginToAwsSSOResponse: LoginToAwsSSOResponse) => this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region)),
+      switchMap((loginToAwsSSOResponse: LoginToAwsSSOResponse) => {
+        return this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region);
+      }),
       // Create an array of observables and then call them in parallel,
       switchMap((response) => {
         const arrayResponse = [];
@@ -261,19 +262,30 @@ export class AwsSsoService extends NativeService {
           const accountInfoCall = this.getSessionsFromAccount(accountInfo, response.accessToken, response.region);
           arrayResponse.push(accountInfoCall);
         }
-
         return merge<Session>(...arrayResponse);
       }),
-      // every call will be merged in an Array
       toArray()
     );
   }
 
   listAccounts(accessToken: string, region: string): Observable<any> {
     this.ssoPortal = new SSO({ region });
+
     const listAccountsRequest: ListAccountsRequest = { accessToken };
+
     return fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()).pipe(
-      map((response: ListAccountsResponse) => ({ accountList: response.accountList , accessToken, region })),
+      expand((response: ListAccountsResponse) => {
+        return (response.nextToken !== null ? fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()) : EMPTY);
+      }),
+      take(100), // safety block for now
+      toArray(),
+      map((response: ListAccountsResponse[]) => {
+        const accountListComplete = [];
+        response.forEach(r => {
+          accountListComplete.push(...r.accountList);
+        });
+        return { accountList: accountListComplete , accessToken, region };
+      }),
       catchError((err) => {
         return throwError(err.toString());
       })

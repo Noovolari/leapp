@@ -214,7 +214,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
       const params = {
         RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
-        RoleSessionName: `truster-on-${session.account.role.name}`,
+        RoleSessionName: this.appService.createRoleSessionName(session.account.role.name),
         DurationSeconds: 3600 // 1 hour for chained assume role
       };
 

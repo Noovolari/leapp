@@ -375,7 +375,7 @@ export class WorkspaceService extends NativeService {
 
         sts.assumeRole({
           RoleArn: `arn:aws:iam::${account.accountNumber}:role/${roleName}`,
-          RoleSessionName: `truster-on-${roleName}`
+          RoleSessionName: this.appService.createRoleSessionName(roleName)
         }, (err, data: any) => {
           if (err) {
 

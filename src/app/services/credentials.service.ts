@@ -85,9 +85,13 @@ export class CredentialsService extends NativeService {
     if (accountType !== null) {
       this.strategyMap[accountType](workspace, accountType);
     } else {
-      this.awsStrategy.refreshCredentials(workspace, accountType);
-      this.azureStrategy.refreshCredentials(workspace, accountType);
-      this.awsSsoStrategy.refreshCredentials(workspace, accountType);
+      this.awsStrategy.refreshCredentials(workspace);
+      this.azureStrategy.refreshCredentials(workspace);
+      this.awsSsoStrategy.refreshCredentials(workspace);
+    }
+
+    if (this.timerService.needToClearTimer()) {
+      this.timerService.clearTimer();
     }
   }
 

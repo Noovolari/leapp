@@ -12,6 +12,10 @@ export class TimerService extends NativeService {
   timer = null;
   startTime;
 
+  noAwsSessionsActive = true;
+  noAwsSsoSessionsActive = true;
+  noAzureSessionsActive = true;
+
   /**
    * Process the actual refresh credential check: if we are over the sessionDuration parameters we need to refresh credentials
    */
@@ -45,6 +49,14 @@ export class TimerService extends NativeService {
       clearInterval(this.timer);
       this.timer = null;
       this.startTime = null;
+    }
+  }
+
+  needToClearTimer(): boolean {
+    if (this.noAwsSessionsActive && this.noAwsSsoSessionsActive && this.noAzureSessionsActive) {
+      return true;
+    } else {
+      return false;
     }
   }
 }

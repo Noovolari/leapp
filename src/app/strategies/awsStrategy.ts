@@ -50,11 +50,15 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   cleanCredentials(workspace: Workspace): void {
     if (workspace) {
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
-      this.timerService.clearTimer();
+      this.timerService.noAwsSessionsActive = true;
     }
   }
 
   manageSingleSession(workspace, session) {
+    if (this.timerService.noAwsSessionsActive === true) {
+      this.timerService.noAwsSessionsActive = false;
+    }
+
     if (session.account.type === AccountType.AWS_PLAIN_USER) {
       this.awsCredentialProcess(workspace, session);
     } else if (session.account.type === AccountType.AWS) {

@@ -45,11 +45,15 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
   cleanCredentials(workspace: Workspace): void {
     if (workspace) {
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
-      this.timerService.clearTimer();
+      this.timerService.noAwsSsoSessionsActive = true;
     }
   }
 
   manageSingleSession(workspace, session) {
+    if (this.timerService.noAwsSsoSessionsActive === true) {
+      this.timerService.noAwsSsoSessionsActive = false;
+    }
+
     if (session.account.type === AccountType.AWS_SSO) {
       this.awsCredentialProcess(workspace, session);
     }

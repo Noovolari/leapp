@@ -38,13 +38,19 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
     if (workspace) {
       // Clean Azure Credential file
       this.cleanAzureCredentialFile();
+      this.timerService.noAzureSessionsActive = true;
     }
   }
 
   manageSingleSession(workspace, session) {
     if (workspace.azureConfig !== null && workspace.azureConfig !== undefined) {
       // Already have tokens
-      // 1) Write accessToken e profile again
+
+      if (this.timerService.noAzureSessionsActive === true) {
+        this.timerService.noAzureSessionsActive = false;
+      }
+
+      // 1) Write accessToken and profile again
       this.configurationService.updateAzureProfileFileSync(workspace.azureProfile);
       this.configurationService.updateAzureAccessTokenFileSync(workspace.azureConfig);
 

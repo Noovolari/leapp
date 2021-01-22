@@ -6,8 +6,10 @@
 */
 import * as Keytar from 'keytar';
 
-export class NativeService {
 
+
+export class NativeService {
+  protected log: any;
   protected fs: any;
   protected rimraf: any;
   protected os: any;
@@ -24,10 +26,8 @@ export class NativeService {
   protected path: any;
   public url: any;
   protected currentWindow: any;
-  protected log: any;
   protected semver: any;
   protected shell: any;
-  protected powerMonitor: any;
   protected Menu: any;
   protected Tray: any;
   protected MachineId: any;
@@ -39,35 +39,36 @@ export class NativeService {
   protected httpsProxyAgent: any;
 
   constructor() {
-    this.fs = (window as any).fs;
-    this.rimraf = (window as any).rimraf;
-    this.ini = (window as any).ini;
-    this.url = (window as any).url;
-    this.currentWindow = (window as any).currentWindow;
-    this.copydir = (window as any).copydir;
-    this.os = (window as any).os;
-    this.app = (window as any).app;
-    this.session = (window as any).session;
-    this.unzip = (window as any).unzip;
-    this.browserWindow = (window as any).browserWindow;
-    this.dialog = (window as any).dialog;
-    this.exec = (window as any).exec;
-    this.sudo = (window as any).sudo;
-    this.md5File = (window as any).md5File;
-    this.path = (window as any).path;
-    this.log = (window as any).log;
-    this.semver = (window as any).semver;
-    this.shell = (window as any).shell;
-    this.powerMonitor = (window as any).powerMonitor;
-    this.Menu = (window as any).Menu;
-    this.Tray = (window as any).Tray;
-    this.MachineId = (window as any).MachineId;
-    this.process = (window as any).process;
-    this.ipcRenderer = (window as any).ipcRenderer;
-    this.keytar = (window as any).keytar;
-    this.followRedirects = (window as any).followRedirects;
-    this.httpProxyAgent = (window as any).httpProxyAgent;
-    this.httpsProxyAgent = (window as any).httpsProxyAgent;
+    this.fs = (window as any).native.fs;
+    this.rimraf = (window as any).native.rimraf;
+    this.ini = (window as any).native.ini;
+    this.url = (window as any).native.url;
+    this.copydir = (window as any).native.copydir;
+    this.os = (window as any).native.os;
+    this.unzip = (window as any).native.unzip;
+    this.exec = (window as any).native.exec;
+    this.sudo = (window as any).native.sudo;
+    this.md5File = (window as any).native.md5File;
+    this.path = (window as any).native.path;
+    this.semver = (window as any).native.semver;
+    this.shell = (window as any).native.shell;
+    this.MachineId = (window as any).native.MachineId;
+    this.process = (window as any).native.process;
+    this.ipcRenderer = (window as any).native.ipcRenderer;
+    this.keytar = (window as any).native.keytar;
+    this.followRedirects = (window as any).native.followRedirects;
+    this.httpProxyAgent = (window as any).native.httpProxyAgent;
+    this.httpsProxyAgent = (window as any).native.httpsProxyAgent;
+
+    this.log = (window as any).native.log;
+    this.app = (window as any).native.app;
+    this.session = (window as any).native.session;
+    this.dialog = (window as any).native.dialog;
+    this.browserWindow = (window as any).native.BrowserWindow;
+    this.currentWindow = (window as any).native.currentWindow;
+    this.Menu = (window as any).native.Menu;
+    this.Tray = (window as any).native.Tray;
+    this.ipcRenderer = (window as any).native.ipcRenderer;
   }
 
 }

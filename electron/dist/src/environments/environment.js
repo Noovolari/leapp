@@ -5,7 +5,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var environment = {
     appName: 'Leapp',
-    sessionDuration: 30,
+    sessionDuration: 1200,
     sessionTokenDuration: 36000,
     timeout: 10000,
     lockFileDestination: '',

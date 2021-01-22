@@ -37,7 +37,6 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
       return (sess.account.type === AccountType.AWS_SSO) && sess.active;
     });
 
-    console.log('active aws sso sessions', activeSessions);
     this.appService.logger('Aws sso Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }

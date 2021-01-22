@@ -87,7 +87,6 @@ export class SsmService {
                   // Add name if exists
                   instance['ComputerName'] = instance.InstanceId;
                   instance['Name'] = instance['ComputerName'];
-                  console.log(instance);
                 });
 
                 // We have found and managed a list of instances
@@ -135,7 +134,6 @@ export class SsmService {
    * @param region - the region for the client
    */
   setConfig(data: AwsCredential , region) {
-    console.log(data);
     return data.aws_session_token ? {
         region,
         accessKeyId: data.aws_access_key_id,

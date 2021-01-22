@@ -6,13 +6,13 @@ import {machineIdSync} from 'node-machine-id';
 import {Workspace} from '../src/app/models/workspace';
 import {AppUpdater} from '../src/app/core/app-updater';
 
-const {app, BrowserWindow, globalShortcut, Menu} = require('electron');
+const {app, BrowserWindow, globalShortcut, Menu, ipcMain, session, dialog, powerMonitor, Tray, getCurrentWindow } = require('electron');
+
 const url = require('url');
 const fs = require('fs');
 const os = require('os');
 const log = require('electron-log');
-const ipc = require('electron').ipcMain;
-
+const ipc = ipcMain;
 
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
@@ -32,6 +32,10 @@ const windowDefaultConfig = {
     titleBarStyle: 'hidden',
     webPreferences: {
       devTools: !environment.production,
+      worldSafeExecuteJavaScript: true,
+
+      contextIsolation: false,
+      enableRemoteModule: true,
       nodeIntegration: true
     }
   }

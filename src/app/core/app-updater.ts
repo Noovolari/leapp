@@ -14,6 +14,7 @@ const userAgent = format('%s/%s (%s: %s)', environment.appName, 'latest', os.pla
 const supportedPlatforms = ['darwin', 'win32'];
 const logger = require('electron-log');
 const electron = require('electron');
+
 const {autoUpdater} = require('electron-updater');
 
 export class AppUpdater {

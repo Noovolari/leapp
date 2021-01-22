@@ -83,7 +83,7 @@ export class AwsSsoService extends NativeService {
 
           return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(
             catchError((err) => {
-              this.app.logger('AWS SSO device authorization error.', LoggerLevel.ERROR, this, err.stack);
+              this.appService.logger('AWS SSO device authorization error.', LoggerLevel.ERROR, this, err.stack);
               return throwError('AWS SSO device authorization error.');
             }),
             switchMap((startDeviceAuthorizationResponse: any) => {
@@ -106,6 +106,8 @@ export class AwsSsoService extends NativeService {
                       this.ssoWindow.close();
                       this.ssoWindow = null;
 
+                      console.log(details);
+
                       observer.next({
                         clientId: registerClientResponse.clientId,
                         clientSecret: registerClientResponse.clientSecret,
@@ -120,11 +122,16 @@ export class AwsSsoService extends NativeService {
                   });
 
                   this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
-                    if (details.error.indexOf('net::ERR_ABORTED') < 0) {
+                    if (
+                      details.error.indexOf('net::ERR_ABORTED') < 0 &&
+                      details.error.indexOf('net::ERR_FAILED') < 0 &&
+                      details.error.indexOf('net::ERR_CACHE_MISS') < 0
+                    ) {
                       if (this.ssoWindow) {
                         this.ssoWindow.close();
                         this.ssoWindow = null;
                       }
+                      console.log(details);
                       observer.error(details.error.toString());
                     }
                   });

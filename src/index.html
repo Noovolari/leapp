@@ -2,68 +2,55 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self';
+    font-src 'self' data: https://fonts.gstatic.com data: https://ka-p.fontawesome.com;
+    script-src 'self' 'unsafe-inline' data: https://kit.fontawesome.com/c02fc34a37.js;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    connect-src *;
+  ">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <base href="/">
 
-  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,800&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/c02fc34a37.js" crossorigin="anonymous"></script>
+  <script src="https://kit.fontawesome.com/c02fc34a37.js"></script>
 </head>
 <body>
-<div style="
-    position: fixed;
-    top: 0;
-    left:  0;
-    right:  0;
-    height: 20px;
-    background: #f8f8f8;
-    -webkit-user-select: none;
-    -webkit-app-region: drag;
-"></div>
-<div class="mask"></div>
-<app-root></app-root>
 <script>
-  window.log = require('electron-log');
-  window.fs = require('fs');
-  window.rimraf = require('rimraf');
-  window.os = require('os');
-  window.ini = require('ini');
-  window.ipcRenderer = require('electron').ipcRenderer;
-  window.md5File = require('md5-file');
-  window.path = require('path');
-  window.app = require('electron').remote.app;
-  window.currentWindow = require('electron').remote.getCurrentWindow();
-  window.session = require('electron').remote.session;
-  window.dialog = require('electron').remote.dialog;
-  window.exec = require('child_process').exec;
-  window.url = require('url');
-  window.unzip = require('extract-zip');
-  window.copydir = require('copy-dir');
-  window.sudo = require('sudo-prompt');
-  window.semver = require('semver');
-  window.browserWindow = require('electron').remote.BrowserWindow;
-  window.powerMonitor = require('electron').powerMonitor;
-  window.process = process;
-  window.mousetrap = require('mousetrap');
-  window.shell = require('electron').shell;
-  window.Menu = require('electron').remote.Menu;
-  window.Tray = require('electron').remote.Tray;
-  window.MachineId = require('node-machine-id').machineIdSync();
-  window.keytar = require('keytar');
-  window.followRedirects = require('follow-redirects');
-  window.httpProxyAgent = require('http-proxy-agent');
-  window.httpsProxyAgent = require('https-proxy-agent');
-
-  // Add Blur after Focus effect
-  document.addEventListener('click', function(e) {
-    if(document.activeElement.toString() == '[object HTMLButtonElement]'){
-      document.activeElement.blur();
-    }
-  });
-
-  // Remove manual refresh
-  window.mousetrap.bind(['command+r', 'ctrl+r', 'f5'], function(){ return false; });
+  window.native = {
+    log: require('electron-log'),
+    fs: require('fs'),
+    rimraf: require('rimraf'),
+    os: require('os'),
+    ini: require('ini'),
+    md5File: require('md5-file'),
+    path: require('path'),
+    exec: require('child_process').exec,
+    url: require('url'),
+    unzip: require('extract-zip'),
+    copydir: require('copy-dir'),
+    sudo: require('sudo-prompt'),
+    semver: require('semver'),
+    process,
+    mousetrap: require('mousetrap'),
+    shell: require('electron').shell,
+    MachineId: require('node-machine-id').machineIdSync(),
+    keytar: require('keytar'),
+    followRedirects: require('follow-redirects'),
+    httpProxyAgent: require('http-proxy-agent'),
+    httpsProxyAgent: require('https-proxy-agent'),
+    app: require('electron').remote.app,
+    session: require('electron').remote.session,
+    dialog: require('electron').remote.dialog,
+    BrowserWindow: require('electron').remote.BrowserWindow,
+    currentWindow: require('electron').remote.getCurrentWindow(),
+    Menu: require('electron').remote.Menu,
+    Tray: require('electron').remote.Tray,
+    ipcRenderer: require('electron').ipcRenderer
+  };
 </script>
+<app-root></app-root>
 </body>
 </html>

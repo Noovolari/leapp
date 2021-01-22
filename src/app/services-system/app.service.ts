@@ -60,6 +60,7 @@ export class AppService extends NativeService {
    * Return the app object from node
    */
   getApp() {
+
     return this.app;
   }
 
@@ -112,18 +113,6 @@ export class AppService extends NativeService {
    */
   getIpcRenderer() {
     return this.ipcRenderer;
-  }
-
-  /**
-   * In theory this method would monitor the information data and check if we are suspending the PC.
-   */
-  enablePowerMonitorFeature() {
-    this.app.on('ready', () => {
-      this.powerMonitor.on('suspend', () => {
-        this.log.info('The system is going to resume');
-        this.isResuming.emit(true);
-      });
-    });
   }
 
   /**
@@ -188,33 +177,6 @@ export class AppService extends NativeService {
   }
 
   /**
-   * Change the current browser window url using the file protocol to point to a local project's file
-   * @param url - the url to point to
-   * @param javascript - the javascript to run at browser window loaded
-   */
-  changeCurrentWindowURL(url: string, javascript?: string) {
-    this.currentWindow.dir = this.fileService.dirname(url);
-    this.currentWindow.loadURL(this.url.format({
-        pathname: url,
-        protocol: 'file:',
-        slashes: true
-    }));
-    this.currentWindow.webContents.on('did-finish-load', () => {
-      if (javascript) {
-        this.currentWindow.webContents.executeJavaScript(javascript);
-      }
-    });
-  }
-
-  /**
-   * Change the current browser window url to points to something else
-   * @param url - url to point to
-   */
-  changeCurrentWindowOnlineUrl(url: string) {
-    this.currentWindow.loadURL(url);
-  }
-
-  /**
    * Create a new browser window
    * @param url - the url to point to launch the window with the protocol, it can also be a file://
    * @param title - the window title
@@ -232,10 +194,8 @@ export class AppService extends NativeService {
       title,
       titleBarStyle: 'hidden',
       webPreferences: {
-        devTools: true,
-        sandbox: true,
-        nodeIntegration: false,
-        allowRunningInsecureContent: true,
+        devTools: !environment.production,
+        worldSafeExecuteJavaScript: true
       }
     };
 

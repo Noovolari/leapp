@@ -98,7 +98,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       // Add parameters to check what to do with form data
       this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
-      console.log(this.firstTime);
+
       this.fedUrl = this.workspace.idpUrl;
       // TODO REDUNDANT
       this.hasSsoUrl = this.fedUrl && this.fedUrl !== '';

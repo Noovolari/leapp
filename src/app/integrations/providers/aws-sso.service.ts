@@ -106,8 +106,6 @@ export class AwsSsoService extends NativeService {
                       this.ssoWindow.close();
                       this.ssoWindow = null;
 
-                      console.log(details);
-
                       observer.next({
                         clientId: registerClientResponse.clientId,
                         clientSecret: registerClientResponse.clientSecret,
@@ -131,7 +129,6 @@ export class AwsSsoService extends NativeService {
                         this.ssoWindow.close();
                         this.ssoWindow = null;
                       }
-                      console.log(details);
                       observer.error(details.error.toString());
                     }
                   });

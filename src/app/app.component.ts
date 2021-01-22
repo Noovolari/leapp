@@ -10,6 +10,7 @@ import {Router} from '@angular/router';
 import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
 import {MenuService} from './services/menu.service';
+import {TimerService} from './services/timer-service';
 
 @Component({
   selector: 'app-root',
@@ -25,7 +26,8 @@ export class AppComponent implements OnInit {
     private fileService: FileService,
     private app: AppService,
     private credentialsService: CredentialsService,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private timerService: TimerService
   ) {
   }
 
@@ -68,6 +70,9 @@ export class AppComponent implements OnInit {
       this.app.logger('Preparing for closing instruction...', LoggerLevel.INFO, this);
       this.beforeCloseInstructions();
     });
+
+
+    this.timerService.defineTimer();
 
     // Initial starting point for DEBUG
     this.router.navigate(['/start']);

@@ -35,8 +35,6 @@ export class IntegrationsService {
           this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
 
           return merge(
-            fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_PORTAL_URL')),
-            fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_REGION')),
             fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN')),
             fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME'))
           ).pipe(

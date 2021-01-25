@@ -382,7 +382,9 @@ export class AwsSsoService extends NativeService {
       // Remove all AWS SSO old session or create a session array
       workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
       // Add new AWS SSO sessions
-      workspace.sessions.push(...AwsSsoSessions);
+      workspace.sessions.push(...AwsSsoSessions.sort((a, b) => {
+        return a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'});
+      }));
       this.configurationService.updateWorkspaceSync(workspace);
       observable.next({});
       observable.complete();

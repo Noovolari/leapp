@@ -195,7 +195,8 @@ export class AppService extends NativeService {
       titleBarStyle: 'hidden',
       webPreferences: {
         devTools: !environment.production,
-        worldSafeExecuteJavaScript: true
+        worldSafeExecuteJavaScript: true,
+        partition: 'persist:Leapp'
       }
     };
 

@@ -9,6 +9,7 @@ import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.servic
 import {TimerService} from '../services/timer-service';
 import {CredentialsService} from '../services/credentials.service';
 import {Subscription} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 export class AzureStrategy extends RefreshCredentialsStrategy {
   private processSubscription: Subscription;
@@ -104,14 +105,18 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
       this.configurationService.updateWorkspaceSync(workspace);
     }
     if (this.processSubscription3) { this.processSubscription3.unsubscribe(); }
-    this.processSubscription3 = this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
+    this.processSubscription3 = this.executeService.execute('az account clear 2>&1').pipe(
+      switchMap(() => this.executeService.execute('az configure --defaults location=\'\' 2>&1'))
+    ).subscribe(res => {}, err => {});
   }
 
   private azureSetSubscription(session: Session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     // We can use Json in res to save account information
     if (this.processSubscription4) { this.processSubscription4.unsubscribe(); }
-    this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).subscribe(acc => {
+    this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).pipe(
+      switchMap(() => this.executeService.execute(`az configure --default location=${session.account.region} 2>&1`))
+    ).subscribe(acc => {
       // be sure to save the profile and tokens
       workspace.azureProfile = this.configurationService.getAzureProfileSync();
       workspace.azureConfig = this.configurationService.getAzureConfigSync();

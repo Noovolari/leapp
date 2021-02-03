@@ -7,6 +7,7 @@ import {FileService} from '../../services-system/file.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {constants} from '../../core/enums/constants';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-profile-page',
@@ -26,8 +27,8 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
   workspaceData: Workspace;
 
-  locations: [];
-  regions: [];
+  locations: { location: string }[];
+  regions: { region: string }[];
   selectedLocation: string;
   selectedRegion: string;
 
@@ -38,7 +39,9 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     proxyPort: new FormControl(''),
     proxyUsername: new FormControl(''),
     proxyPassword: new FormControl(''),
-    showAuthCheckbox: new FormControl('')
+    showAuthCheckbox: new FormControl(''),
+    regionsSelect: new FormControl(''),
+    locationsSelect: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -76,6 +79,12 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
         this.showProxyAuthentication = true;
       }
 
+      this.regions = this.appService.getRegions();
+      this.locations = this.appService.getLocations();
+      this.selectedRegion   = this.workspaceData.defaultRegion || environment.defaultRegion;
+      this.selectedLocation = this.workspaceData.defaultLocation || environment.defaultLocation;
+
+
       this.appService.validateAllFormFields(this.form);
     }
   }
@@ -93,6 +102,9 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
       this.workspaceData.proxyConfiguration.username = this.form.controls['proxyUsername'].value;
       this.workspaceData.proxyConfiguration.password = this.form.controls['proxyPassword'].value;
 
+      this.workspaceData.defaultRegion = this.selectedRegion;
+      this.workspaceData.defaultLocation = this.selectedLocation;
+
       this.configurationService.updateWorkspaceSync(this.workspaceData);
 
       if (this.checkIfNeedDialogBox()) {
@@ -106,6 +118,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
       } else {
         this.appService.logger('Option saved.', LoggerLevel.INFO, this, JSON.stringify(this.form.getRawValue(), null, 3));
         this.appService.toast('Option saved.', ToastLevel.INFO, 'Options');
+        this.router.navigate(['/sessions', 'session-selected']);
       }
     }
   }

@@ -11,6 +11,7 @@ import {setTheme} from 'ngx-bootstrap';
 import {CredentialsService} from './services/credentials.service';
 import {MenuService} from './services/menu.service';
 import {TimerService} from './services/timer-service';
+import {AccountType} from './models/AccountType';
 
 @Component({
   selector: 'app-root',
@@ -48,9 +49,23 @@ export class AppComponent implements OnInit {
 
     // If we have credentials copy them from workspace file to the .aws credential file
     const workspace = this.configurationService.getDefaultWorkspaceSync();
+
+    console.log(workspace);
+
     if (workspace) {
       // Set it as default
       this.configurationService.setDefaultWorkspaceSync(workspace.name);
+      // Path old sessions without a default region
+      const sessions = workspace.sessions;
+      if (sessions) {
+        sessions.forEach(session => {
+          if (session.account.region  === undefined || session.account.region === null || session.account.region === '' || session.account.region === 'no region necessary') {
+            session.account.region = session.account.type !== AccountType.AZURE ? environment.defaultRegion : environment.defaultLocation;
+          }
+        });
+        workspace.sessions = sessions;
+        this.configurationService.updateWorkspaceSync(workspace);
+      }
     }
 
     // Fix for retro-compatibility with old workspace configuration

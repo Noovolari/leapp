@@ -62,7 +62,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   ngOnInit() {
     // Set regions for ssm
-    this.ssmRegions = this.appService.getRegions(false);
+    this.ssmRegions = this.appService.getRegions();
 
     switch (this.session.account.type) {
       case(AccountType.AWS):

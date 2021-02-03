@@ -303,7 +303,7 @@ export class AwsSsoService extends NativeService {
       }),
       map((roleInfo: RoleInfo) => {
         const account: AwsSsoAccount = {
-          region: this.appService.getRegions(true)[0].region,
+          region: this.configurationService.getDefaultWorkspaceSync().defaultRegion || environment.defaultRegion,
           role: {name: roleInfo.roleName},
           accountId: accountInfo.accountId,
           accountName: accountInfo.accountName,

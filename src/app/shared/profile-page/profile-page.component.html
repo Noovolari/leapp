@@ -5,23 +5,26 @@
 
     <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
 
-      <div class="form-group" style="width: 100%; display: inline-block;">
-        <label>Default regions<span class="danger-text">*</span></label>
-      </div>
-      <div class="form-group" style="width: 50%; display: inline-block;">
-        <label>Azure Location</label>
-        <ng-select formControlName="azureLocation" bindLabel="location" bindValue="location" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="top"></ng-select>
-      </div>
-
-      <div class="form-group" style="width: 49%; display: inline-block;">
-        <label>AWS Region</label>
-        <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
-      </div>
+      <h2 style="margin-top: 10px;">IdP URL</h2>
 
       <div class="form-group" style="width: 100%; display: inline-block;">
         <label>Google IdP URL<span class="danger-text">*</span></label>
         <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url *" [value]="idpUrlValue" >
         <small class="text-error" *ngIf="(form.controls['idpUrl'].dirty || form.controls['idpUrl'].touched) && form.controls['idpUrl'].errors">Insert the Google IdP URL</small>
+      </div>
+
+      <h2>Default Regions</h2>
+
+      <div class="form-group" style="width: 49%; display: inline-block;">
+        <label>Azure Location</label>
+        <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="down"></ng-select>
+      </div>
+
+      <div class="form-group" style="width: 2%; display: inline-block;"></div>
+
+      <div class="form-group" style="width: 49%; display: inline-block;">
+        <label>AWS Region</label>
+        <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="down"></ng-select>
       </div>
 
       <h2>Proxy settings</h2>

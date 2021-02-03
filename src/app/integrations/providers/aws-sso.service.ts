@@ -330,7 +330,6 @@ export class AwsSsoService extends NativeService {
   }
 
   // LEAPP Integrations
-
   addSessionsToWorkspace(AwsSsoSessions: Session[]): Observable<any> {
     let oldConfiguration;
     let oldWorkspace;
@@ -370,11 +369,31 @@ export class AwsSsoService extends NativeService {
       }
 
       // Remove all AWS SSO old session or create a session array
-      workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
-      // Add new AWS SSO sessions
-      workspace.sessions.push(...AwsSsoSessions.sort((a, b) => {
+      const oldSSOsessions = workspace.sessions.filter(sess => ((sess.account.type === AccountType.AWS_SSO)));
+      const newSSOSessions = AwsSsoSessions.sort((a, b) => {
         return a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'});
-      }));
+      });
+
+      // Non SSO sessions
+      workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
+
+      // Add new AWS SSO sessions
+      const updatedSSOSessions = [];
+      newSSOSessions.forEach((newSession: Session) => {
+        const found = oldSSOsessions.filter(oldSession => {
+          return oldSession.account.accountName === newSession.account.accountName &&
+                 oldSession.account.accountNumber === (newSession.account as AwsSsoAccount).accountNumber &&
+                 oldSession.account.role.name === (newSession.account as AwsSsoAccount).role.name;
+        })[0];
+        if (found) {
+          newSession.account.region = found.account.region;
+        }
+        updatedSSOSessions.push(newSession);
+      });
+
+      // Update all
+      workspace.sessions.push(...updatedSSOSessions);
+
       this.configurationService.updateWorkspaceSync(workspace);
       observable.next({});
       observable.complete();

@@ -12,7 +12,9 @@ const environment = {
   production: false,
   credentialsDestination: '.aws/credentials',
   azureAccessTokens: '.azure/accessTokens.json',
-  azureProfile: '.azure/azureProfile.json'
+  azureProfile: '.azure/azureProfile.json',
+  defaultRegion: 'us-east-1',
+  defaultLocation: 'eastus'
 };
 
 environment.lockFileDestination = `.Leapp/Leapp-lock.json`;

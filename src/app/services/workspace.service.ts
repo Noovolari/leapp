@@ -454,6 +454,8 @@ export class WorkspaceService extends NativeService {
       // TODO why we need a google token to create a workspace??
       // Create a standard workspace to use as default
       const workspace: Workspace = {
+        defaultLocation: environment.defaultLocation,
+        defaultRegion: environment.defaultRegion,
         type: responseType,
         name,
         lastIDPToken: googleToken,

@@ -190,6 +190,11 @@
           <input formControlName="tenantId" type="text" class="form-control" placeholder="Tenant Id *">
           <small class="text-error" *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert the Tenant Id</small>
         </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Azure Location</label>
+          <ng-select formControlName="azureLocation" bindLabel="location" bindValue="location" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="top"></ng-select>
+        </div>
       </ng-container>
 
       <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="accountType">Save</button>

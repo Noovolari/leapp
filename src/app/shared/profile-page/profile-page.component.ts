@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {Workspace} from '../../models/workspace';
 import {ConfigurationService} from '../../services-system/configuration.service';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {FileService} from '../../services-system/file.service';
 import {Router} from '@angular/router';
@@ -26,6 +26,11 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
   workspaceData: Workspace;
 
+  locations: [];
+  regions: [];
+  selectedLocation: string;
+  selectedRegion: string;
+
   public form = new FormGroup({
     idpUrl: new FormControl(''),
     proxyUrl: new FormControl(''),
@@ -37,6 +42,8 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
+
+
   constructor(
     private configurationService: ConfigurationService,
     private appService: AppService,

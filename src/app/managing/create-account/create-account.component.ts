@@ -43,6 +43,8 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
 
   regions = [];
   selectedRegion;
+  locations = [];
+  selectedLocation;
 
   eAccountType = AccountType;
 
@@ -63,7 +65,8 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     secretKey: new FormControl('', [Validators.required]),
     accessKey: new FormControl('', [Validators.required]),
     awsRegion: new FormControl(''),
-    mfaDevice: new FormControl('')
+    mfaDevice: new FormControl(''),
+    azureLocation: new FormControl('', [Validators.required])
   });
 
   /* Setup the first account for the application */
@@ -113,7 +116,9 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       }
 
       this.regions = this.appService.getRegions();
+      this.locations = this.appService.getLocations();
       this.selectedRegion = this.regions[0].region;
+      this.selectedLocation = this.locations[0].location;
     }));
   }
 

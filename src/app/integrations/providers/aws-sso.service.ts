@@ -303,6 +303,7 @@ export class AwsSsoService extends NativeService {
       }),
       map((roleInfo: RoleInfo) => {
         const account: AwsSsoAccount = {
+          region: this.appService.getRegions(true)[0].region,
           role: {name: roleInfo.roleName},
           accountId: accountInfo.accountId,
           accountName: accountInfo.accountName,
@@ -347,6 +348,8 @@ export class AwsSsoService extends NativeService {
         configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
 
         const workspaceCreation: Workspace = {
+          defaultLocation: environment.defaultLocation,
+          defaultRegion: environment.defaultRegion,
           type: null,
           name: 'default',
           lastIDPToken: null,

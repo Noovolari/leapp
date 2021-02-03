@@ -3,7 +3,10 @@
 .provider-selector {
   position: relative;
   display: inline-block;
+}
 
+.mb-session {
+  margin-bottom: 20px;
 }
 
 .provider-selector.active a {

@@ -1,4 +1,4 @@
-import { Session } from './session';
+import {Session} from './session';
 
 export interface Workspace {
   type?: string;
@@ -21,4 +21,6 @@ export interface Workspace {
   azureProfile: string;
 
   sessions: Session[];
+  defaultRegion: string;
+  defaultLocation: string;
 }

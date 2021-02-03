@@ -24,7 +24,7 @@ export class AzureAccountService extends NativeService {
    * @param subscriptionId - the account number
    * @param accountName - the account name
    */
-  addAzureAccountToWorkSpace(subscriptionId: string, tenantId: string, accountName: string) {
+  addAzureAccountToWorkSpace(subscriptionId: string, tenantId: string, accountName: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const configuration = this.configurationService.getConfigurationFileSync();
 
@@ -32,7 +32,8 @@ export class AzureAccountService extends NativeService {
     const test = workspace.sessions.filter(sess => (sess.account as AzureAccount).subscriptionId === subscriptionId);
     if (!test || test.length === 0) {
       // add new account
-      const account = {
+      const account: AzureAccount = {
+        region,
         accountId: subscriptionId,
         accountName,
         subscriptionId,

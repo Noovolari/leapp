@@ -236,7 +236,8 @@ export class ProviderManagerService {
         const created = this.azureAccountService.addAzureAccountToWorkSpace(
           this.form.value.subscriptionId,
           this.form.value.tenantId,
-          this.form.value.name);
+          this.form.value.name,
+          this.form.value.azureLocation);
 
         return created;
       } catch (err) {

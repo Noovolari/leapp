@@ -1,4 +1,5 @@
 <div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}">
+  <span class="region-label {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}}">{{session.account.region}}</span>
   <div class="information" (click)="switchCredentials()">
     <b>{{session.account.accountName}}</b> - {{ sessionDetailToShow }}
   </div>

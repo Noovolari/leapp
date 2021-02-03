@@ -3,9 +3,20 @@
   <div class="container-fluid background">
     <app-profile-sidebar></app-profile-sidebar>
 
-    <h1>Options</h1>
-    <p>Tweak various aspects of Leapp</p>
     <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
+
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label>Default regions<span class="danger-text">*</span></label>
+      </div>
+      <div class="form-group" style="width: 50%; display: inline-block;">
+        <label>Azure Location</label>
+        <ng-select formControlName="azureLocation" bindLabel="location" bindValue="location" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="top"></ng-select>
+      </div>
+
+      <div class="form-group" style="width: 49%; display: inline-block;">
+        <label>AWS Region</label>
+        <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
+      </div>
 
       <div class="form-group" style="width: 100%; display: inline-block;">
         <label>Google IdP URL<span class="danger-text">*</span></label>

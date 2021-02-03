@@ -68,7 +68,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.getSessions();
 
     // Set regions for ssm
-    this.ssmRegions = this.appService.getRegions(false);
+    this.ssmRegions = this.appService.getRegions();
 
     // Set loading to false when a credential is emitted: if result is false stop the current session!
     this.subs.add(this.credentialsService.refreshReturnStatusEmit.subscribe((res) => {

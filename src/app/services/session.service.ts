@@ -3,6 +3,7 @@ import {NativeService} from '../services-system/native-service';
 import {AppService, LoggerLevel} from '../services-system/app.service';
 import {Session} from '../models/session';
 import {ConfigurationService} from '../services-system/configuration.service';
+import {AccountType} from '../models/AccountType';
 
 @Injectable({
   providedIn: 'root'
@@ -47,6 +48,15 @@ export class SessionService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     if (workspace.sessions) {
       return workspace.sessions;
+    }
+    return [];
+  }
+
+  listTrusterSessions() {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    if (workspace.sessions) {
+      const sessions = workspace.sessions;
+      return sessions.filter(s => s.account.type === AccountType.AWS_TRUSTER || s.account.parent !== undefined);
     }
     return [];
   }
@@ -132,5 +142,14 @@ export class SessionService extends NativeService {
   stopAllSession() {
     this.appService.logger('Stopping all sessions...', LoggerLevel.INFO, this);
     this.stopSession(null);
+  }
+
+  getSession(session: Session) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const sessions = workspace.sessions;
+    if (sessions) {
+      return sessions.filter(s => s.id === session.id)[0];
+    }
+    return undefined;
   }
 }

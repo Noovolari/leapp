@@ -1,6 +1,6 @@
 import {AccountType} from '../models/AccountType';
-import {AppService, LoggerLevel} from '../services-system/app.service';
-import {AwsCredentials} from '../models/credential';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
+import {AwsCredential, AwsCredentials} from '../models/credential';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {CredentialsService} from '../services/credentials.service';
@@ -12,10 +12,16 @@ import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
 import {TimerService} from '../services/timer-service';
 import {Workspace} from '../models/workspace';
 import {WorkspaceService} from '../services/workspace.service';
-import {Observable, Subscription} from 'rxjs';
+import {Observable, of, Subscription, throwError} from 'rxjs';
 import {constants} from '../core/enums/constants';
 import {ProxyService} from '../services/proxy.service';
 import {Session} from '../models/session';
+import {catchError, map, switchMap} from 'rxjs/operators';
+import {AwsSsoAccount} from '../models/aws-sso-account';
+import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
+import {fromPromise} from 'rxjs/internal-compatibility';
+import {AwsSsoService} from '../integrations/providers/aws-sso.service';
+import {SessionService} from '../services/session.service';
 
 
 // Import AWS node style
@@ -34,7 +40,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     private keychainService: KeychainService,
     private proxyService: ProxyService,
     private timerService: TimerService,
-    private workspaceService: WorkspaceService) {
+    private workspaceService: WorkspaceService,
+    private sessionService: SessionService,
+    private awsSsoService: AwsSsoService) {
     super();
   }
 
@@ -99,6 +107,103 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     this.timerService.defineTimer();
   }
 
+  private checkAccountTypeForRefreshCredentials(session) {
+    if (session.account.type === AccountType.AWS && session.account.parent === undefined) {
+      return 0;
+    } else if (session.account.type === AccountType.AWS_TRUSTER || (session.account.type === AccountType.AWS && session.account.parent !== undefined)) {
+      // Here we have a truster account now we need to know the nature of the truster account
+      const parentAccountSessionId = session.account.parent;
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      const sessions = workspace.sessions;
+      const parentAccountList = sessions.filter(sess => sess.id === parentAccountSessionId);
+
+      if (parentAccountList.length > 0) {
+        // Parent account found: check its nature
+        if (parentAccountList[0].account.type === AccountType.AWS) { return 1; }
+        if (parentAccountList[0].account.type === AccountType.AWS_PLAIN_USER ) { return 2; }
+        if (parentAccountList[0].account.type === AccountType.AWS_SSO) { return 3; }
+      }
+    }
+    return 0;
+  }
+
+  doubleJumpFromSSO(session) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const parentSession = this.sessionService.parentSession(session);
+    console.log(parentSession);
+
+    this.awsSsoService.getAwsSsoPortalCredentials().pipe(
+      switchMap((loginToAwsSSOResponse) => {
+        return this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (parentSession.account as AwsSsoAccount).accountNumber, (parentSession.account as AwsSsoAccount).role.name);
+      }),
+      switchMap((getRoleCredentialsResponse: GetRoleCredentialsResponse) => {
+        const credential: AwsCredential = {};
+        credential.aws_access_key_id = getRoleCredentialsResponse.roleCredentials.accessKeyId;
+        credential.aws_secret_access_key = getRoleCredentialsResponse.roleCredentials.secretAccessKey;
+        credential.aws_session_token = getRoleCredentialsResponse.roleCredentials.sessionToken;
+
+        this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
+
+        const params = {
+          RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
+          RoleSessionName: this.appService.createRoleSessionName(session.account.role.name),
+          DurationSeconds: 3600 // 1 hour for chained assume role
+        };
+
+        // Update AWS sdk with new credentials
+        AWS.config.update({
+          accessKeyId: credential.aws_access_key_id,
+          secretAccessKey: credential.aws_secret_access_key,
+          sessionToken: credential.aws_session_token
+        });
+
+        const sts = new AWS.STS(this.appService.stsOptions(session));
+
+        sts.assumeRole(params, (err, data: any) => {
+          if (err) {
+            // Something went wrong save it to the logger file
+            this.appService.logger('Error in assume role from plain to truster in get session token: ', LoggerLevel.ERROR, this, err.stack);
+            this.appService.toast('Error assuming role from plain account, check log for details.', LoggerLevel.WARN, 'Assume role Error');
+
+            // Emit ko for double jump
+            this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+
+            session.active = false;
+            session.loading = false;
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+
+            this.appService.cleanCredentialFile();
+          } else {
+            // We set the new credentials after the first jump
+            const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
+
+            this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
+
+            this.configurationService.updateWorkspaceSync(workspace);
+            this.configurationService.disableLoadingWhenReady(workspace, session);
+
+            // Finished double jump
+            this.appService.logger('Made it through Double jump from plain', LoggerLevel.INFO, this);
+          }
+        });
+
+        return of(true);
+      }),
+      catchError( (err) => {
+        session.active = false;
+        session.loading = false;
+
+        this.configurationService.disableLoadingWhenReady(workspace, session);
+        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
+
+        this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
+        this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+
+        return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
+      })
+    ).subscribe();
+  }
+
   awsCredentialFederatedProcess(workspace, session) {
     // Check for Aws Credentials Process
     if (!workspace) {
@@ -111,10 +216,11 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     this.fileService.writeFileSync(this.appService.awsCredentialPath(), '');
 
     try {
-      if (this.checkIfFederatedOrTrusterWithSamlFederation(session)) {
-        this.workspaceService.refreshCredentials(idpUrl, session);
-      } else {
-        this.doubleJumpFromFixedCredential(session);
+      switch (this.checkAccountTypeForRefreshCredentials(session)) {
+        case 0: this.workspaceService.refreshCredentials(idpUrl, session); break; // FEDERATED
+        case 1: this.workspaceService.refreshCredentials(idpUrl, session); break; // TRUSTER FROM FEDERATED
+        case 2: this.doubleJumpFromFixedCredential(session); break;               // TRUSTER FROM PLAIN
+        case 3: this.doubleJumpFromSSO(session); break;                           // TRUSTER FROM SSO
       }
     } catch (e) {
       this.appService.logger('Error in Aws Credential Federated Process', LoggerLevel.ERROR, this, e.stack);
@@ -178,25 +284,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
     return credentials;
-  }
-
-  private checkIfFederatedOrTrusterWithSamlFederation(session) {
-    if (session.account.parent === null || session.account.parent === undefined) {
-      return true;
-    } else if (session.account.parent !== null && session.account.parent !== undefined) {
-      // Here we have a truster account now we need to know the nature of the truster account
-      const parentAccountSessionId = session.account.parent;
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
-      const sessions = workspace.sessions;
-      const parentAccountList = sessions.filter(sess => sess.id === parentAccountSessionId);
-
-      if (parentAccountList.length > 0) {
-        // Parent account found: check its nature
-        return parentAccountList[0].account.type === AccountType.AWS;
-      }
-    }
-
-    return true;
   }
 
   private async doubleJumpFromFixedCredential(session) {

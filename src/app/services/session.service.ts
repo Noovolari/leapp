@@ -17,7 +17,7 @@ export class SessionService extends NativeService {
 
   /**
    * Remove a session from the list of sessions
-   * @param session -
+   * @param session - the session to be removed
    */
   removeSession(session) {
     this.appService.logger(`Removing: ${session.account.accountName}`, LoggerLevel.INFO, this);
@@ -27,6 +27,16 @@ export class SessionService extends NativeService {
     workspace.sessions = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
     return false;
+  }
+
+  /**
+   * Get the parent Session
+   * @param session - the session for retrieving the parent
+   */
+  parentSession(session) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const sessions = workspace.sessions;
+    return sessions.filter(sess => sess.id === session.account.parent)[0];
   }
 
   /**

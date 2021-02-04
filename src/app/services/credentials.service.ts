@@ -14,6 +14,7 @@ import {WorkspaceService} from './workspace.service';
 import {Subscription} from 'rxjs';
 import {AwsSsoStrategy} from '../strategies/awsSsoStrategy';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
+import {SessionService} from './session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +46,8 @@ export class CredentialsService extends NativeService {
     private proxyService: ProxyService,
     private timerService: TimerService,
     private workspaceService: WorkspaceService,
-    private awsSsoService: AwsSsoService
+    private awsSsoService: AwsSsoService,
+    private sessionService: SessionService
   ) {
     super();
 
@@ -69,7 +71,7 @@ export class CredentialsService extends NativeService {
     // test using Strategy instead of direct methods
     this.azureStrategy = new AzureStrategy(this, appService, timerService, executeService, configurationService);
     this.awsStrategy = new AwsStrategy(this, appService, configurationService, executeService,
-      fileService, keychainService, proxyService, timerService, workspaceService);
+      fileService, keychainService, proxyService, timerService, workspaceService, sessionService, awsSsoService);
     this.awsSsoStrategy = new AwsSsoStrategy(this, appService, fileService, timerService, awsSsoService, configurationService, keychainService);
 
     this.strategyMap[AccountType.AWS] = this.awsStrategy.refreshCredentials.bind(this.awsStrategy);

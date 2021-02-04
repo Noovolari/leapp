@@ -395,8 +395,20 @@ export class AwsSsoService extends NativeService {
 
       // Update all
       workspace.sessions.push(...updatedSSOSessions);
-
       this.configurationService.updateWorkspaceSync(workspace);
+
+      // Verify that eventual trusters from SSO ae not pointing to deleted sessions
+      const trusterSessions = this.sessionService.listTrusterSessions();
+      trusterSessions.forEach(tSession => {
+        const found = this.sessionService.getSession(tSession.account.parent) !== null;
+        if (!found) {
+          this.sessionService.removeSession(tSession);
+        }
+      });
+
+      // Update again
+      this.configurationService.updateWorkspaceSync(workspace);
+
       observable.next({});
       observable.complete();
     }).pipe(catchError((err) => {

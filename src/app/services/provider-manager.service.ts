@@ -53,7 +53,7 @@ export class ProviderManagerService {
     // Get the appropriate roles
     const account = accounts.filter(acc => (acc.session.id === sessionId))[0].session.account;
     if (account !== undefined && account !== null) {
-      if (account.type === AccountType.AWS) {
+      if (account.type === AccountType.AWS || account.type === AccountType.AWS_SSO) {
         // The federated roles we have obtained from the filter
         const federatedRole = account.role;
         // Set the federated role automatically
@@ -398,8 +398,17 @@ export class ProviderManagerService {
     return this.federatedAccountService.listPlainAccountsInWorkspace();
   }
 
-  getFederatedAndPlainAccounts() {
-    return this.getFederatedAccounts().concat(this.getPlainAccounts());
+  getSSOAccounts() {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    if (workspace && workspace.sessions && workspace.sessions.length > 0) {
+      return workspace.sessions.filter(sess => (sess.account.type === AccountType.AWS_SSO)); // .map(s => s.account);
+    } else {
+      return [];
+    }
+  }
+
+  getFederableAccounts() {
+    return this.getFederatedAccounts().concat(this.getPlainAccounts()).concat(this.getSSOAccounts());
   }
 }
 

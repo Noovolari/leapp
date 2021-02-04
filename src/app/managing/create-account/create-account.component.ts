@@ -35,10 +35,10 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
   @Input() fedUrl = '';
 
   federatedRoles: { name: string, roleArn: string }[] = [];
-  federatedAccounts: AwsAccount[] = [];
+  federatedAccounts = [];
 
   workspace: Workspace;
-  accounts: AwsAccount[];
+  accounts = [];
   accountId;
 
   regions = [];
@@ -89,14 +89,27 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
-      // TODO: WHY SESSIONS ARE ONLY PLAIN AND FEDERATED, This method retrieve all the trustable accounts
-      const sessions = this.providerManagerService.getFederatedAndPlainAccounts();
-      this.accounts = sessions.map((sess: Session) => {
-        return {
-          session: sess,
-          accountName: sess.account.accountName
-        };
-      });
+      const sessions = this.providerManagerService.getFederableAccounts();
+
+      this.accounts = sessions.map(sess => { return {
+        session: sess,
+        accountName: sess.account.accountName
+      }; });
+
+      /*sessions.forEach((session: Session) => {
+        let found = false;
+        this.accounts.forEach(acc => {
+          if (session.account.accountName === acc.accountName) {
+            found = true;
+          }
+        });
+        if (!found) {
+          this.accounts.push({
+            session,
+            accountName: session.account.accountName
+          });
+        }
+      });*/
 
       // Add parameters to check what to do with form data
       this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));

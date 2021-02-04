@@ -144,11 +144,11 @@ export class SessionService extends NativeService {
     this.stopSession(null);
   }
 
-  getSession(session: Session) {
+  getSession(sessionId: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.sessions;
     if (sessions) {
-      return sessions.filter(s => s.id === session.id)[0];
+      return sessions.filter(s => s.id === sessionId)[0];
     }
     return undefined;
   }

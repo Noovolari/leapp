@@ -16,10 +16,9 @@ import {Observable, of, Subscription, throwError} from 'rxjs';
 import {constants} from '../core/enums/constants';
 import {ProxyService} from '../services/proxy.service';
 import {Session} from '../models/session';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, switchMap} from 'rxjs/operators';
 import {AwsSsoAccount} from '../models/aws-sso-account';
 import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
-import {fromPromise} from 'rxjs/internal-compatibility';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {SessionService} from '../services/session.service';
 
@@ -162,15 +161,13 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         sts.assumeRole(params, (err, data: any) => {
           if (err) {
             // Something went wrong save it to the logger file
-            this.appService.logger('Error in assume role from plain to truster in get session token: ', LoggerLevel.ERROR, this, err.stack);
-            this.appService.toast('Error assuming role from plain account, check log for details.', LoggerLevel.WARN, 'Assume role Error');
+            this.appService.logger('Error in assume role from AWS SSO to truster in get session token: ', LoggerLevel.ERROR, this, err.stack);
+            this.appService.toast('Error assuming role from AWS SSO account, check log for details.', LoggerLevel.WARN, 'Assume role Error');
 
             // Emit ko for double jump
             this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
 
-            session.active = false;
-            session.loading = false;
-            this.configurationService.disableLoadingWhenReady(workspace, session);
+            this.sessionService.stopSession(session);
 
             this.appService.cleanCredentialFile();
           } else {

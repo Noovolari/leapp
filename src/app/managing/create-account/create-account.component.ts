@@ -91,12 +91,12 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
 
       const sessions = this.providerManagerService.getFederableAccounts();
 
-      this.accounts = sessions.map(sess => { return {
+      /*this.accounts = sessions.map(sess => { return {
         session: sess,
         accountName: sess.account.accountName
-      }; });
+      }; });*/
 
-      /*sessions.forEach((session: Session) => {
+      sessions.forEach((session: Session) => {
         let found = false;
         this.accounts.forEach(acc => {
           if (session.account.accountName === acc.accountName) {
@@ -109,13 +109,14 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
             accountName: session.account.accountName
           });
         }
-      });*/
+      });
 
       // Add parameters to check what to do with form data
       this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
 
       this.fedUrl = this.workspace.idpUrl;
+
       // TODO REDUNDANT
       this.hasSsoUrl = this.fedUrl && this.fedUrl !== '';
 
@@ -140,12 +141,12 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
    */
   getFedRoles() {
     // Get the role data
-    const roleData = this.providerManagerService.getFederatedRole(this.accounts, this.selectedSession);
+    const roleData = this.providerManagerService.getFederatedRole(this.selectedSession);
     // Get the appropriate roles
-    this.federatedRoles = [roleData.federatedRole];
+    this.federatedRoles = roleData.map(rd => rd.federatedRole);
     // Set the federated role automatically
-    this.selectedAccountNumber = roleData.selectedAccountNumber;
-    this.selectedRole = roleData.selectedrole;
+    this.selectedAccountNumber = roleData.map(rd => rd.selectedAccountNumber)[0];
+    this.selectedRole = roleData.map(rd => rd.selectedrole)[0];
   }
 
   /**

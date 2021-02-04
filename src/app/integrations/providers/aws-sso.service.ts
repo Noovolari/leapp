@@ -14,6 +14,7 @@ import {environment} from '../../../environments/environment';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {Workspace} from '../../models/workspace';
+import {SessionService} from '../../services/session.service';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -45,6 +46,7 @@ export class AwsSsoService extends NativeService {
   constructor(private appService: AppService,
               private keychainService: KeychainService,
               private configurationService: ConfigurationService,
+              private sessionService: SessionService
               ) {
     super();
   }
@@ -369,13 +371,13 @@ export class AwsSsoService extends NativeService {
       }
 
       // Remove all AWS SSO old session or create a session array
-      const oldSSOsessions = workspace.sessions.filter(sess => ((sess.account.type === AccountType.AWS_SSO)));
+      const oldSSOsessions = this.sessionService.listSessions().filter(sess => ((sess.account.type === AccountType.AWS_SSO)));
       const newSSOSessions = AwsSsoSessions.sort((a, b) => {
         return a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'});
       });
 
       // Non SSO sessions
-      workspace.sessions = workspace.sessions.filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
+      workspace.sessions = this.sessionService.listSessions().filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
 
       // Add new AWS SSO sessions
       const updatedSSOSessions = [];
@@ -386,7 +388,7 @@ export class AwsSsoService extends NativeService {
                  oldSession.account.role.name === (newSession.account as AwsSsoAccount).role.name;
         })[0];
         if (found) {
-          newSession.account.region = found.account.region;
+          newSession = found;
         }
         updatedSSOSessions.push(newSession);
       });

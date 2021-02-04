@@ -144,9 +144,9 @@ export class SessionService extends NativeService {
     this.stopSession(null);
   }
 
-  getSession(sessionId: string) {
+  getSession(sessionId: string, mysessions?: Session[]) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const sessions = workspace.sessions;
+    const sessions = mysessions || workspace.sessions;
     if (sessions) {
       return sessions.filter(s => s.id === sessionId)[0];
     }

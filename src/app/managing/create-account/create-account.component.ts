@@ -12,6 +12,7 @@ import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
 import {Session} from '../../models/session';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-create-account',
@@ -90,12 +91,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
       const sessions = this.providerManagerService.getFederableAccounts();
-
-      /*this.accounts = sessions.map(sess => { return {
-        session: sess,
-        accountName: sess.account.accountName
-      }; });*/
-
       sessions.forEach((session: Session) => {
         let found = false;
         this.accounts.forEach(acc => {
@@ -131,8 +126,9 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
 
       this.regions = this.appService.getRegions();
       this.locations = this.appService.getLocations();
-      this.selectedRegion = this.regions[0].region;
-      this.selectedLocation = this.locations[0].location;
+
+      this.selectedRegion = this.workspace.defaultRegion || environment.defaultRegion || this.regions[0].region;
+      this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation || this.locations[0].location;
     }));
   }
 

@@ -12,10 +12,9 @@ import {FileService} from '../../services-system/file.service';
 import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
 import {MenuService} from '../../services/menu.service';
-import {IntegrationsService} from '../../integrations/integrations.service';
-import {AwsSsoService} from '../../integrations/providers/aws-sso.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
+import {WebConsoleService} from '../../services/web-console.service';
 
 @Component({
   selector: 'app-session',
@@ -57,13 +56,13 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private credentialsService: CredentialsService,
     private sessionService: SessionService,
     private menuService: MenuService,
-    private zone: NgZone
+    private zone: NgZone,
+    private webConsoleService: WebConsoleService,
   ) { super(); }
 
   ngOnInit() {
     // Set retries
     this.retries = 0;
-
     // retrieve Active and not active sessions
     this.getSessions();
 

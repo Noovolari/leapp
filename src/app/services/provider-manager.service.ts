@@ -44,28 +44,37 @@ export class ProviderManagerService {
 
   /**
    * Get all the federated roles of an account
-   * @param accounts - the accounts from a listFederatedAccountInWorkSpace() call
    * @param selectedSession - the one selected to get the roles
    */
-  getFederatedRole(accounts, selectedSession: Session) {
-    const sessionId = selectedSession.id;
+  getFederatedRole(selectedSession: Session) {
+    const accountName = selectedSession.account.accountName;
+    const roles = [];
 
     // Get the appropriate roles
-    const account = accounts.filter(acc => (acc.session.id === sessionId))[0].session.account;
-    if (account !== undefined && account !== null) {
-      if (account.type === AccountType.AWS || account.type === AccountType.AWS_SSO) {
-        // The federated roles we have obtained from the filter
-        const federatedRole = account.role;
-        // Set the federated role automatically
-        this.appService.logger(`Retrieved federated role for: ${sessionId}`, LoggerLevel.INFO, this, JSON.stringify({ federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name }, null, 3));
-        return { federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name };
-      } else if (account.type === AccountType.AWS_PLAIN_USER) {
-        return { federatedRole: { name: 'no need' }, selectedAccountNumber: account.accountNumber, selectedrole: 'no need' };
-      } else {
-        return { federatedRole: null, selectedAccountNumber: null, selectedrole: null };
+    const filteredAccounts = this.sessionService.listSessions().filter(session => (session.account.accountName === accountName)).map(s => s.account);
+    if (filteredAccounts !== undefined && filteredAccounts !== null && filteredAccounts.length > 0) {
+      for (let i = 0; i < filteredAccounts.length; i++) {
+        const account = filteredAccounts[i];
+
+        if (account.type === AccountType.AWS || account.type === AccountType.AWS_SSO) {
+          // The federated roles we have obtained from the filter
+          const federatedRole = account.role;
+
+          // Set the federated role automatically
+          this.appService.logger(`Retrieved federated role for: ${accountName}`, LoggerLevel.INFO, this, JSON.stringify({ federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name }, null, 3));
+          roles.push({ federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name });
+        } else if (account.type === AccountType.AWS_PLAIN_USER) {
+
+          this.appService.logger(`Retrieved federated role for: ${accountName}`, LoggerLevel.INFO, this, JSON.stringify({federatedRole: {name: 'no need'}, selectedAccountNumber: account.accountNumber, selectedrole: 'no need'}, null, 3));
+          roles.push({federatedRole: {name: 'no need'}, selectedAccountNumber: account.accountNumber, selectedrole: 'no need'});
+        }
+
       }
+      return roles;
     }
-    return { federatedRole: null, selectedAccountNumber: null, selectedrole: null };
+
+    // no account so no roles
+    return [{ federatedRole: null, selectedAccountNumber: null, selectedrole: null }];
   }
 
   /**

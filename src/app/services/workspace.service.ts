@@ -157,16 +157,29 @@ export class WorkspaceService extends NativeService {
       this.proxyService.configureBrowserWindow(this.idpWindow);
 
       // This filter is used to listen to go to a specific callback url (or the generic one)
-      const filter = {urls: ['https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
-
+      const filter = {urls: ['https://*.okta.com/*', 'https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
+      
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response
       this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
+
+        // Show window: login process
+
+        // G Suite
         if (details.url.indexOf('https://accounts.google.com/ServiceLogin') !== -1) {
           this.idpWindow = null;
           obs.next(true);
           obs.complete();
         }
+
+        // OKTA
+        if (details.url.indexOf('.okta.com/discovery/iframe.html') !== -1) {
+          this.idpWindow = null;
+          obs.next(true);
+          obs.complete();
+        }
+
+        // Do not show window: already logged
 
         if (details.url.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
           this.idpWindow = null;

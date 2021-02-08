@@ -235,9 +235,13 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
         if (session.id === this.session.id) {
           session.account.region = this.selectedDefaultRegion;
           this.session.account.region = this.selectedDefaultRegion;
+          this.configurationService.updateWorkspaceSync(workspace);
+
+          if (this.session.active) {
+            this.startSession(this.session);
+          }
         }
       });
-      this.configurationService.updateWorkspaceSync(workspace);
       this.appService.toast('Default region has been changed!', ToastLevel.SUCCESS, 'Region changed!');
       this.modalRef.hide();
 

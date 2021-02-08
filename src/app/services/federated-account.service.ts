@@ -211,6 +211,9 @@ export class FederatedAccountService extends NativeService {
       const session = workspace.sessions[index];
       this.keychainService.deletePassword(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user));
       this.keychainService.deletePassword(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
+
+      workspace.sessions.splice(index, 1);
+      this.configurationService.updateWorkspaceSync(workspace);
       return true;
     } else {
       return false;

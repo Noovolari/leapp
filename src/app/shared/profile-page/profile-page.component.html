@@ -8,7 +8,7 @@
       <h2 style="margin-top: 10px;">IdP URL</h2>
 
       <div class="form-group" style="width: 100%; display: inline-block;">
-        <label>Google IdP URL<span class="danger-text">*</span></label>
+        <label>SAML 2.0 IdP URL<span class="danger-text">*</span></label>
         <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url *" [value]="idpUrlValue" >
         <small class="text-error" *ngIf="(form.controls['idpUrl'].dirty || form.controls['idpUrl'].touched) && form.controls['idpUrl'].errors">Insert the Google IdP URL</small>
       </div>

@@ -8,13 +8,13 @@ import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {AwsSsoAccount} from '../models/aws-sso-account';
-import {catchError, map, switchMap, tap} from 'rxjs/operators';
+import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {AwsCredential} from '../models/credential';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
-import {Observable, of, throwError} from 'rxjs';
+import {of, throwError} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
 
@@ -69,6 +69,7 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         credential.aws_access_key_id = getRoleCredentialsResponse.roleCredentials.accessKeyId;
         credential.aws_secret_access_key = getRoleCredentialsResponse.roleCredentials.secretAccessKey;
         credential.aws_session_token = getRoleCredentialsResponse.roleCredentials.sessionToken;
+        credential.region = session.account.region;
 
         session.active = true;
         session.loading = false;

@@ -24,9 +24,11 @@ export class SessionService extends NativeService {
     this.appService.logger(`Removing: ${session.account.accountName}`, LoggerLevel.INFO, this);
 
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const sessions = workspace.sessions.filter(ses =>  ses.id !== session.id) || [];
-    workspace.sessions = sessions;
-    this.configurationService.updateWorkspaceSync(workspace);
+    const index = workspace.sessions.findIndex(sess => sess.id === session.id);
+    if (index !== -1) {
+      workspace.sessions.splice(index, 1);
+      this.configurationService.updateWorkspaceSync(workspace);
+    }
     return false;
   }
 

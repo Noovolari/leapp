@@ -21,8 +21,8 @@
 
   .pull-left {
     position: absolute;
-    left: 28px;
-    top: 32px;
+    left: 25px;
+    bottom: 25px;
   }
 
   .pull-center {
@@ -147,8 +147,7 @@
     border: 2px solid $main-color-light;
   }
   .providers.extended {
-    margin-left: 7px;
-    margin-right: 0;
+    margin: 0;
     padding: 10px;
     height: 42px;
     background: $focused-element;
@@ -222,7 +221,7 @@
 
 @keyframes expanding {
   from { width: 174px; }
-  to { width: 91%; }
+  to { width: 100%; }
 }
 
 @keyframes moving {

@@ -15,6 +15,7 @@ import {MenuService} from '../../services/menu.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
 import {WebConsoleService} from '../../services/web-console.service';
+import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 @Component({
   selector: 'app-session',
@@ -43,6 +44,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   retries = 0;
   showOnly = 'ALL';
 
+  workspace;
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -61,6 +64,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   ) { super(); }
 
   ngOnInit() {
+    // Set workspace
+    this.workspace = this.configurationService.getDefaultWorkspaceSync();
+
     // Set retries
     this.retries = 0;
     // retrieve Active and not active sessions
@@ -125,8 +131,14 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.getSessions();
     if (query !== '') {
       this.notActiveSessions = this.notActiveSessions.filter(s => {
+        const idpUrl = this.workspace.idpUrl.filter(idp => idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.url);
+
         return s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
           ((s.account as AwsAccount).role && (s.account as AwsAccount).role.name.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          ((s.account as AwsAccount).accountNumber && (s.account as AwsAccount).accountNumber.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          idpUrl.length > 0 && idpUrl.indexOf(u => u === (s.account as AwsAccount).idpUrl) > -1 ||
+          ((s.account as AwsPlainAccount).user && (s.account as AwsPlainAccount).user.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          ((s.account as AzureAccount).tenantId && (s.account as AzureAccount).tenantId.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).subscriptionId && (s.account as AzureAccount).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);
       });
     }

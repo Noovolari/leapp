@@ -59,7 +59,6 @@
         <label>My Access Strategy is:</label>
         <br>
         <div class="correct-top" style="width: 100%;">
-          <a class="back" (click)="goBack();"><i class="fa fa-chevron-left"></i></a>
           <span class="providers extended">
             <ng-container *ngIf="accountType === eAccountType.AWS"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</ng-container>
             <ng-container *ngIf="accountType === eAccountType.AWS_TRUSTER"><i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster</ng-container>
@@ -192,6 +191,7 @@
         </div>
       </ng-container>
 
+      <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
       <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="accountType">Save</button>
     </ng-container>
 

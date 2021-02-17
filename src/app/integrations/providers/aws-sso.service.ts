@@ -264,7 +264,7 @@ export class AwsSsoService extends NativeService {
   listAccounts(accessToken: string, region: string): Observable<any> {
     this.ssoPortal = new SSO({ region });
 
-    const listAccountsRequest: ListAccountsRequest = { accessToken, maxResults: 1 };
+    const listAccountsRequest: ListAccountsRequest = { accessToken, maxResults: 30 };
 
     return fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()).pipe(
       expand((response: ListAccountsResponse) => {

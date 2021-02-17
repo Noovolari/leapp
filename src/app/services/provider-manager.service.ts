@@ -15,14 +15,15 @@ import {Subscription} from 'rxjs';
   providedIn: 'root'
 })
 export class ProviderManagerService {
-  form;
-  accountType;
-  accountId;
-  selectedAccount;
-  selectedSession;
-  selectedRole;
-  selectedRegion;
+  private form;
+  private accountType;
+  private accountId;
+  private selectedAccount;
+  private selectedSession;
+  private selectedRole;
+  private selectedRegion;
   private googleSubscription: Subscription;
+  private selectedIdpUrl: any;
 
   /**
    * Used to manage all the choices done in the app regarding the correct provider to use:
@@ -84,11 +85,12 @@ export class ProviderManagerService {
    * @param selectedSession - the selected session
    * @param selectedRole - the selected role of the parent
    * @param selectedRegion - the region to select for aws
+   * @param selectedIdpUrl - the current idp url to use for saml if needed plus id
    * @param form - the form to use
    */
 
   // TODO: Why we need to save configurations and create the workspace here? it should be done invoked in the start screen and
-  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, form) {
+  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
@@ -97,6 +99,7 @@ export class ProviderManagerService {
     this.selectedSession = selectedSession;
     this.selectedRole = selectedRole;
     this.selectedRegion = selectedRegion;
+    this.selectedIdpUrl = selectedIdpUrl;
     this.form = form;
 
     // TODO: ?? Why I need to call Google?
@@ -114,18 +117,16 @@ export class ProviderManagerService {
       // TODO: What I am updating?
       this.configurationService.updateConfigurationFileSync(configuration);
 
-      const federationUrl = form.value.federationUrl;
-
       // When the token is received save it and go to the setup page for the first account
       if (this.googleSubscription) { this.googleSubscription.unsubscribe(); }
       this.googleSubscription = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => {
-        this.createNewWorkspace(googleToken, federationUrl, responseType);
+        this.createNewWorkspace(googleToken, this.selectedIdpUrl, responseType);
         this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
       }));
 
       // Call the service for working on the first login event to the user idp
       // We add the helper for account choosing just to be sure to give the possibility to call the correct user
-      this.workspaceService.getIdpTokenInSetup(federationUrl, responseType);
+      this.workspaceService.getIdpTokenInSetup(this.selectedIdpUrl.url, responseType);
     } else {
       this.appService.logger(`Saving first account with a plain or azure account`, LoggerLevel.INFO, this);
       this.createNewWorkspace(undefined, undefined, responseType);
@@ -139,9 +140,10 @@ export class ProviderManagerService {
    * @param selectedSession - the selected session
    * @param selectedRole - the selected role of the parent
    * @param selectedRegion - the region to select for aws
+   * @param selectedIdpUrl - the idp url to use for saml auth if needed plus id
    * @param form - the form to use
    */
-  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, form) {
+  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
@@ -153,6 +155,7 @@ export class ProviderManagerService {
     this.selectedSession = selectedSession;
     this.selectedRole = selectedRole;
     this.selectedRegion = selectedRegion;
+    this.selectedIdpUrl = selectedIdpUrl;
     this.form = form;
     this.decideSavingMethodAndSave();
   }
@@ -292,17 +295,15 @@ export class ProviderManagerService {
   saveAwsFederatedAccount() {
     if (this.formValid(this.form, this.accountType)) {
       try {
-        const workspace = this.configurationService.getDefaultWorkspaceSync();
-        workspace.idpUrl = this.form.value.federationUrl;
-        this.configurationService.updateWorkspaceSync(workspace);
-
         // Add a federation Account to the workspace
         const created = this.federatedAccountService.addFederatedAccountToWorkSpace(
+          this.selectedIdpUrl,
           this.form.value.accountNumber,
           this.form.value.name,
           this.generateRolesFromNames(this.form),
           this.form.value.idpArn,
-          this.selectedRegion);
+          this.selectedRegion,
+        );
 
         return created;
       } catch (err) {
@@ -356,7 +357,7 @@ export class ProviderManagerService {
         case AccountType.AWS:
           // Check Federated fields
           check = form.controls['name'].valid &&
-            (form.controls['federationUrl'].valid || workspace.idpUrl) &&
+            form.get('federationUrl').value  &&
             form.controls['accountNumber'].valid &&
             form.controls['role'].valid &&
             form.controls['idpArn'].valid;

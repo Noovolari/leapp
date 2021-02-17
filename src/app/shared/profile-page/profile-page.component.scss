@@ -246,3 +246,66 @@ body {
   from { left: 0; }
   to { left: -10px; }
 }
+
+.tabs{ position: relative; border-bottom: 1px solid #73E0CF; margin: 20px 0; }
+.tabs .tab {
+  cursor: pointer;
+  padding:10px 20px;
+  margin:0 2px -1px;
+  background:#fff;
+  display:inline-block;
+  color:#909f9d;
+  border-radius: 5px 5px 0 0;
+  border: none;
+  border-bottom: 1px solid #73E0CF;
+}
+
+.panel{
+  animation: fadein .8s;
+}
+@keyframes fadein {
+  from {
+    opacity:0;
+  }
+  to {
+    opacity:1;
+  }
+}
+
+.tabs .tab.active {
+  border-top: 3px solid #73E0CF;
+  border-left: 1px solid #73E0CF;
+  border-right: 1px solid #73E0CF;
+  border-bottom: 1px solid white!important;
+}
+
+.idp-url-wrapper {
+  overflow-x: hidden;
+  overflow-y: scroll;
+  height: 240px;
+}
+
+table {
+  display: block;
+
+  th { font-weight: bold; }
+  th, td {
+    width: 26%;
+    border-bottom: 1px solid #cfd2d3;
+    font-size: 10px;
+
+    button {
+      width: 28px!important;
+      height: 28px!important;
+      padding: 0!important;
+      margin-left: 8px;
+    }
+  }
+  th:first-child, td:first-child {
+    width: 77%!important;
+    overflow: hidden;
+    word-break: break-all;
+    text-overflow: ellipsis;
+    padding: 10px 5px;
+  }
+}

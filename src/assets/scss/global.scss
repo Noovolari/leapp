@@ -119,6 +119,26 @@ button small {
   left: -7px;
 }
 
+button.small-btn {
+  display: block;
+  width: 100%;
+  min-width: auto!important;
+  height: 36px;
+  margin: 35px 0!important;
+  font-size: 14px!important;
+  padding: 5px!important;
+}
+
+button.xs-btn {
+  display: inline-block;
+  min-width: auto!important;
+  height: 36px;
+  width: 36px;
+  margin: 10px 0 0 8px!important;
+  font-size: 14px!important;
+  padding: 5px!important;
+}
+
 label { font-size: 12px; }
 
 hr { margin: 0 5px; }

@@ -34,7 +34,7 @@
         <br>
         <ng-container *ngIf="accountType === undefined">
             <div class="correct-top">
-              <button type="button" class="providers {{accountType === eAccountType.AWS ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.AWS);">
+              <button type="button" class="providers {{accountType === eAccountType.AWS ? 'selected' : ''}}" (click)="hasSsoUrl = true; setAccessStrategy(eAccountType.AWS);">
                 <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated
               </button>
               <button type="button" class="providers {{accountType === eAccountType.AWS_PLAIN_USER ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.AWS_PLAIN_USER);">
@@ -49,25 +49,6 @@
             </div>
         </ng-container>
       </div>
-    </ng-container>
-
-    <ng-container *ngIf="provider === eAccountType.AWS && !hasSsoUrl && providerSelected && !typeSelection">
-      <h1>Choose your Access Strategy</h1>
-      <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
-      <div class="form-group" style="width: 100%; display: inline-block;">
-        <label>My Access Strategy is:</label>
-        <br>
-        <div class="correct-top" style="width: 100%;">
-          <a class="back" (click)="goBack();"><i class="fa fa-chevron-left"></i></a>
-          <span class="providers extended"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</span>
-          <br><br>
-        </div>
-        <label>SSO Url<span class="danger-text">*</span></label>
-        <input formControlName="federationUrl" type="url" class="form-control" placeholder="single sign-on url *">
-        <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.controls['federationUrl'].errors">Insert the SSO url</small>
-        <small class="note" style="float: left;">*Currently supported Identity Provider is GSuite.<br>Check the documentation on where to find the SSO URL <a (click)="openSSODocumentation();">here</a>.</small>
-      </div>
-      <button type="button" [ngClass]="form.controls['federationUrl'].valid ? 'pull-center': 'pull-center disabled'" (click)="hasSsoUrl = true" [disabled]="!form.controls['federationUrl'].valid">Next</button>
     </ng-container>
 
     <ng-container *ngIf="((provider !== eAccountType.AWS) || (hasSsoUrl && (provider === eAccountType.AWS))) && !typeSelection && providerSelected">
@@ -89,12 +70,13 @@
         </div>
       </div>
 
-      <div class="form-group" style="width: 100%; display: inline-block;">
+      <div class="form-group d-inline-block" [ngStyle]="{width: accountType === eAccountType.AWS ? '49%' : '100%'}">
         <label>Account Alias<span class="danger-text">*</span></label>
         <br>
         <input formControlName="name" type="text" class="form-control" placeholder="Account Alias *">
         <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
       </div>
+      <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType === eAccountType.AWS"></div>
 
       <ng-container *ngIf="accountType !== eAccountType.AZURE">
         <!-- ====================== -->
@@ -106,21 +88,35 @@
           <small class="text-error" *ngIf="(form.controls['accountNumber'].dirty || form.controls['accountNumber'].touched) && form.controls['accountNumber'].errors">Insert the Account Number</small>
         </div>
 
-        <div class="form-group" style="width: 2%; display: inline-block;"></div>
+        <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType === eAccountType.AWS_TRUSTER"></div>
+
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType !== eAccountType.AWS_PLAIN_USER">
+          <label>Role<span class="danger-text">*</span></label>
+          <input formControlName="role" type="text" class="form-control" placeholder="Role name" />
+          <small class="text-error" *ngIf="(form.controls['role'].dirty || form.controls['role'].touched) && form.controls['role'].errors">Insert the Role</small>
+        </div>
+
+        <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType !== eAccountType.AWS_TRUSTER"></div>
 
         <div class="form-group" style="width: 49%; display: inline-block;">
           <label>AWS Region</label>
           <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
         </div>
 
-        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="accountType !== eAccountType.AWS_PLAIN_USER">
-          <label>Role<span class="danger-text">*</span></label>
-          <input formControlName="role" type="text" class="form-control" placeholder="Role name" />
-          <small class="text-error" *ngIf="(form.controls['role'].dirty || form.controls['role'].touched) && form.controls['role'].errors">Insert the Role</small>
-        </div>
-
         <ng-container *ngIf="accountType === eAccountType.AWS">
           <h2>Federated setting</h2>
+
+          <div class="form-group" style="width: 100%; display: inline-block;">
+            <label>SAML 2.0 Url<span class="danger-text">*</span></label>
+            <ng-select [items]="idps"
+                       [addTag]="addNewSSO"
+                       formControlName="federationUrl"
+                       placeholder="single sign-on url *"
+                       [(ngModel)]="selectedIdpUrl">
+            </ng-select>
+            <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.get('federationUrl').value === undefined">Insert the SAML 2.0 Url</small>
+          </div>
+
           <div class="form-group" style="width: 100%; display: inline-block;">
             <label>IdP ARN<span class="danger-text">*</span></label>
             <input formControlName="idpArn" type="text" class="form-control" placeholder="Idp Arn *">

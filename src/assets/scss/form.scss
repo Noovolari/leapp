@@ -37,6 +37,9 @@ input { height: 36px!important; }
   border-width: 0 5px 5px;
 }
 
+.ng-select { margin-top: 0!important; }
+.ng-select .ng-select-container { height: 36px; }
+
 .ng-option {
   box-sizing: border-box;
   cursor: pointer;
@@ -52,7 +55,15 @@ input { height: 36px!important; }
 .ng-select span { font-size: 12px; }
 
 .ng-untouched:not(.ng-select-opened) .ng-value-label { font-size: 12px; position: absolute; top: 11px; }
-.ng-value-label { font-size: 12px; position: absolute; top: 16px; }
+.ng-value-label {
+  font-size: 12px;
+  position: absolute;
+  top: 16px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  width: 90%;
+}
 
 form button {
   position: relative;

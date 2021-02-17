@@ -6,6 +6,7 @@ import {Session} from '../models/session';
 import {v4 as uuidv4} from 'uuid';
 import {AppService, ToastLevel} from '../services-system/app.service';
 import {AccountType} from '../models/AccountType';
+import {SessionService} from './session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,8 @@ export class TrusterAccountService extends NativeService {
 
   constructor(
     private configurationService: ConfigurationService,
-    private appService: AppService
+    private appService: AppService,
+    private sessionService: SessionService
   ) {
     super();
   }
@@ -49,7 +51,6 @@ export class TrusterAccountService extends NativeService {
         parent: parentAccountSessionId,
         parentRole,
         region,
-        idpUrl: workspace.idpUrl,
         type: AccountType.AWS
       };
 

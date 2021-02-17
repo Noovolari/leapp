@@ -207,15 +207,13 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       return 'workspace not set';
     }
 
-    const idpUrl = workspace.idpUrl ;
-
     // Enable current active session
     this.fileService.writeFileSync(this.appService.awsCredentialPath(), '');
 
     try {
       switch (this.checkAccountTypeForRefreshCredentials(session)) {
-        case 0: this.workspaceService.refreshCredentials(idpUrl, session); break; // FEDERATED
-        case 1: this.workspaceService.refreshCredentials(idpUrl, session); break; // TRUSTER FROM FEDERATED
+        case 0: this.workspaceService.refreshCredentials(session); break; // FEDERATED
+        case 1: this.workspaceService.refreshCredentials(session); break; // TRUSTER FROM FEDERATED
         case 2: this.doubleJumpFromFixedCredential(session); break;               // TRUSTER FROM PLAIN
         case 3: this.doubleJumpFromSSO(session); break;                           // TRUSTER FROM SSO
       }

@@ -38,7 +38,7 @@ button.disabled {
 .button-equalizer button:first-child { float: left; }
 .button-equalizer button:last-child { float: right; }
 
-p { color: $text-color; }
+div,p { color: $text-color; }
 
 .modal-header {
   color: $text-color!important;

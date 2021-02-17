@@ -11,7 +11,6 @@ import {InputDialogComponent} from './input-dialog/input-dialog.component';
 import {IntegrationsPageComponent} from './integrations-page/integrations-page.component';
 import {NgSelectModule} from '@ng-select/ng-select';
 
-
 @NgModule({
   declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent, IntegrationsPageComponent],
     imports: [CommonModule, TooltipModule.forRoot(), BsDropdownModule.forRoot(), ModalModule.forRoot(), ReactiveFormsModule, FormsModule, NgxJsonViewerModule, NgSelectModule],

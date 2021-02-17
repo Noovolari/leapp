@@ -9,7 +9,7 @@
 
   <i class="fas fa-exclamation-triangle fa-2x" style="color: #bababa; margin-bottom: 20px;"></i><h3 style="color: #bababa; display: inline-block;"> Hey,</h3>
 
-  <br><p>{{message}}</p><br>
+  <br><div [innerHTML]="message" style="max-height: 318px; overflow-y: auto;"></div><br>
 
   <div class="button-equalizer">
     <button (click)="close();" class="disabled">Cancel</button>

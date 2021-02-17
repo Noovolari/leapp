@@ -4,6 +4,7 @@ import {AppService, LoggerLevel} from '../services-system/app.service';
 import {Session} from '../models/session';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AccountType} from '../models/AccountType';
+import {AwsAccount} from '../models/aws-account';
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +41,16 @@ export class SessionService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.sessions;
     return sessions.filter(sess => sess.id === session.account.parent)[0];
+  }
+
+  /**
+   * Get all the child sessions
+   * @param session - parent session
+   */
+  childSessions(session) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const sessions = workspace.sessions;
+    return sessions.filter(s => (s.account as AwsAccount).parent === session.id);
   }
 
   /**

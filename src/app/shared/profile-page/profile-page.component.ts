@@ -8,6 +8,9 @@ import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {constants} from '../../core/enums/constants';
 import {environment} from '../../../environments/environment';
+import * as uuid from 'uuid';
+import {AwsAccount} from '../../models/aws-account';
+import {SessionService} from '../../services/session.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -16,7 +19,10 @@ import {environment} from '../../../environments/environment';
 })
 export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
+  activeTab = 1;
+
   idpUrlValue;
+  editingIdpUrl: boolean;
 
   showProxyAuthentication = false;
   proxyProtocol = 'https'; // Default
@@ -45,12 +51,11 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
-
-
   constructor(
     private configurationService: ConfigurationService,
     private appService: AppService,
     private fileService: FileService,
+    private sessionService: SessionService,
     private router: Router
   ) { super(); }
 
@@ -58,7 +63,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData.name && this.workspaceData.name !== '') {
 
-      this.idpUrlValue = this.workspaceData.idpUrl;
+      this.idpUrlValue = '';
       this.proxyProtocol = this.workspaceData.proxyConfiguration.proxyProtocol;
       this.proxyUrl = this.workspaceData.proxyConfiguration.proxyUrl;
       this.proxyPort = this.workspaceData.proxyConfiguration.proxyPort;
@@ -94,8 +99,6 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
    */
   saveOptions() {
     if (this.form.valid) {
-      this.workspaceData.idpUrl = this.form.value.idpUrl;
-
       this.workspaceData.proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
       this.workspaceData.proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
       this.workspaceData.proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
@@ -143,4 +146,56 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     this.router.navigate(['/', 'sessions', 'session-selected']);
   }
 
+  manageIdpUrl(id) {
+    const idpUrl = this.workspaceData.idpUrl.findIndex(u => u.id === id);
+    if (this.form.get('idpUrl').value !== '') {
+      if (idpUrl === -1) {
+        this.workspaceData.idpUrl.push({ id: uuid.v4(), url: this.form.get('idpUrl').value });
+      } else {
+        this.workspaceData.idpUrl[idpUrl].url = this.form.get('idpUrl').value;
+      }
+      this.configurationService.updateWorkspaceSync(this.workspaceData);
+    }
+    this.editingIdpUrl = false;
+    this.idpUrlValue = undefined;
+    this.form.get('idpUrl').setValue('');
+  }
+
+  editIdpUrl(id) {
+    const idpUrl = this.workspaceData.idpUrl.filter(u => u.id === id)[0];
+    this.idpUrlValue = idpUrl;
+    this.form.get('idpUrl').setValue(idpUrl.url);
+    this.editingIdpUrl = true;
+  }
+
+  deleteIdpUrl(id) {
+    // Federated
+    const federated = this.workspaceData.sessions.filter(s => (s.account as AwsAccount).idpUrl !== undefined && (s.account as AwsAccount).idpUrl === id);
+    let sessions = federated;
+
+    // Add trusters from federated
+    federated.forEach(fed => {
+      const childs = this.sessionService.childSessions(fed);
+      sessions = sessions.concat(childs);
+    });
+
+    // Get only names for display
+    let sessionsNames = sessions.map(s => s.account.accountName);
+    if (sessionsNames.length === 0) {
+      sessionsNames = ['no sessions'];
+    }
+
+    // Ask for deletion
+    this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><p class="text-left text-info">- ${sessionsNames.join('<br>- ')}</p>Do you want to proceed?`, (res) => {
+      if (res !== constants.CONFIRM_CLOSED) {
+        this.appService.logger(`Removing idp url with id: ${id}`, LoggerLevel.INFO, this);
+        const idpUrl = this.workspaceData.idpUrl.findIndex(u => u.id === id);
+        this.workspaceData.idpUrl.splice(idpUrl, 1);
+        this.configurationService.updateWorkspaceSync(this.workspaceData);
+        sessions.forEach(s => {
+          this.sessionService.removeSession(s);
+        });
+      }
+    });
+  }
 }

@@ -12,6 +12,7 @@ import {CredentialsService} from './services/credentials.service';
 import {MenuService} from './services/menu.service';
 import {TimerService} from './services/timer-service';
 import {AccountType} from './models/AccountType';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-root',
@@ -55,12 +56,30 @@ export class AppComponent implements OnInit {
     if (workspace) {
       // Set it as default
       this.configurationService.setDefaultWorkspaceSync(workspace.name);
-      // Path old sessions without a default region
+      // Patch old way of having only one idp url
+      if (workspace.idpUrl !== undefined && typeof workspace.idpUrl === 'string') {
+        workspace.idpUrl = [{ id: uuid.v4(), url: workspace.idpUrl }];
+      }
+
+      // Patch old sessions without a default region
       const sessions = workspace.sessions;
       if (sessions) {
         sessions.forEach(session => {
           if (session.account.region  === undefined || session.account.region === null || session.account.region === '' || session.account.region === 'no region necessary') {
             session.account.region = session.account.type !== AccountType.AZURE ? environment.defaultRegion : environment.defaultLocation;
+          }
+          // Another patch: federated and truster for AWS now have their own copy of the selected IdP url so add it if missing (a very old account)
+          if (session.account.type === AccountType.AWS || session.account.type === AccountType.AWS_TRUSTER) {
+            if (session.account.parent === undefined) {
+              if (session.account.idpUrl === '' || session.account.idpUrl === null || session.account.idpUrl === undefined) {
+                session.account.idpUrl = workspace.idpUrl[0].id; // We force the first
+              } else {
+                const found = workspace.idpUrl.filter(u => u.url === session.account.idpUrl)[0];
+                if (found) {
+                  session.account.idpUrl = found.id;
+                }
+              }
+            }
           }
         });
         workspace.sessions = sessions;

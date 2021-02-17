@@ -12,6 +12,8 @@ import {FileService} from '../services-system/file.service';
 import {ProxyService} from './proxy.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
+import * as uuid from 'uuid';
+import {SessionService} from './session.service';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -56,7 +58,8 @@ export class WorkspaceService extends NativeService {
     private configurationService: ConfigurationService,
     private fileService: FileService,
     private proxyService: ProxyService,
-    private keychainService: KeychainService
+    private keychainService: KeychainService,
+    private sessionService: SessionService
   ) {
     super();
   }
@@ -75,6 +78,8 @@ export class WorkspaceService extends NativeService {
   getIdpToken(idpUrl: string, session: any, type: string, callbackUrl?: string) {
     if (this.showingSubscription) { this.showingSubscription.unsubscribe(); }
     this.showingSubscription = this.checkForShowingTheLoginWindow(idpUrl).subscribe((res) => {
+
+      console.log(res);
 
       // We generate a new browser window to host for the Idp Login form
       // Note: this is due to the fact that electron + angular gives problem with embedded webview
@@ -136,10 +141,21 @@ export class WorkspaceService extends NativeService {
   /**
    * Credential refresh method, it cals for the entire procedure to obtain a
    * valid session token to make the assumeRoleWithSAML
-   * @param idpUrl - url to use to connect to the idp
    * @param session - the Session object
    */
-  refreshCredentials(idpUrl: string, session: any) {
+  refreshCredentials(session: any) {
+    // Get correct idp url
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    let idpUrl;
+    if (session.account.parent === undefined) {
+      idpUrl = workspace.idpUrl.filter(u => u.id === session.account.idpUrl)[0].url;
+    } else {
+      const parentSession = this.sessionService.getSession(session.account.parent);
+      idpUrl = workspace.idpUrl.filter(u => u.id === parentSession.account.idpUrl)[0].url;
+    }
+
+    // TODO: probably here will need to clean the partition area to force a windows refresh
+
     // Extract the Idp token passing the type of request, this method has
     // become generic so we can already prepare for multiple idp type
     this.getIdpToken(idpUrl, session, IdpResponseType.SAML, null);
@@ -157,16 +173,23 @@ export class WorkspaceService extends NativeService {
       this.proxyService.configureBrowserWindow(this.idpWindow);
 
       // This filter is used to listen to go to a specific callback url (or the generic one)
-      const filter = {urls: ['https://*.okta.com/*', 'https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
-      
+      const filter = {urls: ['https://*.onelogin.com/*', 'https://*.okta.com/*', 'https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
+
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response
       this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-
         // Show window: login process
+        console.log(details.url);
 
         // G Suite
         if (details.url.indexOf('https://accounts.google.com/ServiceLogin') !== -1) {
+          this.idpWindow = null;
+          obs.next(true);
+          obs.complete();
+        }
+
+        // One Login
+        if (details.url.indexOf('.onelogin.com/login') !== -1) {
           this.idpWindow = null;
           obs.next(true);
           obs.complete();
@@ -206,6 +229,8 @@ export class WorkspaceService extends NativeService {
    * @param callback - eventual callback to call with the response data
    */
   idpResponseHook(details: any, type: string, idpUrl: string, session: any, callback?: any) {
+    console.log(details);
+
     // Extract the token from the request and set the email for the screen
     const token = this.extract_SAML_Response(details);
 
@@ -213,7 +238,6 @@ export class WorkspaceService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     workspace.type = type;
     workspace.lastIDPToken = token;
-    workspace.idpUrl  = idpUrl;
 
     // Now we can go on
     this.configurationService.updateWorkspaceSync(workspace);
@@ -266,10 +290,11 @@ export class WorkspaceService extends NativeService {
    * @returns the decoded saml response
    */
   extract_SAML_Response(requestDetails: any) {
-    const rawData = requestDetails.uploadData[0].bytes.toString('utf8');
+    let rawData = requestDetails.uploadData[0].bytes.toString('utf8');
     const n  = rawData.lastIndexOf('SAMLResponse=');
     const n2 = rawData.lastIndexOf('&RelayState=');
-    return decodeURIComponent(rawData.substring(n + 13, n2));
+    rawData = n2 !== -1 ? rawData.substring(n + 13, n2) : rawData.substring(n + 13);
+    return decodeURIComponent(rawData);
   }
 
   obtainCredentials(workspace: Workspace, session: any, callback?: any) {
@@ -462,7 +487,7 @@ export class WorkspaceService extends NativeService {
   /* ======< WORKSPACE MANAGEMENTS >======= */
   /* ====================================== */
 
-  createNewWorkspace(googleToken: string, federationUrl: string, name: string, responseType: string) {
+  createNewWorkspace(googleToken: string, federationUrl: {id: string, url: string}, name: string, responseType: string) {
     try {
       // TODO why we need a google token to create a workspace??
       // Create a standard workspace to use as default
@@ -472,7 +497,7 @@ export class WorkspaceService extends NativeService {
         type: responseType,
         name,
         lastIDPToken: googleToken,
-        idpUrl: federationUrl,
+        idpUrl: [federationUrl],
         proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
         sessions: [],
         setupDone: true,

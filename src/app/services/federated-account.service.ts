@@ -25,13 +25,17 @@ export class FederatedAccountService extends NativeService {
 
   /**
    * Add a new Federated Account to workspace
+   * @param idpUrl -the selected idp id and url
    * @param accountNumber - the account number
    * @param accountName - the account name
    * @param role - the role to add to the account
    * @param idpArn - the idp arn as it is federated
    * @param region - the region to select as default
    */
-  addFederatedAccountToWorkSpace(accountNumber: string, accountName: string, role: any, idpArn: string, region: string) {
+  addFederatedAccountToWorkSpace(idpUrl: {id: string, url: string}, accountNumber: string, accountName: string, role: any, idpArn: string, region: string) {
+
+    console.log('idpurl', idpUrl);
+
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (role.name[0] === '/') {
@@ -50,7 +54,7 @@ export class FederatedAccountService extends NativeService {
         role,
         idpArn,
         region,
-        idpUrl: workspace.idpUrl,
+        idpUrl: idpUrl.id,
         type: AccountType.AWS,
         parent: undefined,
         parentRole: undefined
@@ -64,8 +68,18 @@ export class FederatedAccountService extends NativeService {
         account
       };
 
+      console.log('idpurl in workspace', workspace.idpUrl);
+
+      if (workspace.idpUrl.findIndex(i => i.id === idpUrl.id) === -1) {
+        workspace.idpUrl.push(idpUrl);
+      }
+
+      console.log('idpurl in workspace after', workspace.idpUrl);
+
       workspace.sessions.push(session);
       this.configurationService.updateWorkspaceSync(workspace);
+      console.log('sessions now', workspace.sessions);
+
       return true;
 
     } else {

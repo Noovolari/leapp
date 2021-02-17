@@ -199,7 +199,6 @@ export class ConfigurationService extends NativeService {
     try {
       // Cleaning Library Electron Cache
       // Get app directory
-      // on OSX it's /Users/Yourname/Library/Application Support/AppName
       const getAppPath = this.path.join(this.app.getPath('appData'), `Leapp`);
       this.rimraf.sync(getAppPath);
 
@@ -215,11 +214,12 @@ export class ConfigurationService extends NativeService {
    */
   public async newConfigurationFileSync() {
     try {
+
+      // Clear all extra data
+      const getAppPath = this.path.join(this.app.getPath('appData'), environment.appName);
+      this.rimraf.sync(getAppPath + '/Partitions/leapp');
+
       // Cleaning Library Electron Cache
-      // Get app directory
-      // on OSX it's /Users/Yourname/Library/Application Support/AppName
-      // const getAppPath = this.path.join(this.app.getPath('appData'), `Leapp`);
-      // this.rimraf.sync(getAppPath);
       await this.session.defaultSession.clearStorageData();
 
       // Clean localStorage

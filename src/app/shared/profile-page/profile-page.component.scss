@@ -139,6 +139,12 @@ body {
     color: $charcoal-grey;
     border: 2px solid $charcoal-grey!important;
   }
+  button.small-btn {
+    color: white;
+  }
+  button.small-btn:hover {
+    color: #73E0CF;
+  }
 
   .providers {
     display: inline-block;
@@ -283,12 +289,13 @@ body {
   overflow-x: hidden;
   overflow-y: scroll;
   height: 240px;
+  margin-right: -25px;
 }
 
 table {
   display: block;
 
-  th { font-weight: bold; }
+  th:last-child label{ margin-right: 17px; }
   th, td {
     width: 26%;
     border-bottom: 1px solid #cfd2d3;
@@ -299,6 +306,10 @@ table {
       height: 28px!important;
       padding: 0!important;
       margin-left: 8px;
+      color: white;
+    }
+    button:hover {
+      color: #73E0CF;
     }
   }
   th:first-child, td:first-child {

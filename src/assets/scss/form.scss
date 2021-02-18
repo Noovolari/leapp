@@ -149,3 +149,21 @@ hr {
 .adder-btn.disabled {
   background: #bababa!important;
 }
+
+::-webkit-scrollbar-track
+{
+  border-radius: 10px;
+  background-color: $focused-element;
+}
+
+::-webkit-scrollbar
+{
+  width: 12px;
+  background-color: $focused-element;
+}
+
+::-webkit-scrollbar-thumb
+{
+  border-radius: 10px;
+  background-color: $main-color-light;
+}

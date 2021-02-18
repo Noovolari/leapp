@@ -203,7 +203,7 @@ export class AppService extends NativeService {
       webPreferences: {
         devTools: !environment.production,
         worldSafeExecuteJavaScript: true,
-        partition: 'persist:Leapp'
+        partition: `persist:Leapp-${btoa(url)}`
       }
     };
 

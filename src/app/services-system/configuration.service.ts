@@ -217,7 +217,7 @@ export class ConfigurationService extends NativeService {
 
       // Clear all extra data
       const getAppPath = this.path.join(this.app.getPath('appData'), environment.appName);
-      this.rimraf.sync(getAppPath + '/Partitions/leapp');
+      this.rimraf.sync(getAppPath + '/Partitions/leapp*');
 
       // Cleaning Library Electron Cache
       await this.session.defaultSession.clearStorageData();

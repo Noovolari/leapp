@@ -150,7 +150,11 @@ const generateMainWindow = () => {
   let loginCount = 0;
   app.on('login', (event, webContents, request, authInfo, callback) => {
     try {
-      let workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, {encoding: 'utf-8'}), machineIdSync()).toString(CryptoJS.enc.Utf8)) : undefined;
+      const file = fs.readFileSync(workspacePath, {encoding: 'utf-8'});
+      const decriptedFile = CryptoJS.AES.decrypt(file, machineIdSync());
+      const fileExists = fs.existsSync(workspacePath);
+
+      let workspace = fileExists ? JSON.parse(decriptedFile).toString(CryptoJS.enc.Utf8) : undefined;
       if (workspace !== undefined && workspace.workspaces[0] !== undefined) {
         workspace = (workspace.workspaces[0] as Workspace);
 

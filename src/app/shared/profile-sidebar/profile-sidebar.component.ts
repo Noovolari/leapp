@@ -46,26 +46,16 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
    * logout from Leapp
    */
   logout() {
-    // Google clean
+    // Data clean
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-
-    // this.proxyService.get('https://mail.google.com/mail/u/0/?logout&hl=en', (res) => {
-    // this.appService.logger('logout res status code: ', LoggerLevel.INFO, this, res.statusCode);
-    // if (res.statusCode !== 407) {
     this.configurationService.newConfigurationFileSync();
-    // } else {
-    //  this.appService.toast('Failed to logout: Proxy auth denied.', ToastLevel.WARN, 'Proxy Auth failed');
-    // }
-    // }, (err) => {
-    //  this.appService.logger('logout error: ', LoggerLevel.ERROR, this, err.stack);
-    // });
-
-    // Azure Clean
     this.appService.logger('Cleaning Azure config files...', LoggerLevel.INFO, this);
 
+    // Azure clean
     workspace.azureProfile = null;
     workspace.azureConfig = null;
     this.configurationService.updateWorkspaceSync(workspace);
+
     if (this.execSubscription) { this.execSubscription.unsubscribe(); }
     this.execSubscription = this.executeService.execute('az account clear 2>&1').subscribe(res => {}, err => {});
   }

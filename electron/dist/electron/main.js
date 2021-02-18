@@ -142,7 +142,10 @@ var generateMainWindow = function () {
     var loginCount = 0;
     app.on('login', function (event, webContents, request, authInfo, callback) {
         try {
-            var workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, { encoding: 'utf-8' }), node_machine_id_1.machineIdSync()).toString(CryptoJS.enc.Utf8)) : undefined;
+            var file = fs.readFileSync(workspacePath, { encoding: 'utf-8' });
+            var decriptedFile = CryptoJS.AES.decrypt(file, node_machine_id_1.machineIdSync());
+            var fileExists = fs.existsSync(workspacePath);
+            var workspace = fileExists ? JSON.parse(decriptedFile).toString(CryptoJS.enc.Utf8) : undefined;
             if (workspace !== undefined && workspace.workspaces[0] !== undefined) {
                 workspace = workspace.workspaces[0];
                 if (workspace.proxyConfiguration !== undefined &&

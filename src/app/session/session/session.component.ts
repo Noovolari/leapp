@@ -131,12 +131,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.getSessions();
     if (query !== '') {
       this.notActiveSessions = this.notActiveSessions.filter(s => {
-        const idpUrl = this.workspace.idpUrl.filter(idp => idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.url);
-
+        const idpID = this.workspace.idpUrl.filter(idp => idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.id);
         return s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
           ((s.account as AwsAccount).role && (s.account as AwsAccount).role.name.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AwsAccount).accountNumber && (s.account as AwsAccount).accountNumber.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
-          idpUrl.length > 0 && idpUrl.indexOf(u => u === (s.account as AwsAccount).idpUrl) > -1 ||
+          (idpID.indexOf((s.account as AwsAccount).idpUrl) > -1) ||
           ((s.account as AwsPlainAccount).user && (s.account as AwsPlainAccount).user.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).tenantId && (s.account as AzureAccount).tenantId.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).subscriptionId && (s.account as AzureAccount).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);

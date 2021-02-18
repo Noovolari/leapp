@@ -65,21 +65,21 @@
       <div class="no-padding no-margin panel" *ngIf="activeTab === 2">
         <h2 style="margin-top: 10px;">IdP URL list</h2>
 
-        <div class="form-group" style="width: 80%; display: inline-block;">
+        <div class="form-group" style="width: 88%; display: inline-block;">
           <label>SAML 2.0 IdP URL<span class="danger-text">*</span></label>
           <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url" [value]="idpUrlValue ? idpUrlValue.url : ''" >
         </div>
 
         <div class="form-group" style="width: 2%; display: inline-block;"></div>
 
-        <div class="form-group" style="width: 18%; display: inline-block;">
-          <button class="small-btn" type="button" (click)="manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);">{{editingIdpUrl ? 'Update' : 'Create'}}</button>
+        <div class="form-group" style="width: 9%; display: inline-block;">
+          <button class="small-btn" type="button" (click)="manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"><i class="far fa-{{editingIdpUrl ? 'edit' : 'plus'}}"></i></button>
         </div>
 
         <div class="idp-url-wrapper">
           <table>
             <thead>
-              <th>Url</th><th>#</th>
+            <th><label>Url</label></th><th class="text-right"><label>Actions</label></th>
             </thead>
             <tbody>
             <ng-container *ngFor="let idpUrl of workspaceData.idpUrl">

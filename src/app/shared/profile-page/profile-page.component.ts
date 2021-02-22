@@ -180,13 +180,15 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     });
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => s.account.accountName);
+    let sessionsNames = sessions.map(s => {
+      return `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsAccount).role.name}</small></div></li>`;
+    });
     if (sessionsNames.length === 0) {
-      sessionsNames = ['no sessions'];
+      sessionsNames = ['<li><b>no sessions</b></li>'];
     }
 
     // Ask for deletion
-    this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><p class="text-left text-info">- ${sessionsNames.join('<br>- ')}</p>Do you want to proceed?`, (res) => {
+    this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
       if (res !== constants.CONFIRM_CLOSED) {
         this.appService.logger(`Removing idp url with id: ${id}`, LoggerLevel.INFO, this);
         const idpUrl = this.workspaceData.idpUrl.findIndex(u => u.id === id);

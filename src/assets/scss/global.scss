@@ -227,3 +227,9 @@ body.moved .mask { display: block; opacity: 0; position: fixed; z-index: 1000; l
     }
   }
 }
+
+ul li div.removed-sessions {
+  text-align: left!important;
+  overflow-x: hidden!important;
+  text-overflow: ellipsis!important;
+}

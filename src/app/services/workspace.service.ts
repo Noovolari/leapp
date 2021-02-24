@@ -12,7 +12,6 @@ import {FileService} from '../services-system/file.service';
 import {ProxyService} from './proxy.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
-import * as uuid from 'uuid';
 import {SessionService} from './session.service';
 
 // Import AWS node style
@@ -182,7 +181,7 @@ export class WorkspaceService extends NativeService {
         console.log(details.url);
 
         // G Suite
-        if (details.url.indexOf('https://accounts.google.com/ServiceLogin') !== -1) {
+        if (details.url.indexOf('accounts.google.com/ServiceLogin') !== -1) {
           this.idpWindow = null;
           obs.next(true);
           obs.complete();
@@ -204,7 +203,7 @@ export class WorkspaceService extends NativeService {
 
         // Do not show window: already logged
 
-        if (details.url.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
+        if (details.url.indexOf('signin.aws.amazon.com/saml') !== -1) {
           this.idpWindow = null;
           obs.next(false);
           obs.complete();

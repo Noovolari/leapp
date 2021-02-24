@@ -6,7 +6,7 @@ import {machineIdSync} from 'node-machine-id';
 import {Workspace} from '../src/app/models/workspace';
 import {AppUpdater} from '../src/app/core/app-updater';
 
-const {app, BrowserWindow, globalShortcut, Menu, ipcMain, session, dialog, powerMonitor, Tray, getCurrentWindow } = require('electron');
+const {app, BrowserWindow, globalShortcut, Menu, ipcMain } = require('electron');
 
 const url = require('url');
 const fs = require('fs');

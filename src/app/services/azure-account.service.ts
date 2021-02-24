@@ -26,7 +26,6 @@ export class AzureAccountService extends NativeService {
    */
   addAzureAccountToWorkSpace(subscriptionId: string, tenantId: string, accountName: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const configuration = this.configurationService.getConfigurationFileSync();
 
     // Verify it not exists
     const test = workspace.sessions.filter(sess => (sess.account as AzureAccount).subscriptionId === subscriptionId);

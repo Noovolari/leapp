@@ -6,11 +6,6 @@ import {FileService} from '../services-system/file.service';
 import {AppService, LoggerLevel} from '../services-system/app.service';
 import {SessionService} from './session.service';
 import {CredentialsService} from './credentials.service';
-import {Session} from '../models/session';
-import {AccountType} from '../models/AccountType';
-import {AwsPlainAccount} from '../models/aws-plain-account';
-import {AwsAccount} from '../models/aws-account';
-import {Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'

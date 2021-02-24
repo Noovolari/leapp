@@ -17,7 +17,7 @@ var CryptoJS = require("crypto-js");
 var initial_configuration_1 = require("../src/app/core/initial-configuration");
 var node_machine_id_1 = require("node-machine-id");
 var app_updater_1 = require("../src/app/core/app-updater");
-var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow, globalShortcut = _a.globalShortcut, Menu = _a.Menu, ipcMain = _a.ipcMain, session = _a.session, dialog = _a.dialog, powerMonitor = _a.powerMonitor, Tray = _a.Tray, getCurrentWindow = _a.getCurrentWindow;
+var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow, globalShortcut = _a.globalShortcut, Menu = _a.Menu, ipcMain = _a.ipcMain;
 var url = require('url');
 var fs = require('fs');
 var os = require('os');

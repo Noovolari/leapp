@@ -15,8 +15,7 @@ export class TrusterAccountService extends NativeService {
 
   constructor(
     private configurationService: ConfigurationService,
-    private appService: AppService,
-    private sessionService: SessionService
+    private appService: AppService
   ) {
     super();
   }
@@ -62,7 +61,6 @@ export class TrusterAccountService extends NativeService {
         account
       };
 
-      const alreadyExist = workspace.sessions.filter(s => (session.id === s.id)).length;
       // Once prepared the session object we verify if we can add it or not to the list and return a boolean about the operation
       workspace.sessions.push(session);
       this.configurationService.updateWorkspaceSync(workspace);

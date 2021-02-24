@@ -2,6 +2,7 @@ Leapp
 =========
 [![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)](https://github.com/Noovolari/leapp/releases/latest)
 [![Discord Badge](https://img.shields.io/discord/745629705964617820)](https://discord.gg/wHh2kyK)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Noovolari/leapp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Noovolari/leapp/context:javascript)
 - Website: https://www.leapp.cloud/
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/4)
 - Wiki: [Wiki](https://github.com/Noovolari/leapp/wiki)

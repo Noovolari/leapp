@@ -245,13 +245,11 @@ export class ProviderManagerService {
   saveAzureAccount() {
     if (this.formValid(this.form, this.accountType)) {
       try {
-        const created = this.azureAccountService.addAzureAccountToWorkSpace(
+        return this.azureAccountService.addAzureAccountToWorkSpace(
           this.form.value.subscriptionId,
           this.form.value.tenantId,
           this.form.value.name,
           this.form.value.azureLocation);
-
-        return created;
       } catch (err) {
         this.appService.logger('Error creating account', LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
@@ -271,7 +269,7 @@ export class ProviderManagerService {
     if (this.formValid(this.form, this.accountType)) {
       try {
         // Try to create the truster account
-        const created = this.trusterAccountService.addTrusterAccountToWorkSpace(
+        return this.trusterAccountService.addTrusterAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
           (this.selectedSession as Session).id,
@@ -279,8 +277,6 @@ export class ProviderManagerService {
           this.generateRolesFromNames(this.form),
           this.form.value.idpArn,
           this.selectedRegion);
-
-        return created;
       } catch (err) {
         this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
@@ -296,7 +292,7 @@ export class ProviderManagerService {
     if (this.formValid(this.form, this.accountType)) {
       try {
         // Add a federation Account to the workspace
-        const created = this.federatedAccountService.addFederatedAccountToWorkSpace(
+        return this.federatedAccountService.addFederatedAccountToWorkSpace(
           this.selectedIdpUrl,
           this.form.value.accountNumber,
           this.form.value.name,
@@ -304,8 +300,6 @@ export class ProviderManagerService {
           this.form.value.idpArn,
           this.selectedRegion,
         );
-
-        return created;
       } catch (err) {
         this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
@@ -348,10 +342,8 @@ export class ProviderManagerService {
   formValid(form, accountType) {
     // First check the type of account we are creating
     if (accountType !== AccountType.AZURE) {
-      // Get the workspace
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
-
       let check;
+
       // We are in AWS check if we are saving a Federated or a Truster
       switch (accountType) {
         case AccountType.AWS:

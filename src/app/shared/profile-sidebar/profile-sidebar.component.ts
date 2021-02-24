@@ -1,5 +1,5 @@
 import {Component, OnInit, Renderer2} from '@angular/core';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';

@@ -2,6 +2,7 @@ Leapp
 =========
 [![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)](https://github.com/Noovolari/leapp/releases/latest)
 [![Discord Badge](https://img.shields.io/discord/745629705964617820)](https://discord.gg/wHh2kyK)
+[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Noovolari/leapp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Noovolari/leapp/context:javascript)
 - Website: https://www.leapp.cloud/
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/4)
 - Wiki: [Wiki](https://github.com/Noovolari/leapp/wiki)
@@ -79,7 +80,7 @@ See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 *Note: it's possible to assign an MFA device to a plain session. Please see [MFA section](https://github.com/Noovolari/leapp/wiki/mfa) for more details.*
 
 ## AWS Federated Access
-Federation is established between **G Suite** and **AWS**. No more AWS credentials 
+Federation is established between **G Suite**, **Okta**, **OneLogin** and **AWS**. No more AWS credentials 
 management is needed. Leapp allows you to get to cloud resources with company email and password.
 
 ![Federated Access Use-case](.github/images/federated-gif.gif)
@@ -119,6 +120,8 @@ See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 - **GCP** - :soon:
 ## Identity Providers
 - **G Suite to AWS** - :white_check_mark:
+- **Okta to AWS** - :white_check_mark:
+- **OneLogin to AWS** - :white_check_mark:
 - **G Suite to Azure** - :white_check_mark:
 - **AZURE AD to Azure** - :white_check_mark:
 - **AZURE AD to AWS** - :soon:

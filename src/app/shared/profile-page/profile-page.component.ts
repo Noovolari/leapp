@@ -11,6 +11,7 @@ import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsAccount} from '../../models/aws-account';
 import {SessionService} from '../../services/session.service';
+import {IdpResponseType, WorkspaceService} from '../../services/workspace.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -56,11 +57,16 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     private appService: AppService,
     private fileService: FileService,
     private sessionService: SessionService,
+    private workspaceService: WorkspaceService,
     private router: Router
   ) { super(); }
 
   ngOnInit() {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
+    if (this.workspaceData === undefined || this.workspaceData.proxyConfiguration === undefined) {
+      this.workspaceService.createNewWorkspace(undefined, undefined, 'default', IdpResponseType.SAML);
+      this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
+    }
     if (this.workspaceData.name && this.workspaceData.name !== '') {
 
       this.idpUrlValue = '';

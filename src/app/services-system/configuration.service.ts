@@ -93,7 +93,6 @@ export class ConfigurationService extends NativeService {
    * Get Default Workspace
    * @returns the default {Workspace}
    */
-  // TODO: WHY IT SHOULD RETURN A EMPTY HASH??
   public getDefaultWorkspaceSync(): Workspace | any {
     const config = this.getConfigurationFileSync();
     if (config.defaultWorkspace) {

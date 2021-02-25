@@ -11,7 +11,6 @@ import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsAccount} from '../../models/aws-account';
 import {SessionService} from '../../services/session.service';
-import {ProviderManagerService} from '../../services/provider-manager.service';
 import {IdpResponseType, WorkspaceService} from '../../services/workspace.service';
 
 @Component({

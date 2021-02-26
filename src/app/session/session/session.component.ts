@@ -131,7 +131,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.getSessions();
     if (query !== '') {
       this.notActiveSessions = this.notActiveSessions.filter(s => {
-        const idpID = this.workspace.idpUrl.filter(idp => idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.id);
+        const idpID = this.workspace.idpUrl.filter(idp => idp && idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.id);
         return s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
           ((s.account as AwsAccount).role && (s.account as AwsAccount).role.name.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AwsAccount).accountNumber && (s.account as AwsAccount).accountNumber.toLowerCase().indexOf(query.toLowerCase()) > -1) ||

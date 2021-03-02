@@ -13,6 +13,8 @@ import {MenuService} from './services/menu.service';
 import {TimerService} from './services/timer-service';
 import {AccountType} from './models/AccountType';
 import * as uuid from 'uuid';
+import {WebsocketService} from './services/websocket.service';
+import {MessageBrokerService} from './services/message-broker.service';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +31,8 @@ export class AppComponent implements OnInit {
     private app: AppService,
     private credentialsService: CredentialsService,
     private menuService: MenuService,
-    private timerService: TimerService
+    private timerService: TimerService,
+    private messageBrockerService: MessageBrokerService
   ) {
   }
 
@@ -110,6 +113,9 @@ export class AppComponent implements OnInit {
 
     // Initial starting point for DEBUG
     this.router.navigate(['/start']);
+
+    // Test - Initialize Websocket Message Broker
+    this.messageBrockerService.initialize();
   }
 
   /**
@@ -118,6 +124,9 @@ export class AppComponent implements OnInit {
   private beforeCloseInstructions() {
     // TODO: Move to another component
     this.menuService.cleanBeforeExit();
+
+    // Test - Close Websocket Connection
+    this.messageBrockerService.stop();
   }
 
   /**

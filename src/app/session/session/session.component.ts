@@ -16,6 +16,12 @@ import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
 import {WebConsoleService} from '../../services/web-console.service';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {WebsocketService} from '../../services/websocket.service';
+import {MessageBrokerService} from '../../services/message-broker.service';
+import {GsuiteConnectorService} from '../../services/gsuite-connector.service';
+import {catchError, tap} from 'rxjs/operators';
+import {of} from 'rxjs';
+import {KeychainService} from '../../services-system/keychain.service';
 
 @Component({
   selector: 'app-session',
@@ -61,9 +67,16 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private menuService: MenuService,
     private zone: NgZone,
     private webConsoleService: WebConsoleService,
+
+    private messageBrokerService: MessageBrokerService,
+    private gsuiteConnectorService: GsuiteConnectorService,
+    private keychainService: KeychainService
   ) { super(); }
 
-  ngOnInit() {
+  async ngOnInit() {
+    // Test WebSocket
+    this.messageBrokerService.sendWebSocketMessage({ code: 'SESSION', body: { message: 'ciao, my pretty Misao' } });
+
     // Set workspace
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
@@ -122,9 +135,16 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   /**
    * Go to Account Management
    */
-  createAccount() {
+  async createAccount() {
+    // Test Connector GSuite
+    const username = await this.keychainService.getSecret('Leapp', 'leapp-rnd-username');
+    const password = await this.keychainService.getSecret('Leapp', 'leapp-rnd-password');
+    this.gsuiteConnectorService.sendFirstRequest({ username, password }).subscribe(
+      data => console.log(data)
+    );
+
     // Go!
-    this.router.navigate(['/managing', 'create-account']);
+    // this.router.navigate(['/managing', 'create-account']);
   }
 
   filterSessions(query) {

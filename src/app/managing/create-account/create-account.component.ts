@@ -13,6 +13,7 @@ import {Session} from '../../models/session';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
+import {WebsocketService} from '../../services/websocket.service';
 
 @Component({
   selector: 'app-create-account',
@@ -83,11 +84,11 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     private credentialsService: CredentialsService,
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
-    private providerManagerService: ProviderManagerService
+    private providerManagerService: ProviderManagerService,
+    private websocketService: WebsocketService
   ) { super(); }
 
   ngOnInit() {
-
     this.subs.add(this.activatedRoute.queryParams.subscribe(params => {
 
       // Get the workspace and the accounts you need

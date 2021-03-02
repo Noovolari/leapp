@@ -12,7 +12,6 @@ import * as uuid from 'uuid';
 import {AwsAccount} from '../../models/aws-account';
 import {SessionService} from '../../services/session.service';
 import {IdpResponseType, WorkspaceService} from '../../services/workspace.service';
-import {WebsocketService} from '../../services/websocket.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -59,8 +58,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     private fileService: FileService,
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
-    private router: Router,
-    private websocketService: WebsocketService
+    private router: Router
   ) { super(); }
 
   ngOnInit() {

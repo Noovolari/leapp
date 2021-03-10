@@ -7,7 +7,7 @@ import {SharedModule} from '../shared/shared.module';
 import {NgSelectModule} from '@ng-select/ng-select';
 import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
 import { SessionCardComponent } from './session-card/session-card.component';
-
+import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 
 @NgModule({
   declarations: [
@@ -22,7 +22,8 @@ import { SessionCardComponent } from './session-card/session-card.component';
     NgSelectModule,
     ReactiveFormsModule,
     TooltipModule.forRoot(),
-    BsDropdownModule
+    BsDropdownModule,
+    InfiniteScrollModule
   ]
 })
 export class SessionModule { }

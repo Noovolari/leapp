@@ -199,3 +199,8 @@ b {
     background: $focused-element;
   }
 }
+
+.ssm-ul {
+  overflow-y: auto;
+  height: 300px;
+}

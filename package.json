@@ -199,6 +199,7 @@
     "ms": "^2.1.1",
     "ngx-bootstrap": "4.3.0",
     "ngx-electron": "^2.2.0",
+    "ngx-infinite-scroll": "^10.0.1",
     "ngx-json-viewer": "~2.4.0",
     "ngx-toastr": "~10.0.4",
     "node-log-rotate": "~0.1.5",

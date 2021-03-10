@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {AwsCredential} from '../models/credential';
 import {switchMap} from 'rxjs/operators';
 
@@ -15,6 +15,7 @@ export class SsmService {
   ssmClient;
   ec2Client;
   instances = [];
+  nextToken = -1;
 
   constructor(
     private app: AppService,
@@ -39,7 +40,13 @@ export class SsmService {
     return this.submit().pipe(
       switchMap(response => {
         return new Observable<SsmResult>(observer => {
-          this.ec2Client.describeInstances({}, (err, reservations) => {
+
+          const params = {MaxResults: 50};
+          this.ec2Client.describeInstances(params, (err, reservations) => {
+            this.nextToken = reservations.NextToken;
+
+            console.log('reservation', reservations);
+
             if (err) {
               this.app.logger('You are not Authorized to perform EC2 Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
               this.app.toast('You are not Authorized to perform EC2 Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
@@ -70,7 +77,7 @@ export class SsmService {
     this.instances = [];
     return new Observable<SsmResult>(observer => {
       try {
-        this.ssmClient.describeInstanceInformation({}, (err, data) => {
+        this.ssmClient.describeInstanceInformation({ MaxResults: 50 }, (err, data) => {
           if (err) {
             this.app.logger('You are not Authorized to perform SSM Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
             mythis.app.toast('You are not Authorized to perform SSM Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');

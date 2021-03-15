@@ -48,6 +48,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   awsRegions = [];
   regionOrLocations = [];
   instances = [];
+  duplicateInstances = [];
   sessionDetailToShow;
   placeholder;
 
@@ -214,6 +215,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
         // Check the result of the call
         this.subs.add(this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
           this.instances = result.instances;
+          this.duplicateInstances = this.instances;
           this.ssmloading = false;
         }, err => {
           this.instances = [];
@@ -263,5 +265,17 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
     this.openSsm = false;
     this.ssmloading = false;
+  }
+
+  searchSSMInstance(event) {
+    console.log(event.target.value);
+    if (event.target.value !== '') {
+      this.instances = this.duplicateInstances.filter(i =>
+                                 i.InstanceId.indexOf(event.target.value) > -1 ||
+                                 i.IPAddress.indexOf(event.target.value) > -1 ||
+                                 i.Name.indexOf(event.target.value) > -1);
+    } else {
+      this.instances = this.duplicateInstances;
+    }
   }
 }

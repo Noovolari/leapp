@@ -41,7 +41,8 @@
 
       <div class="loader" *ngIf="ssmloading"><i class="fa fa-spinner fa-spin"></i></div>
       <div class="list-of-ssm" *ngIf="!ssmloading && instances.length > 0">
-        <b>Select an Instance:</b>
+        <b>Select an Instance:</b><br>
+        <input class="form-control" type="text" placeholder="search by..." (keyup)="searchSSMInstance($event)" />
         <ul class="ssm-ul">
           <li *ngFor="let instance of instances" class="ssm-card">
             <div>

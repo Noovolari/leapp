@@ -316,9 +316,9 @@ export class ProviderManagerService {
       this.form.value.accountNumber,
       this.form.value.name,
       this.form.value.plainUser,
-      this.form.value.secretKey,
-      this.form.value.accessKey,
-      this.form.value.mfaDevice,
+      this.form.value.secretKey.trim(),
+      this.form.value.accessKey.trim(),
+      this.form.value.mfaDevice.trim(),
       this.selectedRegion);
     return true;
   }
@@ -326,9 +326,9 @@ export class ProviderManagerService {
   editPlainCredentials() {
     this.federatedAccountService.editPlainAccountToWorkSpace(
       this.selectedSession,
-      this.form.value.accessKey,
-      this.form.value.secretKey,
-      this.form.value.mfaDevice,
+      this.form.value.accessKey.trim(),
+      this.form.value.secretKey.trim(),
+      this.form.value.mfaDevice.trim(),
       this.selectedRegion,
     );
     return true;

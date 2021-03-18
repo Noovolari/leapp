@@ -14,17 +14,6 @@ Leapp is a Cross-Platform Cloud access App, built on top of [Electron](https://g
 The App is designed designed to **manage and secure Cloud Access in multi-account environments.**.
 
 ![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
-# Table of Contents
-
-- [Key features](#key-features)
-- [Installation](#installation)
-- [Contributring](#contributing)
-- [Developing](#developing)
-- [Documentation](#documentation)  
-- [Logs](#logs)
-- [Links](#links)
-- [License](#license)
-
 
 # Key features
 
@@ -32,17 +21,17 @@ The App is designed designed to **manage and secure Cloud Access in multi-accoun
 > Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
 
 
-- ### Switch **Cloud Profile** in a click
+- **Switch Cloud Profile in a click**
   
-- ### [Secure](https://github.com/Noovolari/leapp/wiki/vault-strategy) repository for your access data
+- **[Secure](https://github.com/Noovolari/leapp/wiki/vault-strategy) repository for your access data**
 
-- ### Multiple Cloud-Access [strategies]
+- **Multiple Cloud-Access [strategies]**
 
-- ### [No long-lived](https://github.com/Noovolari/leapp/wiki/rotating-credentials) credentials
+- **[No long-lived](https://github.com/Noovolari/leapp/wiki/rotating-credentials) credentials**
 
-- ### Generate and use sessions directly from [your AWS Organization](https://aws.amazon.com/single-sign-on/) 
+- **Generate and use sessions directly from [your AWS Organization](https://aws.amazon.com/single-sign-on/)**
 
-- ### Connect EC2 instances straight away
+- **Connect EC2 instances straight away**
 
 
 

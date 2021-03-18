@@ -9,29 +9,17 @@ Leapp
 
 ![logo](.github/images/README-1.png)
 
-Leapp is a DevTool Desktop App designed to **manage and secure Cloud Access in multi-account environments.**
+Leapp is a Cross-Platform Cloud access App, built on top of [Electron](https://github.com/electron/electron).
 
-The App is designed to work with Cloud Providers APIs, CLIs, and SDKs.
-
-It's a tool that securely [**stores your access information in a secure place**](https://github.com/Noovolari/leapp/wiki/vault-strategy) and generates temporary credential sets to access your Cloud from your local machine.
-
-> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **[we prefer to store that information in an encrypted file managed by the system.](https://github.com/Noovolari/leapp/wiki/vault-strategy)**
-> Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
+The App is designed designed to **manage and secure Cloud Access in multi-account environments.**.
 
 ![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
 # Table of Contents
 
 - [Key features](#key-features)
 - [Installation](#installation)
-- [Use Cases](#use-cases)
-  * [AWS Plain Access](#aws-plain-access)
-  * [AWS Federated Access](#aws-federated-access)
-  * [AWS Single Sign-On](#aws-single-sign-on)
-  * [AWS Truster Access](#aws-truster-access)
-  * [Azure Access](#azure-access)
-- [Supported Providers](#supported-providers)
-  * [Cloud Providers](#cloud-providers)
-  * [Identity Providers](#identity-providers)
+- [Contributring](#contributing)
+- [Developing](#developing)
 - [Documentation](#documentation)  
 - [Logs](#logs)
 - [Links](#links)
@@ -39,18 +27,23 @@ It's a tool that securely [**stores your access information in a secure place**]
 
 
 # Key features
+
+> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **[we prefer to store that information in an encrypted file managed by the system.](https://github.com/Noovolari/leapp/wiki/vault-strategy)**
+> Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
+
+
 - ### Switch **Cloud Profile** in a click
-  No need to manage the credentials file. Get connected to your accounts in a click. 
-- ### Secure repository for your access data
-  [Protect your cloud accounts access data in the system vault](https://github.com/Noovolari/leapp/wiki/vault-strategy) and connect straight away.
-- ### Multiple cloud access strategies
-  Connect with [federated single sign-on](#supported-providers), roles or static credentials.
-- ### No static credentials
-  Generate and inject only [temporary credentials to comply with security best-practices.](https://github.com/Noovolari/leapp/wiki/rotating-credentials)
-- ### Generate and use sessions directly from your AWS Organizations
-  Access to multiple AWS accounts with [AWS single sign-on](https://aws.amazon.com/single-sign-on/) access.
+  
+- ### [Secure](https://github.com/Noovolari/leapp/wiki/vault-strategy) repository for your access data
+
+- ### Multiple Cloud-Access [strategies]
+
+- ### [No long-lived](https://github.com/Noovolari/leapp/wiki/rotating-credentials) credentials
+
+- ### Generate and use sessions directly from [your AWS Organization](https://aws.amazon.com/single-sign-on/) 
+
 - ### Connect EC2 instances straight away
-  Connect to your EC2 Instances with AWS System Manager.
+
 
 
 ![Leapp App animation](.github/images/Leapp-animation.gif)
@@ -59,72 +52,53 @@ It's a tool that securely [**stores your access information in a secure place**]
 # Installation
 Get [here](https://github.com/Noovolari/leapp/releases/latest) the latest release.
 
-# Use Cases
-Our use cases are hereby presented to give you a hint on how Leapp can be of help to depend on the type of setup 
-you have in your company and what kind of credentials you need to get.
+# Contributing
 
-## AWS Plain Access
-Store AWS IAM User's Access Keys in your System Vault through Leapp. 
-Leapp automatically manages **Access Key ID** and **Secret Access Key** in your AWS credentials, 
-generating temporary credentials for them.
+Please read through our [contributing guidelines](.github/CONTRIBUTING.md) and [code of conduct](.github/CODE_OF_CONDUCT.md). Included are directions
+for opening issues, coding standards, and notes on development.
 
-**No credentials** are stored in Leapp. 
+Editor preferences are available in the [editor config](.editorconfig) for easy use in
+common text editors. Read more and download plugins at [editorconfig.org](http://editorconfig.org).
 
-Please see [Vault strategy](https://www.github.com/Noovolari/leapp/wiki/vault-strategy) for more information.
+# Developing
 
-![Plain Access Use-case](.github/images/plain-gif.gif)
+Development on Insomnia can be done on Mac, Windows, or Linux as long as you have
+[NodeJS](https://nodejs.org) and [Git](https://git-scm.com/). See the `.nvmrc` file located in the project for the correct Node version.
 
-See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
+<details>
+<summary>Initial Dev Setup</summary>
 
-*Note: it's possible to assign an MFA device to a plain session. Please see [MFA section](https://github.com/Noovolari/leapp/wiki/mfa) for more details.*
+This repository is structured as a monorepo and contains many Node.JS packages. Each package has
+its own set of commands, but the most common commands are available from the
+root [`package.json`](package.json) and can be accessed using the `npm run ...` command. Here
+are the only three commands you should need to start developing on the app.
 
-## AWS Federated Access
-Federation is established between **G Suite**, **Okta**, **OneLogin** and **AWS**. No more AWS credentials 
-management is needed. Leapp allows you to get to cloud resources with company email and password.
+```bash
+# Install and Link Dependencies
+npm install
 
-![Federated Access Use-case](.github/images/federated-gif.gif)
 
-See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
+# Start App with Live Reload
+npm run electron-dev
+```
 
-## AWS Single Sign-On
-Access to your AWS Accounts through Leapp and let the App manage all the available session to generate Temporary Access and Secret keys.
-![AWS SSO video](.github/images/AWS_SSO.gif)
+On Linux, if Electron is failing building the native Library `Keytar` just run:
+```bash
+# Clear Electron and Keytar conflicts
+npm run rebuild-keytar
+```
 
-See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
+</details>
 
-## AWS Truster Access
-Access to an Aws Account Role via another AWS Account role or an IAM user, thanks to a cross-account role available via [STS](https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html).
-In this access strategy a **Truster Role** or a **Plain User** is assumed by a **federated role**.
+<details>
+<summary>Editor Requirements</summary>
 
-![Truster Access Use-case](.github/images/truster-gif.gif)
+You can use any editor you'd like, but make sure to have support/plugins for
+the following tools:
 
-See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
+- [ESLint](http://eslint.org/) – For catching syntax problems and common errors
 
-*Note: it's possible to apply MFA to a truster session by setting it on the plain account it relies on. Please see [MFA section](https://github.com/Noovolari/leapp/wiki/mfa) for more details.*
-
-## Azure Access
-Use Leapp to do Single Sign On with G Suite on Azure to get access to your 
-**Subscriptions**. In this use case is **mandatory** to have defined a Federation 
-between Google and Azure. Leapp manage the login process for you to have Azure CLI 
-ready to be used.
-
-![Azure Access Use-case](.github/images/azure-gif.gif)
-
-See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
-
-# Supported Providers
-## Cloud Providers
-- **AWS** - :white_check_mark:
-- **AZURE** - :white_check_mark:
-- **GCP** - :soon:
-## Identity Providers
-- **G Suite to AWS** - :white_check_mark:
-- **Okta to AWS** - :white_check_mark:
-- **OneLogin to AWS** - :white_check_mark:
-- **G Suite to Azure** - :white_check_mark:
-- **AZURE AD to Azure** - :white_check_mark:
-- **AZURE AD to AWS** - :soon:
-- **AWS Single Sign-On** - :white_check_mark:
+</details>
 
 # Logs
 By default, Leapp writes logs to the following locations:
@@ -143,7 +117,7 @@ Here you can find our [documentation](https://github.com/Noovolari/leapp/wiki).
 
 ## Links
 - [Glossary](.github/GLOSSARY.md): find other information about the system
-- [Roadmap](https://github.com/Noovolari/leapp/projects/1): view our next steps and stay up to date
+- [Roadmap](https://github.com/Noovolari/leapp/projects/4): view our next steps and stay up to date
 - [Contributing](./.github/CONTRIBUTING.md): follow the guidelines if you'd like to contribute to the project
 - [Project Structure](./.github/PROJECT_STRUCTURE.md): check how we structured the project and where to find the files
 ## License

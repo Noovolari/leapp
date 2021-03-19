@@ -34,10 +34,16 @@ Guidelines for bug reports:
 3. **Demonstrate the problem** &mdash; provide clear steps that can be reproduced.
 
 A good bug report should not leave others needing to chase you up for more
-information. Please try to be as detailed as possible in your report. What is
-your environment? What steps will reproduce the issue? What OS experienced the
-problem? What would you expect to be the outcome? All these details will help
-to fix any potential bugs.
+information. Please try to be as detailed as possible in your report. 
+What is your environment? 
+
+What steps will reproduce the issue? 
+
+What OS experienced the problem?
+
+What would you expect to be the outcome? 
+
+All these details will help to fix any potential bugs.
 
 ## Feature Requests
 
@@ -57,13 +63,13 @@ implementing features, refactoring code, porting to a different language),
 otherwise, you risk spending a lot of time working on something that might
 not get accepted into the project.
 
-**IMPORTANT**: By submitting a patch, you agree to allow the project owner to
+**IMPORTANT**: by submitting a patch, you agree to allow the project owner to
 license your work under the same license as that used by the project.
 
 
 ## Submitting changes
 
-Please send a [GitHub Pull Request to Leapp](https://github.com/noovolari/leapp/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). When you send a pull request, we will love you forever if you include test examples. We can always use more test coverage and please follow our coding conventions (below) and make sure all of your commits are atomic (one feature per commit).
+Please send a [GitHub Pull Request to Leapp](https://github.com/noovolari/leapp/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). 
 
 Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
 

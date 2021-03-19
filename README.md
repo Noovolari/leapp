@@ -11,7 +11,7 @@ Leapp
 
 Leapp is a Cross-Platform Cloud access App, built on top of [Electron](https://github.com/electron/electron).
 
-The App is designed designed to **manage and secure Cloud Access in multi-account environments.**
+The App is designed to **manage and secure Cloud Access in multi-account environments.**
 
 ![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
 
@@ -25,11 +25,11 @@ The App is designed designed to **manage and secure Cloud Access in multi-accoun
   
 - **[Secure](https://github.com/Noovolari/leapp/wiki/vault-strategy) repository for your access data**
 
-- **Multiple Cloud-Access [strategies]**
+- **Multiple Cloud-Access [strategies](https://github.com/Noovolari/leapp/wiki/use-cases)**
 
 - **[No long-lived](https://github.com/Noovolari/leapp/wiki/rotating-credentials) credentials**
 
-- **Generate and use sessions directly from [your AWS Organization](https://aws.amazon.com/single-sign-on/)**
+- **Generate and use sessions directly from [your AWS Organization](https://github.com/Noovolari/leapp/wiki/use-cases#aws-single-sign-on)**
 
 - **Connect EC2 instances straight away**
 
@@ -52,7 +52,7 @@ common text editors. Read more and download plugins at [editorconfig.org](http:/
 
 # Developing
 
-Development on Insomnia can be done on Mac, Windows, or Linux as long as you have
+Development on Leapp can be done on Mac, Windows, or Linux as long as you have
 [NodeJS](https://nodejs.org) and [Git](https://git-scm.com/). See the `.nvmrc` file located in the project for the correct Node version.
 
 <details>
@@ -68,11 +68,11 @@ are the only three commands you should need to start developing on the app.
 npm install
 
 
-# Start App with Live Reload
+# Start App without Live Reload
 npm run electron-dev
 ```
 
-On Linux, if Electron is failing building the native Library `Keytar` just run:
+On Linux, if Electron is failing building the native Library `Keytar` just run before `npm run electron-dev`:
 ```bash
 # Clear Electron and Keytar conflicts
 npm run rebuild-keytar

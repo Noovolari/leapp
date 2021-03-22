@@ -72,7 +72,7 @@ npm install
 npm run electron-dev
 ```
 
-On Linux, if Electron is failing building the native Library `Keytar` just run before `npm run electron-dev`:
+If Electron is failing building the native Library `Keytar` just run before `npm run electron-dev`:
 ```bash
 # Clear Electron and Keytar conflicts
 npm run rebuild-keytar

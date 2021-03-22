@@ -3,7 +3,7 @@ import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthoriza
 import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo, LogoutRequest} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
 import {AppService, LoggerLevel} from '../../services-system/app.service';
-import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
+import {EMPTY, timer, merge, Observable, of, throwError} from 'rxjs';
 import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
@@ -80,47 +80,13 @@ export class AwsSsoService extends NativeService {
                 if (!startDeviceAuthorizationResponse) {
                   observer.error('AWS SSO device authorization error.');
                 } else {
-                  const pos = this.currentWindow.getPosition();
-
-                  this.ssoWindow = null;
-                  this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
-                  this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
-
-                  // https://oidc.*.amazonaws.com/device_authorization/associate_token
-
-                  // When the code is verified and the user has been logged in, the window can be closed
-                  this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
-                    'https://*.awsapps.com/start/user-consent/login-success.html',
-                    ] }, (details, callback) => {
-                      this.ssoWindow.close();
-                      this.ssoWindow = null;
-
-                      observer.next({
-                        clientId: registerClientResponse.clientId,
-                        clientSecret: registerClientResponse.clientSecret,
-                        deviceCode: startDeviceAuthorizationResponse.deviceCode
-                      });
-                      observer.complete();
-
-                      callback({
-                        requestHeaders: details.requestHeaders,
-                        url: details.url,
-                      });
+                  this.appService.openExternalUrl(startDeviceAuthorizationResponse.verificationUriComplete);
+                  observer.next({
+                    clientId: registerClientResponse.clientId,
+                    clientSecret: registerClientResponse.clientSecret,
+                    deviceCode: startDeviceAuthorizationResponse.deviceCode
                   });
-
-                  this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
-                    if (
-                      details.error.indexOf('net::ERR_ABORTED') < 0 &&
-                      details.error.indexOf('net::ERR_FAILED') < 0 &&
-                      details.error.indexOf('net::ERR_CACHE_MISS') < 0
-                    ) {
-                      if (this.ssoWindow) {
-                        this.ssoWindow.close();
-                        this.ssoWindow = null;
-                      }
-                      observer.error(details.error.toString());
-                    }
-                  });
+                  observer.complete();
                 }
               });
             })
@@ -144,6 +110,12 @@ export class AwsSsoService extends NativeService {
 
     return fromPromise(this.ssooidc.createToken(createTokenRequest).promise()).pipe(
       catchError((err) => {
+        if (err.code === 'AuthorizationPendingException') {
+          // Retry after 5 seconds if token is not yet ready
+          return timer(5000).pipe(
+            switchMap(() => this.generateSSOToken(authorizeIntegrationResponse))
+          );
+        }
         return throwError(`AWS SSO token creation error: ${err.toString()}`);
       }),
       switchMap((createTokenResponse: any) => {

@@ -19,7 +19,9 @@
       <a (click)="removeAccount(session, $event);">Remove account</a>
       <ng-container *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO)">
       <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
-      <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
+        <ng-container *ngIf="(session.account.type !== eAccountType.AWS_PLAIN_USER)">
+        <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
+      </ng-container>
       </ng-container>
     </div>
   </ng-container>

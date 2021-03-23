@@ -147,9 +147,10 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     try {
       const workspace = this.configurationService.getDefaultWorkspaceSync();
       if (workspace) {
+        const sessionAccount = (session.account as AwsAccount);
         const texts = {
-          1: (session.account as AwsAccount).accountNumber,
-          2: `arn:aws:iam::${(session.account as AwsAccount).accountNumber}:role/${(session.account as AwsAccount).role.name}`
+          1: sessionAccount.accountNumber,
+          2: sessionAccount.role ? `arn:aws:iam::${(session.account as AwsAccount).accountNumber}:role/${(session.account as AwsAccount).role.name}` : ''
         };
 
         const text = texts[type];

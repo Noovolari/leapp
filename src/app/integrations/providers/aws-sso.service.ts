@@ -3,8 +3,8 @@ import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthoriza
 import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo, LogoutRequest} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
 import {AppService, LoggerLevel} from '../../services-system/app.service';
-import {EMPTY, timer, merge, Observable, of, throwError} from 'rxjs';
-import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/operators';
+import {EMPTY, timer, merge, Observable, of, throwError, interval} from 'rxjs';
+import {catchError, delay, delayWhen, expand, map, retry, retryWhen, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
@@ -109,33 +109,38 @@ export class AwsSsoService extends NativeService {
     };
 
     return fromPromise(this.ssooidc.createToken(createTokenRequest).promise()).pipe(
-      catchError((err) => {
-        if (err.code === 'AuthorizationPendingException') {
-          // Retry after 5 seconds if token is not yet ready
-          return timer(5000).pipe(
-            switchMap(() => this.generateSSOToken(authorizeIntegrationResponse))
-          );
-        }
-        return throwError(`AWS SSO token creation error: ${err.toString()}`);
-      }),
-      switchMap((createTokenResponse: any) => {
-        return new Observable<GenerateSSOTokenResponse>((observer) => {
+
+      map((createTokenResponse: any) => {
           if (!createTokenResponse) {
-            observer.error('AWS SSO token creation error...');
+           throw new Error('AWS SSO token creation error...');
           } else {
             let expirationTime: Date = new Date();
             expirationTime = new Date(expirationTime.getTime() + createTokenResponse.expiresIn * 1000);
-            observer.next({ accessToken: createTokenResponse.accessToken, expirationTime });
-            observer.complete();
-          }
-        });
-      })
+            return { accessToken: createTokenResponse.accessToken, expirationTime };
+        }
+      }),
+      catchError((err) => {
+        console.log(err.code);
+        if (err.code === 'AuthorizationPendingException') {
+          console.log('here');
+          return throwError(`AWS SSO pending request, retrying: ${err.toString()}`).pipe(
+          );
+        }
+
+        return of(err).pipe(
+          tap(console.log)
+        );
+      }),
+      delay(5000),
+      retry(30),
     );
   }
 
   firstTimeLoginToAwsSSO(region: string, portalUrl: string): Observable<LoginToAwsSSOResponse> {
     return this.authorizeIntegration(region, portalUrl).pipe(
+      tap(console.log),
       switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
+      tap(console.log),
       switchMap(generateSSOTokenResponse => {
         return this.saveAwsSsoAccessInfo(portalUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
           map(() => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime }))
@@ -155,7 +160,9 @@ export class AwsSsoService extends NativeService {
         return throwError(`AWS SSO in loginToAwsSSO: ${err.toString()}`);
       }),
       switchMap(() => this.authorizeIntegration(region, portalUrl)),
+      tap(console.log),
       switchMap(authorizeIntegrationResponse => this.generateSSOToken(authorizeIntegrationResponse)),
+      tap(console.log),
       map(generateSSOTokenResponse => ({accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
       // whenever try to login then dave info in keychain
       switchMap((response) => {

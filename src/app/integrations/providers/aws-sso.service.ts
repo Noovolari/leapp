@@ -108,8 +108,8 @@ export class AwsSsoService extends NativeService {
       deviceCode: authorizeIntegrationResponse.deviceCode
     };
 
-    return fromPromise(this.ssooidc.createToken(createTokenRequest).promise()).pipe(
-
+    return of(true).pipe(
+      switchMap(() => fromPromise(this.ssooidc.createToken(createTokenRequest).promise())),
       map((createTokenResponse: any) => {
           if (!createTokenResponse) {
            throw new Error('AWS SSO token creation error...');
@@ -119,20 +119,16 @@ export class AwsSsoService extends NativeService {
             return { accessToken: createTokenResponse.accessToken, expirationTime };
         }
       }),
-      catchError((err) => {
-        console.log(err.code);
-        if (err.code === 'AuthorizationPendingException') {
-          console.log('here');
-          return throwError(`AWS SSO pending request, retrying: ${err.toString()}`).pipe(
-          );
-        }
-
-        return of(err).pipe(
-          tap(console.log)
-        );
-      }),
-      delay(5000),
-      retry(30),
+      retryWhen(errors =>
+        errors.pipe(switchMap(err => {
+          if (err.code === 'AuthorizationPendingException') {
+            console.log('inside loop');
+            return of(true).pipe(delay(5000));
+          } else {
+            return throwError(err);
+          }
+        })
+      ))
     );
   }
 

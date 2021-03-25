@@ -3,6 +3,11 @@
   <div class="information" (click)="switchCredentials()">
     <b>{{session.account.accountName}}</b> - {{ sessionDetailToShow }}
   </div>
+  <div class="information-profile" (click)="switchCredentials()">
+    <ng-container *ngIf="session.account.type !== eAccountType.AZURE">
+      <i class="fa fa-{{getProfileIcon(session.profile)}}"></i>&nbsp;&nbsp;{{getProfileName(session.profile)}}
+    </ng-container>
+  </div>
   <div class="information-offset" (click)="switchCredentials()">
     <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
     <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading"></i>

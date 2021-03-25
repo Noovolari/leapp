@@ -50,6 +50,9 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
   locations = [];
   selectedLocation;
 
+  profiles: { value: string, label: string}[] = [];
+  selectedProfile: {value: string, label: string};
+
   eAccountType = AccountType;
 
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
@@ -70,6 +73,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     accessKey: new FormControl('', [Validators.required]),
     awsRegion: new FormControl(''),
     mfaDevice: new FormControl(''),
+    awsProfile: new FormControl('', [Validators.required]),
     azureLocation: new FormControl('', [Validators.required])
   });
 
@@ -118,6 +122,13 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
         });
       }
 
+      // Add parameters to check what to do with form data
+      if (this.workspace.profiles && this.workspace.profiles.length > 0) {
+        this.workspace.profiles.forEach(idp => {
+          this.profiles.push({value: idp.id, label: idp.name});
+        });
+      }
+
       this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
 
@@ -155,6 +166,10 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     return {value: uuid.v4(), label: tag};
   }
 
+  addNewProfile(tag: string) {
+    return {value: uuid.v4(), label: tag};
+  }
+
   /**
    * Set the account number when the event is called
    * @param event - the event to call
@@ -169,6 +184,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
   saveAccount() {
     this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
     const selectedUrl = this.selectedIdpUrl ? {id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label } : undefined;
+    const selectedProfile = this.selectedProfile ? {id: this.selectedProfile.value, name: this.selectedProfile.label } : undefined;
 
     if (this.firstTime) {
       this.providerManagerService.saveFirstAccount(
@@ -178,6 +194,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
         this.selectedRole,
         this.selectedRegion,
         selectedUrl,
+        selectedProfile,
         this.form
       );
     } else {
@@ -188,6 +205,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
         this.selectedRole,
         this.selectedRegion,
         selectedUrl,
+        selectedProfile,
         this.form
       );
     }

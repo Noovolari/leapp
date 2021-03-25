@@ -5,6 +5,8 @@ import {Session} from '../models/session';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AccountType} from '../models/AccountType';
 import {AwsAccount} from '../models/aws-account';
+import {FileService} from '../services-system/file.service';
+import {WorkspaceService} from './workspace.service';
 
 @Injectable({
   providedIn: 'root'
@@ -13,7 +15,8 @@ export class SessionService extends NativeService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   constructor(
     private appService: AppService,
-    private configurationService: ConfigurationService
+    private configurationService: ConfigurationService,
+    private fileService: FileService,
   ) { super(); }
 
 
@@ -97,13 +100,14 @@ export class SessionService extends NativeService {
     // Get the session
     const sessionExist = sessions.filter(ses => ses.id === session.id);
     if (sessionExist.length > 0) {
-      // Set the session as false for all sessions as a starting point
+      // Set the session as false for all sessions as a starting point (only for azure)
       sessions.map(sess => {
         if (sess.active && this.appService.isAzure(sess) && this.appService.isAzure(session)) {
           sess.active = false;
           sess.loading = false;
         }
-        if (sess.active && !this.appService.isAzure(sess) && !this.appService.isAzure(session)) {
+        // Only overwrite session if profile is the same
+        if (sess.active && !this.appService.isAzure(sess) && !this.appService.isAzure(session) && sess.profile === session.profile) {
           sess.active = false;
           sess.loading = false;
         }
@@ -164,5 +168,23 @@ export class SessionService extends NativeService {
       return sessions.filter(s => s.id === sessionId)[0];
     }
     return undefined;
+  }
+
+  replaceAllProfileId(id: string, newId: string) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    workspace.sessions.forEach(s => {
+      if (s.profile === id) {
+        s.profile = newId;
+      }
+    });
+    this.configurationService.updateWorkspaceSync(workspace);
+  }
+
+  removeFromIniFile(session: Session) {
+    const config = this.fileService.iniParseSync(this.appService.awsCredentialPath());
+    if (config) {
+      delete config[this.configurationService.getNameFromProfileId(session.profile)];
+      this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), config);
+    }
   }
 }

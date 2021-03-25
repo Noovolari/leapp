@@ -69,7 +69,7 @@ export class CredentialsService extends NativeService {
     // Define the global strategy map
     // ==============================
     // test using Strategy instead of direct methods
-    this.azureStrategy = new AzureStrategy(this, appService, timerService, executeService, configurationService);
+    this.azureStrategy = new AzureStrategy(this, appService, timerService, executeService, fileService, configurationService);
     this.awsStrategy = new AwsStrategy(this, appService, configurationService, executeService,
       fileService, keychainService, proxyService, timerService, workspaceService, sessionService, awsSsoService);
     this.awsSsoStrategy = new AwsSsoStrategy(this, appService, fileService, timerService, awsSsoService, configurationService, keychainService);

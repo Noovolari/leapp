@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {NativeService} from './native-service';
 import {Observable, Subscription} from 'rxjs';
 import * as CryptoJS from 'crypto-js';
+import {switchMap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -181,7 +182,27 @@ export class FileService extends NativeService {
         }
       });
     });
+    const old = this.iniParseSync(filePath);
+    const result = Object.assign({}, old, content);
+    console.log('content', content);
+    console.log('predres', old);
+    console.log('resultCredes', result);
+    return this.writeFileSync(filePath, this.ini.stringify(result));
+  }
+
+  replaceWriteSync(filePath: string, content: any) {
+    Object.keys(content).forEach(key => {
+      Object.keys(content[key]).forEach(subKey => {
+        if (content[key][subKey] === null || content[key][subKey] === undefined || content[key][subKey] === 'null' || content[key][subKey] === '') {
+          delete content[key][subKey];
+        }
+      });
+    });
     return this.writeFileSync(filePath, this.ini.stringify(content));
+  }
+
+  iniCleanSync(filePath: string) {
+    return this.writeFileSync(filePath, this.ini.stringify({}));
   }
 
   /**

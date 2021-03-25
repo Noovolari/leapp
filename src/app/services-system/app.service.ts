@@ -194,7 +194,7 @@ export class AppService extends NativeService {
    */
   newWindow(url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
     const opts = {
-      width: 430,
+      width: 514,
       height: 550,
       resizable: true,
       show,

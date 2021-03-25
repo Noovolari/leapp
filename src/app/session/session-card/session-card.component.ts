@@ -114,7 +114,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   stopSession(session: Session) {
     // Eventually close the tray
     this.sessionService.stopSession(session);
-    // TODO refactor this.openSsm = false;
+
+    // New: we need to apply changes directly on credentials file if not azure type
+    this.sessionService.removeFromIniFile(session);
 
     // automatically check if there is an active session or stop it
     this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
@@ -277,6 +279,26 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
                                  i.Name.indexOf(event.target.value) > -1);
     } else {
       this.instances = this.duplicateInstances;
+    }
+  }
+
+  getProfileIcon(id) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const profile = workspace.profiles.filter(p => p.id === id)[0];
+    if (profile) {
+      return profile.name === 'default' ? 'home' : 'user';
+    } else {
+      return 'home';
+    }
+  }
+
+  getProfileName(id) {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const profile = workspace.profiles.filter(p => p.id === id)[0];
+    if (profile) {
+      return profile.name;
+    } else {
+      return 'default';
     }
   }
 }

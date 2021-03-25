@@ -65,10 +65,20 @@ b {
   .information {
     padding: 10px 0 10px 10px;
     display: inline-block;
-    width: 77%;
+    width: 52%;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    font-size: 0.85em;
+  }
+  .information-profile {
+    padding: 10px 0 10px 20px;
+    display: inline-block;
+    width: 26%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.85em;
   }
   .information-offset {
     padding: 10px;

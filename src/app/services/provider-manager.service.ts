@@ -24,6 +24,7 @@ export class ProviderManagerService {
   private selectedRegion;
   private googleSubscription: Subscription;
   private selectedIdpUrl: any;
+  private selectedProfile: any;
 
   /**
    * Used to manage all the choices done in the app regarding the correct provider to use:
@@ -90,7 +91,7 @@ export class ProviderManagerService {
    */
 
   // TODO: Why we need to save configurations and create the workspace here? it should be done invoked in the start screen and
-  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, form) {
+  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, selectedProfile, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
@@ -100,6 +101,7 @@ export class ProviderManagerService {
     this.selectedRole = selectedRole;
     this.selectedRegion = selectedRegion;
     this.selectedIdpUrl = selectedIdpUrl;
+    this.selectedProfile = selectedProfile;
     this.form = form;
 
     // TODO: ?? Why I need to call Google?
@@ -143,7 +145,7 @@ export class ProviderManagerService {
    * @param selectedIdpUrl - the idp url to use for saml auth if needed plus id
    * @param form - the form to use
    */
-  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, form) {
+  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, selectedProfile, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
@@ -156,6 +158,7 @@ export class ProviderManagerService {
     this.selectedRole = selectedRole;
     this.selectedRegion = selectedRegion;
     this.selectedIdpUrl = selectedIdpUrl;
+    this.selectedProfile = selectedProfile;
     this.form = form;
     this.decideSavingMethodAndSave();
   }
@@ -276,7 +279,9 @@ export class ProviderManagerService {
           this.selectedRole,
           this.generateRolesFromNames(this.form),
           this.form.value.idpArn,
-          this.selectedRegion);
+          this.selectedRegion,
+          this.selectedProfile
+        );
       } catch (err) {
         this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
@@ -299,6 +304,7 @@ export class ProviderManagerService {
           this.generateRolesFromNames(this.form),
           this.form.value.idpArn,
           this.selectedRegion,
+          this.selectedProfile
         );
       } catch (err) {
         this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
@@ -319,7 +325,9 @@ export class ProviderManagerService {
       this.form.value.secretKey.trim(),
       this.form.value.accessKey.trim(),
       this.form.value.mfaDevice.trim(),
-      this.selectedRegion);
+      this.selectedRegion,
+      this.selectedProfile
+    );
     return true;
   }
 
@@ -329,7 +337,7 @@ export class ProviderManagerService {
       this.form.value.accessKey.trim(),
       this.form.value.secretKey.trim(),
       this.form.value.mfaDevice.trim(),
-      this.selectedRegion,
+      this.selectedRegion
     );
     return true;
   }

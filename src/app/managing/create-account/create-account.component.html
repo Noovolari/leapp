@@ -55,18 +55,42 @@
 
       <h1>Choose your Access Strategy</h1>
       <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
-      <div class="form-group" style="width: 100%; display: inline-block;">
-        <label>My Access Strategy is:</label>
-        <br>
-        <div class="correct-top" style="width: 100%;">
-          <span class="providers extended">
-            <ng-container *ngIf="accountType === eAccountType.AWS"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</ng-container>
-            <ng-container *ngIf="accountType === eAccountType.AWS_TRUSTER"><i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster</ng-container>
-            <ng-container *ngIf="accountType === eAccountType.AWS_PLAIN_USER"><i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain</ng-container>
-            <ng-container *ngIf="accountType === eAccountType.AZURE"><i class="fa fa-info" tooltip="This is a set of option to create azure accounts"></i> Azure</ng-container>
-          </span>
-          <br><br>
-        </div>
+      <div style="width: 100%; display: inline-block;">
+        <ng-container *ngIf="accountType !== eAccountType.AZURE">
+          <div class="form-group" style="width: 49%; display: inline-block;">
+            <label>My Access Strategy is:</label>
+            <br>
+            <span class="providers">
+              <ng-container *ngIf="accountType === eAccountType.AWS"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</ng-container>
+              <ng-container *ngIf="accountType === eAccountType.AWS_TRUSTER"><i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster</ng-container>
+              <ng-container *ngIf="accountType === eAccountType.AWS_PLAIN_USER"><i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain</ng-container>
+            </span>
+            <br><br>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="accountType === eAccountType.AZURE">
+          <div class="form-group" style="width: 100%; display: inline-block">
+            <label>My Access Strategy is:</label>
+            <br>
+            <span class="providers">
+              <ng-container *ngIf="accountType === eAccountType.AZURE"><i class="fa fa-info" tooltip="This is a set of option to create azure accounts"></i> Azure</ng-container>
+            </span>
+            <br><br>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="accountType !== eAccountType.AZURE">
+          <div class="form-group" style="width: 2%; display: inline-block;"></div>
+          <div class="form-group" style="width: 49%; display: inline-block;">
+            <label>AWS Profile<span class="danger-text">*</span></label>
+            <ng-select [items]="profiles"
+                       [addTag]="addNewProfile"
+                       formControlName="awsProfile"
+                       placeholder="add a profile *"
+                       [(ngModel)]="selectedProfile">
+            </ng-select>
+            <small class="text-error" *ngIf="(form.controls['awsProfile'].dirty || form.controls['awsProfile'].touched) && form.get('awsProfile').value === undefined">Insert the AWS Profile</small>
+          </div>
+        </ng-container>
       </div>
 
       <div class="form-group d-inline-block" [ngStyle]="{width: accountType === eAccountType.AWS ? '49%' : '100%'}">

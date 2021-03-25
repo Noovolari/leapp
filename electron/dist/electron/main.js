@@ -32,7 +32,7 @@ app.disableHardwareAcceleration();
 var windowDefaultConfig = {
     dir: path.join(__dirname, "/../../../dist/leapp-client"),
     browserWindow: {
-        width: 430,
+        width: 514,
         height: 600,
         title: "",
         icon: path.join(__dirname, "assets/images/Leapp.png"),

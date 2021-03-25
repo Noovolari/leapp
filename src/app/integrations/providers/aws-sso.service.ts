@@ -332,8 +332,14 @@ export class AwsSsoService extends NativeService {
           email: accountInfo.emailAddress,
           type: AccountType.AWS_SSO
         };
+
+        const workspace  = this.configurationService.getDefaultWorkspaceSync();
+        const profiles   = workspace.profiles;
+        const profileId  = profiles.filter(p => p.name === 'default')[0].id;
+
         const session: Session = {
           account,
+          profile: profileId,
           active: false,
           id: uuidv4(),
           lastStopDate: new Date().toISOString(),

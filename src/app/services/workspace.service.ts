@@ -375,6 +375,7 @@ export class WorkspaceService extends NativeService {
    * @param workspace - the workspace we want to use to inject the credentials and make it default
    * @param isDoubleJump - check if the double jump have to be used
    * @param account - the account of the requester
+   * @param session - the session to use for reference
    * @param roleName - the role name of the requester
    */
   saveCredentialsInFileAndDefaultWorkspace(stsResponse: any, workspace: Workspace, session: Session, isDoubleJump, account, roleName) {
@@ -382,7 +383,7 @@ export class WorkspaceService extends NativeService {
     let credentials;
     try {
       // Construct actual credentials
-      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.region);
+      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.region, session);
 
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
@@ -399,11 +400,12 @@ export class WorkspaceService extends NativeService {
     // Write in aws credential file and workspace
     try {
       if (isDoubleJump) {
+        const name = this.configurationService.getNameFromProfileId(session.profile);
         // Make second jump: credentials are the first one now
         AWS.config.update({
-          sessionToken: credentials.default.aws_session_token,
-          accessKeyId: credentials.default.aws_access_key_id,
-          secretAccessKey: credentials.default.aws_secret_access_key
+          sessionToken: credentials[name].aws_session_token,
+          accessKeyId: credentials[name].aws_access_key_id,
+          secretAccessKey: credentials[name].aws_secret_access_key
         });
 
         this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
@@ -425,7 +427,7 @@ export class WorkspaceService extends NativeService {
           } else {
 
             // we set the new credentials after the first jump
-            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.region);
+            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.region, session);
 
             this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -457,7 +459,7 @@ export class WorkspaceService extends NativeService {
    * @param region - region for aws
    * @returns an object of type {AwsCredential}
    */
-  constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, region: string): AwsCredentials {
+  constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, region: string, session: Session): AwsCredentials {
     // these are the standard STS response types
     const accessKeyId = stsResponse.Credentials.AccessKeyId;
     const secretAccessKey = stsResponse.Credentials.SecretAccessKey;
@@ -479,7 +481,9 @@ export class WorkspaceService extends NativeService {
     }
 
     // Return it!
-    return {default: credential};
+    const obj = {};
+    obj[this.configurationService.getNameFromProfileId(session.profile)] = credential;
+    return obj;
   }
 
   /* ====================================== */

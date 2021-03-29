@@ -20,6 +20,7 @@ import {environment} from '../../../environments/environment';
 import {KeychainService} from '../../services-system/keychain.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-session-card',
@@ -194,6 +195,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   // ============================== //
   // ========== SSM AREA ========== //
   // ============================== //
+  addNewProfile(tag: string) {
+    return {id: uuid.v4(), name: tag};
+  }
 
   /**
    * SSM Modal open given the correct session
@@ -313,9 +317,15 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     }
   }
 
-  changeDefaultProfile(event: unknown) {
+  changeDefaultProfile(event) {
     if (this.selectedProfile) {
       const workspace = this.configurationService.getDefaultWorkspaceSync();
+
+      const found = workspace.profiles.filter(p => p.id === this.selectedProfile)[0];
+      if (found === undefined) {
+        workspace.profiles.push({ id: this.selectedProfile, name: event.target.value });
+      }
+
       workspace.sessions.forEach(session => {
         if (session.id === this.session.id) {
           this.stopSession(this.session);

@@ -236,7 +236,6 @@ export class WorkspaceService extends NativeService {
     // Before doing anything we also need to authenticate VERSUS Cognito to our backend
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     workspace.type = type;
-    workspace.lastIDPToken = token;
     this.keychainService.saveSecret(environment.appName, `session-idpToken-${session.id}`, token).then(res => {
       // Now we can go on
       this.configurationService.updateWorkspaceSync(workspace);

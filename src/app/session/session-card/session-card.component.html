@@ -36,7 +36,6 @@
 
 </div>
 
-
 <ng-template #ssmModalTemplate>
   <div class="modal-header">
     <button type="button" class="back" aria-label="Close" (click)="modalRef.hide();"><i class="fa fa-arrow-left"></i></button>
@@ -96,7 +95,13 @@
     <div class="ssm-tray">
 
       <b class="">Select a profile for the session:</b>
-      <ng-select bindLabel="name" bindValue="id" [items]="profiles" [(ngModel)]="selectedProfile" placeholder="select a profile" (change)="changeDefaultProfile($event);"></ng-select>
+      <ng-select bindLabel="name"
+                 bindValue="id"
+                 [addTag]="addNewProfile"
+                 [items]="profiles"
+                 [(ngModel)]="selectedProfile"
+                 placeholder="select a profile"
+                 (change)="changeDefaultProfile($event);"></ng-select>
 
     </div>
   </div>

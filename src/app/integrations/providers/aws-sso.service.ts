@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest} from 'aws-sdk/clients/ssooidc';
 import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo, LogoutRequest} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {EMPTY, timer, merge, Observable, of, throwError, interval} from 'rxjs';
 import {catchError, delay, delayWhen, expand, map, retry, retryWhen, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
@@ -73,6 +73,7 @@ export class AwsSsoService extends NativeService {
           return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(
             catchError((err) => {
               this.appService.logger('AWS SSO device authorization error.', LoggerLevel.ERROR, this, err.stack);
+              this.appService.toast('Error in device authorization', ToastLevel.ERROR, 'AWS Single Sign-On');
               return throwError('AWS SSO device authorization error.');
             }),
             switchMap((startDeviceAuthorizationResponse: any) => {
@@ -122,9 +123,10 @@ export class AwsSsoService extends NativeService {
       retryWhen(errors =>
         errors.pipe(switchMap(err => {
           if (err.code === 'AuthorizationPendingException') {
-            console.log('inside loop');
             return of(true).pipe(delay(5000));
           } else {
+            this.appService.logger('AWS SSO Generating token exception.', LoggerLevel.ERROR, this, err.stack);
+            this.appService.toast('Error in generating token', ToastLevel.ERROR, 'AWS Single Sign-On');
             return throwError(err);
           }
         })
@@ -153,6 +155,7 @@ export class AwsSsoService extends NativeService {
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => portalUrl = res))
     ).pipe(
       catchError ((err)  => {
+        this.appService.logger(`AWS SSO in loginToAwsSSO:  ${err.toString()}`, LoggerLevel.ERROR, this, err.stack);
         return throwError(`AWS SSO in loginToAwsSSO: ${err.toString()}`);
       }),
       switchMap(() => this.authorizeIntegration(region, portalUrl)),

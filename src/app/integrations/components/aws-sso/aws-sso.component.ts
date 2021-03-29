@@ -22,6 +22,7 @@ export class AwsSsoComponent implements OnInit {
   regions = [];
   selectedRegion;
   portalUrl;
+  loading = false;
 
   public form = new FormGroup({
     portalUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
@@ -46,6 +47,7 @@ export class AwsSsoComponent implements OnInit {
 
   login() {
     if (this.form.valid) {
+      this.loading = true;
       this.integrationsService.login(this.form.value.portalUrl, this.selectedRegion);
     }
   }
@@ -61,6 +63,7 @@ export class AwsSsoComponent implements OnInit {
   }
 
   forceSync() {
+    this.loading = true;
     this.integrationsService.syncAccounts();
   }
 

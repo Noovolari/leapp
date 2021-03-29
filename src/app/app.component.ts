@@ -109,11 +109,12 @@ export class AppComponent implements OnInit {
     this.verifyWorkspace();
 
     // All sessions start stopped when app is launched
-    workspace.sessions.forEach(sess => { sess.loading = false; sess.active = false; });
-    this.configurationService.updateWorkspaceSync(workspace);
-    this.fileService.iniCleanSync(this.app.awsCredentialPath());
-    this.configurationService.cleanAzureCrendentialFile();
-
+    if (workspace.sessions && workspace.sessions.length > 0) {
+      workspace.sessions.forEach(sess => { sess.loading = false; sess.active = false; });
+      this.configurationService.updateWorkspaceSync(workspace);
+      this.fileService.iniCleanSync(this.app.awsCredentialPath());
+      this.configurationService.cleanAzureCrendentialFile();
+    }
 
     // Prevent Dev Tool to show on production mode
     this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {

@@ -20,6 +20,9 @@
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
       <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO) && session.active">SSM session</a>
       <a (click)="changeRegionModalOpen(session, $event);">Change {{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}</a>
+
+      <a *ngIf="session.account.type !== eAccountType.AZURE" (click)="changeProfileModalOpen(session, $event);">Change Profile</a>
+
       <a *ngIf="session.account.type === eAccountType.AWS_PLAIN_USER && !session.active" (click)="editAccount(session, $event);">Edit account</a>
       <a (click)="removeAccount(session, $event);">Remove account</a>
       <ng-container *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO)">
@@ -78,6 +81,22 @@
 
       <b class="">Select a default region for the session:</b>
       <ng-select bindLabel="{{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}" bindValue="{{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}" [items]="regionOrLocations" [(ngModel)]="selectedDefaultRegion" placeholder="{{placeholder}}" (change)="changeDefaultRegion($event);"></ng-select>
+
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #defaultProfileModalTemplate>
+  <div class="modal-header">
+    <button type="button" class="back" aria-label="Close" (click)="modalRef.hide();"><i class="fa fa-arrow-left"></i></button>
+    <b>{{session.account.accountName}}</b> - {{$any(session.account).role ? $any(session.account).role.name : 'Plain' }} | <b>Change Profile</b>
+  </div>
+  <div class="modal-body">
+
+    <div class="ssm-tray">
+
+      <b class="">Select a profile for the session:</b>
+      <ng-select bindLabel="name" bindValue="id" [items]="profiles" [(ngModel)]="selectedProfile" placeholder="select a profile" (change)="changeDefaultProfile($event);"></ng-select>
 
     </div>
   </div>

@@ -237,21 +237,22 @@ export class WorkspaceService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     workspace.type = type;
     workspace.lastIDPToken = token;
+    this.keychainService.saveSecret(environment.appName, `session-idpToken-${session.id}`, token).then(res => {
+      // Now we can go on
+      this.configurationService.updateWorkspaceSync(workspace);
 
-    // Now we can go on
-    this.configurationService.updateWorkspaceSync(workspace);
+      // this is ok for now so we can save it and call sts assume role
+      this.obtainCredentials(workspace, session, () => {
+        // it will throw an error as we have altered the original response
+        // Setting that everything is ok if we have arrived here
+        this.idpWindow.close();
+      });
 
-    // this is ok for now so we can save it and call sts assume role
-    this.obtainCredentials(workspace, session, () => {
-      // it will throw an error as we have altered the original response
-      // Setting that everything is ok if we have arrived here
-      this.idpWindow.close();
+      // Close the window we don't need it anymore because otherwise
+      if (callback) {
+        callback({cancel: true});
+      }
     });
-
-    // Close the window we don't need it anymore because otherwise
-    if (callback) {
-      callback({cancel: true});
-    }
   }
 
   /**
@@ -334,38 +335,48 @@ export class WorkspaceService extends NativeService {
     const idpArn = parentAccount ? parentAccount.idpArn : selectedAccount.idpArn;
     const federatedRoleArn = `arn:aws:iam::${parentAccount ? parentAccount.accountNumber : selectedAccount.accountNumber}:role/${parentRole ? parentRole.name : roleName}`;
 
-    // Params for the calls
-    const params = {
-      PrincipalArn: idpArn,
-      RoleArn: federatedRoleArn,
-      SAMLAssertion: workspace.lastIDPToken,
-      DurationSeconds: 3600,
-    };
+    this.keychainService.getSecret(environment.appName, `session-idpToken-${session.id}`).then(token => {
+      // Params for the calls
+      const params = {
+        PrincipalArn: idpArn,
+        RoleArn: federatedRoleArn,
+        SAMLAssertion: token,
+        DurationSeconds: 3600,
+      };
 
-    // We try to assume role with SAML which will give us the temporary credentials for one hour
-    sts.assumeRoleWithSAML(params, (err, data: any) => {
-      if (!err) {
-        // Save credentials as default in .aws/credentials and in the workspace as default ones
-        this.saveCredentialsInFileAndDefaultWorkspace(data, workspace, session, parentAccount !== undefined, selectedAccount, roleName);
+      // We try to assume role with SAML which will give us the temporary credentials for one hour
+      sts.assumeRoleWithSAML(params, (err, data: any) => {
+        if (!err) {
+          // Save credentials as default in .aws/credentials and in the workspace as default ones
+          this.saveCredentialsInFileAndDefaultWorkspace(data, workspace, session, parentAccount !== undefined, selectedAccount, roleName);
 
-        // If we have a callback call it
-        if (callback) {
-          callback(data);
+          // If we have a callback call it
+          if (callback) {
+            callback(data);
+          }
+        } else {
+          // Something went wrong save it to the logger file
+          this.appService.logger(err.code, LoggerLevel.ERROR, this);
+          this.appService.logger(err.stack, LoggerLevel.ERROR, this);
+          this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
+
+          // Emit ko
+          this.credentialEmit.emit({status: err.stack, accountName: null});
+
+          // If we have a callback call it
+          if (callback) {
+            callback(data);
+          }
         }
-      } else {
-        // Something went wrong save it to the logger file
-        this.appService.logger(err.code, LoggerLevel.ERROR, this);
-        this.appService.logger(err.stack, LoggerLevel.ERROR, this);
-        this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
+      });
+    }).catch(err => {
+      // Something went wrong save it to the logger file
+      this.appService.logger(err.code, LoggerLevel.ERROR, this);
+      this.appService.logger(err.stack, LoggerLevel.ERROR, this);
+      this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
-        // Emit ko
-        this.credentialEmit.emit({status: err.stack, accountName: null});
-
-        // If we have a callback call it
-        if (callback) {
-          callback(data);
-        }
-      }
+      // Emit ko
+      this.credentialEmit.emit({status: err.stack, accountName: null});
     });
   }
 

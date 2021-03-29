@@ -35,6 +35,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   ssmModalTemplate: TemplateRef<any>;
   @ViewChild('defaultRegionModalTemplate', { static: false })
   defaultRegionModalTemplate: TemplateRef<any>;
+  @ViewChild('defaultProfileModalTemplate', { static: false })
+  defaultProfileModalTemplate: TemplateRef<any>;
+
   modalRef: BsModalRef;
 
   @Input() session: Session;
@@ -51,6 +54,8 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   duplicateInstances = [];
   sessionDetailToShow;
   placeholder;
+  profiles: any;
+  selectedProfile: any;
 
   constructor(private sessionService: SessionService,
               private credentialsService: CredentialsService,
@@ -70,10 +75,17 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     // Set regions for ssm and for default region, same with locations,
     // add the correct placeholder to the select
     this.awsRegions = this.appService.getRegions();
+    this.profiles = [];
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    if (workspace && workspace.profiles && workspace.profiles.length > 0) {
+      this.profiles = workspace.profiles;
+    }
+
     const azureLocations = this.appService.getLocations();
     this.regionOrLocations = this.session.account.type !== AccountType.AZURE ? this.awsRegions : azureLocations;
     this.placeholder = this.session.account.type !== AccountType.AZURE ? 'Select a default region' : 'Select a default location';
     this.selectedDefaultRegion = this.session.account.region;
+    this.selectedProfile = this.session.profile;
 
     switch (this.session.account.type) {
       case(AccountType.AWS):
@@ -200,7 +212,6 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
    */
   changeRegionModalOpen(session, event) {
     // open the modal
-
     this.modalRef = this.modalService.show(this.defaultRegionModalTemplate, { class: 'ssm-modal'});
   }
 
@@ -300,5 +311,25 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     } else {
       return 'default';
     }
+  }
+
+  changeDefaultProfile(event: unknown) {
+    if (this.selectedProfile) {
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      workspace.sessions.forEach(session => {
+        if (session.id === this.session.id) {
+          this.stopSession(this.session);
+          session.profile = this.selectedProfile;
+          this.session.profile = this.selectedProfile;
+          this.configurationService.updateWorkspaceSync(workspace);
+        }
+      });
+      this.appService.toast('Profile has been changed!', ToastLevel.SUCCESS, 'Profile changed!');
+      this.modalRef.hide();
+    }
+  }
+
+  changeProfileModalOpen(session: Session, $event: MouseEvent) {
+    this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
   }
 }

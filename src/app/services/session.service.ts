@@ -6,7 +6,7 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {AccountType} from '../models/AccountType';
 import {AwsAccount} from '../models/aws-account';
 import {FileService} from '../services-system/file.service';
-import {WorkspaceService} from './workspace.service';
+import {CredentialsService} from './credentials.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,7 @@ export class SessionService extends NativeService {
     private appService: AppService,
     private configurationService: ConfigurationService,
     private fileService: FileService,
+    private credentialService: CredentialsService
   ) { super(); }
 
 
@@ -175,6 +176,12 @@ export class SessionService extends NativeService {
     workspace.sessions.forEach(s => {
       if (s.profile === id) {
         s.profile = newId;
+        if (s.active) {
+          this.stopSession(s);
+          this.removeFromIniFile(s);
+          this.credentialService.refreshCredentialsEmit.emit(s.account.type);
+          this.appService.redrawList.emit(true);
+        }
       }
     });
     this.configurationService.updateWorkspaceSync(workspace);

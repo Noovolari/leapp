@@ -121,8 +121,10 @@
               <tr>
                 <td>{{profile.name}}</td>
                 <td>
-                  <button class="xs-btn" type="button" (click)="editAwsProfile(profile.id);"><i class="fa fa-edit"></i></button>
-                  <button class="xs-btn" type="button" (click)="deleteAwsProfile(profile.id);"><i class="fa fa-trash"></i></button>
+                  <ng-container *ngIf="profile.name !== 'default'">
+                    <button class="xs-btn" type="button" (click)="editAwsProfile(profile.id);"><i class="fa fa-edit"></i></button>
+                    <button class="xs-btn" type="button" (click)="deleteAwsProfile(profile.id);"><i class="fa fa-trash"></i></button>
+                  </ng-container>
                 </td>
               </tr>
             </ng-container>

@@ -580,7 +580,6 @@ export class AppService extends NativeService {
     roleName =  roleName.substr(0, 64).replace(/\//g, '-');
     return roleName;
   }
-
 }
 
 /*

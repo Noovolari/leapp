@@ -53,6 +53,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
               sess.account.type === AccountType.AWS) && sess.active;
     });
 
+
     this.appService.logger('Aws Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
@@ -132,7 +133,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   doubleJumpFromSSO(session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const parentSession = this.sessionService.parentSession(session);
-    console.log(parentSession);
 
     this.awsSsoService.getAwsSsoPortalCredentials().pipe(
       switchMap((loginToAwsSSOResponse) => {
@@ -190,10 +190,16 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         return of(true);
       }),
       catchError( (err) => {
-        session.active = false;
-        session.loading = false;
+        workspace.sessions.forEach(sess => {
+          if (sess.id === session.id) {
+            sess.loading = false;
+            sess.complete = false;
+            sess.active = false;
+          }
+        });
+        this.configurationService.updateWorkspaceSync(workspace);
+        this.appService.redrawList.emit();
 
-        this.configurationService.disableLoadingWhenReady(workspace, session);
         this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
 
@@ -203,26 +209,26 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   }
 
   awsCredentialFederatedProcess(workspace, session) {
-    // Check for Aws Credentials Process
-    if (!workspace) {
-      return 'workspace not set';
-    }
-
-    // Enable current active session
-    try {
-      switch (this.checkAccountTypeForRefreshCredentials(session)) {
-        case 0: this.workspaceService.refreshCredentials(session); break; // FEDERATED
-        case 1: this.workspaceService.refreshCredentials(session); break; // TRUSTER FROM FEDERATED
-        case 2: this.doubleJumpFromFixedCredential(session); break;               // TRUSTER FROM PLAIN
-        case 3: this.doubleJumpFromSSO(session); break;                           // TRUSTER FROM SSO
+      // Check for Aws Credentials Process
+      if (!workspace) {
+        return 'workspace not set';
       }
-    } catch (e) {
-      this.appService.logger('Error in Aws Credential Federated Process', LoggerLevel.ERROR, this, e.stack);
-      this.credentialsService.refreshReturnStatusEmit.emit(false);
-    }
 
-    // Start Calculating time here once credentials are actually retrieved
-    this.timerService.defineTimer();
+      // Enable current active session
+      try {
+        switch (this.checkAccountTypeForRefreshCredentials(session)) {
+          case 0: this.workspaceService.refreshCredentials(session); break; // FEDERATED
+          case 1: this.workspaceService.refreshCredentials(session); break; // TRUSTER FROM FEDERATED
+          case 2: this.doubleJumpFromFixedCredential(session); break;               // TRUSTER FROM PLAIN
+          case 3: this.doubleJumpFromSSO(session); break;                           // TRUSTER FROM SSO
+        }
+      } catch (e) {
+        this.appService.logger('Error in Aws Credential Federated Process', LoggerLevel.ERROR, this, e.stack);
+        this.credentialsService.refreshReturnStatusEmit.emit(false);
+      }
+
+      // Start Calculating time here once credentials are actually retrieved
+      this.timerService.defineTimer();
   }
 
   // TODO: move to AwsCredentialsGenerationService

@@ -33,9 +33,6 @@ export class FederatedAccountService extends NativeService {
    * @param region - the region to select as default
    */
   addFederatedAccountToWorkSpace(idpUrl: {id: string, url: string}, accountNumber: string, accountName: string, role: any, idpArn: string, region: string, profile: { id: string, name: string}) {
-
-    console.log('idpurl', idpUrl);
-
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (role.name[0] === '/') {
@@ -65,11 +62,10 @@ export class FederatedAccountService extends NativeService {
         profile: profile.id,
         active: false,
         loading: false,
+        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };
-
-      console.log('idpurl in workspace', workspace.idpUrl);
 
       if (workspace.idpUrl.findIndex(i => i.id === idpUrl.id) === -1) {
         workspace.idpUrl.push(idpUrl);
@@ -79,12 +75,8 @@ export class FederatedAccountService extends NativeService {
         workspace.profiles.push(profile);
       }
 
-      console.log('idpurl in workspace after', workspace.idpUrl);
-
       workspace.sessions.push(session);
       this.configurationService.updateWorkspaceSync(workspace);
-      console.log('sessions now', workspace.sessions);
-
       return true;
 
     } else {
@@ -124,6 +116,7 @@ export class FederatedAccountService extends NativeService {
         profile: profile.id,
         active: false,
         loading: false,
+        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };

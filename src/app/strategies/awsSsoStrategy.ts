@@ -80,7 +80,10 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         return of(credential);
       }),
       switchMap((credential: AwsCredential) => {
-        const awsSsoCredentials = { default: credential };
+
+        const profileName = this.configurationService.getNameFromProfileId(session.profile);
+        const awsSsoCredentials = {};
+        awsSsoCredentials[profileName] = credential;
         return fromPromise(this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential))).pipe(
           map(() => {
             return awsSsoCredentials;
@@ -98,8 +101,8 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
       })
     ).subscribe((awsSsoCredentials) => {
-      this.configurationService.disableLoadingWhenReady(workspace, session);
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
+      this.configurationService.disableLoadingWhenReady(workspace, session);
       this.timerService.defineTimer();
     });
   }

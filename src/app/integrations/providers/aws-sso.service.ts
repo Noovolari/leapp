@@ -83,7 +83,7 @@ export class AwsSsoService extends NativeService {
                   const pos = this.currentWindow.getPosition();
 
                   this.ssoWindow = null;
-                  this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
+                  this.ssoWindow = this.appService.newWindow('aws-sso', startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
                   this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
 
                   // https://oidc.*.amazonaws.com/device_authorization/associate_token
@@ -343,7 +343,8 @@ export class AwsSsoService extends NativeService {
           active: false,
           id: uuidv4(),
           lastStopDate: new Date().toISOString(),
-          loading: false
+          loading: false,
+          complete: false
         };
         return session;
       })

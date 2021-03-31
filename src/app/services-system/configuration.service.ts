@@ -243,11 +243,12 @@ export class ConfigurationService extends NativeService {
     workspace.sessions.forEach(sess => {
       if (sess.id === session.id) {
         sess.loading = false;
+        sess.complete = true;
         sess.active = true;
       }
     });
     this.updateWorkspaceSync(workspace);
-    this.appService.redrawList.emit();
+    this.appService.redrawList.emit(true);
   }
 
   public getNameFromProfileId(id: string): string {

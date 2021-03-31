@@ -121,6 +121,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
         if (sess.id === session.id) {
           sess.active = false;
           sess.loading = false;
+          sess.complete = false;
           sess.lastStopDate = new Date().toISOString();
         }
       });

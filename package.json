@@ -49,6 +49,7 @@
     "electron-win": "DEL /Q electron\\dist && ng build --base-href ./ && tsc --p electron && electron .",
     "e2e": "ng e2e",
     "pack": "electron-builder --dir",
+    "release": "standard-version",
     "dist-mac-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
     "dist-mac-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
     "dist-mac-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
@@ -252,6 +253,7 @@
     "karma-jasmine-html-reporter": "~1.5.4",
     "node-abi": "^2.19.3",
     "protractor": "~5.4.4",
+    "standard-version": "~9.1.1",
     "ts-node": "~7.0.0",
     "tslint": "~5.15.0",
     "typescript": "~3.4.3"

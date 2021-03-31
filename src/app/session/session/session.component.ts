@@ -124,6 +124,13 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true).map((session: Session) => {
         if (session.account.type !== AccountType.AZURE) {
           session.loading = !this.fileService.iniCheckProfileExistance(this.appService.awsCredentialPath(), this.configurationService.getNameFromProfileId(session.profile));
+        } else {
+          try {
+            this.configurationService.getAzureConfigSync();
+            session.loading = false;
+          } catch {
+            session.loading = true;
+          }
         }
         return session;
       });

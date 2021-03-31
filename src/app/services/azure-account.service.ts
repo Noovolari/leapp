@@ -45,6 +45,7 @@ export class AzureAccountService extends NativeService {
         profile: 'notneed',
         active: false,
         loading: false,
+        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };

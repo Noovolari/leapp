@@ -58,6 +58,7 @@ export class TrusterAccountService extends NativeService {
         profile: profile.id,
         active: false,
         loading: false,
+        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };

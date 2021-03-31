@@ -50,9 +50,6 @@ export class AppComponent implements OnInit {
 
     // If we have credentials copy them from workspace file to the .aws credential file
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-
-    console.log(workspace);
-
     if (workspace) {
       // Set it as default
       this.configurationService.setDefaultWorkspaceSync(workspace.name);

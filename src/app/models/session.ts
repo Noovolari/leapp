@@ -6,5 +6,6 @@ export interface Session {
   lastStopDate: string;
   active: boolean;
   loading: boolean;
+  complete: boolean;
   account: Account;
 }

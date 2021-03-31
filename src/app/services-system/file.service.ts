@@ -182,11 +182,9 @@ export class FileService extends NativeService {
         }
       });
     });
+
     const old = this.iniParseSync(filePath);
-    const result = Object.assign({}, old, content);
-    console.log('content', content);
-    console.log('predres', old);
-    console.log('resultCredes', result);
+    const result = Object.assign(old, content);
     return this.writeFileSync(filePath, this.ini.stringify(result));
   }
 
@@ -199,6 +197,12 @@ export class FileService extends NativeService {
       });
     });
     return this.writeFileSync(filePath, this.ini.stringify(content));
+  }
+
+  iniCheckProfileExistance(filePath: string, profileName: string): boolean {
+    const currentCredentialFile = this.iniParseSync(filePath);
+    console.log('kjl', currentCredentialFile, profileName);
+    return currentCredentialFile[profileName] !== undefined;
   }
 
   iniCleanSync(filePath: string) {

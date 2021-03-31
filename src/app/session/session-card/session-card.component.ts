@@ -57,6 +57,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   placeholder;
   profiles: any;
   selectedProfile: any;
+  workspace: any;
 
   constructor(private sessionService: SessionService,
               private credentialsService: CredentialsService,
@@ -73,13 +74,14 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
               private modalService: BsModalService) { super(); }
 
   ngOnInit() {
+
     // Set regions for ssm and for default region, same with locations,
     // add the correct placeholder to the select
     this.awsRegions = this.appService.getRegions();
     this.profiles = [];
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace && workspace.profiles && workspace.profiles.length > 0) {
-      this.profiles = workspace.profiles;
+    this.workspace = this.configurationService.getDefaultWorkspaceSync();
+    if (this.workspace && this.workspace.profiles && this.workspace.profiles.length > 0) {
+      this.profiles = this.workspace.profiles;
     }
 
     const azureLocations = this.appService.getLocations();
@@ -106,33 +108,31 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   /**
    * Start the selected session
-   * @param session - {SessionObject} - the session object we want to login to
    */
-  startSession(session: Session) {
+  startSession() {
     // Start a new session with the selected one
-    this.sessionService.startSession(session);
+    this.sessionService.startSession(this.session);
 
     // automatically check if there is an active session and get session list again
-    this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
-
-    this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
-    // Redraw the list
-    this.sessionsChanged.emit('');
-    this.appService.redrawList.emit(true);
+    if (this.session.active === false) {
+      this.appService.redrawList.emit(true);
+      this.credentialsService.refreshCredentials(null);
+      this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
+    }
   }
 
   /**
    * Stop session
    */
-  stopSession(session: Session) {
+  stopSession() {
     // Eventually close the tray
-    this.sessionService.stopSession(session);
+    this.sessionService.stopSession(this.session);
 
     // New: we need to apply changes directly on credentials file if not azure type
-    this.sessionService.removeFromIniFile(session);
+    this.sessionService.removeFromIniFile(this.session);
 
     // automatically check if there is an active session or stop it
-    this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
+    this.credentialsService.refreshCredentialsEmit.emit(this.session.account.type);
     this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
     this.appService.logger('Session Stopped', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
@@ -182,9 +182,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   switchCredentials() {
     if (this.session.active) {
-      this.stopSession(this.session);
+      this.stopSession();
     } else {
-      this.startSession(this.session);
+      this.startSession();
     }
   }
 
@@ -250,15 +250,17 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
    */
   changeDefaultRegion(event) {
     if (this.selectedDefaultRegion) {
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
-      workspace.sessions.forEach(session => {
+      this.workspace = this.configurationService.getDefaultWorkspaceSync();
+      this.workspace.sessions.forEach(session => {
         if (session.id === this.session.id) {
           session.account.region = this.selectedDefaultRegion;
           this.session.account.region = this.selectedDefaultRegion;
-          this.configurationService.updateWorkspaceSync(workspace);
+          this.configurationService.updateWorkspaceSync(this.workspace);
 
           if (this.session.active) {
-            this.startSession(this.session);
+            this.startSession();
+          } else {
+            this.appService.redrawList.emit(true);
           }
         }
       });
@@ -286,7 +288,6 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   }
 
   searchSSMInstance(event) {
-    console.log(event.target.value);
     if (event.target.value !== '') {
       this.instances = this.duplicateInstances.filter(i =>
                                  i.InstanceId.indexOf(event.target.value) > -1 ||
@@ -298,8 +299,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   }
 
   getProfileIcon(id) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const profile = workspace.profiles.filter(p => p.id === id)[0];
+    const profile = this.workspace.profiles.filter(p => p.id === id)[0];
     if (profile) {
       return profile.name === 'default' ? 'home' : 'user';
     } else {
@@ -309,7 +309,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   getProfileName(id) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const profile = workspace.profiles.filter(p => p.id === id)[0];
+    const profile = this.workspace.profiles.filter(p => p.id === id)[0];
     if (profile) {
       return profile.name;
     } else {
@@ -317,29 +317,24 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     }
   }
 
-  changeDefaultProfile(event) {
-    if (this.selectedProfile) {
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
+  changeDefaultProfile(profile) {
 
-      const found = workspace.profiles.filter(p => p.id === this.selectedProfile)[0];
-      if (found === undefined) {
-        workspace.profiles.push({ id: this.selectedProfile, name: event.target.value });
+    if (this.selectedProfile) {
+      this.sessionService.addProfile(profile);
+      this.sessionService.removeFromIniFile(this.session);
+      this.sessionService.updateSessionProfile(this.session, profile);
+
+      if (this.session.active) {
+        this.startSession();
       }
 
-      workspace.sessions.forEach(session => {
-        if (session.id === this.session.id) {
-          this.stopSession(this.session);
-          session.profile = this.selectedProfile;
-          this.session.profile = this.selectedProfile;
-          this.configurationService.updateWorkspaceSync(workspace);
-        }
-      });
       this.appService.toast('Profile has been changed!', ToastLevel.SUCCESS, 'Profile changed!');
       this.modalRef.hide();
     }
   }
 
   changeProfileModalOpen(session: Session, $event: MouseEvent) {
+    this.selectedProfile = null;
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
   }
 }

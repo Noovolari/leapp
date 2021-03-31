@@ -71,8 +71,11 @@ license your work under the same license as that used by the project.
 
 Please send a [GitHub Pull Request to Leapp](https://github.com/noovolari/leapp/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). 
 
+This project uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
+You can find the list of supported commit types [here](https://github.com/conventional-changelog/commitlint/blob/master/%40commitlint/config-conventional/README.md#type-enum) .
+
 Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
 
-    $ git commit -m "A brief summary of the commit
+    $ git commit -m "feat: a brief summary of the commit
     > 
     > A paragraph describing what changed and its impact."

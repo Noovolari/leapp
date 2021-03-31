@@ -34,6 +34,7 @@
   "homepage": "https://leapp.cloud",
   "main": "electron/dist/electron/main.js",
   "scripts": {
+    "prepare": "husky install",
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
     "start": "ng serve",
@@ -155,6 +156,11 @@
       ]
     }
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "dependencies": {
     "@angular/animations": "~8.1.0",
     "@angular/common": "~8.1.0",
@@ -222,6 +228,8 @@
     "@angular/compiler-cli": "~8.1.0",
     "@angular/language-service": "~8.1.0",
     "@biesbjerg/ngx-translate-extract": "~2.3.4",
+    "@commitlint/cli": "12.0.1",
+    "@commitlint/config-conventional": "12.0.1",
     "@types/aws-sdk": "^2.7.0",
     "@types/jasmine": "~3.5.11",
     "@types/jasminewd2": "~2.0.3",
@@ -234,6 +242,7 @@
     "electron-installer-dmg": "~3.0.0",
     "electron-packager": "~15.1.0",
     "electron-rebuild": "~2.0.3",
+    "husky": "~6.0.0",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.4.1",

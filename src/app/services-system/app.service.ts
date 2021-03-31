@@ -15,12 +15,8 @@ import {constants} from '../core/enums/constants';
 })
 export class AppService extends NativeService {
 
-  isResuming: EventEmitter<boolean> = new EventEmitter<boolean>();
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
-  // TODO Why redrawList??
   redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-  newWin;
 
   stsEndpointsPerRegion = new Map([
     ['af-south-1', 'https://sts.af-south-1.amazonaws.com'],
@@ -192,9 +188,9 @@ export class AppService extends NativeService {
    * @param javascript - javascript to be run when the window starts
    * @returns return a new browser window
    */
-  newWindow(url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
+  newWindow(id, url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
     const opts = {
-      width: 430,
+      width: 514,
       height: 550,
       resizable: true,
       show,
@@ -203,7 +199,7 @@ export class AppService extends NativeService {
       webPreferences: {
         devTools: !environment.production,
         worldSafeExecuteJavaScript: true,
-        partition: `persist:Leapp-${btoa(url)}`
+        partition: `persist:Leapp-${btoa(url)}-${id}`
       }
     };
 
@@ -214,15 +210,7 @@ export class AppService extends NativeService {
       });
     }
 
-    if (this.newWin) {
-      console.log('new win', this.newWin);
-      try {
-        this.newWin.close();
-      } catch (e) { }
-      this.newWin = null;
-    }
-    this.newWin = new this.browserWindow(opts);
-    return this.newWin;
+    return new this.browserWindow(opts);
   }
 
   /**
@@ -330,7 +318,6 @@ export class AppService extends NativeService {
    * @param callback - the callback for the ok button to launch
    */
   inputDialog(title: string, placeholder: string, message: string, callback: any) {
-    console.log('inputDialog');
     for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
       this.modalService.hide(i);
     }
@@ -581,6 +568,9 @@ export class AppService extends NativeService {
     return roleName;
   }
 
+  getUrl() {
+    return this.url;
+  }
 }
 
 /*

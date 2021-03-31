@@ -47,8 +47,12 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
   getActiveSessions(workspace: Workspace) {
     const activeSessions = workspace.sessions.filter((sess) => {
-      return (sess.account.type === AccountType.AWS_PLAIN_USER || sess.account.type === AccountType.AWS) && sess.active;
+      return (sess.account.type === AccountType.AWS_TRUSTER ||
+              sess.account.type === AccountType.AWS_SSO ||
+              sess.account.type === AccountType.AWS_PLAIN_USER ||
+              sess.account.type === AccountType.AWS) && sess.active;
     });
+
 
     this.appService.logger('Aws Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
@@ -56,7 +60,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
   cleanCredentials(workspace: Workspace): void {
     if (workspace) {
-      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
+      this.fileService.iniCleanSync(this.appService.awsCredentialPath());
       this.timerService.noAwsSessionsActive = true;
     }
   }
@@ -87,7 +91,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       } else {
         if (this.processSubscription) { this.processSubscription.unsubscribe(); }
         this.processSubscription = this.getPlainAccountSessionToken(credentials, session).subscribe((awsCredentials) => {
-            const tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region);
+            const tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(awsCredentials, workspace, session.account.region, session);
 
             this.keychainService.saveSecret(environment.appName, `plain-account-session-token-${session.account.accountName}`, JSON.stringify(tmpCredentials));
             this.savePlainAccountSessionTokenExpirationInVault(tmpCredentials, session);
@@ -129,7 +133,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   doubleJumpFromSSO(session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const parentSession = this.sessionService.parentSession(session);
-    console.log(parentSession);
 
     this.awsSsoService.getAwsSsoPortalCredentials().pipe(
       switchMap((loginToAwsSSOResponse) => {
@@ -172,7 +175,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
             this.appService.cleanCredentialFile();
           } else {
             // We set the new credentials after the first jump
-            const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
+            const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region, session);
 
             this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -187,11 +190,15 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         return of(true);
       }),
       catchError( (err) => {
-        session.active = false;
-        session.loading = false;
-
-        this.configurationService.disableLoadingWhenReady(workspace, session);
-        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
+        workspace.sessions.forEach(sess => {
+          if (sess.id === session.id) {
+            sess.loading = false;
+            sess.complete = false;
+            sess.active = false;
+          }
+        });
+        this.configurationService.updateWorkspaceSync(workspace);
+        this.appService.redrawList.emit();
 
         this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
@@ -202,28 +209,26 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   }
 
   awsCredentialFederatedProcess(workspace, session) {
-    // Check for Aws Credentials Process
-    if (!workspace) {
-      return 'workspace not set';
-    }
-
-    // Enable current active session
-    this.fileService.writeFileSync(this.appService.awsCredentialPath(), '');
-
-    try {
-      switch (this.checkAccountTypeForRefreshCredentials(session)) {
-        case 0: this.workspaceService.refreshCredentials(session); break; // FEDERATED
-        case 1: this.workspaceService.refreshCredentials(session); break; // TRUSTER FROM FEDERATED
-        case 2: this.doubleJumpFromFixedCredential(session); break;               // TRUSTER FROM PLAIN
-        case 3: this.doubleJumpFromSSO(session); break;                           // TRUSTER FROM SSO
+      // Check for Aws Credentials Process
+      if (!workspace) {
+        return 'workspace not set';
       }
-    } catch (e) {
-      this.appService.logger('Error in Aws Credential Federated Process', LoggerLevel.ERROR, this, e.stack);
-      this.credentialsService.refreshReturnStatusEmit.emit(false);
-    }
 
-    // Start Calculating time here once credentials are actually retrieved
-    this.timerService.defineTimer();
+      // Enable current active session
+      try {
+        switch (this.checkAccountTypeForRefreshCredentials(session)) {
+          case 0: this.workspaceService.refreshCredentials(session); break; // FEDERATED
+          case 1: this.workspaceService.refreshCredentials(session); break; // TRUSTER FROM FEDERATED
+          case 2: this.doubleJumpFromFixedCredential(session); break;               // TRUSTER FROM PLAIN
+          case 3: this.doubleJumpFromSSO(session); break;                           // TRUSTER FROM SSO
+        }
+      } catch (e) {
+        this.appService.logger('Error in Aws Credential Federated Process', LoggerLevel.ERROR, this, e.stack);
+        this.credentialsService.refreshReturnStatusEmit.emit(false);
+      }
+
+      // Start Calculating time here once credentials are actually retrieved
+      this.timerService.defineTimer();
   }
 
   // TODO: move to AwsCredentialsGenerationService
@@ -331,7 +336,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                 this.appService.cleanCredentialFile();
               } else {
                 // We set the new credentials after the first jump
-                const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
+                const trusterCredentials: AwsCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region, session);
 
                 this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -402,7 +407,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                 let tmpCredentials = null;
 
                 if (data !== undefined && data !== null) {
-                  tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, parentSession.account.region);
+                  tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, parentSession.account.region, session);
                   this.keychainService.saveSecret(environment.appName, `truster-account-session-token-${session.account.accountName}`, JSON.stringify(tmpCredentials));
                   this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
                 }
@@ -415,7 +420,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
               let tmpCredentials = null;
 
               if (data !== undefined && data !== null) {
-                tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region);
+                tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region, session);
                 this.keychainService.saveSecret(environment.appName, `truster-account-session-token-${session.account.accountName}`, JSON.stringify(tmpCredentials));
                 this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
               }
@@ -452,12 +457,14 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     });
   }
 
-  private savePlainAccountSessionTokenExpirationInVault(credentials, session) {
-    this.keychainService.saveSecret(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session), credentials.default.expiration.toString());
+  private savePlainAccountSessionTokenExpirationInVault(credentials, session: Session) {
+    const name = this.configurationService.getNameFromProfileId(session.profile);
+    this.keychainService.saveSecret(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session), credentials[name].expiration.toString());
   }
 
-  private saveTrusterAccountSessionTokenExpirationInVault(credentials, session) {
-    this.keychainService.saveSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session), credentials.default.expiration.toString());
+  private saveTrusterAccountSessionTokenExpirationInVault(credentials, session: Session) {
+    const name = this.configurationService.getNameFromProfileId(session.profile);
+    this.keychainService.saveSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session), credentials[name].expiration.toString());
   }
 
   private isSessionTokenStillValid(sessionTokenData): boolean {

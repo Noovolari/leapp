@@ -50,9 +50,6 @@ export class AppComponent implements OnInit {
 
     // If we have credentials copy them from workspace file to the .aws credential file
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-
-    console.log(workspace);
-
     if (workspace) {
       // Set it as default
       this.configurationService.setDefaultWorkspaceSync(workspace.name);
@@ -85,10 +82,36 @@ export class AppComponent implements OnInit {
         workspace.sessions = sessions;
         this.configurationService.updateWorkspaceSync(workspace);
       }
+
+      // Patch for named profiles
+      if (workspace.profiles === undefined || workspace.profiles.length === 0) {
+        workspace.profiles = [{ id: uuid.v4(), name: 'default' }];
+      }
+
+      const defaultProfileId = workspace.profiles.filter(p => p.name === 'default')[0].id;
+
+      // Patch old sessions without a default region
+      if (sessions) {
+        sessions.forEach(session => {
+          if (session.profile === undefined) {
+            session.profile = defaultProfileId;
+          }
+        });
+        workspace.sessions = sessions;
+        this.configurationService.updateWorkspaceSync(workspace);
+      }
     }
 
     // Fix for retro-compatibility with old workspace configuration
     this.verifyWorkspace();
+
+    // All sessions start stopped when app is launched
+    if (workspace.sessions && workspace.sessions.length > 0) {
+      workspace.sessions.forEach(sess => { sess.loading = false; sess.active = false; });
+      this.configurationService.updateWorkspaceSync(workspace);
+      this.fileService.iniCleanSync(this.app.awsCredentialPath());
+      this.configurationService.cleanAzureCrendentialFile();
+    }
 
     // Prevent Dev Tool to show on production mode
     this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {

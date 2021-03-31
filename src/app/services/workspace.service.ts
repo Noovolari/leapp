@@ -32,7 +32,7 @@ export class WorkspaceService extends NativeService {
   timeout;
 
   // A class reference to the idp window
-  idpWindow;
+  idpWindow = {};
 
   // Update Session to backend Emitter
   public sentSessionUpdateEvent: EventEmitter<{accountName: string, status: SessionStatus, message: string}> = new EventEmitter<{accountName: string, status: SessionStatus, message: string}>();
@@ -75,34 +75,46 @@ export class WorkspaceService extends NativeService {
    * @param callbackUrl - the callback url that can be given always by the backend in case is missing we setup a default one
    */
   getIdpToken(idpUrl: string, session: any, type: string, callbackUrl?: string) {
-    if (this.showingSubscription) { this.showingSubscription.unsubscribe(); }
-    this.showingSubscription = this.checkForShowingTheLoginWindow(idpUrl).subscribe((res) => {
+    // We generate a new browser window to host for the Idp Login form
+    // Note: this is due to the fact that electron + angular gives problem with embedded webview
+    const pos = this.currentWindow.getPosition();
 
-      console.log(res);
+    this.idpWindow[session.id] = this.appService.newWindow(session.id, idpUrl, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+    this.proxyService.configureBrowserWindow(this.idpWindow[session.id]);
 
-      // We generate a new browser window to host for the Idp Login form
-      // Note: this is due to the fact that electron + angular gives problem with embedded webview
-      const pos = this.currentWindow.getPosition();
+    const filter = {urls: ['https://*.onelogin.com/*', 'https://*.okta.com/*', 'https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
 
-      this.idpWindow = this.appService.newWindow(idpUrl, res, 'IDP - Login', pos[0] + 200, pos[1] + 50);
-      this.proxyService.configureBrowserWindow(this.idpWindow);
+    // Our request filter call the generic hook filter passing the idp response type
+    // to construct the ideal method to deal with the construction of the response
+    this.idpWindow[session.id].webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
+      // G Suite
+      if (details.url.indexOf('accounts.google.com/ServiceLogin') !== -1) {
+        this.idpWindow[session.id].show();
+      }
 
-      // This filter is used to listen to go to a specific callback url (or the generic one)
-      const filter = {urls: ['https://signin.aws.amazon.com/saml']};
+      // One Login
+      if (details.url.indexOf('.onelogin.com/login') !== -1) {
+        this.idpWindow[session.id].show();
+      }
 
-      // Our request filter call the generic hook filter passing the idp response type
-      // to construct the ideal method to deal with the construction of the response
-      this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
+      // OKTA
+      if (details.url.indexOf('.okta.com/discovery/iframe.html') !== -1) {
+        this.idpWindow[session.id].show();
+      }
+
+      // Do not show window: already logged
+      if (details.url.indexOf('signin.aws.amazon.com/saml') !== -1) {
         this.idpResponseHook(details, type, idpUrl, session, callback);
-      });
-      this.idpWindow.loadURL(idpUrl);
+        return;
+      }
 
-    }, err => {
-      // Sometimes it can arrive here (tested) so the REAL way to block everything is to use the credential emit element!!!
-      this.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
-      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
-      throw new Error(err);
+      callback({
+        requestHeaders: details.requestHeaders,
+        url: details.url,
+      });
+
     });
+    this.idpWindow[session.id].loadURL(idpUrl);
   }
 
   /**
@@ -116,22 +128,41 @@ export class WorkspaceService extends NativeService {
     // We generate a new browser window to host for the Idp Login form
     // Note: this is due to the fact that electron + angular gives problem with embedded webview
     const pos = this.currentWindow.getPosition();
-    this.idpWindow = this.appService.newWindow(idpUrl, true, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+    this.idpWindow[0] = this.appService.newWindow('setup', idpUrl, true, 'IDP - Login', pos[0] + 200, pos[1] + 50);
 
     this.proxyService.configureBrowserWindow(this.idpWindow);
     const options = this.proxyService.getHttpClientOptions('https://mail.google.com/mail/u/0/?logout&hl=en');
 
     // This filter is used to listen to go to a specific callback url (or the generic one)
-    const filter = {urls: ['https://signin.aws.amazon.com/saml']};
+    // const filter = {urls: ['https://signin.aws.amazon.com/saml']};
+    const filter = {urls: ['https://*.onelogin.com/*', 'https://*.okta.com/*', 'https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
 
     // Our request filter call the generic hook filter passing the idp response type
     // to construct the ideal method to deal with the construction of the response
-    this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-      this.idpResponseHookFirstTime(details, type, idpUrl, callback);
+    this.idpWindow[0].webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
+      // G Suite
+      if (details.url.indexOf('accounts.google.com/ServiceLogin') !== -1) {
+        this.idpWindow[0].show();
+      }
+
+      // One Login
+      if (details.url.indexOf('.onelogin.com/login') !== -1) {
+        this.idpWindow[0].show();
+      }
+
+      // OKTA
+      if (details.url.indexOf('.okta.com/discovery/iframe.html') !== -1) {
+        this.idpWindow[0].show();
+      }
+
+      // Do not show window: already logged
+      if (details.url.indexOf('signin.aws.amazon.com/saml') !== -1) {
+        this.idpResponseHookFirstTime(details, type, idpUrl, callback);
+      }
     });
 
     this.followRedirects.https.get(options, (res) => {
-      this.idpWindow.loadURL(idpUrl);
+      this.idpWindow[0].loadURL(idpUrl);
     }).on('error', (err) => {
       console.log('error: ', err);
     }).end();
@@ -153,70 +184,9 @@ export class WorkspaceService extends NativeService {
       idpUrl = workspace.idpUrl.filter(u => u.id === parentSession.account.idpUrl)[0].url;
     }
 
-    // TODO: probably here will need to clean the partition area to force a windows refresh
-
     // Extract the Idp token passing the type of request, this method has
     // become generic so we can already prepare for multiple idp type
     this.getIdpToken(idpUrl, session, IdpResponseType.SAML, null);
-  }
-
-  /**
-   * Check if we need to show the Login window for Google or not
-   * @returns - {boolean} the result of the check if we need to show the Google login window again
-   */
-  checkForShowingTheLoginWindow(url): Observable<boolean> {
-    return new Observable<boolean>(obs => {
-      const pos = this.currentWindow.getPosition();
-
-      this.idpWindow = this.appService.newWindow(url, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
-      this.proxyService.configureBrowserWindow(this.idpWindow);
-
-      // This filter is used to listen to go to a specific callback url (or the generic one)
-      const filter = {urls: ['https://*.onelogin.com/*', 'https://*.okta.com/*', 'https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
-
-      // Our request filter call the generic hook filter passing the idp response type
-      // to construct the ideal method to deal with the construction of the response
-      this.idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-        // Show window: login process
-        console.log(details.url);
-
-        // G Suite
-        if (details.url.indexOf('accounts.google.com/ServiceLogin') !== -1) {
-          this.idpWindow = null;
-          obs.next(true);
-          obs.complete();
-        }
-
-        // One Login
-        if (details.url.indexOf('.onelogin.com/login') !== -1) {
-          this.idpWindow = null;
-          obs.next(true);
-          obs.complete();
-        }
-
-        // OKTA
-        if (details.url.indexOf('.okta.com/discovery/iframe.html') !== -1) {
-          this.idpWindow = null;
-          obs.next(true);
-          obs.complete();
-        }
-
-        // Do not show window: already logged
-
-        if (details.url.indexOf('signin.aws.amazon.com/saml') !== -1) {
-          this.idpWindow = null;
-          obs.next(false);
-          obs.complete();
-        }
-
-        callback({
-          requestHeaders: details.requestHeaders,
-          url: details.url,
-        });
-      });
-
-      this.idpWindow.loadURL(url);
-    });
   }
 
   /**
@@ -228,30 +198,37 @@ export class WorkspaceService extends NativeService {
    * @param callback - eventual callback to call with the response data
    */
   idpResponseHook(details: any, type: string, idpUrl: string, session: any, callback?: any) {
-    console.log(details);
-
     // Extract the token from the request and set the email for the screen
     const token = this.extract_SAML_Response(details);
 
     // Before doing anything we also need to authenticate VERSUS Cognito to our backend
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     workspace.type = type;
-    workspace.lastIDPToken = token;
+    this.keychainService.saveSecret(environment.appName, `session-idpToken-${session.id}`, token).then(res => {
+      // Now we can go on
+      this.configurationService.updateWorkspaceSync(workspace);
 
-    // Now we can go on
-    this.configurationService.updateWorkspaceSync(workspace);
+      // this is ok for now so we can save it and call sts assume role
+      this.obtainCredentials(workspace, session, () => {
+        // it will throw an error as we have altered the original response
+        // Setting that everything is ok if we have arrived here
+        console.log('here 66', session);
+        try {
+          this.idpWindow[session.id].close();
+          delete this.idpWindow[session.id];
+          this.configurationService.disableLoadingWhenReady(workspace, session);
+        } catch (err) {
+          console.log(err);
+        }
+      });
 
-    // this is ok for now so we can save it and call sts assume role
-    this.obtainCredentials(workspace, session, () => {
-      // it will throw an error as we have altered the original response
-      // Setting that everything is ok if we have arrived here
-      this.idpWindow.close();
+      // Close the window we don't need it anymore because otherwise
+      if (callback) {
+        callback({cancel: true});
+      }
+    }, err => {
+      console.log(err);
     });
-
-    // Close the window we don't need it anymore because otherwise
-    if (callback) {
-      callback({cancel: true});
-    }
   }
 
   /**
@@ -269,7 +246,8 @@ export class WorkspaceService extends NativeService {
     // to this specific reduced version of the get credentials method
     // TODO: I am calling the providerManagerService?
     this.googleEmit.emit(token);
-    this.idpWindow.close();
+    this.idpWindow[0].close();
+    delete this.idpWindow[0];
 
     // Close the window we don't need it anymore because otherwise
     if (callback) {
@@ -334,38 +312,48 @@ export class WorkspaceService extends NativeService {
     const idpArn = parentAccount ? parentAccount.idpArn : selectedAccount.idpArn;
     const federatedRoleArn = `arn:aws:iam::${parentAccount ? parentAccount.accountNumber : selectedAccount.accountNumber}:role/${parentRole ? parentRole.name : roleName}`;
 
-    // Params for the calls
-    const params = {
-      PrincipalArn: idpArn,
-      RoleArn: federatedRoleArn,
-      SAMLAssertion: workspace.lastIDPToken,
-      DurationSeconds: 3600,
-    };
+    this.keychainService.getSecret(environment.appName, `session-idpToken-${session.id}`).then(token => {
+      // Params for the calls
+      const params = {
+        PrincipalArn: idpArn,
+        RoleArn: federatedRoleArn,
+        SAMLAssertion: token,
+        DurationSeconds: 3600,
+      };
 
-    // We try to assume role with SAML which will give us the temporary credentials for one hour
-    sts.assumeRoleWithSAML(params, (err, data: any) => {
-      if (!err) {
-        // Save credentials as default in .aws/credentials and in the workspace as default ones
-        this.saveCredentialsInFileAndDefaultWorkspace(data, workspace, session, parentAccount !== undefined, selectedAccount, roleName);
+      // We try to assume role with SAML which will give us the temporary credentials for one hour
+      sts.assumeRoleWithSAML(params, (err, data: any) => {
+        if (!err) {
+          // Save credentials as default in .aws/credentials and in the workspace as default ones
+          this.saveCredentialsInFileAndDefaultWorkspace(data, workspace, session, parentAccount !== undefined, selectedAccount, roleName);
 
-        // If we have a callback call it
-        if (callback) {
-          callback(data);
+          // If we have a callback call it
+          if (callback) {
+            callback(data);
+          }
+        } else {
+          // Something went wrong save it to the logger file
+          this.appService.logger(err.code, LoggerLevel.ERROR, this);
+          this.appService.logger(err.stack, LoggerLevel.ERROR, this);
+          this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
+
+          // Emit ko
+          this.credentialEmit.emit({status: err.stack, accountName: null});
+
+          // If we have a callback call it
+          if (callback) {
+            callback(data);
+          }
         }
-      } else {
-        // Something went wrong save it to the logger file
-        this.appService.logger(err.code, LoggerLevel.ERROR, this);
-        this.appService.logger(err.stack, LoggerLevel.ERROR, this);
-        this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
+      });
+    }).catch(err => {
+      // Something went wrong save it to the logger file
+      this.appService.logger(err.code, LoggerLevel.ERROR, this);
+      this.appService.logger(err.stack, LoggerLevel.ERROR, this);
+      this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
-        // Emit ko
-        this.credentialEmit.emit({status: err.stack, accountName: null});
-
-        // If we have a callback call it
-        if (callback) {
-          callback(data);
-        }
-      }
+      // Emit ko
+      this.credentialEmit.emit({status: err.stack, accountName: null});
     });
   }
 
@@ -375,6 +363,7 @@ export class WorkspaceService extends NativeService {
    * @param workspace - the workspace we want to use to inject the credentials and make it default
    * @param isDoubleJump - check if the double jump have to be used
    * @param account - the account of the requester
+   * @param session - the session to use for reference
    * @param roleName - the role name of the requester
    */
   saveCredentialsInFileAndDefaultWorkspace(stsResponse: any, workspace: Workspace, session: Session, isDoubleJump, account, roleName) {
@@ -382,7 +371,7 @@ export class WorkspaceService extends NativeService {
     let credentials;
     try {
       // Construct actual credentials
-      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.region);
+      credentials = this.constructCredentialObjectFromStsResponse(stsResponse, workspace, account.region, session);
 
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentials);
 
@@ -399,11 +388,12 @@ export class WorkspaceService extends NativeService {
     // Write in aws credential file and workspace
     try {
       if (isDoubleJump) {
+        const name = this.configurationService.getNameFromProfileId(session.profile);
         // Make second jump: credentials are the first one now
         AWS.config.update({
-          sessionToken: credentials.default.aws_session_token,
-          accessKeyId: credentials.default.aws_access_key_id,
-          secretAccessKey: credentials.default.aws_secret_access_key
+          sessionToken: credentials[name].aws_session_token,
+          accessKeyId: credentials[name].aws_access_key_id,
+          secretAccessKey: credentials[name].aws_secret_access_key
         });
 
         this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
@@ -415,7 +405,6 @@ export class WorkspaceService extends NativeService {
           RoleSessionName: this.appService.createRoleSessionName(roleName)
         }, (err, data: any) => {
           if (err) {
-
             // Something went wrong save it to the logger file
             this.appService.logger(err.stack, LoggerLevel.ERROR, this);
             this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
@@ -425,7 +414,7 @@ export class WorkspaceService extends NativeService {
           } else {
 
             // we set the new credentials after the first jump
-            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.region);
+            const trusterCredentials: AwsCredentials = this.constructCredentialObjectFromStsResponse(data, workspace, account.region, session);
 
             this.fileService.iniWriteSync(this.appService.awsCredentialPath(), trusterCredentials);
 
@@ -437,6 +426,7 @@ export class WorkspaceService extends NativeService {
           }
         });
       } else {
+        console.log('here', session);
         this.configurationService.disableLoadingWhenReady(workspace, session);
         // Emit ok for single jump
         this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
@@ -457,7 +447,7 @@ export class WorkspaceService extends NativeService {
    * @param region - region for aws
    * @returns an object of type {AwsCredential}
    */
-  constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, region: string): AwsCredentials {
+  constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, region: string, session: Session): AwsCredentials {
     // these are the standard STS response types
     const accessKeyId = stsResponse.Credentials.AccessKeyId;
     const secretAccessKey = stsResponse.Credentials.SecretAccessKey;
@@ -479,7 +469,9 @@ export class WorkspaceService extends NativeService {
     }
 
     // Return it!
-    return {default: credential};
+    const obj = {};
+    obj[this.configurationService.getNameFromProfileId(session.profile)] = credential;
+    return obj;
   }
 
   /* ====================================== */
@@ -517,6 +509,11 @@ export class WorkspaceService extends NativeService {
       this.appService.logger('create new workspace error:', LoggerLevel.WARN, this, err.stack);
       return false;
     }
+  }
+
+  getProfiles(): { id: string, name: string}[] {
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    return workspace.profiles ? workspace.profiles : [];
   }
 }
 

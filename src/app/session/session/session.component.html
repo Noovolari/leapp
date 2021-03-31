@@ -28,14 +28,14 @@
 <div class="container-fluid with-scroll">
 
   <ul class="account-cards">
-    <li style="position:relative;"> <span class="fixed-status">Status</span></li>
+    <li style="position:relative;"> <span class="fixed-profiles">AWS Profiles</span><span class="fixed-status">Status</span></li>
     <li *ngIf="activeSessions.length !== 0">
       <h3 class="mb-session">Active Accounts</h3>
     </li>
 
     <ng-container *ngFor="let session of activeSessions">
       <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
-        <app-session-card [session]="session" (sessionsChanged)='getSessions()'></app-session-card>
+        <app-session-card [session]="session"></app-session-card>
       </li>
     </ng-container>
 
@@ -45,7 +45,7 @@
 
     <ng-container *ngFor="let session of notActiveSessions">
       <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
-        <app-session-card [session]="session" (sessionsChanged)='getSessions()'></app-session-card>
+        <app-session-card [session]="session"></app-session-card>
       </li>
     </ng-container>
   </ul>

@@ -10,11 +10,11 @@ import {TimerService} from '../services/timer-service';
 import {CredentialsService} from '../services/credentials.service';
 import {Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
+import {FileService} from '../services-system/file.service';
 
 export class AzureStrategy extends RefreshCredentialsStrategy {
   private processSubscription: Subscription;
   private processSubscription2: Subscription;
-  private processSubscription3: Subscription;
   private processSubscription4: Subscription;
 
   constructor(
@@ -22,6 +22,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
     private appService: AppService,
     private timerService: TimerService,
     private executeService: ExecuteServiceService,
+    private fileService: FileService,
     private configurationService: ConfigurationService) {
     super();
   }
@@ -92,22 +93,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
   }
 
   private cleanAzureCredentialFile() {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace && this.configurationService.isAzureConfigPresent()) {
-      workspace.azureProfile = this.configurationService.getAzureProfileSync();
-      workspace.azureConfig = this.configurationService.getAzureConfigSync();
-      if (workspace.azureConfig === '[]') {
-        // Anomalous condition revert to normal az login procedure
-        workspace.azureProfile = null;
-        workspace.azureConfig = null;
-      }
-
-      this.configurationService.updateWorkspaceSync(workspace);
-    }
-    if (this.processSubscription3) { this.processSubscription3.unsubscribe(); }
-    this.processSubscription3 = this.executeService.execute('az account clear 2>&1').pipe(
-      switchMap(() => this.executeService.execute('az configure --defaults location=\'\' 2>&1'))
-    ).subscribe(res => {}, err => {});
+    this.configurationService.cleanAzureCrendentialFile();
   }
 
   private azureSetSubscription(session: Session) {
@@ -135,6 +121,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
         if (sess.id === session.id) {
           sess.active = false;
           sess.loading = false;
+          sess.complete = false;
           sess.lastStopDate = new Date().toISOString();
         }
       });

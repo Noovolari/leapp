@@ -14,8 +14,8 @@ import {SessionService} from '../../services/session.service';
 import {MenuService} from '../../services/menu.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
-import {WebConsoleService} from '../../services/web-console.service';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {AccountType} from '../../models/AccountType';
 
 @Component({
   selector: 'app-session',
@@ -43,8 +43,10 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   allSessions;
   retries = 0;
   showOnly = 'ALL';
+  profiles = [];
 
   workspace;
+  subscription;
 
   constructor(
     private router: Router,
@@ -60,12 +62,13 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private sessionService: SessionService,
     private menuService: MenuService,
     private zone: NgZone,
-    private webConsoleService: WebConsoleService,
   ) { super(); }
 
   ngOnInit() {
     // Set workspace
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
+    this.profiles = this.workspaceService.getProfiles();
+
 
     // Set retries
     this.retries = 0;
@@ -83,9 +86,12 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       }
     }));
 
-    this.subs.add(this.appService.redrawList.subscribe(() => {
-      this.getSessions();
-    }));
+    if (!this.subscription) {
+      this.subscription = this.appService.redrawList.subscribe(() => {
+        this.getSessions();
+      });
+      this.subs.add(this.subscription);
+    }
   }
 
   /**
@@ -98,6 +104,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       if (session === null || (session.id === sess.id)) {
         sess.active = false;
         sess.loading = false;
+        sess.complete = false;
       }
     });
 
@@ -114,7 +121,19 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
    */
   getSessions() {
     this.zone.run(() => {
-      this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
+      this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true).map((session: Session) => {
+        if (session.account.type !== AccountType.AZURE) {
+          session.loading = !this.fileService.iniCheckProfileExistance(this.appService.awsCredentialPath(), this.configurationService.getNameFromProfileId(session.profile));
+        } else {
+          try {
+            this.configurationService.getAzureConfigSync();
+            session.loading = false;
+          } catch {
+            session.loading = true;
+          }
+        }
+        return session;
+      });
       this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter( session => session.active === false));
     });
   }
@@ -135,12 +154,25 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
         return s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
           ((s.account as AwsAccount).role && (s.account as AwsAccount).role.name.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AwsAccount).accountNumber && (s.account as AwsAccount).accountNumber.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          (this.getProfileName(s.profile).toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           (idpID.indexOf((s.account as AwsAccount).idpUrl) > -1) ||
           ((s.account as AwsPlainAccount).user && (s.account as AwsPlainAccount).user.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).tenantId && (s.account as AzureAccount).tenantId.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).subscriptionId && (s.account as AzureAccount).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);
       });
     }
+  }
+
+  getProfileName(profileId: string): string {
+    let profileName = '';
+    for (let i = 0; i < this.profiles.length; i++) {
+      if (this.profiles[i].id === profileId) {
+        profileName = this.profiles[i].name;
+        break;
+      }
+    }
+
+    return profileName;
   }
 
   setVisibility(name) {

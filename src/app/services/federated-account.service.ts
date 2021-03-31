@@ -32,10 +32,7 @@ export class FederatedAccountService extends NativeService {
    * @param idpArn - the idp arn as it is federated
    * @param region - the region to select as default
    */
-  addFederatedAccountToWorkSpace(idpUrl: {id: string, url: string}, accountNumber: string, accountName: string, role: any, idpArn: string, region: string) {
-
-    console.log('idpurl', idpUrl);
-
+  addFederatedAccountToWorkSpace(idpUrl: {id: string, url: string}, accountNumber: string, accountName: string, role: any, idpArn: string, region: string, profile: { id: string, name: string}) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (role.name[0] === '/') {
@@ -62,24 +59,24 @@ export class FederatedAccountService extends NativeService {
 
       const session: Session = {
         id: uuidv4(),
+        profile: profile.id,
         active: false,
         loading: false,
+        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };
-
-      console.log('idpurl in workspace', workspace.idpUrl);
 
       if (workspace.idpUrl.findIndex(i => i.id === idpUrl.id) === -1) {
         workspace.idpUrl.push(idpUrl);
       }
 
-      console.log('idpurl in workspace after', workspace.idpUrl);
+      if (workspace.profiles.findIndex(i => i.id === profile.id) === -1) {
+        workspace.profiles.push(profile);
+      }
 
       workspace.sessions.push(session);
       this.configurationService.updateWorkspaceSync(workspace);
-      console.log('sessions now', workspace.sessions);
-
       return true;
 
     } else {
@@ -97,7 +94,7 @@ export class FederatedAccountService extends NativeService {
    * @param accessKey - access key of the AWS user
    * @param region - the region to set as default
    */
-  addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string, mfaDevice: string, region: string) {
+  addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string, mfaDevice: string, region: string, profile: { id: string, name: string }) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     // Verify it not exists
@@ -116,11 +113,18 @@ export class FederatedAccountService extends NativeService {
 
       const session: Session = {
         id: uuidv4(),
+        profile: profile.id,
         active: false,
         loading: false,
+        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };
+
+      if (workspace.profiles.findIndex(i => i.id === profile.id) === -1) {
+        workspace.profiles.push(profile);
+      }
+      this.configurationService.updateWorkspaceSync(workspace);
 
       try {
         this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(accountName, user), accessKey);

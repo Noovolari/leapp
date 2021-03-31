@@ -44,9 +44,6 @@ export class SsmService {
           const params = {MaxResults: 50};
           this.ec2Client.describeInstances(params, (err, reservations) => {
             this.nextToken = reservations.NextToken;
-
-            console.log('reservation', reservations);
-
             if (err) {
               this.app.logger('You are not Authorized to perform EC2 Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
               this.app.toast('You are not Authorized to perform EC2 Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');

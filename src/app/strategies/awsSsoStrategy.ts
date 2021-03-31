@@ -34,7 +34,10 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
 
   getActiveSessions(workspace: Workspace) {
     const activeSessions = workspace.sessions.filter((sess) => {
-      return (sess.account.type === AccountType.AWS_SSO) && sess.active;
+      return (sess.account.type === AccountType.AWS_TRUSTER ||
+        sess.account.type === AccountType.AWS_SSO ||
+        sess.account.type === AccountType.AWS_PLAIN_USER ||
+        sess.account.type === AccountType.AWS) && sess.active;
     });
 
     this.appService.logger('Aws sso Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
@@ -43,7 +46,7 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
 
   cleanCredentials(workspace: Workspace): void {
     if (workspace) {
-      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
+      this.fileService.iniCleanSync(this.appService.awsCredentialPath());
       this.timerService.noAwsSsoSessionsActive = true;
     }
   }
@@ -77,7 +80,10 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         return of(credential);
       }),
       switchMap((credential: AwsCredential) => {
-        const awsSsoCredentials = { default: credential };
+
+        const profileName = this.configurationService.getNameFromProfileId(session.profile);
+        const awsSsoCredentials = {};
+        awsSsoCredentials[profileName] = credential;
         return fromPromise(this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential))).pipe(
           map(() => {
             return awsSsoCredentials;
@@ -89,16 +95,14 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         session.loading = false;
 
         this.configurationService.disableLoadingWhenReady(workspace, session);
-        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
-
         this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
 
         return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
       })
     ).subscribe((awsSsoCredentials) => {
-      this.configurationService.disableLoadingWhenReady(workspace, session);
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
+      this.configurationService.disableLoadingWhenReady(workspace, session);
       this.timerService.defineTimer();
     });
   }

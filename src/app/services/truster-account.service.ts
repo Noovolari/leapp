@@ -30,7 +30,7 @@ export class TrusterAccountService extends NativeService {
    * @param idpArn - the idArn used for the federated account
    */
   addTrusterAccountToWorkSpace(accountNumber: string, accountName: string, parentAccountSessionId: string, parentRole: string,
-                               role: any, idpArn: string, region: string) {
+                               role: any, idpArn: string, region: string, profile: { id: string, name: string}) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (role.name[0] === '/') {
@@ -55,11 +55,17 @@ export class TrusterAccountService extends NativeService {
 
       const session: Session = {
         id: uuidv4(),
+        profile: profile.id,
         active: false,
         loading: false,
+        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };
+
+      if (workspace.profiles.findIndex(i => i.id === profile.id) === -1) {
+        workspace.profiles.push(profile);
+      }
 
       // Once prepared the session object we verify if we can add it or not to the list and return a boolean about the operation
       workspace.sessions.push(session);

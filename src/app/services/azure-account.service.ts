@@ -42,8 +42,10 @@ export class AzureAccountService extends NativeService {
 
       const session: Session = {
         id: uuidv4(),
+        profile: 'notneed',
         active: false,
         loading: false,
+        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };

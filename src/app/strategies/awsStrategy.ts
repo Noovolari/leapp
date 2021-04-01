@@ -450,9 +450,12 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         workspace.sessions.forEach(sess => {
           if (sess.id === session.id) {
             sess.active = false;
+            sess.loading = false;
+            sess.complete = false;
           }
         });
-        this.configurationService.disableLoadingWhenReady(workspace, session);
+        this.configurationService.updateWorkspaceSync(workspace);
+        this.appService.redrawList.emit(true);
       }
     });
   }

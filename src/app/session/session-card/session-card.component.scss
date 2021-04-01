@@ -39,6 +39,12 @@
   }
 }
 
+.back {
+  color: #707070!important;
+  margin-right: 20px;
+  display: inline-block;
+}
+
 b {
   font-family: "AvenirNextDemiBold", sans-serif!important;
 }
@@ -213,4 +219,42 @@ b {
 .ssm-ul {
   overflow-y: auto;
   height: 300px;
+}
+
+button {
+  background-color: #73E0CF;
+  color: #080B38;
+  border-radius: 4px;
+  border: 2px solid #73E0CF!important;
+
+  font-family: "Lato", "Open Sans", sans-serif;
+  font-size: 19px;
+  font-weight: bold;
+
+  transition: all 0.3s ease;
+
+  min-width: 160px;
+  padding: 10px;
+}
+button:hover {
+  background-color: transparent;
+  color: #73E0CF;
+  border: 2px solid #73E0CF!important;
+}
+button.disabled {
+  background: $light-grey;
+  color: $charcoal-grey;
+  border: 2px solid $charcoal-grey!important;
+}
+
+button.pull-right {
+  position: absolute;
+  right: 25px;
+  bottom: 25px;
+}
+
+button.pull-left {
+  position: absolute;
+  left: 25px;
+  bottom: 25px;
 }

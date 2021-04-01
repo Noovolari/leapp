@@ -204,7 +204,7 @@ export class WorkspaceService extends NativeService {
     // Before doing anything we also need to authenticate VERSUS Cognito to our backend
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     workspace.type = type;
-    this.keychainService.saveSecret(environment.appName, `session-idpToken-${session.id}`, token).then(res => {
+    this.keychainService.saveSecret(environment.appName, `session-idpToken`, token).then(res => {
       // Now we can go on
       this.configurationService.updateWorkspaceSync(workspace);
 
@@ -212,7 +212,6 @@ export class WorkspaceService extends NativeService {
       this.obtainCredentials(workspace, session, () => {
         // it will throw an error as we have altered the original response
         // Setting that everything is ok if we have arrived here
-        console.log('here 66', session);
         try {
           this.idpWindow[session.id].close();
           delete this.idpWindow[session.id];
@@ -312,7 +311,7 @@ export class WorkspaceService extends NativeService {
     const idpArn = parentAccount ? parentAccount.idpArn : selectedAccount.idpArn;
     const federatedRoleArn = `arn:aws:iam::${parentAccount ? parentAccount.accountNumber : selectedAccount.accountNumber}:role/${parentRole ? parentRole.name : roleName}`;
 
-    this.keychainService.getSecret(environment.appName, `session-idpToken-${session.id}`).then(token => {
+    this.keychainService.getSecret(environment.appName, `session-idpToken`).then(token => {
       // Params for the calls
       const params = {
         PrincipalArn: idpArn,

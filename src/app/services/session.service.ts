@@ -135,6 +135,7 @@ export class SessionService extends NativeService {
         if (sess.id === session.id && sess.active === false) {
           sess.loading = true;
           sess.active = true;
+          sess.complete = false;
         }
       });
 

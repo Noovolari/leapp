@@ -146,6 +146,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
 
       this.selectedRegion = this.workspace.defaultRegion || environment.defaultRegion || this.regions[0].region;
       this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation || this.locations[0].location;
+      this.selectedProfile = this.workspace.profiles.filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
     }));
   }
 

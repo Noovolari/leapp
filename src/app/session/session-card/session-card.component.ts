@@ -235,9 +235,11 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
           this.instances = result.instances;
           this.duplicateInstances = this.instances;
           this.ssmloading = false;
+          this.appService.redrawList.emit(true);
         }, err => {
           this.instances = [];
           this.ssmloading = false;
+          this.appService.redrawList.emit(true);
         }));
       });
 
@@ -246,9 +248,8 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   /**
    * Set the region for the session
-   * @param event - the change select event
    */
-  changeDefaultRegion(event) {
+  changeDefaultRegion() {
     if (this.selectedDefaultRegion) {
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
       this.workspace.sessions.forEach(session => {
@@ -309,7 +310,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   getProfileName(id) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const profile = this.workspace.profiles.filter(p => p.id === id)[0];
+    const profile = workspace.profiles.filter(p => p.id === id)[0];
     if (profile) {
       return profile.name;
     } else {
@@ -317,15 +318,17 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     }
   }
 
-  changeDefaultProfile(profile) {
+  changeDefaultProfile() {
 
     if (this.selectedProfile) {
-      this.sessionService.addProfile(profile);
+      this.sessionService.addProfile(this.selectedProfile);
       this.sessionService.removeFromIniFile(this.session);
-      this.sessionService.updateSessionProfile(this.session, profile);
+      this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
 
       if (this.session.active) {
-        this.startSession();
+        this.stopSession();
+      } else {
+        this.appService.redrawList.emit(true);
       }
 
       this.appService.toast('Profile has been changed!', ToastLevel.SUCCESS, 'Profile changed!');
@@ -336,5 +339,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   changeProfileModalOpen(session: Session, $event: MouseEvent) {
     this.selectedProfile = null;
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
+  }
+
+  goBack() {
+    this.modalRef.hide();
   }
 }

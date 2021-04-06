@@ -5,7 +5,7 @@ import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
-import {Observable, Subscription} from 'rxjs';
+import {Observable, Subscribable, Subscriber, Subscription} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
@@ -69,12 +69,13 @@ export class WorkspaceService extends NativeService {
 
   /**
    * Get the Idp Token to save, in the MVP case the SAML response
+   * @param observer - observable<boolean>
    * @param idpUrl - the idp url that is given by the backend
    * @param session - the session to link the request to when setting the credentials directly
    * @param type - the Idp Response Type of the request
    * @param callbackUrl - the callback url that can be given always by the backend in case is missing we setup a default one
    */
-  getIdpToken(idpUrl: string, session: any, type: string, callbackUrl?: string) {
+  getIdpToken(observer: Subscriber<boolean>, idpUrl: string, session: any, type: string, callbackUrl?: string) {
     // We generate a new browser window to host for the Idp Login form
     // Note: this is due to the fact that electron + angular gives problem with embedded webview
     const pos = this.currentWindow.getPosition();
@@ -104,7 +105,7 @@ export class WorkspaceService extends NativeService {
 
       // Do not show window: already logged
       if (details.url.indexOf('signin.aws.amazon.com/saml') !== -1) {
-        this.idpResponseHook(details, type, idpUrl, session, callback);
+        this.idpResponseHook(observer, details, type, idpUrl, session, callback);
         return;
       }
 
@@ -173,7 +174,7 @@ export class WorkspaceService extends NativeService {
    * valid session token to make the assumeRoleWithSAML
    * @param session - the Session object
    */
-  refreshCredentials(session: any) {
+  refreshCredentials(session: any): Observable<boolean> {
     // Get correct idp url
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     let idpUrl;
@@ -186,7 +187,9 @@ export class WorkspaceService extends NativeService {
 
     // Extract the Idp token passing the type of request, this method has
     // become generic so we can already prepare for multiple idp type
-    this.getIdpToken(idpUrl, session, IdpResponseType.SAML, null);
+    return new Observable<boolean>(observer => {
+      this.getIdpToken(observer, idpUrl, session, IdpResponseType.SAML, null);
+    });
   }
 
   /**
@@ -197,7 +200,7 @@ export class WorkspaceService extends NativeService {
    * @param session - the session to obtain credentials with
    * @param callback - eventual callback to call with the response data
    */
-  idpResponseHook(details: any, type: string, idpUrl: string, session: any, callback?: any) {
+  idpResponseHook(observer: Subscriber<boolean>, details: any, type: string, idpUrl: string, session: any, callback?: any) {
     // Extract the token from the request and set the email for the screen
     const token = this.extract_SAML_Response(details);
 
@@ -216,17 +219,19 @@ export class WorkspaceService extends NativeService {
           this.idpWindow[session.id].close();
           delete this.idpWindow[session.id];
           this.configurationService.disableLoadingWhenReady(workspace, session);
+
+          observer.next(true);
+          observer.complete();
         } catch (err) {
           console.log(err);
+          observer.next(false);
+          observer.complete();
         }
       });
-
-      // Close the window we don't need it anymore because otherwise
-      if (callback) {
-        callback({cancel: true});
-      }
     }, err => {
       console.log(err);
+      observer.next(false);
+      observer.complete();
     });
   }
 

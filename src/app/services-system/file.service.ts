@@ -201,7 +201,6 @@ export class FileService extends NativeService {
 
   iniCheckProfileExistance(filePath: string, profileName: string): boolean {
     const currentCredentialFile = this.iniParseSync(filePath);
-    console.log('kjl', currentCredentialFile, profileName);
     return currentCredentialFile[profileName] !== undefined;
   }
 

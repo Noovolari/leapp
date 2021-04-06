@@ -430,7 +430,6 @@ export class WorkspaceService extends NativeService {
           }
         });
       } else {
-        console.log('here', session);
         this.configurationService.disableLoadingWhenReady(workspace, session);
         // Emit ok for single jump
         this.credentialEmit.emit({status: 'ok', accountName: account.accountName});

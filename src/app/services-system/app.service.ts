@@ -248,7 +248,7 @@ export class AppService extends NativeService {
       case ToastLevel.SUCCESS: this.toastr.success(message, title); break;
       case ToastLevel.INFO: this.toastr.info(message, title); break;
       case ToastLevel.WARN: this.toastr.warning(message, title); break;
-      case ToastLevel.ERROR: this.toastr.error(message, 'Invalid Action!'); break;
+      case ToastLevel.ERROR: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
     }
   }
 

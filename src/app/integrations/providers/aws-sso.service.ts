@@ -42,6 +42,7 @@ export class AwsSsoService extends NativeService {
   private ssooidc;
   private ssoPortal;
   private maxRetries: number;
+  private readonly maxRetriesForToken = 12;
 
   constructor(private appService: AppService,
               private keychainService: KeychainService,
@@ -97,7 +98,6 @@ export class AwsSsoService extends NativeService {
     );
   }
 
-  // Generate the access token that is valid for 8 hours
   generateSSOToken(authorizeIntegrationResponse: AuthorizeIntegrationResponse): Observable<GenerateSSOTokenResponse> {
     const createTokenRequest: CreateTokenRequest = {
       clientId: authorizeIntegrationResponse.clientId,
@@ -121,10 +121,8 @@ export class AwsSsoService extends NativeService {
       }),
       retryWhen(errors =>
         errors.pipe(switchMap(err => {
-          if (err.code === 'AuthorizationPendingException' && this.maxRetries < 12) {
+          if (err.code === 'AuthorizationPendingException' && this.maxRetries < this.maxRetriesForToken) {
             this.maxRetries = this.maxRetries + 1;
-            console.log(this.maxRetries);
-
             return of(true).pipe(delay(5000));
           } else {
             return throwError(err);
@@ -237,9 +235,6 @@ export class AwsSsoService extends NativeService {
 
   listAccounts(accessToken: string, region: string): Observable<any> {
     this.ssoPortal = new SSO({ region });
-
-    console.log('LIST ACCOUNTSSSSSS');
-
     const listAccountsRequest: ListAccountsRequest = { accessToken, maxResults: 30 };
 
     return fromPromise(this.ssoPortal.listAccounts(listAccountsRequest).promise()).pipe(

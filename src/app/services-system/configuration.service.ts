@@ -248,7 +248,6 @@ export class ConfigurationService extends NativeService {
       }
     });
     this.updateWorkspaceSync(workspace);
-    this.appService.redrawList.emit(true);
   }
 
   public getNameFromProfileId(id: string): string {

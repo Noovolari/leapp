@@ -1,5 +1,5 @@
 import {AccountType} from '../models/AccountType';
-import {AppService, ToastLevel} from '../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {AwsStrategy} from '../strategies/awsStrategy';
 import {AzureStrategy} from '../strategies/azureStrategy';
 import {ConfigurationService} from '../services-system/configuration.service';
@@ -11,7 +11,7 @@ import {NativeService} from '../services-system/native-service';
 import {ProxyService} from './proxy.service';
 import {TimerService} from './timer-service';
 import {WorkspaceService} from './workspace.service';
-import {Subscription} from 'rxjs';
+import {concat, Subscription} from 'rxjs';
 import {AwsSsoStrategy} from '../strategies/awsSsoStrategy';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {SessionService} from './session.service';
@@ -36,6 +36,9 @@ export class CredentialsService extends NativeService {
   private refreshSubscribe: Subscription;
   private workspaceSubscribe: Subscription;
   private timerSubscription: Subscription;
+
+  refreshStrategySubcribeAll;
+  refreshStrategySubscribeSingle = {};
 
   constructor(
     private appService: AppService,
@@ -85,11 +88,25 @@ export class CredentialsService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (accountType !== null) {
-      this.strategyMap[accountType](workspace, accountType);
+      if (this.refreshStrategySubscribeSingle[accountType]) { this.refreshStrategySubscribeSingle[accountType].unsubscribe(); }
+      this.refreshStrategySubscribeSingle[accountType] = this.strategyMap[accountType](workspace, accountType).subscribe(
+        () => this.appService.redrawList.emit(true),
+        e => {
+          this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
+          this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.ERROR, 'Aws Credential Process');
+      });
     } else {
-      this.awsStrategy.refreshCredentials(workspace);
-      this.azureStrategy.refreshCredentials(workspace);
-      this.awsSsoStrategy.refreshCredentials(workspace);
+      if (this.refreshStrategySubcribeAll) { this.refreshStrategySubcribeAll.unsubscribe(); }
+      this.refreshStrategySubcribeAll = concat(
+        this.awsSsoStrategy.refreshCredentials(workspace),
+        this.awsStrategy.refreshCredentials(workspace),
+        this.azureStrategy.refreshCredentials(workspace)
+      ).subscribe(
+        () => this.appService.redrawList.emit(true),
+          e => {
+        this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
+        this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.ERROR, 'Aws Credential Process');
+      });
     }
 
     if (this.timerService.needToClearTimer()) {

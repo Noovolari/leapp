@@ -3,7 +3,7 @@ import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthoriza
 import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo, LogoutRequest} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
-import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
+import {concat, EMPTY, merge, Observable, of, throwError} from 'rxjs';
 import {catchError, delay, expand, map, retryWhen, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
@@ -77,19 +77,16 @@ export class AwsSsoService extends NativeService {
               return throwError('AWS SSO device authorization error.');
             }),
             switchMap((startDeviceAuthorizationResponse: any) => {
-              return new Observable<AuthorizeIntegrationResponse>((observer) => {
-                if (!startDeviceAuthorizationResponse) {
-                  observer.error('AWS SSO device authorization error.');
-                } else {
-                  this.appService.openExternalUrl(startDeviceAuthorizationResponse.verificationUriComplete);
-                  observer.next({
-                    clientId: registerClientResponse.clientId,
-                    clientSecret: registerClientResponse.clientSecret,
-                    deviceCode: startDeviceAuthorizationResponse.deviceCode
-                  });
-                  observer.complete();
-                }
-              });
+              if (!startDeviceAuthorizationResponse) {
+                throwError('AWS SSO device authorization error.');
+              } else {
+                this.appService.openExternalUrl(startDeviceAuthorizationResponse.verificationUriComplete);
+                return of({
+                  clientId: registerClientResponse.clientId,
+                  clientSecret: registerClientResponse.clientSecret,
+                  deviceCode: startDeviceAuthorizationResponse.deviceCode
+                });
+              }
             })
           );
         }
@@ -136,9 +133,7 @@ export class AwsSsoService extends NativeService {
 
   firstTimeLoginToAwsSSO(region: string, portalUrl: string): Observable<LoginToAwsSSOResponse> {
     return this.authorizeIntegration(region, portalUrl).pipe(
-      tap(console.log),
       switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
-      tap(console.log),
       switchMap(generateSSOTokenResponse => {
         return this.saveAwsSsoAccessInfo(portalUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
           map(() => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime }))
@@ -150,7 +145,7 @@ export class AwsSsoService extends NativeService {
   loginToAwsSSO(): Observable<LoginToAwsSSOResponse> {
     let region;
     let portalUrl;
-    return merge(
+    return concat(
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => region = res)),
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => portalUrl = res))
     ).pipe(
@@ -159,9 +154,7 @@ export class AwsSsoService extends NativeService {
         return throwError(`AWS SSO in loginToAwsSSO: ${err.toString()}`);
       }),
       switchMap(() => this.authorizeIntegration(region, portalUrl)),
-      tap(console.log),
       switchMap(authorizeIntegrationResponse => this.generateSSOToken(authorizeIntegrationResponse)),
-      tap(console.log),
       map(generateSSOTokenResponse => ({accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
       // whenever try to login then dave info in keychain
       switchMap((response) => {
@@ -241,6 +234,8 @@ export class AwsSsoService extends NativeService {
 
   listAccounts(accessToken: string, region: string): Observable<any> {
     this.ssoPortal = new SSO({ region });
+
+    console.log('LIST ACCOUNTSSSSSS');
 
     const listAccountsRequest: ListAccountsRequest = { accessToken, maxResults: 30 };
 

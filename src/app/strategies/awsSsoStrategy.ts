@@ -14,7 +14,7 @@ import {AwsCredential} from '../models/credential';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
-import {of, throwError} from 'rxjs';
+import {EMPTY, Observable, of, throwError} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
 
@@ -51,19 +51,24 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
     }
   }
 
-  manageSingleSession(workspace, session) {
+  manageSingleSession(workspace, session): Observable<boolean> {
     if (this.timerService.noAwsSsoSessionsActive === true) {
       this.timerService.noAwsSsoSessionsActive = false;
     }
 
     if (session.account.type === AccountType.AWS_SSO) {
-      this.awsCredentialProcess(workspace, session);
+      return this.awsCredentialProcess(workspace, session);
+    } else {
+      // We need this because we have checked also for non AWS_SSO potential active sessions,
+      // so for them we don't create credentials but just return an empty observable for the
+      // catch method
+      return of(true);
     }
   }
 
-  private awsCredentialProcess(workspace: Workspace, session: Session) {
+  private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
     // Retrieve access token and region
-    this.awsSsoService.getAwsSsoPortalCredentials().pipe(
+    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
       switchMap((loginToAwsSSOResponse) => {
         return this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name);
       }),
@@ -90,6 +95,12 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
           })
         );
       }),
+      switchMap((awsSsoCredentials) => {
+        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
+        this.configurationService.disableLoadingWhenReady(workspace, session);
+        this.timerService.defineTimer();
+        return of(true);
+      }),
       catchError( (err) => {
         session.active = false;
         session.loading = false;
@@ -97,13 +108,8 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         this.configurationService.disableLoadingWhenReady(workspace, session);
         this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
-
-        return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
+        return of(false);
       })
-    ).subscribe((awsSsoCredentials) => {
-      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
-      this.configurationService.disableLoadingWhenReady(workspace, session);
-      this.timerService.defineTimer();
-    });
+    );
   }
 }

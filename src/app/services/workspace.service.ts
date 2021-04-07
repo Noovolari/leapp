@@ -222,16 +222,28 @@ export class WorkspaceService extends NativeService {
 
           observer.next(true);
           observer.complete();
+
+          if (callback) {
+            callback({cancel: true});
+          }
         } catch (err) {
           console.log(err);
           observer.next(false);
           observer.complete();
+
+          if (callback) {
+            callback({cancel: true});
+          }
         }
       });
     }, err => {
       console.log(err);
       observer.next(false);
       observer.complete();
+
+      if (callback) {
+        callback({cancel: true});
+      }
     });
   }
 

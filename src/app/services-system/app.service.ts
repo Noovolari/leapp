@@ -47,6 +47,8 @@ export class AppService extends NativeService {
   ]);
 
   /* This service is defined to provide different app wide methods as utilities */
+  private newWin: any;
+
   constructor(
     private fileService: FileService,
     private toastr: ToastrService,
@@ -199,7 +201,7 @@ export class AppService extends NativeService {
       webPreferences: {
         devTools: !environment.production,
         worldSafeExecuteJavaScript: true,
-        partition: `persist:Leapp-${btoa(url)}-${id}`
+        partition: `persist:Leapp-${btoa(url)}`
       }
     };
 
@@ -210,7 +212,15 @@ export class AppService extends NativeService {
       });
     }
 
-    return new this.browserWindow(opts);
+    if (this.newWin) {
+      try {
+        this.newWin.close();
+      } catch (e) { }
+      this.newWin = null;
+    }
+    this.newWin = new this.browserWindow(opts);
+    return this.newWin;
+
   }
 
   /**

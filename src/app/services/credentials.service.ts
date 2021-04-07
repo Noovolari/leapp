@@ -37,6 +37,9 @@ export class CredentialsService extends NativeService {
   private workspaceSubscribe: Subscription;
   private timerSubscription: Subscription;
 
+  refreshStrategySubcribeAll;
+  refreshStrategySubscribeSingle = {};
+
   constructor(
     private appService: AppService,
     private configurationService: ConfigurationService,
@@ -85,14 +88,16 @@ export class CredentialsService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (accountType !== null) {
-      this.strategyMap[accountType](workspace, accountType).subscribe(
+      if (this.refreshStrategySubscribeSingle[accountType]) { this.refreshStrategySubscribeSingle[accountType].unsubscribe(); }
+      this.refreshStrategySubscribeSingle[accountType] = this.strategyMap[accountType](workspace, accountType).subscribe(
         () => this.appService.redrawList.emit(true),
         e => {
           this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
           this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.ERROR, 'Aws Credential Process');
       });
     } else {
-      concat(
+      if (this.refreshStrategySubcribeAll) { this.refreshStrategySubcribeAll.unsubscribe(); }
+      this.refreshStrategySubcribeAll = concat(
         this.awsSsoStrategy.refreshCredentials(workspace),
         this.awsStrategy.refreshCredentials(workspace),
         this.azureStrategy.refreshCredentials(workspace)

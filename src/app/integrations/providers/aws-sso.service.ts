@@ -39,9 +39,9 @@ interface LoginToAwsSSOResponse {
 })
 export class AwsSsoService extends NativeService {
 
-  ssooidc;
-  ssoPortal;
-  ssoWindow;
+  private ssooidc;
+  private ssoPortal;
+  private maxRetries: number;
 
   constructor(private appService: AppService,
               private keychainService: KeychainService,
@@ -106,6 +106,8 @@ export class AwsSsoService extends NativeService {
       deviceCode: authorizeIntegrationResponse.deviceCode
     };
 
+    this.maxRetries = 0;
+
     return of(true).pipe(
       switchMap(() => fromPromise(this.ssooidc.createToken(createTokenRequest).promise())),
       map((createTokenResponse: any) => {
@@ -119,11 +121,12 @@ export class AwsSsoService extends NativeService {
       }),
       retryWhen(errors =>
         errors.pipe(switchMap(err => {
-          if (err.code === 'AuthorizationPendingException') {
+          if (err.code === 'AuthorizationPendingException' && this.maxRetries < 12) {
+            this.maxRetries = this.maxRetries + 1;
+            console.log(this.maxRetries);
+
             return of(true).pipe(delay(5000));
           } else {
-            this.appService.logger('AWS SSO Generating token exception.', LoggerLevel.ERROR, this, err.stack);
-            this.appService.toast('Error in generating token', ToastLevel.ERROR, 'AWS Single Sign-On');
             return throwError(err);
           }
         })
@@ -145,7 +148,7 @@ export class AwsSsoService extends NativeService {
   loginToAwsSSO(): Observable<LoginToAwsSSOResponse> {
     let region;
     let portalUrl;
-    return concat(
+    return merge(
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => region = res)),
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => portalUrl = res))
     ).pipe(

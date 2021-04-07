@@ -190,7 +190,7 @@ export class AppService extends NativeService {
    * @param javascript - javascript to be run when the window starts
    * @returns return a new browser window
    */
-  newWindow(id, url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
+  newWindow(url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
     const opts = {
       width: 514,
       height: 550,

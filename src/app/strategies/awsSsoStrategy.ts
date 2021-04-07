@@ -14,9 +14,10 @@ import {AwsCredential} from '../models/credential';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
-import {EMPTY, Observable, of, throwError} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
+import {SessionService} from '../services/session.service';
 
 
 export class AwsSsoStrategy extends RefreshCredentialsStrategy {
@@ -28,6 +29,7 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
     private timerService: TimerService,
     private awsSsoService: AwsSsoService,
     private configurationService: ConfigurationService,
+    private sessionService: SessionService,
     private keychainService: KeychainService) {
     super();
   }
@@ -105,7 +107,7 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         session.active = false;
         session.loading = false;
 
-        this.configurationService.disableLoadingWhenReady(workspace, session);
+        this.sessionService.stopSession(session);
         this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
         return of(false);

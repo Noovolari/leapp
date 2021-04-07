@@ -80,7 +80,14 @@ export class WorkspaceService extends NativeService {
     // Note: this is due to the fact that electron + angular gives problem with embedded webview
     const pos = this.currentWindow.getPosition();
 
-    this.idpWindow[session.id] = this.appService.newWindow(session.id, idpUrl, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+    this.idpWindow[session.id] = this.appService.newWindow(idpUrl, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+    this.idpWindow[session.id].on('close', (evt) => {
+      const sess = this.sessionService.getSession(session.id);
+      if (sess.loading) {
+        this.sessionService.stopSession(session);
+        this.appService.redrawList.emit(true);
+      }
+    });
     this.proxyService.configureBrowserWindow(this.idpWindow[session.id]);
 
     const filter = {urls: ['https://*.onelogin.com/*', 'https://*.okta.com/*', 'https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
@@ -129,7 +136,7 @@ export class WorkspaceService extends NativeService {
     // We generate a new browser window to host for the Idp Login form
     // Note: this is due to the fact that electron + angular gives problem with embedded webview
     const pos = this.currentWindow.getPosition();
-    this.idpWindow[0] = this.appService.newWindow('setup', idpUrl, true, 'IDP - Login', pos[0] + 200, pos[1] + 50);
+    this.idpWindow[0] = this.appService.newWindow(idpUrl, true, 'IDP - Login', pos[0] + 200, pos[1] + 50);
 
     this.proxyService.configureBrowserWindow(this.idpWindow);
     const options = this.proxyService.getHttpClientOptions('https://mail.google.com/mail/u/0/?logout&hl=en');
@@ -216,9 +223,10 @@ export class WorkspaceService extends NativeService {
         // it will throw an error as we have altered the original response
         // Setting that everything is ok if we have arrived here
         try {
+          this.configurationService.disableLoadingWhenReady(workspace, session);
+
           this.idpWindow[session.id].close();
           delete this.idpWindow[session.id];
-          this.configurationService.disableLoadingWhenReady(workspace, session);
 
           observer.next(true);
           observer.complete();

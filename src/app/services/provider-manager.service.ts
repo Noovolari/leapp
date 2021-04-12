@@ -122,7 +122,7 @@ export class ProviderManagerService {
       // When the token is received save it and go to the setup page for the first account
       if (this.googleSubscription) { this.googleSubscription.unsubscribe(); }
       this.googleSubscription = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => {
-        this.createNewWorkspace(googleToken, this.selectedIdpUrl, responseType);
+        this.createNewWorkspace(googleToken, this.selectedIdpUrl, this.selectedProfile, responseType);
         this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
       }));
 
@@ -131,7 +131,7 @@ export class ProviderManagerService {
       this.workspaceService.getIdpTokenInSetup(this.selectedIdpUrl.url, responseType);
     } else {
       this.appService.logger(`Saving first account with a plain or azure account`, LoggerLevel.INFO, this);
-      this.createNewWorkspace(undefined, undefined, responseType);
+      this.createNewWorkspace(undefined, undefined, this.selectedProfile, responseType);
     }
   }
 
@@ -184,9 +184,9 @@ export class ProviderManagerService {
    * When the data from Google is received, generate a new workspace or check errors, etc.
    */
   // TODO: Why there are 2 createNewWorkspace functions?
-  createNewWorkspace(googleToken, federationUrl, responseType) {
+  createNewWorkspace(googleToken, federationUrl, profile, responseType) {
     const name = 'default';
-    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, name, responseType);
+    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, profile, name, responseType);
     if (result) {
       this.decideSavingMethodAndSave();
     } else {

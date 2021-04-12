@@ -68,7 +68,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   ngOnInit() {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData === undefined || this.workspaceData.proxyConfiguration === undefined) {
-      this.workspaceService.createNewWorkspace(undefined, undefined, 'default', IdpResponseType.SAML);
+      this.workspaceService.createNewWorkspace(undefined, undefined, {id: uuid.v4(), name: 'default'}, 'default', IdpResponseType.SAML);
       this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     }
     if (this.workspaceData.name && this.workspaceData.name !== '') {

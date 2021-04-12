@@ -124,7 +124,7 @@ var generateMainWindow = function () {
         });
     };
     app.on('activate', function () {
-        if (win === null || win === undefined) {
+        if (win === undefined) {
             createWindow();
         }
         else {

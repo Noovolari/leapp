@@ -499,7 +499,7 @@ export class WorkspaceService extends NativeService {
   /* ======< WORKSPACE MANAGEMENTS >======= */
   /* ====================================== */
 
-  createNewWorkspace(googleToken: string, federationUrl: {id: string, url: string}, name: string, responseType: string) {
+  createNewWorkspace(googleToken: string, federationUrl: {id: string, url: string}, profile: {id: string, name: string}, name: string, responseType: string) {
     try {
       // TODO why we need a google token to create a workspace??
       // Create a standard workspace to use as default
@@ -509,6 +509,7 @@ export class WorkspaceService extends NativeService {
         type: responseType,
         name,
         lastIDPToken: googleToken,
+        profiles: [profile],
         idpUrl: [federationUrl],
         proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
         sessions: [],

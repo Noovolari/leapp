@@ -179,14 +179,14 @@
         <ng-container *ngIf="accountType === eAccountType.AWS_TRUSTER">
           <h2>Truster setting</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
-            <label style="margin-bottom: 0;">Federated Account<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
+            <label style="margin-bottom: 0;">Starting Account<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
             <ng-select class="mt-2" formControlName="federatedAccount" bindLabel="accountName" bindValue="session" dropdownPosition="top" [items]="federatedAccounts" [(ngModel)]="selectedSession" (change)="getFedRoles();" [disabled]="true"></ng-select>
           </div>
 
           <div style="width: 2%; height: 1px; display: inline-block;"></div>
 
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;">
-            <label style="margin-bottom: 0;">Federated Role<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
+            <label style="margin-bottom: 0;">Starting Role<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
             <ng-select class="mt-2" formControlName="federatedRole" bindLabel="name" bindValue="name" dropdownPosition="top" [items]="federatedRoles" [(ngModel)]="selectedRole"></ng-select>
           </div>
 

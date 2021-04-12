@@ -130,7 +130,7 @@ const generateMainWindow = () => {
   };
 
   app.on('activate', () => {
-    if (win === null || win === undefined) {
+    if (win === undefined) {
       createWindow();
     } else {
       win.show();

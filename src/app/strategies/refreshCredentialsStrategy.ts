@@ -1,7 +1,6 @@
 import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {concat, Observable, of} from 'rxjs';
-import {LoggerLevel, ToastLevel} from '../services-system/app.service';
 
 export abstract class RefreshCredentialsStrategy {
   refreshCredentials(workspace: Workspace): Observable<any> {

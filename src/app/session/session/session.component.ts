@@ -15,7 +15,6 @@ import {MenuService} from '../../services/menu.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
-import {AccountType} from '../../models/AccountType';
 
 @Component({
   selector: 'app-session',

@@ -8,7 +8,7 @@ import {AzureAccount} from '../models/azure-account';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {TimerService} from '../services/timer-service';
 import {CredentialsService} from '../services/credentials.service';
-import {Observable, of, Subscriber, Subscription} from 'rxjs';
+import {Observable, Subscriber, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {FileService} from '../services-system/file.service';
 

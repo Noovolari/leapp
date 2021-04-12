@@ -6,7 +6,6 @@ import {Session} from '../models/session';
 import {v4 as uuidv4} from 'uuid';
 import {AppService, ToastLevel} from '../services-system/app.service';
 import {AccountType} from '../models/AccountType';
-import {SessionService} from './session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +27,8 @@ export class TrusterAccountService extends NativeService {
    * @param parentRole - the parent account's role
    * @param role - the AWS roles to assign to the account
    * @param idpArn - the idArn used for the federated account
+   * @param region - region to addd as default for this session
+   * @param profile - the named profile
    */
   addTrusterAccountToWorkSpace(accountNumber: string, accountName: string, parentAccountSessionId: string, parentRole: string,
                                role: any, idpArn: string, region: string, profile: { id: string, name: string}) {

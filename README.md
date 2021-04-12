@@ -13,7 +13,7 @@ Leapp is a Cross-Platform Cloud access App, built on top of [Electron](https://g
 
 The App is designed to **manage and secure Cloud Access in multi-account environments.**
 
-![Leapp App](.github/images/Leapp-Keynote-pitch.001.png)
+![Securing AWS Credentials on DevOps machines 001](https://user-images.githubusercontent.com/9497292/114399348-1e942f80-9ba1-11eb-8b4a-74b60bd29189.jpeg)
 
 # Key features
 

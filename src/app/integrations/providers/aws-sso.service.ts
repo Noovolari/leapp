@@ -3,7 +3,7 @@ import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthoriza
 import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo, LogoutRequest} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
-import {concat, EMPTY, merge, Observable, of, throwError} from 'rxjs';
+import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
 import {catchError, delay, expand, map, retryWhen, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';

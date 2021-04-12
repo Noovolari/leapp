@@ -12,7 +12,7 @@ import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
 import {TimerService} from '../services/timer-service';
 import {Workspace} from '../models/workspace';
 import {WorkspaceService} from '../services/workspace.service';
-import {EMPTY, Observable, of, Subscriber, Subscription, throwError} from 'rxjs';
+import {Observable, of, Subscriber, Subscription} from 'rxjs';
 import {constants} from '../core/enums/constants';
 import {ProxyService} from '../services/proxy.service';
 import {Session} from '../models/session';

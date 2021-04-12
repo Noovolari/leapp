@@ -5,7 +5,7 @@ import {NativeService} from '../services-system/native-service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {Workspace} from '../models/workspace';
-import {Observable, Subscribable, Subscriber, Subscription} from 'rxjs';
+import {Observable, Subscriber} from 'rxjs';
 import {AwsAccount} from '../models/aws-account';
 import {Session} from '../models/session';
 import {FileService} from '../services-system/file.service';
@@ -18,8 +18,6 @@ import {SessionService} from './session.service';
 const AWS = require('aws-sdk');
 
 export enum SessionStatus {
-  START,
-  STOP,
   ERROR
 }
 
@@ -43,13 +41,11 @@ export class WorkspaceService extends NativeService {
   // First Time Google Token obtained
   public googleEmit: EventEmitter<string> = new EventEmitter<string>();
 
-  // Aws and Azure status
-  public awsStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
+  // Azure status
   public azureStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   // Credential refreshed
   public credentialEmit: EventEmitter<{status: string, accountName: string}> = new EventEmitter<{status: string, accountName: string}>();
-  private showingSubscription: Subscription;
 
   constructor(
     private httpClient: HttpClient,
@@ -81,7 +77,7 @@ export class WorkspaceService extends NativeService {
     const pos = this.currentWindow.getPosition();
 
     this.idpWindow[session.id] = this.appService.newWindow(idpUrl, false, 'IDP - Login', pos[0] + 200, pos[1] + 50);
-    this.idpWindow[session.id].on('close', (evt) => {
+    this.idpWindow[session.id].on('close', () => {
       const sess = this.sessionService.getSession(session.id);
       if (sess.loading) {
         this.sessionService.stopSession(session);
@@ -169,7 +165,7 @@ export class WorkspaceService extends NativeService {
       }
     });
 
-    this.followRedirects.https.get(options, (res) => {
+    this.followRedirects.https.get(options, () => {
       this.idpWindow[0].loadURL(idpUrl);
     }).on('error', (err) => {
       console.log('error: ', err);
@@ -201,6 +197,7 @@ export class WorkspaceService extends NativeService {
 
   /**
    * Generic response hook, this one is used to generally retrieve a response from an idp Url.
+   * @param observer - the observer form the root call
    * @param details - the detail of the response for the call to the idp url
    * @param type - the type of response for example SAML using the IdpResponseType.SAML
    * @param idpUrl - the SSO url
@@ -214,7 +211,7 @@ export class WorkspaceService extends NativeService {
     // Before doing anything we also need to authenticate VERSUS Cognito to our backend
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     workspace.type = type;
-    this.keychainService.saveSecret(environment.appName, `session-idpToken`, token).then(res => {
+    this.keychainService.saveSecret(environment.appName, `session-idpToken`, token).then(() => {
       // Now we can go on
       this.configurationService.updateWorkspaceSync(workspace);
 
@@ -468,6 +465,7 @@ export class WorkspaceService extends NativeService {
    * @param stsResponse - the STS response from an STs client object getTemporaryCredentials of any type
    * @param workspace - the workspace tf the request
    * @param region - region for aws
+   * @param session - we need the session to obtain info o the profile
    * @returns an object of type {AwsCredential}
    */
   constructCredentialObjectFromStsResponse(stsResponse: any, workspace: Workspace, region: string, session: Session): AwsCredentials {

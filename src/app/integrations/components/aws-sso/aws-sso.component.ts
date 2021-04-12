@@ -5,10 +5,10 @@ import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services-system/app.service';
 import {ConfigurationService} from '../../../services-system/configuration.service';
-import {merge, Observable} from 'rxjs';
+import {merge} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../../../environments/environment';
-import {switchMap, tap, toArray} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
 import {KeychainService} from '../../../services-system/keychain.service';
 
 @Component({

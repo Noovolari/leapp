@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
-import {Observable, of} from 'rxjs';
+import {Observable} from 'rxjs';
 import {AwsCredential} from '../models/credential';
 import {switchMap} from 'rxjs/operators';
 

@@ -2,7 +2,6 @@ import {Injectable} from '@angular/core';
 import {NativeService} from './native-service';
 import {Observable, Subscription} from 'rxjs';
 import * as CryptoJS from 'crypto-js';
-import {switchMap} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'

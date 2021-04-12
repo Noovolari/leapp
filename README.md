@@ -102,13 +102,13 @@ Logs are structured in the following way:
 ```
 *Note: please always add logs whenever possible to any issue you want to fill to enable the team identify the problem quickly*
 
-## Documentation
+# Documentation
 Here you can find our [documentation](https://github.com/Noovolari/leapp/wiki).
 
-## Links
+# Links
 - [Glossary](.github/GLOSSARY.md): find other information about the system
 - [Roadmap](https://github.com/Noovolari/leapp/projects/4): view our next steps and stay up to date
 - [Contributing](./.github/CONTRIBUTING.md): follow the guidelines if you'd like to contribute to the project
 - [Project Structure](./.github/PROJECT_STRUCTURE.md): check how we structured the project and where to find the files
-## License
+# License
 [Mozilla Public License v2.0](https://github.com/Noovolari/leapp/blob/master/LICENSE)

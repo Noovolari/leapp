@@ -5,7 +5,7 @@
   </div>
   <div class="information-profile" (click)="switchCredentials()">
     <ng-container *ngIf="session.account.type !== eAccountType.AZURE">
-      <i class="fa fa-{{getProfileIcon(session.profile)}}"></i>&nbsp;&nbsp;{{getProfileName(session.profile)}}
+      <i class="fa fa-{{getProfileIcon(session.active, session.profile)}}"></i>&nbsp;&nbsp;{{getProfileName(session.profile)}}
     </ng-container>
   </div>
   <div class="information-offset" (click)="switchCredentials()">

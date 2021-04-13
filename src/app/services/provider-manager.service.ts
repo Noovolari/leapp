@@ -104,34 +104,14 @@ export class ProviderManagerService {
     this.selectedProfile = selectedProfile;
     this.form = form;
 
-    // TODO: ?? Why I need to call Google?
-    // Before we need to save the first workspace and call google: this is done only the first time so it is not used in other classes
-    // Now we get the default configuration to obtain the previously saved idp url
-    const configuration = this.configurationService.getConfigurationFileSync();
-
-    // TODO: WHy SAML is essential?
-    // Set our response type
-    const responseType = IdpResponseType.SAML;
-
     // Update Configuration
     if (accountType === AccountType.AWS) {
+      this.createNewWorkspace(null, this.selectedIdpUrl, this.selectedProfile, IdpResponseType.SAML);
+      this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
 
-      // TODO: What I am updating?
-      this.configurationService.updateConfigurationFileSync(configuration);
-
-      // When the token is received save it and go to the setup page for the first account
-      if (this.googleSubscription) { this.googleSubscription.unsubscribe(); }
-      this.googleSubscription = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => {
-        this.createNewWorkspace(googleToken, this.selectedIdpUrl, this.selectedProfile, responseType);
-        this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
-      }));
-
-      // Call the service for working on the first login event to the user idp
-      // We add the helper for account choosing just to be sure to give the possibility to call the correct user
-      this.workspaceService.getIdpTokenInSetup(this.selectedIdpUrl.url, responseType);
     } else {
       this.appService.logger(`Saving first account with a plain or azure account`, LoggerLevel.INFO, this);
-      this.createNewWorkspace(undefined, undefined, this.selectedProfile, responseType);
+      this.createNewWorkspace(undefined, undefined, this.selectedProfile, IdpResponseType.SAML);
     }
   }
 

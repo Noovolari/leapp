@@ -122,57 +122,6 @@ export class WorkspaceService extends NativeService {
   }
 
   /**
-   * Get the Idp Token to save, than save it for later, just the first time
-   * This is used in the setup fase
-   * @param idpUrl - the idp url that is given by the backend
-   * @param type - the Idp Response Type of the request
-   * @param callbackUrl - the callback url that can be given always by the backend in case is missing we setup a default one
-   */
-  getIdpTokenInSetup(idpUrl: string, type: string, callbackUrl?: string) {
-    // We generate a new browser window to host for the Idp Login form
-    // Note: this is due to the fact that electron + angular gives problem with embedded webview
-    const pos = this.currentWindow.getPosition();
-    this.idpWindow[0] = this.appService.newWindow(idpUrl, true, 'IDP - Login', pos[0] + 200, pos[1] + 50);
-
-    this.proxyService.configureBrowserWindow(this.idpWindow);
-    const options = this.proxyService.getHttpClientOptions('https://mail.google.com/mail/u/0/?logout&hl=en');
-
-    // This filter is used to listen to go to a specific callback url (or the generic one)
-    // const filter = {urls: ['https://signin.aws.amazon.com/saml']};
-    const filter = {urls: ['https://*.onelogin.com/*', 'https://*.okta.com/*', 'https://accounts.google.com/ServiceLogin*', 'https://signin.aws.amazon.com/saml']};
-
-    // Our request filter call the generic hook filter passing the idp response type
-    // to construct the ideal method to deal with the construction of the response
-    this.idpWindow[0].webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
-      // G Suite
-      if (details.url.indexOf('accounts.google.com/ServiceLogin') !== -1) {
-        this.idpWindow[0].show();
-      }
-
-      // One Login
-      if (details.url.indexOf('.onelogin.com/login') !== -1) {
-        this.idpWindow[0].show();
-      }
-
-      // OKTA
-      if (details.url.indexOf('.okta.com/discovery/iframe.html') !== -1) {
-        this.idpWindow[0].show();
-      }
-
-      // Do not show window: already logged
-      if (details.url.indexOf('signin.aws.amazon.com/saml') !== -1) {
-        this.idpResponseHookFirstTime(details, type, idpUrl, callback);
-      }
-    });
-
-    this.followRedirects.https.get(options, () => {
-      this.idpWindow[0].loadURL(idpUrl);
-    }).on('error', (err) => {
-      console.log('error: ', err);
-    }).end();
-  }
-
-  /**
    * Credential refresh method, it cals for the entire procedure to obtain a
    * valid session token to make the assumeRoleWithSAML
    * @param session - the Session object
@@ -250,30 +199,6 @@ export class WorkspaceService extends NativeService {
         callback({cancel: true});
       }
     });
-  }
-
-  /**
-   * Specific response hook for the first setup, this one is used to generally retrieve a response from an idp Url.
-   * @param details - the detail of the response for the call to the idp url
-   * @param type - the type of response for example SAML using the IdpResponseType.SAML
-   * @param idpUrl - we save it
-   * @param callback - eventual callback to call with the response data
-   */
-  idpResponseHookFirstTime(details: any, type: string, idpUrl: string, callback?: any) {
-    // Extract the token from the request and set the email for the screen
-    const token = this.extract_SAML_Response(details);
-
-    // Close Idp Window and emit a specific event for the page that subscribe
-    // to this specific reduced version of the get credentials method
-    // TODO: I am calling the providerManagerService?
-    this.googleEmit.emit(token);
-    this.idpWindow[0].close();
-    delete this.idpWindow[0];
-
-    // Close the window we don't need it anymore because otherwise
-    if (callback) {
-      callback({cancel: true});
-    }
   }
 
   /* ====================================== */

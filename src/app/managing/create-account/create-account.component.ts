@@ -131,6 +131,10 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
             this.profiles.push({value: idp.id, label: idp.name});
           }
         });
+      } else {
+        this.workspace.profiles = [{ id: uuid.v4(), name: 'default' }];
+        this.profiles.push({value: this.workspace.profiles[0].id, label: this.workspace.profiles[0].name});
+        this.configurationService.updateWorkspaceSync(this.workspace);
       }
 
       this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));

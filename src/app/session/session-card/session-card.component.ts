@@ -299,10 +299,11 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     }
   }
 
-  getProfileIcon(id) {
+  getProfileIcon(active, id) {
     const profile = this.workspace.profiles.filter(p => p.id === id)[0];
     if (profile) {
-      return profile.name === 'default' ? 'home' : 'user';
+      const color = active ? ' orange' : '';
+      return profile.name === 'default' ? ('home' + color) : ('user' + color);
     } else {
       return 'home';
     }

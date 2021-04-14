@@ -15,6 +15,7 @@ import {MenuService} from '../../services/menu.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
+import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-session',
@@ -67,7 +68,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     // Set workspace
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
     this.profiles = this.workspaceService.getProfiles();
-
+    if (this.workspace.profiles === undefined) {
+      this.profiles = [{ id: uuid.v4(), name: 'default' }];
+      this.workspace.profiles = this.profiles;
+      this.configurationService.updateWorkspaceSync(this.workspace);
+    }
 
     // Set retries
     this.retries = 0;

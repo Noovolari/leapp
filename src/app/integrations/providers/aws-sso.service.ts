@@ -15,6 +15,7 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {Workspace} from '../../models/workspace';
 import {SessionService} from '../../services/session.service';
+import * as uuid from 'uuid';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -305,7 +306,12 @@ export class AwsSsoService extends NativeService {
         };
 
         const workspace  = this.configurationService.getDefaultWorkspaceSync();
-        const profiles   = workspace.profiles;
+        let profiles = workspace.profiles;
+        if (profiles === undefined) {
+          profiles = [{ id: uuid.v4(), name: 'default' }];
+          workspace.profiles = profiles;
+          this.configurationService.updateWorkspaceSync(workspace);
+        }
         const profileId  = profiles.filter(p => p.name === 'default')[0].id;
 
         const session: Session = {

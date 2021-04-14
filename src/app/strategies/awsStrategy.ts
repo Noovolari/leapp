@@ -93,7 +93,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       this.getIamUserAccessKeysFromKeychain(session).then(credentials => {
         this.keychainService.getSecret(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
           if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
-            this.applyPlainAccountSessionToken(workspace, session);
+            this.applyPlainAccountSessionToken(observer, workspace, session);
           } else {
             if (this.processSubscription) { this.processSubscription.unsubscribe(); }
             this.processSubscription = this.getPlainAccountSessionToken(credentials, session).subscribe((awsCredentials) => {
@@ -513,12 +513,17 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     return 'truster-account-session-token-' + session.account.accountName;
   }
 
-  private applyPlainAccountSessionToken(workspace, session: Session) {
+  private applyPlainAccountSessionToken(observer, workspace, session: Session) {
     this.keychainService.getSecret(environment.appName, `plain-account-session-token-${session.account.accountName}`).then(sessionToken => {
       sessionToken = JSON.parse(sessionToken);
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), sessionToken);
       this.configurationService.updateWorkspaceSync(workspace);
       this.configurationService.disableLoadingWhenReady(workspace, session);
+
+      // Start Calculating time here once credentials are actually retrieved
+      this.timerService.defineTimer();
+      observer.next(true);
+      observer.complete();
     });
   }
 

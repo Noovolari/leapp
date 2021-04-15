@@ -75,7 +75,6 @@ export class AwsSsoComponent implements OnInit {
     this.regions = this.appService.getRegions();
     this.selectedRegion = this.regions[0].region;
 
-    // if (this.isAwsSsoActive) {
     merge(
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => { this.selectedRegion = res; })),
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => {
@@ -83,6 +82,5 @@ export class AwsSsoComponent implements OnInit {
         this.form.controls['portalUrl'].setValue(res);
       }))
     ).subscribe();
-    // }
   }
 }

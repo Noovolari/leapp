@@ -45,7 +45,7 @@ export class WorkspaceService extends NativeService {
   public azureStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   // Credential refreshed
-  public credentialEmit: EventEmitter<{status: string, accountName: string}> = new EventEmitter<{status: string, accountName: string}>();
+  public credentialEmit: EventEmitter<{status: string, session: Session}> = new EventEmitter<{status: string, session: Session}>();
 
   constructor(
     private httpClient: HttpClient,
@@ -284,7 +284,7 @@ export class WorkspaceService extends NativeService {
           this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
           // Emit ko
-          this.credentialEmit.emit({status: err.stack, accountName: null});
+          this.credentialEmit.emit({status: err.stack, session });
 
           // If we have a callback call it
           if (callback) {
@@ -299,7 +299,7 @@ export class WorkspaceService extends NativeService {
       this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
       // Emit ko
-      this.credentialEmit.emit({status: err.stack, accountName: null});
+      this.credentialEmit.emit({status: err.stack, session });
     });
   }
 
@@ -328,7 +328,7 @@ export class WorkspaceService extends NativeService {
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
-      this.credentialEmit.emit({status: err.stack, accountName: account.accountName});
+      this.credentialEmit.emit({status: err.stack, session});
     }
 
     // Write in aws credential file and workspace
@@ -356,7 +356,7 @@ export class WorkspaceService extends NativeService {
             this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
 
             // Emit ko for double jump
-            this.credentialEmit.emit({status: err.stack, accountName: account.accountName});
+            this.credentialEmit.emit({status: err.stack, session});
           } else {
 
             // we set the new credentials after the first jump
@@ -368,20 +368,20 @@ export class WorkspaceService extends NativeService {
             this.configurationService.disableLoadingWhenReady(workspace, session);
 
             // Emit ok for double jump
-            this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
+            this.credentialEmit.emit({status: 'ok', session});
           }
         });
       } else {
         this.configurationService.disableLoadingWhenReady(workspace, session);
         // Emit ok for single jump
-        this.credentialEmit.emit({status: 'ok', accountName: account.accountName});
+        this.credentialEmit.emit({status: 'ok', session});
       }
     } catch (err) {
       this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
-      this.credentialEmit.emit({status: err.stack, accountName: account.accountName});
+      this.credentialEmit.emit({status: err.stack, session});
     }
   }
 

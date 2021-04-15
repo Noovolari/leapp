@@ -133,7 +133,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
       });
 
       this.configurationService.updateWorkspaceSync(workspace);
-      this.credentialsService.refreshReturnStatusEmit.emit(false);
+      this.credentialsService.refreshReturnStatusEmit.emit(session);
       this.appService.toast('Can\'t refresh Credentials.', ToastLevel.WARN, 'Credentials');
       observer.next(false);
       observer.complete();

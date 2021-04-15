@@ -112,7 +112,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
               },
               (err) => {
                 this.appService.logger('Error in Aws Credential process', LoggerLevel.ERROR, this, err.stack);
-                observer.error(false);
+                observer.next(false);
               });
           }
         });
@@ -178,7 +178,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
             this.appService.toast('Error assuming role from AWS SSO account, check log for details.', LoggerLevel.WARN, 'Assume role Error');
 
             // Emit ko for double jump
-            this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+            this.workspaceService.credentialEmit.emit({status: err.stack, session});
 
             this.sessionService.stopSession(session);
 
@@ -238,7 +238,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           // This catch error is for panics which are not managed by their own procedures
           this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
           this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.ERROR, 'Aws Credential Process');
-          this.credentialsService.refreshReturnStatusEmit.emit(false);
+          this.credentialsService.refreshReturnStatusEmit.emit(session);
           return of(false);
         }),
         switchMap(res => {
@@ -263,7 +263,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           observable.error(err);
           observable.complete();
           // Emit ko for double jump
-          this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+          this.workspaceService.credentialEmit.emit({status: err.stack, session});
         }
       };
 
@@ -347,10 +347,17 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                 this.appService.toast('Error assuming role from plain account, check log for details.', LoggerLevel.WARN, 'Assume role Error');
 
                 // Emit ko for double jump
-                this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+                this.workspaceService.credentialEmit.emit({status: err.stack, session});
 
-                workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
-                this.configurationService.disableLoadingWhenReady(workspace, session);
+                workspace.sessions.forEach(sess => {
+                  if (sess.id === session.id) {
+                    sess.active = false;
+                    sess.loading = false;
+                    sess.complete = false;
+                  }
+                });
+                this.configurationService.updateWorkspaceSync(workspace);
+                this.appService.redrawList.emit(true);
 
                 this.appService.cleanCredentialFile();
                 observer.next(false);
@@ -376,10 +383,17 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
             this.appService.toast('Error in Aws Credential process, check log for details.', LoggerLevel.WARN, 'Aws Credential process Error');
 
             // Emit ko for double jump
-            this.workspaceService.credentialEmit.emit({status: err.stack, accountName: session.account.accountName});
+            this.workspaceService.credentialEmit.emit({status: err.stack, session});
 
-            workspace.sessions.forEach(sess => { if (sess.id === session.id) { sess.active = false; } });
-            this.configurationService.disableLoadingWhenReady(workspace, session);
+            workspace.sessions.forEach(sess => {
+              if (sess.id === session.id) {
+                sess.active = false;
+                sess.loading = false;
+                sess.complete = false;
+              }
+            });
+            this.configurationService.updateWorkspaceSync(workspace);
+            this.appService.redrawList.emit(true);
 
             this.appService.cleanCredentialFile();
             observer.next(false);
@@ -405,7 +419,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           observable.error(err);
           observable.complete();
           // Emit ko for double jump
-          this.workspaceService.credentialEmit.emit({status: err.stack, accountName: parentSession.account.accountName});
+          this.workspaceService.credentialEmit.emit({status: err.stack, session});
         }
       };
 

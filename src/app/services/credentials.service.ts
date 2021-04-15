@@ -23,7 +23,7 @@ export class CredentialsService extends NativeService {
 
   // Emitters
   public refreshCredentialsEmit: EventEmitter<AccountType> = new EventEmitter<AccountType>();
-  public refreshReturnStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
+  public refreshReturnStatusEmit: EventEmitter<any> = new EventEmitter<any>();
 
   // Global strategy map
   strategyMap = {};
@@ -93,7 +93,7 @@ export class CredentialsService extends NativeService {
         () => this.appService.redrawList.emit(true),
         e => {
           this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
-          this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.ERROR, 'Aws Credential Process');
+          this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.WARN, 'Aws Credential Process');
       });
     } else {
       if (this.refreshStrategySubcribeAll) { this.refreshStrategySubcribeAll.unsubscribe(); }
@@ -104,8 +104,8 @@ export class CredentialsService extends NativeService {
       ).subscribe(
         () => this.appService.redrawList.emit(true),
           e => {
-        this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
-        this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.ERROR, 'Aws Credential Process');
+            this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
+            this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.WARN, 'Aws Credential Process');
       });
     }
 
@@ -123,7 +123,7 @@ export class CredentialsService extends NativeService {
       this.refreshReturnStatusEmit.emit(true);
     } else {
       this.appService.toast('There was a problem in generating credentials.', ToastLevel.WARN, 'Credentials');
-      this.refreshReturnStatusEmit.emit(false);
+      this.refreshReturnStatusEmit.emit(res.session);
     }
   }
 }

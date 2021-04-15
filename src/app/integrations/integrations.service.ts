@@ -9,6 +9,7 @@ import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
 import {Session} from '../models/session';
+import {CredentialsService} from '../services/credentials.service';
 
 
 @Injectable({
@@ -49,7 +50,10 @@ export class IntegrationsService {
         })
       )
       .subscribe(() => {
-        this.ngZone.run(() => this.router.navigate(['/sessions', 'session-selected']));
+        this.ngZone.run(() => {
+          this.appService.redrawList.emit(true);
+          this.router.navigate(['/sessions', 'session-selected']);
+        });
         this.loginSubscriber.unsubscribe();
       });
   }
@@ -71,7 +75,10 @@ export class IntegrationsService {
         return throwError(err);
       })
     ).subscribe(() => {
-      this.ngZone.run(() =>  this.router.navigate(['/sessions', 'session-selected']));
+      this.ngZone.run(() => {
+        this.appService.redrawList.emit(true);
+        this.router.navigate(['/sessions', 'session-selected']);
+      });
       this.loginSubscriber.unsubscribe();
     });
   }

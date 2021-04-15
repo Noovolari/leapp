@@ -94,7 +94,7 @@ export class SessionService extends NativeService {
 
   alterOrderByTime(sessions) {
     sessions.sort((a, b) => {
-      return (a as Session).lastStopDate < (b as Session).lastStopDate ? 1 : -1;
+      return new Date((a as Session).lastStopDate).getTime() < new Date((b as Session).lastStopDate).getTime() ? 1 : -1;
     });
     return sessions;
   }
@@ -122,6 +122,7 @@ export class SessionService extends NativeService {
           sess.active = false;
           sess.loading = false;
           sess.complete = false;
+          sess.lastStopDate = new Date().toISOString();
         }
 
         // Only overwrite session if profile is the same
@@ -129,6 +130,7 @@ export class SessionService extends NativeService {
           sess.active = false;
           sess.complete = false;
           sess.loading = false;
+          sess.lastStopDate = new Date().toISOString();
         }
 
         // Set loading only the selected one

@@ -8,7 +8,7 @@ import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {AwsSsoAccount} from '../models/aws-sso-account';
-import {catchError, map, switchMap} from 'rxjs/operators';
+import {catchError, last, map, switchMap} from 'rxjs/operators';
 
 import {AwsCredential} from '../models/credential';
 import {ConfigurationService} from '../services-system/configuration.service';
@@ -42,7 +42,6 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         sess.account.type === AccountType.AWS) && sess.active;
     });
 
-    this.appService.logger('Aws sso Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
 
@@ -70,7 +69,7 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
 
   private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
     // Retrieve access token and region
-    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
+    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(last()).pipe(
       switchMap((loginToAwsSSOResponse) => {
         return this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name);
       }),

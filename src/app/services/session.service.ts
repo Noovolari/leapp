@@ -104,7 +104,7 @@ export class SessionService extends NativeService {
    * @param session - the session object to extract the parameter to generate the credentials
    */
   startSession(session: Session) {
-    this.appService.logger(`Starting Session: ${session.account.accountName}`, LoggerLevel.INFO, this);
+    // REMOVE this.appService.logger(`Starting Session: ${session.account.accountName}`, LoggerLevel.INFO, this);
 
     // Get the current workspace
     const workspace = this.configurationService.getDefaultWorkspaceSync();

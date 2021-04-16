@@ -11,10 +11,11 @@ import {NativeService} from '../services-system/native-service';
 import {ProxyService} from './proxy.service';
 import {TimerService} from './timer-service';
 import {WorkspaceService} from './workspace.service';
-import {concat, Subscription} from 'rxjs';
+import {concat} from 'rxjs';
 import {AwsSsoStrategy} from '../strategies/awsSsoStrategy';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {SessionService} from './session.service';
+import {last} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -33,10 +34,6 @@ export class CredentialsService extends NativeService {
   awsStrategy;
   awsSsoStrategy;
 
-  private refreshSubscribe: Subscription;
-  private workspaceSubscribe: Subscription;
-  private timerSubscription: Subscription;
-
   refreshStrategySubcribeAll;
   refreshStrategySubscribeSingle = {};
 
@@ -54,17 +51,15 @@ export class CredentialsService extends NativeService {
   ) {
     super();
 
-    if (this.refreshSubscribe) { this.refreshSubscribe.unsubscribe(); }
-    this.refreshSubscribe = this.refreshCredentialsEmit.subscribe((accountType) => this.refreshCredentials(accountType));
+    this.refreshCredentialsEmit.subscribe((accountType) => this.refreshCredentials(accountType));
 
-    if (this.workspaceSubscribe) { this.workspaceSubscribe.unsubscribe(); }
-    this.workspaceSubscribe = this.workspaceService.credentialEmit.subscribe(res => this.processCredentials(res));
+    this.workspaceService.credentialEmit.subscribe(res => this.processCredentials(res));
 
     // =================================================
     // Subscribe to global timer manager from strategies
     // =================================================
-    if (this.timerSubscription) { this.timerSubscription.unsubscribe(); }
-    this.timerSubscription = this.timerService.processRefreshByTimer.subscribe(() => {
+
+    this.timerService.processRefreshByTimer.subscribe(() => {
       this.refreshCredentials(null);
     });
 
@@ -88,20 +83,18 @@ export class CredentialsService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (accountType !== null) {
-      if (this.refreshStrategySubscribeSingle[accountType]) { this.refreshStrategySubscribeSingle[accountType].unsubscribe(); }
-      this.refreshStrategySubscribeSingle[accountType] = this.strategyMap[accountType](workspace, accountType).subscribe(
+      this.strategyMap[accountType](workspace, accountType).pipe(last()).subscribe(
         () => this.appService.redrawList.emit(true),
         e => {
           this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
           this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.WARN, 'Aws Credential Process');
       });
     } else {
-      if (this.refreshStrategySubcribeAll) { this.refreshStrategySubcribeAll.unsubscribe(); }
       this.refreshStrategySubcribeAll = concat(
         this.awsSsoStrategy.refreshCredentials(workspace),
         this.awsStrategy.refreshCredentials(workspace),
         this.azureStrategy.refreshCredentials(workspace)
-      ).subscribe(
+      ).pipe(last()).subscribe(
         () => this.appService.redrawList.emit(true),
           e => {
             this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);

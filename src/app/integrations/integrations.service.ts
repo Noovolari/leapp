@@ -9,7 +9,6 @@ import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
 import {Session} from '../models/session';
-import {CredentialsService} from '../services/credentials.service';
 
 
 @Injectable({
@@ -64,6 +63,7 @@ export class IntegrationsService {
 
   syncAccounts() {
     if (this.loginSubscriber) { this.loginSubscriber.unsubscribe(); }
+    console.log('syncing account');
     this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).pipe(
       switchMap((AwsSsoSessions: Session[]) => {
         // Save sessions to workspace

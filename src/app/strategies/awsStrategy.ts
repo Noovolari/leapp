@@ -27,8 +27,6 @@ import {SessionService} from '../services/session.service';
 const AWS = require('aws-sdk');
 
 export class AwsStrategy extends RefreshCredentialsStrategy {
-  private processSubscription: Subscription;
-  private processSubscriptionTruster: Subscription;
 
   constructor(
     private credentialsService: CredentialsService,
@@ -44,6 +42,26 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     private awsSsoService: AwsSsoService) {
     super();
   }
+  private processSubscription: Subscription;
+  private processSubscriptionTruster: Subscription;
+
+  private static checkIfMfaIsNeeded(session: Session): boolean {
+    return (session.account as AwsPlainAccount).mfaDevice !== undefined &&
+      (session.account as AwsPlainAccount).mfaDevice !== null &&
+      (session.account as AwsPlainAccount).mfaDevice !== '';
+  }
+
+  private static generatePlainAccountSessionTokenExpirationString(session: any) {
+    return 'plain-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private static generateTrusterAccountSessionTokenExpirationString(session: any) {
+    return 'truster-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private static generateTrusterAccountSessionTokenString(session: any) {
+    return 'truster-account-session-token-' + session.account.accountName;
+  }
 
   getActiveSessions(workspace: Workspace) {
     const activeSessions = workspace.sessions.filter((sess) => {
@@ -52,9 +70,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
               sess.account.type === AccountType.AWS_PLAIN_USER ||
               sess.account.type === AccountType.AWS) && sess.active;
     });
-
-
-    this.appService.logger('Aws Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
 
@@ -91,7 +106,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   private awsCredentialProcess(workspace: Workspace, session): Observable<boolean> {
     return new Observable<boolean>(observer => {
       this.getIamUserAccessKeysFromKeychain(session).then(credentials => {
-        this.keychainService.getSecret(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
+        this.keychainService.getSecret(environment.appName, AwsStrategy.generatePlainAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
           if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
             this.applyPlainAccountSessionToken(observer, workspace, session);
           } else {
@@ -241,7 +256,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           this.credentialsService.refreshReturnStatusEmit.emit(session);
           return of(false);
         }),
-        switchMap(res => {
+        switchMap(() => {
           // Start Calculating time here once credentials are actually retrieved
           this.timerService.defineTimer();
           // return ok for this credential set
@@ -275,11 +290,11 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const sts = new AWS.STS(this.appService.stsOptions(session));
       const params = { DurationSeconds: environment.sessionTokenDuration };
 
-      this.keychainService.getSecret(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
+      this.keychainService.getSecret(environment.appName, AwsStrategy.generatePlainAccountSessionTokenExpirationString(session)).then(sessionTokenData => {
         if (sessionTokenData && this.isSessionTokenStillValid(sessionTokenData)) {
           processData(sessionTokenData, null);
         } else {
-          if (this.checkIfMfaIsNeeded(session)) {
+          if (AwsStrategy.checkIfMfaIsNeeded(session)) {
             // We Need a MFA BUT Now we need to retrieve a refresh token
             // from the vault to see if the session is still refreshable
             this.showMFAWindowAndAuthenticate(params, session, null, () => {
@@ -301,8 +316,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   private async getIamUserAccessKeysFromKeychain(session) {
     const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
-    const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
-    return credentials;
+    return {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
   }
 
   private async doubleJumpFromFixedCredential(observer: Subscriber<boolean>, session) {
@@ -431,14 +445,14 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const sts = new AWS.STS(this.appService.stsOptions(session));
       const params = { DurationSeconds: environment.sessionTokenDuration };
 
-      this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session)).then(sessionTokenExpirationData => {
+      this.keychainService.getSecret(environment.appName, AwsStrategy.generateTrusterAccountSessionTokenExpirationString(session)).then(sessionTokenExpirationData => {
         if (sessionTokenExpirationData && this.isSessionTokenStillValid(sessionTokenExpirationData)) {
-          this.keychainService.getSecret(environment.appName, this.generateTrusterAccountSessionTokenString(session)).then(sessionTokenData => {
+          this.keychainService.getSecret(environment.appName, AwsStrategy.generateTrusterAccountSessionTokenString(session)).then(sessionTokenData => {
             sessionTokenData = JSON.parse(sessionTokenData);
             processData(sessionTokenData, null);
           });
         } else {
-          if (this.checkIfMfaIsNeeded(parentSession)) {
+          if (AwsStrategy.checkIfMfaIsNeeded(parentSession)) {
             // We Need a MFA BUT Now we need to retrieve a refresh token
             // from the vault to see if the session is still refreshable
             this.showMFAWindowAndAuthenticate(params, parentSession, null, () => {
@@ -472,12 +486,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     });
   }
 
-  private checkIfMfaIsNeeded(session: Session): boolean {
-    return (session.account as AwsPlainAccount).mfaDevice !== undefined &&
-      (session.account as AwsPlainAccount).mfaDevice !== null &&
-      (session.account as AwsPlainAccount).mfaDevice !== '';
-  }
-
   private showMFAWindowAndAuthenticate(params, session, parentSession, callback) {
     this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
       if (value !== constants.CONFIRM_CLOSED) {
@@ -501,30 +509,18 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
   private savePlainAccountSessionTokenExpirationInVault(credentials, session: Session) {
     const name = this.configurationService.getNameFromProfileId(session.profile);
-    this.keychainService.saveSecret(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session), credentials[name].expiration.toString());
+    this.keychainService.saveSecret(environment.appName, AwsStrategy.generatePlainAccountSessionTokenExpirationString(session), credentials[name].expiration.toString());
   }
 
   private saveTrusterAccountSessionTokenExpirationInVault(credentials, session: Session) {
     const name = this.configurationService.getNameFromProfileId(session.profile);
-    this.keychainService.saveSecret(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(session), credentials[name].expiration.toString());
+    this.keychainService.saveSecret(environment.appName, AwsStrategy.generateTrusterAccountSessionTokenExpirationString(session), credentials[name].expiration.toString());
   }
 
   private isSessionTokenStillValid(sessionTokenData): boolean {
     const tokenDate = new Date(sessionTokenData);
     const check = (date) => date > Date.now();
     return check(tokenDate);
-  }
-
-  private generatePlainAccountSessionTokenExpirationString(session: any) {
-    return 'plain-account-session-token-expiration-' + session.account.accountName;
-  }
-
-  private generateTrusterAccountSessionTokenExpirationString(session: any) {
-    return 'truster-account-session-token-expiration-' + session.account.accountName;
-  }
-
-  private generateTrusterAccountSessionTokenString(session: any) {
-    return 'truster-account-session-token-' + session.account.accountName;
   }
 
   private applyPlainAccountSessionToken(observer, workspace, session: Session) {
@@ -545,21 +541,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       observer.complete();
     });
   }
-
-  private applyTrusterAccountSessionToken(workspace, session: Session) {
-    this.keychainService.getSecret(environment.appName, `truster-account-session-token-${session.account.accountName}`).then(sessionToken => {
-      sessionToken = JSON.parse(sessionToken);
-      // Update profile name
-      const sessionTokenExtracted = Object.values(sessionToken)[0];
-      sessionToken = {};
-      sessionToken[this.configurationService.getNameFromProfileId(session.profile)] = sessionTokenExtracted;
-
-      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), sessionToken);
-      this.configurationService.updateWorkspaceSync(workspace);
-      this.configurationService.disableLoadingWhenReady(workspace, session);
-    });
-  }
-
   private doubleJumpFromFixedCredentialWithObserver(session: any): Observable<boolean> {
     return new Observable<boolean>(observer => {
       this.doubleJumpFromFixedCredential(observer, session);

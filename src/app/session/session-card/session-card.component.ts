@@ -129,7 +129,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     this.sessionService.stopSession(this.session);
 
     // New: we need to apply changes directly on credentials file if not azure type
-    this.sessionService.removeFromIniFile(this.session);
+    this.sessionService.removeFromIniFile(this.session.profile);
 
     // automatically check if there is an active session or stop it
     this.credentialsService.refreshCredentialsEmit.emit(this.session.account.type);
@@ -322,8 +322,8 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   changeDefaultProfile() {
 
     if (this.selectedProfile) {
+      this.sessionService.removeFromIniFile(this.session.profile);
       this.sessionService.addProfile(this.selectedProfile);
-      this.sessionService.removeFromIniFile(this.session);
       this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
 
       if (this.session.active) {

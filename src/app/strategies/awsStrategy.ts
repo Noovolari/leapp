@@ -530,6 +530,11 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   private applyPlainAccountSessionToken(observer, workspace, session: Session) {
     this.keychainService.getSecret(environment.appName, `plain-account-session-token-${session.account.accountName}`).then(sessionToken => {
       sessionToken = JSON.parse(sessionToken);
+      // Update profile name
+      const sessionTokenExtracted = Object.values(sessionToken)[0];
+      sessionToken = {};
+      sessionToken[this.configurationService.getNameFromProfileId(session.profile)] = sessionTokenExtracted;
+
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), sessionToken);
       this.configurationService.updateWorkspaceSync(workspace);
       this.configurationService.disableLoadingWhenReady(workspace, session);
@@ -544,6 +549,11 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   private applyTrusterAccountSessionToken(workspace, session: Session) {
     this.keychainService.getSecret(environment.appName, `truster-account-session-token-${session.account.accountName}`).then(sessionToken => {
       sessionToken = JSON.parse(sessionToken);
+      // Update profile name
+      const sessionTokenExtracted = Object.values(sessionToken)[0];
+      sessionToken = {};
+      sessionToken[this.configurationService.getNameFromProfileId(session.profile)] = sessionTokenExtracted;
+
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), sessionToken);
       this.configurationService.updateWorkspaceSync(workspace);
       this.configurationService.disableLoadingWhenReady(workspace, session);

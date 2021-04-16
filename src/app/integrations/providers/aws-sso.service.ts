@@ -134,14 +134,28 @@ export class AwsSsoService extends NativeService {
   }
 
   firstTimeLoginToAwsSSO(region: string, portalUrl: string): Observable<LoginToAwsSSOResponse> {
-    return this.authorizeIntegration(region, portalUrl).pipe(
-      switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
-      switchMap(generateSSOTokenResponse => {
-        return this.saveAwsSsoAccessInfo(portalUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
-          map(() => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime }))
-        );
-      })
-    );
+    return new Observable<LoginToAwsSSOResponse>(observer => {
+      const request = this.appService.getFollowRedirects().https.request(portalUrl, response => {
+        this.authorizeIntegration(region, response.responseUrl).pipe(
+          switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
+          switchMap(generateSSOTokenResponse => {
+            return this.saveAwsSsoAccessInfo(portalUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
+              map(() => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime }))
+            );
+          })
+        ).subscribe(res => {
+          observer.next(res);
+          observer.complete();
+        }, err => {
+          observer.error(err);
+          observer.complete();
+        });
+      }).on('error', err => {
+        observer.error(err);
+        observer.complete();
+      });
+      request.end();
+    });
   }
 
   loginToAwsSSO(): Observable<LoginToAwsSSOResponse> {

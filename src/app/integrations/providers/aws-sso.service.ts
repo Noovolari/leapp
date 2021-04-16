@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest} from 'aws-sdk/clients/ssooidc';
-import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, RoleInfo, LogoutRequest} from 'aws-sdk/clients/sso';
+import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, LogoutRequest, RoleInfo} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
@@ -8,6 +8,7 @@ import {catchError, delay, expand, map, retryWhen, switchMap, take, tap, toArray
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
+import * as uuid from 'uuid';
 import {v4 as uuidv4} from 'uuid';
 import {KeychainService} from '../../services-system/keychain.service';
 import {environment} from '../../../environments/environment';
@@ -15,7 +16,6 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {Workspace} from '../../models/workspace';
 import {SessionService} from '../../services/session.service';
-import * as uuid from 'uuid';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -159,6 +159,7 @@ export class AwsSsoService extends NativeService {
   }
 
   loginToAwsSSO(): Observable<LoginToAwsSSOResponse> {
+    console.warn('retrying login');
     let region;
     let portalUrl;
     return merge(
@@ -184,6 +185,7 @@ export class AwsSsoService extends NativeService {
   }
 
   getAwsSsoPortalCredentials(): Observable<LoginToAwsSSOResponse> {
+    console.warn('portal credentials');
     const loginToAwsSSOResponse: LoginToAwsSSOResponse = {accessToken: '', expirationTime: undefined, region: ''};
     return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(
       switchMap((expirationTime) => {

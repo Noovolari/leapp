@@ -26,8 +26,6 @@ export enum SessionStatus {
 })
 export class WorkspaceService extends NativeService {
 
-  // timeout for get configuration
-  timeout;
 
   // A class reference to the idp window
   idpWindow = {};

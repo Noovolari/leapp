@@ -274,7 +274,7 @@ export class ConfigurationService extends NativeService {
     if (this.processSubscription3) { this.processSubscription3.unsubscribe(); }
     this.processSubscription3 = this.executeService.execute('az account clear 2>&1').pipe(
       switchMap(() => this.executeService.execute('az configure --defaults location=\'\' 2>&1'))
-    ).subscribe(res => {}, err => {});
+    ).subscribe(() => {}, () => {});
   }
 
   // ============================================================ //

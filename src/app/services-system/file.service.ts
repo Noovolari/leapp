@@ -23,8 +23,8 @@ export class FileService extends NativeService {
 
   /**
    * Check if a file or directory exists by passing a path
-   * @param - {string} path - the path to check
    * @returns - {boolean} - exists or not
+   * @param path - the path of the directory
    */
   exists(path: string): boolean {
     return this.fs.existsSync(path);
@@ -32,8 +32,8 @@ export class FileService extends NativeService {
 
   /**
    * Get directory name
-   * @param - {string} path - the path to retrieve the name
    * @returns - {string} - the directory name
+   * @param path - the directory path
    */
   dirname(path: string): string {
     return this.path.dirname(path);
@@ -41,8 +41,8 @@ export class FileService extends NativeService {
 
   /**
    * Read the file
-   * @param - {string} filePath - the path of the file to read
    * @returns - {Observable<string>} - the observable to check for
+   * @param filePath - directory path
    */
   readFile(filePath: string): Observable<string> {
     return new Observable(subscriber => {
@@ -59,8 +59,8 @@ export class FileService extends NativeService {
 
   /**
    * Copy the directory
-   * @param - {string} source
-   * @param - {string} target
+   * @param source - source directory
+   * @param target - target directory
    */
   copyDir(source: string, target: string) {
     this.copydir.sync(source, target, {mode: true});
@@ -68,8 +68,8 @@ export class FileService extends NativeService {
 
   /**
    * Read file sync
-   * @param - {string} filePath - read a file in a synchronous way
    * @returns - {string} - return the file directly as string
+   * @param filePath - Path to read the file
    */
   readFileSync(filePath: string): string {
     return this.fs.readFileSync(filePath, {encoding: 'utf-8'});
@@ -77,8 +77,8 @@ export class FileService extends NativeService {
 
   /**
    * Read a file as base 64
-   * @param - {string} filePath - the file to read
    * @returns - {string} - the base64
+   * @param filePath - path of the directory file
    */
   readFileSyncBase64(filePath: string): string {
     return this.fs.readFileSync(filePath, {encoding: 'base64'});
@@ -86,8 +86,8 @@ export class FileService extends NativeService {
 
   /**
    * Read the directories in a recursive manner
-   * @param - {string} source - the source to start from
    * @returns - {any} - data
+   * @param source - source of the directory
    */
   getSubDirs(source: string) {
     return this.fs.readdirSync(source, { withFileTypes: true })

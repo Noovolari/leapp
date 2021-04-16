@@ -47,7 +47,6 @@ export class AwsSsoComponent implements OnInit {
 
   login() {
     if (this.form.valid) {
-      this.loading = true;
       this.integrationsService.login(this.form.value.portalUrl, this.selectedRegion);
     }
   }
@@ -63,7 +62,6 @@ export class AwsSsoComponent implements OnInit {
   }
 
   forceSync() {
-    this.loading = true;
     this.integrationsService.syncAccounts();
   }
 

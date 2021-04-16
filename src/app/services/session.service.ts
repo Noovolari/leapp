@@ -202,7 +202,7 @@ export class SessionService extends NativeService {
         s.profile = newId;
         if (s.active) {
           this.stopSession(s);
-          this.removeFromIniFile(s);
+          this.removeFromIniFile(id);
           this.appService.redrawList.emit(true);
         }
       }
@@ -210,10 +210,10 @@ export class SessionService extends NativeService {
     this.configurationService.updateWorkspaceSync(workspace);
   }
 
-  removeFromIniFile(session: Session) {
+  removeFromIniFile(profileId: string) {
     const config = this.fileService.iniParseSync(this.appService.awsCredentialPath());
     if (config) {
-      delete config[this.configurationService.getNameFromProfileId(session.profile)];
+      delete config[this.configurationService.getNameFromProfileId(profileId)];
       this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), config);
     }
   }

@@ -173,6 +173,7 @@ export class SessionService extends NativeService {
     }
     workspace.sessions = sessions;
     this.configurationService.updateWorkspaceSync(workspace);
+    this.appService.redrawList.emit(true);
     if (session !== null) {
       this.appService.logger('Stopping session', LoggerLevel.INFO, this, JSON.stringify({ timeStamp: new Date().toISOString(), id: session.id, account: session.account.accountName }, null, 3));
     } else {

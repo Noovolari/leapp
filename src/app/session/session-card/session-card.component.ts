@@ -114,11 +114,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     this.sessionService.startSession(this.session);
 
     // automatically check if there is an active session and get session list again
-    if (this.session.active === false) {
-      this.appService.redrawList.emit(true);
-      this.credentialsService.refreshCredentials(null);
-      this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
-    }
+    this.appService.redrawList.emit(true);
+    this.credentialsService.refreshCredentials(null);
+    this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
   }
 
   /**
@@ -259,7 +257,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
           this.configurationService.updateWorkspaceSync(this.workspace);
 
           if (this.session.active) {
-            this.stopSession();
+            this.startSession();
           } else {
             this.appService.redrawList.emit(true);
           }
@@ -320,14 +318,13 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   }
 
   changeDefaultProfile() {
-
     if (this.selectedProfile) {
       this.sessionService.removeFromIniFile(this.session.profile);
       this.sessionService.addProfile(this.selectedProfile);
       this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
 
       if (this.session.active) {
-        this.stopSession();
+        this.startSession();
       } else {
         this.appService.redrawList.emit(true);
       }

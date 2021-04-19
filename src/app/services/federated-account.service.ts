@@ -60,6 +60,11 @@ export class FederatedAccountService extends NativeService {
     const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);
     if (!test || test.length === 0) {
 
+      console.log('SELECTED URL 4', idpUrl.id);
+      console.log('PROFILE ID', profile.id);
+      console.log('WORKSPACE IDPURL', workspace.idpUrl);
+      console.log('WORKSPACE PROFILES', workspace.profiles);
+
       // add new account
       const account = {
         accountId: accountNumber,
@@ -84,11 +89,11 @@ export class FederatedAccountService extends NativeService {
         account
       };
 
-      if (workspace.idpUrl.findIndex(i => i.id === idpUrl.id) === -1) {
+      if (workspace.idpUrl.findIndex(i => i !== null && i.id === idpUrl.id) === -1) {
         workspace.idpUrl.push(idpUrl);
       }
 
-      if (workspace.profiles.findIndex(i => i.id === profile.id) === -1) {
+      if (workspace.profiles.findIndex(i => i !== null && i.id === profile.id) === -1) {
         workspace.profiles.push(profile);
       }
 

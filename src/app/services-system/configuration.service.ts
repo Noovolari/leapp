@@ -277,6 +277,35 @@ export class ConfigurationService extends NativeService {
     ).subscribe(() => {}, () => {});
   }
 
+  public sanitizeIdpUrlsAndNamedProfiles() {
+    const workspace = this.getDefaultWorkspaceSync();
+
+    const idpUrls = workspace.idpUrl;
+    const profiles = workspace.profiles;
+
+    const sanitizedIdpUrls = [];
+    const sanitizedProfiles = [];
+
+    if (idpUrls && profiles) {
+      idpUrls.forEach((idpUrl) => {
+        if (idpUrl !== null && idpUrl !== undefined) {
+          sanitizedIdpUrls.push(idpUrl);
+        }
+      });
+
+      profiles.forEach((profile) => {
+        if (profile !== null && profile !== undefined) {
+          sanitizedProfiles.push(profile);
+        }
+      });
+
+      workspace.idpUrl = sanitizedIdpUrls;
+      workspace.profiles = sanitizedProfiles;
+
+      this.updateWorkspaceSync(workspace);
+    }
+  }
+
   // ============================================================ //
   // ====================== PRIVATE METHODS ===================== //
   // ============================================================ //
@@ -300,5 +329,4 @@ export class ConfigurationService extends NativeService {
       return null;
     }
   }
-
 }

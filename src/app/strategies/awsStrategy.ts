@@ -449,6 +449,17 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
         if (sessionTokenExpirationData && this.isSessionTokenStillValid(sessionTokenExpirationData)) {
           this.keychainService.getSecret(environment.appName, AwsStrategy.generateTrusterAccountSessionTokenString(session)).then(sessionTokenData => {
             sessionTokenData = JSON.parse(sessionTokenData);
+
+            // Update profile name
+            const sessionTokenExtracted = Object.values(sessionTokenData)[0];
+            sessionTokenData = {};
+            sessionTokenData[this.configurationService.getNameFromProfileId(session.profile)] = sessionTokenExtracted;
+            // Update region
+            const newRegion = session.account.region;
+            if (newRegion && newRegion !== 'no region necessary') {
+              sessionTokenData[this.configurationService.getNameFromProfileId(session.profile)].region = newRegion;
+            }
+
             processData(sessionTokenData, null);
           });
         } else {

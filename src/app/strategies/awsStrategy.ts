@@ -530,6 +530,11 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       const sessionTokenExtracted = Object.values(sessionToken)[0];
       sessionToken = {};
       sessionToken[this.configurationService.getNameFromProfileId(session.profile)] = sessionTokenExtracted;
+      // Update region
+      const newRegion = session.account.region;
+      if (newRegion && newRegion !== 'no region necessary') {
+        sessionToken[this.configurationService.getNameFromProfileId(session.profile)].region = newRegion;
+      }
 
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), sessionToken);
       this.configurationService.updateWorkspaceSync(workspace);

@@ -259,7 +259,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
           this.configurationService.updateWorkspaceSync(this.workspace);
 
           if (this.session.active) {
-            this.startSession();
+            this.stopSession();
           } else {
             this.appService.redrawList.emit(true);
           }

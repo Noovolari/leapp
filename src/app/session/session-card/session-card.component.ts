@@ -221,11 +221,14 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
    * Set the region for ssm init and launch the mopethod form the server to find instances
    * @param event - the change select event
    */
-  changeSsmRegion(event) {
+  changeSsmRegion(event, session: Session) {
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
+
+      const account = `Leapp-ssm-data-${session.profile}`;
+
       // Set the aws credentials to instanziate the ssm client
-      this.keychainService.getSecret(environment.appName, `Leapp-ssm-data`).then(creds => {
+      this.keychainService.getSecret(environment.appName, account).then(creds => {
         const credentials = JSON.parse(creds);
 
         // Check the result of the call

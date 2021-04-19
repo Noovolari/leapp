@@ -85,7 +85,10 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         const profileName = this.configurationService.getNameFromProfileId(session.profile);
         const awsSsoCredentials = {};
         awsSsoCredentials[profileName] = credential;
-        return fromPromise(this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential))).pipe(
+
+        const account = `Leapp-ssm-data-${session.profile}`;
+
+        return fromPromise(this.keychainService.saveSecret(environment.appName, account, JSON.stringify(credential))).pipe(
           map(() => {
             return awsSsoCredentials;
           })

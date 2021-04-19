@@ -34,6 +34,8 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.configurationService.sanitizeIdpUrlsAndNamedProfiles();
+
     // Use ngx bootstrap 4
     setTheme('bs4');
     // Register locale languages and set the default one: we currently use only en
@@ -127,7 +129,6 @@ export class AppComponent implements OnInit {
       this.app.logger('Preparing for closing instruction...', LoggerLevel.INFO, this);
       this.beforeCloseInstructions();
     });
-
 
     this.timerService.defineTimer();
 

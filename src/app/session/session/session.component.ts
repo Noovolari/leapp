@@ -67,9 +67,12 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   ) { super(); }
 
   ngOnInit() {
+    this.configurationService.sanitizeIdpUrlsAndNamedProfiles();
+
     // Set workspace
     this.workspace = this.configurationService.getDefaultWorkspaceSync();
     this.profiles = this.workspaceService.getProfiles();
+
     if (this.workspace.profiles === undefined) {
       this.profiles = [{ id: uuid.v4(), name: 'default' }];
       this.workspace.profiles = this.profiles;

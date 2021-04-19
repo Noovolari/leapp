@@ -140,6 +140,9 @@ export class ProviderManagerService {
     this.selectedIdpUrl = selectedIdpUrl;
     this.selectedProfile = selectedProfile;
     this.form = form;
+
+    console.log('SELECTED URL 2', selectedIdpUrl);
+
     this.decideSavingMethodAndSave();
   }
 
@@ -275,6 +278,9 @@ export class ProviderManagerService {
 
   saveAwsFederatedAccount() {
     if (this.formValid(this.form, this.accountType)) {
+
+      console.log('SELECTED URL 3', this.selectedIdpUrl);
+
       try {
         // Add a federation Account to the workspace
         return this.federatedAccountService.addFederatedAccountToWorkSpace(

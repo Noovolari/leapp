@@ -320,6 +320,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   }
 
   private async doubleJumpFromFixedCredential(observer: Subscriber<boolean>, session) {
+
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const sessions = workspace.sessions;
     const parentAccountSessionId = session.account.parent;
@@ -332,24 +333,18 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       // First jump
       const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
-      const credentials = {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
+
 
       this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
-      const params = {
-        RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
-        RoleSessionName: this.appService.createRoleSessionName(session.account.role.name),
-        DurationSeconds: 3600 // 1 hour for chained assume role
-      };
-
       const processData = (p) => {
         if (this.processSubscriptionTruster) { this.processSubscriptionTruster.unsubscribe(); }
-        this.processSubscriptionTruster = this.getTrusterAccountSessionToken(credentials, parentSession, session).subscribe((awsCredentials) => {
+        this.processSubscriptionTruster = this.getTrusterAccountSessionToken(accessKey, secretKey, parentSession, session).subscribe((awsCredentials) => {
             // Update AWS sdk with new credentials
             AWS.config.update({
-              accessKeyId: awsCredentials.default.aws_access_key_id,
-              secretAccessKey: awsCredentials.default.aws_secret_access_key,
-              sessionToken: awsCredentials.default.aws_session_token
+              accessKeyId: awsCredentials.aws_access_key_id,
+              secretAccessKey: awsCredentials.aws_secret_access_key,
+              sessionToken: awsCredentials.aws_session_token
             });
 
             const sts = new AWS.STS(this.appService.stsOptions(session));
@@ -415,12 +410,18 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           });
       };
 
+      const params = {
+        RoleArn: `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
+        RoleSessionName: this.appService.createRoleSessionName(session.account.role.name),
+        DurationSeconds: 3600 // 1 hour for chained assume role
+      };
+
       processData(params);
     }
   }
 
   // TODO: move to AwsCredentialsGenerationService
-  private getTrusterAccountSessionToken(awsCredentials: AwsCredentials, parentSession, session): Observable<any> {
+  private getTrusterAccountSessionToken(accessKey: string, secretKey: string, parentSession, session): Observable<any> {
     return new Observable<AwsCredentials>((observable) => {
       const workspace = this.configurationService.getDefaultWorkspaceSync();
 
@@ -438,8 +439,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       };
 
       AWS.config.update({
-        accessKeyId: awsCredentials.default.aws_access_key_id,
-        secretAccessKey: awsCredentials.default.aws_secret_access_key
+        accessKeyId: accessKey,
+        secretAccessKey: secretKey
       });
 
       const sts = new AWS.STS(this.appService.stsOptions(session));
@@ -452,15 +453,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
 
             // Update profile name
             const sessionTokenExtracted = Object.values(sessionTokenData)[0];
-            sessionTokenData = {};
-            sessionTokenData[this.configurationService.getNameFromProfileId(session.profile)] = sessionTokenExtracted;
-            // Update region
-            const newRegion = session.account.region;
-            if (newRegion && newRegion !== 'no region necessary') {
-              sessionTokenData[this.configurationService.getNameFromProfileId(session.profile)].region = newRegion;
-            }
-
-            processData(sessionTokenData, null);
+            processData(sessionTokenExtracted, null);
           });
         } else {
           if (AwsStrategy.checkIfMfaIsNeeded(parentSession)) {
@@ -471,12 +464,12 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                 let tmpCredentials = null;
 
                 if (data !== undefined && data !== null) {
-                  tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, parentSession.account.region, session);
+                  tmpCredentials = this.workspaceService.constructCredentialObjectFromStsResponse(data, workspace, session.account.region, session);
                   this.keychainService.saveSecret(environment.appName, `truster-account-session-token-${session.account.accountName}`, JSON.stringify(tmpCredentials));
                   this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
                 }
 
-                processData(tmpCredentials, err);
+                processData(Object.values(tmpCredentials)[0], err);
               });
             });
           } else {
@@ -489,7 +482,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                 this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
               }
 
-              processData(tmpCredentials, err);
+              processData(Object.values(tmpCredentials)[0], err);
             });
           }
         }

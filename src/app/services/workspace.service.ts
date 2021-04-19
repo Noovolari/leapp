@@ -405,6 +405,7 @@ export class WorkspaceService extends NativeService {
     credential.aws_session_token = sessionToken;
     credential.expiration = refreshToken;
 
+    // TODO: the following two lines should not belong to this method
     this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential));
     this.configurationService.updateWorkspaceSync(workspace);
 

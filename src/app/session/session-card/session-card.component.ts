@@ -319,7 +319,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   changeDefaultProfile() {
     if (this.selectedProfile) {
-      this.sessionService.removeFromIniFile(this.session.profile);
+      if (this.session.active) {
+        this.sessionService.removeFromIniFile(this.session.profile);
+      }
       this.sessionService.addProfile(this.selectedProfile);
       this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
 

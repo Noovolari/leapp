@@ -283,8 +283,8 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       };
 
       AWS.config.update({
-        accessKeyId: awsCredentials.default.aws_access_key_id,
-        secretAccessKey: awsCredentials.default.aws_secret_access_key
+        accessKeyId: awsCredentials.aws_access_key_id,
+        secretAccessKey: awsCredentials.aws_secret_access_key
       });
 
       const sts = new AWS.STS(this.appService.stsOptions(session));
@@ -316,7 +316,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   private async getIamUserAccessKeysFromKeychain(session) {
     const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(session.account.accountName, (session.account as AwsPlainAccount).user));
     const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(session.account.accountName, (session.account as AwsPlainAccount).user));
-    return {default: {aws_access_key_id: accessKey, aws_secret_access_key: secretKey}};
+    return {aws_access_key_id: accessKey, aws_secret_access_key: secretKey};
   }
 
   private async doubleJumpFromFixedCredential(observer: Subscriber<boolean>, session) {
@@ -330,10 +330,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       // Parent account found: do double jump
       const parentSession = parentSessions[0];
 
-      // First jump
+      // Retrieve plain access keys from keychain
       const accessKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
       const secretKey = await this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(parentSession.account.accountName, (parentSession.account as AwsPlainAccount).user));
-
 
       this.proxyService.configureBrowserWindow(this.appService.currentBrowserWindow());
 
@@ -451,8 +450,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           this.keychainService.getSecret(environment.appName, AwsStrategy.generateTrusterAccountSessionTokenString(session)).then(sessionTokenData => {
             sessionTokenData = JSON.parse(sessionTokenData);
 
-            // Update profile name
+            // Extract parent account's session token
             const sessionTokenExtracted = Object.values(sessionTokenData)[0];
+
             processData(sessionTokenExtracted, null);
           });
         } else {
@@ -469,7 +469,10 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                   this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
                 }
 
-                processData(Object.values(tmpCredentials)[0], err);
+                // Extract parent account's session token
+                const sessionTokenExtracted = Object.values(tmpCredentials)[0];
+
+                processData(sessionTokenExtracted, err);
               });
             });
           } else {
@@ -482,7 +485,10 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                 this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
               }
 
-              processData(Object.values(tmpCredentials)[0], err);
+              // Extract parent account's session token
+              const sessionTokenExtracted = Object.values(tmpCredentials)[0];
+
+              processData(sessionTokenExtracted, err);
             });
           }
         }
@@ -530,16 +536,21 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
   private applyPlainAccountSessionToken(observer, workspace, session: Session) {
     this.keychainService.getSecret(environment.appName, `plain-account-session-token-${session.account.accountName}`).then(sessionToken => {
       sessionToken = JSON.parse(sessionToken);
-      // Update profile name
+
+      // Extract session token
       const sessionTokenExtracted = Object.values(sessionToken)[0];
+
+      // Update profile name
       sessionToken = {};
       sessionToken[this.configurationService.getNameFromProfileId(session.profile)] = sessionTokenExtracted;
+
       // Update region
       const newRegion = session.account.region;
       if (newRegion && newRegion !== 'no region necessary') {
         sessionToken[this.configurationService.getNameFromProfileId(session.profile)].region = newRegion;
       }
 
+      // Apply session token
       this.fileService.iniWriteSync(this.appService.awsCredentialPath(), sessionToken);
       this.configurationService.updateWorkspaceSync(workspace);
       this.configurationService.disableLoadingWhenReady(workspace, session);
@@ -550,6 +561,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       observer.complete();
     });
   }
+
   private doubleJumpFromFixedCredentialWithObserver(session: any): Observable<boolean> {
     return new Observable<boolean>(observer => {
       this.doubleJumpFromFixedCredential(observer, session);

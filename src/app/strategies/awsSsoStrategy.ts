@@ -69,7 +69,7 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
 
   private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
     // Retrieve access token and region
-    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(last()).pipe(
+    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
       switchMap((loginToAwsSSOResponse) => {
         return this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name);
       }),

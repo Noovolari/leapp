@@ -4,7 +4,7 @@ import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse,
 import {NativeService} from '../../services-system/native-service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
-import {catchError, delay, expand, map, retryWhen, switchMap, take, tap, toArray} from 'rxjs/operators';
+import {catchError, delay, expand, last, map, retryWhen, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
@@ -72,7 +72,7 @@ export class AwsSsoService extends NativeService {
             startUrl: portalUrl
           };
 
-          return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(
+          return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(last()).pipe(
             catchError((err) => {
               this.appService.logger('AWS SSO device authorization error.', LoggerLevel.ERROR, this, err.stack);
               this.appService.toast('Error in device authorization', ToastLevel.ERROR, 'AWS Single Sign-On');
@@ -126,7 +126,10 @@ export class AwsSsoService extends NativeService {
             this.maxRetries = this.maxRetries + 1;
             return of(true).pipe(delay(5000));
           } else {
-            return throwError(err);
+            // session timed out
+            const error = new Error('AWS Single Sign-On session timed out');
+            error.name = 'LeappSessionTimedOut';
+            return throwError(error);
           }
         })
       ))
@@ -185,7 +188,6 @@ export class AwsSsoService extends NativeService {
   }
 
   getAwsSsoPortalCredentials(): Observable<LoginToAwsSSOResponse> {
-    console.warn('portal credentials');
     const loginToAwsSSOResponse: LoginToAwsSSOResponse = {accessToken: '', expirationTime: undefined, region: ''};
     return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(
       switchMap((expirationTime) => {

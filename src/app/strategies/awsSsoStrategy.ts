@@ -8,7 +8,7 @@ import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {AwsSsoAccount} from '../models/aws-sso-account';
-import {catchError, last, map, switchMap} from 'rxjs/operators';
+import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {AwsCredential} from '../models/credential';
 import {ConfigurationService} from '../services-system/configuration.service';
@@ -69,24 +69,19 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
 
   private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
     // Retrieve access token and region
-    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(last()).pipe(
+    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
       switchMap((loginToAwsSSOResponse) => {
         return this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name);
       }),
-      switchMap((getRoleCredentialsResponse: GetRoleCredentialsResponse) => {
+      map((getRoleCredentialsResponse: GetRoleCredentialsResponse) => {
         const credential: AwsCredential = {};
         credential.aws_access_key_id = getRoleCredentialsResponse.roleCredentials.accessKeyId;
         credential.aws_secret_access_key = getRoleCredentialsResponse.roleCredentials.secretAccessKey;
         credential.aws_session_token = getRoleCredentialsResponse.roleCredentials.sessionToken;
         credential.region = session.account.region;
-
-        session.active = true;
-        session.loading = false;
-
-        return of(credential);
+        return credential;
       }),
       switchMap((credential: AwsCredential) => {
-
         const profileName = this.configurationService.getNameFromProfileId(session.profile);
         const awsSsoCredentials = {};
         awsSsoCredentials[profileName] = credential;
@@ -103,13 +98,18 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         return of(true);
       }),
       catchError( (err) => {
-        session.active = false;
-        session.loading = false;
-
         this.sessionService.stopSession(session);
-        this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-        this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
-        return of(false);
+
+        if (err.name === 'LeappSessionTimedOut') {
+          this.appService.logger(err.toString(), LoggerLevel.WARN, this, err.stack);
+          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.WARN, 'AWS SSO warning.');
+          return of(false);
+        } else {
+          this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
+          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+          return of(false);
+        }
+
       })
     );
   }

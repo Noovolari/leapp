@@ -74,7 +74,6 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
               private modalService: BsModalService) { super(); }
 
   ngOnInit() {
-
     // Set regions for ssm and for default region, same with locations,
     // add the correct placeholder to the select
     this.awsRegions = this.appService.getRegions();
@@ -175,7 +174,6 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
       this.appService.toast(err, ToastLevel.WARN);
       this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
     }
-
   }
 
   switchCredentials() {
@@ -253,11 +251,14 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   changeDefaultRegion() {
     if (this.selectedDefaultRegion) {
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
+
       this.workspace.sessions.forEach(session => {
         if (session.id === this.session.id) {
           session.account.region = this.selectedDefaultRegion;
           this.session.account.region = this.selectedDefaultRegion;
           this.configurationService.updateWorkspaceSync(this.workspace);
+
+          this.sessionService.invalidateSessionToken(session);
 
           if (this.session.active) {
             this.startSession();
@@ -266,9 +267,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
           }
         }
       });
+
       this.appService.toast('Default region has been changed!', ToastLevel.SUCCESS, 'Region changed!');
       this.modalRef.hide();
-
     }
   }
 
@@ -325,6 +326,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
       if (this.session.active) {
         this.sessionService.removeFromIniFile(this.session.profile);
       }
+
       this.sessionService.addProfile(this.selectedProfile);
       this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
 

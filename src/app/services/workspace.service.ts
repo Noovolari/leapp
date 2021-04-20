@@ -279,7 +279,7 @@ export class WorkspaceService extends NativeService {
           // Something went wrong save it to the logger file
           this.appService.logger(err.code, LoggerLevel.ERROR, this);
           this.appService.logger(err.stack, LoggerLevel.ERROR, this);
-          this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
+          // this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
           // Emit ko
           this.credentialEmit.emit({status: err.stack, session });

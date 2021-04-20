@@ -6,6 +6,8 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {AccountType} from '../models/AccountType';
 import {AwsAccount} from '../models/aws-account';
 import {FileService} from '../services-system/file.service';
+import {KeychainService} from '../services-system/keychain.service';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -16,8 +18,8 @@ export class SessionService extends NativeService {
     private appService: AppService,
     private configurationService: ConfigurationService,
     private fileService: FileService,
+    private keychainService: KeychainService
   ) { super(); }
-
 
   /**
    * Update a session from the list of sessions
@@ -236,5 +238,58 @@ export class SessionService extends NativeService {
         this.updateSession(session);
       }
     });
+  }
+
+  checkAccountTypeForRefreshCredentials(session) {
+    if (session.account.type === AccountType.AWS && session.account.parent === undefined) {
+      return 0;
+    } else if (session.account.type === AccountType.AWS_TRUSTER || (session.account.type === AccountType.AWS && session.account.parent !== undefined)) {
+      // Here we have a truster account now we need to know the nature of the truster account
+      const parentAccountSessionId = session.account.parent;
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      const sessions = workspace.sessions;
+      const parentAccountList = sessions.filter(sess => sess.id === parentAccountSessionId);
+
+      if (parentAccountList.length > 0) {
+        // Parent account found: check its nature
+        if (parentAccountList[0].account.type === AccountType.AWS) { return 1; }
+        if (parentAccountList[0].account.type === AccountType.AWS_PLAIN_USER ) { return 2; }
+        if (parentAccountList[0].account.type === AccountType.AWS_SSO) { return 3; }
+      }
+    }
+    return 0;
+  }
+
+  invalidateSessionToken(session: Session) {
+    if (session.account.type === AccountType.AWS_PLAIN_USER) {
+
+      let secretName = 'plain-account-session-token-expiration-' + session.account.accountName;
+      this.keychainService.deletePassword(environment.appName, secretName);
+
+      secretName = 'plain-account-session-token-' + session.account.accountName;
+      this.keychainService.deletePassword(environment.appName, secretName);
+
+      secretName = `Leapp-ssm-data-${session.profile}`;
+      this.keychainService.deletePassword(environment.appName, secretName);
+
+    } else if (session.account.type === AccountType.AWS_TRUSTER || session.account.type === AccountType.AWS) {
+
+      const parentId = (session.account as AwsAccount).parent;
+
+      if (parentId !== undefined) {
+        const parentType = this.getSession(parentId).account.type;
+
+        if (parentType === AccountType.AWS_PLAIN_USER) {
+          let secretName = 'truster-account-session-token-expiration-' + session.account.accountName;
+          this.keychainService.deletePassword(environment.appName, secretName);
+
+          secretName = 'truster-account-session-token-' + session.account.accountName;
+          this.keychainService.deletePassword(environment.appName, secretName);
+
+          secretName = `Leapp-ssm-data-${session.profile}`;
+          this.keychainService.deletePassword(environment.appName, secretName);
+        }
+      }
+    }
   }
 }

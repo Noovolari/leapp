@@ -195,8 +195,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     const selectedUrl = this.selectedIdpUrl ? {id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label } : undefined;
     const selectedProfile = this.selectedProfile ? {id: this.selectedProfile.value, name: this.selectedProfile.label } : undefined;
 
-    console.log('SELECTED URL', selectedUrl);
-
     if (this.firstTime) {
       this.providerManagerService.saveFirstAccount(
         this.accountId,

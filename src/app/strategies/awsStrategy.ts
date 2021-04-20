@@ -135,26 +135,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     });
   }
 
-  private checkAccountTypeForRefreshCredentials(session) {
-    if (session.account.type === AccountType.AWS && session.account.parent === undefined) {
-      return 0;
-    } else if (session.account.type === AccountType.AWS_TRUSTER || (session.account.type === AccountType.AWS && session.account.parent !== undefined)) {
-      // Here we have a truster account now we need to know the nature of the truster account
-      const parentAccountSessionId = session.account.parent;
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
-      const sessions = workspace.sessions;
-      const parentAccountList = sessions.filter(sess => sess.id === parentAccountSessionId);
-
-      if (parentAccountList.length > 0) {
-        // Parent account found: check its nature
-        if (parentAccountList[0].account.type === AccountType.AWS) { return 1; }
-        if (parentAccountList[0].account.type === AccountType.AWS_PLAIN_USER ) { return 2; }
-        if (parentAccountList[0].account.type === AccountType.AWS_SSO) { return 3; }
-      }
-    }
-    return 0;
-  }
-
   doubleJumpFromSSO(session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     const parentSession = this.sessionService.parentSession(session);
@@ -240,7 +220,7 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
       let returnedObservable: Observable<boolean>;
 
       // Enable current active session
-      switch (this.checkAccountTypeForRefreshCredentials(session)) {
+      switch (this.sessionService.checkAccountTypeForRefreshCredentials(session)) {
         case 0: returnedObservable = this.workspaceService.refreshCredentials(session); break;        // FEDERATED
         case 1: returnedObservable = this.workspaceService.refreshCredentials(session); break;        // TRUSTER FROM FEDERATED
         case 2: returnedObservable = this.doubleJumpFromFixedCredentialWithObserver(session); break;  // TRUSTER FROM PLAIN
@@ -432,8 +412,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
           this.appService.logger('Error in get session token', LoggerLevel.ERROR, this, err.stack);
           observable.error(err);
           observable.complete();
-          // Emit ko for double jump
-          this.workspaceService.credentialEmit.emit({status: err.stack, session});
         }
       };
 
@@ -469,8 +447,12 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
                   this.saveTrusterAccountSessionTokenExpirationInVault(tmpCredentials, session);
                 }
 
-                // Extract parent account's session token
-                const sessionTokenExtracted = Object.values(tmpCredentials)[0];
+                let sessionTokenExtracted = null;
+
+                if (tmpCredentials !== null) {
+                  // Extract parent account's session token
+                  sessionTokenExtracted = Object.values(tmpCredentials)[0];
+                }
 
                 processData(sessionTokenExtracted, err);
               });

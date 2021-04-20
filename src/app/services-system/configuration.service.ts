@@ -253,8 +253,6 @@ export class ConfigurationService extends NativeService {
   public getNameFromProfileId(id: string): string {
     const workspace = this.getDefaultWorkspaceSync();
     const session = workspace.profiles.filter(p => p.id === id)[0];
-    console.log(session);
-    console.log(workspace.profiles);
     return session ? session.name : '';
   }
 

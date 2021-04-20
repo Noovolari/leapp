@@ -108,7 +108,6 @@ export class ProviderManagerService {
     if (accountType === AccountType.AWS) {
       this.createNewWorkspace(null, this.selectedIdpUrl, this.selectedProfile, IdpResponseType.SAML);
       this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
-
     } else {
       this.appService.logger(`Saving first account with a plain or azure account`, LoggerLevel.INFO, this);
       this.createNewWorkspace(undefined, undefined, this.selectedProfile, IdpResponseType.SAML);
@@ -140,8 +139,6 @@ export class ProviderManagerService {
     this.selectedIdpUrl = selectedIdpUrl;
     this.selectedProfile = selectedProfile;
     this.form = form;
-
-    console.log('SELECTED URL 2', selectedIdpUrl);
 
     this.decideSavingMethodAndSave();
   }
@@ -278,8 +275,6 @@ export class ProviderManagerService {
 
   saveAwsFederatedAccount() {
     if (this.formValid(this.form, this.accountType)) {
-
-      console.log('SELECTED URL 3', this.selectedIdpUrl);
 
       try {
         // Add a federation Account to the workspace

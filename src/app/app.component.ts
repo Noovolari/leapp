@@ -88,11 +88,21 @@ export class AppComponent implements OnInit {
       // Patch for named profiles
       if (workspace.profiles === undefined || workspace.profiles.length === 0) {
         workspace.profiles = [{ id: uuid.v4(), name: 'default' }];
+        this.configurationService.updateWorkspaceSync(workspace);
       }
 
-      const defaultProfileId = workspace.profiles.filter(p => p.name === 'default')[0].id;
+      let defaultProfile = workspace.profiles.filter(p => p.name === 'default')[0];
 
-      // Patch old sessions without a default region
+      // Create default profile if - after first session creation - it is not present in the workspace
+      if (defaultProfile === undefined) {
+        workspace.profiles.push({ id: uuid.v4(), name: 'default' });
+        this.configurationService.updateWorkspaceSync(workspace);
+        defaultProfile = workspace.profiles.filter(p => p.name === 'default')[0];
+      }
+
+      const defaultProfileId = defaultProfile.id;
+
+      // Patch old sessions without a default profile
       if (sessions) {
         sessions.forEach(session => {
           if (session.profile === undefined) {

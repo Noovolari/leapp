@@ -60,11 +60,6 @@ export class FederatedAccountService extends NativeService {
     const test = workspace.sessions.filter(sess => (sess.account as AwsAccount).accountNumber === accountNumber && sess.account.role && sess.account.role.name === role.name);
     if (!test || test.length === 0) {
 
-      console.log('SELECTED URL 4', idpUrl.id);
-      console.log('PROFILE ID', profile.id);
-      console.log('WORKSPACE IDPURL', workspace.idpUrl);
-      console.log('WORKSPACE PROFILES', workspace.profiles);
-
       // add new account
       const account = {
         accountId: accountNumber,

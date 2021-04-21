@@ -67,14 +67,12 @@ export class CredentialsService extends NativeService {
 
   refreshCredentials() {
     // Get all the info we need
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-
     if (!this.refreshStrategySubcribeAll) {
       this.refreshStrategySubcribeAll = true;
       concat(
-        this.awsStrategy.refreshCredentials(workspace),
-        this.azureStrategy.refreshCredentials(workspace),
-        this.awsSsoStrategy.refreshCredentials(workspace)
+        this.awsStrategy.refreshCredentials(this.configurationService),
+        this.azureStrategy.refreshCredentials(this.configurationService),
+        this.awsSsoStrategy.refreshCredentials(this.configurationService)
       ).subscribe(
         () => {
           this.appService.redrawList.emit(true);

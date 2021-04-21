@@ -1,9 +1,13 @@
 import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {concat, Observable, of} from 'rxjs';
+import {CredentialsService} from '../services/credentials.service';
+import {ConfigurationService} from '../services-system/configuration.service';
 
 export abstract class RefreshCredentialsStrategy {
-  refreshCredentials(workspace: Workspace): Observable<any> {
+  refreshCredentials(configurationService: ConfigurationService): Observable<any> {
+    const workspace = configurationService.getDefaultWorkspaceSync();
+
     const activeSessions = this.getActiveSessions(workspace);
 
     // Refresh all active sessions credentials

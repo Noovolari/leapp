@@ -248,25 +248,23 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   /**
    * Set the region for the session
    */
-  changeDefaultRegion() {
+  changeRegion() {
     if (this.selectedDefaultRegion) {
-      this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
-      this.workspace.sessions.forEach(session => {
-        if (session.id === this.session.id) {
-          session.account.region = this.selectedDefaultRegion;
-          this.session.account.region = this.selectedDefaultRegion;
-          this.configurationService.updateWorkspaceSync(this.workspace);
+      if (this.session.active) {
+        this.sessionService.stopSession(this.session);
+      }
 
-          this.sessionService.invalidateSessionToken(session);
+      this.session.account.region = this.selectedDefaultRegion;
+      this.sessionService.invalidateSessionToken(this.session);
+      this.sessionService.updateSession(this.session);
 
-          if (this.session.active) {
-            this.startSession();
-          } else {
-            this.appService.redrawList.emit(true);
-          }
-        }
-      });
+      if (this.session.active) {
+        this.startSession();
+      } else {
+        this.appService.redrawList.emit(true);
+      }
+
 
       this.appService.toast('Default region has been changed!', ToastLevel.SUCCESS, 'Region changed!');
       this.modalRef.hide();
@@ -321,10 +319,10 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     }
   }
 
-  changeDefaultProfile() {
+  changeProfile() {
     if (this.selectedProfile) {
       if (this.session.active) {
-        this.sessionService.removeFromIniFile(this.session.profile);
+        this.sessionService.stopSession(this.session);
       }
 
       this.sessionService.addProfile(this.selectedProfile);

@@ -9,8 +9,8 @@
     </ng-container>
   </div>
   <div class="information-offset" (click)="switchCredentials()">
-    <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
-    <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading"></i>
+    <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!(session.loading && (session.account.type === eAccountType.AWS_SSO))"></i>
+    <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading && (session.account.type === eAccountType.AWS_SSO)"></i>
   </div>
 
   <ng-container dropdown placement="right" [autoClose]="true">
@@ -82,7 +82,7 @@
       <ng-select bindLabel="{{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}" bindValue="{{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}" [items]="regionOrLocations" [(ngModel)]="selectedDefaultRegion" placeholder="{{placeholder}}"></ng-select>
 
       <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
-      <button type="button" (click)="changeDefaultRegion();" [disabled]="!selectedDefaultRegion" [ngClass]="(!selectedDefaultRegion) ? 'pull-right disabled': 'pull-right'">Save</button>
+      <button type="button" (click)="changeRegion();" [disabled]="!selectedDefaultRegion" [ngClass]="(!selectedDefaultRegion) ? 'pull-right disabled': 'pull-right'">Save</button>
     </div>
   </div>
 </ng-template>
@@ -104,7 +104,7 @@
                  placeholder="select a profile"></ng-select>
 
       <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
-      <button type="button" (click)="changeDefaultProfile();" [disabled]="!selectedProfile" [ngClass]="(!selectedProfile) ? 'pull-right disabled': 'pull-right'">Save</button>
+      <button type="button" (click)="changeProfile();" [disabled]="!selectedProfile" [ngClass]="(!selectedProfile) ? 'pull-right disabled': 'pull-right'">Save</button>
     </div>
   </div>
 </ng-template>

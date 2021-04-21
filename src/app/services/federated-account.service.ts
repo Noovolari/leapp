@@ -79,7 +79,6 @@ export class FederatedAccountService extends NativeService {
         profile: profile.id,
         active: false,
         loading: false,
-        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };
@@ -135,7 +134,6 @@ export class FederatedAccountService extends NativeService {
         profile: profile.id,
         active: false,
         loading: false,
-        complete: false,
         lastStopDate: new Date().toISOString(),
         account
       };

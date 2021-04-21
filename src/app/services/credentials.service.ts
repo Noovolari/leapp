@@ -22,10 +22,6 @@ import {last} from 'rxjs/operators';
 })
 export class CredentialsService extends NativeService {
 
-  // Emitters
-  public refreshCredentialsEmit: EventEmitter<AccountType> = new EventEmitter<AccountType>();
-  public refreshReturnStatusEmit: EventEmitter<any> = new EventEmitter<any>();
-
   // Global strategy map
   strategyMap = {};
 
@@ -35,7 +31,6 @@ export class CredentialsService extends NativeService {
   awsSsoStrategy;
 
   refreshStrategySubcribeAll;
-  refreshStrategySubscribeSingle = {};
 
   constructor(
     private appService: AppService,
@@ -51,17 +46,10 @@ export class CredentialsService extends NativeService {
   ) {
     super();
 
-    this.refreshCredentialsEmit.subscribe((accountType) => this.refreshCredentials(accountType));
-
-    this.workspaceService.credentialEmit.subscribe(res => this.processCredentials(res));
-
     // =================================================
     // Subscribe to global timer manager from strategies
     // =================================================
-
-    this.timerService.processRefreshByTimer.subscribe(() => {
-      this.refreshCredentials(null);
-    });
+    this.timerService.processRefreshByTimer.subscribe(() => this.refreshCredentials());
 
     // ==============================
     // Define the global strategy map
@@ -78,45 +66,30 @@ export class CredentialsService extends NativeService {
     this.strategyMap[AccountType.AWS_SSO] = this.awsSsoStrategy.refreshCredentials.bind(this.awsSsoStrategy);
   }
 
-  refreshCredentials(accountType) {
+  refreshCredentials() {
     // Get all the info we need
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
-    if (accountType !== null) {
-      this.strategyMap[accountType](workspace, accountType).pipe(last()).subscribe(
-        () => this.appService.redrawList.emit(true),
+    if (!this.refreshStrategySubcribeAll) {
+      this.refreshStrategySubcribeAll = true;
+      concat(
+        this.awsStrategy.refreshCredentials(workspace),
+        this.azureStrategy.refreshCredentials(workspace),
+        this.awsSsoStrategy.refreshCredentials(workspace)
+      ).subscribe(
+        () => {
+          this.appService.redrawList.emit(true);
+          this.refreshStrategySubcribeAll = false;
+        },
         e => {
           this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
           this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.WARN, 'Aws Credential Process');
-      });
-    } else {
-      this.refreshStrategySubcribeAll = concat(
-        this.awsSsoStrategy.refreshCredentials(workspace),
-        this.awsStrategy.refreshCredentials(workspace),
-        this.azureStrategy.refreshCredentials(workspace)
-      ).pipe(last()).subscribe(
-        () => this.appService.redrawList.emit(true),
-          e => {
-            this.appService.logger('Error in Aws Credential Process', LoggerLevel.ERROR, this, e.stack);
-            this.appService.toast('Error in Aws Credential Process: ' + e.toString(), ToastLevel.WARN, 'Aws Credential Process');
+          this.refreshStrategySubcribeAll = false;
       });
     }
 
     if (this.timerService.needToClearTimer()) {
       this.timerService.clearTimer();
-    }
-  }
-
-  /**
-   * Method that is launched when credential are emitted by the workspace service
-   * @param res - contain the status the operation
-   */
-  private processCredentials(res: any) {
-    if (res.status === 'ok') {
-      this.refreshReturnStatusEmit.emit(true);
-    } else {
-      this.appService.toast('There was a problem in generating credentials.', ToastLevel.WARN, 'Credentials');
-      this.refreshReturnStatusEmit.emit(res.session);
     }
   }
 }

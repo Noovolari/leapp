@@ -338,8 +338,7 @@ export class AwsSsoService extends NativeService {
           active: false,
           id: uuidv4(),
           lastStopDate: new Date().toISOString(),
-          loading: false,
-          complete: false
+          loading: false
         };
         return session;
       })

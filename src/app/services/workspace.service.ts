@@ -13,6 +13,7 @@ import {ProxyService} from './proxy.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
 import {SessionService} from './session.service';
+import {CredentialsService} from './credentials.service';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
@@ -30,21 +31,6 @@ export class WorkspaceService extends NativeService {
   // A class reference to the idp window
   idpWindow = {};
 
-  // Update Session to backend Emitter
-  public sentSessionUpdateEvent: EventEmitter<{accountName: string, status: SessionStatus, message: string}> = new EventEmitter<{accountName: string, status: SessionStatus, message: string}>();
-
-  // Email change Emitter
-  public emailEmit: EventEmitter<string> = new EventEmitter<string>();
-
-  // First Time Google Token obtained
-  public googleEmit: EventEmitter<string> = new EventEmitter<string>();
-
-  // Azure status
-  public azureStatusEmit: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-  // Credential refreshed
-  public credentialEmit: EventEmitter<{status: string, session: Session}> = new EventEmitter<{status: string, session: Session}>();
-
   constructor(
     private httpClient: HttpClient,
     private appService: AppService,
@@ -52,7 +38,7 @@ export class WorkspaceService extends NativeService {
     private fileService: FileService,
     private proxyService: ProxyService,
     private keychainService: KeychainService,
-    private sessionService: SessionService
+    private sessionService: SessionService,
   ) {
     super();
   }
@@ -282,7 +268,7 @@ export class WorkspaceService extends NativeService {
           // this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
           // Emit ko
-          this.credentialEmit.emit({status: err.stack, session });
+          this.appService.refreshReturnStatusEmit.emit(session);
 
           // If we have a callback call it
           if (callback) {
@@ -297,7 +283,7 @@ export class WorkspaceService extends NativeService {
       this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
       // Emit ko
-      this.credentialEmit.emit({status: err.stack, session });
+      this.appService.refreshReturnStatusEmit.emit(session);
     });
   }
 
@@ -326,7 +312,7 @@ export class WorkspaceService extends NativeService {
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
-      this.credentialEmit.emit({status: err.stack, session});
+      this.appService.refreshReturnStatusEmit.emit(session);
     }
 
     // Write in aws credential file and workspace
@@ -354,7 +340,7 @@ export class WorkspaceService extends NativeService {
             this.appService.toast('There was a problem assuming role, please retry', ToastLevel.WARN);
 
             // Emit ko for double jump
-            this.credentialEmit.emit({status: err.stack, session});
+            this.appService.refreshReturnStatusEmit.emit(session);
           } else {
 
             // we set the new credentials after the first jump
@@ -366,20 +352,20 @@ export class WorkspaceService extends NativeService {
             this.configurationService.disableLoadingWhenReady(workspace, session);
 
             // Emit ok for double jump
-            this.credentialEmit.emit({status: 'ok', session});
+            this.appService.refreshReturnStatusEmit.emit(true);
           }
         });
       } else {
         this.configurationService.disableLoadingWhenReady(workspace, session);
         // Emit ok for single jump
-        this.credentialEmit.emit({status: 'ok', session});
+        this.appService.refreshReturnStatusEmit.emit(true);
       }
     } catch (err) {
       this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
       this.appService.toast(err, ToastLevel.ERROR);
 
       // Emit ko
-      this.credentialEmit.emit({status: err.stack, session});
+      this.appService.refreshReturnStatusEmit.emit(session);
     }
   }
 

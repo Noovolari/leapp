@@ -113,12 +113,10 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
       if (session === null || (session.id === sess.id)) {
         sess.active = false;
         sess.loading = false;
-        sess.complete = false;
 
         if (session !== null && session !== undefined) {
           session.active = false;
           session.loading = false;
-          session.complete = false;
         }
       }
     });

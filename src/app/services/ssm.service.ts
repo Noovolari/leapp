@@ -123,6 +123,7 @@ export class SsmService {
   /**
    * Start a new ssm session given the instance id
    * @param instanceId - the instance id of the instance to start
+   * @param region - AWS System Manager start a session from a defined region
    */
   startSession(instanceId, region) {
     const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : '';

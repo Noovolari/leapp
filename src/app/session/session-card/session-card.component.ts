@@ -198,7 +198,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
    * SSM Modal open given the correct session
    * @param session - the session to check for possible ssm sessions
    */
-  ssmModalOpen(session, event) {
+  ssmModalOpen(session) {
     // Reset things before opening the modal
     this.instances = [];
     this.ssmloading = false;
@@ -209,7 +209,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
    * SSM Modal open given the correct session
    * @param session - the session to check for possible ssm sessions
    */
-  changeRegionModalOpen(session, event) {
+  changeRegionModalOpen(session) {
     // open the modal
     this.modalRef = this.modalService.show(this.defaultRegionModalTemplate, { class: 'ssm-modal'});
   }
@@ -217,6 +217,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   /**
    * Set the region for ssm init and launch the mopethod form the server to find instances
    * @param event - the change select event
+   * @param session - The session in which the AWS region need to change
    */
   changeSsmRegion(event, session: Session) {
     if (this.selectedSsmRegion) {
@@ -234,7 +235,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
           this.duplicateInstances = this.instances;
           this.ssmloading = false;
           this.appService.redrawList.emit(true);
-        }, err => {
+        }, () => {
           this.instances = [];
           this.ssmloading = false;
           this.appService.redrawList.emit(true);
@@ -340,7 +341,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     }
   }
 
-  changeProfileModalOpen(session: Session, $event: MouseEvent) {
+  changeProfileModalOpen() {
     this.selectedProfile = null;
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
   }

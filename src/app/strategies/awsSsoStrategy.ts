@@ -35,14 +35,12 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
   }
 
   getActiveSessions(workspace: Workspace) {
-    const activeSessions = workspace.sessions.filter((sess) => {
+    return workspace.sessions.filter((sess) => {
       return (sess.account.type === AccountType.AWS_TRUSTER ||
         sess.account.type === AccountType.AWS_SSO ||
         sess.account.type === AccountType.AWS_PLAIN_USER ||
         sess.account.type === AccountType.AWS) && sess.active;
     });
-
-    return activeSessions;
   }
 
   cleanCredentials(workspace: Workspace): void {

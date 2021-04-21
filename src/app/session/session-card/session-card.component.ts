@@ -114,7 +114,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
     // automatically check if there is an active session and get session list again
     this.appService.redrawList.emit(true);
-    this.credentialsService.refreshCredentials(null);
+    this.credentialsService.refreshCredentials();
     this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
   }
 
@@ -129,7 +129,6 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     this.sessionService.removeFromIniFile(this.session.profile);
 
     // automatically check if there is an active session or stop it
-    this.credentialsService.refreshCredentialsEmit.emit(this.session.account.type);
     this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
     this.appService.logger('Session Stopped', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));

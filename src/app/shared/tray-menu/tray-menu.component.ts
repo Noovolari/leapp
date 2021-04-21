@@ -74,10 +74,10 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
           click: (menuItem, browserWindow, event) => {
             if (!session.active) {
               this.sessionService.startSession(session);
-              this.credentialService.refreshCredentials(session.account.type);
+              this.credentialService.refreshCredentials();
 
             } else {
-              this.credentialService.refreshCredentials(session.account.type);
+              this.credentialService.refreshCredentials();
               this.sessionService.stopSession(session);
             }
             this.appService.redrawList.emit(true);
@@ -117,7 +117,7 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
       // Stop the session...
       this.sessionService.stopAllSession();
       // Stop credentials to be used
-      this.credentialService.refreshCredentials(null);
+      this.credentialService.refreshCredentials();
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {

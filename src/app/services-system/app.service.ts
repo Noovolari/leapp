@@ -17,6 +17,7 @@ export class AppService extends NativeService {
 
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
   redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
+  refreshReturnStatusEmit: EventEmitter<any> = new EventEmitter<any>();
 
   stsEndpointsPerRegion = new Map([
     ['af-south-1', 'https://sts.af-south-1.amazonaws.com'],

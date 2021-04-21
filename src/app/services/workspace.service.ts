@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {EventEmitter, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {NativeService} from '../services-system/native-service';
@@ -13,9 +13,15 @@ import {ProxyService} from './proxy.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
 import {SessionService} from './session.service';
+import {CredentialsService} from './credentials.service';
 
 // Import AWS node style
 const AWS = require('aws-sdk');
+
+export enum SessionStatus {
+  ERROR
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -259,7 +265,7 @@ export class WorkspaceService extends NativeService {
           // Something went wrong save it to the logger file
           this.appService.logger(err.code, LoggerLevel.ERROR, this);
           this.appService.logger(err.stack, LoggerLevel.ERROR, this);
-          // this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
+          this.appService.toast('There was a problem assuming role with SAML, please retry', ToastLevel.WARN);
 
           // Emit ko
           this.appService.refreshReturnStatusEmit.emit(session);

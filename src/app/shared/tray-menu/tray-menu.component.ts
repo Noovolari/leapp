@@ -49,7 +49,7 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
       let icon = '';
       let label = '';
       const profile = this.configurationService.getDefaultWorkspaceSync().profiles.filter(p => p.id === session.profile)[0];
-      const iconValue = profile.name === 'default' ? 'home' : 'user';
+      const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
       switch (session.account.type) {
         case AccountType.AWS_PLAIN_USER:

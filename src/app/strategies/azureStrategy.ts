@@ -72,7 +72,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
         } else {
           // 2b) First time playing with Azure credentials
           if (this.processSubscription) { this.processSubscription.unsubscribe(); }
-          this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(res => {
+          this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
             this.azureSetSubscription(observer, session);
           }, err => {
             this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
@@ -84,7 +84,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
       } else {
         // First time playing with Azure credentials
         if (this.processSubscription2) { this.processSubscription2.unsubscribe(); }
-        this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(res => {
+        this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
           this.azureSetSubscription(observer, session);
         }, err => {
           this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
@@ -106,7 +106,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
     if (this.processSubscription4) { this.processSubscription4.unsubscribe(); }
     this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).pipe(
       switchMap(() => this.executeService.execute(`az configure --default location=${session.account.region} 2>&1`))
-    ).subscribe(acc => {
+    ).subscribe(() => {
       // be sure to save the profile and tokens
       workspace.azureProfile = this.configurationService.getAzureProfileSync();
       workspace.azureConfig = this.configurationService.getAzureConfigSync();

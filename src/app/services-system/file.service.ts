@@ -76,15 +76,6 @@ export class FileService extends NativeService {
   }
 
   /**
-   * Read a file as base 64
-   * @returns - {string} - the base64
-   * @param filePath - path of the directory file
-   */
-  readFileSyncBase64(filePath: string): string {
-    return this.fs.readFileSync(filePath, {encoding: 'base64'});
-  }
-
-  /**
    * Read the directories in a recursive manner
    * @returns - {any} - data
    * @param source - source of the directory
@@ -97,9 +88,9 @@ export class FileService extends NativeService {
 
   /**
    * Unzip a file
-   * @param - {string} source
-   * @param - {string} target
-   * @param - {(err) => any} callback
+   * @param source - the source file
+   * @param target - the target location
+   * @param callback - the callback once finished
    */
   unzipFile(source: string, target: string, callback: (err) => any) {
     this.unzip(source, {dir: target}, callback);
@@ -123,9 +114,9 @@ export class FileService extends NativeService {
 
   /**
    * Write a generic file in an asynchronous way
-   * @param - {string} filePath
-   * @param - {string} content
    * @returns - {Observable<any>}
+   * @param filePath - the filepath to write to
+   * @param content - the content to write
    */
   writeFile(filePath: string, content: string): Observable<any> {
     return new Observable(subscriber => {
@@ -142,9 +133,9 @@ export class FileService extends NativeService {
 
   /**
    * Write a generic file in a synchronous way
-   * @param - {string} filePath
-   * @param - {string} content
    * @returns - {any}
+   * @param filePath - the filepath to write to
+   * @param content - the content to write
    */
   writeFileSync(filePath: string, content: string): any {
     return this.fs.writeFileSync(filePath, content);
@@ -152,9 +143,9 @@ export class FileService extends NativeService {
 
   /**
    * Write the ini file passing each key to the writer avoinding the empty key/value couple
-   * @param - {string} - filePath
-   * @param - content - content is a js object
    * @returns - {Observable<any>} - the result is an observable with the result of the write operation
+   * @param filePath - the filepath to write to
+   * @param content - the content to write
    */
   iniWrite(filePath: string, content: any): Observable<any> {
     Object.keys(content).forEach(key => {
@@ -169,9 +160,9 @@ export class FileService extends NativeService {
 
   /**
    * Write the ini file passing each key to the writer avoinding the empty key/value couple
-   * @param - {string} - filePath
-   * @param - content - content is a js object
    * @returns - {any} - the result of the operation
+   * @param filePath - the filepath to write to
+   * @param content - the content to write
    */
   iniWriteSync(filePath: string, content: any) {
     Object.keys(content).forEach(key => {
@@ -209,8 +200,8 @@ export class FileService extends NativeService {
 
   /**
    * Parse the file asynchronously
-   * @param - {string} filePath - the file path of the ini file
    * @returns - {Observable<any>} - return an observable which point to the data
+   * @param filePath - the filepath to read from
    */
   iniParse(filePath: string): Observable<any> {
     return new Observable(subscriber => {
@@ -232,8 +223,8 @@ export class FileService extends NativeService {
 
   /**
    * Parse the ini file in a synch way
-   * @param - {string} filePath - the file path of the ini file
    * @returns - {any} - returns the parsed string
+   * @param filePath - the filepath to read from
    */
   iniParseSync(filePath: string) {
     return this.ini.parse(this.readFileSync(filePath));

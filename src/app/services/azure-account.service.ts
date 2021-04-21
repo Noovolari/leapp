@@ -21,8 +21,10 @@ export class AzureAccountService extends NativeService {
 
   /**
    * Add a new Azure Account to workspace
-   * @param subscriptionId - the account number
+   * @param subscriptionId - Azure Subscription ID
+   * @param tenantId - Azure Tenant ID
    * @param accountName - the account name
+   * @param region - Azure Location
    */
   addAzureAccountToWorkSpace(subscriptionId: string, tenantId: string, accountName: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();

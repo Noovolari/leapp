@@ -9,7 +9,6 @@ import {TrusterAccountService} from './truster-account.service';
 import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
 import {Session} from '../models/session';
-import {Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,7 +21,6 @@ export class ProviderManagerService {
   private selectedSession;
   private selectedRole;
   private selectedRegion;
-  private googleSubscription: Subscription;
   private selectedIdpUrl: any;
   private selectedProfile: any;
 
@@ -87,6 +85,7 @@ export class ProviderManagerService {
    * @param selectedRole - the selected role of the parent
    * @param selectedRegion - the region to select for aws
    * @param selectedIdpUrl - the current idp url to use for saml if needed plus id
+   * @param selectedProfile - AWS named-profile in which the session is saved
    * @param form - the form to use
    */
 
@@ -122,6 +121,7 @@ export class ProviderManagerService {
    * @param selectedRole - the selected role of the parent
    * @param selectedRegion - the region to select for aws
    * @param selectedIdpUrl - the idp url to use for saml auth if needed plus id
+   * @param selectedProfile - the named-profile in which the Leapp session is saved
    * @param form - the form to use
    */
   saveAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, selectedProfile, form) {

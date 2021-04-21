@@ -4,7 +4,7 @@ import {AwsStrategy} from '../strategies/awsStrategy';
 import {AzureStrategy} from '../strategies/azureStrategy';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FileService} from '../services-system/file.service';
 import {KeychainService} from '../services-system/keychain.service';
 import {NativeService} from '../services-system/native-service';
@@ -15,7 +15,6 @@ import {concat} from 'rxjs';
 import {AwsSsoStrategy} from '../strategies/awsSsoStrategy';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {SessionService} from './session.service';
-import {last} from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'

@@ -18,10 +18,10 @@
       <i class="fa fa-ellipsis-v"></i>
     </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-      <a (click)="ssmModalOpen(session, $event);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO) && session.active">SSM session</a>
-      <a (click)="changeRegionModalOpen(session, $event);">Change {{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}</a>
+      <a (click)="ssmModalOpen(session);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO) && session.active">SSM session</a>
+      <a (click)="changeRegionModalOpen(session);">Change {{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}</a>
 
-      <a *ngIf="session.account.type !== eAccountType.AZURE" (click)="changeProfileModalOpen(session, $event);">Change Profile</a>
+      <a *ngIf="session.account.type !== eAccountType.AZURE" (click)="changeProfileModalOpen();">Change Profile</a>
 
       <a *ngIf="session.account.type === eAccountType.AWS_PLAIN_USER && !session.active" (click)="editAccount(session, $event);">Edit account</a>
       <a (click)="removeAccount(session, $event);">Remove account</a>

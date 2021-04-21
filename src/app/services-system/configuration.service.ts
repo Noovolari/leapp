@@ -243,7 +243,6 @@ export class ConfigurationService extends NativeService {
     workspace.sessions.forEach(sess => {
       if (sess.id === session.id) {
         sess.loading = false;
-        sess.complete = true;
         sess.active = true;
       }
     });

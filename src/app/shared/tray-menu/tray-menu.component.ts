@@ -53,7 +53,7 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
 
       switch (session.account.type) {
         case AccountType.AWS_PLAIN_USER:
-          icon = (session.active && !session.loading) ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
+          icon = (session.active) ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + (session.account as AwsPlainAccount).user;
           break;
         case AccountType.AWS:
@@ -64,7 +64,7 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
           break;
 
         case AccountType.AZURE:
-          icon = (session.active && !session.loading) ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
+          icon = (session.active) ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
           label = '  ' + session.account.accountName;
       }
       voices.push(

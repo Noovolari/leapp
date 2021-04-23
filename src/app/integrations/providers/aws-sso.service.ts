@@ -2,9 +2,9 @@ import {Injectable} from '@angular/core';
 import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest} from 'aws-sdk/clients/ssooidc';
 import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, LogoutRequest, RoleInfo} from 'aws-sdk/clients/sso';
 import {NativeService} from '../../services-system/native-service';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
-import {catchError, delay, expand, last, map, retryWhen, switchMap, take, tap, toArray} from 'rxjs/operators';
+import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
@@ -44,6 +44,7 @@ export class AwsSsoService extends NativeService {
   private ssoPortal;
   private maxRetries: number;
   private readonly maxRetriesForToken = 12;
+  private ssoWindow: any;
 
   constructor(private appService: AppService,
               private keychainService: KeychainService,
@@ -55,12 +56,10 @@ export class AwsSsoService extends NativeService {
 
   authorizeIntegration(region: string, portalUrl: string): Observable<AuthorizeIntegrationResponse> {
     this.ssooidc = new SSOOIDC({region});
-
     const registerClientRequest: RegisterClientRequest = {
       clientName: 'leapp',
       clientType: 'public',
     };
-
     return fromPromise(this.ssooidc.registerClient(registerClientRequest).promise()).pipe(
       switchMap((registerClientResponse: any) => {
         if (!registerClientResponse) {
@@ -71,24 +70,59 @@ export class AwsSsoService extends NativeService {
             clientSecret: registerClientResponse.clientSecret,
             startUrl: portalUrl
           };
-
-          return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(last()).pipe(
+          return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(
             catchError((err) => {
               this.appService.logger('AWS SSO device authorization error.', LoggerLevel.ERROR, this, err.stack);
-              this.appService.toast('Error in device authorization', ToastLevel.ERROR, 'AWS Single Sign-On');
               return throwError('AWS SSO device authorization error.');
             }),
             switchMap((startDeviceAuthorizationResponse: any) => {
-              if (!startDeviceAuthorizationResponse) {
-                throwError('AWS SSO device authorization error.');
-              } else {
-                this.appService.openExternalUrl(startDeviceAuthorizationResponse.verificationUriComplete);
-                return of({
-                  clientId: registerClientResponse.clientId,
-                  clientSecret: registerClientResponse.clientSecret,
-                  deviceCode: startDeviceAuthorizationResponse.deviceCode
-                });
-              }
+              return new Observable<AuthorizeIntegrationResponse>((observer) => {
+                if (!startDeviceAuthorizationResponse) {
+                  observer.error('AWS SSO device authorization error.');
+                } else {
+                  const pos = this.currentWindow.getPosition();
+
+                  this.ssoWindow = null;
+                  this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
+                  this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
+
+                  // https://oidc.*.amazonaws.com/device_authorization/associate_token
+
+                  // When the code is verified and the user has been logged in, the window can be closed
+                  this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
+                      'https://*.awsapps.com/start/user-consent/login-success.html',
+                    ] }, (details, callback) => {
+                    this.ssoWindow.close();
+                    this.ssoWindow = null;
+
+                    observer.next({
+                      clientId: registerClientResponse.clientId,
+                      clientSecret: registerClientResponse.clientSecret,
+                      deviceCode: startDeviceAuthorizationResponse.deviceCode
+                    });
+                    observer.complete();
+
+                    callback({
+                      requestHeaders: details.requestHeaders,
+                      url: details.url,
+                    });
+                  });
+
+                  this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
+                    if (
+                      details.error.indexOf('net::ERR_ABORTED') < 0 &&
+                      details.error.indexOf('net::ERR_FAILED') < 0 &&
+                      details.error.indexOf('net::ERR_CACHE_MISS') < 0
+                    ) {
+                      if (this.ssoWindow) {
+                        this.ssoWindow.close();
+                        this.ssoWindow = null;
+                      }
+                      observer.error(details.error.toString());
+                    }
+                  });
+                }
+              });
             })
           );
         }
@@ -99,6 +133,8 @@ export class AwsSsoService extends NativeService {
     );
   }
 
+
+  // Generate the access token that is valid for 8 hours
   generateSSOToken(authorizeIntegrationResponse: AuthorizeIntegrationResponse): Observable<GenerateSSOTokenResponse> {
     const createTokenRequest: CreateTokenRequest = {
       clientId: authorizeIntegrationResponse.clientId,
@@ -107,32 +143,22 @@ export class AwsSsoService extends NativeService {
       deviceCode: authorizeIntegrationResponse.deviceCode
     };
 
-    this.maxRetries = 0;
-
-    return of(true).pipe(
-      switchMap(() => fromPromise(this.ssooidc.createToken(createTokenRequest).promise())),
-      map((createTokenResponse: any) => {
+    return fromPromise(this.ssooidc.createToken(createTokenRequest).promise()).pipe(
+      catchError((err) => {
+        return throwError(`AWS SSO token creation error: ${err.toString()}`);
+      }),
+      switchMap((createTokenResponse: any) => {
+        return new Observable<GenerateSSOTokenResponse>((observer) => {
           if (!createTokenResponse) {
-           throw new Error('AWS SSO token creation error...');
+            observer.error('AWS SSO token creation error...');
           } else {
             let expirationTime: Date = new Date();
             expirationTime = new Date(expirationTime.getTime() + createTokenResponse.expiresIn * 1000);
-            return { accessToken: createTokenResponse.accessToken, expirationTime };
-        }
-      }),
-      retryWhen(errors =>
-        errors.pipe(switchMap(err => {
-          if (err.code === 'AuthorizationPendingException' && this.maxRetries < this.maxRetriesForToken) {
-            this.maxRetries = this.maxRetries + 1;
-            return of(true).pipe(delay(5000));
-          } else {
-            // session timed out
-            const error = new Error('AWS Single Sign-On session timed out');
-            error.name = 'LeappSessionTimedOut';
-            return throwError(error);
+            observer.next({ accessToken: createTokenResponse.accessToken, expirationTime });
+            observer.complete();
           }
-        })
-      ))
+        });
+      })
     );
   }
 

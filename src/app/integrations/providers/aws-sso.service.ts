@@ -349,7 +349,37 @@ export class AwsSsoService extends NativeService {
           type: AccountType.AWS_SSO
         };
 
-        const workspace  = this.configurationService.getDefaultWorkspaceSync();
+        let workspace  = this.configurationService.getDefaultWorkspaceSync();
+
+        // If sessions does not exist create the sessions array
+        if (JSON.stringify(workspace) === '{}') {
+          // Set the configuration with the updated value
+          const configuration = this.configurationService.getConfigurationFileSync();
+
+          configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
+
+          const workspaceCreation: Workspace = {
+            defaultLocation: environment.defaultLocation,
+            defaultRegion: environment.defaultRegion,
+            type: null,
+            name: 'default',
+            lastIDPToken: null,
+            idpUrl: [],
+            proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
+            sessions: [],
+            setupDone: true,
+            azureProfile: null,
+            azureConfig: null
+          };
+
+          configuration.defaultWorkspace = 'default';
+          configuration.workspaces.push(workspaceCreation);
+
+          this.configurationService.updateConfigurationFileSync(configuration);
+
+          workspace = workspaceCreation;
+        }
+
         let profiles = workspace.profiles;
         if (profiles === undefined) {
           profiles = [{ id: uuid.v4(), name: 'default' }];

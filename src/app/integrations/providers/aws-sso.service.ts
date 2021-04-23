@@ -42,8 +42,6 @@ export class AwsSsoService extends NativeService {
 
   private ssooidc;
   private ssoPortal;
-  private maxRetries: number;
-  private readonly maxRetriesForToken = 12;
   private ssoWindow: any;
 
   constructor(private appService: AppService,

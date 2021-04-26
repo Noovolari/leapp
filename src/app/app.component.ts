@@ -8,7 +8,6 @@ import {FileService} from './services-system/file.service';
 import {AppService, LoggerLevel} from './services-system/app.service';
 import {Router} from '@angular/router';
 import {setTheme} from 'ngx-bootstrap';
-import {CredentialsService} from './services/credentials.service';
 import {MenuService} from './services/menu.service';
 import {TimerService} from './services/timer-service';
 import {AccountType} from './models/AccountType';
@@ -27,7 +26,6 @@ export class AppComponent implements OnInit {
     private configurationService: ConfigurationService,
     private fileService: FileService,
     private app: AppService,
-    private credentialsService: CredentialsService,
     private menuService: MenuService,
     private timerService: TimerService
   ) {

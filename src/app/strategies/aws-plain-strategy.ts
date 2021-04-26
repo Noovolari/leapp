@@ -2,6 +2,7 @@ import {AccessStrategy} from './access-strategy';
 import {CredentialsInfo} from '../models/credentials-info';
 import {AccountType} from '../models/AccountType';
 import {Account} from '../models/account';
+import {AwsPlainAccount} from '../models/aws-plain-account';
 
 
 export class AwsPlainStrategy implements AccessStrategy {
@@ -18,7 +19,7 @@ export class AwsPlainStrategy implements AccessStrategy {
     return undefined;
   }
 
-  createAccount(accountName: string, type: AccountType, region: string, accountInfo: object): Account {
-    return new Account(accountName, type, region);
+  createAccount(accountName: string, type: AccountType, region: string, accountInfo: { [key: string]: any }): Account {
+    return new AwsPlainAccount(accountName, type, region, accountInfo.accessKey, accountInfo.secretKey, accountInfo.profileId, accountInfo.mfaDevice);
   }
 }

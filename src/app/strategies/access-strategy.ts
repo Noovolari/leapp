@@ -7,5 +7,5 @@ export interface AccessStrategy {
   applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
   deApplyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
 
-  createAccount(  accountName: string, type: AccountType, region: string, accountInfo: object): Account;
+  createAccount(  accountName: string, type: AccountType, region: string, accountInfo: { [key: string]: any }): Account;
 }

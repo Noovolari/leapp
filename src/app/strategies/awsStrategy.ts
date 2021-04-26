@@ -8,7 +8,6 @@ import {environment} from '../../environments/environment';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {FileService} from '../services-system/file.service';
 import {KeychainService} from '../services-system/keychain.service';
-import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
 import {TimerService} from '../services/timer-service';
 import {Workspace} from '../models/workspace';
 import {WorkspaceService} from '../services/workspace.service';

@@ -1,6 +1,7 @@
 import {AccountType} from './AccountType';
+import {Account} from './account';
 
-export interface AwsAccount extends Account {
+export class AwsAccount extends Account {
   accountId: string;
   accountName: string;
   accountNumber: string;
@@ -10,5 +11,5 @@ export interface AwsAccount extends Account {
   type: AccountType;
   parent?: string;
   parentRole?: string;
-  region?: string;
+  region: string;
 }

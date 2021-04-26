@@ -1,7 +1,7 @@
 import {AccountType} from './AccountType';
 import {Account} from './account';
 
-export interface AwsSsoAccount  extends Account {
+export class AwsSsoAccount  extends Account {
   accountName: string;
   type: AccountType;
   region: string;

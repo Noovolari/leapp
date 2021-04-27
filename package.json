@@ -158,9 +158,9 @@
   },
   "dependencies": {
     "@angular/animations": "~8.1.0",
-    "@angular/common": "~8.1.0",
+    "@angular/common": "~8.2.14",
     "@angular/compiler": "~8.1.0",
-    "@angular/core": "~8.1.0",
+    "@angular/core": "~8.2.14",
     "@angular/forms": "~8.1.0",
     "@angular/platform-browser": "~8.1.0",
     "@angular/platform-browser-dynamic": "~8.1.0",
@@ -220,7 +220,7 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.1102.10",
     "@angular/cli": "^11.2.10",
-    "@angular/compiler-cli": "~8.1.0",
+    "@angular/compiler-cli": "^11.0.0",
     "@angular/language-service": "~8.1.0",
     "@biesbjerg/ngx-translate-extract": "~2.3.4",
     "@types/aws-sdk": "^2.7.0",

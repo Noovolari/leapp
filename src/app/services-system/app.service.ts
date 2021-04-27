@@ -86,6 +86,10 @@ export class AppService extends NativeService {
     return this.followRedirects;
   }
 
+  getHttpsProxyAgent() {
+    return this.httpsProxyAgent;
+  }
+
   /**
    * Return the dialog native object
    */

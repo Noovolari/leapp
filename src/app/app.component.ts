@@ -1,17 +1,10 @@
 import {Component, OnInit} from '@angular/core';
-import {registerLocaleData} from '@angular/common';
-import localeEn from '@angular/common/locales/en';
-import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../environments/environment';
-import {ConfigurationService} from './services-system/configuration.service';
 import {FileService} from './services-system/file.service';
 import {AppService, LoggerLevel} from './services-system/app.service';
 import {Router} from '@angular/router';
 import {setTheme} from 'ngx-bootstrap';
-import {MenuService} from './services/menu.service';
 import {TimerService} from './services/timer-service';
-import {AccountType} from './models/AccountType';
-import * as uuid from 'uuid';
 import {WorkspaceService} from './services/workspace.service';
 import {SessionService} from './services/session.service';
 import {Workspace} from './models/workspace';
@@ -24,13 +17,12 @@ import {Workspace} from './models/workspace';
 export class AppComponent implements OnInit {
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
+    private app: AppService,
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
     private fileService: FileService,
-    private app: AppService,
+    private timerService: TimerService,
     private router: Router,
-    private menuService: MenuService,
-    private timerService: TimerService
   ) {
   }
 
@@ -82,8 +74,19 @@ export class AppComponent implements OnInit {
    * This is an hook on the closing app to remove credential file and force stop using them
    */
   private beforeCloseInstructions() {
-    // TODO: Move to another component
-    this.menuService.cleanBeforeExit();
+    // Check if we are here
+    this.app.logger('Closing app with cleaning process...', LoggerLevel.INFO, this);
+
+    // We need the Try/Catch as we have a the possibility to call the method without sessions
+    try {
+      // Clean the config file
+      this.app.cleanCredentialFile();
+    } catch (err) {
+      this.app.logger('No sessions to stop, skipping...', LoggerLevel.ERROR, this, err.stack);
+    }
+
+    // Finally quit
+    this.app.quit();
   }
 
   /**

@@ -1,29 +1,23 @@
-import {AppService} from '../services-system/app.service';
 import {Injectable} from '@angular/core';
-import {NativeService} from '../services-system/native-service';
-import {ConfigurationService} from '../services-system/configuration.service';
 import {environment} from '../../environments/environment';
+import {AppService} from '../services-system/app.service';
+import {WorkspaceService} from './workspace.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ProxyService extends NativeService {
+export class ProxyService {
 
-  constructor(
-    private appService: AppService,
-    private configurationService: ConfigurationService
-  ) {
-    super();
-  }
+  constructor(private appService: AppService, private workspaceService: WorkspaceService) {}
 
   configureBrowserWindow(browserWindow: any): void {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const workspace = this.workspaceService.get();
 
     let proxyUrl;
     let proxyPort;
     let proxyProtocol;
 
-    if (workspace && workspace.proxyConfiguration) {
+    if (workspace.proxyConfiguration) {
       proxyUrl = workspace.proxyConfiguration.proxyUrl;
       proxyPort = workspace.proxyConfiguration.proxyPort;
       proxyProtocol = workspace.proxyConfiguration.proxyProtocol;
@@ -38,8 +32,8 @@ export class ProxyService extends NativeService {
   }
 
   getHttpClientOptions(url: string): object {
-    const options = this.configurationService.url.parse(url);
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const options = this.appService.url.parse(url);
+    const workspace = this.workspaceService.get();
 
     let proxyUrl;
     let proxyPort;
@@ -62,7 +56,8 @@ export class ProxyService extends NativeService {
         rule = `${proxyProtocol}://${proxyUsername}:${proxyPassword}@${proxyUrl}:${proxyPort}`;
       }
 
-      options.agent = new this.httpsProxyAgent(rule);
+      const httpsProxyAgent = this.appService.getHttpsProxyAgent();
+      options.agent = new httpsProxyAgent(rule);
       options.timeout = environment.timeout;
     }
 
@@ -71,6 +66,6 @@ export class ProxyService extends NativeService {
 
   get(url: string, resCallback: (res: any) => any, errCallback: (err: any) => any): void {
     const options = this.getHttpClientOptions(url);
-    this.followRedirects.https.get(options, (res) => resCallback(res)).on('error', (err) => errCallback(err)).end();
+    this.appService.getFollowRedirects().https.get(options, (res) => resCallback(res)).on('error', (err) => errCallback(err)).end();
   }
 }

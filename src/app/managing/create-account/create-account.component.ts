@@ -11,6 +11,9 @@ import {AccountType} from '../../models/AccountType';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
+import {AwsPlainService} from '../../strategies/aws-plain.service';
+import {Account} from '../../models/account';
+
 
 @Component({
   selector: 'app-create-account',
@@ -84,7 +87,8 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     private activatedRoute: ActivatedRoute,
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
-    private providerManagerService: ProviderManagerService
+    private providerManagerService: ProviderManagerService,
+    private awsPlainService: AwsPlainService
   ) { super(); }
 
   ngOnInit() {
@@ -191,6 +195,21 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     const selectedUrl = this.selectedIdpUrl ? {id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label } : undefined;
     const selectedProfile = this.selectedProfile ? {id: this.selectedProfile.value, name: this.selectedProfile.label } : undefined;
 
+    let account: Account;
+    switch (this.accountType) {
+      case (AccountType.AWS_PLAIN_USER):
+        account = this.awsPlainService.createAccount( this.form.value.name, this.accountType, this.selectedRegion,
+          {accessKey: this.form.value.accessKey.trim(),
+            secretKey: this.form.value.secretKey.trim(),
+            profileId: this.selectedProfile.value,
+            mfaDevice: this.form.value.mfaDevice.trim(),
+          });
+        break;
+    }
+    this.sessionService.createSession(account);
+
+
+
     if (this.firstTime) {
       this.providerManagerService.saveFirstAccount(
         this.accountId,
@@ -263,9 +282,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
 
-  openSSODocumentation() {
-    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/.github/tutorials/G_SUITE_FEDERATION_SETUP');
-  }
 
   goToAwsSso() {
     this.router.navigate(['/integrations', 'aws-sso']);

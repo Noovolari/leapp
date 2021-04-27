@@ -4,19 +4,18 @@ import {Workspace} from '../models/workspace';
 import {AppService} from '../services-system/app.service';
 import {mustInjected} from '../../base-injectables';
 
-class MokedAppService {
-  constructor() {}
-  getOS() {
-    return { homedir : () => '~/' };
-  }
-}
-
 describe('WorkspaceService', () => {
   let workspaceService;
 
   beforeEach(() => {
+    const spy = jasmine.createSpyObj('AppService', ['getOS']);
+    spy.getOS.and.returnValue({ homedir : () => '~/' });
+
     TestBed.configureTestingModule({
-      providers: [{ provider: AppService, useClass: MokedAppService }, WorkspaceService].concat(mustInjected())
+      providers: [
+        WorkspaceService,
+        { provide: AppService, useValue: spy }
+      ].concat(mustInjected())
     });
 
     workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;

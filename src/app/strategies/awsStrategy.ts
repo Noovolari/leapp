@@ -24,10 +24,9 @@ import {SessionService} from '../services/session.service';
 // Import AWS node style
 const AWS = require('aws-sdk');
 
-export class AwsStrategy extends RefreshCredentialsStrategy {
+export class AwsStrategy {
 
   constructor(
-    private credentialsService: CredentialsService,
     private appService: AppService,
     private configurationService: ConfigurationService,
     private executeService: ExecuteServiceService,
@@ -37,9 +36,9 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     private timerService: TimerService,
     private workspaceService: WorkspaceService,
     private sessionService: SessionService,
-    private awsSsoService: AwsSsoService) {
-    super();
-  }
+    private awsSsoService: AwsSsoService) {}
+
+/*
   private processSubscription: Subscription;
   private processSubscriptionTruster: Subscription;
 
@@ -95,11 +94,6 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     }
   }
 
-  /**
-   * In this method we transform plain to temporary to avoid saving plain credential in the file
-   * @param workspace - the workspace we are working on
-   * @param session - the current session we use to retrieve information from
-   */
   private awsCredentialProcess(workspace: Workspace, session): Observable<boolean> {
     return new Observable<boolean>(observer => {
       this.getIamUserAccessKeysFromKeychain(session).then(credentials => {
@@ -545,5 +539,5 @@ export class AwsStrategy extends RefreshCredentialsStrategy {
     return new Observable<boolean>(observer => {
       this.doubleJumpFromFixedCredential(observer, session);
     });
-  }
+  }*/
 }

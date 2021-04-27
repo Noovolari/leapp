@@ -10,7 +10,7 @@ import {Observable, Subscriber, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {FileService} from '../services-system/file.service';
 
-export class AzureStrategy extends RefreshCredentialsStrategy {
+export class AzureStrategy {
   private processSubscription: Subscription;
   private processSubscription2: Subscription;
   private processSubscription4: Subscription;
@@ -20,9 +20,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
     private timerService: TimerService,
     private executeService: ExecuteServiceService,
     private fileService: FileService,
-    private configurationService: ConfigurationService) {
-    super();
-  }
+    private configurationService: ConfigurationService) {}
 
   getActiveSessions(workspace: Workspace) {
     const activeSessions = workspace.sessions.filter((sess) => {
@@ -98,17 +96,17 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
   }
 
   private azureSetSubscription(observer: Subscriber<boolean>, session: Session) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    // const workspace = this.workspaceService.get();
     // We can use Json in res to save account information
     if (this.processSubscription4) { this.processSubscription4.unsubscribe(); }
     this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).pipe(
       switchMap(() => this.executeService.execute(`az configure --default location=${session.account.region} 2>&1`))
     ).subscribe(() => {
       // be sure to save the profile and tokens
-      workspace.azureProfile = this.configurationService.getAzureProfileSync();
-      workspace.azureConfig = this.configurationService.getAzureConfigSync();
-      this.configurationService.updateWorkspaceSync(workspace);
-      this.configurationService.disableLoadingWhenReady(workspace, session);
+      // workspace.azureProfile = this.configurationService.getAzureProfileSync();
+      // workspace.azureConfig = this.configurationService.getAzureConfigSync();
+      // this.configurationService.updateWorkspaceSync(workspace);
+      // this.configurationService.disableLoadingWhenReady(workspace, session);
 
       // Start Calculating time here once credentials are actually retrieved
       this.timerService.defineTimer();
@@ -120,16 +118,9 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
     }, err2 => {
       this.appService.logger('Error in command: set subscription by Azure Cli', LoggerLevel.ERROR, this, err2.stack);
 
-      workspace.sessions.forEach(sess => {
-        if (sess.id === session.id) {
-          sess.active = false;
-          sess.loading = false;
-          sess.complete = false;
-          sess.lastStopDate = new Date().toISOString();
-        }
-      });
+      // this.sessionService.stop(session.sessionId);
 
-      this.configurationService.updateWorkspaceSync(workspace);
+      // this.workspaceService.update(workspace);
       this.appService.refreshReturnStatusEmit.emit(session);
       this.appService.toast('Can\'t refresh Credentials.', ToastLevel.WARN, 'Credentials');
       observer.next(false);

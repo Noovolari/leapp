@@ -3,7 +3,6 @@ import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.servic
 import {AwsCredential, AwsCredentials} from '../models/credential';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {ConfigurationService} from '../services-system/configuration.service';
-import {CredentialsService} from '../services/credentials.service';
 import {environment} from '../../environments/environment';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {FileService} from '../services-system/file.service';

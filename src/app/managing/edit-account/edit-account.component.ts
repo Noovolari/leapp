@@ -9,7 +9,6 @@ import {AccountType} from '../../models/AccountType';
 import {Session} from '../../models/session';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {KeychainService} from '../../services-system/keychain.service';
-import {environment} from '../../../environments/environment';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 
 @Component({
@@ -65,17 +64,17 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
 
       // Get other readonly properties
       this.form.controls['name'].setValue(selectedAccount.accountName);
-      this.form.controls['accountNumber'].setValue(selectedAccount.accountNumber);
-      this.form.controls['plainUser'].setValue(selectedAccount.user);
+      // this.form.controls['accountNumber'].setValue(selectedAccount.accountNumber);
+      // this.form.controls['plainUser'].setValue(selectedAccount.user);
       this.form.controls['mfaDevice'].setValue(selectedAccount.mfaDevice);
 
       // Get the secrets
-      this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(selectedAccount.accountName, (selectedAccount as AwsPlainAccount).user)).then(access => {
+      /* this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateAccessString(selectedAccount.accountName, (selectedAccount as AwsPlainAccount).user)).then(access => {
         this.keychainService.getSecret(environment.appName, this.appService.keychainGenerateSecretString(selectedAccount.accountName, (selectedAccount as AwsPlainAccount).user)).then(secret => {
           this.form.controls['accessKey'].setValue(access);
           this.form.controls['secretKey'].setValue(secret);
         });
-      });
+      });*/
     }));
   }
 

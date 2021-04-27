@@ -9,12 +9,10 @@ import {BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
-import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
 import {MenuService} from '../../services/menu.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
 import * as uuid from 'uuid';
 
 @Component({
@@ -60,7 +58,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private appService: AppService,
     private ssmService: SsmService,
     private fileService: FileService,
-    private credentialsService: CredentialsService,
     private sessionService: SessionService,
     private menuService: MenuService,
     private zone: NgZone,
@@ -165,7 +162,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
           ((s.account as AwsAccount).accountNumber && (s.account as AwsAccount).accountNumber.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           (this.getProfileName(s.profile).toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           (idpID.indexOf((s.account as AwsAccount).idpUrl) > -1) ||
-          ((s.account as AwsPlainAccount).user && (s.account as AwsPlainAccount).user.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          // ((s.account as AwsPlainAccount).user && (s.account as AwsPlainAccount).user.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).tenantId && (s.account as AzureAccount).tenantId.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).subscriptionId && (s.account as AzureAccount).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);
       });

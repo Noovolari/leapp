@@ -30,4 +30,11 @@ export class SessionService extends NativeService {
   get(sessionId: string): Session {}
 
   list(): Session[] {}
+
+
+  stop(sessionId: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+
+    });
+  }
 }

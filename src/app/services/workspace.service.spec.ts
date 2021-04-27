@@ -1,35 +1,29 @@
 import {WorkspaceService} from './workspace.service';
 import {TestBed} from '@angular/core/testing';
-import {IndividualConfig, ToastrService} from 'ngx-toastr';
-import {BsModalService} from 'ngx-bootstrap/modal';
-import {ComponentLoaderFactory} from 'ngx-bootstrap/component-loader';
-import {PositioningService} from 'ngx-bootstrap/positioning';
+import {Workspace} from '../models/workspace';
+import {AppService} from '../services-system/app.service';
+import {mustInjected} from '../../base-injectables';
 
-const toastrService = {
-  success: (
-    message?: string,
-    title?: string,
-    override?: Partial<IndividualConfig>
-  ) => {},
-  error: (
-    message?: string,
-    title?: string,
-    override?: Partial<IndividualConfig>
-  ) => {},
-};
+class MokedAppService {
+  constructor() {}
+  getOS() {
+    return { homedir : () => '~/' };
+  }
+}
 
 describe('WorkspaceService', () => {
   let workspaceService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [WorkspaceService, PositioningService, ComponentLoaderFactory, BsModalService, { provide: ToastrService, useValue: toastrService }]
+      providers: [{ provider: AppService, useClass: MokedAppService }, WorkspaceService].concat(mustInjected())
     });
 
-    workspaceService = TestBed.inject(WorkspaceService);
+    workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;
   });
 
   it('should be created', () => {
     expect(workspaceService).toBeTruthy();
+    expect(workspaceService.create()).toBeInstanceOf(Workspace);
   });
 });

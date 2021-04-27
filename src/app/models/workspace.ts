@@ -3,10 +3,17 @@ import * as uuid from 'uuid';
 import {environment} from '../../environments/environment';
 
 export class Workspace {
+  get sessions(): Session[] {
+    return this._sessions;
+  }
+
+  set sessions(value: Session[]) {
+    this._sessions = value;
+  }
 
   idpUrl: { id: string, url: string }[];
   profiles: { id: string, name: string }[];
-  sessions: Session[];
+  private _sessions: Session[];
 
   proxyConfiguration: {
     proxyProtocol: string;
@@ -22,8 +29,10 @@ export class Workspace {
   constructor() {
     this.idpUrl = [];
     this.profiles = [{ id: uuid.v4(), name: 'default'}, {id: uuid.v4(), name: 'default-azure'}];
-    this.sessions = [];
+    this._sessions = [];
     this.defaultRegion = environment.defaultRegion;
     this.defaultLocation = environment.defaultLocation;
   }
+
+
 }

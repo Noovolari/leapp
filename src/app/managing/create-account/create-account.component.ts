@@ -206,7 +206,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
           });
         break;
     }
-    this.sessionService.createSession(account);
+    this.sessionService.create(account, this.selectedProfile.value);
 
 
 

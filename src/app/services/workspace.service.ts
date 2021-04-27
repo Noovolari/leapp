@@ -12,8 +12,6 @@ import {Session} from '../models/session';
 })
 export class WorkspaceService extends NativeService {
 
-
-
   constructor(private fileService: FileService) {
     super();
   }
@@ -35,6 +33,11 @@ export class WorkspaceService extends NativeService {
       this.fileService.readFileSync(this.os.homedir() + '/' + environment.lockFileDestination)
       )
     ) as Workspace;
+  }
+
+  getSessions(): Session[] {
+    const workspace = this.get();
+    return workspace.sessions;
   }
 
   updateSessions(sessions: Session[]): Workspace {

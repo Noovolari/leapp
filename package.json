@@ -159,7 +159,6 @@
   "dependencies": {
     "@angular/animations": "~9.1.13",
     "@angular/common": "~9.1.13",
-    "@angular/compiler": "~9.1.13",
     "@angular/core": "~9.1.13",
     "@angular/forms": "~9.1.13",
     "@angular/platform-browser": "~9.1.13",
@@ -220,9 +219,10 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.1102.10",
     "@angular/cli": "^11.2.10",
+    "@angular/compiler": "^9.1.13",
     "@angular/compiler-cli": "^11.0.0",
     "@angular/language-service": "~8.1.0",
-    "@biesbjerg/ngx-translate-extract": "~2.3.4",
+    "@biesbjerg/ngx-translate-extract": "^7.0.4",
     "@types/aws-sdk": "^2.7.0",
     "@types/jasmine": "^3.6.10",
     "@types/jasminewd2": "~2.0.3",
@@ -238,7 +238,7 @@
     "jasmine": "^3.7.0",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",
-    "karma": "~4.4.1",
+    "karma": "^6.3.2",
     "karma-chrome-launcher": "~2.2.0",
     "karma-coverage-istanbul-reporter": "~2.0.1",
     "karma-firefox-launcher": "^2.1.0",
@@ -247,7 +247,7 @@
     "karma-requirejs": "^1.1.0",
     "node-abi": "^2.19.3",
     "nyc": "^15.1.0",
-    "protractor": "~5.4.4",
+    "protractor": "^7.0.0",
     "ts-node": "^7.0.1",
     "tslint": "~5.15.0",
     "typescript": "^3.4.5"

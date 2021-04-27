@@ -158,9 +158,9 @@
   },
   "dependencies": {
     "@angular/animations": "~8.1.0",
-    "@angular/common": "~8.2.14",
-    "@angular/compiler": "~8.1.0",
-    "@angular/core": "~8.2.14",
+    "@angular/common": "~9.1.13",
+    "@angular/compiler": "~9.1.13",
+    "@angular/core": "~9.1.13",
     "@angular/forms": "~8.1.0",
     "@angular/platform-browser": "~8.1.0",
     "@angular/platform-browser-dynamic": "~8.1.0",

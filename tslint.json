@@ -1,6 +1,12 @@
 {
   "extends": "tslint:recommended",
   "rules": {
+    "variable-name": {
+      "options": [
+        "allow-leading-underscore",
+        "require-const-for-all-caps"
+      ]
+    },
     "prefer-for-of": false,
     "no-trailing-whitespace": false,
     "array-type": false,

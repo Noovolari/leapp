@@ -14,7 +14,9 @@ const environment = {
   azureAccessTokens: '.azure/accessTokens.json',
   azureProfile: '.azure/azureProfile.json',
   defaultRegion: 'us-east-1',
-  defaultLocation: 'eastus'
+  defaultLocation: 'eastus',
+  defaultAwsProfileName: 'default',
+  defaultAzureProfileName: 'default-azure'
 };
 
 environment.lockFileDestination = `.Leapp/Leapp-lock.json`;

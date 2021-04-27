@@ -1,14 +1,9 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {FileService} from './file.service';
 import {NativeService} from './native-service';
 import {environment} from '../../environments/environment';
-import {map, switchMap} from 'rxjs/operators';
-import {Observable} from 'rxjs';
 import {AppService, LoggerLevel, ToastLevel} from './app.service';
-import {Workspace} from '../models/workspace';
 import {Configuration} from '../models/configuration';
-import {_} from '../core/translation-marker';
-import {Session} from '../models/session';
 import {ExecuteServiceService} from './execute-service.service';
 import {WorkspaceService} from '../services/workspace.service';
 

@@ -10,7 +10,6 @@ import {SsmService} from '../../services/ssm.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
 import {SessionService} from '../../services/session.service';
-import {MenuService} from '../../services/menu.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
 import * as uuid from 'uuid';
@@ -59,7 +58,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private ssmService: SsmService,
     private fileService: FileService,
     private sessionService: SessionService,
-    private menuService: MenuService,
     private zone: NgZone,
   ) { super(); }
 

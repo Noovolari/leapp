@@ -1,8 +1,6 @@
 import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
-
-import {MenuService} from '../../services/menu.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {Router} from '@angular/router';
 import {ConfigurationService} from '../../services-system/configuration.service';
@@ -58,7 +56,6 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   constructor(private sessionService: SessionService,
               private workspaceService: WorkspaceService,
               private keychainService: KeychainService,
-              private menuService: MenuService,
               private appService: AppService,
               private router: Router,
               private configurationService: ConfigurationService,

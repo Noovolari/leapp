@@ -4,7 +4,6 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SessionService} from '../../services/session.service';
-import {Workspace} from '../../models/workspace';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';

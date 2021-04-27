@@ -1,11 +1,12 @@
 import {Injectable, NgZone} from '@angular/core';
-import {IdpResponseType, WorkspaceService} from './workspace.service';
+import {WorkspaceService} from './workspace.service';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {AccountType} from '../models/AccountType';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {SessionService} from './session.service';
 import {Router} from '@angular/router';
 import {Session} from '../models/session';
+import {AwsAccount} from '../models/aws-account';
 
 @Injectable({
   providedIn: 'root'
@@ -45,22 +46,19 @@ export class ProviderManagerService {
     const roles = [];
 
     // Get the appropriate roles
-    const filteredAccounts = this.sessionService.listSessions().filter(session => (session.account.accountName === accountName)).map(s => s.account);
+    const filteredAccounts = this.sessionService.list().filter(session => (session.account.accountName === accountName)).map(s => s.account);
     if (filteredAccounts !== undefined && filteredAccounts !== null && filteredAccounts.length > 0) {
       for (let i = 0; i < filteredAccounts.length; i++) {
         const account = filteredAccounts[i];
 
         if (account.type === AccountType.AWS || account.type === AccountType.AWS_SSO) {
           // The federated roles we have obtained from the filter
-          const federatedRole = account.role;
+          const federatedRole = (account as AwsAccount).role;
 
           // Set the federated role automatically
-          this.appService.logger(`Retrieved federated role for: ${accountName}`, LoggerLevel.INFO, this, JSON.stringify({ federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name }, null, 3));
-          roles.push({ federatedRole, selectedAccountNumber: account.accountNumber, selectedrole: federatedRole.name });
+          roles.push({ federatedRole, selectedAccountNumber: (account as AwsAccount).accountNumber, selectedrole: federatedRole.name });
         } else if (account.type === AccountType.AWS_PLAIN_USER) {
-
-          this.appService.logger(`Retrieved federated role for: ${accountName}`, LoggerLevel.INFO, this, JSON.stringify({federatedRole: {name: 'no need'}, selectedAccountNumber: account.accountNumber, selectedrole: 'no need'}, null, 3));
-          roles.push({federatedRole: {name: 'no need'}, selectedAccountNumber: account.accountNumber, selectedrole: 'no need'});
+          roles.push({federatedRole: {name: 'no need'}, selectedAccountNumber: (account as AwsAccount).accountNumber, selectedrole: 'no need'});
         }
 
       }
@@ -69,42 +67,6 @@ export class ProviderManagerService {
 
     // no account so no roles
     return [{ federatedRole: null, selectedAccountNumber: null, selectedrole: null }];
-  }
-
-  /**
-   * Save the first account of the Application
-   * @param accountId - the account Id that we are creating
-   * @param accountType - the account Type you have chosen
-   * @param selectedSession - the selected session
-   * @param selectedRole - the selected role of the parent
-   * @param selectedRegion - the region to select for aws
-   * @param selectedIdpUrl - the current idp url to use for saml if needed plus id
-   * @param selectedProfile - AWS named-profile in which the session is saved
-   * @param form - the form to use
-   */
-
-  // TODO: Why we need to save configurations and create the workspace here? it should be done invoked in the start screen and
-  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, selectedProfile, form) {
-    // Set our variable to avoid sending them to all methods;
-    // besides the scope of this service is to manage saving and editing
-    // of multi providers so having some helper class variables is ok
-    this.accountId = accountId;
-    this.accountType = accountType;
-    this.selectedSession = selectedSession;
-    this.selectedRole = selectedRole;
-    this.selectedRegion = selectedRegion;
-    this.selectedIdpUrl = selectedIdpUrl;
-    this.selectedProfile = selectedProfile;
-    this.form = form;
-
-    // Update Configuration
-    if (accountType === AccountType.AWS) {
-      this.createNewWorkspace(null, this.selectedIdpUrl, this.selectedProfile, IdpResponseType.SAML);
-      this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
-    } else {
-      this.appService.logger(`Saving first account with a plain or azure account`, LoggerLevel.INFO, this);
-      this.createNewWorkspace(undefined, undefined, this.selectedProfile, IdpResponseType.SAML);
-    }
   }
 
   /**
@@ -152,21 +114,6 @@ export class ProviderManagerService {
     this.selectedRegion = selectedRegion;
     this.form = form;
     this.decideEditingMethodAndSave();
-  }
-
-  /**
-   * When the data from Google is received, generate a new workspace or check errors, etc.
-   */
-  // TODO: Why there are 2 createNewWorkspace functions?
-  createNewWorkspace(googleToken, federationUrl, profile, responseType) {
-    const name = 'default';
-    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, profile, name, responseType);
-    if (result) {
-      this.decideSavingMethodAndSave();
-    } else {
-      // Error: return to dependencies page
-      this.appService.toast('Can\'t create a new workspace for first account', ToastLevel.ERROR, 'Creation error');
-    }
   }
 
   decideSavingMethodAndSave() {
@@ -373,27 +320,6 @@ export class ProviderManagerService {
     const role = form.controls['role'].value;
     const accountNumber = form.controls['accountNumber'].value;
     return { name: role, roleArn: `arn:aws:iam::${accountNumber}:role/${role}` };
-  }
-
-  getFederatedAccounts() {
-    // return this.federatedAccountService.listFederatedAccountInWorkSpace();
-  }
-
-  getPlainAccounts() {
-    // return this.federatedAccountService.listPlainAccountsInWorkspace();
-  }
-
-  getSSOAccounts() {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace && workspace.sessions && workspace.sessions.length > 0) {
-      return workspace.sessions.filter(sess => (sess.account.type === AccountType.AWS_SSO)); // .map(s => s.account);
-    } else {
-      return [];
-    }
-  }
-
-  getFederableAccounts() {
-    // return this.getFederatedAccounts().concat(this.getPlainAccounts()).concat(this.getSSOAccounts());
   }
 }
 

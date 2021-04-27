@@ -39,6 +39,12 @@ export class SessionService extends NativeService {
     // Return all sessions that have a parent session id
   }
 
+  start(sessionId: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+
+    });
+  }
+
   stop(sessionId: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {
 

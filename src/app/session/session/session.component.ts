@@ -37,9 +37,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   // Connection retries
   allSessions;
-  retries = 0;
   showOnly = 'ALL';
-  profiles = [];
 
   workspace;
   subscription;
@@ -62,22 +60,8 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   ) { super(); }
 
   ngOnInit() {
-    this.configurationService.sanitizeIdpUrlsAndNamedProfiles();
-
-    // Set workspace
-    this.workspace = this.configurationService.getDefaultWorkspaceSync();
-    this.profiles = this.workspaceService.getProfiles();
-
-    if (this.workspace.profiles === undefined) {
-      this.profiles = [{ id: uuid.v4(), name: 'default' }];
-      this.workspace.profiles = this.profiles;
-      this.configurationService.updateWorkspaceSync(this.workspace);
-    }
-
-    // Set retries
-    this.retries = 0;
     // retrieve Active and not active sessions
-    this.getSessions();
+    this.refresh();
 
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions();
@@ -92,50 +76,33 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
     if (!this.subscription) {
       this.subscription = this.appService.redrawList.subscribe(() => {
-        this.getSessions();
+        this.refresh();
       });
       this.subs.add(this.subscription);
     }
   }
 
   /**
-   * Stop the current session, setting it to false and updating the workspace
-   */
-  stopSession(session: Session) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const sessions = workspace.sessions;
-    sessions.map(sess => {
-      if (session === null || (session.id === sess.id)) {
-        sess.active = false;
-        sess.loading = false;
-
-        if (session !== null && session !== undefined) {
-          session.active = false;
-          session.loading = false;
-        }
-      }
-    });
-
-    workspace.sessions = sessions;
-    this.configurationService.updateWorkspaceSync(workspace);
-
-    this.activeSessions = session !== null ? this.activeSessions.filter(sess => sess.id !== session.id) : [];
-    this.notActiveSessions = session !== null ? this.notActiveSessions.concat([session]) : sessions;
-
-    return true;
-  }
-
-  /**
    * getSession
    */
-  getSessions() {
+  refresh() {
     this.zone.run(() => {
-      this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
-      this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter( session => session.active === false));
+      this.activeSessions = this.sessionService.list().filter( session => session.active === true);
+      // @ts-ignore
+      this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.list().filter( session => session.active === false));
       if (this.filterField) {
         this.filterInactiveSessions(this.filterField.nativeElement.value);
       }
     });
+  }
+
+  /**
+   * Stop the current session, setting it to false and updating the workspace
+   */
+  stopSession(session: Session) {
+    this.sessionService.stop(session.sessionId);
+    this.refresh();
+    return true;
   }
 
   /**
@@ -147,7 +114,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   }
 
   filterSessions(query) {
-    this.getSessions();
+    this.refresh();
     this.filterInactiveSessions(query);
   }
 
@@ -158,7 +125,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
         return s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
           ((s.account as AwsAccount).role && (s.account as AwsAccount).role.name.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AwsAccount).accountNumber && (s.account as AwsAccount).accountNumber.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
-          (this.getProfileName(s.profile).toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          (this.getProfileName(s.profileId).toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           (idpID.indexOf((s.account as AwsAccount).idpUrl) > -1) ||
           // ((s.account as AwsPlainAccount).user && (s.account as AwsPlainAccount).user.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).tenantId && (s.account as AzureAccount).tenantId.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
@@ -168,10 +135,11 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   }
 
   getProfileName(profileId: string): string {
+    const workspace = this.workspaceService.get();
     let profileName = '';
-    for (let i = 0; i < this.profiles.length; i++) {
-      if (this.profiles[i].id === profileId) {
-        profileName = this.profiles[i].name;
+    for (let i = 0; i < workspace.profiles.length; i++) {
+      if (workspace.profiles[i].id === profileId) {
+        profileName = workspace.profiles[i].name;
         break;
       }
     }

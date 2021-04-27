@@ -1,23 +1,19 @@
 import {Injectable} from '@angular/core';
-import {NativeService} from '../services-system/native-service';
-import {Workspace} from '../models/workspace';
-import {Configuration} from '../models/configuration';
-import {environment} from '../../environments/environment';
 import {FileService} from '../services-system/file.service';
+import {AppService} from '../services-system/app.service';
 import {Session} from '../models/session';
-
+import {Workspace} from '../models/workspace';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WorkspaceService extends NativeService {
+export class WorkspaceService {
 
-  constructor(private fileService: FileService) {
-    super();
-  }
+  constructor(private appService: AppService, private fileService: FileService) {}
 
   private persist(workspace: Workspace) {
-    const path = this.os.homedir() + '/' + environment.lockFileDestination;
+    const path = this.appService.getOS().homedir() + '/' + environment.lockFileDestination;
     this.fileService.writeFileSync(path, this.fileService.encryptText(JSON.stringify(workspace, null, 2)));
   }
 
@@ -33,7 +29,7 @@ export class WorkspaceService extends NativeService {
 
   get(): Workspace {
     return JSON.parse(this.fileService.decryptText(
-      this.fileService.readFileSync(this.os.homedir() + '/' + environment.lockFileDestination)
+      this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)
       )
     ) as Workspace;
   }

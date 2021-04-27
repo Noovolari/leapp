@@ -14,6 +14,7 @@ import {AccountType} from './models/AccountType';
 import * as uuid from 'uuid';
 import {WorkspaceService} from './services/workspace.service';
 import {SessionService} from './services/session.service';
+import {Workspace} from './models/workspace';
 
 @Component({
   selector: 'app-root',
@@ -57,6 +58,9 @@ export class AppComponent implements OnInit {
     // Create or Get the workspace
     const workspace = this.workspaceService.create();
 
+    // Check the existence of a pre-Leapp credential file and make a backup
+    this.showCredentialBackupMessageIfNeeded(workspace);
+
     // All sessions start stopped when app is launched
     if (workspace.sessions.length > 0) {
       workspace.sessions.forEach(sess => this.sessionService.stop(sess.sessionId));
@@ -80,5 +84,26 @@ export class AppComponent implements OnInit {
   private beforeCloseInstructions() {
     // TODO: Move to another component
     this.menuService.cleanBeforeExit();
+  }
+
+  /**
+   * Show that we created a copy of original credential file if present in the system
+   */
+  private showCredentialBackupMessageIfNeeded(workspace: Workspace) {
+
+    const oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
+    const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
+    const check = workspace.sessions.length === 0 && this.app.getFs().existsSync(oldAwsCredentialsPath);
+
+    this.app.logger(`Check existing credential file: ${check}`, LoggerLevel.INFO, this);
+
+    if (check) {
+      this.app.getFs().renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
+      this.app.getDialog().showMessageBox({
+        type: 'info',
+        icon: __dirname + '/assets/images/Leapp.png',
+        message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
+      });
+    }
   }
 }

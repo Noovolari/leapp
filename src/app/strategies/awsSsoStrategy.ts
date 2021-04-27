@@ -1,8 +1,6 @@
 import {AccountType} from '../models/AccountType';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
-import {CredentialsService} from '../services/credentials.service';
 import {FileService} from '../services-system/file.service';
-import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
 import {TimerService} from '../services/timer-service';
 import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
@@ -20,19 +18,16 @@ import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
 import {SessionService} from '../services/session.service';
 
 
-export class AwsSsoStrategy extends RefreshCredentialsStrategy {
+export class AwsSsoStrategy {
 
   constructor(
-    private credentialsService: CredentialsService,
     private appService: AppService,
     private fileService: FileService,
     private timerService: TimerService,
     private awsSsoService: AwsSsoService,
     private configurationService: ConfigurationService,
     private sessionService: SessionService,
-    private keychainService: KeychainService) {
-    super();
-  }
+    private keychainService: KeychainService) {}
 
   getActiveSessions(workspace: Workspace) {
     return workspace.sessions.filter((sess) => {
@@ -80,11 +75,11 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
         return credential;
       }),
       switchMap((credential: AwsCredential) => {
-        const profileName = this.configurationService.getNameFromProfileId(session.profile);
+        const profileName = this.configurationService.getNameFromProfileId(session.profileId);
         const awsSsoCredentials = {};
         awsSsoCredentials[profileName] = credential;
 
-        const account = `Leapp-ssm-data-${session.profile}`;
+        const account = `Leapp-ssm-data-${session.profileId}`;
 
         return fromPromise(this.keychainService.saveSecret(environment.appName, account, JSON.stringify(credential))).pipe(
           map(() => {
@@ -94,12 +89,12 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
       }),
       switchMap((awsSsoCredentials) => {
         this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
-        this.configurationService.disableLoadingWhenReady(workspace, session);
+        // this.configurationService.disableLoadingWhenReady(workspace, session);
         this.timerService.defineTimer();
         return of(true);
       }),
       catchError( (err) => {
-        this.sessionService.stopSession(session);
+        this.sessionService.stop(session.sessionId);
 
         if (err.name === 'LeappSessionTimedOut') {
           this.appService.logger(err.toString(), LoggerLevel.WARN, this, err.stack);

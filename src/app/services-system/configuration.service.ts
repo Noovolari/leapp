@@ -10,6 +10,7 @@ import {Configuration} from '../models/configuration';
 import {_} from '../core/translation-marker';
 import {Session} from '../models/session';
 import {ExecuteServiceService} from './execute-service.service';
+import {WorkspaceService} from '../services/workspace.service';
 
 
 @Injectable({
@@ -18,101 +19,13 @@ import {ExecuteServiceService} from './execute-service.service';
 export class ConfigurationService extends NativeService {
   private processSubscription3: any;
 
-  constructor(private fileService: FileService, private appService: AppService, private executeService: ExecuteServiceService) {
+  constructor(private fileService: FileService,
+              private appService: AppService,
+              private executeService: ExecuteServiceService,
+              private workspaceService: WorkspaceService) {
     super();
   }
 
-  public changeDefaultWorkspace: EventEmitter<string> = new EventEmitter();
-
-
-
-  /**
-   * Update a workspace or add it and retry if not in the configuration file.
-   * It also update the credential file if the workspace is the default one.
-   * @param workspace - {Workspace} object to update
-   */
-  public updateWorkspaceSync(workspace: Workspace) {
-    const configuration = this.getConfigurationFileSync();
-    configuration.workspaces[0] = workspace;
-    // Everything ok so far so we can update the configuration file with the updated workspace
-    this.updateConfigurationFileSync(configuration);
-  }
-
-  /**
-   * Add a workspace to the configuration workspace array,
-   * if the workspace exists it replaces it with the new version
-   * @param workspace the {Workspace} to add
-   */
-  public addWorkspaceSync(workspace: Workspace) {
-
-    // Remove the old version if exists go on otherwise
-    if (this.workspaceExists(workspace.name)) {
-      this.appService.logger(`Workspace - ${workspace.name} - already exists, updating configuration`, LoggerLevel.WARN, this);
-      this.removeWorkspaceSync(workspace.name);
-    } else {
-      this.appService.logger(`Adding Workspace - ${workspace.name} - to configuration`, LoggerLevel.INFO, this);
-    }
-
-    // Set the configuration with the updated value
-    const configuration = this.getConfigurationFileSync();
-    // TODO: we need more than one workspace?
-    configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
-    configuration.workspaces.push(workspace);
-    this.updateConfigurationFileSync(configuration);
-  }
-
-  /**
-   * Set the default workspace in the configuration file
-   * @param workspaceName - the workspace to set as default one
-   */
-  public setDefaultWorkspaceSync(workspaceName: string) {
-    const conf = this.getConfigurationFileSync();
-    conf.defaultWorkspace = workspaceName;
-    try {
-      this.updateConfigurationFileSync(conf);
-      this.changeDefaultWorkspace.emit(workspaceName);
-    } catch (error) {
-      this.appService.logger(`Proble setting default workspace: ${workspaceName}.`, LoggerLevel.ERROR, this, error.stack);
-      throw error;
-    }
-  }
-
-  /**
-   * Get Default Workspace
-   * @returns the default {Workspace}
-   */
-  public getDefaultWorkspaceSync(): Workspace | any {
-    const config = this.getConfigurationFileSync();
-    if (config.defaultWorkspace) {
-      return this.getFilteredWorkspace(config, config.defaultWorkspace);
-    }
-    return {};
-  }
-
-
-  /**
-   * Get a specific Workspace
-   * @param name - the workspace to search
-   * @returns the selected {Workspace}
-   */
-  public getWorkspaceSync(name: string): Workspace {
-    const config  = this.getConfigurationFileSync();
-    return this.getFilteredWorkspace(config, name);
-  }
-
-  /**
-   * Remove a workspace
-   * @param name - the workspace to remove
-   */
-  public removeWorkspaceSync(name: string) {
-    if (this.workspaceExists(name)) {
-      const config  = this.getConfigurationFileSync();
-      const copy = config.workspaces;
-      config.workspaces = copy.reduce((p, workspace) => (workspace.name !== name && p.push(workspace), p), []);
-      config.defaultWorkspace = (name === config.defaultWorkspace) ? undefined : config.defaultWorkspace;
-      this.updateConfigurationFileSync(config);
-    }
-  }
 
   // ============================================================ //
   // ==================== CONFIGURATION FILE ==================== //
@@ -132,8 +45,6 @@ export class ConfigurationService extends NativeService {
   public updateConfigurationFileSync(config: Configuration) {
     return this.fileService.writeFileSync(this.os.homedir() + '/' + environment.lockFileDestination, this.fileService.encryptText(JSON.stringify(config, null, 2)));
   }
-
-
 
   /**
    * Get the Azure Profile
@@ -187,7 +98,7 @@ export class ConfigurationService extends NativeService {
   /**
    * Create a new configuration file synchronously
    */
-  public async newConfigurationFileSync() {
+  public async logout() {
     try {
 
       // Clear all extra data
@@ -213,24 +124,14 @@ export class ConfigurationService extends NativeService {
     }
   }
 
-  public disableLoadingWhenReady(workspace: Workspace, session: Session) {
-    workspace.sessions.forEach(sess => {
-      if (sess.id === session.id) {
-        sess.loading = false;
-        sess.active = true;
-      }
-    });
-    this.updateWorkspaceSync(workspace);
-  }
-
   public getNameFromProfileId(id: string): string {
-    const workspace = this.getDefaultWorkspaceSync();
+    const workspace = this.workspaceService.get();
     const session = workspace.profiles.filter(p => p.id === id)[0];
     return session ? session.name : '';
   }
 
   public cleanAzureCrendentialFile() {
-    const workspace = this.getDefaultWorkspaceSync();
+    /*const workspace = this.workspaceService.get();
     if (workspace && this.isAzureConfigPresent()) {
       workspace.azureProfile = this.getAzureProfileSync();
       workspace.azureConfig = this.getAzureConfigSync();
@@ -240,16 +141,16 @@ export class ConfigurationService extends NativeService {
         workspace.azureConfig = null;
       }
 
-      this.updateWorkspaceSync(workspace);
+      this.workspaceService.updateSessions(workspace);
     }
     if (this.processSubscription3) { this.processSubscription3.unsubscribe(); }
     this.processSubscription3 = this.executeService.execute('az account clear 2>&1').pipe(
       switchMap(() => this.executeService.execute('az configure --defaults location=\'\' 2>&1'))
-    ).subscribe(() => {}, () => {});
+    ).subscribe(() => {}, () => {});*/
   }
 
   public sanitizeIdpUrlsAndNamedProfiles() {
-    const workspace = this.getDefaultWorkspaceSync();
+    /*const workspace = this.getDefaultWorkspaceSync();
 
     const idpUrls = workspace.idpUrl;
     const profiles = workspace.profiles;
@@ -274,30 +175,6 @@ export class ConfigurationService extends NativeService {
       workspace.profiles = sanitizedProfiles;
 
       this.updateWorkspaceSync(workspace);
-    }
-  }
-
-  // ============================================================ //
-  // ====================== PRIVATE METHODS ===================== //
-  // ============================================================ //
-
-  /**
-   * Get a filtered Workspace
-   * @param config - the configuration file called .Leapp-lock
-   * @param name - the workspace to search
-   * @returns the {Workspace} or null if nothing is found
-   */
-  private getFilteredWorkspace(config: Configuration, name: string): Workspace {
-    if (config) {
-      // Get the workspace array that are filtered by name
-      const workspacesFiltered = config.workspaces.filter(workspace => workspace.name === name);
-      if (workspacesFiltered.length > 0) {
-        return workspacesFiltered[0];
-      } else {
-        return null;
-      }
-    } else {
-      return null;
-    }
+    }*/
   }
 }

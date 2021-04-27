@@ -16,6 +16,7 @@ import {ConfigurationService} from '../../services-system/configuration.service'
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {Workspace} from '../../models/workspace';
 import {SessionService} from '../../services/session.service';
+import {WorkspaceService} from '../../services/workspace.service';
 
 interface AuthorizeIntegrationResponse {
   clientId: string;
@@ -46,7 +47,7 @@ export class AwsSsoService extends NativeService {
 
   constructor(private appService: AppService,
               private keychainService: KeychainService,
-              private configurationService: ConfigurationService,
+              private workspaceService: WorkspaceService,
               private sessionService: SessionService
               ) {
     super();
@@ -338,7 +339,7 @@ export class AwsSsoService extends NativeService {
       }),
       map((roleInfo: RoleInfo) => {
         const account: AwsSsoAccount = {
-          region: this.configurationService.getDefaultWorkspaceSync().defaultRegion || environment.defaultRegion,
+          region: this.workspaceService.get().defaultRegion || environment.defaultRegion,
           role: {name: roleInfo.roleName},
           accountId: accountInfo.accountId,
           accountName: accountInfo.accountName,
@@ -347,51 +348,15 @@ export class AwsSsoService extends NativeService {
           type: AccountType.AWS_SSO
         };
 
-        let workspace  = this.configurationService.getDefaultWorkspaceSync();
-
-        // If sessions does not exist create the sessions array
-        if (JSON.stringify(workspace) === '{}') {
-          // Set the configuration with the updated value
-          const configuration = this.configurationService.getConfigurationFileSync();
-
-          configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
-
-          const workspaceCreation: Workspace = {
-            defaultLocation: environment.defaultLocation,
-            defaultRegion: environment.defaultRegion,
-            type: null,
-            name: 'default',
-            lastIDPToken: null,
-            idpUrl: [],
-            proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
-            sessions: [],
-            setupDone: true,
-            azureProfile: null,
-            azureConfig: null
-          };
-
-          configuration.defaultWorkspace = 'default';
-          configuration.workspaces.push(workspaceCreation);
-
-          this.configurationService.updateConfigurationFileSync(configuration);
-
-          workspace = workspaceCreation;
-        }
-
-        let profiles = workspace.profiles;
-        if (profiles === undefined) {
-          profiles = [{ id: uuid.v4(), name: 'default' }];
-          workspace.profiles = profiles;
-          this.configurationService.updateWorkspaceSync(workspace);
-        }
-        const profileId  = profiles.filter(p => p.name === 'default')[0].id;
+        const profileId  = this.workspaceService.get().profiles.filter(p => p.name === 'default')[0].id;
 
         const session: Session = {
           account,
-          profile: profileId,
+          profileId,
           active: false,
-          id: uuidv4(),
-          lastStopDate: new Date().toISOString(),
+          sessionId: uuidv4(),
+          startDateTime: undefined,
+          lastStopDateTime: new Date().toISOString(),
           loading: false
         };
         return session;
@@ -406,60 +371,30 @@ export class AwsSsoService extends NativeService {
   }
 
   // LEAPP Integrations
-  addSessionsToWorkspace(AwsSsoSessions: Session[]): Observable<any> {
-    let oldConfiguration;
+  addSessionsToWorkspace(awsSsoSessions: Session[]): Observable<any> {
+
     let oldWorkspace;
 
     return new Observable((observable) => {
-      let workspace = this.configurationService.getDefaultWorkspaceSync();
+      const workspace = this.workspaceService.get();
       oldWorkspace = workspace;
 
-      // If sessions does not exist create the sessions array
-      if (JSON.stringify(workspace) === '{}') {
-        // Set the configuration with the updated value
-        const configuration = this.configurationService.getConfigurationFileSync();
-        oldConfiguration = configuration;
-
-        configuration.workspaces = configuration.workspaces ? configuration.workspaces : [];
-
-        const workspaceCreation: Workspace = {
-          defaultLocation: environment.defaultLocation,
-          defaultRegion: environment.defaultRegion,
-          type: null,
-          name: 'default',
-          lastIDPToken: null,
-          idpUrl: [],
-          proxyConfiguration: { proxyPort: '8080', proxyProtocol: 'https', proxyUrl: '', username: '', password: '' },
-          sessions: [],
-          setupDone: true,
-          azureProfile: null,
-          azureConfig: null
-        };
-
-        configuration.defaultWorkspace = 'default';
-        configuration.workspaces.push(workspaceCreation);
-
-        this.configurationService.updateConfigurationFileSync(configuration);
-
-        workspace = workspaceCreation;
-      }
-
       // Remove all AWS SSO old session or create a session array
-      const oldSSOsessions = this.sessionService.listSessions().filter(sess => ((sess.account.type === AccountType.AWS_SSO)));
-      const newSSOSessions = AwsSsoSessions.sort((a, b) => {
+      const oldSSOsessions = this.sessionService.list().filter(sess => ((sess.account.type === AccountType.AWS_SSO)));
+      const newSSOSessions = awsSsoSessions.sort((a, b) => {
         return a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'});
       });
 
       // Non SSO sessions
-      workspace.sessions = this.sessionService.listSessions().filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
+      workspace.sessions = this.sessionService.list().filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
 
       // Add new AWS SSO sessions
       const updatedSSOSessions = [];
       newSSOSessions.forEach((newSession: Session) => {
         const found = oldSSOsessions.filter(oldSession => {
           return oldSession.account.accountName === newSession.account.accountName &&
-                 oldSession.account.accountNumber === (newSession.account as AwsSsoAccount).accountNumber &&
-                 oldSession.account.role.name === (newSession.account as AwsSsoAccount).role.name;
+            (oldSession.account as AwsSsoAccount).accountNumber === (newSession.account as AwsSsoAccount).accountNumber &&
+            (oldSession.account as AwsSsoAccount).role.name === (newSession.account as AwsSsoAccount).role.name;
         })[0];
         if (found) {
           newSession = found;
@@ -469,22 +404,25 @@ export class AwsSsoService extends NativeService {
 
       // Update all
       workspace.sessions.push(...updatedSSOSessions);
-      this.configurationService.updateWorkspaceSync(workspace);
+      this.workspaceService.updateSessions(workspace.sessions);
 
       // Verify that eventual trusters from SSO ae not pointing to deleted sessions
-      const trusterSessions = this.sessionService.listTrusterSessions();
+      const trusterSessions = this.sessionService.listChilds();
       trusterSessions.forEach(tSession => {
-        const found = this.sessionService.getSession(tSession.account.parent) !== undefined;
+        // @ts-ignore
+        const found = this.sessionService.get((tSession.account as AwsTrusterAccount).parentSessionId) !== undefined;
         if (!found) {
-          this.sessionService.removeSession(tSession);
+          this.sessionService.delete(tSession.sessionId);
         }
       });
 
       observable.next({});
       observable.complete();
     }).pipe(catchError((err) => {
-      if (oldWorkspace) { this.configurationService.updateWorkspaceSync(oldWorkspace); }
-      if (oldConfiguration) { this.configurationService.updateConfigurationFileSync(oldConfiguration); }
+      if (oldWorkspace) {
+        // @ts-ignore
+        // TODO: do we want a complete workspace update?
+        this.workspaceService.update(oldWorkspace); }
       return throwError(err);
     }));
   }
@@ -494,7 +432,7 @@ export class AwsSsoService extends NativeService {
     let awsSsoExpirationTime;
     let region;
 
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const workspace = this.workspaceService.get();
     const oldSessions = workspace.sessions;
 
     return merge(
@@ -516,8 +454,7 @@ export class AwsSsoService extends NativeService {
       }),
       toArray(),
       switchMap(() => {
-        workspace.sessions = workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO));
-        this.configurationService.updateWorkspaceSync(workspace);
+        this.workspaceService.updateSessions(workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO)));
         return of(true);
       }),
       catchError((err) => {
@@ -534,8 +471,7 @@ export class AwsSsoService extends NativeService {
           toArray(),
           switchMap(() => {
             if (oldSessions) {
-              workspace.sessions = oldSessions;
-              this.configurationService.updateWorkspaceSync(workspace);
+              this.workspaceService.updateSessions(oldSessions);
             }
             return throwError(err);
           })

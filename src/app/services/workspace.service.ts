@@ -37,9 +37,9 @@ export class WorkspaceService extends NativeService {
     ) as Workspace;
   }
 
-  update(): Workspace {
+  updateSessions(sessions: Session[]): Workspace {
     const workspace = this.get();
-    // modifica
+    workspace.sessions = sessions;
     this.persist(workspace);
     return workspace;
   }

@@ -25,12 +25,19 @@ export class SessionService extends NativeService {
 
   delete(sessionId: string): void {}
 
+  // @ts-ignore
   update(sessionId: string, account: Account, startTime: string, lastStopTime: string, active: boolean, loading: boolean): Session {}
 
+  // @ts-ignore
   get(sessionId: string): Session {}
 
+  // @ts-ignore
   list(): Session[] {}
 
+  // @ts-ignore
+  listChilds(): Session[] {
+    // Return all sessions that have a parent session id
+  }
 
   stop(sessionId: string): Promise<void> {
     return new Promise<void>((resolve, reject) => {

@@ -157,13 +157,13 @@
     }
   },
   "dependencies": {
-    "@angular/animations": "~10.2.5",
-    "@angular/common": "~10.2.5",
-    "@angular/core": "~10.2.5",
-    "@angular/forms": "~10.2.5",
-    "@angular/platform-browser": "~10.2.5",
-    "@angular/platform-browser-dynamic": "~10.2.5",
-    "@angular/router": "~10.2.5",
+    "@angular/animations": "~10.2.0",
+    "@angular/common": "~10.2.0",
+    "@angular/core": "~10.2.0",
+    "@angular/forms": "~10.2.0",
+    "@angular/platform-browser": "~10.2.0",
+    "@angular/platform-browser-dynamic": "~10.2.0",
+    "@angular/router": "~10.2.0",
     "@ng-select/ng-select": "~3.7.3",
     "@ngx-translate/core": "~11.0.1",
     "@ngx-translate/http-loader": "~4.0.0",
@@ -218,10 +218,10 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.1102.10",
-    "@angular/cli": "^11.2.10",
-    "@angular/compiler": "^10.2.5",
-    "@angular/compiler-cli": "^11.0.0",
-    "@angular/language-service": "~8.1.0",
+    "@angular/cli": "^10.2.0",
+    "@angular/compiler": "^10.2.0",
+    "@angular/compiler-cli": "^10.2.0",
+    "@angular/language-service": "~10.2.0",
     "@biesbjerg/ngx-translate-extract": "^7.0.4",
     "@types/aws-sdk": "^2.7.0",
     "@types/jasmine": "^3.6.10",
@@ -250,6 +250,6 @@
     "protractor": "^7.0.0",
     "ts-node": "^7.0.1",
     "tslint": "~5.15.0",
-    "typescript": "^3.4.5"
+    "typescript": "~4.0.7"
   }
 }

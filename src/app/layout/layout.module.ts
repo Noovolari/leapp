@@ -1,11 +1,13 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {BsDropdownModule, TabsModule, TooltipModule} from 'ngx-bootstrap';
 import {TranslateModule} from '@ngx-translate/core';
 import {RouterModule} from '@angular/router';
 import {SessionLayoutComponent} from './session-layout/session-layout.component';
 import {SharedModule} from '../shared/shared.module';
 import {NoAppbarLayoutComponent} from './noappbar-layout/noappbar-layout.component';
+import {TabsModule} from 'ngx-bootstrap/tabs';
+import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import {TooltipModule} from 'ngx-bootstrap/tooltip';
 
 
 @NgModule({

@@ -3,11 +3,11 @@ import {NativeService} from './native-service';
 import {FileService} from './file.service';
 import {ToastrService} from 'ngx-toastr';
 import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirmation-dialog.component';
-import {BsModalService} from 'ngx-bootstrap';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
 import {constants} from '../core/enums/constants';
+import {BsModalService} from 'ngx-bootstrap/modal';
 
 
 @Injectable({
@@ -58,8 +58,10 @@ export class AppService extends NativeService {
     super();
 
     // Global Configure logger
-    this.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
-    this.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+    if (this.log) {
+      this.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+      this.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+    }
   }
 
   /**
@@ -71,11 +73,11 @@ export class AppService extends NativeService {
   }
 
   getMenu() {
-    return this.Menu;
+    return this.menu;
   }
 
   getTray() {
-    return this.Tray;
+    return this.tray;
   }
 
   getCurrentWindow() {

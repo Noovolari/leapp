@@ -4,7 +4,6 @@ import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {Router} from '@angular/router';
 import {AwsAccount} from '../../models/aws-account';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
 import {AzureAccount} from '../../models/azure-account';
 import {AccountType} from '../../models/AccountType';
@@ -15,6 +14,7 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import * as uuid from 'uuid';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-session-card',

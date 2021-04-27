@@ -234,13 +234,13 @@ export class FileService extends NativeService {
    * Encrypt Text
    */
   encryptText(text: string): string {
-    return CryptoJS.AES.encrypt(text.trim(), this.MachineId).toString();
+    return CryptoJS.AES.encrypt(text.trim(), this.machineId).toString();
   }
 
   /**
    * Decrypt Text
    */
   decryptText(text: string): string {
-    return CryptoJS.AES.decrypt(text.trim(), this.MachineId).toString(CryptoJS.enc.Utf8);
+    return CryptoJS.AES.decrypt(text.trim(), this.machineId).toString(CryptoJS.enc.Utf8);
   }
 }

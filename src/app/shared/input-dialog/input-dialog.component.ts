@@ -1,7 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {BsModalRef} from 'ngx-bootstrap';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {constants} from '../../core/enums/constants';
+import {BsModalRef} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-input-dialog',

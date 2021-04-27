@@ -5,9 +5,10 @@ import {LayoutModule} from '../layout/layout.module';
 import {NgSelectModule} from '@ng-select/ng-select';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {SharedModule} from '../shared/shared.module';
-import {BsDropdownModule, TooltipModule} from 'ngx-bootstrap';
 import {CreateAccountComponent} from './create-account/create-account.component';
 import { EditAccountComponent } from './edit-account/edit-account.component';
+import {TooltipModule} from 'ngx-bootstrap/tooltip';
+import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 
 @NgModule({
   declarations: [
@@ -23,7 +24,7 @@ import { EditAccountComponent } from './edit-account/edit-account.component';
     NgSelectModule,
     TooltipModule.forRoot(),
     ReactiveFormsModule,
-    BsDropdownModule
+    BsDropdownModule.forRoot()
   ]
 })
 export class ManagingModule { }

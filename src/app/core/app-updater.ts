@@ -149,7 +149,7 @@ export class AppUpdater {
     );
 
     assert(
-      typeof updateInterval === 'string' && updateInterval.match(/^\d+/),
+      typeof updateInterval === 'string' && (updateInterval as string).match(/^\d+/),
       'updateInterval must be a human-friendly string interval like `20 minutes`'
     );
 

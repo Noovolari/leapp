@@ -59,7 +59,10 @@ export class Workspace {
 
   constructor() {
     this._idpUrl = [];
-    this._profiles = [{ id: uuid.v4(), name: 'default'}, {id: uuid.v4(), name: 'default-azure'}];
+    this._profiles = [
+      { id: uuid.v4(), name: environment.defaultAwsProfileName },
+      { id: uuid.v4(), name: environment.defaultAzureProfileName }
+    ];
     this._sessions = [];
     this._defaultRegion = environment.defaultRegion;
     this._defaultLocation = environment.defaultLocation;

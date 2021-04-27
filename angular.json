@@ -145,6 +145,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "leapp-client"
+    }
+  },
+  "defaultProject": "leapp-client",
+  "cli": {
+    "analytics": "a9497ed5-4b2f-482f-8e51-1f9817d1bec2"
+  }
 }

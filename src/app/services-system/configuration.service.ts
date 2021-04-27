@@ -24,21 +24,7 @@ export class ConfigurationService extends NativeService {
 
   public changeDefaultWorkspace: EventEmitter<string> = new EventEmitter();
 
-  // ============================================================ //
-  // ======================== WORKSPACES ======================== //
-  // ============================================================ //
 
-  // TODO Why here there are all the function on workspace and in workspaceService there is the create new Workspace?
-
-  /**
-   * Check if a workspace exists
-   * @param workspaceName - the name of the workspace to search
-   * @returns a {boolean}
-   */
-  public workspaceExists(workspaceName: string): boolean {
-    const config = this.getConfigurationFileSync();
-    return this.getFilteredWorkspace(config, workspaceName) !== null;
-  }
 
   /**
    * Update a workspace or add it and retry if not in the configuration file.
@@ -147,19 +133,7 @@ export class ConfigurationService extends NativeService {
     return this.fileService.writeFileSync(this.os.homedir() + '/' + environment.lockFileDestination, this.fileService.encryptText(JSON.stringify(config, null, 2)));
   }
 
-  /**
-   * Get the configuration file
-   */
-  public getConfigurationFile(): Observable<Configuration> {
-    return this.fileService.readFile(this.os.homedir() + '/' + environment.lockFileDestination).pipe(map(result => JSON.parse(this.fileService.decryptText(result))));
-  }
 
-  /**
-   * Get the configuration file synchronously
-   */
-  public getConfigurationFileSync(): Configuration {
-    return JSON.parse(this.fileService.decryptText(this.fileService.readFileSync(this.os.homedir() + '/' + environment.lockFileDestination)));
-  }
 
   /**
    * Get the Azure Profile

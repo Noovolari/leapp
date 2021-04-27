@@ -1,19 +1,15 @@
 import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
-import {CredentialsService} from '../../services/credentials.service';
+
 import {MenuService} from '../../services/menu.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {Router} from '@angular/router';
-import {TrusterAccountService} from '../../services/truster-account.service';
-import {FederatedAccountService} from '../../services/federated-account.service';
-import {AzureAccountService} from '../../services/azure-account.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AwsAccount} from '../../models/aws-account';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
 import {AzureAccount} from '../../models/azure-account';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {AccountType} from '../../models/AccountType';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
@@ -60,15 +56,11 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   workspace: any;
 
   constructor(private sessionService: SessionService,
-              private credentialsService: CredentialsService,
               private workspaceService: WorkspaceService,
               private keychainService: KeychainService,
               private menuService: MenuService,
               private appService: AppService,
               private router: Router,
-              private trusterAccountService: TrusterAccountService,
-              private federatedAccountService: FederatedAccountService,
-              private azureAccountService: AzureAccountService,
               private configurationService: ConfigurationService,
               private ssmService: SsmService,
               private modalService: BsModalService) { super(); }
@@ -97,7 +89,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
         break;
       case(AccountType.AWS_PLAIN_USER):
-        this.sessionDetailToShow = (this.session.account as AwsPlainAccount).user;
+        // this.sessionDetailToShow = (this.session.account as AwsPlainAccount).user;
         break;
       case(AccountType.AWS_SSO):
         this.sessionDetailToShow = (this.session.account as AwsSsoAccount).role.name;
@@ -114,7 +106,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
     // automatically check if there is an active session and get session list again
     this.appService.redrawList.emit(true);
-    this.credentialsService.refreshCredentials();
+    // this.credentialsService.refreshCredentials();
     this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
   }
 
@@ -137,7 +129,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   removeAccount(session, event) {
     event.stopPropagation();
     this.appService.confirmDialog('do you really want to delete this account?', () => {
-      this.federatedAccountService.cleanKeychainIfNecessary(session);
+      // this.federatedAccountService.cleanKeychainIfNecessary(session);
       this.sessionService.removeSession(session);
       this.sessionsChanged.emit('');
       this.appService.logger('Session Removed', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));

@@ -1,4 +1,4 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {NativeService} from '../services-system/native-service';
@@ -13,7 +13,6 @@ import {ProxyService} from './proxy.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
 import {SessionService} from './session.service';
-import {CredentialsService} from './credentials.service';
 
 // Import AWS node style
 const AWS = require('aws-sdk');

@@ -3,13 +3,11 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {CredentialsService} from '../../services/credentials.service';
 import {SessionService} from '../../services/session.service';
 import {Workspace} from '../../models/workspace';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
-import {Session} from '../../models/session';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
@@ -84,7 +82,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     private router: Router,
     private ngZone: NgZone,
     private activatedRoute: ActivatedRoute,
-    private credentialsService: CredentialsService,
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
     private providerManagerService: ProviderManagerService
@@ -98,7 +95,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
       const sessions = this.providerManagerService.getFederableAccounts();
-      if (sessions && sessions.length > 0) {
+     /* if (sessions && sessions.length > 0) {
         sessions.forEach((session: Session) => {
           let found = false;
           this.accounts.forEach(acc => {
@@ -113,7 +110,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
             });
           }
         });
-      }
+      }*/
 
       // Add parameters to check what to do with form data
       if (this.workspace.idpUrl && this.workspace.idpUrl.length > 0) {
@@ -141,7 +138,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
 
       // Show the federated accounts
-      // TODO: REDUNDANT
       this.federatedAccounts = this.accounts;
 
       // only for start screen

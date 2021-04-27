@@ -1,4 +1,3 @@
-import {RefreshCredentialsStrategy} from './refreshCredentialsStrategy';
 import {AccountType} from '../models/AccountType';
 import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
@@ -7,7 +6,6 @@ import {ExecuteServiceService} from '../services-system/execute-service.service'
 import {AzureAccount} from '../models/azure-account';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {TimerService} from '../services/timer-service';
-import {CredentialsService} from '../services/credentials.service';
 import {Observable, Subscriber, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {FileService} from '../services-system/file.service';
@@ -18,7 +16,6 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
   private processSubscription4: Subscription;
 
   constructor(
-    private credentialsService: CredentialsService,
     private appService: AppService,
     private timerService: TimerService,
     private executeService: ExecuteServiceService,

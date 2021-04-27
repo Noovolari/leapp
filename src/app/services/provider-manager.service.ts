@@ -4,9 +4,6 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {AccountType} from '../models/AccountType';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {SessionService} from './session.service';
-import {FederatedAccountService} from './federated-account.service';
-import {TrusterAccountService} from './truster-account.service';
-import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
 import {Session} from '../models/session';
 
@@ -35,9 +32,6 @@ export class ProviderManagerService {
     private configurationService: ConfigurationService,
     private workspaceService: WorkspaceService,
     private sessionService: SessionService,
-    private federatedAccountService: FederatedAccountService,
-    private trusterAccountService: TrusterAccountService,
-    private azureAccountService: AzureAccountService
   ) {
 
   }
@@ -185,7 +179,7 @@ export class ProviderManagerService {
         result = this.saveAwsTrusterAccount();
         break;
       case AccountType.AWS_PLAIN_USER:
-        result = this.savePlainCredentials();
+        // result = this.savePlainCredentials();
         break;
       case AccountType.AZURE:
         result = this.saveAzureAccount();
@@ -209,7 +203,7 @@ export class ProviderManagerService {
         result = true; // this.saveAwsTrusterAccount();
         break;
       case AccountType.AWS_PLAIN_USER:
-        result = this.editPlainCredentials();
+        // result = this.editPlainCredentials();
         break;
       case AccountType.AZURE:
         result = true; // this.saveAzureAccount();
@@ -228,11 +222,11 @@ export class ProviderManagerService {
   saveAzureAccount() {
     if (this.formValid(this.form, this.accountType)) {
       try {
-        return this.azureAccountService.addAzureAccountToWorkSpace(
+        /* return this.azureAccountService.addAzureAccountToWorkSpace(
           this.form.value.subscriptionId,
           this.form.value.tenantId,
           this.form.value.name,
-          this.form.value.azureLocation);
+          this.form.value.azureLocation);*/
       } catch (err) {
         this.appService.logger('Error creating account', LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
@@ -252,7 +246,7 @@ export class ProviderManagerService {
     if (this.formValid(this.form, this.accountType)) {
       try {
         // Try to create the truster account
-        return this.trusterAccountService.addTrusterAccountToWorkSpace(
+        /* return this.trusterAccountService.addTrusterAccountToWorkSpace(
           this.form.value.accountNumber,
           this.form.value.name,
           (this.selectedSession as Session).id,
@@ -261,7 +255,7 @@ export class ProviderManagerService {
           this.form.value.idpArn,
           this.selectedRegion,
           this.selectedProfile
-        );
+        );*/
       } catch (err) {
         this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
@@ -278,7 +272,7 @@ export class ProviderManagerService {
 
       try {
         // Add a federation Account to the workspace
-        return this.federatedAccountService.addFederatedAccountToWorkSpace(
+        /* return this.federatedAccountService.addFederatedAccountToWorkSpace(
           this.selectedIdpUrl,
           this.form.value.accountNumber,
           this.form.value.name,
@@ -286,7 +280,7 @@ export class ProviderManagerService {
           this.form.value.idpArn,
           this.selectedRegion,
           this.selectedProfile
-        );
+        );*/
       } catch (err) {
         this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
@@ -299,7 +293,7 @@ export class ProviderManagerService {
   }
 
   savePlainCredentials() {
-    this.federatedAccountService.addPlainAccountToWorkSpace(
+    /* this.federatedAccountService.addPlainAccountToWorkSpace(
       this.form.value.accountNumber,
       this.form.value.name,
       this.form.value.plainUser,
@@ -309,18 +303,18 @@ export class ProviderManagerService {
       this.selectedRegion,
       this.selectedProfile
     );
-    return true;
+    return true;*/
   }
 
   editPlainCredentials() {
-    this.federatedAccountService.editPlainAccountToWorkSpace(
+    /* this.federatedAccountService.editPlainAccountToWorkSpace(
       this.selectedSession,
       this.form.value.accessKey.trim(),
       this.form.value.secretKey.trim(),
       this.form.value.mfaDevice.trim(),
       this.selectedRegion
     );
-    return true;
+    return true;*/
   }
 
   /**
@@ -382,11 +376,11 @@ export class ProviderManagerService {
   }
 
   getFederatedAccounts() {
-    return this.federatedAccountService.listFederatedAccountInWorkSpace();
+    // return this.federatedAccountService.listFederatedAccountInWorkSpace();
   }
 
   getPlainAccounts() {
-    return this.federatedAccountService.listPlainAccountsInWorkspace();
+    // return this.federatedAccountService.listPlainAccountsInWorkspace();
   }
 
   getSSOAccounts() {
@@ -399,7 +393,7 @@ export class ProviderManagerService {
   }
 
   getFederableAccounts() {
-    return this.getFederatedAccounts().concat(this.getPlainAccounts()).concat(this.getSSOAccounts());
+    // return this.getFederatedAccounts().concat(this.getPlainAccounts()).concat(this.getSSOAccounts());
   }
 }
 

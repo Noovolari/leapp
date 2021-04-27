@@ -5,7 +5,6 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {FileService} from '../services-system/file.service';
 import {AppService, LoggerLevel} from '../services-system/app.service';
 import {SessionService} from './session.service';
-import {CredentialsService} from './credentials.service';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +14,6 @@ export class MenuService extends NativeService {
   constructor(
     private workspaceService: WorkspaceService,
     private configurationService: ConfigurationService,
-    private credentialService: CredentialsService,
     private fileService: FileService,
     private sessionService: SessionService,
     private appService: AppService) {
@@ -35,7 +33,7 @@ export class MenuService extends NativeService {
       // Stop the session...
       this.sessionService.stopAllSession();
       // Stop credentials to be used
-      this.credentialService.refreshCredentials();
+      // this.credentialService.refreshCredentials();
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {

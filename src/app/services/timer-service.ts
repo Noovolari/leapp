@@ -55,4 +55,8 @@ export class TimerService extends NativeService {
   needToClearTimer(): boolean {
     return this.noAwsSessionsActive && this.noAwsSsoSessionsActive && this.noAzureSessionsActive;
   }
+
+  start() {
+
+  }
 }

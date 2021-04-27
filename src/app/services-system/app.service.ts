@@ -566,6 +566,15 @@ export class AppService extends NativeService {
   getUrl() {
     return this.url;
   }
+
+  blockDevToolInProductionMode() {
+    this.currentBrowserWindow().webContents.on('devtools-opened', () => {
+      if (environment.production) {
+        this.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
+        this.currentBrowserWindow().webContents.closeDevTools();
+      }
+    });
+  }
 }
 
 /*

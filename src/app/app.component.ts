@@ -12,6 +12,8 @@ import {MenuService} from './services/menu.service';
 import {TimerService} from './services/timer-service';
 import {AccountType} from './models/AccountType';
 import * as uuid from 'uuid';
+import {WorkspaceService} from './services/workspace.service';
+import {SessionService} from './services/session.service';
 
 @Component({
   selector: 'app-root',
@@ -21,116 +23,17 @@ import * as uuid from 'uuid';
 export class AppComponent implements OnInit {
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
-    private translateService: TranslateService,
-    private router: Router,
-    private configurationService: ConfigurationService,
+    private sessionService: SessionService,
+    private workspaceService: WorkspaceService,
     private fileService: FileService,
     private app: AppService,
+    private router: Router,
     private menuService: MenuService,
     private timerService: TimerService
   ) {
   }
 
   ngOnInit() {
-    this.configurationService.sanitizeIdpUrlsAndNamedProfiles();
-
-    // Use ngx bootstrap 4
-    setTheme('bs4');
-    // Register locale languages and set the default one: we currently use only en
-    this.translateService.setDefaultLang('en');
-    registerLocaleData(localeEn, 'en');
-
-    if (environment.production) {
-      // Clear both info and warn message in production mode without removing them from code actually
-      console.warn = () => {
-      };
-      console.log = () => {
-      };
-    }
-
-    // If we have credentials copy them from workspace file to the .aws credential file
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace) {
-      // Set it as default
-      this.configurationService.setDefaultWorkspaceSync(workspace.name);
-      // Patch old way of having only one idp url
-      if (workspace.idpUrl !== undefined && typeof workspace.idpUrl === 'string') {
-        workspace.idpUrl = [{ id: uuid.v4(), url: workspace.idpUrl }];
-      }
-
-      // Patch old sessions without a default region
-      const sessions = workspace.sessions;
-      if (sessions) {
-        sessions.forEach(session => {
-          if (session.account.region  === undefined || session.account.region === null || session.account.region === '' || session.account.region === 'no region necessary') {
-            session.account.region = session.account.type !== AccountType.AZURE ? environment.defaultRegion : environment.defaultLocation;
-          }
-          // Another patch: federated and truster for AWS now have their own copy of the selected IdP url so add it if missing (a very old account)
-          if (session.account.type === AccountType.AWS || session.account.type === AccountType.AWS_TRUSTER) {
-            if (session.account.parent === undefined) {
-              if (session.account.idpUrl === '' || session.account.idpUrl === null || session.account.idpUrl === undefined) {
-                session.account.idpUrl = workspace.idpUrl[0].id; // We force the first
-              } else {
-                const found = workspace.idpUrl.filter(u => u.url === session.account.idpUrl)[0];
-                if (found) {
-                  session.account.idpUrl = found.id;
-                }
-              }
-            }
-          }
-        });
-        workspace.sessions = sessions;
-        this.configurationService.updateWorkspaceSync(workspace);
-      }
-
-      // Patch for named profiles
-      if (workspace.profiles === undefined || workspace.profiles.length === 0) {
-        workspace.profiles = [{ id: uuid.v4(), name: 'default' }];
-        this.configurationService.updateWorkspaceSync(workspace);
-      }
-
-      let defaultProfile = workspace.profiles.filter(p => p.name === 'default')[0];
-
-      // Create default profile if - after first session creation - it is not present in the workspace
-      if (defaultProfile === undefined) {
-        workspace.profiles.push({ id: uuid.v4(), name: 'default' });
-        this.configurationService.updateWorkspaceSync(workspace);
-        defaultProfile = workspace.profiles.filter(p => p.name === 'default')[0];
-      }
-
-      const defaultProfileId = defaultProfile.id;
-
-      // Patch old sessions without a default profile
-      if (sessions) {
-        sessions.forEach(session => {
-          if (session.profile === undefined) {
-            session.profile = defaultProfileId;
-          }
-        });
-        workspace.sessions = sessions;
-        this.configurationService.updateWorkspaceSync(workspace);
-      }
-    }
-
-    // Fix for retro-compatibility with old workspace configuration
-    this.verifyWorkspace();
-
-    // All sessions start stopped when app is launched
-    if (workspace.sessions && workspace.sessions.length > 0) {
-      workspace.sessions.forEach(sess => { sess.loading = false; sess.active = false; });
-      this.configurationService.updateWorkspaceSync(workspace);
-      this.fileService.iniCleanSync(this.app.awsCredentialPath());
-      this.configurationService.cleanAzureCrendentialFile();
-    }
-
-    // Prevent Dev Tool to show on production mode
-    this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
-      if (environment.production) {
-        this.app.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
-        this.app.currentBrowserWindow().webContents.closeDevTools();
-      }
-    });
-
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
@@ -138,10 +41,37 @@ export class AppComponent implements OnInit {
       this.beforeCloseInstructions();
     });
 
-    this.timerService.defineTimer();
+    // Use ngx bootstrap 4
+    setTheme('bs4');
 
-    // Initial starting point for DEBUG
-    this.router.navigate(['/start']);
+    if (environment.production) {
+      // Clear both info and warn message in production
+      // mode without removing them from code actually
+      console.warn = () => {};
+      console.log = () => {};
+    }
+
+    // Prevent Dev Tool to show on production mode
+    this.app.blockDevToolInProductionMode();
+
+    // Create or Get the workspace
+    const workspace = this.workspaceService.create();
+
+    // All sessions start stopped when app is launched
+    if (workspace.sessions.length > 0) {
+      workspace.sessions.forEach(sess => this.sessionService.stop(sess.sessionId));
+    }
+
+    // Start Global Timer (1s)
+    this.timerService.start();
+
+    // Go to initial page if no sessions are already created or
+    // go to the list page if is your second visit
+    if (workspace.sessions.length > 0) {
+      this.router.navigate(['/session-selected']);
+    } else {
+      this.router.navigate(['/start']);
+    }
   }
 
   /**
@@ -150,26 +80,5 @@ export class AppComponent implements OnInit {
   private beforeCloseInstructions() {
     // TODO: Move to another component
     this.menuService.cleanBeforeExit();
-  }
-
-  /**
-   * Fix for having old proxy to new configuration
-   */
-  private verifyWorkspace() {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace !== undefined && workspace !== null) {
-      const hasNewConf = workspace.proxyConfiguration !== undefined;
-      if (!hasNewConf) {
-        const proxyUrl = workspace.proxyUrl ? workspace.proxyUrl : '';
-        workspace.proxyConfiguration = {
-          proxyPort: '8080',
-          proxyProtocol: 'https',
-          proxyUrl,
-          username: '',
-          password: ''
-        };
-        this.configurationService.updateWorkspaceSync(workspace);
-      }
-    }
   }
 }

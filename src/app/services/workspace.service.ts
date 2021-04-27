@@ -22,10 +22,13 @@ export class WorkspaceService extends NativeService {
   }
 
   create(): Workspace {
-    const workspace = new Workspace();
-    this.persist(workspace);
-
-    return workspace;
+    try {
+      return this.get();
+    } catch (err) {
+      const workspace = new Workspace();
+      this.persist(workspace);
+      return workspace;
+    }
   }
 
   get(): Workspace {

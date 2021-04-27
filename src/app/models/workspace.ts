@@ -6,6 +6,11 @@ export class Workspace {
   get defaultLocation(): string {
     return this._defaultLocation;
   }
+
+  set defaultLocation(value: string) {
+    this._defaultLocation = value;
+  }
+
   get defaultRegion(): string {
     return this._defaultRegion;
   }
@@ -13,6 +18,7 @@ export class Workspace {
   set defaultRegion(value: string) {
     this._defaultRegion = value;
   }
+
   get proxyConfiguration(): { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string } {
     return this._proxyConfiguration;
   }
@@ -20,6 +26,7 @@ export class Workspace {
   set proxyConfiguration(value: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
     this._proxyConfiguration = value;
   }
+
   get profiles(): { id: string; name: string }[] {
     return this._profiles;
   }
@@ -27,6 +34,7 @@ export class Workspace {
   set profiles(value: { id: string; name: string }[]) {
     this._profiles = value;
   }
+
   get idpUrl(): { id: string; url: string }[] {
     return this._idpUrl;
   }
@@ -34,6 +42,7 @@ export class Workspace {
   set idpUrl(value: { id: string; url: string }[]) {
     this._idpUrl = value;
   }
+
   get sessions(): Session[] {
     return this._sessions;
   }

@@ -83,7 +83,7 @@
             <th><label>Url</label></th><th class="text-right"><label>Actions</label></th>
             </thead>
             <tbody>
-            <ng-container *ngFor="let idpUrl of workspaceData.idpUrl">
+            <ng-container *ngFor="let idpUrl of workspace.idpUrl">
               <tr>
                 <td>{{idpUrl.url}}</td>
                 <td>
@@ -117,7 +117,7 @@
             <th><label>Name</label></th><th class="text-right"><label>Actions</label></th>
             </thead>
             <tbody>
-            <ng-container *ngFor="let profile of workspaceData.profiles">
+            <ng-container *ngFor="let profile of workspace.profiles">
               <tr>
                 <td>{{profile.name}}</td>
                 <td>

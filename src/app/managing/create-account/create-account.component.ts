@@ -42,7 +42,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
   federatedRoles: { name: string, roleArn: string }[] = [];
   federatedAccounts = [];
 
-  workspace: Workspace;
   accounts = [];
   accountId;
 
@@ -96,11 +95,11 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     this.subs.add(this.activatedRoute.queryParams.subscribe(params => {
 
       // Get the workspace and the accounts you need
-      this.workspace = this.configurationService.getDefaultWorkspaceSync();
+      const workspace = this.workspaceService.get();
 
       // Add parameters to check what to do with form data
-      if (this.workspace.idpUrl && this.workspace.idpUrl.length > 0) {
-        this.workspace.idpUrl.forEach(idp => {
+      if (workspace.idpUrl && workspace.idpUrl.length > 0) {
+        workspace.idpUrl.forEach(idp => {
           if (idp !== null) {
             this.idps.push({value: idp.id, label: idp.url});
           }
@@ -108,13 +107,13 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       }
 
       // Add parameters to check what to do with form data
-      this.workspace.profiles.forEach(idp => {
+      workspace.profiles.forEach(idp => {
           if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
             this.profiles.push({value: idp.id, label: idp.name});
           }
       });
 
-      this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));
+      this.hasOneGoodSession = workspace.sessions.length > 0;
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
 
       // Show the federated accounts
@@ -128,9 +127,9 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       this.regions = this.appService.getRegions();
       this.locations = this.appService.getLocations();
 
-      this.selectedRegion = this.workspace.defaultRegion || environment.defaultRegion || this.regions[0].region;
-      this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation || this.locations[0].location;
-      this.selectedProfile = this.workspace.profiles.filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
+      this.selectedRegion = workspace.defaultRegion || environment.defaultRegion || this.regions[0].region;
+      this.selectedLocation = workspace.defaultLocation || environment.defaultLocation || this.locations[0].location;
+      this.selectedProfile = workspace.profiles.filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
     }));
   }
 
@@ -231,11 +230,9 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
   }
 
   goBack() {
-    this.workspace = this.configurationService.getDefaultWorkspaceSync();
+    const workspace = this.workspaceService.get();
 
-    this.appService.logger(`Going back (this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0): ${this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0}`, LoggerLevel.INFO, this);
-
-    if (this.workspace && this.workspace.sessions && this.workspace.sessions.length > 0) {
+    if (workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
     } else {
       this.accountType = undefined;

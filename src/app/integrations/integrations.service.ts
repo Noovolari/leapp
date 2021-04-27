@@ -29,9 +29,9 @@ export class IntegrationsService {
     if (this.loginSubscriber) { this.loginSubscriber.unsubscribe(); }
     this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO(region, portalUrl))
       .pipe(
-        switchMap((AwsSsoSessions: Session[]) => {
+        switchMap((awsSsoSessions: Session[]) => {
           // Save sessions to workspace
-          return this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
+          return this.awsSsoService.addSessionsToWorkspace(awsSsoSessions);
         }),
         catchError((err) => {
           this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
@@ -65,9 +65,9 @@ export class IntegrationsService {
     if (this.loginSubscriber) { this.loginSubscriber.unsubscribe(); }
     console.log('syncing account');
     this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).pipe(
-      switchMap((AwsSsoSessions: Session[]) => {
+      switchMap((awsSsoSessions: Session[]) => {
         // Save sessions to workspace
-        return this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
+        return this.awsSsoService.addSessionsToWorkspace(awsSsoSessions);
       }),
       catchError( (err) => {
         this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);

@@ -98,24 +98,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       // Get the workspace and the accounts you need
       this.workspace = this.configurationService.getDefaultWorkspaceSync();
 
-      const sessions = this.providerManagerService.getFederableAccounts();
-     /* if (sessions && sessions.length > 0) {
-        sessions.forEach((session: Session) => {
-          let found = false;
-          this.accounts.forEach(acc => {
-            if (session.account.accountName === acc.accountName) {
-              found = true;
-            }
-          });
-          if (!found) {
-            this.accounts.push({
-              session,
-              accountName: session.account.accountName
-            });
-          }
-        });
-      }*/
-
       // Add parameters to check what to do with form data
       if (this.workspace.idpUrl && this.workspace.idpUrl.length > 0) {
         this.workspace.idpUrl.forEach(idp => {
@@ -126,17 +108,11 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       }
 
       // Add parameters to check what to do with form data
-      if (this.workspace.profiles && this.workspace.profiles.length > 0) {
-        this.workspace.profiles.forEach(idp => {
-          if (idp !== null) {
+      this.workspace.profiles.forEach(idp => {
+          if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
             this.profiles.push({value: idp.id, label: idp.name});
           }
-        });
-      } else {
-        this.workspace.profiles = [{ id: uuid.v4(), name: 'default' }];
-        this.profiles.push({value: this.workspace.profiles[0].id, label: this.workspace.profiles[0].name});
-        this.configurationService.updateWorkspaceSync(this.workspace);
-      }
+      });
 
       this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup

@@ -3,11 +3,11 @@ import {environment} from '../environments/environment';
 import {FileService} from './services-system/file.service';
 import {AppService, LoggerLevel} from './services-system/app.service';
 import {Router} from '@angular/router';
-import {setTheme} from 'ngx-bootstrap';
 import {TimerService} from './services/timer-service';
 import {WorkspaceService} from './services/workspace.service';
 import {SessionService} from './services/session.service';
 import {Workspace} from './models/workspace';
+import {setTheme} from 'ngx-bootstrap/utils';
 
 @Component({
   selector: 'app-root',

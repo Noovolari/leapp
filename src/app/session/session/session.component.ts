@@ -5,7 +5,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../services-system/app.service';
 import {HttpClient} from '@angular/common/http';
 import {Session} from '../../models/session';
-import {BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {FileService} from '../../services-system/file.service';
@@ -13,6 +12,7 @@ import {SessionService} from '../../services/session.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
 import * as uuid from 'uuid';
+import {BsModalService} from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-session',

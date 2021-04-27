@@ -64,7 +64,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     // Set regions for ssm and for default region, same with locations,
     // add the correct placeholder to the select
     this.awsRegions = this.appService.getRegions();
-    
+
     this.profiles = this.workspaceService.get().profiles;
 
     const azureLocations = this.appService.getLocations();
@@ -98,16 +98,16 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
     // automatically check if there is an active session and get session list again
     this.appService.redrawList.emit(true);
-    
+
     this.appService.logger(
-      `Starting Session`, 
-      LoggerLevel.INFO, 
-      this, 
-      JSON.stringify({ 
-        timestamp: new Date().toISOString(), 
-        id: this.session.sessionId, 
-        account: this.session.account.accountName, 
-        type: this.session.account.type 
+      `Starting Session`,
+      LoggerLevel.INFO,
+      this,
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        id: this.session.sessionId,
+        account: this.session.account.accountName,
+        type: this.session.account.type
       }, null, 3));
   }
 
@@ -117,7 +117,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   stopSession() {
     // Eventually close the tray
     this.sessionService.stop(this.session.sessionId);
-    
+
     // automatically check if there is an active session or stop it
     this.appService.redrawList.emit(true);
 

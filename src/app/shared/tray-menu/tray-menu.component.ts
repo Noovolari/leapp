@@ -1,13 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
-import {CredentialsService} from '../../services/credentials.service';
 import {FileService} from '../../services-system/file.service';
 import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {Session} from '../../models/session';
 import {AccountType} from '../../models/AccountType';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {AwsAccount} from '../../models/aws-account';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 
@@ -23,7 +21,6 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
 
   constructor(private workspaceService: WorkspaceService,
               private configurationService: ConfigurationService,
-              private credentialService: CredentialsService,
               private fileService: FileService,
               private sessionService: SessionService,
               private appService: AppService) {
@@ -42,19 +39,20 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
 
     let voices = [];
     const maxSessionsToShow = 10;
-    const activeSessions = this.sessionService.listSessions().filter(s => s.active);
-    const allSessions = activeSessions.concat(this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter(s => !s.active)).slice(0, maxSessionsToShow - activeSessions.length));
+    const activeSessions = this.sessionService.list().filter(s => s.active);
+    // @ts-ignore
+    const allSessions = activeSessions.concat(this.sessionService.alterOrderByTime(this.sessionService.list().filter(s => !s.active)).slice(0, maxSessionsToShow - activeSessions.length));
     allSessions.forEach((session: Session) => {
 
       let icon = '';
       let label = '';
-      const profile = this.configurationService.getDefaultWorkspaceSync().profiles.filter(p => p.id === session.profile)[0];
+      const profile = this.workspaceService.get().profiles.filter(p => p.id === session.profileId)[0];
       const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
       switch (session.account.type) {
         case AccountType.AWS_PLAIN_USER:
           icon = (session.active) ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsPlainAccount).user;
+          label = '  ' + session.account.accountName + ' - ' + 'plain';
           break;
         case AccountType.AWS:
         case AccountType.AWS_TRUSTER:
@@ -73,12 +71,11 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
           icon,
           click: () => {
             if (!session.active) {
-              this.sessionService.startSession(session);
-              this.credentialService.refreshCredentials();
-
+              this.sessionService.start(session.sessionId);
+              // TODO: refresh session credential
             } else {
-              this.credentialService.refreshCredentials();
-              this.sessionService.stopSession(session);
+              this.sessionService.stop(session.sessionId);
+              // TODO: refresh session credential
             }
             this.appService.redrawList.emit(true);
             this.generateMenu();
@@ -115,9 +112,9 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Stop the session...
-      this.sessionService.stopAllSession();
+      // this.sessionService.stopAllSession();
       // Stop credentials to be used
-      this.credentialService.refreshCredentials();
+      // this.credentialService.refreshCredentials();
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {

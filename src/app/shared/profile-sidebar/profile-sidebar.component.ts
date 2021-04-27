@@ -1,12 +1,12 @@
 import {Component, OnInit, Renderer2} from '@angular/core';
 import {AppService, LoggerLevel} from '../../services-system/app.service';
-import {ConfigurationService} from '../../services-system/configuration.service';
 import {Router} from '@angular/router';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {HttpClient} from '@angular/common/http';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
 import {ProxyService} from '../../services/proxy.service';
 import {Subscription} from 'rxjs';
+import {WorkspaceService} from '../../services/workspace.service';
 
 @Component({
   selector: 'app-profile-sidebar',
@@ -23,11 +23,11 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
 
   constructor(
     private appService: AppService,
-    private configurationService: ConfigurationService,
     private router: Router,
     private httpClient: HttpClient,
     private executeService: ExecuteServiceService,
     private proxyService: ProxyService,
+    private workspaceService: WorkspaceService,
     private renderer: Renderer2
   ) { super(); }
 
@@ -47,14 +47,9 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
    */
   logout() {
     // Data clean
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    this.configurationService.newConfigurationFileSync();
+    // const workspace = this.workspaceService.get();
+    // this.configurationService.logout();
     this.appService.logger('Cleaning Azure config files...', LoggerLevel.INFO, this);
-
-    // Azure clean
-    workspace.azureProfile = null;
-    workspace.azureConfig = null;
-    this.configurationService.updateWorkspaceSync(workspace);
 
     if (this.execSubscription) { this.execSubscription.unsubscribe(); }
     this.execSubscription = this.executeService.execute('az account clear 2>&1').subscribe(() => {}, () => {});

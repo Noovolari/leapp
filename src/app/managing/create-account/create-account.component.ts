@@ -182,31 +182,17 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     }
     this.sessionService.create(account, this.selectedProfile.value);
 
+    this.providerManagerService.saveAccount(
+      this.accountId,
+      this.accountType,
+      this.selectedSession,
+      this.selectedRole,
+      this.selectedRegion,
+      selectedUrl,
+      selectedProfile,
+      this.form
+    );
 
-
-    if (this.firstTime) {
-      this.providerManagerService.saveFirstAccount(
-        this.accountId,
-        this.accountType,
-        this.selectedSession,
-        this.selectedRole,
-        this.selectedRegion,
-        selectedUrl,
-        selectedProfile,
-        this.form
-      );
-    } else {
-      this.providerManagerService.saveAccount(
-        this.accountId,
-        this.accountType,
-        this.selectedSession,
-        this.selectedRole,
-        this.selectedRegion,
-        selectedUrl,
-        selectedProfile,
-        this.form
-      );
-    }
   }
 
   setProvider(name) {

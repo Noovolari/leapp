@@ -3,7 +3,6 @@ import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {Router} from '@angular/router';
-import {ConfigurationService} from '../../services-system/configuration.service';
 import {AwsAccount} from '../../models/aws-account';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap';
 import {SsmService} from '../../services/ssm.service';
@@ -15,6 +14,7 @@ import {KeychainService} from '../../services-system/keychain.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import * as uuid from 'uuid';
+import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 @Component({
   selector: 'app-session-card',
@@ -49,16 +49,14 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   duplicateInstances = [];
   sessionDetailToShow;
   placeholder;
-  profiles: any;
   selectedProfile: any;
-  workspace: any;
+  private profiles: { id: string; name: string }[];
 
   constructor(private sessionService: SessionService,
               private workspaceService: WorkspaceService,
               private keychainService: KeychainService,
               private appService: AppService,
               private router: Router,
-              private configurationService: ConfigurationService,
               private ssmService: SsmService,
               private modalService: BsModalService) { super(); }
 
@@ -66,17 +64,14 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     // Set regions for ssm and for default region, same with locations,
     // add the correct placeholder to the select
     this.awsRegions = this.appService.getRegions();
-    this.profiles = [];
-    this.workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (this.workspace && this.workspace.profiles && this.workspace.profiles.length > 0) {
-      this.profiles = this.workspace.profiles;
-    }
+    
+    this.profiles = this.workspaceService.get().profiles;
 
     const azureLocations = this.appService.getLocations();
     this.regionOrLocations = this.session.account.type !== AccountType.AZURE ? this.awsRegions : azureLocations;
     this.placeholder = this.session.account.type !== AccountType.AZURE ? 'Select a default region' : 'Select a default location';
     this.selectedDefaultRegion = this.session.account.region;
-    this.selectedProfile = this.session.profile;
+    this.selectedProfile = this.session.profileId;
 
     switch (this.session.account.type) {
       case(AccountType.AWS):
@@ -86,7 +81,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
         break;
       case(AccountType.AWS_PLAIN_USER):
-        // this.sessionDetailToShow = (this.session.account as AwsPlainAccount).user;
+        this.sessionDetailToShow = (this.session.account as AwsPlainAccount).accountName;
         break;
       case(AccountType.AWS_SSO):
         this.sessionDetailToShow = (this.session.account as AwsSsoAccount).role.name;
@@ -99,12 +94,21 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
    */
   startSession() {
     // Start a new session with the selected one
-    this.sessionService.startSession(this.session);
+    this.sessionService.start(this.session.sessionId);
 
     // automatically check if there is an active session and get session list again
     this.appService.redrawList.emit(true);
-    // this.credentialsService.refreshCredentials();
-    this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
+    
+    this.appService.logger(
+      `Starting Session`, 
+      LoggerLevel.INFO, 
+      this, 
+      JSON.stringify({ 
+        timestamp: new Date().toISOString(), 
+        id: this.session.sessionId, 
+        account: this.session.account.accountName, 
+        type: this.session.account.type 
+      }, null, 3));
   }
 
   /**
@@ -112,24 +116,29 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
    */
   stopSession() {
     // Eventually close the tray
-    this.sessionService.stopSession(this.session);
-
-    // New: we need to apply changes directly on credentials file if not azure type
-    this.sessionService.removeFromIniFile(this.session.profile);
-
+    this.sessionService.stop(this.session.sessionId);
+    
     // automatically check if there is an active session or stop it
-    this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
-    this.appService.logger('Session Stopped', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
+
+    this.appService.logger(
+      `Stopped Session`,
+      LoggerLevel.INFO,
+      this,
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        id: this.session.sessionId,
+        account: this.session.account.accountName,
+        type: this.session.account.type
+      }, null, 3));
   }
 
   removeAccount(session, event) {
     event.stopPropagation();
     this.appService.confirmDialog('do you really want to delete this account?', () => {
-      // this.federatedAccountService.cleanKeychainIfNecessary(session);
-      this.sessionService.removeSession(session);
+      this.sessionService.delete(session.sessionId);
       this.sessionsChanged.emit('');
-      this.appService.logger('Session Removed', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
+      this.appService.logger('Session Deleted', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
       this.appService.redrawList.emit(true);
     });
   }
@@ -145,7 +154,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   copyCredentials(session: Session, type: number, event) {
     this.openDropDown(event);
     try {
-      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      const workspace = this.workspaceService.get();
       if (workspace) {
         const sessionAccount = (session.account as AwsAccount);
         const texts = {
@@ -212,7 +221,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
 
-      const account = `Leapp-ssm-data-${session.profile}`;
+      const account = `Leapp-ssm-data-${session.profileId}`;
 
       // Set the aws credentials to instanziate the ssm client
       this.keychainService.getSecret(environment.appName, account).then(creds => {
@@ -241,12 +250,12 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     if (this.selectedDefaultRegion) {
 
       if (this.session.active) {
-        this.sessionService.stopSession(this.session);
+        this.sessionService.stop(this.session.sessionId);
       }
 
       this.session.account.region = this.selectedDefaultRegion;
-      this.sessionService.invalidateSessionToken(this.session);
-      this.sessionService.updateSession(this.session);
+      // this.sessionService.invalidateSessionToken(this.session);
+      // this.sessionService.update(this.session);
 
       if (this.session.active) {
         this.startSession();
@@ -288,34 +297,29 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     }
   }
 
-  getProfileIcon(active, id) {
-    const profile = this.workspace.profiles.filter(p => p.id === id)[0];
-    if (profile) {
-      const color = active ? ' orange' : '';
-      return profile.name === 'default' ? ('home' + color) : ('user' + color);
-    } else {
-      return 'home';
-    }
+  getProfileIcon(active, name) {
+    const color = active ? ' orange' : '';
+    return name === environment.defaultAwsProfileName ? ('home' + color) : ('user' + color);
   }
 
   getProfileName(id) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    const workspace = this.workspaceService.get();
     const profile = workspace.profiles.filter(p => p.id === id)[0];
     if (profile) {
       return profile.name;
     } else {
-      return 'default';
+      return environment.defaultAwsProfileName;
     }
   }
 
   changeProfile() {
     if (this.selectedProfile) {
       if (this.session.active) {
-        this.sessionService.stopSession(this.session);
+        this.sessionService.stop(this.session.sessionId);
       }
 
-      this.sessionService.addProfile(this.selectedProfile);
-      this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
+      // this.sessionService.addProfile(this.selectedProfile);
+      // this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
 
       if (this.session.active) {
         this.startSession();

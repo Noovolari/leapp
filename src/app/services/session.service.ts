@@ -3,51 +3,30 @@ import {NativeService} from '../services-system/native-service';
 import {Account} from '../models/account';
 import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
+import {CredentialsInfo} from '../models/credentials-info';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SessionService extends NativeService {
+export abstract class SessionService extends NativeService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
-  constructor(
+  protected constructor(
     private workspaceService: WorkspaceService
   ) { super(); }
 
-  create(account: Account, profileId: string): Session {
-    const session = new Session(account, profileId);
+  private persistSessionInWorkspace(session: Session) {
     const sessions = this.workspaceService.getSessions();
-
     sessions.push(session);
     this.workspaceService.updateSessions(sessions);
-
-    return session;
   }
 
-  delete(sessionId: string): void {}
-
-  // @ts-ignore
-  update(sessionId: string, account: Account, startTime: string, lastStopTime: string, active: boolean, loading: boolean): Session {}
-
-  // @ts-ignore
-  get(sessionId: string): Session {}
-
-  // @ts-ignore
-  list(): Session[] {}
-
-  // @ts-ignore
-  listChilds(): Session[] {
-    // Return all sessions that have a parent session id
+  create(account: Account, profileId: string): void {
+    const session = new Session(account, profileId);
+    this.persistSessionInWorkspace(session);
   }
 
-  start(sessionId: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
+  abstract generateCredentials(sessionId: string): CredentialsInfo;
+  abstract applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
+  abstract deApplyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
 
-    });
-  }
-
-  stop(sessionId: string): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-
-    });
-  }
 }

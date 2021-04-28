@@ -7,17 +7,20 @@ import {FileService} from '../services-system/file.service';
 
 describe('WorkspaceService', () => {
   let workspaceService;
-
-  const spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
-  spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
-
-  const spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync']);
-  spyFileService.encryptText.and.returnValue((text: string) => text);
-  spyFileService.decryptText.and.returnValue((text: string) => text);
-  spyFileService.writeFileSync.and.returnValue((filePath: string, content: string) => {});
-  spyFileService.readFileSync.and.returnValue((path: string) => '');
+  let workspace;
+  let spyAppService;
+  let spyFileService;
 
   beforeEach(() => {
+    spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
+    spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
+
+    spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync']);
+    spyFileService.encryptText.and.callFake((text: string) => text);
+    spyFileService.decryptText.and.callFake((text: string) => text);
+    spyFileService.writeFileSync.and.callFake((_: string, __: string) => {});
+    spyFileService.readFileSync.and.callFake((_: string) => JSON.stringify(new Workspace()) );
+
     TestBed.configureTestingModule({
       providers: [
         WorkspaceService,
@@ -27,6 +30,7 @@ describe('WorkspaceService', () => {
     });
 
     workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;
+    workspace = workspaceService.create();
   });
 
   it('should be created', () => {
@@ -34,16 +38,34 @@ describe('WorkspaceService', () => {
   });
 
   describe('Create()', () => {
-    it('should persist code in the .Leapp-lock.json file', () => {
+    it('should generate an instance of Workspace', () => {
+      expect(workspace).toBeInstanceOf(Workspace);
+    });
+  });
+
+  describe('Create()', () => {
+    it('should persist code in the .Leapp-lock.json file the first time is called', () => {
       spyOn(workspaceService, 'persist').and.callThrough();
-
+      // Mock first time access
+      spyFileService.readFileSync.and.returnValue(null);
+      // Call create
       workspaceService.create();
-
       expect(workspaceService.persist).toHaveBeenCalled();
     });
 
-    it('should generate an instance of Workspace', () => {
-      expect(workspaceService.create()).toBeInstanceOf(Workspace);
+    it('should call get after the second time you call create', () => {
+      spyOn(workspaceService, 'get').and.callThrough();
+      workspaceService.create();
+      expect(workspaceService.get).toHaveBeenCalled();
+    });
+  });
+
+  describe('Get()', () => {
+    it('should return a workspace object', () => {
+      workspace = workspaceService.get();
+
+      expect(workspace).toBeDefined();
+      expect(workspace).toBeInstanceOf(Workspace);
     });
   });
 });

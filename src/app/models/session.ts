@@ -13,8 +13,8 @@ export class Session {
   constructor(account: Account, profileId: string) {
     this.sessionId = uuid.v4();
     this.profileId = profileId;
-    this.startDateTime = new Date().toISOString();
-    this.lastStopDateTime = undefined;
+    this.startDateTime = undefined;
+    this.lastStopDateTime = new Date().toISOString();
     this.active = false;
     this.loading = false;
     this.account = account;

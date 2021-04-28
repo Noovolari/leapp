@@ -30,11 +30,12 @@ export class WorkspaceService {
   }
 
   get(): Workspace {
-    return JSON.parse(
-      this.fileService.decryptText(
-        this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)
-      )
-    ) as Workspace;
+    const workspaceFile = this.fileService.decryptText(this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination));
+    const workspaceObject = JSON.parse(workspaceFile);
+
+    const workspace = new Workspace();
+    workspace.deserialize(workspaceObject.idpUrl, workspaceObject.profiles, workspaceObject.sessions, workspaceObject.proxyConfiguration, workspaceObject.defaultRegion, workspaceObject.defaultLocation);
+    return workspace;
   }
 
   getSessions(): Session[] {

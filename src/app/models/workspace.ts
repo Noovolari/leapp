@@ -76,4 +76,12 @@ export class Workspace {
     this._defaultRegion = environment.defaultRegion;
     this._defaultLocation = environment.defaultLocation;
   }
+
+  deserialize(idpUrl: { id: string, url: string }[], profiles: { id: string, name: string }[], sessions: Session[], proxyConfiguration: { [key: string]: any }, defaultRegion: string, defaultLocation: string) {
+    this.idpUrl = idpUrl;
+    this.profiles = profiles;
+    this.sessions = sessions;
+    this.defaultRegion = defaultRegion;
+    this.defaultLocation = defaultLocation;
+  }
 }

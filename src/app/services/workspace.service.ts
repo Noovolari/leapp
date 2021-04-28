@@ -13,8 +13,10 @@ export class WorkspaceService {
   constructor(private appService: AppService, private fileService: FileService) {}
 
   private persist(workspace: Workspace) {
-    const path = this.appService.getOS().homedir() + '/' + environment.lockFileDestination;
-    this.fileService.writeFileSync(path, this.fileService.encryptText(JSON.stringify(workspace, null, 2)));
+    this.fileService.writeFileSync(
+      this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
+      this.fileService.encryptText(JSON.stringify(workspace, null, 2))
+    );
   }
 
   create(): Workspace {
@@ -28,8 +30,9 @@ export class WorkspaceService {
   }
 
   get(): Workspace {
-    return JSON.parse(this.fileService.decryptText(
-      this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)
+    return JSON.parse(
+      this.fileService.decryptText(
+        this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)
       )
     ) as Workspace;
   }

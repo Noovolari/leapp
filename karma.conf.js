@@ -25,6 +25,7 @@ module.exports = function (config) {
       reports: ['html', 'lcovonly', 'text-summary'],
       fixWebpackSourcePaths: true
     },
+    webpack: { node: { fs: 'empty', } },
     reporters: ['progress', 'kjhtml'],
     port: 9876,
     colors: true,

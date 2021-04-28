@@ -19,14 +19,9 @@ export class WorkspaceService {
     );
   }
 
-  create(): Workspace {
-    try {
-      return this.get();
-    } catch (err) {
-      const workspace = new Workspace();
-      this.persist(workspace);
-      return workspace;
-    }
+  create(): void {
+    const workspace = new Workspace();
+    this.persist(workspace);
   }
 
   get(): Workspace {

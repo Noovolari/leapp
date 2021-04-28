@@ -1,23 +1,26 @@
 import {Injectable} from '@angular/core';
-import {AccessStrategy} from './access-strategy';
 import {CredentialsInfo} from '../models/credentials-info';
-import {AccountType} from '../models/AccountType';
+
+
+import {SessionService} from '../services/session.service';
+import {WorkspaceService} from '../services/workspace.service';
 import {AwsPlainAccount} from '../models/aws-plain-account';
-import {Account} from '../models/account';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AwsPlainService implements AccessStrategy {
+export class AwsPlainService extends SessionService {
 
-  constructor() { }
+  constructor(private workSpaceService: WorkspaceService) {
+    super(workSpaceService);
+  }
+
+  create(account: AwsPlainAccount, profileId: string) {
+    super.create(account, profileId);
+  }
 
   applyCredentials(credentialsInfo: CredentialsInfo): Promise<void> {
     return Promise.resolve(undefined);
-  }
-
-  createAccount(accountName: string, type: AccountType, region: string, accountInfo: { [p: string]: any }): Account {
-    return new AwsPlainAccount(accountName, type, region, accountInfo.accessKey, accountInfo.secretKey, accountInfo.profileId, accountInfo.mfaDevice);
   }
 
   deApplyCredentials(credentialsInfo: CredentialsInfo): Promise<void> {

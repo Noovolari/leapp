@@ -11,7 +11,7 @@ import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsPlainService} from '../../strategies/aws-plain.service';
-import {Account} from '../../models/account';
+import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 
 @Component({
@@ -168,19 +168,11 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
     const selectedUrl = this.selectedIdpUrl ? {id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label } : undefined;
     const selectedProfile = this.selectedProfile ? {id: this.selectedProfile.value, name: this.selectedProfile.label } : undefined;
-
-    let account: Account;
     switch (this.accountType) {
       case (AccountType.AWS_PLAIN_USER):
-        account = this.awsPlainService.createAccount( this.form.value.name, this.accountType, this.selectedRegion,
-          {accessKey: this.form.value.accessKey.trim(),
-            secretKey: this.form.value.secretKey.trim(),
-            profileId: this.selectedProfile.value,
-            mfaDevice: this.form.value.mfaDevice.trim(),
-          });
+        this.awsPlainService.create(new AwsPlainAccount(this.form.value.name, this.selectedRegion, this.form.value.accessKey.trim(), this.form.value.secretKey.trim(), this.form.value.mfaDevice.trim()), this.selectedProfile.value);
         break;
     }
-    this.sessionService.create(account, this.selectedProfile.value);
 
     this.providerManagerService.saveAccount(
       this.accountId,

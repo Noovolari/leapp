@@ -1,7 +1,5 @@
 import {Injectable} from '@angular/core';
 import {CredentialsInfo} from '../models/credentials-info';
-
-
 import {SessionService} from '../services/session.service';
 import {WorkspaceService} from '../services/workspace.service';
 import {AwsPlainAccount} from '../models/aws-plain-account';

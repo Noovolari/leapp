@@ -14,19 +14,35 @@ export abstract class SessionService extends NativeService {
     private workspaceService: WorkspaceService
   ) { super(); }
 
-  private persistSessionInWorkspace(session: Session) {
-    const sessions = this.workspaceService.getSessions();
-    sessions.push(session);
-    this.workspaceService.updateSessions(sessions);
-  }
 
   create(account: Account, profileId: string): void {
     const session = new Session(account, profileId);
     this.persistSessionInWorkspace(session);
   }
 
-  abstract generateCredentials(sessionId: string): CredentialsInfo;
+  async start(sessionId: string) {
+    this.sessionLoading(sessionId);
+    const credentialsInfo = this.generateCredentials(sessionId);
+    this.applyCredentials(await credentialsInfo).then(value => {
+      this.sessionActivate(sessionId);
+    }, error => {
+      this.sessionError(error);
+    });
+  }
+
+  abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
 
+  private sessionLoading(sessionId: string) { }
+
+  private sessionActivate(sessionId: string) { }
+
+  private sessionError(error: Error) { }
+
+  private persistSessionInWorkspace(session: Session) {
+    const sessions = this.workspaceService.getSessions();
+    sessions.push(session);
+    this.workspaceService.updateSessions(sessions);
+  }
 }

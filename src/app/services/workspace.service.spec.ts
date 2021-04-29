@@ -4,6 +4,8 @@ import {Workspace} from '../models/workspace';
 import {AppService} from '../services-system/app.service';
 import {mustInjected} from '../../base-injectables';
 import {FileService} from '../services-system/file.service';
+import {Session} from '../models/session';
+import {AwsPlainAccount} from '../models/aws-plain-account';
 
 describe('WorkspaceService', () => {
   let workspaceService;
@@ -38,12 +40,6 @@ describe('WorkspaceService', () => {
   });
 
   describe('Create()', () => {
-    it('should generate an instance of Workspace', () => {
-      expect(workspace).toBeInstanceOf(Workspace);
-    });
-  });
-
-  describe('Create()', () => {
     it('should persist code in the .Leapp-lock.json file the first time is called', () => {
       spyOn(workspaceService, 'persist').and.callThrough();
       // Mock first time access
@@ -53,10 +49,19 @@ describe('WorkspaceService', () => {
       expect(workspaceService.persist).toHaveBeenCalled();
     });
 
-    it('should call get after the second time you call create', () => {
-      spyOn(workspaceService, 'get').and.callThrough();
+    it('should not create a second instance of Workspace after first one', () => {
+      spyFileService.readFileSync.and.callFake((_: string) => JSON.stringify(new Workspace()) );
       workspaceService.create();
-      expect(workspaceService.get).toHaveBeenCalled();
+      const workspace1 = workspaceService.get();
+      console.log(new Workspace());
+
+      workspace1.sessions.push(new Session(new AwsPlainAccount('', '', '', '', ''), 'profile'));
+      spyFileService.readFileSync.and.callFake((_: string) => JSON.stringify(workspace1) );
+
+      workspaceService.create();
+      const workspace2 = workspaceService.get();
+
+      expect(workspace1).toEqual(workspace2);
     });
   });
 

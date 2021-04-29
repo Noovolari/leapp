@@ -1,7 +1,6 @@
 import {AccountType} from '../models/AccountType';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {FileService} from '../services-system/file.service';
-import {TimerService} from '../services/timer-service';
 import {Workspace} from '../models/workspace';
 import {Session} from '../models/session';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
@@ -23,7 +22,6 @@ export class AwsSsoStrategy {
   constructor(
     private appService: AppService,
     private fileService: FileService,
-    private timerService: TimerService,
     private awsSsoService: AwsSsoService,
     private configurationService: ConfigurationService,
     private sessionService: SessionService,
@@ -41,14 +39,11 @@ export class AwsSsoStrategy {
   cleanCredentials(workspace: Workspace): void {
     if (workspace) {
       this.fileService.iniCleanSync(this.appService.awsCredentialPath());
-      this.timerService.noAwsSsoSessionsActive = true;
     }
   }
 
   manageSingleSession(workspace, session): Observable<boolean> {
-    if (this.timerService.noAwsSsoSessionsActive === true) {
-      this.timerService.noAwsSsoSessionsActive = false;
-    }
+
 
     if (session.account.type === AccountType.AWS_SSO) {
       return this.awsCredentialProcess(workspace, session);
@@ -90,7 +85,6 @@ export class AwsSsoStrategy {
       switchMap((awsSsoCredentials) => {
         this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
         // this.configurationService.disableLoadingWhenReady(workspace, session);
-        this.timerService.defineTimer();
         return of(true);
       }),
       catchError( (err) => {

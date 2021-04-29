@@ -3,7 +3,6 @@ import {environment} from '../environments/environment';
 import {FileService} from './services-system/file.service';
 import {AppService, LoggerLevel} from './services-system/app.service';
 import {Router} from '@angular/router';
-import {TimerService} from './services/timer-service';
 import {WorkspaceService} from './services/workspace.service';
 import {SessionService} from './services/session.service';
 import {Workspace} from './models/workspace';
@@ -21,7 +20,6 @@ export class AppComponent implements OnInit {
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
     private fileService: FileService,
-    private timerService: TimerService,
     private router: Router,
   ) {
   }
@@ -60,7 +58,7 @@ export class AppComponent implements OnInit {
     }
 
     // Start Global Timer (1s)
-    this.timerService.start();
+    // TODO: re-add timer
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit

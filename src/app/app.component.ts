@@ -48,7 +48,8 @@ export class AppComponent implements OnInit {
     this.app.blockDevToolInProductionMode();
 
     // Create or Get the workspace
-    const workspace = this.workspaceService.create();
+    this.workspaceService.create();
+    const workspace = this.workspaceService.get();
 
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded(workspace);

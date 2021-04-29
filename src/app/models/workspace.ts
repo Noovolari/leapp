@@ -8,7 +8,6 @@ export interface Workspace {
   lastIDPToken?: string;
   setupDone?: boolean;
   idpUrl?: { id: string, url: string }[];
-  profiles?: { id: string, name: string }[];
 
   proxyConfiguration: {
     proxyProtocol?: string;

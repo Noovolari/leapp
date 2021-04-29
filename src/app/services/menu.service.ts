@@ -35,7 +35,7 @@ export class MenuService extends NativeService {
       // Stop the session...
       this.sessionService.stopAllSession();
       // Stop credentials to be used
-      this.credentialService.refreshCredentials();
+      this.credentialService.refreshCredentials(null);
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {

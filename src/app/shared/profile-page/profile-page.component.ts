@@ -12,7 +12,6 @@ import * as uuid from 'uuid';
 import {AwsAccount} from '../../models/aws-account';
 import {SessionService} from '../../services/session.service';
 import {IdpResponseType, WorkspaceService} from '../../services/workspace.service';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 @Component({
   selector: 'app-profile-page',
@@ -23,10 +22,8 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
   activeTab = 1;
 
-  awsProfileValue: { id: string, name: string };
   idpUrlValue;
   editingIdpUrl: boolean;
-  editingAwsProfile: boolean;
 
   showProxyAuthentication = false;
   proxyProtocol = 'https'; // Default
@@ -44,7 +41,6 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
   public form = new FormGroup({
     idpUrl: new FormControl(''),
-    awsProfile: new FormControl(''),
     proxyUrl: new FormControl(''),
     proxyProtocol: new FormControl(''),
     proxyPort: new FormControl(''),
@@ -68,7 +64,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   ngOnInit() {
     this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     if (this.workspaceData === undefined || this.workspaceData.proxyConfiguration === undefined) {
-      this.workspaceService.createNewWorkspace(undefined, undefined, {id: uuid.v4(), name: 'default'}, 'default', IdpResponseType.SAML);
+      this.workspaceService.createNewWorkspace(undefined, undefined, 'default', IdpResponseType.SAML);
       this.workspaceData = this.configurationService.getDefaultWorkspaceSync();
     }
     if (this.workspaceData.name && this.workspaceData.name !== '') {
@@ -207,56 +203,6 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
         sessions.forEach(s => {
           this.sessionService.removeSession(s);
         });
-      }
-    });
-  }
-
-  manageAwsProfile(id: string | number) {
-    const profileIndex = this.workspaceData.profiles.findIndex(p => p.id === id);
-    if (this.form.get('awsProfile').value !== '') {
-      if (profileIndex === -1) {
-        this.workspaceData.profiles.push({ id: uuid.v4(), name: this.form.get('awsProfile').value });
-      } else {
-        this.workspaceData.profiles[profileIndex].name = this.form.get('awsProfile').value;
-      }
-      this.configurationService.updateWorkspaceSync(this.workspaceData);
-    }
-    this.editingAwsProfile = false;
-    this.awsProfileValue = undefined;
-    this.form.get('awsProfile').setValue('');
-  }
-
-  editAwsProfile(id: string) {
-    const profile = this.workspaceData.profiles.filter(u => u.id === id)[0];
-    this.awsProfileValue = profile;
-    this.form.get('awsProfile').setValue(profile.name);
-    this.editingAwsProfile = true;
-  }
-
-  deleteAwsProfile(id: string) {
-    // Default profile id
-    const defaultId = this.workspaceData.profiles.filter(p => p.name === 'default')[0].id;
-
-    // Federated
-    const sessions = this.workspaceData.sessions.filter(s => s.profile === id);
-
-    // Get only names for display
-    let sessionsNames = sessions.map(s => {
-      return `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>
-              ${(s.account as AwsAccount).role ? (s.account as AwsAccount).role.name : (s.account as AwsPlainAccount).user}</small></div></li>`;
-    });
-    if (sessionsNames.length === 0) {
-      sessionsNames = ['<li><b>no sessions</b></li>'];
-    }
-
-    // Ask for deletion
-    this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
-      if (res !== constants.CONFIRM_CLOSED) {
-        this.appService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.INFO, this);
-        const profileToDelete = this.workspaceData.profiles.findIndex(p => p.id === id);
-        this.workspaceData.profiles.splice(profileToDelete, 1);
-        this.configurationService.updateWorkspaceSync(this.workspaceData);
-        this.sessionService.replaceAllProfileId(id, defaultId);
       }
     });
   }

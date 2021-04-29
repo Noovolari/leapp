@@ -15,7 +15,6 @@ export class SsmService {
   ssmClient;
   ec2Client;
   instances = [];
-  nextToken = -1;
 
   constructor(
     private app: AppService,
@@ -40,10 +39,7 @@ export class SsmService {
     return this.submit().pipe(
       switchMap(response => {
         return new Observable<SsmResult>(observer => {
-
-          const params = {MaxResults: 50};
-          this.ec2Client.describeInstances(params, (err, reservations) => {
-            this.nextToken = reservations.NextToken;
+          this.ec2Client.describeInstances({}, (err, reservations) => {
             if (err) {
               this.app.logger('You are not Authorized to perform EC2 Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
               this.app.toast('You are not Authorized to perform EC2 Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
@@ -74,7 +70,7 @@ export class SsmService {
     this.instances = [];
     return new Observable<SsmResult>(observer => {
       try {
-        this.ssmClient.describeInstanceInformation({ MaxResults: 50 }, (err, data) => {
+        this.ssmClient.describeInstanceInformation({}, (err, data) => {
           if (err) {
             this.app.logger('You are not Authorized to perform SSM Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
             mythis.app.toast('You are not Authorized to perform SSM Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
@@ -123,7 +119,6 @@ export class SsmService {
   /**
    * Start a new ssm session given the instance id
    * @param instanceId - the instance id of the instance to start
-   * @param region - AWS System Manager start a session from a defined region
    */
   startSession(instanceId, region) {
     const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : '';

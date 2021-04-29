@@ -15,9 +15,12 @@ import {constants} from '../core/enums/constants';
 })
 export class AppService extends NativeService {
 
+  isResuming: EventEmitter<boolean> = new EventEmitter<boolean>();
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
+  // TODO Why redrawList??
   redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
-  refreshReturnStatusEmit: EventEmitter<any> = new EventEmitter<any>();
+
+  newWin;
 
   stsEndpointsPerRegion = new Map([
     ['af-south-1', 'https://sts.af-south-1.amazonaws.com'],
@@ -48,8 +51,6 @@ export class AppService extends NativeService {
   ]);
 
   /* This service is defined to provide different app wide methods as utilities */
-  private newWin: any;
-
   constructor(
     private fileService: FileService,
     private toastr: ToastrService,
@@ -125,8 +126,6 @@ export class AppService extends NativeService {
    * Log the message to a file and also to console for development mode
    * @param message - the message to log
    * @param type - the LoggerLevel type
-   * @param instance - The structured data of the message
-   * @param stackTrace - Stack trace in case of error log
    */
   logger(message: any, type: LoggerLevel, instance?: any, stackTrace?: string) {
     if (typeof message !== 'string') {
@@ -187,7 +186,6 @@ export class AppService extends NativeService {
   /**
    * Create a new browser window
    * @param url - the url to point to launch the window with the protocol, it can also be a file://
-   * @param show - boolean to make the window visible or not
    * @param title - the window title
    * @param x - position x
    * @param y - position y
@@ -196,7 +194,7 @@ export class AppService extends NativeService {
    */
   newWindow(url: string, show: boolean, title?: string, x?: number, y?: number, javascript?: string) {
     const opts = {
-      width: 514,
+      width: 430,
       height: 550,
       resizable: true,
       show,
@@ -217,6 +215,7 @@ export class AppService extends NativeService {
     }
 
     if (this.newWin) {
+      console.log('new win', this.newWin);
       try {
         this.newWin.close();
       } catch (e) { }
@@ -224,7 +223,6 @@ export class AppService extends NativeService {
     }
     this.newWin = new this.browserWindow(opts);
     return this.newWin;
-
   }
 
   /**
@@ -262,7 +260,7 @@ export class AppService extends NativeService {
       case ToastLevel.SUCCESS: this.toastr.success(message, title); break;
       case ToastLevel.INFO: this.toastr.info(message, title); break;
       case ToastLevel.WARN: this.toastr.warning(message, title); break;
-      case ToastLevel.ERROR: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
+      case ToastLevel.ERROR: this.toastr.error(message, 'Invalid Action!'); break;
     }
   }
 
@@ -332,6 +330,7 @@ export class AppService extends NativeService {
    * @param callback - the callback for the ok button to launch
    */
   inputDialog(title: string, placeholder: string, message: string, callback: any) {
+    console.log('inputDialog');
     for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
       this.modalService.hide(i);
     }
@@ -540,6 +539,25 @@ export class AppService extends NativeService {
     return `${accountName}___${user}___accessKey`;
   }
 
+  // TODO REMOVE
+  /**
+   * Set the hook email based on response type
+   * Now is not used but it can be very useful and we
+   * want to leave it as a possible helper function
+   * @param token - the token retrieved from google
+   * @return email - string - the email object
+   */
+  setHookEmail(token) {
+
+    const samlData = atob(token);
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(samlData, 'text/xml');
+    const email = xmlDoc.getElementsByTagName('saml2p:Response')[0].getElementsByTagName('saml2:Assertion')[0].getElementsByTagName('saml2:Subject')[0].getElementsByTagName('saml2:NameID')[0].childNodes[0].nodeValue;
+    localStorage.setItem('hook_email', email);
+
+    return email;
+  }
+
   stsOptions(session) {
     let options: any = {
       maxRetries: 0,
@@ -563,9 +581,6 @@ export class AppService extends NativeService {
     return roleName;
   }
 
-  getUrl() {
-    return this.url;
-  }
 }
 
 /*

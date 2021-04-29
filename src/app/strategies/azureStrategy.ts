@@ -8,13 +8,13 @@ import {AzureAccount} from '../models/azure-account';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
 import {TimerService} from '../services/timer-service';
 import {CredentialsService} from '../services/credentials.service';
-import {Observable, Subscriber, Subscription} from 'rxjs';
+import {Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
-import {FileService} from '../services-system/file.service';
 
 export class AzureStrategy extends RefreshCredentialsStrategy {
   private processSubscription: Subscription;
   private processSubscription2: Subscription;
+  private processSubscription3: Subscription;
   private processSubscription4: Subscription;
 
   constructor(
@@ -22,7 +22,6 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
     private appService: AppService,
     private timerService: TimerService,
     private executeService: ExecuteServiceService,
-    private fileService: FileService,
     private configurationService: ConfigurationService) {
     super();
   }
@@ -44,69 +43,80 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
     }
   }
 
-  manageSingleSession(workspace, session): Observable<boolean> {
-    return new Observable(observer => {
-      if (workspace.azureConfig !== null && workspace.azureConfig !== undefined) {
-        // Already have tokens
+  manageSingleSession(workspace, session) {
+    if (workspace.azureConfig !== null && workspace.azureConfig !== undefined) {
+      // Already have tokens
 
-        if (this.timerService.noAzureSessionsActive === true) {
-          this.timerService.noAzureSessionsActive = false;
+      if (this.timerService.noAzureSessionsActive === true) {
+        this.timerService.noAzureSessionsActive = false;
+      }
+
+      // 1) Write accessToken and profile again
+      this.configurationService.updateAzureProfileFileSync(workspace.azureProfile);
+      this.configurationService.updateAzureAccessTokenFileSync(workspace.azureConfig);
+
+      const parsedAzureProfile = JSON.parse(workspace.azureProfile.substr(1));
+      let tenantFound = false;
+
+      parsedAzureProfile.subscriptions.forEach((subscription) => {
+        if (subscription.tenantId === (session.account as AzureAccount).tenantId) {
+          tenantFound = true;
         }
+      });
 
-        // 1) Write accessToken and profile again
-        this.configurationService.updateAzureProfileFileSync(workspace.azureProfile);
-        this.configurationService.updateAzureAccessTokenFileSync(workspace.azureConfig);
-
-        const parsedAzureProfile = JSON.parse(workspace.azureProfile.substr(1));
-        let tenantFound = false;
-
-        parsedAzureProfile.subscriptions.forEach((subscription) => {
-          if (subscription.tenantId === (session.account as AzureAccount).tenantId) {
-            tenantFound = true;
-          }
-        });
-
-        if (tenantFound) {
-          // 2a) Apply set subscription
-          this.azureSetSubscription(observer, session);
-        } else {
-          // 2b) First time playing with Azure credentials
-          if (this.processSubscription) { this.processSubscription.unsubscribe(); }
-          this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
-            this.azureSetSubscription(observer, session);
-          }, err => {
-            this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
-            console.log('Error in command by Azure CLI', err);
-            observer.next(false);
-            observer.complete();
-          });
-        }
+      if (tenantFound) {
+        // 2a) Apply set subscription
+        this.azureSetSubscription(session);
       } else {
-        // First time playing with Azure credentials
-        if (this.processSubscription2) { this.processSubscription2.unsubscribe(); }
-        this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
-          this.azureSetSubscription(observer, session);
+        // 2b) First time playing with Azure credentials
+        if (this.processSubscription) { this.processSubscription.unsubscribe(); }
+        this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(res => {
+
+          this.azureSetSubscription(session);
         }, err => {
           this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
           console.log('Error in command by Azure CLI', err);
-          observer.next(false);
-          observer.complete();
         });
       }
-    });
+    } else {
+      // First time playing with Azure credentials
+      if (this.processSubscription2) { this.processSubscription2.unsubscribe(); }
+      this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(res => {
+
+        this.azureSetSubscription(session);
+      }, err => {
+        this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
+        console.log('Error in command by Azure CLI', err);
+      });
+    }
   }
 
   private cleanAzureCredentialFile() {
-    this.configurationService.cleanAzureCrendentialFile();
+    const workspace = this.configurationService.getDefaultWorkspaceSync();
+    if (workspace && this.configurationService.isAzureConfigPresent()) {
+      workspace.azureProfile = this.configurationService.getAzureProfileSync();
+      workspace.azureConfig = this.configurationService.getAzureConfigSync();
+      if (workspace.azureConfig === '[]') {
+        // Anomalous condition revert to normal az login procedure
+        workspace.azureProfile = null;
+        workspace.azureConfig = null;
+      }
+
+      this.configurationService.updateWorkspaceSync(workspace);
+    }
+    if (this.processSubscription3) { this.processSubscription3.unsubscribe(); }
+    this.processSubscription3 = this.executeService.execute('az account clear 2>&1').pipe(
+      switchMap(() => this.executeService.execute('az configure --defaults location=\'\' 2>&1'))
+    ).subscribe(res => {}, err => {});
   }
 
-  private azureSetSubscription(observer: Subscriber<boolean>, session: Session) {
+  private azureSetSubscription(session: Session) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     // We can use Json in res to save account information
     if (this.processSubscription4) { this.processSubscription4.unsubscribe(); }
     this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).pipe(
       switchMap(() => this.executeService.execute(`az configure --default location=${session.account.region} 2>&1`))
-    ).subscribe(() => {
+    ).subscribe(acc => {
       // be sure to save the profile and tokens
       workspace.azureProfile = this.configurationService.getAzureProfileSync();
       workspace.azureConfig = this.configurationService.getAzureConfigSync();
@@ -117,9 +127,7 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
       this.timerService.defineTimer();
 
       // Emit return credentials
-      this.appService.refreshReturnStatusEmit.emit(true);
-      observer.next(true);
-      observer.complete();
+      this.credentialsService.refreshReturnStatusEmit.emit(true);
     }, err2 => {
       this.appService.logger('Error in command: set subscription by Azure Cli', LoggerLevel.ERROR, this, err2.stack);
 
@@ -127,16 +135,14 @@ export class AzureStrategy extends RefreshCredentialsStrategy {
         if (sess.id === session.id) {
           sess.active = false;
           sess.loading = false;
-          sess.complete = false;
           sess.lastStopDate = new Date().toISOString();
         }
       });
 
       this.configurationService.updateWorkspaceSync(workspace);
-      this.appService.refreshReturnStatusEmit.emit(session);
+      this.credentialsService.refreshReturnStatusEmit.emit(false);
+      this.appService.redrawList.emit();
       this.appService.toast('Can\'t refresh Credentials.', ToastLevel.WARN, 'Credentials');
-      observer.next(false);
-      observer.complete();
     });
   }
 }

@@ -14,10 +14,9 @@ import {AwsCredential} from '../models/credential';
 import {ConfigurationService} from '../services-system/configuration.service';
 import {environment} from '../../environments/environment';
 import {KeychainService} from '../services-system/keychain.service';
-import {Observable, of} from 'rxjs';
+import {of, throwError} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
-import {SessionService} from '../services/session.service';
 
 
 export class AwsSsoStrategy extends RefreshCredentialsStrategy {
@@ -29,89 +28,78 @@ export class AwsSsoStrategy extends RefreshCredentialsStrategy {
     private timerService: TimerService,
     private awsSsoService: AwsSsoService,
     private configurationService: ConfigurationService,
-    private sessionService: SessionService,
     private keychainService: KeychainService) {
     super();
   }
 
   getActiveSessions(workspace: Workspace) {
-    return workspace.sessions.filter((sess) => {
-      return (sess.account.type === AccountType.AWS_TRUSTER ||
-        sess.account.type === AccountType.AWS_SSO ||
-        sess.account.type === AccountType.AWS_PLAIN_USER ||
-        sess.account.type === AccountType.AWS) && sess.active;
+    const activeSessions = workspace.sessions.filter((sess) => {
+      return (sess.account.type === AccountType.AWS_SSO) && sess.active;
     });
+
+    this.appService.logger('Aws sso Active sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
+    return activeSessions;
   }
 
   cleanCredentials(workspace: Workspace): void {
     if (workspace) {
-      this.fileService.iniCleanSync(this.appService.awsCredentialPath());
+      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
       this.timerService.noAwsSsoSessionsActive = true;
     }
   }
 
-  manageSingleSession(workspace, session): Observable<boolean> {
+  manageSingleSession(workspace, session) {
     if (this.timerService.noAwsSsoSessionsActive === true) {
       this.timerService.noAwsSsoSessionsActive = false;
     }
 
     if (session.account.type === AccountType.AWS_SSO) {
-      return this.awsCredentialProcess(workspace, session);
-    } else {
-      // We need this because we have checked also for non AWS_SSO potential active sessions,
-      // so for them we don't create credentials but just return an empty observable for the
-      // catch method
-      return of(true);
+      this.awsCredentialProcess(workspace, session);
     }
   }
 
-  private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
+  private awsCredentialProcess(workspace: Workspace, session: Session) {
     // Retrieve access token and region
-    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
+    this.awsSsoService.getAwsSsoPortalCredentials().pipe(
       switchMap((loginToAwsSSOResponse) => {
         return this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name);
       }),
-      map((getRoleCredentialsResponse: GetRoleCredentialsResponse) => {
+      switchMap((getRoleCredentialsResponse: GetRoleCredentialsResponse) => {
         const credential: AwsCredential = {};
         credential.aws_access_key_id = getRoleCredentialsResponse.roleCredentials.accessKeyId;
         credential.aws_secret_access_key = getRoleCredentialsResponse.roleCredentials.secretAccessKey;
         credential.aws_session_token = getRoleCredentialsResponse.roleCredentials.sessionToken;
         credential.region = session.account.region;
-        return credential;
+
+        session.active = true;
+        session.loading = false;
+
+        return of(credential);
       }),
       switchMap((credential: AwsCredential) => {
-        const profileName = this.configurationService.getNameFromProfileId(session.profile);
-        const awsSsoCredentials = {};
-        awsSsoCredentials[profileName] = credential;
-
-        const account = `Leapp-ssm-data-${session.profile}`;
-
-        return fromPromise(this.keychainService.saveSecret(environment.appName, account, JSON.stringify(credential))).pipe(
+        const awsSsoCredentials = { default: credential };
+        return fromPromise(this.keychainService.saveSecret(environment.appName, `Leapp-ssm-data`, JSON.stringify(credential))).pipe(
           map(() => {
             return awsSsoCredentials;
           })
         );
       }),
-      switchMap((awsSsoCredentials) => {
-        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
-        this.configurationService.disableLoadingWhenReady(workspace, session);
-        this.timerService.defineTimer();
-        return of(true);
-      }),
       catchError( (err) => {
-        this.sessionService.stopSession(session);
+        session.active = false;
+        session.loading = false;
 
-        if (err.name === 'LeappSessionTimedOut') {
-          this.appService.logger(err.toString(), LoggerLevel.WARN, this, err.stack);
-          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.WARN, 'AWS SSO warning.');
-          return of(false);
-        } else {
-          this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
-          return of(false);
-        }
+        this.configurationService.disableLoadingWhenReady(workspace, session);
+        this.fileService.iniWriteSync(this.appService.awsCredentialPath(), {});
 
+        this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
+        this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+
+        return throwError(`Error in getAwsSsoPortalCredentials: ${err.toString()}`);
       })
-    );
+    ).subscribe((awsSsoCredentials) => {
+      this.configurationService.disableLoadingWhenReady(workspace, session);
+      this.fileService.iniWriteSync(this.appService.awsCredentialPath(), awsSsoCredentials);
+      this.timerService.defineTimer();
+    });
   }
 }

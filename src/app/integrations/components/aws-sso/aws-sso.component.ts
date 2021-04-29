@@ -5,10 +5,10 @@ import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services-system/app.service';
 import {ConfigurationService} from '../../../services-system/configuration.service';
-import {merge} from 'rxjs';
+import {merge, Observable} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../../../environments/environment';
-import {tap} from 'rxjs/operators';
+import {switchMap, tap, toArray} from 'rxjs/operators';
 import {KeychainService} from '../../../services-system/keychain.service';
 
 @Component({
@@ -22,7 +22,6 @@ export class AwsSsoComponent implements OnInit {
   regions = [];
   selectedRegion;
   portalUrl;
-  loading = false;
 
   public form = new FormGroup({
     portalUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
@@ -73,6 +72,7 @@ export class AwsSsoComponent implements OnInit {
     this.regions = this.appService.getRegions();
     this.selectedRegion = this.regions[0].region;
 
+    // if (this.isAwsSsoActive) {
     merge(
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => { this.selectedRegion = res; })),
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => {
@@ -80,5 +80,6 @@ export class AwsSsoComponent implements OnInit {
         this.form.controls['portalUrl'].setValue(res);
       }))
     ).subscribe();
+    // }
   }
 }

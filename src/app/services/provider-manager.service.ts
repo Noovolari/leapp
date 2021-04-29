@@ -9,6 +9,7 @@ import {TrusterAccountService} from './truster-account.service';
 import {AzureAccountService} from './azure-account.service';
 import {Router} from '@angular/router';
 import {Session} from '../models/session';
+import {Subscription} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,8 +22,8 @@ export class ProviderManagerService {
   private selectedSession;
   private selectedRole;
   private selectedRegion;
+  private googleSubscription: Subscription;
   private selectedIdpUrl: any;
-  private selectedProfile: any;
 
   /**
    * Used to manage all the choices done in the app regarding the correct provider to use:
@@ -85,12 +86,11 @@ export class ProviderManagerService {
    * @param selectedRole - the selected role of the parent
    * @param selectedRegion - the region to select for aws
    * @param selectedIdpUrl - the current idp url to use for saml if needed plus id
-   * @param selectedProfile - AWS named-profile in which the session is saved
    * @param form - the form to use
    */
 
   // TODO: Why we need to save configurations and create the workspace here? it should be done invoked in the start screen and
-  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, selectedProfile, form) {
+  saveFirstAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
@@ -100,16 +100,36 @@ export class ProviderManagerService {
     this.selectedRole = selectedRole;
     this.selectedRegion = selectedRegion;
     this.selectedIdpUrl = selectedIdpUrl;
-    this.selectedProfile = selectedProfile;
     this.form = form;
+
+    // TODO: ?? Why I need to call Google?
+    // Before we need to save the first workspace and call google: this is done only the first time so it is not used in other classes
+    // Now we get the default configuration to obtain the previously saved idp url
+    const configuration = this.configurationService.getConfigurationFileSync();
+
+    // TODO: WHy SAML is essential?
+    // Set our response type
+    const responseType = IdpResponseType.SAML;
 
     // Update Configuration
     if (accountType === AccountType.AWS) {
-      this.createNewWorkspace(null, this.selectedIdpUrl, this.selectedProfile, IdpResponseType.SAML);
-      this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
+
+      // TODO: What I am updating?
+      this.configurationService.updateConfigurationFileSync(configuration);
+
+      // When the token is received save it and go to the setup page for the first account
+      if (this.googleSubscription) { this.googleSubscription.unsubscribe(); }
+      this.googleSubscription = this.workspaceService.googleEmit.subscribe((googleToken) => this.ngZone.run(() => {
+        this.createNewWorkspace(googleToken, this.selectedIdpUrl, responseType);
+        this.appService.logger(`Saving first account with a federated account (already done google token emit)`, LoggerLevel.INFO, this);
+      }));
+
+      // Call the service for working on the first login event to the user idp
+      // We add the helper for account choosing just to be sure to give the possibility to call the correct user
+      this.workspaceService.getIdpTokenInSetup(this.selectedIdpUrl.url, responseType);
     } else {
       this.appService.logger(`Saving first account with a plain or azure account`, LoggerLevel.INFO, this);
-      this.createNewWorkspace(undefined, undefined, this.selectedProfile, IdpResponseType.SAML);
+      this.createNewWorkspace(undefined, undefined, responseType);
     }
   }
 
@@ -121,10 +141,9 @@ export class ProviderManagerService {
    * @param selectedRole - the selected role of the parent
    * @param selectedRegion - the region to select for aws
    * @param selectedIdpUrl - the idp url to use for saml auth if needed plus id
-   * @param selectedProfile - the named-profile in which the Leapp session is saved
    * @param form - the form to use
    */
-  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, selectedProfile, form) {
+  saveAccount(accountId, accountType, selectedSession: Session, selectedRole, selectedRegion, selectedIdpUrl, form) {
     // Set our variable to avoid sending them to all methods;
     // besides the scope of this service is to manage saving and editing
     // of multi providers so having some helper class variables is ok
@@ -137,9 +156,7 @@ export class ProviderManagerService {
     this.selectedRole = selectedRole;
     this.selectedRegion = selectedRegion;
     this.selectedIdpUrl = selectedIdpUrl;
-    this.selectedProfile = selectedProfile;
     this.form = form;
-
     this.decideSavingMethodAndSave();
   }
 
@@ -164,9 +181,9 @@ export class ProviderManagerService {
    * When the data from Google is received, generate a new workspace or check errors, etc.
    */
   // TODO: Why there are 2 createNewWorkspace functions?
-  createNewWorkspace(googleToken, federationUrl, profile, responseType) {
+  createNewWorkspace(googleToken, federationUrl, responseType) {
     const name = 'default';
-    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, profile, name, responseType);
+    const result = this.workspaceService.createNewWorkspace(googleToken, federationUrl, name, responseType);
     if (result) {
       this.decideSavingMethodAndSave();
     } else {
@@ -259,9 +276,7 @@ export class ProviderManagerService {
           this.selectedRole,
           this.generateRolesFromNames(this.form),
           this.form.value.idpArn,
-          this.selectedRegion,
-          this.selectedProfile
-        );
+          this.selectedRegion);
       } catch (err) {
         this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(err, ToastLevel.ERROR);
@@ -275,7 +290,6 @@ export class ProviderManagerService {
 
   saveAwsFederatedAccount() {
     if (this.formValid(this.form, this.accountType)) {
-
       try {
         // Add a federation Account to the workspace
         return this.federatedAccountService.addFederatedAccountToWorkSpace(
@@ -285,7 +299,6 @@ export class ProviderManagerService {
           this.generateRolesFromNames(this.form),
           this.form.value.idpArn,
           this.selectedRegion,
-          this.selectedProfile
         );
       } catch (err) {
         this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
@@ -303,22 +316,20 @@ export class ProviderManagerService {
       this.form.value.accountNumber,
       this.form.value.name,
       this.form.value.plainUser,
-      this.form.value.secretKey.trim(),
-      this.form.value.accessKey.trim(),
-      this.form.value.mfaDevice.trim(),
-      this.selectedRegion,
-      this.selectedProfile
-    );
+      this.form.value.secretKey,
+      this.form.value.accessKey,
+      this.form.value.mfaDevice,
+      this.selectedRegion);
     return true;
   }
 
   editPlainCredentials() {
     this.federatedAccountService.editPlainAccountToWorkSpace(
       this.selectedSession,
-      this.form.value.accessKey.trim(),
-      this.form.value.secretKey.trim(),
-      this.form.value.mfaDevice.trim(),
-      this.selectedRegion
+      this.form.value.accessKey,
+      this.form.value.secretKey,
+      this.form.value.mfaDevice,
+      this.selectedRegion,
     );
     return true;
   }

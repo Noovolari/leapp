@@ -1,6 +1,6 @@
-import {Injectable} from '@angular/core';
-import {NativeService} from './native-service';
-import {Observable} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { NativeService } from './native-service';
+import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ExecuteServiceService extends NativeService {
@@ -9,9 +9,8 @@ export class ExecuteServiceService extends NativeService {
    * Note: with the current version of Electron the sandbox option for Chromium don't allow for sudo prompt on Ubuntu machines 16+
    * Remove the note whenever a fix is found.
    * @param command - the command to launch
-   * @param force - force with sudo commands
    * @returns an {Observable<any>} to use for subscribing to success or error event on the command termination:
-   *          the default unix standard is used so 0 represent a success code, everything else is an error code
+   *          the default unix standard is used so 0 represent a success code, everything elese is an error code
    */
   public execute(command: string, force?: boolean): Observable<any> {
     return new Observable(

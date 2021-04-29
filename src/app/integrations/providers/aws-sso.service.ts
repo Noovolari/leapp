@@ -51,7 +51,7 @@ export class AwsSsoService extends NativeService {
     super();
   }
 
-  authorizeIntegration(region: string, portalUrl: string): Observable<AuthorizeIntegrationResponse> {
+ authorizeIntegration(region: string, portalUrl: string): Observable<AuthorizeIntegrationResponse> {
     this.ssooidc = new SSOOIDC({region});
 
     const registerClientRequest: RegisterClientRequest = {
@@ -162,14 +162,29 @@ export class AwsSsoService extends NativeService {
   }
 
   firstTimeLoginToAwsSSO(region: string, portalUrl: string): Observable<LoginToAwsSSOResponse> {
-    return this.authorizeIntegration(region, portalUrl).pipe(
-      switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
-      switchMap(generateSSOTokenResponse => {
-        return this.saveAwsSsoAccessInfo(portalUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
-          map(() => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime }))
-        );
-      })
-    );
+    return new Observable<LoginToAwsSSOResponse>(observer => {
+      const followRedirect = portalUrl.indexOf('https://') > -1 ? this.appService.getFollowRedirects().https : this.appService.getFollowRedirects().http;
+      const request = followRedirect.request(portalUrl, response => {
+        this.authorizeIntegration(region, response.responseUrl).pipe(
+          switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
+          switchMap(generateSSOTokenResponse => {
+            return this.saveAwsSsoAccessInfo(response.responseUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
+              map(() => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime }))
+            );
+          })
+        ).subscribe(res => {
+          observer.next(res);
+          observer.complete();
+        }, err => {
+          observer.error(err);
+          observer.complete();
+        });
+      }).on('error', err => {
+        observer.error(err);
+        observer.complete();
+      });
+      request.end();
+    });
   }
 
   loginToAwsSSO(): Observable<LoginToAwsSSOResponse> {

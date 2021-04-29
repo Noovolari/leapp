@@ -15,7 +15,6 @@ import {constants} from '../core/enums/constants';
 })
 export class AppService extends NativeService {
 
-  isResuming: EventEmitter<boolean> = new EventEmitter<boolean>();
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
   // TODO Why redrawList??
   redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -126,6 +125,8 @@ export class AppService extends NativeService {
    * Log the message to a file and also to console for development mode
    * @param message - the message to log
    * @param type - the LoggerLevel type
+   * @param instance -
+   * @param stackTrace -
    */
   logger(message: any, type: LoggerLevel, instance?: any, stackTrace?: string) {
     if (typeof message !== 'string') {
@@ -186,6 +187,7 @@ export class AppService extends NativeService {
   /**
    * Create a new browser window
    * @param url - the url to point to launch the window with the protocol, it can also be a file://
+   * @param show - show the window
    * @param title - the window title
    * @param x - position x
    * @param y - position y
@@ -539,25 +541,6 @@ export class AppService extends NativeService {
     return `${accountName}___${user}___accessKey`;
   }
 
-  // TODO REMOVE
-  /**
-   * Set the hook email based on response type
-   * Now is not used but it can be very useful and we
-   * want to leave it as a possible helper function
-   * @param token - the token retrieved from google
-   * @return email - string - the email object
-   */
-  setHookEmail(token) {
-
-    const samlData = atob(token);
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(samlData, 'text/xml');
-    const email = xmlDoc.getElementsByTagName('saml2p:Response')[0].getElementsByTagName('saml2:Assertion')[0].getElementsByTagName('saml2:Subject')[0].getElementsByTagName('saml2:NameID')[0].childNodes[0].nodeValue;
-    localStorage.setItem('hook_email', email);
-
-    return email;
-  }
-
   stsOptions(session) {
     let options: any = {
       maxRetries: 0,
@@ -580,7 +563,6 @@ export class AppService extends NativeService {
     roleName =  roleName.substr(0, 64).replace(/\//g, '-');
     return roleName;
   }
-
 }
 
 /*

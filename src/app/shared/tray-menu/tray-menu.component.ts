@@ -7,14 +7,13 @@ import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {Session} from '../../models/session';
 import {AccountType} from '../../models/AccountType';
 import {AwsAccount} from '../../models/aws-account';
-import {AntiMemLeak} from '../../core/anti-mem-leak';
 
 @Component({
   selector: 'app-tray-menu',
   templateUrl: './tray-menu.component.html',
   styleUrls: ['./tray-menu.component.scss']
 })
-export class TrayMenuComponent extends AntiMemLeak implements OnInit {
+export class TrayMenuComponent implements OnInit {
 
   // Used to define the only tray we want as active expecially in linux context
   currentTray;
@@ -23,14 +22,12 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
               private configurationService: ConfigurationService,
               private fileService: FileService,
               private sessionService: SessionService,
-              private appService: AppService) {
-    super();
-  }
+              private appService: AppService) {}
 
   ngOnInit() {
-    this.subs.add(this.appService.redrawList.subscribe(() => {
+    this.appService.redrawList.subscribe(() => {
       this.generateMenu();
-    }));
+    });
     this.generateMenu();
   }
 
@@ -39,7 +36,7 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
 
     let voices = [];
     const maxSessionsToShow = 10;
-    const activeSessions = this.sessionService.list().filter(s => s.active);
+    const activeSessions = []; // this.sessionService.list().filter(s => s.active);
     // @ts-ignore
     const allSessions = activeSessions.concat(this.sessionService.alterOrderByTime(this.sessionService.list().filter(s => !s.active)).slice(0, maxSessionsToShow - activeSessions.length));
     allSessions.forEach((session: Session) => {
@@ -74,7 +71,7 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
               this.sessionService.start(session.sessionId);
               // TODO: refresh session credential
             } else {
-              this.sessionService.stop(session.sessionId);
+              // this.sessionService.stop(session.sessionId);
               // TODO: refresh session credential
             }
             this.appService.redrawList.emit(true);

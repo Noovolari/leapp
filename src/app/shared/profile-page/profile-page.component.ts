@@ -5,21 +5,19 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
 import {FileService} from '../../services-system/file.service';
 import {Router} from '@angular/router';
-import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {constants} from '../../core/enums/constants';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsAccount} from '../../models/aws-account';
 import {SessionService} from '../../services/session.service';
 import {WorkspaceService} from '../../services/workspace.service';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.component.html',
   styleUrls: ['./profile-page.component.scss']
 })
-export class ProfilePageComponent extends AntiMemLeak implements OnInit {
+export class ProfilePageComponent implements OnInit {
 
   activeTab = 1;
 
@@ -63,7 +61,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
     private router: Router
-  ) { super(); }
+  ) {}
 
   ngOnInit() {
     this.workspace = this.workspaceService.get();
@@ -173,8 +171,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
 
   deleteIdpUrl(id) {
     // Federated
-    const federated = this.workspace.sessions.filter(s => (s.account as AwsAccount).idpUrl !== undefined && (s.account as AwsAccount).idpUrl === id);
-    const sessions = federated;
+    const sessions = this.workspace.sessions.filter(s => (s.account as AwsAccount).idpUrl !== undefined && (s.account as AwsAccount).idpUrl === id);
 
     // Add trusters from federated
     /* federated.forEach(fed => {
@@ -227,9 +224,6 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   }
 
   deleteAwsProfile(id: string) {
-    // Default profile id
-    const defaultId = this.workspace.profiles.filter(p => p.name === 'default')[0].id;
-
     // Federated
     const sessions = this.workspace.sessions.filter(s => s.profileId === id);
 

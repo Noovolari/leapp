@@ -7,7 +7,6 @@ import {SessionService} from '../../services/session.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
-import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsPlainService} from '../../strategies/aws-plain.service';
@@ -19,7 +18,7 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
   templateUrl: './create-account.component.html',
   styleUrls: ['./create-account.component.scss']
 })
-export class CreateAccountComponent extends AntiMemLeak implements OnInit {
+export class CreateAccountComponent implements OnInit {
 
   firstTime = false;
   providerSelected = false;
@@ -87,11 +86,11 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     private workspaceService: WorkspaceService,
     private providerManagerService: ProviderManagerService,
     private awsPlainService: AwsPlainService
-  ) { super(); }
+  ) {}
 
   ngOnInit() {
 
-    this.subs.add(this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe(params => {
 
       // Get the workspace and the accounts you need
       const workspace = this.workspaceService.get();
@@ -129,7 +128,7 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       this.selectedRegion = workspace.defaultRegion || environment.defaultRegion || this.regions[0].region;
       this.selectedLocation = workspace.defaultLocation || environment.defaultLocation || this.locations[0].location;
       this.selectedProfile = workspace.profiles.filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
-    }));
+    });
   }
 
   /**

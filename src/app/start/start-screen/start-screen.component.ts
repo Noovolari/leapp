@@ -1,11 +1,6 @@
-import {AfterViewInit, Component, Input, OnInit} from '@angular/core';
-import {ExecuteServiceService} from '../../services-system/execute-service.service';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
+import {Component, Input} from '@angular/core';
+import {AppService} from '../../services-system/app.service';
 import {Router} from '@angular/router';
-import {ConfigurationService} from '../../services-system/configuration.service';
-import {AntiMemLeak} from '../../core/anti-mem-leak';
-// import {MenuService} from '../../services/menu.service';
-import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-wizard-page',

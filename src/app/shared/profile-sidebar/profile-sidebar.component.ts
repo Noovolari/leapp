@@ -1,7 +1,6 @@
 import {Component, OnInit, Renderer2} from '@angular/core';
 import {AppService, LoggerLevel} from '../../services-system/app.service';
 import {Router} from '@angular/router';
-import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {HttpClient} from '@angular/common/http';
 import {ExecuteServiceService} from '../../services-system/execute-service.service';
 import {ProxyService} from '../../services/proxy.service';
@@ -13,7 +12,7 @@ import {WorkspaceService} from '../../services/workspace.service';
   templateUrl: './profile-sidebar.component.html',
   styleUrls: ['./profile-sidebar.component.scss']
 })
-export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
+export class ProfileSidebarComponent implements OnInit {
 
   profileOpen = false;
   test: any;
@@ -29,17 +28,16 @@ export class ProfileSidebarComponent extends AntiMemLeak implements OnInit {
     private proxyService: ProxyService,
     private workspaceService: WorkspaceService,
     private renderer: Renderer2
-  ) { super(); }
+  ) {}
 
   /**
    * Init the profile sidebar using the event emitter status listener
    */
   ngOnInit() {
-    const sub = this.appService.profileOpen.subscribe(res => {
+    this.appService.profileOpen.subscribe(res => {
       this.profileOpen = res;
       this.profileOpen ? this.renderer.addClass(document.body, 'moved') : this.renderer.removeClass(document.body, 'moved');
     });
-    this.subs.add(sub);
   }
 
   /**

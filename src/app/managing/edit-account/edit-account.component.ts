@@ -7,14 +7,13 @@ import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
 import {Session} from '../../models/session';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
-import {AntiMemLeak} from '../../core/anti-mem-leak';
 
 @Component({
   selector: 'app-edit-account',
   templateUrl: './edit-account.component.html',
   styleUrls: ['./edit-account.component.scss']
 })
-export class EditAccountComponent extends AntiMemLeak implements OnInit {
+export class EditAccountComponent implements OnInit {
   accountType = AccountType.AWS_PLAIN_USER;
   provider = AccountType.AWS;
   selectedSession: Session;
@@ -44,10 +43,10 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private providerManagerService: ProviderManagerService,
-  ) { super(); }
+  ) {}
 
   ngOnInit() {
-    this.subs.add(this.activatedRoute.queryParams.subscribe(params => {
+    this.activatedRoute.queryParams.subscribe(params => {
       // Get the workspace and the account you need
       this.selectedSession = this.workspace.sessions.filter(session => session.sessionId === params.sessionId)[0];
       const selectedAccount = (this.selectedSession.account as AwsPlainAccount);
@@ -60,7 +59,7 @@ export class EditAccountComponent extends AntiMemLeak implements OnInit {
       // Get other readonly properties
       this.form.controls['name'].setValue(selectedAccount.accountName);
       this.form.controls['mfaDevice'].setValue(selectedAccount.mfaDevice);
-    }));
+    });
   }
 
   /**

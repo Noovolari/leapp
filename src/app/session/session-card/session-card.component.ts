@@ -10,7 +10,6 @@ import {AccountType} from '../../models/AccountType';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import {KeychainService} from '../../services-system/keychain.service';
-import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import * as uuid from 'uuid';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
@@ -22,7 +21,7 @@ import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
   styleUrls: ['./session-card.component.scss'],
 })
 
-export class SessionCardComponent extends AntiMemLeak implements OnInit {
+export class SessionCardComponent implements OnInit {
 
   eAccountType = AccountType;
 
@@ -50,7 +49,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   sessionDetailToShow;
   placeholder;
   selectedProfile: any;
-  private profiles: { id: string; name: string }[];
+  profiles: { id: string; name: string }[];
 
   constructor(private sessionService: SessionService,
               private workspaceService: WorkspaceService,
@@ -58,7 +57,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
               private appService: AppService,
               private router: Router,
               private ssmService: SsmService,
-              private modalService: BsModalService) { super(); }
+              private modalService: BsModalService) {}
 
   ngOnInit() {
     // Set regions for ssm and for default region, same with locations,
@@ -228,7 +227,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
         const credentials = JSON.parse(creds);
 
         // Check the result of the call
-        this.subs.add(this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
+        this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
           this.instances = result.instances;
           this.duplicateInstances = this.instances;
           this.ssmloading = false;
@@ -237,7 +236,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
           this.instances = [];
           this.ssmloading = false;
           this.appService.redrawList.emit(true);
-        }));
+        });
       });
 
     }

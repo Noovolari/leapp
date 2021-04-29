@@ -1,7 +1,7 @@
 import {IndividualConfig, ToastrService} from 'ngx-toastr';
 import {PositioningService} from 'ngx-bootstrap/positioning';
 import {ComponentLoaderFactory} from 'ngx-bootstrap/component-loader';
-import {BsModalService} from 'ngx-bootstrap/modal';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import 'jasmine';
 
 const toastrService = {
@@ -19,6 +19,6 @@ const toastrService = {
 
 /* Must inject must be .concat with providers: [] */
 const mustInjected = (): any[] => {
-  return [PositioningService, ComponentLoaderFactory, BsModalService, { provide: ToastrService, useValue: toastrService }];
+  return [PositioningService, ComponentLoaderFactory, BsModalRef, BsModalService, { provide: ToastrService, useValue: toastrService }];
 };
 export { mustInjected };

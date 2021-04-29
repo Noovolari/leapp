@@ -20,12 +20,20 @@ export abstract class SessionService extends NativeService {
     this.persistSessionInWorkspace(session);
   }
 
+  get(sessionId: string): Session {
+
+  }
+
   list(): Session[] {
     return [];
   }
 
   listChilds(): Session[] {
     return [];
+  }
+
+  listActive(): Session[] {
+    return this.list().filter( (session) => session.active);
   }
 
   delete(sessionId: string): void {
@@ -46,6 +54,13 @@ export abstract class SessionService extends NativeService {
 
   }
 
+  expired(sessionId: string): boolean {
+    this.get(sessionId);
+  }
+
+  async rotate(sessionId: string) {
+  }
+
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
@@ -61,4 +76,7 @@ export abstract class SessionService extends NativeService {
     sessions.push(session);
     this.workspaceService.updateSessions(sessions);
   }
+
+
+
 }

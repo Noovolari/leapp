@@ -1,22 +1,10 @@
-import {AccountType} from '../models/AccountType';
-import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
-import {AwsCredential, AwsCredentials} from '../models/credential';
-import {AwsPlainAccount} from '../models/aws-plain-account';
+import {AppService} from '../services-system/app.service';
 import {ConfigurationService} from '../services-system/configuration.service';
-import {environment} from '../../environments/environment';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {FileService} from '../services-system/file.service';
 import {KeychainService} from '../services-system/keychain.service';
-import {TimerService} from '../services/timer-service';
-import {Workspace} from '../models/workspace';
 import {WorkspaceService} from '../services/workspace.service';
-import {Observable, of, Subscriber, Subscription} from 'rxjs';
-import {constants} from '../core/enums/constants';
 import {ProxyService} from '../services/proxy.service';
-import {Session} from '../models/session';
-import {catchError, switchMap} from 'rxjs/operators';
-import {AwsSsoAccount} from '../models/aws-sso-account';
-import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
 import {AwsSsoService} from '../integrations/providers/aws-sso.service';
 import {SessionService} from '../services/session.service';
 
@@ -33,7 +21,6 @@ export class AwsStrategy {
     private fileService: FileService,
     private keychainService: KeychainService,
     private proxyService: ProxyService,
-    private timerService: TimerService,
     private workspaceService: WorkspaceService,
     private sessionService: SessionService,
     private awsSsoService: AwsSsoService) {}

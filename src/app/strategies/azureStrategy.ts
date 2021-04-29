@@ -5,7 +5,6 @@ import {ConfigurationService} from '../services-system/configuration.service';
 import {ExecuteServiceService} from '../services-system/execute-service.service';
 import {AzureAccount} from '../models/azure-account';
 import {AppService, LoggerLevel, ToastLevel} from '../services-system/app.service';
-import {TimerService} from '../services/timer-service';
 import {Observable, Subscriber, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 import {FileService} from '../services-system/file.service';
@@ -17,7 +16,6 @@ export class AzureStrategy {
 
   constructor(
     private appService: AppService,
-    private timerService: TimerService,
     private executeService: ExecuteServiceService,
     private fileService: FileService,
     private configurationService: ConfigurationService) {}
@@ -35,7 +33,6 @@ export class AzureStrategy {
     if (workspace) {
       // Clean Azure Credential file
       this.cleanAzureCredentialFile();
-      this.timerService.noAzureSessionsActive = true;
     }
   }
 
@@ -44,9 +41,6 @@ export class AzureStrategy {
       if (workspace.azureConfig !== null && workspace.azureConfig !== undefined) {
         // Already have tokens
 
-        if (this.timerService.noAzureSessionsActive === true) {
-          this.timerService.noAzureSessionsActive = false;
-        }
 
         // 1) Write accessToken and profile again
         this.configurationService.updateAzureProfileFileSync(workspace.azureProfile);
@@ -107,9 +101,6 @@ export class AzureStrategy {
       // workspace.azureConfig = this.configurationService.getAzureConfigSync();
       // this.configurationService.updateWorkspaceSync(workspace);
       // this.configurationService.disableLoadingWhenReady(workspace, session);
-
-      // Start Calculating time here once credentials are actually retrieved
-      this.timerService.defineTimer();
 
       // Emit return credentials
       this.appService.refreshReturnStatusEmit.emit(true);

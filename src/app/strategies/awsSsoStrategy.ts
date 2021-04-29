@@ -94,7 +94,7 @@ export class AwsSsoStrategy {
         return of(true);
       }),
       catchError( (err) => {
-        this.sessionService.stop(session.sessionId);
+        // this.sessionService.stop(session.sessionId);
 
         if (err.name === 'LeappSessionTimedOut') {
           this.appService.logger(err.toString(), LoggerLevel.WARN, this, err.stack);

@@ -20,7 +20,19 @@ export abstract class SessionService extends NativeService {
     this.persistSessionInWorkspace(session);
   }
 
-  async start(sessionId: string) {
+  list(): Session[] {
+    return [];
+  }
+
+  listChilds(): Session[] {
+    return [];
+  }
+
+  delete(sessionId: string): void {
+
+  }
+
+  async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
     const credentialsInfo = this.generateCredentials(sessionId);
     this.applyCredentials(await credentialsInfo).then(value => {
@@ -28,6 +40,10 @@ export abstract class SessionService extends NativeService {
     }, error => {
       this.sessionError(error);
     });
+  }
+
+  async stop(sessionId: string): Promise<void> {
+
   }
 
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;

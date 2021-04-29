@@ -25,7 +25,7 @@ export class AwsPlainService extends SessionService {
     return Promise.resolve(undefined);
   }
 
-  generateCredentials(sessionId: string): CredentialsInfo {
-    return undefined;
+  generateCredentials(sessionId: string): Promise<CredentialsInfo> {
+    return Promise.resolve(undefined);
   }
 }

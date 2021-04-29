@@ -53,14 +53,12 @@ describe('WorkspaceService', () => {
       spyFileService.readFileSync.and.callFake((_: string) => JSON.stringify(new Workspace()) );
       workspaceService.create();
       const workspace1 = workspaceService.get();
-      console.log(new Workspace());
-
       workspace1.sessions.push(new Session(new AwsPlainAccount('', '', '', '', ''), 'profile'));
       spyFileService.readFileSync.and.callFake((_: string) => JSON.stringify(workspace1) );
+      workspaceService.updateSessions(workspace1.sessions);
 
       workspaceService.create();
       const workspace2 = workspaceService.get();
-
       expect(workspace1).toEqual(workspace2);
     });
   });

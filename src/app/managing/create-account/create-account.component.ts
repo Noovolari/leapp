@@ -114,7 +114,9 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       // Add parameters to check what to do with form data
       if (this.workspace.idpUrl && this.workspace.idpUrl.length > 0) {
         this.workspace.idpUrl.forEach(idp => {
-          this.idps.push({value: idp.id, label: idp.url});
+          if (idp && idp.id && idp.url) {
+            this.idps.push({value: idp.id, label: idp.url});
+          }
         });
       }
 

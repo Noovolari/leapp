@@ -22,7 +22,9 @@ export class TimerService {
   private checkExpiringSessions() {
     const activeSessions = this.sessionService.listActive();
     activeSessions.forEach(session => {
-      if (this.sessionService.expired(session.sessionId)) {this.sessionService.rotate(session.sessionId); }
+      if (this.sessionService.expired(session.sessionId)) {
+        this.sessionService.rotate(session.sessionId);
+      }
     });
   }
 }

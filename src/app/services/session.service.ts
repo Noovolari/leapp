@@ -4,6 +4,8 @@ import {Account} from '../models/account';
 import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
 import {CredentialsInfo} from '../models/credentials-info';
+import {AccountType} from '../models/AccountType';
+import {environment} from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -21,15 +23,16 @@ export abstract class SessionService extends NativeService {
   }
 
   get(sessionId: string): Session {
-
+    const sessionFiltered = this.list().filter(session => session.sessionId === sessionId);
+    return sessionFiltered ? sessionFiltered[0] : null;
   }
 
   list(): Session[] {
-    return [];
+    return this.workspaceService.getSessions();
   }
 
   listChilds(): Session[] {
-    return [];
+    return this.list().filter( (session) => session.account.type === AccountType.AWS_TRUSTER);
   }
 
   listActive(): Session[] {
@@ -41,24 +44,41 @@ export abstract class SessionService extends NativeService {
   }
 
   async start(sessionId: string): Promise<void> {
-    this.sessionLoading(sessionId);
-    const credentialsInfo = this.generateCredentials(sessionId);
-    this.applyCredentials(await credentialsInfo).then(value => {
+    try {
+      this.sessionLoading(sessionId);
+      const credentialsInfo = await this.generateCredentials(sessionId);
+      await this.applyCredentials(credentialsInfo);
       this.sessionActivate(sessionId);
-    }, error => {
-      this.sessionError(error);
-    });
+    } catch (error) {
+      this.sessionError(sessionId, error);
+    }
   }
 
   async stop(sessionId: string): Promise<void> {
 
   }
 
-  expired(sessionId: string): boolean {
-    this.get(sessionId);
+  async rotate(sessionId: string): Promise<void> {
+    try {
+      this.sessionLoading(sessionId);
+      const credentialsInfo = await this.generateCredentials(sessionId);
+      await this.applyCredentials(credentialsInfo);
+      this.sessionRotate(sessionId);
+    } catch (error) {
+      this.sessionError(sessionId, error);
+    }
   }
 
-  async rotate(sessionId: string) {
+  expired(sessionId: string): boolean {
+    const session = this.get(sessionId);
+
+    if (!session.startDateTime) {
+      return false;
+    }
+
+    const currentTime = new Date().getTime();
+    const startTime = new Date(session.startDateTime).getTime();
+    return (currentTime - startTime) / 1000 > environment.sessionDuration;
   }
 
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
@@ -69,14 +89,13 @@ export abstract class SessionService extends NativeService {
 
   private sessionActivate(sessionId: string) { }
 
-  private sessionError(error: Error) { }
+  private sessionRotate(sessionId: string) { }
+
+  private sessionError(sessionId: string, error: Error) { }
 
   private persistSessionInWorkspace(session: Session) {
     const sessions = this.workspaceService.getSessions();
     sessions.push(session);
     this.workspaceService.updateSessions(sessions);
   }
-
-
-
 }

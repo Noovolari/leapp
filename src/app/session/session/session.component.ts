@@ -1,4 +1,4 @@
-import {Component, NgZone, OnDestroy, OnInit} from '@angular/core';
+import {Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
 import {ConfigurationService} from '../../services-system/configuration.service';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -45,6 +45,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
   showOnly = 'ALL';
 
   workspace;
+
+  @ViewChild('filterField', { static: false})
+  filterField: ElementRef;
 
   constructor(
     private router: Router,
@@ -116,6 +119,9 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     this.zone.run(() => {
       this.activeSessions = this.sessionService.listSessions().filter( session => session.active === true);
       this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.listSessions().filter( session => session.active === false));
+      if (this.filterField) {
+        this.filterInactiveSessions(this.filterField.nativeElement.value);
+      }
     });
   }
 
@@ -129,6 +135,10 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   filterSessions(query) {
     this.getSessions();
+    this.filterInactiveSessions(query);
+  }
+
+  filterInactiveSessions(query) {
     if (query !== '') {
       this.notActiveSessions = this.notActiveSessions.filter(s => {
         const idpID = this.workspace.idpUrl.filter(idp => idp && idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.id);

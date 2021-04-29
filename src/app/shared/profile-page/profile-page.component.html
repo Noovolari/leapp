@@ -83,6 +83,7 @@
             </thead>
             <tbody>
             <ng-container *ngFor="let idpUrl of workspaceData.idpUrl">
+              <ng-container *ngIf="idpUrl">
               <tr>
                 <td>{{idpUrl.url}}</td>
                 <td>
@@ -90,6 +91,7 @@
                   <button class="xs-btn" type="button" (click)="deleteIdpUrl(idpUrl.id);"><i class="fa fa-trash"></i></button>
                 </td>
               </tr>
+              </ng-container>
             </ng-container>
             </tbody>
           </table>

@@ -153,7 +153,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   }
 
   manageIdpUrl(id) {
-    const idpUrl = this.workspaceData.idpUrl.findIndex(u => u.id === id);
+    const idpUrl = this.workspaceData.idpUrl.findIndex(u => u && u.id === id);
     if (this.form.get('idpUrl').value !== '') {
       if (idpUrl === -1) {
         this.workspaceData.idpUrl.push({ id: uuid.v4(), url: this.form.get('idpUrl').value });
@@ -168,7 +168,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
   }
 
   editIdpUrl(id) {
-    const idpUrl = this.workspaceData.idpUrl.filter(u => u.id === id)[0];
+    const idpUrl = this.workspaceData.idpUrl.filter(u => u && u.id === id)[0];
     this.idpUrlValue = idpUrl;
     this.form.get('idpUrl').setValue(idpUrl.url);
     this.editingIdpUrl = true;
@@ -197,7 +197,7 @@ export class ProfilePageComponent extends AntiMemLeak implements OnInit {
     this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
       if (res !== constants.CONFIRM_CLOSED) {
         this.appService.logger(`Removing idp url with id: ${id}`, LoggerLevel.INFO, this);
-        const idpUrl = this.workspaceData.idpUrl.findIndex(u => u.id === id);
+        const idpUrl = this.workspaceData.idpUrl.findIndex(u => u && u.id === id);
         this.workspaceData.idpUrl.splice(idpUrl, 1);
         this.configurationService.updateWorkspaceSync(this.workspaceData);
         sessions.forEach(s => {

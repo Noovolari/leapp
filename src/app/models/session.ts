@@ -1,5 +1,8 @@
 import {Account} from './account';
 import * as uuid from 'uuid';
+import {Type} from 'class-transformer';
+import {AwsPlainAccount} from './aws-plain-account';
+import {AccountType} from './AccountType';
 
 export class Session {
   sessionId: string;
@@ -8,6 +11,14 @@ export class Session {
   lastStopDateTime: string;
   active: boolean;
   loading: boolean;
+  @Type(() => Account, {
+    discriminator: {
+      property: 'type',
+      subTypes: [
+        { value: AwsPlainAccount, name: AccountType.AWS_PLAIN_USER},
+      ],
+    },
+  })
   account: Account;
 
   constructor(account: Account, profileId: string) {

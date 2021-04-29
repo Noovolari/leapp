@@ -1,6 +1,7 @@
 import {Session} from './session';
 import * as uuid from 'uuid';
 import {environment} from '../../environments/environment';
+import {Type} from 'class-transformer';
 
 export class Workspace {
   get defaultLocation(): string {
@@ -53,6 +54,7 @@ export class Workspace {
 
   private _idpUrl: { id: string, url: string }[];
   private _profiles: { id: string, name: string }[];
+  @Type(() => Session)
   private _sessions: Session[];
 
   private _proxyConfiguration: {
@@ -77,11 +79,4 @@ export class Workspace {
     this._defaultLocation = environment.defaultLocation;
   }
 
-  deserialize(idpUrl: { id: string, url: string }[], profiles: { id: string, name: string }[], sessions: Session[], proxyConfiguration: { [key: string]: any }, defaultRegion: string, defaultLocation: string) {
-    this.idpUrl = idpUrl;
-    this.profiles = profiles;
-    this.sessions = sessions;
-    this.defaultRegion = defaultRegion;
-    this.defaultLocation = defaultLocation;
-  }
 }

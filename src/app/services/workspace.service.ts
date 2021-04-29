@@ -4,6 +4,7 @@ import {AppService} from '../services-system/app.service';
 import {Session} from '../models/session';
 import {Workspace} from '../models/workspace';
 import {environment} from '../../environments/environment';
+import {deserialize, serialize} from 'class-transformer';
 
 @Injectable({
   providedIn: 'root'
@@ -15,7 +16,7 @@ export class WorkspaceService {
   private persist(workspace: Workspace) {
     this.fileService.writeFileSync(
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
-      this.fileService.encryptText(JSON.stringify(workspace, null, 2))
+      this.fileService.encryptText(serialize(workspace))
     );
   }
 
@@ -25,12 +26,8 @@ export class WorkspaceService {
   }
 
   get(): Workspace {
-    const workspaceFile = this.fileService.decryptText(this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination));
-    const workspaceObject = JSON.parse(workspaceFile);
-
-    const workspace = new Workspace();
-    workspace.deserialize(workspaceObject.idpUrl, workspaceObject.profiles, workspaceObject.sessions, workspaceObject.proxyConfiguration, workspaceObject.defaultRegion, workspaceObject.defaultLocation);
-    return workspace;
+    const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination));
+    return deserialize(Workspace, workspaceJSON);
   }
 
   getSessions(): Session[] {
@@ -38,10 +35,9 @@ export class WorkspaceService {
     return workspace.sessions;
   }
 
-  updateSessions(sessions: Session[]): Workspace {
+  updateSessions(sessions: Session[]): void {
     const workspace = this.get();
     workspace.sessions = sessions;
     this.persist(workspace);
-    return workspace;
   }
 }

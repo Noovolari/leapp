@@ -72,9 +72,9 @@ export class AppComponent implements OnInit {
           if (session.account.type === AccountType.AWS || session.account.type === AccountType.AWS_TRUSTER) {
             if (session.account.parent === undefined) {
               if (session.account.idpUrl === '' || session.account.idpUrl === null || session.account.idpUrl === undefined) {
-                session.account.idpUrl = workspace.idpUrl[0].id; // We force the first
+                session.account.idpUrl = workspace.idpUrl.filter(u => (u !== null && u !== undefined))[0].id; // We force the first
               } else {
-                const found = workspace.idpUrl.filter(u => u.url === session.account.idpUrl)[0];
+                const found = workspace.idpUrl.filter(u => u && u.url === session.account.idpUrl)[0];
                 if (found) {
                   session.account.idpUrl = found.id;
                 }

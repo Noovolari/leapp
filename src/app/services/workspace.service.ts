@@ -147,10 +147,10 @@ export class WorkspaceService extends NativeService {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
     let idpUrl;
     if (session.account.parent === undefined) {
-      idpUrl = workspace.idpUrl.filter(u => u.id === session.account.idpUrl)[0].url;
+      idpUrl = workspace.idpUrl.filter(u => u && u.id === session.account.idpUrl)[0].url;
     } else {
       const parentSession = this.sessionService.getSession(session.account.parent);
-      idpUrl = workspace.idpUrl.filter(u => u.id === parentSession.account.idpUrl)[0].url;
+      idpUrl = workspace.idpUrl.filter(u => u && u.id === parentSession.account.idpUrl)[0].url;
     }
 
     // TODO: probably here will need to clean the partition area to force a windows refresh

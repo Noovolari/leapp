@@ -70,7 +70,7 @@ export class FederatedAccountService extends NativeService {
 
       console.log('idpurl in workspace', workspace.idpUrl);
 
-      if (workspace.idpUrl.findIndex(i => i.id === idpUrl.id) === -1) {
+      if (workspace.idpUrl.findIndex(i => i && i.id === idpUrl.id) === -1) {
         workspace.idpUrl.push(idpUrl);
       }
 

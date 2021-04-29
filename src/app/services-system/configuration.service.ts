@@ -2,23 +2,21 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {FileService} from './file.service';
 import {NativeService} from './native-service';
 import {environment} from '../../environments/environment';
-import {map, switchMap} from 'rxjs/operators';
+import {map} from 'rxjs/operators';
 import {Observable} from 'rxjs';
 import {AppService, LoggerLevel, ToastLevel} from './app.service';
 import {Workspace} from '../models/workspace';
 import {Configuration} from '../models/configuration';
 import {_} from '../core/translation-marker';
 import {Session} from '../models/session';
-import {ExecuteServiceService} from './execute-service.service';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class ConfigurationService extends NativeService {
-  private processSubscription3: any;
 
-  constructor(private fileService: FileService, private appService: AppService, private executeService: ExecuteServiceService) {
+  constructor(private fileService: FileService, private appService: AppService) {
     super();
   }
 
@@ -243,64 +241,10 @@ export class ConfigurationService extends NativeService {
     workspace.sessions.forEach(sess => {
       if (sess.id === session.id) {
         sess.loading = false;
-        sess.active = true;
       }
     });
     this.updateWorkspaceSync(workspace);
-  }
-
-  public getNameFromProfileId(id: string): string {
-    const workspace = this.getDefaultWorkspaceSync();
-    const session = workspace.profiles.filter(p => p.id === id)[0];
-    return session ? session.name : '';
-  }
-
-  public cleanAzureCrendentialFile() {
-    const workspace = this.getDefaultWorkspaceSync();
-    if (workspace && this.isAzureConfigPresent()) {
-      workspace.azureProfile = this.getAzureProfileSync();
-      workspace.azureConfig = this.getAzureConfigSync();
-      if (workspace.azureConfig === '[]') {
-        // Anomalous condition revert to normal az login procedure
-        workspace.azureProfile = null;
-        workspace.azureConfig = null;
-      }
-
-      this.updateWorkspaceSync(workspace);
-    }
-    if (this.processSubscription3) { this.processSubscription3.unsubscribe(); }
-    this.processSubscription3 = this.executeService.execute('az account clear 2>&1').pipe(
-      switchMap(() => this.executeService.execute('az configure --defaults location=\'\' 2>&1'))
-    ).subscribe(() => {}, () => {});
-  }
-
-  public sanitizeIdpUrlsAndNamedProfiles() {
-    const workspace = this.getDefaultWorkspaceSync();
-
-    const idpUrls = workspace.idpUrl;
-    const profiles = workspace.profiles;
-
-    const sanitizedIdpUrls = [];
-    const sanitizedProfiles = [];
-
-    if (idpUrls && profiles) {
-      idpUrls.forEach((idpUrl) => {
-        if (idpUrl !== null && idpUrl !== undefined) {
-          sanitizedIdpUrls.push(idpUrl);
-        }
-      });
-
-      profiles.forEach((profile) => {
-        if (profile !== null && profile !== undefined) {
-          sanitizedProfiles.push(profile);
-        }
-      });
-
-      workspace.idpUrl = sanitizedIdpUrls;
-      workspace.profiles = sanitizedProfiles;
-
-      this.updateWorkspaceSync(workspace);
-    }
+    this.appService.redrawList.emit();
   }
 
   // ============================================================ //
@@ -326,4 +270,5 @@ export class ConfigurationService extends NativeService {
       return null;
     }
   }
+
 }

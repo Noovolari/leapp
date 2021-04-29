@@ -23,22 +23,6 @@ export class FederatedAccountService extends NativeService {
     super();
   }
 
-  static generatePlainAccountSessionTokenExpirationString(session: any) {
-    return 'plain-account-session-token-expiration-' + session.account.accountName;
-  }
-
-  static generateTrusterAccountSessionTokenExpirationString(session: any) {
-    return 'truster-account-session-token-expiration-' + session.account.accountName;
-  }
-
-  static generatePlainAccountSessionTokenString(session: any) {
-    return 'plain-account-session-token-' + session.account.accountName;
-  }
-
-  static generateTrusterAccountSessionTokenString(session: any) {
-    return 'truster-account-session-token-' + session.account.accountName;
-  }
-
   /**
    * Add a new Federated Account to workspace
    * @param idpUrl -the selected idp id and url
@@ -47,9 +31,11 @@ export class FederatedAccountService extends NativeService {
    * @param role - the role to add to the account
    * @param idpArn - the idp arn as it is federated
    * @param region - the region to select as default
-   * @param profile - the profile object for the named profile
    */
-  addFederatedAccountToWorkSpace(idpUrl: {id: string, url: string}, accountNumber: string, accountName: string, role: any, idpArn: string, region: string, profile: { id: string, name: string}) {
+  addFederatedAccountToWorkSpace(idpUrl: {id: string, url: string}, accountNumber: string, accountName: string, role: any, idpArn: string, region: string) {
+
+    console.log('idpurl', idpUrl);
+
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (role.name[0] === '/') {
@@ -76,23 +62,24 @@ export class FederatedAccountService extends NativeService {
 
       const session: Session = {
         id: uuidv4(),
-        profile: profile.id,
         active: false,
         loading: false,
         lastStopDate: new Date().toISOString(),
         account
       };
 
-      if (workspace.idpUrl.findIndex(i => i !== null && i.id === idpUrl.id) === -1) {
+      console.log('idpurl in workspace', workspace.idpUrl);
+
+      if (workspace.idpUrl.findIndex(i => i.id === idpUrl.id) === -1) {
         workspace.idpUrl.push(idpUrl);
       }
 
-      if (workspace.profiles.findIndex(i => i !== null && i.id === profile.id) === -1) {
-        workspace.profiles.push(profile);
-      }
+      console.log('idpurl in workspace after', workspace.idpUrl);
 
       workspace.sessions.push(session);
       this.configurationService.updateWorkspaceSync(workspace);
+      console.log('sessions now', workspace.sessions);
+
       return true;
 
     } else {
@@ -108,11 +95,9 @@ export class FederatedAccountService extends NativeService {
    * @param user - the Aws user added
    * @param secretKey - secret key of the user
    * @param accessKey - access key of the AWS user
-   * @param mfaDevice - the arn form the MFa device
    * @param region - the region to set as default
-   * @param profile - the profile we use forthe named profile
    */
-  addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string, mfaDevice: string, region: string, profile: { id: string, name: string }) {
+  addPlainAccountToWorkSpace(accountNumber: string, accountName: string, user: string, secretKey: string, accessKey: string, mfaDevice: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     // Verify it not exists
@@ -131,17 +116,11 @@ export class FederatedAccountService extends NativeService {
 
       const session: Session = {
         id: uuidv4(),
-        profile: profile.id,
         active: false,
         loading: false,
         lastStopDate: new Date().toISOString(),
         account
       };
-
-      if (workspace.profiles.findIndex(i => i.id === profile.id) === -1) {
-        workspace.profiles.push(profile);
-      }
-      this.configurationService.updateWorkspaceSync(workspace);
 
       try {
         this.keychainService.saveSecret(environment.appName, this.appService.keychainGenerateAccessString(accountName, user), accessKey);
@@ -188,14 +167,14 @@ export class FederatedAccountService extends NativeService {
 
     this.configurationService.updateWorkspaceSync(workspace);
 
-    this.keychainService.deletePassword(environment.appName, FederatedAccountService.generatePlainAccountSessionTokenExpirationString(session));
-    this.keychainService.deletePassword(environment.appName, FederatedAccountService.generatePlainAccountSessionTokenString(session));
+    this.keychainService.deletePassword(environment.appName, this.generatePlainAccountSessionTokenExpirationString(session));
+    this.keychainService.deletePassword(environment.appName, this.generatePlainAccountSessionTokenString(session));
 
     const childSessions = workspace.sessions.filter(sess => sess.account.parent === session.id);
 
     childSessions.forEach(sess => {
-      this.keychainService.deletePassword(environment.appName, FederatedAccountService.generateTrusterAccountSessionTokenExpirationString(sess));
-      this.keychainService.deletePassword(environment.appName, FederatedAccountService.generateTrusterAccountSessionTokenString(sess));
+      this.keychainService.deletePassword(environment.appName, this.generateTrusterAccountSessionTokenExpirationString(sess));
+      this.keychainService.deletePassword(environment.appName, this.generateTrusterAccountSessionTokenString(sess));
     });
 
     return true;
@@ -261,4 +240,21 @@ export class FederatedAccountService extends NativeService {
       this.deleteFederatedPlainAccount(session.id);
     }
   }
+
+  private generatePlainAccountSessionTokenExpirationString(session: any) {
+    return 'plain-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private generateTrusterAccountSessionTokenExpirationString(session: any) {
+    return 'truster-account-session-token-expiration-' + session.account.accountName;
+  }
+
+  private generatePlainAccountSessionTokenString(session: any) {
+    return 'plain-account-session-token-' + session.account.accountName;
+  }
+
+  private generateTrusterAccountSessionTokenString(session: any) {
+    return 'truster-account-session-token-' + session.account.accountName;
+  }
+
 }

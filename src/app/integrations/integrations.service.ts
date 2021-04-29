@@ -16,8 +16,6 @@ import {Session} from '../models/session';
 })
 export class IntegrationsService {
 
-  private loginSubscriber: any;
-
   constructor(private awsSsoService: AwsSsoService,
               private configurationService: ConfigurationService,
               private router: Router,
@@ -26,8 +24,7 @@ export class IntegrationsService {
               private keychainService: KeychainService) {}
 
   login(portalUrl, region) {
-    if (this.loginSubscriber) { this.loginSubscriber.unsubscribe(); }
-    this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO(region, portalUrl))
+    this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO(region, portalUrl))
       .pipe(
         switchMap((AwsSsoSessions: Session[]) => {
           // Save sessions to workspace
@@ -49,11 +46,7 @@ export class IntegrationsService {
         })
       )
       .subscribe(() => {
-        this.ngZone.run(() => {
-          this.appService.redrawList.emit(true);
-          this.router.navigate(['/sessions', 'session-selected']);
-        });
-        this.loginSubscriber.unsubscribe();
+        this.ngZone.run(() => this.router.navigate(['/sessions', 'session-selected']));
       });
   }
 
@@ -62,9 +55,7 @@ export class IntegrationsService {
   }
 
   syncAccounts() {
-    if (this.loginSubscriber) { this.loginSubscriber.unsubscribe(); }
-    console.log('syncing account');
-    this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).pipe(
+    this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).pipe(
       switchMap((AwsSsoSessions: Session[]) => {
         // Save sessions to workspace
         return this.awsSsoService.addSessionsToWorkspace(AwsSsoSessions);
@@ -75,11 +66,7 @@ export class IntegrationsService {
         return throwError(err);
       })
     ).subscribe(() => {
-      this.ngZone.run(() => {
-        this.appService.redrawList.emit(true);
-        this.router.navigate(['/sessions', 'session-selected']);
-      });
-      this.loginSubscriber.unsubscribe();
+      this.ngZone.run(() =>  this.router.navigate(['/sessions', 'session-selected']));
     });
   }
 }

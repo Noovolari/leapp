@@ -20,7 +20,6 @@ import {environment} from '../../../environments/environment';
 import {KeychainService} from '../../services-system/keychain.service';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
-import * as uuid from 'uuid';
 
 @Component({
   selector: 'app-session-card',
@@ -36,9 +35,6 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   ssmModalTemplate: TemplateRef<any>;
   @ViewChild('defaultRegionModalTemplate', { static: false })
   defaultRegionModalTemplate: TemplateRef<any>;
-  @ViewChild('defaultProfileModalTemplate', { static: false })
-  defaultProfileModalTemplate: TemplateRef<any>;
-
   modalRef: BsModalRef;
 
   @Input() session: Session;
@@ -52,12 +48,8 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   awsRegions = [];
   regionOrLocations = [];
   instances = [];
-  duplicateInstances = [];
   sessionDetailToShow;
   placeholder;
-  profiles: any;
-  selectedProfile: any;
-  workspace: any;
 
   constructor(private sessionService: SessionService,
               private credentialsService: CredentialsService,
@@ -77,17 +69,10 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     // Set regions for ssm and for default region, same with locations,
     // add the correct placeholder to the select
     this.awsRegions = this.appService.getRegions();
-    this.profiles = [];
-    this.workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (this.workspace && this.workspace.profiles && this.workspace.profiles.length > 0) {
-      this.profiles = this.workspace.profiles;
-    }
-
     const azureLocations = this.appService.getLocations();
     this.regionOrLocations = this.session.account.type !== AccountType.AZURE ? this.awsRegions : azureLocations;
     this.placeholder = this.session.account.type !== AccountType.AZURE ? 'Select a default region' : 'Select a default location';
     this.selectedDefaultRegion = this.session.account.region;
-    this.selectedProfile = this.session.profile;
 
     switch (this.session.account.type) {
       case(AccountType.AWS):
@@ -107,28 +92,31 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   /**
    * Start the selected session
+   * @param session - {SessionObject} - the session object we want to login to
    */
-  startSession() {
+  startSession(session: Session) {
     // Start a new session with the selected one
-    this.sessionService.startSession(this.session);
+    this.sessionService.startSession(session);
 
     // automatically check if there is an active session and get session list again
-    this.appService.redrawList.emit(true);
-    this.credentialsService.refreshCredentials();
+    this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
+
     this.appService.logger(`Starting Session`, LoggerLevel.INFO, this, JSON.stringify({ timestamp: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
+    // Redraw the list
+    this.sessionsChanged.emit('');
+    this.appService.redrawList.emit(true);
   }
 
   /**
    * Stop session
    */
-  stopSession() {
+  stopSession(session: Session) {
     // Eventually close the tray
-    this.sessionService.stopSession(this.session);
-
-    // New: we need to apply changes directly on credentials file if not azure type
-    this.sessionService.removeFromIniFile(this.session.profile);
+    this.sessionService.stopSession(session);
+    // TODO refactor this.openSsm = false;
 
     // automatically check if there is an active session or stop it
+    this.credentialsService.refreshCredentialsEmit.emit(session.account.type);
     this.sessionsChanged.emit('');
     this.appService.redrawList.emit(true);
     this.appService.logger('Session Stopped', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: this.session.id, account: this.session.account.accountName, type: this.session.account.type }, null, 3));
@@ -158,10 +146,9 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
     try {
       const workspace = this.configurationService.getDefaultWorkspaceSync();
       if (workspace) {
-        const sessionAccount = (session.account as AwsAccount);
         const texts = {
-          1: sessionAccount.accountNumber,
-          2: sessionAccount.role ? `arn:aws:iam::${(session.account as AwsAccount).accountNumber}:role/${(session.account as AwsAccount).role.name}` : ''
+          1: (session.account as AwsAccount).accountNumber,
+          2: `arn:aws:iam::${(session.account as AwsAccount).accountNumber}:role/${(session.account as AwsAccount).role.name}`
         };
 
         const text = texts[type];
@@ -173,13 +160,14 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
       this.appService.toast(err, ToastLevel.WARN);
       this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
     }
+
   }
 
   switchCredentials() {
     if (this.session.active) {
-      this.stopSession();
+      this.stopSession(this.session);
     } else {
-      this.startSession();
+      this.startSession(this.session);
     }
   }
 
@@ -190,15 +178,12 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   // ============================== //
   // ========== SSM AREA ========== //
   // ============================== //
-  addNewProfile(tag: string) {
-    return {id: uuid.v4(), name: tag};
-  }
 
   /**
    * SSM Modal open given the correct session
    * @param session - the session to check for possible ssm sessions
    */
-  ssmModalOpen(session) {
+  ssmModalOpen(session, event) {
     // Reset things before opening the modal
     this.instances = [];
     this.ssmloading = false;
@@ -209,36 +194,30 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
    * SSM Modal open given the correct session
    * @param session - the session to check for possible ssm sessions
    */
-  changeRegionModalOpen(session) {
+  changeRegionModalOpen(session, event) {
     // open the modal
+
     this.modalRef = this.modalService.show(this.defaultRegionModalTemplate, { class: 'ssm-modal'});
   }
 
   /**
    * Set the region for ssm init and launch the mopethod form the server to find instances
    * @param event - the change select event
-   * @param session - The session in which the AWS region need to change
    */
-  changeSsmRegion(event, session: Session) {
+  changeSsmRegion(event) {
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
-
-      const account = `Leapp-ssm-data-${session.profile}`;
-
       // Set the aws credentials to instanziate the ssm client
-      this.keychainService.getSecret(environment.appName, account).then(creds => {
+      this.keychainService.getSecret(environment.appName, `Leapp-ssm-data`).then(creds => {
         const credentials = JSON.parse(creds);
 
         // Check the result of the call
         this.subs.add(this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
           this.instances = result.instances;
-          this.duplicateInstances = this.instances;
           this.ssmloading = false;
-          this.appService.redrawList.emit(true);
-        }, () => {
+        }, err => {
           this.instances = [];
           this.ssmloading = false;
-          this.appService.redrawList.emit(true);
         }));
       });
 
@@ -247,27 +226,25 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
   /**
    * Set the region for the session
+   * @param event - the change select event
    */
-  changeRegion() {
+  changeDefaultRegion(event) {
     if (this.selectedDefaultRegion) {
+      const workspace = this.configurationService.getDefaultWorkspaceSync();
+      workspace.sessions.forEach(session => {
+        if (session.id === this.session.id) {
+          session.account.region = this.selectedDefaultRegion;
+          this.session.account.region = this.selectedDefaultRegion;
+          this.configurationService.updateWorkspaceSync(workspace);
 
-      if (this.session.active) {
-        this.sessionService.stopSession(this.session);
-      }
-
-      this.session.account.region = this.selectedDefaultRegion;
-      this.sessionService.invalidateSessionToken(this.session);
-      this.sessionService.updateSession(this.session);
-
-      if (this.session.active) {
-        this.startSession();
-      } else {
-        this.appService.redrawList.emit(true);
-      }
-
-
+          if (this.session.active) {
+            this.startSession(this.session);
+          }
+        }
+      });
       this.appService.toast('Default region has been changed!', ToastLevel.SUCCESS, 'Region changed!');
       this.modalRef.hide();
+
     }
   }
 
@@ -286,65 +263,5 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
 
     this.openSsm = false;
     this.ssmloading = false;
-  }
-
-  searchSSMInstance(event) {
-    if (event.target.value !== '') {
-      this.instances = this.duplicateInstances.filter(i =>
-                                 i.InstanceId.indexOf(event.target.value) > -1 ||
-                                 i.IPAddress.indexOf(event.target.value) > -1 ||
-                                 i.Name.indexOf(event.target.value) > -1);
-    } else {
-      this.instances = this.duplicateInstances;
-    }
-  }
-
-  getProfileIcon(active, id) {
-    const profile = this.workspace.profiles.filter(p => p.id === id)[0];
-    if (profile) {
-      const color = active ? ' orange' : '';
-      return profile.name === 'default' ? ('home' + color) : ('user' + color);
-    } else {
-      return 'home';
-    }
-  }
-
-  getProfileName(id) {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    const profile = workspace.profiles.filter(p => p.id === id)[0];
-    if (profile) {
-      return profile.name;
-    } else {
-      return 'default';
-    }
-  }
-
-  changeProfile() {
-    if (this.selectedProfile) {
-      if (this.session.active) {
-        this.sessionService.stopSession(this.session);
-      }
-
-      this.sessionService.addProfile(this.selectedProfile);
-      this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
-
-      if (this.session.active) {
-        this.startSession();
-      } else {
-        this.appService.redrawList.emit(true);
-      }
-
-      this.appService.toast('Profile has been changed!', ToastLevel.SUCCESS, 'Profile changed!');
-      this.modalRef.hide();
-    }
-  }
-
-  changeProfileModalOpen() {
-    this.selectedProfile = null;
-    this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
-  }
-
-  goBack() {
-    this.modalRef.hide();
   }
 }

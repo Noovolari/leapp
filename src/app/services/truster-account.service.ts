@@ -6,6 +6,7 @@ import {Session} from '../models/session';
 import {v4 as uuidv4} from 'uuid';
 import {AppService, ToastLevel} from '../services-system/app.service';
 import {AccountType} from '../models/AccountType';
+import {SessionService} from './session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,11 +28,9 @@ export class TrusterAccountService extends NativeService {
    * @param parentRole - the parent account's role
    * @param role - the AWS roles to assign to the account
    * @param idpArn - the idArn used for the federated account
-   * @param region - region to addd as default for this session
-   * @param profile - the named profile
    */
   addTrusterAccountToWorkSpace(accountNumber: string, accountName: string, parentAccountSessionId: string, parentRole: string,
-                               role: any, idpArn: string, region: string, profile: { id: string, name: string}) {
+                               role: any, idpArn: string, region: string) {
     const workspace = this.configurationService.getDefaultWorkspaceSync();
 
     if (role.name[0] === '/') {
@@ -56,16 +55,11 @@ export class TrusterAccountService extends NativeService {
 
       const session: Session = {
         id: uuidv4(),
-        profile: profile.id,
         active: false,
         loading: false,
         lastStopDate: new Date().toISOString(),
         account
       };
-
-      if (workspace.profiles.findIndex(i => i.id === profile.id) === -1) {
-        workspace.profiles.push(profile);
-      }
 
       // Once prepared the session object we verify if we can add it or not to the list and return a boolean about the operation
       workspace.sessions.push(session);

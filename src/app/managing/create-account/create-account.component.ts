@@ -50,9 +50,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
   locations = [];
   selectedLocation;
 
-  profiles: { value: string, label: string}[] = [];
-  selectedProfile: {value: string, label: string};
-
   eAccountType = AccountType;
 
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
@@ -73,7 +70,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     accessKey: new FormControl('', [Validators.required]),
     awsRegion: new FormControl(''),
     mfaDevice: new FormControl(''),
-    awsProfile: new FormControl('', [Validators.required]),
     azureLocation: new FormControl('', [Validators.required])
   });
 
@@ -118,23 +114,8 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
       // Add parameters to check what to do with form data
       if (this.workspace.idpUrl && this.workspace.idpUrl.length > 0) {
         this.workspace.idpUrl.forEach(idp => {
-          if (idp !== null) {
-            this.idps.push({value: idp.id, label: idp.url});
-          }
+          this.idps.push({value: idp.id, label: idp.url});
         });
-      }
-
-      // Add parameters to check what to do with form data
-      if (this.workspace.profiles && this.workspace.profiles.length > 0) {
-        this.workspace.profiles.forEach(idp => {
-          if (idp !== null) {
-            this.profiles.push({value: idp.id, label: idp.name});
-          }
-        });
-      } else {
-        this.workspace.profiles = [{ id: uuid.v4(), name: 'default' }];
-        this.profiles.push({value: this.workspace.profiles[0].id, label: this.workspace.profiles[0].name});
-        this.configurationService.updateWorkspaceSync(this.workspace);
       }
 
       this.hasOneGoodSession = (this.workspace.sessions && (this.workspace.sessions.length > 0));
@@ -154,7 +135,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
 
       this.selectedRegion = this.workspace.defaultRegion || environment.defaultRegion || this.regions[0].region;
       this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation || this.locations[0].location;
-      this.selectedProfile = this.workspace.profiles.filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
     }));
   }
 
@@ -175,10 +155,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
     return {value: uuid.v4(), label: tag};
   }
 
-  addNewProfile(tag: string) {
-    return {value: uuid.v4(), label: tag};
-  }
-
   /**
    * Set the account number when the event is called
    * @param event - the event to call
@@ -193,7 +169,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
   saveAccount() {
     this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
     const selectedUrl = this.selectedIdpUrl ? {id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label } : undefined;
-    const selectedProfile = this.selectedProfile ? {id: this.selectedProfile.value, name: this.selectedProfile.label } : undefined;
 
     if (this.firstTime) {
       this.providerManagerService.saveFirstAccount(
@@ -203,7 +178,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
         this.selectedRole,
         this.selectedRegion,
         selectedUrl,
-        selectedProfile,
         this.form
       );
     } else {
@@ -214,7 +188,6 @@ export class CreateAccountComponent extends AntiMemLeak implements OnInit {
         this.selectedRole,
         this.selectedRegion,
         selectedUrl,
-        selectedProfile,
         this.form
       );
     }

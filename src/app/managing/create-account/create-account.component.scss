@@ -125,8 +125,8 @@
 
   .providers {
     display: inline-block;
-    width: 100%;
-    padding: 7px 10px;
+    width: 175px;
+    padding: 10px;
     margin: 0;
     text-align: center;
     vertical-align: middle;
@@ -137,9 +137,12 @@
     color: $text-color;
 
     border-radius: 4px;
+    border: 2px solid $text-color!important;
+    background-color: $white-text-color;
 
     transition: all 0.3s ease;
-
+  }
+  .providers:hover {
     background: $focused-element;
     border: 2px solid $main-color-light;
   }
@@ -149,6 +152,8 @@
     height: 42px;
     background: $focused-element;
     border: 2px solid $main-color-light!important;
+
+    animation: expanding 0.3s normal forwards ease-in-out;
     animation-iteration-count: 1;
   }
   .providers.hide {
@@ -212,6 +217,11 @@
       animation: moving 0.3s normal forwards ease-in-out;
     }
   }
+}
+
+@keyframes expanding {
+  from { width: 174px; }
+  to { width: 100%; }
 }
 
 @keyframes moving {

@@ -32,7 +32,7 @@ app.disableHardwareAcceleration();
 var windowDefaultConfig = {
     dir: path.join(__dirname, "/../../../dist/leapp-client"),
     browserWindow: {
-        width: 514,
+        width: 430,
         height: 600,
         title: "",
         icon: path.join(__dirname, "assets/images/Leapp.png"),
@@ -124,7 +124,7 @@ var generateMainWindow = function () {
         });
     };
     app.on('activate', function () {
-        if (win === undefined) {
+        if (win === null || win === undefined) {
             createWindow();
         }
         else {
@@ -187,27 +187,6 @@ var generateMainWindow = function () {
         });
     }
 };
-// Used when people accidentally delete .aws directory when a workspace config is already defined
-// Note is a stupid error but people often do so. As there is already some security code with
-// this one we cover the full range of possibilities
-function fixDirectoriesAndFiles() {
-    try {
-        // .aws directory
-        fs.mkdirSync(os.homedir() + '/.aws');
-    }
-    catch (err) {
-        log.warn('directory aws already exist');
-    }
-    finally {
-        try {
-            // Write credential file
-            fs.writeFileSync(awsCredentialsPath, '');
-        }
-        catch (err) {
-            log.warn('credential file couldn\'t be written');
-        }
-    }
-}
 // Prepare and generate the main window if everything is setupped correctly
 var initWorkspace = function () {
     // Remove unused voices from contextual menu
@@ -242,7 +221,6 @@ var initWorkspace = function () {
     }
     else {
         // Generate the main window
-        fixDirectoriesAndFiles();
         generateMainWindow();
     }
 };

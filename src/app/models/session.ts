@@ -3,6 +3,7 @@ import * as uuid from 'uuid';
 import {Type} from 'class-transformer';
 import {AwsPlainAccount} from './aws-plain-account';
 import {AccountType} from './AccountType';
+import {environment} from '../../environments/environment';
 
 export class Session {
   sessionId: string;
@@ -29,5 +30,14 @@ export class Session {
     this.active = false;
     this.loading = false;
     this.account = account;
+  }
+
+  readonly expired = (): boolean => {
+    if (this.startDateTime) {
+      return false;
+    }
+    const currentTime = new Date().getTime();
+    const startTime = new Date(this.startDateTime).getTime();
+    return (currentTime - startTime) / 1000 > environment.sessionDuration;
   }
 }

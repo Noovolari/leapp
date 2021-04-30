@@ -93,7 +93,12 @@ export abstract class SessionService extends NativeService {
   }
 
   async stop(sessionId: string): Promise<void> {
-
+    try {
+      await this.deApplyCredentials(sessionId);
+      this.sessionDeactivated(sessionId);
+    } catch (error) {
+      this.sessionError(sessionId, error);
+    }
   }
 
   async rotate(sessionId: string): Promise<void> {
@@ -101,7 +106,7 @@ export abstract class SessionService extends NativeService {
       this.sessionLoading(sessionId);
       const credentialsInfo = await this.generateCredentials(sessionId);
       await this.applyCredentials(credentialsInfo);
-      this.sessionRotate(sessionId);
+      this.sessionRotated(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
     }
@@ -130,14 +135,74 @@ export abstract class SessionService extends NativeService {
 
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
-  abstract deApplyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
+  abstract deApplyCredentials(sessionId: string): Promise<void>;
 
-  private sessionLoading(sessionId: string) { }
+  private sessionLoading(sessionId: string) {
+    const session = this.sessions.find(s => s.sessionId === sessionId);
+    if (session) {
+      const index = this.sessions.indexOf(session);
+      this.sessions[index] = {
+        ...session,
+        loading: true
+      };
+      this.sessions = [...this.sessions];
+    }
+  }
 
-  private sessionActivate(sessionId: string) { }
+  private sessionActivate(sessionId: string) {
+    const session = this.sessions.find(s => s.sessionId === sessionId);
+    if (session) {
+      const index = this.sessions.indexOf(session);
+      this.sessions[index] = {
+        ...session,
+        loading: false,
+        active: true,
+        startDateTime: new Date().toISOString()
+      };
+      this.sessions = [...this.sessions];
+    }
+  }
 
-  private sessionRotate(sessionId: string) { }
+  private sessionRotated(sessionId: string) {
+    const session = this.sessions.find(s => s.sessionId === sessionId);
+    if (session) {
+      const index = this.sessions.indexOf(session);
+      this.sessions[index] = {
+        ...session,
+        startDateTime: new Date().toISOString()
+      };
+      this.sessions = [...this.sessions];
+    }
+  }
 
-  private sessionError(sessionId: string, error: Error) { }
+  private sessionError(sessionId: string, error: Error) {
+    const session = this.sessions.find(s => s.sessionId === sessionId);
+    if (session) {
+      const index = this.sessions.indexOf(session);
+      this.sessions[index] = {
+        ...session,
+        active: false,
+        loading: false,
+        lastStopDateTime: new Date().toISOString(),
+        startDateTime: undefined
+      };
+      this.sessions = [...this.sessions];
+    }
+  }
+
+  private sessionDeactivated(sessionId: string) {
+    const session = this.sessions.find(s => s.sessionId === sessionId);
+    if (session) {
+      const index = this.sessions.indexOf(session);
+      this.sessions[index] = {
+        ...session,
+        lastStopDateTime: new Date().toISOString(),
+        startDateTime: undefined,
+        active: false,
+        loading: false
+      };
+      this.sessions = [...this.sessions];
+    }
+  }
 
 }

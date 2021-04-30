@@ -9,7 +9,7 @@ import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsPlainService} from '../../strategies/aws-plain.service';
+import {AwsPlainService} from '../../services/session/aws-plain.service';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 

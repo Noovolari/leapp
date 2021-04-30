@@ -6,5 +6,5 @@ export const initialConfiguration = {
   defaultWorkspace: '',   // current workspace
   avatar: '',             // if needed in the future
   name: 'default',
-  workspaces: []          // collection of workspaces which define the strategies of login and their properties
+  workspaces: []          // collection of workspaces which define the session of login and their properties
 };

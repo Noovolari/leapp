@@ -8,6 +8,6 @@ exports.initialConfiguration = {
     defaultWorkspace: '',
     avatar: '',
     name: 'default',
-    workspaces: [] // collection of workspaces which define the strategies of login and their properties
+    workspaces: [] // collection of workspaces which define the session of login and their properties
 };
 //# sourceMappingURL=initial-configuration.js.map

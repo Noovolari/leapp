@@ -1,12 +1,12 @@
-import {AppService} from '../services-system/app.service';
-import {ConfigurationService} from '../services-system/configuration.service';
-import {ExecuteServiceService} from '../services-system/execute-service.service';
-import {FileService} from '../services-system/file.service';
-import {KeychainService} from '../services-system/keychain.service';
-import {WorkspaceService} from '../services/workspace.service';
-import {ProxyService} from '../services/proxy.service';
-import {AwsSsoService} from '../integrations/providers/aws-sso.service';
-import {SessionService} from '../services/session.service';
+import {AppService} from '../../services-system/app.service';
+import {ConfigurationService} from '../../services-system/configuration.service';
+import {ExecuteServiceService} from '../../services-system/execute-service.service';
+import {FileService} from '../../services-system/file.service';
+import {KeychainService} from '../../services-system/keychain.service';
+import {WorkspaceService} from '../workspace.service';
+import {ProxyService} from '../proxy.service';
+import {AwsSsoService} from '../../integrations/providers/aws-sso.service';
+import {SessionService} from '../session.service';
 
 
 // Import AWS node style

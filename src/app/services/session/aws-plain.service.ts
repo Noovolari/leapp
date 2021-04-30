@@ -1,8 +1,8 @@
 import {Injectable} from '@angular/core';
-import {CredentialsInfo} from '../models/credentials-info';
-import {SessionService} from '../services/session.service';
-import {WorkspaceService} from '../services/workspace.service';
-import {AwsPlainAccount} from '../models/aws-plain-account';
+import {CredentialsInfo} from '../../models/credentials-info';
+import {SessionService} from '../session.service';
+import {WorkspaceService} from '../workspace.service';
+import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 @Injectable({
   providedIn: 'root'

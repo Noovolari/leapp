@@ -8,13 +8,10 @@ import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/opera
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
-import * as uuid from 'uuid';
 import {v4 as uuidv4} from 'uuid';
 import {KeychainService} from '../../services-system/keychain.service';
 import {environment} from '../../../environments/environment';
-import {ConfigurationService} from '../../services-system/configuration.service';
 import {fromPromise} from 'rxjs/internal-compatibility';
-import {Workspace} from '../../models/workspace';
 import {SessionService} from '../../services/session.service';
 import {WorkspaceService} from '../../services/workspace.service';
 
@@ -404,10 +401,11 @@ export class AwsSsoService extends NativeService {
 
       // Update all
       workspace.sessions.push(...updatedSSOSessions);
-      this.workspaceService.updateSessions(workspace.sessions);
+      // TODO: add session updated
+      // this.workspaceService.updateSessions(workspace.sessions);
 
       // Verify that eventual trusters from SSO ae not pointing to deleted sessions
-      const trusterSessions = this.sessionService.listChilds();
+      const trusterSessions = this.sessionService.listChildren();
       trusterSessions.forEach(tSession => {
         // @ts-ignore
         const found = this.sessionService.get((tSession.account as AwsTrusterAccount).parentSessionId) !== undefined;
@@ -454,7 +452,7 @@ export class AwsSsoService extends NativeService {
       }),
       toArray(),
       switchMap(() => {
-        this.workspaceService.updateSessions(workspace.sessions.filter(sess => (sess.account.type !== AccountType.AWS_SSO)));
+        // TODO: remove aws sso sessions
         return of(true);
       }),
       catchError((err) => {
@@ -471,7 +469,8 @@ export class AwsSsoService extends NativeService {
           toArray(),
           switchMap(() => {
             if (oldSessions) {
-              this.workspaceService.updateSessions(oldSessions);
+              // TODO: add oldSession to sessions
+              // this.workspaceService.updateSessions(oldSessions);
             }
             return throwError(err);
           })

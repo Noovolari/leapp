@@ -6,11 +6,49 @@ import {WorkspaceService} from './workspace.service';
 import {CredentialsInfo} from '../models/credentials-info';
 import {AccountType} from '../models/AccountType';
 import {environment} from '../../environments/environment';
+import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class SessionService extends NativeService {
+
+  // - We set the initial state in BehaviorSubject's constructor
+  // - Nobody outside the Store should have access to the BehaviorSubject
+  //   because it has the write rights
+  // - Writing to state should be handled by specialized Store methods
+  // - Create one BehaviorSubject per store entity, for example if you have
+  //   create a new BehaviorSubject for it, as well as the observable$, and getters/setters
+
+  private readonly _sessions = new BehaviorSubject<Session[]>(this.workspaceService.getPersistedSessions());
+
+  // Expose the observable$ part of the _sessions subject (read only stream)
+  readonly sessions$ = this._sessions.asObservable();
+
+  // the getter will return the last value emitted in _sessions subject
+  get sessions(): Session[] {
+    return this._sessions.getValue();
+  }
+
+  // assigning a value to this.sessions will push it onto the observable
+  // and down to all of its subscribers (ex: this.sessions = [])
+  set sessions(sessions: Session[]) {
+    this.workspaceService.updatePersistedSessions(sessions);
+    this._sessions.next(sessions);
+  }
+
+  addSession(session: Session) {
+    // we assign a new copy of todos by adding a new session to it
+    this.sessions = [
+      ...this.sessions,
+      session
+    ];
+  }
+
+  removeSession(sessionId: string) {
+    this.sessions = this.sessions.filter(session => session.sessionId !== sessionId);
+  }
+
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(
     private workspaceService: WorkspaceService
@@ -19,24 +57,24 @@ export abstract class SessionService extends NativeService {
 
   create(account: Account, profileId: string): void {
     const session = new Session(account, profileId);
-    this.persistSessionInWorkspace(session);
+    this.addSession(session);
   }
 
   get(sessionId: string): Session {
-    const sessionFiltered = this.list().filter(session => session.sessionId === sessionId);
+    const sessionFiltered = this.sessions.filter(session => session.sessionId === sessionId);
     return sessionFiltered ? sessionFiltered[0] : null;
   }
 
   list(): Session[] {
-    return this.workspaceService.getSessions();
+    return this.sessions;
   }
 
-  listChilds(): Session[] {
-    return this.list().filter( (session) => session.account.type === AccountType.AWS_TRUSTER);
+  listChildren(): Session[] {
+    return this.sessions.filter( (session) => session.account.type === AccountType.AWS_TRUSTER);
   }
 
   listActive(): Session[] {
-    return this.list().filter( (session) => session.active);
+    return this.sessions.filter( (session) => session.active);
   }
 
   delete(sessionId: string): void {
@@ -102,9 +140,4 @@ export abstract class SessionService extends NativeService {
 
   private sessionError(sessionId: string, error: Error) { }
 
-  private persistSessionInWorkspace(session: Session) {
-    const sessions = this.workspaceService.getSessions();
-    sessions.push(session);
-    this.workspaceService.updateSessions(sessions);
-  }
 }

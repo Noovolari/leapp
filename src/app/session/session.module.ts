@@ -9,11 +9,15 @@ import { SessionCardComponent } from './session-card/session-card.component';
 import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import { FilteringPipe } from './session/filtering.pipe';
+import { OrderingPipe } from './session/ordering.pipe';
 
 @NgModule({
   declarations: [
     SessionComponent,
-    SessionCardComponent
+    SessionCardComponent,
+    FilteringPipe,
+    OrderingPipe
   ],
   imports: [
     CommonModule,

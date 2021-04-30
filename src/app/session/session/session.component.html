@@ -6,12 +6,12 @@
     <div class="provider-selector {{showOnly !== 'ALL' ? 'active' : ''}}">
       <div class="btn-left {{showOnly === 'AWS' ? 'active' : ''}}  ">
         <a (click)="setVisibility('AWS');">
-          <img src="assets/images/aws-logo.svg">
+          <img src="assets/images/aws-logo.svg" alt="">
         </a>
       </div>
       <div class="btn-right {{showOnly === 'AZR' ? 'active' : ''}} ">
         <a (click)="setVisibility('AZR');">
-          <img src="assets/images/azure-logo.svg">
+          <img src="assets/images/azure-logo.svg" alt="">
         </a>
       </div>
 
@@ -33,7 +33,7 @@
       <h3 class="mb-session">Active Accounts</h3>
     </li>
 
-    <ng-container *ngFor="let session of sessionService.sessions$ | async ">
+    <ng-container *ngFor="let session of sessionService.sessions$ | async | filtering:true">
       <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session"></app-session-card>
       </li>
@@ -43,7 +43,7 @@
       <h3 class="mb-session">All other Accounts</h3>
     </li>
 
-    <ng-container *ngFor="let session of notActiveSessions">
+    <ng-container *ngFor="let session of sessionService.sessions$ | async | filtering: false | ordering">
       <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session"></app-session-card>
       </li>

@@ -53,7 +53,7 @@ export class SessionComponent implements OnInit {
     private appService: AppService,
     private ssmService: SsmService,
     private fileService: FileService,
-    private sessionService: SessionService,
+    public sessionService: SessionService,
     private zone: NgZone,
   ) {}
 

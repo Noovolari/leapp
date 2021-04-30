@@ -38,7 +38,7 @@ export abstract class SessionService extends NativeService {
   }
 
   addSession(session: Session) {
-    // we assign a new copy of todos by adding a new session to it
+    // we assign a new copy of session by adding a new session to it
     this.sessions = [
       ...this.sessions,
       session

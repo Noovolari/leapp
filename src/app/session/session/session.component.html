@@ -33,7 +33,7 @@
       <h3 class="mb-session">Active Accounts</h3>
     </li>
 
-    <ng-container *ngFor="let session of activeSessions">
+    <ng-container *ngFor="let session of sessionService.sessions$ | async ">
       <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session"></app-session-card>
       </li>

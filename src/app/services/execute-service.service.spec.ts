@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { ExecuteServiceService } from './execute-service.service';
+import {ExecuteServiceService} from './execute-service.service';
 
 describe('ExecuteServiceService', () => {
   beforeEach(() => TestBed.configureTestingModule({}));

@@ -5,7 +5,6 @@ import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
 import {CredentialsInfo} from '../models/credentials-info';
 import {AccountType} from '../models/AccountType';
-import {environment} from '../../environments/environment';
 import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
@@ -112,22 +111,11 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  expired(sessionId: string): boolean {
-    const session = this.get(sessionId);
-
-    if (!session.startDateTime) {
-      return false;
-    }
-
-    const currentTime = new Date().getTime();
-    const startTime = new Date(session.startDateTime).getTime();
-    return (currentTime - startTime) / 1000 > environment.sessionDuration;
-  }
 
    checkExpiring(): void {
     const activeSessions = this.listActive();
     activeSessions.forEach(session => {
-      if (this.expired(session.sessionId)) {
+      if (session.expired()) {
         this.rotate(session.sessionId);
       }
     });
@@ -176,18 +164,8 @@ export abstract class SessionService extends NativeService {
   }
 
   private sessionError(sessionId: string, error: Error) {
-    const session = this.sessions.find(s => s.sessionId === sessionId);
-    if (session) {
-      const index = this.sessions.indexOf(session);
-      this.sessions[index] = {
-        ...session,
-        active: false,
-        loading: false,
-        lastStopDateTime: new Date().toISOString(),
-        startDateTime: undefined
-      };
-      this.sessions = [...this.sessions];
-    }
+    this.sessionDeactivated(sessionId);
+    // TODO: error handling for user
   }
 
   private sessionDeactivated(sessionId: string) {

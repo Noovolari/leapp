@@ -1,7 +1,7 @@
 import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
 import {Router} from '@angular/router';
 import {AwsAccount} from '../../models/aws-account';
 import {SsmService} from '../../services/ssm.service';
@@ -9,7 +9,7 @@ import {AzureAccount} from '../../models/azure-account';
 import {AccountType} from '../../models/AccountType';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
-import {KeychainService} from '../../services-system/keychain.service';
+import {KeychainService} from '../../services/keychain.service';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import * as uuid from 'uuid';
 import {AwsPlainAccount} from '../../models/aws-plain-account';

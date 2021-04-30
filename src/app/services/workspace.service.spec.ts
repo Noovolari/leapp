@@ -1,9 +1,9 @@
 import {WorkspaceService} from './workspace.service';
 import {TestBed} from '@angular/core/testing';
 import {Workspace} from '../models/workspace';
-import {AppService} from '../services-system/app.service';
+import {AppService} from './app.service';
 import {mustInjected} from '../../base-injectables';
-import {FileService} from '../services-system/file.service';
+import {FileService} from './file.service';
 import {Session} from '../models/session';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 

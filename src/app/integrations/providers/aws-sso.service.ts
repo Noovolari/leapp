@@ -1,15 +1,15 @@
 import {Injectable} from '@angular/core';
 import SSOOIDC, {CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest} from 'aws-sdk/clients/ssooidc';
 import SSO, {AccountInfo, GetRoleCredentialsRequest, GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountRolesResponse, ListAccountsRequest, ListAccountsResponse, LogoutRequest, RoleInfo} from 'aws-sdk/clients/sso';
-import {NativeService} from '../../services-system/native-service';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {NativeService} from '../../services/native-service';
+import {AppService, LoggerLevel} from '../../services/app.service';
 import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
 import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
 import {v4 as uuidv4} from 'uuid';
-import {KeychainService} from '../../services-system/keychain.service';
+import {KeychainService} from '../../services/keychain.service';
 import {environment} from '../../../environments/environment';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {SessionService} from '../../services/session.service';

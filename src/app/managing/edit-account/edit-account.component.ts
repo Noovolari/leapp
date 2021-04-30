@@ -1,9 +1,8 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService} from '../../services-system/app.service';
+import {AppService} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Workspace} from '../../models/workspace';
-import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
 import {Session} from '../../models/session';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
@@ -42,7 +41,6 @@ export class EditAccountComponent implements OnInit {
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private providerManagerService: ProviderManagerService,
   ) {}
 
   ngOnInit() {
@@ -74,11 +72,9 @@ export class EditAccountComponent implements OnInit {
    * Save the edited account in the workspace
    */
   saveAccount() {
-    this.providerManagerService.editAccount(this.selectedSession, this.selectedRegion, this.form);
   }
 
   formValid() {
-    return this.providerManagerService.formValid(this.form, this.accountType);
   }
 
   goBack() {

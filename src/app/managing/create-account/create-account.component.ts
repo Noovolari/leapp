@@ -1,11 +1,10 @@
 import {Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {ConfigurationService} from '../../services-system/configuration.service';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {ConfigurationService} from '../../services/configuration.service';
+import {AppService, LoggerLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SessionService} from '../../services/session.service';
 import {WorkspaceService} from '../../services/workspace.service';
-import {ProviderManagerService} from '../../services/provider-manager.service';
 import {AccountType} from '../../models/AccountType';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
@@ -84,7 +83,6 @@ export class CreateAccountComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
-    private providerManagerService: ProviderManagerService,
     private awsPlainService: AwsPlainService
   ) {}
 
@@ -136,12 +134,7 @@ export class CreateAccountComponent implements OnInit {
    */
   getFedRoles() {
     // Get the role data
-    const roleData = this.providerManagerService.getFederatedRole(this.selectedSession);
-    // Get the appropriate roles
-    this.federatedRoles = roleData.map(rd => rd.federatedRole);
-    // Set the federated role automatically
-    this.selectedAccountNumber = roleData.map(rd => rd.selectedAccountNumber)[0];
-    this.selectedRole = roleData.map(rd => rd.selectedrole)[0];
+    // TODO: get federated roles
   }
 
   addNewSSO(tag: string) {
@@ -173,17 +166,6 @@ export class CreateAccountComponent implements OnInit {
         break;
     }
 
-    this.providerManagerService.saveAccount(
-      this.accountId,
-      this.accountType,
-      this.selectedSession,
-      this.selectedRole,
-      this.selectedRegion,
-      selectedUrl,
-      selectedProfile,
-      this.form
-    );
-
   }
 
   setProvider(name) {
@@ -202,7 +184,7 @@ export class CreateAccountComponent implements OnInit {
   }
 
   formValid() {
-    return this.providerManagerService.formValid(this.form, this.accountType);
+    // TODO: validate form
   }
 
   goBack() {

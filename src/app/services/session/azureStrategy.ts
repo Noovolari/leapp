@@ -1,13 +1,13 @@
 import {AccountType} from '../../models/AccountType';
 import {Workspace} from '../../models/workspace';
 import {Session} from '../../models/session';
-import {ConfigurationService} from '../../services-system/configuration.service';
-import {ExecuteServiceService} from '../../services-system/execute-service.service';
+import {ConfigurationService} from '../configuration.service';
+import {ExecuteServiceService} from '../execute-service.service';
 import {AzureAccount} from '../../models/azure-account';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../app.service';
 import {Observable, Subscriber, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
-import {FileService} from '../../services-system/file.service';
+import {FileService} from '../file.service';
 
 export class AzureStrategy {
   private processSubscription: Subscription;

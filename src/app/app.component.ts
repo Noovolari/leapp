@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {environment} from '../environments/environment';
-import {FileService} from './services-system/file.service';
-import {AppService, LoggerLevel} from './services-system/app.service';
+import {FileService} from './services/file.service';
+import {AppService, LoggerLevel} from './services/app.service';
 import {Router} from '@angular/router';
 import {WorkspaceService} from './services/workspace.service';
 import {SessionService} from './services/session.service';

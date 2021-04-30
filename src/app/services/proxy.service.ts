@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {environment} from '../../environments/environment';
-import {AppService} from '../services-system/app.service';
+import {AppService} from './app.service';
 import {WorkspaceService} from './workspace.service';
 
 @Injectable({

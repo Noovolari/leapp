@@ -1,7 +1,6 @@
 import * as path from 'path';
 import {environment} from '../src/environments/environment';
 import * as CryptoJS from 'crypto-js';
-import {initialConfiguration} from '../src/app/core/initial-configuration';
 import {machineIdSync} from 'node-machine-id';
 import {Workspace} from '../src/app/models/workspace';
 import {AppUpdater} from '../src/app/core/app-updater';
@@ -63,9 +62,6 @@ const setupWorkspace = () => {
         if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
           fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
         }
-
-        // Write workspace file
-        fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initialConfiguration, null, 2), machineIdSync()).toString());
 
         // Write credential file
         fs.writeFileSync(awsCredentialsPath, '');

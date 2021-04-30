@@ -111,8 +111,7 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-
-   checkExpiring(): void {
+  checkExpiring(): void {
     const activeSessions = this.listActive();
     activeSessions.forEach(session => {
       if (session.expired()) {

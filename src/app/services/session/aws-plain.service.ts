@@ -21,7 +21,7 @@ export class AwsPlainService extends SessionService {
     return Promise.resolve(undefined);
   }
 
-  deApplyCredentials(credentialsInfo: CredentialsInfo): Promise<void> {
+  deApplyCredentials(sessionId: string): Promise<void> {
     return Promise.resolve(undefined);
   }
 

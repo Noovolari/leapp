@@ -1,8 +1,8 @@
 import {Component, OnInit, Renderer2} from '@angular/core';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services/app.service';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
-import {ExecuteServiceService} from '../../services-system/execute-service.service';
+import {ExecuteServiceService} from '../../services/execute-service.service';
 import {ProxyService} from '../../services/proxy.service';
 import {Subscription} from 'rxjs';
 import {WorkspaceService} from '../../services/workspace.service';

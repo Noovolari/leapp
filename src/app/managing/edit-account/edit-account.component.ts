@@ -1,6 +1,6 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService} from '../../services-system/app.service';
+import {AppService} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Workspace} from '../../models/workspace';
 import {AccountType} from '../../models/AccountType';

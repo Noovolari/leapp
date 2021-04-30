@@ -7,7 +7,6 @@
 import * as Keytar from 'keytar';
 
 
-
 export class NativeService {
   protected log: any;
   protected fs: any;

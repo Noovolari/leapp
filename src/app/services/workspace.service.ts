@@ -30,12 +30,12 @@ export class WorkspaceService {
     return deserialize(Workspace, workspaceJSON);
   }
 
-  getSessions(): Session[] {
+  getPersistedSessions(): Session[] {
     const workspace = this.get();
     return workspace.sessions;
   }
 
-  updateSessions(sessions: Session[]): void {
+  updatePersistedSessions(sessions: Session[]): void {
     const workspace = this.get();
     workspace.sessions = sessions;
     this.persist(workspace);

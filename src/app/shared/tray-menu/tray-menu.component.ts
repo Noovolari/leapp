@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
-import {ConfigurationService} from '../../services-system/configuration.service';
-import {FileService} from '../../services-system/file.service';
+import {ConfigurationService} from '../../services/configuration.service';
+import {FileService} from '../../services/file.service';
 import {SessionService} from '../../services/session.service';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {AppService, LoggerLevel} from '../../services/app.service';
 import {Session} from '../../models/session';
 import {AccountType} from '../../models/AccountType';
 import {AwsAccount} from '../../models/aws-account';

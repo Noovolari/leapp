@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
-import {FileService} from '../../services-system/file.service';
-import {ConfigurationService} from '../../services-system/configuration.service';
-import {AppService, LoggerLevel} from '../../services-system/app.service';
+import {FileService} from '../../services/file.service';
+import {ConfigurationService} from '../../services/configuration.service';
+import {AppService, LoggerLevel} from '../../services/app.service';
 
 @Component({
   selector: 'app-profile',

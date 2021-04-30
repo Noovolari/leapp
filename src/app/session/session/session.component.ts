@@ -1,12 +1,12 @@
 import {Component, ElementRef, NgZone, OnInit, ViewChild} from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
-import {ConfigurationService} from '../../services-system/configuration.service';
+import {ConfigurationService} from '../../services/configuration.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AppService} from '../../services-system/app.service';
+import {AppService} from '../../services/app.service';
 import {HttpClient} from '@angular/common/http';
 import {Session} from '../../models/session';
 import {SsmService} from '../../services/ssm.service';
-import {FileService} from '../../services-system/file.service';
+import {FileService} from '../../services/file.service';
 import {SessionService} from '../../services/session.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';

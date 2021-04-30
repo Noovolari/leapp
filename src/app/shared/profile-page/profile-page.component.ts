@@ -1,9 +1,9 @@
 import {Component, OnInit} from '@angular/core';
 import {Workspace} from '../../models/workspace';
-import {ConfigurationService} from '../../services-system/configuration.service';
+import {ConfigurationService} from '../../services/configuration.service';
 import {FormControl, FormGroup} from '@angular/forms';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
-import {FileService} from '../../services-system/file.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
+import {FileService} from '../../services/file.service';
 import {Router} from '@angular/router';
 import {constants} from '../../core/enums/constants';
 import {environment} from '../../../environments/environment';

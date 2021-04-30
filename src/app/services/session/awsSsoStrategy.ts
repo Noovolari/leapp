@@ -1,6 +1,6 @@
 import {AccountType} from '../../models/AccountType';
-import {AppService, LoggerLevel, ToastLevel} from '../../services-system/app.service';
-import {FileService} from '../../services-system/file.service';
+import {AppService, LoggerLevel, ToastLevel} from '../app.service';
+import {FileService} from '../file.service';
 import {Workspace} from '../../models/workspace';
 import {Session} from '../../models/session';
 import {AwsSsoService} from '../../integrations/providers/aws-sso.service';
@@ -8,9 +8,9 @@ import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {AwsCredential} from '../../models/credential';
-import {ConfigurationService} from '../../services-system/configuration.service';
+import {ConfigurationService} from '../configuration.service';
 import {environment} from '../../../environments/environment';
-import {KeychainService} from '../../services-system/keychain.service';
+import {KeychainService} from '../keychain.service';
 import {Observable, of} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';

@@ -3,13 +3,13 @@ import {IntegrationsService} from '../../integrations.service';
 import {AwsSsoService} from '../../providers/aws-sso.service';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService, LoggerLevel, ToastLevel} from '../../../services-system/app.service';
-import {ConfigurationService} from '../../../services-system/configuration.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
+import {ConfigurationService} from '../../../services/configuration.service';
 import {merge} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {environment} from '../../../../environments/environment';
 import {tap} from 'rxjs/operators';
-import {KeychainService} from '../../../services-system/keychain.service';
+import {KeychainService} from '../../../services/keychain.service';
 
 @Component({
   selector: 'app-aws-sso',

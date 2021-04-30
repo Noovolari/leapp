@@ -5,7 +5,7 @@ import {environment} from '../../environments/environment';
 import {AppService, LoggerLevel, ToastLevel} from './app.service';
 import {Configuration} from '../models/configuration';
 import {ExecuteServiceService} from './execute-service.service';
-import {WorkspaceService} from '../services/workspace.service';
+import {WorkspaceService} from './workspace.service';
 
 
 @Injectable({

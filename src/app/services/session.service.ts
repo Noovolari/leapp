@@ -81,6 +81,15 @@ export abstract class SessionService extends NativeService {
     return (currentTime - startTime) / 1000 > environment.sessionDuration;
   }
 
+   checkExpiring(): void {
+    const activeSessions = this.listActive();
+    activeSessions.forEach(session => {
+      if (this.expired(session.sessionId)) {
+        this.rotate(session.sessionId);
+      }
+    });
+  }
+
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;

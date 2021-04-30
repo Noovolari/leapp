@@ -8,7 +8,6 @@ import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/opera
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
 import {AccountType} from '../../models/AccountType';
-import {v4 as uuidv4} from 'uuid';
 import {KeychainService} from '../../services/keychain.service';
 import {environment} from '../../../environments/environment';
 import {fromPromise} from 'rxjs/internal-compatibility';
@@ -347,16 +346,7 @@ export class AwsSsoService extends NativeService {
 
         const profileId  = this.workspaceService.get().profiles.filter(p => p.name === 'default')[0].id;
 
-        const session: Session = {
-          account,
-          profileId,
-          active: false,
-          sessionId: uuidv4(),
-          startDateTime: undefined,
-          lastStopDateTime: new Date().toISOString(),
-          loading: false
-        };
-        return session;
+        return new Session(account, profileId);
       })
     );
   }

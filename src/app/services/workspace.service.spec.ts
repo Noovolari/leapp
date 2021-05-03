@@ -6,10 +6,12 @@ import {mustInjected} from '../../base-injectables';
 import {FileService} from './file.service';
 import {Session} from '../models/session';
 import {AwsPlainAccount} from '../models/aws-plain-account';
+import {serialize} from 'class-transformer';
 
 describe('WorkspaceService', () => {
   let workspaceService;
   let workspace;
+  let mockedSession;
   let spyAppService;
   let spyFileService;
 
@@ -33,13 +35,14 @@ describe('WorkspaceService', () => {
 
     workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;
     workspace = workspaceService.create();
+    mockedSession = new Session(new AwsPlainAccount('', '', '', '', ''), 'profile');
   });
 
   it('should be created', () => {
     expect(workspaceService).toBeTruthy();
   });
 
-  describe('Create()', () => {
+  describe('create()', () => {
     it('should persist code in the .Leapp-lock.json file the first time is called', () => {
       spyOn(workspaceService, 'persist').and.callThrough();
       // Mock first time access
@@ -50,25 +53,37 @@ describe('WorkspaceService', () => {
     });
 
     it('should not create a second instance of Workspace after first one', () => {
-      spyFileService.readFileSync.and.callFake((_: string) => JSON.stringify(new Workspace()) );
+      spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()));
       workspaceService.create();
       const workspace1 = workspaceService.get();
-      workspace1.sessions.push(new Session(new AwsPlainAccount('', '', '', '', ''), 'profile'));
-      spyFileService.readFileSync.and.callFake((_: string) => JSON.stringify(workspace1) );
-      workspaceService.updateSessions(workspace1.sessions);
+      workspace1.sessions.push(mockedSession);
+      spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace1) );
+      workspaceService.updatePersistedSessions(workspace1.sessions);
 
       workspaceService.create();
       const workspace2 = workspaceService.get();
-      expect(workspace1).toEqual(workspace2);
+      expect(serialize(workspace1)).toEqual(serialize(workspace2));
     });
   });
 
-  describe('Get()', () => {
+  describe('get()', () => {
     it('should return a workspace object', () => {
       workspace = workspaceService.get();
 
       expect(workspace).toBeDefined();
       expect(workspace).toBeInstanceOf(Workspace);
+    });
+  });
+
+  describe('getPersistedSessions()', () => {
+    it('should return a Session array: Session[]', () => {
+      workspace = workspaceService.get();
+      workspace.sessions.push(mockedSession);
+
+      spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace));
+
+      expect(workspaceService.getPersistedSessions()).toBeInstanceOf(Array);
+      expect(workspaceService.getPersistedSessions()[0]).toBeInstanceOf(Session);
     });
   });
 });

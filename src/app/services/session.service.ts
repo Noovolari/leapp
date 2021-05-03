@@ -54,10 +54,7 @@ export abstract class SessionService extends NativeService {
   ) { super(); }
 
 
-  create(account: Account, profileId: string): void {
-    const session = new Session(account, profileId);
-    this.addSession(session);
-  }
+  abstract create(account: Account, profileId: string): void;
 
   get(sessionId: string): Session {
     const sessionFiltered = this.sessions.filter(session => session.sessionId === sessionId);
@@ -111,6 +108,7 @@ export abstract class SessionService extends NativeService {
     }
   }
 
+  // TODO: change signature and name of function
   checkExpiring(): void {
     const activeSessions = this.listActive();
     activeSessions.forEach(session => {
@@ -124,6 +122,7 @@ export abstract class SessionService extends NativeService {
   abstract applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(sessionId: string): Promise<void>;
 
+  // TODO: move to model change method signature
   private sessionLoading(sessionId: string) {
     const session = this.sessions.find(s => s.sessionId === sessionId);
     if (session) {

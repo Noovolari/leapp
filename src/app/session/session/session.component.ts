@@ -58,41 +58,19 @@ export class SessionComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    // retrieve Active and not active sessions
-    this.refresh();
+
 
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions();
 
-    // Set loading to false when a credential is emitted: if result is false stop the current session!
-    this.appService.refreshReturnStatusEmit.subscribe((res) => {
-      if (res !== true) {
-        // problem: stop session now!
-        this.stopSession(res);
-      }
-    });
   }
 
-  /**
-   * getSession
-   */
-  refresh() {
-    this.zone.run(() => {
-      this.activeSessions = this.sessionService.list().filter( session => session.active === true);
-      // @ts-ignore
-      this.notActiveSessions = this.sessionService.alterOrderByTime(this.sessionService.list().filter( session => session.active === false));
-      if (this.filterField) {
-        this.filterInactiveSessions(this.filterField.nativeElement.value);
-      }
-    });
-  }
 
   /**
    * Stop the current session, setting it to false and updating the workspace
    */
   stopSession(session: Session) {
     this.sessionService.stop(session.sessionId);
-    this.refresh();
     return true;
   }
 
@@ -105,7 +83,6 @@ export class SessionComponent implements OnInit {
   }
 
   filterSessions(query) {
-    this.refresh();
     this.filterInactiveSessions(query);
   }
 

@@ -8,8 +8,7 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {AccountType} from '../../models/AccountType';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsPlainService} from '../../services/session/aws-plain.service';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {AwsPlainAccountRequest, AwsPlainService} from '../../services/session/aws-plain.service';
 
 
 @Component({
@@ -162,7 +161,13 @@ export class CreateAccountComponent implements OnInit {
     const selectedProfile = this.selectedProfile ? {id: this.selectedProfile.value, name: this.selectedProfile.label } : undefined;
     switch (this.accountType) {
       case (AccountType.AWS_PLAIN_USER):
-        this.awsPlainService.create(new AwsPlainAccount(this.form.value.name, this.selectedRegion, this.form.value.accessKey.trim(), this.form.value.secretKey.trim(), this.form.value.mfaDevice.trim()), this.selectedProfile.value);
+        const accountRequest: AwsPlainAccountRequest = {
+          accessKey: this.form.value.accessKey.trim(),
+          accountName: this.form.value.name,
+          region: this.selectedRegion,
+          secretKey: this.form.value.secretKey.trim(),
+          mfaDevice: this.form.value.mfaDevice.trim()};
+        this.awsPlainService.create(accountRequest, this.selectedProfile.value);
         break;
     }
 
@@ -185,6 +190,7 @@ export class CreateAccountComponent implements OnInit {
 
   formValid() {
     // TODO: validate form
+    return true;
   }
 
   goBack() {

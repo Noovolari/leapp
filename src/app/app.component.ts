@@ -48,8 +48,6 @@ export class AppComponent implements OnInit {
     // Prevent Dev Tool to show on production mode
     this.app.blockDevToolInProductionMode();
 
-    // Create or Get the workspace
-    this.workspaceService.create();
     const workspace = this.workspaceService.get();
 
     // Check the existence of a pre-Leapp credential file and make a backup
@@ -66,7 +64,7 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     if (workspace.sessions.length > 0) {
-      this.router.navigate(['/session-selected']);
+      this.router.navigate(['/sessions', 'session-selected']);
     } else {
       this.router.navigate(['/start']);
     }

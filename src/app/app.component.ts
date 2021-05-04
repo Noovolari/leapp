@@ -9,6 +9,7 @@ import {Workspace} from './models/workspace';
 import {setTheme} from 'ngx-bootstrap/utils';
 import {TimerService} from './services/timer.service';
 
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -60,7 +61,7 @@ export class AppComponent implements OnInit {
     }
 
     // Start Global Timer (1s)
-    this.timerService.start(this.sessionService.checkExpiring);
+    this.timerService.start(this.sessionService.checkExpiring.bind(this.sessionService));
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit

@@ -13,13 +13,6 @@ export class WorkspaceService {
 
   constructor(private appService: AppService, private fileService: FileService) {}
 
-  private persist(workspace: Workspace) {
-    this.fileService.writeFileSync(
-      this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
-      this.fileService.encryptText(serialize(workspace))
-    );
-  }
-
   create(): void {
     const workspace = new Workspace();
     this.persist(workspace);
@@ -35,15 +28,22 @@ export class WorkspaceService {
     return workspace.sessions;
   }
 
+  getProfileName(profileId): string {
+    const workspace = this.get();
+    const profileFiltered = workspace.profiles.filter(profile => profile.id === profileId);
+    return profileFiltered ? profileFiltered[0].name : null;
+  }
+
   updatePersistedSessions(sessions: Session[]): void {
     const workspace = this.get();
     workspace.sessions = sessions;
     this.persist(workspace);
   }
 
-  getProfileName(profileId): string {
-    const workspace = this.get();
-    const profileFiltered = workspace.profiles.filter(profile => profile.id === profileId);
-    return profileFiltered ? profileFiltered[0].name : null;
+  private persist(workspace: Workspace) {
+    this.fileService.writeFileSync(
+      this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
+      this.fileService.encryptText(serialize(workspace))
+    );
   }
 }

@@ -34,8 +34,9 @@ export class AwsPlainService extends SessionService {
 
   create(accountRequest: AwsPlainAccountRequest, profileId: string) {
     const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, accountRequest.mfaDevice), profileId);
-    this.saveAccountInfoInKeychain(session, accountRequest);
-    this.addSession(session);
+    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
+    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-secret-access-key`, accountRequest.secretKey);
+    this.workSpaceService.addSession(session);
   }
 
   async applyCredentials(credentialsInfo: CredentialsInfo): Promise<void> {
@@ -82,10 +83,6 @@ export class AwsPlainService extends SessionService {
     }
   }
 
-  private async saveAccountInfoInKeychain(session: Session, accountRequest: AwsPlainAccountRequest) {
-    await this.keychainService.saveSecret(environment.appName, `${session.sessionId}_access_key`, accountRequest.accessKey);
-    await this.keychainService.saveSecret(environment.appName, `${session.sessionId}_secret_key`, accountRequest.secretKey);
-  }
 
   private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
     return await this.keychainService.getSecret(environment.appName, `${sessionId}_access_key`);

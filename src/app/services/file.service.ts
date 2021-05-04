@@ -86,23 +86,6 @@ export class FileService extends NativeService {
         .map(dirent => dirent.name);
   }
 
-  /**
-   * Unzip a file
-   * @param source - the source file
-   * @param target - the target location
-   * @param callback - the callback once finished
-   */
-  unzipFile(source: string, target: string, callback: (err) => any) {
-    this.unzip(source, {dir: target}, callback);
-  }
-
-  /**
-   * Choose a folder with os dialog
-   * @returns - {string} - the path of the directory
-   */
-  chooseFolder(): string {
-    return this.dialog.showOpenDialog({properties: ['openDirectory']});
-  }
 
   /**
    * Choose a uses the os filedialog to lewt you choose a file

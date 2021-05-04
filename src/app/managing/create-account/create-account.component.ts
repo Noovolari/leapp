@@ -157,8 +157,6 @@ export class CreateAccountComponent implements OnInit {
    */
   saveAccount() {
     this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
-    const selectedUrl = this.selectedIdpUrl ? {id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label } : undefined;
-    const selectedProfile = this.selectedProfile ? {id: this.selectedProfile.value, name: this.selectedProfile.label } : undefined;
     switch (this.accountType) {
       case (AccountType.AWS_PLAIN_USER):
         const accountRequest: AwsPlainAccountRequest = {
@@ -170,7 +168,7 @@ export class CreateAccountComponent implements OnInit {
         this.awsPlainService.create(accountRequest, this.selectedProfile.value);
         break;
     }
-
+    this.router.navigate(['/sessions', 'session-selected']);
   }
 
   setProvider(name) {

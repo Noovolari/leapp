@@ -7,7 +7,7 @@ const environment = {
   sessionDuration: 1200,
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
-  lockFileDestination: '',
+  lockFileDestination: '.Leapp/Leapp-lock.json',
   python3Version: '3.4.0',
   production: false,
   credentialsDestination: '.aws/credentials',
@@ -19,5 +19,5 @@ const environment = {
   defaultAzureProfileName: 'default-azure'
 };
 
-environment.lockFileDestination = `.Leapp/Leapp-lock.json`;
+
 export { environment };

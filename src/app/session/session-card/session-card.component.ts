@@ -95,8 +95,6 @@ export class SessionCardComponent implements OnInit {
     // Start a new session with the selected one
     this.sessionService.start(this.session.sessionId);
 
-    // automatically check if there is an active session and get session list again
-    this.appService.redrawList.emit(true);
 
     this.appService.logger(
       `Starting Session`,
@@ -117,8 +115,7 @@ export class SessionCardComponent implements OnInit {
     // Eventually close the tray
     this.sessionService.stop(this.session.sessionId);
 
-    // automatically check if there is an active session or stop it
-    this.appService.redrawList.emit(true);
+
 
     this.appService.logger(
       `Stopped Session`,
@@ -138,7 +135,6 @@ export class SessionCardComponent implements OnInit {
       this.sessionService.delete(session.sessionId);
       this.sessionsChanged.emit('');
       this.appService.logger('Session Deleted', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
-      this.appService.redrawList.emit(true);
     });
   }
 
@@ -231,11 +227,9 @@ export class SessionCardComponent implements OnInit {
           this.instances = result.instances;
           this.duplicateInstances = this.instances;
           this.ssmloading = false;
-          this.appService.redrawList.emit(true);
         }, () => {
           this.instances = [];
           this.ssmloading = false;
-          this.appService.redrawList.emit(true);
         });
       });
 
@@ -259,7 +253,6 @@ export class SessionCardComponent implements OnInit {
       if (this.session.active) {
         this.startSession();
       } else {
-        this.appService.redrawList.emit(true);
       }
 
 
@@ -323,7 +316,6 @@ export class SessionCardComponent implements OnInit {
       if (this.session.active) {
         this.startSession();
       } else {
-        this.appService.redrawList.emit(true);
       }
 
       this.appService.toast('Profile has been changed!', ToastLevel.SUCCESS, 'Profile changed!');

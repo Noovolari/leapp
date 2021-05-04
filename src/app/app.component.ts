@@ -13,6 +13,8 @@ import {MenuService} from './services/menu.service';
 import {TimerService} from './services/timer-service';
 import {AccountType} from './models/AccountType';
 import * as uuid from 'uuid';
+import compareVersions from 'compare-versions';
+import {UpdaterService} from './services/updater.service';
 
 @Component({
   selector: 'app-root',
@@ -29,7 +31,8 @@ export class AppComponent implements OnInit {
     private app: AppService,
     private credentialsService: CredentialsService,
     private menuService: MenuService,
-    private timerService: TimerService
+    private timerService: TimerService,
+    private updaterService: UpdaterService
   ) {
   }
 
@@ -50,8 +53,6 @@ export class AppComponent implements OnInit {
 
     // If we have credentials copy them from workspace file to the .aws credential file
     const workspace = this.configurationService.getDefaultWorkspaceSync();
-
-    console.log(workspace);
 
     if (workspace) {
       // Set it as default
@@ -105,6 +106,8 @@ export class AppComponent implements OnInit {
       this.beforeCloseInstructions();
     });
 
+    this.manageAutoUpdate();
+
 
     this.timerService.defineTimer();
 
@@ -139,5 +142,33 @@ export class AppComponent implements OnInit {
         this.configurationService.updateWorkspaceSync(workspace);
       }
     }
+  }
+
+  private manageAutoUpdate(): void {
+    let savedVersion;
+
+    try {
+      savedVersion = this.updaterService.getSavedAppVersion();
+    } catch (error) {
+      savedVersion = this.updaterService.getCurrentAppVersion();
+    }
+
+    try {
+      if (compareVersions(savedVersion, this.updaterService.getCurrentAppVersion()) <= 0) {
+        // We always need to maintain this order: fresh <= saved <= online
+        this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion());
+      }
+    } catch (error) {
+      this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion());
+    }
+
+    const ipc = this.app.getIpcRenderer();
+    ipc.on('UPDATE_AVAILABLE', (_, info) => {
+      this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, info.releaseNotes);
+      if (this.updaterService.isUpdateNeeded()) {
+        this.app.redrawList.emit();
+        this.updaterService.updateDialog();
+      }
+    });
   }
 }

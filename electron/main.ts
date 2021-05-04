@@ -4,14 +4,13 @@ import * as CryptoJS from 'crypto-js';
 import {initialConfiguration} from '../src/app/core/initial-configuration';
 import {machineIdSync} from 'node-machine-id';
 import {Workspace} from '../src/app/models/workspace';
-import {AppUpdater} from '../src/app/core/app-updater';
 
 const {app, BrowserWindow, globalShortcut, Menu, ipcMain } = require('electron');
-
 const url = require('url');
 const fs = require('fs');
 const os = require('os');
 const log = require('electron-log');
+const { autoUpdater } = require('electron-updater');
 const ipc = ipcMain;
 
 // Fix for warning at startup
@@ -46,42 +45,25 @@ const windowDefaultConfig = {
 const workspacePath = os.homedir() + '/' + environment.lockFileDestination;
 const awsCredentialsPath = os.homedir() + '/' + environment.credentialsDestination;
 
-// Setup the first workspace in order to define the .Leapp directory and the .aws one
-const setupWorkspace = () => {
-    try {
+const buildAutoUpdater = (win: any): void => {
+  autoUpdater.allowDowngrade = false;
+  autoUpdater.allowPrerelease = false;
+  autoUpdater.autoDownload = false;
 
-      // Generate .Leapp and .aws directories for future works
-      fs.mkdirSync(os.homedir() + '/.Leapp');
-      fs.mkdirSync(os.homedir() + '/.aws');
-    } catch (err) {
+  const minutes = 10;
 
-      log.warn('directory leapp or aws already exist');
-    } finally {
-      try {
+  autoUpdater.checkForUpdates();
+  setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, 1000 * 60 * minutes);
 
-        // If it is the first time and there's a file, let's backup the file
-        if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
-          fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
-        }
-
-        // Write workspace file
-        fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initialConfiguration, null, 2), machineIdSync()).toString());
-
-        // Write credential file
-        fs.writeFileSync(awsCredentialsPath, '');
-      } catch (e) {
-        log.error(e);
-        app.exit(0);
-      }
-
-      // Launch initWorkspace again, now it will be loaded correctly because the file and directories are there
-      initWorkspace();
-    }
+  autoUpdater.on('update-available', (info) => {
+    win.webContents.send('UPDATE_AVAILABLE', info);
+  });
 };
 
 // Generate the main Electron window
 const generateMainWindow = () => {
-
   let win;
   let forceQuit = false;
 
@@ -143,11 +125,11 @@ const generateMainWindow = () => {
 
   app.on('ready', () => {
     createWindow();
-    AppUpdater.getInstance().initUpdater({});
-    AppUpdater.getInstance().checkForUpdates();
+    buildAutoUpdater(win);
   });
 
   let loginCount = 0;
+
   app.on('login', (event, webContents, request, authInfo, callback) => {
     try {
       const file = fs.readFileSync(workspacePath, {encoding: 'utf-8'});
@@ -188,7 +170,7 @@ const generateMainWindow = () => {
   if (!gotTheLock) {
     app.quit();
   } else {
-    app.on('second-instance', (event, commandLine, workingDirectory) => {
+    app.on('second-instance', () => {
       // Someone tried to run a second instance, we should focus our window.
       if (win) {
         if (win.isMinimized()) { win.restore(); }
@@ -200,7 +182,6 @@ const generateMainWindow = () => {
 
 // Prepare and generate the main window if everything is setupped correctly
 const initWorkspace = () => {
-
   // Remove unused voices from contextual menu
   const template = [
     {
@@ -235,6 +216,36 @@ const initWorkspace = () => {
   } else {
     // Generate the main window
     generateMainWindow();
+  }
+};
+
+// Setup the first workspace in order to define the .Leapp directory and the .aws one
+const setupWorkspace = () => {
+  try {
+    // Generate .Leapp and .aws directories for future works
+    fs.mkdirSync(os.homedir() + '/.Leapp');
+    fs.mkdirSync(os.homedir() + '/.aws');
+  } catch (err) {
+    log.warn('directory leapp or aws already exist');
+  } finally {
+    try {
+      // If it is the first time and there's a file, let's backup the file
+      if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
+        fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
+      }
+
+      // Write workspace file
+      fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initialConfiguration, null, 2), machineIdSync()).toString());
+
+      // Write credential file
+      fs.writeFileSync(awsCredentialsPath, '');
+    } catch (e) {
+      log.error(e);
+      app.exit(0);
+    }
+
+    // Launch initWorkspace again, now it will be loaded correctly because the file and directories are there
+    initWorkspace();
   }
 };
 

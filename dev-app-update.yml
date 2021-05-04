@@ -1,0 +1,5 @@
+owner: Noovolari
+repo: leapp
+provider: github
+releaseType: release
+updaterCacheDirName: leapp-updater

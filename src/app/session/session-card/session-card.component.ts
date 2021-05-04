@@ -183,6 +183,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   /**
    * SSM Modal open given the correct session
    * @param session - the session to check for possible ssm sessions
+   * @param event - event
    */
   ssmModalOpen(session, event) {
     // Reset things before opening the modal
@@ -194,6 +195,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
   /**
    * SSM Modal open given the correct session
    * @param session - the session to check for possible ssm sessions
+   * @param event - event
    */
   changeRegionModalOpen(session, event) {
     // open the modal
@@ -216,7 +218,7 @@ export class SessionCardComponent extends AntiMemLeak implements OnInit {
         this.subs.add(this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
           this.instances = result.instances;
           this.ssmloading = false;
-        }, err => {
+        }, _ => {
           this.instances = [];
           this.ssmloading = false;
         }));

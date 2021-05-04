@@ -13,7 +13,8 @@ const environment = {
   azureAccessTokens: '.azure/accessTokens.json',
   azureProfile: '.azure/azureProfile.json',
   defaultRegion: 'us-east-1',
-  defaultLocation: 'eastus'
+  defaultLocation: 'eastus',
+  latestUrl: 'https://github.com/Noovolari/leapp/releases/tag/'
 };
 
 environment.lockFileDestination = `.Leapp/Leapp-lock.json`;

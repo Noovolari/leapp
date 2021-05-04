@@ -7,6 +7,7 @@ import {AppService, LoggerLevel} from '../../services/app.service';
 import {Session} from '../../models/session';
 import {AccountType} from '../../models/AccountType';
 import {AwsAccount} from '../../models/aws-account';
+import {environment} from '../../../environments/environment';
 
 @Component({
   selector: 'app-tray-menu',
@@ -36,11 +37,8 @@ export class TrayMenuComponent implements OnInit {
 
     let voices = [];
     const maxSessionsToShow = 10;
-    const activeSessions = []; // this.sessionService.list().filter(s => s.active);
-    // @ts-ignore
-    const allSessions = activeSessions.concat(this.sessionService.alterOrderByTime(this.sessionService.list().filter(s => !s.active)).slice(0, maxSessionsToShow - activeSessions.length));
+    const allSessions = this.sessionService.list().filter((value, index) => index < 10);
     allSessions.forEach((session: Session) => {
-
       let icon = '';
       let label = '';
       const profile = this.workspaceService.get().profiles.filter(p => p.id === session.profileId)[0];
@@ -87,6 +85,28 @@ export class TrayMenuComponent implements OnInit {
       { type: 'separator' },
       { label: 'Quit', type: 'normal', click: () => { this.cleanBeforeExit(); } },
     ];
+
+    // Remove unused voices from contextual menu
+    const template = [
+      {
+        label: 'Leapp',
+        submenu: [
+          { label: 'About',  role: 'about' },
+          { label: 'Quit',  role: 'quit' }
+        ]
+      },
+      {
+        label: 'Edit',
+        submenu: [
+          { label: 'Copy', role: 'copy' },
+          { label: 'Paste', role: 'paste' }
+        ]
+      }
+    ];
+    if (!environment.production) {
+      template[0].submenu.push({ label: 'Open DevTool', role: 'toggledevtools' });
+    }
+    this.appService.getMenu().setApplicationMenu(this.appService.getMenu().buildFromTemplate(template));
 
     voices = voices.concat(extraInfo);
     const contextMenu = this.appService.getMenu().buildFromTemplate(voices);

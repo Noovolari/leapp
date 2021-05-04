@@ -1,76 +1,42 @@
 import {Injectable} from '@angular/core';
 import {NativeService} from './native-service';
-import {Account} from '../models/account';
 import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
 import {CredentialsInfo} from '../models/credentials-info';
 import {AccountType} from '../models/AccountType';
-import {BehaviorSubject} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class SessionService extends NativeService {
 
-  // - We set the initial state in BehaviorSubject's constructor
-  // - Nobody outside the Store should have access to the BehaviorSubject
-  //   because it has the write rights
-  // - Writing to state should be handled by specialized Store methods
-  // - Create one BehaviorSubject per store entity, for example if you have
-  //   create a new BehaviorSubject for it, as well as the observable$, and getters/setters
 
-  private readonly _sessions = new BehaviorSubject<Session[]>(this.workspaceService.getPersistedSessions());
-
-  // Expose the observable$ part of the _sessions subject (read only stream)
-  readonly sessions$ = this._sessions.asObservable();
-
-  // the getter will return the last value emitted in _sessions subject
-  get sessions(): Session[] {
-    return this._sessions.getValue();
-  }
-
-  // assigning a value to this.sessions will push it onto the observable
-  // and down to all of its subscribers (ex: this.sessions = [])
-  set sessions(sessions: Session[]) {
-    this.workspaceService.updatePersistedSessions(sessions);
-    this._sessions.next(sessions);
-  }
-
-  addSession(session: Session) {
-    // we assign a new copy of session by adding a new session to it
-    this.sessions = [
-      ...this.sessions,
-      session
-    ];
-  }
-
-  removeSession(sessionId: string) {
-    this.sessions = this.sessions.filter(session => session.sessionId !== sessionId);
-  }
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(
     private workspaceService: WorkspaceService
-  ) { super(); }
+  ) {
+    super();
+
+  }
 
 
-  abstract create(account: Account, profileId: string): void;
 
   get(sessionId: string): Session {
-    const sessionFiltered = this.sessions.filter(session => session.sessionId === sessionId);
+    const sessionFiltered = this.list().filter(session => session.sessionId === sessionId);
     return sessionFiltered ? sessionFiltered[0] : null;
   }
 
   list(): Session[] {
-    return this.sessions;
+    return this.workspaceService.sessions;
   }
 
   listChildren(): Session[] {
-    return this.sessions.filter( (session) => session.account.type === AccountType.AWS_TRUSTER);
+    return (this.list().length > 0) ? this.list().filter( (session) => session.account.type === AccountType.AWS_TRUSTER) : [];
   }
 
-  listActive(): Session[] {
-    return this.sessions.filter( (session) => session.active);
+  public listActive(): Session[] {
+    return (this.list().length > 0) ? this.list().filter( (session) => session.active) : [];
   }
 
   delete(sessionId: string): void {
@@ -124,40 +90,40 @@ export abstract class SessionService extends NativeService {
 
   // TODO: move to model change method signature
   private sessionLoading(sessionId: string) {
-    const session = this.sessions.find(s => s.sessionId === sessionId);
+    const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
-      const index = this.sessions.indexOf(session);
-      this.sessions[index] = {
+      const index = this.workspaceService.sessions.indexOf(session);
+      this.workspaceService.sessions[index] = {
         ...session,
         loading: true
       };
-      this.sessions = [...this.sessions];
+      this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
   }
 
   private sessionActivate(sessionId: string) {
-    const session = this.sessions.find(s => s.sessionId === sessionId);
+    const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
-      const index = this.sessions.indexOf(session);
-      this.sessions[index] = {
+      const index = this.workspaceService.sessions.indexOf(session);
+      this.workspaceService.sessions[index] = {
         ...session,
         loading: false,
         active: true,
         startDateTime: new Date().toISOString()
       };
-      this.sessions = [...this.sessions];
+      this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
   }
 
   private sessionRotated(sessionId: string) {
-    const session = this.sessions.find(s => s.sessionId === sessionId);
+    const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
-      const index = this.sessions.indexOf(session);
-      this.sessions[index] = {
+      const index = this.workspaceService.sessions.indexOf(session);
+      this.workspaceService.sessions[index] = {
         ...session,
         startDateTime: new Date().toISOString()
       };
-      this.sessions = [...this.sessions];
+      this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
   }
 
@@ -167,17 +133,17 @@ export abstract class SessionService extends NativeService {
   }
 
   private sessionDeactivated(sessionId: string) {
-    const session = this.sessions.find(s => s.sessionId === sessionId);
+    const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
-      const index = this.sessions.indexOf(session);
-      this.sessions[index] = {
+      const index = this.workspaceService.sessions.indexOf(session);
+      this.workspaceService.sessions[index] = {
         ...session,
         lastStopDateTime: new Date().toISOString(),
         startDateTime: undefined,
         active: false,
         loading: false
       };
-      this.sessions = [...this.sessions];
+      this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
   }
 

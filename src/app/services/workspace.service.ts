@@ -40,4 +40,10 @@ export class WorkspaceService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
+
+  getProfileName(profileId): string {
+    const workspace = this.get();
+    const profileFiltered = workspace.profiles.filter(profile => profile.id === profileId);
+    return profileFiltered ? profileFiltered[0].name : null;
+  }
 }

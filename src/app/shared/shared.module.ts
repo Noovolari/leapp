@@ -10,10 +10,11 @@ import {NgxJsonViewerModule} from 'ngx-json-viewer';
 import {InputDialogComponent} from './input-dialog/input-dialog.component';
 import {IntegrationsPageComponent} from './integrations-page/integrations-page.component';
 import {NgSelectModule} from '@ng-select/ng-select';
+import {UpdateDialogComponent} from './update-dialog/update-dialog.component';
 
 @NgModule({
-  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent, IntegrationsPageComponent],
+  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent, IntegrationsPageComponent, UpdateDialogComponent],
     imports: [CommonModule, TooltipModule.forRoot(), BsDropdownModule.forRoot(), ModalModule.forRoot(), ReactiveFormsModule, FormsModule, NgxJsonViewerModule, NgSelectModule],
-  exports: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, InputDialogComponent]
+  exports: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, InputDialogComponent, UpdateDialogComponent]
 })
 export class SharedModule { }

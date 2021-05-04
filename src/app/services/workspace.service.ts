@@ -130,7 +130,7 @@ export class WorkspaceService extends NativeService {
       this.idpResponseHookFirstTime(details, type, idpUrl, callback);
     });
 
-    this.followRedirects.https.get(options, (res) => {
+    this.followRedirects.https.get(options, (_) => {
       this.idpWindow.loadURL(idpUrl);
     }).on('error', (err) => {
       console.log('error: ', err);
@@ -373,6 +373,7 @@ export class WorkspaceService extends NativeService {
    * Save and update both Default Workspace and credential file
    * @param stsResponse - the STS reposnse
    * @param workspace - the workspace we want to use to inject the credentials and make it default
+   * @param session - the session
    * @param isDoubleJump - check if the double jump have to be used
    * @param account - the account of the requester
    * @param roleName - the role name of the requester

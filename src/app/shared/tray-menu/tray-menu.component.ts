@@ -10,6 +10,7 @@ import {AccountType} from '../../models/AccountType';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {AwsAccount} from '../../models/aws-account';
 import {AntiMemLeak} from '../../core/anti-mem-leak';
+import {UpdaterService} from '../../services/updater.service';
 
 @Component({
   selector: 'app-tray-menu',
@@ -21,17 +22,20 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
   // Used to define the only tray we want as active expecially in linux context
   currentTray;
 
-  constructor(private workspaceService: WorkspaceService,
-              private configurationService: ConfigurationService,
-              private credentialService: CredentialsService,
-              private fileService: FileService,
-              private sessionService: SessionService,
-              private appService: AppService) {
+  constructor(
+    private workspaceService: WorkspaceService,
+    private configurationService: ConfigurationService,
+    private credentialService: CredentialsService,
+    private fileService: FileService,
+    private sessionService: SessionService,
+    private appService: AppService,
+    private updaterService: UpdaterService
+  ) {
     super();
   }
 
   ngOnInit() {
-    this.subs.add(this.appService.redrawList.subscribe(res => {
+    this.subs.add(this.appService.redrawList.subscribe(_ => {
       this.generateMenu();
     }));
     this.generateMenu();
@@ -68,7 +72,7 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
         { label,
           type: 'normal',
           icon,
-          click: (menuItem, browserWindow, event) => {
+          click: () => {
             if (!session.active) {
               this.sessionService.startSession(session);
               this.credentialService.refreshCredentials(session.account.type);
@@ -85,18 +89,24 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
 
     const extraInfo = [
       { type: 'separator' },
-      { label: 'Show', type: 'normal', click: (menuItem, browserWindow, event) => { this.appService.getCurrentWindow().show(); } },
-      { label: 'About', type: 'normal', click: (menuItem, browserWindow, event) => { this.appService.getCurrentWindow().show(); this.appService.getDialog().showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok'] }); } },
+      { label: 'Show', type: 'normal', click: () => { this.appService.getCurrentWindow().show(); } },
+      { label: 'About', type: 'normal', click: () => { this.appService.getCurrentWindow().show(); this.appService.getDialog().showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok'] }); } },
       { type: 'separator' },
-      { label: 'Quit', type: 'normal', click: (menuItem, browserWindow, event) => { this.cleanBeforeExit(); } },
+      { label: 'Quit', type: 'normal', click: () => { this.cleanBeforeExit(); } },
     ];
-
-    voices = voices.concat(extraInfo);
-    const contextMenu = this.appService.getMenu().buildFromTemplate(voices);
 
     if (!this.currentTray) {
       this.currentTray = new (this.appService.getTray())(__dirname + `/assets/images/LeappMini.png`);
     }
+
+    if (this.updaterService.getSavedVersionComparison()) {
+      voices.push({ type: 'separator' });
+      voices.push({ label: 'Check for Updates...', type: 'normal', click: () => { this.updaterService.updateDialog(); } });
+      this.currentTray.setImage(__dirname + `/assets/images/LeappMini2.png`);
+    }
+
+    voices = voices.concat(extraInfo);
+    const contextMenu = this.appService.getMenu().buildFromTemplate(voices);
 
     this.currentTray.setToolTip('Leapp');
     this.currentTray.setContextMenu(contextMenu);
@@ -124,5 +134,4 @@ export class TrayMenuComponent extends AntiMemLeak implements OnInit {
     // Finally quit
     this.appService.quit();
   }
-
 }

@@ -16,6 +16,7 @@ import { AwsSsoComponent } from './integrations/components/aws-sso/aws-sso.compo
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgSelectModule} from '@ng-select/ng-select';
 import {TrayMenuComponent} from './shared/tray-menu/tray-menu.component';
+import {UpdateDialogComponent} from "./shared/update-dialog/update-dialog.component";
 
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
@@ -51,7 +52,7 @@ export function HttpLoaderFactory(http: HttpClient) {
       }
     }),
   ],
-  entryComponents: [ConfirmationDialogComponent, InputDialogComponent],
+  entryComponents: [ConfirmationDialogComponent, InputDialogComponent, UpdateDialogComponent],
   providers: [],
   bootstrap: [AppComponent]
 })

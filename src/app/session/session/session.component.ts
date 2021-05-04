@@ -14,7 +14,6 @@ import {SessionService} from '../../services/session.service';
 import {MenuService} from '../../services/menu.service';
 import {AwsAccount} from '../../models/aws-account';
 import {AzureAccount} from '../../models/azure-account';
-import {WebConsoleService} from '../../services/web-console.service';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 @Component({
@@ -35,7 +34,6 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
 
   // Ssm instances
   ssmloading = true;
-  selectedSsmRegion;
   ssmRegions = [];
   instances = [];
 
@@ -62,8 +60,7 @@ export class SessionComponent extends AntiMemLeak implements OnInit, OnDestroy {
     private credentialsService: CredentialsService,
     private sessionService: SessionService,
     private menuService: MenuService,
-    private zone: NgZone,
-    private webConsoleService: WebConsoleService,
+    private zone: NgZone
   ) { super(); }
 
   ngOnInit() {

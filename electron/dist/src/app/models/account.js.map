@@ -1,1 +1,1 @@
-{"version":3,"file":"account.js","sourceRoot":"","sources":["../../../../../src/app/models/account.ts"],"names":[],"mappings":""}
+{"version":3,"file":"account.js","sourceRoot":"","sources":["../../../../../src/app/models/account.ts"],"names":[],"mappings":";;;AAEA;IAKE,iBAAY,WAAmB,EAAE,MAAc;QAC7C,IAAI,CAAC,WAAW,GAAG,WAAW,CAAC;QAC/B,IAAI,CAAC,MAAM,GAAG,MAAM,CAAC;IACvB,CAAC;IACH,cAAC;AAAD,CAAC,AATD,IASC;AATY,0BAAO"}

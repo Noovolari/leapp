@@ -14,7 +14,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var path = require("path");
 var environment_1 = require("../src/environments/environment");
 var CryptoJS = require("crypto-js");
-var initial_configuration_1 = require("../src/app/core/initial-configuration");
 var node_machine_id_1 = require("node-machine-id");
 var app_updater_1 = require("../src/app/core/app-updater");
 var _a = require('electron'), app = _a.app, BrowserWindow = _a.BrowserWindow, globalShortcut = _a.globalShortcut, Menu = _a.Menu, ipcMain = _a.ipcMain;
@@ -51,35 +50,6 @@ var windowDefaultConfig = {
 // Define the aws credentials path from config file in *src/environments*
 var workspacePath = os.homedir() + '/' + environment_1.environment.lockFileDestination;
 var awsCredentialsPath = os.homedir() + '/' + environment_1.environment.credentialsDestination;
-// Setup the first workspace in order to define the .Leapp directory and the .aws one
-var setupWorkspace = function () {
-    try {
-        // Generate .Leapp and .aws directories for future works
-        fs.mkdirSync(os.homedir() + '/.Leapp');
-        fs.mkdirSync(os.homedir() + '/.aws');
-    }
-    catch (err) {
-        log.warn('directory leapp or aws already exist');
-    }
-    finally {
-        try {
-            // If it is the first time and there's a file, let's backup the file
-            if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
-                fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
-            }
-            // Write workspace file
-            fs.writeFileSync(workspacePath, CryptoJS.AES.encrypt(JSON.stringify(initial_configuration_1.initialConfiguration, null, 2), node_machine_id_1.machineIdSync()).toString());
-            // Write credential file
-            fs.writeFileSync(awsCredentialsPath, '');
-        }
-        catch (e) {
-            log.error(e);
-            app.exit(0);
-        }
-        // Launch initWorkspace again, now it will be loaded correctly because the file and directories are there
-        initWorkspace();
-    }
-};
 // Generate the main Electron window
 var generateMainWindow = function () {
     var win;
@@ -139,38 +109,41 @@ var generateMainWindow = function () {
         app_updater_1.AppUpdater.getInstance().initUpdater({});
         app_updater_1.AppUpdater.getInstance().checkForUpdates();
     });
-    var loginCount = 0;
-    app.on('login', function (event, webContents, request, authInfo, callback) {
-        try {
-            var file = fs.readFileSync(workspacePath, { encoding: 'utf-8' });
-            var decriptedFile = CryptoJS.AES.decrypt(file, node_machine_id_1.machineIdSync());
-            var fileExists = fs.existsSync(workspacePath);
-            var workspace = fileExists ? JSON.parse(decriptedFile).toString(CryptoJS.enc.Utf8) : undefined;
-            if (workspace !== undefined && workspace.workspaces[0] !== undefined) {
-                workspace = workspace.workspaces[0];
-                if (workspace.proxyConfiguration !== undefined &&
-                    workspace.proxyConfiguration !== null &&
-                    workspace.proxyConfiguration.username &&
-                    workspace.proxyConfiguration.password) {
-                    if (loginCount === 0) {
-                        loginCount++;
-                        var tempInfo = Object.assign({}, workspace.proxyConfiguration);
-                        tempInfo.password = '******';
-                        log.info("we are inside app login with auth: " + JSON.stringify(tempInfo, null, 3));
-                        var proxyUsername = workspace.proxyConfiguration.username;
-                        var proxyPassword = workspace.proxyConfiguration.password;
-                        // Supply credentials to server
-                        callback(proxyUsername, proxyPassword);
-                    }
-                    else {
-                        log.error('[electron main] Proxy Auth Credentials invalid');
-                        return;
-                    }
-                }
+    /* let loginCount = 0;
+     app.on('login', (event, webContents, request, authInfo, callback) => {
+      try {
+        const file = fs.readFileSync(workspacePath, {encoding: 'utf-8'});
+        const decriptedFile = CryptoJS.AES.decrypt(file, machineIdSync());
+        const fileExists = fs.existsSync(workspacePath);
+  
+        let workspace = fileExists ? JSON.parse(decriptedFile).toString(CryptoJS.enc.Utf8) : undefined;
+        if (workspace !== undefined && workspace.workspaces[0] !== undefined) {
+          workspace = (workspace.workspaces[0] as Workspace);
+  
+          if (workspace.proxyConfiguration !== undefined &&
+            workspace.proxyConfiguration !== null &&
+            workspace.proxyConfiguration.username &&
+            workspace.proxyConfiguration.password) {
+  
+            if (loginCount === 0) {
+              loginCount++;
+  
+              const tempInfo = Object.assign({}, workspace.proxyConfiguration);
+              tempInfo.password = '******';
+  
+              log.info(`we are inside app login with auth: ${JSON.stringify(tempInfo, null, 3)}`);
+              const proxyUsername = workspace.proxyConfiguration.username;
+              const proxyPassword = workspace.proxyConfiguration.password;
+              // Supply credentials to server
+              callback(proxyUsername, proxyPassword);
+            } else {
+              log.error('[electron main] Proxy Auth Credentials invalid');
+              return;
             }
+          }
         }
-        catch (err) { }
-    });
+      } catch (err) {}
+    });*/
     var gotTheLock = app.requestSingleInstanceLock();
     if (!gotTheLock) {
         app.quit();
@@ -210,44 +183,47 @@ function fixDirectoriesAndFiles() {
 }
 // Prepare and generate the main window if everything is setupped correctly
 var initWorkspace = function () {
-    // Remove unused voices from contextual menu
-    var template = [
-        {
-            label: 'Leapp',
-            submenu: [
-                { label: 'About', role: 'about' },
-                { label: 'Quit', role: 'quit' }
-            ]
-        },
-        {
-            label: 'Edit',
-            submenu: [
-                { label: 'Copy', role: 'copy' },
-                { label: 'Paste', role: 'paste' }
-            ]
-        }
-    ];
-    if (!environment_1.environment.production) {
-        template[0].submenu.push({ label: 'Open DevTool', role: 'toggledevtools' });
-    }
-    Menu.setApplicationMenu(Menu.buildFromTemplate(template));
-    if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
-        process.env.XDG_CURRENT_DESKTOP = 'Unity';
-    }
+    // TODO: move to workspace service
     var workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, { encoding: 'utf-8' }), node_machine_id_1.machineIdSync()).toString(CryptoJS.enc.Utf8)) : undefined;
     if (workspace === undefined) {
         // Setup your first workspace and then run createWindow
         log.info('Setupping workspace for the first time');
-        setupWorkspace();
+        try {
+            // Generate .Leapp and .aws directories for future works
+            fs.mkdirSync(os.homedir() + '/.Leapp');
+            fs.mkdirSync(os.homedir() + '/.aws');
+        }
+        catch (err) {
+            log.warn('directory leapp or aws already exist');
+        }
+        finally {
+            try {
+                // If it is the first time and there's a file, let's backup the file
+                if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
+                    fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
+                }
+                // Write credential file to clean it
+                fs.writeFileSync(awsCredentialsPath, '');
+            }
+            catch (e) {
+                log.error(e);
+                app.exit(0);
+            }
+            // Launch initWorkspace again, now it will be loaded correctly because the file and directories are there
+            initWorkspace();
+        }
     }
     else {
         // Generate the main window
         fixDirectoriesAndFiles();
-        generateMainWindow();
     }
 };
 // =============================== //
 // Start the real application HERE //
 // =============================== //
-initWorkspace();
+// TODO: maintain in main.ts
+if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
+    process.env.XDG_CURRENT_DESKTOP = 'Unity';
+}
+generateMainWindow();
 //# sourceMappingURL=main.js.map

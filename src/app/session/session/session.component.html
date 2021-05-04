@@ -33,7 +33,7 @@
       <h3 class="mb-session">Active Accounts</h3>
     </li>
 
-    <ng-container *ngFor="let session of sessionService.sessions$ | async | filtering:true">
+    <ng-container *ngFor="let session of workspaceService.sessions$ | async | filtering:true">
       <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session"></app-session-card>
       </li>
@@ -43,7 +43,7 @@
       <h3 class="mb-session">All other Accounts</h3>
     </li>
 
-    <ng-container *ngFor="let session of sessionService.sessions$ | async | filtering: false | ordering">
+    <ng-container *ngFor="let session of workspaceService.sessions$ | async | filtering: false | ordering">
       <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session"></app-session-card>
       </li>

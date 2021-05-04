@@ -46,14 +46,14 @@ export class SessionComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private workspaceService: WorkspaceService,
+    public workspaceService: WorkspaceService,
     private configurationService: ConfigurationService,
     private httpClient: HttpClient,
     private modalService: BsModalService,
     private appService: AppService,
     private ssmService: SsmService,
     private fileService: FileService,
-    public sessionService: SessionService,
+    private sessionService: SessionService,
     private zone: NgZone,
   ) {}
 
@@ -71,12 +71,6 @@ export class SessionComponent implements OnInit {
         this.stopSession(res);
       }
     });
-
-    if (!this.subscription) {
-      this.subscription = this.appService.redrawList.subscribe(() => {
-        this.refresh();
-      });
-    }
   }
 
   /**

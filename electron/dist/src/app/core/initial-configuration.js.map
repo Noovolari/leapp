@@ -1,1 +1,0 @@
-{"version":3,"file":"initial-configuration.js","sourceRoot":"","sources":["../../../../../src/app/core/initial-configuration.ts"],"names":[],"mappings":";;AAAA,gDAAgD;AACnC,QAAA,oBAAoB,GAAG;IAClC,OAAO,EAAE,EAAE;IACX,GAAG,EAAE,EAAE;IACP,QAAQ,EAAE,IAAI;IACd,gBAAgB,EAAE,EAAE;IACpB,MAAM,EAAE,EAAE;IACV,IAAI,EAAE,SAAS;IACf,UAAU,EAAE,EAAE,CAAU,qFAAqF;CAC9G,CAAC"}

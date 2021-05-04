@@ -6,19 +6,17 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {KeychainService} from '../keychain.service';
 import {environment} from '../../../environments/environment';
 import {Session} from '../../models/session';
-import {AccountType} from '../../models/AccountType';
 import {AppService} from '../app.service';
 import AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
 import {FileService} from '../file.service';
 
-interface AwsPlainAccountRequest {
+export interface AwsPlainAccountRequest {
   accountName: string;
   accessKey: string;
   secretKey: string;
   region: string;
   mfaDevice?: string;
-  type: AccountType;
 }
 
 @Injectable({
@@ -47,7 +45,7 @@ export class AwsPlainService extends SessionService {
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
     const profileName = this.workSpaceService.getProfileName(session.profileId);
-    const credentialsFile = this.fileService.iniParseSync(this.appService.awsCredentialPath());
+    const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }

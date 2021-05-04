@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.AppUpdater = void 0;
 var environment_1 = require("../../environments/environment");
 var assert = require('assert');
 var isURL = require('is-url');

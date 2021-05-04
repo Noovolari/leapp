@@ -3,7 +3,6 @@ import {Account} from './account';
 
 export class AwsPlainAccount extends Account {
   accountName: string;
-
   region: string;
   mfaDevice?: string;
   type: AccountType;

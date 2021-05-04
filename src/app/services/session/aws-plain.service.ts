@@ -7,6 +7,10 @@ import {KeychainService} from '../keychain.service';
 import {environment} from '../../../environments/environment';
 import {Session} from '../../models/session';
 import {AccountType} from '../../models/AccountType';
+import {AppService} from '../app.service';
+import AWS from 'aws-sdk';
+import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
+import {FileService} from '../file.service';
 
 interface AwsPlainAccountRequest {
   accountName: string;
@@ -22,7 +26,11 @@ interface AwsPlainAccountRequest {
 })
 export class AwsPlainService extends SessionService {
 
-  constructor(private workSpaceService: WorkspaceService, private keychainService: KeychainService) {
+  constructor(
+    private workSpaceService: WorkspaceService,
+    private keychainService: KeychainService,
+    private appService: AppService,
+    private fileService: FileService) {
     super(workSpaceService);
   }
 
@@ -32,16 +40,48 @@ export class AwsPlainService extends SessionService {
     this.addSession(session);
   }
 
-  applyCredentials(credentialsInfo: CredentialsInfo): Promise<void> {
-    return Promise.resolve(undefined);
+  async applyCredentials(credentialsInfo: CredentialsInfo): Promise<void> {
+    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialsInfo.sessionToken);
   }
 
-  deApplyCredentials(sessionId: string): Promise<void> {
-    return Promise.resolve(undefined);
+  async deApplyCredentials(sessionId: string): Promise<void> {
+    const session = this.get(sessionId);
+    const profileName = this.workSpaceService.getProfileName(session.profileId);
+    const credentialsFile = this.fileService.iniParseSync(this.appService.awsCredentialPath());
+    delete credentialsFile[profileName];
+    return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
 
-  generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    return Promise.resolve(undefined);
+  async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
+    const session = this.get(sessionId);
+    AWS.config.update({
+      accessKeyId: await this.getAccessKeyFromKeychain(sessionId),
+      secretAccessKey: await this.getSecretKeyFromKeychain(sessionId)
+    });
+    const sts = new AWS.STS(this.appService.stsOptions(session));
+    const params = {DurationSeconds: environment.sessionTokenDuration};
+
+    if ((session.account as AwsPlainAccount).mfaDevice) {
+      // TODO: define and open MFA modal
+      return Promise.resolve(undefined);
+    } else {
+      try {
+        const getSessionToken: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
+        const profileName = this.workSpaceService.getProfileName(session.profileId);
+        const obj = {};
+        const credentialObject = obj[profileName] = {
+          accessKey: getSessionToken.Credentials.AccessKeyId,
+          secretKey: getSessionToken.Credentials.SecretAccessKey,
+          sessionsToken: getSessionToken.Credentials.SessionToken,
+          region: session.account.region
+        };
+        return {
+          sessionToken: credentialObject
+        };
+      } catch (err) {
+
+      }
+    }
   }
 
   private async saveAccountInfoInKeychain(session: Session, accountRequest: AwsPlainAccountRequest) {
@@ -56,4 +96,5 @@ export class AwsPlainService extends SessionService {
   private async getSecretKeyFromKeychain(sessionId: string): Promise<string> {
     return await this.keychainService.getSecret(environment.appName, `${sessionId}_secret_key`);
   }
+
 }

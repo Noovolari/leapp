@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
@@ -35,7 +35,6 @@ export class SessionCardComponent implements OnInit {
   modalRef: BsModalRef;
 
   @Input() session: Session;
-  @Output() sessionsChanged = new EventEmitter();
 
   // Ssm instances
   ssmloading = true;
@@ -93,7 +92,13 @@ export class SessionCardComponent implements OnInit {
    */
   startSession() {
     // Start a new session with the selected one
-    this.sessionService.start(this.session.sessionId);
+    switch (this.session.account.type) {
+
+    }
+
+    this.sessionService.start(this.session.sessionId).then(() => {}, error => {
+      console.log(error);
+    });
 
 
     this.appService.logger(
@@ -133,7 +138,6 @@ export class SessionCardComponent implements OnInit {
     event.stopPropagation();
     this.appService.confirmDialog('do you really want to delete this account?', () => {
       this.sessionService.delete(session.sessionId);
-      this.sessionsChanged.emit('');
       this.appService.logger('Session Deleted', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
     });
   }

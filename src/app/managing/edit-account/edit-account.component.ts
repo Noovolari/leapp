@@ -75,6 +75,8 @@ export class EditAccountComponent implements OnInit {
   }
 
   formValid() {
+    // TODO: Implement form validation
+    return true;
   }
 
   goBack() {

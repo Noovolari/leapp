@@ -23,6 +23,4 @@ export class StartScreenComponent {
   openDocumentation() {
     this.app.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
-
-
 }

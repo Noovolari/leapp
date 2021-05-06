@@ -9,7 +9,6 @@ import {Workspace} from './models/workspace';
 import {setTheme} from 'ngx-bootstrap/utils';
 import {TimerService} from './services/timer.service';
 
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -41,8 +40,10 @@ export class AppComponent implements OnInit {
     if (environment.production) {
       // Clear both info and warn message in production
       // mode without removing them from code actually
-      console.warn = () => {};
-      console.log = () => {};
+      console.warn = () => {
+      };
+      console.log = () => {
+      };
     }
 
     // Prevent Dev Tool to show on production mode
@@ -93,7 +94,6 @@ export class AppComponent implements OnInit {
    * Show that we created a copy of original credential file if present in the system
    */
   private showCredentialBackupMessageIfNeeded(workspace: Workspace) {
-
     const oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
     const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
     const check = workspace.sessions.length === 0 && this.app.getFs().existsSync(oldAwsCredentialsPath);

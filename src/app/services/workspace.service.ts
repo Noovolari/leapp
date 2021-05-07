@@ -25,6 +25,12 @@ export class WorkspaceService extends NativeService {
   // Expose the observable$ part of the _sessions subject (read only stream)
   readonly sessions$ = this._sessions.asObservable();
 
+  constructor(private appService: AppService, private fileService: FileService) {
+    super();
+    this.create();
+    this.sessions = this.getPersistedSessions();
+  }
+
   // the getter will return the last value emitted in _sessions subject
   get sessions(): Session[] {
     return this._sessions.getValue();
@@ -49,17 +55,8 @@ export class WorkspaceService extends NativeService {
     this.sessions = this.sessions.filter(session => session.sessionId !== sessionId);
   }
 
-  constructor(private appService: AppService, private fileService: FileService) {
-    super();
-    this.create();
-    this.sessions = this.getPersistedSessions();
-  }
-
   create(): void {
     if (!this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
-      console.log('workspace not exist');
-      // Workspace not exist
-      // I need to create a new workspace
       this.fs.mkdirSync(this.appService.getOS().homedir() + '/.Leapp', { recursive: true});
       const workspace = new Workspace();
       this.persist(workspace);

@@ -28,12 +28,10 @@ export class AwsSsoStrategy {
     private keychainService: KeychainService) {}
 
   getActiveSessions(workspace: Workspace) {
-    return workspace.sessions.filter((sess) => {
-      return (sess.account.type === AccountType.AWS_TRUSTER ||
+    return workspace.sessions.filter((sess) => (sess.account.type === AccountType.AWS_TRUSTER ||
         sess.account.type === AccountType.AWS_SSO ||
         sess.account.type === AccountType.AWS_PLAIN_USER ||
-        sess.account.type === AccountType.AWS) && sess.active;
-    });
+        sess.account.type === AccountType.AWS) && sess.active);
   }
 
   cleanCredentials(workspace: Workspace): void {
@@ -58,9 +56,7 @@ export class AwsSsoStrategy {
   private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
     // Retrieve access token and region
     return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
-      switchMap((loginToAwsSSOResponse) => {
-        return this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name);
-      }),
+      switchMap((loginToAwsSSOResponse) => this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name)),
       map((getRoleCredentialsResponse: GetRoleCredentialsResponse) => {
         const credential: AwsCredential = {};
         credential.aws_access_key_id = getRoleCredentialsResponse.roleCredentials.accessKeyId;
@@ -77,9 +73,7 @@ export class AwsSsoStrategy {
         const account = `Leapp-ssm-data-${session.profileId}`;
 
         return fromPromise(this.keychainService.saveSecret(environment.appName, account, JSON.stringify(credential))).pipe(
-          map(() => {
-            return awsSsoCredentials;
-          })
+          map(() => awsSsoCredentials)
         );
       }),
       switchMap((awsSsoCredentials) => {

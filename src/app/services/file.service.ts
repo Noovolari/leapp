@@ -15,6 +15,7 @@ export class FileService extends NativeService {
 
   /**
    * Get the home directory
+   *
    * @returns - {string} - path of the home directory
    */
   homeDir(): string {
@@ -23,6 +24,7 @@ export class FileService extends NativeService {
 
   /**
    * Check if a file or directory exists by passing a path
+   *
    * @returns - {boolean} - exists or not
    * @param path - the path of the directory
    */
@@ -32,6 +34,7 @@ export class FileService extends NativeService {
 
   /**
    * Get directory name
+   *
    * @returns - {string} - the directory name
    * @param path - the directory path
    */
@@ -41,6 +44,7 @@ export class FileService extends NativeService {
 
   /**
    * Read the file
+   *
    * @returns - {Observable<string>} - the observable to check for
    * @param filePath - directory path
    */
@@ -59,6 +63,7 @@ export class FileService extends NativeService {
 
   /**
    * Copy the directory
+   *
    * @param source - source directory
    * @param target - target directory
    */
@@ -68,6 +73,7 @@ export class FileService extends NativeService {
 
   /**
    * Read file sync
+   *
    * @returns - {string} - return the file directly as string
    * @param filePath - Path to read the file
    */
@@ -77,6 +83,7 @@ export class FileService extends NativeService {
 
   /**
    * Read the directories in a recursive manner
+   *
    * @returns - {any} - data
    * @param source - source of the directory
    */
@@ -89,6 +96,7 @@ export class FileService extends NativeService {
 
   /**
    * Choose a uses the os filedialog to lewt you choose a file
+   *
    * @returns - {string} - the path of the file to open
    */
   chooseFile(): string {
@@ -97,6 +105,7 @@ export class FileService extends NativeService {
 
   /**
    * Write a generic file in an asynchronous way
+   *
    * @returns - {Observable<any>}
    * @param filePath - the filepath to write to
    * @param content - the content to write
@@ -116,6 +125,7 @@ export class FileService extends NativeService {
 
   /**
    * Write a generic file in a synchronous way
+   *
    * @returns - {any}
    * @param filePath - the filepath to write to
    * @param content - the content to write
@@ -126,6 +136,7 @@ export class FileService extends NativeService {
 
   /**
    * Write the ini file passing each key to the writer avoinding the empty key/value couple
+   *
    * @returns - {Observable<any>} - the result is an observable with the result of the write operation
    * @param filePath - the filepath to write to
    * @param content - the content to write
@@ -143,6 +154,7 @@ export class FileService extends NativeService {
 
   /**
    * Write the ini file passing each key to the writer avoinding the empty key/value couple
+   *
    * @returns - {any} - the result of the operation
    * @param filePath - the filepath to write to
    * @param content - the content to write
@@ -183,12 +195,15 @@ export class FileService extends NativeService {
 
   /**
    * Parse the file asynchronously
+   *
    * @returns - {Observable<any>} - return an observable which point to the data
    * @param filePath - the filepath to read from
    */
   iniParse(filePath: string): Observable<any> {
     return new Observable(subscriber => {
-      if (this.readSubscription) { this.readSubscription.unsubscribe(); }
+      if (this.readSubscription) {
+ this.readSubscription.unsubscribe(); 
+}
       this.readSubscription = this.readFile(filePath).subscribe(file => {
         try {
           subscriber.next(this.ini.parse(file));
@@ -206,6 +221,7 @@ export class FileService extends NativeService {
 
   /**
    * Parse the ini file in a synch way
+   *
    * @returns - {any} - returns the parsed string
    * @param filePath - the filepath to read from
    */

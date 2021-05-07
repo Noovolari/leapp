@@ -5,7 +5,7 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
 import {FileService} from '../../services/file.service';
 import {Router} from '@angular/router';
-import {constants} from '../../core/enums/constants';
+import {Constants} from '../../core/enums/constants';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsAccount} from '../../models/aws-account';
@@ -21,7 +21,7 @@ export class ProfilePageComponent implements OnInit {
 
   activeTab = 1;
 
-  awsProfileValue: { id: string, name: string };
+  awsProfileValue: { id: string; name: string };
   idpUrlValue;
   editingIdpUrl: boolean;
   editingAwsProfile: boolean;
@@ -114,7 +114,7 @@ export class ProfilePageComponent implements OnInit {
       if (this.checkIfNeedDialogBox()) {
 
         this.appService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
-          if (res !== constants.CONFIRM_CLOSED) {
+          if (res !== Constants.confirmClosed) {
             this.appService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.INFO, this);
             this.appService.restart();
           }
@@ -180,16 +180,14 @@ export class ProfilePageComponent implements OnInit {
     }); */
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => {
-      return `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsAccount).role.name}</small></div></li>`;
-    });
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsAccount).role.name}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
 
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
-      if (res !== constants.CONFIRM_CLOSED) {
+      if (res !== Constants.confirmClosed) {
         this.appService.logger(`Removing idp url with id: ${id}`, LoggerLevel.INFO, this);
         const idpUrl = this.workspace.idpUrl.findIndex(u => u.id === id);
         this.workspace.idpUrl.splice(idpUrl, 1);
@@ -228,16 +226,14 @@ export class ProfilePageComponent implements OnInit {
     const sessions = this.workspace.sessions.filter(s => s.profileId === id);
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => {
-      return `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsAccount).role ? (s.account as AwsAccount).role.name : ''}</small></div></li>`;
-    });
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsAccount).role ? (s.account as AwsAccount).role.name : ''}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
 
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
-      if (res !== constants.CONFIRM_CLOSED) {
+      if (res !== Constants.confirmClosed) {
         this.appService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.INFO, this);
         const profileToDelete = this.workspace.profiles.findIndex(p => p.id === id);
         this.workspace.profiles.splice(profileToDelete, 1);

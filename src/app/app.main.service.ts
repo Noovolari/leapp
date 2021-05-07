@@ -11,7 +11,9 @@ export class AppMainService {
   }
 
   subscribe(callback: any) {
-    if (this.errorSubscription) { this.errorSubscription.unsubscribe(); }
+    if (this.errorSubscription) {
+      this.errorSubscription.unsubscribe();
+    }
     this.errorSubscription = this.onerror.subscribe(callback);
   }
 }

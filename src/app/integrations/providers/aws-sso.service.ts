@@ -70,8 +70,7 @@ export class AwsSsoService extends NativeService {
               this.appService.logger('AWS SSO device authorization error.', LoggerLevel.ERROR, this, err.stack);
               return throwError('AWS SSO device authorization error.');
             }),
-            switchMap((startDeviceAuthorizationResponse: any) => {
-              return new Observable<AuthorizeIntegrationResponse>((observer) => {
+            switchMap((startDeviceAuthorizationResponse: any) => new Observable<AuthorizeIntegrationResponse>((observer) => {
                 if (!startDeviceAuthorizationResponse) {
                   observer.error('AWS SSO device authorization error.');
                 } else {
@@ -117,14 +116,11 @@ export class AwsSsoService extends NativeService {
                     }
                   });
                 }
-              });
-            })
+              }))
           );
         }
       }),
-      catchError((err) => {
-        return throwError(err.toString());
-      })
+      catchError((err) => throwError(err.toString()))
     );
   }
 
@@ -139,11 +135,8 @@ export class AwsSsoService extends NativeService {
     };
 
     return fromPromise(this.ssooidc.createToken(createTokenRequest).promise()).pipe(
-      catchError((err) => {
-        return throwError(`AWS SSO token creation error: ${err.toString()}`);
-      }),
-      switchMap((createTokenResponse: any) => {
-        return new Observable<GenerateSSOTokenResponse>((observer) => {
+      catchError((err) => throwError(`AWS SSO token creation error: ${err.toString()}`)),
+      switchMap((createTokenResponse: any) => new Observable<GenerateSSOTokenResponse>((observer) => {
           if (!createTokenResponse) {
             observer.error('AWS SSO token creation error...');
           } else {
@@ -152,8 +145,7 @@ export class AwsSsoService extends NativeService {
             observer.next({ accessToken: createTokenResponse.accessToken, expirationTime });
             observer.complete();
           }
-        });
-      })
+        }))
     );
   }
 
@@ -162,11 +154,9 @@ export class AwsSsoService extends NativeService {
       const request = this.appService.getFollowRedirects().https.request(portalUrl, response => {
         this.authorizeIntegration(region, response.responseUrl).pipe(
           switchMap((authorizeIntegrationResponse: AuthorizeIntegrationResponse) => this.generateSSOToken(authorizeIntegrationResponse)),
-          switchMap(generateSSOTokenResponse => {
-            return this.saveAwsSsoAccessInfo(portalUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
+          switchMap(generateSSOTokenResponse => this.saveAwsSsoAccessInfo(portalUrl, region, generateSSOTokenResponse.accessToken, generateSSOTokenResponse.expirationTime).pipe(
               map(() => ({ accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime }))
-            );
-          })
+            ))
         ).subscribe(res => {
           observer.next(res);
           observer.complete();
@@ -198,13 +188,9 @@ export class AwsSsoService extends NativeService {
       switchMap(authorizeIntegrationResponse => this.generateSSOToken(authorizeIntegrationResponse)),
       map(generateSSOTokenResponse => ({accessToken: generateSSOTokenResponse.accessToken, region, expirationTime: generateSSOTokenResponse.expirationTime})),
       // whenever try to login then dave info in keychain
-      switchMap((response) => {
-        return this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime).pipe(
-          map(() => {
-            return { accessToken: response.accessToken, region, expirationTime: response.expirationTime };
-          })
-        );
-      })
+      switchMap((response) => this.saveAwsSsoAccessInfo(portalUrl, region, response.accessToken, response.expirationTime).pipe(
+          map(() => ({ accessToken: response.accessToken, region, expirationTime: response.expirationTime }))
+        ))
     );
   }
 
@@ -243,9 +229,7 @@ export class AwsSsoService extends NativeService {
       fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_ACCESS_TOKEN', accessToken)),
       fromPromise(this.keychainService.saveSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME', expirationTime.toString()))
     ).pipe(
-      catchError((err) => {
-        return throwError(`AWS SSO save secrets error ${err.toString()}`);
-      }),
+      catchError((err) => throwError(`AWS SSO save secrets error ${err.toString()}`)),
       toArray()
     );
   }
@@ -255,9 +239,7 @@ export class AwsSsoService extends NativeService {
   generateSessionsFromToken(observable: Observable<LoginToAwsSSOResponse>): Observable<Session[]> {
     return observable.pipe(
       // API portal Calls
-      switchMap((loginToAwsSSOResponse: LoginToAwsSSOResponse) => {
-        return this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region);
-      }),
+      switchMap((loginToAwsSSOResponse: LoginToAwsSSOResponse) => this.listAccounts(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region)),
       // Create an array of observables and then call them in parallel,
       switchMap((response) => {
         const arrayResponse = [];
@@ -296,9 +278,7 @@ export class AwsSsoService extends NativeService {
         });
         return { accountList: accountListComplete , accessToken, region };
       }),
-      catchError((err) => {
-        return throwError(err.toString());
-      })
+      catchError((err) => throwError(err.toString()))
     );
   }
 
@@ -368,9 +348,7 @@ export class AwsSsoService extends NativeService {
 
       // Remove all AWS SSO old session or create a session array
       const oldSSOsessions = this.sessionService.list().filter(sess => ((sess.account.type === AccountType.AWS_SSO)));
-      const newSSOSessions = awsSsoSessions.sort((a, b) => {
-        return a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'});
-      });
+      const newSSOSessions = awsSsoSessions.sort((a, b) => a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'}));
 
       // Non SSO sessions
       workspace.sessions = this.sessionService.list().filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
@@ -378,11 +356,9 @@ export class AwsSsoService extends NativeService {
       // Add new AWS SSO sessions
       const updatedSSOSessions = [];
       newSSOSessions.forEach((newSession: Session) => {
-        const found = oldSSOsessions.filter(oldSession => {
-          return oldSession.account.accountName === newSession.account.accountName &&
+        const found = oldSSOsessions.filter(oldSession => oldSession.account.accountName === newSession.account.accountName &&
             (oldSession.account as AwsSsoAccount).accountNumber === (newSession.account as AwsSsoAccount).accountNumber &&
-            (oldSession.account as AwsSsoAccount).role.name === (newSession.account as AwsSsoAccount).role.name;
-        })[0];
+            (oldSession.account as AwsSsoAccount).role.name === (newSession.account as AwsSsoAccount).role.name)[0];
         if (found) {
           newSession = found;
         }
@@ -410,7 +386,8 @@ export class AwsSsoService extends NativeService {
       if (oldWorkspace) {
         // @ts-ignore
         // TODO: do we want a complete workspace update?
-        this.workspaceService.update(oldWorkspace); }
+        this.workspaceService.update(oldWorkspace); 
+}
       return throwError(err);
     }));
   }
@@ -434,17 +411,15 @@ export class AwsSsoService extends NativeService {
         this.ssoPortal = new SSO({region});
         return fromPromise(this.ssoPortal.logout(logoutRequest).promise());
       }),
-      switchMap(() => {
-        return merge(
+      switchMap(() => merge(
           fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN')),
           fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME'))
-        );
-      }),
+        )),
       toArray(),
-      switchMap(() => {
+      switchMap(() => 
         // TODO: remove aws sso sessions
-        return of(true);
-      }),
+         of(true)
+      ),
       catchError((err) => {
         const observables = [];
 
@@ -471,9 +446,7 @@ export class AwsSsoService extends NativeService {
 
   isAwsSsoActive(): Observable<boolean> {
     return fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME')).pipe(
-      switchMap((res) => {
-        return of(Date.parse(res) > Date.now());
-      })
+      switchMap((res) => of(Date.parse(res) > Date.now()))
     );
   }
 }

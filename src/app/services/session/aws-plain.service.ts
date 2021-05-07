@@ -58,7 +58,7 @@ export class AwsPlainService extends SessionService {
       secretAccessKey: await this.getSecretKeyFromKeychain(sessionId)
     });
     const sts = new AWS.STS(this.appService.stsOptions(session));
-    const params = {DurationSeconds: environment.sessionTokenDuration};
+    const params = { DurationSeconds: environment.sessionTokenDuration };
 
     if ((session.account as AwsPlainAccount).mfaDevice) {
       // TODO: define and open MFA modal

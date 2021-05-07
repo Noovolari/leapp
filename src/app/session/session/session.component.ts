@@ -19,6 +19,9 @@ import {BsModalService} from 'ngx-bootstrap/modal';
 })
 export class SessionComponent implements OnInit {
 
+  @ViewChild('filterField', { static: false })
+  filterField: ElementRef;
+
   // Session Data
   activeSessions: Session[] = [];
   notActiveSessions: Session[] = [];
@@ -39,9 +42,6 @@ export class SessionComponent implements OnInit {
 
   workspace;
   subscription;
-
-  @ViewChild('filterField', { static: false})
-  filterField: ElementRef;
 
   constructor(
     private router: Router,

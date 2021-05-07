@@ -32,10 +32,10 @@ export class CreateAccountComponent implements OnInit {
   @Input() selectedRole = '';
   @Input() fedUrl = '';
 
-  idps: { value: string, label: string}[] = [];
-  selectedIdpUrl: {value: string, label: string};
+  idps: { value: string; label: string}[] = [];
+  selectedIdpUrl: {value: string; label: string};
 
-  federatedRoles: { name: string, roleArn: string }[] = [];
+  federatedRoles: { name: string; roleArn: string }[] = [];
   federatedAccounts = [];
 
   accounts = [];
@@ -46,8 +46,8 @@ export class CreateAccountComponent implements OnInit {
   locations = [];
   selectedLocation;
 
-  profiles: { value: string, label: string}[] = [];
-  selectedProfile: {value: string, label: string};
+  profiles: { value: string; label: string}[] = [];
+  selectedProfile: {value: string; label: string};
 
   eAccountType = AccountType;
 
@@ -146,6 +146,7 @@ export class CreateAccountComponent implements OnInit {
 
   /**
    * Set the account number when the event is called
+   *
    * @param event - the event to call
    */
   setAccountNumber(event) {

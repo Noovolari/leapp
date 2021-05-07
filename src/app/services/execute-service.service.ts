@@ -8,6 +8,7 @@ export class ExecuteServiceService extends NativeService {
    * Execute a command: if the command contains sudo the system launch it with sudo prompt.
    * Note: with the current version of Electron the sandbox option for Chromium don't allow for sudo prompt on Ubuntu machines 16+
    * Remove the note whenever a fix is found.
+   *
    * @param command - the command to launch
    * @param force - force with sudo commands
    * @returns an {Observable<any>} to use for subscribing to success or error event on the command termination:
@@ -50,6 +51,7 @@ export class ExecuteServiceService extends NativeService {
 
   /**
    * Open a command terminal and launch a generic command
+   *
    * @param command - the command to launch in terminal
    * @returns an {Observable<any>} to subscribe to
    */

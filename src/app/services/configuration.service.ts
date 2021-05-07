@@ -35,6 +35,7 @@ export class ConfigurationService extends NativeService {
 
   /**
    * Update the configuration file synchronously
+   *
    * @param config - the configuration object
    */
   public updateConfigurationFileSync(config: Configuration) {
@@ -50,6 +51,7 @@ export class ConfigurationService extends NativeService {
 
   /**
    * Update the access token file synchronously
+   *
    * @param azureProfile - the configuration object
    */
   public updateAzureProfileFileSync(azureProfile) {
@@ -63,6 +65,7 @@ export class ConfigurationService extends NativeService {
 
   /**
    * Update the access token file synchronously
+   *
    * @param azureConfig - the configuration object
    */
   public updateAzureAccessTokenFileSync(azureConfig) {

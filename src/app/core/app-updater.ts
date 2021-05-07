@@ -109,7 +109,9 @@ export class AppUpdater {
     if (!isDev) {
       // check for updates right away and keep checking later
       autoUpdater.checkForUpdates();
-      setInterval(() => { autoUpdater.checkForUpdates(); }, ms(this.opts.updateInterval));
+      setInterval(() => {
+        autoUpdater.checkForUpdates();
+      }, ms(this.opts.updateInterval));
     }
   }
 

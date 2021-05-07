@@ -5,7 +5,7 @@ export class AwsAccount extends Account {
   accountId: string;
   accountName: string;
   accountNumber: string;
-  role: { name: string, roleArn: string, parent?: string, parentRole?: string };
+  role: { name: string; roleArn: string; parent?: string; parentRole?: string };
   idpArn?: string;
   idpUrl?: string;
   type: AccountType;

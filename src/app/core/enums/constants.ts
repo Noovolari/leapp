@@ -1,6 +1,6 @@
-export enum constants {
-  CONFIRM_CLOSED = '**MODAL_CLOSED**',
-  MAC = 'mac',
-  LINUX = 'linux',
-  WINDOWS = 'windows'
+export enum Constants {
+  confirmClosed = '**MODAL_CLOSED**',
+  mac = 'mac',
+  linux = 'linux',
+  windows = 'windows'
 }

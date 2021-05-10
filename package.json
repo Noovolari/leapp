@@ -34,6 +34,7 @@
   "homepage": "https://leapp.cloud",
   "main": "electron/dist/electron/main.js",
   "scripts": {
+    "prepare": "husky install",
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
     "start": "ng serve",
@@ -48,6 +49,7 @@
     "electron-win": "DEL /Q electron\\dist && ng build --base-href ./ && tsc --p electron && electron .",
     "e2e": "ng e2e",
     "pack": "electron-builder --dir",
+    "release": "standard-version",
     "dist-mac-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
     "dist-mac-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
     "dist-mac-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
@@ -156,6 +158,11 @@
       ]
     }
   },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
   "dependencies": {
     "@angular/animations": "~8.1.0",
     "@angular/common": "~8.1.0",
@@ -222,6 +229,8 @@
     "@angular/compiler-cli": "~8.1.0",
     "@angular/language-service": "~8.1.0",
     "@biesbjerg/ngx-translate-extract": "~2.3.4",
+    "@commitlint/cli": "12.0.1",
+    "@commitlint/config-conventional": "12.0.1",
     "@types/aws-sdk": "^2.7.0",
     "@types/jasmine": "~3.5.11",
     "@types/jasminewd2": "~2.0.3",
@@ -234,6 +243,7 @@
     "electron-installer-dmg": "~3.0.0",
     "electron-packager": "~15.1.0",
     "electron-rebuild": "~2.0.3",
+    "husky": "~6.0.0",
     "jasmine-core": "~3.4.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~4.4.1",
@@ -243,6 +253,7 @@
     "karma-jasmine-html-reporter": "~1.5.4",
     "node-abi": "^2.19.3",
     "protractor": "~5.4.4",
+    "standard-version": "~9.1.1",
     "ts-node": "~7.0.0",
     "tslint": "~5.15.0",
     "typescript": "~3.4.3"

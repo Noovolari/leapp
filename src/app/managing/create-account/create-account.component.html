@@ -216,7 +216,7 @@
       </ng-container>
 
 
-      <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="accountType">Save</button>
+      <button type="button" (click)="saveSession();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'pull-right disabled': 'pull-right'" *ngIf="accountType">Save</button>
     </ng-container>
     <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
   </form>

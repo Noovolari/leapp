@@ -12,9 +12,13 @@ describe('AwsSsoComponent', () => {
 
   const secretManager = [];
   const spyKeychainService = jasmine.createSpyObj('KeychainService', ['saveSecret', 'getSecret', 'deletePassword']);
-  spyKeychainService.saveSecret.and.returnValue((service: string, account: string, password: string) => { secretManager[`${service}-${account}`] = password; });
+  spyKeychainService.saveSecret.and.returnValue((service: string, account: string, password: string) => {
+    secretManager[`${service}-${account}`] = password;
+  });
   spyKeychainService.getSecret.and.returnValue((service: string, account: string) => secretManager[`${service}-${account}`]);
-  spyKeychainService.deletePassword.and.returnValue((service: string, account: string) => { delete secretManager[`${service}-${account}`]; });
+  spyKeychainService.deletePassword.and.returnValue((service: string, account: string) => {
+ delete secretManager[`${service}-${account}`]; 
+});
 
   beforeEach(() => {
     TestBed.configureTestingModule({

@@ -80,10 +80,16 @@ export class TrayMenuComponent implements OnInit {
 
     const extraInfo = [
       { type: 'separator' },
-      { label: 'Show', type: 'normal', click: () => { this.appService.getCurrentWindow().show(); } },
-      { label: 'About', type: 'normal', click: () => { this.appService.getCurrentWindow().show(); this.appService.getDialog().showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok'] }); } },
+      { label: 'Show', type: 'normal', click: () => {
+ this.appService.getCurrentWindow().show(); 
+} },
+      { label: 'About', type: 'normal', click: () => {
+ this.appService.getCurrentWindow().show(); this.appService.getDialog().showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok'] }); 
+} },
       { type: 'separator' },
-      { label: 'Quit', type: 'normal', click: () => { this.cleanBeforeExit(); } },
+      { label: 'Quit', type: 'normal', click: () => {
+ this.cleanBeforeExit(); 
+} },
     ];
 
     // Remove unused voices from contextual menu

@@ -23,18 +23,19 @@ import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 
 export class SessionCardComponent implements OnInit {
 
-  eAccountType = AccountType;
-
   @ViewChild('ssmModalTemplate', { static: false })
   ssmModalTemplate: TemplateRef<any>;
+
   @ViewChild('defaultRegionModalTemplate', { static: false })
   defaultRegionModalTemplate: TemplateRef<any>;
+
   @ViewChild('defaultProfileModalTemplate', { static: false })
   defaultProfileModalTemplate: TemplateRef<any>;
 
-  modalRef: BsModalRef;
-
   @Input() session: Session;
+
+  eAccountType = AccountType;
+  modalRef: BsModalRef;
 
   // Ssm instances
   ssmloading = true;
@@ -193,6 +194,7 @@ export class SessionCardComponent implements OnInit {
 
   /**
    * SSM Modal open given the correct session
+   *
    * @param session - the session to check for possible ssm sessions
    */
   ssmModalOpen(session) {
@@ -204,6 +206,7 @@ export class SessionCardComponent implements OnInit {
 
   /**
    * SSM Modal open given the correct session
+   *
    * @param session - the session to check for possible ssm sessions
    */
   changeRegionModalOpen(session) {
@@ -213,6 +216,7 @@ export class SessionCardComponent implements OnInit {
 
   /**
    * Set the region for ssm init and launch the mopethod form the server to find instances
+   *
    * @param event - the change select event
    * @param session - The session in which the AWS region need to change
    */
@@ -267,15 +271,24 @@ export class SessionCardComponent implements OnInit {
 
   /**
    * Start a new ssm session
+   *
    * @param instanceId - instance id to start ssm session
    */
   startSsmSession(instanceId) {
-    this.instances.forEach(instance => { if (instance.InstanceId === instanceId) { instance.loading = true; } });
+    this.instances.forEach(instance => {
+ if (instance.InstanceId === instanceId) {
+ instance.loading = true;
+}
+});
 
     this.ssmService.startSession(instanceId, this.selectedSsmRegion);
 
     setTimeout(() => {
-      this.instances.forEach(instance => { if (instance.InstanceId === instanceId) { instance.loading = false; } });
+      this.instances.forEach(instance => {
+ if (instance.InstanceId === instanceId) {
+ instance.loading = false;
+}
+});
     }, 4000);
 
     this.openSsm = false;

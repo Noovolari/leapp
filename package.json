@@ -5,7 +5,7 @@
     "name": "besharp",
     "email": "info@besharp.it"
   },
-  "description": "Straight programmatic access via Single Sign-on to all your AWS accounts and resources.",
+  "description": "Leapp is a Cross-Platform Cloud access App, built on top of Electron.",
   "contributors": [
     {
       "name": "Alessandro Gaggia",
@@ -74,18 +74,18 @@
     "productName": "Leapp",
     "icon": "src/assets/icons/icon.icns",
     "files": [
-      "dist/leapp-client/*",
-      "dist/leapp-client/**/*",
-      "node_modules/**/*",
-      "package.json",
-      "electron/dist/*",
-      "electron/dist/**/*",
+      "dist/assets/images/Leapp.icns",
+      "dist/assets/images/Leapp.ico",
+      "dist/assets/images/Leapp.png",
       "dist/icon.icns",
       "dist/icon.ico",
       "dist/icon.png",
-      "dist/assets/images/Leapp.icns",
-      "dist/assets/images/Leapp.ico",
-      "dist/assets/images/Leapp.png"
+      "dist/leapp-client/*",
+      "dist/leapp-client/**/*",
+      "electron/dist/*",
+      "electron/dist/**/*",
+      "node_modules/**/*",
+      "package.json"
     ],
     "directories": {
       "output": "release",
@@ -121,18 +121,6 @@
         "AppImage"
       ]
     },
-    "win": {
-      "target": [
-        "nsis",
-        "zip"
-      ],
-      "icon": "src/assets/images/Leapp.ico",
-      "legalTrademarks": "beSharp",
-      "publisherName": "beSharp",
-      "requestedExecutionLevel": "highestAvailable",
-      "verifyUpdateCodeSignature": false,
-      "certificateFile": "windows_sign_certificate.pfx"
-    },
     "mac": {
       "icon": "src/assets/images/Leapp.icns",
       "forceCodeSigning": true,
@@ -154,6 +142,18 @@
           ]
         }
       ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "src/assets/images/Leapp.ico",
+      "legalTrademarks": "beSharp",
+      "publisherName": "beSharp",
+      "requestedExecutionLevel": "highestAvailable",
+      "verifyUpdateCodeSignature": false,
+      "certificateFile": "windows_sign_certificate.pfx"
     }
   },
   "dependencies": {
@@ -221,6 +221,11 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.1102.10",
+    "@angular-eslint/builder": "4.2.0",
+    "@angular-eslint/eslint-plugin": "4.2.0",
+    "@angular-eslint/eslint-plugin-template": "4.2.0",
+    "@angular-eslint/schematics": "4.2.0",
+    "@angular-eslint/template-parser": "4.2.0",
     "@angular/cli": "^11.2.10",
     "@angular/compiler-cli": "^11.2.11",
     "@angular/language-service": "~11.2.11",
@@ -230,13 +235,18 @@
     "@types/jasminewd2": "~2.0.8",
     "@types/node": "^15.0.1",
     "@types/uuid": "^8.3.0",
-    "codelyzer": "~6.0.1",
+    "@typescript-eslint/eslint-plugin": "4.16.1",
+    "@typescript-eslint/parser": "4.16.1",
     "electron": "12.0.5",
     "electron-builder": "~22.10.5",
     "electron-builder-squirrel-windows": "~22.10.5",
     "electron-installer-dmg": "~3.0.0",
     "electron-packager": "~15.2.0",
     "electron-rebuild": "~2.3.5",
+    "eslint": "^7.6.0",
+    "eslint-plugin-import": "latest",
+    "eslint-plugin-jsdoc": "latest",
+    "eslint-plugin-prefer-arrow": "latest",
     "jasmine": "^3.7.0",
     "jasmine-core": "~3.7.1",
     "jasmine-spec-reporter": "~7.0.0",
@@ -251,7 +261,9 @@
     "nyc": "^15.1.0",
     "protractor": "^7.0.0",
     "ts-node": "^9.1.1",
-    "tslint": "~5.20.1",
     "typescript": "4.1.5"
+  },
+  "browser": {
+    "crypto": false
   }
 }

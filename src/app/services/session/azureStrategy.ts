@@ -21,9 +21,7 @@ export class AzureStrategy {
     private configurationService: ConfigurationService) {}
 
   getActiveSessions(workspace: Workspace) {
-    const activeSessions = workspace.sessions.filter((sess) => {
-      return sess.account.type === AccountType.AZURE && sess.active;
-    });
+    const activeSessions = workspace.sessions.filter((sess) => sess.account.type === AccountType.AZURE && sess.active);
 
     this.appService.logger('active azure sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
@@ -60,7 +58,9 @@ export class AzureStrategy {
           this.azureSetSubscription(observer, session);
         } else {
           // 2b) First time playing with Azure credentials
-          if (this.processSubscription) { this.processSubscription.unsubscribe(); }
+          if (this.processSubscription) {
+ this.processSubscription.unsubscribe(); 
+}
           this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
             this.azureSetSubscription(observer, session);
           }, err => {
@@ -72,7 +72,9 @@ export class AzureStrategy {
         }
       } else {
         // First time playing with Azure credentials
-        if (this.processSubscription2) { this.processSubscription2.unsubscribe(); }
+        if (this.processSubscription2) {
+ this.processSubscription2.unsubscribe(); 
+}
         this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
           this.azureSetSubscription(observer, session);
         }, err => {
@@ -92,7 +94,9 @@ export class AzureStrategy {
   private azureSetSubscription(observer: Subscriber<boolean>, session: Session) {
     // const workspace = this.workspaceService.get();
     // We can use Json in res to save account information
-    if (this.processSubscription4) { this.processSubscription4.unsubscribe(); }
+    if (this.processSubscription4) {
+ this.processSubscription4.unsubscribe(); 
+}
     this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).pipe(
       switchMap(() => this.executeService.execute(`az configure --default location=${session.account.region} 2>&1`))
     ).subscribe(() => {

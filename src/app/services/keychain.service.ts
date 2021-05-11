@@ -10,6 +10,7 @@ export class KeychainService extends NativeService {
 
   /**
    * Save your secret in the keychain
+   *
    * @param service - environment.appName
    * @param account - unique identifier
    * @param password - secret
@@ -20,6 +21,7 @@ export class KeychainService extends NativeService {
 
   /**
    * Retrieve a Secret from the keychain
+   *
    * @param service - environment.appName
    * @param account - unique identifier
    * @returns the secret
@@ -30,6 +32,7 @@ export class KeychainService extends NativeService {
 
   /**
    * Delete a secret from the keychain
+   *
    * @param service - environment.appName
    * @param account - unique identifier
    */

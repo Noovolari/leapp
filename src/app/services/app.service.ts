@@ -6,7 +6,7 @@ import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirm
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
-import {constants} from '../core/enums/constants';
+import {Constants} from '../core/enums/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 
 
@@ -129,6 +129,7 @@ export class AppService extends NativeService {
 
   /**
    * Log the message to a file and also to console for development mode
+   *
    * @param message - the message to log
    * @param type - the LoggerLevel type
    * @param instance - The structured data of the message
@@ -149,16 +150,22 @@ export class AppService extends NativeService {
 
     switch (type) {
       case LoggerLevel.INFO:
-        if (!environment.production) { this.log.info(message); }
+        if (!environment.production) {
+ this.log.info(message); 
+}
         break;
       case LoggerLevel.WARN:
-        if (!environment.production) { this.log.warn(message); }
+        if (!environment.production) {
+ this.log.warn(message); 
+}
         break;
       case LoggerLevel.ERROR:
         this.log.error(message);
         break;
       default:
-        if (!environment.production) { this.log.info(message); }
+        if (!environment.production) {
+ this.log.info(message); 
+}
         break;
     }
   }
@@ -169,6 +176,7 @@ export class AppService extends NativeService {
 
   /**
    * Get the current browser window
+   *
    * @returns - {any} -
    */
   currentBrowserWindow() {
@@ -192,6 +200,7 @@ export class AppService extends NativeService {
 
   /**
    * Create a new browser window
+   *
    * @param url - the url to point to launch the window with the protocol, it can also be a file://
    * @param show - boolean to make the window visible or not
    * @param title - the window title
@@ -235,6 +244,7 @@ export class AppService extends NativeService {
 
   /**
    * Create a new invisible browser window
+   *
    * @param url - the url to point to launch the window with the protocol, it can also be a file://
    * @returns return a new browser window
    */
@@ -249,9 +259,9 @@ export class AppService extends NativeService {
    */
   detectOs() {
     const hrNames = {
-      linux: constants.LINUX,
-      darwin: constants.MAC,
-      win32: constants.WINDOWS
+      linux: Constants.linux,
+      darwin: Constants.mac,
+      win32: Constants.windows
     };
     const os = this.os.platform();
     return hrNames[os];
@@ -259,6 +269,7 @@ export class AppService extends NativeService {
 
   /**
    * Show a toast message with different styles for different type of toast
+   *
    * @param message - the message to show
    * @param type - the type of message from Toast Level
    * @param title - [optional]
@@ -274,6 +285,7 @@ export class AppService extends NativeService {
 
   /**
    * Return the aws credential path so we have only one point in the application where we need to adjust it!
+   *
    * @returns the credential path string
    */
   awsCredentialPath() {
@@ -282,6 +294,7 @@ export class AppService extends NativeService {
 
   /**
    * Return the semantic version object for version checks and operation
+   *
    * @returns the semver object
    */
   semVer() {
@@ -290,6 +303,7 @@ export class AppService extends NativeService {
 
   /**
    * Copy the selected text to clipboard
+   *
    * @param text - the element to copy to clipboard
    */
   copyToClipboard(text: string) {
@@ -308,6 +322,7 @@ export class AppService extends NativeService {
 
   /**
    * Standard parsing of a json JWT token without library
+   *
    * @param token - a string token
    * @returns the json object decoded
    */
@@ -320,6 +335,7 @@ export class AppService extends NativeService {
 
   /**
    * Confirmation dialog popup!
+   *
    * @param message - the message to show
    * @param callback - the callback for the ok button to launch
    */
@@ -332,6 +348,7 @@ export class AppService extends NativeService {
 
   /**
    * Input dialog popup!
+   *
    * @param title - the title of the popup
    * @param placeholder - placeholder for the input
    * @param message - the message to show
@@ -346,6 +363,7 @@ export class AppService extends NativeService {
 
   /**
    * With this one you can open an url in an external browser
+   *
    * @param url - url to open
    */
   openExternalUrl(url) {
@@ -354,6 +372,7 @@ export class AppService extends NativeService {
 
   /**
    * Useful to validate all form field at once if needed
+   *
    * @param formGroup - the form formGroup
    */
   validateAllFormFields(formGroup: FormGroup) {
@@ -369,6 +388,7 @@ export class AppService extends NativeService {
 
   /**
    * Extract an account number from a AWS arn
+   *
    * @param value - arn value
    * @returns - {any} - the
    */
@@ -384,12 +404,17 @@ export class AppService extends NativeService {
 
       if (values[4].length === 12 && Number(values[4])) {
         return values[4];
-      } else  { return ''; }
-    } else  { return ''; }
+      } else  {
+ return ''; 
+}
+    } else  {
+ return ''; 
+}
   }
 
   /**
    * Get all AWS regions
+   *
    * @returns - [{region: string}] - all the regions in array format
    */
   getRegions() {
@@ -424,6 +449,7 @@ export class AppService extends NativeService {
 
   /**
    * Get all Azure locations
+   *
    * @returns - {region: string}[] - all the regions in array format
    */
   getLocations() {
@@ -522,14 +548,18 @@ export class AppService extends NativeService {
 
   /**
    * Check if the account is of type AZURE or not
+   *
    * @param s - the session containing the account
    */
-  isAzure(s) { return s.account.subscriptionId !== null && s.account.subscriptionId !== undefined; }
+  isAzure(s) {
+ return s.account.subscriptionId !== null && s.account.subscriptionId !== undefined; 
+}
 
 
   // TODO MOVE TO KEYCHAIN SERVICE
   /**
    * Generate Secret String for keychain
+   *
    * @param accountName - account ame we want to use
    * @param user - the user we want to use
    */
@@ -539,6 +569,7 @@ export class AppService extends NativeService {
 
   /**
    * Generate Access String for keychain
+   *
    * @param accountName - account ame we want to use
    * @param user - the user we want to use
    */

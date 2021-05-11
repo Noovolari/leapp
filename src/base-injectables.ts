@@ -18,7 +18,5 @@ const toastrService = {
 };
 
 /* Must inject must be .concat with providers: [] */
-const mustInjected = (): any[] => {
-  return [PositioningService, ComponentLoaderFactory, BsModalRef, BsModalService, { provide: ToastrService, useValue: toastrService }];
-};
+const mustInjected = (): any[] => [PositioningService, ComponentLoaderFactory, BsModalRef, BsModalService, { provide: ToastrService, useValue: toastrService }];
 export { mustInjected };

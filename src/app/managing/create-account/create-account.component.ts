@@ -156,8 +156,9 @@ export class CreateAccountComponent implements OnInit {
   /**
    * Save the first account in the workspace
    */
-  saveAccount() {
+  saveSession() {
     this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
+    // TODO: instead of accountType, it's better sessionType at the Session level
     switch (this.accountType) {
       case (AccountType.AWS_PLAIN_USER):
         const accountRequest: AwsPlainAccountRequest = {
@@ -165,7 +166,8 @@ export class CreateAccountComponent implements OnInit {
           accountName: this.form.value.name,
           region: this.selectedRegion,
           secretKey: this.form.value.secretKey.trim(),
-          mfaDevice: this.form.value.mfaDevice.trim()};
+          mfaDevice: this.form.value.mfaDevice.trim()
+        };
         this.awsPlainService.create(accountRequest, this.selectedProfile.value);
         break;
     }

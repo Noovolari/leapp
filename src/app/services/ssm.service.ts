@@ -23,6 +23,7 @@ export class SsmService {
 
   /**
    * Prepare the two clients
+   *
    * @param data - pass the credentials object
    * @param region - pass the region where you want to make the request
    * @returns - {Observable<SsmResult>} - return the list of instances capable of SSM in the selected region
@@ -38,10 +39,9 @@ export class SsmService {
 
     // Get data
     return this.submit().pipe(
-      switchMap(response => {
-        return new Observable<SsmResult>(observer => {
+      switchMap(response => new Observable<SsmResult>(observer => {
 
-          const params = {MaxResults: 50};
+          const params = { MaxResults: 50 };
           this.ec2Client.describeInstances(params, (err, reservations) => {
             this.nextToken = reservations.NextToken;
             if (err) {
@@ -61,8 +61,7 @@ export class SsmService {
               observer.next(response);
             }
           });
-        });
-      })
+        }))
     );
   }
 
@@ -122,6 +121,7 @@ export class SsmService {
 
   /**
    * Start a new ssm session given the instance id
+   *
    * @param instanceId - the instance id of the instance to start
    * @param region - AWS System Manager start a session from a defined region
    */
@@ -135,6 +135,7 @@ export class SsmService {
 
   /**
    * Set the config for the SSM client
+   *
    * @param data - the credential information
    * @param region - the region for the client
    */

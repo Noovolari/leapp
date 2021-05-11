@@ -32,10 +32,10 @@ export class CreateAccountComponent implements OnInit {
   @Input() selectedRole = '';
   @Input() fedUrl = '';
 
-  idps: { value: string, label: string}[] = [];
-  selectedIdpUrl: {value: string, label: string};
+  idps: { value: string; label: string}[] = [];
+  selectedIdpUrl: {value: string; label: string};
 
-  federatedRoles: { name: string, roleArn: string }[] = [];
+  federatedRoles: { name: string; roleArn: string }[] = [];
   federatedAccounts = [];
 
   accounts = [];
@@ -46,8 +46,8 @@ export class CreateAccountComponent implements OnInit {
   locations = [];
   selectedLocation;
 
-  profiles: { value: string, label: string}[] = [];
-  selectedProfile: {value: string, label: string};
+  profiles: { value: string; label: string}[] = [];
+  selectedProfile: {value: string; label: string};
 
   eAccountType = AccountType;
 
@@ -146,6 +146,7 @@ export class CreateAccountComponent implements OnInit {
 
   /**
    * Set the account number when the event is called
+   *
    * @param event - the event to call
    */
   setAccountNumber(event) {
@@ -155,8 +156,9 @@ export class CreateAccountComponent implements OnInit {
   /**
    * Save the first account in the workspace
    */
-  saveAccount() {
+  saveSession() {
     this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
+    // TODO: instead of accountType, it's better sessionType at the Session level
     switch (this.accountType) {
       case (AccountType.AWS_PLAIN_USER):
         const accountRequest: AwsPlainAccountRequest = {
@@ -164,7 +166,8 @@ export class CreateAccountComponent implements OnInit {
           accountName: this.form.value.name,
           region: this.selectedRegion,
           secretKey: this.form.value.secretKey.trim(),
-          mfaDevice: this.form.value.mfaDevice.trim()};
+          mfaDevice: this.form.value.mfaDevice.trim()
+        };
         this.awsPlainService.create(accountRequest, this.selectedProfile.value);
         break;
     }

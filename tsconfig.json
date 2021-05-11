@@ -1,24 +1,17 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "allowSyntheticDefaultImports" : true,
-    "outDir": "./dist/out-tsc",
-    "sourceMap": true,
+    "baseUrl": "./",
     "declaration": false,
-    "module": "es2015",
-    "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "lib": ["es2018", "dom"],
+    "module": "es2015",
+    "moduleResolution": "node",
+    "sourceMap": true,
     "target": "es2015",
-    "types": ["node","jasmine"],
-    "typeRoots": [
-      "../node_modules/@types"
-    ],
-    "lib": [
-      "es2018",
-      "dom"
-    ]
+    "typeRoots": ["../node_modules/@types"]
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

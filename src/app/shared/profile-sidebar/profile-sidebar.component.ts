@@ -36,7 +36,11 @@ export class ProfileSidebarComponent implements OnInit {
   ngOnInit() {
     this.appService.profileOpen.subscribe(res => {
       this.profileOpen = res;
-      this.profileOpen ? this.renderer.addClass(document.body, 'moved') : this.renderer.removeClass(document.body, 'moved');
+      if (this.profileOpen) {
+        this.renderer.addClass(document.body, 'moved');
+      } else {
+        this.renderer.removeClass(document.body, 'moved');
+      }
     });
   }
 
@@ -49,7 +53,9 @@ export class ProfileSidebarComponent implements OnInit {
     // this.configurationService.logout();
     this.appService.logger('Cleaning Azure config files...', LoggerLevel.INFO, this);
 
-    if (this.execSubscription) { this.execSubscription.unsubscribe(); }
+    if (this.execSubscription) {
+ this.execSubscription.unsubscribe();
+}
     this.execSubscription = this.executeService.execute('az account clear 2>&1').subscribe(() => {}, () => {});
   }
 

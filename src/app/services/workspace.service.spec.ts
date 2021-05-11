@@ -35,7 +35,7 @@ describe('WorkspaceService', () => {
 
     workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;
     workspace = workspaceService.create();
-    mockedSession = new Session(new AwsPlainAccount('', '', '', '', ''), 'profile');
+    mockedSession = new Session(new AwsPlainAccount('', '', ''), 'profile');
   });
 
   it('should be created', () => {

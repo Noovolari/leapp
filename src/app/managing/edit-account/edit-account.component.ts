@@ -62,6 +62,7 @@ export class EditAccountComponent implements OnInit {
 
   /**
    * Set the account number when the event is called
+   *
    * @param event - the event to call
    */
   setAccountNumber(event) {

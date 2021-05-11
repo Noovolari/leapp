@@ -26,13 +26,15 @@ export class IntegrationsService {
               private keychainService: KeychainService) {}
 
   login(portalUrl, region) {
-    if (this.loginSubscriber) { this.loginSubscriber.unsubscribe(); }
+    if (this.loginSubscriber) {
+      this.loginSubscriber.unsubscribe();
+    }
     this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO(region, portalUrl))
       .pipe(
-        switchMap((awsSsoSessions: Session[]) => {
+        switchMap((awsSsoSessions: Session[]) => 
           // Save sessions to workspace
-          return this.awsSsoService.addSessionsToWorkspace(awsSsoSessions);
-        }),
+           this.awsSsoService.addSessionsToWorkspace(awsSsoSessions)
+        ),
         catchError((err) => {
           this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
           this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
@@ -42,9 +44,7 @@ export class IntegrationsService {
             fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME'))
           ).pipe(
             toArray(),
-            switchMap(() => {
-              return throwError(err);
-            })
+            switchMap(() => throwError(err))
           );
         })
       )
@@ -62,13 +62,15 @@ export class IntegrationsService {
   }
 
   syncAccounts() {
-    if (this.loginSubscriber) { this.loginSubscriber.unsubscribe(); }
+    if (this.loginSubscriber) {
+ this.loginSubscriber.unsubscribe(); 
+}
     console.log('syncing account');
     this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).pipe(
-      switchMap((awsSsoSessions: Session[]) => {
+      switchMap((awsSsoSessions: Session[]) => 
         // Save sessions to workspace
-        return this.awsSsoService.addSessionsToWorkspace(awsSsoSessions);
-      }),
+         this.awsSsoService.addSessionsToWorkspace(awsSsoSessions)
+      ),
       catchError( (err) => {
         this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
         this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');

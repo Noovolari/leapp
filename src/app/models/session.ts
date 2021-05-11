@@ -39,5 +39,5 @@ export class Session {
     const currentTime = new Date().getTime();
     const startTime = new Date(this.startDateTime).getTime();
     return (currentTime - startTime) / 1000 > environment.sessionDuration;
-  }
+  };
 }

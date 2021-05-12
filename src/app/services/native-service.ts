@@ -38,7 +38,7 @@ export class NativeService {
   protected httpsProxyAgent: any;
 
   constructor() {
-    if ((window as any)) {
+    if ((window as any).native) {
 
       this.fs = (window as any).native.fs;
       this.rimraf = (window as any).native.rimraf;

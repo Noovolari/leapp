@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, Inject, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
@@ -14,11 +14,14 @@ import {AwsSsoAccount} from '../../models/aws-sso-account';
 import * as uuid from 'uuid';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {FileService} from "../../services/file.service";
+import {SessionProviderService} from "../../services/session-provider.service";
 
 @Component({
   selector: 'app-session-card',
   templateUrl: './session-card.component.html',
   styleUrls: ['./session-card.component.scss'],
+
 })
 
 export class SessionCardComponent implements OnInit {
@@ -32,10 +35,11 @@ export class SessionCardComponent implements OnInit {
   @ViewChild('defaultProfileModalTemplate', { static: false })
   defaultProfileModalTemplate: TemplateRef<any>;
 
-  @Input() session: Session;
-
   eAccountType = AccountType;
   modalRef: BsModalRef;
+
+  @Input()
+  session!: Session;
 
   // Ssm instances
   ssmloading = true;
@@ -51,15 +55,22 @@ export class SessionCardComponent implements OnInit {
   selectedProfile: any;
   profiles: { id: string; name: string }[];
 
-  constructor(private sessionService: SessionService,
-              private workspaceService: WorkspaceService,
+  private sessionService: SessionService;
+
+  constructor(private workspaceService: WorkspaceService,
               private keychainService: KeychainService,
               private appService: AppService,
+              private fileService: FileService,
               private router: Router,
               private ssmService: SsmService,
-              private modalService: BsModalService) {}
+              private sessionProviderService: SessionProviderService,
+              private modalService: BsModalService) {
+  }
 
   ngOnInit() {
+    // Generate a singleton service for the concrete implementation of SessionService
+    this.sessionService = this.sessionProviderService.getService(this.session.account.type);
+
     // Set regions for ssm and for default region, same with locations,
     // add the correct placeholder to the select
     this.awsRegions = this.appService.getRegions();
@@ -92,11 +103,6 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    */
   startSession() {
-    // Start a new session with the selected one
-    switch (this.session.account.type) {
-
-    }
-
     this.sessionService.start(this.session.sessionId).then(() => {}, error => {
       console.log(error);
     });

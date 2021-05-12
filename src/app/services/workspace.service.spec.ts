@@ -19,7 +19,8 @@ describe('WorkspaceService', () => {
     spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
     spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
 
-    spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync']);
+    spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync', 'exists']);
+    spyFileService.exists.and.returnValue(true);
     spyFileService.encryptText.and.callFake((text: string) => text);
     spyFileService.decryptText.and.callFake((text: string) => text);
     spyFileService.writeFileSync.and.callFake((_: string, __: string) => {});

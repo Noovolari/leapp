@@ -85,11 +85,11 @@ export class AwsPlainService extends SessionService {
 
 
   private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
-    return await this.keychainService.getSecret(environment.appName, `${sessionId}_access_key`);
+    return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-access-key-id`);
   }
 
   private async getSecretKeyFromKeychain(sessionId: string): Promise<string> {
-    return await this.keychainService.getSecret(environment.appName, `${sessionId}_secret_key`);
+    return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-secret-access-key`);
   }
 
 }

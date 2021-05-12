@@ -32,12 +32,12 @@ export class Session {
     this.account = account;
   }
 
-  readonly expired = (): boolean => {
-    if (this.startDateTime) {
-      return false;
-    }
+  expired(): boolean {
+    console.log(this.startDateTime);
     const currentTime = new Date().getTime();
     const startTime = new Date(this.startDateTime).getTime();
+    console.log(currentTime);
+    console.log(currentTime - startTime);
     return (currentTime - startTime) / 1000 > environment.sessionDuration;
   };
 }

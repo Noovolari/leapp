@@ -33,11 +33,8 @@ export class Session {
   }
 
   expired(): boolean {
-    console.log(this.startDateTime);
     const currentTime = new Date().getTime();
     const startTime = new Date(this.startDateTime).getTime();
-    console.log(currentTime);
-    console.log(currentTime - startTime);
     return (currentTime - startTime) / 1000 > environment.sessionDuration;
   };
 }

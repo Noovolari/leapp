@@ -4,10 +4,11 @@ import {FileService} from './services/file.service';
 import {AppService, LoggerLevel} from './services/app.service';
 import {Router} from '@angular/router';
 import {WorkspaceService} from './services/workspace.service';
-import {SessionService} from './services/session.service';
 import {Workspace} from './models/workspace';
 import {setTheme} from 'ngx-bootstrap/utils';
 import {TimerService} from './services/timer.service';
+import {RotationService} from "./services/rotation.service";
+import {SessionProviderService} from "./services/session-provider.service";
 
 @Component({
   selector: 'app-root',
@@ -18,9 +19,10 @@ export class AppComponent implements OnInit {
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
     private app: AppService,
-    private sessionService: SessionService,
     private workspaceService: WorkspaceService,
     private fileService: FileService,
+    private rotationService: RotationService,
+    private sessionProviderService: SessionProviderService,
     private router: Router,
     private timerService: TimerService
   ) {
@@ -56,11 +58,14 @@ export class AppComponent implements OnInit {
 
     // All sessions start stopped when app is launched
     if (workspace.sessions.length > 0) {
-      workspace.sessions.forEach(sess => this.sessionService.stop(sess.sessionId));
+      workspace.sessions.forEach(sess => {
+        const concreteSessionService = this.sessionProviderService.getService(sess.account.type);
+        concreteSessionService.stop(sess.sessionId);
+      });
     }
 
     // Start Global Timer (1s)
-    this.timerService.start(this.sessionService.checkExpiring.bind(this.sessionService));
+    this.timerService.start(this.rotationService.rotate.bind(this.rotationService));
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit

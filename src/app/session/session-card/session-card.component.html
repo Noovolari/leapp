@@ -9,8 +9,8 @@
     </ng-container>
   </div>
   <div class="information-offset" (click)="switchCredentials()">
-    <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!(session.loading && (session.account.type === eAccountType.AWS_SSO))"></i>
-    <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading && (session.account.type === eAccountType.AWS_SSO)"></i>
+    <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
+    <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading"></i>
   </div>
 
   <ng-container dropdown placement="right" [autoClose]="true">

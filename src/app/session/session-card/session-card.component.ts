@@ -125,8 +125,9 @@ export class SessionCardComponent implements OnInit {
    */
   stopSession() {
     // Eventually close the tray
-    this.sessionService.stop(this.session.sessionId);
-
+    this.sessionService.stop(this.session.sessionId).then(() => {}, error => {
+      console.log(error);
+    });
 
 
     this.appService.logger(

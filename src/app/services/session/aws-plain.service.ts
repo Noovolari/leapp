@@ -25,28 +25,31 @@ export interface AwsPlainAccountRequest {
 export class AwsPlainService extends SessionService {
 
   constructor(
-    private workSpaceService: WorkspaceService,
+    protected workspaceService: WorkspaceService,
     private keychainService: KeychainService,
     private appService: AppService,
     private fileService: FileService) {
-    super(workSpaceService);
+    super(workspaceService);
   }
 
   create(accountRequest: AwsPlainAccountRequest, profileId: string) {
     const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, accountRequest.mfaDevice), profileId);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-secret-access-key`, accountRequest.secretKey);
-    this.workSpaceService.addSession(session);
+    this.workspaceService.addSession(session);
   }
 
   async applyCredentials(credentialsInfo: CredentialsInfo): Promise<void> {
+    console.log(credentialsInfo.sessionToken);
     return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialsInfo.sessionToken);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workSpaceService.getProfileName(session.profileId);
+    const profileName = this.workspaceService.getProfileName(session.profileId);
+    console.log(profileName);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
+    console.log(credentialsFile);
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
@@ -66,12 +69,12 @@ export class AwsPlainService extends SessionService {
     } else {
       try {
         const getSessionToken: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
-        const profileName = this.workSpaceService.getProfileName(session.profileId);
-        const obj = {};
-        const credentialObject = obj[profileName] = {
-          accessKey: getSessionToken.Credentials.AccessKeyId,
-          secretKey: getSessionToken.Credentials.SecretAccessKey,
-          sessionsToken: getSessionToken.Credentials.SessionToken,
+        const profileName = this.workspaceService.getProfileName(session.profileId);
+        const credentialObject = {};
+        credentialObject[profileName] = {
+          aws_access_key_id: getSessionToken.Credentials.AccessKeyId.trim(),
+          aws_secret_access_key: getSessionToken.Credentials.SecretAccessKey.trim(),
+          aws_session_token: getSessionToken.Credentials.SessionToken.trim(),
           region: session.account.region
         };
         return {

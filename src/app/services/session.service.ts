@@ -4,6 +4,7 @@ import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
 import {CredentialsInfo} from '../models/credentials-info';
 import {AccountType} from '../models/AccountType';
+import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
@@ -13,11 +14,8 @@ export abstract class SessionService extends NativeService {
 
 
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
-  protected constructor(
-    private workspaceService: WorkspaceService
-  ) {
+  protected constructor(protected workspaceService: WorkspaceService) {
     super();
-
   }
 
 
@@ -74,16 +72,6 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  // TODO: change signature and name of function
-  checkExpiring(): void {
-    const activeSessions = this.listActive();
-    activeSessions.forEach(session => {
-      if (session.expired()) {
-        this.rotate(session.sessionId);
-      }
-    });
-  }
-
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(sessionId: string): Promise<void>;
@@ -93,25 +81,23 @@ export abstract class SessionService extends NativeService {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
-      this.workspaceService.sessions[index] = {
-        ...session,
-        loading: true
-      };
+      let currentSession : Session = this.workspaceService.sessions[index];
+      currentSession.loading = true;
+      this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
   }
 
   private sessionActivate(sessionId: string) {
-    const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
-    if (session) {
-      const index = this.workspaceService.sessions.indexOf(session);
-      this.workspaceService.sessions[index] = {
-        ...session,
-        loading: false,
-        active: true,
-        startDateTime: new Date().toISOString()
-      };
+    const index = this.workspaceService.sessions.findIndex(s => s.sessionId === sessionId);
+    if (index > -1) {
+      let currentSession : Session = this.workspaceService.sessions[index];
+      currentSession.loading = false;
+      currentSession.active = true;
+      currentSession.startDateTime = new Date().toISOString();
+      this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
+      console.log(this.workspaceService.sessions);
     }
   }
 
@@ -119,10 +105,10 @@ export abstract class SessionService extends NativeService {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
-      this.workspaceService.sessions[index] = {
-        ...session,
-        startDateTime: new Date().toISOString()
-      };
+      let currentSession : Session = this.workspaceService.sessions[index];
+      currentSession.startDateTime = new Date().toISOString();
+      currentSession.loading = false;
+      this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
   }
@@ -130,21 +116,20 @@ export abstract class SessionService extends NativeService {
   private sessionError(sessionId: string, error: Error) {
     this.sessionDeactivated(sessionId);
     // TODO: error handling for user
+    console.log(error);
   }
 
   private sessionDeactivated(sessionId: string) {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
-      this.workspaceService.sessions[index] = {
-        ...session,
-        lastStopDateTime: new Date().toISOString(),
-        startDateTime: undefined,
-        active: false,
-        loading: false
-      };
+      let currentSession : Session = this.workspaceService.sessions[index];
+      currentSession.loading = false;
+      currentSession.active = false;
+      currentSession.startDateTime = undefined;
+      currentSession.lastStopDateTime = new Date().toISOString();
+      this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
   }
-
 }

@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import {ErrorHandler, NgModule} from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
@@ -17,6 +17,7 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import {TrayMenuComponent} from './shared/tray-menu/tray-menu.component';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {ModalModule} from 'ngx-bootstrap/modal';
+import {ErrorService} from "./services/middleware/error.service";
 
 export function httpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
@@ -53,7 +54,7 @@ export function httpLoaderFactory(http: HttpClient) {
     }),
   ],
   entryComponents: [ConfirmationDialogComponent, InputDialogComponent],
-  providers: [],
+  providers: [{ provide: ErrorHandler, useClass: ErrorService}],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

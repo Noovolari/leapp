@@ -12,7 +12,6 @@ describe('RotationService', () => {
 
   let spySessionService;
   let sessionActive;
-  let sessionInactive;
 
   let spySessionProviderService;
   let concreteSessionServiceFake;

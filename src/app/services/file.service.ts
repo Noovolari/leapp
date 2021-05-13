@@ -93,6 +93,14 @@ export class FileService extends NativeService {
         .map(dirent => dirent.name);
   }
 
+  /**
+   * Creates a new directory
+   * @param path - the new directory path
+   * @param options - some options if needed - optional
+   */
+  newDir(path: string, options: {recursive: boolean}): void {
+    this.fs.mkdirSync(path, options);
+  }
 
   /**
    * Choose a uses the os filedialog to lewt you choose a file
@@ -202,7 +210,7 @@ export class FileService extends NativeService {
   iniParse(filePath: string): Observable<any> {
     return new Observable(subscriber => {
       if (this.readSubscription) {
- this.readSubscription.unsubscribe(); 
+ this.readSubscription.unsubscribe();
 }
       this.readSubscription = this.readFile(filePath).subscribe(file => {
         try {

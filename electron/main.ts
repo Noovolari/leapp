@@ -1,15 +1,11 @@
 import * as path from 'path';
 import {environment} from '../src/environments/environment';
-import * as CryptoJS from 'crypto-js';
-import {machineIdSync} from 'node-machine-id';
 import {AppUpdater} from '../src/app/core/app-updater';
 
-const {app, BrowserWindow, globalShortcut, Menu, ipcMain } = require('electron');
+const {app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
 
 const url = require('url');
-const fs = require('fs');
 const os = require('os');
-const log = require('electron-log');
 const ipc = ipcMain;
 
 // Fix for warning at startup
@@ -31,7 +27,6 @@ const windowDefaultConfig = {
     webPreferences: {
       devTools: !environment.production,
       worldSafeExecuteJavaScript: true,
-
       contextIsolation: false,
       enableRemoteModule: true,
       nodeIntegration: true
@@ -39,14 +34,11 @@ const windowDefaultConfig = {
   }
 };
 
-// Define the workspace directory from config file in *src/environments*
-// Define the aws credentials path from config file in *src/environments*
-const workspacePath = os.homedir() + '/' + environment.lockFileDestination;
-const awsCredentialsPath = os.homedir() + '/' + environment.credentialsDestination;
-
-
 // Generate the main Electron window
 const generateMainWindow = () => {
+  if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
+    process.env.XDG_CURRENT_DESKTOP = 'Unity';
+  }
 
   let win;
   let forceQuit = false;
@@ -113,42 +105,6 @@ const generateMainWindow = () => {
     AppUpdater.getInstance().checkForUpdates();
   });
 
-  /* let loginCount = 0;
-   app.on('login', (event, webContents, request, authInfo, callback) => {
-    try {
-      const file = fs.readFileSync(workspacePath, {encoding: 'utf-8'});
-      const decriptedFile = CryptoJS.AES.decrypt(file, machineIdSync());
-      const fileExists = fs.existsSync(workspacePath);
-
-      let workspace = fileExists ? JSON.parse(decriptedFile).toString(CryptoJS.enc.Utf8) : undefined;
-      if (workspace !== undefined && workspace.workspaces[0] !== undefined) {
-        workspace = (workspace.workspaces[0] as Workspace);
-
-        if (workspace.proxyConfiguration !== undefined &&
-          workspace.proxyConfiguration !== null &&
-          workspace.proxyConfiguration.username &&
-          workspace.proxyConfiguration.password) {
-
-          if (loginCount === 0) {
-            loginCount++;
-
-            const tempInfo = Object.assign({}, workspace.proxyConfiguration);
-            tempInfo.password = '******';
-
-            log.info(`we are inside app login with auth: ${JSON.stringify(tempInfo, null, 3)}`);
-            const proxyUsername = workspace.proxyConfiguration.username;
-            const proxyPassword = workspace.proxyConfiguration.password;
-            // Supply credentials to server
-            callback(proxyUsername, proxyPassword);
-          } else {
-            log.error('[electron main] Proxy Auth Credentials invalid');
-            return;
-          }
-        }
-      }
-    } catch (err) {}
-  });*/
-
   const gotTheLock = app.requestSingleInstanceLock();
 
   if (!gotTheLock) {
@@ -164,69 +120,7 @@ const generateMainWindow = () => {
   }
 };
 
-// Used when people accidentally delete .aws directory when a workspace config is already defined
-// Note is a stupid error but people often do so. As there is already some security code with
-// this one we cover the full range of possibilities
-function fixDirectoriesAndFiles() {
-  try {
-    // .aws directory
-    fs.mkdirSync(os.homedir() + '/.aws');
-  } catch (err) {
-    log.warn('directory aws already exist');
-  } finally {
-    try {
-      // Write credential file
-      fs.writeFileSync(awsCredentialsPath, '');
-    } catch (err) {
-      log.warn('credential file couldn\'t be written');
-    }
-  }
-}
-
-// Prepare and generate the main window if everything is setupped correctly
-const initWorkspace = () => {
-
-
-  // TODO: move to workspace service
-  const workspace = fs.existsSync(workspacePath) ? JSON.parse(CryptoJS.AES.decrypt(fs.readFileSync(workspacePath, {encoding: 'utf-8'}), machineIdSync()).toString(CryptoJS.enc.Utf8)) : undefined;
-  if (workspace === undefined) {
-    // Setup your first workspace and then run createWindow
-    log.info('Setupping workspace for the first time');
-    try {
-      // Generate .Leapp and .aws directories for future works
-      fs.mkdirSync(os.homedir() + '/.Leapp');
-      fs.mkdirSync(os.homedir() + '/.aws');
-    } catch (err) {
-      log.warn('directory leapp or aws already exist');
-    } finally {
-      try {
-        // If it is the first time and there's a file, let's backup the file
-        if (!fs.existsSync(workspacePath) && fs.existsSync(awsCredentialsPath) && !fs.existsSync(awsCredentialsPath + '.leapp.bkp')) {
-          fs.renameSync(awsCredentialsPath, awsCredentialsPath + '.leapp.bkp');
-        }
-
-        // Write credential file to clean it
-        fs.writeFileSync(awsCredentialsPath, '');
-      } catch (e) {
-        log.error(e);
-        app.exit(0);
-      }
-
-      // Launch initWorkspace again, now it will be loaded correctly because the file and directories are there
-      initWorkspace();
-    }
-  } else {
-    // Generate the main window
-    fixDirectoriesAndFiles();
-
-  }
-};
-
 // =============================== //
 // Start the real application HERE //
 // =============================== //
-// TODO: maintain in main.ts
-if (process.platform === 'linux' && ['Pantheon', 'Unity:Unity7'].indexOf(process.env.XDG_CURRENT_DESKTOP) !== -1) {
-  process.env.XDG_CURRENT_DESKTOP = 'Unity';
-}
 generateMainWindow();

@@ -57,7 +57,7 @@ export class WorkspaceService extends NativeService {
 
   create(): void {
     if (!this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
-      this.fs.mkdirSync(this.appService.getOS().homedir() + '/.Leapp', { recursive: true});
+      this.fileService.newDir(this.appService.getOS().homedir() + '/.Leapp', { recursive: true});
       const workspace = new Workspace();
       this.persist(workspace);
     }
@@ -68,21 +68,10 @@ export class WorkspaceService extends NativeService {
     return deserialize(Workspace, workspaceJSON);
   }
 
-  getPersistedSessions(): Session[] {
-    const workspace = this.get();
-    return workspace.sessions;
-  }
-
-  updatePersistedSessions(sessions: Session[]): void {
-    const workspace = this.get();
-    workspace.sessions = sessions;
-    this.persist(workspace);
-  }
-
   getProfileName(profileId): string {
     const workspace = this.get();
-    const profileFiltered = workspace.profiles.filter(profile => profile.id === profileId);
-    return profileFiltered ? profileFiltered[0].name : null;
+    const profileFiltered = workspace.profiles.find(profile => profile.id === profileId);
+    return profileFiltered ? profileFiltered.name : null;
   }
 
   private persist(workspace: Workspace) {
@@ -90,5 +79,16 @@ export class WorkspaceService extends NativeService {
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
       this.fileService.encryptText(serialize(workspace))
     );
+  }
+
+  private getPersistedSessions(): Session[] {
+    const workspace = this.get();
+    return workspace.sessions;
+  }
+
+  private updatePersistedSessions(sessions: Session[]): void {
+    const workspace = this.get();
+    workspace.sessions = sessions;
+    this.persist(workspace);
   }
 }

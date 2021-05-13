@@ -59,7 +59,7 @@ export class AppService extends NativeService {
 
     // Global Configure logger
     if (this.log) {
-      this.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+      this.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
       this.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
     }
   }
@@ -151,12 +151,12 @@ export class AppService extends NativeService {
     switch (type) {
       case LoggerLevel.INFO:
         if (!environment.production) {
- this.log.info(message); 
+ this.log.info(message);
 }
         break;
       case LoggerLevel.WARN:
         if (!environment.production) {
- this.log.warn(message); 
+ this.log.warn(message);
 }
         break;
       case LoggerLevel.ERROR:
@@ -164,7 +164,7 @@ export class AppService extends NativeService {
         break;
       default:
         if (!environment.production) {
- this.log.info(message); 
+ this.log.info(message);
 }
         break;
     }
@@ -274,12 +274,12 @@ export class AppService extends NativeService {
    * @param type - the type of message from Toast Level
    * @param title - [optional]
    */
-  toast(message, type, title?: string) {
+  toast(message: string, type: ToastLevel | LoggerLevel, title?: string) {
     switch (type) {
       case ToastLevel.SUCCESS: this.toastr.success(message, title); break;
-      case ToastLevel.INFO: this.toastr.info(message, title); break;
-      case ToastLevel.WARN: this.toastr.warning(message, title); break;
-      case ToastLevel.ERROR: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
+      case ToastLevel.INFO || LoggerLevel.INFO: this.toastr.info(message, title); break;
+      case ToastLevel.WARN || LoggerLevel.WARN: this.toastr.warning(message, title); break;
+      case ToastLevel.ERROR || LoggerLevel.ERROR: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
     }
   }
 
@@ -405,10 +405,10 @@ export class AppService extends NativeService {
       if (values[4].length === 12 && Number(values[4])) {
         return values[4];
       } else  {
- return ''; 
+ return '';
 }
     } else  {
- return ''; 
+ return '';
 }
   }
 
@@ -552,7 +552,7 @@ export class AppService extends NativeService {
    * @param s - the session containing the account
    */
   isAzure(s) {
- return s.account.subscriptionId !== null && s.account.subscriptionId !== undefined; 
+ return s.account.subscriptionId !== null && s.account.subscriptionId !== undefined;
 }
 
 

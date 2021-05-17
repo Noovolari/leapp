@@ -10,8 +10,6 @@ import {AppModule} from "../../app.module";
 
 describe('ErrorService', () => {
   let spyAppService;
-
-  let superErrorHandler;
   let errorService;
   let handler;
 
@@ -19,8 +17,6 @@ describe('ErrorService', () => {
     spyAppService = jasmine.createSpyObj('AppService', ['logger', 'toast']);
     spyAppService.logger.and.returnValue(true);
     spyAppService.toast.and.returnValue(true);
-
-    superErrorHandler = spyOn(ErrorHandler.prototype, 'handleError');
 
     handler = TestBed.configureTestingModule({
       imports: [AppModule, ToastrModule.forRoot()],

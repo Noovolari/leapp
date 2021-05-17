@@ -16,6 +16,7 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {FileService} from "../../services/file.service";
 import {SessionProviderService} from "../../services/session-provider.service";
+import {LeappNotFoundError} from "../../errors/leapp-not-found-error";
 
 @Component({
   selector: 'app-session-card',
@@ -103,6 +104,13 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    */
   startSession() {
+    try {
+      []['fake'].boom();
+    } catch(error) {
+      throw new LeappNotFoundError(this, 'Fake Not Found Session', error.stack);
+    }
+
+
     this.sessionService.start(this.session.sessionId).then(() => {}, error => {
       console.log(error);
     });

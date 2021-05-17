@@ -1,12 +1,12 @@
 import {WorkspaceService} from './workspace.service';
 import {TestBed} from '@angular/core/testing';
 import {Workspace} from '../models/workspace';
-import {AppService} from './app.service';
 import {mustInjected} from '../../base-injectables';
-import {FileService} from './file.service';
 import {Session} from '../models/session';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {serialize} from 'class-transformer';
+import {AppService} from "./app.service";
+import {FileService} from "./file.service";
 
 describe('WorkspaceService', () => {
   let workspaceService;
@@ -16,6 +16,7 @@ describe('WorkspaceService', () => {
   let spyFileService;
 
   beforeEach(() => {
+
     spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
     spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
 
@@ -25,7 +26,7 @@ describe('WorkspaceService', () => {
     spyFileService.encryptText.and.callFake((text: string) => text);
     spyFileService.decryptText.and.callFake((text: string) => text);
     spyFileService.writeFileSync.and.callFake((_: string, __: string) => {});
-    spyFileService.readFileSync.and.callFake((_: string) => JSON.stringify(new Workspace()) );
+    spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()) );
 
     TestBed.configureTestingModule({
       providers: [
@@ -81,10 +82,12 @@ describe('WorkspaceService', () => {
 
   describe('getPersistedSessions()', () => {
     it('should return a Session array: Session[]', () => {
-      workspace = workspaceService.get();
-      workspace.sessions.push(mockedSession);
+      workspace = new Workspace();
 
       spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace));
+      workspaceService.get();
+
+      workspace.sessions.push(mockedSession);
 
       expect(workspaceService.getPersistedSessions()).toBeInstanceOf(Array);
       expect(workspaceService.getPersistedSessions()[0]).toBeInstanceOf(Session);

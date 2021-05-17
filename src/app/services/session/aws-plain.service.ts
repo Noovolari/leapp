@@ -39,9 +39,17 @@ export class AwsPlainService extends SessionService {
     this.workspaceService.addSession(session);
   }
 
-  async applyCredentials(credentialsInfo: CredentialsInfo): Promise<void> {
-    console.log(credentialsInfo.sessionToken);
-    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialsInfo.sessionToken);
+  async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
+    const session = this.get(sessionId);
+    const profileName = this.workspaceService.getProfileName(session.profileId);
+    const credentialObject = {};
+    credentialObject[profileName] = {
+      aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
+      aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
+      aws_session_token: credentialsInfo.sessionToken.aws_session_token,
+      region: session.account.region
+    };
+    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
@@ -68,17 +76,13 @@ export class AwsPlainService extends SessionService {
       return Promise.resolve(undefined);
     } else {
       try {
-        const getSessionToken: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
-        const profileName = this.workspaceService.getProfileName(session.profileId);
-        const credentialObject = {};
-        credentialObject[profileName] = {
-          aws_access_key_id: getSessionToken.Credentials.AccessKeyId.trim(),
-          aws_secret_access_key: getSessionToken.Credentials.SecretAccessKey.trim(),
-          aws_session_token: getSessionToken.Credentials.SessionToken.trim(),
-          region: session.account.region
-        };
+        const getSessionToken: GetSessionTokenResponse = await sts.getSessionToken(params).promise()
         return {
-          sessionToken: credentialObject
+          sessionToken: {
+            aws_access_key_id: getSessionToken.Credentials.AccessKeyId.trim(),
+            aws_secret_access_key: getSessionToken.Credentials.SecretAccessKey.trim(),
+            aws_session_token: getSessionToken.Credentials.SessionToken.trim(),
+          }
         };
       } catch (err) {
 

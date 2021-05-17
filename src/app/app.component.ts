@@ -7,8 +7,8 @@ import {WorkspaceService} from './services/workspace.service';
 import {Workspace} from './models/workspace';
 import {setTheme} from 'ngx-bootstrap/utils';
 import {TimerService} from './services/timer.service';
-import {RotationService} from "./services/rotation.service";
-import {SessionProviderService} from "./services/session-provider.service";
+import {RotationService} from './services/rotation.service';
+import {SessionProviderService} from './services/session-provider.service';
 
 @Component({
   selector: 'app-root',
@@ -107,6 +107,7 @@ export class AppComponent implements OnInit {
 
     if (check) {
       this.app.getFs().renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
+      this.app.getFs().writeFileSync(oldAwsCredentialsPath,'');
       this.app.getDialog().showMessageBox({
         type: 'info',
         icon: __dirname + '/assets/images/Leapp.png',

@@ -25,7 +25,6 @@ let fakePromise = Promise.resolve(undefined);
 describe('SessionService', () => {
   spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
   spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
-  spyAppService.awsCredentialPath.and.returnValue('~/.aws');
 
   spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync', 'exists', 'newDir']);
   spyFileService.exists.and.returnValue(true);
@@ -200,13 +199,13 @@ describe('SessionService', () => {
 
       // <any> is a trick to spy on private methods!
       spyOn(service,'deApplyCredentials').and.callFake(() => fakePromise);
-      spyOn<any>(service,'sessionDeactivated').and.callFake(() => fakePromise);
+      spyOn<any>(service,'sessionDeactivated').and.callThrough();
 
       expect(mockedSession.active).toBe(true);
       service.stop('fakeid');
 
       const caller = setTimeout(() => {
-        expect((service as any).sessionActivate).toHaveBeenCalled();
+        expect((service as any).sessionDeactivated).toHaveBeenCalled();
         expect(mockedSession.active).toBe(false);
 
         done();
@@ -214,31 +213,111 @@ describe('SessionService', () => {
       }, 200);
     });
 
-    it('should call a list of predefined steps inside', () => {
+    it('should call a list of predefined steps inside', (done) => {
+      const service: SessionService = TestBed.inject(AwsPlainService);
 
+      // <any> is a trick to spy on private methods!
+      spyOn(service,'deApplyCredentials').and.callFake(() => fakePromise);
+      spyOn<any>(service,'sessionDeactivated').and.callThrough();
+
+      service.stop('fakeid');
+
+      const caller = setTimeout(() => {
+        expect((service).deApplyCredentials).toHaveBeenCalled();
+        expect((service as any).sessionDeactivated).toHaveBeenCalled();
+
+        done();
+        clearTimeout(caller);
+      }, 200);
     });
 
-    it('should manage an error thrown in a child step', () => {
+    it('should manage an error thrown in a child step', (done) => {
+      const service: SessionService = TestBed.inject(AwsPlainService);
 
+      // <any> is a trick to spy on private methods!
+      spyOn<any>(service, 'sessionError').and.callFake(() => {});
+      spyOn(service,'deApplyCredentials').and.callFake(() => fakePromise);
+      spyOn<any>(service,'sessionDeactivated').and.callFake(() => { throw new LeappNotFoundError(this, 'exploded fake function')});
+
+      service.stop('fakeid');
+
+      const caller = setTimeout(() => {
+        expect((service as any).sessionError).toHaveBeenCalled();
+
+        done();
+        clearTimeout(caller);
+      }, 200);
     });
   });
 
   describe('rotate()', () => {
-    it('should rotate a session when expired', () => {
+    it('should rotate a session when expired', (done) => {
+      const service: SessionService = TestBed.inject(AwsPlainService);
 
+      // <any> is a trick to spy on private methods!
+      spyOn<any>(service,'sessionLoading').and.callThrough();
+      spyOn<any>(service,'sessionRotated').and.callThrough();
+      spyOn(service,'generateCredentials').and.callFake(() => fakePromise);
+      spyOn(service,'applyCredentials').and.callFake(() => fakePromise);
+
+      mockedSession.loading = true;
+      mockedSession.startDateTime = new Date().toISOString();
+      mockedSessions = [mockedSession];
+
+      const previousStartDateTime = mockedSession.startDateTime;
+
+      const caller = setTimeout(() => {
+        service.rotate('fakeid');
+
+        const caller2 = setTimeout(() => {
+          expect((service as any).sessionLoading).toHaveBeenCalled();
+          expect((service as any).generateCredentials).toHaveBeenCalled();
+          expect((service as any).applyCredentials).toHaveBeenCalled();
+          expect((service as any).sessionRotated).toHaveBeenCalled();
+
+          expect(mockedSession.loading).toBe(false);
+          expect(service.get('fakeid').startDateTime).not.toBe(previousStartDateTime);
+          expect(new Date(service.get('fakeid').startDateTime).getTime()).toBeGreaterThan(new Date(previousStartDateTime).getTime());
+
+          done();
+          clearTimeout(caller);
+          clearTimeout(caller2);
+        }, 100);
+      }, 100);
+      service.rotate('fakeid');
     });
 
-    it('should call a list of predefined steps inside', () => {
+    it('should call a list of predefined steps inside', (done) => {
+      const service: SessionService = TestBed.inject(AwsPlainService);
 
+      // <any> is a trick to spy on private methods!
+      spyOn<any>(service,'sessionLoading').and.callThrough();
+      spyOn<any>(service,'sessionRotated').and.callThrough();
+      spyOn(service,'generateCredentials').and.callFake(() => fakePromise);
+      spyOn(service,'applyCredentials').and.callFake(() => fakePromise);
+
+      service.rotate('fakeid');
+
+      const caller = setTimeout(() => {
+        expect((service as any).sessionLoading).toHaveBeenCalled();
+        expect((service as any).generateCredentials).toHaveBeenCalled();
+        expect((service as any).applyCredentials).toHaveBeenCalled();
+        expect((service as any).sessionRotated).toHaveBeenCalled();
+
+        done();
+        clearTimeout(caller);
+      }, 200);
     });
 
     it('should manage an error thrown in a child step', () => {
+      const service: SessionService = TestBed.inject(AwsPlainService);
 
+      // <any> is a trick to spy on private methods!
+      spyOn<any>(service, 'sessionError').and.callThrough();
+      spyOn<any>(service,'sessionLoading').and.callFake(() => { throw new LeappNotFoundError(this, 'exploded fake function')});
+
+      service.rotate('fakeid');
+      expect((service as any).sessionError).toHaveBeenCalled();
     });
   });
-
-  describe('sessionLoading()', () => {});
-  describe('sessionActivate()', () => {});
-  describe('sessionDeActivated()', () => {});
-  describe('sessionRotated()', () => {});
 });

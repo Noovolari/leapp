@@ -1,3 +1,3 @@
 export interface CredentialsInfo {
-  sessionToken: object;
+  sessionToken: any;
 }

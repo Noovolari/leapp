@@ -1,6 +1,5 @@
 import * as path from 'path';
 import {environment} from '../src/environments/environment';
-import {AppUpdater} from '../src/app/core/app-updater';
 
 const {app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
 
@@ -101,8 +100,6 @@ const generateMainWindow = () => {
 
   app.on('ready', () => {
     createWindow();
-    AppUpdater.getInstance().initUpdater({});
-    AppUpdater.getInstance().checkForUpdates();
   });
 
   const gotTheLock = app.requestSingleInstanceLock();

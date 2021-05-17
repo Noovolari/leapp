@@ -4,25 +4,20 @@ import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
 import {CredentialsInfo} from '../models/credentials-info';
 import {AccountType} from '../models/AccountType';
-import {environment} from "../../environments/environment";
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class SessionService extends NativeService {
 
-
-
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(protected workspaceService: WorkspaceService) {
     super();
   }
 
-
-
   get(sessionId: string): Session {
-    const sessionFiltered = this.list().filter(session => session.sessionId === sessionId);
-    return sessionFiltered ? sessionFiltered[0] : null;
+    const sessionFiltered = this.list().find(session => session.sessionId === sessionId);
+    return sessionFiltered ? sessionFiltered : null;
   }
 
   list(): Session[] {
@@ -33,7 +28,7 @@ export abstract class SessionService extends NativeService {
     return (this.list().length > 0) ? this.list().filter( (session) => session.account.type === AccountType.AWS_TRUSTER) : [];
   }
 
-  public listActive(): Session[] {
+  listActive(): Session[] {
     return (this.list().length > 0) ? this.list().filter( (session) => session.active) : [];
   }
 

@@ -5,7 +5,7 @@ import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
 import {FileService} from '../../services/file.service';
 import {Router} from '@angular/router';
-import {Constants} from '../../core/enums/constants';
+import {Constants} from '../../models/constants';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsAccount} from '../../models/aws-account';

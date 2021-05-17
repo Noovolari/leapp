@@ -1,6 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {Constants} from '../../core/enums/constants';
+import {Constants} from '../../models/constants';
 import {BsModalRef} from 'ngx-bootstrap/modal';
 
 @Component({

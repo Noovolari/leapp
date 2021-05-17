@@ -6,7 +6,7 @@ import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirm
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
-import {Constants} from '../core/enums/constants';
+import {Constants} from '../models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 
 

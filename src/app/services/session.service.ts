@@ -40,7 +40,7 @@ export abstract class SessionService extends NativeService {
     try {
       this.sessionLoading(sessionId);
       const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(credentialsInfo);
+      await this.applyCredentials(sessionId, credentialsInfo);
       this.sessionActivate(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
@@ -60,7 +60,7 @@ export abstract class SessionService extends NativeService {
     try {
       this.sessionLoading(sessionId);
       const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(credentialsInfo);
+      await this.applyCredentials(sessionId, credentialsInfo);
       this.sessionRotated(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
@@ -68,7 +68,7 @@ export abstract class SessionService extends NativeService {
   }
 
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
-  abstract applyCredentials(credentialsInfo: CredentialsInfo): Promise<void>;
+  abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(sessionId: string): Promise<void>;
 
   // TODO: move to model change method signature

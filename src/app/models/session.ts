@@ -13,6 +13,7 @@ export class Session {
   active: boolean;
   loading: boolean;
   @Type(() => Account, {
+
     discriminator: {
       property: 'type',
       subTypes: [

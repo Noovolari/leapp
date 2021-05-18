@@ -6,10 +6,11 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {KeychainService} from '../keychain.service';
 import {environment} from '../../../environments/environment';
 import {Session} from '../../models/session';
-import {AppService} from '../app.service';
+import {AppService, LoggerLevel} from '../app.service';
 import AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
 import {FileService} from '../file.service';
+import {LeappBaseError} from "../../errors/leapp-base-error";
 
 export interface AwsPlainAccountRequest {
   accountName: string;
@@ -32,7 +33,7 @@ export class AwsPlainService extends SessionService {
     super(workspaceService);
   }
 
-  create(accountRequest: AwsPlainAccountRequest, profileId: string) {
+  create(accountRequest: AwsPlainAccountRequest, profileId: string): void {
     const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, accountRequest.mfaDevice), profileId);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-secret-access-key`, accountRequest.secretKey);
@@ -55,9 +56,7 @@ export class AwsPlainService extends SessionService {
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
     const profileName = this.workspaceService.getProfileName(session.profileId);
-    console.log(profileName);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
-    console.log(credentialsFile);
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
@@ -68,6 +67,7 @@ export class AwsPlainService extends SessionService {
       accessKeyId: await this.getAccessKeyFromKeychain(sessionId),
       secretAccessKey: await this.getSecretKeyFromKeychain(sessionId)
     });
+
     const sts = new AWS.STS(this.appService.stsOptions(session));
     const params = { DurationSeconds: environment.sessionTokenDuration };
 
@@ -76,7 +76,8 @@ export class AwsPlainService extends SessionService {
       return Promise.resolve(undefined);
     } else {
       try {
-        const getSessionToken: GetSessionTokenResponse = await sts.getSessionToken(params).promise()
+        const getSessionToken: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
+
         return {
           sessionToken: {
             aws_access_key_id: getSessionToken.Credentials.AccessKeyId.trim(),
@@ -85,7 +86,7 @@ export class AwsPlainService extends SessionService {
           }
         };
       } catch (err) {
-
+        throw new LeappBaseError('Get Session token error', this, LoggerLevel.ERROR, err.message, err.stack);
       }
     }
   }

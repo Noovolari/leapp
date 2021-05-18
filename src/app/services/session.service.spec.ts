@@ -145,6 +145,7 @@ describe('SessionService', () => {
       spyOn(service,'applyCredentials').and.callFake(() => fakePromise);
 
       expect(mockedSession.active).toBe(false);
+
       service.start('fakeid');
 
       const caller = setTimeout(() => {

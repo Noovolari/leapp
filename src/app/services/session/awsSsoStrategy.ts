@@ -1,4 +1,4 @@
-import {AccountType} from '../../models/AccountType';
+import {SessionType} from '../../models/session-type';
 import {AppService, LoggerLevel, ToastLevel} from '../app.service';
 import {FileService} from '../file.service';
 import {Workspace} from '../../models/workspace';
@@ -15,6 +15,7 @@ import {Observable, of} from 'rxjs';
 import {fromPromise} from 'rxjs/internal-compatibility';
 import {GetRoleCredentialsResponse} from 'aws-sdk/clients/sso';
 import {SessionService} from '../session.service';
+import {SessionStatus} from '../../models/session-status';
 
 
 export class AwsSsoStrategy {
@@ -28,10 +29,10 @@ export class AwsSsoStrategy {
     private keychainService: KeychainService) {}
 
   getActiveSessions(workspace: Workspace) {
-    return workspace.sessions.filter((sess) => (sess.account.type === AccountType.AWS_TRUSTER ||
-        sess.account.type === AccountType.AWS_SSO ||
-        sess.account.type === AccountType.AWS_PLAIN_USER ||
-        sess.account.type === AccountType.AWS) && sess.active);
+    return workspace.sessions.filter((sess) => (sess.account.type === SessionType.AWS_TRUSTER ||
+        sess.account.type === SessionType.AWS_SSO ||
+        sess.account.type === SessionType.AWS_PLAIN_USER ||
+        sess.account.type === SessionType.AWS) && sess.status === SessionStatus.ACTIVE);
   }
 
   cleanCredentials(workspace: Workspace): void {
@@ -43,7 +44,7 @@ export class AwsSsoStrategy {
   manageSingleSession(workspace, session): Observable<boolean> {
 
 
-    if (session.account.type === AccountType.AWS_SSO) {
+    if (session.account.type === SessionType.AWS_SSO) {
       return this.awsCredentialProcess(workspace, session);
     } else {
       // We need this because we have checked also for non AWS_SSO potential active sessions,

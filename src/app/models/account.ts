@@ -1,8 +1,8 @@
-import {AccountType} from './AccountType';
+import {SessionType} from './session-type';
 
 export class Account {
   accountName: string;
-  type: AccountType;
+  type: SessionType;
   region: string;
 
   constructor(accountName: string, region: string) {

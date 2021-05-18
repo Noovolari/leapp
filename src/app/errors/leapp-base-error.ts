@@ -1,4 +1,4 @@
-import {LoggerLevel} from "../services/app.service";
+import {LoggerLevel} from '../services/app.service';
 
 export class LeappBaseError extends Error {
   private _context: any;

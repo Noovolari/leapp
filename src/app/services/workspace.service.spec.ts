@@ -5,8 +5,8 @@ import {mustInjected} from '../../base-injectables';
 import {Session} from '../models/session';
 import {AwsPlainAccount} from '../models/aws-plain-account';
 import {serialize} from 'class-transformer';
-import {AppService} from "./app.service";
-import {FileService} from "./file.service";
+import {AppService} from './app.service';
+import {FileService} from './file.service';
 
 describe('WorkspaceService', () => {
   let workspaceService;

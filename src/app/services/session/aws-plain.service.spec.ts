@@ -1,18 +1,18 @@
 import {TestBed} from '@angular/core/testing';
 
 import {AwsPlainService} from './aws-plain.service';
-import {mustInjected} from "../../../base-injectables";
-import {serialize} from "class-transformer";
-import {Workspace} from "../../models/workspace";
-import {AppService} from "../app.service";
-import {FileService} from "../file.service";
-import {WorkspaceService} from "../workspace.service";
-import {Session} from "../../models/session";
-import {KeychainService} from "../keychain.service";
-import {environment} from "../../../environments/environment";
-import {LeappNotFoundError} from "../../errors/leapp-not-found-error";
-import AWS from "aws-sdk";
-import {LeappBaseError} from "../../errors/leapp-base-error";
+import {mustInjected} from '../../../base-injectables';
+import {serialize} from 'class-transformer';
+import {Workspace} from '../../models/workspace';
+import {AppService} from '../app.service';
+import {FileService} from '../file.service';
+import {WorkspaceService} from '../workspace.service';
+import {Session} from '../../models/session';
+import {KeychainService} from '../keychain.service';
+import {environment} from '../../../environments/environment';
+import {LeappNotFoundError} from '../../errors/leapp-not-found-error';
+import AWS from 'aws-sdk';
+import {LeappBaseError} from '../../errors/leapp-base-error';
 
 let spyAppService;
 let spyFileService;
@@ -49,7 +49,9 @@ describe('AwsPlainService', () => {
     });
 
     spyWorkspaceService = jasmine.createSpyObj('WorkspaceService', ['addSession', 'getProfileName']);
-    spyWorkspaceService.addSession.and.callFake((session: Session) => { mockedSessions.push(session); });
+    spyWorkspaceService.addSession.and.callFake((session: Session) => {
+ mockedSessions.push(session); 
+});
     spyWorkspaceService.getProfileName.and.returnValue('default');
 
     spyKeychainService = jasmine.createSpyObj('KeychainService' , ['saveSecret', 'getSecret']);
@@ -59,9 +61,7 @@ describe('AwsPlainService', () => {
       mockedSecret[name][account] = secret;
     });
 
-    spyKeychainService.getSecret.and.callFake((name: string, account: string, secret: string) => {
-      return 'fake-secret';
-    });
+    spyKeychainService.getSecret.and.callFake((name: string, account: string, secret: string) => 'fake-secret');
 
     awsSpy = jasmine.createSpyObj('AWS.STS', ['getSessionToken']);
     awsSpy.getSessionToken.and.returnValue(new LeappNotFoundError('test', 'mega error'));
@@ -102,9 +102,7 @@ describe('AwsPlainService', () => {
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
-      spyOn(awsPlainService, 'get').and.callFake((_: string) => {
-        return mockedSessions[0];
-      })
+      spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
 
       const credentialsInfo = {
         sessionToken: {
@@ -138,9 +136,7 @@ describe('AwsPlainService', () => {
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
-      spyOn(awsPlainService, 'get').and.callFake((sessionId: string) => {
-        return mockedSessions[0];
-      })
+      spyOn(awsPlainService, 'get').and.callFake((sessionId: string) => mockedSessions[0]);
 
       const credentialsInfo = {
         sessionToken: {
@@ -159,9 +155,7 @@ describe('AwsPlainService', () => {
         }
       };
 
-      spyFileService.iniParseSync.and.callFake( () => {
-        return credentialFakeObject;
-      });
+      spyFileService.iniParseSync.and.callFake( () => credentialFakeObject);
       spyFileService.replaceWriteSync.and.callFake( () => {});
 
       awsPlainService.deApplyCredentials(mockedSessions[0].sessionId);
@@ -189,7 +183,7 @@ describe('AwsPlainService', () => {
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
-      spyOn(awsPlainService, 'get').and.callFake((_: string) => { return mockedSessions[0]; });
+      spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsPlainService, 'generateCredentials').and.callThrough();
 
       const credentials = await awsPlainService.generateCredentials('fakeid');
@@ -206,7 +200,7 @@ describe('AwsPlainService', () => {
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
-      spyOn(awsPlainService, 'get').and.callFake((_: string) => { return mockedSessions[0]; });
+      spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsPlainService, 'generateCredentials').and.callThrough();
 
       // Trick to test throwing error: basically we catch the error and confront it instead of checking throwError

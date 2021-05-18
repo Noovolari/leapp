@@ -10,7 +10,7 @@ import {AppService, LoggerLevel} from '../app.service';
 import AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
 import {FileService} from '../file.service';
-import {LeappBaseError} from "../../errors/leapp-base-error";
+import {LeappBaseError} from '../../errors/leapp-base-error';
 
 export interface AwsPlainAccountRequest {
   accountName: string;

@@ -3,7 +3,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Workspace} from '../../models/workspace';
-import {AccountType} from '../../models/AccountType';
+import {SessionType} from '../../models/session-type';
 import {Session} from '../../models/session';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 
@@ -13,8 +13,8 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
   styleUrls: ['./edit-account.component.scss']
 })
 export class EditAccountComponent implements OnInit {
-  accountType = AccountType.AWS_PLAIN_USER;
-  provider = AccountType.AWS;
+  accountType = SessionType.AWS_PLAIN_USER;
+  provider = SessionType.AWS;
   selectedSession: Session;
 
   selectedAccountNumber = '';

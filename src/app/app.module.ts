@@ -17,7 +17,7 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import {TrayMenuComponent} from './shared/tray-menu/tray-menu.component';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {ModalModule} from 'ngx-bootstrap/modal';
-import {ErrorService} from "./services/middleware/error.service";
+import {ErrorService} from './services/middleware/error.service';
 
 export function httpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, 'assets/i18n/', '.json');

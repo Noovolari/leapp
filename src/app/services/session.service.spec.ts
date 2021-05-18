@@ -2,16 +2,17 @@ import {TestBed} from '@angular/core/testing';
 
 import {SessionService} from './session.service';
 import {mustInjected} from '../../base-injectables';
-import {serialize} from "class-transformer";
-import {Workspace} from "../models/workspace";
-import {AppService} from "./app.service";
-import {FileService} from "./file.service";
-import {Session} from "../models/session";
-import {WorkspaceService} from "./workspace.service";
-import {Account} from "../models/account";
-import {AccountType} from "../models/AccountType";
-import {AwsPlainService} from "./session/aws-plain.service";
-import {LeappNotFoundError} from "../errors/leapp-not-found-error";
+import {serialize} from 'class-transformer';
+import {Workspace} from '../models/workspace';
+import {AppService} from './app.service';
+import {FileService} from './file.service';
+import {Session} from '../models/session';
+import {WorkspaceService} from './workspace.service';
+import {Account} from '../models/account';
+import {SessionType} from '../models/session-type';
+import {AwsPlainService} from './session/aws-plain.service';
+import {LeappNotFoundError} from '../errors/leapp-not-found-error';
+import {SessionStatus} from '../models/session-status';
 
 let spyAppService;
 let spyFileService;
@@ -20,7 +21,7 @@ let spyWorkspaceService;
 let mockedSession;
 let mockedSessions = [];
 
-let fakePromise = Promise.resolve(undefined);
+const fakePromise = Promise.resolve(undefined);
 
 describe('SessionService', () => {
   spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
@@ -91,14 +92,14 @@ describe('SessionService', () => {
       const service: SessionService = TestBed.inject(SessionService);
 
       expect(service.listChildren()).toBeInstanceOf(Array);
-      expect(service.listChildren().filter(c => c.account.type === AccountType.AWS_TRUSTER)).toEqual([]);
+      expect(service.listChildren().filter(c => c.account.type === SessionType.AWS_TRUSTER)).toEqual([]);
 
       const mockedSession2 = new Session(new Account('fakeaccount2', 'eu-west-2'), 'fakeprofile2');
-      mockedSession2.account.type = AccountType.AWS_TRUSTER;
+      mockedSession2.account.type = SessionType.AWS_TRUSTER;
       mockedSessions.push(mockedSession2);
 
       expect(service.listChildren()).toBeInstanceOf(Array);
-      expect(service.listChildren().filter(c => c.account.type === AccountType.AWS_TRUSTER)).toEqual([mockedSession2]);
+      expect(service.listChildren().filter(c => c.account.type === SessionType.AWS_TRUSTER)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
@@ -115,14 +116,14 @@ describe('SessionService', () => {
       const service: SessionService = TestBed.inject(SessionService);
 
       expect(service.listActive()).toBeInstanceOf(Array);
-      expect(service.listActive().filter(c => c.active)).toEqual([]);
+      expect(service.listActive().filter(c => c.status === SessionStatus.ACTIVE)).toEqual([]);
 
       const mockedSession2 = new Session(new Account('fakeaccount2', 'eu-west-2'), 'fakeprofile2');
-      mockedSession2.active = true;
+      mockedSession2.status = SessionStatus.ACTIVE;
       mockedSessions.push(mockedSession2);
 
       expect(service.listActive()).toBeInstanceOf(Array);
-      expect(service.listActive().filter(c => c.active)).toEqual([mockedSession2]);
+      expect(service.listActive().filter(c => c.status === SessionStatus.ACTIVE)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
@@ -144,13 +145,13 @@ describe('SessionService', () => {
       spyOn(service,'generateCredentials').and.callFake(() => fakePromise);
       spyOn(service,'applyCredentials').and.callFake(() => fakePromise);
 
-      expect(mockedSession.active).toBe(false);
+      expect(mockedSession.status).toBe(SessionStatus.INACTIVE);
 
       service.start('fakeid');
 
       const caller = setTimeout(() => {
         expect((service as any).sessionActivate).toHaveBeenCalled();
-        expect(mockedSession.active).toBe(true);
+        expect(mockedSession.status).toBe(SessionStatus.ACTIVE);
 
         done();
         clearTimeout(caller);
@@ -184,7 +185,9 @@ describe('SessionService', () => {
 
       // <any> is a trick to spy on private methods!
       spyOn<any>(service, 'sessionError').and.callThrough();
-      spyOn<any>(service,'sessionLoading').and.callFake(() => { throw new LeappNotFoundError(this, 'exploded fake function')});
+      spyOn<any>(service,'sessionLoading').and.callFake(() => {
+ throw new LeappNotFoundError(this, 'exploded fake function');
+});
 
       service.start('fakeid');
       expect((service as any).sessionError).toHaveBeenCalled();
@@ -195,19 +198,19 @@ describe('SessionService', () => {
     it('should stop a session', (done) => {
       const service: SessionService = TestBed.inject(AwsPlainService);
 
-      mockedSession.active = true;
+      mockedSession.status = SessionStatus.ACTIVE;
       mockedSessions = [mockedSession];
 
       // <any> is a trick to spy on private methods!
       spyOn(service,'deApplyCredentials').and.callFake(() => fakePromise);
       spyOn<any>(service,'sessionDeactivated').and.callThrough();
 
-      expect(mockedSession.active).toBe(true);
+      expect(mockedSession.status === SessionStatus.ACTIVE).toBe(true);
       service.stop('fakeid');
 
       const caller = setTimeout(() => {
         expect((service as any).sessionDeactivated).toHaveBeenCalled();
-        expect(mockedSession.active).toBe(false);
+        expect(mockedSession.status === SessionStatus.ACTIVE).toBe(false);
 
         done();
         clearTimeout(caller);
@@ -238,7 +241,9 @@ describe('SessionService', () => {
       // <any> is a trick to spy on private methods!
       spyOn<any>(service, 'sessionError').and.callFake(() => {});
       spyOn(service,'deApplyCredentials').and.callFake(() => fakePromise);
-      spyOn<any>(service,'sessionDeactivated').and.callFake(() => { throw new LeappNotFoundError(this, 'exploded fake function')});
+      spyOn<any>(service,'sessionDeactivated').and.callFake(() => {
+ throw new LeappNotFoundError(this, 'exploded fake function');
+});
 
       service.stop('fakeid');
 
@@ -276,7 +281,7 @@ describe('SessionService', () => {
           expect((service as any).applyCredentials).toHaveBeenCalled();
           expect((service as any).sessionRotated).toHaveBeenCalled();
 
-          expect(mockedSession.loading).toBe(false);
+          expect(mockedSession.status).toBe(SessionStatus.ACTIVE);
           expect(service.get('fakeid').startDateTime).not.toBe(previousStartDateTime);
           expect(new Date(service.get('fakeid').startDateTime).getTime()).toBeGreaterThan(new Date(previousStartDateTime).getTime());
 
@@ -315,7 +320,9 @@ describe('SessionService', () => {
 
       // <any> is a trick to spy on private methods!
       spyOn<any>(service, 'sessionError').and.callThrough();
-      spyOn<any>(service,'sessionLoading').and.callFake(() => { throw new LeappNotFoundError(this, 'exploded fake function')});
+      spyOn<any>(service,'sessionLoading').and.callFake(() => {
+ throw new LeappNotFoundError(this, 'exploded fake function');
+});
 
       service.rotate('fakeid');
       expect((service as any).sessionError).toHaveBeenCalled();

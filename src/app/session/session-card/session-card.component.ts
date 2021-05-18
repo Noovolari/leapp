@@ -6,7 +6,7 @@ import {Router} from '@angular/router';
 import {AwsAccount} from '../../models/aws-account';
 import {SsmService} from '../../services/ssm.service';
 import {AzureAccount} from '../../models/azure-account';
-import {AccountType} from '../../models/AccountType';
+import {SessionType} from '../../models/session-type';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import {KeychainService} from '../../services/keychain.service';
@@ -14,9 +14,10 @@ import {AwsSsoAccount} from '../../models/aws-sso-account';
 import * as uuid from 'uuid';
 import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
-import {FileService} from "../../services/file.service";
-import {SessionProviderService} from "../../services/session-provider.service";
-import {LeappNotFoundError} from "../../errors/leapp-not-found-error";
+import {FileService} from '../../services/file.service';
+import {SessionProviderService} from '../../services/session-provider.service';
+import {LeappNotFoundError} from '../../errors/leapp-not-found-error';
+import {SessionStatus} from '../../models/session-status';
 
 @Component({
   selector: 'app-session-card',
@@ -36,7 +37,9 @@ export class SessionCardComponent implements OnInit {
   @ViewChild('defaultProfileModalTemplate', { static: false })
   defaultProfileModalTemplate: TemplateRef<any>;
 
-  eAccountType = AccountType;
+  eSessionType = SessionType;
+  eSessionStatus = SessionStatus;
+
   modalRef: BsModalRef;
 
   @Input()
@@ -79,22 +82,22 @@ export class SessionCardComponent implements OnInit {
     this.profiles = this.workspaceService.get().profiles;
 
     const azureLocations = this.appService.getLocations();
-    this.regionOrLocations = this.session.account.type !== AccountType.AZURE ? this.awsRegions : azureLocations;
-    this.placeholder = this.session.account.type !== AccountType.AZURE ? 'Select a default region' : 'Select a default location';
+    this.regionOrLocations = this.session.account.type !== SessionType.AZURE ? this.awsRegions : azureLocations;
+    this.placeholder = this.session.account.type !== SessionType.AZURE ? 'Select a default region' : 'Select a default location';
     this.selectedDefaultRegion = this.session.account.region;
     this.selectedProfile = this.session.profileId;
 
     switch (this.session.account.type) {
-      case(AccountType.AWS):
+      case(SessionType.AWS):
         this.sessionDetailToShow = (this.session.account as AwsAccount).role.name;
         break;
-      case(AccountType.AZURE):
+      case(SessionType.AZURE):
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
         break;
-      case(AccountType.AWS_PLAIN_USER):
+      case(SessionType.AWS_PLAIN_USER):
         this.sessionDetailToShow = (this.session.account as AwsPlainAccount).accountName;
         break;
-      case(AccountType.AWS_SSO):
+      case(SessionType.AWS_SSO):
         this.sessionDetailToShow = (this.session.account as AwsSsoAccount).role.name;
         break;
     }
@@ -189,7 +192,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   switchCredentials() {
-    if (this.session.active) {
+    if (this.session.status === SessionStatus.ACTIVE) {
       this.stopSession();
     } else {
       this.startSession();
@@ -265,7 +268,7 @@ export class SessionCardComponent implements OnInit {
   changeRegion() {
     if (this.selectedDefaultRegion) {
 
-      if (this.session.active) {
+      if (this.session.status === SessionStatus.ACTIVE) {
         this.sessionService.stop(this.session.sessionId);
       }
 
@@ -273,7 +276,7 @@ export class SessionCardComponent implements OnInit {
       // this.sessionService.invalidateSessionToken(this.session);
       // this.sessionService.update(this.session);
 
-      if (this.session.active) {
+      if (this.session.status === SessionStatus.ACTIVE) {
         this.startSession();
       } else {
       }
@@ -338,14 +341,14 @@ export class SessionCardComponent implements OnInit {
 
   changeProfile() {
     if (this.selectedProfile) {
-      if (this.session.active) {
+      if (this.session.status === SessionStatus.ACTIVE) {
         this.sessionService.stop(this.session.sessionId);
       }
 
       // this.sessionService.addProfile(this.selectedProfile);
       // this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
 
-      if (this.session.active) {
+      if (this.session.status === SessionStatus.ACTIVE) {
         this.startSession();
       } else {
       }

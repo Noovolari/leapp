@@ -95,6 +95,7 @@ export class FileService extends NativeService {
 
   /**
    * Creates a new directory
+   *
    * @param path - the new directory path
    * @param options - some options if needed - optional
    */

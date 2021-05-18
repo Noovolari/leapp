@@ -1,9 +1,9 @@
-import {AccountType} from './AccountType';
+import {SessionType} from './session-type';
 import {Account} from './account';
 
 export class AwsSsoAccount  extends Account {
   accountName: string;
-  type: AccountType;
+  type: SessionType;
   region: string;
   accountId: string;
   accountNumber: string;

@@ -56,8 +56,8 @@ export class AwsSsoComponent implements OnInit {
       this.isAwsSsoActive = false;
       this.setValues();
     }, (err) => {
-      this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+      this.appService.logger(err.toString(), LoggerLevel.error, this, err.stack);
+      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.error, 'AWS SSO error.');
     });
   }
 

@@ -31,8 +31,8 @@ export class ProxyService {
     }
   }
 
-  getHttpClientOptions(url: string): object {
-    const options = this.appService.url.parse(url);
+  getHttpClientOptions(url: string): any {
+    const options = this.appService.getUrl().parse(url);
     const workspace = this.workspaceService.get();
 
     let proxyUrl;

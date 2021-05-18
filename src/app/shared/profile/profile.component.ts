@@ -29,6 +29,6 @@ export class ProfileComponent implements OnInit {
   toggleProfile() {
     this.profileIsOpen = !this.profileIsOpen; // Toggle status
     this.appService.profileOpen.emit(this.profileIsOpen); // Emit event for screen
-    this.appService.logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.INFO, this);
+    this.appService.logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.info, this);
   }
 }

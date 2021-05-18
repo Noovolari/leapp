@@ -4,10 +4,12 @@ import {environment} from '../../environments/environment';
 import {Type} from 'class-transformer';
 
 export class Workspace {
-  private _idpUrl: { id: string; url: string }[];
-  private _profiles: { id: string; name: string }[];
   @Type(() => Session)
   private _sessions: Session[];
+
+  private _idpUrl: { id: string; url: string }[];
+  private _profiles: { id: string; name: string }[];
+
   private _proxyConfiguration: {
     proxyProtocol: string;
     proxyUrl: string;
@@ -15,6 +17,7 @@ export class Workspace {
     username: string;
     password: string;
   };
+
   private _defaultRegion: string;
   private _defaultLocation: string;
 

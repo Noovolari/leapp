@@ -8,8 +8,8 @@ import {SessionStatus} from '../../models/session-status';
 export class FilteringPipe implements PipeTransform {
   transform(sessions: Session[], activeOrPending: boolean): Session[] {
     return sessions.filter(session => activeOrPending ?
-      (session.status === SessionStatus.ACTIVE || session.status === SessionStatus.PENDING) :
-      session.status === SessionStatus.INACTIVE
+      (session.status === SessionStatus.active || session.status === SessionStatus.pending) :
+      session.status === SessionStatus.inactive
     );
   }
 }

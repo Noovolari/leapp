@@ -7,6 +7,7 @@
 import * as Keytar from 'keytar';
 
 export class NativeService {
+  protected url: any;
   protected log: any;
   protected fs: any;
   protected rimraf: any;
@@ -22,7 +23,6 @@ export class NativeService {
   protected sudo: any;
   protected md5File: any;
   protected path: any;
-  public url: any;
   protected currentWindow: any;
   protected semver: any;
   protected shell: any;

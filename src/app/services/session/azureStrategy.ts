@@ -22,9 +22,9 @@ export class AzureStrategy {
     private configurationService: ConfigurationService) {}
 
   getActiveSessions(workspace: Workspace) {
-    const activeSessions = workspace.sessions.filter((sess) => sess.account.type === SessionType.AZURE && sess.status === SessionStatus.ACTIVE);
+    const activeSessions = workspace.sessions.filter((sess) => sess.account.type === SessionType.azure && sess.status === SessionStatus.active);
 
-    this.appService.logger('active azure sessions', LoggerLevel.INFO, this, JSON.stringify(activeSessions, null, 3));
+    this.appService.logger('active azure sessions', LoggerLevel.info, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
   }
 
@@ -65,7 +65,7 @@ export class AzureStrategy {
           this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
             this.azureSetSubscription(observer, session);
           }, err => {
-            this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
+            this.appService.logger('Error in command by Azure Cli', LoggerLevel.error, this, err.stack);
             console.log('Error in command by Azure CLI', err);
             observer.next(false);
             observer.complete();
@@ -79,7 +79,7 @@ export class AzureStrategy {
         this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
           this.azureSetSubscription(observer, session);
         }, err => {
-          this.appService.logger('Error in command by Azure Cli', LoggerLevel.ERROR, this, err.stack);
+          this.appService.logger('Error in command by Azure Cli', LoggerLevel.error, this, err.stack);
           console.log('Error in command by Azure CLI', err);
           observer.next(false);
           observer.complete();
@@ -112,13 +112,13 @@ export class AzureStrategy {
       observer.next(true);
       observer.complete();
     }, err2 => {
-      this.appService.logger('Error in command: set subscription by Azure Cli', LoggerLevel.ERROR, this, err2.stack);
+      this.appService.logger('Error in command: set subscription by Azure Cli', LoggerLevel.error, this, err2.stack);
 
       // this.sessionService.stop(session.sessionId);
 
       // this.workspaceService.update(workspace);
       this.appService.refreshReturnStatusEmit.emit(session);
-      this.appService.toast('Can\'t refresh Credentials.', ToastLevel.WARN, 'Credentials');
+      this.appService.toast('Can\'t refresh Credentials.', ToastLevel.warn, 'Credentials');
       observer.next(false);
       observer.complete();
     });

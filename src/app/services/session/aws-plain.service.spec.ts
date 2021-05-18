@@ -10,15 +10,15 @@ import {WorkspaceService} from '../workspace.service';
 import {Session} from '../../models/session';
 import {KeychainService} from '../keychain.service';
 import {environment} from '../../../environments/environment';
-import {LeappNotFoundError} from '../../errors/leapp-not-found-error';
-import AWS from 'aws-sdk';
 import {LeappBaseError} from '../../errors/leapp-base-error';
+
+import * as AWSMock from 'aws-sdk-mock';
+import * as AWS from 'aws-sdk';
 
 let spyAppService;
 let spyFileService;
 let spyWorkspaceService;
 let spyKeychainService;
-let awsSpy;
 
 let awsPlainService: AwsPlainService;
 
@@ -38,20 +38,22 @@ describe('AwsPlainService', () => {
       'encryptText', 'decryptText', 'iniWriteSync', 'iniParseSync',
       'replaceWriteSync', 'writeFileSync', 'readFileSync', 'exists', 'newDir'
     ]);
+
     spyFileService.exists.and.returnValue(true);
     spyFileService.newDir.and.returnValue(true);
     spyFileService.encryptText.and.callFake((text: string) => text);
     spyFileService.decryptText.and.callFake((text: string) => text);
     spyFileService.writeFileSync.and.callFake((_: string, __: string) => {});
     spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()) );
-    spyFileService.iniWriteSync.and.callFake((_: string, object: { }) => {
+    spyFileService.iniWriteSync.and.callFake((_: string, object: any) => {
       mockedCredentialObject = object;
     });
 
     spyWorkspaceService = jasmine.createSpyObj('WorkspaceService', ['addSession', 'getProfileName']);
     spyWorkspaceService.addSession.and.callFake((session: Session) => {
- mockedSessions.push(session); 
-});
+      mockedSessions.push(session);
+    });
+
     spyWorkspaceService.getProfileName.and.returnValue('default');
 
     spyKeychainService = jasmine.createSpyObj('KeychainService' , ['saveSecret', 'getSecret']);
@@ -61,18 +63,14 @@ describe('AwsPlainService', () => {
       mockedSecret[name][account] = secret;
     });
 
-    spyKeychainService.getSecret.and.callFake((name: string, account: string, secret: string) => 'fake-secret');
-
-    awsSpy = jasmine.createSpyObj('AWS.STS', ['getSessionToken']);
-    awsSpy.getSessionToken.and.returnValue(new LeappNotFoundError('test', 'mega error'));
+    spyKeychainService.getSecret.and.callFake((_: string, _2: string, _3: string) => 'fake-secret');
 
     TestBed.configureTestingModule({
       providers: [
         { provide: WorkspaceService, useValue: spyWorkspaceService },
         { provide: AppService, useValue: spyAppService },
         { provide: FileService, useValue: spyFileService },
-        { provide: KeychainService, useValue: spyKeychainService },
-        { provide: AWS.STS, useValue: awsSpy }
+        { provide: KeychainService, useValue: spyKeychainService }
       ].concat(mustInjected())
     });
 
@@ -106,8 +104,11 @@ describe('AwsPlainService', () => {
 
       const credentialsInfo = {
         sessionToken: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_access_key_id: 'access-key',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_secret_access_key: 'secret-key',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_session_token: 'sessionToken'
         }
       };
@@ -119,8 +120,11 @@ describe('AwsPlainService', () => {
         expect(spyFileService.iniWriteSync).toHaveBeenCalledTimes(1);
         expect(spyFileService.iniWriteSync).toHaveBeenCalledWith('~/.aws', {
           default: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
             aws_session_token: credentialsInfo.sessionToken.aws_session_token,
             region: 'eu-west-1'
           }
@@ -136,20 +140,26 @@ describe('AwsPlainService', () => {
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
-      spyOn(awsPlainService, 'get').and.callFake((sessionId: string) => mockedSessions[0]);
+      spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
 
       const credentialsInfo = {
         sessionToken: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_access_key_id: 'access-key',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_secret_access_key: 'secret-key',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_session_token: 'sessionToken'
         }
       };
 
       const credentialFakeObject = {
         default: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_session_token: credentialsInfo.sessionToken.aws_session_token,
           region: 'eu-west-1'
         }
@@ -172,12 +182,21 @@ describe('AwsPlainService', () => {
 
   describe('generateCredentials()',  () => {
     it('should generate a Credential Info Promise', async () => {
-      awsSpy.getSessionToken.and.returnValue({
-        Credentials: {
-          AccessKeyId: 'access-key-id-1',
-          SecretAccessKey: 'secret-key-1',
-          SessionToken: 'session-token'
-        }
+
+      AWSMock.setSDKInstance(AWS);
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      AWSMock.mock('STS', 'getSessionToken', (params: { DurationSeconds: number }, callback: any) => {
+        callback(null, {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          Credentials: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            AccessKeyId: 'access-key-id-1',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            SecretAccessKey: 'secret-key-1',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            SessionToken: 'session-token'
+          }
+        });
       });
 
       mockedSessions = [];
@@ -189,11 +208,16 @@ describe('AwsPlainService', () => {
       const credentials = await awsPlainService.generateCredentials('fakeid');
       expect(credentials).toEqual({
         sessionToken: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_access_key_id: 'access-key-id-1',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_secret_access_key: 'secret-key-1',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_session_token: 'session-token',
         }
       });
+
+      AWSMock.restore('STS');
     });
 
     it('should manage Error in its proper way and thrown the info up one level short after', async () => {

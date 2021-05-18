@@ -15,9 +15,9 @@ describe('FilteringPipe', () => {
     sessions.push(new Session(new Account('account4', 'eu-west-1'), uuid.v4()));
     sessions.push(new Session(new Account('account5', 'eu-west-1'), uuid.v4()));
 
-    sessions[1].status = SessionStatus.ACTIVE;
-    sessions[2].status = SessionStatus.ACTIVE;
-    sessions[4].status = SessionStatus.ACTIVE;
+    sessions[1].status = SessionStatus.active;
+    sessions[2].status = SessionStatus.active;
+    sessions[4].status = SessionStatus.active;
   });
 
   it('create an instance', () => {

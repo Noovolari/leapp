@@ -6,7 +6,7 @@
     <div class="tabs">
       <label class="tab {{activeTab === 1 ? 'active': ''}}" (click)="activeTab = 1;">General</label>
       <label class="tab {{activeTab === 2 ? 'active': ''}}" (click)="activeTab = 2;">SAML Auth</label>
-      <label class="tab {{activeTab === 3 ? 'active': ''}}" (click)="activeTab = 3;">AWS Profiles</label>
+      <label class="tab {{activeTab === 3 ? 'active': ''}}" (click)="activeTab = 3;">aws Profiles</label>
     </div>
 
     <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
@@ -22,7 +22,7 @@
         <div class="form-group" style="width: 2%; display: inline-block;"></div>
 
         <div class="form-group" style="width: 49%; display: inline-block;">
-          <label>AWS Region</label>
+          <label>aws Region</label>
           <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="down"></ng-select>
         </div>
 
@@ -98,11 +98,11 @@
       </div>
 
       <div class="no-padding no-margin panel" *ngIf="activeTab === 3">
-        <h2 style="margin-top: 10px;">AWS profiles list</h2>
+        <h2 style="margin-top: 10px;">aws profiles list</h2>
 
         <div class="form-group" style="width: 88%; display: inline-block;">
-          <label>AWS Profile<span class="danger-text">*</span></label>
-          <input formControlName="awsProfile" type="text" class="form-control" placeholder="AWS Profile" [value]="awsProfileValue ? awsProfileValue.name : ''" >
+          <label>aws Profile<span class="danger-text">*</span></label>
+          <input formControlName="awsProfile" type="text" class="form-control" placeholder="aws Profile" [value]="awsProfileValue ? awsProfileValue.name : ''" >
         </div>
 
         <div class="form-group" style="width: 2%; display: inline-block;"></div>

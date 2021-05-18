@@ -9,6 +9,23 @@ import {InputDialogComponent} from '../shared/input-dialog/input-dialog.componen
 import {Constants} from '../models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 
+/*
+* External enum to the logger level so we can use this to define the type of log
+*/
+export enum LoggerLevel {
+  info,
+  warn,
+  error
+}
+/*
+* External enum to the toast level so we can use this to define the type of log
+*/
+export enum ToastLevel {
+  info,
+  warn,
+  error,
+  success
+}
 
 @Injectable({
   providedIn: 'root'
@@ -149,17 +166,17 @@ export class AppService extends NativeService {
     }
 
     switch (type) {
-      case LoggerLevel.INFO:
+      case LoggerLevel.info:
         if (!environment.production) {
  this.log.info(message);
 }
         break;
-      case LoggerLevel.WARN:
+      case LoggerLevel.warn:
         if (!environment.production) {
  this.log.warn(message);
 }
         break;
-      case LoggerLevel.ERROR:
+      case LoggerLevel.error:
         this.log.error(message);
         break;
       default:
@@ -276,10 +293,10 @@ export class AppService extends NativeService {
    */
   toast(message: string, type: ToastLevel | LoggerLevel, title?: string) {
     switch (type) {
-      case ToastLevel.SUCCESS: this.toastr.success(message, title); break;
-      case ToastLevel.INFO || LoggerLevel.INFO: this.toastr.info(message, title); break;
-      case ToastLevel.WARN || LoggerLevel.WARN: this.toastr.warning(message, title); break;
-      case ToastLevel.ERROR || LoggerLevel.ERROR: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
+      case ToastLevel.success: this.toastr.success(message, title); break;
+      case ToastLevel.info || LoggerLevel.info: this.toastr.info(message, title); break;
+      case ToastLevel.warn || LoggerLevel.warn: this.toastr.warning(message, title); break;
+      case ToastLevel.error || LoggerLevel.error: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
     }
   }
 
@@ -542,7 +559,7 @@ export class AppService extends NativeService {
       // Rewrite credential file
       this.fs.writeFileSync(awsCredentialsPath, '');
     } catch (e) {
-      this.logger(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.WARN, this, e.stack);
+      this.logger(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.warn, this, e.stack);
     }
   }
 
@@ -607,27 +624,11 @@ export class AppService extends NativeService {
   blockDevToolInProductionMode() {
     this.currentBrowserWindow().webContents.on('devtools-opened', () => {
       if (environment.production) {
-        this.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
+        this.logger('Closing Web tools in production mode', LoggerLevel.info, this);
         this.currentBrowserWindow().webContents.closeDevTools();
       }
     });
   }
 }
 
-/*
-* External enum to the logger level so we can use this to define the type of log
-*/
-export enum LoggerLevel {
-  INFO,
-  WARN,
-  ERROR
-}
-/*
-* External enum to the toast level so we can use this to define the type of log
-*/
-export enum ToastLevel {
-  INFO,
-  WARN,
-  ERROR,
-  SUCCESS
-}
+

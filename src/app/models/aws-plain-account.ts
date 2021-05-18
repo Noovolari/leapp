@@ -6,6 +6,7 @@ export class AwsPlainAccount extends Account {
   region: string;
   mfaDevice?: string;
   type: SessionType;
+  sessionTokenExpiration: string;
 
   constructor(accountName: string, region: string, mfaDevice?: string) {
     super(accountName, region);

@@ -14,12 +14,10 @@ import {Workspace} from '../models/workspace';
 describe('SessionProviderService', () => {
   let sessionProvider: SessionProviderService;
 
-  let spyAppService;
-  let spyFileService;
-  spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
+  const spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
   spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
 
-  spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync', 'exists']);
+  const spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync', 'exists']);
   spyFileService.exists.and.returnValue(true);
   spyFileService.encryptText.and.callFake((text: string) => text);
   spyFileService.decryptText.and.callFake((text: string) => text);
@@ -43,14 +41,14 @@ describe('SessionProviderService', () => {
   });
 
   it('should return a Aws Plain Service when requested with AccountType AWS_PLAIN_USER', () => {
-    const awsPlainService: SessionService = sessionProvider.getService(SessionType.AWS_PLAIN_USER);
+    const awsPlainService: SessionService = sessionProvider.getService(SessionType.awsplainuser);
     expect(awsPlainService).toBeInstanceOf(AwsPlainService);
   });
 
   it('should return the same Service (Singleton) when requested more than one time', () => {
-    const awsPlainService: SessionService = sessionProvider.getService(SessionType.AWS_PLAIN_USER);
-    const awsPlainServiceCopy: SessionService = sessionProvider.getService(SessionType.AWS_PLAIN_USER);
-    const awsPlainServiceCopy2: SessionService = sessionProvider.getService(SessionType.AWS_PLAIN_USER);
+    const awsPlainService: SessionService = sessionProvider.getService(SessionType.awsplainuser);
+    const awsPlainServiceCopy: SessionService = sessionProvider.getService(SessionType.awsplainuser);
+    const awsPlainServiceCopy2: SessionService = sessionProvider.getService(SessionType.awsplainuser);
 
     expect(awsPlainService).toEqual(awsPlainServiceCopy);
     expect(awsPlainServiceCopy).toEqual(awsPlainServiceCopy2);

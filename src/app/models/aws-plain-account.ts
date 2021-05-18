@@ -10,7 +10,7 @@ export class AwsPlainAccount extends Account {
   constructor(accountName: string, region: string, mfaDevice?: string) {
     super(accountName, region);
     this.mfaDevice = mfaDevice;
-    this.type = SessionType.AWS_PLAIN_USER;
+    this.type = SessionType.awsplainuser;
   }
 }
 

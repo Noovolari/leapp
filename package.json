@@ -171,6 +171,7 @@
     "@sebgroup/ng-magic-iframe": "~1.0.2",
     "@types/jest": "~26.0.23",
     "aws-sdk": "~2.893.0",
+    "aws-sdk-mock": "^5.1.0",
     "bootstrap": "~4.6.0",
     "chdir": "0.0.0",
     "class-transformer": "^0.4.0",

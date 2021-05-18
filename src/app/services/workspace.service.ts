@@ -13,20 +13,22 @@ import {BehaviorSubject} from 'rxjs';
 })
 export class WorkspaceService extends NativeService {
 
+  // Expose the observable$ part of the _sessions subject (read only stream)
+  readonly sessions$;
+
   // - We set the initial state in BehaviorSubject's constructor
   // - Nobody outside the Store should have access to the BehaviorSubject
   //   because it has the write rights
   // - Writing to state should be handled by specialized Store methods
   // - Create one BehaviorSubject per store entity, for example if you have
   //   create a new BehaviorSubject for it, as well as the observable$, and getters/setters
-
-  private readonly _sessions = new BehaviorSubject<Session[]>([]);
-
-  // Expose the observable$ part of the _sessions subject (read only stream)
-  readonly sessions$ = this._sessions.asObservable();
+  private readonly _sessions;
 
   constructor(private appService: AppService, private fileService: FileService) {
     super();
+    this._sessions = new BehaviorSubject<Session[]>([]);
+    this.sessions$ = this._sessions.asObservable();
+
     this.create();
     this.sessions = this.getPersistedSessions();
   }

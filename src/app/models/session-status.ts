@@ -1,5 +1,5 @@
 export enum SessionStatus {
-  INACTIVE,
-  PENDING,
-  ACTIVE
+  inactive,
+  pending,
+  active
 }

@@ -29,10 +29,10 @@ export class AwsSsoStrategy {
     private keychainService: KeychainService) {}
 
   getActiveSessions(workspace: Workspace) {
-    return workspace.sessions.filter((sess) => (sess.account.type === SessionType.AWS_TRUSTER ||
-        sess.account.type === SessionType.AWS_SSO ||
-        sess.account.type === SessionType.AWS_PLAIN_USER ||
-        sess.account.type === SessionType.AWS) && sess.status === SessionStatus.ACTIVE);
+    return workspace.sessions.filter((sess) => (sess.account.type === SessionType.awsTruster ||
+        sess.account.type === SessionType.awsSso ||
+        sess.account.type === SessionType.awsplainuser ||
+        sess.account.type === SessionType.aws) && sess.status === SessionStatus.active);
   }
 
   cleanCredentials(workspace: Workspace): void {
@@ -44,7 +44,7 @@ export class AwsSsoStrategy {
   manageSingleSession(workspace, session): Observable<boolean> {
 
 
-    if (session.account.type === SessionType.AWS_SSO) {
+    if (session.account.type === SessionType.awsSso) {
       return this.awsCredentialProcess(workspace, session);
     } else {
       // We need this because we have checked also for non AWS_SSO potential active sessions,
@@ -86,12 +86,12 @@ export class AwsSsoStrategy {
         // this.sessionService.stop(session.sessionId);
 
         if (err.name === 'LeappSessionTimedOut') {
-          this.appService.logger(err.toString(), LoggerLevel.WARN, this, err.stack);
-          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.WARN, 'AWS SSO warning.');
+          this.appService.logger(err.toString(), LoggerLevel.warn, this, err.stack);
+          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.warn, 'AWS SSO warning.');
           return of(false);
         } else {
-          this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+          this.appService.logger(err.toString(), LoggerLevel.error, this, err.stack);
+          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.error, 'AWS SSO error.');
           return of(false);
         }
 

@@ -46,19 +46,19 @@ export class TrayMenuComponent implements OnInit {
       const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
       switch (session.account.type) {
-        case SessionType.AWS_PLAIN_USER:
-          icon = session.status === SessionStatus.ACTIVE ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
+        case SessionType.awsplainuser:
+          icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + 'plain';
           break;
-        case SessionType.AWS:
-        case SessionType.AWS_TRUSTER:
-        case SessionType.AWS_SSO:
-          icon = session.status === SessionStatus.ACTIVE ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
+        case SessionType.aws:
+        case SessionType.awsTruster:
+        case SessionType.awsSso:
+          icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + (session.account as AwsAccount).role.name;
           break;
 
-        case SessionType.AZURE:
-          icon = session.status === SessionStatus.ACTIVE ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
+        case SessionType.azure:
+          icon = session.status === SessionStatus.active ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
           label = '  ' + session.account.accountName;
       }
       voices.push(
@@ -66,7 +66,7 @@ export class TrayMenuComponent implements OnInit {
           type: 'normal',
           icon,
           click: () => {
-            if (session.status !== SessionStatus.ACTIVE) {
+            if (session.status !== SessionStatus.active) {
               this.sessionService.start(session.sessionId);
               // TODO: refresh session credential
             } else {
@@ -131,7 +131,7 @@ export class TrayMenuComponent implements OnInit {
    */
   cleanBeforeExit() {
     // Check if we are here
-    this.appService.logger('Closing app with cleaning process...', LoggerLevel.INFO, this);
+    this.appService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
@@ -142,7 +142,7 @@ export class TrayMenuComponent implements OnInit {
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {
-      this.appService.logger('No sessions to stop, skipping...', LoggerLevel.ERROR, this, err.stack);
+      this.appService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit

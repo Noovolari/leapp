@@ -32,7 +32,7 @@ export class AppComponent implements OnInit {
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
-      this.app.logger('Preparing for closing instruction...', LoggerLevel.INFO, this);
+      this.app.logger('Preparing for closing instruction...', LoggerLevel.info, this);
       this.beforeCloseInstructions();
     });
 
@@ -81,14 +81,14 @@ export class AppComponent implements OnInit {
    */
   private beforeCloseInstructions() {
     // Check if we are here
-    this.app.logger('Closing app with cleaning process...', LoggerLevel.INFO, this);
+    this.app.logger('Closing app with cleaning process...', LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
       this.app.cleanCredentialFile();
     } catch (err) {
-      this.app.logger('No sessions to stop, skipping...', LoggerLevel.ERROR, this, err.stack);
+      this.app.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit
@@ -103,7 +103,7 @@ export class AppComponent implements OnInit {
     const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
     const check = workspace.sessions.length === 0 && this.app.getFs().existsSync(oldAwsCredentialsPath);
 
-    this.app.logger(`Check existing credential file: ${check}`, LoggerLevel.INFO, this);
+    this.app.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
 
     if (check) {
       this.app.getFs().renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);

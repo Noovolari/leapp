@@ -28,6 +28,9 @@ import {SessionStatus} from '../../models/session-status';
 
 export class SessionCardComponent implements OnInit {
 
+  @Input()
+  session!: Session;
+
   @ViewChild('ssmModalTemplate', { static: false })
   ssmModalTemplate: TemplateRef<any>;
 
@@ -41,9 +44,6 @@ export class SessionCardComponent implements OnInit {
   eSessionStatus = SessionStatus;
 
   modalRef: BsModalRef;
-
-  @Input()
-  session!: Session;
 
   // Ssm instances
   ssmloading = true;
@@ -82,22 +82,22 @@ export class SessionCardComponent implements OnInit {
     this.profiles = this.workspaceService.get().profiles;
 
     const azureLocations = this.appService.getLocations();
-    this.regionOrLocations = this.session.account.type !== SessionType.AZURE ? this.awsRegions : azureLocations;
-    this.placeholder = this.session.account.type !== SessionType.AZURE ? 'Select a default region' : 'Select a default location';
+    this.regionOrLocations = this.session.account.type !== SessionType.azure ? this.awsRegions : azureLocations;
+    this.placeholder = this.session.account.type !== SessionType.azure ? 'Select a default region' : 'Select a default location';
     this.selectedDefaultRegion = this.session.account.region;
     this.selectedProfile = this.session.profileId;
 
     switch (this.session.account.type) {
-      case(SessionType.AWS):
+      case(SessionType.aws):
         this.sessionDetailToShow = (this.session.account as AwsAccount).role.name;
         break;
-      case(SessionType.AZURE):
+      case(SessionType.azure):
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
         break;
-      case(SessionType.AWS_PLAIN_USER):
+      case(SessionType.awsplainuser):
         this.sessionDetailToShow = (this.session.account as AwsPlainAccount).accountName;
         break;
-      case(SessionType.AWS_SSO):
+      case(SessionType.awsSso):
         this.sessionDetailToShow = (this.session.account as AwsSsoAccount).role.name;
         break;
     }
@@ -121,7 +121,7 @@ export class SessionCardComponent implements OnInit {
 
     this.appService.logger(
       `Starting Session`,
-      LoggerLevel.INFO,
+      LoggerLevel.info,
       this,
       JSON.stringify({
         timestamp: new Date().toISOString(),
@@ -143,7 +143,7 @@ export class SessionCardComponent implements OnInit {
 
     this.appService.logger(
       `Stopped Session`,
-      LoggerLevel.INFO,
+      LoggerLevel.info,
       this,
       JSON.stringify({
         timestamp: new Date().toISOString(),
@@ -157,7 +157,7 @@ export class SessionCardComponent implements OnInit {
     event.stopPropagation();
     this.appService.confirmDialog('do you really want to delete this account?', () => {
       this.sessionService.delete(session.sessionId);
-      this.appService.logger('Session Deleted', LoggerLevel.INFO, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
+      this.appService.logger('Session Deleted', LoggerLevel.info, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
     });
   }
 
@@ -183,16 +183,16 @@ export class SessionCardComponent implements OnInit {
         const text = texts[type];
 
         this.appService.copyToClipboard(text);
-        this.appService.toast('Your information have been successfully copied!', ToastLevel.SUCCESS, 'Information copied!');
+        this.appService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');
       }
     } catch (err) {
-      this.appService.toast(err, ToastLevel.WARN);
-      this.appService.logger(err, LoggerLevel.ERROR, this, err.stack);
+      this.appService.toast(err, ToastLevel.warn);
+      this.appService.logger(err, LoggerLevel.error, this, err.stack);
     }
   }
 
   switchCredentials() {
-    if (this.session.status === SessionStatus.ACTIVE) {
+    if (this.session.status === SessionStatus.active) {
       this.stopSession();
     } else {
       this.startSession();
@@ -268,7 +268,7 @@ export class SessionCardComponent implements OnInit {
   changeRegion() {
     if (this.selectedDefaultRegion) {
 
-      if (this.session.status === SessionStatus.ACTIVE) {
+      if (this.session.status === SessionStatus.active) {
         this.sessionService.stop(this.session.sessionId);
       }
 
@@ -276,13 +276,13 @@ export class SessionCardComponent implements OnInit {
       // this.sessionService.invalidateSessionToken(this.session);
       // this.sessionService.update(this.session);
 
-      if (this.session.status === SessionStatus.ACTIVE) {
+      if (this.session.status === SessionStatus.active) {
         this.startSession();
       } else {
       }
 
 
-      this.appService.toast('Default region has been changed!', ToastLevel.SUCCESS, 'Region changed!');
+      this.appService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!');
       this.modalRef.hide();
     }
   }
@@ -341,19 +341,19 @@ export class SessionCardComponent implements OnInit {
 
   changeProfile() {
     if (this.selectedProfile) {
-      if (this.session.status === SessionStatus.ACTIVE) {
+      if (this.session.status === SessionStatus.active) {
         this.sessionService.stop(this.session.sessionId);
       }
 
       // this.sessionService.addProfile(this.selectedProfile);
       // this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
 
-      if (this.session.status === SessionStatus.ACTIVE) {
+      if (this.session.status === SessionStatus.active) {
         this.startSession();
       } else {
       }
 
-      this.appService.toast('Profile has been changed!', ToastLevel.SUCCESS, 'Profile changed!');
+      this.appService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!');
       this.modalRef.hide();
     }
   }

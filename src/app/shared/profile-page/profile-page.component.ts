@@ -115,13 +115,13 @@ export class ProfilePageComponent implements OnInit {
 
         this.appService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {
           if (res !== Constants.confirmClosed) {
-            this.appService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.INFO, this);
+            this.appService.logger('User have set a proxy url: the app must be restarted to update the configuration.', LoggerLevel.info, this);
             this.appService.restart();
           }
         });
       } else {
-        this.appService.logger('Option saved.', LoggerLevel.INFO, this, JSON.stringify(this.form.getRawValue(), null, 3));
-        this.appService.toast('Option saved.', ToastLevel.INFO, 'Options');
+        this.appService.logger('Option saved.', LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
+        this.appService.toast('Option saved.', ToastLevel.info, 'Options');
         this.router.navigate(['/sessions', 'session-selected']);
       }
     }
@@ -188,7 +188,7 @@ export class ProfilePageComponent implements OnInit {
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
       if (res !== Constants.confirmClosed) {
-        this.appService.logger(`Removing idp url with id: ${id}`, LoggerLevel.INFO, this);
+        this.appService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
         const idpUrl = this.workspace.idpUrl.findIndex(u => u.id === id);
         this.workspace.idpUrl.splice(idpUrl, 1);
         // this.workspaceService.update(this.workspace);
@@ -234,7 +234,7 @@ export class ProfilePageComponent implements OnInit {
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
       if (res !== Constants.confirmClosed) {
-        this.appService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.INFO, this);
+        this.appService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
         const profileToDelete = this.workspace.profiles.findIndex(p => p.id === id);
         this.workspace.profiles.splice(profileToDelete, 1);
         // this.workspaceService.update(this.workspace);

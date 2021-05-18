@@ -2,11 +2,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import {ErrorHandler, NgModule} from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { ToastrModule } from 'ngx-toastr';
 import { LayoutModule } from './layout/layout.module';
-import { HttpClient, HttpClientModule} from '@angular/common/http';
-import { TranslateHttpLoader } from '@ngx-translate/http-loader';
+import { HttpClientModule} from '@angular/common/http';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { ConfirmationDialogComponent } from './shared/confirmation-dialog/confirmation-dialog.component';
 import {SharedModule} from './shared/shared.module';
@@ -18,10 +16,6 @@ import {TrayMenuComponent} from './shared/tray-menu/tray-menu.component';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {ModalModule} from 'ngx-bootstrap/modal';
 import {ErrorService} from './services/middleware/error.service';
-
-export function httpLoaderFactory(http: HttpClient) {
-  return new TranslateHttpLoader(http, 'assets/i18n/', '.json');
-}
 
 @NgModule({
   declarations: [
@@ -44,14 +38,7 @@ export function httpLoaderFactory(http: HttpClient) {
       positionClass: 'toast-top-full-width'
     }),
     TooltipModule.forRoot(),
-    ModalModule.forRoot(),
-    TranslateModule.forRoot({
-      loader: {
-        provide: TranslateLoader,
-        useFactory: httpLoaderFactory,
-        deps: [HttpClient]
-      }
-    }),
+    ModalModule.forRoot()
   ],
   entryComponents: [ConfirmationDialogComponent, InputDialogComponent],
   providers: [{ provide: ErrorHandler, useClass: ErrorService}],

@@ -9,8 +9,8 @@
         <label>My cloud provider is:</label>
         <br>
         <div class="correct-top">
-        <button type="button" class="providers" (click)="setProvider(eAccountType.AWS);"><img src="assets/images/aws-logo.svg" height="20"></button>
-        <button type="button" class="providers" (click)="setProvider(eAccountType.AZURE);"><img src="assets/images/azure-logo.svg" height="20"></button>
+        <button type="button" class="providers" (click)="setProvider(eAccountType.aws);"><img src="assets/images/aws-logo.svg" height="20"></button>
+        <button type="button" class="providers" (click)="setProvider(eAccountType.azure);"><img src="assets/images/azure-logo.svg" height="20"></button>
         </div>
       </div>
 
@@ -26,7 +26,7 @@
       </div>
     </ng-container>
 
-    <ng-container *ngIf="provider !== eAccountType.AZURE && providerSelected && typeSelection">
+    <ng-container *ngIf="provider !== eAccountType.azure && providerSelected && typeSelection">
       <h1>Choose your Access Strategy</h1>
       <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
       <div class="form-group" style="width: 100%; display: inline-block;">
@@ -34,16 +34,16 @@
         <br>
         <ng-container *ngIf="accountType === undefined">
             <div class="correct-top">
-              <button type="button" class="providers {{accountType === eAccountType.AWS ? 'selected' : ''}}" (click)="hasSsoUrl = true; setAccessStrategy(eAccountType.AWS);">
+              <button type="button" class="providers {{accountType === eAccountType.aws ? 'selected' : ''}}" (click)="hasSsoUrl = true; setAccessStrategy(eAccountType.aws);">
                 <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated
               </button>
-              <button type="button" class="providers {{accountType === eAccountType.AWS_PLAIN_USER ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.AWS_PLAIN_USER);">
+              <button type="button" class="providers {{accountType === eAccountType.awsplainuser ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsplainuser);">
                 <i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain
               </button>
-              <button type="button" class="providers {{accountType === eAccountType.AWS_TRUSTER ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.AWS_TRUSTER);" *ngIf="!firstTime">
+              <button type="button" class="providers {{accountType === eAccountType.awsTruster ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsTruster);" *ngIf="!firstTime">
                 <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
               </button>
-              <span class="providers disabled second-step-fix" *ngIf="firstTime" tooltip="You need at least one Federated or Plain AWS account to unlock this feature.">
+              <span class="providers disabled second-step-fix" *ngIf="firstTime" tooltip="You need at least one Federated or Plain aws account to unlock this feature.">
                 <i class="fa fa-info"></i> Truster
               </span>
             </div>
@@ -51,59 +51,59 @@
       </div>
     </ng-container>
 
-    <ng-container *ngIf="((provider !== eAccountType.AWS) || (hasSsoUrl && (provider === eAccountType.AWS))) && !typeSelection && providerSelected">
+    <ng-container *ngIf="((provider !== eAccountType.aws) || (hasSsoUrl && (provider === eAccountType.aws))) && !typeSelection && providerSelected">
 
       <h1>Choose your Access Strategy</h1>
       <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
       <div style="width: 100%; display: inline-block;">
-        <ng-container *ngIf="accountType !== eAccountType.AZURE">
+        <ng-container *ngIf="accountType !== eAccountType.azure">
           <div class="form-group" style="width: 49%; display: inline-block;">
             <label>My Access Strategy is:</label>
             <br>
             <span class="providers">
-              <ng-container *ngIf="accountType === eAccountType.AWS"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</ng-container>
-              <ng-container *ngIf="accountType === eAccountType.AWS_TRUSTER"><i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster</ng-container>
-              <ng-container *ngIf="accountType === eAccountType.AWS_PLAIN_USER"><i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain</ng-container>
+              <ng-container *ngIf="accountType === eAccountType.aws"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</ng-container>
+              <ng-container *ngIf="accountType === eAccountType.awsTruster"><i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster</ng-container>
+              <ng-container *ngIf="accountType === eAccountType.awsplainuser"><i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain</ng-container>
             </span>
             <br><br>
           </div>
         </ng-container>
-        <ng-container *ngIf="accountType === eAccountType.AZURE">
+        <ng-container *ngIf="accountType === eAccountType.azure">
           <div class="form-group" style="width: 100%; display: inline-block">
             <label>My Access Strategy is:</label>
             <br>
             <span class="providers">
-              <ng-container *ngIf="accountType === eAccountType.AZURE"><i class="fa fa-info" tooltip="This is a set of option to create azure accounts"></i> Azure</ng-container>
+              <ng-container *ngIf="accountType === eAccountType.azure"><i class="fa fa-info" tooltip="This is a set of option to create azure accounts"></i> Azure</ng-container>
             </span>
             <br><br>
           </div>
         </ng-container>
-        <ng-container *ngIf="accountType !== eAccountType.AZURE">
+        <ng-container *ngIf="accountType !== eAccountType.azure">
           <div class="form-group" style="width: 2%; display: inline-block;"></div>
           <div class="form-group" style="width: 49%; display: inline-block;">
-            <label>AWS Profile<span class="danger-text">*</span></label>
+            <label>aws Profile<span class="danger-text">*</span></label>
             <ng-select [items]="profiles"
                        [addTag]="addNewProfile"
                        formControlName="awsProfile"
                        placeholder="add a profile *"
                        [(ngModel)]="selectedProfile">
             </ng-select>
-            <small class="text-error" *ngIf="(form.controls['awsProfile'].dirty || form.controls['awsProfile'].touched) && form.get('awsProfile').value === undefined">Insert the AWS Profile</small>
+            <small class="text-error" *ngIf="(form.controls['awsProfile'].dirty || form.controls['awsProfile'].touched) && form.get('awsProfile').value === undefined">Insert the aws Profile</small>
           </div>
         </ng-container>
       </div>
 
-      <div class="form-group d-inline-block" [ngStyle]="{width: accountType === eAccountType.AWS ? '49%' : '100%'}">
+      <div class="form-group d-inline-block" [ngStyle]="{width: accountType === eAccountType.aws ? '49%' : '100%'}">
         <label>Account Alias<span class="danger-text">*</span></label>
         <br>
         <input formControlName="name" type="text" class="form-control" placeholder="Account Alias *">
         <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
       </div>
-      <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType === eAccountType.AWS"></div>
+      <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType === eAccountType.aws"></div>
 
-      <ng-container *ngIf="accountType !== eAccountType.AZURE">
+      <ng-container *ngIf="accountType !== eAccountType.azure">
         <!-- ====================== -->
-        <!-- AWS ACCOUNT PROPERTIES -->
+        <!-- aws ACCOUNT PROPERTIES -->
         <!-- ====================== -->
         <div class="form-group" style="width: 49%; display: inline-block;">
           <label>Account Number<span class="danger-text">*</span></label>
@@ -111,22 +111,22 @@
           <small class="text-error" *ngIf="(form.controls['accountNumber'].dirty || form.controls['accountNumber'].touched) && form.controls['accountNumber'].errors">Insert the Account Number</small>
         </div>
 
-        <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType === eAccountType.AWS_TRUSTER"></div>
+        <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType === eAccountType.awsTruster"></div>
 
-        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType !== eAccountType.AWS_PLAIN_USER">
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType !== eAccountType.awsplainuser">
           <label>Role<span class="danger-text">*</span></label>
           <input formControlName="role" type="text" class="form-control" placeholder="Role name" />
           <small class="text-error" *ngIf="(form.controls['role'].dirty || form.controls['role'].touched) && form.controls['role'].errors">Insert the Role</small>
         </div>
 
-        <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType !== eAccountType.AWS_TRUSTER"></div>
+        <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType !== eAccountType.awsTruster"></div>
 
         <div class="form-group" style="width: 49%; display: inline-block;">
-          <label>AWS Region</label>
+          <label>aws Region</label>
           <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
         </div>
 
-        <ng-container *ngIf="accountType === eAccountType.AWS">
+        <ng-container *ngIf="accountType === eAccountType.aws">
           <h2>Federated setting</h2>
 
           <div class="form-group" style="width: 100%; display: inline-block;">
@@ -147,20 +147,20 @@
           </div>
         </ng-container>
 
-        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.AWS_PLAIN_USER">
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.awsplainuser">
           <label>User<span class="danger-text">*</span></label>
           <input formControlName="plainUser" type="text" class="form-control" placeholder="User name" />
           <small class="text-error" *ngIf="(form.controls['plainUser'].dirty || form.controls['plainUser'].touched) && form.controls['plainUser'].errors">Insert the User</small>
         </div>
 
-        <div class="form-group" style="width: 2%; display: inline-block; position: relative; top: -1px;" *ngIf="accountType === eAccountType.AWS_PLAIN_USER"></div>
+        <div class="form-group" style="width: 2%; display: inline-block; position: relative; top: -1px;" *ngIf="accountType === eAccountType.awsplainuser"></div>
 
-        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.AWS_PLAIN_USER">
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.awsplainuser">
           <label>Mfa Device</label>
           <input formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
         </div>
 
-        <ng-container *ngIf="accountType === eAccountType.AWS_PLAIN_USER">
+        <ng-container *ngIf="accountType === eAccountType.awsplainuser">
           <h2>Add secret</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Access  Key<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="Add access key"></i></label>
@@ -176,7 +176,7 @@
 
         </ng-container>
 
-        <ng-container *ngIf="accountType === eAccountType.AWS_TRUSTER">
+        <ng-container *ngIf="accountType === eAccountType.awsTruster">
           <h2>Truster setting</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Starting Account<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This role is used to make AssumeRole on the Truster Account"></i></label>
@@ -193,7 +193,7 @@
         </ng-container>
       </ng-container>
 
-      <ng-container *ngIf="accountType === eAccountType.AZURE">
+      <ng-container *ngIf="accountType === eAccountType.azure">
         <!-- ======================== -->
         <!-- AZURE ACCOUNT PROPERTIES -->
         <!-- ======================== -->

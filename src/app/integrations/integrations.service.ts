@@ -31,13 +31,13 @@ export class IntegrationsService {
     }
     this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.firstTimeLoginToAwsSSO(region, portalUrl))
       .pipe(
-        switchMap((awsSsoSessions: Session[]) => 
+        switchMap((awsSsoSessions: Session[]) =>
           // Save sessions to workspace
            this.awsSsoService.addSessionsToWorkspace(awsSsoSessions)
         ),
         catchError((err) => {
-          this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+          this.appService.logger(err.toString(), LoggerLevel.error, this, err.stack);
+          this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.error, 'AWS SSO error.');
 
           return merge(
             fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_ACCESS_TOKEN')),
@@ -63,17 +63,17 @@ export class IntegrationsService {
 
   syncAccounts() {
     if (this.loginSubscriber) {
- this.loginSubscriber.unsubscribe(); 
+ this.loginSubscriber.unsubscribe();
 }
     console.log('syncing account');
     this.loginSubscriber = this.awsSsoService.generateSessionsFromToken(this.awsSsoService.getAwsSsoPortalCredentials()).pipe(
-      switchMap((awsSsoSessions: Session[]) => 
+      switchMap((awsSsoSessions: Session[]) =>
         // Save sessions to workspace
          this.awsSsoService.addSessionsToWorkspace(awsSsoSessions)
       ),
       catchError( (err) => {
-        this.appService.logger(err.toString(), LoggerLevel.ERROR, this, err.stack);
-        this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.ERROR, 'AWS SSO error.');
+        this.appService.logger(err.toString(), LoggerLevel.error, this, err.stack);
+        this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.error, 'AWS SSO error.');
         return throwError(err);
       })
     ).subscribe(() => {

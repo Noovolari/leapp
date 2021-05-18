@@ -34,7 +34,10 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "crypto-js", "aws-sdk"
+            ]
           },
           "configurations": {
             "staging": {

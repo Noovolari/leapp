@@ -67,7 +67,7 @@ export class AwsSsoService extends NativeService {
           };
           return fromPromise(this.ssooidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise()).pipe(
             catchError((err) => {
-              this.appService.logger('AWS SSO device authorization error.', LoggerLevel.ERROR, this, err.stack);
+              this.appService.logger('AWS SSO device authorization error.', LoggerLevel.error, this, err.stack);
               return throwError('AWS SSO device authorization error.');
             }),
             switchMap((startDeviceAuthorizationResponse: any) => new Observable<AuthorizeIntegrationResponse>((observer) => {
@@ -181,7 +181,7 @@ export class AwsSsoService extends NativeService {
       fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => portalUrl = res))
     ).pipe(
       catchError ((err)  => {
-        this.appService.logger(`AWS SSO in loginToAwsSSO:  ${err.toString()}`, LoggerLevel.ERROR, this, err.stack);
+        this.appService.logger(`AWS SSO in loginToAwsSSO:  ${err.toString()}`, LoggerLevel.error, this, err.stack);
         return throwError(`AWS SSO in loginToAwsSSO: ${err.toString()}`);
       }),
       switchMap(() => this.authorizeIntegration(region, portalUrl)),
@@ -321,7 +321,7 @@ export class AwsSsoService extends NativeService {
           accountName: accountInfo.accountName,
           accountNumber: accountInfo.accountId,
           email: accountInfo.emailAddress,
-          type: SessionType.AWS_SSO
+          type: SessionType.awsSso
         };
 
         const profileId  = this.workspaceService.get().profiles.filter(p => p.name === 'default')[0].id;
@@ -347,11 +347,11 @@ export class AwsSsoService extends NativeService {
       oldWorkspace = workspace;
 
       // Remove all AWS SSO old session or create a session array
-      const oldSSOsessions = this.sessionService.list().filter(sess => ((sess.account.type === SessionType.AWS_SSO)));
+      const oldSSOsessions = this.sessionService.list().filter(sess => ((sess.account.type === SessionType.awsSso)));
       const newSSOSessions = awsSsoSessions.sort((a, b) => a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'}));
 
       // Non SSO sessions
-      workspace.sessions = this.sessionService.list().filter(sess => ((sess.account.type !== SessionType.AWS_SSO)));
+      workspace.sessions = this.sessionService.list().filter(sess => ((sess.account.type !== SessionType.awsSso)));
 
       // Add new AWS SSO sessions
       const updatedSSOSessions = [];

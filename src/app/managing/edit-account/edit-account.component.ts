@@ -13,8 +13,10 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
   styleUrls: ['./edit-account.component.scss']
 })
 export class EditAccountComponent implements OnInit {
-  accountType = SessionType.AWS_PLAIN_USER;
-  provider = SessionType.AWS;
+  @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
+
+  accountType = SessionType.awsplainuser;
+  provider = SessionType.aws;
   selectedSession: Session;
 
   selectedAccountNumber = '';
@@ -23,8 +25,6 @@ export class EditAccountComponent implements OnInit {
   regions = [];
 
   workspace: Workspace;
-
-  @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
   public form = new FormGroup({
     secretKey: new FormControl('', [Validators.required]),

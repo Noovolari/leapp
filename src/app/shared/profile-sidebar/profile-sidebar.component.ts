@@ -51,7 +51,7 @@ export class ProfileSidebarComponent implements OnInit {
     // Data clean
     // const workspace = this.workspaceService.get();
     // this.configurationService.logout();
-    this.appService.logger('Cleaning Azure config files...', LoggerLevel.INFO, this);
+    this.appService.logger('Cleaning Azure config files...', LoggerLevel.info, this);
 
     if (this.execSubscription) {
  this.execSubscription.unsubscribe();
@@ -63,7 +63,7 @@ export class ProfileSidebarComponent implements OnInit {
   closeProfile() {
     this.profileOpen = false;
     this.appService.profileOpen.emit(false);
-    this.appService.logger(`Profile open emitting: ${this.profileOpen}`, LoggerLevel.INFO, this);
+    this.appService.logger(`Profile open emitting: ${this.profileOpen}`, LoggerLevel.info, this);
     this.renderer.removeClass(document.body, 'moved');
   }
 

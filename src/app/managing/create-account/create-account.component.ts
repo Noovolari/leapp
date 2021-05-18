@@ -17,6 +17,12 @@ import {AwsPlainAccountRequest, AwsPlainService} from '../../services/session/aw
   styleUrls: ['./create-account.component.scss']
 })
 export class CreateAccountComponent implements OnInit {
+  @Input() selectedSession;
+  @Input() selectedAccountNumber = '';
+  @Input() selectedRole = '';
+  @Input() fedUrl = '';
+
+  @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
   firstTime = false;
   providerSelected = false;
@@ -27,11 +33,6 @@ export class CreateAccountComponent implements OnInit {
   accountType;
   provider;
 
-  @Input() selectedSession;
-  @Input() selectedAccountNumber = '';
-  @Input() selectedRole = '';
-  @Input() fedUrl = '';
-
   idps: { value: string; label: string}[] = [];
   selectedIdpUrl: {value: string; label: string};
 
@@ -39,7 +40,6 @@ export class CreateAccountComponent implements OnInit {
   federatedAccounts = [];
 
   accounts = [];
-  accountId;
 
   regions = [];
   selectedRegion;
@@ -50,8 +50,6 @@ export class CreateAccountComponent implements OnInit {
   selectedProfile: {value: string; label: string};
 
   eAccountType = SessionType;
-
-  @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
   public form = new FormGroup({
     idpArn: new FormControl('', [Validators.required]),
@@ -157,10 +155,10 @@ export class CreateAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveSession() {
-    this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
+    this.appService.logger(`Saving account...`, LoggerLevel.info, this);
     // TODO: instead of accountType, it's better sessionType at the Session level
     switch (this.accountType) {
-      case (SessionType.AWS_PLAIN_USER):
+      case (SessionType.awsplainuser):
         const accountRequest: AwsPlainAccountRequest = {
           accessKey: this.form.value.accessKey.trim(),
           accountName: this.form.value.name,
@@ -177,10 +175,10 @@ export class CreateAccountComponent implements OnInit {
   setProvider(name) {
     this.provider = name;
     this.providerSelected = true;
-    if (name === SessionType.AZURE) {
-      this.accountType = SessionType.AZURE;
+    if (name === SessionType.azure) {
+      this.accountType = SessionType.azure;
     }
-    if (name === SessionType.AWS) {
+    if (name === SessionType.aws) {
       this.typeSelection = true;
     }
   }
@@ -213,7 +211,7 @@ export class CreateAccountComponent implements OnInit {
     this.accountType = strategy;
     this.provider = strategy;
     this.typeSelection = false;
-    this.appService.logger(`Setting an access strategy we want to create`, LoggerLevel.INFO, this, JSON.stringify({ strategy }, null, 3));
+    this.appService.logger(`Setting an access strategy we want to create`, LoggerLevel.info, this, JSON.stringify({ strategy }, null, 3));
   }
 
   openAccessStrategyDocumentation() {

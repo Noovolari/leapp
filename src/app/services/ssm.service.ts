@@ -41,12 +41,13 @@ export class SsmService {
     return this.submit().pipe(
       switchMap(response => new Observable<SsmResult>(observer => {
 
+        // eslint-disable-next-line @typescript-eslint/naming-convention
           const params = { MaxResults: 50 };
           this.ec2Client.describeInstances(params, (err, reservations) => {
             this.nextToken = reservations.NextToken;
             if (err) {
-              this.app.logger('You are not Authorized to perform EC2 Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
-              this.app.toast('You are not Authorized to perform EC2 Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
+              this.app.logger('You are not Authorized to perform EC2 Describe Instance with your current credentials', LoggerLevel.error, this, err.stack);
+              this.app.toast('You are not Authorized to perform EC2 Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.error, 'SSM error.');
               observer.error({status: false, instances: response.instances});
             } else {
               response.instances.forEach(instance => {
@@ -73,10 +74,11 @@ export class SsmService {
     this.instances = [];
     return new Observable<SsmResult>(observer => {
       try {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
         this.ssmClient.describeInstanceInformation({ MaxResults: 50 }, (err, data) => {
           if (err) {
-            this.app.logger('You are not Authorized to perform SSM Describe Instance with your current credentials', LoggerLevel.ERROR, this, err.stack);
-            mythis.app.toast('You are not Authorized to perform SSM Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.ERROR, 'SSM error.');
+            this.app.logger('You are not Authorized to perform SSM Describe Instance with your current credentials', LoggerLevel.error, this, err.stack);
+            mythis.app.toast('You are not Authorized to perform SSM Describe Instance with your current credentials, please check the log files for more information.', ToastLevel.error, 'SSM error.');
             observer.error({status: false, instances: mythis.instances});
           } else {
             const dataSSM = data;
@@ -93,26 +95,26 @@ export class SsmService {
                 });
 
                 // We have found and managed a list of instances
-                this.app.logger('Obtained smm info from AWS for SSM', LoggerLevel.INFO, this);
+                this.app.logger('Obtained smm info from AWS for SSM', LoggerLevel.info, this);
                 observer.next({status: true, instances: mythis.instances});
               } else {
                 // No instances usable
-                mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.WARN, this);
-                mythis.app.toast('No instances are accessible by this Role.', ToastLevel.WARN, 'No instance for SSM.');
+                mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.warn, this);
+                mythis.app.toast('No instances are accessible by this Role.', ToastLevel.warn, 'No instance for SSM.');
                 observer.error({status: false, instances: mythis.instances});
               }
             } else {
               // No instances usable
-              mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.WARN, this);
-              mythis.app.toast('No instances are accessible by this Role.', ToastLevel.WARN, 'No instance for SSM.');
+              mythis.app.logger('No instances are accessible by this Role.', LoggerLevel.warn, this);
+              mythis.app.toast('No instances are accessible by this Role.', ToastLevel.warn, 'No instance for SSM.');
               observer.error({status: false, instances: mythis.instances});
             }
           }
           observer.complete();
         });
       } catch (err) {
-        mythis.app.logger('Error making SSM call', LoggerLevel.WARN, this, err.stack);
-        mythis.app.toast('Error making SSM call, you\'re are not authorized to do SSM', ToastLevel.WARN, 'SSM Auth error.');
+        mythis.app.logger('Error making SSM call', LoggerLevel.warn, this, err.stack);
+        mythis.app.toast('Error making SSM call, you\'re are not authorized to do SSM', ToastLevel.warn, 'SSM Auth error.');
         observer.error({status: false, instances: mythis.instances});
         observer.complete();
       }
@@ -128,8 +130,8 @@ export class SsmService {
   startSession(instanceId, region) {
     const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : '';
     this.exec.openTerminal(`aws ssm start-session --region ${region} --target ${hypen}${instanceId}${hypen}`).subscribe(() => {}, err2 => {
-      this.app.logger('Start SSM session error', LoggerLevel.ERROR, this, err2.stack);
-      this.app.toast(err2.stack, ToastLevel.ERROR, 'Error in running instance via SSM');
+      this.app.logger('Start SSM session error', LoggerLevel.error, this, err2.stack);
+      this.app.toast(err2.stack, ToastLevel.error, 'Error in running instance via SSM');
     });
   }
 

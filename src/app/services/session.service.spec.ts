@@ -92,14 +92,14 @@ describe('SessionService', () => {
       const service: SessionService = TestBed.inject(SessionService);
 
       expect(service.listChildren()).toBeInstanceOf(Array);
-      expect(service.listChildren().filter(c => c.account.type === SessionType.AWS_TRUSTER)).toEqual([]);
+      expect(service.listChildren().filter(c => c.account.type === SessionType.awsTruster)).toEqual([]);
 
       const mockedSession2 = new Session(new Account('fakeaccount2', 'eu-west-2'), 'fakeprofile2');
-      mockedSession2.account.type = SessionType.AWS_TRUSTER;
+      mockedSession2.account.type = SessionType.awsTruster;
       mockedSessions.push(mockedSession2);
 
       expect(service.listChildren()).toBeInstanceOf(Array);
-      expect(service.listChildren().filter(c => c.account.type === SessionType.AWS_TRUSTER)).toEqual([mockedSession2]);
+      expect(service.listChildren().filter(c => c.account.type === SessionType.awsTruster)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
@@ -116,14 +116,14 @@ describe('SessionService', () => {
       const service: SessionService = TestBed.inject(SessionService);
 
       expect(service.listActive()).toBeInstanceOf(Array);
-      expect(service.listActive().filter(c => c.status === SessionStatus.ACTIVE)).toEqual([]);
+      expect(service.listActive().filter(c => c.status === SessionStatus.active)).toEqual([]);
 
       const mockedSession2 = new Session(new Account('fakeaccount2', 'eu-west-2'), 'fakeprofile2');
-      mockedSession2.status = SessionStatus.ACTIVE;
+      mockedSession2.status = SessionStatus.active;
       mockedSessions.push(mockedSession2);
 
       expect(service.listActive()).toBeInstanceOf(Array);
-      expect(service.listActive().filter(c => c.status === SessionStatus.ACTIVE)).toEqual([mockedSession2]);
+      expect(service.listActive().filter(c => c.status === SessionStatus.active)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
@@ -145,13 +145,13 @@ describe('SessionService', () => {
       spyOn(service,'generateCredentials').and.callFake(() => fakePromise);
       spyOn(service,'applyCredentials').and.callFake(() => fakePromise);
 
-      expect(mockedSession.status).toBe(SessionStatus.INACTIVE);
+      expect(mockedSession.status).toBe(SessionStatus.inactive);
 
       service.start('fakeid');
 
       const caller = setTimeout(() => {
         expect((service as any).sessionActivate).toHaveBeenCalled();
-        expect(mockedSession.status).toBe(SessionStatus.ACTIVE);
+        expect(mockedSession.status).toBe(SessionStatus.active);
 
         done();
         clearTimeout(caller);
@@ -198,19 +198,19 @@ describe('SessionService', () => {
     it('should stop a session', (done) => {
       const service: SessionService = TestBed.inject(AwsPlainService);
 
-      mockedSession.status = SessionStatus.ACTIVE;
+      mockedSession.status = SessionStatus.active;
       mockedSessions = [mockedSession];
 
       // <any> is a trick to spy on private methods!
       spyOn(service,'deApplyCredentials').and.callFake(() => fakePromise);
       spyOn<any>(service,'sessionDeactivated').and.callThrough();
 
-      expect(mockedSession.status === SessionStatus.ACTIVE).toBe(true);
+      expect(mockedSession.status === SessionStatus.active).toBe(true);
       service.stop('fakeid');
 
       const caller = setTimeout(() => {
         expect((service as any).sessionDeactivated).toHaveBeenCalled();
-        expect(mockedSession.status === SessionStatus.ACTIVE).toBe(false);
+        expect(mockedSession.status === SessionStatus.active).toBe(false);
 
         done();
         clearTimeout(caller);
@@ -281,7 +281,7 @@ describe('SessionService', () => {
           expect((service as any).applyCredentials).toHaveBeenCalled();
           expect((service as any).sessionRotated).toHaveBeenCalled();
 
-          expect(mockedSession.status).toBe(SessionStatus.ACTIVE);
+          expect(mockedSession.status).toBe(SessionStatus.active);
           expect(service.get('fakeid').startDateTime).not.toBe(previousStartDateTime);
           expect(new Date(service.get('fakeid').startDateTime).getTime()).toBeGreaterThan(new Date(previousStartDateTime).getTime());
 

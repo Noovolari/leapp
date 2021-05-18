@@ -89,7 +89,7 @@ export class ConfigurationService extends NativeService {
       // Clean localStorage
       localStorage.clear();
     } catch (err) {
-      this.appService.logger(`Leapp has an error cleaning your data.`, LoggerLevel.ERROR, this, err.stack);
+      this.appService.logger(`Leapp has an error cleaning your data.`, LoggerLevel.error, this, err.stack);
     }
   }
 
@@ -109,7 +109,7 @@ export class ConfigurationService extends NativeService {
       // Clean localStorage
       localStorage.clear();
 
-      this.appService.toast('Cache and configuration file cleaned.', ToastLevel.SUCCESS, 'Cleaning configuration file');
+      this.appService.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
 
       // Restart
       setTimeout(() => {
@@ -117,8 +117,8 @@ export class ConfigurationService extends NativeService {
       }, 2000);
 
     } catch (err) {
-      this.appService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.ERROR, this, err.stack);
-      this.appService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.ERROR, 'Cleaning configuration file');
+      this.appService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
+      this.appService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
     }
   }
 

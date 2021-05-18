@@ -6,7 +6,6 @@
 */
 import * as Keytar from 'keytar';
 
-
 export class NativeService {
   protected log: any;
   protected fs: any;
@@ -39,7 +38,6 @@ export class NativeService {
 
   constructor() {
     if ((window as any).native) {
-
       this.fs = (window as any).native.fs;
       this.rimraf = (window as any).native.rimraf;
       this.ini = (window as any).native.ini;
@@ -60,7 +58,6 @@ export class NativeService {
       this.followRedirects = (window as any).native.followRedirects;
       this.httpProxyAgent = (window as any).native.httpProxyAgent;
       this.httpsProxyAgent = (window as any).native.httpsProxyAgent;
-
       this.log = (window as any).native.log;
       this.app = (window as any).native.app;
       this.session = (window as any).native.session;
@@ -72,5 +69,4 @@ export class NativeService {
       this.ipcRenderer = (window as any).native.ipcRenderer;
     }
   }
-
 }

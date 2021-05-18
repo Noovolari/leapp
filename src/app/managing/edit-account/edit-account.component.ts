@@ -15,7 +15,7 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
 export class EditAccountComponent implements OnInit {
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
-  accountType = SessionType.awsplainuser;
+  accountType = SessionType.awsPlainUser;
   provider = SessionType.aws;
   selectedSession: Session;
 

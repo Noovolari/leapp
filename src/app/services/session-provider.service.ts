@@ -29,7 +29,7 @@ export class SessionProviderService {
     // Creater and save the SessionService needed; return it to the requester
     switch (accountType) {
       case SessionType.aws: return this.getAwsSessionService(accountType);
-      case SessionType.awsplainuser: return this.getAwsPlainSessionService(accountType);
+      case SessionType.awsPlainUser: return this.getAwsPlainSessionService(accountType);
       case SessionType.awsTruster: return this.getAwsTrusterSessionService(accountType);
       case SessionType.awsSso: return this.getAwsSsoSessionService(accountType);
       case SessionType.azure: return this.getAzureSessionService(accountType);

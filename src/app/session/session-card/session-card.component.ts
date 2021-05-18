@@ -94,7 +94,7 @@ export class SessionCardComponent implements OnInit {
       case(SessionType.azure):
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
         break;
-      case(SessionType.awsplainuser):
+      case(SessionType.awsPlainUser):
         this.sessionDetailToShow = (this.session.account as AwsPlainAccount).accountName;
         break;
       case(SessionType.awsSso):

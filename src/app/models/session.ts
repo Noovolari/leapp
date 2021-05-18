@@ -11,7 +11,7 @@ export class Session {
     discriminator: {
       property: 'type',
       subTypes: [
-        { value: AwsPlainAccount, name: SessionType.awsplainuser },
+        { value: AwsPlainAccount, name: SessionType.awsPlainUser },
       ],
     },
   })

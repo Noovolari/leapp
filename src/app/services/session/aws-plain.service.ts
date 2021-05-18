@@ -33,6 +33,23 @@ export class AwsPlainService extends SessionService {
     super(workspaceService);
   }
 
+  static isTokenExpired(tokenExpiration: Date): boolean {
+    return false;
+  }
+
+  static sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse: GetSessionTokenResponse): { sessionToken: any } {
+    return {
+      sessionToken: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_access_key_id: getSessionTokenResponse.Credentials.AccessKeyId.trim(),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_secret_access_key: getSessionTokenResponse.Credentials.SecretAccessKey.trim(),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_session_token: getSessionTokenResponse.Credentials.SessionToken.trim(),
+      }
+    };
+  }
+
   create(accountRequest: AwsPlainAccountRequest, profileId: string): void {
     const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, accountRequest.mfaDevice), profileId);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
@@ -65,88 +82,49 @@ export class AwsPlainService extends SessionService {
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    // Get the session in question
-    const session = this.get(sessionId);
-    // Retrieve session token expiration
-    const tokenExpiration = await this.getTokenExpirationFromKeychain(sessionId);
+    try {
+      // Get the session in question
+      const session = this.get(sessionId);
+      // Retrieve session token expiration
+      const tokenExpiration = new Date((session.account as AwsPlainAccount).sessionTokenExpiration);
+      // Check if token is expired
+      if (tokenExpiration && AwsPlainService.isTokenExpired(tokenExpiration)) {
+        // Token is Expired!
+        // Retrieve access keys from keychain
+        const accessKeyId = await this.getAccessKeyFromKeychain(sessionId);
+        const secretAccessKey = await this.getSecretKeyFromKeychain(sessionId);
+        // Get session token
+        // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
+        AWS.config.update({ accessKeyId, secretAccessKey });
+        // Configure sts client options
+        const sts = new AWS.STS(this.appService.stsOptions(session));
+        // Configure sts get-session-token api call params
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        let params = { DurationSeconds: environment.sessionTokenDuration };
+        // Check if MFA is needed or not
+        if ((session.account as AwsPlainAccount).mfaDevice) {
+          // TODO: define and open MFA modal
+          //  - prompt for mfa token
+          //  - configure sts get-session-token api call params
+          //  - SerialNumber = MFA device
+          //  - TokenCode
+          //  - Add Parameters to params
+          params = params;
+        }
 
-    // Check if token is expired
-    if (tokenExpiration && this.isTokenExpired(tokenExpiration)) {
-
-    } else {
-
-    }
-    /*
-    * - retrieve session token expiration
-- *if session token is expired (*1)*
-    - retrieve access keys from keychain
-    - get session token
-
-        https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
-
-        - configure sts client options
-            - retries = 0
-            - timeout = 10 seconds
-            - regional endpoint
-            - region
-        - configure sts get-session-token api call params
-            - DurationSeconds = 10 hours = a working day
-        - *if mfa is needed*
-            - prompt for mfa token
-            - configure sts get-session-token api call params
-                - SerialNumber = MFA device
-                - TokenCode
-        - invoke sts get-session-token api
-    - return session token
-- *if session token is NOT expired*
-    - retrieve named profile
-    - *if named profile is present in .aws/credentials file*
-        - validate named profile
-        - *if named profile is not valid*
-            - same as *if session token is expired (*1)*
-        - *if named profile is valid*
-            - nothing to do
-    - *if named profile is not present in .aws/credentials file*
-        - same as *if session token is expired (*1)*
-    * */
-
-
-
-
-
-
-    AWS.config.update({
-      accessKeyId: await this.getAccessKeyFromKeychain(sessionId),
-      secretAccessKey: await this.getSecretKeyFromKeychain(sessionId)
-    });
-
-    const sts = new AWS.STS(this.appService.stsOptions(session));
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    const params = { DurationSeconds: environment.sessionTokenDuration };
-
-    if ((session.account as AwsPlainAccount).mfaDevice) {
-      // TODO: define and open MFA modal
-      return Promise.resolve(undefined);
-    } else {
-      try {
-        const getSessionToken: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
-
-        return {
-          sessionToken: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            aws_access_key_id: getSessionToken.Credentials.AccessKeyId.trim(),
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            aws_secret_access_key: getSessionToken.Credentials.SecretAccessKey.trim(),
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            aws_session_token: getSessionToken.Credentials.SessionToken.trim(),
-          }
-        };
-      } catch (err) {
-        throw new LeappBaseError('Get Session token error', this, LoggerLevel.error, err.message, err.stack);
+        // Invoke sts get-session-token api
+        const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
+        // Return Session Token
+        return AwsPlainService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
+      } else {
+        // Session Token is NOT expired
+        // TODO:
+        //  - Return current session token retrieved from credential file
       }
+    } catch (err) {
+      throw new LeappBaseError('Get Session token error', this, LoggerLevel.error, err.message, err.stack);
     }
   }
-
 
   private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
     return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-access-key-id`);
@@ -154,13 +132,5 @@ export class AwsPlainService extends SessionService {
 
   private async getSecretKeyFromKeychain(sessionId: string): Promise<string> {
     return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-secret-access-key`);
-  }
-
-  private async getTokenExpirationFromKeychain(sessionId: string): Promise<string> {
-    return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-token-expiration`);
-  }
-
-  private isTokenExpired(tokenExpiration: string): boolean {
-    return false;
   }
 }

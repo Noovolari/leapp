@@ -158,7 +158,7 @@ export class CreateAccountComponent implements OnInit {
     this.appService.logger(`Saving account...`, LoggerLevel.info, this);
     // TODO: instead of accountType, it's better sessionType at the Session level
     switch (this.accountType) {
-      case (SessionType.awsplainuser):
+      case (SessionType.awsPlainUser):
         const accountRequest: AwsPlainAccountRequest = {
           accessKey: this.form.value.accessKey.trim(),
           accountName: this.form.value.name,

@@ -31,7 +31,7 @@ export class AwsSsoStrategy {
   getActiveSessions(workspace: Workspace) {
     return workspace.sessions.filter((sess) => (sess.account.type === SessionType.awsTruster ||
         sess.account.type === SessionType.awsSso ||
-        sess.account.type === SessionType.awsplainuser ||
+        sess.account.type === SessionType.awsPlainUser ||
         sess.account.type === SessionType.aws) && sess.status === SessionStatus.active);
   }
 

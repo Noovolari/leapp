@@ -46,7 +46,7 @@ export class TrayMenuComponent implements OnInit {
       const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
       switch (session.account.type) {
-        case SessionType.awsplainuser:
+        case SessionType.awsPlainUser:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + 'plain';
           break;

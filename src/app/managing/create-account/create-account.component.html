@@ -37,7 +37,7 @@
               <button type="button" class="providers {{accountType === eAccountType.aws ? 'selected' : ''}}" (click)="hasSsoUrl = true; setAccessStrategy(eAccountType.aws);">
                 <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated
               </button>
-              <button type="button" class="providers {{accountType === eAccountType.awsplainuser ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsplainuser);">
+              <button type="button" class="providers {{accountType === eAccountType.awsPlainUser ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsPlainUser);">
                 <i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain
               </button>
               <button type="button" class="providers {{accountType === eAccountType.awsTruster ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsTruster);" *ngIf="!firstTime">
@@ -63,7 +63,7 @@
             <span class="providers">
               <ng-container *ngIf="accountType === eAccountType.aws"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</ng-container>
               <ng-container *ngIf="accountType === eAccountType.awsTruster"><i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster</ng-container>
-              <ng-container *ngIf="accountType === eAccountType.awsplainuser"><i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain</ng-container>
+              <ng-container *ngIf="accountType === eAccountType.awsPlainUser"><i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain</ng-container>
             </span>
             <br><br>
           </div>
@@ -113,7 +113,7 @@
 
         <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="accountType === eAccountType.awsTruster"></div>
 
-        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType !== eAccountType.awsplainuser">
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType !== eAccountType.awsPlainUser">
           <label>Role<span class="danger-text">*</span></label>
           <input formControlName="role" type="text" class="form-control" placeholder="Role name" />
           <small class="text-error" *ngIf="(form.controls['role'].dirty || form.controls['role'].touched) && form.controls['role'].errors">Insert the Role</small>
@@ -147,20 +147,20 @@
           </div>
         </ng-container>
 
-        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.awsplainuser">
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.awsPlainUser">
           <label>User<span class="danger-text">*</span></label>
           <input formControlName="plainUser" type="text" class="form-control" placeholder="User name" />
           <small class="text-error" *ngIf="(form.controls['plainUser'].dirty || form.controls['plainUser'].touched) && form.controls['plainUser'].errors">Insert the User</small>
         </div>
 
-        <div class="form-group" style="width: 2%; display: inline-block; position: relative; top: -1px;" *ngIf="accountType === eAccountType.awsplainuser"></div>
+        <div class="form-group" style="width: 2%; display: inline-block; position: relative; top: -1px;" *ngIf="accountType === eAccountType.awsPlainUser"></div>
 
-        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.awsplainuser">
+        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="accountType === eAccountType.awsPlainUser">
           <label>Mfa Device</label>
           <input formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
         </div>
 
-        <ng-container *ngIf="accountType === eAccountType.awsplainuser">
+        <ng-container *ngIf="accountType === eAccountType.awsPlainUser">
           <h2>Add secret</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Access  Key<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="Add access key"></i></label>

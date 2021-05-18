@@ -7,7 +7,7 @@ import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
 import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
 import {AwsSsoAccount} from '../../models/aws-sso-account';
-import {AccountType} from '../../models/AccountType';
+import {SessionType} from '../../models/session-type';
 import {KeychainService} from '../../services/keychain.service';
 import {environment} from '../../../environments/environment';
 import {fromPromise} from 'rxjs/internal-compatibility';
@@ -321,7 +321,7 @@ export class AwsSsoService extends NativeService {
           accountName: accountInfo.accountName,
           accountNumber: accountInfo.accountId,
           email: accountInfo.emailAddress,
-          type: AccountType.AWS_SSO
+          type: SessionType.AWS_SSO
         };
 
         const profileId  = this.workspaceService.get().profiles.filter(p => p.name === 'default')[0].id;
@@ -347,11 +347,11 @@ export class AwsSsoService extends NativeService {
       oldWorkspace = workspace;
 
       // Remove all AWS SSO old session or create a session array
-      const oldSSOsessions = this.sessionService.list().filter(sess => ((sess.account.type === AccountType.AWS_SSO)));
+      const oldSSOsessions = this.sessionService.list().filter(sess => ((sess.account.type === SessionType.AWS_SSO)));
       const newSSOSessions = awsSsoSessions.sort((a, b) => a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'}));
 
       // Non SSO sessions
-      workspace.sessions = this.sessionService.list().filter(sess => ((sess.account.type !== AccountType.AWS_SSO)));
+      workspace.sessions = this.sessionService.list().filter(sess => ((sess.account.type !== SessionType.AWS_SSO)));
 
       // Add new AWS SSO sessions
       const updatedSSOSessions = [];
@@ -386,7 +386,7 @@ export class AwsSsoService extends NativeService {
       if (oldWorkspace) {
         // @ts-ignore
         // TODO: do we want a complete workspace update?
-        this.workspaceService.update(oldWorkspace); 
+        this.workspaceService.update(oldWorkspace);
 }
       return throwError(err);
     }));
@@ -416,7 +416,7 @@ export class AwsSsoService extends NativeService {
           fromPromise(this.keychainService.deletePassword(environment.appName, 'AWS_SSO_EXPIRATION_TIME'))
         )),
       toArray(),
-      switchMap(() => 
+      switchMap(() =>
         // TODO: remove aws sso sessions
          of(true)
       ),

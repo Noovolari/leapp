@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 
 import { RotationService } from './rotation.service';
-import {mustInjected} from "../../base-injectables";
-import {SessionService} from "./session.service";
-import {SessionProviderService} from "./session-provider.service";
-import {Session} from "../models/session";
-import {Account} from "../models/account";
+import {mustInjected} from '../../base-injectables';
+import {SessionService} from './session.service';
+import {SessionProviderService} from './session-provider.service';
+import {Session} from '../models/session';
+import {Account} from '../models/account';
 
 describe('RotationService', () => {
   let rotationService: RotationService;

@@ -5,9 +5,10 @@ import {FileService} from '../../services/file.service';
 import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel} from '../../services/app.service';
 import {Session} from '../../models/session';
-import {AccountType} from '../../models/AccountType';
+import {SessionType} from '../../models/session-type';
 import {AwsAccount} from '../../models/aws-account';
 import {environment} from '../../../environments/environment';
+import {SessionStatus} from '../../models/session-status';
 
 @Component({
   selector: 'app-tray-menu',
@@ -45,19 +46,19 @@ export class TrayMenuComponent implements OnInit {
       const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
       switch (session.account.type) {
-        case AccountType.AWS_PLAIN_USER:
-          icon = (session.active) ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
+        case SessionType.AWS_PLAIN_USER:
+          icon = session.status === SessionStatus.ACTIVE ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + 'plain';
           break;
-        case AccountType.AWS:
-        case AccountType.AWS_TRUSTER:
-        case AccountType.AWS_SSO:
-          icon = (session.active && !session.loading) ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
+        case SessionType.AWS:
+        case SessionType.AWS_TRUSTER:
+        case SessionType.AWS_SSO:
+          icon = session.status === SessionStatus.ACTIVE ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.account.accountName + ' - ' + (session.account as AwsAccount).role.name;
           break;
 
-        case AccountType.AZURE:
-          icon = (session.active) ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
+        case SessionType.AZURE:
+          icon = session.status === SessionStatus.ACTIVE ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
           label = '  ' + session.account.accountName;
       }
       voices.push(
@@ -65,7 +66,7 @@ export class TrayMenuComponent implements OnInit {
           type: 'normal',
           icon,
           click: () => {
-            if (!session.active) {
+            if (session.status !== SessionStatus.ACTIVE) {
               this.sessionService.start(session.sessionId);
               // TODO: refresh session credential
             } else {
@@ -81,14 +82,14 @@ export class TrayMenuComponent implements OnInit {
     const extraInfo = [
       { type: 'separator' },
       { label: 'Show', type: 'normal', click: () => {
- this.appService.getCurrentWindow().show(); 
+ this.appService.getCurrentWindow().show();
 } },
       { label: 'About', type: 'normal', click: () => {
- this.appService.getCurrentWindow().show(); this.appService.getDialog().showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok'] }); 
+ this.appService.getCurrentWindow().show(); this.appService.getDialog().showMessageBox({ icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok'] });
 } },
       { type: 'separator' },
       { label: 'Quit', type: 'normal', click: () => {
- this.cleanBeforeExit(); 
+ this.cleanBeforeExit();
 } },
     ];
 

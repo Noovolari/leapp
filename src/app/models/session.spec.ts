@@ -1,6 +1,6 @@
-import {Session} from "./session";
-import {Account} from "./account";
-import {environment} from "../../environments/environment";
+import {Session} from './session';
+import {Account} from './account';
+import {environment} from '../../environments/environment';
 
 describe('expire()', () => {
   it('should return TRUE if the expiration time is over', () => {

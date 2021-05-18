@@ -2,34 +2,32 @@ import {Account} from './account';
 import * as uuid from 'uuid';
 import {Type} from 'class-transformer';
 import {AwsPlainAccount} from './aws-plain-account';
-import {AccountType} from './AccountType';
+import {SessionType} from './session-type';
 import {environment} from '../../environments/environment';
+import {SessionStatus} from './session-status';
 
 export class Session {
-  sessionId: string;
-  profileId: string;
-  startDateTime: string;
-  lastStopDateTime: string;
-  active: boolean;
-  loading: boolean;
   @Type(() => Account, {
-
     discriminator: {
       property: 'type',
       subTypes: [
-        { value: AwsPlainAccount, name: AccountType.AWS_PLAIN_USER},
+        { value: AwsPlainAccount, name: SessionType.AWS_PLAIN_USER },
       ],
     },
   })
   account: Account;
+  sessionId: string;
+  profileId: string;
+  status: SessionStatus;
+  startDateTime: string;
+  lastStopDateTime: string;
 
   constructor(account: Account, profileId: string) {
     this.sessionId = uuid.v4();
     this.profileId = profileId;
+    this.status = SessionStatus.INACTIVE;
     this.startDateTime = undefined;
     this.lastStopDateTime = new Date().toISOString();
-    this.active = false;
-    this.loading = false;
     this.account = account;
   }
 

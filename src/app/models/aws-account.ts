@@ -1,4 +1,4 @@
-import {AccountType} from './AccountType';
+import {SessionType} from './session-type';
 import {Account} from './account';
 
 export class AwsAccount extends Account {
@@ -8,7 +8,7 @@ export class AwsAccount extends Account {
   role: { name: string; roleArn: string; parent?: string; parentRole?: string };
   idpArn?: string;
   idpUrl?: string;
-  type: AccountType;
+  type: SessionType;
   parent?: string;
   parentRole?: string;
   region: string;

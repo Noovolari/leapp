@@ -1,12 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 
 import { ErrorService } from './error.service';
-import {mustInjected} from "../../../base-injectables";
-import {AppService, LoggerLevel} from "../app.service";
-import {ToastrModule} from "ngx-toastr";
-import {LeappBaseError} from "../../errors/leapp-base-error";
-import {ErrorHandler} from "@angular/core";
-import {AppModule} from "../../app.module";
+import {mustInjected} from '../../../base-injectables';
+import {AppService, LoggerLevel} from '../app.service';
+import {ToastrModule} from 'ngx-toastr';
+import {LeappBaseError} from '../../errors/leapp-base-error';
+import {ErrorHandler} from '@angular/core';
+import {AppModule} from '../../app.module';
 
 describe('ErrorService', () => {
   let spyAppService;
@@ -28,7 +28,7 @@ describe('ErrorService', () => {
     }).inject(ErrorHandler) as any;
 
     errorService = TestBed.inject(ErrorService);
-  })
+  });
 
   it('should be created', () => {
     expect(errorService).toBeTruthy();

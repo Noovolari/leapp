@@ -5,7 +5,7 @@ import {AppService, LoggerLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {SessionService} from '../../services/session.service';
 import {WorkspaceService} from '../../services/workspace.service';
-import {AccountType} from '../../models/AccountType';
+import {SessionType} from '../../models/session-type';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsPlainAccountRequest, AwsPlainService} from '../../services/session/aws-plain.service';
@@ -49,7 +49,7 @@ export class CreateAccountComponent implements OnInit {
   profiles: { value: string; label: string}[] = [];
   selectedProfile: {value: string; label: string};
 
-  eAccountType = AccountType;
+  eAccountType = SessionType;
 
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
@@ -160,7 +160,7 @@ export class CreateAccountComponent implements OnInit {
     this.appService.logger(`Saving account...`, LoggerLevel.INFO, this);
     // TODO: instead of accountType, it's better sessionType at the Session level
     switch (this.accountType) {
-      case (AccountType.AWS_PLAIN_USER):
+      case (SessionType.AWS_PLAIN_USER):
         const accountRequest: AwsPlainAccountRequest = {
           accessKey: this.form.value.accessKey.trim(),
           accountName: this.form.value.name,
@@ -177,10 +177,10 @@ export class CreateAccountComponent implements OnInit {
   setProvider(name) {
     this.provider = name;
     this.providerSelected = true;
-    if (name === AccountType.AZURE) {
-      this.accountType = AccountType.AZURE;
+    if (name === SessionType.AZURE) {
+      this.accountType = SessionType.AZURE;
     }
-    if (name === AccountType.AWS) {
+    if (name === SessionType.AWS) {
       this.typeSelection = true;
     }
   }

@@ -3,7 +3,8 @@ import {NativeService} from './native-service';
 import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
 import {CredentialsInfo} from '../models/credentials-info';
-import {AccountType} from '../models/AccountType';
+import {SessionType} from '../models/session-type';
+import {SessionStatus} from '../models/session-status';
 
 @Injectable({
   providedIn: 'root'
@@ -25,15 +26,15 @@ export abstract class SessionService extends NativeService {
   }
 
   listChildren(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.account.type === AccountType.AWS_TRUSTER) : [];
+    return (this.list().length > 0) ? this.list().filter( (session) => session.account.type === SessionType.AWS_TRUSTER ) : [];
   }
 
   listActive(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.active) : [];
+    return (this.list().length > 0) ? this.list().filter( (session) => session.status === SessionStatus.ACTIVE ) : [];
   }
 
   delete(sessionId: string): void {
-
+    // TODO: implement
   }
 
   async start(sessionId: string): Promise<void> {
@@ -76,8 +77,8 @@ export abstract class SessionService extends NativeService {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
-      let currentSession : Session = this.workspaceService.sessions[index];
-      currentSession.loading = true;
+      const currentSession: Session = this.workspaceService.sessions[index];
+      currentSession.status = SessionStatus.PENDING;
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
@@ -86,9 +87,8 @@ export abstract class SessionService extends NativeService {
   private sessionActivate(sessionId: string) {
     const index = this.workspaceService.sessions.findIndex(s => s.sessionId === sessionId);
     if (index > -1) {
-      let currentSession : Session = this.workspaceService.sessions[index];
-      currentSession.loading = false;
-      currentSession.active = true;
+      const currentSession: Session = this.workspaceService.sessions[index];
+      currentSession.status = SessionStatus.ACTIVE;
       currentSession.startDateTime = new Date().toISOString();
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
@@ -100,9 +100,9 @@ export abstract class SessionService extends NativeService {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
-      let currentSession : Session = this.workspaceService.sessions[index];
+      const currentSession: Session = this.workspaceService.sessions[index];
       currentSession.startDateTime = new Date().toISOString();
-      currentSession.loading = false;
+      currentSession.status = SessionStatus.ACTIVE;
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
@@ -118,9 +118,8 @@ export abstract class SessionService extends NativeService {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
-      let currentSession : Session = this.workspaceService.sessions[index];
-      currentSession.loading = false;
-      currentSession.active = false;
+      const currentSession: Session = this.workspaceService.sessions[index];
+      currentSession.status = SessionStatus.INACTIVE;
       currentSession.startDateTime = undefined;
       currentSession.lastStopDateTime = new Date().toISOString();
       this.workspaceService.sessions[index] = currentSession;

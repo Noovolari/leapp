@@ -1,16 +1,16 @@
-<div class="session-card button-area  {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}} {{session.active ? 'active' : ''}}">
-  <span class="region-label {{session.account.type === eAccountType.AZURE ? 'azr' : 'aws'}}">{{session.account.region}}</span>
+<div class="session-card button-area  {{session.account.type === eSessionType.AZURE ? 'azr' : 'aws'}} {{session.status === eSessionStatus.ACTIVE ? 'active' : ''}}">
+  <span class="region-label {{session.account.type === eSessionType.AZURE ? 'azr' : 'aws'}}">{{session.account.region}}</span>
   <div class="information" (click)="switchCredentials()">
     <b>{{session.account.accountName}}</b> - {{ sessionDetailToShow }}
   </div>
   <div class="information-profile" (click)="switchCredentials()">
-    <ng-container *ngIf="session.account.type !== eAccountType.AZURE">
-      <i class="fa fa-{{getProfileIcon(session.active, getProfileName(session.profileId))}}"></i>&nbsp;&nbsp;{{getProfileName(session.profileId)}}
+    <ng-container *ngIf="session.account.type !== eSessionType.AZURE">
+      <i class="fa fa-{{getProfileIcon(session.status === eSessionStatus.ACTIVE, getProfileName(session.profileId))}}"></i>&nbsp;&nbsp;{{getProfileName(session.profileId)}}
     </ng-container>
   </div>
   <div class="information-offset" (click)="switchCredentials()">
-    <i class="status-item fas fa-circle {{session.active ? 'active' : 'offline'}}" *ngIf="!session.loading"></i>
-    <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.loading"></i>
+    <i class="status-item fas fa-circle {{session.status === eSessionStatus.ACTIVE ? 'active' : 'offline'}}" *ngIf="session.status !== eSessionStatus.PENDING"></i>
+    <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.status === eSessionStatus.PENDING"></i>
   </div>
 
   <ng-container dropdown placement="right" [autoClose]="true">
@@ -18,16 +18,16 @@
       <i class="fa fa-ellipsis-v"></i>
     </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-      <a (click)="ssmModalOpen(session);" *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO) && session.active">SSM session</a>
-      <a (click)="changeRegionModalOpen(session);">Change {{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}</a>
+      <a (click)="ssmModalOpen(session);" *ngIf="(session.account.type === eSessionType.AWS || session.account.type === eSessionType.AWS_PLAIN_USER || session.account.type === eSessionType.AWS_SSO) && session.status === eSessionStatus.ACTIVE">SSM session</a>
+      <a (click)="changeRegionModalOpen(session);">Change {{session.account.type === eSessionType.AZURE ? 'location' : 'region'}}</a>
 
-      <a *ngIf="session.account.type !== eAccountType.AZURE" (click)="changeProfileModalOpen();">Change Profile</a>
+      <a *ngIf="session.account.type !== eSessionType.AZURE" (click)="changeProfileModalOpen();">Change Profile</a>
 
-      <a *ngIf="session.account.type === eAccountType.AWS_PLAIN_USER && !session.active" (click)="editAccount(session, $event);">Edit account</a>
+      <a *ngIf="session.account.type === eSessionType.AWS_PLAIN_USER && session.status !== eSessionStatus.ACTIVE" (click)="editAccount(session, $event);">Edit account</a>
       <a (click)="removeAccount(session, $event);">Remove account</a>
-      <ng-container *ngIf="(session.account.type === eAccountType.AWS || session.account.type === eAccountType.AWS_PLAIN_USER || session.account.type === eAccountType.AWS_SSO)">
+      <ng-container *ngIf="(session.account.type === eSessionType.AWS || session.account.type === eSessionType.AWS_PLAIN_USER || session.account.type === eSessionType.AWS_SSO)">
       <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
-        <ng-container *ngIf="(session.account.type !== eAccountType.AWS_PLAIN_USER)">
+        <ng-container *ngIf="(session.account.type !== eSessionType.AWS_PLAIN_USER)">
         <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
       </ng-container>
       </ng-container>
@@ -72,14 +72,14 @@
 <ng-template #defaultRegionModalTemplate>
   <div class="modal-header">
     <a class="back" aria-label="Close" (click)="modalRef.hide();"><i class="fa fa-arrow-left"></i></a>
-    <b>{{session.account.accountName}}</b> - {{$any(session.account).role ? $any(session.account).role.name : 'Plain' }} | <b>Change {{session.account.type === eAccountType.AZURE ? 'Location' : 'Region'}}</b>
+    <b>{{session.account.accountName}}</b> - {{$any(session.account).role ? $any(session.account).role.name : 'Plain' }} | <b>Change {{session.account.type === eSessionType.AZURE ? 'Location' : 'Region'}}</b>
   </div>
   <div class="modal-body">
 
     <div class="ssm-tray">
 
       <b class="">Select a default region for the session:</b>
-      <ng-select bindLabel="{{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}" bindValue="{{session.account.type === eAccountType.AZURE ? 'location' : 'region'}}" [items]="regionOrLocations" [(ngModel)]="selectedDefaultRegion" placeholder="{{placeholder}}"></ng-select>
+      <ng-select bindLabel="{{session.account.type === eSessionType.AZURE ? 'location' : 'region'}}" bindValue="{{session.account.type === eSessionType.AZURE ? 'location' : 'region'}}" [items]="regionOrLocations" [(ngModel)]="selectedDefaultRegion" placeholder="{{placeholder}}"></ng-select>
 
       <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
       <button type="button" (click)="changeRegion();" [disabled]="!selectedDefaultRegion" [ngClass]="(!selectedDefaultRegion) ? 'pull-right disabled': 'pull-right'">Save</button>

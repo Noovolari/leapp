@@ -1,5 +1,5 @@
-import {LeappBaseError} from "./leapp-base-error";
-import {LoggerLevel} from "../services/app.service";
+import {LeappBaseError} from './leapp-base-error';
+import {LoggerLevel} from '../services/app.service';
 
 export class LeappNotFoundError extends LeappBaseError {
   constructor(context: any, ...params) {

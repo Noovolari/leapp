@@ -14,7 +14,7 @@ module.exports = function (config) {
     files: [
       {
         pattern: 'src/**/*.ts',
-        type: 'js'  // to silence the warning. Means load with <script> tag
+        type: 'js' // To silence the warning. Means load with <script> tag.
       },
     ],
     client: {

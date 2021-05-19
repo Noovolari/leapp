@@ -34,7 +34,8 @@ export class AwsPlainService extends SessionService {
   }
 
   static isTokenExpired(tokenExpiration: Date): boolean {
-    return false;
+    const now = Date.now();
+    return now - tokenExpiration.getTime() > environment.sessionTokenDuration;
   }
 
   static sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse: GetSessionTokenResponse): { sessionToken: any } {
@@ -103,6 +104,10 @@ export class AwsPlainService extends SessionService {
         let params = { DurationSeconds: environment.sessionTokenDuration };
         // Check if MFA is needed or not
         if ((session.account as AwsPlainAccount).mfaDevice) {
+          this.appService.inputDialog('Multi-factor Authentication', 'insert your code...', 'Add your MFA code', (code) => {
+
+          });
+
           // TODO: define and open MFA modal
           //  - prompt for mfa token
           //  - configure sts get-session-token api call params
@@ -118,8 +123,8 @@ export class AwsPlainService extends SessionService {
         return AwsPlainService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
       } else {
         // Session Token is NOT expired
-        // TODO:
-        //  - Return current session token retrieved from credential file
+        // Retrieve from credential file
+
       }
     } catch (err) {
       throw new LeappBaseError('Get Session token error', this, LoggerLevel.error, err.message, err.stack);

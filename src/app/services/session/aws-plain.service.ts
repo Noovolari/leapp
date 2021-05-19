@@ -6,11 +6,14 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {KeychainService} from '../keychain.service';
 import {environment} from '../../../environments/environment';
 import {Session} from '../../models/session';
-import {AppService, LoggerLevel} from '../app.service';
+import {AppService} from '../app.service';
 import AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
 import {FileService} from '../file.service';
-import {LeappBaseError} from '../../errors/leapp-base-error';
+import {Constants} from '../../models/constants';
+import {LeappModalClosedError} from '../../errors/leapp-modal-closed-error';
+import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
+import {LeappParseError} from '../../errors/leapp-parse-error';
 
 export interface AwsPlainAccountRequest {
   accountName: string;
@@ -35,7 +38,7 @@ export class AwsPlainService extends SessionService {
 
   static isTokenExpired(tokenExpiration: Date): boolean {
     const now = Date.now();
-    return now - tokenExpiration.getTime() > environment.sessionTokenDuration;
+    return now > tokenExpiration.getTime();
   }
 
   static sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse: GetSessionTokenResponse): { sessionToken: any } {
@@ -83,7 +86,6 @@ export class AwsPlainService extends SessionService {
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    try {
       // Get the session in question
       const session = this.get(sessionId);
       // Retrieve session token expiration
@@ -101,34 +103,37 @@ export class AwsPlainService extends SessionService {
         const sts = new AWS.STS(this.appService.stsOptions(session));
         // Configure sts get-session-token api call params
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        let params = { DurationSeconds: environment.sessionTokenDuration };
+        const params = { DurationSeconds: environment.sessionTokenDuration };
         // Check if MFA is needed or not
         if ((session.account as AwsPlainAccount).mfaDevice) {
-          this.appService.inputDialog('Multi-factor Authentication', 'insert your code...', 'Add your MFA code', (code) => {
-
+          this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
+            if (value !== Constants.confirmClosed) {
+              params['SerialNumber'] = (session.account as AwsPlainAccount).mfaDevice;
+              params['TokenCode'] = value;
+              // Return session token in the form of CredentialsInfo
+              return this.generateSessionToken(sts, params);
+            } else {
+              throw new LeappModalClosedError(this, 'Closed Mfa Modal');
+            }
           });
-
-          // TODO: define and open MFA modal
-          //  - prompt for mfa token
-          //  - configure sts get-session-token api call params
-          //  - SerialNumber = MFA device
-          //  - TokenCode
-          //  - Add Parameters to params
-          params = params;
+        } else {
+          // Return session token in the form of CredentialsInfo
+          return this.generateSessionToken(sts, params);
         }
-
-        // Invoke sts get-session-token api
-        const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
-        // Return Session Token
-        return AwsPlainService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
       } else {
         // Session Token is NOT expired
-        // Retrieve from credential file
+        // Retrieve profile from current session
+        const profileName = this.workspaceService.getProfileName(session.profileId);
 
+        try {
+          // Retrieve session token from credential file
+          const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
+          delete credentialsFile[profileName].region;
+          return { sessionToken: credentialsFile[profileName] };
+        } catch (err) {
+          throw new LeappParseError(this, err.message, err.stack);
+        }
       }
-    } catch (err) {
-      throw new LeappBaseError('Get Session token error', this, LoggerLevel.error, err.message, err.stack);
-    }
   }
 
   private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
@@ -137,5 +142,16 @@ export class AwsPlainService extends SessionService {
 
   private async getSecretKeyFromKeychain(sessionId: string): Promise<string> {
     return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-secret-access-key`);
+  }
+
+  private async generateSessionToken(sts: AWS.STS, params: any): Promise<CredentialsInfo> {
+    try {
+      // Invoke sts get-session-token api
+      const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
+      // Return Session Token
+      return AwsPlainService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
+    } catch (err) {
+      throw new LeappAwsStsError(this, err.message, err.stack);
+    }
   }
 }

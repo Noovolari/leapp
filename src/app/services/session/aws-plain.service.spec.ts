@@ -14,6 +14,7 @@ import {LeappBaseError} from '../../errors/leapp-base-error';
 
 import * as AWSMock from 'aws-sdk-mock';
 import * as AWS from 'aws-sdk';
+import {AwsPlainAccount} from '../../models/aws-plain-account';
 
 let spyAppService;
 let spyFileService;
@@ -29,7 +30,7 @@ let mockedCredentialObject;
 describe('AwsPlainService', () => {
 
   beforeEach(() => {
-    spyAppService = jasmine.createSpyObj('AppService', ['getOS', 'awsCredentialPath', 'stsOptions']);
+    spyAppService = jasmine.createSpyObj('AppService', ['getOS', 'awsCredentialPath', 'stsOptions', 'inputDialog']);
     spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
     spyAppService.awsCredentialPath.and.returnValue('~/.aws');
     spyAppService.stsOptions.and.returnValue({});
@@ -181,7 +182,7 @@ describe('AwsPlainService', () => {
   });
 
   describe('generateCredentials()',  () => {
-    it('should generate a Credential Info Promise', async () => {
+    it('should generate a Credential Info Promise if token is expired', async () => {
 
       AWSMock.setSDKInstance(AWS);
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -201,6 +202,7 @@ describe('AwsPlainService', () => {
 
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
+      (mockedSessions[0].account as AwsPlainAccount).sessionTokenExpiration = new Date(Date.now() - environment.sessionTokenDuration - 1000).toISOString();
 
       spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsPlainService, 'generateCredentials').and.callThrough();
@@ -214,6 +216,100 @@ describe('AwsPlainService', () => {
           aws_secret_access_key: 'secret-key-1',
           // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_session_token: 'session-token',
+        }
+      });
+
+      AWSMock.restore('STS');
+    });
+
+    it('should ask for MFA code if token is expired and mfadevice is present as a property of aws plain account', async () => {
+
+      AWSMock.setSDKInstance(AWS);
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      AWSMock.mock('STS', 'getSessionToken', (params: { DurationSeconds: number }, callback: any) => {
+        callback(null, {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          Credentials: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            AccessKeyId: 'access-key-id-1',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            SecretAccessKey: 'secret-key-1',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            SessionToken: 'session-token'
+          }
+        });
+      });
+
+      mockedSessions = [];
+      awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
+      (mockedSessions[0].account as AwsPlainAccount).mfaDevice = 'fake-device-arn';
+      (mockedSessions[0].account as AwsPlainAccount).sessionTokenExpiration = new Date(Date.now() - 10000).toISOString();
+
+      spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
+      spyOn(awsPlainService, 'generateCredentials').and.callThrough();
+      spyOn<any>(awsPlainService, 'generateSessionToken').and.returnValue(true);
+
+      spyAppService.inputDialog.and.callFake((_: string, _2: string, _3: string, callback: any) => callback('fake-code'));
+
+      await awsPlainService.generateCredentials('fakeid');
+
+      expect(spyAppService.inputDialog).toHaveBeenCalled();
+      expect((awsPlainService as any).generateSessionToken).toHaveBeenCalled();
+
+      AWSMock.restore('STS');
+    });
+
+    it('should retrieve Credential Info from credential file if token is NOT expired', async () => {
+
+      AWSMock.setSDKInstance(AWS);
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      AWSMock.mock('STS', 'getSessionToken', (params: { DurationSeconds: number }, callback: any) => {
+        callback(null, {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          Credentials: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            AccessKeyId: 'access-key-id-1',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            SecretAccessKey: 'secret-key-1',
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            SessionToken: 'session-token'
+          }
+        });
+      });
+
+      mockedSessions = [];
+      awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
+      // Fake date in the future to prevent token expiration
+      (mockedSessions[0].account as AwsPlainAccount).sessionTokenExpiration = new Date(Date.now() + 1000).toISOString();
+
+      spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
+      spyOn(awsPlainService, 'generateCredentials').and.callThrough();
+
+      // We need to spy on iniParseFile
+      const credentialFakeObject = {
+        default: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_access_key_id: 'access-key-id-file',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_secret_access_key: 'secret-key-file',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_session_token: 'session-token-file',
+          region: 'eu-west-1'
+        }
+      };
+
+      spyFileService.iniParseSync.and.callFake( () => credentialFakeObject);
+
+      const credentials = await awsPlainService.generateCredentials('fakeid');
+
+      expect(credentials).toEqual({
+        sessionToken: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_access_key_id: 'access-key-id-file',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_secret_access_key: 'secret-key-file',
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_session_token: 'session-token-file',
         }
       });
 

@@ -15,8 +15,12 @@ export class Session {
       ],
     },
   })
+
   account: Account;
+
   sessionId: string;
+  parentSessionId?: string;
+
   profileId: string;
   status: SessionStatus;
   startDateTime: string;

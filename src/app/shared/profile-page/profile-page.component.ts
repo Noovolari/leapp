@@ -8,7 +8,7 @@ import {Router} from '@angular/router';
 import {Constants} from '../../models/constants';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsAccount} from '../../models/aws-account';
+import {AwsFederatedAccount} from '../../models/aws-federated-account';
 import {SessionService} from '../../services/session.service';
 import {WorkspaceService} from '../../services/workspace.service';
 
@@ -171,7 +171,7 @@ export class ProfilePageComponent implements OnInit {
 
   deleteIdpUrl(id) {
     // Federated
-    const sessions = this.workspace.sessions.filter(s => (s.account as AwsAccount).idpUrl !== undefined && (s.account as AwsAccount).idpUrl === id);
+    const sessions = this.workspace.sessions.filter(s => (s.account as AwsFederatedAccount).idpUrl !== undefined && (s.account as AwsFederatedAccount).idpUrl === id);
 
     // Add trusters from federated
     /* federated.forEach(fed => {
@@ -180,7 +180,7 @@ export class ProfilePageComponent implements OnInit {
     }); */
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsAccount).role.name}</small></div></li>`);
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).role.name}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
@@ -226,7 +226,7 @@ export class ProfilePageComponent implements OnInit {
     const sessions = this.workspace.sessions.filter(s => s.profileId === id);
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsAccount).role ? (s.account as AwsAccount).role.name : ''}</small></div></li>`);
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).role ? (s.account as AwsFederatedAccount).role.name : ''}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }

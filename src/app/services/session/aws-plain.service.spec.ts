@@ -206,6 +206,7 @@ describe('AwsPlainService', () => {
 
       spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsPlainService, 'generateCredentials').and.callThrough();
+      spyOn<any>(awsPlainService, 'saveSessionTokenResponseInTheSession').and.callFake(() => true);
 
       const credentials = await awsPlainService.generateCredentials('fakeid');
       expect(credentials).toEqual({
@@ -247,7 +248,7 @@ describe('AwsPlainService', () => {
 
       spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsPlainService, 'generateCredentials').and.callThrough();
-      spyOn<any>(awsPlainService, 'generateSessionToken').and.returnValue(true);
+      spyOn<any>(awsPlainService, 'generateSessionToken').and.callFake(() => true);
 
       spyAppService.inputDialog.and.callFake((_: string, _2: string, _3: string, callback: any) => callback('fake-code'));
 
@@ -259,7 +260,7 @@ describe('AwsPlainService', () => {
       AWSMock.restore('STS');
     });
 
-    it('should retrieve Credential Info from credential file if token is NOT expired', async () => {
+    it('should retrieve Credential Info from keychain if token is NOT expired', async () => {
 
       AWSMock.setSDKInstance(AWS);
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -287,18 +288,17 @@ describe('AwsPlainService', () => {
 
       // We need to spy on iniParseFile
       const credentialFakeObject = {
-        default: {
+        sessionToken: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_access_key_id: 'access-key-id-file',
           // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_secret_access_key: 'secret-key-file',
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          aws_session_token: 'session-token-file',
-          region: 'eu-west-1'
+          aws_session_token: 'session-token-file'
         }
       };
 
-      spyFileService.iniParseSync.and.callFake( () => credentialFakeObject);
+      spyKeychainService.getSecret.and.returnValue(JSON.stringify(credentialFakeObject));
 
       const credentials = await awsPlainService.generateCredentials('fakeid');
 

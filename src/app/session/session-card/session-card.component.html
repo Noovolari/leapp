@@ -5,7 +5,7 @@
   </div>
   <div class="information-profile" (click)="switchCredentials()">
     <ng-container *ngIf="session.account.type !== eSessionType.azure">
-      <i class="fa fa-{{getProfileIcon(session.status === eSessionStatus.active, getProfileName(session.profileId))}}"></i>&nbsp;&nbsp;{{getProfileName(session.profileId)}}
+      <i class="fa fa-{{getProfileIcon(session.status === eSessionStatus.active, getProfileName(getProfileId(session)))}}"></i>&nbsp;&nbsp;{{getProfileName(getProfileId(session))}}
     </ng-container>
   </div>
   <div class="information-offset" (click)="switchCredentials()">
@@ -18,16 +18,16 @@
       <i class="fa fa-ellipsis-v"></i>
     </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-      <a (click)="ssmModalOpen(session);" *ngIf="(session.account.type === eSessionType.aws || session.account.type === eSessionType.awsPlainUser || session.account.type === eSessionType.awsSso) && session.status === eSessionStatus.active">SSM session</a>
+      <a (click)="ssmModalOpen(session);" *ngIf="(session.account.type === eSessionType.awsFederated || session.account.type === eSessionType.awsPlain || session.account.type === eSessionType.awsSso) && session.status === eSessionStatus.active">SSM session</a>
       <a (click)="changeRegionModalOpen(session);">Change {{session.account.type === eSessionType.azure ? 'location' : 'region'}}</a>
 
       <a *ngIf="session.account.type !== eSessionType.azure" (click)="changeProfileModalOpen();">Change Profile</a>
 
-      <a *ngIf="session.account.type === eSessionType.awsPlainUser && session.status !== eSessionStatus.active" (click)="editAccount(session, $event);">Edit account</a>
+      <a *ngIf="session.account.type === eSessionType.awsPlain && session.status !== eSessionStatus.active" (click)="editAccount(session, $event);">Edit account</a>
       <a (click)="removeAccount(session, $event);">Remove account</a>
-      <ng-container *ngIf="(session.account.type === eSessionType.aws || session.account.type === eSessionType.awsPlainUser || session.account.type === eSessionType.awsSso)">
+      <ng-container *ngIf="(session.account.type === eSessionType.awsFederated || session.account.type === eSessionType.awsPlain || session.account.type === eSessionType.awsSso)">
       <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
-        <ng-container *ngIf="(session.account.type !== eSessionType.awsPlainUser)">
+        <ng-container *ngIf="(session.account.type !== eSessionType.awsPlain)">
         <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
       </ng-container>
       </ng-container>

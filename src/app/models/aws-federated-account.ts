@@ -12,4 +12,5 @@ export class AwsFederatedAccount extends Account {
   parent?: string;
   parentRole?: string;
   region: string;
+  profileId: string;
 }

@@ -7,11 +7,13 @@ export class AwsPlainAccount extends Account {
   mfaDevice?: string;
   type: SessionType;
   sessionTokenExpiration: string;
+  profileId: string;
 
-  constructor(accountName: string, region: string, mfaDevice?: string) {
+  constructor(accountName: string, region: string, profileId: string, mfaDevice?: string) {
     super(accountName, region);
     this.mfaDevice = mfaDevice;
-    this.type = SessionType.awsPlainUser;
+    this.type = SessionType.awsPlain;
+    this.profileId = profileId;
   }
 }
 

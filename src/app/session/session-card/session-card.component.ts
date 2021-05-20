@@ -1,4 +1,4 @@
-import {Component, Inject, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
@@ -16,8 +16,9 @@ import {AwsPlainAccount} from '../../models/aws-plain-account';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {FileService} from '../../services/file.service';
 import {SessionProviderService} from '../../services/session-provider.service';
-import {LeappNotFoundError} from '../../errors/leapp-not-found-error';
 import {SessionStatus} from '../../models/session-status';
+import {AwsTrusterAccount} from '../../models/aws-truster-account';
+import {LeappNotAwsAccountError} from '../../errors/leapp-not-aws-account-error';
 
 @Component({
   selector: 'app-session-card',
@@ -85,16 +86,16 @@ export class SessionCardComponent implements OnInit {
     this.regionOrLocations = this.session.account.type !== SessionType.azure ? this.awsRegions : azureLocations;
     this.placeholder = this.session.account.type !== SessionType.azure ? 'Select a default region' : 'Select a default location';
     this.selectedDefaultRegion = this.session.account.region;
-    this.selectedProfile = this.session.profileId;
+    this.selectedProfile = this.getProfileId(this.session);
 
     switch (this.session.account.type) {
-      case(SessionType.aws):
+      case(SessionType.awsFederated):
         this.sessionDetailToShow = (this.session.account as AwsFederatedAccount).role.name;
         break;
       case(SessionType.azure):
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
         break;
-      case(SessionType.awsPlainUser):
+      case(SessionType.awsPlain):
         this.sessionDetailToShow = (this.session.account as AwsPlainAccount).accountName;
         break;
       case(SessionType.awsSso):
@@ -234,7 +235,7 @@ export class SessionCardComponent implements OnInit {
     if (this.selectedSsmRegion) {
       this.ssmloading = true;
 
-      const account = `Leapp-ssm-data-${session.profileId}`;
+      const account = `Leapp-ssm-data-${this.getProfileId(session)}`;
 
       // Set the aws credentials to instanziate the ssm client
       this.keychainService.getSecret(environment.appName, account).then(creds => {
@@ -319,6 +320,20 @@ export class SessionCardComponent implements OnInit {
   getProfileIcon(active, name) {
     const color = active ? ' orange' : '';
     return name === environment.defaultAwsProfileName ? ('home' + color) : ('user' + color);
+  }
+
+  getProfileId(session: Session): string {
+    if(session.account.type === SessionType.awsFederated) {
+      return (session.account as AwsFederatedAccount).profileId;
+    } else if (session.account.type === SessionType.awsPlain) {
+      return (session.account as AwsPlainAccount).profileId;
+    } else if (session.account.type === SessionType.awsTruster) {
+      return (session.account as AwsTrusterAccount).profileId;
+    } else if (session.account.type === SessionType.awsSso) {
+      return (session.account as AwsSsoAccount).profileId;
+    } else {
+      throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
+    }
   }
 
   getProfileName(id) {

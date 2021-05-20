@@ -3,6 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 const environment = {
   appName: 'Leapp',
+  samlRoleSessionDuration: 3600, // 1h
   sessionDuration: 3600,
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,

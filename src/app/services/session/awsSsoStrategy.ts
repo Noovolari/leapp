@@ -31,8 +31,8 @@ export class AwsSsoStrategy {
   getActiveSessions(workspace: Workspace) {
     return workspace.sessions.filter((sess) => (sess.account.type === SessionType.awsTruster ||
         sess.account.type === SessionType.awsSso ||
-        sess.account.type === SessionType.awsPlainUser ||
-        sess.account.type === SessionType.aws) && sess.status === SessionStatus.active);
+        sess.account.type === SessionType.awsPlain ||
+        sess.account.type === SessionType.awsFederated) && sess.status === SessionStatus.active);
   }
 
   cleanCredentials(workspace: Workspace): void {
@@ -67,11 +67,11 @@ export class AwsSsoStrategy {
         return credential;
       }),
       switchMap((credential: AwsCredential) => {
-        const profileName = this.configurationService.getNameFromProfileId(session.profileId);
+        const profileName = this.configurationService.getNameFromProfileId((session.account as AwsSsoAccount).profileId);
         const awsSsoCredentials = {};
         awsSsoCredentials[profileName] = credential;
 
-        const account = `Leapp-ssm-data-${session.profileId}`;
+        const account = `Leapp-ssm-data-${(session.account as AwsSsoAccount).profileId}`;
 
         return fromPromise(this.keychainService.saveSecret(environment.appName, account, JSON.stringify(credential))).pipe(
           map(() => awsSsoCredentials)

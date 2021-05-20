@@ -9,4 +9,5 @@ export class AwsSsoAccount  extends Account {
   accountNumber: string;
   email?: string;
   role: { name: string};
+  profileId: string;
 }

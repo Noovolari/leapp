@@ -11,7 +11,7 @@ export class Session {
     discriminator: {
       property: 'type',
       subTypes: [
-        { value: AwsPlainAccount, name: SessionType.awsPlainUser },
+        { value: AwsPlainAccount, name: SessionType.awsPlain },
       ],
     },
   })
@@ -21,14 +21,12 @@ export class Session {
   sessionId: string;
   parentSessionId?: string;
 
-  profileId: string;
   status: SessionStatus;
   startDateTime: string;
   lastStopDateTime: string;
 
-  constructor(account: Account, profileId: string) {
+  constructor(account: Account) {
     this.sessionId = uuid.v4();
-    this.profileId = profileId;
     this.status = SessionStatus.inactive;
     this.startDateTime = undefined;
     this.lastStopDateTime = new Date().toISOString();

@@ -1,6 +1,6 @@
 export enum SessionType {
-  aws = 'aws',
-  awsPlainUser = 'awsPlainUser',
+  awsFederated = 'awsFederated',
+  awsPlain = 'awsPlain',
   awsTruster = 'awsTruster',
   awsSso = 'awsSso',
   azure = 'azure'

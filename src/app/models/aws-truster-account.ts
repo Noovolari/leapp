@@ -6,10 +6,12 @@ export class AwsTrusterAccount extends Account {
   region: string;
   roleArn: string;
   type: SessionType;
+  profileId: string;
 
-  constructor(accountName: string, region: string, roleArn?: string) {
+  constructor(accountName: string, region: string, profileId: string, roleArn?: string) {
     super(accountName, region);
     this.roleArn = roleArn;
     this.type = SessionType.awsTruster;
+    this.profileId = profileId;
   }
 }

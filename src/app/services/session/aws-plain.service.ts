@@ -55,7 +55,7 @@ export class AwsPlainService extends SessionService {
   }
 
   create(accountRequest: AwsPlainAccountRequest, profileId: string): void {
-    const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, accountRequest.mfaDevice), profileId);
+    const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, accountRequest.mfaDevice, profileId));
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-secret-access-key`, accountRequest.secretKey);
     this.workspaceService.addSession(session);
@@ -63,7 +63,7 @@ export class AwsPlainService extends SessionService {
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName(session.profileId);
+    const profileName = this.workspaceService.getProfileName((session.account as AwsPlainAccount).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -79,7 +79,7 @@ export class AwsPlainService extends SessionService {
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName(session.profileId);
+    const profileName = this.workspaceService.getProfileName((session.account as AwsPlainAccount).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);

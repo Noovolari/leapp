@@ -6,7 +6,7 @@ import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel} from '../../services/app.service';
 import {Session} from '../../models/session';
 import {SessionType} from '../../models/session-type';
-import {AwsAccount} from '../../models/aws-account';
+import {AwsFederatedAccount} from '../../models/aws-federated-account';
 import {environment} from '../../../environments/environment';
 import {SessionStatus} from '../../models/session-status';
 
@@ -54,7 +54,7 @@ export class TrayMenuComponent implements OnInit {
         case SessionType.awsTruster:
         case SessionType.awsSso:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsAccount).role.name;
+          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsFederatedAccount).role.name;
           break;
 
         case SessionType.azure:

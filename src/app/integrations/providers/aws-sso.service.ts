@@ -314,6 +314,8 @@ export class AwsSsoService extends NativeService {
         return rolesListAggregate;
       }),
       map((roleInfo: RoleInfo) => {
+        const profileId  = this.workspaceService.get().profiles.filter(p => p.name === 'default')[0].id;
+
         const account: AwsSsoAccount = {
           region: this.workspaceService.get().defaultRegion || environment.defaultRegion,
           role: {name: roleInfo.roleName},
@@ -321,12 +323,11 @@ export class AwsSsoService extends NativeService {
           accountName: accountInfo.accountName,
           accountNumber: accountInfo.accountId,
           email: accountInfo.emailAddress,
-          type: SessionType.awsSso
+          type: SessionType.awsSso,
+          profileId
         };
 
-        const profileId  = this.workspaceService.get().profiles.filter(p => p.name === 'default')[0].id;
-
-        return new Session(account, profileId);
+        return new Session(account);
       })
     );
   }

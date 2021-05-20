@@ -11,6 +11,12 @@ import * as uuid from 'uuid';
 import {AwsFederatedAccount} from '../../models/aws-federated-account';
 import {SessionService} from '../../services/session.service';
 import {WorkspaceService} from '../../services/workspace.service';
+import {Session} from '../../models/session';
+import {SessionType} from '../../models/session-type';
+import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {AwsTrusterAccount} from '../../models/aws-truster-account';
+import {AwsSsoAccount} from '../../models/aws-sso-account';
+import {LeappNotAwsAccountError} from '../../errors/leapp-not-aws-account-error';
 
 @Component({
   selector: 'app-profile-page',
@@ -223,7 +229,7 @@ export class ProfilePageComponent implements OnInit {
 
   deleteAwsProfile(id: string) {
     // Federated
-    const sessions = this.workspace.sessions.filter(s => s.profileId === id);
+    const sessions = this.workspace.sessions.filter(s => this.getProfileId(s) === id);
 
     // Get only names for display
     let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).role ? (s.account as AwsFederatedAccount).role.name : ''}</small></div></li>`);
@@ -241,5 +247,19 @@ export class ProfilePageComponent implements OnInit {
         // this.sessionService.replaceAllProfileId(id, defaultId);
       }
     });
+  }
+
+  getProfileId(session: Session): string {
+    if(session.account.type === SessionType.awsFederated) {
+      return (session.account as AwsFederatedAccount).profileId;
+    } else if (session.account.type === SessionType.awsPlain) {
+      return (session.account as AwsPlainAccount).profileId;
+    } else if (session.account.type === SessionType.awsTruster) {
+      return (session.account as AwsTrusterAccount).profileId;
+    } else if (session.account.type === SessionType.awsSso) {
+      return (session.account as AwsSsoAccount).profileId;
+    } else {
+      throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
+    }
   }
 }

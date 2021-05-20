@@ -1,7 +1,7 @@
 import {SessionType} from './session-type';
 import {Account} from './account';
 
-export class AwsAccount extends Account {
+export class AwsFederatedAccount extends Account {
   accountId: string;
   accountName: string;
   accountNumber: string;

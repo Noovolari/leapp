@@ -14,6 +14,7 @@ import {Constants} from '../../models/constants';
 import {LeappModalClosedError} from '../../errors/leapp-modal-closed-error';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
 import {LeappParseError} from '../../errors/leapp-parse-error';
+import {SessionStatus} from "../../models/session-status";
 
 export interface AwsPlainAccountRequest {
   accountName: string;
@@ -36,9 +37,9 @@ export class AwsPlainService extends SessionService {
     super(workspaceService);
   }
 
-  static isTokenExpired(tokenExpiration: Date): boolean {
+  static isTokenExpired(tokenExpiration: string): boolean {
     const now = Date.now();
-    return now > tokenExpiration.getTime();
+    return now > new Date(tokenExpiration).getTime();
   }
 
   static sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse: GetSessionTokenResponse): { sessionToken: any } {
@@ -89,9 +90,9 @@ export class AwsPlainService extends SessionService {
       // Get the session in question
       const session = this.get(sessionId);
       // Retrieve session token expiration
-      const tokenExpiration = new Date((session.account as AwsPlainAccount).sessionTokenExpiration);
+      const tokenExpiration = (session.account as AwsPlainAccount).sessionTokenExpiration;
       // Check if token is expired
-      if (tokenExpiration && AwsPlainService.isTokenExpired(tokenExpiration)) {
+      if (!tokenExpiration || AwsPlainService.isTokenExpired(tokenExpiration)) {
         // Token is Expired!
         // Retrieve access keys from keychain
         const accessKeyId = await this.getAccessKeyFromKeychain(sessionId);
@@ -106,30 +107,27 @@ export class AwsPlainService extends SessionService {
         const params = { DurationSeconds: environment.sessionTokenDuration };
         // Check if MFA is needed or not
         if ((session.account as AwsPlainAccount).mfaDevice) {
-          this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
-            if (value !== Constants.confirmClosed) {
-              params['SerialNumber'] = (session.account as AwsPlainAccount).mfaDevice;
-              params['TokenCode'] = value;
-              // Return session token in the form of CredentialsInfo
-              return this.generateSessionToken(sts, params);
-            } else {
-              throw new LeappModalClosedError(this, 'Closed Mfa Modal');
-            }
+          return new Promise((resolve, reject) => {
+            this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
+              if (value !== Constants.confirmClosed) {
+                params['SerialNumber'] = (session.account as AwsPlainAccount).mfaDevice;
+                params['TokenCode'] = value;
+                // Return session token in the form of CredentialsInfo
+                resolve(this.generateSessionToken(session, sts, params));
+              } else {
+                reject(new LeappModalClosedError(this, 'Closed Mfa Modal'));
+              }
+            });
           });
         } else {
           // Return session token in the form of CredentialsInfo
-          return this.generateSessionToken(sts, params);
+          return this.generateSessionToken(session, sts, params);
         }
       } else {
         // Session Token is NOT expired
-        // Retrieve profile from current session
-        const profileName = this.workspaceService.getProfileName(session.profileId);
-
         try {
-          // Retrieve session token from credential file
-          const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
-          delete credentialsFile[profileName].region;
-          return { sessionToken: credentialsFile[profileName] };
+          // Retrieve session token from keychain
+          return JSON.parse(await this.keychainService.getSecret(environment.appName, `${session.sessionId}-plain-aws-session-token`));
         } catch (err) {
           throw new LeappParseError(this, err.message, err.stack);
         }
@@ -144,12 +142,26 @@ export class AwsPlainService extends SessionService {
     return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-secret-access-key`);
   }
 
-  private async generateSessionToken(sts: AWS.STS, params: any): Promise<CredentialsInfo> {
+  private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {
     try {
       // Invoke sts get-session-token api
       const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
+
+      // Save session token expiration
+      const index = this.workspaceService.sessions.indexOf(session);
+      const currentSession: Session = this.workspaceService.sessions[index];
+      (currentSession.account as AwsPlainAccount).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+      this.workspaceService.sessions[index] = currentSession;
+      this.workspaceService.sessions = [...this.workspaceService.sessions];
+
+      // Generate correct object from session token response
+      const sessionToken = AwsPlainService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
+
+      // Save in keychain the session token
+      await this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-token`, JSON.stringify(sessionToken));
+
       // Return Session Token
-      return AwsPlainService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
+      return sessionToken;
     } catch (err) {
       throw new LeappAwsStsError(this, err.message, err.stack);
     }

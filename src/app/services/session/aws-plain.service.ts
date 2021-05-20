@@ -14,7 +14,6 @@ import {Constants} from '../../models/constants';
 import {LeappModalClosedError} from '../../errors/leapp-modal-closed-error';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
 import {LeappParseError} from '../../errors/leapp-parse-error';
-import {SessionStatus} from "../../models/session-status";
 
 export interface AwsPlainAccountRequest {
   accountName: string;
@@ -107,18 +106,8 @@ export class AwsPlainService extends SessionService {
         const params = { DurationSeconds: environment.sessionTokenDuration };
         // Check if MFA is needed or not
         if ((session.account as AwsPlainAccount).mfaDevice) {
-          return new Promise((resolve, reject) => {
-            this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
-              if (value !== Constants.confirmClosed) {
-                params['SerialNumber'] = (session.account as AwsPlainAccount).mfaDevice;
-                params['TokenCode'] = value;
-                // Return session token in the form of CredentialsInfo
-                resolve(this.generateSessionToken(session, sts, params));
-              } else {
-                reject(new LeappModalClosedError(this, 'Closed Mfa Modal'));
-              }
-            });
-          });
+          // Return session token after calling MFA modal
+          return this.generateSessionTokenCallingMfaModal(session, sts, params);
         } else {
           // Return session token in the form of CredentialsInfo
           return this.generateSessionToken(session, sts, params);
@@ -132,6 +121,23 @@ export class AwsPlainService extends SessionService {
           throw new LeappParseError(this, err.message, err.stack);
         }
       }
+  }
+
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  private generateSessionTokenCallingMfaModal( session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise<CredentialsInfo> {
+    return new Promise((resolve, reject) => {
+      this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
+        if (value !== Constants.confirmClosed) {
+          params['SerialNumber'] = (session.account as AwsPlainAccount).mfaDevice;
+          params['TokenCode'] = value;
+          // Return session token in the form of CredentialsInfo
+          console.log(session, params);
+          resolve(this.generateSessionToken(session, sts, params));
+        } else {
+          reject(new LeappModalClosedError(this, 'Closed Mfa Modal'));
+        }
+      });
+    });
   }
 
   private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
@@ -148,11 +154,7 @@ export class AwsPlainService extends SessionService {
       const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
 
       // Save session token expiration
-      const index = this.workspaceService.sessions.indexOf(session);
-      const currentSession: Session = this.workspaceService.sessions[index];
-      (currentSession.account as AwsPlainAccount).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
-      this.workspaceService.sessions[index] = currentSession;
-      this.workspaceService.sessions = [...this.workspaceService.sessions];
+      this.saveSessionTokenResponseInTheSession(session, getSessionTokenResponse);
 
       // Generate correct object from session token response
       const sessionToken = AwsPlainService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
@@ -165,5 +167,13 @@ export class AwsPlainService extends SessionService {
     } catch (err) {
       throw new LeappAwsStsError(this, err.message, err.stack);
     }
+  }
+
+  private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
+    const index = this.workspaceService.sessions.indexOf(session);
+    const currentSession: Session = this.workspaceService.sessions[index];
+    (currentSession.account as AwsPlainAccount).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+    this.workspaceService.sessions[index] = currentSession;
+    this.workspaceService.sessions = [...this.workspaceService.sessions];
   }
 }

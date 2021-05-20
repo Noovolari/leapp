@@ -3,7 +3,7 @@ import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
 import {Router} from '@angular/router';
-import {AwsAccount} from '../../models/aws-account';
+import {AwsFederatedAccount} from '../../models/aws-federated-account';
 import {SsmService} from '../../services/ssm.service';
 import {AzureAccount} from '../../models/azure-account';
 import {SessionType} from '../../models/session-type';
@@ -89,7 +89,7 @@ export class SessionCardComponent implements OnInit {
 
     switch (this.session.account.type) {
       case(SessionType.aws):
-        this.sessionDetailToShow = (this.session.account as AwsAccount).role.name;
+        this.sessionDetailToShow = (this.session.account as AwsFederatedAccount).role.name;
         break;
       case(SessionType.azure):
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
@@ -107,17 +107,9 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    */
   startSession() {
-    try {
-      []['fake'].boom();
-    } catch(error) {
-      throw new LeappNotFoundError(this, 'Fake Not Found Session', error.stack);
-    }
-
-
     this.sessionService.start(this.session.sessionId).then(() => {}, error => {
       console.log(error);
     });
-
 
     this.appService.logger(
       `Starting Session`,
@@ -174,10 +166,10 @@ export class SessionCardComponent implements OnInit {
     try {
       const workspace = this.workspaceService.get();
       if (workspace) {
-        const sessionAccount = (session.account as AwsAccount);
+        const sessionAccount = (session.account as AwsFederatedAccount);
         const texts = {
           1: sessionAccount.accountNumber,
-          2: sessionAccount.role ? `arn:aws:iam::${(session.account as AwsAccount).accountNumber}:role/${(session.account as AwsAccount).role.name}` : ''
+          2: sessionAccount.role ? `arn:aws:iam::${(session.account as AwsFederatedAccount).accountNumber}:role/${(session.account as AwsFederatedAccount).role.name}` : ''
         };
 
         const text = texts[type];

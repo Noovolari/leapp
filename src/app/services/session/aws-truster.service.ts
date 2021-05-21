@@ -103,7 +103,7 @@ export class AwsTrusterService extends SessionService {
     // Configure Truster Account session parameters
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleSessionName: `assumed-from-${parentSession.account.accountName}-for-${session.account.accountName}`,
+      RoleSessionName: `assumed-from-leapp`,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       RoleArn: (session.account as AwsTrusterAccount).roleArn,
     };

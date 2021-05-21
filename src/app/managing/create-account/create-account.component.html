@@ -202,13 +202,13 @@
         </ng-container>
 
         <!-- ================================================================== -->
-        <!-- ==                       ASSUMABLE SESSION                      == -->
+        <!-- ==                       ASSUMER SESSIONS                       == -->
         <!-- ================================================================== -->
         <ng-container *ngIf="sessionType === eAccountType.awsTruster">
           <h2>Truster setting</h2>
           <div class="form-group" style="width: 100%; display: inline-block; position: relative; top: -1px;" >
-            <label style="margin-bottom: 0;">Assumable Account<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This is the account used to make AssumeRole on the Truster Account"></i></label>
-            <ng-select class="mt-2" formControlName="assumableAccount" bindLabel="accountName" bindValue="session" dropdownPosition="top" [items]="assumableAccounts" [(ngModel)]="selectedSession" [disabled]="true"></ng-select>
+            <label style="margin-bottom: 0;">Assumer Session<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This is the account used to make AssumeRole on the Truster Account"></i></label>
+            <ng-select class="mt-2" formControlName="assumerSession" bindLabel="accountName" bindValue="session" dropdownPosition="top" [items]="assumerAwsSessions" [(ngModel)]="selectedSession" [disabled]="true"></ng-select>
           </div>
         </ng-container>
       </ng-container>

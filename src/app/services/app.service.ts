@@ -605,7 +605,7 @@ export class AppService extends NativeService {
     if (session.account.region) {
       options = {
         ...options,
-        endpoint: this.stsEndpointsPerRegion.get(session.account.region),
+        //endpoint: this.stsEndpointsPerRegion.get(session.account.region),
         region: session.account.region
       };
     }

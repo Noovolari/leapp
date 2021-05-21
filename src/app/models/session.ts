@@ -5,6 +5,7 @@ import {AwsPlainAccount} from './aws-plain-account';
 import {SessionType} from './session-type';
 import {environment} from '../../environments/environment';
 import {SessionStatus} from './session-status';
+import {AwsTrusterAccount} from './aws-truster-account';
 
 export class Session {
   @Type(() => Account, {
@@ -12,21 +13,23 @@ export class Session {
       property: 'type',
       subTypes: [
         { value: AwsPlainAccount, name: SessionType.awsPlain },
+        { value: AwsTrusterAccount, name: SessionType.awsTruster },
       ],
     },
   })
-
   account: Account;
 
-  sessionId: string;
   parentSessionId?: string;
+
+  sessionId: string;
 
   status: SessionStatus;
   startDateTime: string;
   lastStopDateTime: string;
 
-  constructor(account: Account) {
+  constructor(account: Account, parentSessionId?: string) {
     this.sessionId = uuid.v4();
+    this.parentSessionId = parentSessionId;
     this.status = SessionStatus.inactive;
     this.startDateTime = undefined;
     this.lastStopDateTime = new Date().toISOString();

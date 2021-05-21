@@ -6,6 +6,7 @@ import {FileService} from './file.service';
 import {SessionService} from './session.service';
 import {SessionType} from '../models/session-type';
 import {AwsPlainService} from './session/aws-plain.service';
+import {AwsTrusterService} from "./session/aws-truster.service";
 
 @Injectable({
   providedIn: 'root'
@@ -47,7 +48,9 @@ export class SessionProviderService {
   }
 
   private getAwsTrusterSessionService(accountType: SessionType) {
-    return undefined;
+    const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService, this);
+    this.sessionServiceCache[accountType.toString()] = service;
+    return service;
   }
 
   private getAwsSsoSessionService(accountType: SessionType) {

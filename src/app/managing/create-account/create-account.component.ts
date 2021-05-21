@@ -1,4 +1,4 @@
-import {Component, ElementRef, Input, NgZone, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ConfigurationService} from '../../services/configuration.service';
 import {AppService, LoggerLevel} from '../../services/app.service';
@@ -9,7 +9,7 @@ import {SessionType} from '../../models/session-type';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsPlainAccountRequest, AwsPlainService} from '../../services/session/aws-plain.service';
-
+import {AwsTrusterAccountRequest, AwsTrusterService} from '../../services/session/aws-truster.service';
 
 @Component({
   selector: 'app-create-account',
@@ -17,10 +17,11 @@ import {AwsPlainAccountRequest, AwsPlainService} from '../../services/session/aw
   styleUrls: ['./create-account.component.scss']
 })
 export class CreateAccountComponent implements OnInit {
+
   @Input() selectedSession;
   @Input() selectedAccountNumber = '';
   @Input() selectedRole = '';
-  @Input() fedUrl = '';
+  @Input() selectedSamlUrl = '';
 
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
@@ -30,24 +31,21 @@ export class CreateAccountComponent implements OnInit {
   hasOneGoodSession = false;
   hasSsoUrl = false;
 
-  accountType;
+  sessionType;
   provider;
 
   idps: { value: string; label: string}[] = [];
   selectedIdpUrl: {value: string; label: string};
 
-  federatedRoles: { name: string; roleArn: string }[] = [];
-  federatedAccounts = [];
+  profiles: { value: string; label: string}[] = [];
+  selectedProfile: {value: string; label: string};
 
-  accounts = [];
+  assumableAccounts = [];
 
   regions = [];
   selectedRegion;
   locations = [];
   selectedLocation;
-
-  profiles: { value: string; label: string}[] = [];
-  selectedProfile: {value: string; label: string};
 
   eAccountType = SessionType;
 
@@ -58,17 +56,18 @@ export class CreateAccountComponent implements OnInit {
     tenantId: new FormControl('', [Validators.required]),
     name: new FormControl('', [Validators.required]),
     role: new FormControl('', [Validators.required]),
+    roleArn: new FormControl('', [Validators.required]),
     federatedOrTruster: new FormControl('', [Validators.required]),
     federatedRole: new FormControl('', [Validators.required]),
     federatedAccount: new FormControl('', [Validators.required]),
     federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
-    plainUser: new FormControl('', [Validators.required]),
     secretKey: new FormControl('', [Validators.required]),
     accessKey: new FormControl('', [Validators.required]),
     awsRegion: new FormControl(''),
     mfaDevice: new FormControl(''),
     awsProfile: new FormControl('', [Validators.required]),
-    azureLocation: new FormControl('', [Validators.required])
+    azureLocation: new FormControl('', [Validators.required]),
+    assumableAccount: new FormControl('', [Validators.required])
   });
 
   /* Setup the first account for the application */
@@ -76,11 +75,11 @@ export class CreateAccountComponent implements OnInit {
     private configurationService: ConfigurationService,
     private appService: AppService,
     private router: Router,
-    private ngZone: NgZone,
     private activatedRoute: ActivatedRoute,
     private sessionService: SessionService,
     private workspaceService: WorkspaceService,
-    private awsPlainService: AwsPlainService
+    private awsPlainService: AwsPlainService,
+    private awsTrusterService: AwsTrusterService
   ) {}
 
   ngOnInit() {
@@ -90,7 +89,7 @@ export class CreateAccountComponent implements OnInit {
       // Get the workspace and the accounts you need
       const workspace = this.workspaceService.get();
 
-      // Add parameters to check what to do with form data
+      // We get all the applicable idp urls
       if (workspace.idpUrl && workspace.idpUrl.length > 0) {
         workspace.idpUrl.forEach(idp => {
           if (idp !== null) {
@@ -99,27 +98,39 @@ export class CreateAccountComponent implements OnInit {
         });
       }
 
-      // Add parameters to check what to do with form data
+      // We got all the applicable profiles
+      // Note: we don't use azure profile so we remove default azure profile from the list
       workspace.profiles.forEach(idp => {
           if (idp !== null && idp.name !== environment.defaultAzureProfileName) {
             this.profiles.push({value: idp.id, label: idp.name});
           }
       });
 
+      // This way we also fix potential incongruences when you have half saved setup
       this.hasOneGoodSession = workspace.sessions.length > 0;
-      this.firstTime = params['firstTime'] || !this.hasOneGoodSession; // This way we also fix potential incongruence when you have half saved setup
+      this.firstTime = params['firstTime'] || !this.hasOneGoodSession;
 
-      // Show the federated accounts
-      this.federatedAccounts = this.accounts;
+      // Show the assumable accounts
+      this.assumableAccounts = this.sessionService.listAwsAssumable().map(session => {
+        return {
+          accountName: session.account.accountName,
+          session
+        };
+      });
+      console.log(this.assumableAccounts);
 
-      // only for start screen
+
+
+      // Only for start screen: disable Truster creation
       if (this.firstTime) {
         this.form.controls['federatedOrTruster'].disable({ onlySelf: true });
       }
 
+      // Get all regions and locations from app service lists
       this.regions = this.appService.getRegions();
       this.locations = this.appService.getLocations();
 
+      // Select default values
       this.selectedRegion = workspace.defaultRegion || environment.defaultRegion || this.regions[0].region;
       this.selectedLocation = workspace.defaultLocation || environment.defaultLocation || this.locations[0].location;
       this.selectedProfile = workspace.profiles.filter(p => p.name === 'default').map(p => ({ value: p.id, label: p.name }))[0];
@@ -127,28 +138,21 @@ export class CreateAccountComponent implements OnInit {
   }
 
   /**
-   * Get all the federated roles
+   * Add a new single sing-on url to list
+   *
+   * @param tag
    */
-  getFedRoles() {
-    // Get the role data
-    // TODO: get federated roles
-  }
-
-  addNewSSO(tag: string) {
-    return {value: uuid.v4(), label: tag};
-  }
-
-  addNewProfile(tag: string) {
-    return {value: uuid.v4(), label: tag};
+  addNewSSO(tag: string): { value: string; label: string } {
+   return { value: uuid.v4(), label: tag };
   }
 
   /**
-   * Set the account number when the event is called
+   * Add a new profile to list
    *
-   * @param event - the event to call
+   * @param tag
    */
-  setAccountNumber(event) {
-    this.form.controls['accountNumber'].setValue(this.appService.extractAccountNumberFromIdpArn(event.target.value));
+  addNewProfile(tag: string): { value: string; label: string } {
+   return { value: uuid.v4(), label: tag };
   }
 
   /**
@@ -156,70 +160,99 @@ export class CreateAccountComponent implements OnInit {
    */
   saveSession() {
     this.appService.logger(`Saving account...`, LoggerLevel.info, this);
-    // TODO: instead of accountType, it's better sessionType at the Session level
-    switch (this.accountType) {
+
+    switch (this.sessionType) {
       case (SessionType.awsPlain):
-        const accountRequest: AwsPlainAccountRequest = {
-          accessKey: this.form.value.accessKey.trim(),
-          accountName: this.form.value.name,
+        const awsPlainAccountRequest: AwsPlainAccountRequest = {
+          accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
+          accessKey: this.form.value.accessKey.trim(),
           secretKey: this.form.value.secretKey.trim(),
           mfaDevice: this.form.value.mfaDevice.trim()
         };
-        this.awsPlainService.create(accountRequest, this.selectedProfile.value);
+        this.awsPlainService.create(awsPlainAccountRequest, this.selectedProfile.value);
+        break;
+      case (SessionType.awsTruster):
+        const awsTrusterAccountRequest: AwsTrusterAccountRequest = {
+          accountName: this.form.value.name.trim(),
+          region: this.selectedRegion,
+          roleArn: this.form.value.roleArn.trim(),
+          parentSessionId: this.selectedSession.sessionId
+        };
+        this.awsTrusterService.create(awsTrusterAccountRequest, this.selectedProfile.value);
         break;
     }
     this.router.navigate(['/sessions', 'session-selected']);
   }
 
+  /**
+   * Form validation mechanic
+   */
+  formValid() {
+    // TODO: validate form
+    return true;
+  }
+
+  /**
+   * First step of the wizard: set the Cloud provider or go to the SSO integration
+   *
+   * @param name
+   */
   setProvider(name) {
     this.provider = name;
     this.providerSelected = true;
     if (name === SessionType.azure) {
-      this.accountType = SessionType.azure;
+      this.sessionType = SessionType.azure;
     }
     if (name === SessionType.awsFederated) {
       this.typeSelection = true;
     }
   }
 
-  setAccountType(name) {
-    this.accountType = name;
+  /**
+   * Second step of wizard: set the strategy in the UI
+   *
+   * @param strategy
+   */
+  setAccessStrategy(strategy) {
+    this.sessionType = strategy;
+    this.provider = strategy;
+    this.typeSelection = false;
   }
 
-  formValid() {
-    // TODO: validate form
-    return true;
+  /**
+   * Open the Leapp documentation in the default browser
+   *
+   */
+  openAccessStrategyDocumentation() {
+    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
   }
 
+  /**
+   * Go to the Single Sing-On integration page
+   *
+   */
+  goToAwsSso() {
+    this.router.navigate(['/integrations', 'aws-sso']);
+  }
+
+  /**
+   * Go to Session Selection screen or to first stage of wizard
+   * depending if if there are sessions already or not
+   *
+   */
   goBack() {
     const workspace = this.workspaceService.get();
 
     if (workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
-    } else {
+    }/* else {
       this.accountType = undefined;
       this.provider = undefined;
       this.hasOneGoodSession = false;
       this.providerSelected = false;
       this.typeSelection = false;
       this.firstTime = true;
-    }
-  }
-
-  setAccessStrategy(strategy) {
-    this.accountType = strategy;
-    this.provider = strategy;
-    this.typeSelection = false;
-    this.appService.logger(`Setting an access strategy we want to create`, LoggerLevel.info, this, JSON.stringify({ strategy }, null, 3));
-  }
-
-  openAccessStrategyDocumentation() {
-    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
-  }
-
-
-  goToAwsSso() {
-    this.router.navigate(['/integrations', 'aws-sso']);
+    }*/
   }
 }

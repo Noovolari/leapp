@@ -8,10 +8,10 @@ export class AwsTrusterAccount extends Account {
   type: SessionType;
   profileId: string;
 
-  constructor(accountName: string, region: string, profileId: string, roleArn?: string) {
+  constructor(accountName: string, region: string, roleArn: string, profileId: string) {
     super(accountName, region);
     this.roleArn = roleArn;
-    this.type = SessionType.awsTruster;
     this.profileId = profileId;
+    this.type = SessionType.awsTruster;
   }
 }

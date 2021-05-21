@@ -7,9 +7,16 @@ import {AppService} from '../app.service';
 import {LeappNotFoundError} from '../../errors/leapp-not-found-error';
 import {SessionProviderService} from '../session-provider.service';
 import {Session} from '../../models/session';
-import AWS from 'aws-sdk';
 import {AwsTrusterAccount} from '../../models/aws-truster-account';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
+import AWS from 'aws-sdk';
+
+export interface AwsTrusterAccountRequest {
+  accountName: string;
+  region: string;
+  roleArn: string;
+  parentSessionId: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -38,9 +45,14 @@ export class AwsTrusterService extends SessionService {
     };
   }
 
+  create(accountRequest: AwsTrusterAccountRequest, profileId: string): void {
+    const session = new Session(new AwsTrusterAccount(accountRequest.accountName, accountRequest.region, accountRequest.roleArn, profileId), accountRequest.parentSessionId);
+    this.workspaceService.addSession(session);
+  }
+
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName(session.profileId);
+    const profileName = this.workspaceService.getProfileName((session.account as AwsTrusterAccount).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -56,7 +68,7 @@ export class AwsTrusterService extends SessionService {
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName(session.profileId);
+    const profileName = this.workspaceService.getProfileName((session.account as AwsTrusterAccount).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
@@ -71,7 +83,7 @@ export class AwsTrusterService extends SessionService {
     try {
       parentSession = this.get(session.parentSessionId);
     } catch (err) {
-      throw new LeappNotFoundError(this, `Parent Account Session  not found for Truster Account ${session.account.accountName}`, err.stack);
+      throw new LeappNotFoundError(this, `Parent Account Session  not found for Truster Account ${session.account.accountName}`);
     }
 
     // Generate a credential set from Parent Session
@@ -107,7 +119,7 @@ export class AwsTrusterService extends SessionService {
       // Generate correct object from session token response and return
       return AwsTrusterService.sessionTokenFromassumeRoleResponse(assumeRoleResponse);
     } catch (err) {
-      throw new LeappAwsStsError(this, err.message, err.stack);
+      throw new LeappAwsStsError(this, err.message);
     }
   }
 }

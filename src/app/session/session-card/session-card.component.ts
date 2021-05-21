@@ -101,6 +101,9 @@ export class SessionCardComponent implements OnInit {
       case(SessionType.awsSso):
         this.sessionDetailToShow = (this.session.account as AwsSsoAccount).role.name;
         break;
+      case(SessionType.awsTruster):
+        this.sessionDetailToShow = (this.session.account as AwsTrusterAccount).roleArn.split('/')[1];
+        break;
     }
   }
 
@@ -108,9 +111,7 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    */
   startSession() {
-    this.sessionService.start(this.session.sessionId).then(() => {}, error => {
-      console.log(error);
-    });
+    this.sessionService.start(this.session.sessionId);
 
     this.appService.logger(
       `Starting Session`,

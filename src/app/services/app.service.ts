@@ -168,21 +168,21 @@ export class AppService extends NativeService {
     switch (type) {
       case LoggerLevel.info:
         if (!environment.production) {
- this.log.info(message);
-}
+         this.log.info(message);
+        }
         break;
       case LoggerLevel.warn:
         if (!environment.production) {
- this.log.warn(message);
-}
+         this.log.warn(message);
+        }
         break;
       case LoggerLevel.error:
         this.log.error(message);
         break;
       default:
         if (!environment.production) {
- this.log.info(message);
-}
+         this.log.error(message);
+        }
         break;
     }
   }
@@ -291,12 +291,14 @@ export class AppService extends NativeService {
    * @param type - the type of message from Toast Level
    * @param title - [optional]
    */
-  toast(message: string, type: ToastLevel | LoggerLevel, title?: string) {
+  toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
+    console.log('dentor toast', type);
     switch (type) {
       case ToastLevel.success: this.toastr.success(message, title); break;
       case ToastLevel.info || LoggerLevel.info: this.toastr.info(message, title); break;
       case ToastLevel.warn || LoggerLevel.warn: this.toastr.warning(message, title); break;
       case ToastLevel.error || LoggerLevel.error: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
+      default: this.toastr.error(message, title); break;
     }
   }
 

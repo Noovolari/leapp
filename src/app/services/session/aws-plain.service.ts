@@ -11,9 +11,9 @@ import AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
 import {FileService} from '../file.service';
 import {Constants} from '../../models/constants';
-import {LeappModalClosedError} from '../../errors/leapp-modal-closed-error';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
 import {LeappParseError} from '../../errors/leapp-parse-error';
+import {LeappMissingMfaTokenError} from '../../errors/leapp-missing-mfa-token-error';
 
 export interface AwsPlainAccountRequest {
   accountName: string;
@@ -55,7 +55,7 @@ export class AwsPlainService extends SessionService {
   }
 
   create(accountRequest: AwsPlainAccountRequest, profileId: string): void {
-    const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, accountRequest.mfaDevice, profileId));
+    const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice));
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-secret-access-key`, accountRequest.secretKey);
     this.workspaceService.addSession(session);
@@ -118,7 +118,7 @@ export class AwsPlainService extends SessionService {
           // Retrieve session token from keychain
           return JSON.parse(await this.keychainService.getSecret(environment.appName, `${session.sessionId}-plain-aws-session-token`));
         } catch (err) {
-          throw new LeappParseError(this, err.message, err.stack);
+          throw new LeappParseError(this, err.message);
         }
       }
   }
@@ -134,7 +134,7 @@ export class AwsPlainService extends SessionService {
           console.log(session, params);
           resolve(this.generateSessionToken(session, sts, params));
         } else {
-          reject(new LeappModalClosedError(this, 'Closed Mfa Modal'));
+          reject(new LeappMissingMfaTokenError(this, 'Missing Multi Factor Authentication code'));
         }
       });
     });
@@ -165,7 +165,7 @@ export class AwsPlainService extends SessionService {
       // Return Session Token
       return sessionToken;
     } catch (err) {
-      throw new LeappAwsStsError(this, err.message, err.stack);
+      throw new LeappAwsStsError(this, err.message);
     }
   }
 

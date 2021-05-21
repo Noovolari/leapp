@@ -7,6 +7,7 @@ import {SessionType} from '../models/session-type';
 import {SessionStatus} from '../models/session-status';
 import {LeappBaseError} from '../errors/leapp-base-error';
 
+
 @Injectable({
   providedIn: 'root'
 })
@@ -20,6 +21,10 @@ export abstract class SessionService extends NativeService {
   get(sessionId: string): Session {
     const sessionFiltered = this.list().find(session => session.sessionId === sessionId);
     return sessionFiltered ? sessionFiltered : null;
+  }
+
+  delete(sessionId: string): Promise<void> {
+    return undefined;
   }
 
   list(): Session[] {
@@ -36,10 +41,6 @@ export abstract class SessionService extends NativeService {
 
   listAwsAssumable(): Session[] {
     return (this.list().length > 0) ? this.list().filter( (session) => session.account.type !== SessionType.azure ) : [];
-  }
-
-  delete(sessionId: string): void {
-    // TODO: implement
   }
 
   async start(sessionId: string): Promise<void> {
@@ -109,7 +110,7 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  private sessionError(sessionId: string, error: LeappBaseError) {
+  private sessionError(sessionId: string, error: any) {
     this.sessionDeactivated(sessionId);
     throw error;
   }
@@ -127,9 +128,8 @@ export abstract class SessionService extends NativeService {
     }
   }
 
+
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(sessionId: string): Promise<void>;
-
-
 }

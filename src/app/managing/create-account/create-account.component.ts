@@ -10,6 +10,8 @@ import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsPlainAccountRequest, AwsPlainService} from '../../services/session/aws-plain.service';
 import {AwsTrusterAccountRequest, AwsTrusterService} from '../../services/session/aws-truster.service';
+import {LeappParseError} from '../../errors/leapp-parse-error';
+import {SessionProviderService} from "../../services/session-provider.service";
 
 @Component({
   selector: 'app-create-account',
@@ -40,7 +42,7 @@ export class CreateAccountComponent implements OnInit {
   profiles: { value: string; label: string}[] = [];
   selectedProfile: {value: string; label: string};
 
-  assumableAccounts = [];
+  assumerAwsSessions = [];
 
   regions = [];
   selectedRegion;
@@ -67,7 +69,7 @@ export class CreateAccountComponent implements OnInit {
     mfaDevice: new FormControl(''),
     awsProfile: new FormControl('', [Validators.required]),
     azureLocation: new FormControl('', [Validators.required]),
-    assumableAccount: new FormControl('', [Validators.required])
+    assumerSession: new FormControl('', [Validators.required])
   });
 
   /* Setup the first account for the application */
@@ -77,6 +79,7 @@ export class CreateAccountComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private sessionService: SessionService,
+    private sessionProviderService: SessionProviderService,
     private workspaceService: WorkspaceService,
     private awsPlainService: AwsPlainService,
     private awsTrusterService: AwsTrusterService
@@ -111,15 +114,11 @@ export class CreateAccountComponent implements OnInit {
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
-      this.assumableAccounts = this.sessionService.listAwsAssumable().map(session => {
-        return {
+      this.assumerAwsSessions = this.sessionService.listAwsAssumable().map(session => ({
           accountName: session.account.accountName,
           session
-        };
-      });
-      console.log(this.assumableAccounts);
-
-
+      }));
+      console.log(this.assumerAwsSessions);
 
       // Only for start screen: disable Truster creation
       if (this.firstTime) {
@@ -160,28 +159,9 @@ export class CreateAccountComponent implements OnInit {
    */
   saveSession() {
     this.appService.logger(`Saving account...`, LoggerLevel.info, this);
-
-    switch (this.sessionType) {
-      case (SessionType.awsPlain):
-        const awsPlainAccountRequest: AwsPlainAccountRequest = {
-          accountName: this.form.value.name.trim(),
-          region: this.selectedRegion,
-          accessKey: this.form.value.accessKey.trim(),
-          secretKey: this.form.value.secretKey.trim(),
-          mfaDevice: this.form.value.mfaDevice.trim()
-        };
-        this.awsPlainService.create(awsPlainAccountRequest, this.selectedProfile.value);
-        break;
-      case (SessionType.awsTruster):
-        const awsTrusterAccountRequest: AwsTrusterAccountRequest = {
-          accountName: this.form.value.name.trim(),
-          region: this.selectedRegion,
-          roleArn: this.form.value.roleArn.trim(),
-          parentSessionId: this.selectedSession.sessionId
-        };
-        this.awsTrusterService.create(awsTrusterAccountRequest, this.selectedProfile.value);
-        break;
-    }
+    this.addProfileToWorkspace();
+    this.saveNewSsosToWorkspace();
+    this.createSession();
     this.router.navigate(['/sessions', 'session-selected']);
   }
 
@@ -254,5 +234,65 @@ export class CreateAccountComponent implements OnInit {
       this.typeSelection = false;
       this.firstTime = true;
     }*/
+  }
+
+  /**
+   * Save actual session based on Session Type
+   *
+   * @private
+   */
+  private createSession() {
+    switch (this.sessionType) {
+      case (SessionType.awsPlain):
+        const awsPlainAccountRequest: AwsPlainAccountRequest = {
+          accountName: this.form.value.name.trim(),
+          region: this.selectedRegion,
+          accessKey: this.form.value.accessKey.trim(),
+          secretKey: this.form.value.secretKey.trim(),
+          mfaDevice: this.form.value.mfaDevice.trim()
+        };
+        this.awsPlainService.create(awsPlainAccountRequest, this.selectedProfile.value);
+        break;
+      case (SessionType.awsTruster):
+        const awsTrusterAccountRequest: AwsTrusterAccountRequest = {
+          accountName: this.form.value.name.trim(),
+          region: this.selectedRegion,
+          roleArn: this.form.value.roleArn.trim(),
+          parentSessionId: this.selectedSession.sessionId
+        };
+        this.awsTrusterService.create(awsTrusterAccountRequest, this.selectedProfile.value);
+        break;
+    }
+  }
+
+  /**
+   * Save a new Single Sign on object in workspace if new
+   *
+   * @private
+   */
+  private saveNewSsosToWorkspace() {
+    if(this.sessionType === SessionType.awsFederated) {
+      try {
+        // TODO: single sign on add to workspace
+      } catch(err) {
+        throw new LeappParseError(this, err.message);
+      }
+    }
+  }
+
+  /**
+   * Save a New profile if is not in the workspace
+   *
+   * @private
+   */
+  private addProfileToWorkspace() {
+    try {
+      const profile = { id: this.selectedProfile.value, name: this.selectedProfile.label };
+      if(!this.workspaceService.getProfileName(profile.id)) {
+        this.workspaceService.addProfile(profile);
+      }
+    } catch(err) {
+      throw new LeappParseError(this, err.message);
+    }
   }
 }

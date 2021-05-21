@@ -76,6 +76,12 @@ export class WorkspaceService extends NativeService {
     return profileFiltered ? profileFiltered.name : null;
   }
 
+  addProfile(profile: { id: string; name: string }): void {
+    const workspace = this.get();
+    workspace.profiles.push(profile);
+    this.persist(workspace);
+  }
+
   private persist(workspace: Workspace) {
     this.fileService.writeFileSync(
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
@@ -93,4 +99,6 @@ export class WorkspaceService extends NativeService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
+
+
 }

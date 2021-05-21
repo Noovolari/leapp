@@ -9,10 +9,10 @@ export class ErrorService implements ErrorHandler {
 
   constructor(private injector: Injector) { }
 
-  handleError(error: LeappBaseError): void {
-    console.log('lkjklj', (error as LeappBaseError).severity);
-
+  handleError(error: any): void {
+    error = error.rejection ? error.rejection : error;
     const appService = this.injector.get(AppService);
+
     appService.logger((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).context, (error as LeappBaseError).stack);
     appService.toast((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).name);
   }

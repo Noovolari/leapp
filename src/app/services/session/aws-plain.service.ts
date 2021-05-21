@@ -118,7 +118,7 @@ export class AwsPlainService extends SessionService {
           // Retrieve session token from keychain
           return JSON.parse(await this.keychainService.getSecret(environment.appName, `${session.sessionId}-plain-aws-session-token`));
         } catch (err) {
-          throw new LeappParseError(this, err.message, err.stack);
+          throw new LeappParseError(this, err.message);
         }
       }
   }
@@ -165,7 +165,7 @@ export class AwsPlainService extends SessionService {
       // Return Session Token
       return sessionToken;
     } catch (err) {
-      throw new LeappAwsStsError(this, err.message, err.stack);
+      throw new LeappAwsStsError(this, err.message);
     }
   }
 

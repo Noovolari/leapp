@@ -108,9 +108,7 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    */
   startSession() {
-    this.sessionService.start(this.session.sessionId).then(() => {}, error => {
-      console.log(error);
-    });
+    this.sessionService.start(this.session.sessionId);
 
     this.appService.logger(
       `Starting Session`,

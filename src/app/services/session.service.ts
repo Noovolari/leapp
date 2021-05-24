@@ -94,7 +94,6 @@ export abstract class SessionService extends NativeService {
       currentSession.startDateTime = new Date().toISOString();
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
-      console.log(this.workspaceService.sessions);
     }
   }
 

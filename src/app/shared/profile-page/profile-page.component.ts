@@ -177,7 +177,7 @@ export class ProfilePageComponent implements OnInit {
 
   deleteIdpUrl(id) {
     // Federated
-    const sessions = this.workspace.sessions.filter(s => (s.account as AwsFederatedAccount).idpUrl !== undefined && (s.account as AwsFederatedAccount).idpUrl === id);
+    const sessions = this.workspace.sessions.filter(s => (s.account as AwsFederatedAccount).idpUrlId !== undefined && (s.account as AwsFederatedAccount).idpUrlId === id);
 
     // Add trusters from federated
     /* federated.forEach(fed => {
@@ -186,7 +186,7 @@ export class ProfilePageComponent implements OnInit {
     }); */
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).role.name}</small></div></li>`);
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).roleArn.split('/')[1]}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
@@ -232,7 +232,7 @@ export class ProfilePageComponent implements OnInit {
     const sessions = this.workspace.sessions.filter(s => this.getProfileId(s) === id);
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).role ? (s.account as AwsFederatedAccount).role.name : ''}</small></div></li>`);
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).roleArn ? (s.account as AwsFederatedAccount).roleArn.split('/')[1] : ''}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }

@@ -292,7 +292,6 @@ export class AppService extends NativeService {
    * @param title - [optional]
    */
   toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
-    console.log('dentor toast', type);
     switch (type) {
       case ToastLevel.success: this.toastr.success(message, title); break;
       case ToastLevel.info || LoggerLevel.info: this.toastr.info(message, title); break;

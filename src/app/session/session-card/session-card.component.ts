@@ -90,7 +90,7 @@ export class SessionCardComponent implements OnInit {
 
     switch (this.session.account.type) {
       case(SessionType.awsFederated):
-        this.sessionDetailToShow = (this.session.account as AwsFederatedAccount).role.name;
+        this.sessionDetailToShow = (this.session.account as AwsFederatedAccount).roleArn.split('/')[1];
         break;
       case(SessionType.azure):
         this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
@@ -170,8 +170,8 @@ export class SessionCardComponent implements OnInit {
       if (workspace) {
         const sessionAccount = (session.account as AwsFederatedAccount);
         const texts = {
-          1: sessionAccount.accountNumber,
-          2: sessionAccount.role ? `arn:aws:iam::${(session.account as AwsFederatedAccount).accountNumber}:role/${(session.account as AwsFederatedAccount).role.name}` : ''
+          1: sessionAccount.roleArn ? `${(session.account as AwsFederatedAccount).roleArn.split('/')[0]}` : '',
+          2: sessionAccount.roleArn ? `${(session.account as AwsFederatedAccount).roleArn}` : ''
         };
 
         const text = texts[type];

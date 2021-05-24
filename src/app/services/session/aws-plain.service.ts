@@ -131,7 +131,6 @@ export class AwsPlainService extends SessionService {
           params['SerialNumber'] = (session.account as AwsPlainAccount).mfaDevice;
           params['TokenCode'] = value;
           // Return session token in the form of CredentialsInfo
-          console.log(session, params);
           resolve(this.generateSessionToken(session, sts, params));
         } else {
           reject(new LeappMissingMfaTokenError(this, 'Missing Multi Factor Authentication code'));

@@ -97,10 +97,9 @@ export class SessionComponent implements OnInit {
       this.notActiveSessions = this.notActiveSessions.filter(s => {
         const idpID = this.workspace.idpUrl.filter(idp => idp && idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.id);
         return s.account.accountName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
-          ((s.account as AwsFederatedAccount).role && (s.account as AwsFederatedAccount).role.name.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
-          ((s.account as AwsFederatedAccount).accountNumber && (s.account as AwsFederatedAccount).accountNumber.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
+          ((s.account as AwsFederatedAccount).roleArn && (s.account as AwsFederatedAccount).roleArn.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           (this.getProfileName(this.getProfileId(s)).toLowerCase().indexOf(query.toLowerCase()) > -1) ||
-          (idpID.indexOf((s.account as AwsFederatedAccount).idpUrl) > -1) ||
+          (idpID.indexOf((s.account as AwsFederatedAccount).idpUrlId) > -1) ||
           // ((s.account as AwsPlainAccount).user && (s.account as AwsPlainAccount).user.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).tenantId && (s.account as AzureAccount).tenantId.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s.account as AzureAccount).subscriptionId && (s.account as AzureAccount).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);

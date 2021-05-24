@@ -6,12 +6,14 @@ import {SessionType} from './session-type';
 import {environment} from '../../environments/environment';
 import {SessionStatus} from './session-status';
 import {AwsTrusterAccount} from './aws-truster-account';
+import {AwsFederatedAccount} from './aws-federated-account';
 
 export class Session {
   @Type(() => Account, {
     discriminator: {
       property: 'type',
       subTypes: [
+        { value: AwsFederatedAccount, name: SessionType.awsFederated },
         { value: AwsPlainAccount, name: SessionType.awsPlain },
         { value: AwsTrusterAccount, name: SessionType.awsTruster },
       ],

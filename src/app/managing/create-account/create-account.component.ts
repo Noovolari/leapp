@@ -11,7 +11,8 @@ import * as uuid from 'uuid';
 import {AwsPlainAccountRequest, AwsPlainService} from '../../services/session/aws-plain.service';
 import {AwsTrusterAccountRequest, AwsTrusterService} from '../../services/session/aws-truster.service';
 import {LeappParseError} from '../../errors/leapp-parse-error';
-import {SessionProviderService} from "../../services/session-provider.service";
+import {SessionProviderService} from '../../services/session-provider.service';
+import {AwsFederatedAccountRequest, AwsFederatedService} from '../../services/session/aws-federated.service';
 
 @Component({
   selector: 'app-create-account',
@@ -81,6 +82,7 @@ export class CreateAccountComponent implements OnInit {
     private sessionService: SessionService,
     private sessionProviderService: SessionProviderService,
     private workspaceService: WorkspaceService,
+    private awsFederatedService: AwsFederatedService,
     private awsPlainService: AwsPlainService,
     private awsTrusterService: AwsTrusterService
   ) {}
@@ -118,7 +120,6 @@ export class CreateAccountComponent implements OnInit {
           accountName: session.account.accountName,
           session
       }));
-      console.log(this.assumerAwsSessions);
 
       // Only for start screen: disable Truster creation
       if (this.firstTime) {
@@ -243,6 +244,16 @@ export class CreateAccountComponent implements OnInit {
    */
   private createSession() {
     switch (this.sessionType) {
+      case (SessionType.awsFederated):
+        const awsFederatedAccountRequest: AwsFederatedAccountRequest = {
+          accountName: this.form.value.name.trim(),
+          region: this.selectedRegion,
+          idpUrl: this.selectedIdpUrl.value.trim(),
+          idpArn: this.form.value.idpArn.trim(),
+          roleArn: this.form.value.roleArn.trim()
+        };
+        this.awsFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value);
+        break;
       case (SessionType.awsPlain):
         const awsPlainAccountRequest: AwsPlainAccountRequest = {
           accountName: this.form.value.name.trim(),
@@ -273,7 +284,10 @@ export class CreateAccountComponent implements OnInit {
   private saveNewSsosToWorkspace() {
     if(this.sessionType === SessionType.awsFederated) {
       try {
-        // TODO: single sign on add to workspace
+        const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };
+        if(!this.workspaceService.getIdpUrl(ipdUrl.id)) {
+          this.workspaceService.addIdpUrl(ipdUrl);
+        }
       } catch(err) {
         throw new LeappParseError(this, err.message);
       }

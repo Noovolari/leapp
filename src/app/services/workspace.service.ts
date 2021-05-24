@@ -82,6 +82,18 @@ export class WorkspaceService extends NativeService {
     this.persist(workspace);
   }
 
+  getIdpUrl(idpUrlId: string): string {
+    const workspace = this.get();
+    const idpUrlFiltered = workspace.idpUrl.find(url => url.id === idpUrlId);
+    return idpUrlFiltered ? idpUrlFiltered.url : null;
+  }
+
+  addIdpUrl(idpUrl: { id: string; url: string }): void {
+    const workspace = this.get();
+    workspace.idpUrl.push(idpUrl);
+    this.persist(workspace);
+  }
+
   private persist(workspace: Workspace) {
     this.fileService.writeFileSync(
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
@@ -99,6 +111,7 @@ export class WorkspaceService extends NativeService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
+
 
 
 }

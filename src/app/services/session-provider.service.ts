@@ -6,7 +6,8 @@ import {FileService} from './file.service';
 import {SessionService} from './session.service';
 import {SessionType} from '../models/session-type';
 import {AwsPlainService} from './session/aws-plain.service';
-import {AwsTrusterService} from "./session/aws-truster.service";
+import {AwsTrusterService} from './session/aws-truster.service';
+import {AwsFederatedService} from './session/aws-federated.service';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,7 @@ export class SessionProviderService {
 
     // Creater and save the SessionService needed; return it to the requester
     switch (accountType) {
-      case SessionType.awsFederated: return this.getAwsSessionService(accountType);
+      case SessionType.awsFederated: return this.getAwsFederatedSessionService(accountType);
       case SessionType.awsPlain: return this.getAwsPlainSessionService(accountType);
       case SessionType.awsTruster: return this.getAwsTrusterSessionService(accountType);
       case SessionType.awsSso: return this.getAwsSsoSessionService(accountType);
@@ -37,8 +38,10 @@ export class SessionProviderService {
     }
   }
 
-  private getAwsSessionService(accountType: SessionType) {
-    return undefined;
+  private getAwsFederatedSessionService(accountType: SessionType) {
+    const service = new AwsFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService);
+    this.sessionServiceCache[accountType.toString()] = service;
+    return service;
   }
 
   private getAwsPlainSessionService(accountType: SessionType): AwsPlainService {

@@ -72,7 +72,7 @@ export class TrayMenuComponent implements OnInit {
         case SessionType.awsFederated:
         case SessionType.awsSso:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsFederatedAccount).role.name;
+          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsFederatedAccount).roleArn.split('/')[1];
           break;
         case SessionType.awsTruster:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;

@@ -1,10 +1,10 @@
-<div class="session-card button-area  {{session.account.type === eSessionType.azure ? 'azr' : 'aws'}} {{session.status === eSessionStatus.active ? 'active' : ''}}">
-  <span class="region-label {{session.account.type === eSessionType.azure ? 'azr' : 'aws'}}">{{session.account.region}}</span>
+<div class="session-card button-area  {{session.type === eSessionType.azure ? 'azr' : 'aws'}} {{session.status === eSessionStatus.active ? 'active' : ''}}">
+  <span class="region-label {{session.type === eSessionType.azure ? 'azr' : 'aws'}}">{{session.region}}</span>
   <div class="information" (click)="switchCredentials()">
-    <b>{{session.account.accountName}}</b> - {{ session | detail }}
+    <b>{{session.sessionName}}</b> - {{ session | detail }}
   </div>
   <div class="information-profile" (click)="switchCredentials()">
-    <ng-container *ngIf="session.account.type !== eSessionType.azure">
+    <ng-container *ngIf="session.type !== eSessionType.azure">
       <i class="fa fa-{{session | icon: getProfileName(getProfileId(session))}}"></i>&nbsp;&nbsp;{{getProfileName(getProfileId(session))}}
     </ng-container>
   </div>
@@ -18,16 +18,16 @@
       <i class="fa fa-ellipsis-v"></i>
     </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-      <a (click)="ssmModalOpen(session);" *ngIf="(session.account.type === eSessionType.awsFederated || session.account.type === eSessionType.awsPlain || session.account.type === eSessionType.awsSso) && session.status === eSessionStatus.active">SSM session</a>
-      <a (click)="changeRegionModalOpen(session);">Change {{session.account.type === eSessionType.azure ? 'location' : 'region'}}</a>
+      <a (click)="ssmModalOpen(session);" *ngIf="(session.type === eSessionType.awsFederated || session.type === eSessionType.awsPlain || session.type === eSessionType.awsSso) && session.status === eSessionStatus.active">SSM session</a>
+      <a (click)="changeRegionModalOpen(session);">Change {{session.type === eSessionType.azure ? 'location' : 'region'}}</a>
 
-      <a *ngIf="session.account.type !== eSessionType.azure" (click)="changeProfileModalOpen();">Change Profile</a>
+      <a *ngIf="session.type !== eSessionType.azure" (click)="changeProfileModalOpen();">Change Profile</a>
 
-      <a *ngIf="session.account.type === eSessionType.awsPlain && session.status !== eSessionStatus.active" (click)="editSession(session, $event);">Edit account</a>
+      <a *ngIf="session.type === eSessionType.awsPlain && session.status !== eSessionStatus.active" (click)="editSession(session, $event);">Edit account</a>
       <a (click)="deleteSession(session, $event);">Remove account</a>
-      <ng-container *ngIf="(session.account.type === eSessionType.awsFederated || session.account.type === eSessionType.awsPlain || session.account.type === eSessionType.awsSso)">
+      <ng-container *ngIf="(session.type === eSessionType.awsFederated || session.type === eSessionType.awsPlain || session.type === eSessionType.awsSso)">
       <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
-        <ng-container *ngIf="(session.account.type !== eSessionType.awsPlain)">
+        <ng-container *ngIf="(session.type !== eSessionType.awsPlain)">
         <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
       </ng-container>
       </ng-container>
@@ -39,7 +39,7 @@
 <ng-template #ssmModalTemplate>
   <div class="modal-header">
     <a class="back" aria-label="Close" (click)="modalRef.hide();"><i class="fa fa-arrow-left"></i></a>
-    <b>{{session.account.accountName}}</b> - {{$any(session.account).role ? $any(session.account).role.name : 'Plain' }} | <b>SSM</b>
+    <b>{{session.sessionName}}</b> - {{ session | detail }} | <b>SSM</b>
   </div>
   <div class="modal-body">
 
@@ -72,14 +72,14 @@
 <ng-template #defaultRegionModalTemplate>
   <div class="modal-header">
     <a class="back" aria-label="Close" (click)="modalRef.hide();"><i class="fa fa-arrow-left"></i></a>
-    <b>{{session.account.accountName}}</b> - {{$any(session.account).role ? $any(session.account).role.name : 'Plain' }} | <b>Change {{session.account.type === eSessionType.azure ? 'Location' : 'Region'}}</b>
+    <b>{{session.sessionName}}</b> - {{session | detail }} | <b>Change {{session.type === eSessionType.azure ? 'Location' : 'Region'}}</b>
   </div>
   <div class="modal-body">
 
     <div class="ssm-tray">
 
       <b class="">Select a default region for the session:</b>
-      <ng-select bindLabel="{{session.account.type === eSessionType.azure ? 'location' : 'region'}}" bindValue="{{session.account.type === eSessionType.azure ? 'location' : 'region'}}" [items]="regionOrLocations" [(ngModel)]="selectedDefaultRegion" placeholder="{{placeholder}}"></ng-select>
+      <ng-select bindLabel="{{session.type === eSessionType.azure ? 'location' : 'region'}}" bindValue="{{session.type === eSessionType.azure ? 'location' : 'region'}}" [items]="regionOrLocations" [(ngModel)]="selectedDefaultRegion" placeholder="{{placeholder}}"></ng-select>
 
       <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
       <button type="button" (click)="changeRegion();" [disabled]="!selectedDefaultRegion" [ngClass]="(!selectedDefaultRegion) ? 'pull-right disabled': 'pull-right'">Save</button>
@@ -90,7 +90,7 @@
 <ng-template #defaultProfileModalTemplate>
   <div class="modal-header">
     <a class="back" aria-label="Close" (click)="modalRef.hide();"><i class="fa fa-arrow-left"></i></a>
-    <b>{{session.account.accountName}}</b> - {{$any(session.account).role ? $any(session.account).role.name : 'Plain' }} | <b>Change Profile</b>
+    <b>{{session.sessionName}}</b> - {{ session | detail }} | <b>Change Profile</b>
   </div>
   <div class="modal-body">
 

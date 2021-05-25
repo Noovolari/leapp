@@ -1,28 +1,28 @@
 import {Pipe, PipeTransform} from '@angular/core';
 import {Session} from '../../models/session';
 import {SessionType} from '../../models/session-type';
-import {AwsFederatedAccount} from '../../models/aws-federated-account';
-import {AzureAccount} from '../../models/azure-account';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
-import {AwsSsoAccount} from '../../models/aws-sso-account';
-import {AwsTrusterAccount} from '../../models/aws-truster-account';
+import {AwsFederatedSession} from '../../models/aws-federated-session';
+import {AzureSession} from '../../models/azure-session';
+import {AwsPlainSession} from '../../models/aws-plain-session';
+import {AwsSsoSession} from '../../models/aws-sso-session';
+import {AwsTrusterSession} from '../../models/aws-truster-session';
 
 @Pipe({
   name: 'detail'
 })
 export class DetailPipe implements PipeTransform {
   transform(session: Session): string {
-    switch (session.account.type) {
+    switch (session.type) {
       case(SessionType.awsFederated):
-        return (session.account as AwsFederatedAccount).roleArn.split('/')[1];
+        return (session as AwsFederatedSession).roleArn.split('/')[1];
       case(SessionType.azure):
-        return (session.account as AzureAccount).subscriptionId;
+        return (session as AzureSession).subscriptionId;
       case(SessionType.awsPlain):
-        return (session.account as AwsPlainAccount).accountName;
+        return (session as AwsPlainSession).sessionName;
       case(SessionType.awsSso):
-        return (session.account as AwsSsoAccount).role.name;
+        return (session as AwsSsoSession).roleArn.split('/')[1];
       case(SessionType.awsTruster):
-        return (session.account as AwsTrusterAccount).roleArn.split('/')[1];
+        return (session as AwsTrusterSession).roleArn.split('/')[1];
     }
   }
 }

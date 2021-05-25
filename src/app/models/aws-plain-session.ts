@@ -1,16 +1,15 @@
 import {SessionType} from './session-type';
-import {Account} from './account';
+import {Session} from './session';
 
-export class AwsPlainAccount extends Account {
-  accountName: string;
+export class AwsPlainSession extends Session {
   region: string;
   mfaDevice?: string;
-  type: SessionType;
   sessionTokenExpiration: string;
   profileId: string;
 
-  constructor(accountName: string, region: string, profileId: string, mfaDevice?: string) {
-    super(accountName, region);
+  constructor(sessionName: string, region: string, profileId: string, mfaDevice?: string) {
+    super(sessionName, region);
+
     this.mfaDevice = mfaDevice;
     this.type = SessionType.awsPlain;
     this.profileId = profileId;

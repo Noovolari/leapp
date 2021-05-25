@@ -15,7 +15,7 @@ export class RotationService {
     const activeSessions = this.sessionService.listActive();
     activeSessions.forEach(session => {
       if (session.expired()) {
-        const concreteSessionService = this.sessionProviderService.getService(session.account.type);
+        const concreteSessionService = this.sessionProviderService.getService(session.type);
         concreteSessionService.rotate(session.sessionId);
       }
     });

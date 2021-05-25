@@ -6,13 +6,11 @@ import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel} from '../../services/app.service';
 import {Session} from '../../models/session';
 import {SessionType} from '../../models/session-type';
-import {AwsFederatedAccount} from '../../models/aws-federated-account';
 import {environment} from '../../../environments/environment';
 import {SessionStatus} from '../../models/session-status';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
-import {AwsTrusterAccount} from '../../models/aws-truster-account';
-import {AwsSsoAccount} from '../../models/aws-sso-account';
+import {AwsTrusterSession} from '../../models/aws-truster-session';
 import {LeappNotAwsAccountError} from '../../errors/leapp-not-aws-account-error';
+import {AwsFederatedSession} from '../../models/aws-federated-session';
 
 @Component({
   selector: 'app-tray-menu',
@@ -39,14 +37,8 @@ export class TrayMenuComponent implements OnInit {
   }
 
   getProfileId(session: Session): string {
-    if(session.account.type === SessionType.awsFederated) {
-      return (session.account as AwsFederatedAccount).profileId;
-    } else if (session.account.type === SessionType.awsPlain) {
-      return (session.account as AwsPlainAccount).profileId;
-    } else if (session.account.type === SessionType.awsTruster) {
-      return (session.account as AwsTrusterAccount).profileId;
-    } else if (session.account.type === SessionType.awsSso) {
-      return (session.account as AwsSsoAccount).profileId;
+    if(session.type !== SessionType.azure) {
+      return (session as any).profileId;
     } else {
       throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
     }
@@ -56,7 +48,6 @@ export class TrayMenuComponent implements OnInit {
     const version = this.appService.getApp().getVersion();
 
     let voices = [];
-    const maxSessionsToShow = 10;
     const allSessions = this.sessionService.list().filter((value, index) => index < 10);
     allSessions.forEach((session: Session) => {
       let icon = '';
@@ -64,32 +55,32 @@ export class TrayMenuComponent implements OnInit {
       const profile = this.workspaceService.get().profiles.filter(p => p.id === this.getProfileId(session))[0];
       const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
-      switch (session.account.type) {
+      switch (session.type) {
         case SessionType.awsPlain:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.account.accountName + ' - ' + 'plain';
+          label = '  ' + session.sessionName + ' - ' + 'plain';
           break;
         case SessionType.awsFederated:
         case SessionType.awsSso:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsFederatedAccount).roleArn.split('/')[1];
+          label = '  ' + session.sessionName + ' - ' + (session as AwsFederatedSession).roleArn.split('/')[1];
           break;
         case SessionType.awsTruster:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.account.accountName + ' - ' + (session.account as AwsTrusterAccount).roleArn.split('/')[1];
+          label = '  ' + session.sessionName + ' - ' + (session as AwsTrusterSession).roleArn.split('/')[1];
           break;
         case SessionType.azure:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;
-          label = '  ' + session.account.accountName;
+          label = '  ' + session.sessionName;
       }
       voices.push(
         {
           label,
           type: 'normal',
           icon,
-          click: () => {
+          click: async () => {
             if (session.status !== SessionStatus.active) {
-              this.sessionService.start(session.sessionId);
+              await this.sessionService.start(session.sessionId);
               // TODO: refresh session credential
             } else {
               // this.sessionService.stop(session.sessionId);

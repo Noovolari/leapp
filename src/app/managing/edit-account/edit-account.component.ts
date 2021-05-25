@@ -5,7 +5,7 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Workspace} from '../../models/workspace';
 import {SessionType} from '../../models/session-type';
 import {Session} from '../../models/session';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {AwsPlainSession} from '../../models/aws-plain-session';
 
 @Component({
   selector: 'app-edit-account',
@@ -47,7 +47,7 @@ export class EditAccountComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe(params => {
       // Get the workspace and the account you need
       this.selectedSession = this.workspace.sessions.filter(session => session.sessionId === params.sessionId)[0];
-      const selectedAccount = (this.selectedSession.account as AwsPlainAccount);
+      const selectedAccount = (this.selectedSession as AwsPlainSession);
 
       // Get the region
       this.regions = this.appService.getRegions();
@@ -55,7 +55,7 @@ export class EditAccountComponent implements OnInit {
       this.form.controls['awsRegion'].setValue(this.selectedRegion);
 
       // Get other readonly properties
-      this.form.controls['name'].setValue(selectedAccount.accountName);
+      this.form.controls['name'].setValue(selectedAccount.sessionName);
       this.form.controls['mfaDevice'].setValue(selectedAccount.mfaDevice);
     });
   }

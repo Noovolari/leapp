@@ -3,7 +3,7 @@ import {TestBed} from '@angular/core/testing';
 import {Workspace} from '../models/workspace';
 import {mustInjected} from '../../base-injectables';
 import {Session} from '../models/session';
-import {AwsPlainAccount} from '../models/aws-plain-account';
+import {AwsPlainSession} from '../models/aws-plain-session.ts';
 import {serialize} from 'class-transformer';
 import {AppService} from './app.service';
 import {FileService} from './file.service';
@@ -39,7 +39,7 @@ describe('WorkspaceService', () => {
     workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;
     workspace = workspaceService.create();
 
-    mockedSession = new Session(new AwsPlainAccount('', '', ''), 'profile');
+    mockedSession = new Session(new AwsPlainSession('', '', ''), 'profile');
   });
 
   it('should be created', () => {

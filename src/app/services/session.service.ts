@@ -5,8 +5,6 @@ import {WorkspaceService} from './workspace.service';
 import {CredentialsInfo} from '../models/credentials-info';
 import {SessionType} from '../models/session-type';
 import {SessionStatus} from '../models/session-status';
-import {LeappBaseError} from '../errors/leapp-base-error';
-
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +28,7 @@ export abstract class SessionService extends NativeService {
   }
 
   listChildren(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.account.type === SessionType.awsTruster ) : [];
+    return (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsTruster ) : [];
   }
 
   listActive(): Session[] {
@@ -38,7 +36,7 @@ export abstract class SessionService extends NativeService {
   }
 
   listAwsAssumable(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.account.type !== SessionType.azure ) : [];
+    return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure ) : [];
   }
 
   async delete(sessionId: string): Promise<void> {

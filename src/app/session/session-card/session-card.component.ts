@@ -103,7 +103,6 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    */
   startSession() {
-    // TODO: check session profile
     this.sessionService.start(this.session.sessionId);
     this.logSessionData(this.session, `Starting Session`);
   }
@@ -124,7 +123,22 @@ export class SessionCardComponent implements OnInit {
    */
   deleteSession(session, event) {
     event.stopPropagation();
-    this.appService.confirmDialog('do you really want to delete this account?', () => {
+
+    const childSessions = this.sessionService.listChildren(session);
+    let dialogMessage = '';
+    let childSessionString = '';
+    childSessions.forEach(sess => {
+      childSessionString += `<li><div class="removed-sessions"><b>${sess.sessionName}</b></div></li>`;
+    });
+    if (childSessionString !== '') {
+      dialogMessage = 'This session has truster sessions: <br><ul>' +
+                      childSessionString +
+                      '</ul><br>Removing the session will also remove the truster session associated with it. Do you want to proceed?';
+    } else {
+      dialogMessage = 'Do you really want to delete this session?';
+    }
+
+    this.appService.confirmDialog(dialogMessage, () => {
       this.sessionService.delete(session.sessionId);
       this.logSessionData(session, 'Session Deleted');
     });

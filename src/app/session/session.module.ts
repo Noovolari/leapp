@@ -11,14 +11,17 @@ import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import { FilteringPipe } from './session/filtering.pipe';
 import { OrderingPipe } from './session/ordering.pipe';
-import {ErrorService} from '../services/middleware/error.service';
+import {IconPipe} from './session-card/icon.pipe';
+import {DetailPipe} from './session-card/detail.pipe';
 
 @NgModule({
   declarations: [
     SessionComponent,
     SessionCardComponent,
     FilteringPipe,
-    OrderingPipe
+    OrderingPipe,
+    IconPipe,
+    DetailPipe
   ],
   imports: [
     CommonModule,

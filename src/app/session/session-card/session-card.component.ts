@@ -5,7 +5,6 @@ import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
 import {Router} from '@angular/router';
 import {AwsFederatedAccount} from '../../models/aws-federated-account';
 import {SsmService} from '../../services/ssm.service';
-import {AzureAccount} from '../../models/azure-account';
 import {SessionType} from '../../models/session-type';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
@@ -46,8 +45,7 @@ export class SessionCardComponent implements OnInit {
 
   modalRef: BsModalRef;
 
-  // Ssm instances
-  ssmloading = true;
+  ssmLoading = true;
   selectedSsmRegion;
   selectedDefaultRegion;
   openSsm = false;
@@ -55,7 +53,6 @@ export class SessionCardComponent implements OnInit {
   regionOrLocations = [];
   instances = [];
   duplicateInstances = [];
-  sessionDetailToShow;
   placeholder;
   selectedProfile: any;
   profiles: { id: string; name: string }[];
@@ -69,41 +66,36 @@ export class SessionCardComponent implements OnInit {
               private router: Router,
               private ssmService: SsmService,
               private sessionProviderService: SessionProviderService,
-              private modalService: BsModalService) {
-  }
+              private modalService: BsModalService) {}
 
   ngOnInit() {
     // Generate a singleton service for the concrete implementation of SessionService
     this.sessionService = this.sessionProviderService.getService(this.session.account.type);
 
-    // Set regions for ssm and for default region, same with locations,
-    // add the correct placeholder to the select
+    // Set regions and locations
     this.awsRegions = this.appService.getRegions();
+    const azureLocations = this.appService.getLocations();
 
+    // Get profiles
     this.profiles = this.workspaceService.get().profiles;
 
-    const azureLocations = this.appService.getLocations();
+    // Array and labels for regions and locations
     this.regionOrLocations = this.session.account.type !== SessionType.azure ? this.awsRegions : azureLocations;
     this.placeholder = this.session.account.type !== SessionType.azure ? 'Select a default region' : 'Select a default location';
+
+    // Pre selected Region and Profile
     this.selectedDefaultRegion = this.session.account.region;
     this.selectedProfile = this.getProfileId(this.session);
+  }
 
-    switch (this.session.account.type) {
-      case(SessionType.awsFederated):
-        this.sessionDetailToShow = (this.session.account as AwsFederatedAccount).roleArn.split('/')[1];
-        break;
-      case(SessionType.azure):
-        this.sessionDetailToShow = (this.session.account as AzureAccount).subscriptionId;
-        break;
-      case(SessionType.awsPlain):
-        this.sessionDetailToShow = (this.session.account as AwsPlainAccount).accountName;
-        break;
-      case(SessionType.awsSso):
-        this.sessionDetailToShow = (this.session.account as AwsSsoAccount).role.name;
-        break;
-      case(SessionType.awsTruster):
-        this.sessionDetailToShow = (this.session.account as AwsTrusterAccount).roleArn.split('/')[1];
-        break;
+  /**
+   * Used to call for start or stop depending on session status
+   */
+  switchCredentials() {
+    if (this.session.status === SessionStatus.active) {
+      this.stopSession();
+    } else {
+      this.startSession();
     }
   }
 
@@ -112,50 +104,38 @@ export class SessionCardComponent implements OnInit {
    */
   startSession() {
     this.sessionService.start(this.session.sessionId);
-
-    this.appService.logger(
-      `Starting Session`,
-      LoggerLevel.info,
-      this,
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
-        id: this.session.sessionId,
-        account: this.session.account.accountName,
-        type: this.session.account.type
-      }, null, 3));
+    this.logSessionData(this.session, `Starting Session`);
   }
 
   /**
    * Stop session
    */
   stopSession() {
-    // Eventually close the tray
-    this.sessionService.stop(this.session.sessionId).then(() => {}, error => {
-      console.log(error);
-    });
-
-
-    this.appService.logger(
-      `Stopped Session`,
-      LoggerLevel.info,
-      this,
-      JSON.stringify({
-        timestamp: new Date().toISOString(),
-        id: this.session.sessionId,
-        account: this.session.account.accountName,
-        type: this.session.account.type
-      }, null, 3));
+    this.sessionService.stop(this.session.sessionId);
+    this.logSessionData(this.session, `Stopped Session`);
   }
 
-  removeAccount(session, event) {
+  /**
+   * Delete a session from the workspace
+   *
+   * @param session - the session to remove
+   * @param event - for stopping propagation bubbles
+   */
+  deleteSession(session, event) {
     event.stopPropagation();
     this.appService.confirmDialog('do you really want to delete this account?', () => {
       this.sessionService.delete(session.sessionId);
-      this.appService.logger('Session Deleted', LoggerLevel.info, this, JSON.stringify({ timespan: new Date().toISOString(), id: session.id, account: session.account.accountName, type: session.account.type }, null, 3));
+      this.logSessionData(session, 'Session Deleted');
     });
   }
 
-  editAccount(session, event) {
+  /**
+   * Edit Session
+   *
+   * @param session - the session to edit
+   * @param event - to remove propagation bubbles
+   */
+  editSession(session, event) {
     event.stopPropagation();
     this.router.navigate(['/managing', 'edit-account'], {queryParams: { sessionId: session.id }});
   }
@@ -164,13 +144,13 @@ export class SessionCardComponent implements OnInit {
    * Copy credentials in the clipboard
    */
   copyCredentials(session: Session, type: number, event) {
-    this.openDropDown(event);
+    event.stopPropagation();
     try {
       const workspace = this.workspaceService.get();
       if (workspace) {
         const sessionAccount = (session.account as AwsFederatedAccount);
         const texts = {
-          1: sessionAccount.roleArn ? `${(session.account as AwsFederatedAccount).roleArn.split('/')[0]}` : '',
+          1: sessionAccount.roleArn ? `${(session.account as AwsFederatedAccount).roleArn.split('/')[0].substring(14, 12)}` : '',
           2: sessionAccount.roleArn ? `${(session.account as AwsFederatedAccount).roleArn}` : ''
         };
 
@@ -183,18 +163,6 @@ export class SessionCardComponent implements OnInit {
       this.appService.toast(err, ToastLevel.warn);
       this.appService.logger(err, LoggerLevel.error, this, err.stack);
     }
-  }
-
-  switchCredentials() {
-    if (this.session.status === SessionStatus.active) {
-      this.stopSession();
-    } else {
-      this.startSession();
-    }
-  }
-
-  openDropDown(event) {
-    event.stopPropagation();
   }
 
   // ============================== //
@@ -212,7 +180,7 @@ export class SessionCardComponent implements OnInit {
   ssmModalOpen(session) {
     // Reset things before opening the modal
     this.instances = [];
-    this.ssmloading = false;
+    this.ssmLoading = false;
     this.modalRef = this.modalService.show(this.ssmModalTemplate, { class: 'ssm-modal'});
   }
 
@@ -234,7 +202,7 @@ export class SessionCardComponent implements OnInit {
    */
   changeSsmRegion(event, session: Session) {
     if (this.selectedSsmRegion) {
-      this.ssmloading = true;
+      this.ssmLoading = true;
 
       const account = `Leapp-ssm-data-${this.getProfileId(session)}`;
 
@@ -246,10 +214,10 @@ export class SessionCardComponent implements OnInit {
         this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
           this.instances = result.instances;
           this.duplicateInstances = this.instances;
-          this.ssmloading = false;
+          this.ssmLoading = false;
         }, () => {
           this.instances = [];
-          this.ssmloading = false;
+          this.ssmLoading = false;
         });
       });
 
@@ -272,9 +240,7 @@ export class SessionCardComponent implements OnInit {
 
       if (this.session.status === SessionStatus.active) {
         this.startSession();
-      } else {
       }
-
 
       this.appService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!');
       this.modalRef.hide();
@@ -288,23 +254,23 @@ export class SessionCardComponent implements OnInit {
    */
   startSsmSession(instanceId) {
     this.instances.forEach(instance => {
- if (instance.InstanceId === instanceId) {
- instance.loading = true;
-}
-});
+     if (instance.InstanceId === instanceId) {
+     instance.loading = true;
+    }
+    });
 
     this.ssmService.startSession(instanceId, this.selectedSsmRegion);
 
     setTimeout(() => {
       this.instances.forEach(instance => {
- if (instance.InstanceId === instanceId) {
- instance.loading = false;
-}
-});
+       if (instance.InstanceId === instanceId) {
+          instance.loading = false;
+       }
+      });
     }, 4000);
 
     this.openSsm = false;
-    this.ssmloading = false;
+    this.ssmLoading = false;
   }
 
   searchSSMInstance(event) {
@@ -316,11 +282,6 @@ export class SessionCardComponent implements OnInit {
     } else {
       this.instances = this.duplicateInstances;
     }
-  }
-
-  getProfileIcon(active, name) {
-    const color = active ? ' orange' : '';
-    return name === environment.defaultAwsProfileName ? ('home' + color) : ('user' + color);
   }
 
   getProfileId(session: Session): string {
@@ -337,14 +298,9 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  getProfileName(id) {
-    const workspace = this.workspaceService.get();
-    const profile = workspace.profiles.filter(p => p.id === id)[0];
-    if (profile) {
-      return profile.name;
-    } else {
-      return environment.defaultAwsProfileName;
-    }
+  getProfileName(profileId: string): string {
+    const profileName = this.workspaceService.getProfileName(profileId);
+    return profileName ? profileName : environment.defaultAwsProfileName;
   }
 
   changeProfile() {
@@ -371,7 +327,23 @@ export class SessionCardComponent implements OnInit {
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
   }
 
+  /**
+   * Close modals
+   */
   goBack() {
     this.modalRef.hide();
+  }
+
+  private logSessionData(session: Session, message: string): void {
+    this.appService.logger(
+      message,
+      LoggerLevel.info,
+      this,
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        id: session.sessionId,
+        account: session.account.accountName,
+        type: session.account.type
+      }, null, 3));
   }
 }

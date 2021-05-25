@@ -23,9 +23,7 @@ export abstract class SessionService extends NativeService {
     return sessionFiltered ? sessionFiltered : null;
   }
 
-  delete(sessionId: string): Promise<void> {
-    return undefined;
-  }
+
 
   list(): Session[] {
     return this.workspaceService.sessions;
@@ -41,6 +39,15 @@ export abstract class SessionService extends NativeService {
 
   listAwsAssumable(): Session[] {
     return (this.list().length > 0) ? this.list().filter( (session) => session.account.type !== SessionType.azure ) : [];
+  }
+
+  async delete(sessionId: string): Promise<void> {
+    try {
+      await this.stop(sessionId);
+      this.workspaceService.removeSession(sessionId);
+    } catch(error) {
+      this.sessionError(sessionId, error);
+    }
   }
 
   async start(sessionId: string): Promise<void> {
@@ -126,7 +133,6 @@ export abstract class SessionService extends NativeService {
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
   }
-
 
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;

@@ -3,7 +3,7 @@ import {Workspace} from '../../models/workspace';
 import {Session} from '../../models/session';
 import {ConfigurationService} from '../configuration.service';
 import {ExecuteServiceService} from '../execute-service.service';
-import {AzureAccount} from '../../models/azure-account';
+import {AzureSession} from '../../models/azure-session';
 import {AppService, LoggerLevel, ToastLevel} from '../app.service';
 import {Observable, Subscriber, Subscription} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
@@ -22,7 +22,7 @@ export class AzureStrategy {
     private configurationService: ConfigurationService) {}
 
   getActiveSessions(workspace: Workspace) {
-    const activeSessions = workspace.sessions.filter((sess) => sess.account.type === SessionType.azure && sess.status === SessionStatus.active);
+    const activeSessions = workspace.sessions.filter((sess) => sess.type === SessionType.azure && sess.status === SessionStatus.active);
 
     this.appService.logger('active azure sessions', LoggerLevel.info, this, JSON.stringify(activeSessions, null, 3));
     return activeSessions;
@@ -49,7 +49,7 @@ export class AzureStrategy {
         let tenantFound = false;
 
         parsedAzureProfile.subscriptions.forEach((subscription) => {
-          if (subscription.tenantId === (session.account as AzureAccount).tenantId) {
+          if (subscription.tenantId === (session.account as AzureSession).tenantId) {
             tenantFound = true;
           }
         });
@@ -62,7 +62,7 @@ export class AzureStrategy {
           if (this.processSubscription) {
  this.processSubscription.unsubscribe();
 }
-          this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
+          this.processSubscription = this.executeService.execute(`az login --tenant ${(session.account as AzureSession).tenantId} 2>&1`).subscribe(() => {
             this.azureSetSubscription(observer, session);
           }, err => {
             this.appService.logger('Error in command by Azure Cli', LoggerLevel.error, this, err.stack);
@@ -76,7 +76,7 @@ export class AzureStrategy {
         if (this.processSubscription2) {
  this.processSubscription2.unsubscribe();
 }
-        this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureAccount).tenantId} 2>&1`).subscribe(() => {
+        this.processSubscription2 = this.executeService.execute(`az login --tenant ${(session.account as AzureSession).tenantId} 2>&1`).subscribe(() => {
           this.azureSetSubscription(observer, session);
         }, err => {
           this.appService.logger('Error in command by Azure Cli', LoggerLevel.error, this, err.stack);
@@ -98,8 +98,8 @@ export class AzureStrategy {
     if (this.processSubscription4) {
  this.processSubscription4.unsubscribe();
 }
-    this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session.account as AzureAccount).subscriptionId} 2>&1`).pipe(
-      switchMap(() => this.executeService.execute(`az configure --default location=${session.account.region} 2>&1`))
+    this.processSubscription4 = this.executeService.execute(`az account set --subscription ${(session as AzureSession).subscriptionId} 2>&1`).pipe(
+      switchMap(() => this.executeService.execute(`az configure --default location=${session.region} 2>&1`))
     ).subscribe(() => {
       // be sure to save the profile and tokens
       // workspace.azureProfile = this.configurationService.getAzureProfileSync();

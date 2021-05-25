@@ -4,7 +4,7 @@ import {FileService} from '../file.service';
 import {Workspace} from '../../models/workspace';
 import {Session} from '../../models/session';
 import {AwsSsoService} from '../../integrations/providers/aws-sso.service';
-import {AwsSsoAccount} from '../../models/aws-sso-account';
+import {AwsSsoSession} from '../../models/aws-sso-session';
 import {catchError, map, switchMap} from 'rxjs/operators';
 
 import {AwsCredential} from '../../models/credential';
@@ -29,10 +29,10 @@ export class AwsSsoStrategy {
     private keychainService: KeychainService) {}
 
   getActiveSessions(workspace: Workspace) {
-    return workspace.sessions.filter((sess) => (sess.account.type === SessionType.awsTruster ||
-        sess.account.type === SessionType.awsSso ||
-        sess.account.type === SessionType.awsPlain ||
-        sess.account.type === SessionType.awsFederated) && sess.status === SessionStatus.active);
+    return workspace.sessions.filter((sess) => (sess.type === SessionType.awsTruster ||
+        sess.type === SessionType.awsSso ||
+        sess.type === SessionType.awsPlain ||
+        sess.type === SessionType.awsFederated) && sess.status === SessionStatus.active);
   }
 
   cleanCredentials(workspace: Workspace): void {
@@ -44,7 +44,7 @@ export class AwsSsoStrategy {
   manageSingleSession(workspace, session): Observable<boolean> {
 
 
-    if (session.account.type === SessionType.awsSso) {
+    if (session.type === SessionType.awsSso) {
       return this.awsCredentialProcess(workspace, session);
     } else {
       // We need this because we have checked also for non AWS_SSO potential active sessions,
@@ -56,22 +56,25 @@ export class AwsSsoStrategy {
 
   private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
     // Retrieve access token and region
+    const accountNumber = (session as AwsSsoSession).roleArn.substring(14, 12);
+    const roleName = (session as AwsSsoSession).roleArn.split('/')[1];
+
     return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
-      switchMap((loginToAwsSSOResponse) => this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, (session.account as AwsSsoAccount).accountNumber, (session.account as AwsSsoAccount).role.name)),
+      switchMap((loginToAwsSSOResponse) => this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, accountNumber, roleName)),
       map((getRoleCredentialsResponse: GetRoleCredentialsResponse) => {
         const credential: AwsCredential = {};
         credential.aws_access_key_id = getRoleCredentialsResponse.roleCredentials.accessKeyId;
         credential.aws_secret_access_key = getRoleCredentialsResponse.roleCredentials.secretAccessKey;
         credential.aws_session_token = getRoleCredentialsResponse.roleCredentials.sessionToken;
-        credential.region = session.account.region;
+        credential.region = session.region;
         return credential;
       }),
       switchMap((credential: AwsCredential) => {
-        const profileName = this.configurationService.getNameFromProfileId((session.account as AwsSsoAccount).profileId);
+        const profileName = this.configurationService.getNameFromProfileId((session as AwsSsoSession).profileId);
         const awsSsoCredentials = {};
         awsSsoCredentials[profileName] = credential;
 
-        const account = `Leapp-ssm-data-${(session.account as AwsSsoAccount).profileId}`;
+        const account = `Leapp-ssm-data-${(session as AwsSsoSession).profileId}`;
 
         return fromPromise(this.keychainService.saveSecret(environment.appName, account, JSON.stringify(credential))).pipe(
           map(() => awsSsoCredentials)

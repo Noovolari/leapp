@@ -5,16 +5,14 @@ import {WorkspaceService} from '../workspace.service';
 import {KeychainService} from '../keychain.service';
 import {AppService} from '../app.service';
 import {FileService} from '../file.service';
-import {Session} from '../../models/session';
-import {AwsFederatedAccount} from '../../models/aws-federated-account';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {AwsFederatedSession} from '../../models/aws-federated-session';
 import {LeappSamlError} from '../../errors/leapp-saml-error';
 import {LeappParseError} from '../../errors/leapp-parse-error';
 import {environment} from '../../../environments/environment';
 import AWS from 'aws-sdk';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
 
-export interface AwsFederatedAccountRequest {
+export interface AwsFederatedSessionRequest {
   accountName: string;
   idpUrl: string;
   idpArn: string;
@@ -59,22 +57,20 @@ export class AwsFederatedService extends SessionService {
     };
   }
 
-  create(accountRequest: AwsFederatedAccountRequest, profileId: string): void {
-    const session = new Session(
-      new AwsFederatedAccount(accountRequest.accountName,
-        accountRequest.region,
-        accountRequest.idpUrl,
-        accountRequest.idpArn,
-        accountRequest.roleArn,
-        profileId
-      )
-    );
+  create(sessionRequest: AwsFederatedSessionRequest, profileId: string): void {
+    const session = new AwsFederatedSession(
+      sessionRequest.accountName,
+      sessionRequest.region,
+      sessionRequest.idpUrl,
+      sessionRequest.idpArn,
+      sessionRequest.roleArn,
+      profileId);
     this.workspaceService.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session.account as AwsPlainAccount).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsFederatedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -83,14 +79,14 @@ export class AwsFederatedService extends SessionService {
       aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
-      region: session.account.region
+      region: session.region
     };
     return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session.account as AwsPlainAccount).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsFederatedSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
@@ -101,7 +97,7 @@ export class AwsFederatedService extends SessionService {
     const session = this.get(sessionId);
 
     // Get idp Url
-    const idpUrl = this.workspaceService.getIdpUrl((session.account as AwsFederatedAccount).idpUrlId);
+    const idpUrl = this.workspaceService.getIdpUrl((session as AwsFederatedSession).idpUrlId);
 
     // Check if we need to authenticate
     let needToAuthenticate;
@@ -133,9 +129,9 @@ export class AwsFederatedService extends SessionService {
     // Params for the calls
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      PrincipalArn: (session.account as AwsFederatedAccount).idpArn,
+      PrincipalArn: (session as AwsFederatedSession).idpArn,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleArn: (session.account as AwsFederatedAccount).roleArn,
+      RoleArn: (session as AwsFederatedSession).roleArn,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       SAMLAssertion: samlResponse,
       // eslint-disable-next-line @typescript-eslint/naming-convention

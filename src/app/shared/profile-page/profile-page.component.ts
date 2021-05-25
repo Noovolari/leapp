@@ -8,14 +8,14 @@ import {Router} from '@angular/router';
 import {Constants} from '../../models/constants';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsFederatedAccount} from '../../models/aws-federated-account';
+import {AwsFederatedSession} from '../../models/aws-federated-session';
 import {SessionService} from '../../services/session.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {Session} from '../../models/session';
 import {SessionType} from '../../models/session-type';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
-import {AwsTrusterAccount} from '../../models/aws-truster-account';
-import {AwsSsoAccount} from '../../models/aws-sso-account';
+import {AwsPlainSession} from '../../models/aws-plain-session';
+import {AwsTrusterSession} from '../../models/aws-truster-session';
+import {AwsSsoSession} from '../../models/aws-sso-session';
 import {LeappNotAwsAccountError} from '../../errors/leapp-not-aws-account-error';
 
 @Component({
@@ -177,7 +177,7 @@ export class ProfilePageComponent implements OnInit {
 
   deleteIdpUrl(id) {
     // Federated
-    const sessions = this.workspace.sessions.filter(s => (s.account as AwsFederatedAccount).idpUrlId !== undefined && (s.account as AwsFederatedAccount).idpUrlId === id);
+    const sessions = this.workspace.sessions.filter(s => (s as AwsFederatedSession).idpUrlId !== undefined && (s as AwsFederatedSession).idpUrlId === id);
 
     // Add trusters from federated
     /* federated.forEach(fed => {
@@ -186,7 +186,7 @@ export class ProfilePageComponent implements OnInit {
     }); */
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).roleArn.split('/')[1]}</small></div></li>`);
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsFederatedSession).roleArn.split('/')[1]}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
@@ -232,7 +232,7 @@ export class ProfilePageComponent implements OnInit {
     const sessions = this.workspace.sessions.filter(s => this.getProfileId(s) === id);
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.account.accountName}</b> - <small>${(s.account as AwsFederatedAccount).roleArn ? (s.account as AwsFederatedAccount).roleArn.split('/')[1] : ''}</small></div></li>`);
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsFederatedSession).roleArn ? (s as AwsFederatedSession).roleArn.split('/')[1] : ''}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
@@ -250,14 +250,8 @@ export class ProfilePageComponent implements OnInit {
   }
 
   getProfileId(session: Session): string {
-    if(session.account.type === SessionType.awsFederated) {
-      return (session.account as AwsFederatedAccount).profileId;
-    } else if (session.account.type === SessionType.awsPlain) {
-      return (session.account as AwsPlainAccount).profileId;
-    } else if (session.account.type === SessionType.awsTruster) {
-      return (session.account as AwsTrusterAccount).profileId;
-    } else if (session.account.type === SessionType.awsSso) {
-      return (session.account as AwsSsoAccount).profileId;
+    if(session.type !== SessionType.azure) {
+      return (session as any).profileId;
     } else {
       throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
     }

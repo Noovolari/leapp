@@ -8,11 +8,11 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {SessionType} from '../../models/session-type';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsPlainAccountRequest, AwsPlainService} from '../../services/session/aws-plain.service';
-import {AwsTrusterAccountRequest, AwsTrusterService} from '../../services/session/aws-truster.service';
+import {AwsPlainSessionRequest, AwsPlainService} from '../../services/session/aws-plain.service';
+import {AwsTrusterSessionRequest, AwsTrusterService} from '../../services/session/aws-truster.service';
 import {LeappParseError} from '../../errors/leapp-parse-error';
 import {SessionProviderService} from '../../services/session-provider.service';
-import {AwsFederatedAccountRequest, AwsFederatedService} from '../../services/session/aws-federated.service';
+import {AwsFederatedSessionRequest, AwsFederatedService} from '../../services/session/aws-federated.service';
 
 @Component({
   selector: 'app-create-account',
@@ -117,7 +117,7 @@ export class CreateAccountComponent implements OnInit {
 
       // Show the assumable accounts
       this.assumerAwsSessions = this.sessionService.listAwsAssumable().map(session => ({
-          accountName: session.account.accountName,
+          sessionName: session.sessionName,
           session
       }));
 
@@ -245,7 +245,7 @@ export class CreateAccountComponent implements OnInit {
   private createSession() {
     switch (this.sessionType) {
       case (SessionType.awsFederated):
-        const awsFederatedAccountRequest: AwsFederatedAccountRequest = {
+        const awsFederatedAccountRequest: AwsFederatedSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           idpUrl: this.selectedIdpUrl.value.trim(),
@@ -255,7 +255,7 @@ export class CreateAccountComponent implements OnInit {
         this.awsFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value);
         break;
       case (SessionType.awsPlain):
-        const awsPlainAccountRequest: AwsPlainAccountRequest = {
+        const awsPlainAccountRequest: AwsPlainSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           accessKey: this.form.value.accessKey.trim(),
@@ -265,7 +265,7 @@ export class CreateAccountComponent implements OnInit {
         this.awsPlainService.create(awsPlainAccountRequest, this.selectedProfile.value);
         break;
       case (SessionType.awsTruster):
-        const awsTrusterAccountRequest: AwsTrusterAccountRequest = {
+        const awsTrusterAccountRequest: AwsTrusterSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           roleArn: this.form.value.roleArn.trim(),

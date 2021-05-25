@@ -6,7 +6,7 @@ import {AppService, LoggerLevel} from '../../services/app.service';
 import {EMPTY, merge, Observable, of, throwError} from 'rxjs';
 import {catchError, expand, map, switchMap, take, tap, toArray} from 'rxjs/operators';
 import {Session} from '../../models/session';
-import {AwsSsoAccount} from '../../models/aws-sso-account';
+import {AwsSsoSession} from '../../models/aws-sso-session';
 import {SessionType} from '../../models/session-type';
 import {KeychainService} from '../../services/keychain.service';
 import {environment} from '../../../environments/environment';
@@ -316,18 +316,15 @@ export class AwsSsoService extends NativeService {
       map((roleInfo: RoleInfo) => {
         const profileId  = this.workspaceService.get().profiles.filter(p => p.name === 'default')[0].id;
 
-        const account: AwsSsoAccount = {
-          region: this.workspaceService.get().defaultRegion || environment.defaultRegion,
-          role: {name: roleInfo.roleName},
-          accountId: accountInfo.accountId,
-          accountName: accountInfo.accountName,
-          accountNumber: accountInfo.accountId,
-          email: accountInfo.emailAddress,
-          type: SessionType.awsSso,
-          profileId
-        };
+        const account = new AwsSsoSession(
+          accountInfo.accountName,
+          this.workspaceService.get().defaultRegion || environment.defaultRegion,
+          `arn:aws:iam::${accountInfo.accountId}/${roleInfo.roleName}`,
+          profileId,
+          accountInfo.emailAddress
+          );
 
-        return new Session(account);
+        return account;
       })
     );
   }
@@ -348,18 +345,18 @@ export class AwsSsoService extends NativeService {
       oldWorkspace = workspace;
 
       // Remove all AWS SSO old session or create a session array
-      const oldSSOsessions = this.sessionService.list().filter(sess => ((sess.account.type === SessionType.awsSso)));
-      const newSSOSessions = awsSsoSessions.sort((a, b) => a.account.accountName.toLowerCase().localeCompare(b.account.accountName.toLowerCase(), 'en', {sensitivity: 'base'}));
+      const oldSSOsessions = this.sessionService.list().filter(sess => ((sess.type === SessionType.awsSso)));
+      const newSSOSessions = awsSsoSessions.sort((a, b) => a.sessionName.toLowerCase().localeCompare(b.sessionName.toLowerCase(), 'en', {sensitivity: 'base'}));
 
       // Non SSO sessions
-      workspace.sessions = this.sessionService.list().filter(sess => ((sess.account.type !== SessionType.awsSso)));
+      workspace.sessions = this.sessionService.list().filter(sess => ((sess.type !== SessionType.awsSso)));
 
       // Add new AWS SSO sessions
       const updatedSSOSessions = [];
       newSSOSessions.forEach((newSession: Session) => {
-        const found = oldSSOsessions.filter(oldSession => oldSession.account.accountName === newSession.account.accountName &&
-            (oldSession.account as AwsSsoAccount).accountNumber === (newSession.account as AwsSsoAccount).accountNumber &&
-            (oldSession.account as AwsSsoAccount).role.name === (newSession.account as AwsSsoAccount).role.name)[0];
+        const found = oldSSOsessions.filter(oldSession => oldSession.sessionName === newSession.sessionName &&
+            (oldSession as AwsSsoSession).roleArn.substring(14,12) === (newSession as AwsSsoSession).roleArn.substring(14,12) &&
+            (oldSession as AwsSsoSession).roleArn.split('/')[1] === (newSession as AwsSsoSession).roleArn.split('/')[1])[0];
         if (found) {
           newSession = found;
         }

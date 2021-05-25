@@ -8,11 +8,11 @@ import {AppService} from './app.service';
 import {FileService} from './file.service';
 import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
-import {Account} from '../models/account';
 import {SessionType} from '../models/session-type';
 import {AwsPlainService} from './session/aws-plain.service';
 import {LeappNotFoundError} from '../errors/leapp-not-found-error';
 import {SessionStatus} from '../models/session-status';
+import {AwsPlainSession} from '../models/aws-plain-session';
 
 let spyAppService;
 let spyFileService;
@@ -36,7 +36,7 @@ describe('SessionService', () => {
   spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()) );
 
   beforeEach(() => {
-    mockedSession = new Session(new Account('fakeaccount', 'eu-west-1'), 'default');
+    mockedSession = new AwsPlainSession('fakeaccount', 'eu-west-1', 'default');
     mockedSession.sessionId = 'fakeid';
 
     mockedSessions = [mockedSession];
@@ -67,7 +67,7 @@ describe('SessionService', () => {
 
       expect(service.get('fakeid')).toBeInstanceOf(Session);
       expect(service.get('fakeid').sessionId).toEqual('fakeid');
-      expect(service.get('fakeid').account.accountName).toEqual('fakeaccount');
+      expect(service.get('fakeid').sessionName).toEqual('fakeaccount');
     });
 
     it('should return null if session is not found given the id', () => {
@@ -92,14 +92,14 @@ describe('SessionService', () => {
       const service: SessionService = TestBed.inject(SessionService);
 
       expect(service.listChildren()).toBeInstanceOf(Array);
-      expect(service.listChildren().filter(c => c.account.type === SessionType.awsTruster)).toEqual([]);
+      expect(service.listChildren().filter(c => c.type === SessionType.awsTruster)).toEqual([]);
 
-      const mockedSession2 = new Session(new Account('fakeaccount2', 'eu-west-2'), 'fakeprofile2');
-      mockedSession2.account.type = SessionType.awsTruster;
+      const mockedSession2 = new AwsPlainSession('fakeaccount2', 'eu-west-2', 'fakeprofile2');
+      mockedSession2.type = SessionType.awsTruster;
       mockedSessions.push(mockedSession2);
 
       expect(service.listChildren()).toBeInstanceOf(Array);
-      expect(service.listChildren().filter(c => c.account.type === SessionType.awsTruster)).toEqual([mockedSession2]);
+      expect(service.listChildren().filter(c => c.type === SessionType.awsTruster)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
@@ -118,7 +118,7 @@ describe('SessionService', () => {
       expect(service.listActive()).toBeInstanceOf(Array);
       expect(service.listActive().filter(c => c.status === SessionStatus.active)).toEqual([]);
 
-      const mockedSession2 = new Session(new Account('fakeaccount2', 'eu-west-2'), 'fakeprofile2');
+      const mockedSession2 = new AwsPlainSession('fakeaccount2', 'eu-west-2', 'fakeprofile2');
       mockedSession2.status = SessionStatus.active;
       mockedSessions.push(mockedSession2);
 

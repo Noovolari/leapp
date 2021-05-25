@@ -59,7 +59,7 @@ export class AppComponent implements OnInit {
     // All sessions start stopped when app is launched
     if (workspace.sessions.length > 0) {
       workspace.sessions.forEach(sess => {
-        const concreteSessionService = this.sessionProviderService.getService(sess.account.type);
+        const concreteSessionService = this.sessionProviderService.getService(sess.type);
         concreteSessionService.stop(sess.sessionId);
       });
     }

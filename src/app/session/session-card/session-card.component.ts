@@ -3,20 +3,20 @@ import {Session} from '../../models/session';
 import {SessionService} from '../../services/session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
 import {Router} from '@angular/router';
-import {AwsFederatedAccount} from '../../models/aws-federated-account';
+import {AwsFederatedSession} from '../../models/aws-federated-session';
 import {SsmService} from '../../services/ssm.service';
 import {SessionType} from '../../models/session-type';
 import {WorkspaceService} from '../../services/workspace.service';
 import {environment} from '../../../environments/environment';
 import {KeychainService} from '../../services/keychain.service';
-import {AwsSsoAccount} from '../../models/aws-sso-account';
+import {AwsSsoSession} from '../../models/aws-sso-session';
 import * as uuid from 'uuid';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {AwsPlainSession} from '../../models/aws-plain-session';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {FileService} from '../../services/file.service';
 import {SessionProviderService} from '../../services/session-provider.service';
 import {SessionStatus} from '../../models/session-status';
-import {AwsTrusterAccount} from '../../models/aws-truster-account';
+import {AwsTrusterSession} from '../../models/aws-truster-session';
 import {LeappNotAwsAccountError} from '../../errors/leapp-not-aws-account-error';
 
 @Component({
@@ -70,7 +70,7 @@ export class SessionCardComponent implements OnInit {
 
   ngOnInit() {
     // Generate a singleton service for the concrete implementation of SessionService
-    this.sessionService = this.sessionProviderService.getService(this.session.account.type);
+    this.sessionService = this.sessionProviderService.getService(this.session.type);
 
     // Set regions and locations
     this.awsRegions = this.appService.getRegions();
@@ -80,11 +80,11 @@ export class SessionCardComponent implements OnInit {
     this.profiles = this.workspaceService.get().profiles;
 
     // Array and labels for regions and locations
-    this.regionOrLocations = this.session.account.type !== SessionType.azure ? this.awsRegions : azureLocations;
-    this.placeholder = this.session.account.type !== SessionType.azure ? 'Select a default region' : 'Select a default location';
+    this.regionOrLocations = this.session.type !== SessionType.azure ? this.awsRegions : azureLocations;
+    this.placeholder = this.session.type !== SessionType.azure ? 'Select a default region' : 'Select a default location';
 
     // Pre selected Region and Profile
-    this.selectedDefaultRegion = this.session.account.region;
+    this.selectedDefaultRegion = this.session.region;
     this.selectedProfile = this.getProfileId(this.session);
   }
 
@@ -103,6 +103,7 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    */
   startSession() {
+    // TODO: check session profile
     this.sessionService.start(this.session.sessionId);
     this.logSessionData(this.session, `Starting Session`);
   }
@@ -148,10 +149,9 @@ export class SessionCardComponent implements OnInit {
     try {
       const workspace = this.workspaceService.get();
       if (workspace) {
-        const sessionAccount = (session.account as AwsFederatedAccount);
         const texts = {
-          1: sessionAccount.roleArn ? `${(session.account as AwsFederatedAccount).roleArn.split('/')[0].substring(14, 12)}` : '',
-          2: sessionAccount.roleArn ? `${(session.account as AwsFederatedAccount).roleArn}` : ''
+          1: (session as AwsFederatedSession).roleArn ? `${(session as AwsFederatedSession).roleArn.split('/')[0].substring(14, 12)}` : '',
+          2: (session as AwsFederatedSession).roleArn ? `${(session as AwsFederatedSession).roleArn}` : ''
         };
 
         const text = texts[type];
@@ -234,7 +234,7 @@ export class SessionCardComponent implements OnInit {
         this.sessionService.stop(this.session.sessionId);
       }
 
-      this.session.account.region = this.selectedDefaultRegion;
+      this.session.region = this.selectedDefaultRegion;
       // this.sessionService.invalidateSessionToken(this.session);
       // this.sessionService.update(this.session);
 
@@ -285,14 +285,8 @@ export class SessionCardComponent implements OnInit {
   }
 
   getProfileId(session: Session): string {
-    if(session.account.type === SessionType.awsFederated) {
-      return (session.account as AwsFederatedAccount).profileId;
-    } else if (session.account.type === SessionType.awsPlain) {
-      return (session.account as AwsPlainAccount).profileId;
-    } else if (session.account.type === SessionType.awsTruster) {
-      return (session.account as AwsTrusterAccount).profileId;
-    } else if (session.account.type === SessionType.awsSso) {
-      return (session.account as AwsSsoAccount).profileId;
+    if(session.type !== SessionType.azure) {
+      return (session as any).profileId;
     } else {
       throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
     }
@@ -342,8 +336,8 @@ export class SessionCardComponent implements OnInit {
       JSON.stringify({
         timestamp: new Date().toISOString(),
         id: session.sessionId,
-        account: session.account.accountName,
-        type: session.account.type
+        account: session.sessionName,
+        type: session.type
       }, null, 3));
   }
 }

@@ -1,41 +1,27 @@
-import {Account} from './account';
 import * as uuid from 'uuid';
-import {Type} from 'class-transformer';
-import {AwsPlainAccount} from './aws-plain-account';
-import {SessionType} from './session-type';
 import {environment} from '../../environments/environment';
 import {SessionStatus} from './session-status';
-import {AwsTrusterAccount} from './aws-truster-account';
-import {AwsFederatedAccount} from './aws-federated-account';
+import {SessionType} from './session-type';
 
 export class Session {
-  @Type(() => Account, {
-    discriminator: {
-      property: 'type',
-      subTypes: [
-        { value: AwsFederatedAccount, name: SessionType.awsFederated },
-        { value: AwsPlainAccount, name: SessionType.awsPlain },
-        { value: AwsTrusterAccount, name: SessionType.awsTruster },
-      ],
-    },
-  })
-  account: Account;
-
-  parentSessionId?: string;
 
   sessionId: string;
-
+  sessionName: string;
+  type: SessionType;
   status: SessionStatus;
+
+  region: string;
   startDateTime: string;
   lastStopDateTime: string;
 
-  constructor(account: Account, parentSessionId?: string) {
+  constructor(sessionName: string, region: string) {
     this.sessionId = uuid.v4();
-    this.parentSessionId = parentSessionId;
+    this.sessionName = sessionName;
     this.status = SessionStatus.inactive;
+
+    this.region = region;
     this.startDateTime = undefined;
     this.lastStopDateTime = new Date().toISOString();
-    this.account = account;
   }
 
   expired(): boolean {

@@ -570,7 +570,7 @@ export class AppService extends NativeService {
    * @param s - the session containing the account
    */
   isAzure(s) {
- return s.account.subscriptionId !== null && s.account.subscriptionId !== undefined;
+ return s.subscriptionId !== null && s.subscriptionId !== undefined;
 }
 
 
@@ -601,11 +601,11 @@ export class AppService extends NativeService {
       httpOptions: { timeout: environment.timeout }
     };
 
-    if (session.account.region) {
+    if (session.region) {
       options = {
         ...options,
-        //endpoint: this.stsEndpointsPerRegion.get(session.account.region),
-        region: session.account.region
+        endpoint: this.stsEndpointsPerRegion.get(session.region),
+        region: session.region
       };
     }
 

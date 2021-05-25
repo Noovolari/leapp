@@ -7,11 +7,11 @@ import {AppService} from '../app.service';
 import {LeappNotFoundError} from '../../errors/leapp-not-found-error';
 import {SessionProviderService} from '../session-provider.service';
 import {Session} from '../../models/session';
-import {AwsTrusterAccount} from '../../models/aws-truster-account';
+import {AwsTrusterSession} from '../../models/aws-truster-session';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
 import AWS from 'aws-sdk';
 
-export interface AwsTrusterAccountRequest {
+export interface AwsTrusterSessionRequest {
   accountName: string;
   region: string;
   roleArn: string;
@@ -45,14 +45,14 @@ export class AwsTrusterService extends SessionService {
     };
   }
 
-  create(accountRequest: AwsTrusterAccountRequest, profileId: string): void {
-    const session = new Session(new AwsTrusterAccount(accountRequest.accountName, accountRequest.region, accountRequest.roleArn, profileId), accountRequest.parentSessionId);
+  create(sessionRequest: AwsTrusterSessionRequest, profileId: string): void {
+    const session = new AwsTrusterSession(sessionRequest.accountName, sessionRequest.region, sessionRequest.roleArn, profileId, sessionRequest.parentSessionId);
     this.workspaceService.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session.account as AwsTrusterAccount).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsTrusterSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -61,14 +61,14 @@ export class AwsTrusterService extends SessionService {
       aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
-      region: session.account.region
+      region: session.region
     };
     return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session.account as AwsTrusterAccount).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsTrusterSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
@@ -81,13 +81,13 @@ export class AwsTrusterService extends SessionService {
     // Retrieve Parent Session
     let parentSession: Session;
     try {
-      parentSession = this.get(session.parentSessionId);
+      parentSession = this.get((session as AwsTrusterSession).parentSessionId);
     } catch (err) {
-      throw new LeappNotFoundError(this, `Parent Account Session  not found for Truster Account ${session.account.accountName}`);
+      throw new LeappNotFoundError(this, `Parent Account Session  not found for Truster Account ${session.sessionName}`);
     }
 
     // Generate a credential set from Parent Session
-    const parentSessionService = this.sessionProviderService.getService(parentSession.account.type);
+    const parentSessionService = this.sessionProviderService.getService(parentSession.type);
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);
 
     // Make second jump: configure AWS SDK with parent credentials set
@@ -105,7 +105,7 @@ export class AwsTrusterService extends SessionService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       RoleSessionName: `assumed-from-leapp`,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleArn: (session.account as AwsTrusterAccount).roleArn,
+      RoleArn: (session as AwsTrusterSession).roleArn,
     };
 
     // Generate Session token

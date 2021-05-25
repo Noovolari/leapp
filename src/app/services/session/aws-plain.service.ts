@@ -2,7 +2,7 @@ import {Injectable} from '@angular/core';
 import {CredentialsInfo} from '../../models/credentials-info';
 import {SessionService} from '../session.service';
 import {WorkspaceService} from '../workspace.service';
-import {AwsPlainAccount} from '../../models/aws-plain-account';
+import {AwsPlainSession} from '../../models/aws-plain-session';
 import {KeychainService} from '../keychain.service';
 import {environment} from '../../../environments/environment';
 import {Session} from '../../models/session';
@@ -15,7 +15,7 @@ import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
 import {LeappParseError} from '../../errors/leapp-parse-error';
 import {LeappMissingMfaTokenError} from '../../errors/leapp-missing-mfa-token-error';
 
-export interface AwsPlainAccountRequest {
+export interface AwsPlainSessionRequest {
   accountName: string;
   accessKey: string;
   secretKey: string;
@@ -54,8 +54,8 @@ export class AwsPlainService extends SessionService {
     };
   }
 
-  create(accountRequest: AwsPlainAccountRequest, profileId: string): void {
-    const session = new Session(new AwsPlainAccount(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice));
+  create(accountRequest: AwsPlainSessionRequest, profileId: string): void {
+    const session = new AwsPlainSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-secret-access-key`, accountRequest.secretKey);
     this.workspaceService.addSession(session);
@@ -63,7 +63,7 @@ export class AwsPlainService extends SessionService {
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session.account as AwsPlainAccount).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsPlainSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -72,14 +72,14 @@ export class AwsPlainService extends SessionService {
       aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       aws_session_token: credentialsInfo.sessionToken.aws_session_token,
-      region: session.account.region
+      region: session.region
     };
     return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session.account as AwsPlainAccount).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsPlainSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
@@ -89,7 +89,7 @@ export class AwsPlainService extends SessionService {
       // Get the session in question
       const session = this.get(sessionId);
       // Retrieve session token expiration
-      const tokenExpiration = (session.account as AwsPlainAccount).sessionTokenExpiration;
+      const tokenExpiration = (session as AwsPlainSession).sessionTokenExpiration;
       // Check if token is expired
       if (!tokenExpiration || AwsPlainService.isTokenExpired(tokenExpiration)) {
         // Token is Expired!
@@ -105,7 +105,7 @@ export class AwsPlainService extends SessionService {
         // eslint-disable-next-line @typescript-eslint/naming-convention
         const params = { DurationSeconds: environment.sessionTokenDuration };
         // Check if MFA is needed or not
-        if ((session.account as AwsPlainAccount).mfaDevice) {
+        if ((session as AwsPlainSession).mfaDevice) {
           // Return session token after calling MFA modal
           return this.generateSessionTokenCallingMfaModal(session, sts, params);
         } else {
@@ -128,7 +128,7 @@ export class AwsPlainService extends SessionService {
     return new Promise((resolve, reject) => {
       this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
         if (value !== Constants.confirmClosed) {
-          params['SerialNumber'] = (session.account as AwsPlainAccount).mfaDevice;
+          params['SerialNumber'] = (session as AwsPlainSession).mfaDevice;
           params['TokenCode'] = value;
           // Return session token in the form of CredentialsInfo
           resolve(this.generateSessionToken(session, sts, params));
@@ -171,7 +171,7 @@ export class AwsPlainService extends SessionService {
   private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
     const index = this.workspaceService.sessions.indexOf(session);
     const currentSession: Session = this.workspaceService.sessions[index];
-    (currentSession.account as AwsPlainAccount).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+    (currentSession as AwsPlainSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
     this.workspaceService.sessions[index] = currentSession;
     this.workspaceService.sessions = [...this.workspaceService.sessions];
   }

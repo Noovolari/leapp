@@ -1,0 +1,53 @@
+<app-profile-sidebar></app-profile-sidebar>
+
+<div class="container-fluid">
+
+  <div class="menu-bar">
+    <div class="provider-selector {{showOnly !== 'ALL' ? 'active' : ''}}">
+      <div class="btn-left {{showOnly === 'AWS' ? 'active' : ''}}  ">
+        <a (click)="setVisibility('AWS');">
+          <img src="../../../../assets/images/aws-logo.svg" alt="">
+        </a>
+      </div>
+      <div class="btn-right {{showOnly === 'AZR' ? 'active' : ''}} ">
+        <a (click)="setVisibility('AZR');">
+          <img src="../../../../assets/images/azure-logo.svg" alt="">
+        </a>
+      </div>
+
+    </div>
+
+    <a (click)="createAccount();" tooltip="Create Account" class="small-btn"><i class="far fa-plus"></i></a>
+    <span class="search-bar">
+      <input #filterField type="text" (keyup)="filterSessions($any($event.target).value)" placeholder="Search by..."/>
+      <i class="far fa-search"></i>
+    </span>
+  </div>
+</div>
+
+<div class="container-fluid with-scroll">
+
+  <ul class="account-cards">
+    <li style="position:relative;"> <span class="fixed-profiles">aws Profiles</span><span class="fixed-status">Status</span></li>
+    <li *ngIf="activeSessions.length !== 0">
+      <h3 class="mb-session">Active Accounts</h3>
+    </li>
+
+    <ng-container *ngFor="let session of workspaceService.sessions$ | async | filtering:true">
+      <li *ngIf="(showOnly === 'ALL') || ($any(session).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+        <app-session-card [session]="session"></app-session-card>
+      </li>
+    </ng-container>
+
+    <li>
+      <h3 class="mb-session">All other Accounts</h3>
+    </li>
+
+    <ng-container *ngFor="let session of workspaceService.sessions$ | async | filtering: false | ordering">
+      <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+        <app-session-card [session]="session"></app-session-card>
+      </li>
+    </ng-container>
+  </ul>
+
+</div>

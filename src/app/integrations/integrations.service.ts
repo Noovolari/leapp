@@ -1,5 +1,5 @@
 import {Injectable, NgZone} from '@angular/core';
-import {AwsSsoService} from './providers/aws-sso.service';
+import {AwsSsoSessionProviderService} from '../services/providers/aws-sso-session-provider.service';
 import {ConfigurationService} from '../services/configuration.service';
 import {Router} from '@angular/router';
 import {merge, Observable, throwError} from 'rxjs';
@@ -18,7 +18,7 @@ export class IntegrationsService {
 
   private loginSubscriber: any;
 
-  constructor(private awsSsoService: AwsSsoService,
+  constructor(private awsSsoService: AwsSsoSessionProviderService,
               private configurationService: ConfigurationService,
               private router: Router,
               private ngZone: NgZone,

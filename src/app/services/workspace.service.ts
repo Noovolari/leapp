@@ -6,7 +6,7 @@ import {Workspace} from '../models/workspace';
 import {environment} from '../../environments/environment';
 import {deserialize, serialize} from 'class-transformer';
 import {NativeService} from './native-service';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ import {BehaviorSubject} from 'rxjs';
 export class WorkspaceService extends NativeService {
 
   // Expose the observable$ part of the _sessions subject (read only stream)
-  readonly sessions$;
+  readonly sessions$: Observable<Session[]>;
 
   // - We set the initial state in BehaviorSubject's constructor
   // - Nobody outside the Store should have access to the BehaviorSubject

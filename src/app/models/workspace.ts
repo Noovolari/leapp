@@ -4,11 +4,18 @@ import {environment} from '../../environments/environment';
 import {Type} from 'class-transformer';
 
 export class Workspace {
+
   @Type(() => Session)
   private _sessions: Session[];
 
   private _idpUrl: { id: string; url: string }[];
   private _profiles: { id: string; name: string }[];
+
+  private _awsSsoConfiguration: {
+    region: string;
+    portalUrl: string;
+    expirationTime: string;
+  };
 
   private _proxyConfiguration: {
     proxyProtocol: string;
@@ -77,5 +84,13 @@ export class Workspace {
 
   set defaultLocation(value: string) {
     this._defaultLocation = value;
+  }
+
+  get awsSsoConfiguration(): { region: string; portalUrl: string; expirationTime: string } {
+    return this._awsSsoConfiguration;
+  }
+
+  set awsSsoConfiguration(value: { region: string; portalUrl: string; expirationTime: string }) {
+    this._awsSsoConfiguration = value;
   }
 }

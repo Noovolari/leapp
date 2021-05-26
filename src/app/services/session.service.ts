@@ -28,7 +28,7 @@ export abstract class SessionService extends NativeService {
     return this.workspaceService.sessions;
   }
 
-  listChildren(parentSession?: Session): Session[] {
+  listTruster(parentSession?: Session): Session[] {
     let childSession = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsTruster ) : [];
     if (parentSession) {
       childSession = childSession.filter(session => (session as AwsTrusterSession).parentSessionId === parentSession.sessionId );
@@ -47,7 +47,7 @@ export abstract class SessionService extends NativeService {
   async delete(sessionId: string): Promise<void> {
     try {
       await this.stop(sessionId);
-      this.listChildren(this.get(sessionId)).forEach(sess => {
+      this.listTruster(this.get(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);
         }

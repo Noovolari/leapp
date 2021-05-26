@@ -3,7 +3,7 @@ import {AppService, LoggerLevel, ToastLevel} from '../app.service';
 import {FileService} from '../file.service';
 import {Workspace} from '../../models/workspace';
 import {Session} from '../../models/session';
-import {AwsSsoService} from '../../integrations/providers/aws-sso.service';
+import {AwsSsoSessionProviderService} from '../providers/aws-sso-session-provider.service';
 import {AwsSsoSession} from '../../models/aws-sso-session';
 import {catchError, map, switchMap} from 'rxjs/operators';
 
@@ -23,7 +23,7 @@ export class AwsSsoStrategy {
   constructor(
     private appService: AppService,
     private fileService: FileService,
-    private awsSsoService: AwsSsoService,
+    private awsSsoService: AwsSsoSessionProviderService,
     private configurationService: ConfigurationService,
     private sessionService: SessionService,
     private keychainService: KeychainService) {}

@@ -2,10 +2,10 @@ import {EventEmitter, Injectable} from '@angular/core';
 import {NativeService} from './native-service';
 import {FileService} from './file.service';
 import {ToastrService} from 'ngx-toastr';
-import {ConfirmationDialogComponent} from '../shared/confirmation-dialog/confirmation-dialog.component';
+import {ConfirmationDialogComponent} from '../components/shared/confirmation-dialog/confirmation-dialog.component';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
-import {InputDialogComponent} from '../shared/input-dialog/input-dialog.component';
+import {InputDialogComponent} from '../components/shared/input-dialog/input-dialog.component';
 import {Constants} from '../models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 

@@ -1,0 +1,51 @@
+@import "palette";
+@import "../../../../assets/scss/mixins/utility";
+
+.confirm-modal {
+  max-width: 300px;
+  width: 100%;
+}
+
+h4 { color: $text-color; }
+
+button {
+  background-color: #73E0CF;
+  color: #080B38;
+  border-radius: 4px;
+  border: 2px solid #73E0CF!important;
+
+  font-family: "Lato", "Open Sans", sans-serif;
+  font-size: 19px;
+  font-weight: bold;
+
+  transition: all 0.3s ease;
+
+  min-width: 160px;
+  padding: 10px;
+}
+button:hover {
+  background-color: transparent;
+  color: #73E0CF;
+  border: 2px solid #73E0CF!important;
+}
+button.disabled {
+  background: $light-grey;
+  color: $charcoal-grey;
+  border: 2px solid $charcoal-grey!important;
+}
+
+.button-equalizer { height: 36px; margin-bottom: 20px; }
+.button-equalizer button:first-child { float: left; }
+.button-equalizer button:last-child { float: right; }
+
+div,p { color: $text-color; }
+
+.modal-header {
+  color: $text-color!important;
+  background: $white-text-color;
+
+  .close {
+    font-size: 36px;
+    color: $text-color!important;
+  }
+}

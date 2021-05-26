@@ -91,22 +91,22 @@ describe('SessionService', () => {
     it('should return a session list composed only of truster accounts', () => {
       const service: SessionService = TestBed.inject(SessionService);
 
-      expect(service.listChildren()).toBeInstanceOf(Array);
-      expect(service.listChildren().filter(c => c.type === SessionType.awsTruster)).toEqual([]);
+      expect(service.listTruster()).toBeInstanceOf(Array);
+      expect(service.listTruster().filter(c => c.type === SessionType.awsTruster)).toEqual([]);
 
       const mockedSession2 = new AwsPlainSession('fakeaccount2', 'eu-west-2', 'fakeprofile2');
       mockedSession2.type = SessionType.awsTruster;
       mockedSessions.push(mockedSession2);
 
-      expect(service.listChildren()).toBeInstanceOf(Array);
-      expect(service.listChildren().filter(c => c.type === SessionType.awsTruster)).toEqual([mockedSession2]);
+      expect(service.listTruster()).toBeInstanceOf(Array);
+      expect(service.listTruster().filter(c => c.type === SessionType.awsTruster)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
       const service: SessionService = TestBed.inject(SessionService);
 
       spyOn(service, 'list').and.callThrough();
-      service.listChildren();
+      service.listTruster();
       expect(service.list).toHaveBeenCalled();
     });
   });

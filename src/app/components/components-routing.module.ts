@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import {NoAppbarLayoutComponent} from '../layout/noappbar-layout/noappbar-layout.component';
 import {CreateAccountComponent} from './create-account/create-account.component';
 import { EditAccountComponent } from './edit-account/edit-account.component';
+import {StartScreenComponent} from './start-screen/start-screen.component';
 
 const routes: Routes = [
   {
@@ -16,6 +17,10 @@ const routes: Routes = [
       {
         path: 'edit-account',
         component: EditAccountComponent
+      },
+      {
+        path: 'start-page',
+        component: StartScreenComponent
       }
     ]
   }

@@ -214,7 +214,7 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   goToAwsSso() {
-    this.router.navigate(['aws-sso']);
+    this.router.navigate(['/', 'aws-sso']);
   }
 
   /**

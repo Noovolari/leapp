@@ -6,12 +6,12 @@
     <div class="provider-selector {{showOnly !== 'ALL' ? 'active' : ''}}">
       <div class="btn-left {{showOnly === 'AWS' ? 'active' : ''}}  ">
         <a (click)="setVisibility('AWS');">
-          <img src="../../../../assets/images/aws-logo.svg" alt="">
+          <img src="assets/images/aws-logo.svg" alt="">
         </a>
       </div>
       <div class="btn-right {{showOnly === 'AZR' ? 'active' : ''}} ">
         <a (click)="setVisibility('AZR');">
-          <img src="../../../../assets/images/azure-logo.svg" alt="">
+          <img src="assets/images/azure-logo.svg" alt="">
         </a>
       </div>
 
@@ -44,7 +44,7 @@
     </li>
 
     <ng-container *ngFor="let session of workspaceService.sessions$ | async | filtering: false | ordering">
-      <li *ngIf="(showOnly === 'ALL') || ($any(session.account).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+      <li *ngIf="(showOnly === 'ALL') || ($any(session).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session"></app-session-card>
       </li>
     </ng-container>

@@ -1,11 +1,10 @@
-import { Injectable } from '@angular/core';
+import {Inject, Injectable} from '@angular/core';
 import {SessionService} from '../session.service';
 import {CredentialsInfo} from '../../models/credentials-info';
 import {WorkspaceService} from '../workspace.service';
 import {FileService} from '../file.service';
 import {AppService} from '../app.service';
 import {LeappNotFoundError} from '../../errors/leapp-not-found-error';
-import {SessionProviderService} from '../session-provider.service';
 import {Session} from '../../models/session';
 import {AwsTrusterSession} from '../../models/aws-truster-session';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
@@ -22,15 +21,16 @@ export interface AwsTrusterSessionRequest {
   providedIn: 'root'
 })
 export class AwsTrusterService extends SessionService {
+  private factoryFunction: any;
 
   constructor(
     protected workspaceService: WorkspaceService,
     private appService: AppService,
-    private fileService: FileService,
-    private sessionProviderService: SessionProviderService
+    private fileService: FileService
   ) {
     super(workspaceService);
   }
+
 
   static sessionTokenFromassumeRoleResponse(assumeRoleResponse: AssumeRoleResponse): { sessionToken: any } {
     return {
@@ -43,6 +43,10 @@ export class AwsTrusterService extends SessionService {
         aws_session_token: assumeRoleResponse.Credentials.SessionToken.trim(),
       }
     };
+  }
+
+  setFactoryFunction(factoryFunction: any) {
+    this.factoryFunction = factoryFunction;
   }
 
   create(sessionRequest: AwsTrusterSessionRequest, profileId: string): void {
@@ -87,7 +91,7 @@ export class AwsTrusterService extends SessionService {
     }
 
     // Generate a credential set from Parent Session
-    const parentSessionService = this.sessionProviderService.getService(parentSession.type);
+    const parentSessionService = this.factoryFunction(parentSession.type);
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);
 
     // Make second jump: configure AWS SDK with parent credentials set

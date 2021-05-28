@@ -45,7 +45,7 @@ export class AwsSsoStrategy {
 
 
     if (session.type === SessionType.awsSso) {
-      return this.awsCredentialProcess(workspace, session);
+      // return this.awsCredentialProcess(workspace, session);
     } else {
       // We need this because we have checked also for non AWS_SSO potential active sessions,
       // so for them we don't create credentials but just return an empty observable for the
@@ -54,12 +54,14 @@ export class AwsSsoStrategy {
     }
   }
 
-  private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
+  /*private awsCredentialProcess(workspace: Workspace, session: Session): Observable<boolean> {
     // Retrieve access token and region
     const accountNumber = (session as AwsSsoSession).roleArn.substring(14, 12);
     const roleName = (session as AwsSsoSession).roleArn.split('/')[1];
 
-    return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
+    return undefined;
+
+    /*return this.awsSsoService.getAwsSsoPortalCredentials().pipe(
       switchMap((loginToAwsSSOResponse) => this.awsSsoService.getRoleCredentials(loginToAwsSSOResponse.accessToken, loginToAwsSSOResponse.region, accountNumber, roleName)),
       map((getRoleCredentialsResponse: GetRoleCredentialsResponse) => {
         const credential: AwsCredential = {};
@@ -99,6 +101,6 @@ export class AwsSsoStrategy {
         }
 
       })
-    );
-  }
+  );
+  }*/
 }

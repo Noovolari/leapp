@@ -94,6 +94,24 @@ export class WorkspaceService extends NativeService {
     this.persist(workspace);
   }
 
+  configureAwsSso(region: string, portalUrl: string, expirationTime: string): void {
+    const workspace = this.get();
+    workspace.awsSsoConfiguration.region = region;
+    workspace.awsSsoConfiguration.portalUrl = portalUrl;
+    workspace.awsSsoConfiguration.expirationTime = expirationTime;
+    this.persist(workspace);
+  }
+
+  removeExpirationTimeFromAwsSsoConfiguration(): void {
+    const workspace = this.get();
+    workspace.awsSsoConfiguration.expirationTime = undefined;
+    this.persist(workspace);
+  }
+
+  getAwsSsoConfiguration(): {region: string; portalUrl: string; expirationTime: string} {
+    return this.get().awsSsoConfiguration;
+  }
+
   private persist(workspace: Workspace) {
     this.fileService.writeFileSync(
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
@@ -111,7 +129,4 @@ export class WorkspaceService extends NativeService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
-
-
-
 }

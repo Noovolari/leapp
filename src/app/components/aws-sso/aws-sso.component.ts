@@ -1,15 +1,11 @@
 import {Component, OnInit} from '@angular/core';
-import {IntegrationsService} from '../../integrations/integrations.service';
-import {AwsSsoSessionProviderService} from '../../services/providers/aws-sso-session-provider.service';
+import {AwsSsoSessionProviderService, SsoSession} from '../../services/providers/aws-sso-session-provider.service';
 import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService, LoggerLevel, ToastLevel} from '../../services/app.service';
+import {AppService} from '../../services/app.service';
 import {ConfigurationService} from '../../services/configuration.service';
-import {merge} from 'rxjs';
-import {fromPromise} from 'rxjs/internal-compatibility';
-import {environment} from '../../../environments/environment';
-import {tap} from 'rxjs/operators';
-import {KeychainService} from '../../services/keychain.service';
+import {WorkspaceService} from '../../services/workspace.service';
+import {AwsSsoService} from '../../services/session/aws-sso.service';
 
 @Component({
   selector: 'app-aws-sso',
@@ -32,14 +28,15 @@ export class AwsSsoComponent implements OnInit {
   constructor(
     private appService: AppService,
     private configurationservice: ConfigurationService,
-    private integrationsService: IntegrationsService,
-    private awsSsoService: AwsSsoSessionProviderService,
+    private awsSsoProviderService: AwsSsoSessionProviderService,
+    private awsSsoService: AwsSsoService,
     private router: Router,
-    private keychainService: KeychainService
+    private workspaceService: WorkspaceService
   ) {}
 
   ngOnInit() {
-    this.awsSsoService.isAwsSsoActive().subscribe(res => {
+    this.awsSsoProviderService.awsSsoActive().then(res => {
+      console.log(res);
       this.isAwsSsoActive = res;
       this.setValues();
     });
@@ -47,40 +44,45 @@ export class AwsSsoComponent implements OnInit {
 
   login() {
     if (this.form.valid) {
-      this.integrationsService.login(this.form.value.portalUrl, this.selectedRegion);
+      this.awsSsoProviderService.sync(this.selectedRegion, this.form.value.portalUrl).then((ssoSessions: SsoSession[]) => {
+        ssoSessions.forEach(ssoSession => {
+          this.awsSsoService.create(ssoSession, 'default');
+        });
+        this.router.navigate(['/sessions', 'session-selected']);
+      });
     }
   }
 
   logout() {
-    this.integrationsService.logout().subscribe(() => {
+    this.awsSsoProviderService.logout().then(_ => {
       this.isAwsSsoActive = false;
       this.setValues();
-    }, (err) => {
-      this.appService.logger(err.toString(), LoggerLevel.error, this, err.stack);
-      this.appService.toast(`${err.toString()}; please check the log files for more information.`, ToastLevel.error, 'AWS SSO error.');
     });
   }
 
   forceSync() {
-    this.integrationsService.syncAccounts();
+    const region = this.workspaceService.getAwsSsoConfiguration().region;
+    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+
+    this.awsSsoProviderService.sync(region, portalUrl).then((ssoSessions: SsoSession[]) => {
+      ssoSessions.forEach(ssoSession => {
+        this.awsSsoService.create(ssoSession, 'default');
+      });
+      this.router.navigate(['/sessions', 'session-selected']);
+    });
   }
 
   goBack() {
-    this.router.navigate(['/', 'integrations', 'list']);
+    this.router.navigate(['/', 'integrations']);
   }
 
   setValues() {
     this.regions = this.appService.getRegions();
-    this.selectedRegion = this.regions[0].region;
+    const region = this.workspaceService.getAwsSsoConfiguration().region;
+    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
 
-    merge(
-      fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION')).pipe(tap(res => {
-        this.selectedRegion = res;
-      })),
-      fromPromise<string>(this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL')).pipe(tap(res => {
-        this.portalUrl = res;
-        this.form.controls['portalUrl'].setValue(res);
-      }))
-    ).subscribe();
+    this.selectedRegion = region || this.regions[0].region;
+    this.portalUrl = portalUrl;
+    this.form.controls['portalUrl'].setValue(portalUrl);
   }
 }

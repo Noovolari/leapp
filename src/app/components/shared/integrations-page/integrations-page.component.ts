@@ -1,5 +1,4 @@
 import {Component, OnInit} from '@angular/core';
-import {IntegrationsService} from '../../../integrations/integrations.service';
 import {AwsSsoSessionProviderService} from '../../../services/providers/aws-sso-session-provider.service';
 import {Router} from '@angular/router';
 
@@ -12,11 +11,7 @@ export class IntegrationsPageComponent implements OnInit {
 
   showProviderList = false;
 
-  constructor(private integrationsService: IntegrationsService,
-              private awsSsoService: AwsSsoSessionProviderService,
-              private router: Router) {
-
-  }
+  constructor(private awsSsoService: AwsSsoSessionProviderService, private router: Router) {}
 
   ngOnInit(): void {
     this.showProviderList = false;
@@ -35,7 +30,7 @@ export class IntegrationsPageComponent implements OnInit {
   }
 
   goToAwsSSO() {
-    this.router.navigate(['/', 'integrations', 'aws-sso']);
+    this.router.navigate(['/', 'aws-sso']);
   }
 
 }

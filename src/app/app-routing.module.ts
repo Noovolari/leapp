@@ -25,6 +25,10 @@ const routes: Routes = [
         component: AwsSsoComponent
       },
       {
+        path: 'integrations',
+        component: IntegrationsPageComponent
+      },
+      {
         path: 'sessions',
         children: [
           {

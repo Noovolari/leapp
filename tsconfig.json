@@ -6,7 +6,7 @@
     "declaration": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "lib": ["ES2018", "DOM"],
+    "lib": ["ES2019", "DOM"],
     "module": "ES6",
     "moduleResolution": "node",
     "sourceMap": true,

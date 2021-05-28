@@ -5,20 +5,13 @@ import {CredentialsInfo} from '../../models/credentials-info';
 import {AwsSsoSessionProviderService} from '../providers/aws-sso-session-provider.service';
 import {AwsSsoSession} from '../../models/aws-sso-session';
 import {FileService} from '../file.service';
-import {AppService, LoggerLevel, ToastLevel} from '../app.service';
-import {catchError, switchMap, toArray} from "rxjs/operators";
-import {Session} from "../../models/session";
-import {merge, throwError} from "rxjs";
-import {fromPromise} from "rxjs/internal-compatibility";
-import {environment} from "../../../environments/environment";
-import {KeychainService} from "../keychain.service";
+import {AppService} from '../app.service';
 
 export interface AwsSsoSessionRequest {
   sessionName: string;
   region: string;
   email: string;
   roleArn: string;
-  profileId: string;
 }
 
 @Injectable({
@@ -30,8 +23,7 @@ export class AwsSsoService extends SessionService {
     protected workspaceService: WorkspaceService,
     private awsSsoSessionProviderService: AwsSsoSessionProviderService,
     private fileService: FileService,
-    private appService: AppService,
-    private keychainService: KeychainService
+    private appService: AppService
   ) {
     super(workspaceService);
   }

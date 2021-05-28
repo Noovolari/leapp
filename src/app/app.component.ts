@@ -72,7 +72,7 @@ export class AppComponent implements OnInit {
     if (workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
     } else {
-      this.router.navigate(['/start']);
+      this.router.navigate(['/start', 'start-page']);
     }
   }
 

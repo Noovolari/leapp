@@ -9,11 +9,13 @@ import {CreateAccountComponent} from './create-account/create-account.component'
 import { EditAccountComponent } from './edit-account/edit-account.component';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
+import {StartScreenComponent} from './start-screen/start-screen.component';
 
 @NgModule({
   declarations: [
     CreateAccountComponent,
-    EditAccountComponent
+    EditAccountComponent,
+    StartScreenComponent
   ],
   imports: [
     CommonModule,

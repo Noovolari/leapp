@@ -79,11 +79,11 @@ export class ProfileSidebarComponent implements OnInit {
 
   goToIntegrations() {
     this.closeProfile();
-    this.router.navigate(['/integrations', 'list']);
+    this.router.navigate(['/integrations']);
   }
 
   goToIdentityProvider() {
     this.closeProfile();
-    this.router.navigate(['/integrations', 'aws-sso']);
+    this.router.navigate(['/', 'aws-sso']);
   }
 }

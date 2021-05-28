@@ -36,6 +36,12 @@ export class Workspace {
     this._sessions = [];
     this._defaultRegion = environment.defaultRegion;
     this._defaultLocation = environment.defaultLocation;
+
+    this._awsSsoConfiguration = {
+      region: undefined,
+      portalUrl: undefined,
+      expirationTime: undefined
+    };
   }
 
   get idpUrl(): { id: string; url: string }[] {

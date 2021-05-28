@@ -8,6 +8,8 @@ import {SessionType} from '../models/session-type';
 import {AwsPlainService} from './session/aws-plain.service';
 import {AwsTrusterService} from './session/aws-truster.service';
 import {AwsFederatedService} from './session/aws-federated.service';
+import {AwsSsoService} from "./session/aws-sso.service";
+import {AwsSsoSessionProviderService} from "./providers/aws-sso-session-provider.service";
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +22,7 @@ export class SessionProviderService {
     private workspaceService: WorkspaceService,
     private keychainService: KeychainService,
     private appService: AppService,
+    private awsSsoProviderService: AwsSsoSessionProviderService,
     private fileService: FileService) {}
 
   getService(accountType: SessionType): SessionService {
@@ -51,13 +54,16 @@ export class SessionProviderService {
   }
 
   private getAwsTrusterSessionService(accountType: SessionType) {
-    const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService, this);
+    const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService);
+    service.setFactoryFunction(this.getService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsSsoSessionService(accountType: SessionType) {
-    return undefined;
+    const service = new AwsSsoService(this.workspaceService, this.awsSsoProviderService, this.fileService, this.appService);
+    this.sessionServiceCache[accountType.toString()] = service;
+    return service;
   }
 
   private getAzureSessionService(accountType: SessionType) {

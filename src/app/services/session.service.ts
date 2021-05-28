@@ -36,6 +36,11 @@ export abstract class SessionService extends NativeService {
     return childSession;
   }
 
+  listSso() {
+    const ssoSessions = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsSso ) : [];
+    return ssoSessions;
+  }
+
   listActive(): Session[] {
     return (this.list().length > 0) ? this.list().filter( (session) => session.status === SessionStatus.active ) : [];
   }
@@ -161,6 +166,7 @@ export abstract class SessionService extends NativeService {
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(sessionId: string): Promise<void>;
+
 
 
 }

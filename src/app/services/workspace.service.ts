@@ -76,6 +76,12 @@ export class WorkspaceService extends NativeService {
     return profileFiltered ? profileFiltered.name : null;
   }
 
+  getDefaultProfileId(): string {
+    const workspace = this.get();
+    const profileFiltered = workspace.profiles.find(profile => profile.name === 'default');
+    return profileFiltered.id;
+  }
+
   addProfile(profile: { id: string; name: string }): void {
     const workspace = this.get();
     workspace.profiles.push(profile);

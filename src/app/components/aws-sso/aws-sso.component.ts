@@ -46,7 +46,7 @@ export class AwsSsoComponent implements OnInit {
     if (this.form.valid) {
       this.awsSsoProviderService.sync(this.selectedRegion, this.form.value.portalUrl).then((ssoSessions: SsoSession[]) => {
         ssoSessions.forEach(ssoSession => {
-          this.awsSsoService.create(ssoSession, 'default');
+          this.awsSsoService.create(ssoSession, this.workspaceService.getDefaultProfileId());
         });
         this.router.navigate(['/sessions', 'session-selected']);
       });
@@ -66,7 +66,7 @@ export class AwsSsoComponent implements OnInit {
 
     this.awsSsoProviderService.sync(region, portalUrl).then((ssoSessions: SsoSession[]) => {
       ssoSessions.forEach(ssoSession => {
-        this.awsSsoService.create(ssoSession, 'default');
+        this.awsSsoService.create(ssoSession, this.workspaceService.getDefaultProfileId());
       });
       this.router.navigate(['/sessions', 'session-selected']);
     });

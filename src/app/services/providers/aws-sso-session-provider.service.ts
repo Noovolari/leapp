@@ -91,28 +91,25 @@ export class AwsSsoSessionProviderService extends NativeService {
   async logout(): Promise<void> {
     // Obtain region and access token
     const region = this.workspaceService.getAwsSsoConfiguration().region;
-    const accessToken = await this.getAccessTokenFromKeychain();
+    const savedAccessToken = await this.getAccessTokenFromKeychain();
 
     // Configure Sso Portal Client
     this.getSsoPortalClient(region);
 
     // Make a logout request to Sso
+    const logoutRequest: LogoutRequest = { accessToken: savedAccessToken };
+    this.ssoPortal.logout(logoutRequest).promise().then(_ => {}, _ => {
+      // Delete access token and remove sso configuration info from workspace
+      this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');
+      this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration();
 
-    const logoutRequest: LogoutRequest = { accessToken };
-    console.log(logoutRequest);
-    console.log(this.ssoPortal);
-    await this.ssoPortal.logout(logoutRequest).promise();
+      // Clean clients
+      this.ssoOidc = null;
+      this.ssoPortal = null;
 
-    // Delete access token and remove sso configuration info from workspace
-    await this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');
-    this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration();
-
-    // Clean clients
-    this.ssoOidc = null;
-    this.ssoPortal = null;
-
-    // Remove sessions from workspace
-    this.removeSsoSessionsFromWorkspace();
+      // Remove sessions from workspace
+      this.removeSsoSessionsFromWorkspace();
+    });
   }
 
   async getAccessToken(region: string, portalUrl: string): Promise<string> {
@@ -137,8 +134,9 @@ export class AwsSsoSessionProviderService extends NativeService {
   // TODO: out of provisioning we are generating session credentials
   async getRoleCredentials(accessToken: string, region: string, roleArn: string): Promise<GetRoleCredentialsResponse> {
     this.getSsoPortalClient(region);
+
     const getRoleCredentialsRequest: GetRoleCredentialsRequest = {
-      accountId: roleArn.substring(14, 12),
+      accountId: roleArn.substring(13, 25),
       roleName: roleArn.split('/')[1],
       accessToken
     };

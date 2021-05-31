@@ -167,7 +167,7 @@ export class SessionCardComponent implements OnInit {
       const workspace = this.workspaceService.get();
       if (workspace) {
         const texts = {
-          1: (session as AwsFederatedSession).roleArn ? `${(session as AwsFederatedSession).roleArn.split('/')[0].substring(14, 12)}` : '',
+          1: (session as AwsFederatedSession).roleArn ? `${(session as AwsFederatedSession).roleArn.split('/')[0].substring(13, 25)}` : '',
           2: (session as AwsFederatedSession).roleArn ? `${(session as AwsFederatedSession).roleArn}` : ''
         };
 

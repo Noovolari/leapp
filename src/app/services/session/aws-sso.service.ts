@@ -6,6 +6,7 @@ import {AwsSsoSessionProviderService} from '../providers/aws-sso-session-provide
 import {AwsSsoSession} from '../../models/aws-sso-session';
 import {FileService} from '../file.service';
 import {AppService} from '../app.service';
+import SSO from 'aws-sdk/clients/sso';
 
 export interface AwsSsoSessionRequest {
   sessionName: string;
@@ -26,6 +27,19 @@ export class AwsSsoService extends SessionService {
     private appService: AppService
   ) {
     super(workspaceService);
+  }
+
+  static sessionTokenFromGetSessionTokenResponse(getRoleCredentialResponse: SSO.GetRoleCredentialsResponse): { sessionToken: any } {
+    return {
+      sessionToken: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_access_key_id: getRoleCredentialResponse.roleCredentials.accessKeyId.trim(),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_secret_access_key: getRoleCredentialResponse.roleCredentials.secretAccessKey.trim(),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_session_token: getRoleCredentialResponse.roleCredentials.sessionToken.trim(),
+      }
+    };
   }
 
   create(accountRequest: AwsSsoSessionRequest, profileId: string): void {
@@ -58,9 +72,12 @@ export class AwsSsoService extends SessionService {
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    // TODO: implement in a clean way the strategy generateCredentials
-    //  - login to portal to verify that you can still access to sso portal
-    //  - if yes
-    return Promise.resolve(undefined);
+    const roleArn = (this.get(sessionId) as AwsSsoSession).roleArn;
+    const region = this.workspaceService.getAwsSsoConfiguration().region;
+    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+
+    const accessToken = await this.awsSsoSessionProviderService.getAccessToken(region, portalUrl);
+    const credentials = await this.awsSsoSessionProviderService.getRoleCredentials(accessToken, region, roleArn);
+    return AwsSsoService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 }

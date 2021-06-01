@@ -3,7 +3,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ConfigurationService} from '../../services/configuration.service';
 import {AppService, LoggerLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {SessionService} from '../../services/session.service';
+import {AwsSessionService} from '../../services/aws-session.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {SessionType} from '../../models/session-type';
 import {environment} from '../../../environments/environment';
@@ -13,6 +13,7 @@ import {AwsTrusterSessionRequest, AwsTrusterService} from '../../services/sessio
 import {LeappParseError} from '../../errors/leapp-parse-error';
 import {SessionProviderService} from '../../services/session-provider.service';
 import {AwsFederatedSessionRequest, AwsFederatedService} from '../../services/session/aws-federated.service';
+import {AzureService, AzureSessionRequest} from '../../services/session/azure.service';
 
 @Component({
   selector: 'app-create-account',
@@ -79,12 +80,13 @@ export class CreateAccountComponent implements OnInit {
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private sessionService: SessionService,
     private sessionProviderService: SessionProviderService,
     private workspaceService: WorkspaceService,
     private awsFederatedService: AwsFederatedService,
     private awsPlainService: AwsPlainService,
-    private awsTrusterService: AwsTrusterService
+    private awsTrusterService: AwsTrusterService,
+    private awsSessionService: AwsSessionService,
+    private azureService: AzureService
   ) {}
 
   ngOnInit() {
@@ -116,7 +118,7 @@ export class CreateAccountComponent implements OnInit {
       this.firstTime = params['firstTime'] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
-      this.assumerAwsSessions = this.sessionService.listAwsAssumable().map(session => ({
+      this.assumerAwsSessions = this.awsSessionService.listAwsAssumable().map(session => ({
           sessionName: session.sessionName,
           session
       }));
@@ -227,14 +229,7 @@ export class CreateAccountComponent implements OnInit {
 
     if (workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
-    }/* else {
-      this.accountType = undefined;
-      this.provider = undefined;
-      this.hasOneGoodSession = false;
-      this.providerSelected = false;
-      this.typeSelection = false;
-      this.firstTime = true;
-    }*/
+    }
   }
 
   /**
@@ -272,6 +267,15 @@ export class CreateAccountComponent implements OnInit {
           parentSessionId: this.selectedSession.sessionId
         };
         this.awsTrusterService.create(awsTrusterAccountRequest, this.selectedProfile.value);
+        break;
+      case (SessionType.azure):
+        const azureSessionRequest: AzureSessionRequest = {
+          region: this.selectedLocation,
+          sessionName: this.form.value.name,
+          subscriptionId: this.form.value.subscriptionId,
+          tenantId: this.form.value.tenantId
+        };
+        this.azureService.create(azureSessionRequest);
         break;
     }
   }

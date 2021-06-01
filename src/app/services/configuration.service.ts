@@ -4,7 +4,7 @@ import {NativeService} from './native-service';
 import {environment} from '../../environments/environment';
 import {AppService, LoggerLevel, ToastLevel} from './app.service';
 import {Configuration} from '../models/configuration';
-import {ExecuteServiceService} from './execute-service.service';
+import {ExecuteService} from './execute.service';
 import {WorkspaceService} from './workspace.service';
 
 
@@ -16,7 +16,7 @@ export class ConfigurationService extends NativeService {
 
   constructor(private fileService: FileService,
               private appService: AppService,
-              private executeService: ExecuteServiceService,
+              private executeService: ExecuteService,
               private workspaceService: WorkspaceService) {
     super();
   }
@@ -42,39 +42,8 @@ export class ConfigurationService extends NativeService {
     return this.fileService.writeFileSync(this.os.homedir() + '/' + environment.lockFileDestination, this.fileService.encryptText(JSON.stringify(config, null, 2)));
   }
 
-  /**
-   * Get the Azure Profile
-   */
-  public getAzureProfileSync() {
-    return this.fileService.readFileSync(this.os.homedir() + '/' + environment.azureProfile);
-  }
-
-  /**
-   * Update the access token file synchronously
-   *
-   * @param azureProfile - the configuration object
-   */
-  public updateAzureProfileFileSync(azureProfile) {
-    return this.fileService.writeFileSync(this.os.homedir() + '/' + environment.azureProfile, azureProfile);
-  }
 
 
-  public getAzureConfigSync() {
-    return this.fileService.readFileSync(this.os.homedir() + '/' + environment.azureAccessTokens);
-  }
-
-  /**
-   * Update the access token file synchronously
-   *
-   * @param azureConfig - the configuration object
-   */
-  public updateAzureAccessTokenFileSync(azureConfig) {
-    return this.fileService.writeFileSync(this.os.homedir() + '/' + environment.azureAccessTokens, azureConfig);
-  }
-
-  public isAzureConfigPresent() {
-    return this.fileService.exists(this.os.homedir() + '/' + environment.azureAccessTokens);
-  }
 
   /**
    * Clean the data in the program
@@ -122,57 +91,4 @@ export class ConfigurationService extends NativeService {
     }
   }
 
-  public getNameFromProfileId(id: string): string {
-    const workspace = this.workspaceService.get();
-    const session = workspace.profiles.filter(p => p.id === id)[0];
-    return session ? session.name : '';
-  }
-
-  public cleanAzureCrendentialFile() {
-    /*const workspace = this.workspaceService.get();
-    if (workspace && this.isAzureConfigPresent()) {
-      workspace.azureProfile = this.getAzureProfileSync();
-      workspace.azureConfig = this.getAzureConfigSync();
-      if (workspace.azureConfig === '[]') {
-        // Anomalous condition revert to normal az login procedure
-        workspace.azureProfile = null;
-        workspace.azureConfig = null;
-      }
-
-      this.workspaceService.updateSessions(workspace);
-    }
-    if (this.processSubscription3) { this.processSubscription3.unsubscribe(); }
-    this.processSubscription3 = this.executeService.execute('az account clear 2>&1').pipe(
-      switchMap(() => this.executeService.execute('az configure --defaults location=\'\' 2>&1'))
-    ).subscribe(() => {}, () => {});*/
-  }
-
-  public sanitizeIdpUrlsAndNamedProfiles() {
-    /*const workspace = this.getDefaultWorkspaceSync();
-
-    const idpUrls = workspace.idpUrl;
-    const profiles = workspace.profiles;
-
-    const sanitizedIdpUrls = [];
-    const sanitizedProfiles = [];
-
-    if (idpUrls && profiles) {
-      idpUrls.forEach((idpUrl) => {
-        if (idpUrl !== null && idpUrl !== undefined) {
-          sanitizedIdpUrls.push(idpUrl);
-        }
-      });
-
-      profiles.forEach((profile) => {
-        if (profile !== null && profile !== undefined) {
-          sanitizedProfiles.push(profile);
-        }
-      });
-
-      workspace.idpUrl = sanitizedIdpUrls;
-      workspace.profiles = sanitizedProfiles;
-
-      this.updateWorkspaceSync(workspace);
-    }*/
-  }
 }

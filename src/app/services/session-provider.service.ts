@@ -3,26 +3,30 @@ import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
 import {FileService} from './file.service';
-import {SessionService} from './session.service';
+import {AwsSessionService} from './aws-session.service';
 import {SessionType} from '../models/session-type';
 import {AwsPlainService} from './session/aws-plain.service';
 import {AwsTrusterService} from './session/aws-truster.service';
 import {AwsFederatedService} from './session/aws-federated.service';
-import {AwsSsoService} from "./session/aws-sso.service";
-import {AwsSsoSessionProviderService} from "./providers/aws-sso-session-provider.service";
+import {AwsSsoService} from './session/aws-sso.service';
+import {AwsSsoSessionProviderService} from './providers/aws-sso-session-provider.service';
+import {AzureService} from './session/azure.service';
+import {ExecuteService} from './execute.service';
+import {SessionService} from './session.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SessionProviderService {
 
-  private sessionServiceCache: SessionService[] = [];
+  private sessionServiceCache: AwsSessionService[] = [];
 
   constructor(
     private workspaceService: WorkspaceService,
     private keychainService: KeychainService,
     private appService: AppService,
     private awsSsoProviderService: AwsSsoSessionProviderService,
+    private executeService: ExecuteService,
     private fileService: FileService) {}
 
   getService(accountType: SessionType): SessionService {
@@ -67,6 +71,8 @@ export class SessionProviderService {
   }
 
   private getAzureSessionService(accountType: SessionType) {
-    return undefined;
+    const service = new AzureService(this.workspaceService, this.fileService, this.appService, this.executeService);
+    this.sessionServiceCache[accountType.toString()] = service;
+    return service;
   }
 }

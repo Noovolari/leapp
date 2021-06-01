@@ -1,6 +1,6 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../../models/session';
-import {SessionService} from '../../../services/session.service';
+import {AwsSessionService} from '../../../services/aws-session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
 import {Router} from '@angular/router';
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
@@ -9,15 +9,12 @@ import {SessionType} from '../../../models/session-type';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {environment} from '../../../../environments/environment';
 import {KeychainService} from '../../../services/keychain.service';
-import {AwsSsoSession} from '../../../models/aws-sso-session';
 import * as uuid from 'uuid';
-import {AwsPlainSession} from '../../../models/aws-plain-session';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {FileService} from '../../../services/file.service';
 import {SessionProviderService} from '../../../services/session-provider.service';
 import {SessionStatus} from '../../../models/session-status';
-import {AwsTrusterSession} from '../../../models/aws-truster-session';
-import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-error';
+import {SessionService} from '../../../services/session.service';
 
 @Component({
   selector: 'app-session-card',
@@ -124,8 +121,7 @@ export class SessionCardComponent implements OnInit {
   deleteSession(session, event) {
     event.stopPropagation();
 
-    const trusterSessions = this.sessionService.listTruster(session);
-    const dialogMessage = this.generateDeleteDialogMessage(trusterSessions);
+    const dialogMessage = this.generateDeleteDialogMessage(session);
 
     this.appService.confirmDialog(dialogMessage, () => {
       this.sessionService.delete(session.sessionId);
@@ -133,19 +129,6 @@ export class SessionCardComponent implements OnInit {
     });
   }
 
-  private generateDeleteDialogMessage(trusterSessions: Session[]): string {
-    let trusterSessionString = '';
-    trusterSessions.forEach(sess => {
-      trusterSessionString += `<li><div class="removed-sessions"><b>${sess.sessionName}</b></div></li>`;
-    });
-    if (trusterSessionString !== '') {
-      return 'This session has truster sessions: <br><ul>' +
-        trusterSessionString +
-        '</ul><br>Removing the session will also remove the truster session associated with it. Do you want to proceed?';
-    } else {
-      return 'Do you really want to delete this session?';
-    }
-  }
 
   /**
    * Edit Session
@@ -217,27 +200,17 @@ export class SessionCardComponent implements OnInit {
    * @param event - the change select event
    * @param session - The session in which the AWS region need to change
    */
-  changeSsmRegion(event, session: Session) {
+  async changeSsmRegion(event, session: Session) {
+    // We have a valid SSM region
     if (this.selectedSsmRegion) {
+      // Start process
       this.ssmLoading = true;
-
-      const account = `Leapp-ssm-data-${this.getProfileId(session)}`;
-
-      // Set the aws credentials to instanziate the ssm client
-      this.keychainService.getSecret(environment.appName, account).then(creds => {
-        const credentials = JSON.parse(creds);
-
-        // Check the result of the call
-        this.ssmService.setInfo(credentials, this.selectedSsmRegion).subscribe(result => {
-          this.instances = result.instances;
-          this.duplicateInstances = this.instances;
-          this.ssmLoading = false;
-        }, () => {
-          this.instances = [];
-          this.ssmLoading = false;
-        });
-      });
-
+      // Generate valid temporary credentials for the SSM and EC2 client
+      const credentials = await (this.sessionService as AwsSessionService).generateCredentials(session.sessionId);
+      // Get the instances
+      this.instances = await this.ssmService.getSsmInstances(credentials, this.selectedSsmRegion);
+      this.duplicateInstances = this.instances;
+      this.ssmLoading = false;
     }
   }
 
@@ -305,7 +278,7 @@ export class SessionCardComponent implements OnInit {
     if(session.type !== SessionType.azure) {
       return (session as any).profileId;
     } else {
-      throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
+      return undefined;
     }
   }
 
@@ -356,5 +329,24 @@ export class SessionCardComponent implements OnInit {
         account: session.sessionName,
         type: session.type
       }, null, 3));
+  }
+
+  private generateDeleteDialogMessage(session: Session): string {
+    let trusterSessions = [];
+    if (session.type !== SessionType.azure) {
+      trusterSessions = (this.sessionService as AwsSessionService).listTruster(session);
+    }
+
+    let trusterSessionString = '';
+    trusterSessions.forEach(sess => {
+      trusterSessionString += `<li><div class="removed-sessions"><b>${sess.sessionName}</b></div></li>`;
+    });
+    if (trusterSessionString !== '') {
+      return 'This session has truster sessions: <br><ul>' +
+        trusterSessionString +
+        '</ul><br>Removing the session will also remove the truster session associated with it. Do you want to proceed?';
+    } else {
+      return 'Do you really want to delete this session?';
+    }
   }
 }

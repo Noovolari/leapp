@@ -5,7 +5,7 @@ import {NativeService} from '../native-service';
 import {AppService} from '../app.service';
 import {KeychainService} from '../keychain.service';
 import {environment} from '../../../environments/environment';
-import {SessionService} from '../session.service';
+import {AwsSessionService} from '../aws-session.service';
 import {WorkspaceService} from '../workspace.service';
 import {AwsSsoService} from '../session/aws-sso.service';
 
@@ -62,7 +62,7 @@ export class AwsSsoSessionProviderService extends NativeService {
   constructor(private appService: AppService,
               private keychainService: KeychainService,
               private workspaceService: WorkspaceService,
-              private sessionService: SessionService
+              private awsSessionService: AwsSessionService
               ) {
     super();
   }
@@ -115,6 +115,7 @@ export class AwsSsoSessionProviderService extends NativeService {
   async getAccessToken(region: string, portalUrl: string): Promise<string> {
     if (this.ssoExpired()) {
       // Get login
+      this.getSsoOidcClient(region);
       const loginResponse = await this.login(region, portalUrl);
       // Set configuration related data to workspace
       this.configureAwsSso(
@@ -253,12 +254,12 @@ export class AwsSsoSessionProviderService extends NativeService {
   }
 
   private removeSsoSessionsFromWorkspace(): void {
-    const sessions = this.sessionService.listSso();
+    const sessions = this.awsSessionService.listSso();
     sessions.forEach(sess => {
       // Verify and delete eventual truster sessions from old Sso session
-      const trusterSessions = this.sessionService.listTruster(sess);
+      const trusterSessions = this.awsSessionService.listTruster(sess);
       trusterSessions.forEach(session => {
-          this.sessionService.delete(session.sessionId);
+          this.awsSessionService.delete(session.sessionId);
       });
 
       // Now we can safely remove

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { RotationService } from './rotation.service';
 import {mustInjected} from '../../base-injectables';
-import {SessionService} from './session.service';
+import {AwsSessionService} from './aws-session.service';
 import {SessionProviderService} from './session-provider.service';
 import {Session} from '../models/session';
 import {Account} from '../models/account';
@@ -29,7 +29,7 @@ describe('RotationService', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: SessionService, useValue: spySessionService },
+        { provide: AwsSessionService, useValue: spySessionService },
         { provide: SessionProviderService, useValue: spySessionProviderService },
       ].concat(mustInjected())
     });

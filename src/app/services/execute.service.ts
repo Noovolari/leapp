@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import {NativeService} from './native-service';
-import {Observable} from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class ExecuteServiceService extends NativeService {
+export class ExecuteService extends NativeService {
   /**
    * Execute a command: if the command contains sudo the system launch it with sudo prompt.
    * Note: with the current version of Electron the sandbox option for Chromium don't allow for sudo prompt on Ubuntu machines 16+
@@ -14,12 +13,11 @@ export class ExecuteServiceService extends NativeService {
    * @returns an {Observable<any>} to use for subscribing to success or error event on the command termination:
    *          the default unix standard is used so 0 represent a success code, everything else is an error code
    */
-  public execute(command: string, force?: boolean): Observable<any> {
-    return new Observable(
-      subscriber => {
+  public execute(command: string, force?: boolean): Promise<string> {
+    return new Promise(
+      (resolve, reject) => {
         if (force) {
-          subscriber.next('');
-          subscriber.complete();
+          resolve('');
         }
 
         let exec = this.exec;
@@ -39,11 +37,10 @@ export class ExecuteServiceService extends NativeService {
         exec(command, {name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
           this.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
           if (err) {
-            subscriber.error(err);
+            reject(err);
           } else {
-            subscriber.next(stdout ? stdout : stderr);
+            resolve(stdout ? stdout : stderr);
           }
-          subscriber.complete();
         });
       }
     );
@@ -55,7 +52,7 @@ export class ExecuteServiceService extends NativeService {
    * @param command - the command to launch in terminal
    * @returns an {Observable<any>} to subscribe to
    */
-  public openTerminal(command: string): Observable<any> {
+  public openTerminal(command: string): Promise<string> {
     if (this.process.platform === 'darwin') {
       return this.execute(`osascript -e "tell app \\"Terminal\\"
                               do script \\"${command}\\"

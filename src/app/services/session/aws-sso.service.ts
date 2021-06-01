@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {SessionService} from '../session.service';
+import {AwsSessionService} from '../aws-session.service';
 import {WorkspaceService} from '../workspace.service';
 import {CredentialsInfo} from '../../models/credentials-info';
 import {AwsSsoSessionProviderService} from '../providers/aws-sso-session-provider.service';
@@ -18,7 +18,7 @@ export interface AwsSsoSessionRequest {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsSsoService extends SessionService {
+export class AwsSsoService extends AwsSessionService {
 
   constructor(
     protected workspaceService: WorkspaceService,

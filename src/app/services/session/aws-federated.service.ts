@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {SessionService} from '../session.service';
+import {AwsSessionService} from '../aws-session.service';
 import {CredentialsInfo} from '../../models/credentials-info';
 import {WorkspaceService} from '../workspace.service';
 import {KeychainService} from '../keychain.service';
@@ -27,7 +27,7 @@ export interface ResponseHookDetails {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsFederatedService extends SessionService {
+export class AwsFederatedService extends AwsSessionService {
 
   constructor(protected workspaceService: WorkspaceService,
               private keychainService: KeychainService,

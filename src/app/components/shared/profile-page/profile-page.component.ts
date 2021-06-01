@@ -9,7 +9,7 @@ import {Constants} from '../../../models/constants';
 import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
-import {SessionService} from '../../../services/session.service';
+import {AwsSessionService} from '../../../services/aws-session.service';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {Session} from '../../../models/session';
 import {SessionType} from '../../../models/session-type';
@@ -64,7 +64,7 @@ export class ProfilePageComponent implements OnInit {
     private configurationService: ConfigurationService,
     private appService: AppService,
     private fileService: FileService,
-    private sessionService: SessionService,
+    private sessionService: AwsSessionService,
     private workspaceService: WorkspaceService,
     private router: Router
   ) {}

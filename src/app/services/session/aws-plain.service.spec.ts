@@ -14,7 +14,7 @@ import {LeappBaseError} from '../../errors/leapp-base-error';
 
 import * as AWSMock from 'aws-sdk-mock';
 import * as AWS from 'aws-sdk';
-import {AwsPlainSession} from '../../models/aws-plain-session.ts';
+import {AwsPlainSession} from '../../models/aws-plain-session';
 
 let spyAppService;
 let spyFileService;
@@ -202,7 +202,7 @@ describe('AwsPlainService', () => {
 
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
-      (mockedSessions[0].account as AwsPlainSession).sessionTokenExpiration = new Date(Date.now() - environment.sessionTokenDuration - 1000).toISOString();
+      (mockedSessions[0] as AwsPlainSession).sessionTokenExpiration = new Date(Date.now() - environment.sessionTokenDuration - 1000).toISOString();
 
       spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsPlainService, 'generateCredentials').and.callThrough();
@@ -243,8 +243,8 @@ describe('AwsPlainService', () => {
 
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
-      (mockedSessions[0].account as AwsPlainSession).mfaDevice = 'fake-device-arn';
-      (mockedSessions[0].account as AwsPlainSession).sessionTokenExpiration = new Date(Date.now() - 10000).toISOString();
+      (mockedSessions[0] as AwsPlainSession).mfaDevice = 'fake-device-arn';
+      (mockedSessions[0] as AwsPlainSession).sessionTokenExpiration = new Date(Date.now() - 10000).toISOString();
 
       spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsPlainService, 'generateCredentials').and.callThrough();
@@ -281,7 +281,7 @@ describe('AwsPlainService', () => {
       mockedSessions = [];
       awsPlainService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
       // Fake date in the future to prevent token expiration
-      (mockedSessions[0].account as AwsPlainSession).sessionTokenExpiration = new Date(Date.now() + 1000).toISOString();
+      (mockedSessions[0] as AwsPlainSession).sessionTokenExpiration = new Date(Date.now() + 1000).toISOString();
 
       spyOn(awsPlainService, 'get').and.callFake((_: string) => mockedSessions[0]);
       spyOn(awsPlainService, 'generateCredentials').and.callThrough();

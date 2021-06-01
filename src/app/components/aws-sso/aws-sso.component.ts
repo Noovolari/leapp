@@ -36,7 +36,6 @@ export class AwsSsoComponent implements OnInit {
 
   ngOnInit() {
     this.awsSsoProviderService.awsSsoActive().then(res => {
-      console.log(res);
       this.isAwsSsoActive = res;
       this.setValues();
     });

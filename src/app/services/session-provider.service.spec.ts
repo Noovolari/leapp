@@ -2,7 +2,7 @@ import {TestBed} from '@angular/core/testing';
 
 import {SessionProviderService} from './session-provider.service';
 import {mustInjected} from '../../base-injectables';
-import {SessionService} from './session.service';
+import {AwsSessionService} from './aws-session.service';
 import {SessionType} from '../models/session-type';
 import {AwsPlainService} from './session/aws-plain.service';
 import {WorkspaceService} from './workspace.service';
@@ -41,14 +41,14 @@ describe('SessionProviderService', () => {
   });
 
   it('should return a Aws Plain Service when requested with AccountType AWS_PLAIN_USER', () => {
-    const awsPlainService: SessionService = sessionProvider.getService(SessionType.awsPlain);
+    const awsPlainService: AwsSessionService = sessionProvider.getService(SessionType.awsPlain);
     expect(awsPlainService).toBeInstanceOf(AwsPlainService);
   });
 
   it('should return the same Service (Singleton) when requested more than one time', () => {
-    const awsPlainService: SessionService = sessionProvider.getService(SessionType.awsPlain);
-    const awsPlainServiceCopy: SessionService = sessionProvider.getService(SessionType.awsPlain);
-    const awsPlainServiceCopy2: SessionService = sessionProvider.getService(SessionType.awsPlain);
+    const awsPlainService: AwsSessionService = sessionProvider.getService(SessionType.awsPlain);
+    const awsPlainServiceCopy: AwsSessionService = sessionProvider.getService(SessionType.awsPlain);
+    const awsPlainServiceCopy2: AwsSessionService = sessionProvider.getService(SessionType.awsPlain);
 
     expect(awsPlainService).toEqual(awsPlainServiceCopy);
     expect(awsPlainServiceCopy).toEqual(awsPlainServiceCopy2);

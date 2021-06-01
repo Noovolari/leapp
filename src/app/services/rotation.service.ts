@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {SessionService} from './session.service';
+import {AwsSessionService} from './aws-session.service';
 import {SessionProviderService} from './session-provider.service';
 
 @Injectable({
@@ -8,7 +8,7 @@ import {SessionProviderService} from './session-provider.service';
 export class RotationService {
 
   constructor(
-    private sessionService: SessionService,
+    private sessionService: AwsSessionService,
     private sessionProviderService: SessionProviderService) { }
 
   rotate(): void {

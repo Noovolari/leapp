@@ -18,7 +18,7 @@
       <i class="fa fa-ellipsis-v"></i>
     </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
-      <a (click)="ssmModalOpen(session);" *ngIf="(session.type === eSessionType.awsFederated || session.type === eSessionType.awsPlain || session.type === eSessionType.awsSso) && session.status === eSessionStatus.active">SSM session</a>
+      <a (click)="ssmModalOpen(session);" *ngIf="session.type !== eSessionType.azure">SSM session</a>
       <a (click)="changeRegionModalOpen(session);">Change {{session.type === eSessionType.azure ? 'location' : 'region'}}</a>
 
       <a *ngIf="session.type !== eSessionType.azure" (click)="changeProfileModalOpen();">Change Profile</a>

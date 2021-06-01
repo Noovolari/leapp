@@ -1,18 +1,15 @@
-import {Injectable} from '@angular/core';
+import { Injectable } from '@angular/core';
 import {NativeService} from './native-service';
+import {CredentialsInfo} from '../models/credentials-info';
+import {SessionStatus} from '../models/session-status';
 import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
-import {CredentialsInfo} from '../models/credentials-info';
-import {SessionType} from '../models/session-type';
-import {SessionStatus} from '../models/session-status';
-import {AwsTrusterSession} from '../models/aws-truster-session';
 
 @Injectable({
   providedIn: 'root'
 })
 export abstract class SessionService extends NativeService {
 
-  /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(protected workspaceService: WorkspaceService) {
     super();
   }
@@ -22,82 +19,15 @@ export abstract class SessionService extends NativeService {
     return sessionFiltered ? sessionFiltered : null;
   }
 
-
-
   list(): Session[] {
     return this.workspaceService.sessions;
-  }
-
-  listTruster(parentSession?: Session): Session[] {
-    let childSession = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsTruster ) : [];
-    if (parentSession) {
-      childSession = childSession.filter(session => (session as AwsTrusterSession).parentSessionId === parentSession.sessionId );
-    }
-    return childSession;
-  }
-
-  listSso() {
-    const ssoSessions = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsSso ) : [];
-    return ssoSessions;
   }
 
   listActive(): Session[] {
     return (this.list().length > 0) ? this.list().filter( (session) => session.status === SessionStatus.active ) : [];
   }
 
-  listAwsAssumable(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure ) : [];
-  }
-
-  async delete(sessionId: string): Promise<void> {
-    try {
-      await this.stop(sessionId);
-      this.listTruster(this.get(sessionId)).forEach(sess => {
-        if (sess.status === SessionStatus.active) {
-          this.stop(sess.sessionId);
-        }
-        this.workspaceService.removeSession(sess.sessionId);
-      });
-      this.workspaceService.removeSession(sessionId);
-    } catch(error) {
-      this.sessionError(sessionId, error);
-    }
-  }
-
-  async start(sessionId: string): Promise<void> {
-    try {
-      this.stopAllWithSameProfile(sessionId);
-      this.sessionLoading(sessionId);
-      const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(sessionId, credentialsInfo);
-      this.sessionActivate(sessionId);
-    } catch (error) {
-      this.sessionError(sessionId, error);
-    }
-  }
-
-  async stop(sessionId: string): Promise<void> {
-    try {
-      await this.deApplyCredentials(sessionId);
-      this.sessionDeactivated(sessionId);
-    } catch (error) {
-      this.sessionError(sessionId, error);
-    }
-  }
-
-  async rotate(sessionId: string): Promise<void> {
-    try {
-      this.sessionLoading(sessionId);
-      const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(sessionId, credentialsInfo);
-      this.sessionRotated(sessionId);
-    } catch (error) {
-      this.sessionError(sessionId, error);
-    }
-  }
-
-  // TODO: move to model change method signature
-  private sessionLoading(sessionId: string) {
+  protected sessionLoading(sessionId: string) {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
@@ -108,7 +38,7 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  private sessionActivate(sessionId: string) {
+  protected sessionActivate(sessionId: string) {
     const index = this.workspaceService.sessions.findIndex(s => s.sessionId === sessionId);
     if (index > -1) {
       const currentSession: Session = this.workspaceService.sessions[index];
@@ -119,7 +49,7 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  private sessionRotated(sessionId: string) {
+  protected sessionRotated(sessionId: string) {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
@@ -131,12 +61,12 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  private sessionError(sessionId: string, error: any) {
+  protected sessionError(sessionId: string, error: any) {
     this.sessionDeactivated(sessionId);
     throw error;
   }
 
-  private sessionDeactivated(sessionId: string) {
+  protected sessionDeactivated(sessionId: string) {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
       const index = this.workspaceService.sessions.indexOf(session);
@@ -149,24 +79,11 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  private stopAllWithSameProfile(sessionId: string) {
-    // Get profile to check
-    const session = this.get(sessionId);
-    const profileId = (session as any).profileId;
-    // Get all active sessions
-    const activeSessions = this.listActive();
-    // Stop all that shares the same profile
-    activeSessions.forEach(sess => {
-      if( (sess as any).profileId === profileId ) {
-        this.stop(sess.sessionId);
-      }
-    });
-  }
+  abstract delete(sessionId: string): Promise<void>;
 
-  abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
-  abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
-  abstract deApplyCredentials(sessionId: string): Promise<void>;
+  abstract start(sessionId: string): Promise<void>;
 
+  abstract stop(sessionId: string): Promise<void>;
 
-
+  abstract rotate(sessionId: string): Promise<void>;
 }

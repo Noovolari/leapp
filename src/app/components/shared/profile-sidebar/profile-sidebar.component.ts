@@ -2,9 +2,8 @@ import {Component, OnInit, Renderer2} from '@angular/core';
 import {AppService, LoggerLevel} from '../../../services/app.service';
 import {Router} from '@angular/router';
 import {HttpClient} from '@angular/common/http';
-import {ExecuteServiceService} from '../../../services/execute-service.service';
+import {ExecuteService} from '../../../services/execute.service';
 import {ProxyService} from '../../../services/proxy.service';
-import {Subscription} from 'rxjs';
 import {WorkspaceService} from '../../../services/workspace.service';
 
 @Component({
@@ -17,14 +16,11 @@ export class ProfileSidebarComponent implements OnInit {
   profileOpen = false;
   test: any;
 
-  /* Profile Sidebar with links */
-  private execSubscription: Subscription;
-
   constructor(
     private appService: AppService,
     private router: Router,
     private httpClient: HttpClient,
-    private executeService: ExecuteServiceService,
+    private executeService: ExecuteService,
     private proxyService: ProxyService,
     private workspaceService: WorkspaceService,
     private renderer: Renderer2
@@ -47,18 +43,7 @@ export class ProfileSidebarComponent implements OnInit {
   /**
    * logout from Leapp
    */
-  logout() {
-    // Data clean
-    // const workspace = this.workspaceService.get();
-    // this.configurationService.logout();
-    this.appService.logger('Cleaning Azure config files...', LoggerLevel.info, this);
-
-    if (this.execSubscription) {
- this.execSubscription.unsubscribe();
-}
-    this.execSubscription = this.executeService.execute('az account clear 2>&1').subscribe(() => {}, () => {});
-  }
-
+  logout() {}
 
   closeProfile() {
     this.profileOpen = false;

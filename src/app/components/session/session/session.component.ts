@@ -7,7 +7,7 @@ import {HttpClient} from '@angular/common/http';
 import {Session} from '../../../models/session';
 import {SsmService} from '../../../services/ssm.service';
 import {FileService} from '../../../services/file.service';
-import {SessionService} from '../../../services/session.service';
+import {AwsSessionService} from '../../../services/aws-session.service';
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
 import {AzureSession} from '../../../models/azure-session';
 import {BsModalService} from 'ngx-bootstrap/modal';
@@ -57,7 +57,7 @@ export class SessionComponent implements OnInit {
     private appService: AppService,
     private ssmService: SsmService,
     private fileService: FileService,
-    private sessionService: SessionService,
+    private sessionService: AwsSessionService,
     private zone: NgZone,
   ) {}
 

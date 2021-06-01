@@ -1,6 +1,6 @@
 import {Injectable} from '@angular/core';
 import {CredentialsInfo} from '../../models/credentials-info';
-import {SessionService} from '../session.service';
+import {AwsSessionService} from '../aws-session.service';
 import {WorkspaceService} from '../workspace.service';
 import {AwsPlainSession} from '../../models/aws-plain-session';
 import {KeychainService} from '../keychain.service';
@@ -26,7 +26,7 @@ export interface AwsPlainSessionRequest {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsPlainService extends SessionService {
+export class AwsPlainService extends AwsSessionService {
 
   constructor(
     protected workspaceService: WorkspaceService,

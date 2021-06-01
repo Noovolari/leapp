@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {ConfigurationService} from '../../../services/configuration.service';
 import {FileService} from '../../../services/file.service';
-import {SessionService} from '../../../services/session.service';
+import {AwsSessionService} from '../../../services/aws-session.service';
 import {AppService, LoggerLevel} from '../../../services/app.service';
 import {Session} from '../../../models/session';
 import {SessionType} from '../../../models/session-type';
@@ -25,7 +25,7 @@ export class TrayMenuComponent implements OnInit {
   constructor(private workspaceService: WorkspaceService,
               private configurationService: ConfigurationService,
               private fileService: FileService,
-              private sessionService: SessionService,
+              private sessionService: AwsSessionService,
               private appService: AppService) {
   }
 

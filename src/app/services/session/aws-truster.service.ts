@@ -1,5 +1,5 @@
 import {Inject, Injectable} from '@angular/core';
-import {SessionService} from '../session.service';
+import {AwsSessionService} from '../aws-session.service';
 import {CredentialsInfo} from '../../models/credentials-info';
 import {WorkspaceService} from '../workspace.service';
 import {FileService} from '../file.service';
@@ -20,7 +20,7 @@ export interface AwsTrusterSessionRequest {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsTrusterService extends SessionService {
+export class AwsTrusterService extends AwsSessionService {
   private factoryFunction: any;
 
   constructor(

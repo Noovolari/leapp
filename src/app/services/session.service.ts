@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import {NativeService} from './native-service';
-import {CredentialsInfo} from '../models/credentials-info';
 import {SessionStatus} from '../models/session-status';
 import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';

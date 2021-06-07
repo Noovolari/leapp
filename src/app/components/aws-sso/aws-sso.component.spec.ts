@@ -2,7 +2,6 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {AwsSsoComponent} from './aws-sso.component';
 import {mustInjected} from '../../../base-injectables';
-import {IntegrationsService} from '../../integrations/integrations.service';
 import {RouterTestingModule} from '@angular/router/testing';
 import {KeychainService} from '../../services/keychain.service';
 
@@ -24,7 +23,7 @@ describe('AwsSsoComponent', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
       declarations: [AwsSsoComponent],
-      providers: [IntegrationsService, { provide: KeychainService, useValue: spyKeychainService }].concat(mustInjected())
+      providers: [{ provide: KeychainService, useValue: spyKeychainService }].concat(mustInjected())
     }).compileComponents();
 
     fixture = TestBed.createComponent(AwsSsoComponent);

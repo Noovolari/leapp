@@ -3,16 +3,17 @@ import {TestBed} from '@angular/core/testing';
 import {Workspace} from '../models/workspace';
 import {mustInjected} from '../../base-injectables';
 import {Session} from '../models/session';
-import {AwsPlainSession} from '../models/aws-plain-session.ts';
+import {AwsPlainSession} from '../models/aws-plain-session';
 import {serialize} from 'class-transformer';
 import {AppService} from './app.service';
 import {FileService} from './file.service';
+import SpyObj = jasmine.SpyObj;
 
 describe('WorkspaceService', () => {
-  let workspaceService;
+  let workspaceService: WorkspaceService;
   let workspace;
   let mockedSession;
-  let spyAppService;
+  let spyAppService: SpyObj<AppService>;
   let spyFileService;
 
   beforeEach(() => {
@@ -39,7 +40,7 @@ describe('WorkspaceService', () => {
     workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;
     workspace = workspaceService.create();
 
-    mockedSession = new Session(new AwsPlainSession('', '', ''), 'profile');
+    mockedSession = new AwsPlainSession('a', 'eu-west-1', 'profile', '');
   });
 
   it('should be created', () => {
@@ -48,13 +49,13 @@ describe('WorkspaceService', () => {
 
   describe('create()', () => {
     it('should persist code in the .Leapp-lock.json file the first time is called', () => {
-      spyOn(workspaceService, 'persist').and.callThrough();
+      spyOn<any>(workspaceService, 'persist').and.callThrough();
       // Mock first time access
       spyFileService.exists.and.returnValue(false);
       spyFileService.newDir.and.returnValue(false);
       // Call create
       workspaceService.create();
-      expect(workspaceService.persist).toHaveBeenCalled();
+      expect((workspaceService as any).persist).toHaveBeenCalled();
     });
 
     it('should not create a second instance of Workspace after first one', () => {
@@ -63,7 +64,7 @@ describe('WorkspaceService', () => {
       const workspace1 = workspaceService.get();
       workspace1.sessions.push(mockedSession);
       spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace1) );
-      workspaceService.updatePersistedSessions(workspace1.sessions);
+      (workspaceService as any).updatePersistedSessions(workspace1.sessions);
 
       workspaceService.create();
       const workspace2 = workspaceService.get();
@@ -89,8 +90,8 @@ describe('WorkspaceService', () => {
 
       workspace.sessions.push(mockedSession);
 
-      expect(workspaceService.getPersistedSessions()).toBeInstanceOf(Array);
-      expect(workspaceService.getPersistedSessions()[0]).toBeInstanceOf(Session);
+      expect((workspaceService as any).getPersistedSessions()).toBeInstanceOf(Array);
+      expect((workspaceService as any).getPersistedSessions()[0]).toBeInstanceOf(Session);
     });
   });
 
@@ -120,11 +121,11 @@ describe('WorkspaceService', () => {
       workspace = new Workspace();
       workspace.sessions.push(mockedSession);
 
-      spyOn(workspaceService._sessions, 'next').and.callThrough();
+      spyOn((workspaceService as any)._sessions, 'next').and.callThrough();
 
       workspaceService.sessions = [...workspace.sessions];
 
-      expect(workspaceService._sessions.next).toHaveBeenCalled();
+      expect((workspaceService as any)._sessions.next).toHaveBeenCalled();
     });
   });
 
@@ -150,13 +151,13 @@ describe('WorkspaceService', () => {
 
     it('should invoke next and persist data', () => {
 
-      spyOn(workspaceService._sessions, 'next').and.callThrough();
-      spyOn(workspaceService, 'persist').and.callThrough();
+      spyOn((workspaceService as any)._sessions, 'next').and.callThrough();
+      spyOn<any>(workspaceService, 'persist').and.callThrough();
 
       workspaceService.addSession(mockedSession);
 
-      expect(workspaceService._sessions.next).toHaveBeenCalled();
-      expect(workspaceService.persist).toHaveBeenCalled();
+      expect((workspaceService as any)._sessions.next).toHaveBeenCalled();
+      expect((workspaceService as any).persist).toHaveBeenCalled();
     });
   });
 

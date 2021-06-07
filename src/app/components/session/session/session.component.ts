@@ -12,10 +12,8 @@ import {AwsFederatedSession} from '../../../models/aws-federated-session';
 import {AzureSession} from '../../../models/azure-session';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {SessionType} from '../../../models/session-type';
-import {AwsPlainSession} from '../../../models/aws-plain-session';
-import {AwsTrusterSession} from '../../../models/aws-truster-session';
-import {AwsSsoSession} from '../../../models/aws-sso-session';
 import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-error';
+
 @Component({
   selector: 'app-session',
   templateUrl: './session.component.html',
@@ -62,20 +60,8 @@ export class SessionComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-
-
     // Set regions for ssm
     this.ssmRegions = this.appService.getRegions();
-
-  }
-
-
-  /**
-   * Stop the current session, setting it to false and updating the workspace
-   */
-  stopSession(session: Session) {
-    this.sessionService.stop(session.sessionId);
-    return true;
   }
 
   /**
@@ -98,7 +84,6 @@ export class SessionComponent implements OnInit {
           ((s as AwsFederatedSession).roleArn && (s as AwsFederatedSession).roleArn.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           (this.getProfileName(this.getProfileId(s)).toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           (idpID.indexOf((s as AwsFederatedSession).idpUrlId) > -1) ||
-          // ((s.account as AwsPlainSession).user && (s.account as AwsPlainSession).user.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s as AzureSession).tenantId && (s as AzureSession).tenantId.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
           ((s as AzureSession).subscriptionId && (s as AzureSession).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);
       });
@@ -121,7 +106,6 @@ export class SessionComponent implements OnInit {
         break;
       }
     }
-
     return profileName;
   }
 

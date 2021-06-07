@@ -69,13 +69,11 @@ export class AzureService extends SessionService {
 
     // Try parse accessToken.json
     let accessTokensFile = this.parseAccessTokens();
-    console.log(accessTokensFile);
 
     // extract accessToken corresponding to the specific tenant (if not present, require az login)
     let accessTokenExpirationTime;
     if(accessTokensFile) {
       accessTokenExpirationTime = this.extractAccessTokenExpirationTime(accessTokensFile, (session as AzureSession).tenantId);
-      console.log(accessTokenExpirationTime);
     }
 
     if (!accessTokenExpirationTime) {

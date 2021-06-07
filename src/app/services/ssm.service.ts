@@ -1,9 +1,8 @@
 import {Injectable} from '@angular/core';
 import {ExecuteService} from './execute.service';
 import {AppService, LoggerLevel} from './app.service';
-import {AwsCredential} from '../models/credential';
 import {LeappBaseError} from '../errors/leapp-base-error';
-import {CredentialsInfo} from "../models/credentials-info";
+import {CredentialsInfo} from '../models/credentials-info';
 
 const AWS = require('aws-sdk');
 
@@ -37,13 +36,13 @@ export class SsmService {
    * Prepare the two clients and returns the available
    * ssm instances for the selected region
    *
-   * @param data - pass the credentials object
+   * @param credentials - pass the credentials object
    * @param region - pass the region where you want to make the request
    * @returns - {Observable<SsmResult>} - return the list of instances capable of SSM in the selected region
    */
-  async getSsmInstances(data: any, region): Promise<any> {
+  async getSsmInstances(credentials: any, region): Promise<any> {
     // Set your SSM client and EC2 client
-    AWS.config.update(SsmService.setConfig(data, region));
+    AWS.config.update(SsmService.setConfig(credentials, region));
     this.ssmClient = new AWS.SSM();
     this.ec2Client = new AWS.EC2();
 

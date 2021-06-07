@@ -189,6 +189,8 @@ describe('SessionService', () => {
  throw new LeappNotFoundError(this, 'exploded fake function');
 });
 
+
+
       service.start('fakeid');
       expect((service as any).sessionError).toHaveBeenCalled();
     });

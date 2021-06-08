@@ -58,6 +58,7 @@ export class SessionFactoryService {
 
   private getAwsTrusterSessionService(accountType: SessionType) {
     const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService);
+    // TODO: check if there is another way to avoid circular dependency
     service.setFactoryFunction(this.getService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;

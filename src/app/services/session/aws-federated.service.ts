@@ -96,7 +96,7 @@ export class AwsFederatedService extends AwsSessionService {
     // Get the session in question
     const session = this.get(sessionId);
 
-    // Get idp Url
+    // Get idpUrl
     const idpUrl = this.workspaceService.getIdpUrl((session as AwsFederatedSession).idpUrlId);
 
     // Check if we need to authenticate

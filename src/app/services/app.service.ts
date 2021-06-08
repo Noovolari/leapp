@@ -17,6 +17,7 @@ export enum LoggerLevel {
   warn,
   error
 }
+
 /*
 * External enum to the toast level so we can use this to define the type of log
 */
@@ -33,8 +34,6 @@ export enum ToastLevel {
 export class AppService extends NativeService {
 
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
-  redrawList: EventEmitter<boolean> = new EventEmitter<boolean>();
-  refreshReturnStatusEmit: EventEmitter<any> = new EventEmitter<any>();
 
   stsEndpointsPerRegion = new Map([
     ['af-south-1', 'https://sts.af-south-1.amazonaws.com'],
@@ -85,7 +84,6 @@ export class AppService extends NativeService {
    * Return the app object from node
    */
   getApp() {
-
     return this.app;
   }
 
@@ -303,7 +301,6 @@ export class AppService extends NativeService {
 
   public async logout() {
     try {
-
       // Clear all extra data
       const getAppPath = this.path.join(this.app.getPath('appData'), environment.appName);
       this.rimraf.sync(getAppPath + '/Partitions/leapp*');
@@ -320,7 +317,6 @@ export class AppService extends NativeService {
       setTimeout(() => {
         this.restart();
       }, 2000);
-
     } catch (err) {
       this.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
       this.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
@@ -437,7 +433,6 @@ export class AppService extends NativeService {
    * @returns - {any} - the
    */
   extractAccountNumberFromIdpArn(value) {
-
     const values = value.split(':');
     if (
       values.length === 6 &&
@@ -629,5 +624,3 @@ export class AppService extends NativeService {
     });
   }
 }
-
-

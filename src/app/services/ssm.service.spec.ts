@@ -5,7 +5,7 @@ import {mustInjected} from '../../base-injectables';
 
 describe('SsmService', () => {
   beforeEach(() => TestBed.configureTestingModule({
-    providers: [].concat(mustInjected())
+    providers: [SsmService].concat(mustInjected())
   }));
 
   it('should be created', () => {

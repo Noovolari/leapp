@@ -3,9 +3,8 @@ import { TestBed } from '@angular/core/testing';
 import { RotationService } from './rotation.service';
 import {mustInjected} from '../../base-injectables';
 import {AwsSessionService} from './aws-session.service';
-import {SessionProviderService} from './session-provider.service';
+import {SessionFactoryService} from './session-factory.service';
 import {Session} from '../models/session';
-import {Account} from '../models/account';
 
 describe('RotationService', () => {
   let rotationService: RotationService;
@@ -18,7 +17,7 @@ describe('RotationService', () => {
 
   beforeEach(() => {
     spySessionService = jasmine.createSpyObj('SessionService', ['listActive']);
-    sessionActive = new Session(new Account('fakeaccount', 'eu-west-1'), 'fakeid');
+    sessionActive = new Session('fakeaccount', 'eu-west-1');
     sessionActive.active = true;
     spySessionService.listActive.and.returnValue([sessionActive]);
 
@@ -30,7 +29,7 @@ describe('RotationService', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: AwsSessionService, useValue: spySessionService },
-        { provide: SessionProviderService, useValue: spySessionProviderService },
+        { provide: SessionFactoryService, useValue: spySessionProviderService },
       ].concat(mustInjected())
     });
     rotationService = TestBed.inject(RotationService);

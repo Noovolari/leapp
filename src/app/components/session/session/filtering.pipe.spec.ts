@@ -1,6 +1,5 @@
 import {FilteringPipe} from './filtering.pipe';
 import {Session} from '../../../models/session';
-import {Account} from '../../models/account';
 import * as uuid from 'uuid';
 import {SessionStatus} from '../../../models/session-status';
 
@@ -9,11 +8,11 @@ let sessions: Session[] = [];
 describe('FilteringPipe', () => {
   beforeEach(() => {
     sessions = [];
-    sessions.push(new Session(new Account('account1', 'eu-west-1'), uuid.v4()));
-    sessions.push(new Session(new Account('account2', 'eu-west-1'), uuid.v4()));
-    sessions.push(new Session(new Account('account3', 'eu-west-1'), uuid.v4()));
-    sessions.push(new Session(new Account('account4', 'eu-west-1'), uuid.v4()));
-    sessions.push(new Session(new Account('account5', 'eu-west-1'), uuid.v4()));
+    sessions.push(new Session('account1', 'eu-west-1'));
+    sessions.push(new Session('account2', 'eu-west-1'));
+    sessions.push(new Session('account3', 'eu-west-1'));
+    sessions.push(new Session('account4', 'eu-west-1'));
+    sessions.push(new Session('account5', 'eu-west-1'));
 
     sessions[1].status = SessionStatus.active;
     sessions[2].status = SessionStatus.active;

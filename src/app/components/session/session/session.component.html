@@ -29,7 +29,7 @@
 
   <ul class="account-cards">
     <li style="position:relative;"> <span class="fixed-profiles">aws Profiles</span><span class="fixed-status">Status</span></li>
-    <li *ngIf="activeSessions.length !== 0">
+    <li *ngIf="(workspaceService.sessions$ | async | filtering:true).length !== 0">
       <h3 class="mb-session">Active Accounts</h3>
     </li>
 

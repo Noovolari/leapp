@@ -42,6 +42,14 @@ export class Workspace {
       portalUrl: undefined,
       expirationTime: undefined
     };
+
+    this._proxyConfiguration = {
+      proxyProtocol: 'https',
+      proxyUrl: undefined,
+      proxyPort: '8080',
+      username: undefined,
+      password: undefined
+    };
   }
 
   get idpUrl(): { id: string; url: string }[] {

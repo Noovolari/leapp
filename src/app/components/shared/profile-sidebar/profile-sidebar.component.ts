@@ -43,7 +43,9 @@ export class ProfileSidebarComponent implements OnInit {
   /**
    * logout from Leapp
    */
-  logout() {}
+  async logout() {
+    await this.appService.logout();
+  }
 
   closeProfile() {
     this.profileOpen = false;

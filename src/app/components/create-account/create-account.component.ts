@@ -1,6 +1,5 @@
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {ConfigurationService} from '../../services/configuration.service';
 import {AppService, LoggerLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AwsSessionService} from '../../services/aws-session.service';
@@ -11,7 +10,7 @@ import * as uuid from 'uuid';
 import {AwsPlainSessionRequest, AwsPlainService} from '../../services/session/aws-plain.service';
 import {AwsTrusterSessionRequest, AwsTrusterService} from '../../services/session/aws-truster.service';
 import {LeappParseError} from '../../errors/leapp-parse-error';
-import {SessionProviderService} from '../../services/session-provider.service';
+import {SessionFactoryService} from '../../services/session-factory.service';
 import {AwsFederatedSessionRequest, AwsFederatedService} from '../../services/session/aws-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure.service';
 
@@ -76,11 +75,10 @@ export class CreateAccountComponent implements OnInit {
 
   /* Setup the first account for the application */
   constructor(
-    private configurationService: ConfigurationService,
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private sessionProviderService: SessionProviderService,
+    private sessionProviderService: SessionFactoryService,
     private workspaceService: WorkspaceService,
     private awsFederatedService: AwsFederatedService,
     private awsPlainService: AwsPlainService,

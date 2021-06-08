@@ -12,7 +12,7 @@ import {KeychainService} from '../../../services/keychain.service';
 import * as uuid from 'uuid';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {FileService} from '../../../services/file.service';
-import {SessionProviderService} from '../../../services/session-provider.service';
+import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../services/session.service';
 
@@ -62,7 +62,7 @@ export class SessionCardComponent implements OnInit {
               private fileService: FileService,
               private router: Router,
               private ssmService: SsmService,
-              private sessionProviderService: SessionProviderService,
+              private sessionProviderService: SessionFactoryService,
               private modalService: BsModalService) {}
 
   ngOnInit() {
@@ -217,16 +217,16 @@ export class SessionCardComponent implements OnInit {
   /**
    * Set the region for the session
    */
-  changeRegion() {
+  async changeRegion() {
     if (this.selectedDefaultRegion) {
-
+      // If there is a valid region to change
       if (this.session.status === SessionStatus.active) {
-        this.sessionService.stop(this.session.sessionId);
+        // Stop temporary if the session is active
+        await this.sessionService.stop(this.session.sessionId);
       }
 
       this.session.region = this.selectedDefaultRegion;
-      // this.sessionService.invalidateSessionToken(this.session);
-      // this.sessionService.update(this.session);
+      this.sessionService.update(this.session.sessionId, this.session);
 
       if (this.session.status === SessionStatus.active) {
         this.startSession();
@@ -287,18 +287,23 @@ export class SessionCardComponent implements OnInit {
     return profileName ? profileName : environment.defaultAwsProfileName;
   }
 
-  changeProfile() {
+  async changeProfile() {
     if (this.selectedProfile) {
       if (this.session.status === SessionStatus.active) {
-        this.sessionService.stop(this.session.sessionId);
+        await this.sessionService.stop(this.session.sessionId);
       }
 
-      // this.sessionService.addProfile(this.selectedProfile);
-      // this.sessionService.updateSessionProfile(this.session, this.selectedProfile);
+      console.log(this.selectedProfile);
+
+      if(!this.workspaceService.getProfileName(this.selectedProfile.id)) {
+        this.workspaceService.addProfile(this.selectedProfile);
+      }
+
+      (this.session as any).profileId = this.selectedProfile.id;
+      this.sessionService.update(this.session.sessionId, this.session);
 
       if (this.session.status === SessionStatus.active) {
         this.startSession();
-      } else {
       }
 
       this.appService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!');

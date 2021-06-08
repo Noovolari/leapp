@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {FileService} from '../../../services/file.service';
-import {ConfigurationService} from '../../../services/configuration.service';
 import {AppService, LoggerLevel} from '../../../services/app.service';
 
 @Component({
@@ -15,7 +14,6 @@ export class ProfileComponent implements OnInit {
   /* The header that we shows on the app */
   constructor(
     private fileService: FileService,
-    private configurationService: ConfigurationService,
     private appService: AppService,
   ) {}
 

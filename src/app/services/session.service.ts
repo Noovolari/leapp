@@ -26,6 +26,15 @@ export abstract class SessionService extends NativeService {
     return (this.list().length > 0) ? this.list().filter( (session) => session.status === SessionStatus.active ) : [];
   }
 
+  update(sessionId: string, session: Session) {
+    const sessions = this.list();
+    const index = sessions.findIndex(sess => sess.sessionId === sessionId);
+    if(index > -1) {
+      this.workspaceService.sessions[index] = session;
+      this.workspaceService.sessions = [...this.workspaceService.sessions];
+    }
+  }
+
   protected sessionLoading(sessionId: string) {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {

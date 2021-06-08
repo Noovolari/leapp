@@ -88,6 +88,25 @@ export class WorkspaceService extends NativeService {
     this.persist(workspace);
   }
 
+  updateProfile(id: string, name: string) {
+    const workspace = this.get();
+    const profileIndex = workspace.profiles.findIndex(p => p.id === id);
+    if(profileIndex > -1) {
+      workspace.profiles[profileIndex].name = name;
+      this.persist(workspace);
+    }
+  }
+
+  removeProfile(id: string) {
+    const workspace = this.get();
+    const profileIndex = workspace.profiles.findIndex(p => p.id === id);
+
+    console.log(profileIndex, workspace.profiles);
+
+    delete workspace.idpUrl[profileIndex];
+    this.persist(workspace);
+  }
+
   getIdpUrl(idpUrlId: string): string {
     const workspace = this.get();
     const idpUrlFiltered = workspace.idpUrl.find(url => url.id === idpUrlId);
@@ -97,6 +116,22 @@ export class WorkspaceService extends NativeService {
   addIdpUrl(idpUrl: { id: string; url: string }): void {
     const workspace = this.get();
     workspace.idpUrl.push(idpUrl);
+    this.persist(workspace);
+  }
+
+  updateIdpUrl(id: string, url: string) {
+    const workspace = this.get();
+    const index = workspace.idpUrl.findIndex(u => u.id === id);
+    if(index > -1) {
+      workspace.idpUrl[index].url = url;
+      this.persist(workspace);
+    }
+  }
+
+  removeIdpUrl(id: string) {
+    const workspace = this.get();
+    const index = workspace.idpUrl.findIndex(u => u.id === id);
+    delete workspace.idpUrl[index];
     this.persist(workspace);
   }
 
@@ -118,6 +153,24 @@ export class WorkspaceService extends NativeService {
     return this.get().awsSsoConfiguration;
   }
 
+  updateProxyConfiguration(proxyConfiguration: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
+    const workspace = this.get();
+    workspace.proxyConfiguration = proxyConfiguration;
+    this.persist(workspace);
+  }
+
+  updateDefaultRegion(defaultRegion: string) {
+    const workspace = this.get();
+    workspace.defaultRegion = defaultRegion;
+    this.persist(workspace);
+  }
+
+  updateDefaultLocation(defaultLocation: string) {
+    const workspace = this.get();
+    workspace.defaultLocation = defaultLocation;
+    this.persist(workspace);
+  }
+
   private persist(workspace: Workspace) {
     this.fileService.writeFileSync(
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
@@ -135,4 +188,6 @@ export class WorkspaceService extends NativeService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
+
+
 }

@@ -1,4 +1,4 @@
-import {ErrorHandler, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {ProfileComponent} from './profile/profile.component';
 import {ConfirmationDialogComponent} from './confirmation-dialog/confirmation-dialog.component';
@@ -12,10 +12,9 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import {ModalModule} from 'ngx-bootstrap/modal';
-import {ErrorService} from '../../services/middleware/error.service';
 
 @NgModule({
-  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent, IntegrationsPageComponent],
+  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent],
   imports: [CommonModule, TooltipModule.forRoot(), BsDropdownModule.forRoot(), ModalModule.forRoot(), ReactiveFormsModule, FormsModule, NgxJsonViewerModule, NgSelectModule],
   exports: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, InputDialogComponent]
 })

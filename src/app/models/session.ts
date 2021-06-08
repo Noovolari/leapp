@@ -7,21 +7,19 @@ export class Session {
 
   sessionId: string;
   sessionName: string;
-  type: SessionType;
   status: SessionStatus;
-
-  region: string;
   startDateTime: string;
   lastStopDateTime: string;
+  region: string;
+  type: SessionType;
 
   constructor(sessionName: string, region: string) {
     this.sessionId = uuid.v4();
     this.sessionName = sessionName;
     this.status = SessionStatus.inactive;
-
-    this.region = region;
     this.startDateTime = undefined;
     this.lastStopDateTime = new Date().toISOString();
+    this.region = region;
   }
 
   expired(): boolean {

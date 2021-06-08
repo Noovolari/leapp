@@ -104,6 +104,4 @@ export abstract class AwsSessionService extends SessionService {
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(sessionId: string): Promise<void>;
-
-
 }

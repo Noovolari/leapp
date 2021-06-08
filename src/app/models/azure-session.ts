@@ -8,9 +8,9 @@ export class AzureSession extends Session {
 
   constructor(sessionName: string, region: string, subscriptionId: string, tenantId: string) {
     super(sessionName, region);
-    this.type = SessionType.azure;
 
     this.subscriptionId = subscriptionId;
     this.tenantId = tenantId;
+    this.type = SessionType.azure;
   }
 }

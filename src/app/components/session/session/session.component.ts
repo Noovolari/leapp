@@ -1,13 +1,9 @@
-import {Component, ElementRef, NgZone, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {ConfigurationService} from '../../../services/configuration.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../../services/app.service';
 import {HttpClient} from '@angular/common/http';
 import {Session} from '../../../models/session';
-import {SsmService} from '../../../services/ssm.service';
-import {FileService} from '../../../services/file.service';
-import {AwsSessionService} from '../../../services/aws-session.service';
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
 import {AzureSession} from '../../../models/azure-session';
 import {BsModalService} from 'ngx-bootstrap/modal';
@@ -49,14 +45,9 @@ export class SessionComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     public workspaceService: WorkspaceService,
-    private configurationService: ConfigurationService,
     private httpClient: HttpClient,
     private modalService: BsModalService,
-    private appService: AppService,
-    private ssmService: SsmService,
-    private fileService: FileService,
-    private sessionService: AwsSessionService,
-    private zone: NgZone,
+    private appService: AppService
   ) {}
 
   ngOnInit() {

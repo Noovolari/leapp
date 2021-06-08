@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {Workspace} from '../../../models/workspace';
-import {ConfigurationService} from '../../../services/configuration.service';
 import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
 import {FileService} from '../../../services/file.service';
@@ -11,12 +10,7 @@ import * as uuid from 'uuid';
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
 import {AwsSessionService} from '../../../services/aws-session.service';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {Session} from '../../../models/session';
 import {SessionType} from '../../../models/session-type';
-import {AwsPlainSession} from '../../../models/aws-plain-session';
-import {AwsTrusterSession} from '../../../models/aws-truster-session';
-import {AwsSsoSession} from '../../../models/aws-sso-session';
-import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-error';
 
 @Component({
   selector: 'app-profile-page',
@@ -61,7 +55,6 @@ export class ProfilePageComponent implements OnInit {
 
   /* Simple profile page: shows the Idp Url and the workspace json */
   constructor(
-    private configurationService: ConfigurationService,
     private appService: AppService,
     private fileService: FileService,
     private sessionService: AwsSessionService,
@@ -111,11 +104,13 @@ export class ProfilePageComponent implements OnInit {
       this.workspace.proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;
       this.workspace.proxyConfiguration.username = this.form.controls['proxyUsername'].value;
       this.workspace.proxyConfiguration.password = this.form.controls['proxyPassword'].value;
+      this.workspaceService.updateProxyConfiguration(this.workspace.proxyConfiguration);
 
       this.workspace.defaultRegion = this.selectedRegion;
-      this.workspace.defaultLocation = this.selectedLocation;
+      this.workspaceService.updateDefaultRegion(this.workspace.defaultRegion);
 
-      // this.workspaceService.update(this.workspace);
+      this.workspace.defaultLocation = this.selectedLocation;
+      this.workspaceService.updateDefaultLocation(this.workspace.defaultLocation);
 
       if (this.checkIfNeedDialogBox()) {
 
@@ -154,18 +149,20 @@ export class ProfilePageComponent implements OnInit {
   }
 
   manageIdpUrl(id) {
-    const idpUrl = this.workspace.idpUrl.findIndex(u => u.id === id);
+    console.log(id);
+
+    const idpUrl = this.workspaceService.getIdpUrl(id);
     if (this.form.get('idpUrl').value !== '') {
-      if (idpUrl === -1) {
-        this.workspace.idpUrl.push({ id: uuid.v4(), url: this.form.get('idpUrl').value });
+      if (!idpUrl) {
+        this.workspaceService.addIdpUrl({ id: uuid.v4(), url: this.form.get('idpUrl').value });
       } else {
-        this.workspace.idpUrl[idpUrl].url = this.form.get('idpUrl').value;
+        this.workspaceService.updateIdpUrl(id, this.form.get('idpUrl').value);
       }
-      // this.workspaceService.updatethis.workspace);
     }
     this.editingIdpUrl = false;
     this.idpUrlValue = undefined;
     this.form.get('idpUrl').setValue('');
+    this.workspace = this.workspaceService.get();
   }
 
   editIdpUrl(id) {
@@ -176,14 +173,14 @@ export class ProfilePageComponent implements OnInit {
   }
 
   deleteIdpUrl(id) {
-    // Federated
-    const sessions = this.workspace.sessions.filter(s => (s as AwsFederatedSession).idpUrlId !== undefined && (s as AwsFederatedSession).idpUrlId === id);
+    // Assumable sessions with this id
+    let sessions = this.sessionService.list().filter(s => (s as AwsFederatedSession).idpUrlId === id);
 
     // Add trusters from federated
-    /* federated.forEach(fed => {
-      const childs = this.sessionService.listChilds(fed);
+    sessions.forEach(parent => {
+      const childs = this.sessionService.listTruster(parent);
       sessions = sessions.concat(childs);
-    }); */
+    });
 
     // Get only names for display
     let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsFederatedSession).roleArn.split('/')[1]}</small></div></li>`);
@@ -195,29 +192,33 @@ export class ProfilePageComponent implements OnInit {
     this.appService.confirmDialog(`Deleting this Idp url will also remove these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
       if (res !== Constants.confirmClosed) {
         this.appService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
-        const idpUrl = this.workspace.idpUrl.findIndex(u => u.id === id);
-        this.workspace.idpUrl.splice(idpUrl, 1);
-        // this.workspaceService.update(this.workspace);
+
+        this.workspaceService.removeIdpUrl(id);
+
         sessions.forEach(session => {
           this.sessionService.delete(session.sessionId);
         });
+
+        this.workspace = this.workspaceService.get();
       }
     });
   }
 
   manageAwsProfile(id: string | number) {
-    const profileIndex = this.workspace.profiles.findIndex(p => p.id === id);
+    console.log(id);
+
+    const profileIndex = this.workspaceService.get().profiles.findIndex(p => p.id === id.toString());
     if (this.form.get('awsProfile').value !== '') {
       if (profileIndex === -1) {
-        this.workspace.profiles.push({ id: uuid.v4(), name: this.form.get('awsProfile').value });
+        this.workspaceService.addProfile({ id: uuid.v4(), name: this.form.get('awsProfile').value });
       } else {
-        this.workspace.profiles[profileIndex].name = this.form.get('awsProfile').value;
+        this.workspaceService.updateProfile(id.toString(), this.form.get('awsProfile').value);
       }
-      // this.workspaceService.update(this.workspace);
     }
     this.editingAwsProfile = false;
     this.awsProfileValue = undefined;
     this.form.get('awsProfile').setValue('');
+    this.workspace = this.workspaceService.get();
   }
 
   editAwsProfile(id: string) {
@@ -228,8 +229,8 @@ export class ProfilePageComponent implements OnInit {
   }
 
   deleteAwsProfile(id: string) {
-    // Federated
-    const sessions = this.workspace.sessions.filter(s => this.getProfileId(s) === id);
+    // With profile
+    const sessions = this.sessionService.list().filter(sess => (sess as any).profileId === id);
 
     // Get only names for display
     let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsFederatedSession).roleArn ? (s as AwsFederatedSession).roleArn.split('/')[1] : ''}</small></div></li>`);
@@ -241,19 +242,15 @@ export class ProfilePageComponent implements OnInit {
     this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
       if (res !== Constants.confirmClosed) {
         this.appService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
-        const profileToDelete = this.workspace.profiles.findIndex(p => p.id === id);
-        this.workspace.profiles.splice(profileToDelete, 1);
-        // this.workspaceService.update(this.workspace);
-        // this.sessionService.replaceAllProfileId(id, defaultId);
+        this.workspaceService.removeProfile(id);
+        // Reverting all sessions to default profile
+        sessions.forEach(sess => {
+          (sess as any).profileId = this.workspaceService.getDefaultProfileId();
+          this.sessionService.update(sess.sessionId, sess);
+        });
+
+        this.workspace = this.workspaceService.get();
       }
     });
-  }
-
-  getProfileId(session: Session): string {
-    if(session.type !== SessionType.azure) {
-      return (session as any).profileId;
-    } else {
-      throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
-    }
   }
 }

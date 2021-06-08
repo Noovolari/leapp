@@ -8,7 +8,7 @@ import {Workspace} from './models/workspace';
 import {setTheme} from 'ngx-bootstrap/utils';
 import {TimerService} from './services/timer.service';
 import {RotationService} from './services/rotation.service';
-import {SessionProviderService} from './services/session-provider.service';
+import {SessionFactoryService} from './services/session-factory.service';
 
 @Component({
   selector: 'app-root',
@@ -22,7 +22,7 @@ export class AppComponent implements OnInit {
     private workspaceService: WorkspaceService,
     private fileService: FileService,
     private rotationService: RotationService,
-    private sessionProviderService: SessionProviderService,
+    private sessionProviderService: SessionFactoryService,
     private router: Router,
     private timerService: TimerService
   ) {

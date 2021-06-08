@@ -9,7 +9,6 @@ import {AwsPlainService} from './session/aws-plain.service';
 import {AwsTrusterService} from './session/aws-truster.service';
 import {AwsFederatedService} from './session/aws-federated.service';
 import {AwsSsoService} from './session/aws-sso.service';
-import {AwsSsoSessionProviderService} from './providers/aws-sso-session-provider.service';
 import {AzureService} from './session/azure.service';
 import {ExecuteService} from './execute.service';
 import {SessionService} from './session.service';
@@ -17,17 +16,17 @@ import {SessionService} from './session.service';
 @Injectable({
   providedIn: 'root'
 })
-export class SessionProviderService {
+export class SessionFactoryService {
 
-  private sessionServiceCache: AwsSessionService[] = [];
+  private sessionServiceCache: SessionService[] = [];
 
   constructor(
     private workspaceService: WorkspaceService,
     private keychainService: KeychainService,
     private appService: AppService,
-    private awsSsoProviderService: AwsSsoSessionProviderService,
     private executeService: ExecuteService,
-    private fileService: FileService) {}
+    private fileService: FileService,
+    private awsSessionService: AwsSessionService) {}
 
   getService(accountType: SessionType): SessionService {
     // Return if service is already in the cache using flyweight pattern
@@ -65,7 +64,7 @@ export class SessionProviderService {
   }
 
   private getAwsSsoSessionService(accountType: SessionType) {
-    const service = new AwsSsoService(this.workspaceService, this.awsSsoProviderService, this.fileService, this.appService);
+    const service = new AwsSsoService(this.workspaceService, this.fileService, this.appService, this.keychainService, this.awsSessionService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {ConfigurationService} from '../../../services/configuration.service';
 import {FileService} from '../../../services/file.service';
 import {AwsSessionService} from '../../../services/aws-session.service';
 import {AppService, LoggerLevel} from '../../../services/app.service';
@@ -19,18 +18,17 @@ import {AwsFederatedSession} from '../../../models/aws-federated-session';
 })
 export class TrayMenuComponent implements OnInit {
 
-  // Used to define the only tray we want as active expecially in linux context
+  // Used to define the only tray we want as active especially in linux context
   currentTray;
 
   constructor(private workspaceService: WorkspaceService,
-              private configurationService: ConfigurationService,
               private fileService: FileService,
               private sessionService: AwsSessionService,
               private appService: AppService) {
   }
 
   ngOnInit() {
-    this.appService.redrawList.subscribe(() => {
+    this.workspaceService.sessions$.subscribe(() => {
       this.generateMenu();
     });
     this.generateMenu();
@@ -81,12 +79,9 @@ export class TrayMenuComponent implements OnInit {
           click: async () => {
             if (session.status !== SessionStatus.active) {
               await this.sessionService.start(session.sessionId);
-              // TODO: refresh session credential
             } else {
-              // this.sessionService.stop(session.sessionId);
-              // TODO: refresh session credential
+              await this.sessionService.stop(session.sessionId);
             }
-            this.appService.redrawList.emit(true);
             this.generateMenu();
           }
         },
@@ -150,16 +145,14 @@ export class TrayMenuComponent implements OnInit {
   /**
    * Remove session and credential file before exiting program
    */
-  cleanBeforeExit() {
+  async cleanBeforeExit() {
     // Check if we are here
     this.appService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
-      // Stop the session...
-      // this.sessionService.stopAllSession();
-      // Stop credentials to be used
-      // this.credentialService.refreshCredentials();
+      // Stop the sessions...
+      await this.sessionService.stopAll();
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {

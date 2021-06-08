@@ -301,6 +301,32 @@ export class AppService extends NativeService {
     }
   }
 
+  public async logout() {
+    try {
+
+      // Clear all extra data
+      const getAppPath = this.path.join(this.app.getPath('appData'), environment.appName);
+      this.rimraf.sync(getAppPath + '/Partitions/leapp*');
+
+      // Cleaning Library Electron Cache
+      await this.session.defaultSession.clearStorageData();
+
+      // Clean localStorage
+      localStorage.clear();
+
+      this.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
+
+      // Restart
+      setTimeout(() => {
+        this.restart();
+      }, 2000);
+
+    } catch (err) {
+      this.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
+      this.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
+    }
+  }
+
   /**
    * Return the aws credential path so we have only one point in the application where we need to adjust it!
    *
@@ -423,11 +449,11 @@ export class AppService extends NativeService {
       if (values[4].length === 12 && Number(values[4])) {
         return values[4];
       } else  {
- return '';
-}
-    } else  {
- return '';
-}
+       return '';
+      }
+          } else  {
+       return '';
+    }
   }
 
   /**
@@ -570,29 +596,7 @@ export class AppService extends NativeService {
    * @param s - the session containing the account
    */
   isAzure(s) {
- return s.subscriptionId !== null && s.subscriptionId !== undefined;
-}
-
-
-  // TODO MOVE TO KEYCHAIN SERVICE
-  /**
-   * Generate Secret String for keychain
-   *
-   * @param accountName - account ame we want to use
-   * @param user - the user we want to use
-   */
-  keychainGenerateSecretString(accountName, user) {
-    return `${accountName}___${user}___secretKey`;
-  }
-
-  /**
-   * Generate Access String for keychain
-   *
-   * @param accountName - account ame we want to use
-   * @param user - the user we want to use
-   */
-  keychainGenerateAccessString(accountName, user) {
-    return `${accountName}___${user}___accessKey`;
+   return s.subscriptionId !== null && s.subscriptionId !== undefined;
   }
 
   stsOptions(session) {
@@ -610,12 +614,6 @@ export class AppService extends NativeService {
     }
 
     return options;
-  }
-
-  createRoleSessionName(role) {
-    let roleName = `${role}-trusted`;
-    roleName =  roleName.substr(0, 64).replace(/\//g, '-');
-    return roleName;
   }
 
   getUrl() {

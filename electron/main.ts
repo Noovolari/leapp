@@ -2,9 +2,7 @@ import * as path from 'path';
 import {environment} from '../src/environments/environment';
 
 const {app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
-
 const url = require('url');
-const os = require('os');
 const ipc = ipcMain;
 
 // Fix for warning at startup

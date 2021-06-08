@@ -145,14 +145,10 @@ export class AwsSsoService extends AwsSessionService {
     const roleArn = (this.get(sessionId) as AwsSsoSession).roleArn;
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
-
     const accessToken = await this.getAccessToken(region, portalUrl);
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
     return AwsSsoService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
-
-
-
 
   async sync(region: string, portalUrl: string): Promise<SsoSession[]> {
     // Prepare Sso Client for operations

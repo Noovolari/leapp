@@ -31,8 +31,7 @@ export class AwsTrusterService extends AwsSessionService {
     super(workspaceService);
   }
 
-
-  static sessionTokenFromassumeRoleResponse(assumeRoleResponse: AssumeRoleResponse): { sessionToken: any } {
+  static sessionTokenFromAssumeRoleResponse(assumeRoleResponse: AssumeRoleResponse): { sessionToken: any } {
     return {
       sessionToken: {
         // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -121,7 +120,7 @@ export class AwsTrusterService extends AwsSessionService {
       // Assume Role
       const assumeRoleResponse: AssumeRoleResponse = await sts.assumeRole(params).promise();
       // Generate correct object from session token response and return
-      return AwsTrusterService.sessionTokenFromassumeRoleResponse(assumeRoleResponse);
+      return AwsTrusterService.sessionTokenFromAssumeRoleResponse(assumeRoleResponse);
     } catch (err) {
       throw new LeappAwsStsError(this, err.message);
     }

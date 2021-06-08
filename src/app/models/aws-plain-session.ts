@@ -2,7 +2,7 @@ import {SessionType} from './session-type';
 import {Session} from './session';
 
 export class AwsPlainSession extends Session {
-  region: string;
+
   mfaDevice?: string;
   sessionTokenExpiration: string;
   profileId: string;

@@ -1,6 +1,6 @@
 import {TestBed} from '@angular/core/testing';
 
-import {SessionProviderService} from './session-provider.service';
+import {SessionFactoryService} from './session-factory.service';
 import {mustInjected} from '../../base-injectables';
 import {AwsSessionService} from './aws-session.service';
 import {SessionType} from '../models/session-type';
@@ -12,7 +12,7 @@ import {FileService} from './file.service';
 import {Workspace} from '../models/workspace';
 
 describe('SessionProviderService', () => {
-  let sessionProvider: SessionProviderService;
+  let sessionFactoryService: SessionFactoryService;
 
   const spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
   spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
@@ -33,22 +33,22 @@ describe('SessionProviderService', () => {
         { provide: FileService, useValue: spyFileService }
       ].concat(mustInjected())
     });
-    sessionProvider = TestBed.inject(SessionProviderService);
+    sessionFactoryService = TestBed.inject(SessionFactoryService);
   });
 
   it('should be created', () => {
-    expect(sessionProvider).toBeTruthy();
+    expect(sessionFactoryService).toBeTruthy();
   });
 
   it('should return a Aws Plain Service when requested with AccountType AWS_PLAIN_USER', () => {
-    const awsPlainService: AwsSessionService = sessionProvider.getService(SessionType.awsPlain);
+    const awsPlainService: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
     expect(awsPlainService).toBeInstanceOf(AwsPlainService);
   });
 
   it('should return the same Service (Singleton) when requested more than one time', () => {
-    const awsPlainService: AwsSessionService = sessionProvider.getService(SessionType.awsPlain);
-    const awsPlainServiceCopy: AwsSessionService = sessionProvider.getService(SessionType.awsPlain);
-    const awsPlainServiceCopy2: AwsSessionService = sessionProvider.getService(SessionType.awsPlain);
+    const awsPlainService: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
+    const awsPlainServiceCopy: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
+    const awsPlainServiceCopy2: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
 
     expect(awsPlainService).toEqual(awsPlainServiceCopy);
     expect(awsPlainServiceCopy).toEqual(awsPlainServiceCopy2);

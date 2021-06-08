@@ -23,7 +23,7 @@ let mockedSessions = [];
 
 const fakePromise = Promise.resolve(undefined);
 
-describe('SessionService', () => {
+describe('AwsSessionService', () => {
   spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
   spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
 

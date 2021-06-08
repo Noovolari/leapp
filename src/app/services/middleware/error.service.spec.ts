@@ -36,13 +36,13 @@ describe('ErrorService', () => {
 
   it('should call the Error Handler is an error is thrown in code', () => {
     const spyErrorHandler = spyOn(errorService, 'handleError');
-    const error =  new LeappBaseError('Mock Error', 'testing', LoggerLevel.warn, 'custom test message', {});
+    const error =  new LeappBaseError('Mock Error', 'testing', LoggerLevel.warn, 'custom test message');
     errorService.handleError(error);
     expect(spyErrorHandler).toHaveBeenCalled();
   });
 
   it('should call logger and toast', () => {
-    const error =  new LeappBaseError('Mock Error', 'testing', LoggerLevel.warn, 'custom test message', {});
+    const error =  new LeappBaseError('Mock Error', 'testing', LoggerLevel.warn, 'custom test message');
     errorService.handleError(error);
     expect(spyAppService.logger).toHaveBeenCalled();
     expect(spyAppService.toast).toHaveBeenCalled();

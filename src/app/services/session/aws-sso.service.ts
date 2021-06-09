@@ -329,7 +329,7 @@ export class AwsSsoService extends AwsSessionService {
   }
 
   private removeSsoSessionsFromWorkspace(): void {
-    const sessions = this.awsSessionService.listSso();
+    const sessions = this.awsSessionService.listAwsSso();
     sessions.forEach(sess => {
       // Verify and delete eventual truster sessions from old Sso session
       const trusterSessions = this.awsSessionService.listTruster(sess);

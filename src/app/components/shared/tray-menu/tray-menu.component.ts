@@ -1,7 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {FileService} from '../../../services/file.service';
-import {AwsSessionService} from '../../../services/aws-session.service';
 import {AppService, LoggerLevel} from '../../../services/app.service';
 import {Session} from '../../../models/session';
 import {SessionType} from '../../../models/session-type';
@@ -10,6 +9,7 @@ import {SessionStatus} from '../../../models/session-status';
 import {AwsTrusterSession} from '../../../models/aws-truster-session';
 import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-error';
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
+import {SessionService} from '../../../services/session.service';
 
 @Component({
   selector: 'app-tray-menu',
@@ -23,7 +23,7 @@ export class TrayMenuComponent implements OnInit {
 
   constructor(private workspaceService: WorkspaceService,
               private fileService: FileService,
-              private sessionService: AwsSessionService,
+              private sessionService: SessionService,
               private appService: AppService) {
   }
 
@@ -152,7 +152,10 @@ export class TrayMenuComponent implements OnInit {
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Stop the sessions...
-      await this.sessionService.stopAll();
+      const sessions = this.sessionService.listActive();
+      sessions.forEach(session => {
+        this.sessionService.stop(session.sessionId);
+      });
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {
@@ -162,5 +165,4 @@ export class TrayMenuComponent implements OnInit {
     // Finally quit
     this.appService.quit();
   }
-
 }

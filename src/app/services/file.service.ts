@@ -50,14 +50,14 @@ export class FileService extends NativeService {
    */
   readFile(filePath: string): Observable<string> {
     return new Observable(subscriber => {
-        this.fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
-          if (err) {
-            subscriber.error(err);
-          } else {
-            subscriber.next(data);
-          }
-          subscriber.complete();
-        });
+      this.fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
+        if (err) {
+          subscriber.error(err);
+        } else {
+          subscriber.next(data);
+        }
+        subscriber.complete();
+      });
     });
   }
 
@@ -88,9 +88,9 @@ export class FileService extends NativeService {
    * @param source - source of the directory
    */
   getSubDirs(source: string) {
-    return this.fs.readdirSync(source, { withFileTypes: true })
-        .filter(dirent => dirent.isDirectory())
-        .map(dirent => dirent.name);
+    return this.fs.readdirSync(source, {withFileTypes: true})
+      .filter(dirent => dirent.isDirectory())
+      .map(dirent => dirent.name);
   }
 
   /**
@@ -99,7 +99,7 @@ export class FileService extends NativeService {
    * @param path - the new directory path
    * @param options - some options if needed - optional
    */
-  newDir(path: string, options: {recursive: boolean}): void {
+  newDir(path: string, options: { recursive: boolean }): void {
     this.fs.mkdirSync(path, options);
   }
 
@@ -121,14 +121,14 @@ export class FileService extends NativeService {
    */
   writeFile(filePath: string, content: string): Observable<any> {
     return new Observable(subscriber => {
-        this.fs.writeFile(filePath, content, (err, data) => {
-          if (err) {
-            subscriber.error(err);
-          } else {
-            subscriber.next(data);
-          }
-          subscriber.complete();
-        });
+      this.fs.writeFile(filePath, content, (err, data) => {
+        if (err) {
+          subscriber.error(err);
+        } else {
+          subscriber.next(data);
+        }
+        subscriber.complete();
+      });
     });
   }
 
@@ -193,15 +193,6 @@ export class FileService extends NativeService {
     return this.writeFileSync(filePath, this.ini.stringify(content));
   }
 
-  iniCheckProfileExistance(filePath: string, profileName: string): boolean {
-    const currentCredentialFile = this.iniParseSync(filePath);
-    return currentCredentialFile[profileName] !== undefined;
-  }
-
-  iniCleanSync(filePath: string) {
-    return this.writeFileSync(filePath, this.ini.stringify({}));
-  }
-
   /**
    * Parse the file asynchronously
    *
@@ -211,8 +202,8 @@ export class FileService extends NativeService {
   iniParse(filePath: string): Observable<any> {
     return new Observable(subscriber => {
       if (this.readSubscription) {
- this.readSubscription.unsubscribe();
-}
+        this.readSubscription.unsubscribe();
+      }
       this.readSubscription = this.readFile(filePath).subscribe(file => {
         try {
           subscriber.next(this.ini.parse(file));

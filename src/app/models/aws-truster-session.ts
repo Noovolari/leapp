@@ -2,9 +2,8 @@ import {SessionType} from './session-type';
 import {Session} from './session';
 
 export class AwsTrusterSession extends Session {
-  region: string;
+
   roleArn: string;
-  type: SessionType;
   profileId: string;
   parentSessionId: string;
 

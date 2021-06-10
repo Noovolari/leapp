@@ -10,7 +10,7 @@ import {TimerService} from './services/timer.service';
 import {RotationService} from './services/rotation.service';
 import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
-import compareVersions from "compare-versions";
+import compareVersions from 'compare-versions';
 
 @Component({
   selector: 'app-root',
@@ -45,10 +45,8 @@ export class AppComponent implements OnInit {
     if (environment.production) {
       // Clear both info and warn message in production
       // mode without removing them from code actually
-      console.warn = () => {
-      };
-      console.log = () => {
-      };
+      console.warn = () => {};
+      console.log = () => {};
     }
 
     // Prevent Dev Tool to show on production mode

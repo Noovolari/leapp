@@ -52,7 +52,7 @@ export class UpdaterService extends NativeService {
     this.releaseDate = releaseDate;
     this.releaseNotes = releaseNotes;
 
-    this.appService.redrawList.emit();
+    this.workspaceService.sessions = [...this.workspaceService.sessions];
   }
 
   updateDialog(): void {
@@ -61,7 +61,7 @@ export class UpdaterService extends NativeService {
         this.updateVersionJson(this.version);
         this.workspaceService.sessions = [...this.workspaceService.sessions];
       } else if (event === Constants.confirmCloseAndDownloadUpdate) {
-        this.appService.openExternalUrl(`${environment.latestUrl}${this.releaseName}`);
+        this.appService.openExternalUrl(`${environment.latestUrl}`);
       }
       this.bsModalRef = undefined;
     };

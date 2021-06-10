@@ -9,7 +9,6 @@ export class Session {
   sessionName: string;
   status: SessionStatus;
   startDateTime: string;
-  lastStopDateTime: string;
   region: string;
   type: SessionType;
 
@@ -18,7 +17,6 @@ export class Session {
     this.sessionName = sessionName;
     this.status = SessionStatus.inactive;
     this.startDateTime = undefined;
-    this.lastStopDateTime = new Date().toISOString();
     this.region = region;
   }
 

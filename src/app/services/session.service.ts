@@ -81,7 +81,6 @@ export abstract class SessionService extends NativeService {
       const currentSession: Session = this.workspaceService.sessions[index];
       currentSession.status = SessionStatus.inactive;
       currentSession.startDateTime = undefined;
-      currentSession.lastStopDateTime = new Date().toISOString();
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }

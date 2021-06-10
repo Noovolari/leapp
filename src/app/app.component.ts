@@ -9,6 +9,8 @@ import {setTheme} from 'ngx-bootstrap/utils';
 import {TimerService} from './services/timer.service';
 import {RotationService} from './services/rotation.service';
 import {SessionFactoryService} from './services/session-factory.service';
+import {UpdaterService} from './services/updater.service';
+import compareVersions from "compare-versions";
 
 @Component({
   selector: 'app-root',
@@ -24,7 +26,8 @@ export class AppComponent implements OnInit {
     private rotationService: RotationService,
     private sessionProviderService: SessionFactoryService,
     private router: Router,
-    private timerService: TimerService
+    private timerService: TimerService,
+    private updaterService: UpdaterService
   ) {
   }
 
@@ -66,6 +69,9 @@ export class AppComponent implements OnInit {
 
     // Start Global Timer (1s)
     this.timerService.start(this.rotationService.rotate.bind(this.rotationService));
+
+    // Launch Auto Updater Routines
+    this.manageAutoUpdate();
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
@@ -114,5 +120,38 @@ export class AppComponent implements OnInit {
         message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
       });
     }
+  }
+
+  /**
+   * Launch Updater process
+   *
+   * @private
+   */
+  private manageAutoUpdate(): void {
+    let savedVersion;
+
+    try {
+      savedVersion = this.updaterService.getSavedAppVersion();
+    } catch (error) {
+      savedVersion = this.updaterService.getCurrentAppVersion();
+    }
+
+    try {
+      if (compareVersions(savedVersion, this.updaterService.getCurrentAppVersion()) <= 0) {
+        // We always need to maintain this order: fresh <= saved <= online
+        this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion());
+      }
+    } catch (error) {
+      this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion());
+    }
+
+    const ipc = this.app.getIpcRenderer();
+    ipc.on('UPDATE_AVAILABLE', (_, info) => {
+      this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, info.releaseNotes);
+      if (this.updaterService.isUpdateNeeded()) {
+        this.workspaceService.sessions = [...this.workspaceService.sessions];
+        this.updaterService.updateDialog();
+      }
+    });
   }
 }

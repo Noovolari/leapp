@@ -57,12 +57,23 @@ export class SsmService {
   /**
    * Start a new ssm session given the instance id
    *
+   * @param credentials - CredentialsInfo data from generate credentials method
    * @param instanceId - the instance id of the instance to start
    * @param region - AWS System Manager start a session from a defined region
    */
-  startSession(instanceId, region) {
+  startSession(credentials: CredentialsInfo, instanceId, region) {
     const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : '';
-    this.exec.openTerminal(`aws ssm start-session --region ${region} --target ${hypen}${instanceId}${hypen}`).then(() => {}, err => {
+
+    const env = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      AWS_ACCESS_KEY_ID: credentials.sessionToken.aws_access_key_id,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      AWS_SECRET_ACCESS_KEY: credentials.sessionToken.aws_secret_access_key,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      AWS_SESSION_TOKEN : credentials.sessionToken.aws_session_token
+    };
+
+    this.exec.openTerminal(`aws ssm start-session --region ${region} --target ${hypen}${instanceId}${hypen}`, env).then(() => {}, err => {
       throw new LeappBaseError('Start SSM error', this, LoggerLevel.error, err.message);
     });
   }

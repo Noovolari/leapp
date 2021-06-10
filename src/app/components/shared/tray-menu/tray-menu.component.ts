@@ -10,6 +10,7 @@ import {SessionStatus} from '../../../models/session-status';
 import {AwsTrusterSession} from '../../../models/aws-truster-session';
 import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-error';
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
+import {UpdaterService} from '../../../services/updater.service';
 
 @Component({
   selector: 'app-tray-menu',
@@ -24,6 +25,7 @@ export class TrayMenuComponent implements OnInit {
   constructor(private workspaceService: WorkspaceService,
               private fileService: FileService,
               private sessionService: AwsSessionService,
+              private updaterService: UpdaterService,
               private appService: AppService) {
   }
 
@@ -131,12 +133,18 @@ export class TrayMenuComponent implements OnInit {
     }
     this.appService.getMenu().setApplicationMenu(this.appService.getMenu().buildFromTemplate(template));
 
-    voices = voices.concat(extraInfo);
-    const contextMenu = this.appService.getMenu().buildFromTemplate(voices);
-
     if (!this.currentTray) {
       this.currentTray = new (this.appService.getTray())(__dirname + `/assets/images/LeappMini.png`);
     }
+
+    if (this.updaterService.getSavedVersionComparison()) {
+      voices.push({ type: 'separator' });
+      voices.push({ label: 'Check for Updates...', type: 'normal', click: () => this.updaterService.updateDialog() });
+      this.currentTray.setImage(__dirname + `/assets/images/LeappMini2.png`);
+    }
+
+    voices = voices.concat(extraInfo);
+    const contextMenu = this.appService.getMenu().buildFromTemplate(voices);
 
     this.currentTray.setToolTip('Leapp');
     this.currentTray.setContextMenu(contextMenu);

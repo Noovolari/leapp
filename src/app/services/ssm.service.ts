@@ -40,7 +40,7 @@ export class SsmService {
    * @param region - pass the region where you want to make the request
    * @returns - {Observable<SsmResult>} - return the list of instances capable of SSM in the selected region
    */
-  async getSsmInstances(credentials: any, region): Promise<any> {
+  async getSsmInstances(credentials: CredentialsInfo, region): Promise<any> {
     // Set your SSM client and EC2 client
     AWS.config.update(SsmService.setConfig(credentials, region));
     this.ssmClient = new AWS.SSM();

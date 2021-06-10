@@ -26,10 +26,12 @@ export class WorkspaceService extends NativeService {
 
   constructor(private appService: AppService, private fileService: FileService) {
     super();
+
     this._sessions = new BehaviorSubject<Session[]>([]);
     this.sessions$ = this._sessions.asObservable();
 
     this.create();
+    // TODO: check if it is possible to call directly this._sessions.next(this.getPersistedSessions())
     this.sessions = this.getPersistedSessions();
   }
 
@@ -100,10 +102,7 @@ export class WorkspaceService extends NativeService {
   removeProfile(id: string) {
     const workspace = this.get();
     const profileIndex = workspace.profiles.findIndex(p => p.id === id);
-
-    console.log(profileIndex, workspace.profiles);
-
-    delete workspace.idpUrl[profileIndex];
+    delete workspace.profiles[profileIndex];
     this.persist(workspace);
   }
 
@@ -188,6 +187,4 @@ export class WorkspaceService extends NativeService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
-
-
 }

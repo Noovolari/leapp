@@ -17,6 +17,11 @@ export abstract class AwsSessionService extends SessionService {
     super(workspaceService);
   }
 
+  // TODO: are they assumable (maybe assumer) or generic AWS sessions?
+  listAssumable(): Session[] {
+    return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure ) : [];
+  }
+
   listTruster(parentSession?: Session): Session[] {
     let childSession = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsTruster ) : [];
     if (parentSession) {
@@ -25,12 +30,8 @@ export abstract class AwsSessionService extends SessionService {
     return childSession;
   }
 
-  listSso() {
+  listAwsSso() {
     return (this.list().length > 0) ? this.list().filter((session) => session.type === SessionType.awsSso) : [];
-  }
-
-  listAwsAssumable(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure ) : [];
   }
 
   async delete(sessionId: string): Promise<void> {
@@ -80,13 +81,6 @@ export abstract class AwsSessionService extends SessionService {
     }
   }
 
-  async stopAll(): Promise<void> {
-    const sessions = this.listActive();
-    sessions.forEach(session => {
-      this.stop(session.sessionId);
-    });
-  }
-
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
     const session = this.get(sessionId);
@@ -104,6 +98,4 @@ export abstract class AwsSessionService extends SessionService {
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(sessionId: string): Promise<void>;
-
-
 }

@@ -145,14 +145,10 @@ export class AwsSsoService extends AwsSessionService {
     const roleArn = (this.get(sessionId) as AwsSsoSession).roleArn;
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
-
     const accessToken = await this.getAccessToken(region, portalUrl);
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
     return AwsSsoService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
-
-
-
 
   async sync(region: string, portalUrl: string): Promise<SsoSession[]> {
     // Prepare Sso Client for operations
@@ -333,7 +329,7 @@ export class AwsSsoService extends AwsSessionService {
   }
 
   private removeSsoSessionsFromWorkspace(): void {
-    const sessions = this.awsSessionService.listSso();
+    const sessions = this.awsSessionService.listAwsSso();
     sessions.forEach(sess => {
       // Verify and delete eventual truster sessions from old Sso session
       const trusterSessions = this.awsSessionService.listTruster(sess);

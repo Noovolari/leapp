@@ -16,7 +16,8 @@ const environment = {
   defaultRegion: 'us-east-1',
   defaultLocation: 'eastus',
   defaultAwsProfileName: 'default',
-  defaultAzureProfileName: 'default-azure'
+  defaultAzureProfileName: 'default-azure',
+  latestUrl: 'https://github.com/Noovolari/leapp/releases/tag/'
 };
 
 environment.lockFileDestination = `.Leapp/Leapp-lock.json`;

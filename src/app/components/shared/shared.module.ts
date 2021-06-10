@@ -12,9 +12,10 @@ import {NgSelectModule} from '@ng-select/ng-select';
 import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import {ModalModule} from 'ngx-bootstrap/modal';
+import { UpdateDialogComponent } from './update-dialog/update-dialog.component';
 
 @NgModule({
-  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent],
+  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent, UpdateDialogComponent],
   imports: [CommonModule, TooltipModule.forRoot(), BsDropdownModule.forRoot(), ModalModule.forRoot(), ReactiveFormsModule, FormsModule, NgxJsonViewerModule, NgSelectModule],
   exports: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, InputDialogComponent]
 })

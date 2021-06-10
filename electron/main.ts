@@ -2,9 +2,8 @@ import * as path from 'path';
 import {environment} from '../src/environments/environment';
 
 const {app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
-
+const { autoUpdater } = require('electron-updater');
 const url = require('url');
-const os = require('os');
 const ipc = ipcMain;
 
 // Fix for warning at startup
@@ -31,6 +30,23 @@ const windowDefaultConfig = {
       nodeIntegration: true
     }
   }
+};
+
+const buildAutoUpdater = (win: any): void => {
+  autoUpdater.allowDowngrade = false;
+  autoUpdater.allowPrerelease = false;
+  autoUpdater.autoDownload = false;
+
+  const minutes = 10;
+
+  autoUpdater.checkForUpdates();
+  setInterval(() => {
+    autoUpdater.checkForUpdates();
+  }, 1000 * 60 * minutes);
+
+  autoUpdater.on('update-available', (info) => {
+    win.webContents.send('UPDATE_AVAILABLE', info);
+  });
 };
 
 // Generate the main Electron window
@@ -100,6 +116,7 @@ const generateMainWindow = () => {
 
   app.on('ready', () => {
     createWindow();
+    buildAutoUpdater(win);
   });
 
   const gotTheLock = app.requestSingleInstanceLock();

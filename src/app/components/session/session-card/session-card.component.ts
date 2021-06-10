@@ -15,6 +15,7 @@ import {FileService} from '../../../services/file.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../services/session.service';
+import {CredentialsInfo} from "../../../models/credentials-info";
 
 @Component({
   selector: 'app-session-card',
@@ -240,16 +241,20 @@ export class SessionCardComponent implements OnInit {
   /**
    * Start a new ssm session
    *
+   * @param sessionId - id of the session
    * @param instanceId - instance id to start ssm session
    */
-  startSsmSession(instanceId) {
+  async startSsmSession(sessionId, instanceId) {
     this.instances.forEach(instance => {
      if (instance.InstanceId === instanceId) {
        instance.loading = true;
      }
     });
 
-    this.ssmService.startSession(instanceId, this.selectedSsmRegion);
+    // Generate valid temporary credentials for the SSM and EC2 client
+    const credentials = await (this.sessionService as AwsSessionService).generateCredentials(sessionId);
+
+    this.ssmService.startSession(credentials, instanceId, this.selectedSsmRegion);
 
     setTimeout(() => {
       this.instances.forEach(instance => {

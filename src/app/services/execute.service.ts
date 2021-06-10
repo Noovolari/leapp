@@ -9,16 +9,13 @@ export class ExecuteService extends NativeService {
    * Remove the note whenever a fix is found.
    *
    * @param command - the command to launch
-   * @param force - force with sudo commands
+   * @param env - environment
    * @returns an {Observable<any>} to use for subscribing to success or error event on the command termination:
    *          the default unix standard is used so 0 represent a success code, everything else is an error code
    */
-  public execute(command: string, force?: boolean): Promise<string> {
+  public execute(command: string, env?: boolean): Promise<string> {
     return new Promise(
       (resolve, reject) => {
-        if (force) {
-          resolve('');
-        }
 
         let exec = this.exec;
         if (command.startsWith('sudo')) {
@@ -34,7 +31,7 @@ export class ExecuteService extends NativeService {
           }
         }
 
-        exec(command, {name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
+        exec(command, {env, name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
           this.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
           if (err) {
             reject(err);
@@ -52,15 +49,15 @@ export class ExecuteService extends NativeService {
    * @param command - the command to launch in terminal
    * @returns an {Observable<any>} to subscribe to
    */
-  public openTerminal(command: string): Promise<string> {
+  public openTerminal(command: string, env?: any): Promise<string> {
     if (this.process.platform === 'darwin') {
       return this.execute(`osascript -e "tell app \\"Terminal\\"
                               do script \\"${command}\\"
-                              end tell"`);
+                              end tell"`, env);
     } else if (this.process.platform === 'win32') {
-      return this.execute(`start cmd /k ${command}`);
+      return this.execute(`start cmd /k ${command}`, env);
     } else {
-      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`);
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, env);
     }
   }
 }

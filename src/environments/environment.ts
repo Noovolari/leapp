@@ -21,5 +21,4 @@ const environment = {
   latestUrl: 'https://leapp.cloud/releases.html'
 };
 
-
 export { environment };

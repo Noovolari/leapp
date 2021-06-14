@@ -166,7 +166,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   editIdpUrl(id) {
-    const idpUrl = this.workspace.idpUrl.filter(u => u.id === id)[0];
+    const idpUrl = this.workspace.idpUrls.filter(u => u.id === id)[0];
     this.idpUrlValue = idpUrl;
     this.form.get('idpUrl').setValue(idpUrl.url);
     this.editingIdpUrl = true;

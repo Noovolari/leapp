@@ -108,29 +108,29 @@ export class WorkspaceService extends NativeService {
 
   getIdpUrl(idpUrlId: string): string {
     const workspace = this.get();
-    const idpUrlFiltered = workspace.idpUrl.find(url => url.id === idpUrlId);
+    const idpUrlFiltered = workspace.idpUrls.find(url => url.id === idpUrlId);
     return idpUrlFiltered ? idpUrlFiltered.url : null;
   }
 
   addIdpUrl(idpUrl: { id: string; url: string }): void {
     const workspace = this.get();
-    workspace.idpUrl.push(idpUrl);
+    workspace.idpUrls.push(idpUrl);
     this.persist(workspace);
   }
 
   updateIdpUrl(id: string, url: string) {
     const workspace = this.get();
-    const index = workspace.idpUrl.findIndex(u => u.id === id);
+    const index = workspace.idpUrls.findIndex(u => u.id === id);
     if(index > -1) {
-      workspace.idpUrl[index].url = url;
+      workspace.idpUrls[index].url = url;
       this.persist(workspace);
     }
   }
 
   removeIdpUrl(id: string) {
     const workspace = this.get();
-    const index = workspace.idpUrl.findIndex(u => u.id === id);
-    delete workspace.idpUrl[index];
+    const index = workspace.idpUrls.findIndex(u => u.id === id);
+    delete workspace.idpUrls[index];
     this.persist(workspace);
   }
 

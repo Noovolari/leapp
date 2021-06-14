@@ -9,7 +9,7 @@ export class Workspace {
   private _sessions: Session[];
   private _defaultRegion: string;
   private _defaultLocation: string;
-  private _idpUrl: { id: string; url: string }[];
+  private _idpUrls: { id: string; url: string }[];
   private _profiles: { id: string; name: string }[];
 
   private _awsSsoConfiguration: {
@@ -30,7 +30,7 @@ export class Workspace {
     this._sessions = [];
     this._defaultRegion = environment.defaultRegion;
     this._defaultLocation = environment.defaultLocation;
-    this._idpUrl = [];
+    this._idpUrls = [];
     this._profiles = [
       { id: uuid.v4(), name: environment.defaultAwsProfileName }
     ];
@@ -50,12 +50,12 @@ export class Workspace {
     };
   }
 
-  get idpUrl(): { id: string; url: string }[] {
-    return this._idpUrl;
+  get idpUrls(): { id: string; url: string }[] {
+    return this._idpUrls;
   }
 
-  set idpUrl(value: { id: string; url: string }[]) {
-    this._idpUrl = value;
+  set idpUrls(value: { id: string; url: string }[]) {
+    this._idpUrls = value;
   }
 
   get profiles(): { id: string; name: string }[] {

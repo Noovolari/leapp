@@ -1,16 +1,16 @@
 import { Injectable } from '@angular/core';
-import {AppService} from '../app.service';
-import {environment} from '../../../environments/environment';
-import {FileService} from '../file.service';
-import {Workspace} from '../../models/workspace';
+import {AppService} from './app.service';
+import {environment} from '../../environments/environment';
+import {FileService} from './file.service';
+import {Workspace} from '../models/workspace';
 import {serialize} from 'class-transformer';
-import {KeychainService} from '../keychain.service';
-import {AwsFederatedSession} from '../../models/aws-federated-session';
-import {AwsTrusterSession} from '../../models/aws-truster-session';
-import {AwsPlainSession} from '../../models/aws-plain-session';
-import {AwsSsoSession} from '../../models/aws-sso-session';
-import {AzureSession} from '../../models/azure-session';
-import {WorkspaceService} from '../workspace.service';
+import {KeychainService} from './keychain.service';
+import {AwsFederatedSession} from '../models/aws-federated-session';
+import {AwsTrusterSession} from '../models/aws-truster-session';
+import {AwsPlainSession} from '../models/aws-plain-session';
+import {AwsSsoSession} from '../models/aws-sso-session';
+import {AzureSession} from '../models/azure-session';
+import {WorkspaceService} from './workspace.service';
 
 @Injectable({
   providedIn: 'root'

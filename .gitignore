@@ -52,3 +52,5 @@ windows.pfx
 package-lock.json
 
 /electron/dist
+
+start.sh

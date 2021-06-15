@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { RetrocompatibilityService } from './retrocompatibility.service';
-import {mustInjected} from '../../../base-injectables';
+import {mustInjected} from '../../base-injectables';
 
 describe('RetrocompatibilityService', () => {
   let service: RetrocompatibilityService;

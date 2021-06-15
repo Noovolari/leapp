@@ -11,7 +11,7 @@ import {RotationService} from './services/rotation.service';
 import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
-import {RetrocompatibilityService} from './services/middleware/retrocompatibility.service';
+import {RetrocompatibilityService} from './services/retrocompatibility.service';
 
 @Component({
   selector: 'app-root',

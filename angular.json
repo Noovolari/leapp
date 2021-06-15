@@ -34,10 +34,7 @@
             "styles": [
               "src/styles.scss"
             ],
-            "scripts": [],
-            "allowedCommonJsDependencies": [
-              "crypto-js", "aws-sdk"
-            ]
+            "scripts": []
           },
           "configurations": {
             "staging": {
@@ -124,11 +121,15 @@
           }
         },
         "lint": {
-          "builder": "@angular-eslint/builder:lint",
+          "builder": "@angular-devkit/build-angular:tslint",
           "options": {
-            "lintFilePatterns": [
-              "src/**/*.ts",
-              "src/**/*.html"
+            "tsConfig": [
+              "tsconfig.app.json",
+              "tsconfig.spec.json",
+              "e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
             ]
           }
         },
@@ -148,7 +149,6 @@
           }
         }
       }
-    }
-  },
+    }},
   "defaultProject": "leapp-client"
 }

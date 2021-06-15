@@ -49,19 +49,6 @@ export class AzureService extends SessionService {
     this.workspaceService.addSession(session);
   }
 
-  async delete(sessionId: string): Promise<void> {
-    try {
-      await this.stop(sessionId);
-      this.workspaceService.removeSession(sessionId);
-    } catch(error) {
-      throw new LeappParseError(this, error.message);
-    }
-  }
-
-  async rotate(sessionId: string): Promise<void> {
-    return this.start(sessionId);
-  }
-
   async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
 
@@ -113,6 +100,10 @@ export class AzureService extends SessionService {
     return Promise.resolve(undefined);
   }
 
+  async rotate(sessionId: string): Promise<void> {
+    return this.start(sessionId);
+  }
+
   async stop(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
     try {
@@ -122,6 +113,15 @@ export class AzureService extends SessionService {
       throw new LeappExecuteError(this, err.message);
     } finally {
       this.sessionDeactivated(sessionId);
+    }
+  }
+
+  async delete(sessionId: string): Promise<void> {
+    try {
+      await this.stop(sessionId);
+      this.workspaceService.removeSession(sessionId);
+    } catch(error) {
+      throw new LeappParseError(this, error.message);
     }
   }
 

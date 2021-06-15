@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": {
     "name": "besharp",
     "email": "info@besharp.it"
@@ -47,6 +47,7 @@
     "electron-prod": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration production --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
     "electron-win": "DEL /Q electron\\dist && ng build --base-href ./ && tsc --p electron && electron .",
     "e2e": "ng e2e",
+    "release": "standard-version",
     "pack": "electron-builder --dir",
     "dist-mac-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
     "dist-mac-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
@@ -213,6 +214,7 @@
     "rxjs": "~6.6.7",
     "saml-encoder-decoder-js": "~1.0.1",
     "semver": "~7.3.5",
+    "standard-version": "^9.3.0",
     "sudo-prompt": "~9.2.1",
     "tslib": "~2.2.0",
     "update-electron-app": "~2.0.1",

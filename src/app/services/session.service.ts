@@ -35,23 +35,23 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  protected sessionLoading(sessionId: string) {
-    const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
-    if (session) {
-      const index = this.workspaceService.sessions.indexOf(session);
-      const currentSession: Session = this.workspaceService.sessions[index];
-      currentSession.status = SessionStatus.pending;
-      this.workspaceService.sessions[index] = currentSession;
-      this.workspaceService.sessions = [...this.workspaceService.sessions];
-    }
-  }
-
   protected sessionActivate(sessionId: string) {
     const index = this.workspaceService.sessions.findIndex(s => s.sessionId === sessionId);
     if (index > -1) {
       const currentSession: Session = this.workspaceService.sessions[index];
       currentSession.status = SessionStatus.active;
       currentSession.startDateTime = new Date().toISOString();
+      this.workspaceService.sessions[index] = currentSession;
+      this.workspaceService.sessions = [...this.workspaceService.sessions];
+    }
+  }
+
+  protected sessionLoading(sessionId: string) {
+    const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
+    if (session) {
+      const index = this.workspaceService.sessions.indexOf(session);
+      const currentSession: Session = this.workspaceService.sessions[index];
+      currentSession.status = SessionStatus.pending;
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
@@ -69,11 +69,6 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  protected sessionError(sessionId: string, error: any) {
-    this.sessionDeactivated(sessionId);
-    throw error;
-  }
-
   protected sessionDeactivated(sessionId: string) {
     const session = this.workspaceService.sessions.find(s => s.sessionId === sessionId);
     if (session) {
@@ -86,11 +81,16 @@ export abstract class SessionService extends NativeService {
     }
   }
 
-  abstract delete(sessionId: string): Promise<void>;
+  protected sessionError(sessionId: string, error: any) {
+    this.sessionDeactivated(sessionId);
+    throw error;
+  }
 
   abstract start(sessionId: string): Promise<void>;
 
+  abstract rotate(sessionId: string): Promise<void>;
+
   abstract stop(sessionId: string): Promise<void>;
 
-  abstract rotate(sessionId: string): Promise<void>;
+  abstract delete(sessionId: string): Promise<void>;
 }

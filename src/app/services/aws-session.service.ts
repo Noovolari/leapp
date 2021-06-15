@@ -34,21 +34,6 @@ export abstract class AwsSessionService extends SessionService {
     return (this.list().length > 0) ? this.list().filter((session) => session.type === SessionType.awsSso) : [];
   }
 
-  async delete(sessionId: string): Promise<void> {
-    try {
-      await this.stop(sessionId);
-      this.listTruster(this.get(sessionId)).forEach(sess => {
-        if (sess.status === SessionStatus.active) {
-          this.stop(sess.sessionId);
-        }
-        this.workspaceService.removeSession(sess.sessionId);
-      });
-      this.workspaceService.removeSession(sessionId);
-    } catch(error) {
-      this.sessionError(sessionId, error);
-    }
-  }
-
   async start(sessionId: string): Promise<void> {
     try {
       this.stopAllWithSameNameProfile(sessionId);
@@ -56,6 +41,17 @@ export abstract class AwsSessionService extends SessionService {
       const credentialsInfo = await this.generateCredentials(sessionId);
       await this.applyCredentials(sessionId, credentialsInfo);
       this.sessionActivate(sessionId);
+    } catch (error) {
+      this.sessionError(sessionId, error);
+    }
+  }
+
+  async rotate(sessionId: string): Promise<void> {
+    try {
+      this.sessionLoading(sessionId);
+      const credentialsInfo = await this.generateCredentials(sessionId);
+      await this.applyCredentials(sessionId, credentialsInfo);
+      this.sessionRotated(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
     }
@@ -70,13 +66,17 @@ export abstract class AwsSessionService extends SessionService {
     }
   }
 
-  async rotate(sessionId: string): Promise<void> {
+  async delete(sessionId: string): Promise<void> {
     try {
-      this.sessionLoading(sessionId);
-      const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(sessionId, credentialsInfo);
-      this.sessionRotated(sessionId);
-    } catch (error) {
+      await this.stop(sessionId);
+      this.listTruster(this.get(sessionId)).forEach(sess => {
+        if (sess.status === SessionStatus.active) {
+          this.stop(sess.sessionId);
+        }
+        this.workspaceService.removeSession(sess.sessionId);
+      });
+      this.workspaceService.removeSession(sessionId);
+    } catch(error) {
       this.sessionError(sessionId, error);
     }
   }

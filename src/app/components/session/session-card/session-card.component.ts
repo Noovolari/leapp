@@ -15,7 +15,6 @@ import {FileService} from '../../../services/file.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../services/session.service';
-import {CredentialsInfo} from "../../../models/credentials-info";
 
 @Component({
   selector: 'app-session-card',

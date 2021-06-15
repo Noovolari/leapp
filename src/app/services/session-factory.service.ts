@@ -18,7 +18,7 @@ import {SessionService} from './session.service';
 })
 export class SessionFactoryService {
 
-  private sessionServiceCache: SessionService[] = [];
+  private sessionServiceCache: SessionService[];
 
   constructor(
     private workspaceService: WorkspaceService,
@@ -26,10 +26,15 @@ export class SessionFactoryService {
     private appService: AppService,
     private executeService: ExecuteService,
     private fileService: FileService,
-    private awsSessionService: AwsSessionService) {}
+    private awsSessionService: AwsSessionService) {
+
+    this.sessionServiceCache = [];
+  }
 
   getService(accountType: SessionType): SessionService {
     // Return if service is already in the cache using flyweight pattern
+    this.sessionServiceCache = this.sessionServiceCache || [];
+
     if(this.sessionServiceCache[accountType.toString()]) {
       return this.sessionServiceCache[accountType.toString()];
     }
@@ -57,9 +62,7 @@ export class SessionFactoryService {
   }
 
   private getAwsTrusterSessionService(accountType: SessionType) {
-    const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService);
-    // TODO: check if there is another way to avoid circular dependency
-    service.setFactoryFunction(this.getService);
+    const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService, this);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

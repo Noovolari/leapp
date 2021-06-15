@@ -14,6 +14,8 @@ export abstract class SessionService extends NativeService {
   }
 
   get(sessionId: string): Session {
+    console.log(sessionId, this.list());
+
     const sessionFiltered = this.list().find(session => session.sessionId === sessionId);
     return sessionFiltered ? sessionFiltered : null;
   }

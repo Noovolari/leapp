@@ -95,8 +95,8 @@ export class CreateAccountComponent implements OnInit {
       const workspace = this.workspaceService.get();
 
       // We get all the applicable idp urls
-      if (workspace.idpUrl && workspace.idpUrl.length > 0) {
-        workspace.idpUrl.forEach(idp => {
+      if (workspace.idpUrls && workspace.idpUrls.length > 0) {
+        workspace.idpUrls.forEach(idp => {
           if (idp !== null) {
             this.idps.push({value: idp.id, label: idp.url});
           }

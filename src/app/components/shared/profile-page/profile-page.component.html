@@ -6,7 +6,7 @@
     <div class="tabs">
       <label class="tab {{activeTab === 1 ? 'active': ''}}" (click)="activeTab = 1;">General</label>
       <label class="tab {{activeTab === 2 ? 'active': ''}}" (click)="activeTab = 2;">SAML Auth</label>
-      <label class="tab {{activeTab === 3 ? 'active': ''}}" (click)="activeTab = 3;">aws Profiles</label>
+      <label class="tab {{activeTab === 3 ? 'active': ''}}" (click)="activeTab = 3;">AWS Profiles</label>
     </div>
 
     <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
@@ -83,7 +83,7 @@
             <th><label>Url</label></th><th class="text-right"><label>Actions</label></th>
             </thead>
             <tbody>
-            <ng-container *ngFor="let idpUrl of workspace.idpUrl">
+            <ng-container *ngFor="let idpUrl of workspace.idpUrls">
               <tr>
                 <td>{{idpUrl.url}}</td>
                 <td>
@@ -98,7 +98,7 @@
       </div>
 
       <div class="no-padding no-margin panel" *ngIf="activeTab === 3">
-        <h2 style="margin-top: 10px;">aws profiles list</h2>
+        <h2 style="margin-top: 10px;">AWS profiles list</h2>
 
         <div class="form-group" style="width: 88%; display: inline-block;">
           <label>aws Profile<span class="danger-text">*</span></label>

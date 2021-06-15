@@ -47,6 +47,19 @@ export class WorkspaceService extends NativeService {
     this._sessions.next(sessions);
   }
 
+  create(): void {
+    if (!this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
+      this.fileService.newDir(this.appService.getOS().homedir() + '/.Leapp', { recursive: true});
+      const workspace = new Workspace();
+      this.persist(workspace);
+    }
+  }
+
+  get(): Workspace {
+    const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination));
+    return deserialize(Workspace, workspaceJSON);
+  }
+
   addSession(session: Session) {
     // we assign a new copy of session by adding a new session to it
     this.sessions = [
@@ -59,17 +72,44 @@ export class WorkspaceService extends NativeService {
     this.sessions = this.sessions.filter(session => session.sessionId !== sessionId);
   }
 
-  create(): void {
-    if (!this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
-      this.fileService.newDir(this.appService.getOS().homedir() + '/.Leapp', { recursive: true});
-      const workspace = new Workspace();
+  updateDefaultRegion(defaultRegion: string) {
+    const workspace = this.get();
+    workspace.defaultRegion = defaultRegion;
+    this.persist(workspace);
+  }
+
+  updateDefaultLocation(defaultLocation: string) {
+    const workspace = this.get();
+    workspace.defaultLocation = defaultLocation;
+    this.persist(workspace);
+  }
+
+  getIdpUrl(idpUrlId: string): string {
+    const workspace = this.get();
+    const idpUrlFiltered = workspace.idpUrls.find(url => url.id === idpUrlId);
+    return idpUrlFiltered ? idpUrlFiltered.url : null;
+  }
+
+  addIdpUrl(idpUrl: { id: string; url: string }): void {
+    const workspace = this.get();
+    workspace.idpUrls.push(idpUrl);
+    this.persist(workspace);
+  }
+
+  updateIdpUrl(id: string, url: string) {
+    const workspace = this.get();
+    const index = workspace.idpUrls.findIndex(u => u.id === id);
+    if(index > -1) {
+      workspace.idpUrls[index].url = url;
       this.persist(workspace);
     }
   }
 
-  get(): Workspace {
-    const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination));
-    return deserialize(Workspace, workspaceJSON);
+  removeIdpUrl(id: string) {
+    const workspace = this.get();
+    const index = workspace.idpUrls.findIndex(u => u.id === id);
+    delete workspace.idpUrls[index];
+    this.persist(workspace);
   }
 
   getProfileName(profileId): string {
@@ -106,34 +146,6 @@ export class WorkspaceService extends NativeService {
     this.persist(workspace);
   }
 
-  getIdpUrl(idpUrlId: string): string {
-    const workspace = this.get();
-    const idpUrlFiltered = workspace.idpUrls.find(url => url.id === idpUrlId);
-    return idpUrlFiltered ? idpUrlFiltered.url : null;
-  }
-
-  addIdpUrl(idpUrl: { id: string; url: string }): void {
-    const workspace = this.get();
-    workspace.idpUrls.push(idpUrl);
-    this.persist(workspace);
-  }
-
-  updateIdpUrl(id: string, url: string) {
-    const workspace = this.get();
-    const index = workspace.idpUrls.findIndex(u => u.id === id);
-    if(index > -1) {
-      workspace.idpUrls[index].url = url;
-      this.persist(workspace);
-    }
-  }
-
-  removeIdpUrl(id: string) {
-    const workspace = this.get();
-    const index = workspace.idpUrls.findIndex(u => u.id === id);
-    delete workspace.idpUrls[index];
-    this.persist(workspace);
-  }
-
   configureAwsSso(region: string, portalUrl: string, expirationTime: string): void {
     const workspace = this.get();
     workspace.awsSsoConfiguration.region = region;
@@ -155,18 +167,6 @@ export class WorkspaceService extends NativeService {
   updateProxyConfiguration(proxyConfiguration: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
     const workspace = this.get();
     workspace.proxyConfiguration = proxyConfiguration;
-    this.persist(workspace);
-  }
-
-  updateDefaultRegion(defaultRegion: string) {
-    const workspace = this.get();
-    workspace.defaultRegion = defaultRegion;
-    this.persist(workspace);
-  }
-
-  updateDefaultLocation(defaultLocation: string) {
-    const workspace = this.get();
-    workspace.defaultLocation = defaultLocation;
     this.persist(workspace);
   }
 

@@ -28,6 +28,9 @@ export class RetrocompatibilityService {
     if (this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
       const workspaceParsed = this.parseWorkspaceFile();
       // use a never more used property to check if workspace has changed to new version
+
+      console.log(workspaceParsed);
+
       return workspaceParsed.avatar !== undefined;
     }
     return false;
@@ -88,7 +91,7 @@ export class RetrocompatibilityService {
   }
 
   private adaptIdpUrls(oldWorkspace: any, workspace: Workspace) {
-    workspace.idpUrl = oldWorkspace.workspaces[0].idpUrl;
+    workspace.idpUrls = oldWorkspace.workspaces[0].idpUrl;
   }
 
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: Workspace): Promise<void> {

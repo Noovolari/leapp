@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {NativeService} from './native-service';
 import {SessionStatus} from '../models/session-status';
 import {Session} from '../models/session';
@@ -14,7 +14,6 @@ export abstract class SessionService extends NativeService {
   }
 
   get(sessionId: string): Session {
-    console.log(sessionId, this.list());
 
     const sessionFiltered = this.list().find(session => session.sessionId === sessionId);
     return sessionFiltered ? sessionFiltered : null;

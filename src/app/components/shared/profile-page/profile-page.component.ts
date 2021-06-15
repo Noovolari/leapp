@@ -10,7 +10,6 @@ import * as uuid from 'uuid';
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
 import {AwsSessionService} from '../../../services/aws-session.service';
 import {WorkspaceService} from '../../../services/workspace.service';
-import {SessionType} from '../../../models/session-type';
 
 @Component({
   selector: 'app-profile-page',
@@ -149,7 +148,7 @@ export class ProfilePageComponent implements OnInit {
   }
 
   manageIdpUrl(id) {
-    console.log(id);
+
 
     const idpUrl = this.workspaceService.getIdpUrl(id);
     if (this.form.get('idpUrl').value !== '') {
@@ -205,7 +204,6 @@ export class ProfilePageComponent implements OnInit {
   }
 
   manageAwsProfile(id: string | number) {
-    console.log(id);
 
     const profileIndex = this.workspaceService.get().profiles.findIndex(p => p.id === id.toString());
     if (this.form.get('awsProfile').value !== '') {

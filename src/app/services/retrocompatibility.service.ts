@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AppService} from './app.service';
 import {environment} from '../../environments/environment';
 import {FileService} from './file.service';

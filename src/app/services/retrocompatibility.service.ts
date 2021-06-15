@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AppService} from './app.service';
 import {environment} from '../../environments/environment';
 import {FileService} from './file.service';
@@ -88,7 +88,7 @@ export class RetrocompatibilityService {
   }
 
   private adaptIdpUrls(oldWorkspace: any, workspace: Workspace) {
-    workspace.idpUrl = oldWorkspace.workspaces[0].idpUrl;
+    workspace.idpUrls = oldWorkspace.workspaces[0].idpUrl;
   }
 
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: Workspace): Promise<void> {

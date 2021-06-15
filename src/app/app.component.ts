@@ -61,7 +61,6 @@ export class AppComponent implements OnInit {
     }
 
     const workspace = this.workspaceService.get();
-    console.log(workspace);
 
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded(workspace);

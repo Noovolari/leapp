@@ -297,8 +297,6 @@ export class SessionCardComponent implements OnInit {
         await this.sessionService.stop(this.session.sessionId);
       }
 
-      console.log(this.selectedProfile);
-
       if(!this.workspaceService.getProfileName(this.selectedProfile.id)) {
         this.workspaceService.addProfile(this.selectedProfile);
       }

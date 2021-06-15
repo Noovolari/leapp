@@ -29,8 +29,6 @@ export class RetrocompatibilityService {
       const workspaceParsed = this.parseWorkspaceFile();
       // use a never more used property to check if workspace has changed to new version
 
-      console.log(workspaceParsed);
-
       return workspaceParsed.avatar !== undefined;
     }
     return false;

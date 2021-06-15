@@ -10,7 +10,6 @@ import * as uuid from 'uuid';
 import {AwsPlainSessionRequest, AwsPlainService} from '../../services/session/aws-plain.service';
 import {AwsTrusterSessionRequest, AwsTrusterService} from '../../services/session/aws-truster.service';
 import {LeappParseError} from '../../errors/leapp-parse-error';
-import {SessionFactoryService} from '../../services/session-factory.service';
 import {AwsFederatedSessionRequest, AwsFederatedService} from '../../services/session/aws-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure.service';
 
@@ -78,7 +77,6 @@ export class CreateAccountComponent implements OnInit {
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private sessionProviderService: SessionFactoryService,
     private workspaceService: WorkspaceService,
     private awsFederatedService: AwsFederatedService,
     private awsPlainService: AwsPlainService,

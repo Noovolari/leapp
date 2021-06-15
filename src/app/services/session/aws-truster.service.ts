@@ -9,6 +9,7 @@ import {Session} from '../../models/session';
 import {AwsTrusterSession} from '../../models/aws-truster-session';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
 import AWS from 'aws-sdk';
+import {SessionFactoryService} from '../session-factory.service';
 
 export interface AwsTrusterSessionRequest {
   accountName: string;
@@ -21,12 +22,11 @@ export interface AwsTrusterSessionRequest {
   providedIn: 'root'
 })
 export class AwsTrusterService extends AwsSessionService {
-  private factoryFunction: any;
-
   constructor(
     protected workspaceService: WorkspaceService,
     private appService: AppService,
-    private fileService: FileService
+    private fileService: FileService,
+    private factoryService: SessionFactoryService
   ) {
     super(workspaceService);
   }
@@ -42,10 +42,6 @@ export class AwsTrusterService extends AwsSessionService {
         aws_session_token: assumeRoleResponse.Credentials.SessionToken.trim(),
       }
     };
-  }
-
-  setFactoryFunction(factoryFunction: any) {
-    this.factoryFunction = factoryFunction;
   }
 
   create(sessionRequest: AwsTrusterSessionRequest, profileId: string): void {
@@ -90,7 +86,7 @@ export class AwsTrusterService extends AwsSessionService {
     }
 
     // Generate a credential set from Parent Session
-    const parentSessionService = this.factoryFunction(parentSession.type);
+    const parentSessionService = this.factoryService.getService(parentSession.type) as AwsSessionService;
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);
 
     // Make second jump: configure AWS SDK with parent credentials set

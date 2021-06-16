@@ -64,11 +64,6 @@ export class ProfileSidebarComponent implements OnInit {
     this.router.navigate(['/sessions', 'session-selected']);
   }
 
-  goToIntegrations() {
-    this.closeProfile();
-    this.router.navigate(['/integrations']);
-  }
-
   goToIdentityProvider() {
     this.closeProfile();
     this.router.navigate(['/', 'aws-sso']);

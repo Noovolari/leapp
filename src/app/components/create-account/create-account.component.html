@@ -98,7 +98,7 @@
         <ng-container *ngIf="sessionType !== eAccountType.azure">
           <div class="form-group" style="width: 2%; display: inline-block;"></div>
           <div class="form-group" style="width: 49%; display: inline-block;">
-            <label>aws Profile<span class="danger-text">*</span></label>
+            <label>aws Profile</label>
             <ng-select [items]="profiles"
                        [addTag]="addNewProfile"
                        formControlName="awsProfile"

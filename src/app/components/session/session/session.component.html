@@ -19,7 +19,7 @@
 
     <a (click)="createAccount();" tooltip="Create Account" class="small-btn"><i class="far fa-plus"></i></a>
     <span class="search-bar">
-      <input #filterField type="text" (keyup)="filterSessions($any($event.target).value)" placeholder="Search by..."/>
+      <input #filterField type="text" (keyup)="workspaceService.sessions = workspaceService.sessions" placeholder="Search by..."/>
       <i class="far fa-search"></i>
     </span>
   </div>
@@ -43,7 +43,7 @@
       <h3 class="mb-session">All other Accounts</h3>
     </li>
 
-    <ng-container *ngFor="let session of workspaceService.sessions$ | async | filtering: false | ordering">
+    <ng-container *ngFor="let session of workspaceService.sessions$ | async | querying:filterField.value:workspaceService.get() | filtering: false | ordering">
       <li *ngIf="(showOnly === 'ALL') || ($any(session).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
         <app-session-card [session]="session"></app-session-card>
       </li>

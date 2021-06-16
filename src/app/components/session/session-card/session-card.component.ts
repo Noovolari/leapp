@@ -219,16 +219,18 @@ export class SessionCardComponent implements OnInit {
    */
   async changeRegion() {
     if (this.selectedDefaultRegion) {
-      // If there is a valid region to change
+      let wasActive = false;
+
       if (this.session.status === SessionStatus.active) {
         // Stop temporary if the session is active
         await this.sessionService.stop(this.session.sessionId);
+        wasActive = true;
       }
 
       this.session.region = this.selectedDefaultRegion;
       this.sessionService.update(this.session.sessionId, this.session);
 
-      if (this.session.status === SessionStatus.active) {
+      if (wasActive) {
         this.startSession();
       }
 
@@ -293,18 +295,21 @@ export class SessionCardComponent implements OnInit {
 
   async changeProfile() {
     if (this.selectedProfile) {
-      if (this.session.status === SessionStatus.active) {
-        await this.sessionService.stop(this.session.sessionId);
-      }
+      let wasActive = false;
 
       if(!this.workspaceService.getProfileName(this.selectedProfile.id)) {
         this.workspaceService.addProfile(this.selectedProfile);
       }
 
+      if (this.session.status === SessionStatus.active) {
+        await this.sessionService.stop(this.session.sessionId);
+        wasActive = true;
+      }
+
       (this.session as any).profileId = this.selectedProfile.id;
       this.sessionService.update(this.session.sessionId, this.session);
 
-      if (this.session.status === SessionStatus.active) {
+      if (wasActive) {
         this.startSession();
       }
 

@@ -24,6 +24,9 @@ export class WorkspaceService extends NativeService {
   //   create a new BehaviorSubject for it, as well as the observable$, and getters/setters
   private readonly _sessions;
 
+  // Private singleton workspace
+  private workspace: Workspace;
+
   constructor(private appService: AppService, private fileService: FileService) {
     super();
 
@@ -50,14 +53,18 @@ export class WorkspaceService extends NativeService {
   create(): void {
     if (!this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
       this.fileService.newDir(this.appService.getOS().homedir() + '/.Leapp', { recursive: true});
-      const workspace = new Workspace();
-      this.persist(workspace);
+      this.workspace = new Workspace();
+      this.persist(this.workspace);
     }
   }
 
   get(): Workspace {
-    const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination));
-    return deserialize(Workspace, workspaceJSON);
+    if(!this.workspace) {
+      const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination));
+      this.workspace = deserialize(Workspace, workspaceJSON);
+      return this.workspace;
+    }
+    return this.workspace;
   }
 
   addSession(session: Session) {

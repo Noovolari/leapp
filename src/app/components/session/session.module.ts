@@ -13,6 +13,7 @@ import { FilteringPipe } from './session/filtering.pipe';
 import { OrderingPipe } from './session/ordering.pipe';
 import {IconPipe} from './session-card/icon.pipe';
 import {DetailPipe} from './session-card/detail.pipe';
+import {QueryingPipe} from './session/querying.pipe';
 
 @NgModule({
   declarations: [
@@ -20,6 +21,7 @@ import {DetailPipe} from './session-card/detail.pipe';
     SessionCardComponent,
     FilteringPipe,
     OrderingPipe,
+    QueryingPipe,
     IconPipe,
     DetailPipe
   ],

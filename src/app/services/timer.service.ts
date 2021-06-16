@@ -5,7 +5,7 @@ import {Injectable} from '@angular/core';
 })
 export class TimerService {
   private _timer: NodeJS.Timeout;
-  private timeInterval = 1000;
+  private timeInterval = 10000;
 
   constructor() { }
 

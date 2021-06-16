@@ -4,11 +4,8 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../../services/app.service';
 import {HttpClient} from '@angular/common/http';
 import {Session} from '../../../models/session';
-import {AwsFederatedSession} from '../../../models/aws-federated-session';
-import {AzureSession} from '../../../models/azure-session';
 import {BsModalService} from 'ngx-bootstrap/modal';
-import {SessionType} from '../../../models/session-type';
-import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-error';
+import {SessionService} from '../../../services/session.service';
 
 @Component({
   selector: 'app-session',
@@ -19,10 +16,6 @@ export class SessionComponent implements OnInit {
 
   @ViewChild('filterField', { static: false })
   filterField: ElementRef;
-
-  // Session Data
-  activeSessions: Session[] = [];
-  notActiveSessions: Session[] = [];
 
   // Data for the select
   modalAccounts = [];
@@ -39,7 +32,6 @@ export class SessionComponent implements OnInit {
   showOnly = 'ALL';
 
   workspace;
-  subscription;
 
   constructor(
     private router: Router,
@@ -61,43 +53,6 @@ export class SessionComponent implements OnInit {
   createAccount() {
     // Go!
     this.router.navigate(['/managing', 'create-account']);
-  }
-
-  filterSessions(query) {
-    this.filterInactiveSessions(query);
-  }
-
-  filterInactiveSessions(query) {
-    if (query !== '') {
-      this.notActiveSessions = this.notActiveSessions.filter(s => {
-        const idpID = this.workspace.idpUrl.filter(idp => idp && idp.url.toLowerCase().indexOf(query.toLowerCase()) > -1).map(m => m.id);
-        return s.sessionName.toLowerCase().indexOf(query.toLowerCase()) > -1 ||
-          ((s as AwsFederatedSession).roleArn && (s as AwsFederatedSession).roleArn.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
-          (this.getProfileName(this.getProfileId(s)).toLowerCase().indexOf(query.toLowerCase()) > -1) ||
-          (idpID.indexOf((s as AwsFederatedSession).idpUrlId) > -1) ||
-          ((s as AzureSession).tenantId && (s as AzureSession).tenantId.toLowerCase().indexOf(query.toLowerCase()) > -1) ||
-          ((s as AzureSession).subscriptionId && (s as AzureSession).subscriptionId.toLowerCase().indexOf(query.toLowerCase()) > -1);
-      });
-    }
-  }
-
-  getProfileId(session: Session): string {
-    if(session.type !== SessionType.azure) {
-      return (session as any).profileId;
-      throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
-    }
-  }
-
-  getProfileName(profileId: string): string {
-    const workspace = this.workspaceService.get();
-    let profileName = '';
-    for (let i = 0; i < workspace.profiles.length; i++) {
-      if (workspace.profiles[i].id === profileId) {
-        profileName = workspace.profiles[i].name;
-        break;
-      }
-    }
-    return profileName;
   }
 
   setVisibility(name) {

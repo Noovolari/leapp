@@ -204,7 +204,7 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   openAccessStrategyDocumentation() {
-    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/blob/master/README.md');
+    this.appService.openExternalUrl('https://github.com/Noovolari/leapp/wiki');
   }
 
   /**

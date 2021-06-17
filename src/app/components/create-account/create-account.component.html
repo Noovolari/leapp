@@ -31,23 +31,23 @@
 
     <ng-container *ngIf="provider !== eAccountType.azure && providerSelected && typeSelection">
       <h1>Choose your Access Strategy</h1>
-      <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
+      <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a class="link-wiki" (click)="openAccessStrategyDocumentation();">here</a></p>
       <div class="form-group" style="width: 100%; display: inline-block;">
         <label>My Access Strategy is:</label>
         <br>
         <ng-container *ngIf="sessionType === undefined">
             <div class="correct-top">
               <button type="button" class="providers {{sessionType === eAccountType.awsFederated ? 'selected' : ''}}" (click)="hasSsoUrl = true; setAccessStrategy(eAccountType.awsFederated);">
-                <i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated
+                Federated
               </button>
               <button type="button" class="providers {{sessionType === eAccountType.awsPlain ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsPlain);">
-                <i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain
+                Plain
               </button>
               <button type="button" class="providers {{sessionType === eAccountType.awsTruster ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsTruster);" *ngIf="!firstTime">
-                <i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster
+                Truster
               </button>
-              <span class="providers disabled second-step-fix" *ngIf="firstTime" tooltip="You need at least one Federated or Plain aws account to unlock this feature.">
-                <i class="fa fa-info"></i> Truster
+              <span class="providers disabled second-step-fix" *ngIf="firstTime">
+                Truster
               </span>
             </div>
         </ng-container>
@@ -60,7 +60,7 @@
     <ng-container *ngIf="((provider !== eAccountType.awsFederated) || (hasSsoUrl && (provider === eAccountType.awsFederated))) && !typeSelection && providerSelected">
 
       <h1>Choose your Access Strategy</h1>
-      <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a (click)="openAccessStrategyDocumentation();">here</a></p>
+      <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a class="link-wiki" (click)="openAccessStrategyDocumentation();">here</a></p>
       <div style="width: 100%; display: inline-block;">
         <!-- ================================================================== -->
         <!-- ==                    LOGO FOR AWS ACCOUNTS ARE                 == -->
@@ -70,9 +70,9 @@
             <label>My Access Strategy is:</label>
             <br>
             <span class="providers">
-              <ng-container *ngIf="sessionType === eAccountType.awsFederated"><i class="fa fa-info" tooltip="This is a set of option to create federated accounts"></i> Federated</ng-container>
-              <ng-container *ngIf="sessionType === eAccountType.awsTruster"><i class="fa fa-info" tooltip="This is a set of option to create truster accounts"></i> Truster</ng-container>
-              <ng-container *ngIf="sessionType === eAccountType.awsPlain"><i class="fa fa-info" tooltip="This is a set of option to create plain accounts"></i> Plain</ng-container>
+              <ng-container *ngIf="sessionType === eAccountType.awsFederated">Federated</ng-container>
+              <ng-container *ngIf="sessionType === eAccountType.awsTruster">Truster</ng-container>
+              <ng-container *ngIf="sessionType === eAccountType.awsPlain">Plain</ng-container>
             </span>
             <br><br>
           </div>
@@ -86,7 +86,7 @@
             <label>My Access Strategy is:</label>
             <br>
             <span class="providers">
-              <ng-container *ngIf="sessionType === eAccountType.azure"><i class="fa fa-info" tooltip="This is a set of option to create azure accounts"></i> Azure</ng-container>
+              <ng-container *ngIf="sessionType === eAccountType.azure">Azure</ng-container>
             </span>
             <br><br>
           </div>
@@ -179,14 +179,14 @@
         <ng-container *ngIf="sessionType === eAccountType.awsPlain">
           <h2>Add secret</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
-            <label style="margin-bottom: 0;">Access  Key<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="Add access key"></i></label>
+            <label style="margin-bottom: 0;">Access  Key<span class="danger-text">*</span></label>
             <input formControlName="accessKey" type="text" class="form-control" placeholder="Access Key *">
           </div>
 
           <div style="width: 2%; height: 1px; display: inline-block;"></div>
 
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
-            <label style="margin-bottom: 0;">Secret Key<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="Add secret key"></i></label>
+            <label style="margin-bottom: 0;">Secret Key<span class="danger-text">*</span></label>
             <input formControlName="secretKey" type="text" class="form-control" placeholder="Secret Key *">
           </div>
         </ng-container>

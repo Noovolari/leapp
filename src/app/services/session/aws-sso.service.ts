@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import {Injectable} from '@angular/core';
 import {AwsSessionService} from '../aws-session.service';
 import {WorkspaceService} from '../workspace.service';
 import {CredentialsInfo} from '../../models/credentials-info';
@@ -10,8 +10,11 @@ import {AppService} from '../app.service';
 import SSO, {
   AccountInfo,
   GetRoleCredentialsRequest,
-  GetRoleCredentialsResponse, ListAccountRolesRequest, ListAccountsRequest,
-  LogoutRequest, RoleInfo
+  GetRoleCredentialsResponse,
+  ListAccountRolesRequest,
+  ListAccountsRequest,
+  LogoutRequest,
+  RoleInfo
 } from 'aws-sdk/clients/sso';
 
 import {environment} from '../../../environments/environment';
@@ -23,6 +26,7 @@ import SSOOIDC, {
 } from 'aws-sdk/clients/ssooidc';
 
 import {KeychainService} from '../keychain.service';
+import {SessionType} from '../../models/session-type';
 
 export interface AwsSsoSessionRequest {
   sessionName: string;
@@ -70,6 +74,7 @@ export interface SsoSession {
   roleArn: string;
   email: string;
   region: string;
+  profileId: string;
 }
 
 @Injectable({
@@ -279,11 +284,17 @@ export class AwsSsoService extends AwsSessionService {
     const awsSsoSessions: SsoSession[] = [];
 
     accountRoles.forEach((accountRole) => {
+
+      const oldSession = this.findOldSession(accountInfo, accountRole);
+
+      console.log(oldSession);
+
       const awsSsoSession = {
         email: accountInfo.emailAddress,
-        region: this.workspaceService.get().defaultRegion || environment.defaultRegion,
+        region: oldSession?.region || this.workspaceService.get().defaultRegion || environment.defaultRegion,
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
+        profileId: oldSession?.profileId || this.workspaceService.getDefaultProfileId()
       };
       awsSsoSessions.push(awsSsoSession);
     });
@@ -440,5 +451,23 @@ export class AwsSsoService extends AwsSessionService {
 
   private async getAccessTokenFromKeychain(): Promise<string> {
     return this.keychainService.getSecret(environment.appName, 'aws-sso-access-token');
+  }
+
+  private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
+
+    for (let i = 0; i < this.workspaceService.sessions.length; i++) {
+      const sess = this.workspaceService.sessions[i];
+
+      if(sess.type === SessionType.awsSso) {
+        if (
+          ((sess as AwsSsoSession).email === accountInfo.emailAddress ) &&
+          ((sess as AwsSsoSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}` )
+        ) {
+          return { region: (sess as AwsSsoSession).region, profileId: (sess as AwsSsoSession).profileId };
+        }
+      }
+    }
+
+    return undefined;
   }
 }

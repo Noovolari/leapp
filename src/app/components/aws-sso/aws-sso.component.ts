@@ -61,7 +61,7 @@ export class AwsSsoComponent implements OnInit {
 
     this.awsSsoService.sync(region, portalUrl).then((ssoSessions: SsoSession[]) => {
       ssoSessions.forEach(ssoSession => {
-        this.awsSsoService.create(ssoSession, this.workspaceService.getDefaultProfileId());
+        this.awsSsoService.create(ssoSession, ssoSession.profileId);
       });
       this.router.navigate(['/sessions', 'session-selected']);
     });

@@ -84,7 +84,7 @@
             </thead>
             <tbody>
             <ng-container *ngFor="let idpUrl of workspace.idpUrls">
-              <tr>
+              <tr *ngIf="idpUrl">
                 <td>{{idpUrl.url}}</td>
                 <td>
                   <button class="xs-btn" type="button" (click)="editIdpUrl(idpUrl.id);"><i class="fa fa-edit"></i></button>
@@ -118,7 +118,7 @@
             </thead>
             <tbody>
             <ng-container *ngFor="let profile of workspace.profiles">
-              <tr>
+              <tr *ngIf="profile">
                 <td>{{profile.name}}</td>
                 <td>
                   <ng-container *ngIf="profile.name !== 'default'">

@@ -64,6 +64,9 @@ export class WorkspaceService extends NativeService {
       this.workspace = deserialize(Workspace, workspaceJSON);
       return this.workspace;
     }
+
+    console.log('checking', this.workspace);
+
     return this.workspace;
   }
 
@@ -115,7 +118,9 @@ export class WorkspaceService extends NativeService {
   removeIdpUrl(id: string) {
     const workspace = this.get();
     const index = workspace.idpUrls.findIndex(u => u.id === id);
-    delete workspace.idpUrls[index];
+
+    workspace.idpUrls.splice(index, 1);
+
     this.persist(workspace);
   }
 
@@ -149,7 +154,8 @@ export class WorkspaceService extends NativeService {
   removeProfile(id: string) {
     const workspace = this.get();
     const profileIndex = workspace.profiles.findIndex(p => p.id === id);
-    delete workspace.profiles[profileIndex];
+    workspace.profiles.splice(profileIndex, 1);
+
     this.persist(workspace);
   }
 

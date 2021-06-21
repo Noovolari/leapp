@@ -28,13 +28,14 @@ export class RetrocompatibilityService {
     if (this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
       const workspaceParsed = this.parseWorkspaceFile();
       // use a never more used property to check if workspace has changed to new version
-
-      return workspaceParsed.avatar !== undefined;
+      return workspaceParsed.defaultWorkspace === 'default';
     }
     return false;
   }
 
   async adaptOldWorkspaceFile(): Promise<void> {
+    (this.workspaceService as any).workspace = undefined;
+
     // We need to adapt Sessions, IdpUrls, AwsSso Config, Proxy Config
     const workspace = new Workspace();
     const oldWorkspace = this.parseWorkspaceFile();
@@ -66,6 +67,7 @@ export class RetrocompatibilityService {
   }
 
   private persists(workspace: Workspace): void {
+    this.appService.getFs().unlinkSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination);
     this.fileService.writeFileSync(
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
       this.fileService.encryptText(serialize(workspace))

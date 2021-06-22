@@ -9,7 +9,11 @@ import {Session} from '../../models/session';
 import {AwsTrusterSession} from '../../models/aws-truster-session';
 import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
 import AWS from 'aws-sdk';
-import {SessionFactoryService} from '../session-factory.service';
+import {SessionType} from '../../models/session-type';
+import {AwsFederatedService} from './aws-federated.service';
+import {KeychainService} from '../keychain.service';
+import {AwsPlainService} from "./aws-plain.service";
+import {AwsSsoService} from "./aws-sso.service";
 
 export interface AwsTrusterSessionRequest {
   accountName: string;
@@ -22,11 +26,12 @@ export interface AwsTrusterSessionRequest {
   providedIn: 'root'
 })
 export class AwsTrusterService extends AwsSessionService {
+
   constructor(
     protected workspaceService: WorkspaceService,
     private appService: AppService,
     private fileService: FileService,
-    private factoryService: SessionFactoryService
+    private keychainService: KeychainService
   ) {
     super(workspaceService);
   }
@@ -86,7 +91,15 @@ export class AwsTrusterService extends AwsSessionService {
     }
 
     // Generate a credential set from Parent Session
-    const parentSessionService = this.factoryService.getService(parentSession.type) as AwsSessionService;
+    let parentSessionService;
+    if(parentSession.type === SessionType.awsFederated) {
+      parentSessionService = new AwsFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
+    } else if(parentSession.type === SessionType.awsPlain) {
+      parentSessionService = new AwsPlainService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
+    } else if(parentSession.type === SessionType.awsSso) {
+      parentSessionService = new AwsSsoService(this.workspaceService, this.fileService, this.appService, this.keychainService) as AwsSessionService;
+    }
+
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);
 
     // Make second jump: configure AWS SDK with parent credentials set

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {FileService} from '../../../services/file.service';
 import {AppService, LoggerLevel} from '../../../services/app.service';
@@ -11,26 +11,29 @@ import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-err
 import {AwsFederatedSession} from '../../../models/aws-federated-session';
 import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
+import {SessionFactoryService} from '../../../services/session-factory.service';
 
 @Component({
   selector: 'app-tray-menu',
   templateUrl: './tray-menu.component.html',
   styleUrls: ['./tray-menu.component.scss']
 })
-export class TrayMenuComponent implements OnInit {
+export class TrayMenuComponent implements OnInit, OnDestroy {
 
   // Used to define the only tray we want as active especially in linux context
   currentTray;
+  subscribed;
 
   constructor(private workspaceService: WorkspaceService,
               private fileService: FileService,
               private sessionService: SessionService,
               private updaterService: UpdaterService,
+              private sessionProviderService: SessionFactoryService,
               private appService: AppService) {
   }
 
   ngOnInit() {
-    this.workspaceService.sessions$.subscribe(() => {
+    this.subscribed = this.workspaceService.sessions$.subscribe(() => {
       this.generateMenu();
     });
     this.generateMenu();
@@ -48,7 +51,8 @@ export class TrayMenuComponent implements OnInit {
     const version = this.appService.getApp().getVersion();
 
     let voices = [];
-    const allSessions = this.sessionService.list().filter((value, index) => index < 10);
+    const actives = this.sessionService.listActive();
+    const allSessions = actives.concat(this.sessionService.list().filter(session => session.status === SessionStatus.inactive).filter((_, index) => index < (10 - actives.length)));
     allSessions.forEach((session: Session) => {
       let icon = '';
       let label = '';
@@ -79,12 +83,13 @@ export class TrayMenuComponent implements OnInit {
           type: 'normal',
           icon,
           click: async () => {
+            const factorizedSessionService = this.sessionProviderService.getService(session.type);
+
             if (session.status !== SessionStatus.active) {
-              await this.sessionService.start(session.sessionId);
+              await factorizedSessionService.start(session.sessionId);
             } else {
-              await this.sessionService.stop(session.sessionId);
+              await factorizedSessionService.stop(session.sessionId);
             }
-            this.generateMenu();
           }
         },
       );
@@ -173,6 +178,10 @@ export class TrayMenuComponent implements OnInit {
 
     // Finally quit
     this.appService.quit();
+  }
+
+  ngOnDestroy(): void {
+    this.subscribed.unsubscribe();
   }
 
 }

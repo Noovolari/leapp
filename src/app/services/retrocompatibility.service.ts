@@ -33,7 +33,7 @@ export class RetrocompatibilityService {
     return false;
   }
 
-  async adaptOldWorkspaceFile(): Promise<void> {
+  async adaptOldWorkspaceFile(): Promise<Workspace> {
     (this.workspaceService as any).workspace = undefined;
 
     // We need to adapt Sessions, IdpUrls, AwsSso Config, Proxy Config
@@ -56,6 +56,8 @@ export class RetrocompatibilityService {
       this.persists(workspace);
       // Apply sessions to behaviour subject
       this.workspaceService.sessions = workspace.sessions;
+
+      return workspace;
     }
   }
 
@@ -67,7 +69,7 @@ export class RetrocompatibilityService {
   }
 
   private persists(workspace: Workspace): void {
-    this.appService.getFs().unlinkSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination);
+    // this.appService.getFs().unlinkSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination);
     this.fileService.writeFileSync(
       this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
       this.fileService.encryptText(serialize(workspace))

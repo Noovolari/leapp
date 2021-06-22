@@ -13,6 +13,7 @@ import {BehaviorSubject, Observable} from 'rxjs';
 })
 export class WorkspaceService extends NativeService {
 
+
   // Expose the observable$ part of the _sessions subject (read only stream)
   readonly sessions$: Observable<Session[]>;
 
@@ -25,7 +26,7 @@ export class WorkspaceService extends NativeService {
   private readonly _sessions;
 
   // Private singleton workspace
-  private workspace: Workspace;
+  private _workspace: Workspace;
 
   constructor(private appService: AppService, private fileService: FileService) {
     super();
@@ -36,6 +37,14 @@ export class WorkspaceService extends NativeService {
     this.create();
     // TODO: check if it is possible to call directly this._sessions.next(this.getPersistedSessions())
     this.sessions = this.getPersistedSessions();
+  }
+
+  get workspace(): Workspace {
+    return this._workspace;
+  }
+
+  set workspace(value: Workspace) {
+    this._workspace = value;
   }
 
   // the getter will return the last value emitted in _sessions subject
@@ -53,21 +62,21 @@ export class WorkspaceService extends NativeService {
   create(): void {
     if (!this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
       this.fileService.newDir(this.appService.getOS().homedir() + '/.Leapp', { recursive: true});
-      this.workspace = new Workspace();
-      this.persist(this.workspace);
+      this._workspace = new Workspace();
+      this.persist(this._workspace);
     }
   }
 
   get(): Workspace {
-    if(!this.workspace) {
+    if(!this._workspace) {
       const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination));
-      this.workspace = deserialize(Workspace, workspaceJSON);
-      return this.workspace;
+      this._workspace = deserialize(Workspace, workspaceJSON);
+      return this._workspace;
     }
 
-    console.log('checking', this.workspace);
+    console.log('checking', this._workspace);
 
-    return this.workspace;
+    return this._workspace;
   }
 
   addSession(session: Session) {

@@ -6,13 +6,19 @@ import {serialize} from 'class-transformer';
 import {Workspace} from '../models/workspace';
 import {AppService} from './app.service';
 import SpyObj = jasmine.SpyObj;
-import {FileService} from "./file.service";
+import {FileService} from './file.service';
+import {WorkspaceService} from './workspace.service';
+import {KeychainService} from './keychain.service';
+import createSpyObj = jasmine.createSpyObj;
 
 describe('RetrocompatibilityService', () => {
   let service: RetrocompatibilityService;
+  let workspaceService: WorkspaceService;
 
   let spyAppService: SpyObj<AppService>;
   let spyFileService;
+
+  let spyKeychain: SpyObj<KeychainService>;
 
   const mockedOldFile = {
     licence: '',
@@ -164,14 +170,21 @@ describe('RetrocompatibilityService', () => {
     spyFileService.writeFileSync.and.callFake((_: string, __: string) => {});
     spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()) );
 
+    spyKeychain = jasmine.createSpyObj('KeychainService', ['getSecret', 'saveSecret']);
+    spyKeychain.getSecret.and.callFake((serv: string, account: string) => serv + '_' + account);
+    spyKeychain.saveSecret.and.returnValue(Promise.resolve());
+
     TestBed.configureTestingModule({
       providers: [
         RetrocompatibilityService,
         { provide: AppService, useValue: spyAppService },
-        { provide: FileService, useValue: spyFileService }
+        { provide: FileService, useValue: spyFileService },
+        { provide: KeychainService, useValue: spyKeychain }
       ].concat(mustInjected())
     });
+
     service = TestBed.inject(RetrocompatibilityService);
+    workspaceService = TestBed.inject(WorkspaceService);
   });
 
   it('should be created', () => {
@@ -187,11 +200,62 @@ describe('RetrocompatibilityService', () => {
     });
 
     it('should indicate false if file is not present', () => {
-
+      const retroService = TestBed.inject(RetrocompatibilityService);
+      spyFileService.exists.and.returnValue(false);
+      expect(retroService.isRetroPatchNecessary()).toEqual(false);
     });
 
     it('should indicate false if key is not there', () => {
+      const retroService = TestBed.inject(RetrocompatibilityService);
 
+      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify({}));
+      expect(retroService.isRetroPatchNecessary()).toEqual(false);
+    });
+
+    it('should return a default workspace if false', () => {
+      workspaceService = TestBed.inject(WorkspaceService);
+
+      const retroService = TestBed.inject(RetrocompatibilityService);
+      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify({}));
+      expect(retroService.isRetroPatchNecessary()).toEqual(false);
+
+      const workspace = new Workspace();
+      workspace.profiles = workspaceService.get().profiles;
+
+      expect(JSON.stringify(workspace)).toEqual(JSON.stringify(workspaceService.get()));
+    });
+  });
+
+  describe('adaptOldWorkspaceFile', () => {
+    it('should return a modern copy of the workspace', async () => {
+
+      const retroService = TestBed.inject(RetrocompatibilityService);
+
+      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify(mockedOldFile));
+
+      const workspace = new Workspace();
+
+      workspace.defaultLocation = 'eastus';
+      workspace.defaultRegion = 'us-east-1';
+
+      workspace.idpUrls = mockedOldFile.workspaces[0].idpUrl;
+
+      const returnedWorkspace = await retroService.adaptOldWorkspaceFile();
+
+      workspace.sessions = returnedWorkspace.sessions;
+      workspace.profiles = returnedWorkspace.profiles;
+      workspace.proxyConfiguration = mockedOldFile.workspaces[0].proxyConfiguration;
+
+      workspace.awsSsoConfiguration.region = 'Leapp_AWS_SSO_REGION';
+      workspace.awsSsoConfiguration.portalUrl = 'Leapp_AWS_SSO_PORTAL_URL';
+      workspace.awsSsoConfiguration.expirationTime = 'Leapp_AWS_SSO_EXPIRATION_TIME';
+
+      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify(new Workspace()));
+
+      expect(returnedWorkspace).toEqual(workspace);
+      expect((returnedWorkspace as any).defaultWorkspace).toBe(undefined);
+      expect((returnedWorkspace as any).avatar).toBe(undefined);
+      expect((returnedWorkspace as any).workspaces).toBe(undefined);
     });
   });
 });

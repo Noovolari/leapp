@@ -24,11 +24,11 @@ describe('OrderingPipe', () => {
     const pipe = new OrderingPipe();
 
     // YYYY - DD - MM
-    sessions[0].lastStopDateTime = new Date('2021-04-03').toISOString();
-    sessions[1].lastStopDateTime = new Date('2021-02-03').toISOString();
-    sessions[2].lastStopDateTime = new Date('2021-05-03').toISOString();
-    sessions[3].lastStopDateTime = new Date('2021-01-03').toISOString();
-    sessions[4].lastStopDateTime = new Date('2021-08-03').toISOString();
+    sessions[0].startDateTime = new Date('2021-04-03').toISOString();
+    sessions[1].startDateTime = new Date('2021-02-03').toISOString();
+    sessions[2].startDateTime = new Date('2021-05-03').toISOString();
+    sessions[3].startDateTime = new Date('2021-01-03').toISOString();
+    sessions[4].startDateTime = new Date('2021-08-03').toISOString();
 
     expect(sessions[0].sessionName).toBe('account1');
     expect(sessions[1].sessionName).toBe('account2');
@@ -48,8 +48,8 @@ describe('OrderingPipe', () => {
   it('should order even when lastStopDateTime is not managed directly', () => {
     const pipe = new OrderingPipe();
 
-    sessions[0].lastStopDateTime = new Date('2000-02-03').toISOString();
-    sessions[4].lastStopDateTime = new Date('2000-03-03').toISOString();
+    sessions[0].startDateTime = new Date('2000-02-03').toISOString();
+    sessions[4].startDateTime = new Date('2000-03-03').toISOString();
 
     sessions = pipe.transform(sessions);
     // Because [1], [2], [3] are set automatically their value is today which is always
@@ -61,11 +61,11 @@ describe('OrderingPipe', () => {
   it('should invert the order when asc option is used', () => {
     const pipe = new OrderingPipe();
 
-    sessions[0].lastStopDateTime = new Date('2021-04-03').toISOString();
-    sessions[1].lastStopDateTime = new Date('2021-02-03').toISOString();
-    sessions[2].lastStopDateTime = new Date('2021-05-03').toISOString();
-    sessions[3].lastStopDateTime = new Date('2021-01-03').toISOString();
-    sessions[4].lastStopDateTime = new Date('2021-08-03').toISOString();
+    sessions[0].startDateTime = new Date('2021-04-03').toISOString();
+    sessions[1].startDateTime = new Date('2021-02-03').toISOString();
+    sessions[2].startDateTime = new Date('2021-05-03').toISOString();
+    sessions[3].startDateTime = new Date('2021-01-03').toISOString();
+    sessions[4].startDateTime = new Date('2021-08-03').toISOString();
 
     expect(sessions[0].sessionName).toBe('account1');
     expect(sessions[1].sessionName).toBe('account2');

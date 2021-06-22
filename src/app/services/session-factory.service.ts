@@ -3,7 +3,6 @@ import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
 import {FileService} from './file.service';
-import {AwsSessionService} from './aws-session.service';
 import {SessionType} from '../models/session-type';
 import {AwsPlainService} from './session/aws-plain.service';
 import {AwsTrusterService} from './session/aws-truster.service';
@@ -25,8 +24,7 @@ export class SessionFactoryService {
     private keychainService: KeychainService,
     private appService: AppService,
     private executeService: ExecuteService,
-    private fileService: FileService,
-    private awsSessionService: AwsSessionService) {
+    private fileService: FileService) {
 
     this.sessionServiceCache = [];
   }
@@ -62,13 +60,13 @@ export class SessionFactoryService {
   }
 
   private getAwsTrusterSessionService(accountType: SessionType) {
-    const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService, this);
+    const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService, this.keychainService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsSsoSessionService(accountType: SessionType) {
-    const service = new AwsSsoService(this.workspaceService, this.fileService, this.appService, this.keychainService, this.awsSessionService);
+    const service = new AwsSsoService(this.workspaceService, this.fileService, this.appService, this.keychainService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

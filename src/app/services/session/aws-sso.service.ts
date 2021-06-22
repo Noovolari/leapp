@@ -90,8 +90,7 @@ export class AwsSsoService extends AwsSessionService {
     protected workspaceService: WorkspaceService,
     private fileService: FileService,
     private appService: AppService,
-    private keychainService: KeychainService,
-    private awsSessionService: AwsSessionService
+    private keychainService: KeychainService
   ) {
     super(workspaceService);
   }
@@ -340,12 +339,12 @@ export class AwsSsoService extends AwsSessionService {
   }
 
   private removeSsoSessionsFromWorkspace(): void {
-    const sessions = this.awsSessionService.listAwsSso();
+    const sessions = this.listAwsSso();
     sessions.forEach(sess => {
       // Verify and delete eventual truster sessions from old Sso session
-      const trusterSessions = this.awsSessionService.listTruster(sess);
+      const trusterSessions = this.listTruster(sess);
       trusterSessions.forEach(session => {
-        this.awsSessionService.delete(session.sessionId);
+        this.delete(session.sessionId);
       });
 
       // Now we can safely remove

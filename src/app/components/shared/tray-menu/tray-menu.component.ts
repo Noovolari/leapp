@@ -43,7 +43,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     if(session.type !== SessionType.azure) {
       return (session as any).profileId;
     } else {
-      throw new LeappNotAwsAccountError(this, 'cannot retrieve profile id of an account that is not an AWS one');
+      return undefined;
     }
   }
 

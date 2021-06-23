@@ -1,11 +1,14 @@
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {AppService} from '../../services/app.service';
+import {AppService, ToastLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Workspace} from '../../models/workspace';
 import {SessionType} from '../../models/session-type';
-import {Session} from '../../models/session';
 import {AwsPlainSession} from '../../models/aws-plain-session';
+import {WorkspaceService} from '../../services/workspace.service';
+import {KeychainService} from '../../services/keychain.service';
+import {environment} from '../../../environments/environment';
+import {SessionService} from '../../services/session.service';
 
 @Component({
   selector: 'app-edit-account',
@@ -17,7 +20,7 @@ export class EditAccountComponent implements OnInit {
 
   accountType = SessionType.awsPlain;
   provider = SessionType.awsFederated;
-  selectedSession: Session;
+  selectedSession: AwsPlainSession;
 
   selectedAccountNumber = '';
   selectedRole = '';
@@ -29,10 +32,8 @@ export class EditAccountComponent implements OnInit {
   public form = new FormGroup({
     secretKey: new FormControl('', [Validators.required]),
     accessKey: new FormControl('', [Validators.required]),
-    accountNumber: new FormControl('', [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
     name: new FormControl('', [Validators.required]),
     awsRegion: new FormControl(''),
-    plainUser: new FormControl('', [Validators.required]),
     mfaDevice: new FormControl('')
   });
 
@@ -41,38 +42,42 @@ export class EditAccountComponent implements OnInit {
     private appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
+    private workspaceService: WorkspaceService,
+    private keychainService: KeychainService,
+    private sessionService: SessionService
   ) {}
 
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(params => {
       // Get the workspace and the account you need
-      this.selectedSession = this.workspace.sessions.filter(session => session.sessionId === params.sessionId)[0];
-      const selectedAccount = (this.selectedSession as AwsPlainSession);
+      this.selectedSession = this.workspaceService.sessions.find(session => session.sessionId === params.sessionId) as AwsPlainSession;
 
       // Get the region
       this.regions = this.appService.getRegions();
-      this.selectedRegion = this.regions.filter(r => r.region === selectedAccount.region)[0].region;
+      this.selectedRegion = this.regions.find(r => r.region === this.selectedSession.region).region;
       this.form.controls['awsRegion'].setValue(this.selectedRegion);
 
       // Get other readonly properties
-      this.form.controls['name'].setValue(selectedAccount.sessionName);
-      this.form.controls['mfaDevice'].setValue(selectedAccount.mfaDevice);
+      this.form.controls['name'].setValue(this.selectedSession.sessionName);
+      this.form.controls['mfaDevice'].setValue(this.selectedSession.mfaDevice);
     });
   }
-
-  /**
-   * Set the account number when the event is called
-   *
-   * @param event - the event to call
-   */
-  setAccountNumber(event) {
-    this.form.controls['accountNumber'].setValue(this.appService.extractAccountNumberFromIdpArn(event.target.value));
-  }
-
   /**
    * Save the edited account in the workspace
    */
   saveAccount() {
+    if (this.form.valid) {
+      this.selectedSession.sessionName =  this.form.controls['name'].value;
+      this.selectedSession.region      =  this.selectedRegion;
+      this.selectedSession.mfaDevice   =  this.form.controls['mfaDevice'].value;
+      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-plain-aws-session-access-key-id`, this.form.controls['accessKey'].value);
+      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-plain-aws-session-secret-access-key`, this.form.controls['secretKey'].value);
+
+      this.sessionService.update(this.selectedSession.sessionId, this.selectedSession);
+      this.appService.toast('Session updated correctly.', ToastLevel.success, 'Session Update');
+
+      this.router.navigate(['/sessions', 'session-selected']);
+    }
   }
 
   formValid() {

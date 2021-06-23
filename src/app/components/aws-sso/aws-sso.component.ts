@@ -68,7 +68,7 @@ export class AwsSsoComponent implements OnInit {
   }
 
   goBack() {
-    this.router.navigate(['/', 'integrations']);
+    this.router.navigate(['/sessions', 'session-selected']);
   }
 
   setValues() {

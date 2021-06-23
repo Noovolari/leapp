@@ -136,9 +136,9 @@ export class SessionCardComponent implements OnInit {
    * @param session - the session to edit
    * @param event - to remove propagation bubbles
    */
-  editSession(session, event) {
+  editSession(session: Session, event) {
     event.stopPropagation();
-    this.router.navigate(['/managing', 'edit-account'], {queryParams: { sessionId: session.id }});
+    this.router.navigate(['/managing', 'edit-account'], {queryParams: { sessionId: session.sessionId }});
   }
 
   /**

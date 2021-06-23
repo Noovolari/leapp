@@ -283,10 +283,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     const awsSsoSessions: SsoSession[] = [];
 
     accountRoles.forEach((accountRole) => {
-
       const oldSession = this.findOldSession(accountInfo, accountRole);
-
-      console.log(oldSession);
 
       const awsSsoSession = {
         email: accountInfo.emailAddress,

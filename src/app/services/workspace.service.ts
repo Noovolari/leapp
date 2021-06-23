@@ -73,9 +73,6 @@ export class WorkspaceService extends NativeService {
       this._workspace = deserialize(Workspace, workspaceJSON);
       return this._workspace;
     }
-
-    console.log('checking', this._workspace);
-
     return this._workspace;
   }
 

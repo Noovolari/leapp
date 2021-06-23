@@ -18,8 +18,8 @@ import {SessionService} from '../../services/session.service';
 export class EditAccountComponent implements OnInit {
   @ViewChild('roleInput', {static: false}) roleInput: ElementRef;
 
-  accountType = SessionType.awsPlain;
-  provider = SessionType.awsFederated;
+  accountType = SessionType.awsIamUser;
+  provider = SessionType.awsIamRoleFederated;
   selectedSession: AwsIamUserSession;
 
   selectedAccountNumber = '';

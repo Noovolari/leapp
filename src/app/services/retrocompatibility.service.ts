@@ -151,16 +151,16 @@ export class RetrocompatibilityService {
       workspace.sessions.push(federatedSession);
     } else {
       // Truster
-      const trusterSession = new AwsIamRoleChainedSession(
+      const iamRoleChainedSession = new AwsIamRoleChainedSession(
         session.account.accountName,
         session.account.region,
         session.account.role.roleArn,
         workspace.profiles[0].id,
         session.account.parent
       );
-      trusterSession.sessionId = session.id;
+      iamRoleChainedSession.sessionId = session.id;
 
-      workspace.sessions.push(trusterSession);
+      workspace.sessions.push(iamRoleChainedSession);
     }
   }
 

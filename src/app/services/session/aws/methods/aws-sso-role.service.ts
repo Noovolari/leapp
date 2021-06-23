@@ -341,9 +341,9 @@ export class AwsSsoRoleService extends AwsSessionService {
   private removeSsoSessionsFromWorkspace(): void {
     const sessions = this.listAwsSso();
     sessions.forEach(sess => {
-      // Verify and delete eventual truster sessions from old Sso session
-      const trusterSessions = this.listTruster(sess);
-      trusterSessions.forEach(session => {
+      // Verify and delete eventual iamRoleChained sessions from old Sso session
+      const iamRoleChainedSessions = this.listTruster(sess);
+      iamRoleChainedSessions.forEach(session => {
         this.delete(session.sessionId);
       });
 
@@ -457,7 +457,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     for (let i = 0; i < this.workspaceService.sessions.length; i++) {
       const sess = this.workspaceService.sessions[i];
 
-      if(sess.type === SessionType.awsSso) {
+      if(sess.type === SessionType.awsSsoRole) {
         if (
           ((sess as AwsSsoRoleSession).email === accountInfo.emailAddress ) &&
           ((sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}` )

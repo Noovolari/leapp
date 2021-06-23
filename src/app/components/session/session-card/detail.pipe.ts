@@ -13,15 +13,15 @@ import {AwsIamRoleChainedSession} from '../../../models/aws-iam-role-chained-ses
 export class DetailPipe implements PipeTransform {
   transform(session: Session): string {
     switch (session.type) {
-      case(SessionType.awsFederated):
+      case(SessionType.awsIamRoleFederated):
         return (session as AwsIamRoleFederatedSession).roleArn.split('/')[1];
       case(SessionType.azure):
         return (session as AzureSession).subscriptionId;
-      case(SessionType.awsPlain):
+      case(SessionType.awsIamUser):
         return (session as AwsIamUserSession).sessionName;
-      case(SessionType.awsSso):
+      case(SessionType.awsSsoRole):
         return (session as AwsSsoRoleSession).roleArn.split('/')[1];
-      case(SessionType.awsTruster):
+      case(SessionType.awsIamRoleChained):
         return (session as AwsIamRoleChainedSession).roleArn.split('/')[1];
     }
   }

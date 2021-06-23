@@ -15,6 +15,6 @@ export class AwsIamRoleFederatedSession extends Session {
     this.idpArn = idpArn;
     this.roleArn = roleArn;
     this.profileId = profileId;
-    this.type = SessionType.awsFederated;
+    this.type = SessionType.awsIamRoleFederated;
   }
 }

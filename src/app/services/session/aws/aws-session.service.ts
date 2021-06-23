@@ -23,7 +23,7 @@ export abstract class AwsSessionService extends SessionService {
   }
 
   listTruster(parentSession?: Session): Session[] {
-    let childSession = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsTruster ) : [];
+    let childSession = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsIamRoleChained ) : [];
     if (parentSession) {
       childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId );
     }
@@ -31,7 +31,7 @@ export abstract class AwsSessionService extends SessionService {
   }
 
   listAwsSso() {
-    return (this.list().length > 0) ? this.list().filter((session) => session.type === SessionType.awsSso) : [];
+    return (this.list().length > 0) ? this.list().filter((session) => session.type === SessionType.awsSsoRole) : [];
   }
 
   async start(sessionId: string): Promise<void> {

@@ -183,7 +183,7 @@ export class CreateAccountComponent implements OnInit {
     if (name === SessionType.azure) {
       this.sessionType = SessionType.azure;
     }
-    if (name === SessionType.awsFederated) {
+    if (name === SessionType.awsIamRoleFederated) {
       this.typeSelection = true;
     }
   }
@@ -235,7 +235,7 @@ export class CreateAccountComponent implements OnInit {
    */
   private createSession() {
     switch (this.sessionType) {
-      case (SessionType.awsFederated):
+      case (SessionType.awsIamRoleFederated):
         const awsFederatedAccountRequest: AwsIamRoleFederatedSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
@@ -245,7 +245,7 @@ export class CreateAccountComponent implements OnInit {
         };
         this.awsFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value);
         break;
-      case (SessionType.awsPlain):
+      case (SessionType.awsIamUser):
         const awsPlainAccountRequest: AwsIamUserSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
@@ -255,7 +255,7 @@ export class CreateAccountComponent implements OnInit {
         };
         this.awsPlainService.create(awsPlainAccountRequest, this.selectedProfile.value);
         break;
-      case (SessionType.awsTruster):
+      case (SessionType.awsIamRoleChained):
         const awsTrusterAccountRequest: AwsIamRoleChainedSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
@@ -282,7 +282,7 @@ export class CreateAccountComponent implements OnInit {
    * @private
    */
   private saveNewSsosToWorkspace() {
-    if(this.sessionType === SessionType.awsFederated) {
+    if(this.sessionType === SessionType.awsIamRoleFederated) {
       try {
         const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };
         if(!this.workspaceService.getIdpUrl(ipdUrl.id)) {

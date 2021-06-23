@@ -12,7 +12,7 @@
         <label>My cloud provider is:</label>
         <br>
         <div class="correct-top">
-        <button type="button" class="providers" (click)="setProvider(eAccountType.awsFederated);"><img src="assets/images/aws-logo.svg" height="20"></button>
+        <button type="button" class="providers" (click)="setProvider(eAccountType.awsIamRoleFederated);"><img src="assets/images/aws-logo.svg" height="20"></button>
         <button type="button" class="providers" (click)="setProvider(eAccountType.azure);"><img src="assets/images/azure-logo.svg" height="20"></button>
         </div>
       </div>
@@ -37,13 +37,13 @@
         <br>
         <ng-container *ngIf="sessionType === undefined">
             <div class="correct-top">
-              <button type="button" class="providers {{sessionType === eAccountType.awsFederated ? 'selected' : ''}}" (click)="hasSsoUrl = true; setAccessStrategy(eAccountType.awsFederated);">
+              <button type="button" class="providers {{sessionType === eAccountType.awsIamRoleFederated ? 'selected' : ''}}" (click)="hasSsoUrl = true; setAccessStrategy(eAccountType.awsIamRoleFederated);">
                 Federated
               </button>
-              <button type="button" class="providers {{sessionType === eAccountType.awsPlain ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsPlain);">
+              <button type="button" class="providers {{sessionType === eAccountType.awsIamUser ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsIamUser);">
                 Plain
               </button>
-              <button type="button" class="providers {{sessionType === eAccountType.awsTruster ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsTruster);" *ngIf="!firstTime">
+              <button type="button" class="providers {{sessionType === eAccountType.awsIamRoleChained ? 'selected' : ''}}" (click)="setAccessStrategy(eAccountType.awsIamRoleChained);" *ngIf="!firstTime">
                 Truster
               </button>
               <span class="providers disabled second-step-fix" *ngIf="firstTime">
@@ -57,7 +57,7 @@
     <!-- ================================================================== -->
     <!-- ================================================================== -->
 
-    <ng-container *ngIf="((provider !== eAccountType.awsFederated) || (hasSsoUrl && (provider === eAccountType.awsFederated))) && !typeSelection && providerSelected">
+    <ng-container *ngIf="((provider !== eAccountType.awsIamRoleFederated) || (hasSsoUrl && (provider === eAccountType.awsIamRoleFederated))) && !typeSelection && providerSelected">
 
       <h1>Choose your Access Strategy</h1>
       <p class="smaller">I’m not sure of what’s my Access Strategy? Know more <a class="link-wiki" (click)="openAccessStrategyDocumentation();">here</a></p>
@@ -70,9 +70,9 @@
             <label>My Access Strategy is:</label>
             <br>
             <span class="providers">
-              <ng-container *ngIf="sessionType === eAccountType.awsFederated">Federated</ng-container>
-              <ng-container *ngIf="sessionType === eAccountType.awsTruster">Truster</ng-container>
-              <ng-container *ngIf="sessionType === eAccountType.awsPlain">Plain</ng-container>
+              <ng-container *ngIf="sessionType === eAccountType.awsIamRoleFederated">Federated</ng-container>
+              <ng-container *ngIf="sessionType === eAccountType.awsIamRoleChained">Truster</ng-container>
+              <ng-container *ngIf="sessionType === eAccountType.awsIamUser">Plain</ng-container>
             </span>
             <br><br>
           </div>
@@ -113,13 +113,13 @@
       <!-- ================================================================== -->
       <!-- ==              ACCOUNT ALIAS FOR ALL ACCOUNTS TYPE             == -->
       <!-- ================================================================== -->
-      <div class="form-group d-inline-block" [ngStyle]="{width: sessionType === eAccountType.awsFederated ? '49%' : '100%'}">
+      <div class="form-group d-inline-block" [ngStyle]="{width: sessionType === eAccountType.awsIamRoleFederated ? '49%' : '100%'}">
         <label>Account Alias<span class="danger-text">*</span></label>
         <br>
         <input formControlName="name" type="text" class="form-control" placeholder="Account Alias *">
         <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert an Account Alias</small>
       </div>
-      <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="sessionType === eAccountType.awsFederated"></div>
+      <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="sessionType === eAccountType.awsIamRoleFederated"></div>
 
       <!-- ====================== -->
       <!-- AWS ACCOUNT PROPERTIES -->
@@ -128,7 +128,7 @@
         <!-- ================================================================== -->
         <!-- ==                        AWS REGION ALL                        == -->
         <!-- ================================================================== -->
-        <div class="form-group" [ngStyle]="{display: 'inline-block', width: sessionType === eAccountType.awsFederated ? '49%': '100%'}">
+        <div class="form-group" [ngStyle]="{display: 'inline-block', width: sessionType === eAccountType.awsIamRoleFederated ? '49%': '100%'}">
           <label>aws Region</label>
           <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
         </div>
@@ -136,7 +136,7 @@
         <!-- ================================================================== -->
         <!-- ==                 ROLE ARN FEDERATED & TRUSTER                 == -->
         <!-- ================================================================== -->
-        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="sessionType === eAccountType.awsFederated || sessionType === eAccountType.awsTruster">
+        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="sessionType === eAccountType.awsIamRoleFederated || sessionType === eAccountType.awsIamRoleChained">
           <label>RoleArn<span class="danger-text">*</span></label>
           <input formControlName="roleArn" type="text" class="form-control" placeholder="Role ARN" />
           <small class="text-error" *ngIf="(form.controls['roleArn'].dirty || form.controls['roleArn'].touched) && form.controls['roleArn'].errors">Insert the Role ARN</small>
@@ -145,7 +145,7 @@
         <!-- ================================================================== -->
         <!-- ==                 SAML & IDP ARN FOR FEDERATED                 == -->
         <!-- ================================================================== -->
-        <ng-container *ngIf="sessionType === eAccountType.awsFederated">
+        <ng-container *ngIf="sessionType === eAccountType.awsIamRoleFederated">
           <h2>Federated setting</h2>
           <div class="form-group" style="width: 100%; display: inline-block;">
             <label>SAML 2.0 Url<span class="danger-text">*</span></label>
@@ -168,7 +168,7 @@
         <!-- ================================================================== -->
         <!-- ==                         MFA DEVICE ARN                       == -->
         <!-- ================================================================== -->
-        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="sessionType === eAccountType.awsPlain">
+        <div class="form-group" style="width: 100%; display: inline-block;" *ngIf="sessionType === eAccountType.awsIamUser">
           <label>Mfa Device</label>
           <input formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
         </div>
@@ -176,7 +176,7 @@
         <!-- ================================================================== -->
         <!-- ==                      SECRET & ACCESS KEYS                    == -->
         <!-- ================================================================== -->
-        <ng-container *ngIf="sessionType === eAccountType.awsPlain">
+        <ng-container *ngIf="sessionType === eAccountType.awsIamUser">
           <h2>Add secret</h2>
           <div class="form-group" style="width: 49%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Access  Key<span class="danger-text">*</span></label>
@@ -194,7 +194,7 @@
         <!-- ================================================================== -->
         <!-- ==                       ASSUMER SESSIONS                       == -->
         <!-- ================================================================== -->
-        <ng-container *ngIf="sessionType === eAccountType.awsTruster">
+        <ng-container *ngIf="sessionType === eAccountType.awsIamRoleChained">
           <h2>Truster setting</h2>
           <div class="form-group" style="width: 100%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Assumer Session<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="This is the account used to make AssumeRole on the Truster Account"></i></label>

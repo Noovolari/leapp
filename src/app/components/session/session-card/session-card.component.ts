@@ -344,19 +344,19 @@ export class SessionCardComponent implements OnInit {
   }
 
   private generateDeleteDialogMessage(session: Session): string {
-    let trusterSessions = [];
+    let iamRoleChainedSessions = [];
     if (session.type !== SessionType.azure) {
-      trusterSessions = (this.sessionService as AwsSessionService).listTruster(session);
+      iamRoleChainedSessions = (this.sessionService as AwsSessionService).listTruster(session);
     }
 
-    let trusterSessionString = '';
-    trusterSessions.forEach(sess => {
-      trusterSessionString += `<li><div class="removed-sessions"><b>${sess.sessionName}</b></div></li>`;
+    let iamRoleChainedSessionString = '';
+    iamRoleChainedSessions.forEach(sess => {
+      iamRoleChainedSessionString += `<li><div class="removed-sessions"><b>${sess.sessionName}</b></div></li>`;
     });
-    if (trusterSessionString !== '') {
-      return 'This session has truster sessions: <br><ul>' +
-        trusterSessionString +
-        '</ul><br>Removing the session will also remove the truster session associated with it. Do you want to proceed?';
+    if (iamRoleChainedSessionString !== '') {
+      return 'This session has iamRoleChained sessions: <br><ul>' +
+        iamRoleChainedSessionString +
+        '</ul><br>Removing the session will also remove the iamRoleChained session associated with it. Do you want to proceed?';
     } else {
       return 'Do you really want to delete this session?';
     }

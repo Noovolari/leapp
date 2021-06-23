@@ -92,11 +92,11 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
     // Generate a credential set from Parent Session
     let parentSessionService;
-    if(parentSession.type === SessionType.awsFederated) {
+    if(parentSession.type === SessionType.awsIamRoleFederated) {
       parentSessionService = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
-    } else if(parentSession.type === SessionType.awsPlain) {
+    } else if(parentSession.type === SessionType.awsIamUser) {
       parentSessionService = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
-    } else if(parentSession.type === SessionType.awsSso) {
+    } else if(parentSession.type === SessionType.awsSsoRole) {
       parentSessionService = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService) as AwsSessionService;
     }
 

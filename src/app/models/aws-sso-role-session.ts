@@ -13,6 +13,6 @@ export class AwsSsoRoleSession extends Session {
     this.email= email;
     this.roleArn = roleArn;
     this.profileId = profileId;
-    this.type = SessionType.awsSso;
+    this.type = SessionType.awsSsoRole;
   }
 }

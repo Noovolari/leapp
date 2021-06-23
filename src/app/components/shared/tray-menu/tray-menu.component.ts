@@ -60,16 +60,16 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
       switch (session.type) {
-        case SessionType.awsPlain:
+        case SessionType.awsIamUser:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.sessionName + ' - ' + 'plain';
           break;
-        case SessionType.awsFederated:
-        case SessionType.awsSso:
+        case SessionType.awsIamRoleFederated:
+        case SessionType.awsSsoRole:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.sessionName + ' - ' + (session as AwsIamRoleFederatedSession).roleArn.split('/')[1];
           break;
-        case SessionType.awsTruster:
+        case SessionType.awsIamRoleChained:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
           label = '  ' + session.sessionName + ' - ' + (session as AwsIamRoleChainedSession).roleArn.split('/')[1];
           break;

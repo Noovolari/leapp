@@ -88,18 +88,18 @@ describe('AwsSessionService', () => {
   });
 
   describe('listChildren()', () => {
-    it('should return a session list composed only of truster accounts', () => {
+    it('should return a session list composed only of IAM Role Chained accounts', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
       expect(service.listTruster()).toBeInstanceOf(Array);
-      expect(service.listTruster().filter(c => c.type === SessionType.awsTruster)).toEqual([]);
+      expect(service.listTruster().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([]);
 
       const mockedSession2 = new AwsIamUserSession('fakeaccount2', 'eu-west-2', 'fakeprofile2');
-      mockedSession2.type = SessionType.awsTruster;
+      mockedSession2.type = SessionType.awsIamRoleChained;
       mockedSessions.push(mockedSession2);
 
       expect(service.listTruster()).toBeInstanceOf(Array);
-      expect(service.listTruster().filter(c => c.type === SessionType.awsTruster)).toEqual([mockedSession2]);
+      expect(service.listTruster().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {

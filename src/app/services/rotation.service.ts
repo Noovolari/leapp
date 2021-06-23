@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {AwsSessionService} from './aws-session.service';
+import {AwsSessionService} from './session/aws/aws-session.service';
 import {SessionFactoryService} from './session-factory.service';
 
 @Injectable({

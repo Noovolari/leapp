@@ -1,7 +1,7 @@
 import {SessionType} from './session-type';
 import {Session} from './session';
 
-export class AwsFederatedSession extends Session {
+export class AwsIamRoleFederatedSession extends Session {
 
   idpUrlId: string;
   idpArn: string;

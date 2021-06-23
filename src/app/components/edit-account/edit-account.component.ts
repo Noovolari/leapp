@@ -4,7 +4,7 @@ import {AppService, ToastLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Workspace} from '../../models/workspace';
 import {SessionType} from '../../models/session-type';
-import {AwsPlainSession} from '../../models/aws-plain-session';
+import {AwsIamUserSession} from '../../models/aws-iam-user-session';
 import {WorkspaceService} from '../../services/workspace.service';
 import {KeychainService} from '../../services/keychain.service';
 import {environment} from '../../../environments/environment';
@@ -20,7 +20,7 @@ export class EditAccountComponent implements OnInit {
 
   accountType = SessionType.awsPlain;
   provider = SessionType.awsFederated;
-  selectedSession: AwsPlainSession;
+  selectedSession: AwsIamUserSession;
 
   selectedAccountNumber = '';
   selectedRole = '';
@@ -50,7 +50,7 @@ export class EditAccountComponent implements OnInit {
   ngOnInit() {
     this.activatedRoute.queryParams.subscribe(params => {
       // Get the workspace and the account you need
-      this.selectedSession = this.workspaceService.sessions.find(session => session.sessionId === params.sessionId) as AwsPlainSession;
+      this.selectedSession = this.workspaceService.sessions.find(session => session.sessionId === params.sessionId) as AwsIamUserSession;
 
       // Get the region
       this.regions = this.appService.getRegions();

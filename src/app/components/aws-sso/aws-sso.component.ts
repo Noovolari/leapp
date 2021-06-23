@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
-import {AwsSsoService, SsoSession} from '../../services/session/aws-sso.service';
+import {AwsSsoRoleService, SsoSession} from '../../services/session/aws/methods/aws-sso-role.service';
 
 @Component({
   selector: 'app-aws-sso',
@@ -25,7 +25,7 @@ export class AwsSsoComponent implements OnInit {
 
   constructor(
     private appService: AppService,
-    private awsSsoService: AwsSsoService,
+    private awsSsoService: AwsSsoRoleService,
     private router: Router,
     private workspaceService: WorkspaceService
   ) {}

@@ -1,9 +1,9 @@
 import {Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {Session} from '../../../models/session';
-import {AwsSessionService} from '../../../services/aws-session.service';
+import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
 import {Router} from '@angular/router';
-import {AwsFederatedSession} from '../../../models/aws-federated-session';
+import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
 import {SsmService} from '../../../services/ssm.service';
 import {SessionType} from '../../../models/session-type';
 import {WorkspaceService} from '../../../services/workspace.service';
@@ -150,8 +150,8 @@ export class SessionCardComponent implements OnInit {
       const workspace = this.workspaceService.get();
       if (workspace) {
         const texts = {
-          1: (session as AwsFederatedSession).roleArn ? `${(session as AwsFederatedSession).roleArn.split('/')[0].substring(13, 25)}` : '',
-          2: (session as AwsFederatedSession).roleArn ? `${(session as AwsFederatedSession).roleArn}` : ''
+          1: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn.split('/')[0].substring(13, 25)}` : '',
+          2: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn}` : ''
         };
 
         const text = texts[type];

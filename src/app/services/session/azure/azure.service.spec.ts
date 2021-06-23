@@ -1,16 +1,16 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AwsFederatedService } from './aws-federated.service';
-import {mustInjected} from '../../../base-injectables';
+import { AzureService } from './azure.service';
+import {mustInjected} from "../../../../base-injectables";
 
-describe('AwsFederatedService', () => {
-  let service: AwsFederatedService;
+describe('AzureService', () => {
+  let service: AzureService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [].concat(mustInjected())
     });
-    service = TestBed.inject(AwsFederatedService);
+    service = TestBed.inject(AzureService);
   });
 
   it('should be created', () => {

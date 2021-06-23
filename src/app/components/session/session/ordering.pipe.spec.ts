@@ -1,18 +1,18 @@
 import { OrderingPipe } from './ordering.pipe';
 import {Session} from '../../../models/session';
 import * as uuid from 'uuid';
-import {AwsPlainSession} from '../../../models/aws-plain-session';
+import {AwsIamUserSession} from '../../../models/aws-iam-user-session';
 
 let sessions: Session[] = [];
 
 describe('OrderingPipe', () => {
   beforeEach(() => {
     sessions = [];
-    sessions.push(new AwsPlainSession('account1', 'eu-west-1', ''));
-    sessions.push(new AwsPlainSession('account2', 'eu-west-1', ''));
-    sessions.push(new AwsPlainSession('account3', 'eu-west-1', ''));
-    sessions.push(new AwsPlainSession('account4', 'eu-west-1', ''));
-    sessions.push(new AwsPlainSession('account5', 'eu-west-1', ''));
+    sessions.push(new AwsIamUserSession('account1', 'eu-west-1', ''));
+    sessions.push(new AwsIamUserSession('account2', 'eu-west-1', ''));
+    sessions.push(new AwsIamUserSession('account3', 'eu-west-1', ''));
+    sessions.push(new AwsIamUserSession('account4', 'eu-west-1', ''));
+    sessions.push(new AwsIamUserSession('account5', 'eu-west-1', ''));
   });
 
   it('create an instance', () => {

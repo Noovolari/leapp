@@ -2,16 +2,16 @@ import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService, LoggerLevel} from '../../services/app.service';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AwsSessionService} from '../../services/aws-session.service';
+import {AwsSessionService} from '../../services/session/aws/aws-session.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {SessionType} from '../../models/session-type';
 import {environment} from '../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsPlainSessionRequest, AwsPlainService} from '../../services/session/aws-plain.service';
-import {AwsTrusterSessionRequest, AwsTrusterService} from '../../services/session/aws-truster.service';
+import {AwsIamUserSessionRequest, AwsIamUserService} from '../../services/session/aws/methods/aws-iam-user.service';
+import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../services/session/aws/methods/aws-iam-role-chained.service';
 import {LeappParseError} from '../../errors/leapp-parse-error';
-import {AwsFederatedSessionRequest, AwsFederatedService} from '../../services/session/aws-federated.service';
-import {AzureService, AzureSessionRequest} from '../../services/session/azure.service';
+import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
+import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
 
 @Component({
   selector: 'app-create-account',
@@ -78,9 +78,9 @@ export class CreateAccountComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private workspaceService: WorkspaceService,
-    private awsFederatedService: AwsFederatedService,
-    private awsPlainService: AwsPlainService,
-    private awsTrusterService: AwsTrusterService,
+    private awsFederatedService: AwsIamRoleFederatedService,
+    private awsPlainService: AwsIamUserService,
+    private awsTrusterService: AwsIamRoleChainedService,
     private awsSessionService: AwsSessionService,
     private azureService: AzureService
   ) {}
@@ -236,7 +236,7 @@ export class CreateAccountComponent implements OnInit {
   private createSession() {
     switch (this.sessionType) {
       case (SessionType.awsFederated):
-        const awsFederatedAccountRequest: AwsFederatedSessionRequest = {
+        const awsFederatedAccountRequest: AwsIamRoleFederatedSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           idpUrl: this.selectedIdpUrl.value.trim(),
@@ -246,7 +246,7 @@ export class CreateAccountComponent implements OnInit {
         this.awsFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value);
         break;
       case (SessionType.awsPlain):
-        const awsPlainAccountRequest: AwsPlainSessionRequest = {
+        const awsPlainAccountRequest: AwsIamUserSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           accessKey: this.form.value.accessKey.trim(),
@@ -256,7 +256,7 @@ export class CreateAccountComponent implements OnInit {
         this.awsPlainService.create(awsPlainAccountRequest, this.selectedProfile.value);
         break;
       case (SessionType.awsTruster):
-        const awsTrusterAccountRequest: AwsTrusterSessionRequest = {
+        const awsTrusterAccountRequest: AwsIamRoleChainedSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           roleArn: this.form.value.roleArn.trim(),

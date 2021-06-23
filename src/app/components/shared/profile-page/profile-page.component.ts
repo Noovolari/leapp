@@ -7,12 +7,12 @@ import {Router} from '@angular/router';
 import {Constants} from '../../../models/constants';
 import {environment} from '../../../../environments/environment';
 import * as uuid from 'uuid';
-import {AwsFederatedSession} from '../../../models/aws-federated-session';
+import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
 import {WorkspaceService} from '../../../services/workspace.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionType} from '../../../models/session-type';
-import {AwsSessionService} from '../../../services/aws-session.service';
+import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
 
 @Component({
   selector: 'app-profile-page',
@@ -179,7 +179,7 @@ export class ProfilePageComponent implements OnInit {
   deleteIdpUrl(id) {
     // Assumable sessions with this id
     this.sessionService = this.sessionProviderService.getService(SessionType.awsFederated);
-    let sessions = this.sessionService.list().filter(s => (s as AwsFederatedSession).idpUrlId === id);
+    let sessions = this.sessionService.list().filter(s => (s as AwsIamRoleFederatedSession).idpUrlId === id);
 
     // Add trusters from federated
     sessions.forEach(parent => {
@@ -188,7 +188,7 @@ export class ProfilePageComponent implements OnInit {
     });
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsFederatedSession).roleArn.split('/')[1]}</small></div></li>`);
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsIamRoleFederatedSession).roleArn.split('/')[1]}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }
@@ -248,7 +248,7 @@ export class ProfilePageComponent implements OnInit {
     const sessions = this.awsSessionService.list().filter(sess => (sess as any).profileId === id);
 
     // Get only names for display
-    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsFederatedSession).roleArn ? (s as AwsFederatedSession).roleArn.split('/')[1] : ''}</small></div></li>`);
+    let sessionsNames = sessions.map(s => `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${(s as AwsIamRoleFederatedSession).roleArn ? (s as AwsIamRoleFederatedSession).roleArn.split('/')[1] : ''}</small></div></li>`);
     if (sessionsNames.length === 0) {
       sessionsNames = ['<li><b>no sessions</b></li>'];
     }

@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 
 import { RotationService } from './rotation.service';
 import {mustInjected} from '../../base-injectables';
-import {AwsSessionService} from './aws-session.service';
+import {AwsSessionService} from './session/aws/aws-session.service';
 import {SessionFactoryService} from './session-factory.service';
 import {Session} from '../models/session';
 

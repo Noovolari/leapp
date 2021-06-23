@@ -1,21 +1,21 @@
 import {Injectable} from '@angular/core';
 import {AwsSessionService} from '../aws-session.service';
-import {CredentialsInfo} from '../../models/credentials-info';
-import {WorkspaceService} from '../workspace.service';
-import {FileService} from '../file.service';
-import {AppService} from '../app.service';
-import {LeappNotFoundError} from '../../errors/leapp-not-found-error';
-import {Session} from '../../models/session';
-import {AwsTrusterSession} from '../../models/aws-truster-session';
-import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
+import {CredentialsInfo} from '../../../../models/credentials-info';
+import {WorkspaceService} from '../../../workspace.service';
+import {FileService} from '../../../file.service';
+import {AppService} from '../../../app.service';
+import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
+import {Session} from '../../../../models/session';
+import {AwsIamRoleChainedSession} from '../../../../models/aws-iam-role-chained-session';
+import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import AWS from 'aws-sdk';
-import {SessionType} from '../../models/session-type';
-import {AwsFederatedService} from './aws-federated.service';
-import {KeychainService} from '../keychain.service';
-import {AwsPlainService} from "./aws-plain.service";
-import {AwsSsoService} from "./aws-sso.service";
+import {SessionType} from '../../../../models/session-type';
+import {AwsIamRoleFederatedService} from './aws-iam-role-federated.service';
+import {KeychainService} from '../../../keychain.service';
+import {AwsIamUserService} from './aws-iam-user.service';
+import {AwsSsoRoleService} from './aws-sso-role.service';
 
-export interface AwsTrusterSessionRequest {
+export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
   region: string;
   roleArn: string;
@@ -25,7 +25,7 @@ export interface AwsTrusterSessionRequest {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsTrusterService extends AwsSessionService {
+export class AwsIamRoleChainedService extends AwsSessionService {
 
   constructor(
     protected workspaceService: WorkspaceService,
@@ -49,14 +49,14 @@ export class AwsTrusterService extends AwsSessionService {
     };
   }
 
-  create(sessionRequest: AwsTrusterSessionRequest, profileId: string): void {
-    const session = new AwsTrusterSession(sessionRequest.accountName, sessionRequest.region, sessionRequest.roleArn, profileId, sessionRequest.parentSessionId);
+  create(sessionRequest: AwsIamRoleChainedSessionRequest, profileId: string): void {
+    const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region, sessionRequest.roleArn, profileId, sessionRequest.parentSessionId);
     this.workspaceService.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsTrusterSession).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -72,7 +72,7 @@ export class AwsTrusterService extends AwsSessionService {
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsTrusterSession).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsIamRoleChainedSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
@@ -85,19 +85,19 @@ export class AwsTrusterService extends AwsSessionService {
     // Retrieve Parent Session
     let parentSession: Session;
     try {
-      parentSession = this.get((session as AwsTrusterSession).parentSessionId);
+      parentSession = this.get((session as AwsIamRoleChainedSession).parentSessionId);
     } catch (err) {
-      throw new LeappNotFoundError(this, `Parent Account Session  not found for Truster Account ${session.sessionName}`);
+      throw new LeappNotFoundError(this, `Parent Account Session  not found for Chained Account ${session.sessionName}`);
     }
 
     // Generate a credential set from Parent Session
     let parentSessionService;
     if(parentSession.type === SessionType.awsFederated) {
-      parentSessionService = new AwsFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
+      parentSessionService = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsPlain) {
-      parentSessionService = new AwsPlainService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
+      parentSessionService = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSso) {
-      parentSessionService = new AwsSsoService(this.workspaceService, this.fileService, this.appService, this.keychainService) as AwsSessionService;
+      parentSessionService = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService) as AwsSessionService;
     }
 
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);
@@ -117,7 +117,7 @@ export class AwsTrusterService extends AwsSessionService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       RoleSessionName: `assumed-from-leapp`,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleArn: (session as AwsTrusterSession).roleArn,
+      RoleArn: (session as AwsIamRoleChainedSession).roleArn,
     };
 
     // Generate Session token
@@ -129,7 +129,7 @@ export class AwsTrusterService extends AwsSessionService {
       // Assume Role
       const assumeRoleResponse: AssumeRoleResponse = await sts.assumeRole(params).promise();
       // Generate correct object from session token response and return
-      return AwsTrusterService.sessionTokenFromAssumeRoleResponse(assumeRoleResponse);
+      return AwsIamRoleChainedService.sessionTokenFromAssumeRoleResponse(assumeRoleResponse);
     } catch (err) {
       throw new LeappAwsStsError(this, err.message);
     }

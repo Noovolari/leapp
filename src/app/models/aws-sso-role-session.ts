@@ -1,7 +1,7 @@
 import {SessionType} from './session-type';
 import {Session} from './session';
 
-export class AwsSsoSession extends Session {
+export class AwsSsoRoleSession extends Session {
 
   email?: string;
   roleArn: string;

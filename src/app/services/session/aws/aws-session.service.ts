@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
-import {Session} from '../models/session';
-import {WorkspaceService} from './workspace.service';
-import {CredentialsInfo} from '../models/credentials-info';
-import {SessionType} from '../models/session-type';
-import {SessionStatus} from '../models/session-status';
-import {AwsTrusterSession} from '../models/aws-truster-session';
-import {SessionService} from './session.service';
+import {Session} from '../../../models/session';
+import {WorkspaceService} from '../../workspace.service';
+import {CredentialsInfo} from '../../../models/credentials-info';
+import {SessionType} from '../../../models/session-type';
+import {SessionStatus} from '../../../models/session-status';
+import {AwsIamRoleChainedSession} from '../../../models/aws-iam-role-chained-session';
+import {SessionService} from '../../session.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +25,7 @@ export abstract class AwsSessionService extends SessionService {
   listTruster(parentSession?: Session): Session[] {
     let childSession = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsTruster ) : [];
     if (parentSession) {
-      childSession = childSession.filter(session => (session as AwsTrusterSession).parentSessionId === parentSession.sessionId );
+      childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId );
     }
     return childSession;
   }

@@ -2,9 +2,9 @@ import {TestBed} from '@angular/core/testing';
 
 import {SessionFactoryService} from './session-factory.service';
 import {mustInjected} from '../../base-injectables';
-import {AwsSessionService} from './aws-session.service';
+import {AwsSessionService} from './session/aws/aws-session.service';
 import {SessionType} from '../models/session-type';
-import {AwsPlainService} from './session/aws-plain.service';
+import {AwsIamUserService} from './session/aws/methods/aws-iam-user.service';
 import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
@@ -42,7 +42,7 @@ describe('SessionProviderService', () => {
 
   it('should return a Aws Plain Service when requested with AccountType AWS_PLAIN_USER', () => {
     const awsPlainService: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
-    expect(awsPlainService).toBeInstanceOf(AwsPlainService);
+    expect(awsPlainService).toBeInstanceOf(AwsIamUserService);
   });
 
   it('should return the same Service (Singleton) when requested more than one time', () => {

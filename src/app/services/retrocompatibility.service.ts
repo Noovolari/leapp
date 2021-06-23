@@ -5,10 +5,10 @@ import {FileService} from './file.service';
 import {Workspace} from '../models/workspace';
 import {serialize} from 'class-transformer';
 import {KeychainService} from './keychain.service';
-import {AwsFederatedSession} from '../models/aws-federated-session';
-import {AwsTrusterSession} from '../models/aws-truster-session';
-import {AwsPlainSession} from '../models/aws-plain-session';
-import {AwsSsoSession} from '../models/aws-sso-session';
+import {AwsIamRoleFederatedSession} from '../models/aws-iam-role-federated-session';
+import {AwsIamRoleChainedSession} from '../models/aws-iam-role-chained-session';
+import {AwsIamUserSession} from '../models/aws-iam-user-session';
+import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {AzureSession} from '../models/azure-session';
 import {WorkspaceService} from './workspace.service';
 
@@ -138,7 +138,7 @@ export class RetrocompatibilityService {
   private createNewAwsFederatedOrTrusterSession(session: any, workspace: Workspace) {
     if(!session.account.parent) {
       // Federated
-      const federatedSession = new AwsFederatedSession(
+      const federatedSession = new AwsIamRoleFederatedSession(
         session.account.accountName,
         session.account.region,
         session.account.idpUrl,
@@ -151,7 +151,7 @@ export class RetrocompatibilityService {
       workspace.sessions.push(federatedSession);
     } else {
       // Truster
-      const trusterSession = new AwsTrusterSession(
+      const trusterSession = new AwsIamRoleChainedSession(
         session.account.accountName,
         session.account.region,
         session.account.role.roleArn,
@@ -165,7 +165,7 @@ export class RetrocompatibilityService {
   }
 
   private async createNewAwsPlainSession(session: any, workspace: Workspace) {
-    const plainSession = new AwsPlainSession(
+    const plainSession = new AwsIamUserSession(
       session.account.accountName,
       session.account.region,
       workspace.profiles[0].id,
@@ -186,7 +186,7 @@ export class RetrocompatibilityService {
   }
 
   private createNewAwsSingleSignOnSession(session: any, workspace: Workspace) {
-    const ssoSession = new AwsSsoSession(
+    const ssoSession = new AwsSsoRoleSession(
       session.account.accountName,
       session.account.region,
       `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,

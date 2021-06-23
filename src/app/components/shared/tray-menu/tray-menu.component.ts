@@ -6,9 +6,9 @@ import {Session} from '../../../models/session';
 import {SessionType} from '../../../models/session-type';
 import {environment} from '../../../../environments/environment';
 import {SessionStatus} from '../../../models/session-status';
-import {AwsTrusterSession} from '../../../models/aws-truster-session';
+import {AwsIamRoleChainedSession} from '../../../models/aws-iam-role-chained-session';
 import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-error';
-import {AwsFederatedSession} from '../../../models/aws-federated-session';
+import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
 import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
@@ -67,11 +67,11 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         case SessionType.awsFederated:
         case SessionType.awsSso:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.sessionName + ' - ' + (session as AwsFederatedSession).roleArn.split('/')[1];
+          label = '  ' + session.sessionName + ' - ' + (session as AwsIamRoleFederatedSession).roleArn.split('/')[1];
           break;
         case SessionType.awsTruster:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.sessionName + ' - ' + (session as AwsTrusterSession).roleArn.split('/')[1];
+          label = '  ' + session.sessionName + ' - ' + (session as AwsIamRoleChainedSession).roleArn.split('/')[1];
           break;
         case SessionType.azure:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/icon-online-azure.png` : __dirname + `/assets/images/icon-offline.png`;

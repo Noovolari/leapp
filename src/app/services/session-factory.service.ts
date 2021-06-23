@@ -4,11 +4,11 @@ import {KeychainService} from './keychain.service';
 import {AppService} from './app.service';
 import {FileService} from './file.service';
 import {SessionType} from '../models/session-type';
-import {AwsPlainService} from './session/aws-plain.service';
-import {AwsTrusterService} from './session/aws-truster.service';
-import {AwsFederatedService} from './session/aws-federated.service';
-import {AwsSsoService} from './session/aws-sso.service';
-import {AzureService} from './session/azure.service';
+import {AwsIamUserService} from './session/aws/methods/aws-iam-user.service';
+import {AwsIamRoleChainedService} from './session/aws/methods/aws-iam-role-chained.service';
+import {AwsIamRoleFederatedService} from './session/aws/methods/aws-iam-role-federated.service';
+import {AwsSsoRoleService} from './session/aws/methods/aws-sso-role.service';
+import {AzureService} from './session/azure/azure.service';
 import {ExecuteService} from './execute.service';
 import {SessionService} from './session.service';
 
@@ -48,25 +48,25 @@ export class SessionFactoryService {
   }
 
   private getAwsFederatedSessionService(accountType: SessionType) {
-    const service = new AwsFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService);
+    const service = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
-  private getAwsPlainSessionService(accountType: SessionType): AwsPlainService {
-    const service = new AwsPlainService(this.workspaceService, this.keychainService, this.appService, this.fileService);
+  private getAwsPlainSessionService(accountType: SessionType): AwsIamUserService {
+    const service = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService, this.fileService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsTrusterSessionService(accountType: SessionType) {
-    const service = new AwsTrusterService(this.workspaceService, this.appService, this.fileService, this.keychainService);
+    const service = new AwsIamRoleChainedService(this.workspaceService, this.appService, this.fileService, this.keychainService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsSsoSessionService(accountType: SessionType) {
-    const service = new AwsSsoService(this.workspaceService, this.fileService, this.appService, this.keychainService);
+    const service = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

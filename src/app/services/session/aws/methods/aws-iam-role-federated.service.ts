@@ -1,18 +1,18 @@
 import { Injectable } from '@angular/core';
 import {AwsSessionService} from '../aws-session.service';
-import {CredentialsInfo} from '../../models/credentials-info';
-import {WorkspaceService} from '../workspace.service';
-import {KeychainService} from '../keychain.service';
-import {AppService} from '../app.service';
-import {FileService} from '../file.service';
-import {AwsFederatedSession} from '../../models/aws-federated-session';
-import {LeappSamlError} from '../../errors/leapp-saml-error';
-import {LeappParseError} from '../../errors/leapp-parse-error';
-import {environment} from '../../../environments/environment';
+import {CredentialsInfo} from '../../../../models/credentials-info';
+import {WorkspaceService} from '../../../workspace.service';
+import {KeychainService} from '../../../keychain.service';
+import {AppService} from '../../../app.service';
+import {FileService} from '../../../file.service';
+import {AwsIamRoleFederatedSession} from '../../../../models/aws-iam-role-federated-session';
+import {LeappSamlError} from '../../../../errors/leapp-saml-error';
+import {LeappParseError} from '../../../../errors/leapp-parse-error';
+import {environment} from '../../../../../environments/environment';
 import AWS from 'aws-sdk';
-import {LeappAwsStsError} from '../../errors/leapp-aws-sts-error';
+import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 
-export interface AwsFederatedSessionRequest {
+export interface AwsIamRoleFederatedSessionRequest {
   accountName: string;
   idpUrl: string;
   idpArn: string;
@@ -27,7 +27,7 @@ export interface ResponseHookDetails {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsFederatedService extends AwsSessionService {
+export class AwsIamRoleFederatedService extends AwsSessionService {
 
   constructor(protected workspaceService: WorkspaceService,
               private keychainService: KeychainService,
@@ -57,8 +57,8 @@ export class AwsFederatedService extends AwsSessionService {
     };
   }
 
-  create(sessionRequest: AwsFederatedSessionRequest, profileId: string): void {
-    const session = new AwsFederatedSession(
+  create(sessionRequest: AwsIamRoleFederatedSessionRequest, profileId: string): void {
+    const session = new AwsIamRoleFederatedSession(
       sessionRequest.accountName,
       sessionRequest.region,
       sessionRequest.idpUrl,
@@ -70,7 +70,7 @@ export class AwsFederatedService extends AwsSessionService {
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsFederatedSession).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -86,7 +86,7 @@ export class AwsFederatedService extends AwsSessionService {
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsFederatedSession).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
@@ -97,7 +97,7 @@ export class AwsFederatedService extends AwsSessionService {
     const session = this.get(sessionId);
 
     // Get idpUrl
-    const idpUrl = this.workspaceService.getIdpUrl((session as AwsFederatedSession).idpUrlId);
+    const idpUrl = this.workspaceService.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
 
     // Check if we need to authenticate
     let needToAuthenticate;
@@ -118,7 +118,7 @@ export class AwsFederatedService extends AwsSessionService {
     // Extract SAML response from responseHookDetails
     let samlResponse;
     try {
-      samlResponse = await AwsFederatedService.extractSamlResponse(responseHookDetails);
+      samlResponse = await AwsIamRoleFederatedService.extractSamlResponse(responseHookDetails);
     } catch(err) {
       throw new LeappParseError(this, err.message);
     }
@@ -129,9 +129,9 @@ export class AwsFederatedService extends AwsSessionService {
     // Params for the calls
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      PrincipalArn: (session as AwsFederatedSession).idpArn,
+      PrincipalArn: (session as AwsIamRoleFederatedSession).idpArn,
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleArn: (session as AwsFederatedSession).roleArn,
+      RoleArn: (session as AwsIamRoleFederatedSession).roleArn,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       SAMLAssertion: samlResponse,
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -147,7 +147,7 @@ export class AwsFederatedService extends AwsSessionService {
     }
 
     // Generate credentials
-    return AwsFederatedService.sessionTokenFromGetSessionTokenResponse(assumeRoleWithSamlResponse);
+    return AwsIamRoleFederatedService.sessionTokenFromGetSessionTokenResponse(assumeRoleWithSamlResponse);
   }
 
   private async needAuthentication(idpUrl: string): Promise<boolean> {

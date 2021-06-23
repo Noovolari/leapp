@@ -1,7 +1,7 @@
 import {SessionType} from './session-type';
 import {Session} from './session';
 
-export class AwsPlainSession extends Session {
+export class AwsIamUserSession extends Session {
 
   mfaDevice?: string;
   sessionTokenExpiration: string;

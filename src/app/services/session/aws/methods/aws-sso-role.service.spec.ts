@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { AwsSsoService } from './aws-sso.service';
+import { AwsSsoRoleService } from './aws-sso-role.service';
 
-describe('AwsSsoService', () => {
-  let service: AwsSsoService;
+describe('AwsSsoRoleService', () => {
+  let service: AwsSsoRoleService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(AwsSsoService);
+    service = TestBed.inject(AwsSsoRoleService);
   });
 
   it('should be created', () => {

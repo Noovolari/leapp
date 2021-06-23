@@ -1,7 +1,7 @@
 import {SessionType} from './session-type';
 import {Session} from './session';
 
-export class AwsTrusterSession extends Session {
+export class AwsIamRoleChainedSession extends Session {
 
   roleArn: string;
   profileId: string;

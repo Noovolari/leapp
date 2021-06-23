@@ -1,13 +1,13 @@
 import {Injectable} from '@angular/core';
-import {WorkspaceService} from '../workspace.service';
-import {AzureSession} from '../../models/azure-session';
-import {FileService} from '../file.service';
-import {environment} from '../../../environments/environment';
-import {AppService} from '../app.service';
-import {ExecuteService} from '../execute.service';
-import {SessionService} from '../session.service';
-import {LeappExecuteError} from '../../errors/leapp-execute-error';
-import {LeappParseError} from '../../errors/leapp-parse-error';
+import {WorkspaceService} from '../../workspace.service';
+import {AzureSession} from '../../../models/azure-session';
+import {FileService} from '../../file.service';
+import {environment} from '../../../../environments/environment';
+import {AppService} from '../../app.service';
+import {ExecuteService} from '../../execute.service';
+import {SessionService} from '../../session.service';
+import {LeappExecuteError} from '../../../errors/leapp-execute-error';
+import {LeappParseError} from '../../../errors/leapp-parse-error';
 
 export interface AzureSessionRequest {
   sessionName: string;

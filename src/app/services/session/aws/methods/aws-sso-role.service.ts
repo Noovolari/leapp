@@ -1,11 +1,11 @@
 import {Injectable} from '@angular/core';
 import {AwsSessionService} from '../aws-session.service';
-import {WorkspaceService} from '../workspace.service';
-import {CredentialsInfo} from '../../models/credentials-info';
+import {WorkspaceService} from '../../../workspace.service';
+import {CredentialsInfo} from '../../../../models/credentials-info';
 
-import {AwsSsoSession} from '../../models/aws-sso-session';
-import {FileService} from '../file.service';
-import {AppService} from '../app.service';
+import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
+import {FileService} from '../../../file.service';
+import {AppService} from '../../../app.service';
 
 import SSO, {
   AccountInfo,
@@ -17,7 +17,7 @@ import SSO, {
   RoleInfo
 } from 'aws-sdk/clients/sso';
 
-import {environment} from '../../../environments/environment';
+import {environment} from '../../../../../environments/environment';
 
 import SSOOIDC, {
   CreateTokenRequest,
@@ -25,10 +25,10 @@ import SSOOIDC, {
   StartDeviceAuthorizationRequest
 } from 'aws-sdk/clients/ssooidc';
 
-import {KeychainService} from '../keychain.service';
-import {SessionType} from '../../models/session-type';
+import {KeychainService} from '../../../keychain.service';
+import {SessionType} from '../../../../models/session-type';
 
-export interface AwsSsoSessionRequest {
+export interface AwsSsoRoleSessionRequest {
   sessionName: string;
   region: string;
   email: string;
@@ -80,7 +80,7 @@ export interface SsoSession {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsSsoService extends AwsSessionService {
+export class AwsSsoRoleService extends AwsSessionService {
 
   private ssoPortal: SSO;
   private ssoOidc: SSOOIDC;
@@ -116,14 +116,14 @@ export class AwsSsoService extends AwsSessionService {
     };
   }
 
-  create(accountRequest: AwsSsoSessionRequest, profileId: string): void {
-    const session = new AwsSsoSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn, profileId, accountRequest.email);
+  create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
+    const session = new AwsSsoRoleSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn, profileId, accountRequest.email);
     this.workspaceService.addSession(session);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsSsoSession).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -139,19 +139,19 @@ export class AwsSsoService extends AwsSessionService {
 
   async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
-    const profileName = this.workspaceService.getProfileName((session as AwsSsoSession).profileId);
+    const profileName = this.workspaceService.getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    const roleArn = (this.get(sessionId) as AwsSsoSession).roleArn;
+    const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
     const accessToken = await this.getAccessToken(region, portalUrl);
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
-    return AwsSsoService.sessionTokenFromGetSessionTokenResponse(credentials);
+    return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
   async sync(region: string, portalUrl: string): Promise<SsoSession[]> {
@@ -235,7 +235,7 @@ export class AwsSsoService extends AwsSessionService {
 
   private async login(region: string, portalUrl: string): Promise<LoginResponse> {
 
-    const followRedirectClient = this.appService.getFollowRedirects()[AwsSsoService.getProtocol(portalUrl)];
+    const followRedirectClient = this.appService.getFollowRedirects()[AwsSsoRoleService.getProtocol(portalUrl)];
 
     portalUrl = await new Promise( (resolve, _) => {
       const request = followRedirectClient.request(portalUrl, response => resolve(response.responseUrl));
@@ -459,10 +459,10 @@ export class AwsSsoService extends AwsSessionService {
 
       if(sess.type === SessionType.awsSso) {
         if (
-          ((sess as AwsSsoSession).email === accountInfo.emailAddress ) &&
-          ((sess as AwsSsoSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}` )
+          ((sess as AwsSsoRoleSession).email === accountInfo.emailAddress ) &&
+          ((sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}` )
         ) {
-          return { region: (sess as AwsSsoSession).region, profileId: (sess as AwsSsoSession).profileId };
+          return { region: (sess as AwsSsoRoleSession).region, profileId: (sess as AwsSsoRoleSession).profileId };
         }
       }
     }

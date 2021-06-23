@@ -41,14 +41,14 @@ describe('SessionProviderService', () => {
   });
 
   it('should return a Aws Plain Service when requested with AccountType AWS_PLAIN_USER', () => {
-    const awsPlainService: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
+    const awsPlainService: AwsSessionService = sessionFactoryService.getService(SessionType.awsIamUser) as AwsSessionService;
     expect(awsPlainService).toBeInstanceOf(AwsIamUserService);
   });
 
   it('should return the same Service (Singleton) when requested more than one time', () => {
-    const awsPlainService: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
-    const awsPlainServiceCopy: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
-    const awsPlainServiceCopy2: AwsSessionService = sessionFactoryService.getService(SessionType.awsPlain) as AwsSessionService;
+    const awsPlainService: AwsSessionService = sessionFactoryService.getService(SessionType.awsIamUser) as AwsSessionService;
+    const awsPlainServiceCopy: AwsSessionService = sessionFactoryService.getService(SessionType.awsIamUser) as AwsSessionService;
+    const awsPlainServiceCopy2: AwsSessionService = sessionFactoryService.getService(SessionType.awsIamUser) as AwsSessionService;
 
     expect(awsPlainService).toEqual(awsPlainServiceCopy);
     expect(awsPlainServiceCopy).toEqual(awsPlainServiceCopy2);

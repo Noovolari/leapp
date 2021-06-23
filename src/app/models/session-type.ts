@@ -1,8 +1,8 @@
 // TODO: could we refactor it as an enum?
 export enum SessionType {
-  awsFederated = 'awsFederated',
-  awsPlain = 'awsPlain',
-  awsTruster = 'awsTruster',
-  awsSso = 'awsSso',
+  awsIamRoleFederated = 'awsFederated',
+  awsIamUser = 'awsPlain',
+  awsIamRoleChained = 'awsTruster',
+  awsSsoRole = 'awsSso',
   azure = 'azure'
 }

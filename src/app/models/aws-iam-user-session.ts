@@ -11,7 +11,7 @@ export class AwsIamUserSession extends Session {
     super(sessionName, region);
 
     this.mfaDevice = mfaDevice;
-    this.type = SessionType.awsPlain;
+    this.type = SessionType.awsIamUser;
     this.profileId = profileId;
   }
 }

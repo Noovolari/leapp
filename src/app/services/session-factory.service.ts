@@ -39,10 +39,10 @@ export class SessionFactoryService {
 
     // Creater and save the SessionService needed; return it to the requester
     switch (accountType) {
-      case SessionType.awsFederated: return this.getAwsFederatedSessionService(accountType);
-      case SessionType.awsPlain: return this.getAwsPlainSessionService(accountType);
-      case SessionType.awsTruster: return this.getAwsTrusterSessionService(accountType);
-      case SessionType.awsSso: return this.getAwsSsoSessionService(accountType);
+      case SessionType.awsIamRoleFederated: return this.getAwsFederatedSessionService(accountType);
+      case SessionType.awsIamUser: return this.getAwsPlainSessionService(accountType);
+      case SessionType.awsIamRoleChained: return this.getAwsTrusterSessionService(accountType);
+      case SessionType.awsSsoRole: return this.getAwsSsoSessionService(accountType);
       case SessionType.azure: return this.getAzureSessionService(accountType);
     }
   }

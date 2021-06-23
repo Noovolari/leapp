@@ -13,6 +13,6 @@ export class AwsIamRoleChainedSession extends Session {
     this.roleArn = roleArn;
     this.profileId = profileId;
     this.parentSessionId = parentSessionId;
-    this.type = SessionType.awsTruster;
+    this.type = SessionType.awsIamRoleChained;
   }
 }

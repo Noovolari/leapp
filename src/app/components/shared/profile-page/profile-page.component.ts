@@ -178,10 +178,10 @@ export class ProfilePageComponent implements OnInit {
 
   deleteIdpUrl(id) {
     // Assumable sessions with this id
-    this.sessionService = this.sessionProviderService.getService(SessionType.awsFederated);
+    this.sessionService = this.sessionProviderService.getService(SessionType.awsIamRoleFederated);
     let sessions = this.sessionService.list().filter(s => (s as AwsIamRoleFederatedSession).idpUrlId === id);
 
-    // Add trusters from federated
+    // Add iamRoleChaineds from federated
     sessions.forEach(parent => {
       const childs = this.sessionService.listTruster(parent);
       sessions = sessions.concat(childs);
@@ -209,7 +209,7 @@ export class ProfilePageComponent implements OnInit {
     });
   }
 
-  manageAwsProfile(id: string | number) {
+  async manageAwsProfile(id: string | number) {
 
     const profileIndex = this.workspaceService.get().profiles.findIndex(p => p.id === id.toString());
     if (this.form.get('awsProfile').value !== '') {
@@ -218,16 +218,17 @@ export class ProfilePageComponent implements OnInit {
       } else {
         this.workspaceService.updateProfile(id.toString(), this.form.get('awsProfile').value);
 
-        this.workspaceService.sessions.forEach(sess => {
+        for(let i = 0; i < this.workspaceService.sessions.length; i++) {
+          const sess = this.workspaceService.sessions[i];
           this.sessionService = this.sessionProviderService.getService(sess.type);
 
           if( (sess as any).profileId === id.toString()) {
             if ((sess as any).status === SessionStatus.active) {
-              this.sessionService.stop(sess.sessionId);
-              this.sessionService.start(sess.sessionId);
+              await this.sessionService.stop(sess.sessionId);
+              await this.sessionService.start(sess.sessionId);
             }
           }
-        });
+        }
       }
     }
     this.editingAwsProfile = false;
@@ -254,27 +255,28 @@ export class ProfilePageComponent implements OnInit {
     }
 
     // Ask for deletion
-    this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, (res) => {
+    this.appService.confirmDialog(`Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join('')}</ul>Do you want to proceed?`, async (res) => {
       if (res !== Constants.confirmClosed) {
         this.appService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
         this.workspaceService.removeProfile(id);
         // Reverting all sessions to default profile
-        sessions.forEach(sess => {
+        for(let i = 0; i < sessions.length; i++) {
+          const sess = sessions[i];
           this.sessionService = this.sessionProviderService.getService(sess.type);
-          (sess as any).profileId = this.workspaceService.getDefaultProfileId();
 
           let wasActive = false;
           if ((sess as any).status === SessionStatus.active) {
             wasActive = true;
-            this.sessionService.stop(sess.sessionId);
+            await this.sessionService.stop(sess.sessionId);
           }
 
+          (sess as any).profileId = this.workspaceService.getDefaultProfileId();
           this.sessionService.update(sess.sessionId, sess);
 
           if(wasActive) {
             this.sessionService.start(sess.sessionId);
           }
-        });
+        }
 
         this.workspace = this.workspaceService.get();
       }

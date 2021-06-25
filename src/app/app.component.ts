@@ -12,6 +12,7 @@ import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
+import {LeappParseError} from "./errors/leapp-parse-error";
 
 @Component({
   selector: 'app-root',
@@ -30,8 +31,7 @@ export class AppComponent implements OnInit {
     private router: Router,
     private timerService: TimerService,
     private updaterService: UpdaterService
-  ) {
-  }
+  ) {}
 
   async ngOnInit() {
     // We get the right moment to set an hook to app close
@@ -60,7 +60,12 @@ export class AppComponent implements OnInit {
       await this.retrocompatibilityService.adaptOldWorkspaceFile();
     }
 
-    const workspace = this.workspaceService.get();
+    let workspace;
+    try {
+      workspace = this.workspaceService.get();
+    } catch {
+      throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
+    }
 
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded(workspace);

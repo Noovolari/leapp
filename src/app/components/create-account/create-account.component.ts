@@ -36,7 +36,7 @@ export class CreateAccountComponent implements OnInit {
   sessionType;
   provider;
 
-  idps: { value: string; label: string}[] = [];
+  idpUrls: { value: string; label: string}[] = [];
   selectedIdpUrl: {value: string; label: string};
 
   profiles: { value: string; label: string}[] = [];
@@ -49,7 +49,7 @@ export class CreateAccountComponent implements OnInit {
   locations = [];
   selectedLocation;
 
-  eAccountType = SessionType;
+  eSessionType = SessionType;
 
   public form = new FormGroup({
     idpArn: new FormControl('', [Validators.required]),
@@ -59,9 +59,8 @@ export class CreateAccountComponent implements OnInit {
     name: new FormControl('', [Validators.required]),
     role: new FormControl('', [Validators.required]),
     roleArn: new FormControl('', [Validators.required]),
-    federatedOrTruster: new FormControl('', [Validators.required]),
+    federatedOrIamRoleChained: new FormControl('', [Validators.required]),
     federatedRole: new FormControl('', [Validators.required]),
-    federatedAccount: new FormControl('', [Validators.required]),
     federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
     secretKey: new FormControl('', [Validators.required]),
     accessKey: new FormControl('', [Validators.required]),
@@ -78,9 +77,9 @@ export class CreateAccountComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private workspaceService: WorkspaceService,
-    private awsFederatedService: AwsIamRoleFederatedService,
-    private awsPlainService: AwsIamUserService,
-    private awsTrusterService: AwsIamRoleChainedService,
+    private awsIamRoleFederatedService: AwsIamRoleFederatedService,
+    private awsIamUserService: AwsIamUserService,
+    private awsIamRoleChainedService: AwsIamRoleChainedService,
     private awsSessionService: AwsSessionService,
     private azureService: AzureService
   ) {}
@@ -96,7 +95,7 @@ export class CreateAccountComponent implements OnInit {
       if (workspace.idpUrls && workspace.idpUrls.length > 0) {
         workspace.idpUrls.forEach(idp => {
           if (idp !== null) {
-            this.idps.push({value: idp.id, label: idp.url});
+            this.idpUrls.push({value: idp.id, label: idp.url});
           }
         });
       }
@@ -119,9 +118,9 @@ export class CreateAccountComponent implements OnInit {
           session
       }));
 
-      // Only for start screen: disable Truster creation
+      // Only for start screen: disable IAM Chained creation
       if (this.firstTime) {
-        this.form.controls['federatedOrTruster'].disable({ onlySelf: true });
+        this.form.controls['federatedOrIamRoleChained'].disable({ onlySelf: true });
       }
 
       // Get all regions and locations from app service lists
@@ -159,7 +158,7 @@ export class CreateAccountComponent implements OnInit {
   saveSession() {
     this.appService.logger(`Saving account...`, LoggerLevel.info, this);
     this.addProfileToWorkspace();
-    this.saveNewSsosToWorkspace();
+    this.saveNewSsoRolesToWorkspace();
     this.createSession();
     this.router.navigate(['/sessions', 'session-selected']);
   }
@@ -243,26 +242,26 @@ export class CreateAccountComponent implements OnInit {
           idpArn: this.form.value.idpArn.trim(),
           roleArn: this.form.value.roleArn.trim()
         };
-        this.awsFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value);
+        this.awsIamRoleFederatedService.create(awsFederatedAccountRequest, this.selectedProfile.value);
         break;
       case (SessionType.awsIamUser):
-        const awsPlainAccountRequest: AwsIamUserSessionRequest = {
+        const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           accessKey: this.form.value.accessKey.trim(),
           secretKey: this.form.value.secretKey.trim(),
           mfaDevice: this.form.value.mfaDevice.trim()
         };
-        this.awsPlainService.create(awsPlainAccountRequest, this.selectedProfile.value);
+        this.awsIamUserService.create(awsIamUserSessionRequest, this.selectedProfile.value);
         break;
       case (SessionType.awsIamRoleChained):
-        const awsTrusterAccountRequest: AwsIamRoleChainedSessionRequest = {
+        const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           roleArn: this.form.value.roleArn.trim(),
           parentSessionId: this.selectedSession.sessionId
         };
-        this.awsTrusterService.create(awsTrusterAccountRequest, this.selectedProfile.value);
+        this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value);
         break;
       case (SessionType.azure):
         const azureSessionRequest: AzureSessionRequest = {
@@ -281,7 +280,7 @@ export class CreateAccountComponent implements OnInit {
    *
    * @private
    */
-  private saveNewSsosToWorkspace() {
+  private saveNewSsoRolesToWorkspace() {
     if(this.sessionType === SessionType.awsIamRoleFederated) {
       try {
         const ipdUrl = { id: this.selectedIdpUrl.value, url: this.selectedIdpUrl.label };

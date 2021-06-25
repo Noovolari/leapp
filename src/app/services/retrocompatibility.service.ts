@@ -83,9 +83,9 @@ export class RetrocompatibilityService {
       // Get session type
       const sessionType = session.account.type;
       switch (sessionType) {
-        case 'AWS': this.createNewAwsFederatedOrTrusterSession(session, workspace); break;
-        case 'AWS_TRUSTER': this.createNewAwsFederatedOrTrusterSession(session, workspace); break;
-        case 'AWS_PLAIN_USER': await this.createNewAwsPlainSession(session, workspace); break;
+        case 'AWS': this.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
+        case 'AWS_TRUSTER': this.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
+        case 'AWS_PLAIN_USER': await this.createNewAwsIamUserSession(session, workspace); break;
         case 'AWS_SSO': this.createNewAwsSingleSignOnSession(session, workspace); break;
         case 'AZURE': this.createNewAzureSession(session, workspace); break;
       }
@@ -135,7 +135,7 @@ export class RetrocompatibilityService {
     workspace.defaultLocation = oldWorkspace.workspaces[0].defaultLocation;
   }
 
-  private createNewAwsFederatedOrTrusterSession(session: any, workspace: Workspace) {
+  private createNewAwsFederatedOrIamRoleChainedSession(session: any, workspace: Workspace) {
     if(!session.account.parent) {
       // Federated
       const federatedSession = new AwsIamRoleFederatedSession(
@@ -150,7 +150,7 @@ export class RetrocompatibilityService {
 
       workspace.sessions.push(federatedSession);
     } else {
-      // Truster
+      // IamRoleChained
       const iamRoleChainedSession = new AwsIamRoleChainedSession(
         session.account.accountName,
         session.account.region,
@@ -164,14 +164,14 @@ export class RetrocompatibilityService {
     }
   }
 
-  private async createNewAwsPlainSession(session: any, workspace: Workspace) {
-    const plainSession = new AwsIamUserSession(
+  private async createNewAwsIamUserSession(session: any, workspace: Workspace) {
+    const iamUserSession = new AwsIamUserSession(
       session.account.accountName,
       session.account.region,
       workspace.profiles[0].id,
       session.account.mfaDevice
     );
-    plainSession.sessionId = session.id;
+    iamUserSession.sessionId = session.id;
 
     const accessKey = await this.keychainService.getSecret(
       environment.appName, `${session.account.accountName}___${session.account.user}___accessKey`);
@@ -179,10 +179,10 @@ export class RetrocompatibilityService {
     const secretKey = await this.keychainService.getSecret(
       environment.appName, `${session.account.accountName}___${session.account.user}___secretKey`);
 
-    this.keychainService.saveSecret(environment.appName, `${session.id}-plain-aws-session-access-key-id`, accessKey);
-    this.keychainService.saveSecret(environment.appName, `${session.id}-plain-aws-session-secret-access-key`, secretKey);
+    this.keychainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-access-key-id`, accessKey);
+    this.keychainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-secret-access-key`, secretKey);
 
-    workspace.sessions.push(plainSession);
+    workspace.sessions.push(iamUserSession);
   }
 
   private createNewAwsSingleSignOnSession(session: any, workspace: Workspace) {

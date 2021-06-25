@@ -22,7 +22,7 @@ export abstract class AwsSessionService extends SessionService {
     return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure ) : [];
   }
 
-  listTruster(parentSession?: Session): Session[] {
+  listIamRoleChained(parentSession?: Session): Session[] {
     let childSession = (this.list().length > 0) ? this.list().filter( (session) => session.type === SessionType.awsIamRoleChained ) : [];
     if (parentSession) {
       childSession = childSession.filter(session => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId );
@@ -30,7 +30,7 @@ export abstract class AwsSessionService extends SessionService {
     return childSession;
   }
 
-  listAwsSso() {
+  listAwsSsoRoles() {
     return (this.list().length > 0) ? this.list().filter((session) => session.type === SessionType.awsSsoRole) : [];
   }
 
@@ -69,7 +69,7 @@ export abstract class AwsSessionService extends SessionService {
   async delete(sessionId: string): Promise<void> {
     try {
       await this.stop(sessionId);
-      this.listTruster(this.get(sessionId)).forEach(sess => {
+      this.listIamRoleChained(this.get(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);
         }

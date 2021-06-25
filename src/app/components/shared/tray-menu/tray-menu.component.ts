@@ -62,7 +62,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       switch (session.type) {
         case SessionType.awsIamUser:
           icon = session.status === SessionStatus.active ? __dirname + `/assets/images/${iconValue}-online.png` : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = '  ' + session.sessionName + ' - ' + 'plain';
+          label = '  ' + session.sessionName + ' - ' + 'iam user';
           break;
         case SessionType.awsIamRoleFederated:
         case SessionType.awsSsoRole:
@@ -105,7 +105,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       {
         label: 'About', type: 'normal', click: () => {
           this.appService.getCurrentWindow().show();
-          this.appService.getDialog().showMessageBox({icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + 'Copyright 2019 beSharp srl.', buttons: ['Ok']});
+          this.appService.getDialog().showMessageBox({icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + '© 2020 Noovolari', buttons: ['Ok']});
         }
       },
       {type: 'separator'},

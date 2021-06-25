@@ -91,22 +91,22 @@ describe('AwsSessionService', () => {
     it('should return a session list composed only of IAM Role Chained accounts', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
-      expect(service.listTruster()).toBeInstanceOf(Array);
-      expect(service.listTruster().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([]);
+      expect(service.listIamRoleChained()).toBeInstanceOf(Array);
+      expect(service.listIamRoleChained().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([]);
 
       const mockedSession2 = new AwsIamUserSession('fakeaccount2', 'eu-west-2', 'fakeprofile2');
       mockedSession2.type = SessionType.awsIamRoleChained;
       mockedSessions.push(mockedSession2);
 
-      expect(service.listTruster()).toBeInstanceOf(Array);
-      expect(service.listTruster().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([mockedSession2]);
+      expect(service.listIamRoleChained()).toBeInstanceOf(Array);
+      expect(service.listIamRoleChained().filter(c => c.type === SessionType.awsIamRoleChained)).toEqual([mockedSession2]);
     });
 
     it('should call list() under the hood', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
       spyOn(service, 'list').and.callThrough();
-      service.listTruster();
+      service.listIamRoleChained();
       expect(service.list).toHaveBeenCalled();
     });
   });

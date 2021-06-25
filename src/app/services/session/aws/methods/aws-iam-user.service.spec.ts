@@ -84,15 +84,15 @@ describe('AwsIamUserService', () => {
   });
 
   describe('create()', () => {
-    it('should create a new Account of type Plain', () => {
+    it('should create a new Account of type Iam User', () => {
       mockedSessions = [];
       awsIamUserService.create({accountName: 'fakeaccount', region: 'eu-west-1', accessKey: 'access-key', secretKey: 'secret-key'}, 'default');
 
       expect(spyWorkspaceService.addSession).toHaveBeenCalled();
       expect(mockedSessions.length).toBe(1);
       expect(spyKeychainService.saveSecret).toHaveBeenCalledTimes(2);
-      expect(spyKeychainService.saveSecret).toHaveBeenCalledWith(environment.appName, `${mockedSessions[0].sessionId}-plain-aws-session-access-key-id`, 'access-key');
-      expect(spyKeychainService.saveSecret).toHaveBeenCalledWith(environment.appName, `${mockedSessions[0].sessionId}-plain-aws-session-secret-access-key`, 'secret-key');
+      expect(spyKeychainService.saveSecret).toHaveBeenCalledWith(environment.appName, `${mockedSessions[0].sessionId}-iam-user-aws-session-access-key-id`, 'access-key');
+      expect(spyKeychainService.saveSecret).toHaveBeenCalledWith(environment.appName, `${mockedSessions[0].sessionId}-iam-user-aws-session-secret-access-key`, 'secret-key');
     });
   });
 
@@ -223,7 +223,7 @@ describe('AwsIamUserService', () => {
       AWSMock.restore('STS');
     });
 
-    it('should ask for MFA code if token is expired and mfadevice is present as a property of aws plain account', async () => {
+    it('should ask for MFA code if token is expired and mfadevice is present as a property of aws iam user account', async () => {
 
       AWSMock.setSDKInstance(AWS);
       // eslint-disable-next-line @typescript-eslint/naming-convention

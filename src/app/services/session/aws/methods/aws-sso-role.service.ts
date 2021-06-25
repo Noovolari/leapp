@@ -69,7 +69,7 @@ export interface VerificationResponse {
   deviceCode: string;
 }
 
-export interface SsoSession {
+export interface SsoRoleSession {
   sessionName: string;
   roleArn: string;
   email: string;
@@ -154,7 +154,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
-  async sync(region: string, portalUrl: string): Promise<SsoSession[]> {
+  async sync(region: string, portalUrl: string): Promise<SsoRoleSession[]> {
     // Prepare Sso Client for operations
     this.getSsoOidcClient(region);
     // Get access token from either login procedure or keychain depending on being expired or not
@@ -250,23 +250,23 @@ export class AwsSsoRoleService extends AwsSessionService {
     return { portalUrlUnrolled: portalUrl, accessToken: generateSsoTokenResponse.accessToken, region, expirationTime: generateSsoTokenResponse.expirationTime };
   }
 
-  private async getSessions(accessToken: string, region: string): Promise<SsoSession[]> {
+  private async getSessions(accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region);
 
-    const promiseArray: Promise<SsoSession[]>[] = [];
+    const promiseArray: Promise<SsoRoleSession[]>[] = [];
 
     accounts.forEach((account) => {
       promiseArray.push(this.getSessionsFromAccount(account, accessToken, region));
     });
 
     return new Promise( (resolve, _) => {
-      Promise.all(promiseArray).then( (sessionMatrix: SsoSession[][]) => {
+      Promise.all(promiseArray).then( (sessionMatrix: SsoRoleSession[][]) => {
         resolve(sessionMatrix.flat());
       });
     });
   }
 
-  private async getSessionsFromAccount(accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoSession[]> {
+  private async getSessionsFromAccount(accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     this.getSsoPortalClient(region);
     const listAccountRolesRequest: ListAccountRolesRequest = {
       accountId: accountInfo.accountId,
@@ -280,7 +280,7 @@ export class AwsSsoRoleService extends AwsSessionService {
       this.recursiveListRoles(accountRoles, listAccountRolesRequest, resolve);
     });
 
-    const awsSsoSessions: SsoSession[] = [];
+    const awsSsoSessions: SsoRoleSession[] = [];
 
     accountRoles.forEach((accountRole) => {
       const oldSession = this.findOldSession(accountInfo, accountRole);
@@ -336,10 +336,10 @@ export class AwsSsoRoleService extends AwsSessionService {
   }
 
   private removeSsoSessionsFromWorkspace(): void {
-    const sessions = this.listAwsSso();
+    const sessions = this.listAwsSsoRoles();
     sessions.forEach(sess => {
       // Verify and delete eventual iamRoleChained sessions from old Sso session
-      const iamRoleChainedSessions = this.listTruster(sess);
+      const iamRoleChainedSessions = this.listIamRoleChained(sess);
       iamRoleChainedSessions.forEach(session => {
         this.delete(session.sessionId);
       });

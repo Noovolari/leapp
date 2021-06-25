@@ -181,9 +181,9 @@ export class ProfilePageComponent implements OnInit {
     this.sessionService = this.sessionProviderService.getService(SessionType.awsIamRoleFederated);
     let sessions = this.sessionService.list().filter(s => (s as AwsIamRoleFederatedSession).idpUrlId === id);
 
-    // Add iamRoleChaineds from federated
+    // Add iam Role Chained from iam role federated
     sessions.forEach(parent => {
-      const childs = this.sessionService.listTruster(parent);
+      const childs = this.sessionService.listIamRoleChained(parent);
       sessions = sessions.concat(childs);
     });
 

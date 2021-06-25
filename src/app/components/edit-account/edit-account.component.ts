@@ -70,8 +70,8 @@ export class EditAccountComponent implements OnInit {
       this.selectedSession.sessionName =  this.form.controls['name'].value;
       this.selectedSession.region      =  this.selectedRegion;
       this.selectedSession.mfaDevice   =  this.form.controls['mfaDevice'].value;
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-plain-aws-session-access-key-id`, this.form.controls['accessKey'].value);
-      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-plain-aws-session-secret-access-key`, this.form.controls['secretKey'].value);
+      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls['accessKey'].value);
+      this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value);
 
       this.sessionService.update(this.selectedSession.sessionId, this.selectedSession);
       this.appService.toast('Session updated correctly.', ToastLevel.success, 'Session Update');

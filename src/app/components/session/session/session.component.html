@@ -17,9 +17,9 @@
 
     </div>
 
-    <a (click)="createAccount();" tooltip="Create Account" class="small-btn"><i class="far fa-plus"></i></a>
+    <a (click)="createAccount();" tooltip="Create Session" class="small-btn"><i class="far fa-plus"></i></a>
     <span class="search-bar">
-      <input #filterField type="text" (keyup)="workspaceService.sessions = workspaceService.sessions" placeholder="Search by..."/>
+      <input #filterField type="text" (keyup)="workspaceService.sessions = workspaceService.sessions" placeholder="Find Sessions by..."/>
       <i class="far fa-search"></i>
     </span>
   </div>
@@ -28,9 +28,9 @@
 <div class="container-fluid with-scroll">
 
   <ul class="account-cards">
-    <li style="position:relative;"> <span class="fixed-profiles">AWS Profiles</span><span class="fixed-status">Status</span></li>
+    <li style="position:relative;"> <span class="fixed-profiles">Named Profiles</span><span class="fixed-status">Status</span></li>
     <li *ngIf="(workspaceService.sessions$ | async | filtering:true).length !== 0">
-      <h3 class="mb-session">Active Accounts</h3>
+      <h3 class="mb-session">Active Sessions</h3>
     </li>
 
     <ng-container *ngFor="let session of workspaceService.sessions$ | async | filtering:true">
@@ -40,7 +40,7 @@
     </ng-container>
 
     <li>
-      <h3 class="mb-session">All other Accounts</h3>
+      <h3 class="mb-session">Sessions</h3>
     </li>
 
     <ng-container *ngFor="let session of workspaceService.sessions$ | async | querying:filterField.value:workspaceService.get() | filtering: false | ordering">

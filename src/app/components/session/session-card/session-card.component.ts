@@ -346,7 +346,7 @@ export class SessionCardComponent implements OnInit {
   private generateDeleteDialogMessage(session: Session): string {
     let iamRoleChainedSessions = [];
     if (session.type !== SessionType.azure) {
-      iamRoleChainedSessions = (this.sessionService as AwsSessionService).listTruster(session);
+      iamRoleChainedSessions = (this.sessionService as AwsSessionService).listIamRoleChained(session);
     }
 
     let iamRoleChainedSessionString = '';

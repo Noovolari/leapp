@@ -56,8 +56,8 @@ export class AwsIamUserService extends AwsSessionService {
 
   create(accountRequest: AwsIamUserSessionRequest, profileId: string): void {
     const session = new AwsIamUserSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
-    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
-    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-secret-access-key`, accountRequest.secretKey);
+    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey);
+    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey);
     this.workspaceService.addSession(session);
   }
 
@@ -116,7 +116,7 @@ export class AwsIamUserService extends AwsSessionService {
         // Session Token is NOT expired
         try {
           // Retrieve session token from keychain
-          return JSON.parse(await this.keychainService.getSecret(environment.appName, `${session.sessionId}-plain-aws-session-token`));
+          return JSON.parse(await this.keychainService.getSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-token`));
         } catch (err) {
           throw new LeappParseError(this, err.message);
         }
@@ -140,11 +140,11 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
-    return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-access-key-id`);
+    return await this.keychainService.getSecret(environment.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
   }
 
   private async getSecretKeyFromKeychain(sessionId: string): Promise<string> {
-    return await this.keychainService.getSecret(environment.appName, `${sessionId}-plain-aws-session-secret-access-key`);
+    return await this.keychainService.getSecret(environment.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
   }
 
   private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {
@@ -159,7 +159,7 @@ export class AwsIamUserService extends AwsSessionService {
       const sessionToken = AwsIamUserService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
 
       // Save in keychain the session token
-      await this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-token`, JSON.stringify(sessionToken));
+      await this.keychainService.saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-token`, JSON.stringify(sessionToken));
 
       // Return Session Token
       return sessionToken;

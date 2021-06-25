@@ -3,7 +3,7 @@ import {Router} from '@angular/router';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
-import {AwsSsoRoleService, SsoSession} from '../../services/session/aws/methods/aws-sso-role.service';
+import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
 
 @Component({
   selector: 'app-aws-sso',
@@ -25,13 +25,13 @@ export class AwsSsoComponent implements OnInit {
 
   constructor(
     private appService: AppService,
-    private awsSsoService: AwsSsoRoleService,
+    private awsSsoRoleService: AwsSsoRoleService,
     private router: Router,
     private workspaceService: WorkspaceService
   ) {}
 
   ngOnInit() {
-    this.awsSsoService.awsSsoActive().then(res => {
+    this.awsSsoRoleService.awsSsoActive().then(res => {
       this.isAwsSsoActive = res;
       this.setValues();
     });
@@ -39,9 +39,9 @@ export class AwsSsoComponent implements OnInit {
 
   login() {
     if (this.form.valid) {
-      this.awsSsoService.sync(this.selectedRegion, this.form.value.portalUrl).then((ssoSessions: SsoSession[]) => {
-        ssoSessions.forEach(ssoSession => {
-          this.awsSsoService.create(ssoSession, this.workspaceService.getDefaultProfileId());
+      this.awsSsoRoleService.sync(this.selectedRegion, this.form.value.portalUrl).then((ssoRoleSessions: SsoRoleSession[]) => {
+        ssoRoleSessions.forEach(ssoRoleSession => {
+          this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
         });
         this.router.navigate(['/sessions', 'session-selected']);
       });
@@ -49,7 +49,7 @@ export class AwsSsoComponent implements OnInit {
   }
 
   logout() {
-    this.awsSsoService.logout().then(_ => {
+    this.awsSsoRoleService.logout().then(_ => {
       this.isAwsSsoActive = false;
       this.setValues();
     });
@@ -59,9 +59,9 @@ export class AwsSsoComponent implements OnInit {
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
 
-    this.awsSsoService.sync(region, portalUrl).then((ssoSessions: SsoSession[]) => {
-      ssoSessions.forEach(ssoSession => {
-        this.awsSsoService.create(ssoSession, ssoSession.profileId);
+    this.awsSsoRoleService.sync(region, portalUrl).then((ssoRoleSessions: SsoRoleSession[]) => {
+      ssoRoleSessions.forEach(ssoRoleSession => {
+        this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId);
       });
       this.router.navigate(['/sessions', 'session-selected']);
     });

@@ -112,7 +112,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     // Assume Role from parent
     // Prepare session credentials set parameters and client
     const sts = new AWS.STS(this.appService.stsOptions(session));
-    // Configure Truster Account session parameters
+    // Configure IamRoleChained Account session parameters
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       RoleSessionName: `assumed-from-leapp`,

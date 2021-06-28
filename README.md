@@ -25,7 +25,7 @@ The App is designed to **manage and secure Cloud Access in multi-account environ
   
 - **[Secure](https://github.com/Noovolari/leapp/wiki/vault-strategy) repository for your access data**
 
-- **Multiple Cloud-Access [strategies](https://github.com/Noovolari/leapp/wiki/use-cases)**
+- **Multiple Cloud-Access [Methods](https://github.com/Noovolari/leapp/wiki/use-cases)**
 
 - **[No long-lived](https://github.com/Noovolari/leapp/wiki/rotating-credentials) credentials**
 
@@ -33,14 +33,14 @@ The App is designed to **manage and secure Cloud Access in multi-account environ
 
 - **Connect EC2 instances straight away**
 
-All the covered access methods can be found [here](https://github.com/Noovolari/leapp/wiki/use-cases).
+All the covered **Access Methods** can be found [here](https://github.com/Noovolari/leapp/wiki/use-cases).
 
 
 ![Leapp App animation](.github/images/Leapp-animation.gif)
 
 
 # Installation
-Get [here](https://github.com/Noovolari/leapp/releases/latest) the latest release.
+Get [here](https://www.leapp.cloud/changelog) the latest release.
 
 # Contributing
 
@@ -106,9 +106,8 @@ Logs are structured in the following way:
 Here you can find our [documentation](https://github.com/Noovolari/leapp/wiki).
 
 # Links
-- [Glossary](.github/GLOSSARY.md): find other information about the system
 - [Roadmap](https://github.com/Noovolari/leapp/projects/4): view our next steps and stay up to date
 - [Contributing](./.github/CONTRIBUTING.md): follow the guidelines if you'd like to contribute to the project
-- [Project Structure](./.github/PROJECT_STRUCTURE.md): check how we structured the project and where to find the files
+- [Project Structure](https://github.com/Noovolari/leapp/wiki/project-structure): check how we structured the project and where to find the files
 # License
 [Mozilla Public License v2.0](https://github.com/Noovolari/leapp/blob/master/LICENSE)

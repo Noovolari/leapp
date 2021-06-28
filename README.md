@@ -40,7 +40,7 @@ All the covered **Access Methods** can be found [here](https://github.com/Noovol
 
 
 # Installation
-Get [here](https://www.leapp.cloud/index.html#features) the latest release.
+Get [here](https://github.com/Noovolari/leapp/releases) the latest release.
 
 # Contributing
 

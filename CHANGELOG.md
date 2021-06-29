@@ -1,9 +1,17 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines. 
 
-### [0.5.10](https://github.com/Noovolari/leapp/compare/v0.5.1...v0.5.10) (2021-06-29)
+App downloads are available in the [website](https://www.leapp.cloud/releases.html)
 
+### [0.6.0](https://github.com/Noovolari/leapp/compare/v0.5.3...v0.6.0) (2021-06-30)
+
+### Features
+
+* Added AWS Named-Profile support ([#117](https://github.com/Noovolari/leapp/issues/117))
+* Added support for AWS System Manager Session Manager Session for not active Session. Now AWS Credentials are injected in the Terminal window.
+* Added [specifications](https://github.com/Noovolari/leapp/wiki/Specs) and [new project structure](https://github.com/Noovolari/leapp/wiki/project-structure).
+* Added [Jasmine Test Suite](https://jasmine.github.io/), and Automatic testing for the core Services of Leapp.
 
 ### Bug Fixes
 

@@ -7,7 +7,8 @@ import {environment} from '../../environments/environment';
 import {UpdateDialogComponent} from '../components/shared/update-dialog/update-dialog.component';
 import compareVersions from 'compare-versions';
 import {WorkspaceService} from './workspace.service';
-
+import {HttpClient} from '@angular/common/http';
+import md from 'markdown-it';
 
 @Injectable({
   providedIn: 'root'
@@ -19,13 +20,16 @@ export class UpdaterService extends NativeService {
   releaseDate: string;
   releaseNotes: string;
   bsModalRef: BsModalRef;
+  markdown: any;
 
   constructor(
     private appService: AppService,
     private workspaceService: WorkspaceService,
-    private bsModalService: BsModalService
+    private bsModalService: BsModalService,
+    private httpClient: HttpClient
   ) {
     super();
+    this.markdown = md();
   }
 
   isUpdateNeeded(): boolean {
@@ -82,5 +86,20 @@ export class UpdaterService extends NativeService {
 
   updateVersionJson(version: string): void {
     this.fs.writeFileSync(this.os.homedir() + '/.Leapp/.latest.json', version);
+  }
+
+  async getReleaseNote(): Promise<string> {
+    return new Promise( (resolve, _) => {
+        this.httpClient.get('https://asset.noovolari.com/CHANGELOG.md', { responseType: 'text' }).subscribe(data => {
+          resolve(this.markdown.render(data));
+        }, error => {
+          console.log('error', error);
+          resolve('');
+        });
+    });
+  }
+
+  isReady() {
+    return (this.version !== undefined);
   }
 }

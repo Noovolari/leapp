@@ -142,7 +142,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       this.currentTray = new (this.appService.getTray())(__dirname + `/assets/images/LeappMini.png`);
     }
 
-    if (this.updaterService.getSavedVersionComparison()) {
+    if (this.updaterService.getSavedVersionComparison() && this.updaterService.isReady()) {
       voices.push({ type: 'separator' });
       voices.push({ label: 'Check for Updates...', type: 'normal', click: () => this.updaterService.updateDialog() });
       this.currentTray.setImage(__dirname + `/assets/images/LeappMini2.png`);

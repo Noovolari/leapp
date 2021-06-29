@@ -157,11 +157,13 @@ export class AppComponent implements OnInit {
     }
 
     const ipc = this.app.getIpcRenderer();
-    ipc.on('UPDATE_AVAILABLE', (_, info) => {
-      this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, info.releaseNotes);
+    ipc.on('UPDATE_AVAILABLE', async (_, info) => {
+
+      const releaseNote = await this.updaterService.getReleaseNote();
+      this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
       if (this.updaterService.isUpdateNeeded()) {
-        this.workspaceService.sessions = [...this.workspaceService.sessions];
         this.updaterService.updateDialog();
+        this.workspaceService.sessions = [...this.workspaceService.sessions];
       }
     });
   }

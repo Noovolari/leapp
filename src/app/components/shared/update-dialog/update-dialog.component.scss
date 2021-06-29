@@ -2,7 +2,7 @@
 @import "../../../../assets/scss/mixins/utility";
 
 .confirm-modal {
-  max-width: 400px;
+  max-width: 484px;
   width: 100%;
   margin: 20px 15px;
 }
@@ -39,7 +39,7 @@ button.disabled {
 .button-equalizer button:first-child { float: left; }
 .button-equalizer button:last-child { float: right; }
 
-h3 { text-align: left; font-size: 1.3rem; color: #616161; font-weight: bold;
+h3 { text-align: left; font-size: 17px; color: #616161; font-weight: bold;
   span {
     font-size: 1.3rem; color: #908e8e; font-weight: normal;
   }

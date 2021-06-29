@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.6.0",
+  "version": "0.5.0",
   "author": {
     "name": "besharp",
     "email": "info@besharp.it"
@@ -198,6 +198,7 @@
     "is-url": "^1.2.4",
     "jwt-decode": "~3.1.2",
     "keytar": "7.6.0",
+    "markdown-it": "^12.0.6",
     "md5-file": "~5.0.0",
     "menubar": "~9.0.3",
     "mousetrap": "~1.6.5",

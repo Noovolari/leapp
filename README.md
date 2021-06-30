@@ -40,7 +40,7 @@ All the covered access methods can be found [here](https://github.com/Noovolari/
 
 
 # Installation
-Get [here](https://github.com/Noovolari/leapp/releases/latest) the latest release.
+Get [here](https://www.leapp.cloud/releases) the latest release.
 
 # Contributing
 

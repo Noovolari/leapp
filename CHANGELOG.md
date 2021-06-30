@@ -8,10 +8,10 @@ App downloads are available in the [website](https://www.leapp.cloud/releases.ht
 
 ### Features
 
-* Added AWS Named-Profile support ([#117](https://github.com/Noovolari/leapp/issues/117))
-* Added support for AWS System Manager Session Manager Session for not active Session. Now AWS Credentials are injected in the Terminal window.
-* Added [specifications](https://github.com/Noovolari/leapp/wiki/Specs) and [new project structure](https://github.com/Noovolari/leapp/wiki/project-structure).
-* Added [Jasmine Test Suite](https://jasmine.github.io/), and Automatic testing for the core Services of Leapp.
+* added AWS Named-Profile support ([#117](https://github.com/Noovolari/leapp/issues/117))
+* added support for AWS System Manager Session Manager Session for not active Session. Now AWS Credentials are injected in the Terminal window.
+* added [specifications](https://github.com/Noovolari/leapp/wiki/Specs) and [new project structure](https://github.com/Noovolari/leapp/wiki/project-structure)
+* added [Jasmine Test Suite](https://jasmine.github.io/), and Automatic testing for the core Services of Leapp.
 
 ### Bug Fixes
 

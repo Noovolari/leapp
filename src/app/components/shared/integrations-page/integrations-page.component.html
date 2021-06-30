@@ -1,0 +1,30 @@
+<img src="assets/images/fake_blur.png" class="fake-blur" />
+<div class="background">
+  <div class="container-fluid">
+    <h1><a (click)="goBack()" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-link"></i> Integrations</h1>
+
+    <ng-container *ngIf="!showProviderList">
+    <div class="callout" (click)="showProviders()">
+      <h2><i class="fa fa-fingerprint"></i> Identity Providers</h2>
+      <span>
+      Integrate an Identity Provider that will handle your Leapp Sessions and act as a credential broker.
+      </span>
+    </div>
+
+    <h3>More integrations coming soon.</h3>
+    <br>
+    <small>Any suggestions? Reach out at info@noovolari.it</small>
+    </ng-container>
+
+    <ng-container *ngIf="showProviderList">
+
+      <div class="form-group" style="width: 100%; display: inline-block;">
+        <label><strong>Identity Providers</strong></label>
+        <br>
+        <span class="form-control blue-control btn-control" (click)="goToAwsSSO()">aws Single Sign On</span>
+      </div>
+
+    </ng-container>
+
+  </div>
+</div>

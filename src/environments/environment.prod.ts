@@ -3,6 +3,7 @@
 // The list of file replacements can be found in `angular.json`.
 const environment = {
   appName: 'Leapp',
+  samlRoleSessionDuration: 3600, // 1h
   sessionDuration: 1200,
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
@@ -14,7 +15,9 @@ const environment = {
   azureProfile: '.azure/azureProfile.json',
   defaultRegion: 'us-east-1',
   defaultLocation: 'eastus',
-  latestUrl: 'https://github.com/Noovolari/leapp/releases/tag/'
+  defaultAwsProfileName: 'default',
+  defaultAzureProfileName: 'default-azure',
+  latestUrl: 'https://leapp.cloud/releases.html'
 };
 
 environment.lockFileDestination = `.Leapp/Leapp-lock.json`;

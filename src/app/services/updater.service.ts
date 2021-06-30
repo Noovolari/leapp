@@ -1,11 +1,14 @@
-import { Injectable } from '@angular/core';
-import compareVersions from 'compare-versions';
-import {NativeService} from '../services-system/native-service';
-import {AppService} from '../services-system/app.service';
-import {constants} from '../core/enums/constants';
+import {Injectable} from '@angular/core';
+import {NativeService} from './native-service';
+import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
+import {AppService} from './app.service';
+import {Constants} from '../models/constants';
 import {environment} from '../../environments/environment';
-import {UpdateDialogComponent} from '../shared/update-dialog/update-dialog.component';
-import {BsModalRef, BsModalService} from 'ngx-bootstrap';
+import {UpdateDialogComponent} from '../components/shared/update-dialog/update-dialog.component';
+import compareVersions from 'compare-versions';
+import {WorkspaceService} from './workspace.service';
+import {HttpClient} from '@angular/common/http';
+import md from 'markdown-it';
 
 @Injectable({
   providedIn: 'root'
@@ -17,12 +20,16 @@ export class UpdaterService extends NativeService {
   releaseDate: string;
   releaseNotes: string;
   bsModalRef: BsModalRef;
+  markdown: any;
 
   constructor(
     private appService: AppService,
-    private bsModalService: BsModalService
+    private workspaceService: WorkspaceService,
+    private bsModalService: BsModalService,
+    private httpClient: HttpClient
   ) {
     super();
+    this.markdown = md();
   }
 
   isUpdateNeeded(): boolean {
@@ -49,16 +56,16 @@ export class UpdaterService extends NativeService {
     this.releaseDate = releaseDate;
     this.releaseNotes = releaseNotes;
 
-    this.appService.redrawList.emit();
+    this.workspaceService.sessions = [...this.workspaceService.sessions];
   }
 
   updateDialog(): void {
     const callback = (event) => {
-      if (event === constants.CONFIRM_CLOSED_AND_IGNORE_UPDATE) {
+      if (event === Constants.confirmClosedAndIgnoreUpdate) {
         this.updateVersionJson(this.version);
-        this.appService.redrawList.emit();
-      } else if (event === constants.CONFIRM_CLOSED_AND_DOWNLOAD_UPDATE) {
-        this.appService.openExternalUrl(`${environment.latestUrl}${this.releaseName}`);
+        this.workspaceService.sessions = [...this.workspaceService.sessions];
+      } else if (event === Constants.confirmCloseAndDownloadUpdate) {
+        this.appService.openExternalUrl(`${environment.latestUrl}`);
       }
       this.bsModalRef = undefined;
     };
@@ -79,5 +86,20 @@ export class UpdaterService extends NativeService {
 
   updateVersionJson(version: string): void {
     this.fs.writeFileSync(this.os.homedir() + '/.Leapp/.latest.json', version);
+  }
+
+  async getReleaseNote(): Promise<string> {
+    return new Promise( (resolve, _) => {
+        this.httpClient.get('https://asset.noovolari.com/CHANGELOG.md', { responseType: 'text' }).subscribe(data => {
+          resolve(this.markdown.render(data));
+        }, error => {
+          console.log('error', error);
+          resolve('');
+        });
+    });
+  }
+
+  isReady() {
+    return (this.version !== undefined);
   }
 }

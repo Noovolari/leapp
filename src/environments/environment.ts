@@ -4,10 +4,11 @@
 
 const environment = {
   appName: 'Leapp',
-  sessionDuration: 1200,
+  samlRoleSessionDuration: 3600, // 1h
+  sessionDuration: 1200, // 20 min
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
-  lockFileDestination: '',
+  lockFileDestination: '.Leapp/Leapp-lock.json',
   python3Version: '3.4.0',
   production: false,
   credentialsDestination: '.aws/credentials',
@@ -15,8 +16,9 @@ const environment = {
   azureProfile: '.azure/azureProfile.json',
   defaultRegion: 'us-east-1',
   defaultLocation: 'eastus',
-  latestUrl: 'https://github.com/Noovolari/leapp/releases/tag/'
+  defaultAwsProfileName: 'default',
+  defaultAzureProfileName: 'default-azure',
+  latestUrl: 'https://leapp.cloud/releases.html'
 };
 
-environment.lockFileDestination = `.Leapp/Leapp-lock.json`;
 export { environment };

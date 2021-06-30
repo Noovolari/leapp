@@ -297,7 +297,7 @@ table {
 
   th:last-child label{ margin-right: 17px; }
   th, td {
-    width: 26%;
+    width: 100px!important;
     border-bottom: 1px solid #cfd2d3;
     font-size: 10px;
 
@@ -313,7 +313,7 @@ table {
     }
   }
   th:first-child, td:first-child {
-    width: 77%!important;
+    width: 530px!important;
     overflow: hidden;
     word-break: break-all;
     text-overflow: ellipsis;

@@ -7,7 +7,6 @@
       "node"
     ]
   },
-  "typeRoots": ["node_modules/@types"],
   "files": [
     "src/test.ts",
     "src/polyfills.ts"

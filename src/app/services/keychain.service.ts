@@ -1,11 +1,10 @@
 import {Injectable} from '@angular/core';
 import {NativeService} from './native-service';
-import {AppService} from './app.service';
 
 @Injectable({ providedIn: 'root' })
 export class KeychainService extends NativeService {
 
-  constructor(private appService: AppService) {
+  constructor() {
     super();
   }
 

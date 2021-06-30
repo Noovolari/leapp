@@ -82,7 +82,7 @@ import { NativeService } from './native-service';
 import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
-export class ExecuteServiceService extends NativeService {
+export class ExecuteService extends NativeService {
   /**
    * Execute a command: if the command contains sudo the system launch it with sudo prompt.
    * Note: with the current version of Electron the sandbox option for Chromium don't allow for sudo prompt on Ubuntu machines 16+

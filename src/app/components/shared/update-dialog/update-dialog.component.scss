@@ -1,0 +1,77 @@
+@import "palette";
+@import "../../../../assets/scss/mixins/utility";
+
+.confirm-modal {
+  max-width: 484px;
+  width: 100%;
+  margin: 20px 15px;
+}
+
+h4 { color: $text-color; }
+
+button {
+  background-color: #73E0CF;
+  color: #080B38;
+  border-radius: 4px;
+  border: 2px solid #73E0CF!important;
+
+  font-family: "Lato", "Open Sans", sans-serif;
+  font-size: 19px;
+  font-weight: bold;
+
+  transition: all 0.3s ease;
+
+  min-width: 160px;
+  padding: 10px;
+}
+button:hover {
+  background-color: transparent;
+  color: #73E0CF;
+  border: 2px solid #73E0CF!important;
+}
+button.disabled {
+  background: $light-grey;
+  color: $charcoal-grey;
+  border: 2px solid $charcoal-grey!important;
+}
+
+.button-equalizer { height: 36px; margin-bottom: 20px; }
+.button-equalizer button:first-child { float: left; }
+.button-equalizer button:last-child { float: right; }
+
+h3 { text-align: left; font-size: 17px; color: #616161; font-weight: bold;
+  span {
+    font-size: 1.3rem; color: #908e8e; font-weight: normal;
+  }
+}
+
+div.updater > div.html-content {
+  color: $text-color; overflow-y: scroll; height: 284px; text-align: left;
+
+  h2 {
+    text-align: center!important; color: #616161!important; font-size: 1.3rem!important; font-weight: bold!important;
+  }
+  h3 {
+    text-align: left!important; color: #616161!important; font-size: 1.3rem!important; font-weight: bold!important;
+  }
+
+  p { font-size: 14px; }
+
+  a {
+    color: #64c2b4;
+    text-decoration: none;
+    background-color: transparent;
+    margin-top: 10px;
+    display: inline-block;
+  }
+}
+
+.modal-header {
+  color: $text-color!important;
+  background: $white-text-color;
+
+  .close {
+    font-size: 36px;
+    color: $text-color!important;
+  }
+}

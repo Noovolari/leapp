@@ -1,20 +1,18 @@
 import {Component, OnInit} from '@angular/core';
-import {registerLocaleData} from '@angular/common';
-import localeEn from '@angular/common/locales/en';
-import {TranslateService} from '@ngx-translate/core';
 import {environment} from '../environments/environment';
-import {ConfigurationService} from './services-system/configuration.service';
-import {FileService} from './services-system/file.service';
-import {AppService, LoggerLevel} from './services-system/app.service';
+import {FileService} from './services/file.service';
+import {AppService, LoggerLevel} from './services/app.service';
 import {Router} from '@angular/router';
-import {setTheme} from 'ngx-bootstrap';
-import {CredentialsService} from './services/credentials.service';
-import {MenuService} from './services/menu.service';
-import {TimerService} from './services/timer-service';
-import {AccountType} from './models/AccountType';
-import * as uuid from 'uuid';
-import compareVersions from 'compare-versions';
+import {WorkspaceService} from './services/workspace.service';
+import {Workspace} from './models/workspace';
+import {setTheme} from 'ngx-bootstrap/utils';
+import {TimerService} from './services/timer.service';
+import {RotationService} from './services/rotation.service';
+import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
+import compareVersions from 'compare-versions';
+import {RetrocompatibilityService} from './services/retrocompatibility.service';
+import {LeappParseError} from "./errors/leapp-parse-error";
 
 @Component({
   selector: 'app-root',
@@ -24,126 +22,122 @@ import {UpdaterService} from './services/updater.service';
 export class AppComponent implements OnInit {
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
-    private translateService: TranslateService,
-    private router: Router,
-    private configurationService: ConfigurationService,
-    private fileService: FileService,
     private app: AppService,
-    private credentialsService: CredentialsService,
-    private menuService: MenuService,
+    private workspaceService: WorkspaceService,
+    private retrocompatibilityService: RetrocompatibilityService,
+    private fileService: FileService,
+    private rotationService: RotationService,
+    private sessionProviderService: SessionFactoryService,
+    private router: Router,
     private timerService: TimerService,
     private updaterService: UpdaterService
-  ) {
-  }
+  ) {}
 
-  ngOnInit() {
-    // Use ngx bootstrap 4
-    setTheme('bs4');
-    // Register locale languages and set the default one: we currently use only en
-    this.translateService.setDefaultLang('en');
-    registerLocaleData(localeEn, 'en');
-
-    if (environment.production) {
-      // Clear both info and warn message in production mode without removing them from code actually
-      console.warn = () => {
-      };
-      console.log = () => {
-      };
-    }
-
-    // If we have credentials copy them from workspace file to the .aws credential file
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-
-    if (workspace) {
-      // Set it as default
-      this.configurationService.setDefaultWorkspaceSync(workspace.name);
-      // Patch old way of having only one idp url
-      if (workspace.idpUrl !== undefined && typeof workspace.idpUrl === 'string') {
-        workspace.idpUrl = [{ id: uuid.v4(), url: workspace.idpUrl }];
-      }
-
-      // Patch old sessions without a default region
-      const sessions = workspace.sessions;
-      if (sessions) {
-        sessions.forEach(session => {
-          if (session.account.region  === undefined || session.account.region === null || session.account.region === '' || session.account.region === 'no region necessary') {
-            session.account.region = session.account.type !== AccountType.AZURE ? environment.defaultRegion : environment.defaultLocation;
-          }
-          // Another patch: federated and truster for AWS now have their own copy of the selected IdP url so add it if missing (a very old account)
-          if (session.account.type === AccountType.AWS || session.account.type === AccountType.AWS_TRUSTER) {
-            if (session.account.parent === undefined) {
-              if (session.account.idpUrl === '' || session.account.idpUrl === null || session.account.idpUrl === undefined) {
-                session.account.idpUrl = workspace.idpUrl.filter(u => (u !== null && u !== undefined))[0].id; // We force the first
-              } else {
-                const found = workspace.idpUrl.filter(u => u && u.url === session.account.idpUrl)[0];
-                if (found) {
-                  session.account.idpUrl = found.id;
-                }
-              }
-            }
-          }
-        });
-        workspace.sessions = sessions;
-        this.configurationService.updateWorkspaceSync(workspace);
-      }
-    }
-
-    // Fix for retro-compatibility with old workspace configuration
-    this.verifyWorkspace();
-
-    // Prevent Dev Tool to show on production mode
-    this.app.currentBrowserWindow().webContents.on('devtools-opened', () => {
-      if (environment.production) {
-        this.app.logger('Closing Web tools in production mode', LoggerLevel.INFO, this);
-        this.app.currentBrowserWindow().webContents.closeDevTools();
-      }
-    });
-
+  async ngOnInit() {
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
-      this.app.logger('Preparing for closing instruction...', LoggerLevel.INFO, this);
+      this.app.logger('Preparing for closing instruction...', LoggerLevel.info, this);
       this.beforeCloseInstructions();
     });
 
+    // Use ngx bootstrap 4
+    setTheme('bs4');
+
+    if (environment.production) {
+      // Clear both info and warn message in production
+      // mode without removing them from code actually
+      console.warn = () => {};
+      console.log = () => {};
+    }
+
+    // Prevent Dev Tool to show on production mode
+    this.app.blockDevToolInProductionMode();
+
+    // Before retrieving an actual copy of the workspace we
+    // check and in case apply, our retro compatibility service
+    if (this.retrocompatibilityService.isRetroPatchNecessary()) {
+      await this.retrocompatibilityService.adaptOldWorkspaceFile();
+    }
+
+    let workspace;
+    try {
+      workspace = this.workspaceService.get();
+    } catch {
+      throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
+    }
+
+    // Check the existence of a pre-Leapp credential file and make a backup
+    this.showCredentialBackupMessageIfNeeded(workspace);
+
+    // All sessions start stopped when app is launched
+    if (workspace.sessions.length > 0) {
+      workspace.sessions.forEach(sess => {
+        const concreteSessionService = this.sessionProviderService.getService(sess.type);
+        concreteSessionService.stop(sess.sessionId);
+      });
+    }
+
+    // Start Global Timer (1s)
+    this.timerService.start(this.rotationService.rotate.bind(this.rotationService));
+
+    // Launch Auto Updater Routines
     this.manageAutoUpdate();
 
-
-    this.timerService.defineTimer();
-
-    // Initial starting point for DEBUG
-    this.router.navigate(['/start']);
+    // Go to initial page if no sessions are already created or
+    // go to the list page if is your second visit
+    if (workspace.sessions.length > 0) {
+      this.router.navigate(['/sessions', 'session-selected']);
+    } else {
+      this.router.navigate(['/start', 'start-page']);
+    }
   }
 
   /**
    * This is an hook on the closing app to remove credential file and force stop using them
    */
   private beforeCloseInstructions() {
-    // TODO: Move to another component
-    this.menuService.cleanBeforeExit();
+    // Check if we are here
+    this.app.logger('Closing app with cleaning process...', LoggerLevel.info, this);
+
+    // We need the Try/Catch as we have a the possibility to call the method without sessions
+    try {
+      // Clean the config file
+      this.app.cleanCredentialFile();
+    } catch (err) {
+      this.app.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
+    }
+
+    // Finally quit
+    this.app.quit();
   }
 
   /**
-   * Fix for having old proxy to new configuration
+   * Show that we created a copy of original credential file if present in the system
    */
-  private verifyWorkspace() {
-    const workspace = this.configurationService.getDefaultWorkspaceSync();
-    if (workspace !== undefined && workspace !== null) {
-      const hasNewConf = workspace.proxyConfiguration !== undefined;
-      if (!hasNewConf) {
-        const proxyUrl = workspace.proxyUrl ? workspace.proxyUrl : '';
-        workspace.proxyConfiguration = {
-          proxyPort: '8080',
-          proxyProtocol: 'https',
-          proxyUrl,
-          username: '',
-          password: ''
-        };
-        this.configurationService.updateWorkspaceSync(workspace);
-      }
+  private showCredentialBackupMessageIfNeeded(workspace: Workspace) {
+    const oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
+    const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
+    const check = workspace.sessions.length === 0 && this.app.getFs().existsSync(oldAwsCredentialsPath);
+
+    this.app.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
+
+    if (check) {
+      this.app.getFs().renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
+      this.app.getFs().writeFileSync(oldAwsCredentialsPath,'');
+      this.app.getDialog().showMessageBox({
+        type: 'info',
+        icon: __dirname + '/assets/images/Leapp.png',
+        message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
+      });
     }
   }
 
+  /**
+   * Launch Updater process
+   *
+   * @private
+   */
   private manageAutoUpdate(): void {
     let savedVersion;
 
@@ -163,11 +157,13 @@ export class AppComponent implements OnInit {
     }
 
     const ipc = this.app.getIpcRenderer();
-    ipc.on('UPDATE_AVAILABLE', (_, info) => {
-      this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, info.releaseNotes);
+    ipc.on('UPDATE_AVAILABLE', async (_, info) => {
+
+      const releaseNote = await this.updaterService.getReleaseNote();
+      this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
       if (this.updaterService.isUpdateNeeded()) {
-        this.app.redrawList.emit();
         this.updaterService.updateDialog();
+        this.workspaceService.sessions = [...this.workspaceService.sessions];
       }
     });
   }

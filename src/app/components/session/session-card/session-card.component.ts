@@ -45,6 +45,7 @@ export class SessionCardComponent implements OnInit {
   selectedSsmRegion;
   selectedDefaultRegion;
   openSsm = false;
+  firstTimeSsm = true;
   awsRegions = [];
   regionOrLocations = [];
   instances = [];
@@ -181,6 +182,8 @@ export class SessionCardComponent implements OnInit {
     // Reset things before opening the modal
     this.instances = [];
     this.ssmLoading = false;
+    this.firstTimeSsm = true;
+    this.selectedSsmRegion = null;
     this.modalRef = this.modalService.show(this.ssmModalTemplate, { class: 'ssm-modal'});
   }
 
@@ -205,12 +208,14 @@ export class SessionCardComponent implements OnInit {
     if (this.selectedSsmRegion) {
       // Start process
       this.ssmLoading = true;
+      this.firstTimeSsm = true;
       // Generate valid temporary credentials for the SSM and EC2 client
       const credentials = await (this.sessionService as AwsSessionService).generateCredentials(session.sessionId);
       // Get the instances
       this.instances = await this.ssmService.getSsmInstances(credentials, this.selectedSsmRegion);
       this.duplicateInstances = this.instances;
       this.ssmLoading = false;
+      this.firstTimeSsm = false;
     }
   }
 

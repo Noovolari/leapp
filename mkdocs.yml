@@ -1,0 +1,73 @@
+site_name: Leapp
+site_url: https://example.com/
+repo_url: https://github.com/Noovolari/leapp
+
+nav:
+  - Overview: index.md
+  - Concepts: concepts.md
+  - 'Use Cases':
+      - 'AWS IAM User': 'use-cases/aws_iam_user.md'
+      - 'AWS IAM Role': 'use-cases/aws_iam_role.md'
+      - 'AWS SSO': 'use-cases/aws_sso.md'
+      - 'Azure': 'use-cases/azure.md'
+  - 'Tutorials':
+      - 'First Access': 'tutorials/first_access.md'
+      - 'AWS':
+        - 'IAM User': 'tutorials/aws/iam_user_setup.md'
+        - 'IAM Federated Role':
+          - 'G Suite Federation': 'tutorials/aws/federated/gsuite_federation_setup.md'
+          - 'AWS Federation': 'tutorials/aws/federated/aws_federation_setup.md'
+          - 'Enable Federated Access': 'tutorials/aws/federated/enable_federated_access.md'
+          - 'Assign Role to GSuite Principal': 'tutorials/aws/federated/assign_role.md'
+          - 'Setup Leapp Federated': 'tutorials/aws/federated/leapp_federated_setup.md'
+        - 'IAM Chained Role':
+          - 'Setup Trust Relationship': 'tutorials/aws/chained/trust_setup.md'
+          - 'Setup Leapp Chained': 'tutorials/aws/chained/leapp_chained_setup.md'
+        - 'AWS SSO': 'tutorials/aws/aws_sso.md'
+      - 'Azure':
+        - 'G Suite Federation': 'tutorials/azure/gsuite_federation_setup.md'
+        - 'Setup Leapp Federated': 'tutorials/azure/leapp_federated_setup.md'
+      - 'Misc':
+          - 'Quick List': 'tutorials/misc/quick_list.md'
+          - 'Default Region/Location': 'tutorials/misc/defaults.md'
+          - 'Session Region/Location': 'tutorials/misc/session_region.md'
+          - 'Named Profiles': 'tutorials/misc/named_profiles.md'
+  - 'Contributing':
+      - 'Project Structure':
+          - 'Overview': 'contributing/structure/overview.md'
+          - 'Updater': 'contributing/structure/updater.md'
+          - 'System Vault': 'contributing/structure/system_vault.md'
+          - 'AWS Named Profiles': 'contributing/structure/aws_named_profiles.md'
+          - 'AWS SSO': 'contributing/structure/aws_sso.md'
+  - 'Community':
+      - 'Get Involved': 'community/getinvolved.md'
+      - 'Guides and Resources': 'community/guides.md'
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.indexes
+    - navigation.sections
+    - navigation.top
+  font:
+    text: Roboto
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to light mode
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg

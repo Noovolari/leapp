@@ -75,8 +75,14 @@ export class AppService extends NativeService {
 
     // Global Configure logger
     if (this.log) {
+      const logPaths = {
+        mac: `${this.process.env.HOME}/Library/Logs/Leapp/log.log`,
+        linux: `${this.process.env.HOME}/.config/Leapp/logs/log.log`,
+        windows: `${this.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.log`,
+      }
       this.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
       this.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+      this.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
   }
 

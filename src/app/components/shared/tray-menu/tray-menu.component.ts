@@ -12,6 +12,7 @@ import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated
 import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
+import {normalizeSourceMaps} from "@angular-devkit/build-angular/src/utils";
 
 @Component({
   selector: 'app-tray-menu',
@@ -138,14 +139,22 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
     this.appService.getMenu().setApplicationMenu(this.appService.getMenu().buildFromTemplate(template));
 
+    // check for dark mode
+    let normalIcon = 'LeappMini';
+    let updateIcon = 'LeappMini2';
+    if (this.appService.isDarkMode()) {
+      normalIcon = 'LeappMini3';
+      updateIcon = 'Leappmini4';
+    }
+
     if (!this.currentTray) {
-      this.currentTray = new (this.appService.getTray())(__dirname + `/assets/images/LeappMini.png`);
+      this.currentTray = new (this.appService.getTray())(__dirname + `/assets/images/${normalIcon}.png`);
     }
 
     if (this.updaterService.getSavedVersionComparison() && this.updaterService.isReady()) {
       voices.push({ type: 'separator' });
       voices.push({ label: 'Check for Updates...', type: 'normal', click: () => this.updaterService.updateDialog() });
-      this.currentTray.setImage(__dirname + `/assets/images/LeappMini2.png`);
+      this.currentTray.setImage(__dirname + `/assets/images/${updateIcon}.png`);
     }
 
     voices = voices.concat(extraInfo);

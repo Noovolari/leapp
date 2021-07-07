@@ -35,6 +35,7 @@ export class NativeService {
   protected followRedirects: any;
   protected httpProxyAgent: any;
   protected httpsProxyAgent: any;
+  protected nativeTheme: any;
 
   constructor() {
     if ((window as any).native) {
@@ -67,6 +68,9 @@ export class NativeService {
       this.menu = (window as any).native.Menu;
       this.tray = (window as any).native.Tray;
       this.ipcRenderer = (window as any).native.ipcRenderer;
+      this.nativeTheme = (window as any).native.nativeTheme;
+
+      console.log(this.nativeTheme);
     }
   }
 }

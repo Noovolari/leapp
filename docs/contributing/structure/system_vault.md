@@ -1,13 +1,13 @@
 # Vault Strategy
-On Leapp we use [Keytar](https://github.com/atom/node-keytar) as a library to maintain a secure vault for sensible information.
-We use it wrapping the functions listed below.
+We use [Keytar](https://github.com/atom/node-keytar) as a library to maintain a secure vault for sensitive data.
 
 ### Prerequisite for using on Linux systems
 Currently this library uses `libsecret` so you **may** need to install it before running Leapp.
 Depending on your distribution, you will need to run the following command:
-* Debian/Ubuntu: `sudo apt-get install libsecret-1-dev`
-* Red Hat-based: `sudo yum install libsecret-devel`
-* Arch Linux: `sudo pacman -S libsecret`
+
+- Debian/Ubuntu: `sudo apt-get install libsecret-1-dev`
+- Red Hat-based: `sudo yum install libsecret-devel`
+- Arch Linux: `sudo pacman -S libsecret`
 
 ### Supported versions for contributors
 Each release of `keytar` includes prebuilt binaries for the versions of Node and Electron that are actively supported by our project.
@@ -44,6 +44,7 @@ Every key stored by Leapp in the vault is named **Leapp**. The account name show
 
 ## How Keytar translate to system vaults?
 Keytar translate to the following system vaults depending on the OS:
+
 * On **macOS** the passwords are managed by the *Keychain*.
 * On **Linux** they are managed by the Secret Service *API/libsecret*.
 * On **Windows** they are managed by *Credential Vault*.

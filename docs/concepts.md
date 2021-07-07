@@ -1,32 +1,30 @@
 # Concepts
-Leapp grants to the users the generation of **temporary credentials** only for accessing the Cloud programmatically.
+Leapp grants the users the generation of **temporary credentials** for accessing the cloud programmatically through CLI/SDK.
 
-Leapp is created with security in mind: **NO credentials are saved in our system whatsoever. Nor in code neither in our configuration file.** Every time a credential is generated is **temporary**, and **no long-term ones are ever saved** in plain accessible files or locations.
+Leapp is built with security in mind: **NO credentials are saved in our system whatsoever. Nor in code neither in our configuration file.** Every time a credential is generated is **temporary**, and **no long-term ones are ever saved** in plain accessible files or locations.
 
-The main goal of the Desktop App is to provide credentials to Developers only when they are needed. Otherwise, those credentials are stored in a secure place (the System Vault).
-
-To do so, Leapp introduces the concept of **Session.**
+Our main goal is to provide credentials to developers only when needed. Otherwise, those credentials are stored in a secure place (the system vault).
 
 ## Session
 
-A **Session** contains all the relevant information to make you connect to a cloud provider.
+A **Session** contains all the relevant information to let the dev connect to a cloud provider.
 
-To reach the goals set to Leapp, three standard actions should be implemented for each session:
+Three standard actions should be implemented for each session: **start**, **stop**, and **rotate**.
 
 ### Start
-This action makes the credentials available to the User of Leapp.
+Make the temporary credentials available to the provider chain.
 
 ### Stop
-This action removes the credentials whenever they are not needed.
+Removes the temporary credentials from the provider chain.
 
 ### Rotate
-Renewing a specific set of credentials referred to a Leapp Session.
+Generate new temporary credentials, and substitute the previous ones in the provider chain.
 
 ## Data
-A Session contains basic information:
+All Sessions shares some basic data, common to all. 
 
 ### ID
-Unique ID to identify the Session
+Unique identifier to the Session
 
 ### sessionName
 A fancy name for the Session to make it recognizable to the user.

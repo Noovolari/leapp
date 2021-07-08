@@ -1,4 +1,4 @@
-import {ErrorHandler, NgModule} from '@angular/core';
+import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {SessionRoutingModule} from './session-routing.module';
 import {SessionComponent} from './session/session.component';
@@ -11,7 +11,6 @@ import {TooltipModule} from 'ngx-bootstrap/tooltip';
 import {BsDropdownModule} from 'ngx-bootstrap/dropdown';
 import { FilteringPipe } from './session/filtering.pipe';
 import { OrderingPipe } from './session/ordering.pipe';
-import {IconPipe} from './session-card/icon.pipe';
 import {DetailPipe} from './session-card/detail.pipe';
 import {QueryingPipe} from './session/querying.pipe';
 
@@ -22,7 +21,6 @@ import {QueryingPipe} from './session/querying.pipe';
     FilteringPipe,
     OrderingPipe,
     QueryingPipe,
-    IconPipe,
     DetailPipe
   ],
   imports: [

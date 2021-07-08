@@ -5,6 +5,7 @@
 * - create an entry in this file; now through native service you can inject that library everywhere in the angular code!
 */
 import * as Keytar from 'keytar';
+import {getWindowSizes} from "ngx-bootstrap/positioning/utils";
 
 export class NativeService {
   protected url: any;
@@ -36,6 +37,7 @@ export class NativeService {
   protected httpProxyAgent: any;
   protected httpsProxyAgent: any;
   protected nativeTheme: any;
+  protected notification: any;
 
   constructor() {
     if ((window as any).native) {
@@ -69,6 +71,7 @@ export class NativeService {
       this.tray = (window as any).native.Tray;
       this.ipcRenderer = (window as any).native.ipcRenderer;
       this.nativeTheme = (window as any).native.nativeTheme;
+      this.notification = (window as any).native.notification;
 
       console.log(this.nativeTheme);
     }

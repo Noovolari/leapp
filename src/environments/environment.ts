@@ -6,10 +6,9 @@ const environment = {
   appName: 'Leapp',
   samlRoleSessionDuration: 3600, // 1h
   sessionDuration: 1200, // 20 min
-  sessionTokenDuration: 36000, // 10h
+  sessionTokenDuration: 900, // 36000 - 10h
   timeout: 10000,
   lockFileDestination: '.Leapp/Leapp-lock.json',
-  python3Version: '3.4.0',
   production: false,
   credentialsDestination: '.aws/credentials',
   azureAccessTokens: '.azure/accessTokens.json',

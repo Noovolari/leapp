@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import {BsModalRef} from 'ngx-bootstrap/modal';
+import {Constants} from '../../../models/constants';
 
 @Component({
   selector: 'app-confirmation-dialog',
@@ -24,13 +25,14 @@ export class ConfirmationDialogComponent implements OnInit {
    */
   confirm() {
     if (this.callback) {
-      this.callback();
+      this.callback(Constants.confirmed);
       this.close();
     }
   }
 
   close() {
     this.bsModalRef.hide();
+    this.callback(Constants.confirmClosed);
   }
 
 }

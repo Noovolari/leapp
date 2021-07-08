@@ -8,7 +8,6 @@ const environment = {
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
   lockFileDestination: '',
-  python3Version: '3.4.0',
   production: true,
   credentialsDestination: '.aws/credentials',
   azureAccessTokens: '.azure/accessTokens.json',

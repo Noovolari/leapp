@@ -15,6 +15,7 @@ import {FileService} from '../../../services/file.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../services/session.service';
+import {Constants} from "../../../models/constants";
 
 @Component({
   selector: 'app-session-card',
@@ -124,12 +125,13 @@ export class SessionCardComponent implements OnInit {
 
     const dialogMessage = this.generateDeleteDialogMessage(session);
 
-    this.appService.confirmDialog(dialogMessage, () => {
-      this.sessionService.delete(session.sessionId);
-      this.logSessionData(session, 'Session Deleted');
+    this.appService.confirmDialog(dialogMessage, (status) => {
+      if (status === Constants.confirmed) {
+        this.sessionService.delete(session.sessionId);
+        this.logSessionData(session, 'Session Deleted');
+      }
     });
   }
-
 
   /**
    * Edit Session
@@ -328,11 +330,13 @@ export class SessionCardComponent implements OnInit {
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
   }
 
-  /**
-   * Close modals
-   */
   goBack() {
     this.modalRef.hide();
+  }
+
+  getIcon(session: Session) {
+    const iconName = this.getProfileName(this.getProfileId(session)) === environment.defaultAwsProfileName ? 'home' : 'user';
+    return session.status === SessionStatus.active ? `${iconName} orange` : iconName;
   }
 
   private logSessionData(session: Session, message: string): void {

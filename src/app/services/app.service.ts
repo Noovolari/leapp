@@ -78,8 +78,9 @@ export class AppService extends NativeService {
       const logPaths = {
         mac: `${this.process.env.HOME}/Library/Logs/Leapp/log.log`,
         linux: `${this.process.env.HOME}/.config/Leapp/logs/log.log`,
-        windows: `${this.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.log`,
-      }
+        windows: `${this.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.log`
+      };
+
       this.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
       this.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
       this.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
@@ -148,6 +149,10 @@ export class AppService extends NativeService {
     return this.ipcRenderer;
   }
 
+  newNotification(title: string, message: string) {
+    new this.notification({ title, body: message, icon: __dirname + `/assets/images/Leapp.png` }).show();
+  }
+
   /**
    * Log the message to a file and also to console for development mode
    *
@@ -202,6 +207,10 @@ export class AppService extends NativeService {
    */
   currentBrowserWindow() {
     return this.currentWindow;
+  }
+
+  isDarkMode() {
+    return this.nativeTheme.shouldUseDarkColors;
   }
 
   /**
@@ -389,7 +398,10 @@ export class AppService extends NativeService {
     for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
       this.modalService.hide(i);
     }
+
+    this.getCurrentWindow().show();
     this.modalService.show(ConfirmationDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { message, callback}});
+
   }
 
   /**
@@ -404,6 +416,9 @@ export class AppService extends NativeService {
     for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
       this.modalService.hide(i);
     }
+
+    this.getCurrentWindow().show();
+    this.newNotification('MFA Token needed', 'Please insert MFA Token for Leapp Session');
     this.modalService.show(InputDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { title, placeholder, message, callback}});
   }
 

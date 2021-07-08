@@ -68,7 +68,9 @@ export abstract class AwsSessionService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      await this.stop(sessionId);
+      if (this.get(sessionId).status === SessionStatus.active) {
+        await this.stop(sessionId);
+      }
       this.listIamRoleChained(this.get(sessionId)).forEach(sess => {
         if (sess.status === SessionStatus.active) {
           this.stop(sess.sessionId);

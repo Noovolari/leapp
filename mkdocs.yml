@@ -44,6 +44,8 @@ nav:
       - 'Guides and Resources': 'community/guides.md'
 
 theme:
+  logo: images/icon.png
+  favicon: images/favicon.ico
   name: material
   features:
     - navigation.instant

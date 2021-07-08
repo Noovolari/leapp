@@ -40,7 +40,7 @@ nav:
           - 'AWS Named Profiles': 'contributing/structure/aws_named_profiles.md'
           - 'AWS SSO': 'contributing/structure/aws_sso.md'
   - 'Community':
-      - 'Get Involved': 'community/getinvolved.md'
+      - 'Get Involved': 'community/get_involved.md'
       - 'Guides and Resources': 'community/guides.md'
 
 theme:

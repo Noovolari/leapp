@@ -60,27 +60,29 @@ export class UpdaterService extends NativeService {
   }
 
   updateDialog(): void {
-    const callback = (event) => {
-      if (event === Constants.confirmClosedAndIgnoreUpdate) {
-        this.updateVersionJson(this.version);
-        this.workspaceService.sessions = [...this.workspaceService.sessions];
-      } else if (event === Constants.confirmCloseAndDownloadUpdate) {
-        this.appService.openExternalUrl(`${environment.latestUrl}`);
-      }
-      this.bsModalRef = undefined;
-    };
-
     if (!this.bsModalRef) {
       for (let i = 1; i <= this.bsModalService.getModalsCount(); i++) {
         this.bsModalService.hide(i);
       }
 
+      const callback = (event) => {
+        if (event === Constants.confirmClosedAndIgnoreUpdate) {
+          this.updateVersionJson(this.version);
+          this.workspaceService.sessions = [...this.workspaceService.sessions];
+        } else if (event === Constants.confirmCloseAndDownloadUpdate) {
+          this.appService.openExternalUrl(`${environment.latestUrl}`);
+        }
+        this.bsModalRef = undefined;
+      };
+
+      this.appService.getCurrentWindow().show();
       this.bsModalRef = this.bsModalService.show(UpdateDialogComponent, {
         backdrop: 'static',
         animated: false,
         class: 'confirm-modal',
         initialState: { version: this.version, releaseDate: this.releaseDate, releaseNotes: this.releaseNotes, callback}
       });
+
     }
   }
 

@@ -190,10 +190,8 @@ export class WorkspaceService extends NativeService {
   }
 
   private persist(workspace: Workspace) {
-    this.fileService.writeFileSync(
-      this.appService.getOS().homedir() + '/' + environment.lockFileDestination,
-      this.fileService.encryptText(serialize(workspace))
-    );
+    const path = this.appService.getOS().homedir() + '/' + environment.lockFileDestination;
+    this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
 
   private getPersistedSessions(): Session[] {

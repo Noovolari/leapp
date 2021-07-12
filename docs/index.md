@@ -6,6 +6,8 @@ Leapp is a tool for developers to manage, secure, and gain access to any cloud. 
 
 Leapp is compatible out-of-the-box with any third-party tool that uses the default cloud provider credential chain like Terraform, the Serverless Framework, Amplify, and much more.
 
+Leapp information needed to retrieve credentials are stored **LOCALLY** inside his [workspace](https://docs.leapp.cloud/concepts/). Critical information such as Cloud secrets and token are stored inside the **System Vault**.
+
 ![Leapp Main Window](images/main-window.png?style=center-img)
 
 ## Key Features

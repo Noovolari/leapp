@@ -103,7 +103,7 @@ Logs are structured in the following way:
 *Note: please always add logs whenever possible to any issue you want to fill to enable the team identify the problem quickly*
 
 # Documentation
-Here you can find our [documentation](https://github.com/Noovolari/leapp/wiki).
+Here you can find our [documentation](https://docs.leapp.cloud).
 
 # Links
 - [Glossary](.github/GLOSSARY.md): find other information about the system

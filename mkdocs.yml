@@ -24,6 +24,7 @@ nav:
           - 'Setup Trust Relationship': 'tutorials/aws/chained/trust_setup.md'
           - 'Setup Leapp Chained': 'tutorials/aws/chained/leapp_chained_setup.md'
         - 'AWS SSO': 'tutorials/aws/aws_sso.md'
+        - 'AWS SSM Connect': 'tutorials/aws/ssm.md'
       - 'Azure':
         - 'G Suite Federation': 'tutorials/azure/gsuite_federation_setup.md'
         - 'Setup Leapp Federated': 'tutorials/azure/leapp_federated_setup.md'

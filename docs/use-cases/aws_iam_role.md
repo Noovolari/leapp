@@ -6,7 +6,7 @@ management is needed.
 
 Leapp allows you to get to cloud resources with company email and password.
 
-![Federated Access Use-case](https://github.com/Noovolari/leapp/wiki/images/federated-gif.gif)
+![Federated Access Use-case](../videos/Federated.gif)
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 
@@ -15,7 +15,7 @@ Access to an Aws Account Role via another AWS Account role or an IAM user, thank
 
 In this access strategy a **Truster Role** or a **Plain User** is assumed by a **federated role**.
 
-![Truster Access Use-case](https://github.com/Noovolari/leapp/wiki/images/truster-gif.gif)
+![Truster Access Use-case](../videos/Chained.gif)
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 

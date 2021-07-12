@@ -6,7 +6,7 @@ Leapp automatically uses your **Access Key ID** and **Secret Access Key** for ge
 
 > Access and secret keys are safely stored in the system vault. Please head to [vault strategy](https://www.github.com/Noovolari/leapp/wiki/vault-strategy) section if you want to know how Leapp manages your secrets.
 
-![type:video](../videos/aws_iam_user.mp4)
+![type:video](../videos/User.gif)
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 

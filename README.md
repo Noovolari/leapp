@@ -3,7 +3,7 @@ Leapp
 [![Github All Releases](https://img.shields.io/github/downloads/noovolari/leapp/latest/total)](https://github.com/Noovolari/leapp/releases/latest)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Noovolari/leapp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Noovolari/leapp/context:javascript)
 - Website: https://www.leapp.cloud/
-- Docs: [Docs](https://docs.leapp.cloud/)
+- Documentation Website: [Docs](https://docs.leapp.cloud/)
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/4)
 - Chat with us: [Slack](https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q)
 

@@ -1,18 +1,20 @@
-If this is your first time accessing Leapp please follow this guide: [First setup](FIRST_SETUP.md).
+# How to create an Azure Access Method in Leapp
+
+If this is your first time accessing Leapp please follow this guide: [First Launch Setup](../first_access.md).
 
 1) From your quick list click on the "+" button located on the top-right corner of the app
 
-![CREATE FEDERATED ACCOUNT 1](images/CREATE_GENERIC_1.png)
+![](../../images/tutorials/AZURE/SETUP_IN_LEAPP-1.png)
 
 You'll be presented with the **Provider Selection** screen:
 
-<img width="512" alt="Screenshot 2021-04-12 at 14 23 00" src="https://user-images.githubusercontent.com/9497292/114393749-ac205100-9b9a-11eb-94a2-726377d6023b.png">
+![](../../images/tutorials/AZURE/SETUP_IN_LEAPP-2.png)
 
 2) Choose "**Azure**" as a Cloud Provider, then you'll be ported directly to the creation form:
 
 3) As the last screen you'll be presented with the actual account creation screen:
 
-<img width="508" alt="Screenshot 2021-04-12 at 15 37 19" src="https://user-images.githubusercontent.com/9497292/114404465-ff4bd100-9ba5-11eb-84ae-259ad1894ac0.png">
+![](../../images/tutorials/AZURE/SETUP_IN_LEAPP-3.png)
 
 - **Account Alias:** choose a unique name suitable to recognize the Access Strategy.
 - **Subscription Id:** get the subscription Id from Azure Active Directory in the Azure console

@@ -6,6 +6,10 @@ management is needed.
 
 Leapp allows you to get to cloud resources with company email and password.
 
+![AWS IAM Role Access Schema](../images/AWS_IAM_FEDERATED_ROLE_ACCESS_SCHEMA.png)
+
+*AWS IAM Role Access Schema*
+
 ![Federated Access Use-case](../videos/Federated.gif)
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
@@ -13,7 +17,13 @@ See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 ## AWS IAM Chained Role
 Access to an Aws Account Role via another AWS Account role or an IAM user, thanks to a cross-account role available via [STS](https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html).
 
-In this access strategy a **Truster Role** or a **Plain User** is assumed by a **federated role**.
+In this access strategy a **IAM Chained Role** is assumed by a **IAM User**, a **IAM Federated Role**, or an **AWS SSO Role**.
+
+![](../images/AWS_IAM_CHAINED_ROLE_FROM_USER_ACCESS_SCHEMA.png)
+
+![](../images/AWS_IAM_CHAINED_ROLE_FROM_FEDERATED_ROLE_ACCESS_SCHEMA.png)
+
+![](../images/AWS_IAM_CHAINED_ROLE_FROM_AWS_SSO_ROLE_ACCESS_SCHEMA.png)
 
 ![Truster Access Use-case](../videos/Chained.gif)
 

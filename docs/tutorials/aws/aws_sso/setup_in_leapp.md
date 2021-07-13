@@ -1,4 +1,4 @@
-# Setup AWS SSO Role Access Method for Leapp
+# Setup AWS SSO Access Method in Leapp
 
 To start using AWS SSO in Leapp you first need to retrieve two information from your AWS account:
 the **Portal URL** and the **AWS SSO region**.
@@ -17,35 +17,33 @@ Now you can go to your Leapp Application and add your AWS SSO configuration in t
    configure all of your session directly from AWS SSO. To do so press **Start** and go to the next screen.
    In the next screen select **AWS SSO** like in the picture below:
 
-<img width="515" alt="1" src="https://user-images.githubusercontent.com/9497292/123769058-2f636000-d8c9-11eb-8d2f-952a23686cc5.png">
-  
+![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_1.png)
 
 In the following screen insert the **portal url** and the **region**. then press the **AWS SSO** button.
 
-![image](images/AWS_SSO_TUTORIAL_3.png)
+![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_2.png)
 
 if everything is correct you'll be prompted with the following screen:
 
-![image](images/AWS_SSO_TUTORIAL_4.png)
+![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_3.png)
 
 Click on the orange button, and Leapp will connect to your AWS SSO portal retrieving all the sessions for you.
 
-<img width="514" alt="Screenshot 2021-06-29 at 10 46 54" src="https://user-images.githubusercontent.com/9497292/123767072-80725480-d8c7-11eb-8f12-b745853bcaaa.png">
-
+![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_4.png)
 
 2) **You already have some sessions**: to add sessions from your AWS SSO portal, go to the **option menu** clicking on the **azure hamburger button** on the **top-left of Leapp header**.
    From the sidebar menù choose **integration - Identity Provider** like in the screenshot below:
 
-![image](images/AWS_SSO_TUTORIAL_6.png)
+![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_5.png)
 
 In the following screen insert the **portal url** and the **region**. then press the **AWS SSO** button.
 
-![image](images/AWS_SSO_TUTORIAL_3.png)
+![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_6.png)
 
 if everything is correct you'll be prompted with the following screen:
 
-![image](images/AWS_SSO_TUTORIAL_4.png)
+![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_7.png)
 
 Click on the orange button and Leapp will connect to your AWS SSO portal retrieving all the sessions for you.
 
-<img width="514" alt="Screenshot 2021-06-29 at 10 46 54" src="https://user-images.githubusercontent.com/9497292/123767072-80725480-d8c7-11eb-8f12-b745853bcaaa.png">
+![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_8.png)

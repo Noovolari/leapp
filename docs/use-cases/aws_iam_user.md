@@ -1,10 +1,12 @@
 # AWS IAM User
 
-
-
 Leapp automatically uses your **Access Key ID** and **Secret Access Key** for generating temporary credentials through the [AWS STS Get Session Token](https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html).
 
 > Access and secret keys are safely stored in the system vault. Please head to [vault strategy](https://www.github.com/Noovolari/leapp/wiki/vault-strategy) section if you want to know how Leapp manages your secrets.
+
+![AWS IAM User Access Schema](../images/AWS_IAM_USER_ACCESS_SCHEMA.png)
+
+*AWS IAM User Access Schema*
 
 ![type:video](../videos/User.gif)
 

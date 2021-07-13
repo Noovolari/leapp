@@ -18,6 +18,7 @@ Leapp information needed to retrieve credentials are stored **LOCALLY** inside h
 - [Only short-lived](https://github.com/Noovolari/leapp/wiki/rotating-credentials) credentials (or none at all)
   
 ### Supported Services
+
 - Import sessions from [AWS Single Sign-On (SSO)](https://github.com/Noovolari/leapp/wiki/use-cases#aws-single-sign-on)
 - Connect to EC2 instances without certificates through AWS System Manager (SSM)
 
@@ -26,3 +27,16 @@ Leapp information needed to retrieve credentials are stored **LOCALLY** inside h
 You can install Leapp by downloading the pre-built binaries for your OS [here](https://www.leapp.cloud/releases).
 
 Unzip the package and double-click on the executable to install.
+
+## Logs
+
+By default, Leapp writes logs to the following locations:
+
+- on Linux: `~/.config/Leapp/log.log`
+- on macOS: `~/Library/Logs/Leapp/log.log`
+- on Windows: `%USERPROFILE%\\AppData\\Roaming\\Leapp\\log.log`
+  Logs are structured in the following way:
+```
+[YYYY-MM-DD HH:mm:ss.mmm] [LEVEL] [rendered/system] [COMPONENT] MESSAGE {Useful Object / Stacktrace Err Object}
+```
+*Note: please always add logs whenever possible to any issue you want to fill to enable the team identify the problem quickly*

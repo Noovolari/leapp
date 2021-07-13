@@ -1,4 +1,4 @@
-# How to create a Federated Role Access Method for AWS with Leapp
+# How to create a IAM Federated Role Access Method for AWS in Leapp
 
 If this is your first time accessing Leapp please follow this guide: [First setup](FIRST_SETUP.md).
 
@@ -6,17 +6,17 @@ If this is your first time accessing Leapp please follow this guide: [First setu
 
 You'll be presented with the **Provider Selection** screen:
 
-<img width="515" alt="1" src="https://user-images.githubusercontent.com/9497292/123762870-8108ec00-d8c3-11eb-84f4-d0a06d866d5c.png">
+![](../../../images/tutorials/AWS/IAM_FEDERATED_ROLE/SETUP_IN_LEAPP-1.png)
 
 #### 2) Choose "**AWS**" as a Cloud Provider, than you'll be presented with the **Access Strategy** selection screen:
 
-<img width="514" alt="2" src="https://user-images.githubusercontent.com/9497292/123763231-dc3ade80-d8c3-11eb-9ebf-edbfc6aaf1d3.png">
+![](../../../images/tutorials/AWS/IAM_FEDERATED_ROLE/SETUP_IN_LEAPP-2.png)
 
 Select "**IAM Federated Role**" as the Access Method.
 
 #### 3) As the last screen you'll be presented with the actual account creation screen:
 
-<img width="516" alt="Screenshot 2021-06-29 at 10 23 49" src="https://user-images.githubusercontent.com/9497292/123763843-7dc23000-d8c4-11eb-88b1-2ee90357951f.png">
+![](../../../images/tutorials/AWS/IAM_FEDERATED_ROLE/SETUP_IN_LEAPP-3.png)
 
 - **AWS Profile**: here you can select (ora add by writing and pressing ENTER) a named profile to use for this credential set, base one is "default"
 - **Session Alias:** choose a unique name suitable to recognize the Access Method.

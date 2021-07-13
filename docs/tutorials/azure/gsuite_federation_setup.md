@@ -2,11 +2,11 @@
 
 ### G Suite side
 
-![](images/FEDERATION_AZURE_1.png)
+![](../../images/tutorials/AZURE/G_SUITE_FEDERATION_SETUP-1.png)
 
 *G Suite SAML Application setup.*
 
-![](images/FEDERATION_AZURE_2.png)
+![](../../images/tutorials/AZURE/G_SUITE_FEDERATION_SETUP-2.png)
 
 *Modal from which you can download the metadata XML file.*
 
@@ -20,7 +20,7 @@
 
 Inside the Azure Active Directory Service, go to Custom domain names. Here you can find default and custom domain names associated to the root account.
 
-![](images/FEDERATION_AZURE_3.png)
+![](../../images/tutorials/AZURE/G_SUITE_FEDERATION_SETUP-3.png)
 
 A custom domain name could be federated to G Suite only if it is not the primary account.
 

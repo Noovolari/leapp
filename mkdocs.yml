@@ -10,8 +10,8 @@ nav:
       - 'AWS':
         - 'AWS IAM User': 'use-cases/aws_iam_user.md'
         - 'AWS IAM Role': 'use-cases/aws_iam_role.md'
-        - 'AWS SSO': 'use-cases/setup_in_leapp.md'
-      - 'Azure': 'use-cases/intro.md'
+        - 'AWS SSO': 'use-cases/aws_sso.md'
+      - 'Azure': 'use-cases/azure.md'
   - 'Tutorials':
       - 'First Access': 'tutorials/first_access.md'
       - 'AWS':
@@ -27,22 +27,18 @@ nav:
           - 'Introduction': 'tutorials/aws/iam_chained_role/intro.md'
           - 'Step 1: Setup Trust Relationship': 'tutorials/aws/iam_chained_role/trust_relationship_setup.md'
           - 'Step 2: Setup in Leapp': 'tutorials/aws/iam_chained_role/setup_in_leapp.md'
-        - 'AWS SSO': 'tutorials/aws/setup_in_leapp.md'
-        - 'AWS SSM Connect': 'tutorials/aws/aws_ssm.md'
+        - 'AWS SSO': 'tutorials/aws/aws_sso/setup_in_leapp.md'
+        - 'AWS SSM Connect': 'tutorials/aws/aws_ssm_connect.md'
       - 'Azure':
         - 'Step 1: G Suite Federation': 'tutorials/azure/gsuite_federation_setup.md'
         - 'Step 2: Setup in Leapp': 'tutorials/azure/setup_in_leapp.md'
-      - 'Misc':
-          - 'Quick List': 'tutorials/misc/quick_list.md'
-          - 'Default Region/Location': 'tutorials/misc/defaults.md'
-          - 'Session Region/Location': 'tutorials/misc/session_region.md'
-          - 'Named Profiles': 'tutorials/misc/named_profiles.md'
   - 'Contributing':
-      - 'Project Structure': 'contributing/structure/structure.md'
-      - 'Updater': 'contributing/structure/updater.md'
-      - 'System Vault': 'contributing/structure/system_vault.md'
-      - 'AWS Named Profiles': 'contributing/structure/aws_named_profiles.md'
-      - 'AWS SSO': 'contributing/structure/setup_in_leapp.md'
+      - 'Project Structure': 'contributing/project_structure.md'
+      - 'Updater': 'contributing/updater.md'
+      - 'System Vault': 'contributing/system_vault.md'
+      - 'AWS Named Profiles': 'contributing/aws_named_profiles.md'
+      - 'AWS SSO': 'contributing/setup_in_leapp.md'
+      - 'Default Options': 'contributing/default_options.md'
   - 'Community':
       - 'Get Involved': 'community/get_involved.md'
       - 'Guides and Resources': 'community/guides.md'

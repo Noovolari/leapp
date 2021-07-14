@@ -17,33 +17,33 @@ Now you can go to your Leapp Application and add your AWS SSO configuration in t
    configure all of your session directly from AWS SSO. To do so press **Start** and go to the next screen.
    In the next screen select **AWS SSO** like in the picture below:
 
-![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_1.png)
+![image](../../../images/tutorials/aws/aws_sso/SETUP_IN_LEAPP_1.png)
 
 In the following screen insert the **portal url** and the **region**. then press the **AWS SSO** button.
 
-![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_2.png)
+![image](../../../images/tutorials/aws/aws_sso/SETUP_IN_LEAPP_2.png)
 
 if everything is correct you'll be prompted with the following screen:
 
-![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_3.png)
+![image](../../../images/tutorials/aws/aws_sso/SETUP_IN_LEAPP_3.png)
 
 Click on the orange button, and Leapp will connect to your AWS SSO portal retrieving all the sessions for you.
 
-![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_4.png)
+![image](../../../images/tutorials/aws/aws_sso/SETUP_IN_LEAPP_4.png)
 
 2) **You already have some sessions**: to add sessions from your AWS SSO portal, go to the **option menu** clicking on the **azure hamburger button** on the **top-left of Leapp header**.
    From the sidebar menù choose **integration - Identity Provider** like in the screenshot below:
 
-![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_5.png)
+![image](../../../images/tutorials/aws/aws_sso/SETUP_IN_LEAPP_5.png)
 
 In the following screen insert the **portal url** and the **region**. then press the **AWS SSO** button.
 
-![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_6.png)
+![image](../../../images/tutorials/aws/aws_sso/SETUP_IN_LEAPP_6.png)
 
 if everything is correct you'll be prompted with the following screen:
 
-![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_7.png)
+![image](../../../images/tutorials/aws/aws_sso/SETUP_IN_LEAPP_7.png)
 
 Click on the orange button and Leapp will connect to your AWS SSO portal retrieving all the sessions for you.
 
-![image](../../../images/tutorials/AWS/AWS_SSO/SETUP_IN_LEAPP_8.png)
+![image](../../../images/tutorials/aws/aws_sso/SETUP_IN_LEAPP_8.png)

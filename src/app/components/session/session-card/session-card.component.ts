@@ -203,7 +203,7 @@ export class SessionCardComponent implements OnInit {
    * Set the region for ssm init and launch the mopethod form the server to find instances
    *
    * @param event - the change select event
-   * @param session - The session in which the AWS region need to change
+   * @param session - The session in which the aws region need to change
    */
   async changeSsmRegion(event, session: Session) {
     // We have a valid SSM region

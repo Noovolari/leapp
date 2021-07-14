@@ -10,7 +10,7 @@ Click on **Create Role** and select **Another AWS account** as the type of trust
 then, specify the Account ID (i.e. the Account Number) of the AWS Account that contains the
 Federated Role that will assume the Truster Role that you're creating.
 
-![](../../../images/tutorials/AWS/IAM_CHAINED_ROLE/AWS_IAM_CHAINED_ROLE_SETUP_TRUST_RELATIONSHIP-1.png)
+![](../../../images/tutorials/aws/iam_chained_role/AWS_IAM_CHAINED_ROLE_SETUP_TRUST_RELATIONSHIP-1.png)
 
 The Trust Policy associated to the newly created AWS Chained Role should look as follows.
 

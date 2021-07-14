@@ -17,7 +17,7 @@ export abstract class AwsSessionService extends SessionService {
     super(workspaceService);
   }
 
-  // TODO: are they assumable (maybe assumer) or generic AWS sessions?
+  // TODO: are they assumable (maybe assumer) or generic aws sessions?
   listAssumable(): Session[] {
     return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure ) : [];
   }

@@ -17,14 +17,14 @@ nav:
       - 'AWS':
         - 'AWS IAM User': 'tutorials/aws/setup_in_leapp.md'
         - 'AWS IAM Federated Role':
-          - 'Introduction': 'tutorials/aws/intro.md'
+          - 'Introduction': 'tutorials/aws/iam_federated_role/intro.md'
           - 'Step 1: G Suite Federation': 'tutorials/aws/iam_federated_role/gsuite_federation_setup.md'
           - 'Step 2: AWS Federation': 'tutorials/aws/iam_federated_role/aws_federation_setup.md'
           - 'Step 3: Enable Federated Access': 'tutorials/aws/iam_federated_role/enable_federated_access.md'
           - 'Step 4: Assign Role to GSuite Principal': 'tutorials/aws/iam_federated_role/assign_role.md'
           - 'Step 5: Setup in Leapp': 'tutorials/aws/iam_federated_role/setup_in_leapp.md'
         - 'AWS IAM Chained Role':
-          - 'Introduction': 'tutorials/aws/intro.md'
+          - 'Introduction': 'tutorials/aws/iam_chained_role/intro.md'
           - 'Step 1: Setup Trust Relationship': 'tutorials/aws/iam_chained_role/trust_relationship_setup.md'
           - 'Step 2: Setup in Leapp': 'tutorials/aws/iam_chained_role/setup_in_leapp.md'
         - 'AWS SSO': 'tutorials/aws/setup_in_leapp.md'

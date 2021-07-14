@@ -1,6 +1,6 @@
 # How to create a IAM Federated Role Access Method for AWS in Leapp
 
-If this is your first time accessing Leapp please follow this guide: [First setup](FIRST_SETUP.md).
+If this is your first time accessing Leapp please follow this guide: [First setup](../../first_access.md).
 
 #### 1) From your quick list click on the "+" button located on the top-right corner of the app
 

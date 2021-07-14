@@ -15,7 +15,7 @@ nav:
   - 'Tutorials':
       - 'First Access': 'tutorials/first_access.md'
       - 'AWS':
-        - 'AWS IAM User': 'tutorials/aws/setup_in_leapp.md'
+        - 'AWS IAM User': 'tutorials/aws/iam_user/setup_in_leapp.md'
         - 'AWS IAM Federated Role':
           - 'Introduction': 'tutorials/aws/iam_federated_role/intro.md'
           - 'Step 1: G Suite Federation': 'tutorials/aws/iam_federated_role/gsuite_federation_setup.md'

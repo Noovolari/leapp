@@ -4,7 +4,7 @@ Leapp automatically uses your **Access Key ID** and **Secret Access Key** for ge
 
 > Access and secret keys are safely stored in the system vault. Please head to [vault strategy](https://www.github.com/Noovolari/leapp/wiki/vault-strategy) section if you want to know how Leapp manages your secrets.
 
-![AWS IAM User Access Schema](../images/AWS_IAM_USER_ACCESS_SCHEMA.png)
+![AWS IAM User Access Schema](../images/access_schemas/AWS_IAM_USER_ACCESS_SCHEMA.png)
 
 *AWS IAM User Access Schema*
 
@@ -12,7 +12,16 @@ Leapp automatically uses your **Access Key ID** and **Secret Access Key** for ge
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
 
-*Note: it's possible to assign an MFA device to a plain session. Please see [MFA section](https://github.com/Noovolari/leapp/wiki/mfa) for more details.*
+### Multi-Factor Authentication
+
+Leapp support Multi-Factor Authentication for AWS IAM User and AWS IAM Chained Role access methods. The system will ask for the MFA device ARN provided by AWS when creating/editing an AWS IAM User access method.
+
+To assign an MFA device to an AWS IAM User access method just insert a physical device's serial number, or an MFA device ARN in the corresponding field of the access method's form. 
+The device is then associated with that specific session, and the MFA token will be prompted when the session starts.
+
+> Note 1: if you need to remove MFA from an AWS IAM User, just edit it and leave the field blank. 
+
+> Note 2: when you set up an AWS IAM Chained Role from an AWS IAM User with MFA enabled, Leapp inherently associates MFA checks to it.
 
 ### Caveats
 

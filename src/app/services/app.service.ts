@@ -448,7 +448,7 @@ export class AppService extends NativeService {
   }
 
   /**
-   * Extract an account number from a AWS arn
+   * Extract an account number from a aws arn
    *
    * @param value - arn value
    * @returns - {any} - the
@@ -473,7 +473,7 @@ export class AppService extends NativeService {
   }
 
   /**
-   * Get all AWS regions
+   * Get all aws regions
    *
    * @returns - [{region: string}] - all the regions in array format
    */
@@ -607,7 +607,7 @@ export class AppService extends NativeService {
   }
 
   /**
-   * Check if the account is of type AZURE or not
+   * Check if the account is of type azure or not
    *
    * @param s - the session containing the account
    */

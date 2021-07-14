@@ -59,7 +59,7 @@ export class SsmService {
    *
    * @param credentials - CredentialsInfo data from generate credentials method
    * @param instanceId - the instance id of the instance to start
-   * @param region - AWS System Manager start a session from a defined region
+   * @param region - aws System Manager start a session from a defined region
    */
   startSession(credentials: CredentialsInfo, instanceId, region) {
     const hypen = this.app.getProcess().platform === 'darwin' ? '\'' : '';
@@ -79,7 +79,7 @@ export class SsmService {
   }
 
   /**
-   * Submit the request to do ssm to AWS
+   * Submit the request to do ssm to aws
    */
   private async requestSsmInstances(): Promise<any> {
     let instances = [];
@@ -101,7 +101,7 @@ export class SsmService {
           });
 
           // We have found and managed a list of instances
-          this.app.logger('Obtained smm info from AWS for SSM', LoggerLevel.info, this);
+          this.app.logger('Obtained smm info from aws for SSM', LoggerLevel.info, this);
           return instances;
         } else {
           // No instances usable

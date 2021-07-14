@@ -86,8 +86,8 @@ export class RetrocompatibilityService {
         case 'AWS': this.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
         case 'AWS_TRUSTER': this.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
         case 'AWS_PLAIN_USER': await this.createNewAwsIamUserSession(session, workspace); break;
-        case 'AWS_SSO': this.createNewAwsSingleSignOnSession(session, workspace); break;
-        case 'AZURE': this.createNewAzureSession(session, workspace); break;
+        case 'aws_sso': this.createNewAwsSingleSignOnSession(session, workspace); break;
+        case 'azure': this.createNewAzureSession(session, workspace); break;
       }
     }
   }
@@ -102,7 +102,7 @@ export class RetrocompatibilityService {
     for(let i = 0; i < oldWorkspace.workspaces[0].sessions.length; i++) {
       const session = oldWorkspace.workspaces[0].sessions[i];
       // We have changed the enum type so we must check it manually
-      if (session.account.type === 'AWS_SSO') {
+      if (session.account.type === 'aws_sso') {
         // OK, let's check if we have data saved in the keychain
         let region;
         let portalUrl;

@@ -4,8 +4,8 @@
 
   <div class="menu-bar">
     <div class="provider-selector {{showOnly !== 'ALL' ? 'active' : ''}}">
-      <div class="btn-left {{showOnly === 'AWS' ? 'active' : ''}}  ">
-        <a (click)="setVisibility('AWS');">
+      <div class="btn-left {{showOnly === 'aws' ? 'active' : ''}}  ">
+        <a (click)="setVisibility('aws');">
           <img src="assets/images/aws-logo.svg" alt="">
         </a>
       </div>
@@ -34,7 +34,7 @@
     </li>
 
     <ng-container *ngFor="let session of workspaceService.sessions$ | async | filtering:true">
-      <li *ngIf="(showOnly === 'ALL') || ($any(session).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+      <li *ngIf="(showOnly === 'ALL') || ($any(session).subscriptionId ? showOnly === 'AZR' : showOnly === 'aws')">
         <app-session-card [session]="session"></app-session-card>
       </li>
     </ng-container>
@@ -44,7 +44,7 @@
     </li>
 
     <ng-container *ngFor="let session of workspaceService.sessions$ | async | querying:filterField.value:workspaceService.get() | filtering: false | ordering">
-      <li *ngIf="(showOnly === 'ALL') || ($any(session).subscriptionId ? showOnly === 'AZR' : showOnly === 'AWS')">
+      <li *ngIf="(showOnly === 'ALL') || ($any(session).subscriptionId ? showOnly === 'AZR' : showOnly === 'aws')">
         <app-session-card [session]="session"></app-session-card>
       </li>
     </ng-container>

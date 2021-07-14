@@ -63,7 +63,7 @@
       <p class="smaller">I’m not sure of what’s my Access Method? Know more <a class="link-wiki" (click)="openAccessStrategyDocumentation();">here</a></p>
       <div style="width: 100%; display: inline-block;">
         <!-- ================================================================== -->
-        <!-- ==                    LOGO FOR AWS ACCOUNTS ARE                 == -->
+        <!-- ==                    LOGO FOR aws ACCOUNTS ARE                 == -->
         <!-- ================================================================== -->
         <ng-container *ngIf="sessionType !== eSessionType.azure">
           <div class="form-group" style="width: 49%; display: inline-block;">
@@ -79,7 +79,7 @@
         </ng-container>
 
         <!-- ================================================================== -->
-        <!-- ==                  LOGO FOR AZURE ACCOUNTS ARE                 == -->
+        <!-- ==                  LOGO FOR azure ACCOUNTS ARE                 == -->
         <!-- ================================================================== -->
         <ng-container *ngIf="sessionType === eSessionType.azure">
           <div class="form-group" style="width: 100%; display: inline-block">
@@ -122,11 +122,11 @@
       <div class="form-group" style="width: 2%; display: inline-block;" *ngIf="sessionType === eSessionType.awsIamRoleFederated"></div>
 
       <!-- ====================== -->
-      <!-- AWS SESSION PROPERTIES -->
+      <!-- aws SESSION PROPERTIES -->
       <!-- ====================== -->
       <ng-container *ngIf="sessionType !== eSessionType.azure">
         <!-- ================================================================== -->
-        <!-- ==                        AWS REGION ALL                        == -->
+        <!-- ==                        aws REGION ALL                        == -->
         <!-- ================================================================== -->
         <div class="form-group" [ngStyle]="{display: 'inline-block', width: sessionType === eSessionType.awsIamRoleFederated ? '49%': '100%'}">
           <label>Region</label>
@@ -204,7 +204,7 @@
       </ng-container>
 
       <!-- ================================================================= -->
-      <!-- ==                  AZURE SESSION PROPERTIES                   == -->
+      <!-- ==                  azure SESSION PROPERTIES                   == -->
       <!-- ================================================================= -->
       <ng-container *ngIf="sessionType === eSessionType.azure">
         <div class="form-group" style="width: 100%; display: inline-block;">

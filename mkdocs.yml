@@ -73,6 +73,7 @@ theme:
 plugins:
   - search
   - mkdocs-video
+  - img2fig
 
 extra_css:
   - stylesheets/extra.css

@@ -1,6 +1,6 @@
 # How to create a IAM User Access Method for AWS
 
-If this is your first time accessing Leapp please follow this [guide](https://github.com/Noovolari/leapp/wiki/first-access).
+If this is your first time accessing Leapp please follow this [guide](../../../tutorials/first_access.md).
 
 1) From your quick list click on the "+" button located on the top-right corner of the app
 
@@ -24,6 +24,6 @@ Select "**IAM User**" as the Access Strategy.
 - **Region**: The AWS Region you want your credentials to work on.
 - **Access Key / Secret Key:** get the credentials from your IAM User.
 
-Here you can also set a new MFA device by clicking on "Manage" in the AWS console at the voice *Assigned MFA device*. **IF** an MFA **arn** is inserted in the form field, then Leapp will ask for MFA token before trying to generate temporary credentials. Please also refer to this section about [limits](https://github.com/Noovolari/leapp/wiki/Limited-role-permissions-for-AWS-plain-account) in the plain account.
+Here you can also set a new MFA device by clicking on "Manage" in the AWS console at the voice *Assigned MFA device*. **IF** an MFA **arn** is inserted in the form field, then Leapp will ask for MFA token before trying to generate temporary credentials.
 
 Finally press **Save**.

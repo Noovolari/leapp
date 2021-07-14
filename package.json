@@ -115,6 +115,7 @@
       "synopsis": "Leapp Client is a tool that allows the user to obtain secure, temporary and refreshable credentials to access AWS Services with AWS CLI and tools based on it",
       "description": "Leapp Client is a tool that allows the user to obtain secure, temporary and refreshable credentials to access AWS Services with AWS CLI and tools based on it, with versioning tools that work with AWS CodeCommit service and to easily use AWS SDK from your local environment during your everyday development.",
       "icon": "src/assets/icons/1024x1024.png",
+
       "desktop": {
         "Icon": "/usr/share/icons/hicolor/0x0/apps/leapp.png"
       },

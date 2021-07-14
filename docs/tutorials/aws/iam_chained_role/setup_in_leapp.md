@@ -8,17 +8,17 @@ If this is your first time accessing Leapp please follow this [guide](https://gi
 
 You'll be presented with the **Provider Selection** screen:
 
-![](../../../images/tutorials/aws/iam_chained_role/AWS_IAM_CHAINED_ROLE_SETUP_IN_LEAPP-1.png)
+![](../../../../images/tutorials/aws/iam_chained_role/AWS_IAM_CHAINED_ROLE_SETUP_IN_LEAPP-1.png)
 
 #### 2. Choose "**AWS**" as a Cloud Provider, then you'll be presented with the **Access Method** selection screen:
 
-![](../../../images/tutorials/aws/iam_chained_role/AWS_IAM_CHAINED_ROLE_SETUP_IN_LEAPP-2.png)
+![](../../../../images/tutorials/aws/iam_chained_role/AWS_IAM_CHAINED_ROLE_SETUP_IN_LEAPP-2.png)
 
 Select "**IAM Chained Role**" as the Access Strategy.
 
 #### 3. As the last screen you'll be presented with the actual account creation screen:
 
-![](../../../images/tutorials/aws/iam_chained_role/AWS_IAM_CHAINED_ROLE_SETUP_IN_LEAPP-3.png)
+![](../../../../images/tutorials/aws/iam_chained_role/AWS_IAM_CHAINED_ROLE_SETUP_IN_LEAPP-3.png)
 
 - **AWS Profile**: here you can select (ora add by writing and pressing ENTER) a named profile to use for this credential set, base one is "default"
 - **Session Alias:** choose a unique name suitable to recognize the Access Method.

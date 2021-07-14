@@ -8,4 +8,3 @@ Access to your AWS Accounts through Leapp and let the App manage all the availab
 ![AWS SSO video](../videos/SSO.gif)
 
 See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
-

@@ -58,3 +58,4 @@ start.sh
 
 #Mkdocs
 site/
+temp/

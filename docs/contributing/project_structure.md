@@ -10,7 +10,7 @@ In particular, we want to focus the attention on the development of Session Serv
 
 A specific service manages the way each type of Session will handle the process of credentials generation.
 
-![session_service2x_(2)](https://user-images.githubusercontent.com/9497292/123654287-38ebba00-d82e-11eb-8b3e-ed77983e2e16.png)
+![](../../images/contributing/project_structure/PROJECT_STRUCTURE-1.png)
 
 There is a **three-level abstraction** implementation for this kind of service:
 

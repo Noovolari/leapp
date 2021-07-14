@@ -6,7 +6,7 @@ always use simple, flat, short-lived credentials, avoiding to leave any sensitiv
 in the profile. That is why Leapp **takes care for you** of the authentication process, no matter
 what strategy do you plan to use.
 
-Because of this, Leapp allows AWS SSO to be compatible with AWS Cli V2 and many others libraries out
+Because of this, Leapp allows AWS SSO to be compatible with AWS CLI V2 and many others libraries out
 there, because at the end of its process you'll have plain temporary credentials to use.
 
 ## How Leapp integrates with AWS SSO under the hood
@@ -17,7 +17,7 @@ The Auth flow in AWS SSO is made up with OIDC and is divided in three different 
 2. [StartDeviceAuthorization](https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html)
 3. [CreateToken](https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_CreateToken.html)
 
-*note: CREDENTIALS ARE NOT NEEDED FOR THOSE THREE CALLS*
+> *Note: CREDENTIALS ARE NOT NEEDED FOR THOSE THREE CALLS*
 
 The first thing we have to do is to register a local client.
 
@@ -70,7 +70,7 @@ We have to locally save those info and pass them into the next call.
 
 In order to make this call the user of Leapp need to have registered into AWS SSO and provide a valid start-url, that is the **portal url**
 
-![image](images/AWS_SSO_UTH_1.png)
+![](../../images/contributing/aws_sso/AWS_SSO-1.png)
 
 Having a valid OIDC client registration we can now initiate the device authorization flow using the [StartDeviceAuthorization](https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html) API action.
 
@@ -196,7 +196,7 @@ Response:
 
 After that for each pair of Account and role found we will add an AWS session that is available to get the correct credentials.
 
-![image](images/AWS_SSO_UTH_3.png)
+![](../../images/contributing/aws_sso/AWS_SSO-2.png)
 
 #### GetRoleCredentials
 

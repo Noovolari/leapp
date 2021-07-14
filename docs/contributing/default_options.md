@@ -16,4 +16,4 @@ And by selecting "Change Region/Location" (depending on the type of Session). He
 
 ![](../images/contributing/default_options/DEFAULT_OPTIONS-2.png)
 
-*Note: if the session is active, the actual credentials will be [rotated](../concepts.md) by new ones that reflect the newly selected region*.
+> *Note: if the session is active, the actual credentials will be [rotated](../concepts.md) by new ones that reflect the newly selected region*.

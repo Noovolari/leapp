@@ -2,7 +2,7 @@
 
 > **NOTE**: to create a chained session you either need a Federated, Plain, or SSO session first.
 
-If this is your first time accessing Leapp please follow this [guide](https://github.com/Noovolari/leapp/wiki/FIRST_SETUP.md).
+If this is your first time accessing Leapp please follow this [guide](../../first_access.md).
 
 #### 1. From your quick list click on the "+" button located on the top-right corner of the app
 

@@ -39,4 +39,4 @@ By default, Leapp writes logs to the following locations:
 ```
 [YYYY-MM-DD HH:mm:ss.mmm] [LEVEL] [rendered/system] [COMPONENT] MESSAGE {Useful Object / Stacktrace Err Object}
 ```
-*Note: please always add logs whenever possible to any issue you want to fill to enable the team identify the problem quickly*
+> *Note: please always add logs whenever possible to any issue you want to fill to enable the team identify the problem quickly*

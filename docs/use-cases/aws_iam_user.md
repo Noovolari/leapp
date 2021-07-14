@@ -6,11 +6,9 @@ Leapp automatically uses your **Access Key ID** and **Secret Access Key** for ge
 
 ![AWS IAM User Access Schema](../../images/access_schemas/AWS_IAM_USER_ACCESS_SCHEMA.png)
 
-*AWS IAM User Access Schema*
+![AWS IAM User Access Use Case](../../videos/User.gif)
 
-![type:video](../../videos/User.gif)
-
-See setup [tutorial](https://www.github.com/Noovolari/leapp/wiki/tutorials)
+See setup [tutorial](../tutorials/aws/iam_user/setup_in_leapp.md)
 
 ### Multi-Factor Authentication
 

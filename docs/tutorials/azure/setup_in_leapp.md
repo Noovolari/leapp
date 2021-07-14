@@ -1,6 +1,6 @@
 # How to create an Azure Access Method in Leapp
 
-If this is your first time accessing Leapp please follow this guide: [First Launch Setup](../../first_access.md).
+If this is your first time accessing Leapp please follow this guide: [First Launch Setup](../first_access.md).
 
 1) From your quick list click on the "+" button located on the top-right corner of the app
 

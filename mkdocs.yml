@@ -42,7 +42,6 @@ nav:
       - 'Integrations': 'contributing/integrations.md'
   - 'Community':
       - 'Get Involved': 'community/get_involved.md'
-      - 'Guides and Resources': 'community/guides.md'
 
 theme:
   logo: images/icon.png

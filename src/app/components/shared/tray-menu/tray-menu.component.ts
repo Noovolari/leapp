@@ -176,7 +176,8 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       // Stop the sessions...
       const activeSessions = this.sessionService.listActive();
       activeSessions.forEach(sess => {
-        this.sessionService.stop(sess.sessionId);
+        const factorizedService = this.sessionProviderService.getService(sess.type);
+        factorizedService.stop(sess.sessionId);
       });
 
       // Clean the config file

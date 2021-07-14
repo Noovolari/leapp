@@ -37,7 +37,7 @@ nav:
       - 'Updater': 'contributing/updater.md'
       - 'System Vault': 'contributing/system_vault.md'
       - 'AWS Named Profiles': 'contributing/aws_named_profiles.md'
-      - 'AWS SSO': 'contributing/setup_in_leapp.md'
+      - 'AWS SSO': 'contributing/aws-sso.md'
       - 'Default Options': 'contributing/default_options.md'
       - 'Integrations': 'contributing/integrations.md'
   - 'Community':

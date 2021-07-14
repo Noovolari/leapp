@@ -57,7 +57,7 @@ describe('RetrocompatibilityService', () => {
               accountName: 'noovolari-dev-account-1',
               accountNumber: '198863347786',
               email: 'info+noovolari-dev-account-1@noovolari.com',
-              type: 'AWS_SSO'
+              type: 'aws_sso'
             },
             active: false,
             id: '3217b15f-297c-4dbd-96c6-50860e1b4635',
@@ -74,7 +74,7 @@ describe('RetrocompatibilityService', () => {
               accountName: 'noovolari-dev-account-1',
               accountNumber: '198863347786',
               email: 'info+noovolari-dev-account-1@noovolari.com',
-              type: 'AWS_SSO'
+              type: 'aws_sso'
             },
             active: false,
             id: '46915c50-5dd1-4c08-86d5-4252ad5bb060',
@@ -126,7 +126,7 @@ describe('RetrocompatibilityService', () => {
               accountName: 'azure',
               subscriptionId: '6d5f42d2-0b2a-4372-93da-3d835cb4852c',
               tenantId: '20f03cc3-841f-412b-8f24-16621d26a8cb',
-              type: 'AZURE'
+              type: 'azure'
             }
           }
         ],

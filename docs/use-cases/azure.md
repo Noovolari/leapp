@@ -4,7 +4,7 @@ Use Leapp to do Single Sign On with G Suite on Azure to get access to your
 between Google and Azure. Leapp manage the login process for you to have Azure CLI
 ready to be used.
 
-![](../images/tutorials/AZURE_ACCESS_SCHEMA.png)
+![](../images/access_schemas/AZURE_ACCESS_SCHEMA.png)
 
 *Azure Access Schema*
 

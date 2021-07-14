@@ -39,6 +39,7 @@ nav:
       - 'AWS Named Profiles': 'contributing/aws_named_profiles.md'
       - 'AWS SSO': 'contributing/setup_in_leapp.md'
       - 'Default Options': 'contributing/default_options.md'
+      - 'Integrations': 'contributing/integrations.md'
   - 'Community':
       - 'Get Involved': 'community/get_involved.md'
       - 'Guides and Resources': 'community/guides.md'

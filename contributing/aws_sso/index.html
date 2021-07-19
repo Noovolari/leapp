@@ -1,0 +1,1239 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="canonical" href="https://example.com/contributing/aws_sso/">
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+    
+    
+      
+        <title>Aws sso - Leapp</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.3754935a.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7C&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:""}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#why-using-aws-sso-with-leapp" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Leapp" class="md-header__button md-logo" aria-label="Leapp" data-md-component="logo">
+      
+  <img src="../../images/icon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Leapp
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Aws sso
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2m10-3a5 5 0 0 1 5 5 5 5 0 0 1-5 5H7a5 5 0 0 1-5-5 5 5 0 0 1 5-5h10M7 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3h10a3 3 0 0 0 3-3 3 3 0 0 0-3-3H7z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/Noovolari/leapp/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Leapp" class="md-nav__button md-logo" aria-label="Leapp" data-md-component="logo">
+      
+  <img src="../../images/icon.png" alt="logo">
+
+    </a>
+    Leapp
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/Noovolari/leapp/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/" class="md-nav__link">
+        Concepts
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      <label class="md-nav__link" for="__nav_3">
+        Use Cases
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Use Cases" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Use Cases
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/intro/" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      <label class="md-nav__link" for="__nav_3_2">
+        AWS
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="AWS" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          AWS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/aws_iam_user/" class="md-nav__link">
+        AWS IAM User
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/aws_iam_role/" class="md-nav__link">
+        AWS IAM Role
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/aws_sso/" class="md-nav__link">
+        AWS SSO
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/azure/" class="md-nav__link">
+        Azure
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      <label class="md-nav__link" for="__nav_4">
+        Tutorials
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Tutorials" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorials
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/first_access/" class="md-nav__link">
+        First Access
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
+      
+      <label class="md-nav__link" for="__nav_4_2">
+        AWS
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="AWS" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AWS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_user/setup_in_leapp/" class="md-nav__link">
+        AWS IAM User
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2_2" type="checkbox" id="__nav_4_2_2" >
+      
+      <label class="md-nav__link" for="__nav_4_2_2">
+        AWS IAM Federated Role
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="AWS IAM Federated Role" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          AWS IAM Federated Role
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/intro/" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/gsuite_federation_setup/" class="md-nav__link">
+        Step 1: G Suite Federation
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/aws_federation_setup/" class="md-nav__link">
+        Step 2: AWS Federation
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/enable_federated_access/" class="md-nav__link">
+        Step 3: Enable Federated Access
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/assign_role/" class="md-nav__link">
+        Step 4: Assign Role to GSuite Principal
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/setup_in_leapp/" class="md-nav__link">
+        Step 5: Setup in Leapp
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2_3" type="checkbox" id="__nav_4_2_3" >
+      
+      <label class="md-nav__link" for="__nav_4_2_3">
+        AWS IAM Chained Role
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="AWS IAM Chained Role" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_2_3">
+          <span class="md-nav__icon md-icon"></span>
+          AWS IAM Chained Role
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_chained_role/intro/" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_chained_role/trust_relationship_setup/" class="md-nav__link">
+        Step 1: Setup Trust Relationship
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_chained_role/setup_in_leapp/" class="md-nav__link">
+        Step 2: Setup in Leapp
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/aws_sso/setup_in_leapp/" class="md-nav__link">
+        AWS SSO
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/aws_ssm_connect/" class="md-nav__link">
+        AWS SSM Connect
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      <label class="md-nav__link" for="__nav_4_3">
+        Azure
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Azure" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          Azure
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/azure/gsuite_federation_setup/" class="md-nav__link">
+        Step 1: G Suite Federation
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/azure/setup_in_leapp/" class="md-nav__link">
+        Step 2: Setup in Leapp
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
+      
+      <label class="md-nav__link" for="__nav_5">
+        Contributing
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Contributing" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Contributing
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../project_structure/" class="md-nav__link">
+        Project Structure
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../updater/" class="md-nav__link">
+        Updater
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system_vault/" class="md-nav__link">
+        System Vault
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws_named_profiles/" class="md-nav__link">
+        AWS Named Profiles
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-sso.md" class="md-nav__link">
+        AWS SSO
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_options/" class="md-nav__link">
+        Default Options
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integrations/" class="md-nav__link">
+        Integrations
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      <label class="md-nav__link" for="__nav_6">
+        Community
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Community" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Community
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/get_involved/" class="md-nav__link">
+        Get Involved
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-using-aws-sso-with-leapp" class="md-nav__link">
+    Why Using AWS SSO with Leapp
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-leapp-integrates-with-aws-sso-under-the-hood" class="md-nav__link">
+    How Leapp integrates with AWS SSO under the hood
+  </a>
+  
+    <nav class="md-nav" aria-label="How Leapp integrates with AWS SSO under the hood">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#registerclient" class="md-nav__link">
+    RegisterClient
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#startdeviceauthorization" class="md-nav__link">
+    StartDeviceAuthorization
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#createtoken" class="md-nav__link">
+    CreateToken
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#aws-sso-portal-api" class="md-nav__link">
+    AWS SSO Portal API
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#listaccounts" class="md-nav__link">
+    ListAccounts
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#listaccountroles" class="md-nav__link">
+    ListAccountRoles
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getrolecredentials" class="md-nav__link">
+    GetRoleCredentials
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq" class="md-nav__link">
+    FAQ
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/Noovolari/leapp/edit/master/docs/contributing/aws_sso.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                  <h1>Aws sso</h1>
+                
+                <h2 id="why-using-aws-sso-with-leapp">Why Using AWS SSO with Leapp</h2>
+<p>When using AWS SSO directly with tools like AWS CLI V2 a specific profile is defined for the
+user when using <em>aws configure</em>. Because of that you lose compatibility with lots of tools
+and libraries that uses the standard profile. Leapp believes that tools and software must
+always use simple, flat, short-lived credentials, avoiding to leave any sensitive information
+in the profile. That is why Leapp <strong>takes care for you</strong> of the authentication process, no matter
+what strategy do you plan to use.</p>
+<p>Because of this, Leapp allows AWS SSO to be compatible with AWS CLI V2 and many others libraries out
+there, because at the end of its process you'll have plain temporary credentials to use.</p>
+<h2 id="how-leapp-integrates-with-aws-sso-under-the-hood">How Leapp integrates with AWS SSO under the hood</h2>
+<p>The Auth flow in AWS SSO is made up with OIDC and is divided in three different steps:</p>
+<ol>
+<li><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_RegisterClient.html">RegisterClient</a></li>
+<li><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html">StartDeviceAuthorization</a></li>
+<li><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_CreateToken.html">CreateToken</a></li>
+</ol>
+<blockquote>
+<p><em>Note: CREDENTIALS ARE NOT NEEDED FOR THOSE THREE CALLS</em></p>
+</blockquote>
+<p>The first thing we have to do is to register a local client.</p>
+<blockquote>
+<p>The AWS SSO OIDC service currently implements only the portions of the OAuth 2.0 Device Authorization Grant standard (<a href="https://tools.ietf.org/html/rfc8628">https://tools.ietf.org/html/rfc8628</a>) that are necessary to enable SSO authentication with the AWS CLI. Support for other OIDC flows frequently needed for native applications, such as Authorization Code Flow (+ PKCE), is planned in future releases.</p>
+</blockquote>
+<h4 id="registerclient">RegisterClient</h4>
+<p>As soon as the <strong>aws sso</strong> button is clicked, the RegisterClient Api will be invoked.</p>
+<pre><code class="language-json">aws sso-oidc register-client --client-name leapp --client-type public
+</code></pre>
+<p><em>notes: public is the only client type available at the moment.</em></p>
+<p>it will generate a response like the one below:</p>
+<pre><code class="language-json">{
+    &quot;clientId&quot;: &quot;ClhqC9rDzjY43Nh0nYEL-2V1LXdlc3QtMQ&quot;,
+    &quot;clientSecret&quot;: &quot;eyJraWQiOiJrZXktMTU2Njk2ODAxMyIsImFsZyI6IkhTMzg0In0.eyJzZXJpYWxpemVkIjoie1wiZXhwaXJlZFwiOmZhbHNlLFwiY2xpZW50SWRcIjp7XCJ2YWx1ZVwiOlwiQ2xocUM5ckR6alk0M05oMG5ZRUwtMlYxTFhkbGMzUXRNUVwifSxcInRlbmFudElkXCI6bnVsbCxcImNsaWVudE5hbWVcIjpcImxlYXBwLXRlc3RcIixcImNsaWVudFR5cGVcIjpcIlBVQkxJQ1wiLFwidGVtcGxhdGVBcm5cIjpudWxsLFwidGVtcGxhdGVDb250ZXh0XCI6bnVsbCxcImV4cGlyYXRpb25UaW1lc3RhbXBcIjoxNjExNjc0Njg2Ljg0MTAwMDAwMCxcImNyZWF0ZWRUaW1lc3RhbXBcIjoxNjAzODk4Njg2Ljg0MTAwMDAwMCxcInVwZGF0ZWRUaW1lc3RhbXBcIjoxNjAzODk4Njg2Ljg0MTAwMDAwMCxcImNyZWF0ZWRCeVwiOm51bGwsXCJ1cGRhdGVkQnlcIjpudWxsLFwic3RhdHVzXCI6bnVsbCxcImluaXRpYXRlTG9naW5VcmlcIjpudWxsLFwiZW50aXRsZWRSZXNvdXJjZUlkXCI6bnVsbCxcImVudGl0bGVkUmVzb3VyY2VDb250YWluZXJJZFwiOm51bGwsXCJleHRlcm5hbElkXCI6bnVsbH0ifQ.s5fnQhh7J70RGxcUsSUvI08ptEr8dqIWPQRVAq0DFGrdsqea6d411ExkKhbGJRlK&quot;,
+    &quot;clientIdIssuedAt&quot;: 1603898686,
+    &quot;clientSecretExpiresAt&quot;: 1611674686
+}
+</code></pre>
+<p>By decoding the Client secret you will see:</p>
+<pre><code class="language-json">{
+  &quot;expired&quot;: false,
+  &quot;clientId&quot;: {
+    &quot;value&quot;: &quot;R-j5yN-4-TPNs...tMQ&quot;
+  },
+  &quot;clientName&quot;: &quot;my-client&quot;,
+  &quot;clientType&quot;: &quot;PUBLIC&quot;,
+  &quot;templateArn&quot;: null,
+  &quot;templateContext&quot;: null,
+  &quot;expirationTimestamp&quot;: 1594932567.612,
+  &quot;createdTimestamp&quot;: 1587156567.612,
+  &quot;updatedTimestamp&quot;: 1587156567.612,
+  &quot;createdBy&quot;: null,
+  &quot;updatedBy&quot;: null
+}
+</code></pre>
+<p>We have to locally save those info and pass them into the next call.</p>
+<h4 id="startdeviceauthorization">StartDeviceAuthorization</h4>
+<p>In order to make this call the user of Leapp need to have registered into AWS SSO and provide a valid start-url, that is the <strong>portal url</strong></p>
+<figure class="figure-image">
+  <img src="../../images/contributing/aws_sso/AWS_SSO-1.png" alt="">
+  <figcaption></figcaption>
+</figure>
+
+<p>Having a valid OIDC client registration we can now initiate the device authorization flow using the <a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html">StartDeviceAuthorization</a> API action.</p>
+<pre><code class="language-jsx">aws sso-oidc start-device-authorization 
+--client-id mVZBEoa-gUBj8nugHZUIsWV1LXdlc3QtMQ 
+--client-secret eyJraWQiOiJrZXktMTU2Njk2ODAxMyIsImFsZyI6IkhTMzg0In0.eyJzZXJpYWxpemVkIjoie1wiZXhwaXJlZFwiOmZhbHNlLFwiY2xpZW50SWRcIjp7XCJ2YWx1ZVwiOlwibVZaQkVvYS1nVUJqOG51Z0haVUlzV1YxTFhkbGMzUXRNUVwifSxcInRlbmFudElkXCI6bnVsbCxcImNsaWVudE5hbWVcIjpcImxlYXBwXCIsXCJjbGllbnRUeXBlXCI6XCJQVUJMSUNcIixcInRlbXBsYXRlQXJuXCI6bnVsbCxcInRlbXBsYXRlQ29udGV4dFwiOm51bGwsXCJleHBpcmF0aW9uVGltZXN0YW1wXCI6MTYxMTU2ODM0MS45MDkwMDAwMDAsXCJjcmVhdGVkVGltZXN0YW1wXCI6MTYwMzc5MjM0MS45MDkwMDAwMDAsXCJ1cGRhdGVkVGltZXN0YW1wXCI6MTYwMzc5MjM0MS45MDkwMDAwMDAsXCJjcmVhdGVkQnlcIjpudWxsLFwidXBkYXRlZEJ5XCI6bnVsbCxcInN0YXR1c1wiOm51bGwsXCJpbml0aWF0ZUxvZ2luVXJpXCI6bnVsbCxcImVudGl0bGVkUmVzb3VyY2VJZFwiOm51bGwsXCJlbnRpdGxlZFJlc291cmNlQ29udGFpbmVySWRcIjpudWxsLFwiZXh0ZXJuYWxJZFwiOm51bGx9In0.nyRt2ELVoiBh95GiZ_Igzzsn4DkzwfiU446c0lvuS9yqJe5Fk2Ra_tV-htKetQH8 
+--start-url [https://u](https://awscli.amazonaws.com/v2/documentation/api/latest/reference/sso-oidc/start-device-authorization.html)rltoSSOendpoint
+</code></pre>
+<p>That will produce a response like this:</p>
+<pre><code class="language-json">{
+  &quot;deviceCode&quot;: &quot;8Acq...DUg&quot;,
+  &quot;expiresIn&quot;: 600,
+  &quot;interval&quot;: 1,
+  &quot;userCode&quot;: &quot;RPXP-JSQA&quot;,
+  &quot;verificationUri&quot;: &quot;https://device.sso.eu-central-1.amazonaws.com/&quot;,
+  &quot;verificationUriComplete&quot;: &quot;https://device.sso.eu-central-1.amazonaws.com/?user_code=RPXP-JSQA&quot;
+}
+</code></pre>
+<p>Where:</p>
+<ul>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html#API_StartDeviceAuthorization_ResponseSyntax">deviceCode</a>:</strong> The short-lived code that is used by the device when polling for a session token.</li>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html#API_StartDeviceAuthorization_ResponseSyntax">expiresIn</a>:</strong> Indicates the number of seconds in which the verification code will become invalid.</li>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html#API_StartDeviceAuthorization_ResponseSyntax">interval</a>:</strong> Indicates the number of seconds the client must wait between attempts when polling for a session.</li>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html#API_StartDeviceAuthorization_ResponseSyntax">userCode</a>:</strong> A one-time user verification code. This is needed to authorize an in-use device.</li>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html#API_StartDeviceAuthorization_ResponseSyntax">verificationUri</a>:</strong> The URI of the verification page that takes the <code>userCode</code> to authorize the device.</li>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_StartDeviceAuthorization.html#API_StartDeviceAuthorization_ResponseSyntax">verificationUriComplete</a>:</strong> An alternate URL that the client can use to automatically launch a browser. This process skips the manual step in which the user visits the verification page and enters their code.</li>
+</ul>
+<p>In order to verify this device, <strong>Leapp</strong> will prompt you to the LOGIN PAGE and the verification code page, by opening a web browser with the <code>verificationUriComplete</code></p>
+<p>After the verification of the device we can now call the <code>CreateToken</code> API</p>
+<h4 id="createtoken">CreateToken</h4>
+<p>Having the <code>userCode</code>and <code>deviceCode</code>values we can now us the <a href="https://docs.aws.amazon.com/singlesignon/latest/OIDCAPIReference/API_CreateToken.html">CreateToken</a> API action to obtain a device access token. However, before we can request any tokens we need to open the <code>verificationUriComplete</code> URL in a web browser, complete authentication and provide authorization. At this point the end-user has to provide personal credentials in order to authenticate himself, for example by entering his username, password and maybe also has to provide multi factory authentication (MFA) credentials.</p>
+<pre><code class="language-jsx">curl -X POST https://oidc.eu-central-1.amazonaws.com/token -d 
+'{&quot;clientId&quot;: &quot;R-j5yN-4-TPNs...tMQ&quot;, &quot;clientSecret&quot;: &quot;eyJr...x74&quot;, &quot;deviceCode&quot;: &quot;8Acq...DUg&quot;, &quot;grantType&quot;: &quot;urn:ietf:params:oauth:grant-type:device_code&quot;}'
+</code></pre>
+<p>If everything worked out as expected, the token endpoint will return a valid accessToken, which we later can use with the <strong>AWS SSO Portal API</strong> to obtain temporary AWS credentials using the GetRoleCredentials action.</p>
+<p><strong>The returned tokens are valid for 8 hours.</strong></p>
+<p>This API call is region sensible, so we have to extract the region from the <code>verificationUriComplete</code> url with a RegEx!</p>
+<p>With this token we can now call the <a href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference">AWS SSO Portal API</a> to autogenerate sessions in Leapp.</p>
+<h4 id="aws-sso-portal-api">AWS SSO Portal API</h4>
+<p>In order to fill the session available with AWS SSO we have to use those APIs</p>
+<p>The following actions are supported:</p>
+<ul>
+<li><a href="https://docs.aws.amazon.com/it_it/singlesignon/latest/PortalAPIReference/API_GetRoleCredentials.html">GetRoleCredentials</a></li>
+<li><a href="https://docs.aws.amazon.com/it_it/singlesignon/latest/PortalAPIReference/API_ListAccountRoles.html">ListAccountRoles</a></li>
+<li><a href="https://docs.aws.amazon.com/it_it/singlesignon/latest/PortalAPIReference/API_ListAccounts.html">ListAccounts</a></li>
+<li><a href="https://docs.aws.amazon.com/it_it/singlesignon/latest/PortalAPIReference/API_Logout.html">Logout</a></li>
+</ul>
+<p>and in order to complete this action we need scan for account and roles inside them.</p>
+<h4 id="listaccounts">ListAccounts</h4>
+<p>Lists all AWS accounts assigned to the user. These AWS accounts are assigned by the administrator of the account.</p>
+<pre><code class="language-bash">GET /assignment/accounts?max_result=maxResults&amp;next_token=nextToken HTTP/1.1
+x-amz-sso_bearer_token: accessToken
+</code></pre>
+<ul>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference/API_ListAccounts.html#API_ListAccounts_RequestSyntax">accessToken</a>:</strong> The token issued by the <code>CreateToken</code> API call. <strong>Required: Yes</strong></li>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference/API_ListAccounts.html#API_ListAccounts_RequestSyntax">maxResults</a>:</strong> This is the number of items clients can request per page. <strong>Valid Range: Minimum value of 1. Maximum value of 100.</strong></li>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference/API_ListAccounts.html#API_ListAccounts_RequestSyntax">nextToken</a>:</strong>  When requesting subsequent pages, this is the page token from the previous response output. <strong>Required: NO</strong></li>
+</ul>
+<p><strong>RESPONSE</strong></p>
+<pre><code class="language-json">{
+   &quot;accountList&quot;: [ 
+      { 
+         &quot;accountId&quot;: &quot;string&quot;,
+         &quot;accountName&quot;: &quot;string&quot;,
+         &quot;emailAddress&quot;: &quot;string&quot;
+      }
+   ],
+   &quot;nextToken&quot;: &quot;string&quot;
+}
+</code></pre>
+<p>The following data is returned in JSON format by the service.</p>
+<ul>
+<li><strong><a href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference/API_ListAccounts.html#API_ListAccounts_ResponseSyntax">accountList</a>:</strong> A paginated response with the list of account information and the next token if more results are available.</li>
+<li><strong>accountId:</strong> The identifier of the AWS account that is assigned to the user.</li>
+<li><strong>accountName</strong>The display name of the AWS account that is assigned to the user.</li>
+<li><strong>emailAddress</strong>The email address of the AWS account that is assigned to the user. Length</li>
+</ul>
+<p>For each account retrieved by this API we need to check all the possible roles inside it.</p>
+<h4 id="listaccountroles">ListAccountRoles</h4>
+<p><a href="https://docs.aws.amazon.com/it_it/singlesignon/latest/PortalAPIReference/API_ListAccountRoles.html">ListAccountRoles</a></p>
+<pre><code class="language-json">aws sso list-account-roles --access-token eyJlbmMiOiJBMjU2R0NNIiwidGFnIjoiT25ZVUUxVFdOTkJPTHBlXyIsImFsZyI6IkEyNTZHQ01LVyIsIml2IjoiTlN6OGZhX3R5OUlTQ2pDSCJ9.AYABeE2XhZfXOo0AQH4b8xBx2IcAHwABABBEYXRhUGxhbmVTZXNzaW9uAAlQZXJlZ3JpbmUAAQAHYXdzLWttcwBLYXJuOmF3czprbXM6ZXUtd2VzdC0xOjU2ODkwNzQ4NjgzOTprZXkvZjgxOTE5ODYtODUxMi00MjUxLWE2OGItZjA1ZDc4NzNjY2MwALgBAgEAeJu9skq4zE2ey9fc15hIacoXwiFFMAppCV0W0rSVkM8-AfyfQxekoSqPhi7I-4NV30sAAAB-MHwGCSqGSIb3DQEHBqBvMG0CAQAwaAYJKoZIhvcNAQcBMB4GCWCGSAFlAwQBLjARBAxmhCL0DkKsDKDXCOACARCAO3Eve3w-RA7Qhr2OXf2rIzq27GqRNnym4mKIr1GRApaqQg045HyPCu8sOPVAJ5hNkuozdXFEyLWczHixAgAAAAAMAAAQAAAAAAAAAAAAAAAAAF7LbxztBp6QTtJLUfx0lz______AAAAAQAAAAAAAAAAAAAAAQAAACCLZim2-nRmKQ1xBgn6dyEcIYkErQ3JrZD3xH2QVJWUzbKlF9iq4MY_GHL9IqjFzVc.SEOxHOT20ShnIeWq.i5iBKVf-UnQQxODhm9wr_HNfZVsr0vfp7afk0DXWMyom41khUS5eH8-i8K6kqZSxhxsyX6Pf502c-h0iIGYjZZEZ8jvoYnYTr900w8mjNAP1G1r-6gpqLSBw8wgEe194VfPmbMP6lL534fAwQeqQBBvUjDgCGsUgn3SniGXeTR-x7khc01Mvf6ocHAvkjAsdz3s0zsXjZDUsCId8XlWZaeapsJ9_JGOx_UmzhGeMY96JtwWcRKjGLOVaT2E8rkU32RZwgwWQGkTpLI75_IWlsfgj69nDpUYc65AsJHk0vywa7xbS9F_oYrgAzqUPBPbc8WTxOSejljCpefOjSSBRkzuTFw9YKhDOs4G_gS6pg-LFFN-WVIYuLAELRalZspk3WeTyUsJK_aFxUnY3sEUzEqF8TWMIK8AXKW0m8fBI8-zuzJvmVrYdcnf6u2oyd-Q_m3sxm2va1Ec_cKYPWUtLOp8.ZCp-zED2Sv2nZEpteo-dHw --account-id 198863347786 
+</code></pre>
+<p>Response:</p>
+<pre><code class="language-json">{
+    &quot;roleList&quot;: [
+        {
+            &quot;roleName&quot;: &quot;ViewOnlyAccess&quot;,
+            &quot;accountId&quot;: &quot;198863347786&quot;
+        }
+    ]
+}
+</code></pre>
+<p>After that for each pair of Account and role found we will add an AWS session that is available to get the correct credentials.</p>
+<figure class="figure-image">
+  <img src="../../images/contributing/aws_sso/AWS_SSO-2.png" alt="">
+  <figcaption></figcaption>
+</figure>
+
+<h4 id="getrolecredentials">GetRoleCredentials</h4>
+<p>Having a valid access token, we can use the <a href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference">AWS SSO Portal API</a> to obtain temporary AWS credentials using the <a href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference/API_GetRoleCredentials.html">GetRoleCredentials</a> action.</p>
+<pre><code class="language-bash">curl 'https://portal.sso.eu-central-1.amazonaws.com/federation/credentials?account_id=999999999999&amp;role_name=MyIamRoleName' -H 'x-amz-sso_bearer_token: eyJl...Blw'
+</code></pre>
+<p>Which will then provide us with temporary AWS session credentials, which by default are valid for 12 hours.</p>
+<pre><code class="language-json">{
+  &quot;roleCredentials&quot;: {
+    &quot;accessKeyId&quot;: &quot;ASIA...Z3XM&quot;,
+    &quot;secretAccessKey&quot;: &quot;+t6UnVLWia...hFOzGL&quot;,
+    &quot;sessionToken&quot;: &quot;IQoJb3JpZ2lu...dK6&quot;,
+    &quot;expiration&quot;: 1587361828000
+  }
+}
+</code></pre>
+<p>We've tried several additional query parameters (<code>session_duration</code>, <code>duration_seconds</code>, …) to figure out whether one can choose a shorter session duration, but it looks like 12 hours is all you can get. While <a href="https://docs.aws.amazon.com/STS/latest/APIReference/Welcome.html">AWS STS API</a>’s actions like <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html">AssumeRole</a> or <a href="https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRoleWithWebIdentity.html">AssumeRoleWithWebIdentity</a> allow callers to specify custom session duration, <a href="https://docs.aws.amazon.com/singlesignon/latest/PortalAPIReference/API_GetRoleCredentials.html">GetRoleCredentials</a> does not yet support that.</p>
+<h2 id="faq">FAQ</h2>
+<ul>
+<li>
+<p><strong>Q: Can I use Leapp AWS SSO with AWS Cli V2?</strong>
+  <br>A: Yes you can, Leapp is compatible with both AWS Cli V1 and V2.</p>
+</li>
+<li>
+<p><strong>Q: I put the portal url and the region in the AWS SSO configuration but the login keeps saying Invalid Grants?</strong>
+  <br>A: Verify that are using the correct region which must be equal to the one you've registered your AWS SSO portal.</p>
+</li>
+<li>
+<p><strong>Q: Can I use an AWS SSO session as a federated one for making a truster account?</strong>
+  <br>A: Yes you can, but there is currently a limit: after 8h the access token is refreshed, and
+  the AWS SSO session is reloaded. So the association is lost and must be reverted by hand. We already opened an issue, upvote it to increase the priority.</p>
+</li>
+<li>
+<p><strong>Q: How much the access token lasts?</strong>
+  <br>A: The access token for AWS SSO lasts for 8h, after that period the sessions are synchronized again automatically.</p>
+</li>
+<li>
+<p><strong>Q: My administrator has changed some accounts and roles but I can't see them?</strong>
+  <br>A: Synchronizing is done when access token expires, you can force a manual re-synch from the AWS SSO page.</p>
+</li>
+<li>
+<p><strong>Q: Can I use Leapp AWS SSO session with AWS SSM?</strong>
+  <br>A: Yes you can, just be sure to have the correct permissions AWS-side and you're good to go.</p>
+</li>
+<li>
+<p><strong>Q: Can I use Leapp AWS SSO sessions to issue AWS commands with my <library/program/sdk>?</strong>
+  <br>A: Yes you can, Leapp generates under the hood plain temporary credentials in your default
+  profile. If for any reason you find some incompatibilities, please fill a new <a href="https://github.com/Noovolari/leapp/issues">issue</a></p>
+</li>
+<li>
+<p><strong>Q: I can't find my portal URL, when I try to access AWS SSO service it points me to presentation page but there is no admin console?</strong>
+  <br>A: To have access to AWS SSO console you must have privileges for that, please check your email or contact your administrator to obtain a portal URL.</p>
+</li>
+<li>
+<p><strong>Q: Why there are no options to edit or delete AWS SSO accounts?</strong>
+  <br>A: AWS SSO management is done via AWS console by your administrator, you only have read access to the sessions, no need to edit or remove them.</p>
+</li>
+<li>
+<p><strong>Q: I only see the name of the account and the role, can I recover other information for my work?</strong>
+  <br>A: Yes you can, you can copy the role arn and the account number from the contextual menu.</p>
+</li>
+<li>
+<p><strong>Q: Can I use MFA with Leapp and AWS SSO?</strong>
+  <br>A: Yes, if your administrator has configured MFA for your AWS SSO account you'll be prompted for the code during authentication process.</p>
+</li>
+<li>
+<p><strong>Q: I've installed Leapp, before I was using AWS SSO with CLI v2. It says my credentials are expired, what can I do?</strong>
+  <br>A: Clear <strong>cli/</strong> folder, clear <strong>sso/</strong> inside <strong>~/.aws</strong>. Also, be sure to clean <strong>~/.aws/config</strong> because it will probably contains data from your previous setup.       </p>
+</li>
+</ul>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.sections", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.477d984a.min.js", "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ddd52ceb.min.js"></script>
+      
+    
+  </body>
+</html>

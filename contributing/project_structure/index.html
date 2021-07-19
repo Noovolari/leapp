@@ -1,0 +1,1411 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="canonical" href="https://example.com/contributing/project_structure/">
+      
+      <link rel="icon" href="../../images/favicon.ico">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+    
+    
+      
+        <title>Project Structure - Leapp</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.3754935a.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7C&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:""}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent="">
+  
+    
+    <script>function __prefix(e){return new URL("../..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+      <script>var palette=__get("__palette");if(null!==palette&&"object"==typeof palette.color)for(var key in palette.color)document.body.setAttribute("data-md-color-"+key,palette.color[key])</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#overview" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Leapp" class="md-header__button md-logo" aria-label="Leapp" data-md-component="logo">
+      
+  <img src="../../images/icon.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Leapp
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Project Structure
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      <form class="md-header__option" data-md-component="palette">
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+          
+            <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7 10a2 2 0 0 1 2 2 2 2 0 0 1-2 2 2 2 0 0 1-2-2 2 2 0 0 1 2-2m10-3a5 5 0 0 1 5 5 5 5 0 0 1-5 5H7a5 5 0 0 1-5-5 5 5 0 0 1 5-5h10M7 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3h10a3 3 0 0 0 3-3 3 3 0 0 0-3-3H7z"/></svg>
+            </label>
+          
+        
+          
+          
+          <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="" data-md-color-accent=""  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_2">
+          
+            <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3z"/></svg>
+            </label>
+          
+        
+      </form>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/Noovolari/leapp/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Leapp" class="md-nav__button md-logo" aria-label="Leapp" data-md-component="logo">
+      
+  <img src="../../images/icon.png" alt="logo">
+
+    </a>
+    Leapp
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/Noovolari/leapp/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        Overview
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/" class="md-nav__link">
+        Concepts
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3" type="checkbox" id="__nav_3" >
+      
+      <label class="md-nav__link" for="__nav_3">
+        Use Cases
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Use Cases" data-md-level="1">
+        <label class="md-nav__title" for="__nav_3">
+          <span class="md-nav__icon md-icon"></span>
+          Use Cases
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/intro/" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_3_2" type="checkbox" id="__nav_3_2" >
+      
+      <label class="md-nav__link" for="__nav_3_2">
+        AWS
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="AWS" data-md-level="2">
+        <label class="md-nav__title" for="__nav_3_2">
+          <span class="md-nav__icon md-icon"></span>
+          AWS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/aws_iam_user/" class="md-nav__link">
+        AWS IAM User
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/aws_iam_role/" class="md-nav__link">
+        AWS IAM Role
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/aws_sso/" class="md-nav__link">
+        AWS SSO
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../use-cases/azure/" class="md-nav__link">
+        Azure
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4" type="checkbox" id="__nav_4" >
+      
+      <label class="md-nav__link" for="__nav_4">
+        Tutorials
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Tutorials" data-md-level="1">
+        <label class="md-nav__title" for="__nav_4">
+          <span class="md-nav__icon md-icon"></span>
+          Tutorials
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/first_access/" class="md-nav__link">
+        First Access
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2" type="checkbox" id="__nav_4_2" >
+      
+      <label class="md-nav__link" for="__nav_4_2">
+        AWS
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="AWS" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_2">
+          <span class="md-nav__icon md-icon"></span>
+          AWS
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_user/setup_in_leapp/" class="md-nav__link">
+        AWS IAM User
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2_2" type="checkbox" id="__nav_4_2_2" >
+      
+      <label class="md-nav__link" for="__nav_4_2_2">
+        AWS IAM Federated Role
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="AWS IAM Federated Role" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_2_2">
+          <span class="md-nav__icon md-icon"></span>
+          AWS IAM Federated Role
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/intro/" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/gsuite_federation_setup/" class="md-nav__link">
+        Step 1: G Suite Federation
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/aws_federation_setup/" class="md-nav__link">
+        Step 2: AWS Federation
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/enable_federated_access/" class="md-nav__link">
+        Step 3: Enable Federated Access
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/assign_role/" class="md-nav__link">
+        Step 4: Assign Role to GSuite Principal
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_federated_role/setup_in_leapp/" class="md-nav__link">
+        Step 5: Setup in Leapp
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_2_3" type="checkbox" id="__nav_4_2_3" >
+      
+      <label class="md-nav__link" for="__nav_4_2_3">
+        AWS IAM Chained Role
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="AWS IAM Chained Role" data-md-level="3">
+        <label class="md-nav__title" for="__nav_4_2_3">
+          <span class="md-nav__icon md-icon"></span>
+          AWS IAM Chained Role
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_chained_role/intro/" class="md-nav__link">
+        Introduction
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_chained_role/trust_relationship_setup/" class="md-nav__link">
+        Step 1: Setup Trust Relationship
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/iam_chained_role/setup_in_leapp/" class="md-nav__link">
+        Step 2: Setup in Leapp
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/aws_sso/setup_in_leapp/" class="md-nav__link">
+        AWS SSO
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/aws/aws_ssm_connect/" class="md-nav__link">
+        AWS SSM Connect
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_4_3" type="checkbox" id="__nav_4_3" >
+      
+      <label class="md-nav__link" for="__nav_4_3">
+        Azure
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Azure" data-md-level="2">
+        <label class="md-nav__title" for="__nav_4_3">
+          <span class="md-nav__icon md-icon"></span>
+          Azure
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/azure/gsuite_federation_setup/" class="md-nav__link">
+        Step 1: G Suite Federation
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/azure/setup_in_leapp/" class="md-nav__link">
+        Step 2: Setup in Leapp
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+      
+      <label class="md-nav__link" for="__nav_5">
+        Contributing
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Contributing" data-md-level="1">
+        <label class="md-nav__title" for="__nav_5">
+          <span class="md-nav__icon md-icon"></span>
+          Contributing
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          Project Structure
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        Project Structure
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#session-service-pattern" class="md-nav__link">
+    Session Service Pattern
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws-example" class="md-nav__link">
+    AWS example
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#awssessionservice-provider-service" class="md-nav__link">
+    AwsSessionService (Provider Service)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-method-session-service" class="md-nav__link">
+    Access Method Session Service
+  </a>
+  
+    <nav class="md-nav" aria-label="Access Method Session Service">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-iam-users-access-method" class="md-nav__link">
+    AWS IAM Users Access Method
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../updater/" class="md-nav__link">
+        Updater
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../system_vault/" class="md-nav__link">
+        System Vault
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws_named_profiles/" class="md-nav__link">
+        AWS Named Profiles
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../aws-sso.md" class="md-nav__link">
+        AWS SSO
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../default_options/" class="md-nav__link">
+        Default Options
+      </a>
+    </li>
+  
+
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../integrations/" class="md-nav__link">
+        Integrations
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_6" type="checkbox" id="__nav_6" >
+      
+      <label class="md-nav__link" for="__nav_6">
+        Community
+        <span class="md-nav__icon md-icon"></span>
+      </label>
+      <nav class="md-nav" aria-label="Community" data-md-level="1">
+        <label class="md-nav__title" for="__nav_6">
+          <span class="md-nav__icon md-icon"></span>
+          Community
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/get_involved/" class="md-nav__link">
+        Get Involved
+      </a>
+    </li>
+  
+
+          
+        </ul>
+      </nav>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#session-service-pattern" class="md-nav__link">
+    Session Service Pattern
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#aws-example" class="md-nav__link">
+    AWS example
+  </a>
+  
+    <nav class="md-nav" aria-label="AWS example">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#awssessionservice-provider-service" class="md-nav__link">
+    AwsSessionService (Provider Service)
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-method-session-service" class="md-nav__link">
+    Access Method Session Service
+  </a>
+  
+    <nav class="md-nav" aria-label="Access Method Session Service">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-iam-users-access-method" class="md-nav__link">
+    AWS IAM Users Access Method
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/Noovolari/leapp/edit/master/docs/contributing/project_structure.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="overview">Overview</h1>
+<p>To allow what is proposed in the Specs, Leapp's project is built on a set of <strong>services</strong> that realize the <strong>basic functionalities</strong>.</p>
+<p>The actual project's structure is structured to allow developers to contribute to source code in the most easier and atomic way possible.</p>
+<p>In particular, we want to focus the attention on the development of Session Service patterns:</p>
+<h2 id="session-service-pattern">Session Service Pattern</h2>
+<p>A specific service manages the way each type of Session will handle the process of credentials generation.</p>
+<figure class="figure-image">
+  <img src="../../images/contributing/project_structure/PROJECT_STRUCTURE-1.png" alt="">
+  <figcaption></figcaption>
+</figure>
+
+<p>There is a <strong>three-level abstraction</strong> implementation for this kind of service:</p>
+<ul>
+<li>A general <strong>Session Service</strong> is the top level of abstraction of a Session, it implements the state management of any Session in the app and has three abstract methods for Start, Stop, and Rotate.</li>
+<li>A <strong>Provider Session Service</strong>  (i.e., <em>AWSSessionService</em>) extends the general session service and handles credentials for a specific Cloud Provider to Start, Stop, and Rotate each Session of this type. This level of abstraction unifies all the common actions for all the Access Methods within a Cloud Provider.</li>
+<li>A  <strong>Provider Access Method Service</strong> (i.e., <em>AWSIAMUserService</em>) is the concrete implementation of all the information needed to generate the credentials for a specific Access Method. It implements both CRUD methods and the specific steps to generate credentials for a given Access Method.</li>
+</ul>
+<h2 id="aws-example">AWS example</h2>
+<p>Leapp manages on behalf of a user the <code>~./aws/credentials</code> file.</p>
+<p>It leverages <strong>Start</strong>, <strong>Stop</strong>, and <strong>Rotate</strong> methods from basic <strong>Session Service</strong> to add, remove, or renew <strong>temporary credentials</strong> in the file.</p>
+<p>Based on the Session Service Pattern, we created the Aws Session Service to extend basic Session Service for <strong>AWS</strong>.</p>
+<h3 id="awssessionservice-provider-service">AwsSessionService (Provider Service)</h3>
+<p><strong>AwsSessionService</strong> was created because all the <strong>Access Methods</strong> <strong>for AWS</strong> implemented in Leapp shares a common code structure for <strong>Start</strong>, <strong>Stop</strong>, and <strong>Rotate</strong>.</p>
+<p><strong>AwsSessionService</strong> defines three abstract methods, that must be implemented by every <strong>Access Methods of AWS</strong>. They are:</p>
+<ul>
+<li><strong>generateCredentials</strong></li>
+<li><strong>applyCredentials</strong></li>
+<li><strong>deApplyCredentials</strong></li>
+</ul>
+<pre><code class="language-tsx">async generateCredentials(sessionId: string): Promise&lt;CredentialsInfo&gt; {}
+
+async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise&lt;void&gt; {}
+
+async deApplyCredentials(sessionId: string): Promise&lt;void&gt; {}
+</code></pre>
+<p>Let's check Start, Stop, and Rotate in detail.</p>
+<p><strong>Start()</strong></p>
+<p>The start method is called when a user clicks on an <strong>AWS session in the Session List</strong> in the Client UI, and it marks the <strong>activation</strong> of a session thus <strong>generating</strong> and <strong>applying</strong> new temporary credentials.</p>
+<pre><code class="language-tsx">async start(sessionId: string): Promise&lt;void&gt; {
+    try {   
+      this.stopAllWithSameNameProfile(sessionId);
+      this.sessionLoading(sessionId);
+      **const credentialsInfo = await this.generateCredentials(sessionId);**
+      **await this.applyCredentials(sessionId, credentialsInfo);**
+      this.sessionActivate(sessionId);
+    } catch (error) {
+      this.sessionError(sessionId, error);
+    }
+  }
+</code></pre>
+<p>Start method accept a <strong>sessionId</strong> parameter to retrieve the session to <strong>activate</strong>. Above is how the Start method is coded in AWS Session Service by means of a <strong>template</strong>.</p>
+<p>Using a <strong>template</strong> ensures that every <strong>Access Method</strong> for AWS, will need to implement only some specific parts of the code, without compromising the general logic.</p>
+<p>The steps included are:</p>
+<ul>
+<li><strong>Stop all sessions with the same name profile</strong> - only one session can be activated with a specific profile name at a time.</li>
+<li>Put Session state to <strong>loading</strong>.</li>
+<li>Generate a set of new temporary credentials for the given session - this is overridden by the <strong>specific Access Method.</strong></li>
+<li>Once obtained the new temporary credentials apply them - this step is also <strong>overridden by Access Methods.</strong></li>
+<li>Finally set Session state to <strong>active</strong> using sessionActivate() method. This method will also set the <strong>startDateTime</strong> to the current Date and Time.</li>
+</ul>
+<p>In case of an error we call the generic method <strong>sessionError</strong> which will send relevant error information both to the UI and the log file.</p>
+<p><strong>Rotate()</strong></p>
+<pre><code class="language-tsx">async rotate(sessionId: string): Promise&lt;void&gt; {
+    try {
+      this.sessionLoading(sessionId);
+      **const credentialsInfo = await this.generateCredentials(sessionId);
+      await this.applyCredentials(sessionId, credentialsInfo);**
+      this.sessionRotated(sessionId);
+    } catch (error) {
+      this.sessionError(sessionId, error);
+    }
+  }
+</code></pre>
+<p>A similar approach to Start is used with Rotate. Rotate() is called by the Client <strong>every time a session is expired (temporary credentials are no longer valid).</strong> Calling Rotate will generate a new set of temporary credentials, replacing the old ones.</p>
+<p>The steps included are:</p>
+<ul>
+<li>Put Session state to <strong>loading</strong>.</li>
+<li>Generate a set of new temporary credentials for the given session - this is overridden by the <strong>specific Access Method.</strong></li>
+<li>Once obtained the new temporary credentials apply them - this step is also <strong>overridden by Access Methods.</strong></li>
+<li>Finally set Session state to <strong>active</strong> by calling the sessionRotated() method. This method will also set the <strong>startDateTime</strong> to the current Date and Time.</li>
+</ul>
+<p>In case of an error we call the generic method <strong>sessionError</strong> which will send relevant error information both to the UI and the log file.</p>
+<p><strong>Stop()</strong></p>
+<pre><code class="language-tsx">async stop(sessionId: string): Promise&lt;void&gt; {
+    try {
+      **await this.deApplyCredentials(sessionId);**
+      this.sessionDeactivated(sessionId);
+    } catch (error) {
+      this.sessionError(sessionId, error);
+    }
+  }
+</code></pre>
+<p>The <strong>Stop method happens when an error occurs during a call or when the user clicks on an active session</strong>. In this case, we de-apply temporary credentials, which in the case of AWS, means removing them from the credential file.</p>
+<p>Steps here are:</p>
+<ul>
+<li><strong>De-apply credentials</strong> - this method is overridden by specific implementations of Access Methods, usually involving operations other than removing credentials from credentials file, like removing sensible information from your Secret Vault because they are no longer used.</li>
+<li>Deactivate the session - which involves putting the Session' state to <strong>inactive</strong>. The Session will be moved from <strong>active session list</strong> to <strong>general session list in the UI</strong>.</li>
+</ul>
+<p>As always in case of error, we send general error information to the UI and to the log file via <strong>sessionError</strong>.</p>
+<p>To conclude, each <strong>Access Method</strong> has a specific service that <strong>extends AwsSessionService</strong> implementing these <strong>3 common methods (generate, apply, and de-apply)</strong>.</p>
+<h2 id="access-method-session-service"><strong>Access Method Session Service</strong></h2>
+<p>An <strong>Access Method generates credentials</strong> <strong>for the User access to a Cloud Provider</strong>, for example, in AWS we have different access methods:</p>
+<ul>
+<li>AWS IAM Users</li>
+<li>AWS IAM Roles Federated</li>
+<li>AWS IAM Role Chained</li>
+<li>AWS SSO Role.</li>
+</ul>
+<p>Each access method service implements actions to <strong>Create</strong>, <strong>Delete</strong>, and <strong>Edit</strong> this specific Session Type.</p>
+<p>As the first thing we need to create an interface of all the required information to a specific Access Method:</p>
+<pre><code class="language-tsx">export interface AwsPlainSessionRequest {
+  accountName: string;
+  accessKey: string;
+  secretKey: string;
+  region: string;
+  mfaDevice?: string;
+}
+</code></pre>
+<p>To set up a specific session from an Access Method we have to create it with a <strong>Create</strong> method, which uses the interface previously defined:</p>
+<pre><code class="language-tsx">create(accountRequest: AwsPlainSessionRequest, profileId: string): void {
+    const session = new AwsPlainSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
+    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
+    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-secret-access-key`, accountRequest.secretKey);
+    this.workspaceService.addSession(session);
+  }
+</code></pre>
+<p>At the moment <strong>edit</strong> and <strong>delete are defined</strong> generally in <strong>SessionService</strong>, so no need to implement them in an Access Method.</p>
+<p>To allow using other services to construct our logic we define them in the constructor of the service class.</p>
+<pre><code class="language-tsx">constructor(
+    protected workspaceService: WorkspaceService,
+    private keychainService: KeychainService,
+    private appService: AppService,
+    private fileService: FileService) {
+    super(workspaceService);
+  }
+</code></pre>
+<p>We also need to define a <strong>super(workspaceService)</strong> as we are extending AwsSessionService, and thus its constructor.</p>
+<p>To fulfill its tasks an Access Method must extend <strong>AwsSessionService</strong>; doing so, will require to implement these three methods:</p>
+<pre><code class="language-tsx">async generateCredentials(sessionId: string): Promise&lt;CredentialsInfo&gt; {}
+
+async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise&lt;void&gt; {}
+
+async deApplyCredentials(sessionId: string): Promise&lt;void&gt; {}
+</code></pre>
+<p><strong>They are mandatory</strong>, but besides them, a Developer can add to the service class every private or static method he/she would like to organize the code.</p>
+<p>We present <strong>AWS IAM Users Access Method</strong> implementation as an <strong>example</strong>.</p>
+<h3 id="aws-iam-users-access-method"><strong>AWS IAM Users Access Method</strong></h3>
+<p>Below we present all the methods implemented in the AWS IAM User Access Method; its purpose is to build temporary IAM STS credentials starting from a standard IAM User credential set.</p>
+<p>The Set is stored securely upon session creation in the OS Vault and is used at runtime, and only here to generate valid IAM STS temporary credentials.</p>
+<p>Let's start with two helper methods:</p>
+<pre><code class="language-tsx">static isTokenExpired(tokenExpiration: string): boolean {
+    const now = Date.now();
+    return now &gt; new Date(tokenExpiration).getTime();
+  }
+</code></pre>
+<p>With <strong>isTokenExpired</strong> we check the SessionToken expiration <strong>given with the temporary credentials</strong> to see if they are still valid or not (thus the method returning a boolean).</p>
+<pre><code class="language-tsx">static sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse: GetSessionTokenResponse): { sessionToken: any } {
+    return {
+      sessionToken: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_access_key_id: getSessionTokenResponse.Credentials.AccessKeyId.trim(),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_secret_access_key: getSessionTokenResponse.Credentials.SecretAccessKey.trim(),
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_session_token: getSessionTokenResponse.Credentials.SessionToken.trim(),
+      }
+    };
+  }
+</code></pre>
+<p>The second helper method constructs a <strong>CredentialInfo</strong> object to return to the AWSSessionService template for <strong>Start</strong>() and <strong>Rotate</strong>(). It is called at the end of the <strong>generateCredentials</strong>() <strong><em>*method</em>*.</strong></p>
+<p>It has the SessionTokenResponse from the STS client as the input parameter. It maps all the relevant attributes to the returned object.</p>
+<pre><code class="language-tsx">create(accountRequest: AwsIamUserSessionRequest, profileId: string): void {
+    const session = new AwsIamUserSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
+    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey);
+    this.keychainService.saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, accountRequest.secretKey);
+    this.workspaceService.addSession(session);
+  }
+</code></pre>
+<p>Create() is used to construct a new Session as explained before. It calls for a new <strong>AwsIamUserSession</strong>, passing the properties retrieved from the UI form.</p>
+<p>A Developer will define a new Model for a Session and that new model will be used here, in case he/she wants to create a new Access Method.</p>
+<p>In this particular case we also save the static credentials in the OS Vault using the KeyChain service, which makes saving and retrieving secrets from the vault transparent to the developer.</p>
+<p>Finally, we add the session to the workspace (our configuration object).</p>
+<pre><code class="language-tsx">async generateCredentials(sessionId: string): Promise&lt;CredentialsInfo&gt; {
+      // Get the session in question
+      const session = this.get(sessionId);
+      // Retrieve session token expiration
+      const tokenExpiration = (session as AwsIamUserSession).sessionTokenExpiration;
+      // Check if token is expired
+      if (!tokenExpiration || AwsIamUserService.isTokenExpired(tokenExpiration)) {
+        // Token is Expired!
+        // Retrieve access keys from keychain
+        const accessKeyId = await this.getAccessKeyFromKeychain(sessionId);
+        const secretAccessKey = await this.getSecretKeyFromKeychain(sessionId);
+        // Get session token
+        // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
+        AWS.config.update({ accessKeyId, secretAccessKey });
+        // Configure sts client options
+        const sts = new AWS.STS(this.appService.stsOptions(session));
+        // Configure sts get-session-token api call params
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const params = { DurationSeconds: environment.sessionTokenDuration };
+        // Check if MFA is needed or not
+        if ((session as AwsIamUserSession).mfaDevice) {
+          // Return session token after calling MFA modal
+          return this.generateSessionTokenCallingMfaModal(session, sts, params);
+        } else {
+          // Return session token in the form of CredentialsInfo
+          return this.generateSessionToken(session, sts, params);
+        }
+      } else {
+        // Session Token is NOT expired
+        try {
+          // Retrieve session token from keychain
+          return JSON.parse(await this.keychainService.getSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-token`));
+        } catch (err) {
+          throw new LeappParseError(this, err.message);
+        }
+      }
+  }
+</code></pre>
+<p>The first of the abstract methods we need to implement in the Access Method Service. We use this to generate credentials and return them in the form of a <strong>Javascript Promise -</strong> because the procedure is potentially not immediate and asynchronous.</p>
+<p>We retrieve the session previously created using the <strong>sessionId</strong>, which is passed as a parameter; from there we check its token expiration to see if we need to generate new credentials or reuse the one previously created.</p>
+<p>If we already have a valid session token, we retrieve it from the OS vault, parse the JSON string to construct a valid object to return for further processing. Note that when the return type is a Promise, any normal object will be directly cast to Promise<Object>.</p>
+<p>If we don't have any token expiration property (first generation) or the token is expired, we retrieve static credentials from the OS vault and use them in combination with the IAM STS client to generate a new Session Token with temporary credentials using</p>
+<pre><code class="language-tsx">this.generateSessionToken(session, sts, params);
+</code></pre>
+<p>In case we have configured Multi-Factor Authentication, we call for a helper method to show a modal window, retrieve the MFA code, add it to the STS parameters and then obtain the session token.</p>
+<pre><code class="language-tsx">private generateSessionTokenCallingMfaModal( session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise&lt;CredentialsInfo&gt; {
+    return new Promise((resolve, reject) =&gt; {
+      this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) =&gt; {
+        if (value !== Constants.confirmClosed) {
+          params['SerialNumber'] = (session as AwsIamUserSession).mfaDevice;
+          params['TokenCode'] = value;
+          // Return session token in the form of CredentialsInfo
+          resolve(this.generateSessionToken(session, sts, params));
+        } else {
+          reject(new LeappMissingMfaTokenError(this, 'Missing Multi Factor Authentication code'));
+        }
+      });
+    });
+  }
+</code></pre>
+<p>We can see that we return a promise to adhere to the <strong>generateCredentials</strong> signature.</p>
+<pre><code class="language-tsx">async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise&lt;void&gt; {
+    const session = this.get(sessionId);
+    const profileName = this.workspaceService.getProfileName((session as AwsIamUserSession).profileId);
+    const credentialObject = {};
+    credentialObject[profileName] = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      aws_session_token: credentialsInfo.sessionToken.aws_session_token,
+      region: session.region
+    };
+    return await this.fileService.iniWriteSync(this.appService.awsCredentialPath(), credentialObject);
+  }
+</code></pre>
+<p>Applying credentials is just a matter of getting the current profile name for the session, construct a suitable credential object using the profile name and the CredentialInfo object from <strong>generateCredentials</strong> and write it in the AWS credential file.</p>
+<pre><code class="language-tsx">async deApplyCredentials(sessionId: string): Promise&lt;void&gt; {
+    const session = this.get(sessionId);
+    const profileName = this.workspaceService.getProfileName((session as AwsIamUserSession).profileId);
+    const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
+    delete credentialsFile[profileName];
+    return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
+  }
+</code></pre>
+<p>To de-apply a credential we retrieve its profile name and use it to find and remove the credential set from the credential file.</p>
+<pre><code class="language-tsx">private async getAccessKeyFromKeychain(sessionId: string): Promise&lt;string&gt; {
+    return await this.keychainService.getSecret(environment.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
+}
+
+private async getSecretKeyFromKeychain(sessionId: string): Promise&lt;string&gt; {
+    return await this.keychainService.getSecret(environment.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
+}
+
+private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise&lt;CredentialsInfo&gt; {
+    try {
+      // Invoke sts get-session-token api
+      const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
+
+      // Save session token expiration
+      this.saveSessionTokenResponseInTheSession(session, getSessionTokenResponse);
+
+      // Generate correct object from session token response
+      const sessionToken = AwsIamUserService.sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse);
+
+      // Save in keychain the session token
+      await this.keychainService.saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-token`, JSON.stringify(sessionToken));
+
+      // Return Session Token
+      return sessionToken;
+    } catch (err) {
+      throw new LeappAwsStsError(this, err.message);
+    }
+}
+</code></pre>
+<p>The first two methods are used to simplify getting secrets in the OS vault.</p>
+<p><strong>generateSessionToken</strong>() is used to call STS for generating a new session, save the expiration time from token in the session, save the session token in the OS vault and finally return the session token for further processing.</p>
+<pre><code class="language-tsx">private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
+    const index = this.workspaceService.sessions.indexOf(session);
+    const currentSession: Session = this.workspaceService.sessions[index];
+    (currentSession as AwsIamUserSession).sessionTokenExpiration = getSessionTokenResponse.Credentials.Expiration.toISOString();
+    this.workspaceService.sessions[index] = currentSession;
+    this.workspaceService.sessions = [...this.workspaceService.sessions];
+}
+</code></pre>
+<p>This helper method is used to extract the session token expiration and save it as a property of the session object to later use it in case of a further generation of credentials, both during a rotation event or a manual re-apply.</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+          <a href="#" class="md-top md-icon" data-md-component="top" data-md-state="hidden">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8v12z"/></svg>
+            Back to top
+          </a>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../../tutorials/azure/setup_in_leapp/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Step 2: Setup in Leapp" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              Step 2: Setup in Leapp
+            </div>
+          </div>
+        </a>
+      
+      
+        
+        <a href="../updater/" class="md-footer__link md-footer__link--next" aria-label="Next: Updater" rel="next">
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              Updater
+            </div>
+          </div>
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11H4z"/></svg>
+          </div>
+        </a>
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.sections", "navigation.top"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.477d984a.min.js", "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.ddd52ceb.min.js"></script>
+      
+    
+  </body>
+</html>

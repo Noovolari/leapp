@@ -1,8 +1,8 @@
 Leapp
 =========
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Noovolari/leapp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Noovolari/leapp/context:javascript)
-- Website: https://www.leapp.cloud/
-- Documentation Website: [Docs](https://docs.leapp.cloud/)
+- Website: [leapp.cloud](https://www.leapp.cloud/)
+- Documentation Website: [docs.leapp.cloud](https://docs.leapp.cloud/)
 - Roadmap: [Roadmap](https://github.com/Noovolari/leapp/projects/4)
 - Chat with us: [Slack](https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q)
 
@@ -102,7 +102,7 @@ Logs are structured in the following way:
 > *Note: please always add logs whenever possible to any issue you want to fill to enable the team identify the problem quickly*
 
 # Documentation
-Here you can find our [documentation](https://docs.leapp.cloud).
+Refer to the documentation [website](https://docs.leapp.cloud).
 
 # Links
 - [Glossary](.github/GLOSSARY.md): find other information about the system

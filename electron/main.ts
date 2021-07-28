@@ -10,14 +10,14 @@ const ipc = ipcMain;
 app.allowRendererProcessReuse = true;
 app.disableHardwareAcceleration();
 
-// Main Window configuration: set here tyhe options to make it works with your app
+// Main Window configuration: set here the options to make it works with your app
 // Electron is the application wrapper so NOT log is prompted when we build an
 // application, we need to log to a file instead
 const windowDefaultConfig = {
   dir: path.join(__dirname, `/../../../dist/leapp-client`),
   browserWindow: {
     width: 514,
-    height: 600,
+    height: 650,
     title: ``,
     icon: path.join(__dirname, `assets/images/Leapp.png`),
     resizable: false,

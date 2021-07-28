@@ -197,6 +197,11 @@
         <ng-container *ngIf="sessionType === eSessionType.awsIamRoleChained">
           <h2>IAM Role Chained setting</h2>
           <div class="form-group" style="width: 100%; display: inline-block; position: relative; top: -1px;" >
+            <label>Role Session Name</label>
+            <input formControlName="roleSessionName" type="text" class="form-control" placeholder="Role Session Name" />
+            <small class="text-error" *ngIf="(form.controls['roleSessionName'].dirty || form.controls['roleSessionName'].touched) && form.controls['roleSessionName'].errors">Invalid Role Session Name</small>
+          </div>
+          <div class="form-group" style="width: 100%; display: inline-block; position: relative; top: -1px;" >
             <label style="margin-bottom: 0;">Assumer Session<span class="danger-text">*</span> <i class="fa fa-question-circle" tooltip="Source Session to assume the current Session"></i></label>
             <ng-select class="mt-2" formControlName="assumerSession" bindLabel="sessionName" bindValue="session" dropdownPosition="top" [items]="assumerAwsSessions" [(ngModel)]="selectedSession" [disabled]="true"></ng-select>
           </div>

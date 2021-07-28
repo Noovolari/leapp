@@ -24,6 +24,7 @@ Select "**IAM Chained Role**" as the Access Strategy.
 - **Session Alias:** choose a unique name suitable to recognize the Access Method.
 - **Region**: the region to start this credential set into once the section is active. You can always add a default one from option panel
 - **Role ARN**: Write the role ARN of the chained role you want to assume inside your AWS Account.
+- **Role Session Name**: Optional Role Session Name to apply to the chained session. Defaults to `assumed-from-leapp`
 - **Assumer Session**: any eligible session that you can use to start your chained session.
 
 Finally press **Save**.

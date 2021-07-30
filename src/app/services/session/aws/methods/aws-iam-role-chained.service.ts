@@ -19,6 +19,7 @@ export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
   region: string;
   roleArn: string;
+  roleSessionName?: string;
   parentSessionId: string;
 }
 
@@ -50,7 +51,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   create(sessionRequest: AwsIamRoleChainedSessionRequest, profileId: string): void {
-    const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region, sessionRequest.roleArn, profileId, sessionRequest.parentSessionId);
+    const session = new AwsIamRoleChainedSession(sessionRequest.accountName, sessionRequest.region, sessionRequest.roleArn, profileId, sessionRequest.parentSessionId, sessionRequest.roleSessionName);
     this.workspaceService.addSession(session);
   }
 
@@ -115,7 +116,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     // Configure IamRoleChained Account session parameters
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleSessionName: `assumed-from-leapp`,
+      RoleSessionName: (session as AwsIamRoleChainedSession).roleSessionName,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       RoleArn: (session as AwsIamRoleChainedSession).roleArn,
     };

@@ -59,6 +59,7 @@ export class CreateAccountComponent implements OnInit {
     name: new FormControl('', [Validators.required]),
     role: new FormControl('', [Validators.required]),
     roleArn: new FormControl('', [Validators.required]),
+    roleSessionName: new FormControl('', [Validators.pattern('[a-zA-Z\\d\\-\\_\\@\\=\\,\\.]+')]),
     federatedOrIamRoleChained: new FormControl('', [Validators.required]),
     federatedRole: new FormControl('', [Validators.required]),
     federationUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
@@ -259,6 +260,7 @@ export class CreateAccountComponent implements OnInit {
           accountName: this.form.value.name.trim(),
           region: this.selectedRegion,
           roleArn: this.form.value.roleArn.trim(),
+          roleSessionName: this.form.value.roleSessionName.trim(),
           parentSessionId: this.selectedSession.sessionId
         };
         this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest, this.selectedProfile.value);

@@ -419,7 +419,8 @@ export class AwsSsoRoleService extends AwsSessionService {
         if (
           details.error.indexOf('net::ERR_ABORTED') < 0 &&
           details.error.indexOf('net::ERR_FAILED') < 0 &&
-          details.error.indexOf('net::ERR_CACHE_MISS') < 0
+          details.error.indexOf('net::ERR_CACHE_MISS') < 0 &&
+          details.error.indexOf('net::ERR_CONNECTION_REFUSED') < 0
         ) {
           if (this.ssoWindow) {
             this.ssoWindow.close();

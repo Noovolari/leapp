@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.6.2](https://github.com/Noovolari/leapp/compare/v0.6.1...v0.6.2) (2021-08-05)
+
+
+### Features
+
+* allow defining iam role session name ([#155](https://github.com/Noovolari/leapp/issues/155)) ([9e21ef2](https://github.com/Noovolari/leapp/commit/9e21ef2749cca9b9dcbee05c95612487dd65c56a))
+
+
+### Bug Fixes
+
+* aws iam user access keys are now stored sequentially ([b64041e](https://github.com/Noovolari/leapp/commit/b64041ed29b906656ac88e153c9e8980ebc4e83c)), closes [#154](https://github.com/Noovolari/leapp/issues/154)
+* fallback to assumed-from-leapp in case of AwsIamRoleChainedSession without roleSessionName ([09293b6](https://github.com/Noovolari/leapp/commit/09293b6fad13ef464571ed598d3ad71653b90fca))
+* ignoring net::ERR_CONNECTION_REFUSED in AWS SSO verification browser window ([e281746](https://github.com/Noovolari/leapp/commit/e28174692ccf3f11ed250f1b23f0bdbeb2fe6d02)), closes [#152](https://github.com/Noovolari/leapp/issues/152)
+
 ### [0.6.1](https://github.com/Noovolari/leapp/compare/v0.6.0...v0.6.1) (2021-07-14)
 
 

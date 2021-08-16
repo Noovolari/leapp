@@ -6,3 +6,9 @@ img[src$="center-img"] {
 .md-header__button.md-logo img, .md-header__button.md-logo svg {
     width: auto !important;
 }
+
+:root {
+  --md-primary-fg-color:        #080C37;
+  --md-primary-fg-color--light: #ECB7B7;
+  --md-primary-fg-color--dark:  #90030C;
+}

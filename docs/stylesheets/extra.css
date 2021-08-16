@@ -13,6 +13,6 @@ img[src$="center-img"] {
   --md-primary-fg-color--dark:  #90030C;
 }
 
-a {
+.md-typeset a, .md-nav__item .md-nav__link--active {
    color: #78E0CF !important;
 }

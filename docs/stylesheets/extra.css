@@ -13,6 +13,6 @@ img[src$="center-img"] {
   --md-primary-fg-color--dark:  #90030C;
 }
 
-.md-typeset a {
+a {
    color: #78E0CF !important;
 }

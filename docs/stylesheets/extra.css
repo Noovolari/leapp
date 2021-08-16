@@ -2,3 +2,7 @@ img[src$="center-img"] {
   display:block;
   margin: 0 auto;
 }
+
+.md-header__button.md-logo img, .md-header__button.md-logo svg {
+    width: auto !important;
+}

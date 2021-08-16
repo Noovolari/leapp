@@ -44,7 +44,7 @@ nav:
       - 'Get Involved': 'community/get_involved.md'
 
 theme:
-  logo: images/icon.png
+  logo: images/logo.png
   favicon: images/favicon.ico
   name: material
   features:

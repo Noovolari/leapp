@@ -54,7 +54,7 @@ theme:
     - navigation.sections
     - navigation.top
   font:
-    text: Roboto
+    text: Lato
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default

@@ -106,7 +106,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       {
         label: 'About', type: 'normal', click: () => {
           this.appService.getCurrentWindow().show();
-          this.appService.getDialog().showMessageBox({icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp.\n` + `Version ${version} (${version})\n` + '© 2020 Noovolari', buttons: ['Ok']});
+          this.appService.getDialog().showMessageBox({icon: __dirname + `/assets/images/Leapp.png`, message: `Leapp\n` + `Version ${version} (${version})\n` + '© 2021 Noovolari', buttons: ['Ok']});
         }
       },
       {type: 'separator'},

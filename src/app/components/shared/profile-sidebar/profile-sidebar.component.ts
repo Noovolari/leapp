@@ -15,6 +15,7 @@ export class ProfileSidebarComponent implements OnInit {
 
   profileOpen = false;
   test: any;
+  version;
 
   constructor(
     private appService: AppService,
@@ -30,6 +31,8 @@ export class ProfileSidebarComponent implements OnInit {
    * Init the profile sidebar using the event emitter status listener
    */
   ngOnInit() {
+    this.version = this.appService.getApp().getVersion();
+    
     this.appService.profileOpen.subscribe(res => {
       this.profileOpen = res;
       if (this.profileOpen) {

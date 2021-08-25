@@ -2,3 +2,17 @@ img[src$="center-img"] {
   display:block;
   margin: 0 auto;
 }
+
+.md-header__button.md-logo img, .md-header__button.md-logo svg {
+    width: auto !important;
+}
+
+:root {
+  --md-primary-fg-color:        #080C37;
+  --md-primary-fg-color--light: #ECB7B7;
+  --md-primary-fg-color--dark:  #90030C;
+}
+
+.md-typeset a, .md-nav__item .md-nav__link--active {
+   color: #78E0CF !important;
+}

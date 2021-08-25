@@ -1,6 +1,8 @@
 site_name: Leapp
 site_url: https://example.com/
 repo_url: https://github.com/Noovolari/leapp
+site_description: 'Leapp is a tool for developers to manage, secure, and gain access to any cloud. From setting up your access data to activating a session, Leapp can help manage the underlying assets to let you use your provider CLI or SDK seamlessy.'
+copyright: '© 2021 Noovolari, All rights reserved. | Powered by beSharp'
 
 nav:
   - Overview: index.md
@@ -44,7 +46,7 @@ nav:
       - 'Get Involved': 'community/get_involved.md'
 
 theme:
-  logo: images/icon.png
+  logo: images/logo.png
   favicon: images/favicon.ico
   name: material
   features:
@@ -53,7 +55,7 @@ theme:
     - navigation.sections
     - navigation.top
   font:
-    text: Roboto
+    text: Lato
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default

@@ -1,4 +1,4 @@
-site_name: Leapp
+site_name: Leapp - Docs
 site_url: https://example.com/
 repo_url: https://github.com/Noovolari/leapp
 site_description: 'Leapp is a tool for developers to manage, secure, and gain access to any cloud. From setting up your access data to activating a session, Leapp can help manage the underlying assets to let you use your provider CLI or SDK seamlessy.'
@@ -81,6 +81,8 @@ extra:
     provider: google
     property: G-FB1NX90MYZ
   consent:
+    cookies:
+      analytics: Google Analytics
     title: Cookie consent
     description: >
       We use cookies to recognize your repeated visits and preferences, as well

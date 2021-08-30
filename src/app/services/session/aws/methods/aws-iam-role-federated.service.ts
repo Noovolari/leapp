@@ -164,6 +164,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
           'https://*.onelogin.com/*',
           'https://*.okta.com/*',
           'https://accounts.google.com/ServiceLogin*',
+          'https://login.microsoftonline.com/*',
           'https://signin.aws.amazon.com/saml'
         ]
       };
@@ -183,6 +184,11 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
         }
         // OKTA
         if (details.url.indexOf('.okta.com/discovery/iframe.html') !== -1) {
+          idpWindow = null;
+          resolve(true);
+        }
+        // AzureAD
+        if (details.url.indexOf('login.microsoftonline.com') !== -1) {
           idpWindow = null;
           resolve(true);
         }

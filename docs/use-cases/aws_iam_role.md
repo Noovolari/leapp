@@ -1,7 +1,7 @@
 # AWS IAM Roles
 
 ## AWS IAM Federated Role
-Federation is established between **G Suite**, **Okta**, **OneLogin** and **AWS**. No more AWS credentials
+Federation is established between **G Suite**, **Okta**, **OneLogin**, **AzureAD**, and **AWS**. No more AWS credentials
 management is needed.
 
 Leapp allows you to get to cloud resources with company email and password.

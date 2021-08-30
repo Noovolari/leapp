@@ -21,5 +21,5 @@ The use cases covered by Leapp are the following:
 - **OneLogin to AWS** - :white_check_mark:
 - **G Suite to Azure** - :white_check_mark:
 - **AZURE AD to Azure** - :white_check_mark:
-- **AZURE AD to AWS** - :soon:
+- **AZURE AD to AWS** - :white_check_mark:
 - **AWS Single Sign-On** - :white_check_mark:

@@ -16,7 +16,7 @@
         <div class="form-group" style="width: 100%; display: inline-block;">
           <label><strong>Aws Single Sign-On Url</strong><span class="danger-text">*</span></label>
           <br>
-          <input formControlName="portalUrl" type="url" class="form-control" placeholder="aws SSO url *">
+          <input formControlName="portalUrl" type="url" class="form-control" placeholder="aws SSO url (eg https://d-xxxxxxxxxx.awsapps.com/start) *">
           <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert the Aws Single Sign-On url</small>
         </div>
 

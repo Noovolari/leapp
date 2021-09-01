@@ -8,6 +8,8 @@ Leapp is compatible out-of-the-box with any third-party tool that uses the defau
 
 Leapp information needed to retrieve credentials are stored **LOCALLY** inside his [workspace](concepts.md). Critical information such as Cloud secrets and token are stored inside the **System Vault**.
 
+The name **Leapp** is inspired by the English word *leap* and pronounced */l:ip/*. We choose this name because the project enables you to be one step away from your cloud environments.
+
 ![Leapp Main Window](images/main-window.png?style=center-img)
 
 ## Key Features

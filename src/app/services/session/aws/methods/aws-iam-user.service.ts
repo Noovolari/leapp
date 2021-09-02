@@ -179,4 +179,8 @@ export class AwsIamUserService extends AwsSessionService {
     this.workspaceService.sessions[index] = currentSession;
     this.workspaceService.sessions = [...this.workspaceService.sessions];
   }
+
+  async generateExtensionPayload(sessionId: string): Promise<Object> {
+    return "a"
+  }
 }

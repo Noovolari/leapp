@@ -16,6 +16,10 @@ import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../services/session.service';
 import {Constants} from "../../../models/constants";
+import {ExecuteService} from '../../../services/execute.service';
+import {AwsIamRoleFederatedService} from "../../../services/session/aws/methods/aws-iam-role-federated.service";
+import {LeappSamlError} from "../../../errors/leapp-saml-error";
+import {LeappParseError} from "../../../errors/leapp-parse-error";
 
 @Component({
   selector: 'app-session-card',
@@ -28,13 +32,13 @@ export class SessionCardComponent implements OnInit {
   @Input()
   session!: Session;
 
-  @ViewChild('ssmModalTemplate', { static: false })
+  @ViewChild('ssmModalTemplate', {static: false})
   ssmModalTemplate: TemplateRef<any>;
 
-  @ViewChild('defaultRegionModalTemplate', { static: false })
+  @ViewChild('defaultRegionModalTemplate', {static: false})
   defaultRegionModalTemplate: TemplateRef<any>;
 
-  @ViewChild('defaultProfileModalTemplate', { static: false })
+  @ViewChild('defaultProfileModalTemplate', {static: false})
   defaultProfileModalTemplate: TemplateRef<any>;
 
   eSessionType = SessionType;
@@ -63,9 +67,11 @@ export class SessionCardComponent implements OnInit {
               private appService: AppService,
               private fileService: FileService,
               private router: Router,
+              private executeService: ExecuteService,
               private ssmService: SsmService,
               private sessionProviderService: SessionFactoryService,
-              private modalService: BsModalService) {}
+              private modalService: BsModalService) {
+  }
 
   ngOnInit() {
     // Generate a singleton service for the concrete implementation of SessionService
@@ -141,7 +147,7 @@ export class SessionCardComponent implements OnInit {
    */
   editSession(session: Session, event) {
     event.stopPropagation();
-    this.router.navigate(['/managing', 'edit-account'], {queryParams: { sessionId: session.sessionId }});
+    this.router.navigate(['/managing', 'edit-account'], {queryParams: {sessionId: session.sessionId}});
   }
 
   /**
@@ -186,7 +192,7 @@ export class SessionCardComponent implements OnInit {
     this.ssmLoading = false;
     this.firstTimeSsm = true;
     this.selectedSsmRegion = null;
-    this.modalRef = this.modalService.show(this.ssmModalTemplate, { class: 'ssm-modal'});
+    this.modalRef = this.modalService.show(this.ssmModalTemplate, {class: 'ssm-modal'});
   }
 
   /**
@@ -196,7 +202,7 @@ export class SessionCardComponent implements OnInit {
    */
   changeRegionModalOpen(session) {
     // open the modal
-    this.modalRef = this.modalService.show(this.defaultRegionModalTemplate, { class: 'ssm-modal'});
+    this.modalRef = this.modalService.show(this.defaultRegionModalTemplate, {class: 'ssm-modal'});
   }
 
   /**
@@ -218,6 +224,36 @@ export class SessionCardComponent implements OnInit {
       this.duplicateInstances = this.instances;
       this.ssmLoading = false;
       this.firstTimeSsm = false;
+    }
+  }
+
+  async openDefaultBrowser(session: Session) {
+    //creates a json request object for the native host websocket
+    let nativeHostRequestObject = {};
+    nativeHostRequestObject["provider"] = 'AWS';
+    nativeHostRequestObject["consoleRegion"] = session.region;
+    nativeHostRequestObject["type"] = session.type;
+    nativeHostRequestObject["payloadInfo"] = await (this.sessionService as AwsSessionService).generateExtensionPayload(session.sessionId);
+    const p = JSON.stringify(nativeHostRequestObject);
+    const stringifiedPayload = p + "\n";
+    console.log(nativeHostRequestObject);
+    //just for logging...
+    if (this.session.type === this.eSessionType.awsIamRoleFederated) {
+      console.log("%cOpening a new " + nativeHostRequestObject["type"] + " session", "background-color: red; color: white; font-size: 14px");
+    } else if (this.session.type === this.eSessionType.awsSsoRole) {
+      console.log("%cOpening a new " + nativeHostRequestObject["type"] + " session", "background-color: red; color: white; font-size: 14px");
+      console.log("%cAccount: " + nativeHostRequestObject["payloadInfo"]["accountName"] +
+                  " Role: " + nativeHostRequestObject["payloadInfo"]["roleName"] +
+                  " Region: " + nativeHostRequestObject["consoleRegion"], "background-color: red; color: white; font-size: 14px");
+    } else {
+      console.log(nativeHostRequestObject["payloadInfo"])
+      //alert("Not Yet Implemented");
+    }
+    console.log(stringifiedPayload);
+
+    //a sto punto, basta SENDARE lo stringifiedPayload via websocket!
+    if (this.session.type === this.eSessionType.awsIamRoleFederated || this.session.type === this.eSessionType.awsSsoRole || this.session.type === this.eSessionType.awsIamRoleChained) {
+      this.appService.sendToWebSocket(stringifiedPayload);
     }
   }
 
@@ -254,9 +290,9 @@ export class SessionCardComponent implements OnInit {
    */
   async startSsmSession(sessionId, instanceId) {
     this.instances.forEach(instance => {
-     if (instance.InstanceId === instanceId) {
-       instance.loading = true;
-     }
+      if (instance.InstanceId === instanceId) {
+        instance.loading = true;
+      }
     });
 
     // Generate valid temporary credentials for the SSM and EC2 client
@@ -266,9 +302,9 @@ export class SessionCardComponent implements OnInit {
 
     setTimeout(() => {
       this.instances.forEach(instance => {
-       if (instance.InstanceId === instanceId) {
+        if (instance.InstanceId === instanceId) {
           instance.loading = false;
-       }
+        }
       });
     }, 4000);
 
@@ -279,16 +315,16 @@ export class SessionCardComponent implements OnInit {
   searchSSMInstance(event) {
     if (event.target.value !== '') {
       this.instances = this.duplicateInstances.filter(i =>
-                                 i.InstanceId.indexOf(event.target.value) > -1 ||
-                                 i.IPAddress.indexOf(event.target.value) > -1 ||
-                                 i.Name.indexOf(event.target.value) > -1);
+        i.InstanceId.indexOf(event.target.value) > -1 ||
+        i.IPAddress.indexOf(event.target.value) > -1 ||
+        i.Name.indexOf(event.target.value) > -1);
     } else {
       this.instances = this.duplicateInstances;
     }
   }
 
   getProfileId(session: Session): string {
-    if(session.type !== SessionType.azure) {
+    if (session.type !== SessionType.azure) {
       return (session as any).profileId;
     } else {
       return undefined;
@@ -304,7 +340,7 @@ export class SessionCardComponent implements OnInit {
     if (this.selectedProfile) {
       let wasActive = false;
 
-      if(!this.workspaceService.getProfileName(this.selectedProfile.id)) {
+      if (!this.workspaceService.getProfileName(this.selectedProfile.id)) {
         this.workspaceService.addProfile(this.selectedProfile);
       }
 
@@ -327,7 +363,7 @@ export class SessionCardComponent implements OnInit {
 
   changeProfileModalOpen() {
     this.selectedProfile = null;
-    this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: 'ssm-modal'});
+    this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, {class: 'ssm-modal'});
   }
 
   goBack() {

@@ -27,6 +27,7 @@ import SSOOIDC, {
 
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
+import {SessionService} from "../../../session.service";
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -466,5 +467,17 @@ export class AwsSsoRoleService extends AwsSessionService {
     }
 
     return undefined;
+  }
+
+  async generateExtensionPayload(sessionId: string): Promise<Object> {
+    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+    const SSORegion = this.workspaceService.getAwsSsoConfiguration().region;
+    const authToken = await this.getAccessToken(SSORegion, portalUrl);
+    const sessions = this.listAwsSsoRoles();
+    const selectedSession = sessions.find(session => session.sessionId === sessionId);
+    const roleName = (selectedSession as AwsSsoRoleSession).roleArn.split('/')[1];
+    const accountName = selectedSession.sessionName;
+
+    return { accountName, roleName, SSORegion, authToken }
   }
 }

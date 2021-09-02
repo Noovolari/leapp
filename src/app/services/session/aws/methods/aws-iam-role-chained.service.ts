@@ -14,6 +14,8 @@ import {AwsIamRoleFederatedService} from './aws-iam-role-federated.service';
 import {KeychainService} from '../../../keychain.service';
 import {AwsIamUserService} from './aws-iam-user.service';
 import {AwsSsoRoleService} from './aws-sso-role.service';
+import {AwsSsoRoleSession} from "../../../../models/aws-sso-role-session";
+import {AwsIamRoleFederatedSession} from "../../../../models/aws-iam-role-federated-session";
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -135,6 +137,67 @@ export class AwsIamRoleChainedService extends AwsSessionService {
       return AwsIamRoleChainedService.sessionTokenFromAssumeRoleResponse(assumeRoleResponse);
     } catch (err) {
       throw new LeappAwsStsError(this, err.message);
+    }
+  }
+
+  async generateExtensionPayload(sessionId: string): Promise<Object> {
+    // Retrieve Session
+    const session = this.get(sessionId);
+    // Retrieve Parent Session
+    let parentSession: Session;
+    try {
+      parentSession = this.get((session as AwsIamRoleChainedSession).parentSessionId);
+    } catch (err) {
+      throw new LeappNotFoundError(this, `Parent Account Session  not found for Chained Account ${session.sessionName}`);
+    }
+
+    //roleArn for the role to be assumed
+    const roleArn = (session as AwsIamRoleChainedSession).roleArn;
+    const assumedRoleName = roleArn.split('/')[1];
+    const accountId = roleArn.substring( roleArn.lastIndexOf("::") + 2, roleArn.lastIndexOf(":role") );
+    //TODO: display name only if the account has a custom alias
+    const displayName = "";
+
+    //before going to the next step, check that the assumer has permissions for switching role
+    let parentSessionService;
+    if(parentSession.type === SessionType.awsIamRoleFederated) {
+      parentSessionService = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
+    }
+    else if(parentSession.type === SessionType.awsSsoRole) {
+      parentSessionService = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService) as AwsSessionService;
+    }
+    const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);
+    AWS.config.update({
+      sessionToken: parentCredentialsInfo.sessionToken.aws_session_token,
+      accessKeyId: parentCredentialsInfo.sessionToken.aws_access_key_id,
+      secretAccessKey: parentCredentialsInfo.sessionToken.aws_secret_access_key,
+    });
+    const roleSessionName = (session as AwsIamRoleChainedSession).roleSessionName;
+    const params = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      RoleSessionName: roleSessionName ? roleSessionName : 'assumed-from-leapp',
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      RoleArn: roleArn
+    };
+    const sts = new AWS.STS(this.appService.stsOptions(session));
+    try {
+      await sts.assumeRole(params).promise()
+    } catch(e) {
+      throw new LeappAwsStsError(this, e.message);
+    }
+
+    //create the appropriate payload according to the PARENTSESSION.TYPE and return it
+    if(parentSession.type === SessionType.awsIamRoleFederated) {
+      //for chained from federated
+      //parentSessionService = new AwsIamRoleFederatedService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
+      const parentSAMLResponse = await parentSessionService.generateExtensionPayload(parentSession.sessionId);
+      return { SAMLResponse: parentSAMLResponse.SAMLResponse, accountId, roleName: assumedRoleName, displayName }
+
+    } else if(parentSession.type === SessionType.awsSsoRole) {
+      //for chained from SSO
+      //parentSessionService = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService) as AwsSessionService;
+      const { accountName, roleName, SSORegion, authToken } = await parentSessionService.generateExtensionPayload(parentSession.sessionId);
+      return { parentAccountName: accountName, parentRoleName: roleName, SSORegion, authToken, accountId, roleName: assumedRoleName, displayName }
     }
   }
 }

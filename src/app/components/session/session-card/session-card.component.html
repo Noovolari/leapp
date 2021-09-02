@@ -18,6 +18,7 @@
       <i class="fa fa-ellipsis-v"></i>
     </a>
     <div id="drop-list" *dropdownMenu class="dropdown-menu drop-list dropdown-menu-right" role="menu" aria-labelledby="button-basic">
+      <a (click)="openDefaultBrowser(session)" *ngIf="session.type !== eSessionType.awsIamUser && session.type !== eSessionType.azure">Open Default Browser</a>
       <a (click)="ssmModalOpen(session);" *ngIf="session.type !== eSessionType.azure">SSM Session</a>
       <a (click)="changeRegionModalOpen(session);">Edit {{session.type === eSessionType.azure ? 'Location' : 'Region'}}</a>
 

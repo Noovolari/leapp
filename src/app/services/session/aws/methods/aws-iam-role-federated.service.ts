@@ -150,6 +150,39 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     return AwsIamRoleFederatedService.sessionTokenFromGetSessionTokenResponse(assumeRoleWithSamlResponse);
   }
 
+  async generateExtensionPayload(sessionId: string): Promise<Object> {
+    // Get the session in question
+    const session = this.get(sessionId);
+
+    // Get idpUrl
+    const idpUrl = this.workspaceService.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
+
+    // Check if we need to authenticate
+    let needToAuthenticate;
+    try {
+      needToAuthenticate = await this.needAuthentication(idpUrl);
+    } catch(err) {
+      throw new LeappSamlError(this, err.message);
+    }
+
+    // AwsSignIn: retrieve the response hook
+    let responseHookDetails;
+    try {
+      responseHookDetails = await this.awsSignIn(idpUrl, needToAuthenticate);
+    } catch(err) {
+      throw new LeappParseError(this, err.message);
+    }
+
+    // Extract SAML response from responseHookDetails
+    let SAMLResponse;
+    try {
+      SAMLResponse = await AwsIamRoleFederatedService.extractSamlResponse(responseHookDetails);
+    } catch(err) {
+      throw new LeappParseError(this, err.message);
+    }
+    return { SAMLResponse };
+  }
+
   private async needAuthentication(idpUrl: string): Promise<boolean> {
     return new Promise( (resolve, _) => {
       // Get active window position for extracting new windows coordinate

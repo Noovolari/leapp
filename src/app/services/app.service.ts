@@ -8,6 +8,7 @@ import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../components/shared/input-dialog/input-dialog.component';
 import {Constants} from '../models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
+import {LeappExtensionError} from '../errors/leapp-extension-error';
 
 /*
 * External enum to the logger level so we can use this to define the type of log
@@ -630,6 +631,24 @@ export class AppService extends NativeService {
     }
 
     return options;
+  }
+
+  sendToWebSocket(message) {
+    //this.toast(`Error`, 2)
+    const webSocket = new WebSocket('ws://localhost:8080');
+    webSocket.onopen = function (e) {
+      console.log("[open] Connection established");
+      console.log("Sending to server");
+      webSocket.send(message);
+    };
+    webSocket.onmessage = function (e) {
+      console.log("M E S S A G G I O    R I C E V U T O: ", e)
+      webSocket.close();
+    }
+    webSocket.onerror = function(e){
+      //chiedere come far durare l'errore di più
+      throw new LeappExtensionError(this);
+    }
   }
 
   getUrl() {

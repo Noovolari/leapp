@@ -10,7 +10,7 @@
   <h3>Version: <span>{{version}}</span></h3>
   <h3>Release Date: <span>{{releaseDate | date }}</span></h3>
   <br>
-  <div class="html-content" [innerHTML]="releaseNotes"></div>
+  <div class="html-content" [innerHTML]="releaseNotes" (click)="$event.preventDefault()"></div>
   <br>
 
   <div class="button-equalizer">

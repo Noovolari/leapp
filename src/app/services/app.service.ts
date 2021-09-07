@@ -418,7 +418,7 @@ export class AppService extends NativeService {
     }
 
     this.getCurrentWindow().show();
-    this.newNotification('MFA Token needed', 'Please insert MFA Token for Leapp Session');
+    this.newNotification('MFA Token needed', message);
     this.modalService.show(InputDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { title, placeholder, message, callback}});
   }
 

@@ -130,7 +130,7 @@ export class AwsIamUserService extends AwsSessionService {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private generateSessionTokenCallingMfaModal( session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise<CredentialsInfo> {
     return new Promise((resolve, reject) => {
-      this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
+      this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', `please insert MFA code from your app or device for ${session.sessionName}`, (value) => {
         if (value !== Constants.confirmClosed) {
           params['SerialNumber'] = (session as AwsIamUserSession).mfaDevice;
           params['TokenCode'] = value;

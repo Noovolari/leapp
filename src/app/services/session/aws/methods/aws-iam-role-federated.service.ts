@@ -188,7 +188,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
           resolve(true);
         }
         // AzureAD
-        if (details.url.indexOf('login.microsoftonline.com') !== -1) {
+        if (details.url.indexOf('login.microsoftonline.com') !== -1 && details.url.indexOf('/oauth2/authorize') !== -1) {
           idpWindow = null;
           resolve(true);
         }

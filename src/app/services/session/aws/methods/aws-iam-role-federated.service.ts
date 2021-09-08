@@ -164,6 +164,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
           'https://*.onelogin.com/*',
           'https://*.okta.com/*',
           'https://accounts.google.com/ServiceLogin*',
+          'https://login.microsoftonline.com/*',
           'https://signin.aws.amazon.com/saml'
         ]
       };
@@ -172,7 +173,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       // to construct the ideal method to deal with the construction of the response
       idpWindow.webContents.session.webRequest.onBeforeRequest(filter, (details, callback) => {
         // G Suite
-        if (details.url.indexOf('accounts.google.com/ServiceLogin') !== -1) {
+        if (details.url.indexOf('https://accounts.google.com/ServiceLogin') !== -1) {
           idpWindow = null;
           resolve(true);
         }
@@ -186,8 +187,13 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
           idpWindow = null;
           resolve(true);
         }
+        // AzureAD
+        if (details.url.indexOf('https://login.microsoftonline.com') !== -1 && details.url.indexOf('/oauth2/authorize') !== -1) {
+          idpWindow = null;
+          resolve(true);
+        }
         // Do not show window: already logged by means of session cookies
-        if (details.url.indexOf('signin.aws.amazon.com/saml') !== -1) {
+        if (details.url.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
           idpWindow = null;
           resolve(false);
         }

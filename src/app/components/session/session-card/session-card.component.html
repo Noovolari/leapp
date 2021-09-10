@@ -1,7 +1,7 @@
 <div class="session-card button-area  {{session.type === eSessionType.azure ? 'azr' : 'aws'}} {{session.status === eSessionStatus.active ? 'active' : ''}}">
   <span class="region-label {{session.type === eSessionType.azure ? 'azr' : 'aws'}}">{{session.region}}</span>
   <div class="information" (click)="switchCredentials()" title="{{ session | detail }}">
-    <b>{{session.sessionName}}</b>{{ session | detail }}
+    <b>{{session.sessionName}}</b> - {{ session | detail }}
   </div>
   <div class="information-profile" (click)="switchCredentials()">
     <ng-container *ngIf="session.type !== eSessionType.azure">

@@ -14,15 +14,15 @@ export class DetailPipe implements PipeTransform {
   transform(session: Session): string {
     switch (session.type) {
       case(SessionType.awsIamRoleFederated):
-        return ' - ' + (session as AwsIamRoleFederatedSession).roleArn.split('role/')[1];
+        return (session as AwsIamRoleFederatedSession).roleArn.split('role/')[1];
       case(SessionType.azure):
-        return ' - ' + (session as AzureSession).subscriptionId;
+        return (session as AzureSession).subscriptionId;
       case(SessionType.awsIamUser):
         return ''; // (session as AwsIamUserSession).sessionName;
       case(SessionType.awsSsoRole):
-        return ' - ' + (session as AwsSsoRoleSession).roleArn.split('role/')[1];
+        return (session as AwsSsoRoleSession).roleArn.split('role/')[1];
       case(SessionType.awsIamRoleChained):
-        return ' - ' + (session as AwsIamRoleChainedSession).roleArn.split('role/')[1];
+        return (session as AwsIamRoleChainedSession).roleArn.split('role/')[1];
     }
   }
 }

@@ -13,6 +13,7 @@ import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {normalizeSourceMaps} from "@angular-devkit/build-angular/src/utils";
+import {Constants} from "../../../models/constants";
 
 @Component({
   selector: 'app-tray-menu',
@@ -142,7 +143,10 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     // check for dark mode
     let normalIcon = 'LeappMini';
     let updateIcon = 'LeappMini2';
-    if (this.appService.isDarkMode()) {
+    if (
+      (this.appService.isDarkMode() && this.appService.detectOs() !== Constants.windows) ||
+      this.appService.detectOs() === Constants.linux
+    ) {
       normalIcon = 'LeappMini3';
       updateIcon = 'Leappmini4';
     }

@@ -47,6 +47,7 @@ export class ExecuteService extends NativeService {
    * Open a command terminal and launch a generic command
    *
    * @param command - the command to launch in terminal
+   * @param env - optional the environment object we can set to pass environment variables
    * @returns an {Observable<any>} to subscribe to
    */
   public openTerminal(command: string, env?: any): Promise<string> {

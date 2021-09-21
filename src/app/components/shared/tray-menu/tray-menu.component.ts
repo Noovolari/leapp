@@ -7,13 +7,11 @@ import {SessionType} from '../../../models/session-type';
 import {environment} from '../../../../environments/environment';
 import {SessionStatus} from '../../../models/session-status';
 import {AwsIamRoleChainedSession} from '../../../models/aws-iam-role-chained-session';
-import {LeappNotAwsAccountError} from '../../../errors/leapp-not-aws-account-error';
 import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
 import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
-import {normalizeSourceMaps} from "@angular-devkit/build-angular/src/utils";
-import {Constants} from "../../../models/constants";
+import {Constants} from '../../../models/constants';
 
 @Component({
   selector: 'app-tray-menu',

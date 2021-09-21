@@ -225,6 +225,11 @@ export class CreateAccountComponent implements OnInit {
 
     if (workspace.sessions.length > 0) {
       this.router.navigate(['/sessions', 'session-selected']);
+    } else {
+      this.sessionType = undefined;
+      this.provider = undefined;
+      this.providerSelected = false;
+      this.typeSelection = false;
     }
   }
 

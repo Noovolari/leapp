@@ -20,7 +20,9 @@ export class DetailPipe implements PipeTransform {
       case(SessionType.awsIamUser):
         return ''; // (session as AwsIamUserSession).sessionName;
       case(SessionType.awsSsoRole):
-        return (session as AwsSsoRoleSession).roleArn.split('role/')[1];
+        const splittedRoleArn = (session as AwsSsoRoleSession).roleArn.split('/');
+        splittedRoleArn.splice(0, 1);
+        return splittedRoleArn.join('/');
       case(SessionType.awsIamRoleChained):
         return (session as AwsIamRoleChainedSession).roleArn.split('role/')[1];
     }

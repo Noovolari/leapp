@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.7.0](https://github.com/Noovolari/leapp/compare/v0.6.2...v0.7.0) (2021-09-23)
+## [0.7.1](https://github.com/Noovolari/leapp/compare/v0.7.0...v0.7.1) (2021-09-23)
+
+
+### Bug Fixes
+
+* fixed role name not appearing in aws sso's session cards ([13cadc0](https://github.com/Noovolari/leapp/commit/13cadc084b2b5e2de2b03f7039e79eedc11d320a))
+
+### [0.7.0](https://github.com/Noovolari/leapp/compare/v0.6.2...v0.7.0) (2021-09-23)
 
 
 ### Features

@@ -16,6 +16,7 @@ import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../services/session.service';
 import {Constants} from "../../../models/constants";
+import {AwsIamUserService} from "../../../services/session/aws/methods/aws-iam-user.service";
 
 @Component({
   selector: 'app-session-card',
@@ -147,7 +148,7 @@ export class SessionCardComponent implements OnInit {
   /**
    * Copy credentials in the clipboard
    */
-  copyCredentials(session: Session, type: number, event) {
+  async copyCredentials(session: Session, type: number, event) {
     event.stopPropagation();
     try {
       const workspace = this.workspaceService.get();
@@ -157,7 +158,13 @@ export class SessionCardComponent implements OnInit {
           2: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn}` : ''
         };
 
-        const text = texts[type];
+        let text = texts[type];
+
+        // Special conditions for IAM Users
+        if (session.type === SessionType.awsIamUser) {
+          // Get Account from Caller Identity
+          text = await (this.sessionService as AwsIamUserService).getAccountNumberFromCallerIdentity(session);
+        }
 
         this.appService.copyToClipboard(text);
         this.appService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');

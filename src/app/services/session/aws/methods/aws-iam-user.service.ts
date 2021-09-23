@@ -127,6 +127,20 @@ export class AwsIamUserService extends AwsSessionService {
       }
   }
 
+  async getAccountNumberFromCallerIdentity(session: Session): Promise<string> {
+    // Get credentials
+    const credentials: CredentialsInfo = await this.generateCredentials(session.sessionId);
+    AWS.config.update({ accessKeyId: credentials.sessionToken.aws_access_key_id, secretAccessKey: credentials.sessionToken.aws_secret_access_key, sessionToken: credentials.sessionToken.aws_session_token });
+    // Configure sts client options
+    try {
+      const sts = new AWS.STS(this.appService.stsOptions(session));
+      const response = await sts.getCallerIdentity({}).promise();
+      return response.Account;
+    } catch (err) {
+      throw new LeappAwsStsError(this, err.message);
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private generateSessionTokenCallingMfaModal( session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise<CredentialsInfo> {
     return new Promise((resolve, reject) => {

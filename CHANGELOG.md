@@ -2,6 +2,31 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.7.0](https://github.com/Noovolari/leapp/compare/v0.6.2...v0.7.0) (2021-09-23)
+
+
+### Features
+
+* add support for aws azuread federation ([#165](https://github.com/Noovolari/leapp/issues/165)) ([2d0b70b](https://github.com/Noovolari/leapp/commit/2d0b70b5f935ad0b5abac72ee73cf6bcfdba0cef)), closes [#160](https://github.com/Noovolari/leapp/issues/160)
+* add tooltip to show session & detail info ([#169](https://github.com/Noovolari/leapp/issues/169)) ([14b5b7c](https://github.com/Noovolari/leapp/commit/14b5b7c3d3cf418a3a81534de03f336771908381))
+
+
+### Bug Fixes
+
+* [#171](https://github.com/Noovolari/leapp/issues/171) back button now returns to list if there are already some sessions otherwise it will return to start of provider selection ([06c6a10](https://github.com/Noovolari/leapp/commit/06c6a106b7875b68eaa41ef227759a1fb856b7b5))
+* [#172](https://github.com/Noovolari/leapp/issues/172) IAM user account number is retrieved using GetCallerIdentity() ([e0c6d4c](https://github.com/Noovolari/leapp/commit/e0c6d4c8736544f4e4be92e09fc92e0c73f93c56))
+* [#157](https://github.com/Noovolari/leapp/issues/157) 2020 is over and added version to sidebar ([714dd91](https://github.com/Noovolari/leapp/commit/714dd91890a31a15b8352a5d5721ae8ec337ff84))
+* [#167](https://github.com/Noovolari/leapp/issues/167) typo in button ([ffc75a6](https://github.com/Noovolari/leapp/commit/ffc75a6a3f8ce3a0a6b4d1e6723da815eac97fe7))
+
+Thank you!
+A huge shout out to the community members who contributed to this release of Leapp!
+
+[@mholttech](https://github.com/mholttech) #169 #165
+
+[@Plasma](https://github.com/Plasma) #167
+
+[@jgrumboe](https://github.com/jgrumboe) #157
+
 ### [0.6.2](https://github.com/Noovolari/leapp/compare/v0.6.1...v0.6.2) (2021-08-05)
 
 

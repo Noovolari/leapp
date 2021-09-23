@@ -72,8 +72,6 @@ export class NativeService {
       this.ipcRenderer = (window as any).native.ipcRenderer;
       this.nativeTheme = (window as any).native.nativeTheme;
       this.notification = (window as any).native.notification;
-
-      console.log(this.nativeTheme);
     }
   }
 }

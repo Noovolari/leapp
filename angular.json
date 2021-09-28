@@ -40,7 +40,8 @@
             "buildOptimizer": false,
             "sourceMap": true,
             "optimization": false,
-            "namedChunks": true
+            "namedChunks": true,
+            "allowedCommonJsDependencies": ["stream", "assert", "fs"]
           },
           "configurations": {
             "staging": {

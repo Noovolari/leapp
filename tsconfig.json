@@ -10,7 +10,12 @@
     "moduleResolution": "node",
     "sourceMap": true,
     "target": "ES6",
-    "typeRoots": ["../node_modules/@types"]
+    "typeRoots": ["../node_modules/@types"],
+    "paths": {
+      "stream": ["node_modules/stream-browserify"],
+      "assert": ["node_modules/assert"],
+      "fs": ["node_modules/fs-web"],
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

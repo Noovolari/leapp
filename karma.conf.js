@@ -13,6 +13,10 @@ module.exports = function (config) {
     ],
     files: [
       {
+        pattern: 'karma-process-mock.js',
+        type: 'js'
+      },
+      {
         pattern: 'src/**/*.ts',
         type: 'js' // To silence the warning. Means load with <script> tag.
       },

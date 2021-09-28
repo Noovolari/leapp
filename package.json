@@ -172,7 +172,7 @@
     "@ng-select/ng-select": "~6.1.0",
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
-    "@sebgroup/ng-magic-iframe": "~1.0.2",
+    "@sebgroup/ng-magic-iframe": "1.0.2",
     "@types/jest": "~26.0.23",
     "aws-sdk": "~2.893.0",
     "aws-sdk-mock": "^5.1.0",
@@ -229,7 +229,7 @@
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^0.1102.10",
-    "@angular-eslint/builder": "4.2.0",
+    "@angular-eslint/builder": "12.5.0",
     "@angular-eslint/eslint-plugin": "4.2.0",
     "@angular-eslint/eslint-plugin-template": "4.2.0",
     "@angular-eslint/schematics": "4.2.0",

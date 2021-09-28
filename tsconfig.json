@@ -4,10 +4,9 @@
     "allowSyntheticDefaultImports" : true,
     "baseUrl": "./",
     "declaration": false,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": ["ES2019", "DOM"],
-    "module": "ES6",
+    "module": "esnext",
     "moduleResolution": "node",
     "sourceMap": true,
     "target": "ES6",
@@ -16,5 +15,5 @@
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
     "strictInjectionParameters": true
-  }
+  },
 }

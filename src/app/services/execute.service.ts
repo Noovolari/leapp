@@ -58,7 +58,7 @@ export class ExecuteService extends NativeService {
     } else if (this.process.platform === 'win32') {
       return this.execute(`start cmd /k ${command}`, env);
     } else {
-      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, env);
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.process.env, env));
     }
   }
 }

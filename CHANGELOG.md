@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.7.1](https://github.com/Noovolari/leapp/compare/v0.7.0...v0.7.1) (2021-09-23)
+## [0.7.2](https://github.com/Noovolari/leapp/compare/v0.7.1...v0.7.2) (2021-09-29)
+
+
+### Bug Fixes
+
+* fixed aws ssm start-session on linux systems using gnome-terminal ([b7d9d0b](https://github.com/Noovolari/leapp/commit/b7d9d0b388969538d8958e7f2ed560a6d75c2ce0))
+
+### [0.7.1](https://github.com/Noovolari/leapp/compare/v0.7.0...v0.7.1) (2021-09-23)
 
 
 ### Bug Fixes

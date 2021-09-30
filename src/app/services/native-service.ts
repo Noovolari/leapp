@@ -29,7 +29,6 @@ export class NativeService {
   protected menu: any;
   protected tray: any;
   protected machineId: any;
-  protected process: any;
   protected ipcRenderer: any;
   protected keytar: typeof Keytar;
   protected followRedirects: any;
@@ -38,39 +37,45 @@ export class NativeService {
   protected nativeTheme: any;
   protected notification: any;
 
+  protected process: any;
+
+  get isElectron(): boolean {
+    return !!(window && window.process && (window.process as any).type);
+  }
+
   constructor() {
-    if ((window as any).native) {
-      this.fs = (window as any).native.fs;
-      this.rimraf = (window as any).native.rimraf;
-      this.ini = (window as any).native.ini;
-      this.url = (window as any).native.url;
-      this.copydir = (window as any).native.copydir;
-      this.os = (window as any).native.os;
-      this.unzip = (window as any).native.unzip;
-      this.exec = (window as any).native.exec;
-      this.sudo = (window as any).native.sudo;
-      this.md5File = (window as any).native.md5File;
-      this.path = (window as any).native.path;
-      this.semver = (window as any).native.semver;
-      this.shell = (window as any).native.shell;
-      this.machineId = (window as any).native.MachineId;
-      this.process = (window as any).native.process;
-      this.ipcRenderer = (window as any).native.ipcRenderer;
-      this.keytar = (window as any).native.keytar;
-      this.followRedirects = (window as any).native.followRedirects;
-      this.httpProxyAgent = (window as any).native.httpProxyAgent;
-      this.httpsProxyAgent = (window as any).native.httpsProxyAgent;
-      this.log = (window as any).native.log;
-      this.app = (window as any).native.app;
-      this.session = (window as any).native.session;
-      this.dialog = (window as any).native.dialog;
-      this.browserWindow = (window as any).native.BrowserWindow;
-      this.currentWindow = (window as any).native.currentWindow;
-      this.menu = (window as any).native.Menu;
-      this.tray = (window as any).native.Tray;
-      this.ipcRenderer = (window as any).native.ipcRenderer;
-      this.nativeTheme = (window as any).native.nativeTheme;
-      this.notification = (window as any).native.notification;
+    if (this.isElectron) {
+      this.log = window.require('electron-log');
+      this.fs = window.require('fs-extra');
+      this.rimraf = window.require('rimraf');
+      this.os = window.require('os');
+      this.ini = window.require('ini');
+      this.md5File = window.require('md5-file');
+      this.path = window.require('path');
+      this.exec = window.require('child_process').exec;
+      this.url = window.require('url');
+      this.unzip = window.require('extract-zip');
+      this.copydir = window.require('copy-dir');
+      this.sudo = window.require('sudo-prompt');
+      this.semver = window.require('semver');
+      this.shell = window.require('electron').shell;
+      this.machineId = window.require('node-machine-id').machineIdSync();
+      this.keytar = window.require('keytar');
+      this.followRedirects = window.require('follow-redirects');
+      this.httpProxyAgent = window.require('http-proxy-agent');
+      this.httpsProxyAgent = window.require('https-proxy-agent');
+      this.app = window.require('@electron/remote').app;
+      this.session = window.require('@electron/remote').session;
+      this.dialog = window.require('@electron/remote').dialog;
+      this.browserWindow = window.require('@electron/remote').BrowserWindow;
+      this.currentWindow = window.require('@electron/remote').getCurrentWindow();
+      this.menu = window.require('@electron/remote').Menu;
+      this.tray = window.require('@electron/remote').Tray;
+      this.ipcRenderer = window.require('electron').ipcRenderer;
+      this.nativeTheme = window.require('@electron/remote').nativeTheme;
+      this.notification = window.require('@electron/remote').Notification;
+      this.process = (window as any).process;
+
     }
   }
 }

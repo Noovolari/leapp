@@ -1,6 +1,9 @@
 import * as path from 'path';
 import {environment} from '../src/environments/environment';
 
+const remote = require('@electron/remote/main');
+remote.initialize();
+
 const {app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
 const url = require('url');

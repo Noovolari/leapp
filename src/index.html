@@ -41,16 +41,16 @@
     followRedirects: require('follow-redirects'),
     httpProxyAgent: require('http-proxy-agent'),
     httpsProxyAgent: require('https-proxy-agent'),
-    app: require('electron').remote.app,
-    session: require('electron').remote.session,
-    dialog: require('electron').remote.dialog,
-    BrowserWindow: require('electron').remote.BrowserWindow,
-    currentWindow: require('electron').remote.getCurrentWindow(),
-    Menu: require('electron').remote.Menu,
-    Tray: require('electron').remote.Tray,
+    app: require('@electron/remote').app,
+    session: require('@electron/remote').session,
+    dialog: require('@electron/remote').dialog,
+    BrowserWindow: require('@electron/remote').BrowserWindow,
+    currentWindow: require('@electron/remote').getCurrentWindow(),
+    Menu: require('@electron/remote').Menu,
+    Tray: require('@electron/remote').Tray,
     ipcRenderer: require('electron').ipcRenderer,
-    nativeTheme: require('electron').remote.nativeTheme,
-    notification: require('electron').remote.Notification
+    nativeTheme: require('@electron/remote').nativeTheme,
+    notification: require('@electron/remote').Notification
   };
 </script>
 <app-root></app-root>

@@ -5,7 +5,6 @@
 * - create an entry in this file; now through native service you can inject that library everywhere in the angular code!
 */
 import * as Keytar from 'keytar';
-import {getWindowSizes} from "ngx-bootstrap/positioning/utils";
 
 export class NativeService {
   protected url: any;

@@ -54,7 +54,7 @@ package-lock.json
 /electron/dist
 
 start.sh
-
+pipeline.sh
 
 #Mkdocs
 site/

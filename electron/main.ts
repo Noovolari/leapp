@@ -27,7 +27,6 @@ const windowDefaultConfig = {
     titleBarStyle: 'hidden',
     webPreferences: {
       devTools: !environment.production,
-      worldSafeExecuteJavaScript: true,
       contextIsolation: false,
       enableRemoteModule: true,
       nodeIntegration: true

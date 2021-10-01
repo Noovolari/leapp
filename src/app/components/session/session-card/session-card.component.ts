@@ -15,8 +15,9 @@ import {FileService} from '../../../services/file.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../services/session.service';
-import {Constants} from "../../../models/constants";
-import {AwsIamUserService} from "../../../services/session/aws/methods/aws-iam-user.service";
+import {Constants} from '../../../models/constants';
+import {AwsIamUserService} from '../../../services/session/aws/methods/aws-iam-user.service';
+import {LoggingService} from '../../../services/logging.service';
 
 @Component({
   selector: 'app-session-card',
@@ -66,6 +67,7 @@ export class SessionCardComponent implements OnInit {
               private router: Router,
               private ssmService: SsmService,
               private sessionProviderService: SessionFactoryService,
+              private loggingService: LoggingService,
               private modalService: BsModalService) {}
 
   ngOnInit() {
@@ -167,11 +169,11 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-        this.appService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');
+        this.loggingService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');
       }
     } catch (err) {
-      this.appService.toast(err, ToastLevel.warn);
-      this.appService.logger(err, LoggerLevel.error, this, err.stack);
+      this.loggingService.toast(err, ToastLevel.warn);
+      this.loggingService.logger(err, LoggerLevel.error, this, err.stack);
     }
   }
 
@@ -248,7 +250,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession();
       }
 
-      this.appService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!');
+      this.loggingService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!');
       this.modalRef.hide();
     }
   }
@@ -327,7 +329,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession();
       }
 
-      this.appService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!');
+      this.loggingService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!');
       this.modalRef.hide();
     }
   }
@@ -347,7 +349,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   private logSessionData(session: Session, message: string): void {
-    this.appService.logger(
+    this.loggingService.logger(
       message,
       LoggerLevel.info,
       this,

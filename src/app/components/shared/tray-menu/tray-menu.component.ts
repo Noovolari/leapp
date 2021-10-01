@@ -12,6 +12,7 @@ import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {Constants} from '../../../models/constants';
+import {LoggingService} from "../../../services/logging.service";
 
 @Component({
   selector: 'app-tray-menu',
@@ -28,6 +29,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
               private fileService: FileService,
               private sessionService: SessionService,
               private updaterService: UpdaterService,
+              private loggingService: LoggingService,
               private sessionProviderService: SessionFactoryService,
               private appService: AppService) {
   }
@@ -171,7 +173,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
    */
   async cleanBeforeExit() {
     // Check if we are here
-    this.appService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
+    this.loggingService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
@@ -185,7 +187,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       // Clean the config file
       this.appService.cleanCredentialFile();
     } catch (err) {
-      this.appService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
+      this.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit

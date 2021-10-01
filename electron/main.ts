@@ -110,6 +110,8 @@ const generateMainWindow = () => {
       globalShortcut.unregister('CommandOrControl+R');
       globalShortcut.unregister('F5');
     });
+
+    remote.enable(win.webContents);
   };
 
   app.on('activate', () => {

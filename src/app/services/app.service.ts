@@ -1,6 +1,5 @@
 import {EventEmitter, Injectable} from '@angular/core';
 import {FileService} from './file.service';
-import {ToastrService} from 'ngx-toastr';
 import {ConfirmationDialogComponent} from '../components/shared/confirmation-dialog/confirmation-dialog.component';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
@@ -8,6 +7,7 @@ import {InputDialogComponent} from '../components/shared/input-dialog/input-dial
 import {Constants} from '../models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {ElectronService} from './electron.service';
+import {LoggingService} from './logging.service';
 
 /*
 * External enum to the logger level so we can use this to define the type of log
@@ -68,9 +68,9 @@ export class AppService {
 
   constructor(
     private fileService: FileService,
-    private toastr: ToastrService,
     private modalService: BsModalService,
-    private electronService: ElectronService
+    private electronService: ElectronService,
+    private loggingService: LoggingService
   ) {
 
     // Global Configure logger
@@ -151,49 +151,6 @@ export class AppService {
 
   newNotification(title: string, message: string) {
     new this.electronService.notification({ title, body: message, icon: __dirname + `/assets/images/Leapp.png` }).show();
-  }
-
-  /**
-   * Log the message to a file and also to console for development mode
-   *
-   * @param message - the message to log
-   * @param type - the LoggerLevel type
-   * @param instance - The structured data of the message
-   * @param stackTrace - Stack trace in case of error log
-   */
-  logger(message: any, type: LoggerLevel, instance?: any, stackTrace?: string) {
-    if (typeof message !== 'string') {
-      message = JSON.stringify(message, null, 3);
-    }
-
-    if (instance) {
-      message = `[${instance.constructor['name']}] ${message}`;
-    }
-
-    if (stackTrace) {
-      message = `${message} ${stackTrace}`;
-    }
-
-    switch (type) {
-      case LoggerLevel.info:
-        if (!environment.production) {
-         this.electronService.log.info(message);
-        }
-        break;
-      case LoggerLevel.warn:
-        if (!environment.production) {
-         this.electronService.log.warn(message);
-        }
-        break;
-      case LoggerLevel.error:
-        this.electronService.log.error(message);
-        break;
-      default:
-        if (!environment.production) {
-         this.electronService.log.error(message);
-        }
-        break;
-    }
   }
 
   getLog() {
@@ -297,23 +254,6 @@ export class AppService {
     return hrNames[os];
   }
 
-  /**
-   * Show a toast message with different styles for different type of toast
-   *
-   * @param message - the message to show
-   * @param type - the type of message from Toast Level
-   * @param title - [optional]
-   */
-  toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
-    switch (type) {
-      case ToastLevel.success: this.toastr.success(message, title); break;
-      case ToastLevel.info || LoggerLevel.info: this.toastr.info(message, title); break;
-      case ToastLevel.warn || LoggerLevel.warn: this.toastr.warning(message, title); break;
-      case ToastLevel.error || LoggerLevel.error: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
-      default: this.toastr.error(message, title); break;
-    }
-  }
-
   public async logout() {
     try {
       // Clear all extra data
@@ -326,7 +266,7 @@ export class AppService {
       // Clean localStorage
       localStorage.clear();
 
-      this.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
+      this.loggingService.toast('Cache and configuration file cleaned.', ToastLevel.success, 'Cleaning configuration file');
 
       // Restart
       setTimeout(() => {
@@ -334,7 +274,7 @@ export class AppService {
       }, 2000);
     } catch (err) {
       this.electronService.log(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
-      this.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
+      this.loggingService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
     }
   }
 
@@ -445,31 +385,6 @@ export class AppService {
         this.validateAllFormFields(control);
       }
     });
-  }
-
-  /**
-   * Extract an account number from a aws arn
-   *
-   * @param value - arn value
-   * @returns - {any} - the
-   */
-  extractAccountNumberFromIdpArn(value) {
-    const values = value.split(':');
-    if (
-      values.length === 6 &&
-      values[0] === 'arn' &&
-      values[1] === 'aws' &&
-      values[2] === 'iam' &&
-      values[3] === '') {
-
-      if (values[4].length === 12 && Number(values[4])) {
-        return values[4];
-      } else  {
-       return '';
-      }
-          } else  {
-       return '';
-    }
   }
 
   /**

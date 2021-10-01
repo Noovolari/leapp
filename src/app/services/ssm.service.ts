@@ -3,6 +3,7 @@ import {ExecuteService} from './execute.service';
 import {AppService, LoggerLevel} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
 import {CredentialsInfo} from '../models/credentials-info';
+import {LoggingService} from './logging.service';
 
 const AWS = require('aws-sdk');
 
@@ -15,6 +16,7 @@ export class SsmService {
 
   constructor(
     private app: AppService,
+    private loggingService: LoggingService,
     private exec: ExecuteService) {}
 
   /**
@@ -101,7 +103,7 @@ export class SsmService {
           });
 
           // We have found and managed a list of instances
-          this.app.logger('Obtained smm info from aws for SSM', LoggerLevel.info, this);
+          this.loggingService.logger('Obtained smm info from aws for SSM', LoggerLevel.info, this);
           return instances;
         } else {
           // No instances usable

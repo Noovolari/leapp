@@ -12,6 +12,7 @@ import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../s
 import {LeappParseError} from '../../errors/leapp-parse-error';
 import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
+import {LoggingService} from '../../services/logging.service';
 
 @Component({
   selector: 'app-create-account',
@@ -82,7 +83,8 @@ export class CreateAccountComponent implements OnInit {
     private awsIamUserService: AwsIamUserService,
     private awsIamRoleChainedService: AwsIamRoleChainedService,
     private awsSessionService: AwsSessionService,
-    private azureService: AzureService
+    private azureService: AzureService,
+    private loggingService: LoggingService
   ) {}
 
   ngOnInit() {
@@ -157,7 +159,7 @@ export class CreateAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveSession() {
-    this.appService.logger(`Saving account...`, LoggerLevel.info, this);
+    this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
     this.addProfileToWorkspace();
     this.saveNewSsoRolesToWorkspace();
     this.createSession();

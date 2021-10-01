@@ -1,6 +1,6 @@
 import {ErrorHandler, Injectable, Injector} from '@angular/core';
-import {AppService} from '../app.service';
 import {LeappBaseError} from '../../errors/leapp-base-error';
+import {LoggingService} from '../logging.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,11 +11,9 @@ export class ErrorService implements ErrorHandler {
 
   handleError(error: any): void {
     error = error.rejection ? error.rejection : error;
-    const appService = this.injector.get(AppService);
+    const loggingService = this.injector.get(LoggingService);
 
-    appService.logger((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).context, (error as LeappBaseError).stack);
-    appService.toast((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).name);
+    loggingService.logger((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).context, (error as LeappBaseError).stack);
+    loggingService.toast((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).name);
   }
-
-
 }

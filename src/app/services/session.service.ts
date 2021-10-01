@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {NativeService} from './native-service';
 import {SessionStatus} from '../models/session-status';
 import {Session} from '../models/session';
 import {WorkspaceService} from './workspace.service';
@@ -7,11 +6,11 @@ import {WorkspaceService} from './workspace.service';
 @Injectable({
   providedIn: 'root'
 })
-export abstract class SessionService extends NativeService {
+export abstract class SessionService {
 
-  protected constructor(protected workspaceService: WorkspaceService) {
-    super();
-  }
+  protected constructor(
+    protected workspaceService: WorkspaceService
+  ) {}
 
   get(sessionId: string): Session {
 

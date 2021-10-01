@@ -179,7 +179,7 @@ This can be used to inject some Electron specific libraries in the actual Angula
 window.<unique_name> = require('your-library');
 ```
 
-- Now go to the **native-service.ts** and add your new library mimicking the other ones in the page:
+- Now go to the **electron.service.ts** and add your new library mimicking the other ones in the page:
 
 ```html
 protected <unique_name>: any;

@@ -1,25 +1,25 @@
 import {Injectable} from '@angular/core';
-import {NativeService} from './native-service';
 import {Observable, Subscription} from 'rxjs';
 import * as CryptoJS from 'crypto-js';
+import {ElectronService} from './electron.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class FileService extends NativeService {
-
+export class FileService {
   /* ====================================================
    * === Wrapper functions over the fs native library ===
    * ==================================================== */
   private readSubscription: Subscription;
 
+  constructor(private electronService: ElectronService) {}
   /**
    * Get the home directory
    *
    * @returns - {string} - path of the home directory
    */
   homeDir(): string {
-    return this.os.homedir();
+    return this.electronService.os.homedir();
   }
 
   /**
@@ -29,7 +29,7 @@ export class FileService extends NativeService {
    * @param path - the path of the directory
    */
   exists(path: string): boolean {
-    return this.fs.existsSync(path);
+    return this.electronService.fs.existsSync(path);
   }
 
   /**
@@ -39,7 +39,7 @@ export class FileService extends NativeService {
    * @param path - the directory path
    */
   dirname(path: string): string {
-    return this.path.dirname(path);
+    return this.electronService.path.dirname(path);
   }
 
   /**
@@ -50,7 +50,7 @@ export class FileService extends NativeService {
    */
   readFile(filePath: string): Observable<string> {
     return new Observable(subscriber => {
-      this.fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
+      this.electronService.fs.readFile(filePath, {encoding: 'utf-8'}, (err, data) => {
         if (err) {
           subscriber.error(err);
         } else {
@@ -68,7 +68,7 @@ export class FileService extends NativeService {
    * @param target - target directory
    */
   copyDir(source: string, target: string) {
-    this.copydir.sync(source, target, {mode: true});
+    this.electronService.copydir.sync(source, target, {mode: true});
   }
 
   /**
@@ -78,7 +78,7 @@ export class FileService extends NativeService {
    * @param filePath - Path to read the file
    */
   readFileSync(filePath: string): string {
-    return this.fs.readFileSync(filePath, {encoding: 'utf-8'});
+    return this.electronService.fs.readFileSync(filePath, {encoding: 'utf-8'});
   }
 
   /**
@@ -88,7 +88,7 @@ export class FileService extends NativeService {
    * @param source - source of the directory
    */
   getSubDirs(source: string) {
-    return this.fs.readdirSync(source, {withFileTypes: true})
+    return this.electronService.fs.readdirSync(source, {withFileTypes: true})
       .filter(dirent => dirent.isDirectory())
       .map(dirent => dirent.name);
   }
@@ -100,7 +100,7 @@ export class FileService extends NativeService {
    * @param options - some options if needed - optional
    */
   newDir(path: string, options: { recursive: boolean }): void {
-    this.fs.mkdirSync(path, options);
+    this.electronService.fs.mkdirSync(path, options);
   }
 
   /**
@@ -109,7 +109,7 @@ export class FileService extends NativeService {
    * @returns - {string} - the path of the file to open
    */
   chooseFile(): string {
-    return this.dialog.showOpenDialog({properties: ['openFile']});
+    return this.electronService.dialog.showOpenDialog({properties: ['openFile']});
   }
 
   /**
@@ -121,7 +121,7 @@ export class FileService extends NativeService {
    */
   writeFile(filePath: string, content: string): Observable<any> {
     return new Observable(subscriber => {
-      this.fs.writeFile(filePath, content, (err, data) => {
+      this.electronService.fs.writeFile(filePath, content, (err, data) => {
         if (err) {
           subscriber.error(err);
         } else {
@@ -140,7 +140,7 @@ export class FileService extends NativeService {
    * @param content - the content to write
    */
   writeFileSync(filePath: string, content: string): any {
-    return this.fs.writeFileSync(filePath, content);
+    return this.electronService.fs.writeFileSync(filePath, content);
   }
 
   /**
@@ -158,7 +158,7 @@ export class FileService extends NativeService {
         }
       });
     });
-    return this.writeFile(filePath, this.ini.stringify(content));
+    return this.writeFile(filePath, this.electronService.ini.stringify(content));
   }
 
   /**
@@ -179,7 +179,7 @@ export class FileService extends NativeService {
 
     const old = this.iniParseSync(filePath);
     const result = Object.assign(old, content);
-    return this.writeFileSync(filePath, this.ini.stringify(result));
+    return this.writeFileSync(filePath, this.electronService.ini.stringify(result));
   }
 
   replaceWriteSync(filePath: string, content: any) {
@@ -190,7 +190,7 @@ export class FileService extends NativeService {
         }
       });
     });
-    return this.writeFileSync(filePath, this.ini.stringify(content));
+    return this.writeFileSync(filePath, this.electronService.ini.stringify(content));
   }
 
   /**
@@ -206,7 +206,7 @@ export class FileService extends NativeService {
       }
       this.readSubscription = this.readFile(filePath).subscribe(file => {
         try {
-          subscriber.next(this.ini.parse(file));
+          subscriber.next(this.electronService.ini.parse(file));
         } catch (e) {
           subscriber.error(e);
         } finally {
@@ -226,20 +226,20 @@ export class FileService extends NativeService {
    * @param filePath - the filepath to read from
    */
   iniParseSync(filePath: string) {
-    return this.ini.parse(this.readFileSync(filePath));
+    return this.electronService.ini.parse(this.readFileSync(filePath));
   }
 
   /**
    * Encrypt Text
    */
   encryptText(text: string): string {
-    return CryptoJS.AES.encrypt(text.trim(), this.machineId).toString();
+    return CryptoJS.AES.encrypt(text.trim(), this.electronService.machineId).toString();
   }
 
   /**
    * Decrypt Text
    */
   decryptText(text: string): string {
-    return CryptoJS.AES.decrypt(text.trim(), this.machineId).toString(CryptoJS.enc.Utf8);
+    return CryptoJS.AES.decrypt(text.trim(), this.electronService.machineId).toString(CryptoJS.enc.Utf8);
   }
 }

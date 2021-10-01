@@ -1,5 +1,4 @@
 import {EventEmitter, Injectable} from '@angular/core';
-import {NativeService} from './native-service';
 import {FileService} from './file.service';
 import {ToastrService} from 'ngx-toastr';
 import {ConfirmationDialogComponent} from '../components/shared/confirmation-dialog/confirmation-dialog.component';
@@ -8,6 +7,7 @@ import {environment} from '../../environments/environment';
 import {InputDialogComponent} from '../components/shared/input-dialog/input-dialog.component';
 import {Constants} from '../models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
+import {ElectronService} from './electron.service';
 
 /*
 * External enum to the logger level so we can use this to define the type of log
@@ -31,7 +31,7 @@ export enum ToastLevel {
 @Injectable({
   providedIn: 'root'
 })
-export class AppService extends NativeService {
+export class AppService {
 
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
 
@@ -69,21 +69,21 @@ export class AppService extends NativeService {
   constructor(
     private fileService: FileService,
     private toastr: ToastrService,
-    private modalService: BsModalService
+    private modalService: BsModalService,
+    private electronService: ElectronService
   ) {
-    super();
 
     // Global Configure logger
-    if (this.log) {
+    if (this.electronService.log) {
       const logPaths = {
-        mac: `${this.process.env.HOME}/Library/Logs/Leapp/log.log`,
-        linux: `${this.process.env.HOME}/.config/Leapp/logs/log.log`,
-        windows: `${this.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.log`
+        mac: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
+        linux: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
+        windows: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`
       };
 
-      this.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
-      this.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
-      this.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
+      this.electronService.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';
+      this.electronService.log.transports.file.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}';
+      this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
   }
 
@@ -91,66 +91,66 @@ export class AppService extends NativeService {
    * Return the app object from node
    */
   getApp() {
-    return this.app;
+    return this.electronService.app;
   }
 
   getMenu() {
-    return this.menu;
+    return this.electronService.menu;
   }
 
   getTray() {
-    return this.tray;
+    return this.electronService.tray;
   }
 
   getCurrentWindow() {
-    return this.currentWindow;
+    return this.electronService.currentWindow;
   }
 
   getFollowRedirects() {
-    return this.followRedirects;
+    return this.electronService.followRedirects;
   }
 
   getHttpsProxyAgent() {
-    return this.httpsProxyAgent;
+    return this.electronService.httpsProxyAgent;
   }
 
   /**
    * Return the dialog native object
    */
   getDialog() {
-    return this.dialog;
+    return this.electronService.dialog;
   }
 
   /**
    * Return the native os object
    */
   getOS() {
-    return this.os;
+    return this.electronService.os;
   }
 
   /**
    * Return the fs native object
    */
   getFs() {
-    return this.fs;
+    return this.electronService.fs;
   }
 
   /**
    * Return the app process
    */
   getProcess() {
-    return this.process;
+    return this.electronService.process;
   }
 
   /**
    * Return Electron ipcRenderer
    */
   getIpcRenderer() {
-    return this.ipcRenderer;
+    return this.electronService.ipcRenderer;
   }
 
   newNotification(title: string, message: string) {
-    new this.notification({ title, body: message, icon: __dirname + `/assets/images/Leapp.png` }).show();
+    new this.electronService.notification({ title, body: message, icon: __dirname + `/assets/images/Leapp.png` }).show();
   }
 
   /**
@@ -177,27 +177,27 @@ export class AppService extends NativeService {
     switch (type) {
       case LoggerLevel.info:
         if (!environment.production) {
-         this.log.info(message);
+         this.electronService.log.info(message);
         }
         break;
       case LoggerLevel.warn:
         if (!environment.production) {
-         this.log.warn(message);
+         this.electronService.log.warn(message);
         }
         break;
       case LoggerLevel.error:
-        this.log.error(message);
+        this.electronService.log.error(message);
         break;
       default:
         if (!environment.production) {
-         this.log.error(message);
+         this.electronService.log.error(message);
         }
         break;
     }
   }
 
   getLog() {
-    return this.log;
+    return this.electronService.log;
   }
 
   /**
@@ -206,26 +206,26 @@ export class AppService extends NativeService {
    * @returns - {any} -
    */
   currentBrowserWindow() {
-    return this.currentWindow;
+    return this.electronService.currentWindow;
   }
 
   isDarkMode() {
-    return this.nativeTheme.shouldUseDarkColors;
+    return this.electronService.nativeTheme.shouldUseDarkColors;
   }
 
   /**
    * Quit the app
    */
   quit() {
-    this.app.exit(0);
+    this.electronService.app.exit(0);
   }
 
   /**
    * Restart the app
    */
   restart() {
-    this.app.relaunch();
-    this.app.exit(0);
+    this.electronService.app.relaunch();
+    this.electronService.app.exit(0);
   }
 
   /**
@@ -267,7 +267,7 @@ export class AppService extends NativeService {
       } catch (e) { }
       this.newWin = null;
     }
-    this.newWin = new this.browserWindow(opts);
+    this.newWin = new this.electronService.browserWindow(opts);
     return this.newWin;
 
   }
@@ -279,7 +279,7 @@ export class AppService extends NativeService {
    * @returns return a new browser window
    */
   newInvisibleWindow(url: string) {
-    const win = new this.browserWindow({ width: 1, height: 1, show: false });
+    const win = new this.electronService.browserWindow({ width: 1, height: 1, show: false });
     win.loadURL(url);
     return win;
   }
@@ -293,7 +293,7 @@ export class AppService extends NativeService {
       darwin: Constants.mac,
       win32: Constants.windows
     };
-    const os = this.os.platform();
+    const os = this.electronService.os.platform();
     return hrNames[os];
   }
 
@@ -317,11 +317,11 @@ export class AppService extends NativeService {
   public async logout() {
     try {
       // Clear all extra data
-      const getAppPath = this.path.join(this.app.getPath('appData'), environment.appName);
-      this.rimraf.sync(getAppPath + '/Partitions/leapp*');
+      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), environment.appName);
+      this.electronService.rimraf.sync(getAppPath + '/Partitions/leapp*');
 
       // Cleaning Library Electron Cache
-      await this.session.defaultSession.clearStorageData();
+      await this.electronService.session.defaultSession.clearStorageData();
 
       // Clean localStorage
       localStorage.clear();
@@ -333,7 +333,7 @@ export class AppService extends NativeService {
         this.restart();
       }, 2000);
     } catch (err) {
-      this.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
+      this.electronService.log(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
       this.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
     }
   }
@@ -344,7 +344,7 @@ export class AppService extends NativeService {
    * @returns the credential path string
    */
   awsCredentialPath() {
-   return this.path.join(this.os.homedir(), '.aws', 'credentials');
+   return this.electronService.path.join(this.electronService.os.homedir(), '.aws', 'credentials');
   }
 
   /**
@@ -353,7 +353,7 @@ export class AppService extends NativeService {
    * @returns the semver object
    */
   semVer() {
-    return this.semver;
+    return this.electronService.semver;
   }
 
   /**
@@ -428,7 +428,7 @@ export class AppService extends NativeService {
    * @param url - url to open
    */
   openExternalUrl(url) {
-    this.shell.openExternal(url);
+    this.electronService.shell.openExternal(url);
   }
 
   /**
@@ -587,7 +587,7 @@ export class AppService extends NativeService {
     // Modify the user agent for all requests to the following urls.
     const filter = { urls: ['https://*.amazonaws.com/'] };
 
-    this.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    this.electronService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
       details.requestHeaders['Origin'] = 'http://localhost:4200';
       callback({ cancel: false, requestHeaders: details.requestHeaders });
     });
@@ -600,9 +600,9 @@ export class AppService extends NativeService {
     try {
       const awsCredentialsPath = this.awsCredentialPath();
       // Rewrite credential file
-      this.fs.writeFileSync(awsCredentialsPath, '');
+      this.electronService.fs.writeFileSync(awsCredentialsPath, '');
     } catch (e) {
-      this.logger(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.warn, this, e.stack);
+      this.electronService.log(`Can\'t delete aws credential file probably missing: ${e.toString()}`, LoggerLevel.warn, this, e.stack);
     }
   }
 
@@ -633,13 +633,13 @@ export class AppService extends NativeService {
   }
 
   getUrl() {
-    return this.url;
+    return this.electronService.url;
   }
 
   blockDevToolInProductionMode() {
     this.currentBrowserWindow().webContents.on('devtools-opened', () => {
       if (environment.production) {
-        this.logger('Closing Web tools in production mode', LoggerLevel.info, this);
+        this.electronService.log('Closing Web tools in production mode', LoggerLevel.info, this);
         this.currentBrowserWindow().webContents.closeDevTools();
       }
     });

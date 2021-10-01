@@ -27,6 +27,7 @@ import SSOOIDC, {
 
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
+import {ElectronService} from '../../../electron.service';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -90,7 +91,8 @@ export class AwsSsoRoleService extends AwsSessionService {
     protected workspaceService: WorkspaceService,
     private fileService: FileService,
     private appService: AppService,
-    private keychainService: KeychainService
+    private keychainService: KeychainService,
+    private electronService: ElectronService
   ) {
     super(workspaceService);
   }
@@ -386,7 +388,7 @@ export class AwsSsoRoleService extends AwsSessionService {
 
   private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
 
-    const pos = this.currentWindow.getPosition();
+    const pos = this.electronService.currentWindow.getPosition();
 
     this.ssoWindow = null;
     this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);

@@ -1,43 +1,40 @@
-/*
-* Everytime you need to add a new native service from a node.js module the procedure is:
-* - do the normal npm install from the IntelliJ terminal from the root of your project
-* - add the require in the main index.html file pointing to a window object of your choice e.g. window.mylib; use the already added libraries as reference
-* - create an entry in this file; now through native service you can inject that library everywhere in the angular code!
-*/
+import { Injectable } from '@angular/core';
 import * as Keytar from 'keytar';
 
-export class NativeService {
-  protected url: any;
-  protected log: any;
-  protected fs: any;
-  protected rimraf: any;
-  protected os: any;
-  protected ini: any;
-  protected app: any;
-  protected dialog: any;
-  protected exec: any;
-  protected session: any;
-  protected unzip: any;
-  protected copydir: any;
-  protected browserWindow: any;
-  protected sudo: any;
-  protected md5File: any;
-  protected path: any;
-  protected currentWindow: any;
-  protected semver: any;
-  protected shell: any;
-  protected menu: any;
-  protected tray: any;
-  protected machineId: any;
-  protected ipcRenderer: any;
-  protected keytar: typeof Keytar;
-  protected followRedirects: any;
-  protected httpProxyAgent: any;
-  protected httpsProxyAgent: any;
-  protected nativeTheme: any;
-  protected notification: any;
-
-  protected process: any;
+@Injectable({
+  providedIn: 'root'
+})
+export class ElectronService {
+  url: any;
+  log: any;
+  fs: any;
+  rimraf: any;
+  os: any;
+  ini: any;
+  app: any;
+  dialog: any;
+  exec: any;
+  session: any;
+  unzip: any;
+  copydir: any;
+  browserWindow: any;
+  sudo: any;
+  md5File: any;
+  path: any;
+  currentWindow: any;
+  semver: any;
+  shell: any;
+  menu: any;
+  tray: any;
+  machineId: any;
+  ipcRenderer: any;
+  keytar: typeof Keytar;
+  followRedirects: any;
+  httpProxyAgent: any;
+  httpsProxyAgent: any;
+  nativeTheme: any;
+  notification: any;
+  process: any;
 
   get isElectron(): boolean {
     return !!(window && window.process && (window.process as any).type);
@@ -75,7 +72,6 @@ export class NativeService {
       this.nativeTheme = window.require('@electron/remote').nativeTheme;
       this.notification = window.require('@electron/remote').Notification;
       this.process = (window as any).process;
-
     }
   }
 }

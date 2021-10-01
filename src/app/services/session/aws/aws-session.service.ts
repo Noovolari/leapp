@@ -78,6 +78,7 @@ export abstract class AwsSessionService extends SessionService {
         this.workspaceService.removeSession(sess.sessionId);
       });
       this.workspaceService.removeSession(sessionId);
+      await this.removeSecrets(sessionId);
     } catch(error) {
       this.sessionError(sessionId, error);
     }
@@ -100,4 +101,5 @@ export abstract class AwsSessionService extends SessionService {
   abstract generateCredentials(sessionId: string): Promise<CredentialsInfo>;
   abstract applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void>;
   abstract deApplyCredentials(sessionId: string): Promise<void>;
+  abstract removeSecrets(sessionId: string): void;
 }

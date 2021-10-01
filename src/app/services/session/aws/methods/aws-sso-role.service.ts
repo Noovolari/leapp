@@ -154,6 +154,8 @@ export class AwsSsoRoleService extends AwsSessionService {
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
+  removeSecrets(sessionId: string): void {}
+
   async sync(region: string, portalUrl: string): Promise<SsoRoleSession[]> {
     // Prepare Sso Client for operations
     this.getSsoOidcClient(region);

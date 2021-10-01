@@ -150,6 +150,8 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     return AwsIamRoleFederatedService.sessionTokenFromGetSessionTokenResponse(assumeRoleWithSamlResponse);
   }
 
+  removeSecrets(sessionId: string): void {}
+
   private async needAuthentication(idpUrl: string): Promise<boolean> {
     return new Promise( (resolve, _) => {
       // Get active window position for extracting new windows coordinate

@@ -16,23 +16,23 @@ The App is designed to **manage and secure Cloud Access in multi-account environ
 
 # Key features
 
-> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **[we prefer to store that information in an encrypted file managed by the system.](https://github.com/Noovolari/leapp/wiki/vault-strategy)**
+> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **[we prefer to store that information in an encrypted file managed by the system.](https://docs.leapp.cloud/contributing/system_vault/)**
 > Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
 
 
 - **Switch Cloud Profile in a click**
   
-- **[Secure](https://github.com/Noovolari/leapp/wiki/vault-strategy) repository for your access data**
+- **[Secure](https://docs.leapp.cloud/contributing/system_vault/) repository for your access data**
 
-- **Multiple Cloud-Access [strategies](https://github.com/Noovolari/leapp/wiki/use-cases)**
+- **Multiple Cloud-Access [strategies](https://docs.leapp.cloud/use-cases/intro/)**
 
-- **[No long-lived](https://github.com/Noovolari/leapp/wiki/rotating-credentials) credentials**
+- **[No long-lived](https://docs.leapp.cloud/concepts/) credentials**
 
-- **Generate and use sessions directly from [your aws Organization](https://github.com/Noovolari/leapp/wiki/use-cases#aws-single-sign-on)**
+- **Generate and use sessions directly from [your aws Organization](https://docs.leapp.cloud/use-cases/aws_sso/)**
 
 - **Connect EC2 instances straight away**
 
-All the covered access methods can be found [here](https://github.com/Noovolari/leapp/wiki/use-cases).
+All the covered access methods can be found [here](https://docs.leapp.cloud/use-cases/intro/).
 
 
 ![Leapp App animation](.github/images/Leapp-animation.gif)

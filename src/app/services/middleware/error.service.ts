@@ -16,4 +16,6 @@ export class ErrorService implements ErrorHandler {
     appService.logger((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).context, (error as LeappBaseError).stack);
     appService.toast((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).name);
   }
+
+
 }

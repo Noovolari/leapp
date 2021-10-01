@@ -249,7 +249,7 @@
     "@types/uuid": "^8.3.0",
     "@typescript-eslint/eslint-plugin": "4.16.1",
     "@typescript-eslint/parser": "4.16.1",
-    "electron": "13.1.7",
+    "electron": "^15.0.0",
     "electron-builder": "22.14.3",
     "electron-builder-squirrel-windows": "22.14.3",
     "electron-installer-dmg": "3.0.0",
@@ -259,6 +259,7 @@
     "eslint-plugin-import": "latest",
     "eslint-plugin-jsdoc": "latest",
     "eslint-plugin-prefer-arrow": "latest",
+    "husky": "^7.0.0",
     "jasmine": "^3.7.0",
     "jasmine-core": "~3.7.1",
     "jasmine-spec-reporter": "~7.0.0",
@@ -273,8 +274,7 @@
     "nyc": "^15.1.0",
     "protractor": "^7.0.0",
     "ts-node": "^9.1.1",
-    "typescript": "4.3.5",
-    "husky": "^7.0.0"
+    "typescript": "4.3.5"
   },
   "browser": {
     "crypto": false

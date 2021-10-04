@@ -36,7 +36,12 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
-    "start": "ng serve",
+
+    "start": "npm-run-all -p electron:serve ng:serve",
+    "ng:serve": "ng serve -o",
+    "electron:serve-tsc": "tsc -p electron/tsconfig.json",
+    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && npx electron . --serve",
+
     "rebuild-keytar": "electron-rebuild -f -w keytar",
     "build": "rm -rf electron/dist && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
     "test": "ng test",
@@ -188,7 +193,7 @@
     "electron-log": "~4.3.4",
     "electron-notarize": "~1.0.0",
     "electron-osx-sign": "~0.5.0",
-    "electron-reload": "~1.5.0",
+    "electron-reload": "^1.5.0",
     "electron-updater": "^4.3.8",
     "extract-zip": "~2.0.1",
     "fix-path": "~3.0.0",
@@ -215,6 +220,7 @@
     "ngx-toastr": "~13.2.1",
     "node-log-rotate": "~0.1.5",
     "node-machine-id": "~1.1.12",
+    "npm-run-all": "^4.1.5",
     "reflect-metadata": "^0.1.13",
     "rimraf": "~3.0.2",
     "rxjs": "~6.6.7",
@@ -227,6 +233,7 @@
     "update-electron-app": "~2.0.1",
     "uuid": "~8.3.2",
     "v8-compile-cache": "~2.3.0",
+    "wait-on": "^6.0.0",
     "zlib": "~1.0.5",
     "zone.js": "~0.11.4"
   },

@@ -36,37 +36,31 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "ng": "ng",
-
-    "start": "npm-run-all -p electron:serve ng:serve",
-    "ng:serve": "ng serve -o",
-    "electron:serve-tsc": "tsc -p electron/tsconfig.json",
-    "electron:serve": "wait-on tcp:4200 && npm run electron:serve-tsc && npx electron . --serve",
-
+    "release": "standard-version",
     "rebuild-keytar": "electron-rebuild -f -w keytar",
     "build": "rm -rf electron/dist && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
     "test": "ng test",
-    "lint": "ng lint",
-    "extract": "ngx-translate-extract --input ./src --output ./src/assets/i18n/en.json ./src/assets/i18n/it.json --clean --sort --format namespaced-json --marker _",
+    "prepare": "husky install",
+
     "electron-dev": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --aot --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
     "electron-stag": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration staging --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
     "electron-prod": "rm -rf electron/dist && rm -rf dist && mkdir -p dist/leapp-client && cp -a src/assets/icons/* dist/leapp-client/ && ng build --configuration production --base-href ./ && tsc --p electron && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron .",
-    "electron-win": "DEL /Q electron\\dist && ng build --base-href ./ && tsc --p electron && electron .",
-    "e2e": "ng e2e",
-    "release": "standard-version",
-    "pack": "electron-builder --dir",
+
     "dist-mac-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
     "dist-mac-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
     "dist-mac-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
+
     "dist-deb-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
     "dist-deb-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
     "dist-deb-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
+
     "dist-win-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
     "dist-win-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
     "dist-win-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
+
     "dist-all-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux",
     "dist-all-stag": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration staging --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux",
-    "dist-all-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux",
-    "prepare": "husky install"
+    "dist-all-prod": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --mac --win --linux"
   },
   "build": {
     "publish": [

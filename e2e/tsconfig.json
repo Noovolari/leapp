@@ -1,13 +1,30 @@
 {
-  "extends": "../tsconfig.json",
+  "compileOnSave": false,
   "compilerOptions": {
+    "allowSyntheticDefaultImports" : true,
+    "baseUrl": "./",
+    "declaration": false,
+    "experimentalDecorators": true,
+    "lib": ["ES2019", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "target": "ES6",
+    "typeRoots": ["../node_modules/@types"],
+    "paths": {
+      "stream": ["node_modules/stream-browserify"],
+      "assert": ["node_modules/assert"],
+      "fs": ["node_modules/fs-web"],
+    },
     "outDir": "../out-tsc/e2e",
-    "module": "commonjs",
-    "target": "es5",
     "types": [
       "jasmine",
       "jasminewd2",
       "node"
     ]
-  }
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
+  },
 }

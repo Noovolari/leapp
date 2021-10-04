@@ -9,7 +9,6 @@ const { autoUpdater } = require('electron-updater');
 
 const url = require('url');
 const ipc = ipcMain;
-const serve = process.argv.slice(1).some(val => val === '--serve');
 
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
@@ -29,7 +28,6 @@ const windowDefaultConfig = {
     titleBarStyle: 'hidden',
     webPreferences: {
       devTools: !environment.production,
-      allowRunningInsecureContent: (serve) ? true : false,
       contextIsolation: false,
       enableRemoteModule: true,
       nodeIntegration: true
@@ -71,21 +69,16 @@ const generateMainWindow = () => {
   let forceQuit = false;
 
   const createWindow = () => {
-
-    let initUrl = url.format({ pathname: windowDefaultConfig.dir + '/index.html', protocol: 'file:', slashes: true });
-    if(serve) {
-      require('electron-reload')(windowDefaultConfig.dir, {
-        electron: path.join(__dirname, '/../../../node_modules/electron')
-      });
-      initUrl = 'http://localhost:4200';
-    }
+    require('electron-reload')(windowDefaultConfig.dir, {
+      electron: path.join(__dirname, '/../../../node_modules/electron')
+    });
 
     // Generate the App Window
     win = new BrowserWindow({...windowDefaultConfig.browserWindow});
     win.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
     win.removeMenu(); // Remove Window Menu inside App, to make it compliant with Linux
     win.setMenu(null);
-    win.loadURL(initUrl);
+    win.loadURL(url.format({ pathname: windowDefaultConfig.dir + '/index.html', protocol: 'file:', slashes: true }));
     win.center();
 
     // Open the dev tools only if not in production

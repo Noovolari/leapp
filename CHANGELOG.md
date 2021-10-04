@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.7.3](https://github.com/Noovolari/leapp/compare/v0.7.2...v0.7.3) (2021-10-04)
+
+
+### Bug Fixes
+
+* added aws iam chained role's copy account number ([69b4a09](https://github.com/Noovolari/leapp/commit/69b4a096dec34fea25ff69f525a9673877a8d4bd))
+* added secrets deletion in IAM User session's deletion ([9a15039](https://github.com/Noovolari/leapp/commit/9a150390b3ec3ebbe0d76fd0af67aac7f352a70d))
+
 ### [0.7.2](https://github.com/Noovolari/leapp/compare/v0.7.1...v0.7.2) (2021-09-29)
 
 

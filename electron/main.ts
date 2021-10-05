@@ -1,14 +1,16 @@
 import * as path from 'path';
 import {environment} from '../src/environments/environment';
 
-const remote = require('@electron/remote/main');
-remote.initialize();
+
 
 const {app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
 
 const url = require('url');
 const ipc = ipcMain;
+
+const remote = require('@electron/remote/main');
+remote.initialize();
 
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
@@ -69,10 +71,6 @@ const generateMainWindow = () => {
   let forceQuit = false;
 
   const createWindow = () => {
-    require('electron-reload')(windowDefaultConfig.dir, {
-      electron: path.join(__dirname, '/../../../node_modules/electron')
-    });
-
     // Generate the App Window
     win = new BrowserWindow({...windowDefaultConfig.browserWindow});
     win.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX

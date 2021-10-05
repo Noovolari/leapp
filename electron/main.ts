@@ -28,6 +28,7 @@ const windowDefaultConfig = {
     icon: path.join(__dirname, `assets/images/Leapp.png`),
     resizable: false,
     titleBarStyle: 'hidden',
+    titleBarOverlay: true,
     webPreferences: {
       devTools: !environment.production,
       contextIsolation: false,

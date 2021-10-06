@@ -25,8 +25,6 @@ const windowDefaultConfig = {
     title: ``,
     icon: path.join(__dirname, `assets/images/Leapp.png`),
     resizable: false,
-    titleBarStyle: 'hidden',
-    titleBarOverlay: true,
     webPreferences: {
       devTools: !environment.production,
       contextIsolation: false,
@@ -35,6 +33,11 @@ const windowDefaultConfig = {
     }
   }
 };
+
+if(process.platform !== 'win32') {
+  windowDefaultConfig.browserWindow['titleBarStyle'] = 'hidden';
+  windowDefaultConfig.browserWindow['titleBarOverlay'] = true;
+}
 
 const buildAutoUpdater = (win: any): void => {
   autoUpdater.allowDowngrade = false;

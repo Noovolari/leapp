@@ -49,12 +49,12 @@ export class AppComponent implements OnInit {
     if (environment.production) {
       // Clear both info and warn message in production
       // mode without removing them from code actually
-      console.warn = () => {};
-      console.log = () => {};
+      // console.warn = () => {};
+      // console.log = () => {};
     }
 
     // Prevent Dev Tool to show on production mode
-    this.app.blockDevToolInProductionMode();
+    // this.app.blockDevToolInProductionMode();
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service

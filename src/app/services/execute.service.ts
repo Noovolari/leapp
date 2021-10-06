@@ -1,8 +1,11 @@
 import {Injectable} from '@angular/core';
-import {NativeService} from './native-service';
+import {ElectronService} from './electron.service';
 
 @Injectable({ providedIn: 'root' })
-export class ExecuteService extends NativeService {
+export class ExecuteService {
+  constructor(private electronService: ElectronService) {
+  }
+
   /**
    * Execute a command: if the command contains sudo the system launch it with sudo prompt.
    * Note: with the current version of Electron the sandbox option for Chromium don't allow for sudo prompt on Ubuntu machines 16+
@@ -16,14 +19,13 @@ export class ExecuteService extends NativeService {
   public execute(command: string, env?: boolean): Promise<string> {
     return new Promise(
       (resolve, reject) => {
-
-        let exec = this.exec;
+        let exec = this.electronService.exec;
         if (command.startsWith('sudo')) {
-          exec = this.sudo.exec;
+          exec = this.electronService.sudo.exec;
           command = command.substring(5, command.length);
         }
 
-        if (this.process.platform === 'darwin') {
+        if (this.electronService.process.platform === 'darwin') {
           if (command.indexOf('osascript') === -1) {
             command = '/usr/local/bin/' + command;
           } else {
@@ -32,7 +34,7 @@ export class ExecuteService extends NativeService {
         }
 
         exec(command, {env, name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
-          this.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
+          this.electronService.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
           if (err) {
             reject(err);
           } else {
@@ -51,14 +53,14 @@ export class ExecuteService extends NativeService {
    * @returns an {Observable<any>} to subscribe to
    */
   public openTerminal(command: string, env?: any): Promise<string> {
-    if (this.process.platform === 'darwin') {
+    if (this.electronService.process.platform === 'darwin') {
       return this.execute(`osascript -e "tell app \\"Terminal\\"
                               do script \\"${command}\\"
                               end tell"`, env);
-    } else if (this.process.platform === 'win32') {
+    } else if (this.electronService.process.platform === 'win32') {
       return this.execute(`start cmd /k ${command}`, env);
     } else {
-      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.process.env, env));
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, env);
     }
   }
 }

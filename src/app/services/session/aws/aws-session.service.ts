@@ -78,7 +78,10 @@ export abstract class AwsSessionService extends SessionService {
         this.workspaceService.removeSession(sess.sessionId);
       });
       this.workspaceService.removeSession(sessionId);
+<<<<<<< HEAD
       await this.removeSecrets(sessionId);
+=======
+>>>>>>> electron-update
     } catch(error) {
       this.sessionError(sessionId, error);
     }

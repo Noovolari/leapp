@@ -4,7 +4,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [0.7.3](https://github.com/Noovolari/leapp/compare/v0.7.2...v0.7.3) (2021-10-04)
 
-
 ### Bug Fixes
 
 * added aws iam chained role's copy account number ([69b4a09](https://github.com/Noovolari/leapp/commit/69b4a096dec34fea25ff69f525a9673877a8d4bd))
@@ -12,13 +11,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [0.7.2](https://github.com/Noovolari/leapp/compare/v0.7.1...v0.7.2) (2021-09-29)
 
-
 ### Bug Fixes
 
 * fixed aws ssm start-session on linux systems using gnome-terminal ([b7d9d0b](https://github.com/Noovolari/leapp/commit/b7d9d0b388969538d8958e7f2ed560a6d75c2ce0))
 
 ### [0.7.1](https://github.com/Noovolari/leapp/compare/v0.7.0...v0.7.1) (2021-09-23)
-
 
 ### Bug Fixes
 
@@ -26,12 +23,10 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [0.7.0](https://github.com/Noovolari/leapp/compare/v0.6.2...v0.7.0) (2021-09-23)
 
-
 ### Features
 
 * add support for aws azuread federation ([#165](https://github.com/Noovolari/leapp/issues/165)) ([2d0b70b](https://github.com/Noovolari/leapp/commit/2d0b70b5f935ad0b5abac72ee73cf6bcfdba0cef)), closes [#160](https://github.com/Noovolari/leapp/issues/160)
 * add tooltip to show session & detail info ([#169](https://github.com/Noovolari/leapp/issues/169)) ([14b5b7c](https://github.com/Noovolari/leapp/commit/14b5b7c3d3cf418a3a81534de03f336771908381))
-
 
 ### Bug Fixes
 

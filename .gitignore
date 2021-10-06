@@ -54,8 +54,7 @@ package-lock.json
 /electron/dist
 
 start.sh
-pre-release.sh
-release.sh
+buildAll.sh
 
 #Mkdocs
 site/

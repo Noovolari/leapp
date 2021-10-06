@@ -1,5 +1,4 @@
 import {Injectable} from '@angular/core';
-import {NativeService} from './native-service';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {AppService} from './app.service';
 import {Constants} from '../models/constants';
@@ -9,11 +8,12 @@ import compareVersions from 'compare-versions';
 import {WorkspaceService} from './workspace.service';
 import {HttpClient} from '@angular/common/http';
 import md from 'markdown-it';
+import {ElectronService} from './electron.service';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UpdaterService extends NativeService {
+export class UpdaterService {
 
   version: string;
   releaseName: string;
@@ -26,9 +26,9 @@ export class UpdaterService extends NativeService {
     private appService: AppService,
     private workspaceService: WorkspaceService,
     private bsModalService: BsModalService,
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private electronService: ElectronService
   ) {
-    super();
     this.markdown = md();
   }
 
@@ -39,11 +39,11 @@ export class UpdaterService extends NativeService {
   }
 
   getCurrentAppVersion(): string {
-    return this.app.getVersion();
+    return this.electronService.app.getVersion();
   }
 
   getSavedAppVersion(): string {
-    return this.fs.readFileSync(this.os.homedir() + `/.Leapp/.latest.json`).toString();
+    return this.electronService.fs.readFileSync(this.electronService.os.homedir() + `/.Leapp/.latest.json`).toString();
   }
 
   getSavedVersionComparison(): boolean {
@@ -87,7 +87,7 @@ export class UpdaterService extends NativeService {
   }
 
   updateVersionJson(version: string): void {
-    this.fs.writeFileSync(this.os.homedir() + '/.Leapp/.latest.json', version);
+    this.electronService.fs.writeFileSync(this.electronService.os.homedir() + '/.Leapp/.latest.json', version);
   }
 
   async getReleaseNote(): Promise<string> {

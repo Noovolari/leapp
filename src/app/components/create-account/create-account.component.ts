@@ -12,6 +12,10 @@ import {AwsIamRoleChainedSessionRequest, AwsIamRoleChainedService} from '../../s
 import {LeappParseError} from '../../errors/leapp-parse-error';
 import {AwsIamRoleFederatedSessionRequest, AwsIamRoleFederatedService} from '../../services/session/aws/methods/aws-iam-role-federated.service';
 import {AzureService, AzureSessionRequest} from '../../services/session/azure/azure.service';
+<<<<<<< HEAD
+=======
+import {LoggingService} from '../../services/logging.service';
+>>>>>>> electron-update
 
 @Component({
   selector: 'app-create-account',
@@ -82,7 +86,12 @@ export class CreateAccountComponent implements OnInit {
     private awsIamUserService: AwsIamUserService,
     private awsIamRoleChainedService: AwsIamRoleChainedService,
     private awsSessionService: AwsSessionService,
+<<<<<<< HEAD
     private azureService: AzureService
+=======
+    private azureService: AzureService,
+    private loggingService: LoggingService
+>>>>>>> electron-update
   ) {}
 
   ngOnInit() {
@@ -157,7 +166,11 @@ export class CreateAccountComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveSession() {
+<<<<<<< HEAD
     this.appService.logger(`Saving account...`, LoggerLevel.info, this);
+=======
+    this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
+>>>>>>> electron-update
     this.addProfileToWorkspace();
     this.saveNewSsoRolesToWorkspace();
     this.createSession();

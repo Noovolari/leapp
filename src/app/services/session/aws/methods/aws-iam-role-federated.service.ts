@@ -9,7 +9,7 @@ import {AwsIamRoleFederatedSession} from '../../../../models/aws-iam-role-federa
 import {LeappSamlError} from '../../../../errors/leapp-saml-error';
 import {LeappParseError} from '../../../../errors/leapp-parse-error';
 import {environment} from '../../../../../environments/environment';
-import AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 
 export interface AwsIamRoleFederatedSessionRequest {

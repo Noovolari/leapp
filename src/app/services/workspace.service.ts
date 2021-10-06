@@ -5,13 +5,13 @@ import {Session} from '../models/session';
 import {Workspace} from '../models/workspace';
 import {environment} from '../../environments/environment';
 import {deserialize, serialize} from 'class-transformer';
-import {NativeService} from './native-service';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
-export class WorkspaceService extends NativeService {
+
+export class WorkspaceService {
 
 
   // Expose the observable$ part of the _sessions subject (read only stream)
@@ -29,7 +29,6 @@ export class WorkspaceService extends NativeService {
   private _workspace: Workspace;
 
   constructor(private appService: AppService, private fileService: FileService) {
-    super();
 
     this._sessions = new BehaviorSubject<Session[]>([]);
     this.sessions$ = this._sessions.asObservable();

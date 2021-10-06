@@ -21,7 +21,7 @@ The App is designed to **manage and secure Cloud Access in multi-account environ
 
 
 - **Switch Cloud Profile in a click**
-  
+
 - **[Secure](https://docs.leapp.cloud/contributing/system_vault/) repository for your access data**
 
 - **Multiple Cloud-Access [strategies](https://docs.leapp.cloud/use-cases/intro/)**
@@ -33,7 +33,6 @@ The App is designed to **manage and secure Cloud Access in multi-account environ
 - **Connect EC2 instances straight away**
 
 All the covered access methods can be found [here](https://docs.leapp.cloud/use-cases/intro/).
-
 
 ![Leapp App animation](.github/images/Leapp-animation.gif)
 

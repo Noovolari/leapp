@@ -18,41 +18,6 @@
   <script src="https://kit.fontawesome.com/c02fc34a37.js"></script>
 </head>
 <body>
-<script>
-  window.native = {
-    log: require('electron-log'),
-    fs: require('fs-extra'),
-    rimraf: require('rimraf'),
-    os: require('os'),
-    ini: require('ini'),
-    md5File: require('md5-file'),
-    path: require('path'),
-    exec: require('child_process').exec,
-    url: require('url'),
-    unzip: require('extract-zip'),
-    copydir: require('copy-dir'),
-    sudo: require('sudo-prompt'),
-    semver: require('semver'),
-    process,
-    mousetrap: require('mousetrap'),
-    shell: require('electron').shell,
-    MachineId: require('node-machine-id').machineIdSync(),
-    keytar: require('keytar'),
-    followRedirects: require('follow-redirects'),
-    httpProxyAgent: require('http-proxy-agent'),
-    httpsProxyAgent: require('https-proxy-agent'),
-    app: require('electron').remote.app,
-    session: require('electron').remote.session,
-    dialog: require('electron').remote.dialog,
-    BrowserWindow: require('electron').remote.BrowserWindow,
-    currentWindow: require('electron').remote.getCurrentWindow(),
-    Menu: require('electron').remote.Menu,
-    Tray: require('electron').remote.Tray,
-    ipcRenderer: require('electron').ipcRenderer,
-    nativeTheme: require('electron').remote.nativeTheme,
-    notification: require('electron').remote.Notification
-  };
-</script>
 <app-root></app-root>
 </body>
 </html>

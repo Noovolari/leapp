@@ -10,11 +10,11 @@ const routes: Routes = [
     children: [
       {
         path: 'start',
-        loadChildren: './components/components.module#ComponentsModule' // contains all the components that defines the initial setup
+        loadChildren: () => import('./components/components.module').then(m => m.ComponentsModule) // contains all the components that defines the initial setup
       },
       {
         path: 'managing',
-        loadChildren: './components/components.module#ComponentsModule' // contains all the components that defines the initial setup
+        loadChildren: () => import('./components/components.module').then(m => m.ComponentsModule), // contains all the components that defines the initial setup
       },
       {
         path: 'profile',
@@ -33,7 +33,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            loadChildren: './components/session/session.module#SessionModule' // Starting component for all sessions related, when the app is up and running
+            loadChildren: () => import('./components/session/session.module').then(m => m.SessionModule) // Starting component for all sessions related, when the app is up and running
           }
         ]
       }

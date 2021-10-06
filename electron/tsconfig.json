@@ -3,7 +3,6 @@
   "compilerOptions": {
     "baseUrl": "./",
     "declaration": false,
-    "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": ["es2018", "dom"],
     "module": "commonjs",

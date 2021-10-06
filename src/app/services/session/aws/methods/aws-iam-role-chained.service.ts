@@ -8,12 +8,13 @@ import {LeappNotFoundError} from '../../../../errors/leapp-not-found-error';
 import {Session} from '../../../../models/session';
 import {AwsIamRoleChainedSession} from '../../../../models/aws-iam-role-chained-session';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
-import AWS from 'aws-sdk';
+import * as AWS from 'aws-sdk';
 import {SessionType} from '../../../../models/session-type';
 import {AwsIamRoleFederatedService} from './aws-iam-role-federated.service';
 import {KeychainService} from '../../../keychain.service';
 import {AwsIamUserService} from './aws-iam-user.service';
 import {AwsSsoRoleService} from './aws-sso-role.service';
+import {ElectronService} from '../../../electron.service';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -32,7 +33,8 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     protected workspaceService: WorkspaceService,
     private appService: AppService,
     private fileService: FileService,
-    private keychainService: KeychainService
+    private keychainService: KeychainService,
+    private electronService: ElectronService
   ) {
     super(workspaceService);
   }
@@ -98,7 +100,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     } else if(parentSession.type === SessionType.awsIamUser) {
       parentSessionService = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSsoRole) {
-      parentSessionService = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService) as AwsSessionService;
+      parentSessionService = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService, this.electronService) as AwsSessionService;
     }
 
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);

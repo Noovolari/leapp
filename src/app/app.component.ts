@@ -12,7 +12,8 @@ import {SessionFactoryService} from './services/session-factory.service';
 import {UpdaterService} from './services/updater.service';
 import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
-import {LeappParseError} from "./errors/leapp-parse-error";
+import {LoggingService} from './services/logging.service';
+import {LeappParseError} from './errors/leapp-parse-error';
 
 @Component({
   selector: 'app-root',
@@ -30,14 +31,15 @@ export class AppComponent implements OnInit {
     private sessionProviderService: SessionFactoryService,
     private router: Router,
     private timerService: TimerService,
-    private updaterService: UpdaterService
+    private updaterService: UpdaterService,
+    private loggingService: LoggingService
   ) {}
 
   async ngOnInit() {
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
-      this.app.logger('Preparing for closing instruction...', LoggerLevel.info, this);
+      this.loggingService.logger('Preparing for closing instruction...', LoggerLevel.info, this);
       this.beforeCloseInstructions();
     });
 
@@ -98,14 +100,14 @@ export class AppComponent implements OnInit {
    */
   private beforeCloseInstructions() {
     // Check if we are here
-    this.app.logger('Closing app with cleaning process...', LoggerLevel.info, this);
+    this.loggingService.logger('Closing app with cleaning process...', LoggerLevel.info, this);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
       this.app.cleanCredentialFile();
     } catch (err) {
-      this.app.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
+      this.loggingService.logger('No sessions to stop, skipping...', LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit
@@ -122,7 +124,7 @@ export class AppComponent implements OnInit {
                   this.app.getFs().existsSync(oldAwsCredentialsPath) &&
                   !this.app.getFs().existsSync(newAwsCredentialsPath);
 
-    this.app.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
+    this.loggingService.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
 
     if (check) {
       this.app.getFs().renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);

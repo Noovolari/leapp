@@ -3,8 +3,12 @@ import {environment} from '../src/environments/environment';
 
 const {app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
 const { autoUpdater } = require('electron-updater');
+
 const url = require('url');
 const ipc = ipcMain;
+
+const remote = require('@electron/remote/main');
+remote.initialize();
 
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
@@ -22,9 +26,9 @@ const windowDefaultConfig = {
     icon: path.join(__dirname, `assets/images/Leapp.png`),
     resizable: false,
     titleBarStyle: 'hidden',
+    titleBarOverlay: true,
     webPreferences: {
       devTools: !environment.production,
-      worldSafeExecuteJavaScript: true,
       contextIsolation: false,
       enableRemoteModule: true,
       nodeIntegration: true
@@ -107,6 +111,8 @@ const generateMainWindow = () => {
       globalShortcut.unregister('CommandOrControl+R');
       globalShortcut.unregister('F5');
     });
+
+    remote.enable(win.webContents);
   };
 
   app.on('activate', () => {

@@ -6,15 +6,14 @@ import {AwsIamUserSession} from '../../../../models/aws-iam-user-session';
 import {KeychainService} from '../../../keychain.service';
 import {environment} from '../../../../../environments/environment';
 import {Session} from '../../../../models/session';
-import {AppService, LoggerLevel} from '../../../app.service';
-import AWS from 'aws-sdk';
+import {AppService} from '../../../app.service';
+import * as AWS from 'aws-sdk';
 import {GetSessionTokenResponse} from 'aws-sdk/clients/sts';
 import {FileService} from '../../../file.service';
 import {Constants} from '../../../../models/constants';
 import {LeappAwsStsError} from '../../../../errors/leapp-aws-sts-error';
 import {LeappParseError} from '../../../../errors/leapp-parse-error';
 import {LeappMissingMfaTokenError} from '../../../../errors/leapp-missing-mfa-token-error';
-import {LeappBaseError} from "../../../../errors/leapp-base-error";
 
 export interface AwsIamUserSessionRequest {
   accountName: string;
@@ -142,20 +141,6 @@ export class AwsIamUserService extends AwsSessionService {
     }
   }
 
-  removeSecrets(sessionId: string): void {
-    this.removeAccessKeyFromKeychain(sessionId).then( res1 => {
-      this.removeSecretKeyFromKeychain(sessionId).then( res2 => {
-        this.removeSessionTokenFromKeychain(sessionId).catch(err => {
-          throw err;
-        });
-      }).catch(err => {
-        throw err;
-      });
-    }).catch(err => {
-      throw err;
-    });
-  }
-
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private generateSessionTokenCallingMfaModal( session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise<CredentialsInfo> {
     return new Promise((resolve, reject) => {
@@ -178,18 +163,6 @@ export class AwsIamUserService extends AwsSessionService {
 
   private async getSecretKeyFromKeychain(sessionId: string): Promise<string> {
     return await this.keychainService.getSecret(environment.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
-  }
-
-  private async removeAccessKeyFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(environment.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
-  }
-
-  private async removeSecretKeyFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(environment.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
-  }
-
-  private async removeSessionTokenFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(environment.appName, `${sessionId}-iam-user-aws-session-token`);
   }
 
   private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {

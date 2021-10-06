@@ -30,6 +30,11 @@ You can install Leapp by downloading the pre-built binaries for your OS [here](h
 
 Unzip the package and double-click on the executable to install.
 
+### macOS (Homebrew) & Linux (Linuxbrew)
+
+There exists a [Homebrew](https://brew.sh/) Cask for Leapp which can be installed with:
+`brew install leapp`
+
 ### Prerequisite for using on Linux systems
 Currently, we have `libsecret` and `gnome-keyring` as dependencies to store all sensitive data into the keyring; you **may** need to install them before running Leapp.
 Depending on your distribution, you will need to run the following command:

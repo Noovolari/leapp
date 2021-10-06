@@ -1,10 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {FileService} from '../../../services/file.service';
 import {AppService, LoggerLevel} from '../../../services/app.service';
-<<<<<<< HEAD
-=======
 import {LoggingService} from '../../../services/logging.service';
->>>>>>> electron-update
 
 @Component({
   selector: 'app-profile',
@@ -19,10 +16,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     private fileService: FileService,
     private appService: AppService,
-<<<<<<< HEAD
-=======
     private loggingService: LoggingService
->>>>>>> electron-update
   ) {}
 
   ngOnInit() {
@@ -35,10 +29,6 @@ export class ProfileComponent implements OnInit {
   toggleProfile() {
     this.profileIsOpen = !this.profileIsOpen; // Toggle status
     this.appService.profileOpen.emit(this.profileIsOpen); // Emit event for screen
-<<<<<<< HEAD
-    this.appService.logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.info, this);
-=======
     this.loggingService.logger(`Profile open emitting: ${this.profileIsOpen}`, LoggerLevel.info, this);
->>>>>>> electron-update
   }
 }

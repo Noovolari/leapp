@@ -9,10 +9,7 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {KeychainService} from '../../services/keychain.service';
 import {environment} from '../../../environments/environment';
 import {SessionService} from '../../services/session.service';
-<<<<<<< HEAD
-=======
 import {LoggingService} from '../../services/logging.service';
->>>>>>> electron-update
 
 @Component({
   selector: 'app-edit-account',
@@ -48,12 +45,8 @@ export class EditAccountComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private workspaceService: WorkspaceService,
     private keychainService: KeychainService,
-<<<<<<< HEAD
-    private sessionService: SessionService
-=======
     private sessionService: SessionService,
     private loggingService: LoggingService
->>>>>>> electron-update
   ) {}
 
   ngOnInit() {
@@ -83,11 +76,7 @@ export class EditAccountComponent implements OnInit {
       this.keychainService.saveSecret(environment.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`, this.form.controls['secretKey'].value);
 
       this.sessionService.update(this.selectedSession.sessionId, this.selectedSession);
-<<<<<<< HEAD
-      this.appService.toast('Session updated correctly.', ToastLevel.success, 'Session Update');
-=======
       this.loggingService.toast('Session updated correctly.', ToastLevel.success, 'Session Update');
->>>>>>> electron-update
 
       this.router.navigate(['/sessions', 'session-selected']);
     }

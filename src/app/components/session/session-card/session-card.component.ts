@@ -15,14 +15,9 @@ import {FileService} from '../../../services/file.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionStatus} from '../../../models/session-status';
 import {SessionService} from '../../../services/session.service';
-<<<<<<< HEAD
-import {Constants} from "../../../models/constants";
-import {AwsIamUserService} from "../../../services/session/aws/methods/aws-iam-user.service";
-=======
 import {Constants} from '../../../models/constants';
 import {AwsIamUserService} from '../../../services/session/aws/methods/aws-iam-user.service';
 import {LoggingService} from '../../../services/logging.service';
->>>>>>> electron-update
 
 @Component({
   selector: 'app-session-card',
@@ -72,10 +67,7 @@ export class SessionCardComponent implements OnInit {
               private router: Router,
               private ssmService: SsmService,
               private sessionProviderService: SessionFactoryService,
-<<<<<<< HEAD
-=======
               private loggingService: LoggingService,
->>>>>>> electron-update
               private modalService: BsModalService) {}
 
   ngOnInit() {
@@ -177,19 +169,11 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-<<<<<<< HEAD
-        this.appService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');
-      }
-    } catch (err) {
-      this.appService.toast(err, ToastLevel.warn);
-      this.appService.logger(err, LoggerLevel.error, this, err.stack);
-=======
         this.loggingService.toast('Your information have been successfully copied!', ToastLevel.success, 'Information copied!');
       }
     } catch (err) {
       this.loggingService.toast(err, ToastLevel.warn);
       this.loggingService.logger(err, LoggerLevel.error, this, err.stack);
->>>>>>> electron-update
     }
   }
 
@@ -266,11 +250,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession();
       }
 
-<<<<<<< HEAD
-      this.appService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!');
-=======
       this.loggingService.toast('Default region has been changed!', ToastLevel.success, 'Region changed!');
->>>>>>> electron-update
       this.modalRef.hide();
     }
   }
@@ -349,11 +329,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession();
       }
 
-<<<<<<< HEAD
-      this.appService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!');
-=======
       this.loggingService.toast('Profile has been changed!', ToastLevel.success, 'Profile changed!');
->>>>>>> electron-update
       this.modalRef.hide();
     }
   }
@@ -373,11 +349,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   private logSessionData(session: Session, message: string): void {
-<<<<<<< HEAD
-    this.appService.logger(
-=======
     this.loggingService.logger(
->>>>>>> electron-update
       message,
       LoggerLevel.info,
       this,

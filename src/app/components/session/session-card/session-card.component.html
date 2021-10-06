@@ -24,17 +24,9 @@
       <a *ngIf="session.type !== eSessionType.azure" (click)="changeProfileModalOpen();">Edit Profile</a>
 
       <a *ngIf="session.type === eSessionType.awsIamUser && session.status !== eSessionStatus.active" (click)="editSession(session, $event);">Edit account</a>
-<<<<<<< HEAD
       <ng-container *ngIf="(session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained || session.type === eSessionType.awsSsoRole)">
         <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
         <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
-=======
-      <ng-container *ngIf="(session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamUser || session.type === eSessionType.awsSsoRole)">
-        <a (click)="copyCredentials(session, 1, $event);">Copy Account Number</a>
-        <ng-container *ngIf="(session.type !== eSessionType.awsIamUser)">
-          <a (click)="copyCredentials(session, 2, $event);">Copy Role ARN</a>
-        </ng-container>
->>>>>>> electron-update
       </ng-container>
       <a (click)="deleteSession(session, $event);">Delete Session</a>
 

@@ -60,7 +60,7 @@ export class ExecuteService {
     } else if (this.electronService.process.platform === 'win32') {
       return this.execute(`start cmd /k ${command}`, env);
     } else {
-      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, env);
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.electronService.process.env, env));
     }
   }
 }

@@ -1,4 +1,4 @@
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {Workspace} from '../../../models/workspace';
 import {FormControl, FormGroup} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
@@ -18,11 +18,10 @@ import {LoggingService} from '../../../services/logging.service';
 @Component({
   selector: 'app-profile-page',
   templateUrl: './profile-page.component.html',
-  styleUrls: ['./profile-page.component.scss']
+  styleUrls: ['./profile-page.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class ProfilePageComponent implements OnInit {
-
-  activeTab = 1;
 
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
@@ -42,6 +41,7 @@ export class ProfilePageComponent implements OnInit {
   regions: { region: string }[];
   selectedLocation: string;
   selectedRegion: string;
+  selectedBrowserOpening = 'In-app';
 
   public form = new FormGroup({
     idpUrl: new FormControl(''),
@@ -53,7 +53,8 @@ export class ProfilePageComponent implements OnInit {
     proxyPassword: new FormControl(''),
     showAuthCheckbox: new FormControl(''),
     regionsSelect: new FormControl(''),
-    locationsSelect: new FormControl('')
+    locationsSelect: new FormControl(''),
+    defaultBrowserOpening: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -96,6 +97,7 @@ export class ProfilePageComponent implements OnInit {
     this.locations = this.appService.getLocations();
     this.selectedRegion   = this.workspace.defaultRegion || environment.defaultRegion;
     this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation;
+    this.selectedBrowserOpening = this.workspace.defaultBrowserOpening || 'In-app';
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -117,6 +119,7 @@ export class ProfilePageComponent implements OnInit {
 
       this.workspace.defaultLocation = this.selectedLocation;
       this.workspaceService.updateDefaultLocation(this.workspace.defaultLocation);
+      this.workspace.defaultBrowserOpening = this.selectedBrowserOpening;
 
       if (this.checkIfNeedDialogBox()) {
 

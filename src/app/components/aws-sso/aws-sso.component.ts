@@ -17,10 +17,12 @@ export class AwsSsoComponent implements OnInit {
   selectedRegion;
   portalUrl;
   loading = false;
+  selectedBrowserOpening: string;
 
   public form = new FormGroup({
     portalUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
-    awsRegion: new FormControl('', [Validators.required])
+    awsRegion: new FormControl('', [Validators.required]),
+    defaultBrowserOpening: new FormControl('', [Validators.required])
   });
 
   constructor(
@@ -39,7 +41,7 @@ export class AwsSsoComponent implements OnInit {
 
   login() {
     if (this.form.valid) {
-      this.awsSsoRoleService.sync(this.selectedRegion, this.form.value.portalUrl).then((ssoRoleSessions: SsoRoleSession[]) => {
+      this.awsSsoRoleService.sync(this.selectedRegion, this.form.value.portalUrl, this.selectedBrowserOpening).then((ssoRoleSessions: SsoRoleSession[]) => {
         ssoRoleSessions.forEach(ssoRoleSession => {
           this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
         });
@@ -58,8 +60,9 @@ export class AwsSsoComponent implements OnInit {
   forceSync() {
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+    const opening = this.workspaceService.get().defaultBrowserOpening || 'In-app';
 
-    this.awsSsoRoleService.sync(region, portalUrl).then((ssoRoleSessions: SsoRoleSession[]) => {
+    this.awsSsoRoleService.sync(region, portalUrl, opening).then((ssoRoleSessions: SsoRoleSession[]) => {
       ssoRoleSessions.forEach(ssoRoleSession => {
         this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId);
       });
@@ -75,6 +78,7 @@ export class AwsSsoComponent implements OnInit {
     this.regions = this.appService.getRegions();
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+    this.selectedBrowserOpening = this.workspaceService.get().defaultBrowserOpening || 'In-app';
 
     this.selectedRegion = region || this.regions[0].region;
     this.portalUrl = portalUrl;

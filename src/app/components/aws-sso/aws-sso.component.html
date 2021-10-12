@@ -24,6 +24,11 @@
           <label><strong>Aws Region</strong></label>
           <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
         </div>
+
+        <div class="form-group" style="width: 100%; display: inline-block;">
+          <label>Default browser opening</label>
+          <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: 'In-app'}, {type: 'In-browser'}]" [(ngModel)]="selectedBrowserOpening" dropdownPosition="top"></ng-select>
+        </div>
         </ng-container>
 
         <ng-container *ngIf="isAwsSsoActive">
@@ -38,6 +43,8 @@
             <br>
             <span class="form-control blue-control">{{selectedRegion}}</span>
           </div>
+
+
         </ng-container>
       </form>
 

@@ -158,7 +158,7 @@ export class AwsSsoRoleService extends AwsSessionService {
 
   removeSecrets(sessionId: string): void {}
 
-  async sync(region: string, portalUrl: string): Promise<SsoRoleSession[]> {
+  async sync(region: string, portalUrl: string, opening: string): Promise<SsoRoleSession[]> {
     // Prepare Sso Client for operations
     this.getSsoOidcClient(region);
     // Get access token from either login procedure or keychain depending on being expired or not

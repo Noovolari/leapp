@@ -4,11 +4,11 @@ import {environment} from '../../environments/environment';
 import {Type} from 'class-transformer';
 
 export class Workspace {
-
   @Type(() => Session)
   private _sessions: Session[];
   private _defaultRegion: string;
   private _defaultLocation: string;
+  private _defaultBrowserOpening: string;
   private _idpUrls: { id: string; url: string }[];
   private _profiles: { id: string; name: string }[];
 
@@ -104,5 +104,13 @@ export class Workspace {
 
   set awsSsoConfiguration(value: { region: string; portalUrl: string; expirationTime: string }) {
     this._awsSsoConfiguration = value;
+  }
+
+  get defaultBrowserOpening(): string {
+    return this._defaultBrowserOpening;
+  }
+
+  set defaultBrowserOpening(value: string) {
+    this._defaultBrowserOpening = value;
   }
 }

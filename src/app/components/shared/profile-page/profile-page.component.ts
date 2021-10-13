@@ -23,6 +23,7 @@ import {LoggingService} from '../../../services/logging.service';
 })
 export class ProfilePageComponent implements OnInit {
 
+  eConstants = Constants;
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
   editingIdpUrl: boolean;
@@ -41,7 +42,7 @@ export class ProfilePageComponent implements OnInit {
   regions: { region: string }[];
   selectedLocation: string;
   selectedRegion: string;
-  selectedBrowserOpening = 'In-app';
+  selectedBrowserOpening = Constants.inApp.toString();
 
   public form = new FormGroup({
     idpUrl: new FormControl(''),
@@ -97,7 +98,7 @@ export class ProfilePageComponent implements OnInit {
     this.locations = this.appService.getLocations();
     this.selectedRegion   = this.workspace.defaultRegion || environment.defaultRegion;
     this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation;
-    this.selectedBrowserOpening = this.workspace.defaultBrowserOpening || 'In-app';
+    this.selectedBrowserOpening = this.workspace.awsSsoConfiguration.browserOpening || Constants.inApp.toString();
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -119,7 +120,9 @@ export class ProfilePageComponent implements OnInit {
 
       this.workspace.defaultLocation = this.selectedLocation;
       this.workspaceService.updateDefaultLocation(this.workspace.defaultLocation);
-      this.workspace.defaultBrowserOpening = this.selectedBrowserOpening;
+
+      this.workspace.awsSsoConfiguration.browserOpening = this.selectedBrowserOpening;
+      this.workspaceService.updateBrowserOpening(this.selectedBrowserOpening);
 
       if (this.checkIfNeedDialogBox()) {
 

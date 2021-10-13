@@ -11,6 +11,7 @@ import {AwsIamUserSession} from '../models/aws-iam-user-session';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {AzureSession} from '../models/azure-session';
 import {WorkspaceService} from './workspace.service';
+import {Constants} from '../models/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -107,10 +108,12 @@ export class RetrocompatibilityService {
         let region;
         let portalUrl;
         let expirationTime;
+        let browserOpening;
         try {
           region = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION');
           portalUrl = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL');
           expirationTime = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
+          browserOpening = Constants.inApp.toString();
         } catch(err) {
           // we need all or nothing, otherwise it means that configuration is incomplete so its better
           // to force the user to redo the process on the new fresh workspace
@@ -119,7 +122,8 @@ export class RetrocompatibilityService {
         workspace.awsSsoConfiguration = {
           region,
           portalUrl,
-          expirationTime
+          expirationTime,
+          browserOpening
         };
         break;
       }

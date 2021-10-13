@@ -178,8 +178,20 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
-  getAwsSsoConfiguration(): {region: string; portalUrl: string; expirationTime: string} {
+  getAwsSsoConfiguration(): {region: string; portalUrl: string; browserOpening: string; expirationTime: string} {
     return this.get().awsSsoConfiguration;
+  }
+
+  setAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string, expirationTime: string) {
+    const workspace = this.get();
+    workspace.awsSsoConfiguration = { region, portalUrl, browserOpening, expirationTime };
+    this.persist(workspace);
+  }
+
+  updateBrowserOpening(browserOpening: string) {
+    const workspace = this.get();
+    workspace.awsSsoConfiguration.browserOpening = browserOpening;
+    this.persist(workspace);
   }
 
   updateProxyConfiguration(proxyConfiguration: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {

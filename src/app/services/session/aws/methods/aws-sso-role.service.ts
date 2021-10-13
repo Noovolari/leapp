@@ -5,7 +5,7 @@ import {CredentialsInfo} from '../../../../models/credentials-info';
 
 import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
 import {FileService} from '../../../file.service';
-import {AppService} from '../../../app.service';
+import {AppService, LoggerLevel} from '../../../app.service';
 
 import SSO, {
   AccountInfo,
@@ -25,9 +25,13 @@ import SSOOIDC, {
   StartDeviceAuthorizationRequest
 } from 'aws-sdk/clients/ssooidc';
 
+import AuthorizationPendingException from 'aws-sdk';
+
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
 import {ElectronService} from '../../../electron.service';
+import {Constants} from '../../../../models/constants';
+import {LeappBaseError} from '../../../../errors/leapp-base-error';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -158,7 +162,10 @@ export class AwsSsoRoleService extends AwsSessionService {
 
   removeSecrets(sessionId: string): void {}
 
-  async sync(region: string, portalUrl: string, opening: string): Promise<SsoRoleSession[]> {
+  async sync(): Promise<SsoRoleSession[]> {
+    const region = this.workspaceService.getAwsSsoConfiguration().region;
+    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+
     // Prepare Sso Client for operations
     this.getSsoOidcClient(region);
     // Get access token from either login procedure or keychain depending on being expired or not
@@ -199,6 +206,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     if (this.ssoExpired()) {
       // Get login
       this.getSsoOidcClient(region);
+
       const loginResponse = await this.login(region, portalUrl);
       // Set configuration related data to workspace
       this.configureAwsSso(
@@ -389,49 +397,69 @@ export class AwsSsoRoleService extends AwsSessionService {
   }
 
   private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    const pos = this.electronService.currentWindow.getPosition();
+    if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp.toString()) {
+      const pos = this.electronService.currentWindow.getPosition();
 
-    this.ssoWindow = null;
-    this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
-    this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
+      this.ssoWindow = null;
+      this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
+      this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
 
-    return new Promise( (resolve, reject) => {
+      return new Promise( (resolve, reject) => {
 
-      // When the code is verified and the user has been logged in, the window can be closed
-      this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
-          'https://*.awsapps.com/start/user-consent/login-success.html',
-        ] }, (details, callback) => {
-        this.ssoWindow.close();
-        this.ssoWindow = null;
+        // When the code is verified and the user has been logged in, the window can be closed
+        this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
+            'https://*.awsapps.com/start/user-consent/login-success.html',
+          ] }, (details, callback) => {
+          this.ssoWindow.close();
+          this.ssoWindow = null;
 
-        const verificationResponse: VerificationResponse = {
-          clientId: registerClientResponse.clientId,
-          clientSecret: registerClientResponse.clientSecret,
-          deviceCode: startDeviceAuthorizationResponse.deviceCode
-        };
+          const verificationResponse: VerificationResponse = {
+            clientId: registerClientResponse.clientId,
+            clientSecret: registerClientResponse.clientSecret,
+            deviceCode: startDeviceAuthorizationResponse.deviceCode
+          };
 
-        resolve(verificationResponse);
+          resolve(verificationResponse);
 
-        callback({
-          requestHeaders: details.requestHeaders,
-          url: details.url,
+          callback({
+            requestHeaders: details.requestHeaders,
+            url: details.url,
+          });
+        });
+
+        this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
+          if (
+            details.error.indexOf('net::ERR_ABORTED') < 0 &&
+            details.error.indexOf('net::ERR_FAILED') < 0 &&
+            details.error.indexOf('net::ERR_CACHE_MISS') < 0 &&
+            details.error.indexOf('net::ERR_CONNECTION_REFUSED') < 0
+          ) {
+            if (this.ssoWindow) {
+              this.ssoWindow.close();
+              this.ssoWindow = null;
+            }
+            reject(details.error.toString());
+          }
         });
       });
+    } else {
+      return this.openExternalVerificationBrowserWindow(registerClientResponse, startDeviceAuthorizationResponse);
+    }
+  }
 
-      this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
-        if (
-          details.error.indexOf('net::ERR_ABORTED') < 0 &&
-          details.error.indexOf('net::ERR_FAILED') < 0 &&
-          details.error.indexOf('net::ERR_CACHE_MISS') < 0 &&
-          details.error.indexOf('net::ERR_CONNECTION_REFUSED') < 0
-        ) {
-          if (this.ssoWindow) {
-            this.ssoWindow.close();
-            this.ssoWindow = null;
-          }
-          reject(details.error.toString());
-        }
-      });
+  private async openExternalVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
+    const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete;
+
+    return new Promise( (resolve, _) => {
+       // Open external browser window and let authentication begins
+       this.appService.openExternalUrl(uriComplete);
+       // Return the code to be used after
+       const verificationResponse: VerificationResponse = {
+            clientId: registerClientResponse.clientId,
+            clientSecret: registerClientResponse.clientSecret,
+            deviceCode: startDeviceAuthorizationResponse.deviceCode
+       };
+       resolve(verificationResponse);
     });
   }
 
@@ -443,10 +471,40 @@ export class AwsSsoRoleService extends AwsSessionService {
       deviceCode: verificationResponse.deviceCode
     };
 
-    const createTokenResponse = await this.ssoOidc.createToken(createTokenRequest).promise();
+    let createTokenResponse;
+    if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
+      createTokenResponse = await this.ssoOidc.createToken(createTokenRequest).promise();
+    } else {
+      createTokenResponse = await this.waitForToken(createTokenRequest);
+    }
 
     const expirationTime: Date = new Date(Date.now() + createTokenResponse.expiresIn * 1000);
     return { accessToken: createTokenResponse.accessToken, expirationTime };
+  }
+
+  private async waitForToken(createTokenRequest: CreateTokenRequest): Promise<any> {
+    return new Promise((resolve, reject) => {
+
+      // Start listening to completion
+      const timeout = 10000; // 5
+      const repeatEvery = 5000; // 5 seconds
+      let passed = 0;
+      const resolved = setInterval(() => {
+        this.ssoOidc.createToken(createTokenRequest).promise().then(createTokenResponse => {
+          // Resolve and go
+          clearInterval(resolved);
+          resolve(createTokenResponse);
+        }).catch(err => {
+          passed += repeatEvery;
+          if(err.toString().indexOf('AuthorizationPendingException') !== -1 && passed >= timeout) {
+            // Timeout
+            clearInterval(resolved);
+            console.log('AWS SSO err in create token: ', err.toString());
+            reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
+          }
+        });
+      }, repeatEvery);
+    });
   }
 
   private async getAccessTokenFromKeychain(): Promise<string> {

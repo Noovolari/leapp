@@ -4,6 +4,8 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
+import {Constants} from '../../models/constants';
+import {LeappBaseError} from "../../errors/leapp-base-error";
 
 @Component({
   selector: 'app-aws-sso',
@@ -12,6 +14,7 @@ import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/meth
 })
 export class AwsSsoComponent implements OnInit {
 
+  eConstants = Constants;
   isAwsSsoActive: boolean;
   regions = [];
   selectedRegion;
@@ -35,39 +38,53 @@ export class AwsSsoComponent implements OnInit {
   ngOnInit() {
     this.awsSsoRoleService.awsSsoActive().then(res => {
       this.isAwsSsoActive = res;
+      this.loading = false;
       this.setValues();
     });
   }
 
-  login() {
+  async login() {
     if (this.form.valid) {
-      this.awsSsoRoleService.sync(this.selectedRegion, this.form.value.portalUrl, this.selectedBrowserOpening).then((ssoRoleSessions: SsoRoleSession[]) => {
+      this.loading = (this.selectedBrowserOpening === Constants.inBrowser.toString());
+
+      this.workspaceService.setAwsSsoConfiguration(
+        this.selectedRegion,
+        this.form.value.portalUrl,
+        this.selectedBrowserOpening,
+        this.workspaceService.getAwsSsoConfiguration().expirationTime
+      );
+
+      try {
+        const ssoRoleSessions: SsoRoleSession[] = await this.awsSsoRoleService.sync();
         ssoRoleSessions.forEach(ssoRoleSession => {
           this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
         });
         this.router.navigate(['/sessions', 'session-selected']);
-      });
+      } catch (err) {
+        await this.logout();
+        throw err;
+      }
     }
   }
 
-  logout() {
-    this.awsSsoRoleService.logout().then(_ => {
-      this.isAwsSsoActive = false;
-      this.setValues();
-    });
+  async logout() {
+    await this.awsSsoRoleService.logout();
+    this.isAwsSsoActive = false;
+    this.loading = false;
+    this.setValues();
   }
 
-  forceSync() {
-    const region = this.workspaceService.getAwsSsoConfiguration().region;
-    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
-    const opening = this.workspaceService.get().defaultBrowserOpening || 'In-app';
-
-    this.awsSsoRoleService.sync(region, portalUrl, opening).then((ssoRoleSessions: SsoRoleSession[]) => {
+  async forceSync() {
+    try {
+      const ssoRoleSessions: SsoRoleSession[] = await this.awsSsoRoleService.sync();
       ssoRoleSessions.forEach(ssoRoleSession => {
         this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId);
       });
       this.router.navigate(['/sessions', 'session-selected']);
-    });
+    } catch(err) {
+      await this.logout();
+      throw err;
+    }
   }
 
   goBack() {
@@ -78,7 +95,7 @@ export class AwsSsoComponent implements OnInit {
     this.regions = this.appService.getRegions();
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
-    this.selectedBrowserOpening = this.workspaceService.get().defaultBrowserOpening || 'In-app';
+    this.selectedBrowserOpening = this.workspaceService.getAwsSsoConfiguration().browserOpening || Constants.inApp;
 
     this.selectedRegion = region || this.regions[0].region;
     this.portalUrl = portalUrl;

@@ -28,7 +28,7 @@
           <h2 style="margin-top: 10px;">AWS SSO</h2>
           <div class="form-group" style="width: 43%; display: inline-block;">
             <label>Default browser opening</label>
-            <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: 'In-app'}, {type: 'In-browser'}]" [(ngModel)]="selectedBrowserOpening" dropdownPosition="down"></ng-select>
+            <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedBrowserOpening" dropdownPosition="down"></ng-select>
           </div>
 
         </div>

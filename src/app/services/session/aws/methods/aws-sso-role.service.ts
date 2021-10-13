@@ -486,20 +486,16 @@ export class AwsSsoRoleService extends AwsSessionService {
     return new Promise((resolve, reject) => {
 
       // Start listening to completion
-      const timeout = 10000; // 5
       const repeatEvery = 5000; // 5 seconds
-      let passed = 0;
       const resolved = setInterval(() => {
         this.ssoOidc.createToken(createTokenRequest).promise().then(createTokenResponse => {
           // Resolve and go
           clearInterval(resolved);
           resolve(createTokenResponse);
         }).catch(err => {
-          passed += repeatEvery;
-          if(err.toString().indexOf('AuthorizationPendingException') !== -1 && passed >= timeout) {
+          if(err.toString().indexOf('AuthorizationPendingException') !== -1) {
             // Timeout
             clearInterval(resolved);
-            console.log('AWS SSO err in create token: ', err.toString());
             reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
           }
         });

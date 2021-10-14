@@ -161,8 +161,6 @@ export class ProfilePageComponent implements OnInit {
   }
 
   manageIdpUrl(id) {
-
-
     const idpUrl = this.workspaceService.getIdpUrl(id);
     if (this.form.get('idpUrl').value !== '') {
       if (!idpUrl) {

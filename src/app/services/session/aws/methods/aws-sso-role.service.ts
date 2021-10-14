@@ -90,6 +90,7 @@ export class AwsSsoRoleService extends AwsSessionService {
   private ssoPortal: SSO;
   private ssoOidc: SSOOIDC;
   private ssoWindow: any;
+  private openExternalVerificationBrowserWindowMutex: boolean;
 
   constructor(
     protected workspaceService: WorkspaceService,
@@ -99,6 +100,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     private electronService: ElectronService
   ) {
     super(workspaceService);
+    this.openExternalVerificationBrowserWindowMutex = false;
   }
 
   static getProtocol(aliasedUrl: string): string {
@@ -160,6 +162,11 @@ export class AwsSsoRoleService extends AwsSessionService {
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
+  sessionDeactivated(sessionId: string) {
+    super.sessionDeactivated(sessionId);
+    this.openExternalVerificationBrowserWindowMutex = false;
+  }
+
   removeSecrets(sessionId: string): void {}
 
   async sync(): Promise<SsoRoleSession[]> {
@@ -199,6 +206,8 @@ export class AwsSsoRoleService extends AwsSessionService {
 
       // Remove sessions from workspace
       this.removeSsoSessionsFromWorkspace();
+
+      this.openExternalVerificationBrowserWindowMutex = false;
     });
   }
 
@@ -451,8 +460,11 @@ export class AwsSsoRoleService extends AwsSessionService {
     const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete;
 
     return new Promise( (resolve, _) => {
-       // Open external browser window and let authentication begins
-       this.appService.openExternalUrl(uriComplete);
+       if (this.openExternalVerificationBrowserWindowMutex === false) {
+         this.openExternalVerificationBrowserWindowMutex = true;
+         // Open external browser window and let authentication begins
+         this.appService.openExternalUrl(uriComplete);
+       }
        // Return the code to be used after
        const verificationResponse: VerificationResponse = {
             clientId: registerClientResponse.clientId,
@@ -493,9 +505,13 @@ export class AwsSsoRoleService extends AwsSessionService {
           clearInterval(resolved);
           resolve(createTokenResponse);
         }).catch(err => {
-          if(err.toString().indexOf('AuthorizationPendingException') !== -1) {
+          console.log(err);
+          if(err.toString().indexOf('AuthorizationPendingException') === -1) {
             // Timeout
             clearInterval(resolved);
+
+            this.openExternalVerificationBrowserWindowMutex = false;
+
             reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
           }
         });

@@ -5,7 +5,6 @@ import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
 import {Constants} from '../../models/constants';
-import {LeappBaseError} from "../../errors/leapp-base-error";
 
 @Component({
   selector: 'app-aws-sso',
@@ -59,7 +58,7 @@ export class AwsSsoComponent implements OnInit {
         ssoRoleSessions.forEach(ssoRoleSession => {
           this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
         });
-        this.router.navigate(['/sessions', 'session-selected']);
+        await this.router.navigate(['/sessions', 'session-selected']);
       } catch (err) {
         await this.logout();
         throw err;
@@ -80,15 +79,15 @@ export class AwsSsoComponent implements OnInit {
       ssoRoleSessions.forEach(ssoRoleSession => {
         this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId);
       });
-      this.router.navigate(['/sessions', 'session-selected']);
+      await this.router.navigate(['/sessions', 'session-selected']);
     } catch(err) {
       await this.logout();
       throw err;
     }
   }
 
-  goBack() {
-    this.router.navigate(['/sessions', 'session-selected']);
+  async goBack() {
+    await this.router.navigate(['/sessions', 'session-selected']);
   }
 
   setValues() {

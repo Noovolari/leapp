@@ -2,10 +2,10 @@ import {RegisterClientResponse} from '../services/session/aws/methods/aws-sso-ro
 import SSOOIDC, {RegisterClientRequest} from 'aws-sdk/clients/ssooidc';
 
 export class AwsSsoOidcRegisterClientResponseSingleton {
-  private instance: AwsSsoOidcRegisterClientResponseSingleton;
+  private static instance: AwsSsoOidcRegisterClientResponseSingleton;
   private registerClientResponse: RegisterClientResponse;
   private ssoOidc: SSOOIDC;
-  private region: string;
+  private currentRegion: string;
 
   private constructor() {}
 
@@ -16,36 +16,26 @@ export class AwsSsoOidcRegisterClientResponseSingleton {
     return this.instance;
   }
 
-  getRegisterClientResponse(region: string): RegisterClientResponse {
-    if (!this.ssoOidc || (region !== this.region)) {
+  async getRegisterClientResponse(region: string): Promise<RegisterClientResponse> {
+    if (!this.ssoOidc || (region !== this.currentRegion)) {
       this.ssoOidc = new SSOOIDC({ region });
-      this.region = region;
+      this.currentRegion = region;
+      await this.registerSsoOidcClient();
     }
 
     if (this.registerClientResponse.clientSecretExpiresAt < Date.now()) {
-      this.registerSsoOidcClient();
+      await this.registerSsoOidcClient();
     }
+
     return this.registerClientResponse;
   }
 
-
-
-
-  initialize(region: string): void {
-    if (!this.ssoOidc && !this.registerClientResponse) {
-      this.invalidateSsoOidcClient(region);
-    }
+  getAwsSsoOidcClient(): SSOOIDC {
+    return this.ssoOidc;
   }
 
-  invalidateSsoOidcClient(region: string): void {
-    this.ssoOidc = new SSOOIDC({ region });
-    this.registerSsoOidcClient();
-  }
-
-
-
-  private registerSsoOidcClient(): void {
+  private async registerSsoOidcClient(): Promise<void> {
     const registerClientRequest: RegisterClientRequest = { clientName: 'leapp', clientType: 'public' };
-    this.registerClientResponse = this.ssoOidc.registerClient(registerClientRequest).promise();
+    this.registerClientResponse = await this.ssoOidc.registerClient(registerClientRequest).promise();
   }
 }

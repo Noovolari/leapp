@@ -32,6 +32,7 @@ import {SessionType} from '../../../../models/session-type';
 import {ElectronService} from '../../../electron.service';
 import {Constants} from '../../../../models/constants';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
+import {AwsSsoOidcRegisterClientResponseSingleton} from '../../../../models/aws-sso-oidc-register-client-response-singleton';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -88,7 +89,6 @@ export interface SsoRoleSession {
 export class AwsSsoRoleService extends AwsSessionService {
 
   private ssoPortal: SSO;
-  private ssoOidc: SSOOIDC;
   private ssoWindow: any;
   private openExternalVerificationBrowserWindowMutex: boolean;
   private registerClientResponse: RegisterClientResponse;
@@ -174,8 +174,6 @@ export class AwsSsoRoleService extends AwsSessionService {
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
 
-    // Prepare Sso Client for operations
-    this.getSsoOidcClient(region);
     // Get access token from either login procedure or keychain depending on being expired or not
     const accessToken = await this.getAccessToken(region, portalUrl);
     // get sessions from sso
@@ -202,7 +200,6 @@ export class AwsSsoRoleService extends AwsSessionService {
       this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration();
 
       // Clean clients
-      this.ssoOidc = null;
       this.ssoPortal = null;
 
       // Remove sessions from workspace
@@ -214,9 +211,6 @@ export class AwsSsoRoleService extends AwsSessionService {
 
   async getAccessToken(region: string, portalUrl: string): Promise<string> {
     if (this.ssoExpired()) {
-      // Get login
-      this.getSsoOidcClient(region);
-
       const loginResponse = await this.login(region, portalUrl);
       // Set configuration related data to workspace
       this.configureAwsSso(
@@ -264,7 +258,7 @@ export class AwsSsoRoleService extends AwsSessionService {
       request.end();
     });
 
-    this.registerClientResponse = await this.registerClient();
+    this.registerClientResponse = await AwsSsoOidcRegisterClientResponseSingleton.getInstance().getRegisterClientResponse(region);
     const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(this.registerClientResponse, portalUrl);
     const verificationResponse = await this.openVerificationBrowserWindow(this.registerClientResponse, startDeviceAuthorizationResponse);
     const generateSsoTokenResponse = await this.createToken(verificationResponse);
@@ -377,23 +371,10 @@ export class AwsSsoRoleService extends AwsSessionService {
     this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken);
   }
 
-
-
   private getSsoPortalClient(region: string): void {
     if (!this.ssoPortal) {
       this.ssoPortal = new SSO({region});
     }
-  }
-
-  private async registerClient(): Promise<RegisterClientResponse> {
-    if(!this.registerClientResponse) {
-      const registerClientRequest: RegisterClientRequest = {
-        clientName: 'leapp',
-        clientType: 'public',
-      };
-      return this.ssoOidc.registerClient(registerClientRequest).promise();
-    }
-    return this.registerClientResponse;
   }
 
   private async startDeviceAuthorization(registerClientResponse: RegisterClientResponse, portalUrl: string): Promise<StartDeviceAuthorizationResponse> {
@@ -402,7 +383,7 @@ export class AwsSsoRoleService extends AwsSessionService {
       clientSecret: registerClientResponse.clientSecret,
       startUrl: portalUrl
     };
-    return this.ssoOidc.startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
+    return AwsSsoOidcRegisterClientResponseSingleton.getInstance().getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
   }
 
   private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
@@ -485,7 +466,7 @@ export class AwsSsoRoleService extends AwsSessionService {
 
     let createTokenResponse;
     if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
-      createTokenResponse = await this.ssoOidc.createToken(createTokenRequest).promise();
+      createTokenResponse = await AwsSsoOidcRegisterClientResponseSingleton.getInstance().getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest);
     }
@@ -500,7 +481,7 @@ export class AwsSsoRoleService extends AwsSessionService {
       // Start listening to completion
       const repeatEvery = 5000; // 5 seconds
       const resolved = setInterval(() => {
-        this.ssoOidc.createToken(createTokenRequest).promise().then(createTokenResponse => {
+        AwsSsoOidcRegisterClientResponseSingleton.getInstance().getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
           // Resolve and go
           clearInterval(resolved);
           resolve(createTokenResponse);

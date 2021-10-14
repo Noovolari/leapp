@@ -32,7 +32,7 @@ import {SessionType} from '../../../../models/session-type';
 import {ElectronService} from '../../../electron.service';
 import {Constants} from '../../../../models/constants';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
-import {AwsSsoOidcRegisterClientResponseSingleton} from '../../../../models/aws-sso-oidc-register-client-response-singleton';
+import {AwsSsoOidcStartDeviceAuthorizationSingleton} from '../../../../models/aws-sso-oidc-start-device-authorization-singleton';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -91,7 +91,6 @@ export class AwsSsoRoleService extends AwsSessionService {
   private ssoPortal: SSO;
   private ssoWindow: any;
   private openExternalVerificationBrowserWindowMutex: boolean;
-  private registerClientResponse: RegisterClientResponse;
 
   constructor(
     protected workspaceService: WorkspaceService,
@@ -250,7 +249,6 @@ export class AwsSsoRoleService extends AwsSessionService {
   }
 
   private async login(region: string, portalUrl: string): Promise<LoginResponse> {
-
     const followRedirectClient = this.appService.getFollowRedirects()[AwsSsoRoleService.getProtocol(portalUrl)];
 
     portalUrl = await new Promise( (resolve, _) => {
@@ -258,9 +256,12 @@ export class AwsSsoRoleService extends AwsSessionService {
       request.end();
     });
 
-    this.registerClientResponse = await AwsSsoOidcRegisterClientResponseSingleton.getInstance().getRegisterClientResponse(region);
-    const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(this.registerClientResponse, portalUrl);
-    const verificationResponse = await this.openVerificationBrowserWindow(this.registerClientResponse, startDeviceAuthorizationResponse);
+    const startDeviceAuthorizationResponse = await AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance()
+      .getStartDeviceAuthorizationResponse(region, portalUrl);
+    console.log(`getRegisterClientResponse: ${JSON.stringify(AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance().getRegisterClientResponse())}`);
+    console.log(`startDeviceAuthorizationResponse: ${JSON.stringify(startDeviceAuthorizationResponse)}`);
+    const verificationResponse = await this.openVerificationBrowserWindow(AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance().getRegisterClientResponse(), startDeviceAuthorizationResponse);
+    console.log(`verificationResponse: ${JSON.stringify(verificationResponse)}`);
     const generateSsoTokenResponse = await this.createToken(verificationResponse);
 
     return { portalUrlUnrolled: portalUrl, accessToken: generateSsoTokenResponse.accessToken, region, expirationTime: generateSsoTokenResponse.expirationTime };
@@ -377,15 +378,6 @@ export class AwsSsoRoleService extends AwsSessionService {
     }
   }
 
-  private async startDeviceAuthorization(registerClientResponse: RegisterClientResponse, portalUrl: string): Promise<StartDeviceAuthorizationResponse> {
-    const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
-      clientId: registerClientResponse.clientId,
-      clientSecret: registerClientResponse.clientSecret,
-      startUrl: portalUrl
-    };
-    return AwsSsoOidcRegisterClientResponseSingleton.getInstance().getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
-  }
-
   private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
     if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp.toString()) {
       const pos = this.electronService.currentWindow.getPosition();
@@ -466,7 +458,7 @@ export class AwsSsoRoleService extends AwsSessionService {
 
     let createTokenResponse;
     if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
-      createTokenResponse = await AwsSsoOidcRegisterClientResponseSingleton.getInstance().getAwsSsoOidcClient().createToken(createTokenRequest).promise();
+      createTokenResponse = await AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance().getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest);
     }
@@ -481,7 +473,7 @@ export class AwsSsoRoleService extends AwsSessionService {
       // Start listening to completion
       const repeatEvery = 5000; // 5 seconds
       const resolved = setInterval(() => {
-        AwsSsoOidcRegisterClientResponseSingleton.getInstance().getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
+        AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance().getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
           // Resolve and go
           clearInterval(resolved);
           resolve(createTokenResponse);

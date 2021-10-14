@@ -91,6 +91,7 @@ export class AwsSsoRoleService extends AwsSessionService {
   private ssoOidc: SSOOIDC;
   private ssoWindow: any;
   private openExternalVerificationBrowserWindowMutex: boolean;
+  private registerClientResponse: RegisterClientResponse;
 
   constructor(
     protected workspaceService: WorkspaceService,
@@ -263,9 +264,9 @@ export class AwsSsoRoleService extends AwsSessionService {
       request.end();
     });
 
-    const registerClientResponse = await this.registerClient();
-    const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(registerClientResponse, portalUrl);
-    const verificationResponse = await this.openVerificationBrowserWindow(registerClientResponse, startDeviceAuthorizationResponse);
+    this.registerClientResponse = await this.registerClient();
+    const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(this.registerClientResponse, portalUrl);
+    const verificationResponse = await this.openVerificationBrowserWindow(this.registerClientResponse, startDeviceAuthorizationResponse);
     const generateSsoTokenResponse = await this.createToken(verificationResponse);
 
     return { portalUrlUnrolled: portalUrl, accessToken: generateSsoTokenResponse.accessToken, region, expirationTime: generateSsoTokenResponse.expirationTime };
@@ -376,11 +377,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken);
   }
 
-  private getSsoOidcClient(region: string): void {
-    if (!this.ssoOidc) {
-      this.ssoOidc = new SSOOIDC({region});
-    }
-  }
+
 
   private getSsoPortalClient(region: string): void {
     if (!this.ssoPortal) {
@@ -389,11 +386,14 @@ export class AwsSsoRoleService extends AwsSessionService {
   }
 
   private async registerClient(): Promise<RegisterClientResponse> {
-    const registerClientRequest: RegisterClientRequest = {
-      clientName: 'leapp',
-      clientType: 'public',
-    };
-    return this.ssoOidc.registerClient(registerClientRequest).promise();
+    if(!this.registerClientResponse) {
+      const registerClientRequest: RegisterClientRequest = {
+        clientName: 'leapp',
+        clientType: 'public',
+      };
+      return this.ssoOidc.registerClient(registerClientRequest).promise();
+    }
+    return this.registerClientResponse;
   }
 
   private async startDeviceAuthorization(registerClientResponse: RegisterClientResponse, portalUrl: string): Promise<StartDeviceAuthorizationResponse> {

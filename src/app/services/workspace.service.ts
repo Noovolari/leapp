@@ -200,7 +200,7 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
-  private persist(workspace: Workspace) {
+   persist(workspace: Workspace) {
     const path = this.appService.getOS().homedir() + '/' + environment.lockFileDestination;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }

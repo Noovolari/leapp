@@ -58,8 +58,12 @@ export class AwsSsoComponent implements OnInit {
         ssoRoleSessions.forEach(ssoRoleSession => {
           this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
         });
-        await this.router.navigate(['/sessions', 'session-selected']);
+        this.loading = false;
+        setTimeout(() => {
+          this.router.navigate(['/sessions', 'session-selected']);
+        }, 1500);
       } catch (err) {
+        this.loading = false;
         await this.logout();
         throw err;
       }
@@ -79,8 +83,12 @@ export class AwsSsoComponent implements OnInit {
       ssoRoleSessions.forEach(ssoRoleSession => {
         this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId);
       });
-      await this.router.navigate(['/sessions', 'session-selected']);
+      this.loading = false;
+      setTimeout(() => {
+        this.router.navigate(['/sessions', 'session-selected']);
+      });
     } catch(err) {
+      this.loading = false;
       await this.logout();
       throw err;
     }

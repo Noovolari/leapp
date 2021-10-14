@@ -155,15 +155,53 @@ button {
   padding: 10px;
   cursor: pointer;
 }
+
 button:hover {
   background-color: transparent;
   color: #73E0CF;
   border: 2px solid #73E0CF!important;
 }
+
 button.disabled {
   background: $light-grey;
   color: $charcoal-grey;
   border: 2px solid $charcoal-grey!important;
+}
+
+.onclick {
+  width: 40px;
+  border-color: #ddd;
+  border-width:3px;
+  font-size:0;
+  border-left-color: #00ff00;
+  animation: rotating 2s 0.25s linear infinite;
+
+  &:after {
+    content:"";
+  }
+  &:hover {
+    color: #00ff00;
+    background: white;
+  }
+}
+
+.validate {
+  font-size:13px;
+  color: white;
+  background: #00ff00;
+  &:after {
+    font-family:'FontAwesome';
+    content:"\f00c";
+  }
+}
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes expanding {

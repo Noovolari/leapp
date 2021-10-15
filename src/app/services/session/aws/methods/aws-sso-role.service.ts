@@ -5,7 +5,7 @@ import {CredentialsInfo} from '../../../../models/credentials-info';
 
 import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
 import {FileService} from '../../../file.service';
-import {AppService, LoggerLevel} from '../../../app.service';
+import {AppService} from '../../../app.service';
 
 import SSO, {
   AccountInfo,
@@ -19,20 +19,9 @@ import SSO, {
 
 import {environment} from '../../../../../environments/environment';
 
-import SSOOIDC, {
-  CreateTokenRequest,
-  RegisterClientRequest,
-  StartDeviceAuthorizationRequest
-} from 'aws-sdk/clients/ssooidc';
-
-import AuthorizationPendingException from 'aws-sdk';
-
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
-import {ElectronService} from '../../../electron.service';
-import {Constants} from '../../../../models/constants';
-import {LeappBaseError} from '../../../../errors/leapp-base-error';
-import {AwsSsoOidcStartDeviceAuthorizationSingleton} from '../../../../models/aws-sso-oidc-start-device-authorization-singleton';
+import {AwsSsoOidcService} from '../../../aws-sso-oidc-service';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -89,18 +78,15 @@ export interface SsoRoleSession {
 export class AwsSsoRoleService extends AwsSessionService {
 
   private ssoPortal: SSO;
-  private ssoWindow: any;
-  private openExternalVerificationBrowserWindowMutex: boolean;
 
   constructor(
     protected workspaceService: WorkspaceService,
     private fileService: FileService,
     private appService: AppService,
     private keychainService: KeychainService,
-    private electronService: ElectronService
+    private awsSsoOidcService: AwsSsoOidcService
   ) {
     super(workspaceService);
-    this.openExternalVerificationBrowserWindowMutex = false;
   }
 
   static getProtocol(aliasedUrl: string): string {
@@ -164,7 +150,6 @@ export class AwsSsoRoleService extends AwsSessionService {
 
   sessionDeactivated(sessionId: string) {
     super.sessionDeactivated(sessionId);
-    this.openExternalVerificationBrowserWindowMutex = false;
   }
 
   removeSecrets(sessionId: string): void {}
@@ -203,8 +188,6 @@ export class AwsSsoRoleService extends AwsSessionService {
 
       // Remove sessions from workspace
       this.removeSsoSessionsFromWorkspace();
-
-      this.openExternalVerificationBrowserWindowMutex = false;
     });
   }
 
@@ -226,7 +209,6 @@ export class AwsSsoRoleService extends AwsSessionService {
     }
   }
 
-  // TODO: out of provisioning we are generating session credentials
   async getRoleCredentials(accessToken: string, region: string, roleArn: string): Promise<GetRoleCredentialsResponse> {
     this.getSsoPortalClient(region);
 
@@ -256,13 +238,7 @@ export class AwsSsoRoleService extends AwsSessionService {
       request.end();
     });
 
-    const startDeviceAuthorizationResponse = await AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance()
-      .getStartDeviceAuthorizationResponse(region, portalUrl);
-    console.log(`getRegisterClientResponse: ${JSON.stringify(AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance().getRegisterClientResponse())}`);
-    console.log(`startDeviceAuthorizationResponse: ${JSON.stringify(startDeviceAuthorizationResponse)}`);
-    const verificationResponse = await this.openVerificationBrowserWindow(AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance().getRegisterClientResponse(), startDeviceAuthorizationResponse);
-    console.log(`verificationResponse: ${JSON.stringify(verificationResponse)}`);
-    const generateSsoTokenResponse = await this.createToken(verificationResponse);
+    const generateSsoTokenResponse = await this.awsSsoOidcService.login(region, portalUrl);
 
     return { portalUrlUnrolled: portalUrl, accessToken: generateSsoTokenResponse.accessToken, region, expirationTime: generateSsoTokenResponse.expirationTime };
   }
@@ -366,7 +342,6 @@ export class AwsSsoRoleService extends AwsSessionService {
     });
   }
 
-  // TODO: check name
   private configureAwsSso(region: string, portalUrl: string, expirationTime: string, accessToken: string) {
     this.workspaceService.configureAwsSso(region, portalUrl, expirationTime);
     this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken);
@@ -376,120 +351,6 @@ export class AwsSsoRoleService extends AwsSessionService {
     if (!this.ssoPortal) {
       this.ssoPortal = new SSO({region});
     }
-  }
-
-  private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp.toString()) {
-      const pos = this.electronService.currentWindow.getPosition();
-
-      this.ssoWindow = null;
-      this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
-      this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
-
-      return new Promise( (resolve, reject) => {
-
-        // When the code is verified and the user has been logged in, the window can be closed
-        this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
-            'https://*.awsapps.com/start/user-consent/login-success.html',
-          ] }, (details, callback) => {
-          this.ssoWindow.close();
-          this.ssoWindow = null;
-
-          const verificationResponse: VerificationResponse = {
-            clientId: registerClientResponse.clientId,
-            clientSecret: registerClientResponse.clientSecret,
-            deviceCode: startDeviceAuthorizationResponse.deviceCode
-          };
-
-          resolve(verificationResponse);
-
-          callback({
-            requestHeaders: details.requestHeaders,
-            url: details.url,
-          });
-        });
-
-        this.ssoWindow.webContents.session.webRequest.onErrorOccurred((details) => {
-          if (
-            details.error.indexOf('net::ERR_ABORTED') < 0 &&
-            details.error.indexOf('net::ERR_FAILED') < 0 &&
-            details.error.indexOf('net::ERR_CACHE_MISS') < 0 &&
-            details.error.indexOf('net::ERR_CONNECTION_REFUSED') < 0
-          ) {
-            if (this.ssoWindow) {
-              this.ssoWindow.close();
-              this.ssoWindow = null;
-            }
-            reject(details.error.toString());
-          }
-        });
-      });
-    } else {
-      return this.openExternalVerificationBrowserWindow(registerClientResponse, startDeviceAuthorizationResponse);
-    }
-  }
-
-  private async openExternalVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete;
-
-    return new Promise( (resolve, _) => {
-       if (this.openExternalVerificationBrowserWindowMutex === false) {
-         this.openExternalVerificationBrowserWindowMutex = true;
-         // Open external browser window and let authentication begins
-         this.appService.openExternalUrl(uriComplete);
-       }
-       // Return the code to be used after
-       const verificationResponse: VerificationResponse = {
-            clientId: registerClientResponse.clientId,
-            clientSecret: registerClientResponse.clientSecret,
-            deviceCode: startDeviceAuthorizationResponse.deviceCode
-       };
-       resolve(verificationResponse);
-    });
-  }
-
-  private async createToken(verificationResponse: VerificationResponse): Promise<GenerateSSOTokenResponse> {
-    const createTokenRequest: CreateTokenRequest = {
-      clientId: verificationResponse.clientId,
-      clientSecret: verificationResponse.clientSecret,
-      grantType: 'urn:ietf:params:oauth:grant-type:device_code',
-      deviceCode: verificationResponse.deviceCode
-    };
-
-    let createTokenResponse;
-    if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
-      createTokenResponse = await AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance().getAwsSsoOidcClient().createToken(createTokenRequest).promise();
-    } else {
-      createTokenResponse = await this.waitForToken(createTokenRequest);
-    }
-
-    const expirationTime: Date = new Date(Date.now() + createTokenResponse.expiresIn * 1000);
-    return { accessToken: createTokenResponse.accessToken, expirationTime };
-  }
-
-  private async waitForToken(createTokenRequest: CreateTokenRequest): Promise<any> {
-    return new Promise((resolve, reject) => {
-
-      // Start listening to completion
-      const repeatEvery = 5000; // 5 seconds
-      const resolved = setInterval(() => {
-        AwsSsoOidcStartDeviceAuthorizationSingleton.getInstance().getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
-          // Resolve and go
-          clearInterval(resolved);
-          resolve(createTokenResponse);
-        }).catch(err => {
-          console.log(err);
-          if(err.toString().indexOf('AuthorizationPendingException') === -1) {
-            // Timeout
-            clearInterval(resolved);
-
-            this.openExternalVerificationBrowserWindowMutex = false;
-
-            reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
-          }
-        });
-      }, repeatEvery);
-    });
   }
 
   private async getAccessTokenFromKeychain(): Promise<string> {

@@ -212,6 +212,7 @@
     "ngx-toastr": "~13.2.1",
     "node-log-rotate": "~0.1.5",
     "node-machine-id": "~1.1.12",
+    "proxy-agent": "^5.0.0",
     "reflect-metadata": "^0.1.13",
     "rimraf": "~3.0.2",
     "rxjs": "~6.6.7",

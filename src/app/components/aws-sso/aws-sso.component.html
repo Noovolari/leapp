@@ -1,6 +1,6 @@
 <img src="assets/images/fake_blur.png" class="fake-blur"  alt="" />
 <div class="background">
-  <ng-container>
+  <ng-container *ngIf="!loading">
     <div class="container-fluid">
       <h1><a (click)="goBack()" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-fingerprint"></i> Identity Providers</h1>
 
@@ -52,14 +52,26 @@
 
     <ng-container *ngIf="!isAwsSsoActive">
       <button class="button pull-center" (click)="login()" *ngIf="!loading">Login</button>
-      <button class="button pull-center disabled" *ngIf="loading" disabled><i class="fa fa-spin fa-spinner"></i></button>
     </ng-container>
 
     <ng-container *ngIf="isAwsSsoActive">
       <button class="button pull-left disabled" (click)="logout()">Logout</button>
       <button class="button pull-right" (click)="forceSync()" *ngIf="!loading">Synchronize</button>
-      <button class="button pull-center disabled " *ngIf="loading" disabled><i class="fa fa-spin fa-spinner"></i></button>
     </ng-container>
 
+  </ng-container>
+  <ng-container *ngIf="loading">
+    <h1><span class="back-link"><i class="fa fa-link"></i></span><i class="fa fa-fingerprint"></i> AWS SSO Login</h1>
+    <span class="close" (click)="goBack()">&times;</span>
+
+    <div class="loading-content">
+      <label>Leapp</label>
+      <br>
+      <span>Don't see the secure AWS Single Sign-On Browser Page? We'll help you re-launch the windows</span>
+      <br>
+      <img src="assets/images/loading-pc.png" alt="" class="loading-pc" />
+      <br>
+      <a (click)="loading = false;">Click to open AWS Single Sign-On form here</a>
+    </div>
   </ng-container>
 </div>

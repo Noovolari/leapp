@@ -168,40 +168,60 @@ button.disabled {
   border: 2px solid $charcoal-grey!important;
 }
 
-.onclick {
-  width: 40px;
-  border-color: #ddd;
-  border-width:3px;
-  font-size:0;
-  border-left-color: #00ff00;
-  animation: rotating 2s 0.25s linear infinite;
-
-  &:after {
-    content:"";
-  }
-  &:hover {
-    color: #00ff00;
-    background: white;
-  }
+.loading-content {
+  margin: 0 auto;
+  padding: 20px;
+  width: 380px;
 }
 
-.validate {
-  font-size:13px;
-  color: white;
-  background: #00ff00;
-  &:after {
-    font-family:'FontAwesome';
-    content:"\f00c";
-  }
+.loading-pc {
+  width: 300px;
+  margin-bottom: 50px;
 }
 
-@keyframes rotating {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.closing {
+  font-size: 35px;
+  font-weight: lighter;
+  color: #666;
+  position: absolute;
+  right: 40px;
+  top: 20px;
+  cursor: pointer;
+}
+
+.loading-title {
+  font-size: 16px!important;
+  font-weight: bold!important;
+  color: #666!important;
+  position: relative!important;
+  margin-top: 10px!important;
+  padding-left: 86px!important;
+}
+
+.loading-leapp {
+  font-weight: bold;
+  margin-bottom: 20px;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  color: #666;
+}
+
+.loading-text {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 50px;
+  display: inline-block;
+}
+
+.loading-link {
+  font-size: 12px;
+  display: inline-block;
+  color: #666;
+  width: 100%;
+  text-align: center;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 @keyframes expanding {

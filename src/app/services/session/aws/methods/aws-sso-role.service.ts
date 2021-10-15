@@ -338,6 +338,7 @@ export class AwsSsoRoleService extends AwsSessionService {
         this.delete(session.sessionId);
       });
 
+      this.stop(sess.sessionId);
       // Now we can safely remove
       this.workspaceService.removeSession(sess.sessionId);
     });

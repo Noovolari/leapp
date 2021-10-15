@@ -15,10 +15,6 @@ import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {LoggingService} from './services/logging.service';
 import {LeappParseError} from './errors/leapp-parse-error';
 
-
-import * as AWS from 'aws-sdk';
-import proxy from "proxy-agent";
-
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -91,13 +87,6 @@ export class AppComponent implements OnInit {
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
-
-    // Configure AWS proxy
-    AWS.config.update({
-      httpOptions: {
-        agent: proxy(`http://client1:${encodeURIComponent('123456Aa!')}@3.248.200.62:3128`)
-      }
-    });
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit

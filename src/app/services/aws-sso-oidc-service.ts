@@ -141,6 +141,10 @@ export class AwsSsoOidcService {
     }
   }
 
+  unsetOidc() {
+    this.ssoOidc = null;
+  }
+
   private async registerSsoOidcClient(): Promise<void> {
     const registerClientRequest: RegisterClientRequest = { clientName: 'leapp', clientType: 'public' };
     this.registerClientResponse = await this.ssoOidc.registerClient(registerClientRequest).promise();

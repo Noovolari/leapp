@@ -185,6 +185,7 @@ export class AwsSsoRoleService extends AwsSessionService {
 
       // Clean clients
       this.ssoPortal = null;
+      this.awsSsoOidcService.unsetOidc();
 
       // Remove sessions from workspace
       this.removeSsoSessionsFromWorkspace();

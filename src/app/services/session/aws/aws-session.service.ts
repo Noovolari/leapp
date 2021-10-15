@@ -39,7 +39,7 @@ export abstract class AwsSessionService extends SessionService {
   async start(sessionId: string): Promise<void> {
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
-        throw new LeappBaseError('pippo', this, LoggerLevel.info, 'pippo');
+        throw new LeappBaseError('Pending session with same named profile', this, LoggerLevel.info, 'Pending session with same named profile');
       }
       this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);
@@ -95,7 +95,7 @@ export abstract class AwsSessionService extends SessionService {
     const pendingSessions = this.listPending();
 
     for(let i = 0; i < pendingSessions.length; i++) {
-      if ((pendingSessions[i] as any).profileId === profileId) {
+      if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
         return true;
       }
     }

@@ -22,28 +22,31 @@ import { AWSError } from 'aws-sdk';
 })
 export class AwsSsoOidcService {
   private ssoOidc: SSOOIDC;
+  private ssoWindow: any;
   private currentRegion: string;
   private currentPortalUrl: string;
   private registerClientResponse: RegisterClientResponse;
   private startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse;
   private startDeviceAuthorizationResponseExpiresAt: number;
-  private ssoWindow: any;
-  private openExternalVerificationBrowserWindowMutex: boolean;
   private createTokenRequestPromise: Promise<PromiseResult<SSOOIDC.CreateTokenResponse, AWSError>>;
-  private getTokenMutex: boolean;
   private createTokenResponse: PromiseResult<SSOOIDC.CreateTokenResponse, AWSError>;
-  private timeoutOccurred: boolean;
+  private generateSSOTokenResponse: GenerateSSOTokenResponse;
   private setIntervalQueue: Array<any>;
+  private timeoutOccurred: boolean;
+  private getTokenMutex: boolean;
+  private openExternalVerificationBrowserWindowMutex: boolean;
+  private loginMutex: boolean;
 
   private constructor(
     private workspaceService: WorkspaceService,
     private appService: AppService,
     private electronService: ElectronService,
   ) {
-    this.openExternalVerificationBrowserWindowMutex = false;
-    this.getTokenMutex = false;
-    this.timeoutOccurred = false;
     this.setIntervalQueue = [];
+    this.timeoutOccurred = false;
+    //this.getTokenMutex = false;
+    //this.openExternalVerificationBrowserWindowMutex = false;
+    this.loginMutex = false;
   }
 
   getAwsSsoOidcClient(): SSOOIDC {
@@ -51,50 +54,91 @@ export class AwsSsoOidcService {
   }
 
   async login(region: string, portalUrl: string): Promise<GenerateSSOTokenResponse> {
-    if (!this.ssoOidc || (region !== this.currentRegion) || (portalUrl !== this.currentPortalUrl)) {
-      this.currentRegion = region;
-      this.currentPortalUrl = portalUrl;
+    if (!this.loginMutex && this.setIntervalQueue.length === 0) {
+      this.loginMutex = true;
+      this.timeoutOccurred = false;
 
-      this.ssoOidc = new SSOOIDC({ region });
+      if (!this.ssoOidc || (region !== this.currentRegion) || (portalUrl !== this.currentPortalUrl)) {
+        this.currentRegion = region;
+        this.currentPortalUrl = portalUrl;
 
-      await this.registerSsoOidcClient();
+        this.ssoOidc = new SSOOIDC({ region });
 
-      const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
-        clientId: this.registerClientResponse.clientId,
-        clientSecret: this.registerClientResponse.clientSecret,
-        startUrl: portalUrl
-      };
+        await this.registerSsoOidcClient();
 
-      const baseTimeInMilliseconds = Date.now();
-      this.startDeviceAuthorizationResponse = await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
-      this.startDeviceAuthorizationResponseExpiresAt = baseTimeInMilliseconds + this.startDeviceAuthorizationResponse.expiresIn * 1000;
+        const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
+          clientId: this.registerClientResponse.clientId,
+          clientSecret: this.registerClientResponse.clientSecret,
+          startUrl: portalUrl
+        };
+
+        const baseTimeInMilliseconds = Date.now();
+        this.startDeviceAuthorizationResponse = await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
+        this.startDeviceAuthorizationResponseExpiresAt = baseTimeInMilliseconds + this.startDeviceAuthorizationResponse.expiresIn * 1000;
+      }
+
+      if (this.registerClientResponse.clientSecretExpiresAt * 1000 < Date.now()) {
+        await this.registerSsoOidcClient();
+
+        const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
+          clientId: this.registerClientResponse.clientId,
+          clientSecret: this.registerClientResponse.clientSecret,
+          startUrl: portalUrl
+        };
+
+        const baseTimeInMilliseconds = Date.now();
+        this.startDeviceAuthorizationResponse = await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
+        this.startDeviceAuthorizationResponseExpiresAt = baseTimeInMilliseconds + this.startDeviceAuthorizationResponse.expiresIn * 1000;
+      }
+
+      if (this.startDeviceAuthorizationResponseExpiresAt < Date.now()) {
+        const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
+          clientId: this.registerClientResponse.clientId,
+          clientSecret: this.registerClientResponse.clientSecret,
+          startUrl: portalUrl
+        };
+
+        const baseTimeInMilliseconds = Date.now();
+        this.startDeviceAuthorizationResponse = await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
+        this.startDeviceAuthorizationResponseExpiresAt = baseTimeInMilliseconds + this.startDeviceAuthorizationResponse.expiresIn * 1000;
+      }
+
+      const verificationResponse = await this.openVerificationBrowserWindow(this.registerClientResponse, this.startDeviceAuthorizationResponse);
+      const generateSSOTokenResponse = await this.createToken(verificationResponse);
+
+      this.loginMutex = false;
+
+      return generateSSOTokenResponse;
+    } else if (!this.loginMutex && this.setIntervalQueue.length > 0) {
+      return this.generateSSOTokenResponse;
+    } else {
+      return new Promise((resolve, reject) => {
+        const repeatEvery = 5000; // 5 seconds
+
+        const resolved = setInterval(async () => {
+          if (this.generateSSOTokenResponse) {
+            clearInterval(resolved);
+
+            const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
+            this.setIntervalQueue.splice(resolvedIndex, 1);
+
+            //const expirationTime: Date = new Date(Date.now() + this.createTokenResponse.expiresIn * 1000);
+            //resolve ({ accessToken: this.createTokenResponse.accessToken, expirationTime });
+
+            resolve (this.generateSSOTokenResponse);
+          } else if (this.timeoutOccurred) {
+            clearInterval(resolved);
+
+            const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
+            this.setIntervalQueue.splice(resolvedIndex, 1);
+
+            reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
+          }
+        }, repeatEvery);
+
+        this.setIntervalQueue.push(resolved);
+      });
     }
-
-    if (this.registerClientResponse.clientSecretExpiresAt * 1000 < Date.now()) {
-      await this.registerSsoOidcClient();
-
-      const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
-        clientId: this.registerClientResponse.clientId,
-        clientSecret: this.registerClientResponse.clientSecret,
-        startUrl: portalUrl
-      };
-
-      this.startDeviceAuthorizationResponse = await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
-    }
-
-    if (this.startDeviceAuthorizationResponseExpiresAt < Date.now()) {
-      const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
-        clientId: this.registerClientResponse.clientId,
-        clientSecret: this.registerClientResponse.clientSecret,
-        startUrl: portalUrl
-      };
-
-      this.startDeviceAuthorizationResponse = await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
-    }
-
-    const verificationResponse = await this.openVerificationBrowserWindow(this.registerClientResponse, this.startDeviceAuthorizationResponse);
-
-    return await this.createToken(verificationResponse);
   }
 
   private async registerSsoOidcClient(): Promise<void> {
@@ -157,11 +201,11 @@ export class AwsSsoOidcService {
     const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete;
 
     return new Promise( (resolve, _) => {
-      if (!this.openExternalVerificationBrowserWindowMutex) {
-        this.openExternalVerificationBrowserWindowMutex = true;
+      //if (!this.openExternalVerificationBrowserWindowMutex) {
+        //this.openExternalVerificationBrowserWindowMutex = true;
         // Open external browser window and let authentication begins
         this.appService.openExternalUrl(uriComplete);
-      }
+      //}
 
       // Return the code to be used after
       const verificationResponse: VerificationResponse = {
@@ -186,34 +230,33 @@ export class AwsSsoOidcService {
     if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
-      this.createTokenRequestPromise = this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
+      //this.createTokenRequestPromise = this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
       createTokenResponse = await this.waitForToken(createTokenRequest);
     }
 
     const expirationTime: Date = new Date(Date.now() + createTokenResponse.expiresIn * 1000);
-    return { accessToken: createTokenResponse.accessToken, expirationTime };
+    this.generateSSOTokenResponse = { accessToken: createTokenResponse.accessToken, expirationTime };
+
+    return this.generateSSOTokenResponse;
   }
 
   private async waitForToken(createTokenRequest: CreateTokenRequest): Promise<any> {
     return new Promise((resolve, reject) => {
 
-      // Start listening to completion
       const repeatEvery = 5000; // 5 seconds
 
-      if (!this.getTokenMutex) {
-        if (this.setIntervalQueue.length === 0) {
+      //if (!this.getTokenMutex) {
+        /*if (this.setIntervalQueue.length === 0) {
           this.getTokenMutex = true;
           this.timeoutOccurred = false;
-        }
+        }*/
 
         const resolved = setInterval(() => {
-
           this.getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
-            // Resolve and go
             clearInterval(resolved);
 
-            this.createTokenResponse = createTokenResponse;
-            this.getTokenMutex = false;
+            //this.createTokenResponse = createTokenResponse;
+            //this.getTokenMutex = false;
 
             resolve(createTokenResponse);
           }).catch(err => {
@@ -221,19 +264,17 @@ export class AwsSsoOidcService {
               // Timeout
               clearInterval(resolved);
 
-              this.getTokenMutex = false;
+              //this.getTokenMutex = false;
+              //this.openExternalVerificationBrowserWindowMutex = false;
               this.timeoutOccurred = true;
-              this.openExternalVerificationBrowserWindowMutex = false;
 
               reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
             }
           });
         }, repeatEvery);
-      } else {
+      /*} else {
         const resolved = setInterval(async () => {
-
           if (this.createTokenResponse) {
-            // Resolve and go
             clearInterval(resolved);
 
             const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
@@ -241,7 +282,6 @@ export class AwsSsoOidcService {
 
             resolve(this.createTokenResponse);
           } else if (this.timeoutOccurred) {
-            // Timeout
             clearInterval(resolved);
 
             const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
@@ -252,7 +292,7 @@ export class AwsSsoOidcService {
         }, repeatEvery);
 
         this.setIntervalQueue.push(resolved);
-      }
+      }*/
     });
   }
 }

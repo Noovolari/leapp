@@ -1,5 +1,5 @@
 site_name: Leapp - Docs
-site_url: https://example.com/
+site_url: https://docs.leapp.cloud/
 repo_url: https://github.com/Noovolari/leapp
 site_description: 'Leapp is a tool for developers to manage, secure, and gain access to any cloud. From setting up your access data to activating a session, Leapp can help manage the underlying assets to let you use your provider CLI or SDK seamlessy.'
 copyright: '© 2021 Noovolari, All rights reserved. | Powered by beSharp'

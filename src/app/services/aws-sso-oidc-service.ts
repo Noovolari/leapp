@@ -46,8 +46,6 @@ export class AwsSsoOidcService {
   ) {
     this.setIntervalQueue = [];
     this.timeoutOccurred = false;
-    //this.getTokenMutex = false;
-    //this.openExternalVerificationBrowserWindowMutex = false;
     this.loginMutex = false;
   }
 
@@ -123,9 +121,6 @@ export class AwsSsoOidcService {
 
             const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
             this.setIntervalQueue.splice(resolvedIndex, 1);
-
-            //const expirationTime: Date = new Date(Date.now() + this.createTokenResponse.expiresIn * 1000);
-            //resolve ({ accessToken: this.createTokenResponse.accessToken, expirationTime });
 
             resolve (this.generateSSOTokenResponse);
           } else if (this.timeoutOccurred) {
@@ -207,11 +202,8 @@ export class AwsSsoOidcService {
     const uriComplete = startDeviceAuthorizationResponse.verificationUriComplete;
 
     return new Promise( (resolve, _) => {
-      //if (!this.openExternalVerificationBrowserWindowMutex) {
-        //this.openExternalVerificationBrowserWindowMutex = true;
-        // Open external browser window and let authentication begins
-        this.appService.openExternalUrl(uriComplete);
-      //}
+      // Open external browser window and let authentication begins
+      this.appService.openExternalUrl(uriComplete);
 
       // Return the code to be used after
       const verificationResponse: VerificationResponse = {
@@ -236,7 +228,6 @@ export class AwsSsoOidcService {
     if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
-      //this.createTokenRequestPromise = this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
       createTokenResponse = await this.waitForToken(createTokenRequest);
     }
 
@@ -248,57 +239,22 @@ export class AwsSsoOidcService {
 
   private async waitForToken(createTokenRequest: CreateTokenRequest): Promise<any> {
     return new Promise((resolve, reject) => {
-
       const repeatEvery = 5000; // 5 seconds
+      const resolved = setInterval(() => {
+        this.getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
+          clearInterval(resolved);
 
-      //if (!this.getTokenMutex) {
-        /*if (this.setIntervalQueue.length === 0) {
-          this.getTokenMutex = true;
-          this.timeoutOccurred = false;
-        }*/
-
-        const resolved = setInterval(() => {
-          this.getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
+          resolve(createTokenResponse);
+        }).catch(err => {
+          if(err.toString().indexOf('AuthorizationPendingException') === -1) {
+            // Timeout
             clearInterval(resolved);
-
-            //this.createTokenResponse = createTokenResponse;
-            //this.getTokenMutex = false;
-
-            resolve(createTokenResponse);
-          }).catch(err => {
-            if(err.toString().indexOf('AuthorizationPendingException') === -1) {
-              // Timeout
-              clearInterval(resolved);
-
-              //this.getTokenMutex = false;
-              //this.openExternalVerificationBrowserWindowMutex = false;
-              this.timeoutOccurred = true;
-
-              reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
-            }
-          });
-        }, repeatEvery);
-      /*} else {
-        const resolved = setInterval(async () => {
-          if (this.createTokenResponse) {
-            clearInterval(resolved);
-
-            const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
-            this.setIntervalQueue.splice(resolvedIndex, 1);
-
-            resolve(this.createTokenResponse);
-          } else if (this.timeoutOccurred) {
-            clearInterval(resolved);
-
-            const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
-            this.setIntervalQueue.splice(resolvedIndex, 1);
+            this.timeoutOccurred = true;
 
             reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
           }
-        }, repeatEvery);
-
-        this.setIntervalQueue.push(resolved);
-      }*/
+        });
+      }, repeatEvery);
     });
   }
 }

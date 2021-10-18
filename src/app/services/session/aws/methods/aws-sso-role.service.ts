@@ -136,7 +136,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     const profileName = this.workspaceService.getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.appService.awsCredentialPath());
     delete credentialsFile[profileName];
-    return await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
+    await this.fileService.replaceWriteSync(this.appService.awsCredentialPath(), credentialsFile);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
@@ -160,10 +160,12 @@ export class AwsSsoRoleService extends AwsSessionService {
 
     // Get access token from either login procedure or keychain depending on being expired or not
     const accessToken = await this.getAccessToken(region, portalUrl);
+
     // get sessions from sso
     const sessions = await this.getSessions(accessToken, region);
+
     // remove all old sessions from workspace
-    this.removeSsoSessionsFromWorkspace();
+    await this.removeSsoSessionsFromWorkspace();
 
     return sessions;
   }
@@ -178,16 +180,16 @@ export class AwsSsoRoleService extends AwsSessionService {
 
     // Make a logout request to Sso
     const logoutRequest: LogoutRequest = { accessToken: savedAccessToken };
-    this.ssoPortal.logout(logoutRequest).promise().then(_ => {}, _ => {
-      // Delete access token and remove sso configuration info from workspace
-      this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');
-      this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration();
 
+    this.ssoPortal.logout(logoutRequest).promise().then(_ => {}, _ => {
       // Clean clients
       this.ssoPortal = null;
       this.awsSsoOidcService.unsetOidc();
 
-      // Remove sessions from workspace
+      // Delete access token and remove sso configuration info from workspace
+      this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');
+      this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration();
+
       this.removeSsoSessionsFromWorkspace();
     });
   }
@@ -329,19 +331,22 @@ export class AwsSsoRoleService extends AwsSessionService {
     });
   }
 
-  private removeSsoSessionsFromWorkspace(): void {
+  private async removeSsoSessionsFromWorkspace(): Promise<void> {
     const sessions = this.listAwsSsoRoles();
-    sessions.forEach(sess => {
-      // Verify and delete eventual iamRoleChained sessions from old Sso session
-      const iamRoleChainedSessions = this.listIamRoleChained(sess);
-      iamRoleChainedSessions.forEach(session => {
-        this.delete(session.sessionId).then(_ => {});
-      });
 
-      this.stop(sess.sessionId).then(_ => {});
-      // Now we can safely remove
+    for (let i = 0; i < sessions.length; i++) {
+      const sess = sessions[i];
+
+      const iamRoleChainedSessions = this.listIamRoleChained(sess);
+
+      for (let j = 0; j < iamRoleChainedSessions.length; j++) {
+        await this.delete(iamRoleChainedSessions[j].sessionId);
+      }
+
+      await this.stop(sess.sessionId).then(_ => {});
+
       this.workspaceService.removeSession(sess.sessionId);
-    });
+    }
   }
 
   private configureAwsSso(region: string, portalUrl: string, expirationTime: string, accessToken: string) {

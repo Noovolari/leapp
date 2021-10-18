@@ -30,13 +30,9 @@ export class AwsSsoOidcService {
   private registerClientResponse: RegisterClientResponse;
   private startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse;
   private startDeviceAuthorizationResponseExpiresAt: number;
-  private createTokenRequestPromise: Promise<PromiseResult<SSOOIDC.CreateTokenResponse, AWSError>>;
-  private createTokenResponse: PromiseResult<SSOOIDC.CreateTokenResponse, AWSError>;
   private generateSSOTokenResponse: GenerateSSOTokenResponse;
   private setIntervalQueue: Array<any>;
   private timeoutOccurred: boolean;
-  private getTokenMutex: boolean;
-  private openExternalVerificationBrowserWindowMutex: boolean;
   private loginMutex: boolean;
 
   private constructor(
@@ -243,14 +239,12 @@ export class AwsSsoOidcService {
       const resolved = setInterval(() => {
         this.getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
           clearInterval(resolved);
-
           resolve(createTokenResponse);
         }).catch(err => {
           if(err.toString().indexOf('AuthorizationPendingException') === -1) {
             // Timeout
             clearInterval(resolved);
             this.timeoutOccurred = true;
-
             reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
           }
         });

@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {RouterModule, Routes} from '@angular/router';
 import {ProfilePageComponent} from './components/shared/profile-page/profile-page.component';
-import {IntegrationsPageComponent} from './components/shared/integrations-page/integrations-page.component';
 import {AwsSsoComponent} from './components/aws-sso/aws-sso.component';
 
 const routes: Routes = [
@@ -23,10 +22,6 @@ const routes: Routes = [
       {
         path: 'aws-sso',
         component: AwsSsoComponent
-      },
-      {
-        path: 'integrations',
-        component: IntegrationsPageComponent
       },
       {
         path: 'sessions',

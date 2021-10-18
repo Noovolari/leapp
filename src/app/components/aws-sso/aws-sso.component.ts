@@ -98,6 +98,10 @@ export class AwsSsoComponent implements OnInit {
     await this.router.navigate(['/sessions', 'session-selected']);
   }
 
+  gotoWebForm() {
+    this.appService.openExternalUrl(this.portalUrl);
+  }
+
   setValues() {
     this.regions = this.appService.getRegions();
     const region = this.workspaceService.getAwsSsoConfiguration().region;

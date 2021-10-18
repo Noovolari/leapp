@@ -62,7 +62,7 @@
   </ng-container>
   <ng-container *ngIf="loading">
     <h1 class="loading-title"><span class="back-link"><i class="fa fa-link"></i></span> AWS SSO Login</h1>
-    <span class="closing" (click)="goBack()">&times;</span>
+    <span class="closing" (click)="loading = false;">&times;</span>
 
     <div class="loading-content">
       <label class="loading-leapp">Leapp</label>
@@ -71,7 +71,7 @@
       <br>
       <img src="assets/images/loading-pc.png" alt="" class="loading-pc" />
       <br>
-      <a (click)="loading = false;" class="loading-link">Click to open AWS Single Sign-On form here</a>
+      <a (click)="gotoWebForm()" class="loading-link">Click to open AWS Single Sign-On form here</a>
     </div>
   </ng-container>
 </div>

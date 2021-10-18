@@ -37,6 +37,7 @@ body {
   font-weight: 400;
 }
 
+//noinspection DuplicatedCode
 .container-fluid {
   color: $text-color;
   font-family: "AvenirNext", "Open Sans", sans-serif;
@@ -54,10 +55,6 @@ body {
       padding: 0 30px;
       font-size: 12px;
     }
-  }
-
-  .ng-dropdown-panel .ng-dropdown-panel-items {
-    max-height: 188px;
   }
 
   h1 {
@@ -139,6 +136,7 @@ body {
   transform: translateX(-50%);
 }
 
+//noinspection DuplicatedCode
 button {
   background-color: $main-color-light;
   color: $primary-text-color;

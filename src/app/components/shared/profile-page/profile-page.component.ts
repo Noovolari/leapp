@@ -135,7 +135,7 @@ export class ProfilePageComponent implements OnInit {
       } else {
         this.loggingService.logger('Option saved.', LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
         this.loggingService.toast('Option saved.', ToastLevel.info, 'Options');
-        this.router.navigate(['/sessions', 'session-selected']);
+        this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
       }
     }
   }
@@ -157,7 +157,7 @@ export class ProfilePageComponent implements OnInit {
    * Return to home screen
    */
   goBack() {
-    this.router.navigate(['/', 'sessions', 'session-selected']);
+    this.router.navigate(['/', 'sessions', 'session-selected']).then(_ => {});
   }
 
   manageIdpUrl(id) {

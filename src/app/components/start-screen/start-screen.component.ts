@@ -17,7 +17,7 @@ export class StartScreenComponent {
   constructor(private app: AppService, private router: Router) {}
 
   goToSetup() {
-    this.router.navigate(['/managing', 'create-account'], { queryParams: { firstTime: true }});
+    this.router.navigate(['/managing', 'create-account'], { queryParams: { firstTime: true }}).then(_ => {});
   }
 
   openDocumentation() {

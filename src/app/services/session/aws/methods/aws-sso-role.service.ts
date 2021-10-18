@@ -335,10 +335,10 @@ export class AwsSsoRoleService extends AwsSessionService {
       // Verify and delete eventual iamRoleChained sessions from old Sso session
       const iamRoleChainedSessions = this.listIamRoleChained(sess);
       iamRoleChainedSessions.forEach(session => {
-        this.delete(session.sessionId);
+        this.delete(session.sessionId).then(_ => {});
       });
 
-      this.stop(sess.sessionId);
+      this.stop(sess.sessionId).then(_ => {});
       // Now we can safely remove
       this.workspaceService.removeSession(sess.sessionId);
     });
@@ -346,7 +346,7 @@ export class AwsSsoRoleService extends AwsSessionService {
 
   private configureAwsSso(region: string, portalUrl: string, expirationTime: string, accessToken: string) {
     this.workspaceService.configureAwsSso(region, portalUrl, expirationTime);
-    this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken);
+    this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {});
   }
 
   private getSsoPortalClient(region: string): void {

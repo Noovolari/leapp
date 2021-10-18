@@ -3,7 +3,6 @@ import {Session} from '../../../models/session';
 import {SessionType} from '../../../models/session-type';
 import {AwsIamRoleFederatedSession} from '../../../models/aws-iam-role-federated-session';
 import {AzureSession} from '../../../models/azure-session';
-import {AwsIamUserSession} from '../../../models/aws-iam-user-session';
 import {AwsSsoRoleSession} from '../../../models/aws-sso-role-session';
 import {AwsIamRoleChainedSession} from '../../../models/aws-iam-role-chained-session';
 

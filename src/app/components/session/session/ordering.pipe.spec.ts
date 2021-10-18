@@ -1,6 +1,5 @@
 import { OrderingPipe } from './ordering.pipe';
 import {Session} from '../../../models/session';
-import * as uuid from 'uuid';
 import {AwsIamUserSession} from '../../../models/aws-iam-user-session';
 
 let sessions: Session[] = [];

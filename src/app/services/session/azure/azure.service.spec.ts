@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { AzureService } from './azure.service';
-import {mustInjected} from "../../../../base-injectables";
+import {mustInjected} from '../../../../base-injectables';
 
 describe('AzureService', () => {
   let service: AzureService;

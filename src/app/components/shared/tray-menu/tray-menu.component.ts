@@ -12,7 +12,7 @@ import {UpdaterService} from '../../../services/updater.service';
 import {SessionService} from '../../../services/session.service';
 import {SessionFactoryService} from '../../../services/session-factory.service';
 import {Constants} from '../../../models/constants';
-import {LoggingService} from "../../../services/logging.service";
+import {LoggingService} from '../../../services/logging.service';
 
 @Component({
   selector: 'app-tray-menu',
@@ -113,7 +113,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       {type: 'separator'},
       {
         label: 'Quit', type: 'normal', click: () => {
-          this.cleanBeforeExit();
+          this.cleanBeforeExit().then(_ => {});
         }
       },
     ];

@@ -38,7 +38,7 @@ describe('WorkspaceService', () => {
     });
 
     workspaceService = TestBed.inject(WorkspaceService) as WorkspaceService;
-    workspace = workspaceService.create();
+    workspaceService.create();
 
     mockedSession = new AwsIamUserSession('a', 'eu-west-1', 'profile', '');
   });

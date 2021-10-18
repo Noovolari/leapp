@@ -6,8 +6,8 @@ import {SessionType} from '../../../models/session-type';
 import {SessionStatus} from '../../../models/session-status';
 import {AwsIamRoleChainedSession} from '../../../models/aws-iam-role-chained-session';
 import {SessionService} from '../../session.service';
-import {LeappBaseError} from "../../../errors/leapp-base-error";
-import {LoggerLevel} from "../../app.service";
+import {LeappBaseError} from '../../../errors/leapp-base-error';
+import {LoggerLevel} from '../../app.service';
 
 @Injectable({
   providedIn: 'root'
@@ -112,7 +112,7 @@ export abstract class AwsSessionService extends SessionService {
     // Stop all that shares the same profile
     activeSessions.forEach(sess => {
       if( (sess as any).profileId === profileId ) {
-        this.stop(sess.sessionId);
+        this.stop(sess.sessionId).then(_ => {});
       }
     });
   }

@@ -166,7 +166,10 @@ export class AwsSsoOidcService {
 
       this.ssoWindow.on('close', (e) => {
         e.preventDefault();
+
+        this.unsetOidc();
         this.loginMutex = false;
+
         this.listeners.forEach(listener => {
           listener.catchClosingBrowserWindow();
         });

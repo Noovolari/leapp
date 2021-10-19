@@ -1,5 +1,3 @@
-// noinspection DuplicatedCode
-
 import {
   GenerateSSOTokenResponse,
   RegisterClientResponse,
@@ -16,8 +14,6 @@ import {WorkspaceService} from './workspace.service';
 import {AppService, LoggerLevel} from './app.service';
 import {ElectronService} from './electron.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
-import { PromiseResult } from 'aws-sdk/lib/request';
-import { AWSError } from 'aws-sdk';
 
 @Injectable({
   providedIn: 'root'
@@ -100,7 +96,15 @@ export class AwsSsoOidcService {
       }
 
       const verificationResponse = await this.openVerificationBrowserWindow(this.registerClientResponse, this.startDeviceAuthorizationResponse);
-      const generateSSOTokenResponse = await this.createToken(verificationResponse);
+
+      let generateSSOTokenResponse;
+
+      try {
+        generateSSOTokenResponse = await this.createToken(verificationResponse);
+      } catch (err) {
+        this.loginMutex = false;
+        throw(err);
+      }
 
       this.loginMutex = false;
 
@@ -108,6 +112,8 @@ export class AwsSsoOidcService {
     } else if (!this.loginMutex && this.setIntervalQueue.length > 0) {
       return this.generateSSOTokenResponse;
     } else {
+      // TODO: check if starting session or logging in as integration
+
       return new Promise((resolve, reject) => {
         const repeatEvery = 5000; // 5 seconds
 
@@ -221,6 +227,7 @@ export class AwsSsoOidcService {
     };
 
     let createTokenResponse;
+
     if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
@@ -235,20 +242,21 @@ export class AwsSsoOidcService {
 
   private async waitForToken(createTokenRequest: CreateTokenRequest): Promise<any> {
     return new Promise((resolve, reject) => {
-      const repeatEvery = 5000; // 5 seconds
+      const intervalInMilliseconds = 5000;
+
       const resolved = setInterval(() => {
         this.getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
           clearInterval(resolved);
           resolve(createTokenResponse);
         }).catch(err => {
           if(err.toString().indexOf('AuthorizationPendingException') === -1) {
-            // Timeout
+            // AWS SSO Timeout occurred
             clearInterval(resolved);
             this.timeoutOccurred = true;
             reject(new LeappBaseError('AWS SSO Timeout', this, LoggerLevel.error, 'AWS SSO Timeout occurred. Please redo login procedure.'));
           }
         });
-      }, repeatEvery);
+      }, intervalInMilliseconds);
     });
   }
 }

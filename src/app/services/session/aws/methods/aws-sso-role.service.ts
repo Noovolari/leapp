@@ -140,11 +140,13 @@ export class AwsSsoRoleService extends AwsSessionService {
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+    const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
+
     const accessToken = await this.getAccessToken(region, portalUrl);
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
+
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
@@ -158,13 +160,12 @@ export class AwsSsoRoleService extends AwsSessionService {
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
 
-    // Get access token from either login procedure or keychain depending on being expired or not
     const accessToken = await this.getAccessToken(region, portalUrl);
 
-    // get sessions from sso
+    // Get AWS SSO Role sessions
     const sessions = await this.getSessions(accessToken, region);
 
-    // remove all old sessions from workspace
+    // Remove all old AWS SSO Role sessions from workspace
     await this.removeSsoSessionsFromWorkspace();
 
     return sessions;
@@ -197,17 +198,16 @@ export class AwsSsoRoleService extends AwsSessionService {
   async getAccessToken(region: string, portalUrl: string): Promise<string> {
     if (this.ssoExpired()) {
       const loginResponse = await this.login(region, portalUrl);
-      // Set configuration related data to workspace
+
       this.configureAwsSso(
         region,
         loginResponse.portalUrlUnrolled,
         loginResponse.expirationTime.toISOString(),
         loginResponse.accessToken
       );
-      // Set access token
+
       return loginResponse.accessToken;
     } else {
-      // Set access token
       return await this.getAccessTokenFromKeychain();
     }
   }
@@ -220,6 +220,7 @@ export class AwsSsoRoleService extends AwsSessionService {
       roleName: roleArn.split('/')[1],
       accessToken
     };
+
     return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise();
   }
 
@@ -264,6 +265,7 @@ export class AwsSsoRoleService extends AwsSessionService {
 
   private async getSessionsFromAccount(accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     this.getSsoPortalClient(region);
+
     const listAccountRolesRequest: ListAccountRolesRequest = {
       accountId: accountInfo.accountId,
       accessToken,
@@ -288,6 +290,7 @@ export class AwsSsoRoleService extends AwsSessionService {
         sessionName: accountInfo.accountName,
         profileId: oldSession?.profileId || this.workspaceService.getDefaultProfileId()
       };
+
       awsSsoSessions.push(awsSsoSession);
     });
 
@@ -343,7 +346,7 @@ export class AwsSsoRoleService extends AwsSessionService {
         await this.delete(iamRoleChainedSessions[j].sessionId);
       }
 
-      await this.stop(sess.sessionId).then(_ => {});
+      await this.stop(sess.sessionId);
 
       this.workspaceService.removeSession(sess.sessionId);
     }
@@ -365,7 +368,6 @@ export class AwsSsoRoleService extends AwsSessionService {
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
-
     for (let i = 0; i < this.workspaceService.sessions.length; i++) {
       const sess = this.workspaceService.sessions[i];
 

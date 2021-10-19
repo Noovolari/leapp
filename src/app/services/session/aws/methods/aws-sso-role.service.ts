@@ -23,7 +23,6 @@ import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc-service';
 import {LeappBaseError} from '../../../../errors/leapp-base-error';
-import {LoggingService} from "../../../logging.service";
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;

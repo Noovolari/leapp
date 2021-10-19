@@ -5,7 +5,7 @@ import {CredentialsInfo} from '../../../../models/credentials-info';
 
 import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
 import {FileService} from '../../../file.service';
-import {AppService, LoggerLevel, ToastLevel} from '../../../app.service';
+import {AppService, ToastLevel} from '../../../app.service';
 
 import SSO, {
   AccountInfo,
@@ -18,11 +18,9 @@ import SSO, {
 } from 'aws-sdk/clients/sso';
 
 import {environment} from '../../../../../environments/environment';
-
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc-service';
-import {LeappBaseError} from '../../../../errors/leapp-base-error';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -153,16 +151,14 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+    const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
+
     const accessToken = await this.getAccessToken(region, portalUrl);
-    if(accessToken) {
-      const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
-      return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
-    } else {
-      throw new LeappBaseError('Foce Closed Browser Window', this, LoggerLevel.info, 'You Force Closed the browser window.');
-    }
+    const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
+
+    return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }
 
   sessionDeactivated(sessionId: string) {
@@ -175,12 +171,14 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
 
-    // Get access token from either login procedure or keychain depending on being expired or not
     const accessToken = await this.getAccessToken(region, portalUrl);
-    // get sessions from sso
+
+    // Get AWS SSO Role sessions
     const sessions = await this.getSessions(accessToken, region);
-    // remove all old sessions from workspace
+
+    // Remove all old AWS SSO Role sessions from workspace
     await this.removeSsoSessionsFromWorkspace();
+
     return sessions;
   }
 
@@ -211,17 +209,16 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   async getAccessToken(region: string, portalUrl: string): Promise<string> {
     if (this.ssoExpired()) {
       const loginResponse = await this.login(region, portalUrl);
-      // Set configuration related data to workspace
+
       this.configureAwsSso(
         region,
         loginResponse.portalUrlUnrolled,
         loginResponse.expirationTime.toISOString(),
         loginResponse.accessToken
       );
-      // Set access token
+
       return loginResponse.accessToken;
     } else {
-      // Set access token
       return await this.getAccessTokenFromKeychain();
     }
   }
@@ -234,6 +231,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       roleName: roleArn.split('/')[1],
       accessToken
     };
+
     return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise();
   }
 
@@ -277,6 +275,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   private async getSessionsFromAccount(accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     this.getSsoPortalClient(region);
+
     const listAccountRolesRequest: ListAccountRolesRequest = {
       accountId: accountInfo.accountId,
       accessToken,
@@ -301,6 +300,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
         sessionName: accountInfo.accountName,
         profileId: oldSession?.profileId || this.workspaceService.getDefaultProfileId()
       };
+
       awsSsoSessions.push(awsSsoSession);
     });
 
@@ -356,7 +356,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
         await this.delete(iamRoleChainedSessions[j].sessionId);
       }
 
-      await this.stop(sess.sessionId).then(_ => {});
+      await this.stop(sess.sessionId);
 
       this.workspaceService.removeSession(sess.sessionId);
     }
@@ -378,7 +378,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
-
     for (let i = 0; i < this.workspaceService.sessions.length; i++) {
       const sess = this.workspaceService.sessions[i];
 
@@ -394,6 +393,4 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
     return undefined;
   }
-
-
 }

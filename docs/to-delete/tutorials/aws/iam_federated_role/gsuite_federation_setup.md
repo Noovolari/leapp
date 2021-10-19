@@ -42,7 +42,7 @@ In order to set up a SAML-Based Single Sign-On, we first need to create a custom
 
 Click on the “Add apps” selector in the menu bar, then "Search app" like in figure:
 
-![](../../../images/tutorials/aws/iam_federated_role/G_SUITE_FEDERATION_SETUP-7.png)
+![](../../../../images/tutorials/aws/iam_federated_role/G_SUITE_FEDERATION_SETUP-7.png)
 
 Then Search for "Amazon Web Services", wait for search to complete then select the one in figure, being careful to check that is a "Web SAML":
 

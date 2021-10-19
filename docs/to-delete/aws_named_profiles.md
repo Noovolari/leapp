@@ -6,7 +6,7 @@ Named Profiles have a *default* one which is the one you get from **aws configur
 
 Leapp can, from release [0.4.7](https://github.com/Noovolari/leapp/releases/tag/v0.4.7), manage more than one profile, to allow users to have multiple credentials set at the same time.
 
-Named Profiles are selectable directly when creating an AWS access method ([IAM Federated Role](../use-cases/aws_iam_role.md), [IAM Chained Role](../use-cases/aws_iam_role.md), [IAM User](../use-cases/aws_iam_user.md)), by using the selector provided in the form.
+Named Profiles are selectable directly when creating an AWS access method ([IAM Federated Role](use-cases/aws_iam_role.md), [IAM Chained Role](use-cases/aws_iam_role.md), [IAM User](use-cases/aws_iam_user.md)), by using the selector provided in the form.
 
 ![](../images/contributing/aws_named_profiles/AWS_NAMED_PROFILES_1.png)
 

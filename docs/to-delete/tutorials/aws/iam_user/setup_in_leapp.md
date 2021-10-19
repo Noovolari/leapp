@@ -1,6 +1,6 @@
 # How to create a IAM User Access Method for AWS
 
-If this is your first time accessing Leapp please follow this [guide](../../../tutorials/first_access.md).
+If this is your first time accessing Leapp please follow this [guide](../...md).
 
 1) From your quick list click on the "+" button located on the top-right corner of the app
 

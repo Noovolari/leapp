@@ -1,58 +1,45 @@
 site_name: Leapp - Docs
 site_url: https://docs.leapp.cloud/
 repo_url: https://github.com/Noovolari/leapp
-site_description: 'Leapp is a tool for developers to manage, secure, and gain access to any cloud. From setting up your access data to activating a session, Leapp can help manage the underlying assets to let you use your provider CLI or SDK seamlessy.'
+site_description: 'Leapp is a tool for developers to manage, secure, and access the cloud. Manage AWS and Azure credentials centrally'
 copyright: '© 2021 Noovolari, All rights reserved. | Powered by beSharp'
 
 nav:
-  - Overview: index.md
-  - Concepts: concepts.md
-  - 'Use Cases':
-      - 'Introduction': 'use-cases/intro.md'
-      - 'AWS':
-        - 'AWS IAM User': 'use-cases/aws_iam_user.md'
-        - 'AWS IAM Role': 'use-cases/aws_iam_role.md'
-        - 'AWS SSO': 'use-cases/aws_sso.md'
-      - 'Azure': 'use-cases/azure.md'
-  - 'Tutorials':
-      - 'First Access': 'tutorials/first_access.md'
-      - 'AWS':
-        - 'AWS IAM User': 'tutorials/aws/iam_user/setup_in_leapp.md'
-        - 'AWS IAM Federated Role':
-          - 'Introduction': 'tutorials/aws/iam_federated_role/intro.md'
-          - 'Step 1: G Suite Federation': 'tutorials/aws/iam_federated_role/gsuite_federation_setup.md'
-          - 'Step 2: AWS Federation': 'tutorials/aws/iam_federated_role/aws_federation_setup.md'
-          - 'Step 3: Enable Federated Access': 'tutorials/aws/iam_federated_role/enable_federated_access.md'
-          - 'Step 4: Assign Role to GSuite Principal': 'tutorials/aws/iam_federated_role/assign_role.md'
-          - 'Step 5: Setup in Leapp': 'tutorials/aws/iam_federated_role/setup_in_leapp.md'
-        - 'AWS IAM Chained Role':
-          - 'Introduction': 'tutorials/aws/iam_chained_role/intro.md'
-          - 'Step 1: Setup Trust Relationship': 'tutorials/aws/iam_chained_role/trust_relationship_setup.md'
-          - 'Step 2: Setup in Leapp': 'tutorials/aws/iam_chained_role/setup_in_leapp.md'
-        - 'AWS SSO': 'tutorials/aws/aws_sso/setup_in_leapp.md'
-        - 'AWS SSM Connect': 'tutorials/aws/aws_ssm_connect.md'
-      - 'Azure':
-        - 'Step 1: G Suite Federation': 'tutorials/azure/gsuite_federation_setup.md'
-        - 'Step 2: Setup in Leapp': 'tutorials/azure/setup_in_leapp.md'
-  - 'Contributing':
-      - 'Project Structure': 'contributing/project_structure.md'
-      - 'Updater': 'contributing/updater.md'
-      - 'System Vault': 'contributing/system_vault.md'
-      - 'AWS Named Profiles': 'contributing/aws_named_profiles.md'
-      - 'AWS SSO': 'contributing/aws-sso.md'
-      - 'Default Options': 'contributing/default_options.md'
-      - 'Integrations': 'contributing/integrations.md'
-  - 'Community':
-      - 'Get Involved': 'community/get_involved.md'
-
+  - 'Get Started':
+      - Intro: index.md
+      - Installation:
+          - 'Pre-install': 'installation/pre-install.md'
+          - 'Installing Leapp': 'installation/installing-leapp.md'
+          - 'Updating Leapp': 'installation/updating-leapp.md'
+      - Sessions: 'sessions.md'
+      - Integrations: 'integrations.md'
+  - 'Configuring Session':
+      - 'Configure AWS IAM User': 'configuring-session/configure-aws-iam-user.md'
+      - 'Configure AWS IAM Role Federated': 'configuring-session/configure-aws-iam-role-federated.md'
+      - 'Configure AWS IAM Role Chained': 'configuring-session/configure-aws-iam-role-chained.md'
+      - 'Configure Azure Tenant': 'configuring-session/configure-azure-tenant.md'
+  - 'Configuring Integration':
+      - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
+  - Security:
+      - 'Credentials generation':
+          - AWS: 'security/credentials-generation/aws.md'
+          - Azure: 'security/credentials-generation/azure.md'
+      - Keychain: 'security/keychain.md'
+  - 'Built-in features':
+      - 'EC2 connector through AWS System manager': 'built-in-features/ec2-connector-through-aws-system-manager.md'
+      - 'Proxy Server': 'built-in-features/proxy-server.md'
+      - 'Multi-profile management': 'built-in-features/multi-profile-management.md'
+  - Contributing:
+      - 'Get involved': 'contributing/get-involved.md'
+      - 'Project structure': 'contributing/project-structure.md'
 theme:
   logo: images/logo.png
+  titles_only: true
   favicon: images/favicon.ico
   name: material
   features:
     - navigation.instant
     - navigation.indexes
-    - navigation.sections
     - navigation.top
   font:
     text: Lato

@@ -2,27 +2,14 @@
 
 ## Welcome to Leapp :rocket:
 
-Leapp is a tool for developers to manage, secure, and gain access to any cloud. From setting up your access data to activating a session, Leapp can help manage the underlying assets to let you use your provider's CLI or SDK seamlessy.
-
-Leapp is compatible out-of-the-box with any third-party tool that uses the default cloud provider credential chain like Terraform, the Serverless Framework, Amplify, and much more.
+Leapp is a tool for developers to manage, secure, and access to the Cloud.
 
 Leapp information needed to retrieve credentials are stored **LOCALLY** inside his [workspace](concepts.md). Critical information such as Cloud secrets and token are stored inside the **System Vault**.
 
-The name **Leapp** is inspired by the English word *leap* and pronounced */l:ip/*. We choose this name because the project enables you to be one step away from your cloud environments.
-
 ![Leapp Main Window](images/main-window.png?style=center-img)
 
-## Key Features
+The name **Leapp** is inspired by the English word *leap* and pronounced */l:ip/*. We choose this name because the project enables you to be one step away from your cloud environments.
 
-- Switch active session in a click
-- [Secure repository](contributing/system_vault.md) for your access data
-- Multiple clouds [access methods](use-cases/intro.md)
-- [Only short-lived](concepts.md) credentials (or none at all)
-  
-### Supported Services
-
-- Import sessions from [AWS Single Sign-On (SSO)](use-cases/aws_sso.md)
-- Connect to EC2 instances without certificates through AWS System Manager (SSM)
 
 ## Installing
 

@@ -15,10 +15,15 @@ import {AppService, LoggerLevel} from './app.service';
 import {ElectronService} from './electron.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
 
+export interface BrowserWindowClosing {
+  catchClosingBrowserWindow(): void;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class AwsSsoOidcService {
+  listeners: BrowserWindowClosing[];
   private ssoOidc: SSOOIDC;
   private ssoWindow: any;
   private currentRegion: string;
@@ -36,6 +41,7 @@ export class AwsSsoOidcService {
     private appService: AppService,
     private electronService: ElectronService,
   ) {
+    this.listeners = [];
     this.setIntervalQueue = [];
     this.timeoutOccurred = false;
     this.loginMutex = false;
@@ -156,6 +162,15 @@ export class AwsSsoOidcService {
       this.ssoWindow = null;
       this.ssoWindow = this.appService.newWindow(startDeviceAuthorizationResponse.verificationUriComplete, true, 'Portal url - Client verification', pos[0] + 200, pos[1] + 50);
       this.ssoWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
+
+
+      this.ssoWindow.on('close', (e) => {
+        e.preventDefault();
+        this.loginMutex = false;
+        this.listeners.forEach(listener => {
+          listener.catchClosingBrowserWindow();
+        });
+      });
 
       return new Promise( (resolve, reject) => {
 

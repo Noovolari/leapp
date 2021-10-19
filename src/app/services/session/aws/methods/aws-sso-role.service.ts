@@ -5,7 +5,7 @@ import {CredentialsInfo} from '../../../../models/credentials-info';
 
 import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
 import {FileService} from '../../../file.service';
-import {AppService} from '../../../app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../../app.service';
 
 import SSO, {
   AccountInfo,
@@ -18,10 +18,9 @@ import SSO, {
 } from 'aws-sdk/clients/sso';
 
 import {environment} from '../../../../../environments/environment';
-
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
-import {AwsSsoOidcService} from '../../../aws-sso-oidc-service';
+import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc-service';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -75,7 +74,7 @@ export interface SsoRoleSession {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsSsoRoleService extends AwsSessionService {
+export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
 
   private ssoPortal: SSO;
 
@@ -87,6 +86,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     private awsSsoOidcService: AwsSsoOidcService
   ) {
     super(workspaceService);
+    this.awsSsoOidcService.listeners.push(this);
   }
 
   static getProtocol(aliasedUrl: string): string {
@@ -108,6 +108,17 @@ export class AwsSsoRoleService extends AwsSessionService {
         aws_session_token: getRoleCredentialResponse.roleCredentials.sessionToken.trim(),
       }
     };
+  }
+
+  async catchClosingBrowserWindow(): Promise<void> {
+    // Get all current sessions if any
+    const sessions = this.listAwsSsoRoles();
+    for (let i = 0; i < sessions.length; i++) {
+      // Stop session
+      const sess = sessions[i];
+      await this.stop(sess.sessionId).then(_ => {});
+    }
+    this.appService.toast('You closed the browser window, login process is stopped.', ToastLevel.info, 'Force Closed Browser Window');
   }
 
   create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
@@ -243,7 +254,6 @@ export class AwsSsoRoleService extends AwsSessionService {
     });
 
     const generateSsoTokenResponse = await this.awsSsoOidcService.login(region, portalUrl);
-
     return { portalUrlUnrolled: portalUrl, accessToken: generateSsoTokenResponse.accessToken, region, expirationTime: generateSsoTokenResponse.expirationTime };
   }
 
@@ -383,4 +393,6 @@ export class AwsSsoRoleService extends AwsSessionService {
 
     return undefined;
   }
+
+
 }

@@ -8,4 +8,5 @@ export enum Constants {
   windows = 'windows',
   inApp = 'In-app',
   inBrowser = 'In-browser',
+  forcedCloseBrowserWindow = 'ForceCloseBrowserWindow',
 }

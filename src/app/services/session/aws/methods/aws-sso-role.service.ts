@@ -5,7 +5,7 @@ import {CredentialsInfo} from '../../../../models/credentials-info';
 
 import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
 import {FileService} from '../../../file.service';
-import {AppService} from '../../../app.service';
+import {AppService, LoggerLevel, ToastLevel} from '../../../app.service';
 
 import SSO, {
   AccountInfo,
@@ -21,7 +21,9 @@ import {environment} from '../../../../../environments/environment';
 
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
-import {AwsSsoOidcService} from '../../../aws-sso-oidc-service';
+import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc-service';
+import {LeappBaseError} from '../../../../errors/leapp-base-error';
+import {LoggingService} from "../../../logging.service";
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -75,7 +77,7 @@ export interface SsoRoleSession {
 @Injectable({
   providedIn: 'root'
 })
-export class AwsSsoRoleService extends AwsSessionService {
+export class AwsSsoRoleService extends AwsSessionService implements BrowserWindowClosing {
 
   private ssoPortal: SSO;
 
@@ -87,6 +89,7 @@ export class AwsSsoRoleService extends AwsSessionService {
     private awsSsoOidcService: AwsSsoOidcService
   ) {
     super(workspaceService);
+    this.awsSsoOidcService.listeners.push(this);
   }
 
   static getProtocol(aliasedUrl: string): string {
@@ -108,6 +111,17 @@ export class AwsSsoRoleService extends AwsSessionService {
         aws_session_token: getRoleCredentialResponse.roleCredentials.sessionToken.trim(),
       }
     };
+  }
+
+  async catchClosingBrowserWindow(): Promise<void> {
+    // Get all current sessions if any
+    const sessions = this.listAwsSsoRoles();
+    for (let i = 0; i < sessions.length; i++) {
+      // Stop session
+      const sess = sessions[i];
+      await this.stop(sess.sessionId).then(_ => {});
+    }
+    this.appService.toast('You closed the browser window, login process is stopped.', ToastLevel.info, 'Force Closed Browser Window');
   }
 
   create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
@@ -144,8 +158,12 @@ export class AwsSsoRoleService extends AwsSessionService {
     const region = this.workspaceService.getAwsSsoConfiguration().region;
     const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
     const accessToken = await this.getAccessToken(region, portalUrl);
-    const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
-    return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
+    if(accessToken) {
+      const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
+      return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
+    } else {
+      throw new LeappBaseError('Foce Closed Browser Window', this, LoggerLevel.info, 'You Force Closed the browser window.');
+    }
   }
 
   sessionDeactivated(sessionId: string) {
@@ -160,13 +178,10 @@ export class AwsSsoRoleService extends AwsSessionService {
 
     // Get access token from either login procedure or keychain depending on being expired or not
     const accessToken = await this.getAccessToken(region, portalUrl);
-
     // get sessions from sso
     const sessions = await this.getSessions(accessToken, region);
-
     // remove all old sessions from workspace
     await this.removeSsoSessionsFromWorkspace();
-
     return sessions;
   }
 
@@ -242,7 +257,6 @@ export class AwsSsoRoleService extends AwsSessionService {
     });
 
     const generateSsoTokenResponse = await this.awsSsoOidcService.login(region, portalUrl);
-
     return { portalUrlUnrolled: portalUrl, accessToken: generateSsoTokenResponse.accessToken, region, expirationTime: generateSsoTokenResponse.expirationTime };
   }
 
@@ -381,4 +395,6 @@ export class AwsSsoRoleService extends AwsSessionService {
 
     return undefined;
   }
+
+
 }

@@ -558,4 +558,8 @@ export class AppService {
       }
     });
   }
+
+  toast(message: string, level: ToastLevel, title: string) {
+    this.loggingService.toast(message, level, title);
+  }
 }

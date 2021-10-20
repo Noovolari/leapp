@@ -49,7 +49,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   }
 
   async login() {
-    if (this.form.valid && !this.loadingInApp && !this.loadingInBrowser) {
+    if (this.form.valid && !this.loadingInApp) {
       this.loadingInBrowser = (this.selectedBrowserOpening === Constants.inBrowser.toString());
       this.loadingInApp = (this.selectedBrowserOpening === Constants.inApp.toString());
 

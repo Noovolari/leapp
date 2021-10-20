@@ -200,7 +200,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     this.ssoPortal.logout(logoutRequest).promise().then(_ => {}, _ => {
       // Clean clients
       this.ssoPortal = null;
-      this.awsSsoOidcService.unsetOidc();
+      this.awsSsoOidcService.unsetAwsSsoOidcClient();
 
       // Delete access token and remove sso configuration info from workspace
       this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');

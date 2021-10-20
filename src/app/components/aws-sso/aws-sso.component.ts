@@ -95,10 +95,11 @@ export class AwsSsoComponent implements OnInit {
   }
 
   gotoWebForm() {
-    this.awsSsoRoleService.interrupt();
-    setInterval(() => {
+    try {
+      this.awsSsoRoleService.interrupt();
+    } catch(err) {
       this.login();
-    }, 2000);
+    }
   }
 
   setValues() {
@@ -113,7 +114,10 @@ export class AwsSsoComponent implements OnInit {
   }
 
   closeLoadingScreen() {
-    this.loading = false;
-    this.awsSsoRoleService.interrupt();
+    try {
+      this.awsSsoRoleService.interrupt();
+    } catch(err) {
+      this.loading = false;
+    }
   }
 }

@@ -115,16 +115,10 @@ export class AwsSsoOidcService {
     } else if (!this.loginMutex && this.setIntervalQueue.length > 0) {
       return this.generateSSOTokenResponse;
     } else {
-
       return new Promise((resolve, reject) => {
         const repeatEvery = 500; // 0.5 second, we can make these more speedy as they just check a variable, no external calls here
 
-        const i = this.index;
-        this.index++;
-
         const resolved = setInterval(async () => {
-          console.log('index: ', i);
-
           if(this.interruptOccurred) {
             clearInterval(resolved);
 
@@ -173,18 +167,11 @@ export class AwsSsoOidcService {
         this.loginMutex = false;
 
         this.listeners.forEach(listener => {
-          console.log('ciao');
           listener.catchClosingBrowserWindow();
         });
       });
 
       return new Promise( (resolve, reject) => {
-
-        const i = this.index;
-        this.index++;
-
-        console.log('index: ', i);
-
         // When the code is verified and the user has been logged in, the window can be closed
         this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
             'https://*.awsapps.com/start/user-consent/login-success.html',

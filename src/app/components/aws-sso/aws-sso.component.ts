@@ -5,20 +5,22 @@ import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
 import {Constants} from '../../models/constants';
+import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
 
 @Component({
   selector: 'app-aws-sso',
   templateUrl: './aws-sso.component.html',
   styleUrls: ['./aws-sso.component.scss']
 })
-export class AwsSsoComponent implements OnInit {
+export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
   eConstants = Constants;
   isAwsSsoActive: boolean;
   regions = [];
   selectedRegion;
   portalUrl;
-  loading = false;
+  loadingInBrowser = false;
+  loadingInApp = false;
   selectedBrowserOpening: string;
 
   public form = new FormGroup({
@@ -31,20 +33,25 @@ export class AwsSsoComponent implements OnInit {
     private appService: AppService,
     private awsSsoRoleService: AwsSsoRoleService,
     private router: Router,
-    private workspaceService: WorkspaceService
+    private workspaceService: WorkspaceService,
+    private awsSsoOidcService: AwsSsoOidcService
   ) {}
 
   ngOnInit() {
+    this.awsSsoOidcService.listeners.push(this);
+
     this.awsSsoRoleService.awsSsoActive().then(res => {
       this.isAwsSsoActive = res;
-      this.loading = false;
+      this.loadingInBrowser = false;
+      this.loadingInApp = false;
       this.setValues();
     });
   }
 
   async login() {
-    if (this.form.valid) {
-      this.loading = (this.selectedBrowserOpening === Constants.inBrowser.toString());
+    if (this.form.valid && !this.loadingInApp && !this.loadingInBrowser) {
+      this.loadingInBrowser = (this.selectedBrowserOpening === Constants.inBrowser.toString());
+      this.loadingInApp = (this.selectedBrowserOpening === Constants.inApp.toString());
 
       this.workspaceService.setAwsSsoConfiguration(
         this.selectedRegion,
@@ -59,9 +66,9 @@ export class AwsSsoComponent implements OnInit {
           this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
         });
         this.router.navigate(['/sessions', 'session-selected']);
-        this.loading = false;
+        this.loadingInBrowser = false;
+        this.loadingInApp = false;
       } catch (err) {
-        this.loading = false;
         await this.logout();
         throw err;
       }
@@ -71,7 +78,8 @@ export class AwsSsoComponent implements OnInit {
   async logout() {
     await this.awsSsoRoleService.logout();
     this.isAwsSsoActive = false;
-    this.loading = false;
+    this.loadingInBrowser = false;
+    this.loadingInApp = false;
     this.setValues();
   }
 
@@ -82,9 +90,9 @@ export class AwsSsoComponent implements OnInit {
         this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId);
       });
       this.router.navigate(['/sessions', 'session-selected']);
-      this.loading = false;
+      this.loadingInBrowser = false;
+      this.loadingInApp = false;
     } catch(err) {
-      this.loading = false;
       await this.logout();
       throw err;
     }
@@ -95,11 +103,9 @@ export class AwsSsoComponent implements OnInit {
   }
 
   gotoWebForm() {
-    try {
-      this.awsSsoRoleService.interrupt();
-    } catch(err) {
-      this.login();
-    }
+    // TODO: call aws sso oidc service directly
+    this.awsSsoRoleService.interrupt();
+    this.login();
   }
 
   setValues() {
@@ -114,10 +120,14 @@ export class AwsSsoComponent implements OnInit {
   }
 
   closeLoadingScreen() {
-    try {
-      this.awsSsoRoleService.interrupt();
-    } catch(err) {
-      this.loading = false;
-    }
+    // TODO: call aws sso oidc service directly
+    this.awsSsoRoleService.interrupt();
+    this.loadingInBrowser = false;
+    this.loadingInApp = false;
+  }
+
+  catchClosingBrowserWindow(): void {
+    this.loadingInBrowser = false;
+    this.loadingInApp = false;
   }
 }

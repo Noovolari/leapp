@@ -71,7 +71,7 @@ Using a **template** ensures that every **Access Method** for AWS, will need to 
 The steps included are:
 
 - **Stop all sessions with the same name profile** - only one session can be activated with a specific profile name at a time.
-- Put Session state to **loading**.
+- Put Session state to **loadingInBrowser**.
 - Generate a set of new temporary credentials for the given session - this is overridden by the **specific Access Method.**
 - Once obtained the new temporary credentials apply them - this step is also **overridden by Access Methods.**
 - Finally set Session state to **active** using sessionActivate() method. This method will also set the **startDateTime** to the current Date and Time.
@@ -97,7 +97,7 @@ A similar approach to Start is used with Rotate. Rotate() is called by the Clien
 
 The steps included are:
 
-- Put Session state to **loading**.
+- Put Session state to **loadingInBrowser**.
 - Generate a set of new temporary credentials for the given session - this is overridden by the **specific Access Method.**
 - Once obtained the new temporary credentials apply them - this step is also **overridden by Access Methods.**
 - Finally set Session state to **active** by calling the sessionRotated() method. This method will also set the **startDateTime** to the current Date and Time.

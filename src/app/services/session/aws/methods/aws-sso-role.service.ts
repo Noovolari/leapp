@@ -113,12 +113,12 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   async catchClosingBrowserWindow(): Promise<void> {
     // Get all current sessions if any
     const sessions = this.listAwsSsoRoles();
+
     for (let i = 0; i < sessions.length; i++) {
       // Stop session
       const sess = sessions[i];
       await this.stop(sess.sessionId).then(_ => {});
     }
-    this.appService.toast('You closed the browser window, login process is stopped.', ToastLevel.info, 'Force Closed Browser Window');
   }
 
   create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
@@ -200,7 +200,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     this.ssoPortal.logout(logoutRequest).promise().then(_ => {}, _ => {
       // Clean clients
       this.ssoPortal = null;
-      this.awsSsoOidcService.unsetOidc();
 
       // Delete access token and remove sso configuration info from workspace
       this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');

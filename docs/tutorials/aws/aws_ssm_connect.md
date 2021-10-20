@@ -22,7 +22,7 @@ In the context menu, choose **SSM Session**.
 
 ![](../../../images/tutorials/aws_ssm_connect/AWS_SSM_CONNECT-2.png)
 
-In the modal that should open select the **region** in which your EC2 instance resides. After loading all the available instances in that region, it will be possible to connect.
+In the modal that should open select the **region** in which your EC2 instance resides. After loadingInBrowser all the available instances in that region, it will be possible to connect.
 
 ![](../../../images/tutorials/aws_ssm_connect/AWS_SSM_CONNECT-3.png)
 

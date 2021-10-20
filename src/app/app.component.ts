@@ -50,12 +50,12 @@ export class AppComponent implements OnInit {
     if (environment.production) {
       // Clear both info and warn message in production
       // mode without removing them from code actually
-      // console.warn = () => {};
-      // console.log = () => {};
+      console.warn = () => {};
+      console.log = () => {};
     }
 
     // Prevent Dev Tool to show on production mode
-    // this.app.blockDevToolInProductionMode();
+    this.app.blockDevToolInProductionMode();
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
@@ -66,8 +66,6 @@ export class AppComponent implements OnInit {
     let workspace;
     try {
       workspace = this.workspaceService.get();
-      //workspace.awsSsoConfiguration.expirationTime = new Date(Date.now() - 4000 * 24);
-      //this.workspaceService.persist(workspace);
 
       if (!workspace.awsSsoConfiguration.browserOpening) {
         workspace.awsSsoConfiguration.browserOpening = Constants.inApp.toString();
@@ -142,6 +140,8 @@ export class AppComponent implements OnInit {
         icon: __dirname + '/assets/images/Leapp.png',
         message: 'You had a previous credential file. We made a backup of the old one in the same directory before starting.'
       });
+    } else if(!this.fileService.exists(this.app.awsCredentialPath())) {
+      this.fileService.writeFileSync(this.app.awsCredentialPath(), '');
     }
   }
 

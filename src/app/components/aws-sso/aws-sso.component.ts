@@ -5,7 +5,6 @@ import {AppService} from '../../services/app.service';
 import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
 import {Constants} from '../../models/constants';
-import {AwsSsoOidcService} from "../../services/aws-sso-oidc.service";
 
 @Component({
   selector: 'app-aws-sso',
@@ -32,8 +31,7 @@ export class AwsSsoComponent implements OnInit {
     private appService: AppService,
     private awsSsoRoleService: AwsSsoRoleService,
     private router: Router,
-    private workspaceService: WorkspaceService,
-    private awsSsoOidcService: AwsSsoOidcService
+    private workspaceService: WorkspaceService
   ) {}
 
   ngOnInit() {
@@ -60,10 +58,8 @@ export class AwsSsoComponent implements OnInit {
         ssoRoleSessions.forEach(ssoRoleSession => {
           this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
         });
+        this.router.navigate(['/sessions', 'session-selected']);
         this.loading = false;
-        setTimeout(() => {
-          this.router.navigate(['/sessions', 'session-selected']);
-        }, 1500);
       } catch (err) {
         this.loading = false;
         await this.logout();
@@ -85,10 +81,8 @@ export class AwsSsoComponent implements OnInit {
       ssoRoleSessions.forEach(ssoRoleSession => {
         this.awsSsoRoleService.create(ssoRoleSession, ssoRoleSession.profileId);
       });
+      this.router.navigate(['/sessions', 'session-selected']);
       this.loading = false;
-      setTimeout(() => {
-        this.router.navigate(['/sessions', 'session-selected']);
-      });
     } catch(err) {
       this.loading = false;
       await this.logout();
@@ -101,7 +95,10 @@ export class AwsSsoComponent implements OnInit {
   }
 
   gotoWebForm() {
-    this.appService.openExternalUrl(this.portalUrl);
+    this.awsSsoRoleService.interrupt();
+    setInterval(() => {
+      this.login();
+    }, 2000);
   }
 
   setValues() {
@@ -113,5 +110,10 @@ export class AwsSsoComponent implements OnInit {
     this.selectedRegion = region || this.regions[0].region;
     this.portalUrl = portalUrl;
     this.form.controls['portalUrl'].setValue(portalUrl);
+  }
+
+  closeLoadingScreen() {
+    this.loading = false;
+    this.awsSsoRoleService.interrupt();
   }
 }

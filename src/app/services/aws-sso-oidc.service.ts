@@ -35,6 +35,7 @@ export class AwsSsoOidcService {
   private setIntervalQueue: Array<any>;
   private timeoutOccurred: boolean;
   private loginMutex: boolean;
+  private interruptPromise: boolean;
 
   constructor(
     private workspaceService: WorkspaceService,
@@ -45,16 +46,22 @@ export class AwsSsoOidcService {
     this.setIntervalQueue = [];
     this.timeoutOccurred = false;
     this.loginMutex = false;
+    this.interruptPromise = false;
   }
 
   getAwsSsoOidcClient(): SSOOIDC {
     return this.ssoOidc;
   }
 
+  interrupt() {
+    this.interruptPromise = true;
+  }
+
   async login(region: string, portalUrl: string): Promise<GenerateSSOTokenResponse> {
     if (!this.loginMutex && this.setIntervalQueue.length === 0) {
       this.loginMutex = true;
       this.timeoutOccurred = false;
+      this.interruptPromise = false;
 
       if (!this.ssoOidc || (region !== this.currentRegion) || (portalUrl !== this.currentPortalUrl)) {
         this.currentRegion = region;
@@ -121,9 +128,15 @@ export class AwsSsoOidcService {
       // TODO: check if starting session or logging in as integration
 
       return new Promise((resolve, reject) => {
-        const repeatEvery = 5000; // 5 seconds
+        const repeatEvery = 500; // 0.5 second, we can make these more speedy as they just check a variable, no external calls here
 
         const resolved = setInterval(async () => {
+          if(this.interruptPromise) {
+            clearInterval(resolved);
+            reject(new LeappBaseError('AWS SSO Interrupted', this, LoggerLevel.info, 'AWS SSO Interrupted.'));
+            return;
+          }
+
           if (this.generateSSOTokenResponse) {
             clearInterval(resolved);
 
@@ -263,6 +276,21 @@ export class AwsSsoOidcService {
       const intervalInMilliseconds = 5000;
 
       const resolved = setInterval(() => {
+        if(this.interruptPromise) {
+          clearInterval(resolved);
+
+          // Unblock here to avoid miss timing
+          this.unsetOidc();
+          this.registerClientResponse = null;
+          this.startDeviceAuthorizationResponse = null;
+          this.startDeviceAuthorizationResponseExpiresAt = null;
+          this.setIntervalQueue = [];
+          this.loginMutex = false;
+
+          reject(new LeappBaseError('AWS SSO Interrupted', this, LoggerLevel.info, 'AWS SSO Interrupted.'));
+          return;
+        }
+
         this.getAwsSsoOidcClient().createToken(createTokenRequest).promise().then(createTokenResponse => {
           clearInterval(resolved);
           resolve(createTokenResponse);

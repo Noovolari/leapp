@@ -44,6 +44,12 @@
             <span class="form-control blue-control">{{selectedRegion}}</span>
           </div>
 
+          <div class="form-group" style="width: 100%; display: inline-block;">
+            <label><strong>Default browser opening</strong></label>
+            <br>
+            <span class="form-control blue-control">{{selectedBrowserOpening}}</span>
+          </div>
+
 
         </ng-container>
       </form>
@@ -60,9 +66,10 @@
     </ng-container>
 
   </ng-container>
+
   <ng-container *ngIf="loading">
     <h1 class="loading-title"><span class="back-link"><i class="fa fa-link"></i></span> AWS SSO Login</h1>
-    <span class="closing" (click)="loading = false;">&times;</span>
+    <span class="closing" (click)="closeLoadingScreen();">&times;</span>
 
     <div class="loading-content">
       <label class="loading-leapp">Leapp</label>

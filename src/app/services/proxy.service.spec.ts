@@ -8,7 +8,7 @@ import {Workspace} from '../models/workspace';
 import {AppService} from './app.service';
 
 import SpyObj = jasmine.SpyObj;
-import {FileService} from "./file.service";
+import {FileService} from './file.service';
 
 describe('ProxyService', () => {
   let service: ProxyService;

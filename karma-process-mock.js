@@ -1,3 +1,3 @@
-const process =  {
+var process =  {
   env: { DEBUG: undefined },
 };

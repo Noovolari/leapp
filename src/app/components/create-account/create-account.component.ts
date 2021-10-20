@@ -163,7 +163,7 @@ export class CreateAccountComponent implements OnInit {
     this.addProfileToWorkspace();
     this.saveNewSsoRolesToWorkspace();
     this.createSession();
-    this.router.navigate(['/sessions', 'session-selected']);
+    this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
   }
 
   /**
@@ -214,7 +214,7 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   goToAwsSso() {
-    this.router.navigate(['/', 'aws-sso']);
+    this.router.navigate(['/', 'aws-sso']).then(_ => {});
   }
 
   /**
@@ -223,16 +223,7 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   goBack() {
-    const workspace = this.workspaceService.get();
-
-    if (workspace.sessions.length > 0) {
-      this.router.navigate(['/sessions', 'session-selected']);
-    } else {
-      this.sessionType = undefined;
-      this.provider = undefined;
-      this.providerSelected = false;
-      this.typeSelection = false;
-    }
+    this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
   }
 
   /**

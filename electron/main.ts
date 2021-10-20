@@ -53,9 +53,9 @@ const buildAutoUpdater = (win: any): void => {
   };
   autoUpdater.setFeedURL(data);
 
-  autoUpdater.checkForUpdates();
+  autoUpdater.checkForUpdates().then(_ => {});
   setInterval(() => {
-    autoUpdater.checkForUpdates();
+    autoUpdater.checkForUpdates().then(_ => {});
   }, 1000 * 60 * minutes);
 
   autoUpdater.on('update-available', (info) => {

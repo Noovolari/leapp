@@ -3,10 +3,6 @@ import {PositioningService} from 'ngx-bootstrap/positioning';
 import {ComponentLoaderFactory} from 'ngx-bootstrap/component-loader';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import 'jasmine';
-import {Workspace} from './app/models/workspace';
-import {AppService} from './app/services/app.service';
-import {FileService} from './app/services/file.service';
-import {serialize} from 'class-transformer';
 
 const spyToasterService = jasmine.createSpyObj('ToastrService', ['success', 'warning', 'error', 'info']);
 spyToasterService.success.and.callFake(() => {});

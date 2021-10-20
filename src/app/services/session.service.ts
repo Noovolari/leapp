@@ -22,6 +22,10 @@ export abstract class SessionService {
     return this.workspaceService.sessions;
   }
 
+  listPending(): Session[] {
+    return (this.list().length > 0) ? this.list().filter( (session) => session.status === SessionStatus.pending ) : [];
+  }
+
   listActive(): Session[] {
     return (this.list().length > 0) ? this.list().filter( (session) => session.status === SessionStatus.active ) : [];
   }

@@ -6,6 +6,8 @@ import {SessionType} from '../../../models/session-type';
 import {SessionStatus} from '../../../models/session-status';
 import {AwsIamRoleChainedSession} from '../../../models/aws-iam-role-chained-session';
 import {SessionService} from '../../session.service';
+import {LeappBaseError} from '../../../errors/leapp-base-error';
+import {LoggerLevel} from '../../app.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +38,9 @@ export abstract class AwsSessionService extends SessionService {
 
   async start(sessionId: string): Promise<void> {
     try {
+      if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
+        throw new LeappBaseError('Pending session with same named profile', this, LoggerLevel.info, 'Pending session with same named profile');
+      }
       this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);
       const credentialsInfo = await this.generateCredentials(sessionId);
@@ -84,6 +89,20 @@ export abstract class AwsSessionService extends SessionService {
     }
   }
 
+  private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
+    const session = this.get(sessionId);
+    const profileId = (session as any).profileId;
+    const pendingSessions = this.listPending();
+
+    for(let i = 0; i < pendingSessions.length; i++) {
+      if ((pendingSessions[i] as any).profileId === profileId && (pendingSessions[i] as any).sessionId !== sessionId) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private stopAllWithSameNameProfile(sessionId: string) {
     // Get profile to check
     const session = this.get(sessionId);
@@ -93,7 +112,7 @@ export abstract class AwsSessionService extends SessionService {
     // Stop all that shares the same profile
     activeSessions.forEach(sess => {
       if( (sess as any).profileId === profileId ) {
-        this.stop(sess.sessionId);
+        this.stop(sess.sessionId).then(_ => {});
       }
     });
   }

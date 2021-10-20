@@ -32,13 +32,47 @@ input { height: 36px!important; }
 .ng-select-opened .ng-placeholder { opacity: 0.4; }
 
 .ng-arrow {
-  top: 4px!important;
+  top: 4px;
   border-color: transparent transparent #999;
   border-width: 0 5px 5px;
 }
 
 .ng-select { margin-top: 0!important; }
 .ng-select .ng-select-container { height: 36px; }
+
+.ng-select .ng-arrow-wrapper {
+   -moz-user-select: none;
+   -ms-user-select: none;
+   -webkit-user-select: none;
+   cursor: pointer;
+   position: relative;
+   text-align: center;
+   user-select: none;
+}
+
+.ng-select .ng-arrow-wrapper {
+  width: 25px;
+  height: 25px;
+  text-align: center!important;
+  padding: 0;
+  vertical-align: middle;
+  margin: 4px;
+  top: 1px;
+  border-radius: 4px;
+  background-color: $main-color-light;
+}
+
+.ng-select > .ng-select-container .ng-arrow {
+  top: 1px;
+  border-color: #ffffff transparent transparent!important;
+  border-width: 5px 5px 0;
+}
+
+.ng-select.ng-select-opened > .ng-select-container .ng-arrow {
+  top: 1px;
+  border-color: transparent transparent #ffffff!important;
+  border-width: 0 5px 5px;
+}
 
 .ng-option {
   box-sizing: border-box;
@@ -58,11 +92,18 @@ input { height: 36px!important; }
 .ng-value-label {
   font-size: 12px;
   position: absolute;
-  top: 16px;
+  top: 9px!important;
   overflow: hidden;
   text-overflow: ellipsis;
   display: inline-block;
   width: 90%;
+}
+
+.ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input {
+  top: 0!important;
+  left: 0;
+  padding-left: 10px;
+  padding-right: 50px;
 }
 
 form button {

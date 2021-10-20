@@ -25,6 +25,7 @@ $theme-colors: (
 /**
 Library scss
 */
+//noinspection CssUnknownTarget
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import "~bootstrap/dist/css/bootstrap.css";
 
@@ -33,3 +34,6 @@ Ng Select theme material
  */
 @import "~@ng-select/ng-select/themes/default.theme.css";
 
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

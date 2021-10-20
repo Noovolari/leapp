@@ -1,3 +1,5 @@
+// noinspection DuplicatedCode
+
 import {TestBed} from '@angular/core/testing';
 
 import {AwsSessionService} from './aws-session.service';

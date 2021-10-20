@@ -11,6 +11,7 @@ import {AwsIamUserSession} from '../models/aws-iam-user-session';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {AzureSession} from '../models/azure-session';
 import {WorkspaceService} from './workspace.service';
+import {Constants} from '../models/constants';
 
 @Injectable({
   providedIn: 'root'
@@ -23,6 +24,72 @@ export class RetrocompatibilityService {
     private keychainService: KeychainService,
     private workspaceService: WorkspaceService
   ) { }
+
+  private static adaptIdpUrls(oldWorkspace: any, workspace: Workspace) {
+    workspace.idpUrls = oldWorkspace.workspaces[0].idpUrl;
+  }
+
+  private static adaptProxyConfig(oldWorkspace: any, workspace: Workspace) {
+    workspace.proxyConfiguration = oldWorkspace.workspaces[0].proxyConfiguration;
+  }
+
+  private static adaptGeneralProperties(oldWorkspace: any, workspace: Workspace) {
+    workspace.defaultRegion   = oldWorkspace.workspaces[0].defaultRegion;
+    workspace.defaultLocation = oldWorkspace.workspaces[0].defaultLocation;
+  }
+
+  private static createNewAwsFederatedOrIamRoleChainedSession(session: any, workspace: Workspace) {
+    if(!session.account.parent) {
+      // Federated
+      const federatedSession = new AwsIamRoleFederatedSession(
+        session.account.accountName,
+        session.account.region,
+        session.account.idpUrl,
+        session.account.idpArn,
+        session.account.role.roleArn,
+        workspace.profiles[0].id
+      );
+      federatedSession.sessionId = session.id;
+
+      workspace.sessions.push(federatedSession);
+    } else {
+      // IamRoleChained
+      const iamRoleChainedSession = new AwsIamRoleChainedSession(
+        session.account.accountName,
+        session.account.region,
+        session.account.role.roleArn,
+        workspace.profiles[0].id,
+        session.account.parent
+      );
+      iamRoleChainedSession.sessionId = session.id;
+
+      workspace.sessions.push(iamRoleChainedSession);
+    }
+  }
+
+  private static createNewAwsSingleSignOnSession(session: any, workspace: Workspace) {
+    const ssoSession = new AwsSsoRoleSession(
+      session.account.accountName,
+      session.account.region,
+      `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
+      workspace.profiles[0].id,
+      session.account.email
+    );
+    ssoSession.sessionId = session.id;
+
+    workspace.sessions.push(ssoSession);
+  }
+
+  private static createNewAzureSession(session: any, workspace: Workspace) {
+    const azureSession = new AzureSession(
+      session.account.accountName,
+      session.account.region,
+      session.account.subscriptionId,
+      session.account.tenantId
+    );
+    azureSession.sessionId = session.id;
+    workspace.sessions.push(azureSession);
+  }
 
   isRetroPatchNecessary(): boolean {
     if (this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
@@ -46,9 +113,9 @@ export class RetrocompatibilityService {
       this.persists(workspace);
     } else {
       // Adapt data structure
-      this.adaptIdpUrls(oldWorkspace, workspace);
-      this.adaptProxyConfig(oldWorkspace, workspace);
-      this.adaptGeneralProperties(oldWorkspace, workspace);
+      RetrocompatibilityService.adaptIdpUrls(oldWorkspace, workspace);
+      RetrocompatibilityService.adaptProxyConfig(oldWorkspace, workspace);
+      RetrocompatibilityService.adaptGeneralProperties(oldWorkspace, workspace);
       await this.adaptAwsSsoConfig(oldWorkspace, workspace);
       await this.adaptSessions(oldWorkspace, workspace);
 
@@ -83,18 +150,16 @@ export class RetrocompatibilityService {
       // Get session type
       const sessionType = session.account.type;
       switch (sessionType) {
-        case 'AWS': this.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
-        case 'AWS_TRUSTER': this.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
+        case 'AWS': RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
+        case 'AWS_TRUSTER': RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
         case 'AWS_PLAIN_USER': await this.createNewAwsIamUserSession(session, workspace); break;
-        case 'aws_sso': this.createNewAwsSingleSignOnSession(session, workspace); break;
-        case 'azure': this.createNewAzureSession(session, workspace); break;
+        case 'aws_sso': RetrocompatibilityService.createNewAwsSingleSignOnSession(session, workspace); break;
+        case 'azure': RetrocompatibilityService.createNewAzureSession(session, workspace); break;
       }
     }
   }
 
-  private adaptIdpUrls(oldWorkspace: any, workspace: Workspace) {
-    workspace.idpUrls = oldWorkspace.workspaces[0].idpUrl;
-  }
+
 
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: Workspace): Promise<void> {
     // check if we have at least one SSO session
@@ -107,10 +172,12 @@ export class RetrocompatibilityService {
         let region;
         let portalUrl;
         let expirationTime;
+        let browserOpening;
         try {
           region = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION');
           portalUrl = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL');
           expirationTime = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
+          browserOpening = Constants.inApp.toString();
         } catch(err) {
           // we need all or nothing, otherwise it means that configuration is incomplete so its better
           // to force the user to redo the process on the new fresh workspace
@@ -119,50 +186,19 @@ export class RetrocompatibilityService {
         workspace.awsSsoConfiguration = {
           region,
           portalUrl,
-          expirationTime
+          expirationTime,
+          browserOpening
         };
         break;
       }
     }
   }
 
-  private adaptProxyConfig(oldWorkspace: any, workspace: Workspace) {
-    workspace.proxyConfiguration = oldWorkspace.workspaces[0].proxyConfiguration;
-  }
 
-  private adaptGeneralProperties(oldWorkspace: any, workspace: Workspace) {
-    workspace.defaultRegion   = oldWorkspace.workspaces[0].defaultRegion;
-    workspace.defaultLocation = oldWorkspace.workspaces[0].defaultLocation;
-  }
 
-  private createNewAwsFederatedOrIamRoleChainedSession(session: any, workspace: Workspace) {
-    if(!session.account.parent) {
-      // Federated
-      const federatedSession = new AwsIamRoleFederatedSession(
-        session.account.accountName,
-        session.account.region,
-        session.account.idpUrl,
-        session.account.idpArn,
-        session.account.role.roleArn,
-        workspace.profiles[0].id
-      );
-      federatedSession.sessionId = session.id;
 
-      workspace.sessions.push(federatedSession);
-    } else {
-      // IamRoleChained
-      const iamRoleChainedSession = new AwsIamRoleChainedSession(
-        session.account.accountName,
-        session.account.region,
-        session.account.role.roleArn,
-        workspace.profiles[0].id,
-        session.account.parent
-      );
-      iamRoleChainedSession.sessionId = session.id;
 
-      workspace.sessions.push(iamRoleChainedSession);
-    }
-  }
+
 
   private async createNewAwsIamUserSession(session: any, workspace: Workspace) {
     const iamUserSession = new AwsIamUserSession(
@@ -179,33 +215,13 @@ export class RetrocompatibilityService {
     const secretKey = await this.keychainService.getSecret(
       environment.appName, `${session.account.accountName}___${session.account.user}___secretKey`);
 
-    this.keychainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-access-key-id`, accessKey);
-    this.keychainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-secret-access-key`, secretKey);
+    await this.keychainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-access-key-id`, accessKey);
+    await this.keychainService.saveSecret(environment.appName, `${session.id}-iam-user-aws-session-secret-access-key`, secretKey);
 
     workspace.sessions.push(iamUserSession);
   }
 
-  private createNewAwsSingleSignOnSession(session: any, workspace: Workspace) {
-    const ssoSession = new AwsSsoRoleSession(
-      session.account.accountName,
-      session.account.region,
-      `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
-      workspace.profiles[0].id,
-      session.account.email
-    );
-    ssoSession.sessionId = session.id;
 
-    workspace.sessions.push(ssoSession);
-  }
 
-  private createNewAzureSession(session: any, workspace: Workspace) {
-    const azureSession = new AzureSession(
-      session.account.accountName,
-      session.account.region,
-      session.account.subscriptionId,
-      session.account.tenantId
-    );
-    azureSession.sessionId = session.id;
-    workspace.sessions.push(azureSession);
-  }
+
 }

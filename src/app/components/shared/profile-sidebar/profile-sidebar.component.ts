@@ -61,16 +61,16 @@ export class ProfileSidebarComponent implements OnInit {
 
   goToProfile() {
     this.closeProfile();
-    this.router.navigate(['/profile']);
+    this.router.navigate(['/profile']).then(_ => {});
   }
 
   goToHome() {
     this.closeProfile();
-    this.router.navigate(['/sessions', 'session-selected']);
+    this.router.navigate(['/sessions', 'session-selected']).then(_ => {});
   }
 
   goToIdentityProvider() {
     this.closeProfile();
-    this.router.navigate(['/', 'aws-sso']);
+    this.router.navigate(['/', 'aws-sso']).then(_ => {});
   }
 }

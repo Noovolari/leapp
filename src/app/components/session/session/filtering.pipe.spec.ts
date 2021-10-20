@@ -1,6 +1,5 @@
 import {FilteringPipe} from './filtering.pipe';
 import {Session} from '../../../models/session';
-import * as uuid from 'uuid';
 import {SessionStatus} from '../../../models/session-status';
 
 let sessions: Session[] = [];

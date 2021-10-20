@@ -13,7 +13,6 @@ import {BehaviorSubject, Observable} from 'rxjs';
 
 export class WorkspaceService {
 
-
   // Expose the observable$ part of the _sessions subject (read only stream)
   readonly sessions$: Observable<Session[]>;
 
@@ -178,8 +177,20 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
-  getAwsSsoConfiguration(): {region: string; portalUrl: string; expirationTime: string} {
+  getAwsSsoConfiguration(): {region: string; portalUrl: string; browserOpening: string; expirationTime: string} {
     return this.get().awsSsoConfiguration;
+  }
+
+  setAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string, expirationTime: string) {
+    const workspace = this.get();
+    workspace.awsSsoConfiguration = { region, portalUrl, browserOpening, expirationTime };
+    this.persist(workspace);
+  }
+
+  updateBrowserOpening(browserOpening: string) {
+    const workspace = this.get();
+    workspace.awsSsoConfiguration.browserOpening = browserOpening;
+    this.persist(workspace);
   }
 
   updateProxyConfiguration(proxyConfiguration: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
@@ -188,7 +199,7 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
-  private persist(workspace: Workspace) {
+   persist(workspace: Workspace) {
     const path = this.appService.getOS().homedir() + '/' + environment.lockFileDestination;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }

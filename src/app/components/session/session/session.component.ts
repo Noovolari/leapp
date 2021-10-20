@@ -3,9 +3,7 @@ import {WorkspaceService} from '../../../services/workspace.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {AppService} from '../../../services/app.service';
 import {HttpClient} from '@angular/common/http';
-import {Session} from '../../../models/session';
 import {BsModalService} from 'ngx-bootstrap/modal';
-import {SessionService} from '../../../services/session.service';
 
 @Component({
   selector: 'app-session',
@@ -52,7 +50,7 @@ export class SessionComponent implements OnInit {
    */
   createAccount() {
     // Go!
-    this.router.navigate(['/managing', 'create-account']);
+    this.router.navigate(['/managing', 'create-account']).then(_ => {});
   }
 
   setVisibility(name) {

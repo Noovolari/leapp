@@ -105,7 +105,7 @@ export class SessionCardComponent implements OnInit {
    * Start the selected session
    */
   startSession() {
-    this.sessionService.start(this.session.sessionId);
+    this.sessionService.start(this.session.sessionId).then(_ => {});
     this.logSessionData(this.session, `Starting Session`);
   }
 
@@ -113,7 +113,7 @@ export class SessionCardComponent implements OnInit {
    * Stop session
    */
   stopSession() {
-    this.sessionService.stop(this.session.sessionId);
+    this.sessionService.stop(this.session.sessionId).then(_ => {});
     this.logSessionData(this.session, `Stopped Session`);
   }
 
@@ -130,7 +130,7 @@ export class SessionCardComponent implements OnInit {
 
     this.appService.confirmDialog(dialogMessage, (status) => {
       if (status === Constants.confirmed) {
-        this.sessionService.delete(session.sessionId);
+        this.sessionService.delete(session.sessionId).then(_ => {});
         this.logSessionData(session, 'Session Deleted');
       }
     });
@@ -144,7 +144,7 @@ export class SessionCardComponent implements OnInit {
    */
   editSession(session: Session, event) {
     event.stopPropagation();
-    this.router.navigate(['/managing', 'edit-account'], {queryParams: { sessionId: session.sessionId }});
+    this.router.navigate(['/managing', 'edit-account'], {queryParams: { sessionId: session.sessionId }}).then(_ => {});
   }
 
   /**

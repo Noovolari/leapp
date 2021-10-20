@@ -165,6 +165,7 @@ This can be used to inject some Electron specific libraries in the actual Angula
 - Locate this area in the page:
 
 ```html
+<!--suppress JSValidateTypes -->
 <script>
   window.log = require('electron-log');
   window.fs = require('fs');

@@ -9,7 +9,6 @@ import SpyObj = jasmine.SpyObj;
 import {FileService} from './file.service';
 import {WorkspaceService} from './workspace.service';
 import {KeychainService} from './keychain.service';
-import createSpyObj = jasmine.createSpyObj;
 
 describe('RetrocompatibilityService', () => {
   let service: RetrocompatibilityService;
@@ -36,7 +35,7 @@ describe('RetrocompatibilityService', () => {
         idpUrl: [
           {
             id: 'cb8a78b9-357f-4cb8-965b-655838f068c1',
-            url: 'http://accounts.google.com/o/saml2/initsso?idpid=C03eqis8s&spid=1033946587263&forceauthn=false'
+            url: 'https://accounts.google.com/o/saml2/initsso?idpid=C03eqis8s&spid=1033946587263&forceauthn=false'
           }
         ],
         proxyConfiguration: {

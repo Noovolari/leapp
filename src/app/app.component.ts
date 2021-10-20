@@ -14,6 +14,7 @@ import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {LoggingService} from './services/logging.service';
 import {LeappParseError} from './errors/leapp-parse-error';
+import {Constants} from './models/constants';
 
 @Component({
   selector: 'app-root',
@@ -65,6 +66,13 @@ export class AppComponent implements OnInit {
     let workspace;
     try {
       workspace = this.workspaceService.get();
+      //workspace.awsSsoConfiguration.expirationTime = new Date(Date.now() - 4000 * 24);
+      //this.workspaceService.persist(workspace);
+
+      if (!workspace.awsSsoConfiguration.browserOpening) {
+        workspace.awsSsoConfiguration.browserOpening = Constants.inApp.toString();
+        this.workspaceService.persist(workspace);
+      }
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
     }
@@ -89,9 +97,9 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     if (workspace.sessions.length > 0) {
-      this.router.navigate(['/sessions', 'session-selected']);
+      await this.router.navigate(['/sessions', 'session-selected']);
     } else {
-      this.router.navigate(['/start', 'start-page']);
+      await this.router.navigate(['/start', 'start-page']);
     }
   }
 

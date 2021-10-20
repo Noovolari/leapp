@@ -37,6 +37,7 @@ body {
   font-weight: 400;
 }
 
+//noinspection DuplicatedCode
 .container-fluid {
   color: $text-color;
   font-family: "AvenirNext", "Open Sans", sans-serif;
@@ -54,10 +55,6 @@ body {
       padding: 0 30px;
       font-size: 12px;
     }
-  }
-
-  .ng-dropdown-panel .ng-dropdown-panel-items {
-    max-height: 188px;
   }
 
   h1 {
@@ -139,6 +136,7 @@ body {
   transform: translateX(-50%);
 }
 
+//noinspection DuplicatedCode
 button {
   background-color: $main-color-light;
   color: $primary-text-color;
@@ -155,15 +153,73 @@ button {
   padding: 10px;
   cursor: pointer;
 }
+
 button:hover {
   background-color: transparent;
   color: #73E0CF;
   border: 2px solid #73E0CF!important;
 }
+
 button.disabled {
   background: $light-grey;
   color: $charcoal-grey;
   border: 2px solid $charcoal-grey!important;
+}
+
+.loading-content {
+  margin: 0 auto;
+  padding: 20px;
+  width: 380px;
+}
+
+.loading-pc {
+  width: 300px;
+  margin-bottom: 50px;
+}
+
+.closing {
+  font-size: 35px;
+  font-weight: lighter;
+  color: #666;
+  position: absolute;
+  right: 40px;
+  top: 20px;
+  cursor: pointer;
+}
+
+.loading-title {
+  font-size: 16px!important;
+  font-weight: bold!important;
+  color: #666!important;
+  position: relative!important;
+  margin-top: 10px!important;
+  padding-left: 86px!important;
+}
+
+.loading-leapp {
+  font-weight: bold;
+  margin-bottom: 20px;
+  display: inline-block;
+  text-align: center;
+  width: 100%;
+  color: #666;
+}
+
+.loading-text {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 50px;
+  display: inline-block;
+}
+
+.loading-link {
+  font-size: 12px;
+  display: inline-block;
+  color: #666;
+  width: 100%;
+  text-align: center;
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 @keyframes expanding {

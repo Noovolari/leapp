@@ -1,137 +1,151 @@
-<div class="background">
+<div class="antiglobal background">
   <app-profile></app-profile>
   <div class="container-fluid background">
     <app-profile-sidebar></app-profile-sidebar>
 
-    <div class="tabs">
-      <label class="tab {{activeTab === 1 ? 'active': ''}}" (click)="activeTab = 1;">General</label>
-      <label class="tab {{activeTab === 2 ? 'active': ''}}" (click)="activeTab = 2;">IdP Urls</label>
-      <label class="tab {{activeTab === 3 ? 'active': ''}}" (click)="activeTab = 3;">Named Profiles</label>
-    </div>
-
     <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
 
-      <div class="no-margin no-padding panel" *ngIf="activeTab === 1">
-        <h2>Default Regions</h2>
+    <mat-tab-group>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mat-tab-icon">settings</mat-icon>
+          <span class="mat-tab-label-text">General</span>
+        </ng-template>
+        <div class="no-margin no-padding panel">
+          <h2 style="margin-top: 10px;">Default Regions</h2>
+          <div class="form-group" style="width: 43%; display: inline-block;">
+            <label>Select default AWS Region</label>
+            <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="down"></ng-select>
+          </div>
 
-        <div class="form-group" style="width: 49%; display: inline-block;">
-          <label>Azure Location</label>
-          <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="down"></ng-select>
+          <div class="form-group" style="width: 14%; display: inline-block;"></div>
+
+          <div class="form-group" style="width: 43%; display: inline-block;">
+            <label>Select default Azure Location</label>
+            <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="down"></ng-select>
+          </div>
+
+          <h2 style="margin-top: 10px;">AWS SSO</h2>
+          <div class="form-group" style="width: 43%; display: inline-block;">
+            <label>Default browser opening</label>
+            <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedBrowserOpening" dropdownPosition="down"></ng-select>
+          </div>
+
+        </div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mat-tab-icon">share</mat-icon>
+          <span class="mat-tab-label-text">IdP Urls</span>
+        </ng-template>
+        <div class="no-padding no-margin panel">
+          <h2 style="margin-top: 10px;">IdP URL list</h2>
+
+          <div class="form-group" style="width: 100%; display: inline-block; position: relative;">
+            <label>SAML 2.0 IdP URL<span class="danger-text">*</span></label>
+            <input formControlName="idpUrl" type="text" class="form-control adapt" placeholder="Idp Url" [value]="idpUrlValue ? idpUrlValue.url : ''" >
+            <button class="inside-btn" type="button" (click)="manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"><i class="far fa-{{editingIdpUrl ? 'edit' : 'plus'}}"></i></button>
+          </div>
+
+          <div class="idp-url-wrapper">
+            <table>
+              <thead>
+              <th><label>Url</label></th><th class="text-right"><label>Actions</label></th>
+              </thead>
+              <tbody>
+              <ng-container *ngFor="let idpUrl of workspace.idpUrls">
+                <tr *ngIf="idpUrl">
+                  <td>{{idpUrl.url}}</td>
+                  <td>
+                    <button class="my-btn" type="button" (click)="editIdpUrl(idpUrl.id);"><i class="fa fa-edit"></i></button>
+                    <button class="my-btn" type="button" (click)="deleteIdpUrl(idpUrl.id);"><i class="fa fa-trash"></i></button>
+                  </td>
+                </tr>
+              </ng-container>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="form-group" style="width: 2%; display: inline-block;"></div>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mat-tab-icon">account_box</mat-icon>
+          <span class="mat-tab-label-text">Named Profiles</span>
+        </ng-template>
+        <div class="no-padding no-margin panel">
+          <h2 style="margin-top: 10px;">Named Profiles list</h2>
 
-        <div class="form-group" style="width: 49%; display: inline-block;">
-          <label>AWS Region</label>
-          <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="down"></ng-select>
+          <div class="form-group" style="width: 100%; display: inline-block; position: relative;">
+            <label>Named Profile<span class="danger-text">*</span></label>
+            <input formControlName="awsProfile" type="text" class="form-control adapt" placeholder="Profile" [value]="awsProfileValue ? awsProfileValue.name : ''" >
+            <button class="inside-btn" type="button" (click)="manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);"><i class="far fa-{{editingAwsProfile ? 'edit' : 'plus'}}"></i></button>
+          </div>
+
+          <div class="idp-url-wrapper">
+            <table>
+              <thead>
+              <th><label>Name</label></th><th class="text-right"><label>Actions</label></th>
+              </thead>
+              <tbody>
+              <ng-container *ngFor="let profile of workspace.profiles">
+                <tr *ngIf="profile">
+                  <td>{{profile.name}}</td>
+                  <td>
+                    <ng-container *ngIf="profile.name !== 'default'">
+                      <button class="my-btn" type="button" (click)="editAwsProfile(profile.id);"><i class="fa fa-edit"></i></button>
+                      <button class="my-btn" type="button" (click)="deleteAwsProfile(profile.id);"><i class="fa fa-trash"></i></button>
+                    </ng-container>
+                  </td>
+                </tr>
+              </ng-container>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <h2>Proxy settings</h2>
-        <div class="form-group" style="width: 16%; display: inline-block;">
-          <label>Protocol</label>
-          <select formControlName="proxyProtocol" class="form-control" [value]="proxyProtocol">
-            <option value="http">HTTP</option>
-            <option value="https">HTTPS</option>
-          </select>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="mat-tab-icon">lan</mat-icon>
+          <span class="mat-tab-label-text">Proxy</span>
+        </ng-template>
+        <div class="no-padding no-margin panel">
+          <h2 style="margin-top: 10px;">Proxy settings</h2>
+          <div class="form-group" style="width: 16%; display: inline-block;">
+            <label>Protocol</label>
+            <select formControlName="proxyProtocol" class="form-control" [value]="proxyProtocol">
+              <option value="http">HTTP</option>
+              <option value="https">HTTPS</option>
+            </select>
+          </div>
+          <div class="form-group" style="width: 6%; display: inline-block; padding-top: 35px; padding-left: 3px;">://</div>
+          <div class="form-group" style="width: 56%; display: inline-block;">
+            <label>Proxy URL</label>
+            <input formControlName="proxyUrl" type="text" class="form-control" placeholder="Proxy Url" [value]="proxyUrl" >
+          </div>
+          <div class="form-group" style="width: 6%; display: inline-block; padding-top: 35px; padding-left: 3px;">:</div>
+          <div class="form-group" style="width: 16%; display: inline-block;">
+            <label>Proxy Port</label>
+            <input formControlName="proxyPort" type="text" class="form-control" placeholder="Proxy Port" [value]="proxyPort" >
+          </div>
+
+          <div class="form-group" style="width: 100%; display: inline-block; height: 35px; padding-top: 10px;">
+            <span><mat-checkbox formControlName="showAuthCheckbox" [(ngModel)]="showProxyAuthentication" class="d-inline-block" style="height: 20px!important;"></mat-checkbox> Use authentication?</span>
+          </div>
+
+          <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="showProxyAuthentication">
+            <label>Username</label>
+            <input formControlName="proxyUsername" type="text" class="form-control" placeholder="Proxy Username" [value]="proxyUsername" >
+          </div>
+          <div class="form-group" style="width: 2%; display: inline-block;"></div>
+          <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="showProxyAuthentication">
+            <label>Password</label>
+            <input formControlName="proxyPassword" type="password" class="form-control" placeholder="Proxy Password" [value]="proxyPassword" >
+          </div>
         </div>
-        <div class="form-group" style="width: 6%; display: inline-block; padding-top: 35px; padding-left: 3px;">://</div>
-        <div class="form-group" style="width: 56%; display: inline-block;">
-          <label>Proxy URL</label>
-          <input formControlName="proxyUrl" type="text" class="form-control" placeholder="Proxy Url" [value]="proxyUrl" >
-        </div>
-        <div class="form-group" style="width: 6%; display: inline-block; padding-top: 35px; padding-left: 3px;">:</div>
-        <div class="form-group" style="width: 16%; display: inline-block;">
-          <label>Proxy Port</label>
-          <input formControlName="proxyPort" type="text" class="form-control" placeholder="Proxy Port" [value]="proxyPort" >
-        </div>
-
-        <div class="form-group" style="width: 100%; display: inline-block; height: 35px; padding-top: 10px;">
-          <span><input formControlName="showAuthCheckbox" [(ngModel)]="showProxyAuthentication" type="checkbox" class="d-inline-block" style="height: 20px!important;"/> Use authentication?</span>
-        </div>
-
-        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="showProxyAuthentication">
-          <label>Username</label>
-          <input formControlName="proxyUsername" type="text" class="form-control" placeholder="Proxy Username" [value]="proxyUsername" >
-        </div>
-        <div class="form-group" style="width: 2%; display: inline-block;"></div>
-        <div class="form-group" style="width: 49%; display: inline-block;" *ngIf="showProxyAuthentication">
-          <label>Password</label>
-          <input formControlName="proxyPassword" type="password" class="form-control" placeholder="Proxy Password" [value]="proxyPassword" >
-        </div>
-
-      </div>
-
-
-
-      <div class="no-padding no-margin panel" *ngIf="activeTab === 2">
-        <h2 style="margin-top: 10px;">IdP URL list</h2>
-
-        <div class="form-group" style="width: 88%; display: inline-block;">
-          <label>SAML 2.0 IdP URL<span class="danger-text">*</span></label>
-          <input formControlName="idpUrl" type="text" class="form-control" placeholder="Idp Url" [value]="idpUrlValue ? idpUrlValue.url : ''" >
-        </div>
-
-        <div class="form-group" style="width: 2%; display: inline-block;"></div>
-
-        <div class="form-group" style="width: 9%; display: inline-block;">
-          <button class="small-btn" type="button" (click)="manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"><i class="far fa-{{editingIdpUrl ? 'edit' : 'plus'}}"></i></button>
-        </div>
-
-        <div class="idp-url-wrapper">
-          <table>
-            <thead>
-            <th><label>Url</label></th><th class="text-right"><label>Actions</label></th>
-            </thead>
-            <tbody>
-            <ng-container *ngFor="let idpUrl of workspace.idpUrls">
-              <tr *ngIf="idpUrl">
-                <td>{{idpUrl.url}}</td>
-                <td>
-                  <button class="xs-btn" type="button" (click)="editIdpUrl(idpUrl.id);"><i class="fa fa-edit"></i></button>
-                  <button class="xs-btn" type="button" (click)="deleteIdpUrl(idpUrl.id);"><i class="fa fa-trash"></i></button>
-                </td>
-              </tr>
-            </ng-container>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="no-padding no-margin panel" *ngIf="activeTab === 3">
-        <h2 style="margin-top: 10px;">Named Profiles list</h2>
-
-        <div class="form-group" style="width: 88%; display: inline-block;">
-          <label>Named Profile<span class="danger-text">*</span></label>
-          <input formControlName="awsProfile" type="text" class="form-control" placeholder="Profile" [value]="awsProfileValue ? awsProfileValue.name : ''" >
-        </div>
-
-        <div class="form-group" style="width: 2%; display: inline-block;"></div>
-
-        <div class="form-group" style="width: 9%; display: inline-block;">
-          <button class="small-btn" type="button" (click)="manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);"><i class="far fa-{{editingAwsProfile ? 'edit' : 'plus'}}"></i></button>
-        </div>
-
-        <div class="idp-url-wrapper">
-          <table>
-            <thead>
-            <th><label>Name</label></th><th class="text-right"><label>Actions</label></th>
-            </thead>
-            <tbody>
-            <ng-container *ngFor="let profile of workspace.profiles">
-              <tr *ngIf="profile">
-                <td>{{profile.name}}</td>
-                <td>
-                  <ng-container *ngIf="profile.name !== 'default'">
-                    <button class="xs-btn" type="button" (click)="editAwsProfile(profile.id);"><i class="fa fa-edit"></i></button>
-                    <button class="xs-btn" type="button" (click)="deleteAwsProfile(profile.id);"><i class="fa fa-trash"></i></button>
-                  </ng-container>
-                </td>
-              </tr>
-            </ng-container>
-            </tbody>
-          </table>
-        </div>
-      </div>
+      </mat-tab>
+    </mat-tab-group>
 
       <button type="button" (click)="goBack();" class="pull-left disabled">Back</button>
       <button type="button" (click)="saveOptions();" [disabled]="!form.valid" [ngClass]="(!form.valid) ? 'pull-right disabled': 'pull-right'">Save</button>

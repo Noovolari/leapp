@@ -2,9 +2,9 @@ import {Session} from './session';
 import * as uuid from 'uuid';
 import {environment} from '../../environments/environment';
 import {Type} from 'class-transformer';
+import {Constants} from './constants';
 
 export class Workspace {
-
   @Type(() => Session)
   private _sessions: Session[];
   private _defaultRegion: string;
@@ -16,6 +16,7 @@ export class Workspace {
     region: string;
     portalUrl: string;
     expirationTime: string;
+    browserOpening: string;
   };
 
   private _proxyConfiguration: {
@@ -38,7 +39,8 @@ export class Workspace {
     this._awsSsoConfiguration = {
       region: undefined,
       portalUrl: undefined,
-      expirationTime: undefined
+      expirationTime: undefined,
+      browserOpening: Constants.inApp.toString()
     };
 
     this._proxyConfiguration = {
@@ -98,11 +100,11 @@ export class Workspace {
     this._defaultLocation = value;
   }
 
-  get awsSsoConfiguration(): { region: string; portalUrl: string; expirationTime: string } {
+  get awsSsoConfiguration(): { region: string; portalUrl: string; browserOpening: string; expirationTime: string } {
     return this._awsSsoConfiguration;
   }
 
-  set awsSsoConfiguration(value: { region: string; portalUrl: string; expirationTime: string }) {
+  set awsSsoConfiguration(value: { region: string; portalUrl: string; browserOpening: string; expirationTime: string }) {
     this._awsSsoConfiguration = value;
   }
 }

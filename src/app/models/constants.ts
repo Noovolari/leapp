@@ -6,4 +6,7 @@ export enum Constants {
   mac = 'mac',
   linux = 'linux',
   windows = 'windows',
+  inApp = 'In-app',
+  inBrowser = 'In-browser',
+  forcedCloseBrowserWindow = 'ForceCloseBrowserWindow',
 }

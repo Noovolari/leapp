@@ -15,7 +15,7 @@ import {KeychainService} from '../../../keychain.service';
 import {AwsIamUserService} from './aws-iam-user.service';
 import {AwsSsoRoleService} from './aws-sso-role.service';
 import {ElectronService} from '../../../electron.service';
-import {AwsSsoOidcService} from '../../../aws-sso-oidc-service';
+import {AwsSsoOidcService} from "../../../aws-sso-oidc.service";
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;

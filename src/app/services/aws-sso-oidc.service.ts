@@ -36,7 +36,7 @@ export class AwsSsoOidcService {
   private timeoutOccurred: boolean;
   private loginMutex: boolean;
 
-  private constructor(
+  constructor(
     private workspaceService: WorkspaceService,
     private appService: AppService,
     private electronService: ElectronService,

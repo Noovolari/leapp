@@ -13,7 +13,6 @@ import {BehaviorSubject, Observable} from 'rxjs';
 
 export class WorkspaceService {
 
-
   // Expose the observable$ part of the _sessions subject (read only stream)
   readonly sessions$: Observable<Session[]>;
 

@@ -12,7 +12,7 @@ import {AzureService} from './session/azure/azure.service';
 import {ExecuteService} from './execute.service';
 import {SessionService} from './session.service';
 import {ElectronService} from './electron.service';
-import {AwsSsoOidcService} from './aws-sso-oidc-service';
+import {AwsSsoOidcService} from './aws-sso-oidc.service';
 
 @Injectable({
   providedIn: 'root'

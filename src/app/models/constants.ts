@@ -8,5 +8,7 @@ export enum Constants {
   windows = 'windows',
   inApp = 'In-app',
   inBrowser = 'In-browser',
+  macOsTerminal = 'Terminal',
+  macOsiTerm2 = 'iTerm2',
   forcedCloseBrowserWindow = 'ForceCloseBrowserWindow',
 }

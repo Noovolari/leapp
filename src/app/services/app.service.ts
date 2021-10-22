@@ -494,6 +494,18 @@ export class AppService {
     ];
   }
 
+   /**
+   * Get supported MacOs terminals
+   *
+   * @returns - [{terminal: string}] - all supported MacOs terminals in array format
+   */
+    getMacOsTerminals() {
+      return [
+        {terminal: 'Terminal'},
+        {terminal: 'iTerm2'}
+      ];
+    }
+
   /**
    * To use EC2 services with the client you need to change the
    * request header because the origin for electron app is of type file

@@ -11,6 +11,7 @@ export class Workspace {
   private _defaultLocation: string;
   private _idpUrls: { id: string; url: string }[];
   private _profiles: { id: string; name: string }[];
+  private _macOsTerminal: string;
 
   private _awsSsoIntegrations: AwsSsoIntegration[];
 
@@ -42,6 +43,7 @@ export class Workspace {
       username: undefined,
       password: undefined
     };
+    this._macOsTerminal = environment.macOsTerminal;
   }
 
   get sessions(): Session[] {
@@ -102,5 +104,13 @@ export class Workspace {
 
   get version(): string {
     return this._version;
+  }
+
+  get macOsTerminal(): string {
+    return this._macOsTerminal;
+  }
+
+  set macOsTerminal(value: string) {
+    this._macOsTerminal = value;
   }
 }

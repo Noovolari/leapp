@@ -45,6 +45,7 @@ export class ProfilePageComponent implements OnInit {
   selectedLocation: string;
   selectedRegion: string;
   selectedBrowserOpening = Constants.inApp.toString();
+  selectedMacOsTerminal: string;
 
   public form = new FormGroup({
     idpUrl: new FormControl(''),
@@ -57,7 +58,8 @@ export class ProfilePageComponent implements OnInit {
     showAuthCheckbox: new FormControl(''),
     regionsSelect: new FormControl(''),
     locationsSelect: new FormControl(''),
-    defaultBrowserOpening: new FormControl('')
+    defaultBrowserOpening: new FormControl(''),
+    macOsTerminalsSelect: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -101,6 +103,7 @@ export class ProfilePageComponent implements OnInit {
     this.locations = this.appService.getLocations();
     this.selectedRegion   = this.workspace.defaultRegion || environment.defaultRegion;
     this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation;
+    this.selectedMacOsTerminal = this.workspace.macOsTerminal || Constants.macOsTerminal.toString();
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -125,6 +128,9 @@ export class ProfilePageComponent implements OnInit {
 
       // this.workspace.awsSsoConfiguration.browserOpening = this.selectedBrowserOpening;
       // this.workspaceService.updateBrowserOpening(this.selectedBrowserOpening);
+
+      this.workspace.macOsTerminal = this.selectedMacOsTerminal;
+      this.workspaceService.updateMacOsTerminal(this.workspace.macOsTerminal);
 
       if (this.checkIfNeedDialogBox()) {
 

@@ -33,6 +33,12 @@
           </div>
           -->
 
+          <h2 style="margin-top: 10px;">External programs</h2>
+          <div class="form-group" style="width: 43%; display: inline-block;">
+            <label>MacOS terminal</label>
+            <ng-select formControlName="macOsTerminalsSelect" bindLabel="terminal" bindValue="terminal" [items]="[{terminal: eConstants.macOsTerminal.toString() }, {terminal: eConstants.macOsiTerm2.toString() }]" [(ngModel)]="selectedMacOsTerminal" dropdownPosition="down"></ng-select>
+          </div>
+
         </div>
       </mat-tab>
       <mat-tab>

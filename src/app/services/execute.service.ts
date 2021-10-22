@@ -1,10 +1,14 @@
-import {Injectable} from '@angular/core';
-import {ElectronService} from './electron.service';
+import { Injectable } from '@angular/core';
+import { ElectronService } from './electron.service';
+import { WorkspaceService } from './workspace.service';
+import { Constants } from '../models/constants';
 
 @Injectable({ providedIn: 'root' })
 export class ExecuteService {
-  constructor(private electronService: ElectronService) {
-  }
+  constructor(
+    private electronService: ElectronService,
+    private workspaceService: WorkspaceService
+  ) { }
 
   /**
    * Execute a command: if the command contains sudo the system launch it with sudo prompt.
@@ -33,8 +37,8 @@ export class ExecuteService {
           }
         }
 
-        exec(command, {env, name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
-          this.electronService.log.info('execute from Leapp: ', {error: err, standardout: stdout, standarderror: stderr});
+        exec(command, { env, name: 'Leapp', timeout: 60000 }, (err, stdout, stderr) => {
+          this.electronService.log.info('execute from Leapp: ', { error: err, standardout: stdout, standarderror: stderr });
           if (err) {
             reject(err);
           } else {
@@ -54,9 +58,19 @@ export class ExecuteService {
    */
   public openTerminal(command: string, env?: any): Promise<string> {
     if (this.electronService.process.platform === 'darwin') {
-      return this.execute(`osascript -e "tell app \\"Terminal\\"
-                              do script \\"${command}\\"
-                              end tell"`, Object.assign(this.electronService.process.env, env));
+      if (this.workspaceService.getMacOsTerminal() === Constants.macOsTerminal.toString()) {
+        return this.execute(`osascript -e "tell app \\"Terminal\\"
+                                do script \\"${command}\\"
+                                end tell"`, Object.assign(this.electronService.process.env, env));
+      }
+      if (this.workspaceService.getMacOsTerminal() === Constants.macOsiTerm2.toString()) {
+        return this.execute(`osascript -e "tell app \\"iTerm2\\"
+                              set newWindow to (create window with default profile)
+                              tell current session of newWindow
+                                write text \\"${command}\\"
+                              end tell
+                            end tell"`, Object.assign(this.electronService.process.env, env));
+      }
     } else if (this.electronService.process.platform === 'win32') {
       return this.execute(`start cmd /k ${command}`, env);
     } else {

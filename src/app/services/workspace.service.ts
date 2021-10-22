@@ -243,4 +243,15 @@ export class WorkspaceService {
     workspace.sessions = sessions;
     this.persistWorkspace(workspace);
   }
+
+  getMacOsTerminal(): string {
+    return this.workspace.macOsTerminal;
+  }
+  
+  updateMacOsTerminal(macOsTerminal: string) {
+    const workspace = this.getWorkspace();
+    workspace.macOsTerminal = macOsTerminal;
+    this.persistWorkspace(workspace);
+  }
+  
 }

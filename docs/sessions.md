@@ -6,14 +6,12 @@ Three standard actions should be implemented for each session: **start**, **stop
 
 ## Actions
 
-### Start
-Make the temporary credentials available to the provider chain.
+| Method      | Description                          |
+| ----------- | ------------------------------------ |
+| `START`       | :fontawesome-solid-play:    Make the temporary credentials available to the provider chain  |
+| `STOP`       | :fontawesome-solid-stop: Removes the temporary credentials from the provider chain |
+| `ROTATE`    | :fontawesome-solid-undo:     Generate new temporary credentials, and substitute the previous ones in the provider chain |
 
-### Stop
-Removes the temporary credentials from the provider chain.
-
-### Rotate
-Generate new temporary credentials, and substitute the previous ones in the provider chain.
 
 ## Data
 All Sessions shares some basic data, common to all.
@@ -48,3 +46,31 @@ The naming convention we are using is `cloudProvider-accessMethod`.
 The process of setting up Leapp Sessions is managed either **manually**, for each access method, or through **integrations** with third-party tools.
 
 Leapp stores all the Sessions available to the users locally, inside a configuration file called **Workspace.**
+
+``` python
+import tensorflow as tf
+```
+
+- [x] Lorem ipsum dolor sit amet, consectetur adipiscing elit
+- [ ] Vestibulum convallis sit amet nisi a tincidunt
+  * [x] In hac habitasse platea dictumst
+  * [x] In scelerisque nibh non dolor mollis congue sed et metus
+  * [ ] Praesent sed risus massa
+- [ ] Aenean pretium efficitur erat, donec pharetra, ligula non scelerisque
+
+
+``` python hl_lines="2-5"
+def bubble_sort(items):
+    for i in range(len(items)):
+        for j in range(len(items) - 1 - i):
+            if items[j] > items[j + 1]:
+                items[j], items[j + 1] = items[j + 1], items[j]
+```
+
+
+
+??? note
+
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
+    nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
+    massa, nec semper lorem quam in massa.

@@ -41,6 +41,7 @@ theme:
     - navigation.instant
     - navigation.indexes
     - navigation.top
+    - content.code.annotate
   font:
     text: Lato
   palette:
@@ -81,3 +82,12 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:materialx.emoji.twemoji
       emoji_generator: !!python/name:materialx.emoji.to_svg
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - meta

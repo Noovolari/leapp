@@ -43,7 +43,7 @@ export class Workspace {
       username: undefined,
       password: undefined
     };
-    this._macOsTerminal = environment.macOsTerminal;
+    this._macOsTerminal = Constants.macOsTerminal;
   }
 
   get sessions(): Session[] {

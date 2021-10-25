@@ -32,6 +32,7 @@ nav:
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'
       - 'Project structure': 'contributing/project-structure.md'
+
 theme:
   logo: images/logo.png
   titles_only: true
@@ -88,6 +89,7 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.superfences
   - pymdownx.snippets
+  - pymdownx.keys
   - pymdownx.tasklist:
       custom_checkbox: true
   - meta

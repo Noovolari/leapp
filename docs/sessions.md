@@ -1,8 +1,7 @@
 # Session
 
-A **Session** contains all the relevant information to let the dev connect to a cloud provider.
+A **Session** contains all the relevant information to let the dev connect to a cloud provider. Three standard actions should be implemented for each session: **start**, **stop**, and **rotate**.
 
-Three standard actions should be implemented for each session: **start**, **stop**, and **rotate**.
 
 ## Actions
 
@@ -16,7 +15,11 @@ Three standard actions should be implemented for each session: **start**, **stop
 ## Session Model Data
 All Sessions Models shares some basic information, common to all of them. These variables must be defined all the time.
 
-``` javascript
+??? info
+
+    The process of setting up Leapp Sessions is managed either **manually**, for each access method, or through **integrations** with third-party tools. Leapp stores all the Sessions available to the users locally, inside a configuration file called **Workspace.**
+
+``` typescript
 ...
 export class Session {
 
@@ -27,13 +30,6 @@ export class Session {
   region: string;
   type: SessionType;
 
-  constructor(sessionName: string, region: string) {
-    this.sessionId = uuid.v4();
-    this.sessionName = sessionName;
-    this.status = SessionStatus.inactive;
-    this.startDateTime = undefined;
-    this.region = region;
-  }
   ...
 }
 ```
@@ -46,8 +42,3 @@ export class Session {
 | `startDateTime`  | A **UTC DateTime** string representing the last time a specific Session has started; this is useful for rotation and sorting purposes |
 | `region`         | The **AWS Region** or **Azure Location** the Session is working on. For a complete list of AWS Regions go [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html), and for Azure Locations, go [here](https://azure.microsoft.com/it-it/global-infrastructure/data-residency/#overview) |
 | `type`           | Uniquely identifies two important aspects to determine the Session: **Cloud Provider** and **Access Method.**. Possible values are: `awsIamRoleFederated`, `awsIamUser`, `awsIamRoleChained`, `awsSsoRole`, `azure`. The naming convention we are using is *cloudProvider-accessMethod*: **Cloud Provider** on which you are connecting (i.e., AWS, Azure, GCP...), and the **Access Method** used to generate credentials (i.e., AWS IAM User, Azure Tenant, AWS IAM Role...) |
-
-??? note
-
-    The process of setting up Leapp Sessions is managed either **manually**, for each access method, or through **integrations** with third-party tools. Leapp stores all the Sessions available to the users locally, inside a configuration file called **Workspace.**
-

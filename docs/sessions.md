@@ -8,69 +8,46 @@ Three standard actions should be implemented for each session: **start**, **stop
 
 | Method      | Description                          |
 | ----------- | ------------------------------------ |
-| `START`       | :fontawesome-solid-play:    Make the temporary credentials available to the provider chain  |
-| `STOP`       | :fontawesome-solid-stop: Removes the temporary credentials from the provider chain |
-| `ROTATE`    | :fontawesome-solid-undo:     Generate new temporary credentials, and substitute the previous ones in the provider chain |
+| `START`     | :fontawesome-solid-play:    &nbsp;Make the temporary credentials available to the provider chain  |
+| `STOP`      | :fontawesome-solid-stop:    &nbsp;Removes the temporary credentials from the provider chain |
+| `ROTATE`    | :fontawesome-solid-undo:    &nbsp;Generate new temporary credentials, and substitute the previous ones in the provider chain |
 
 
-## Data
-All Sessions shares some basic data, common to all.
+## Session Model Data
+All Sessions Models shares some basic information, common to all of them. These variables must be defined all the time.
 
-### ID
-Unique identifier to the Session
+``` javascript
+...
+export class Session {
 
-### sessionName
-A fancy name for the Session to make it recognizable to the user.
+  sessionId: string;
+  sessionName: string;
+  status: SessionStatus;
+  startDateTime: string;
+  region: string;
+  type: SessionType;
 
-### status
-Represent the **State Management** of a single session; when the **status** of a session is **`ACTIVE`,** temporary credentials are available to the user.
-
-### startDateTime
-A UTC DateTime string representing the last time a specific Session has started; this is useful for rotation and sorting purposes.
-
-### region
-The AWS region or Azure Location the Session is working on.
-
-### type
-Uniquely identifies two central aspects to determine the Session: **Cloud Provider** and **Access Method.**
-
-## Access Method
-
-**Type** identifies two central aspects to determine the Session: **Cloud Provider** and **Access Method.**
-
-The naming convention we are using is `cloudProvider-accessMethod`.
-
-- the **Cloud Provider** on which you are connecting (i.e., AWS, Azure, GCP...)
-- the **Access Method** used to generate credentials (i.e., AWS IAM User, Azure Tenant, AWS IAM Role...)
-
-The process of setting up Leapp Sessions is managed either **manually**, for each access method, or through **integrations** with third-party tools.
-
-Leapp stores all the Sessions available to the users locally, inside a configuration file called **Workspace.**
-
-``` python
-import tensorflow as tf
+  constructor(sessionName: string, region: string) {
+    this.sessionId = uuid.v4();
+    this.sessionName = sessionName;
+    this.status = SessionStatus.inactive;
+    this.startDateTime = undefined;
+    this.region = region;
+  }
+  ...
+}
 ```
 
-- [x] Lorem ipsum dolor sit amet, consectetur adipiscing elit
-- [ ] Vestibulum convallis sit amet nisi a tincidunt
-  * [x] In hac habitasse platea dictumst
-  * [x] In scelerisque nibh non dolor mollis congue sed et metus
-  * [ ] Praesent sed risus massa
-- [ ] Aenean pretium efficitur erat, donec pharetra, ligula non scelerisque
-
-
-``` python hl_lines="2-5"
-def bubble_sort(items):
-    for i in range(len(items)):
-        for j in range(len(items) - 1 - i):
-            if items[j] > items[j + 1]:
-                items[j], items[j + 1] = items[j + 1], items[j]
-```
-
-
+| Session Variable | Description                          |
+| ---------------- | ------------------------------------ |
+| `sessionId`      | **Unique identifier** to the Session. Is defined at Model instantiation, and represent a unique ID for the session. Every operation involving a specific session must start by getting a session through its `sessionId`  |
+| `sessionName`    | A **fancy name**, given at creation by the user, for the Session to make it recognizable at glance. |
+| `status`         | Represent the **State Management** of a single session; when the **status** of a session is `active`, temporary credentials are available to the user. The possible values are: `inactive`, `pending`, `active` |
+| `startDateTime`  | A **UTC DateTime** string representing the last time a specific Session has started; this is useful for rotation and sorting purposes |
+| `region`         | The **AWS Region** or **Azure Location** the Session is working on. For a complete list of AWS Regions go [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html), and for Azure Locations, go [here](https://azure.microsoft.com/it-it/global-infrastructure/data-residency/#overview) |
+| `type`           | Uniquely identifies two important aspects to determine the Session: **Cloud Provider** and **Access Method.**. Possible values are: `awsIamRoleFederated`, `awsIamUser`, `awsIamRoleChained`, `awsSsoRole`, `azure`. The naming convention we are using is *cloudProvider-accessMethod*: **Cloud Provider** on which you are connecting (i.e., AWS, Azure, GCP...), and the **Access Method** used to generate credentials (i.e., AWS IAM User, Azure Tenant, AWS IAM Role...) |
 
 ??? note
 
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla et euismod
-    nulla. Curabitur feugiat, tortor non consequat finibus, justo purus auctor
-    massa, nec semper lorem quam in massa.
+    The process of setting up Leapp Sessions is managed either **manually**, for each access method, or through **integrations** with third-party tools. Leapp stores all the Sessions available to the users locally, inside a configuration file called **Workspace.**
+

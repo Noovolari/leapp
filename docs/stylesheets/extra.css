@@ -1,18 +1,82 @@
+body {
+  font: 400 16px/1.5 "Lato", BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
+}
+
+:root {
+  --md-default-fg-color--light: #080B38;
+
+  /* Primary color shades */
+  --md-primary-fg-color:        #080B38;
+  --md-primary-fg-color--light: #ECB7B7;
+  --md-primary-fg-color--dark:  #90030C;
+  --md-primary-bg-color:        hsla(0, 0%, 100%, 1);
+  --md-primary-bg-color--light: hsla(0, 0%, 100%, 0.7);
+  --md-text-link-color:         #78E0CF;
+
+  /* Accent color shades */
+  --md-accent-fg-color: #78E0CF;
+  --md-accent-fg-color--transparent: hsla(189, 100%, 37%, 0.1);
+  --md-accent-bg-color: hsla(0, 0%, 100%, 1);
+  --md-accent-bg-color--light: hsla(0, 0%, 100%, 0.7);
+}
+
+:root > * {
+  /* Code block color shades */
+  --md-code-bg-color: hsl(0, 0%, 94%);
+  --md-code-fg-color: hsla(200, 18%, 26%, 1);
+
+  /* Footer */
+  --md-footer-bg-color: #080B38;
+  --md-footer-bg-color--dark: hsla(0, 0%, 0%, 0.32);
+  --md-footer-fg-color: hsla(0, 0%, 100%, 1);
+  --md-footer-fg-color--light: hsla(0, 0%, 100%, 0.7);
+  --md-footer-fg-color--lighter: hsla(0, 0%, 100%, 0.3);
+}
+
+
 img[src$="center-img"] {
   display:block;
   margin: 0 auto;
 }
 
-.md-header__button.md-logo img, .md-header__button.md-logo svg {
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
     width: auto !important;
 }
 
-:root {
-  --md-primary-fg-color:        #080C37;
-  --md-primary-fg-color--light: #ECB7B7;
-  --md-primary-fg-color--dark:  #90030C;
+.md-typeset a,
+.md-nav__item .md-nav__link--active {
+   color: #78E0CF !important;
 }
 
-.md-typeset a, .md-nav__item .md-nav__link--active {
-   color: #78E0CF !important;
+.md-typeset h1,
+.md-typeset h2,
+.md-typeset h3 {
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.md-typeset h1 {
+  font-weight: 700;
+  font-size: 50px;
+}
+
+.md-typeset h2 {
+  font-size: 30px;
+  font-weight: 600;
+}
+
+.md-typeset h3 {
+  font-size: 20px;
+  font-weight: 400;
+}
+
+p {
+  font-size: 19px;
+  font-weight: 400;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  line-height: 26px;
 }

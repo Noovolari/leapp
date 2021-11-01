@@ -4,6 +4,7 @@ import {AppService, LoggerLevel} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
 import {CredentialsInfo} from '../models/credentials-info';
 import {LoggingService} from './logging.service';
+import {FileService} from './file.service';
 
 const AWS = require('aws-sdk');
 
@@ -17,7 +18,8 @@ export class SsmService {
   constructor(
     private app: AppService,
     private loggingService: LoggingService,
-    private exec: ExecuteService) {}
+    private exec: ExecuteService,
+    private fileService: FileService) {}
 
   /**
    * Set the config for the SSM client
@@ -75,9 +77,26 @@ export class SsmService {
       AWS_SESSION_TOKEN : credentials.sessionToken.aws_session_token
     };
 
-    this.exec.openTerminal(`aws ssm start-session --region ${region} --target ${hypen}${instanceId}${hypen}`, env).then(() => {}, err => {
+    const profileName = 'ssm_' + instanceId + '_' + region;
+    this.applyCredentials(profileName, credentials, region);
+
+    this.exec.openTerminal(`aws ssm start-session --profile ${profileName} --target ${hypen}${instanceId}${hypen}`, env).then(() => {}, err => {
       throw new LeappBaseError('Start SSM error', this, LoggerLevel.error, err.message);
     });
+  }
+
+  private async applyCredentials(profileName: string, credentialsInfo: CredentialsInfo, region: string, ): Promise<void> {
+    const credentialObject = {};
+    credentialObject[profileName] = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      aws_session_token: credentialsInfo.sessionToken.aws_session_token,
+      region: region
+    };
+    return await this.fileService.iniWriteSync(this.app.awsCredentialPath(), credentialObject);
   }
 
   /**

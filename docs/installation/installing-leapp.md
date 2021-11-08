@@ -2,9 +2,33 @@
 
 You can install Leapp by downloading the pre-built binaries for your OS [here](https://www.leapp.cloud/releases).
 
-Unzip the package and double-click on the executable to install.
+**Unzip** the package and **double-click on the executable** to install.
 
 ## macOS (Homebrew) & Linux (Linuxbrew)
 
-There exists a [Homebrew](https://brew.sh/) Cask for Leapp which can be installed with:
-`brew install leapp`
+Leapp can also be installed on **macOS** or **Linux** via [Homebrew Cask](https://brew.sh/) with:
+```
+brew install leapp
+```
+
+??? info
+
+    Leapp can also be installed with Linuxbrew on Windows via [WSL](https://docs.microsoft.com/en-us/windows/wsl/about)
+
+## Default Leapp directories
+
+### Installation
+
+| OS      | Path                                           | 
+| ------- | ---------------------------------------------- | 
+| macOS   | /Applications                                  | 
+| Linux   | /opt/Leapp                                     |
+| Windows | C:\Users\<USER>\AppData\Local\Programs\Leapp   |
+
+### Configuration files
+
+| OS      | Path                   | 
+| ------- | ---------------------- | 
+| macOS   | ~/.Leapp               | 
+| Linux   | ~/.Leapp               |
+| Windows | C:\Users\<USER>\.Leapp |

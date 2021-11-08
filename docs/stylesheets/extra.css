@@ -73,7 +73,7 @@ img[src$="center-img"] {
 
 .md-typeset h3 {
   font-size: 20px;
-  font-weight: 400;
+  font-weight: 600;
 }
 
 p {
@@ -84,10 +84,10 @@ p {
   line-height: 26px;
 }
 
-details p {
+details p, .admonition p {
   font-size: .64rem;
   font-weight: 400;
-  padding: 20px;
+  padding-top: 1em;
 }
 
 .tabbed-block p {

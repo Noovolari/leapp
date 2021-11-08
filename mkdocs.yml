@@ -32,6 +32,9 @@ nav:
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'
       - 'Project structure': 'contributing/project-structure.md'
+  - Troubleshooting:
+      - 'FAQ': 'troubleshooting/faq.md'
+      - 'Application Data': 'troubleshooting/app-data.md'
 
 theme:
   logo: images/logo.png

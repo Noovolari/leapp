@@ -90,6 +90,11 @@ details p {
   padding: 20px;
 }
 
+.tabbed-block p {
+  padding: 10px;
+  background: rgba(0,0,0,0.02);
+}
+
 .md-typeset .admonition.note,
 .md-typeset details.note {
   border-color: #448aff;

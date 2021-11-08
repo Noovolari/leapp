@@ -87,9 +87,11 @@ markdown_extensions:
   - pymdownx.details
   - pymdownx.highlight
   - pymdownx.inlinehilite
-  - pymdownx.superfences
   - pymdownx.snippets
   - pymdownx.keys
   - pymdownx.tasklist:
       custom_checkbox: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
   - meta

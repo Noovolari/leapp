@@ -19,16 +19,40 @@ brew install leapp
 
 ### Installation
 
-| OS      | Path                                           | 
-| ------- | ---------------------------------------------- | 
-| macOS   | /Applications                                  | 
-| Linux   | /opt/Leapp                                     |
-| Windows | C:\Users\<USER>\AppData\Local\Programs\Leapp   |
+=== "MacOS"
+
+    ```
+    /Applications
+    ```
+
+=== "Linux"
+
+    ```
+    /opt/Leapp
+    ```
+
+=== "Windows"
+
+    ```
+    C:\Users\<USER>\AppData\Local\Programs\Leapp
+    ```
 
 ### Configuration files
 
-| OS      | Path                   | 
-| ------- | ---------------------- | 
-| macOS   | ~/.Leapp               | 
-| Linux   | ~/.Leapp               |
-| Windows | C:\Users\<USER>\.Leapp |
+=== "MacOS"
+
+    ```
+    ~/.Leapp
+    ```
+
+=== "Linux"
+
+    ```
+    ~/.Leapp
+    ```
+
+=== "Windows"
+
+    ```
+    C:\Users\<USER>\.Leapp
+    ```

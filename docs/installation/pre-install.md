@@ -6,21 +6,26 @@ No requirements are requested for **macOS** and **Windows** users.
 Leapp uses `libsecret` and `gnome-keyring` as dependencies to store all sensitive data into the keyring.
 Depending on your distribution you **may** need to install them before running Leapp using these commands.
 
-**Debian/Ubuntu:**
-```
-sudo apt-get install gnome-keyring
-sudo apt-get install libsecret-1-dev
-```
-**Red Hat-based:**
-```
-sudo yum install gnome-keyring
-sudo yum install libsecret-devel
-```
-**Arch Linux:**
-```
-sudo pacman -S gnome-keyring
-sudo pacman -S libsecret
-```
+=== "Arch Linux"
+
+    ``` bash
+    sudo pacman -S gnome-keyring
+    sudo pacman -S libsecret
+    ```
+
+=== "Debian/Ubuntu"
+
+    ``` bash
+    sudo apt-get install gnome-keyring
+    sudo apt-get install libsecret-1-dev
+    ```
+=== "Red Hat-based"
+
+    ``` bash
+    sudo yum install gnome-keyring
+    sudo yum install libsecret-devel
+    ```
+
 
 ##Pre-requisites for logging into EC2 Instances via AWS SSM with Leapp 
 

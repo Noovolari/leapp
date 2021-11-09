@@ -5,7 +5,7 @@ import {CredentialsInfo} from '../../../../models/credentials-info';
 
 import {AwsSsoRoleSession} from '../../../../models/aws-sso-role-session';
 import {FileService} from '../../../file.service';
-import {AppService, ToastLevel} from '../../../app.service';
+import {AppService} from '../../../app.service';
 
 import SSO, {
   AccountInfo,
@@ -28,6 +28,7 @@ export interface AwsSsoRoleSessionRequest {
   region: string;
   email: string;
   roleArn: string;
+  awsSsoConfigurationId: string;
 }
 
 export interface GenerateSSOTokenResponse {
@@ -70,6 +71,7 @@ export interface SsoRoleSession {
   email: string;
   region: string;
   profileId: string;
+  awsSsoConfigurationId: string;
 }
 
 @Injectable({
@@ -123,7 +125,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   create(accountRequest: AwsSsoRoleSessionRequest, profileId: string): void {
-    const session = new AwsSsoRoleSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn, profileId, accountRequest.email);
+    const session = new AwsSsoRoleSession(accountRequest.sessionName, accountRequest.region, accountRequest.roleArn, profileId, accountRequest.awsSsoConfigurationId, accountRequest.email);
     this.workspaceService.addSession(session);
   }
 
@@ -174,15 +176,13 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   async sync(awsSsoConfiguration: AwsSsoConfiguration): Promise<SsoRoleSession[]> {
     const region = awsSsoConfiguration.region;
-    const portalUrl = awsSsoConfiguration.portalUrl;
-
     const accessToken = await this.getAccessToken(awsSsoConfiguration);
 
     // Get AWS SSO Role sessions
-    const sessions = await this.getSessions(accessToken, region);
+    const sessions = await this.getSessions(awsSsoConfiguration.id, accessToken, region);
 
     // Remove all old AWS SSO Role sessions from workspace
-    await this.removeSsoSessionsFromWorkspace();
+    await this.removeSsoSessionsFromWorkspace(awsSsoConfiguration.id);
 
     return sessions;
   }
@@ -206,7 +206,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');
       this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration(awsSsoConfiguration.id);
 
-      this.removeSsoSessionsFromWorkspace();
+      this.removeSsoSessionsFromWorkspace(awsSsoConfiguration.id);
     });
   }
 
@@ -217,6 +217,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       this.configureAwsSso(
         awsSsoConfiguration.id,
         awsSsoConfiguration.region,
+        awsSsoConfiguration.browserOpening,
         loginResponse.portalUrlUnrolled,
         loginResponse.expirationTime.toISOString(),
         loginResponse.accessToken
@@ -262,13 +263,13 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return { portalUrlUnrolled: awsSsoConfiguration.portalUrl, accessToken: generateSsoTokenResponse.accessToken, region: awsSsoConfiguration.region, expirationTime: generateSsoTokenResponse.expirationTime };
   }
 
-  private async getSessions(accessToken: string, region: string): Promise<SsoRoleSession[]> {
+  private async getSessions(configurationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region);
 
     const promiseArray: Promise<SsoRoleSession[]>[] = [];
 
     accounts.forEach((account) => {
-      promiseArray.push(this.getSessionsFromAccount(account, accessToken, region));
+      promiseArray.push(this.getSessionsFromAccount(configurationId, account, accessToken, region));
     });
 
     return new Promise( (resolve, _) => {
@@ -278,7 +279,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     });
   }
 
-  private async getSessionsFromAccount(accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
+  private async getSessionsFromAccount(configurationId: string, accountInfo: AccountInfo, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     this.getSsoPortalClient(region);
 
     const listAccountRolesRequest: ListAccountRolesRequest = {
@@ -303,7 +304,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
         region: oldSession?.region || this.workspaceService.get().defaultRegion || environment.defaultRegion,
         roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`,
         sessionName: accountInfo.accountName,
-        profileId: oldSession?.profileId || this.workspaceService.getDefaultProfileId()
+        profileId: oldSession?.profileId || this.workspaceService.getDefaultProfileId(),
+        awsSsoConfigurationId: configurationId
       };
 
       awsSsoSessions.push(awsSsoSession);
@@ -349,8 +351,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     });
   }
 
-  private async removeSsoSessionsFromWorkspace(): Promise<void> {
-    const sessions = this.listAwsSsoRoles();
+  private async removeSsoSessionsFromWorkspace(awsSsoConfigurationId: string): Promise<void> {
+    const sessions = this.listAwsSsoRoles().filter(sess => (sess as AwsSsoRoleSession).awsSsoConfigurationId === awsSsoConfigurationId);
 
     for (let i = 0; i < sessions.length; i++) {
       const sess = sessions[i];
@@ -367,8 +369,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     }
   }
 
-  private configureAwsSso(id: string, region: string, portalUrl: string, expirationTime: string, accessToken: string) {
-    this.workspaceService.updateAwsSsoConfiguration(id, region, portalUrl, expirationTime);
+  private configureAwsSso(id: string, region: string, browserOpening: string, portalUrl: string, expirationTime: string, accessToken: string) {
+    this.workspaceService.updateAwsSsoConfiguration(id, region, portalUrl, browserOpening, expirationTime);
     this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {});
   }
 

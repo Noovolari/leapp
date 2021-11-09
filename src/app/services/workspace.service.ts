@@ -164,13 +164,16 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
-  updateAwsSsoConfiguration(id: string, region: string, portalUrl: string, browserOpening: string): void {
+  updateAwsSsoConfiguration(id: string, region: string, portalUrl: string, browserOpening: string, expirationTime?: string): void {
     const workspace = this.get();
     const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
     if(index > -1) {
       workspace.awsSsoConfigurations[index].region = region;
       workspace.awsSsoConfigurations[index].portalUrl = portalUrl;
       workspace.awsSsoConfigurations[index].browserOpening = browserOpening;
+      if(expirationTime) {
+        workspace.awsSsoConfigurations[index].expirationTime = expirationTime;
+      }
       this.persist(workspace);
     }
   }

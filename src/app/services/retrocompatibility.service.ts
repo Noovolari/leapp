@@ -74,6 +74,7 @@ export class RetrocompatibilityService {
       session.account.region,
       `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
       workspace.profiles[0].id,
+      workspace.awsSsoConfigurations[0].id,
       session.account.email
     );
     ssoSession.sessionId = session.id;

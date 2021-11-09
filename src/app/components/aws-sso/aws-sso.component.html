@@ -43,11 +43,11 @@
         <div class="sso-card" *ngFor="let awsSsoConfiguration of awsSsoConfigurations">
           <p>AWS Single Sign-On</p>
           <p>{{awsSsoConfiguration.portalUrl}}</p>
-          <p>{{awsSsoConfiguration.region}}</p>
+          <p>{{awsSsoConfiguration.region}} - {{awsSsoConfiguration.browserOpening}}</p>
 
           <button class="button pull-apart" (click)="openAddModal(2, awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-edit"></i> Edit</button>
           <button class="button pull-apart-2" (click)="delete(awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-trash"></i> Delete</button>
-          <button class="button pull-left disabled" (click)="logout(awsSsoConfiguration.id)"><i class="fa fa-exit"></i> Logout</button>
+          <button class="button pull-left" (click)="logout(awsSsoConfiguration.id)"><i class="fa fa-exit"></i> Logout</button>
           <button class="button pull-right" (click)="forceSync(awsSsoConfiguration.id)" *ngIf="!loadingInBrowser"><i class="fa fa-refresh"></i> Synch</button>
         </div>
 

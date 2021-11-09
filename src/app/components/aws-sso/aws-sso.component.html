@@ -47,7 +47,14 @@
 
           <button class="button pull-apart" (click)="openAddModal(2, awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-edit"></i> Edit</button>
           <button class="button pull-apart-2" (click)="delete(awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-trash"></i> Delete</button>
-          <button class="button pull-left" (click)="logout(awsSsoConfiguration.id)"><i class="fa fa-exit"></i> Logout</button>
+          <button class="button pull-left" (click)="logout(awsSsoConfiguration.id)">
+            <ng-container *ngIf="logoutLoadings[awsSsoConfiguration.id]">
+              <i class="fa fa-spin fa-spinner"></i> ...
+            </ng-container>
+            <ng-container *ngIf="!logoutLoadings[awsSsoConfiguration.id]">
+              <i class="fa fa-exit"></i> Logout
+            </ng-container>
+          </button>
           <button class="button pull-right" (click)="forceSync(awsSsoConfiguration.id)" *ngIf="!loadingInBrowser"><i class="fa fa-refresh"></i> Synch</button>
         </div>
 

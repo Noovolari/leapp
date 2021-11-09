@@ -31,6 +31,8 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     defaultBrowserOpening: new FormControl('', [Validators.required])
   });
 
+  public logoutLoadings: any;
+
   constructor(
     private appService: AppService,
     private awsSsoRoleService: AwsSsoRoleService,
@@ -50,6 +52,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   }
 
   async logout(configurationId: string) {
+    this.logoutLoadings[configurationId] = true;
     this.selectedAwsSsoConfiguration = this.workspaceService.getAwsSsoConfiguration(configurationId);
     await this.awsSsoRoleService.logout(this.selectedAwsSsoConfiguration);
 
@@ -96,6 +99,10 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     this.modifying = 0;
     this.regions = this.appService.getRegions();
     this.awsSsoConfigurations = this.workspaceService.getAwsSsoConfigurations();
+    this.logoutLoadings = {};
+    this.awsSsoConfigurations.forEach(sc => {
+      this.logoutLoadings[sc.id] = false;
+    });
 
     this.selectedAwsSsoConfiguration = {
       id: 'new AWS Single Sign-On',

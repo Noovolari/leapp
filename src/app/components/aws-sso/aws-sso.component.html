@@ -1,71 +1,67 @@
 <img src="assets/images/fake_blur.png" class="fake-blur"  alt="" />
 <div class="background">
   <ng-container *ngIf="!loadingInBrowser">
+
     <div class="container-fluid">
       <h1><a (click)="goBack()" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-fingerprint"></i> Identity Providers</h1>
 
-      <form [formGroup]="form" class="form center-vertical text-left">
+      <ng-container *ngIf="modifying > 0">
 
-        <div class="form-group" style="width: 100%; display: inline-block;">
-          <label><strong>Identity Provider</strong></label>
-          <br>
-          <input  type="text" class="form-control blue-control btn-control" placeholder="Aws Single Sign-On" value="Aws Single Sign-On" readonly>
-        </div>
+        <form [formGroup]="form" class="form center-vertical text-left">
 
-        <ng-container *ngIf="!isAwsSsoActive">
-        <div class="form-group" style="width: 100%; display: inline-block;">
-          <label><strong>Aws Single Sign-On Url</strong><span class="danger-text">*</span></label>
-          <br>
-          <input formControlName="portalUrl" type="url" class="form-control" placeholder="aws SSO url (eg https://d-xxxxxxxxxx.awsapps.com/start) *">
-          <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert the Aws Single Sign-On url</small>
-        </div>
-
-        <div class="form-group" style="width: 100%; display: inline-block;">
-          <label><strong>Aws Region</strong></label>
-          <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion" dropdownPosition="top"></ng-select>
-        </div>
-
-        <div class="form-group" style="width: 100%; display: inline-block;">
-          <label><strong>Default browser opening</strong></label>
-          <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedBrowserOpening" dropdownPosition="top"></ng-select>
-        </div>
-        </ng-container>
-
-        <ng-container *ngIf="isAwsSsoActive">
           <div class="form-group" style="width: 100%; display: inline-block;">
-            <label><strong>Aws Single Sign-On Url</strong></label>
+            <label><strong>Identity Provider</strong></label>
             <br>
-            <span class="form-control blue-control">{{portalUrl}}</span>
-         </div>
+            <input  type="text" class="form-control blue-control btn-control" value="{{selectedAwsSsoConfiguration.id}}" readonly>
+          </div>
+
+          <div class="form-group" style="width: 100%; display: inline-block;">
+            <label><strong>Aws Single Sign-On Url</strong><span class="danger-text">*</span></label>
+            <br>
+            <input formControlName="portalUrl" type="url" class="form-control" placeholder="aws SSO url (eg https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedAwsSsoConfiguration.portalUrl}}">
+            <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert the Aws Single Sign-On url</small>
+          </div>
 
           <div class="form-group" style="width: 100%; display: inline-block;">
             <label><strong>Aws Region</strong></label>
-            <br>
-            <span class="form-control blue-control">{{selectedRegion}}</span>
+            <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedAwsSsoConfiguration.region" dropdownPosition="top"></ng-select>
           </div>
 
           <div class="form-group" style="width: 100%; display: inline-block;">
             <label><strong>Default browser opening</strong></label>
-            <br>
-            <span class="form-control blue-control">{{selectedBrowserOpening}}</span>
+            <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedAwsSsoConfiguration.browserOpening" dropdownPosition="top"></ng-select>
           </div>
 
+          <button class="button pull-left disabled" (click)="openAddModal(0, selectedAwsSsoConfiguration)">Cancel</button>
+          <button class="button pull-right" (click)="save();">Save</button>
+        </form>
 
-        </ng-container>
-      </form>
+      </ng-container>
 
+      <div class="sso-card-container" *ngIf="modifying === 0">
+
+        <div class="sso-card" *ngFor="let awsSsoConfiguration of awsSsoConfigurations">
+          <p>AWS Single Sign-On</p>
+          <p>{{awsSsoConfiguration.portalUrl}}</p>
+          <p>{{awsSsoConfiguration.region}}</p>
+
+          <button class="button pull-apart" (click)="openAddModal(2, awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-edit"></i> Edit</button>
+          <button class="button pull-apart-2" (click)="delete(awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-trash"></i> Delete</button>
+          <button class="button pull-left disabled" (click)="logout(awsSsoConfiguration.id)"><i class="fa fa-exit"></i> Logout</button>
+          <button class="button pull-right" (click)="forceSync(awsSsoConfiguration.id)" *ngIf="!loadingInBrowser"><i class="fa fa-refresh"></i> Synch</button>
+        </div>
+
+        <div class="sso-card add" (click)="openAddModal(1, selectedAwsSsoConfiguration);">
+          <div><span>+</span></div>
+          <p>Add a new AWS SSO</p>
+        </div>
+
+      </div>
     </div>
 
-    <ng-container *ngIf="!isAwsSsoActive">
-      <button class="button pull-center" (click)="login()" *ngIf="!loadingInBrowser">Login</button>
-    </ng-container>
-
-    <ng-container *ngIf="isAwsSsoActive">
-      <button class="button pull-left disabled" (click)="logout()">Logout</button>
-      <button class="button pull-right" (click)="forceSync()" *ngIf="!loadingInBrowser">Synchronize</button>
-    </ng-container>
-
   </ng-container>
+
+
 
   <ng-container *ngIf="loadingInBrowser">
     <h1 class="loading-title"><span class="back-link"><i class="fa fa-link"></i></span> AWS SSO Login</h1>
@@ -78,7 +74,8 @@
       <br>
       <img src="assets/images/loading-pc.png" alt="" class="loading-pc" />
       <br>
-      <a (click)="gotoWebForm()" class="loading-link">Click to open AWS Single Sign-On form here</a>
+      <a (click)="gotoWebForm(selectedAwsSsoConfiguration.id)" class="loading-link">Click to open AWS Single Sign-On form here</a>
     </div>
   </ng-container>
+
 </div>

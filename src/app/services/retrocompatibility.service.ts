@@ -12,6 +12,7 @@ import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {AzureSession} from '../models/azure-session';
 import {WorkspaceService} from './workspace.service';
 import {Constants} from '../models/constants';
+import * as uuid from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -183,12 +184,13 @@ export class RetrocompatibilityService {
           // to force the user to redo the process on the new fresh workspace
         }
 
-        workspace.awsSsoConfiguration = {
+        workspace.awsSsoConfigurations = [{
+          id: uuid.v4(),
           region,
           portalUrl,
           expirationTime,
           browserOpening
-        };
+        }];
         break;
       }
     }

@@ -20,7 +20,8 @@ import SSO, {
 import {environment} from '../../../../../environments/environment';
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
-import {AwsSsoOidcService, BrowserWindowClosing} from "../../../aws-sso-oidc.service";
+import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
+import {AwsSsoConfiguration} from '../../../../models/workspace';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -151,11 +152,11 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    const region = this.workspaceService.getAwsSsoConfiguration().region;
-    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+    const awsSsoConfiguration = this.workspaceService.getAwsSsoConfiguration((this.get(sessionId) as AwsSsoRoleSession).awsSsoConfigurationId);
+    const region = awsSsoConfiguration.region;
     const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
 
-    const accessToken = await this.getAccessToken(region, portalUrl);
+    const accessToken = await this.getAccessToken(awsSsoConfiguration);
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
 
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
@@ -171,11 +172,11 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     this.awsSsoOidcService.interrupt();
   }
 
-  async sync(): Promise<SsoRoleSession[]> {
-    const region = this.workspaceService.getAwsSsoConfiguration().region;
-    const portalUrl = this.workspaceService.getAwsSsoConfiguration().portalUrl;
+  async sync(awsSsoConfiguration: AwsSsoConfiguration): Promise<SsoRoleSession[]> {
+    const region = awsSsoConfiguration.region;
+    const portalUrl = awsSsoConfiguration.portalUrl;
 
-    const accessToken = await this.getAccessToken(region, portalUrl);
+    const accessToken = await this.getAccessToken(awsSsoConfiguration);
 
     // Get AWS SSO Role sessions
     const sessions = await this.getSessions(accessToken, region);
@@ -186,9 +187,9 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return sessions;
   }
 
-  async logout(): Promise<void> {
+  async logout(awsSsoConfiguration: AwsSsoConfiguration): Promise<void> {
     // Obtain region and access token
-    const region = this.workspaceService.getAwsSsoConfiguration().region;
+    const region = awsSsoConfiguration.region;
     const savedAccessToken = await this.getAccessTokenFromKeychain();
 
     // Configure Sso Portal Client
@@ -203,18 +204,19 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
       // Delete access token and remove sso configuration info from workspace
       this.keychainService.deletePassword(environment.appName, 'aws-sso-access-token');
-      this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration();
+      this.workspaceService.removeExpirationTimeFromAwsSsoConfiguration(awsSsoConfiguration.id);
 
       this.removeSsoSessionsFromWorkspace();
     });
   }
 
-  async getAccessToken(region: string, portalUrl: string): Promise<string> {
-    if (this.ssoExpired()) {
-      const loginResponse = await this.login(region, portalUrl);
+  async getAccessToken(awsSsoConfiguration: AwsSsoConfiguration): Promise<string> {
+    if (this.ssoExpired(awsSsoConfiguration)) {
+      const loginResponse = await this.login(awsSsoConfiguration);
 
       this.configureAwsSso(
-        region,
+        awsSsoConfiguration.id,
+        awsSsoConfiguration.region,
         loginResponse.portalUrlUnrolled,
         loginResponse.expirationTime.toISOString(),
         loginResponse.accessToken
@@ -238,26 +240,26 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise();
   }
 
-  async awsSsoActive(): Promise<boolean> {
+  async awsSsoActive(awsSsoConfiguration: AwsSsoConfiguration): Promise<boolean> {
     const ssoToken = await this.getAccessTokenFromKeychain();
-    return !this.ssoExpired() && ssoToken !== undefined;
+    return !this.ssoExpired(awsSsoConfiguration) && ssoToken !== undefined;
   }
 
-  private ssoExpired(): boolean {
-    const expirationTime = this.workspaceService.getAwsSsoConfiguration().expirationTime;
+  private ssoExpired(awsSsoConfiguration: AwsSsoConfiguration): boolean {
+    const expirationTime = awsSsoConfiguration.expirationTime;
     return !expirationTime || Date.parse(expirationTime) < Date.now();
   }
 
-  private async login(region: string, portalUrl: string): Promise<LoginResponse> {
-    const followRedirectClient = this.appService.getFollowRedirects()[AwsSsoRoleService.getProtocol(portalUrl)];
+  private async login(awsSsoConfiguration: AwsSsoConfiguration): Promise<LoginResponse> {
+    const followRedirectClient = this.appService.getFollowRedirects()[AwsSsoRoleService.getProtocol(awsSsoConfiguration.portalUrl)];
 
-    portalUrl = await new Promise( (resolve, _) => {
-      const request = followRedirectClient.request(portalUrl, response => resolve(response.responseUrl));
+    awsSsoConfiguration.portalUrl = await new Promise( (resolve, _) => {
+      const request = followRedirectClient.request(awsSsoConfiguration.portalUrl, response => resolve(response.responseUrl));
       request.end();
     });
 
-    const generateSsoTokenResponse = await this.awsSsoOidcService.login(region, portalUrl);
-    return { portalUrlUnrolled: portalUrl, accessToken: generateSsoTokenResponse.accessToken, region, expirationTime: generateSsoTokenResponse.expirationTime };
+    const generateSsoTokenResponse = await this.awsSsoOidcService.login(awsSsoConfiguration);
+    return { portalUrlUnrolled: awsSsoConfiguration.portalUrl, accessToken: generateSsoTokenResponse.accessToken, region: awsSsoConfiguration.region, expirationTime: generateSsoTokenResponse.expirationTime };
   }
 
   private async getSessions(accessToken: string, region: string): Promise<SsoRoleSession[]> {
@@ -365,8 +367,8 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     }
   }
 
-  private configureAwsSso(region: string, portalUrl: string, expirationTime: string, accessToken: string) {
-    this.workspaceService.configureAwsSso(region, portalUrl, expirationTime);
+  private configureAwsSso(id: string, region: string, portalUrl: string, expirationTime: string, accessToken: string) {
+    this.workspaceService.updateAwsSsoConfiguration(id, region, portalUrl, expirationTime);
     this.keychainService.saveSecret(environment.appName, 'aws-sso-access-token', accessToken).then(_ => {});
   }
 

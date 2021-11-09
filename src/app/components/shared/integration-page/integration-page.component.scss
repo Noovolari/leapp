@@ -1,5 +1,5 @@
 @import "palette";
-@import "../../../assets/scss/mixins/utility";
+@import "../../../../assets/scss/mixins/utility";
 
 body {
   background: $white-text-color;
@@ -35,7 +35,6 @@ body {
   border: 1px solid $main-color-light;
   font-size: 12px;
   font-weight: 400;
-  height: 94vh;
 }
 
 //noinspection DuplicatedCode
@@ -43,7 +42,6 @@ body {
   color: $text-color;
   font-family: "AvenirNext", "Open Sans", sans-serif;
   padding: 0 40px;
-  height: 94vh;
 
   .callout {
     background: $white-text-color;
@@ -233,84 +231,41 @@ button.disabled {
   from { left: 0; }
   to { left: -10px; }
 }
-.sso-card-container {
-  overflow-y: auto;
-}
 
-.sso-card {
-  position: relative;
-  margin: 10px 40px;
-  padding: 20px 20px 40px 20px;
+.integration-button {
+  margin-top: 20px;
+  background: white;
   border-radius: 5px;
-  border: 1px solid #78E0CF;
-  background: rgba(120, 224, 207, 0.4);
+  padding: 10px;
   cursor: pointer;
 
-  p {
+  i {
+    font-size: 30px;
     color: #343e48;
-    font-size: 14px;
-    margin-bottom: 5px;
   }
-
-  p:not(:first-child) {
+  span {
+    padding-left: 10px;
+    font-size: 18px;
     font-weight: bold;
+    color: #343e48;
   }
-
-  button {
-    min-width: 70px;
-    height: 30px;
+  p {
     font-size: 12px;
-    color: white;
-    padding: 0;
+    color: #343e48;
+    margin: 15px 40px 0 40px;
   }
+}
 
-  .pull-right {
-    position: absolute;
-    right: 17px;
-    bottom: 9px;
-  }
+.more-coming {
+  display: block;
+  margin: 40px auto;
+  width: 200px;
+  text-align: center;
+  color: #343e48;
+  text-decoration: underline;
+}
 
-  .pull-left {
-    position: absolute;
-    left: 17px;
-    bottom: 9px;
-  }
-
-  .pull-apart {
-    position: absolute;
-    bottom: 9px;
-    right: 92px;
-  }
-
-  .pull-apart-2 {
-    position: absolute;
-    bottom: 9px;
-    right: 167px;
-  }
-
-  &.add {
-    border: 1px dashed #78E0CF;
-    padding: 20px;
-
-    div, p {
-      text-align: center;
-      font-size: 12px;
-
-      span {
-        color: white;
-        font-size: 30px;
-        display: block;
-        height: 46px;
-        background: #73E0CF;
-        width: 46px;
-        margin: 0 auto;
-        border-radius: 5px;
-      }
-    }
-  }
-
-  &:hover {
-    -webkit-box-shadow: 0 0 8px 1px rgba(0,0,0,0.41), inset 0 0 8px 2px rgba(69,236,255,0.13);
-    box-shadow: 0 0 8px 1px rgba(0,0,0,0.41), inset 0 0 8px 2px rgba(69,236,255,0.13);
-  }
+.integration-button:hover, .integration-button:active {
+  -webkit-box-shadow: 0 0 8px 1px rgba(0,0,0,0.41), inset 0 0 8px 2px rgba(69,236,255,0.13);
+  box-shadow: 0 0 8px 1px rgba(0,0,0,0.41), inset 0 0 8px 2px rgba(69,236,255,0.13);
 }

@@ -15,9 +15,10 @@ import { UpdateDialogComponent } from './update-dialog/update-dialog.component';
 import {MatTabsModule} from '@angular/material/tabs';
 import {MatIconModule} from '@angular/material/icon';
 import {MatCheckboxModule} from '@angular/material/checkbox';
+import { IntegrationPageComponent } from './integration-page/integration-page.component';
 
 @NgModule({
-  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent, UpdateDialogComponent],
+  declarations: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, ProfilePageComponent, InputDialogComponent, UpdateDialogComponent, IntegrationPageComponent],
     imports: [CommonModule, TooltipModule.forRoot(), BsDropdownModule.forRoot(), ModalModule.forRoot(), ReactiveFormsModule, FormsModule, NgxJsonViewerModule, NgSelectModule, MatTabsModule, MatIconModule, MatCheckboxModule],
   exports: [ProfileComponent, ConfirmationDialogComponent, ProfileSidebarComponent, InputDialogComponent]
 })

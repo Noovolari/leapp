@@ -2,10 +2,11 @@ import {Injectable} from '@angular/core';
 import {FileService} from './file.service';
 import {AppService} from './app.service';
 import {Session} from '../models/session';
-import {Workspace} from '../models/workspace';
+import {AwsSsoConfiguration, Workspace} from '../models/workspace';
 import {environment} from '../../environments/environment';
 import {deserialize, serialize} from 'class-transformer';
 import {BehaviorSubject, Observable} from 'rxjs';
+import * as uuid from 'uuid';
 
 @Injectable({
   providedIn: 'root'
@@ -163,34 +164,49 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
-  configureAwsSso(region: string, portalUrl: string, expirationTime: string): void {
+  updateAwsSsoConfiguration(id: string, region: string, portalUrl: string, browserOpening: string): void {
     const workspace = this.get();
-    workspace.awsSsoConfiguration.region = region;
-    workspace.awsSsoConfiguration.portalUrl = portalUrl;
-    workspace.awsSsoConfiguration.expirationTime = expirationTime;
+    const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
+    if(index > -1) {
+      workspace.awsSsoConfigurations[index].region = region;
+      workspace.awsSsoConfigurations[index].portalUrl = portalUrl;
+      workspace.awsSsoConfigurations[index].browserOpening = browserOpening;
+      this.persist(workspace);
+    }
+  }
+
+  removeExpirationTimeFromAwsSsoConfiguration(id: string): void {
+    const workspace = this.get();
+    const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
+    if(index > -1) {
+      workspace.awsSsoConfigurations[index].expirationTime = undefined;
+      this.persist(workspace);
+    }
+  }
+
+  getAwsSsoConfiguration(id: string | number): AwsSsoConfiguration {
+    const workspace = this.get();
+    return workspace.awsSsoConfigurations.filter(ssoConfig => ssoConfig.id === id)[0];
+  }
+
+  getAwsSsoConfigurations() {
+    const workspace = this.get();
+    return workspace.awsSsoConfigurations;
+  }
+
+  addAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string) {
+    const workspace = this.get();
+    workspace.awsSsoConfigurations.push({ id: uuid.v4(), region, portalUrl, browserOpening, expirationTime: undefined });
     this.persist(workspace);
   }
 
-  removeExpirationTimeFromAwsSsoConfiguration(): void {
+  updateBrowserOpening(id: string, browserOpening: string) {
     const workspace = this.get();
-    workspace.awsSsoConfiguration.expirationTime = undefined;
-    this.persist(workspace);
-  }
-
-  getAwsSsoConfiguration(): {region: string; portalUrl: string; browserOpening: string; expirationTime: string} {
-    return this.get().awsSsoConfiguration;
-  }
-
-  setAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string, expirationTime: string) {
-    const workspace = this.get();
-    workspace.awsSsoConfiguration = { region, portalUrl, browserOpening, expirationTime };
-    this.persist(workspace);
-  }
-
-  updateBrowserOpening(browserOpening: string) {
-    const workspace = this.get();
-    workspace.awsSsoConfiguration.browserOpening = browserOpening;
-    this.persist(workspace);
+    const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
+    if(index > -1) {
+      workspace.awsSsoConfigurations[index].browserOpening = browserOpening;
+      this.persist(workspace);
+    }
   }
 
   updateProxyConfiguration(proxyConfiguration: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
@@ -204,6 +220,15 @@ export class WorkspaceService {
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
 
+  deleteAwsSsoConfiguration(id: string): void {
+    const workspace = this.get();
+    const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
+    if(index > -1) {
+      workspace.awsSsoConfigurations.splice(index, 1);
+      this.persist(workspace);
+    }
+  }
+
   private getPersistedSessions(): Session[] {
     const workspace = this.get();
     return workspace.sessions;
@@ -214,4 +239,7 @@ export class WorkspaceService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
+
+
+
 }

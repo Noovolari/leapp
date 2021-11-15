@@ -176,6 +176,8 @@ export class AwsSsoOidcService {
         this.ssoWindow.webContents.session.webRequest.onBeforeRequest({ urls: [
             'https://*.awsapps.com/start/user-consent/login-success.html',
           ] }, (details, callback) => {
+
+          this.ssoWindow.hide();
           this.ssoWindow.close();
           this.ssoWindow = null;
 

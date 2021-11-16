@@ -182,7 +182,7 @@ export class WorkspaceService {
     return workspace.awsSsoIntegrations.filter(ssoConfig => ssoConfig.id === id)[0];
   }
 
-  getAwsSsoConfigurations() {
+  listAwsSsoIntegrations() {
     const workspace = this.get();
     return workspace.awsSsoIntegrations;
   }

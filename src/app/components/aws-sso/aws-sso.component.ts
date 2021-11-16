@@ -98,7 +98,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   setValues() {
     this.modifying = 0;
     this.regions = this.appService.getRegions();
-    this.awsSsoConfigurations = this.workspaceService.getAwsSsoConfigurations();
+    this.awsSsoConfigurations = this.workspaceService.listAwsSsoIntegrations();
     this.logoutLoadings = {};
     this.awsSsoConfigurations.forEach(sc => {
       this.logoutLoadings[sc.id] = false;

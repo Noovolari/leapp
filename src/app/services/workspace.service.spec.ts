@@ -149,7 +149,7 @@ describe('WorkspaceService', () => {
   });
 
   describe('addAwsSsoIntegration()', () => {
-    it('invokes get() to retrieve the current workspace', () => {
+    it('invokes get() 1 time to retrieve the current workspace', () => {
       spyOn(workspaceService, 'get').and.callThrough();
       workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-region', 'fake-browser-opening');
       expect(workspaceService.get).toHaveBeenCalledTimes(1);
@@ -165,6 +165,24 @@ describe('WorkspaceService', () => {
       expect(awsSsoIntegrationsAfter[awsSsoIntegrationsAfter.length - 1].region).toEqual('fake-region');
       expect(awsSsoIntegrationsAfter[awsSsoIntegrationsAfter.length - 1].expirationTime).toEqual(undefined);
       expect(awsSsoIntegrationsAfter[awsSsoIntegrationsAfter.length - 1].browserOpening).toEqual('fake-browser-opening');
+    });
+  });
+
+  describe('listAwsSsoIntegrations', () => {
+    it('invokes get() 1 time to retrieve the current workspace', () => {
+      spyOn(workspaceService, 'get').and.callThrough();
+      workspaceService.listAwsSsoIntegrations();
+      expect(workspaceService.get).toHaveBeenCalledTimes(1);
+    });
+
+    it('retrieves the list of AwsSsoIntegration objects persisted in the workspace', () => {
+      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-region', 'fake-browser-opening');
+      const awsSsoIntegrations = workspaceService.listAwsSsoIntegrations();
+      expect(awsSsoIntegrations.length).toEqual(1);
+      expect(awsSsoIntegrations[awsSsoIntegrations.length - 1].portalUrl).toEqual('fake-portal-url');
+      expect(awsSsoIntegrations[awsSsoIntegrations.length - 1].region).toEqual('fake-region');
+      expect(awsSsoIntegrations[awsSsoIntegrations.length - 1].expirationTime).toEqual(undefined);
+      expect(awsSsoIntegrations[awsSsoIntegrations.length - 1].browserOpening).toEqual('fake-browser-opening');
     });
   });
 

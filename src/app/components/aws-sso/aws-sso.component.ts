@@ -53,7 +53,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
   async logout(configurationId: string) {
     this.logoutLoadings[configurationId] = true;
-    this.selectedAwsSsoConfiguration = this.workspaceService.getAwsSsoConfiguration(configurationId);
+    this.selectedAwsSsoConfiguration = this.workspaceService.getAwsSsoIntegration(configurationId);
     await this.awsSsoRoleService.logout(this.selectedAwsSsoConfiguration);
 
     this.loadingInBrowser = false;
@@ -63,7 +63,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   }
 
   async forceSync(configurationId: string) {
-    this.selectedAwsSsoConfiguration = this.workspaceService.getAwsSsoConfiguration(configurationId);
+    this.selectedAwsSsoConfiguration = this.workspaceService.getAwsSsoIntegration(configurationId);
 
     if (this.selectedAwsSsoConfiguration && !this.loadingInApp) {
       this.loadingInBrowser = (this.selectedAwsSsoConfiguration.browserOpening === Constants.inBrowser.toString());

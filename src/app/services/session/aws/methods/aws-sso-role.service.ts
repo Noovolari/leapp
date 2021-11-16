@@ -154,7 +154,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    const awsSsoConfiguration = this.workspaceService.getAwsSsoConfiguration((this.get(sessionId) as AwsSsoRoleSession).awsSsoConfigurationId);
+    const awsSsoConfiguration = this.workspaceService.getAwsSsoIntegration((this.get(sessionId) as AwsSsoRoleSession).awsSsoConfigurationId);
     const region = awsSsoConfiguration.region;
     const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
 

@@ -177,7 +177,7 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
-  getAwsSsoConfiguration(id: string | number): AwsSsoIntegration {
+  getAwsSsoIntegration(id: string | number): AwsSsoIntegration {
     const workspace = this.get();
     return workspace.awsSsoIntegrations.filter(ssoConfig => ssoConfig.id === id)[0];
   }

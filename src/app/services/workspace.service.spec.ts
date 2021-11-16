@@ -17,7 +17,6 @@ describe('WorkspaceService', () => {
   let spyFileService;
 
   beforeEach(() => {
-
     spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
     spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
 

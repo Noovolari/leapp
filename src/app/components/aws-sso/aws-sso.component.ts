@@ -6,8 +6,8 @@ import {WorkspaceService} from '../../services/workspace.service';
 import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/methods/aws-sso-role.service';
 import {Constants} from '../../models/constants';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
-import {AwsSsoConfiguration} from '../../models/workspace';
 import {LoggingService} from '../../services/logging.service';
+import {AwsSsoIntegration} from "../../models/aws-sso-integration";
 
 @Component({
   selector: 'app-aws-sso',
@@ -18,11 +18,11 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
   eConstants = Constants;
   regions = [];
-  selectedAwsSsoConfiguration: AwsSsoConfiguration;
+  selectedAwsSsoConfiguration: AwsSsoIntegration;
   loadingInBrowser = false;
   loadingInApp = false;
 
-  public awsSsoConfigurations: AwsSsoConfiguration[];
+  public awsSsoConfigurations: AwsSsoIntegration[];
   public modifying: number;
 
   public form = new FormGroup({
@@ -125,7 +125,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     this.loadingInApp = false;
   }
 
-  async isAwsSsoActive(awsSsoConfiguration: AwsSsoConfiguration) {
+  async isAwsSsoActive(awsSsoConfiguration: AwsSsoIntegration) {
     return await this.awsSsoRoleService.awsSsoActive(awsSsoConfiguration);
   }
 
@@ -170,7 +170,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     }
   }
 
-  delete(awsSsoConfiguration: AwsSsoConfiguration) {
+  delete(awsSsoConfiguration: AwsSsoIntegration) {
     // Ask for deletion
     this.appService.confirmDialog(`Deleting this configuration will also logout from its sessions: do you wannt to proceed?`, async (res) => {
       if (res !== Constants.confirmClosed) {

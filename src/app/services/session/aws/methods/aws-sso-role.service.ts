@@ -21,7 +21,7 @@ import {environment} from '../../../../../environments/environment';
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
-import {AwsSsoConfiguration} from '../../../../models/workspace';
+import {AwsSsoIntegration} from "../../../../models/aws-sso-integration";
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -174,7 +174,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     this.awsSsoOidcService.interrupt();
   }
 
-  async sync(awsSsoConfiguration: AwsSsoConfiguration): Promise<SsoRoleSession[]> {
+  async sync(awsSsoConfiguration: AwsSsoIntegration): Promise<SsoRoleSession[]> {
     const region = awsSsoConfiguration.region;
     const accessToken = await this.getAccessToken(awsSsoConfiguration);
 
@@ -187,7 +187,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return sessions;
   }
 
-  async logout(awsSsoConfiguration: AwsSsoConfiguration): Promise<void> {
+  async logout(awsSsoConfiguration: AwsSsoIntegration): Promise<void> {
     // Obtain region and access token
     const region = awsSsoConfiguration.region;
     const savedAccessToken = await this.getAccessTokenFromKeychain();
@@ -210,7 +210,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     });
   }
 
-  async getAccessToken(awsSsoConfiguration: AwsSsoConfiguration): Promise<string> {
+  async getAccessToken(awsSsoConfiguration: AwsSsoIntegration): Promise<string> {
     if (this.ssoExpired(awsSsoConfiguration)) {
       const loginResponse = await this.login(awsSsoConfiguration);
 
@@ -241,17 +241,17 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise();
   }
 
-  async awsSsoActive(awsSsoConfiguration: AwsSsoConfiguration): Promise<boolean> {
+  async awsSsoActive(awsSsoConfiguration: AwsSsoIntegration): Promise<boolean> {
     const ssoToken = await this.getAccessTokenFromKeychain();
     return !this.ssoExpired(awsSsoConfiguration) && ssoToken !== undefined;
   }
 
-  private ssoExpired(awsSsoConfiguration: AwsSsoConfiguration): boolean {
+  private ssoExpired(awsSsoConfiguration: AwsSsoIntegration): boolean {
     const expirationTime = awsSsoConfiguration.expirationTime;
     return !expirationTime || Date.parse(expirationTime) < Date.now();
   }
 
-  private async login(awsSsoConfiguration: AwsSsoConfiguration): Promise<LoginResponse> {
+  private async login(awsSsoConfiguration: AwsSsoIntegration): Promise<LoginResponse> {
     const followRedirectClient = this.appService.getFollowRedirects()[AwsSsoRoleService.getProtocol(awsSsoConfiguration.portalUrl)];
 
     awsSsoConfiguration.portalUrl = await new Promise( (resolve, _) => {

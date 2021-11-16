@@ -1,6 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import {TestBed} from '@angular/core/testing';
 
-import { RotationService } from './rotation.service';
+import {RotationService} from './rotation.service';
 import {mustInjected} from '../../base-injectables';
 import {AwsSessionService} from './session/aws/aws-session.service';
 import {SessionFactoryService} from './session-factory.service';
@@ -21,15 +21,17 @@ describe('RotationService', () => {
     sessionActive.active = true;
     spySessionService.listActive.and.returnValue([sessionActive]);
 
-
     spySessionProviderService = jasmine.createSpyObj('SessionProviderService', ['getService']);
-    concreteSessionServiceFake = { rotate: () => {} };
+    concreteSessionServiceFake = {
+      rotate: () => {
+      }
+    };
     spySessionProviderService.getService.and.returnValue(concreteSessionServiceFake);
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: AwsSessionService, useValue: spySessionService },
-        { provide: SessionFactoryService, useValue: spySessionProviderService },
+        {provide: AwsSessionService, useValue: spySessionService},
+        {provide: SessionFactoryService, useValue: spySessionProviderService},
       ].concat(mustInjected())
     });
     rotationService = TestBed.inject(RotationService);

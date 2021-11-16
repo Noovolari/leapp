@@ -13,7 +13,7 @@ import {Constants} from '../models/constants';
 import {AppService, LoggerLevel} from './app.service';
 import {ElectronService} from './electron.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
-import {AwsSsoConfiguration} from '../models/workspace';
+import {AwsSsoIntegration} from "../models/aws-sso-integration";
 
 export interface BrowserWindowClosing {
   catchClosingBrowserWindow(): void;
@@ -39,7 +39,7 @@ export class AwsSsoOidcService {
   private mainIntervalId: any;
 
   private index: number;
-  private selectedConfiguration: AwsSsoConfiguration;
+  private selectedConfiguration: AwsSsoIntegration;
 
   constructor(
     private appService: AppService,
@@ -72,7 +72,7 @@ export class AwsSsoOidcService {
     this.loginMutex = false;
   }
 
-  async login(selectedConfiguration: AwsSsoConfiguration): Promise<GenerateSSOTokenResponse> {
+  async login(selectedConfiguration: AwsSsoIntegration): Promise<GenerateSSOTokenResponse> {
     if (!this.loginMutex && this.setIntervalQueue.length === 0) {
       this.loginMutex = true;
 

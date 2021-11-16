@@ -2,14 +2,7 @@ import {Session} from './session';
 import * as uuid from 'uuid';
 import {environment} from '../../environments/environment';
 import {Type} from 'class-transformer';
-
-export interface AwsSsoConfiguration {
-  id: string;
-  region: string;
-  portalUrl: string;
-  expirationTime: string;
-  browserOpening: string;
-}
+import {AwsSsoIntegration} from './aws-sso-integration';
 
 export class Workspace {
   @Type(() => Session)
@@ -19,7 +12,7 @@ export class Workspace {
   private _idpUrls: { id: string; url: string }[];
   private _profiles: { id: string; name: string }[];
 
-  private _awsSsoConfiguration: AwsSsoConfiguration[];
+  private _awsSsoIntegrations: AwsSsoIntegration[];
 
   private _proxyConfiguration: {
     proxyProtocol: string;
@@ -38,7 +31,7 @@ export class Workspace {
       { id: uuid.v4(), name: environment.defaultAwsProfileName }
     ];
 
-    this._awsSsoConfiguration = [];
+    this._awsSsoIntegrations = [];
 
     this._proxyConfiguration = {
       proxyProtocol: 'https',
@@ -97,11 +90,11 @@ export class Workspace {
     this._defaultLocation = value;
   }
 
-  get awsSsoConfigurations(): AwsSsoConfiguration[] {
-    return this._awsSsoConfiguration;
+  get awsSsoConfigurations(): AwsSsoIntegration[] {
+    return this._awsSsoIntegrations;
   }
 
-  set awsSsoConfigurations(value: AwsSsoConfiguration[]) {
-    this._awsSsoConfiguration = value;
+  set awsSsoConfigurations(value: AwsSsoIntegration[]) {
+    this._awsSsoIntegrations = value;
   }
 }

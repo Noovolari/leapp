@@ -22,9 +22,11 @@ describe('TimerService', () => {
 
   describe('start()', () => {
     it('should run the callback function after one second', () => {
-      const fakeCallbackObject = { fakeCallback: () => {
- console.log('fake callback called'); 
-} };
+      const fakeCallbackObject = {
+        fakeCallback: () => {
+          console.log('fake callback called');
+        }
+      };
       const spyCallback = spyOn(fakeCallbackObject, 'fakeCallback').and.callThrough();
 
       timerService.start(fakeCallbackObject.fakeCallback);
@@ -35,9 +37,11 @@ describe('TimerService', () => {
     });
 
     it('should run the setInterval timer', () => {
-      const fakeCallbackObject = { fakeCallback: () => {
- console.log('fake callback called'); 
-} };
+      const fakeCallbackObject = {
+        fakeCallback: () => {
+          console.log('fake callback called');
+        }
+      };
       const spySetInterval = spyOn(window, 'setInterval').and.callThrough();
 
       timerService.start(fakeCallbackObject.fakeCallback);
@@ -45,9 +49,11 @@ describe('TimerService', () => {
     });
 
     it('should manage timer as a singleton', () => {
-      const fakeCallbackObject = { fakeCallback: () => {
- console.log('fake callback called'); 
-} };
+      const fakeCallbackObject = {
+        fakeCallback: () => {
+          console.log('fake callback called');
+        }
+      };
       const spyTimerProperty = spyOnProperty(timerService, 'timer', 'set').and.callThrough();
       timerService.start(fakeCallbackObject.fakeCallback);
       timerService.start(fakeCallbackObject.fakeCallback);
@@ -56,9 +62,11 @@ describe('TimerService', () => {
     });
 
     it('should run callback every 1 second', () => {
-      const fakeCallbackObject = { fakeCallback: () => {
- console.log('fake callback called'); 
-} };
+      const fakeCallbackObject = {
+        fakeCallback: () => {
+          console.log('fake callback called');
+        }
+      };
       const spyCallback = spyOn(fakeCallbackObject, 'fakeCallback').and.callThrough();
 
       timerService.start(fakeCallbackObject.fakeCallback);

@@ -2,11 +2,12 @@ import {Injectable} from '@angular/core';
 import {FileService} from './file.service';
 import {AppService} from './app.service';
 import {Session} from '../models/session';
-import {AwsSsoConfiguration, Workspace} from '../models/workspace';
+import {Workspace} from '../models/workspace';
 import {environment} from '../../environments/environment';
 import {deserialize, serialize} from 'class-transformer';
 import {BehaviorSubject, Observable} from 'rxjs';
 import * as uuid from 'uuid';
+import {AwsSsoIntegration} from "../models/aws-sso-integration";
 
 @Injectable({
   providedIn: 'root'
@@ -187,7 +188,7 @@ export class WorkspaceService {
     }
   }
 
-  getAwsSsoConfiguration(id: string | number): AwsSsoConfiguration {
+  getAwsSsoConfiguration(id: string | number): AwsSsoIntegration {
     const workspace = this.get();
     return workspace.awsSsoConfigurations.filter(ssoConfig => ssoConfig.id === id)[0];
   }

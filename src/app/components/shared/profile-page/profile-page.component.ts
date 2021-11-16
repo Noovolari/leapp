@@ -1,5 +1,5 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
-import {AwsSsoConfiguration, Workspace} from '../../../models/workspace';
+import {Workspace} from '../../../models/workspace';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
 import {FileService} from '../../../services/file.service';
@@ -15,6 +15,7 @@ import {SessionType} from '../../../models/session-type';
 import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
 import {LoggingService} from '../../../services/logging.service';
 import {AwsSsoRoleSession} from '../../../models/aws-sso-role-session';
+import {AwsSsoIntegration} from "../../../models/aws-sso-integration";
 
 @Component({
   selector: 'app-profile-page',

@@ -219,9 +219,9 @@ export class WorkspaceService {
     }
   }
 
-  deleteAwsSsoConfiguration(id: string): void {
+  deleteAwsSsoIntegration(id: string): void {
     const workspace = this.get();
-    const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
+    const index = workspace.awsSsoIntegrations.findIndex(awsSsoIntegration => awsSsoIntegration.id === id);
     if(index > -1) {
       workspace.awsSsoIntegrations.splice(index, 1);
       this.persist(workspace);

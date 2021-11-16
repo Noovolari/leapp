@@ -9,6 +9,8 @@ import {AppService} from './app.service';
 import {FileService} from './file.service';
 import SpyObj = jasmine.SpyObj;
 import {AwsSsoIntegration} from "../models/aws-sso-integration";
+import * as uuid from 'uuid';
+import {Constants} from "../models/constants";
 
 describe('WorkspaceService', () => {
   let workspaceService: WorkspaceService;
@@ -183,6 +185,26 @@ describe('WorkspaceService', () => {
       expect(awsSsoIntegrations[awsSsoIntegrations.length - 1].region).toEqual('fake-region');
       expect(awsSsoIntegrations[awsSsoIntegrations.length - 1].expirationTime).toEqual(undefined);
       expect(awsSsoIntegrations[awsSsoIntegrations.length - 1].browserOpening).toEqual('fake-browser-opening');
+    });
+  });
+
+  describe('deleteAwsSsoIntegration', () => {
+    it('deletes the specified AwsSsoIntegration object from the array', () => {
+      const id = uuid.v4();
+      workspace = workspaceService.get();
+
+      workspace.awsSsoIntegrations.push({
+        id,
+        portalUrl: 'fake-portal-url',
+        region: 'fake-region',
+        expirationTime: undefined,
+        browserOpening: Constants.inApp
+      });
+
+      workspaceService.persist(workspace);
+      workspaceService.deleteAwsSsoIntegration(id);
+
+      expect(workspace.awsSsoIntegrations.length).toBe(0);
     });
   });
 

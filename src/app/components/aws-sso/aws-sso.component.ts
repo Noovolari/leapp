@@ -7,7 +7,7 @@ import {AwsSsoRoleService, SsoRoleSession} from '../../services/session/aws/meth
 import {Constants} from '../../models/constants';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
 import {LoggingService} from '../../services/logging.service';
-import {AwsSsoIntegration} from "../../models/aws-sso-integration";
+import {AwsSsoIntegration} from '../../models/aws-sso-integration';
 
 @Component({
   selector: 'app-aws-sso',
@@ -176,7 +176,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       if (res !== Constants.confirmClosed) {
         this.loggingService.logger(`Removing sessions with attached aws sso config id: ${awsSsoConfiguration.id}`, LoggerLevel.info, this);
         this.logout(awsSsoConfiguration.id);
-        this.workspaceService.deleteAwsSsoConfiguration(awsSsoConfiguration.id);
+        this.workspaceService.deleteAwsSsoIntegration(awsSsoConfiguration.id);
       }
     });
   }

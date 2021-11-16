@@ -148,7 +148,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
       if(this.modifying === 1) {
         // Save
-        this.workspaceService.addAwsSsoConfiguration(
+        this.workspaceService.addAwsSsoIntegration(
           region,
           portalUrl,
           browserOpening

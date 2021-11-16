@@ -42,36 +42,12 @@ export class Workspace {
     };
   }
 
-  get idpUrls(): { id: string; url: string }[] {
-    return this._idpUrls;
-  }
-
-  set idpUrls(value: { id: string; url: string }[]) {
-    this._idpUrls = value;
-  }
-
-  get profiles(): { id: string; name: string }[] {
-    return this._profiles;
-  }
-
-  set profiles(value: { id: string; name: string }[]) {
-    this._profiles = value;
-  }
-
   get sessions(): Session[] {
     return this._sessions;
   }
 
   set sessions(value: Session[]) {
     this._sessions = value;
-  }
-
-  get proxyConfiguration(): { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string } {
-    return this._proxyConfiguration;
-  }
-
-  set proxyConfiguration(value: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
-    this._proxyConfiguration = value;
   }
 
   get defaultRegion(): string {
@@ -90,11 +66,35 @@ export class Workspace {
     this._defaultLocation = value;
   }
 
-  get awsSsoConfigurations(): AwsSsoIntegration[] {
+  get idpUrls(): { id: string; url: string }[] {
+    return this._idpUrls;
+  }
+
+  set idpUrls(value: { id: string; url: string }[]) {
+    this._idpUrls = value;
+  }
+
+  get profiles(): { id: string; name: string }[] {
+    return this._profiles;
+  }
+
+  set profiles(value: { id: string; name: string }[]) {
+    this._profiles = value;
+  }
+
+  get awsSsoIntegrations(): AwsSsoIntegration[] {
     return this._awsSsoIntegrations;
   }
 
-  set awsSsoConfigurations(value: AwsSsoIntegration[]) {
+  set awsSsoIntegrations(value: AwsSsoIntegration[]) {
     this._awsSsoIntegrations = value;
+  }
+
+  get proxyConfiguration(): { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string } {
+    return this._proxyConfiguration;
+  }
+
+  set proxyConfiguration(value: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
+    this._proxyConfiguration = value;
   }
 }

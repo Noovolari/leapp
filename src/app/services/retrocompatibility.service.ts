@@ -74,7 +74,7 @@ export class RetrocompatibilityService {
       session.account.region,
       `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
       workspace.profiles[0].id,
-      workspace.awsSsoConfigurations[0].id,
+      workspace.awsSsoIntegrations[0].id,
       session.account.email
     );
     ssoSession.sessionId = session.id;
@@ -185,7 +185,7 @@ export class RetrocompatibilityService {
           // to force the user to redo the process on the new fresh workspace
         }
 
-        workspace.awsSsoConfigurations = [{
+        workspace.awsSsoIntegrations = [{
           id: uuid.v4(),
           region,
           portalUrl,

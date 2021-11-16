@@ -7,7 +7,8 @@ import {environment} from '../../environments/environment';
 import {deserialize, serialize} from 'class-transformer';
 import {BehaviorSubject, Observable} from 'rxjs';
 import * as uuid from 'uuid';
-import {AwsSsoIntegration} from "../models/aws-sso-integration";
+import {AwsSsoIntegration} from '../models/aws-sso-integration';
+import {Constants} from "../models/constants";
 
 @Injectable({
   providedIn: 'root'
@@ -74,6 +75,11 @@ export class WorkspaceService {
       return this._workspace;
     }
     return this._workspace;
+  }
+
+  persist(workspace: Workspace) {
+    const path = this.appService.getOS().homedir() + '/' + environment.lockFileDestination;
+    this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
 
   addSession(session: Session) {
@@ -165,15 +171,31 @@ export class WorkspaceService {
     this.persist(workspace);
   }
 
+  addAwsSsoIntegration(portalUrl: string, region: string, browserOpening: string) {
+    const workspace = this.get();
+    workspace.awsSsoIntegrations.push({ id: uuid.v4(), region, portalUrl, expirationTime: undefined, browserOpening });
+    this.persist(workspace);
+  }
+
+  getAwsSsoConfiguration(id: string | number): AwsSsoIntegration {
+    const workspace = this.get();
+    return workspace.awsSsoIntegrations.filter(ssoConfig => ssoConfig.id === id)[0];
+  }
+
+  getAwsSsoConfigurations() {
+    const workspace = this.get();
+    return workspace.awsSsoIntegrations;
+  }
+
   updateAwsSsoConfiguration(id: string, region: string, portalUrl: string, browserOpening: string, expirationTime?: string): void {
     const workspace = this.get();
-    const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
+    const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
     if(index > -1) {
-      workspace.awsSsoConfigurations[index].region = region;
-      workspace.awsSsoConfigurations[index].portalUrl = portalUrl;
-      workspace.awsSsoConfigurations[index].browserOpening = browserOpening;
+      workspace.awsSsoIntegrations[index].region = region;
+      workspace.awsSsoIntegrations[index].portalUrl = portalUrl;
+      workspace.awsSsoIntegrations[index].browserOpening = browserOpening;
       if(expirationTime) {
-        workspace.awsSsoConfigurations[index].expirationTime = expirationTime;
+        workspace.awsSsoIntegrations[index].expirationTime = expirationTime;
       }
       this.persist(workspace);
     }
@@ -181,34 +203,27 @@ export class WorkspaceService {
 
   removeExpirationTimeFromAwsSsoConfiguration(id: string): void {
     const workspace = this.get();
-    const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
+    const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
     if(index > -1) {
-      workspace.awsSsoConfigurations[index].expirationTime = undefined;
+      workspace.awsSsoIntegrations[index].expirationTime = undefined;
       this.persist(workspace);
     }
   }
 
-  getAwsSsoConfiguration(id: string | number): AwsSsoIntegration {
-    const workspace = this.get();
-    return workspace.awsSsoConfigurations.filter(ssoConfig => ssoConfig.id === id)[0];
-  }
-
-  getAwsSsoConfigurations() {
-    const workspace = this.get();
-    return workspace.awsSsoConfigurations;
-  }
-
-  addAwsSsoConfiguration(region: string, portalUrl: string, browserOpening: string) {
-    const workspace = this.get();
-    workspace.awsSsoConfigurations.push({ id: uuid.v4(), region, portalUrl, browserOpening, expirationTime: undefined });
-    this.persist(workspace);
-  }
-
   updateBrowserOpening(id: string, browserOpening: string) {
     const workspace = this.get();
-    const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
+    const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
     if(index > -1) {
-      workspace.awsSsoConfigurations[index].browserOpening = browserOpening;
+      workspace.awsSsoIntegrations[index].browserOpening = browserOpening;
+      this.persist(workspace);
+    }
+  }
+
+  deleteAwsSsoConfiguration(id: string): void {
+    const workspace = this.get();
+    const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
+    if(index > -1) {
+      workspace.awsSsoIntegrations.splice(index, 1);
       this.persist(workspace);
     }
   }
@@ -217,20 +232,6 @@ export class WorkspaceService {
     const workspace = this.get();
     workspace.proxyConfiguration = proxyConfiguration;
     this.persist(workspace);
-  }
-
-   persist(workspace: Workspace) {
-    const path = this.appService.getOS().homedir() + '/' + environment.lockFileDestination;
-    this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
-  }
-
-  deleteAwsSsoConfiguration(id: string): void {
-    const workspace = this.get();
-    const index = workspace.awsSsoConfigurations.findIndex(sso => sso.id === id);
-    if(index > -1) {
-      workspace.awsSsoConfigurations.splice(index, 1);
-      this.persist(workspace);
-    }
   }
 
   private getPersistedSessions(): Session[] {
@@ -243,7 +244,4 @@ export class WorkspaceService {
     workspace.sessions = sessions;
     this.persist(workspace);
   }
-
-
-
 }

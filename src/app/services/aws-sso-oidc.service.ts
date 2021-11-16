@@ -13,7 +13,7 @@ import {Constants} from '../models/constants';
 import {AppService, LoggerLevel} from './app.service';
 import {ElectronService} from './electron.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
-import {AwsSsoIntegration} from "../models/aws-sso-integration";
+import {AwsSsoIntegration} from '../models/aws-sso-integration';
 
 export interface BrowserWindowClosing {
   catchClosingBrowserWindow(): void;

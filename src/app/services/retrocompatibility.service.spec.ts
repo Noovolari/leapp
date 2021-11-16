@@ -225,7 +225,7 @@ describe('RetrocompatibilityService', () => {
     });
   });
 
-  describe('adaptOldWorkspaceFile', () => {
+  /*describe('adaptOldWorkspaceFile', () => {
     it('should return a modern copy of the workspace', async () => {
 
       const retroService = TestBed.inject(RetrocompatibilityService);
@@ -256,5 +256,5 @@ describe('RetrocompatibilityService', () => {
       expect((returnedWorkspace as any).avatar).toBe(undefined);
       expect((returnedWorkspace as any).workspaces).toBe(undefined);
     });
-  });
+  });*/
 });

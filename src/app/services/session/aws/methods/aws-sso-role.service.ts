@@ -21,7 +21,7 @@ import {environment} from '../../../../../environments/environment';
 import {KeychainService} from '../../../keychain.service';
 import {SessionType} from '../../../../models/session-type';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
-import {AwsSsoIntegration} from "../../../../models/aws-sso-integration";
+import {AwsSsoIntegration} from '../../../../models/aws-sso-integration';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;

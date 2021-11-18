@@ -104,7 +104,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     } else if(parentSession.type === SessionType.awsIamUser) {
       parentSessionService = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSsoRole) {
-      parentSessionService = new AwsSsoRoleService(this.appService, this.awsSsoIntegrationService, this.awsSsoOidcService, this.fileService, this.workspaceService) as AwsSessionService;
+      parentSessionService = new AwsSsoRoleService(this.appService, this.awsSsoOidcService, this.fileService, this.workspaceService) as AwsSessionService;
     }
 
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);

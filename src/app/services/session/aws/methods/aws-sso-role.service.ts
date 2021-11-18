@@ -12,7 +12,7 @@ import SSO, {
 } from 'aws-sdk/clients/sso';
 
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
-import {AwsSsoIntegrationService} from '../../../aws-sso-integration.service';
+import {AwsSsoIntegrationService} from "../../../aws-sso-integration.service";
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
@@ -74,7 +74,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
   constructor(
     private appService: AppService,
-    private awsSsoIntegrationService: AwsSsoIntegrationService,
     private awsSsoOidcService: AwsSsoOidcService,
     private fileService: FileService,
     protected workspaceService: WorkspaceService,
@@ -138,7 +137,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const region = awsSsoConfiguration.region;
     const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
 
-    const accessToken = await this.awsSsoIntegrationService.getAccessToken(awsSsoConfiguration);
+    const accessToken = await AwsSsoIntegrationService.getInstance().getAccessToken(awsSsoConfiguration);
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
 
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);

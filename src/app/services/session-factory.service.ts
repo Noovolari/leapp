@@ -73,7 +73,7 @@ export class SessionFactoryService {
   }
 
   private getAwsSsoRoleSessionService(accountType: SessionType) {
-    const service = new AwsSsoRoleService(this.appService, this.awsSsoIntegrationService,this.awsSsoOidcService,
+    const service = new AwsSsoRoleService(this.appService, this.awsSsoOidcService,
       this.fileService, this.workspaceService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;

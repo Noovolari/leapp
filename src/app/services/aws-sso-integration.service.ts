@@ -15,22 +15,56 @@ import {KeychainService} from './keychain.service';
 import {AwsSsoRoleService, LoginResponse, SsoRoleSession} from './session/aws/methods/aws-sso-role.service';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {SessionType} from '../models/session-type';
-import {AppService} from './app.service';
+import {AppService, LoggerLevel} from './app.service';
+import {LeappBaseError} from '../errors/leapp-base-error';
 
-@Injectable({
-  providedIn: 'root'
-})
 export class AwsSsoIntegrationService {
 
+  private static instance: AwsSsoIntegrationService;
   private ssoPortal: SSO;
+  private appService: AppService;
+  private awsSsoOidcService: AwsSsoOidcService;
+  private awsSsoRoleService: AwsSsoRoleService;
+  private keychainService: KeychainService;
+  private workspaceService: WorkspaceService;
 
-  constructor(
-    private appService: AppService,
-    private awsSsoOidcService: AwsSsoOidcService,
-    private awsSsoRoleService: AwsSsoRoleService,
-    private keychainService: KeychainService,
-    private workspaceService: WorkspaceService
-  ) {}
+  private constructor(
+    appService: AppService,
+    awsSsoOidcService: AwsSsoOidcService,
+    awsSsoRoleService: AwsSsoRoleService,
+    keychainService: KeychainService,
+    workspaceService: WorkspaceService
+  ) {
+    this.appService = appService;
+    this.awsSsoOidcService = awsSsoOidcService;
+    this.awsSsoRoleService = awsSsoRoleService;
+    this.keychainService = keychainService;
+    this.workspaceService = workspaceService;
+  }
+
+  static getInstance(): AwsSsoIntegrationService  {
+    if(!this.instance) {
+      throw new LeappBaseError('AwsSsoIntegrationService singleton initialization error', this, LoggerLevel.error, 'AwsSsoIntegrationService singleton not yet initialized');
+    } else {
+      return this.instance;
+    }
+  }
+
+  static init(
+    appService: AppService,
+    awsSsoOidcService: AwsSsoOidcService,
+    awsSsoRoleService: AwsSsoRoleService,
+    keychainService: KeychainService,
+    workspaceService: WorkspaceService
+  ) {
+    this.instance = new AwsSsoIntegrationService(
+      appService,
+      awsSsoOidcService,
+      awsSsoRoleService,
+      keychainService,
+      workspaceService
+    );
+  }
 
   async login(awsSsoIntegrationId: string): Promise<LoginResponse> {
     const awsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
@@ -78,7 +112,6 @@ export class AwsSsoIntegrationService {
     return sessions;
   }
 
-  // TODO: refactor method signature and pass integration id
   async logout(awsSsoIntegrationId: string): Promise<void> {
     const awsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
 

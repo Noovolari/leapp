@@ -219,9 +219,9 @@ describe('RetrocompatibilityService', () => {
       expect(retroService.isRetroPatchNecessary()).toEqual(false);
 
       const workspace = new Workspace();
-      workspace.profiles = workspaceService.get().profiles;
+      workspace.profiles = workspaceService.getWorkspace().profiles;
 
-      expect(JSON.stringify(workspace)).toEqual(JSON.stringify(workspaceService.get()));
+      expect(JSON.stringify(workspace)).toEqual(JSON.stringify(workspaceService.getWorkspace()));
     });
   });
 

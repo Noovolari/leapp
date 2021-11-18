@@ -39,7 +39,7 @@ export class AwsSsoOidcService {
   private mainIntervalId: any;
 
   private index: number;
-  private selectedConfiguration: AwsSsoIntegration;
+  private awsSsoIntegration: AwsSsoIntegration;
 
   constructor(
     private appService: AppService,
@@ -72,15 +72,15 @@ export class AwsSsoOidcService {
     this.loginMutex = false;
   }
 
-  async login(selectedConfiguration: AwsSsoIntegration): Promise<GenerateSSOTokenResponse> {
+  async login(awsSsoIntegration: AwsSsoIntegration): Promise<GenerateSSOTokenResponse> {
     if (!this.loginMutex && this.setIntervalQueue.length === 0) {
       this.loginMutex = true;
 
-      this.selectedConfiguration = selectedConfiguration;
-      this.ssoOidc = new SSOOIDC({ region: selectedConfiguration.region });
+      this.awsSsoIntegration = awsSsoIntegration;
+      this.ssoOidc = new SSOOIDC({ region: awsSsoIntegration.region });
       this.ssoWindow = null;
-      this.currentRegion = selectedConfiguration.region;
-      this.currentPortalUrl = selectedConfiguration.portalUrl;
+      this.currentRegion = awsSsoIntegration.region;
+      this.currentPortalUrl = awsSsoIntegration.portalUrl;
       this.registerClientResponse = null;
       this.startDeviceAuthorizationResponse = null;
       this.startDeviceAuthorizationResponseExpiresAt = null;
@@ -94,7 +94,7 @@ export class AwsSsoOidcService {
       const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
         clientId: this.registerClientResponse.clientId,
         clientSecret: this.registerClientResponse.clientSecret,
-        startUrl: this.selectedConfiguration.portalUrl
+        startUrl: this.awsSsoIntegration.portalUrl
       };
 
       const baseTimeInMilliseconds = Date.now();
@@ -155,7 +155,7 @@ export class AwsSsoOidcService {
   }
 
   private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    if(this.selectedConfiguration.browserOpening === Constants.inApp.toString()) {
+    if(this.awsSsoIntegration.browserOpening === Constants.inApp.toString()) {
       const pos = this.electronService.currentWindow.getPosition();
 
       this.ssoWindow = null;
@@ -242,7 +242,7 @@ export class AwsSsoOidcService {
 
     let createTokenResponse;
 
-    if(this.selectedConfiguration.browserOpening === Constants.inApp) {
+    if(this.awsSsoIntegration.browserOpening === Constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest);

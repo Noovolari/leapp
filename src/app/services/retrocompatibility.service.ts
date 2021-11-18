@@ -189,7 +189,7 @@ export class RetrocompatibilityService {
           id: uuid.v4(),
           region,
           portalUrl,
-          expirationTime,
+          accessTokenExpiration: expirationTime,
           browserOpening
         }];
         break;

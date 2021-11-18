@@ -65,7 +65,6 @@ describe('AwsIamUserService', () => {
       mockedSecret[name] = {};
       mockedSecret[name][account] = secret;
     });
-
     spyKeychainService.getSecret.and.callFake((_: string, _2: string, _3: string) => 'fake-secret');
 
     TestBed.configureTestingModule({

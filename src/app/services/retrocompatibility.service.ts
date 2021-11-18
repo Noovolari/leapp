@@ -78,6 +78,9 @@ export class RetrocompatibilityService {
       session.account.email
     );
     ssoSession.sessionId = session.id;
+    if (workspace.awsSsoIntegrations.length > 0) {
+      ssoSession.awsSsoConfigurationId = workspace.awsSsoIntegrations[0].id;
+    }
 
     workspace.sessions.push(ssoSession);
   }
@@ -97,7 +100,17 @@ export class RetrocompatibilityService {
     if (this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
       const workspaceParsed = this.parseWorkspaceFile();
       // use a never more used property to check if workspace has changed to new version
+      // also check for new integration array if present or not
       return workspaceParsed.defaultWorkspace === 'default';
+    }
+    return false;
+  }
+
+  isIntegrationPatchNecessary(): boolean {
+    if (this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
+      const workspaceParsed = this.parseWorkspaceFile();
+      // check for new integration array if present or not
+      return !workspaceParsed._awsSsoIntegrations || (workspaceParsed._awsSsoIntegrations.length === 0 && workspaceParsed._sessions.filter(s => s.type === 'awsSsoRole').length > 0);
     }
     return false;
   }
@@ -130,6 +143,18 @@ export class RetrocompatibilityService {
     }
   }
 
+  async adaptIntegrationPatch(workspace: Workspace): Promise<Workspace> {
+
+    await this.adaptIntegrations(workspace);
+
+    // Persist adapted workspace data
+    this.persists(workspace);
+    // Apply sessions to behaviour subject
+    this.workspaceService.sessions = workspace.sessions;
+
+    return workspace;
+  }
+
   private parseWorkspaceFile(): any {
     const workspaceJSON = this.fileService.decryptText(
       this.fileService.readFileSync(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)
@@ -146,9 +171,11 @@ export class RetrocompatibilityService {
   }
 
   private async adaptSessions(oldWorkspace: any, workspace: Workspace): Promise<void> {
+    const sessions = oldWorkspace.workspaces[0].sessions;
+
     // Loop through sessions and generate data
-    for(let i = 0; i < oldWorkspace.workspaces[0].sessions.length; i++) {
-      const session = oldWorkspace.workspaces[0].sessions[i];
+    for(let i = 0; i < sessions.length; i++) {
+      const session = sessions[i];
       // Get session type
       const sessionType = session.account.type;
       switch (sessionType) {
@@ -161,13 +188,12 @@ export class RetrocompatibilityService {
     }
   }
 
-
-
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: Workspace): Promise<void> {
+    const sessions = oldWorkspace.workspaces[0].sessions;
     // check if we have at least one SSO session
     // otherwise standard generated properties are just fine
-    for(let i = 0; i < oldWorkspace.workspaces[0].sessions.length; i++) {
-      const session = oldWorkspace.workspaces[0].sessions[i];
+    for(let i = 0; i < sessions.length; i++) {
+      const session = sessions[i];
       // We have changed the enum type so we must check it manually
       if (session.account.type === 'aws_sso') {
         // OK, let's check if we have data saved in the keychain
@@ -185,23 +211,19 @@ export class RetrocompatibilityService {
           // to force the user to redo the process on the new fresh workspace
         }
 
-        workspace.awsSsoIntegrations = [{
-          id: uuid.v4(),
-          region,
-          portalUrl,
-          accessTokenExpiration: expirationTime,
-          browserOpening
-        }];
-        break;
+        if(workspace.awsSsoIntegrations.length === 0)  {
+          workspace.awsSsoIntegrations = [{
+            id: uuid.v4(),
+            region,
+            portalUrl,
+            accessTokenExpiration: expirationTime,
+            browserOpening
+          }];
+          break;
+        }
       }
     }
   }
-
-
-
-
-
-
 
   private async createNewAwsIamUserSession(session: any, workspace: Workspace) {
     const iamUserSession = new AwsIamUserSession(
@@ -224,7 +246,33 @@ export class RetrocompatibilityService {
     workspace.sessions.push(iamUserSession);
   }
 
+  private async adaptIntegrations(workspace: any) {
+    if(!workspace._awsSsoIntegrations) {
+      workspace._awsSsoIntegrations = [];
+    }
 
+    if(workspace._awsSsoIntegrations.length === 0)  {
+      workspace._awsSsoIntegrations = [{
+        id: uuid.v4(),
+        region: workspace._awsSsoConfiguration.region,
+        portalUrl: workspace._awsSsoConfiguration.portalUrl,
+        accessTokenExpiration: workspace._awsSsoConfiguration.expirationTime,
+        browserOpening: Constants.inApp
+      }];
+    }
 
+    console.log(workspace._awsSsoIntegrations);
 
+    for(let i = 0; i < workspace._sessions.length; i++) {
+      const session = workspace._sessions[i];
+      // We have changed the enum type so we must check it manually
+      if (session.type === 'awsSsoRole') {
+        (session as AwsSsoRoleSession).awsSsoConfigurationId = workspace._awsSsoIntegrations[0].id;
+        workspace._sessions[i] = session;
+      }
+    }
+
+    console.log(workspace);
+
+  }
 }

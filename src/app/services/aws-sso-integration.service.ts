@@ -125,7 +125,10 @@ export class AwsSsoIntegrationService {
     this.ssoPortal.logout(logoutRequest).promise().then(_ => {}, async _ => {
       this.ssoPortal = null;
 
-      await this.keychainService.deletePassword(environment.appName, 'aws-sso-integration-access-token');
+      try {
+        await this.keychainService.deletePassword(environment.appName, `aws-sso-integration-access-token-${awsSsoIntegrationId}`);
+      } catch(err) {}
+
       this.workspaceService.unsetAwsSsoIntegrationExpiration(awsSsoIntegration.id);
 
       const sessions = this.workspaceService.getAwsSsoIntegrationSessions(awsSsoIntegration.id);
@@ -163,7 +166,7 @@ export class AwsSsoIntegrationService {
   }
 
   async getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId: string): Promise<AwsSsoIntegrationTokenInfo> {
-    const accessToken = await this.keychainService.getSecret(environment.appName, 'aws-sso-integration-access-token');
+    const accessToken = await this.keychainService.getSecret(environment.appName, `aws-sso-integration-access-token-${awsSsoIntegrationId}`);
     const expiration = new Date(this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId).accessTokenExpiration).getTime();
     return { accessToken, expiration };
   }
@@ -185,7 +188,7 @@ export class AwsSsoIntegrationService {
         loginResponse.expirationTime.toISOString()
       );
 
-      this.keychainService.saveSecret(environment.appName, 'aws-sso-integration-access-token', loginResponse.accessToken).then(_ => {});
+      this.keychainService.saveSecret(environment.appName, `aws-sso-integration-access-token-${awsSsoIntegration.id}`, loginResponse.accessToken).then(_ => {});
 
       return loginResponse.accessToken;
     } else {

@@ -42,7 +42,7 @@
       <h3 class="mb-session">Sessions</h3>
     </li>
 
-    <ng-container *ngFor="let session of workspaceService.sessions$ | async | querying:filterField.value:workspaceService.get() | filtering: false | ordering">
+    <ng-container *ngFor="let session of workspaceService.sessions$ | async | querying:filterField.value:workspaceService.getWorkspace() | filtering: false | ordering">
       <li *ngIf="(showOnly === 'ALL') || ($any(session).subscriptionId ? showOnly === 'AZR' : showOnly === 'aws')">
         <app-session-card [session]="session"></app-session-card>
       </li>

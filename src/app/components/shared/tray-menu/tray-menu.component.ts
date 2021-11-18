@@ -58,7 +58,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     allSessions.forEach((session: Session) => {
       let icon = '';
       let label = '';
-      const profile = this.workspaceService.get().profiles.filter(p => p.id === this.getProfileId(session))[0];
+      const profile = this.workspaceService.getWorkspace().profiles.filter(p => p.id === this.getProfileId(session))[0];
       const iconValue = (profile && profile.name === 'default') ? 'home' : 'user';
 
       switch (session.type) {

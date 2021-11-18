@@ -8,6 +8,7 @@ import {Constants} from '../../models/constants';
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oidc.service';
 import {LoggingService} from '../../services/logging.service';
 import {AwsSsoIntegration} from '../../models/aws-sso-integration';
+import {AwsSsoIntegrationService} from "../../services/aws-sso-integration.service";
 
 @Component({
   selector: 'app-aws-sso',
@@ -39,7 +40,8 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     private router: Router,
     private workspaceService: WorkspaceService,
     private awsSsoOidcService: AwsSsoOidcService,
-    private loggingService: LoggingService
+    private loggingService: LoggingService,
+    private awsSsoIntegrationService: AwsSsoIntegrationService
   ) {}
 
   ngOnInit() {
@@ -54,7 +56,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   async logout(configurationId: string) {
     this.logoutLoadings[configurationId] = true;
     this.selectedAwsSsoConfiguration = this.workspaceService.getAwsSsoIntegration(configurationId);
-    await this.awsSsoRoleService.logout(this.selectedAwsSsoConfiguration);
+    await this.awsSsoIntegrationService.logout(this.selectedAwsSsoConfiguration.id);
 
     this.loadingInBrowser = false;
     this.loadingInApp = false;
@@ -70,7 +72,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       this.loadingInApp = (this.selectedAwsSsoConfiguration.browserOpening === Constants.inApp.toString());
 
       try {
-        const ssoRoleSessions: SsoRoleSession[] = await this.awsSsoRoleService.sync(this.selectedAwsSsoConfiguration);
+        const ssoRoleSessions: SsoRoleSession[] = await this.awsSsoIntegrationService.sync(this.selectedAwsSsoConfiguration.id);
         ssoRoleSessions.forEach(ssoRoleSession => {
           ssoRoleSession.awsSsoConfigurationId = configurationId;
           this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());
@@ -109,7 +111,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       region: this.regions[0].region,
       portalUrl: '',
       browserOpening: Constants.inApp,
-      expirationTime: undefined
+      accessTokenExpiration: undefined
     };
   }
 
@@ -126,7 +128,8 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   }
 
   async isAwsSsoActive(awsSsoConfiguration: AwsSsoIntegration) {
-    return await this.awsSsoRoleService.awsSsoActive(awsSsoConfiguration);
+    const isAwsSsoAccessTokenExpired = await this.awsSsoIntegrationService.isAwsSsoAccessTokenExpired(awsSsoConfiguration.id);
+    return !isAwsSsoAccessTokenExpired;
   }
 
   openAddModal(modifying, currentAwsSsoConfiguration) {
@@ -149,13 +152,13 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       if(this.modifying === 1) {
         // Save
         this.workspaceService.addAwsSsoIntegration(
-          region,
           portalUrl,
+          region,
           browserOpening
         );
       } else if(this.modifying === 2 && this.selectedAwsSsoConfiguration.portalUrl !== '') {
         // Edit
-        this.workspaceService.updateAwsSsoConfiguration(
+        this.workspaceService.updateAwsSsoIntegration(
           this.selectedAwsSsoConfiguration.id,
           region,
           portalUrl,

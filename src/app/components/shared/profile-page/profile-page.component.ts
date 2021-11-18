@@ -75,7 +75,7 @@ export class ProfilePageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.workspace = this.workspaceService.get();
+    this.workspace = this.workspaceService.getWorkspace();
     this.idpUrlValue = '';
     this.proxyProtocol = this.workspace.proxyConfiguration.proxyProtocol;
     this.proxyUrl = this.workspace.proxyConfiguration.proxyUrl;
@@ -174,7 +174,7 @@ export class ProfilePageComponent implements OnInit {
     this.editingIdpUrl = false;
     this.idpUrlValue = undefined;
     this.form.get('idpUrl').setValue('');
-    this.workspace = this.workspaceService.get();
+    this.workspace = this.workspaceService.getWorkspace();
   }
 
   editIdpUrl(id) {
@@ -212,14 +212,14 @@ export class ProfilePageComponent implements OnInit {
           this.sessionService.delete(session.sessionId);
         });
 
-        this.workspace = this.workspaceService.get();
+        this.workspace = this.workspaceService.getWorkspace();
       }
     });
   }
 
   async manageAwsProfile(id: string | number) {
 
-    const profileIndex = this.workspaceService.get().profiles.findIndex(p => p.id === id.toString());
+    const profileIndex = this.workspaceService.getWorkspace().profiles.findIndex(p => p.id === id.toString());
     if (this.form.get('awsProfile').value !== '') {
       if (profileIndex === -1) {
         this.workspaceService.addProfile({ id: uuid.v4(), name: this.form.get('awsProfile').value });
@@ -242,7 +242,7 @@ export class ProfilePageComponent implements OnInit {
     this.editingAwsProfile = false;
     this.awsProfileValue = undefined;
     this.form.get('awsProfile').setValue('');
-    this.workspace = this.workspaceService.get();
+    this.workspace = this.workspaceService.getWorkspace();
   }
 
   editAwsProfile(id: string) {
@@ -286,7 +286,7 @@ export class ProfilePageComponent implements OnInit {
           }
         }
 
-        this.workspace = this.workspaceService.get();
+        this.workspace = this.workspaceService.getWorkspace();
       }
     });
   }

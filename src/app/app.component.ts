@@ -65,7 +65,7 @@ export class AppComponent implements OnInit {
 
     let workspace;
     try {
-      workspace = this.workspaceService.get();
+      workspace = this.workspaceService.getWorkspace();
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
     }

@@ -13,7 +13,6 @@ import {ExecuteService} from './execute.service';
 import {SessionService} from './session.service';
 import {ElectronService} from './electron.service';
 import {AwsSsoOidcService} from './aws-sso-oidc.service';
-import {AwsSsoIntegrationService} from './aws-sso-integration.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +23,6 @@ export class SessionFactoryService {
 
   constructor(
     private appService: AppService,
-    private awsSsoIntegrationService: AwsSsoIntegrationService,
     private awsSsoOidcService: AwsSsoOidcService,
     private electronService: ElectronService,
     private executeService: ExecuteService,
@@ -66,8 +64,7 @@ export class SessionFactoryService {
   }
 
   private getAwsIamRoleChainedSessionService(accountType: SessionType) {
-    const service = new AwsIamRoleChainedService(this.appService, this.awsSsoIntegrationService, this.awsSsoOidcService,
-      this.electronService, this.fileService, this.keychainService, this.workspaceService);
+    const service = new AwsIamRoleChainedService(this.appService, this.awsSsoOidcService, this.electronService, this.fileService, this.keychainService, this.workspaceService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

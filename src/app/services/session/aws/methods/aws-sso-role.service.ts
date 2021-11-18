@@ -12,7 +12,7 @@ import SSO, {
 } from 'aws-sdk/clients/sso';
 
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
-import {AwsSsoIntegrationService} from "../../../aws-sso-integration.service";
+import {AwsSsoIntegrationService} from '../../../aws-sso-integration.service';
 
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;

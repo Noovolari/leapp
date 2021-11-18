@@ -16,7 +16,6 @@ import {AwsIamUserService} from './aws-iam-user.service';
 import {AwsSsoRoleService} from './aws-sso-role.service';
 import {ElectronService} from '../../../electron.service';
 import {AwsSsoOidcService} from '../../../aws-sso-oidc.service';
-import {AwsSsoIntegrationService} from '../../../aws-sso-integration.service';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -33,7 +32,6 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   constructor(
     private appService: AppService,
-    private awsSsoIntegrationService: AwsSsoIntegrationService,
     private awsSsoOidcService: AwsSsoOidcService,
     private electronService: ElectronService,
     private fileService: FileService,

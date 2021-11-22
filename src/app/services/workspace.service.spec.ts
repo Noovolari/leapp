@@ -160,14 +160,14 @@ describe('WorkspaceService', () => {
   describe('addAwsSsoIntegration()', () => {
     it('invokes get() 1 time to retrieve the current workspace', () => {
       spyOn(workspaceService, 'get').and.callThrough();
-      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-region', 'fake-browser-opening');
+      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region', 'fake-browser-opening');
       expect(workspaceService.getWorkspace).toHaveBeenCalledTimes(1);
     });
 
     it('adds a new AwsSsoIntegration to workspace.awsSsoIntegrations array', () => {
       workspace = workspaceService.getWorkspace();
       const awsSsoIntegrationsLengthBefore: number = workspace.awsSsoIntegrations.length;
-      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-region', 'fake-browser-opening');
+      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region', 'fake-browser-opening');
       const awsSsoIntegrationsAfter: AwsSsoIntegration[] = workspace.awsSsoIntegrations;
       expect(awsSsoIntegrationsAfter.length).toBeGreaterThan(awsSsoIntegrationsLengthBefore);
       expect(awsSsoIntegrationsAfter[awsSsoIntegrationsAfter.length - 1].portalUrl).toEqual('fake-portal-url');
@@ -179,7 +179,7 @@ describe('WorkspaceService', () => {
 
   describe('getAwsSsoIntegrationSessions', () => {
     it('returns the list of AwsSsoRoleSession objects associated to an AwsSsoIntegration', () => {
-      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-region', 'fake-browser-opening');
+      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region', 'fake-browser-opening');
       workspace = workspaceService.getWorkspace();
       const awsSsoRoleSession = new AwsSsoRoleSession('fake-session-name', 'fake-region',
         'fake-role-arn', 'fake-profile-id', workspace.awsSsoIntegrations[0].id);
@@ -204,7 +204,7 @@ describe('WorkspaceService', () => {
     });
 
     it('retrieves the list of AwsSsoIntegration objects persisted in the workspace', () => {
-      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-region', 'fake-browser-opening');
+      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region', 'fake-browser-opening');
       const awsSsoIntegrations = workspaceService.listAwsSsoIntegrations();
       expect(awsSsoIntegrations.length).toEqual(1);
       expect(awsSsoIntegrations[awsSsoIntegrations.length - 1].portalUrl).toEqual('fake-portal-url');
@@ -216,10 +216,10 @@ describe('WorkspaceService', () => {
 
   describe('getAwsSsoIntegrationTokenInfo', () => {
     it('returns the expected awsSsoIntegrationTokenInfo', async () => {
-      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-region','fake-browser-opening');
+      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region','fake-browser-opening');
       const currentAwsSsoIntegration = workspaceService.getWorkspace().awsSsoIntegrations[0];
       const expiration = new Date(Date.now()).toISOString();
-      workspaceService.updateAwsSsoIntegration(currentAwsSsoIntegration.id, currentAwsSsoIntegration.region, currentAwsSsoIntegration.portalUrl, currentAwsSsoIntegration.browserOpening, expiration);
+      workspaceService.updateAwsSsoIntegration(currentAwsSsoIntegration.id, currentAwsSsoIntegration.alias, currentAwsSsoIntegration.region, currentAwsSsoIntegration.portalUrl, currentAwsSsoIntegration.browserOpening, expiration);
       const awsSsoIntegrationTokenInfo = await workspaceService.getAwsSsoIntegrationTokenInfo(currentAwsSsoIntegration.id);
       expect(awsSsoIntegrationTokenInfo.accessToken).toEqual('fake-secret');
       expect(awsSsoIntegrationTokenInfo.expiration).toEqual(new Date(expiration).getTime());

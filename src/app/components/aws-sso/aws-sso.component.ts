@@ -28,6 +28,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   public modifying: number;
 
   public form = new FormGroup({
+    alias: new FormControl('', [Validators.required]),
     portalUrl: new FormControl('', [Validators.required, Validators.pattern('https?://.+')]),
     awsRegion: new FormControl('', [Validators.required]),
     defaultBrowserOpening: new FormControl('', [Validators.required])
@@ -108,6 +109,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
     this.selectedAwsSsoConfiguration = {
       id: 'new AWS Single Sign-On',
+      alias: '',
       region: this.regions[0].region,
       portalUrl: '',
       browserOpening: Constants.inApp,
@@ -138,6 +140,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     this.modifying = modifying;
     this.selectedAwsSsoConfiguration = currentAwsSsoConfiguration;
 
+    this.form.get('alias').setValue(this.selectedAwsSsoConfiguration.alias);
     this.form.get('portalUrl').setValue(this.selectedAwsSsoConfiguration.portalUrl);
     this.form.get('awsRegion').setValue(this.selectedAwsSsoConfiguration.region);
     this.form.get('defaultBrowserOpening').setValue(this.selectedAwsSsoConfiguration.browserOpening);
@@ -145,6 +148,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
   save() {
     if(this.form.valid) {
+      const alias = this.form.get('alias').value;
       const portalUrl = this.form.get('portalUrl').value;
       const region = this.form.get('awsRegion').value;
       const browserOpening = this.form.get('defaultBrowserOpening').value;
@@ -155,6 +159,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
         // Save
         this.workspaceService.addAwsSsoIntegration(
           portalUrl,
+          alias,
           region,
           browserOpening
         );
@@ -162,6 +167,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
         // Edit
         this.workspaceService.updateAwsSsoIntegration(
           this.selectedAwsSsoConfiguration.id,
+          alias,
           region,
           portalUrl,
           browserOpening
@@ -184,5 +190,21 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
         this.workspaceService.deleteAwsSsoIntegration(awsSsoConfiguration.id);
       }
     });
+  }
+
+  isOnline(awsSsoConfiguration: AwsSsoIntegration) {
+    return awsSsoConfiguration.accessTokenExpiration !== null &&
+           awsSsoConfiguration.accessTokenExpiration !== undefined &&
+           awsSsoConfiguration.accessTokenExpiration !== '';
+  }
+
+  remainingHours(awsSsoConfiguration: AwsSsoIntegration) {
+    const expiringTime = new Date(awsSsoConfiguration.accessTokenExpiration).getTime();
+    const now = new Date().getTime();
+    const diff = expiringTime - now;
+
+    const hours = Math.floor(Math.abs(diff) / (1000 * 60 * 60) % 24);
+
+    return hours + 'hours';
   }
 }

@@ -240,7 +240,7 @@ button.disabled {
 .sso-card {
   position: relative;
   margin: 10px 40px;
-  padding: 20px 20px 40px 20px;
+  padding: 15px 20px 40px 20px;
   border-radius: 5px;
   border: 1px solid #78E0CF;
   background: rgba(120, 224, 207, 0.4);
@@ -324,4 +324,34 @@ button.disabled {
   font-size: 12px;
   color: #343e48;
   display: inline-block;
+}
+
+.underlined {
+  text-decoration: underline;
+  font-weight: normal!important;
+}
+
+.uppercased {
+  text-transform: uppercase;
+  font-weight: normal!important;
+}
+
+.alias {
+  max-width: 300px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 4px;
+}
+
+.status {
+  text-align: right;
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  font-size: 10px;
+  color: #203E3A;
+
+  .green-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #8fc92a; }
+  .red-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #d64123; }
 }

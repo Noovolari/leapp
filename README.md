@@ -90,8 +90,8 @@ the following tools:
 
 # Our Sponsors
 
-<span style="border:1px solid #ddd;">[<img hspace="5" src="https://avatars.githubusercontent.com/u/1290287?s=60&amp;v=4" width="30" height="30" alt="@taimos">](https://github.com/taimos)</span>
-<span style="border:1px solid #ddd;">[<img hspace="5" src="https://avatars.githubusercontent.com/u/2232217?s=60&amp;v=4" width="30" height="30" alt="@aws">](https://github.com/aws)</span>
+[<img hspace="5" src="https://avatars.githubusercontent.com/u/1290287?s=60&amp;v=4" width="30" height="30" alt="@taimos">](https://github.com/taimos)
+[<img hspace="5" src="https://avatars.githubusercontent.com/u/2232217?s=60&amp;v=4" width="30" height="30" alt="@aws">](https://github.com/aws)
 
 
 # Documentation

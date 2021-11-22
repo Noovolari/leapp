@@ -22,6 +22,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   selectedAwsSsoConfiguration: AwsSsoIntegration;
   loadingInBrowser = false;
   loadingInApp = false;
+  chooseIntegration = false;
 
   public awsSsoConfigurations: AwsSsoIntegration[];
   public modifying: number;
@@ -132,6 +133,8 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   }
 
   openAddModal(modifying, currentAwsSsoConfiguration) {
+    this.chooseIntegration = false;
+
     this.modifying = modifying;
     this.selectedAwsSsoConfiguration = currentAwsSsoConfiguration;
 

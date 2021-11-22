@@ -3,42 +3,51 @@
   <ng-container *ngIf="!loadingInBrowser">
 
     <div class="container-fluid">
-      <h1><a (click)="goBack()" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-fingerprint"></i> Identity Providers</h1>
+      <h1><a (click)="modifying === 0 ? goBack() : openAddModal(0, selectedAwsSsoConfiguration);" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-link"></i> Identity Providers</h1>
+
+      <ng-container *ngIf="chooseIntegration">
+        <br><br>
+        <div>
+          <label><strong>My integration type is:</strong> <i class="fa fa-info-circle" tooltip="integration is a way to obtain credential to access services"></i></label>
+          <br>
+          <div class="integration-button" (click)="openAddModal(1, selectedAwsSsoConfiguration);">AWS Single Sign-On</div>
+        </div>
+      </ng-container>
 
       <ng-container *ngIf="modifying > 0">
 
         <form [formGroup]="form" class="form center-vertical text-left">
 
           <div class="form-group" style="width: 100%; display: inline-block;">
-            <label><strong>Identity Provider</strong></label>
+            <label><strong>My integration type is</strong></label>
             <br>
-            <input  type="text" class="form-control blue-control btn-control" value="{{selectedAwsSsoConfiguration.id}}" readonly>
+            <input  type="text" class="form-control blue-control btn-control" value="Aws Single Sign-On" readonly>
           </div>
 
           <div class="form-group" style="width: 100%; display: inline-block;">
-            <label><strong>Aws Single Sign-On Url</strong><span class="danger-text">*</span></label>
+            <label><strong>Portal Url</strong><span class="danger-text">*</span> <i class="fa fa-info-circle" tooltip="portal url"></i></label>
             <br>
             <input formControlName="portalUrl" type="url" class="form-control" placeholder="aws SSO url (eg https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedAwsSsoConfiguration.portalUrl}}">
             <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert the Aws Single Sign-On url</small>
           </div>
 
           <div class="form-group" style="width: 100%; display: inline-block;">
-            <label><strong>Aws Region</strong></label>
+            <label><strong>Select an Aws Region: </strong> <i class="fa fa-info-circle" tooltip="the aws region you've registered your portal into"></i></label>
             <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedAwsSsoConfiguration.region" dropdownPosition="top"></ng-select>
           </div>
 
           <div class="form-group" style="width: 100%; display: inline-block;">
-            <label><strong>Default browser opening</strong></label>
+            <label><strong>Choose an Authentication method: </strong> <i class="fa fa-info-circle" tooltip="In-app or In-browser"></i></label>
             <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedAwsSsoConfiguration.browserOpening" dropdownPosition="top"></ng-select>
           </div>
 
-          <button class="button pull-left disabled" (click)="openAddModal(0, selectedAwsSsoConfiguration)">Cancel</button>
-          <button class="button pull-right" (click)="save();">Save</button>
+          <!--<button class="button pull-left disabled" (click)="openAddModal(0, selectedAwsSsoConfiguration)">Cancel</button>-->
+          <button class="button pull-center" (click)="save();">Add integration</button>
         </form>
 
       </ng-container>
 
-      <div class="sso-card-container" *ngIf="modifying === 0">
+      <div class="sso-card-container" *ngIf="modifying === 0 && !chooseIntegration">
 
         <div class="sso-card" *ngFor="let awsSsoConfiguration of awsSsoConfigurations">
           <p>AWS Single Sign-On</p>
@@ -58,9 +67,9 @@
           <button class="button pull-right" (click)="forceSync(awsSsoConfiguration.id)" *ngIf="!loadingInBrowser"><i class="fa fa-refresh"></i> Sync</button>
         </div>
 
-        <div class="sso-card add" (click)="openAddModal(1, selectedAwsSsoConfiguration);">
+        <div class="sso-card add" (click)="chooseIntegration = true;">
           <div><span>+</span></div>
-          <p>Add a new AWS SSO</p>
+          <p>Add a new integration</p>
         </div>
 
       </div>

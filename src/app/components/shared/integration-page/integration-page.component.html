@@ -2,19 +2,11 @@
 <div class="background">
     <div class="container-fluid">
       <h1><a (click)="goBack()" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-link"></i> Integration</h1>
-
-      <div class="integration-button" (click)="goToSSO();">
-        <i class="fa fa-fingerprint"></i>
-        <span>Identity Provider</span>
-        <br>
-        <p>
-          Go take a coffee and we will fill sessions from your AWS SSO profile,
-          we are checking all the possible roles you can access to.
-        </p>
+      <br>
+      <div>
+        <label>My integration type is: <i class="fa fa-circle-info" tooltip="integration is a way to obtain credential to access services"></i></label><br>
+        <div class="integration-button" (click)="goToSSO();">AWS Single Sign-On</div>
       </div>
 
-      <br>
-
-      <p class="more-coming">More integrations coming soon.</p>
     </div>
 </div>

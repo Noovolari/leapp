@@ -236,24 +236,11 @@ button.disabled {
   margin-top: 20px;
   background: white;
   border-radius: 5px;
-  padding: 10px;
+  border: 1px solid #343e48;
+  padding: 4px;
   cursor: pointer;
-
-  i {
-    font-size: 30px;
-    color: #343e48;
-  }
-  span {
-    padding-left: 10px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #343e48;
-  }
-  p {
-    font-size: 12px;
-    color: #343e48;
-    margin: 15px 40px 0 40px;
-  }
+  font-size: 18px;
+  color: #343e48;
 }
 
 .more-coming {

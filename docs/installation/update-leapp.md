@@ -1,4 +1,4 @@
-# Leapp Updater
+# Update Leapp
 
 Leapp checks every **10 minutes** (counting from application start) that a new version is available. 
 If so, a dialog message will pop up and show `version number`, `release date` and `changelog`

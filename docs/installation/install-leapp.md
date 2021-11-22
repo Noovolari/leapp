@@ -1,4 +1,6 @@
-# Installing
+# Install Leapp
+
+## MacOS, Windows, and Linux
 
 You can install Leapp by downloading the pre-built binaries for your OS [here](https://www.leapp.cloud/releases).
 

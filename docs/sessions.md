@@ -1,4 +1,4 @@
-# Session
+# Sessions
 
 A **Session** contains all the relevant information to let the dev connect to a cloud provider. Three standard actions should be implemented for each session: **start**, **stop**, and **rotate**.
 

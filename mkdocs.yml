@@ -8,9 +8,9 @@ nav:
   - 'Get Started':
       - Intro: index.md
       - Installation:
-          - 'Pre-install': 'installation/pre-install.md'
-          - 'Installing Leapp': 'installation/installing-leapp.md'
-          - 'Updating Leapp': 'installation/updating-leapp.md'
+          - 'Requirements': 'installation/requirements.md'
+          - 'Install Leapp': 'installation/install-leapp.md'
+          - 'Update Leapp': 'installation/update-leapp.md'
       - Sessions: 'sessions.md'
       - Integrations: 'integrations.md'
   - 'Configuring Session':
@@ -21,10 +21,12 @@ nav:
   - 'Configuring Integration':
       - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
   - Security:
+      - 'Intro': 'security/intro.md'
       - 'Credentials generation':
           - AWS: 'security/credentials-generation/aws.md'
           - Azure: 'security/credentials-generation/azure.md'
-      - Keychain: 'security/keychain.md'
+      - System Vault: 'security/system-vault.md'
+      - FAQ: 'security/faq.md'
   - 'Built-in features':
       - 'EC2 connector through AWS System manager': 'built-in-features/ec2-connector-through-aws-system-manager.md'
       - 'Proxy Server': 'built-in-features/proxy-server.md'

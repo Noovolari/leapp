@@ -1,8 +1,10 @@
-#Pre-install
+# Requirements
+
+## MacOS and Windows
 
 No requirements are requested for **macOS** and **Windows** users.
 
-## Pre-requisites for using on Linux systems
+## Linux systems
 Leapp uses `libsecret` and `gnome-keyring` as dependencies to store all sensitive data into the keyring.
 Depending on your distribution you **may** need to install them before running Leapp using these commands.
 
@@ -27,7 +29,7 @@ Depending on your distribution you **may** need to install them before running L
     ```
 
 
-##Pre-requisites for logging into EC2 Instances via AWS SSM with Leapp 
+## Logging into EC2 Instances via AWS SSM with Leapp 
 
 In order to use AWS SSM on your System through Leapp, you must be able to execute this command 
 on your own at least once when suitable credentials are active.

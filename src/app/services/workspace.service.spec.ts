@@ -13,6 +13,7 @@ import * as uuid from 'uuid';
 import {Constants} from '../models/constants';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {KeychainService} from './keychain.service';
+import {AwsSsoIntegrationService} from './aws-sso-integration.service';
 
 describe('WorkspaceService', () => {
   let workspaceService: WorkspaceService;
@@ -159,7 +160,7 @@ describe('WorkspaceService', () => {
 
   describe('addAwsSsoIntegration()', () => {
     it('invokes get() 1 time to retrieve the current workspace', () => {
-      spyOn(workspaceService, 'get').and.callThrough();
+      // spyOn(workspaceService, 'get').and.callThrough();
       workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region', 'fake-browser-opening');
       expect(workspaceService.getWorkspace).toHaveBeenCalledTimes(1);
     });
@@ -198,7 +199,7 @@ describe('WorkspaceService', () => {
 
   describe('listAwsSsoIntegrations', () => {
     it('invokes get() 1 time to retrieve the current workspace', () => {
-      spyOn(workspaceService, 'get').and.callThrough();
+      // spyOn(workspaceService, 'get').and.callThrough();
       workspaceService.listAwsSsoIntegrations();
       expect(workspaceService.getWorkspace).toHaveBeenCalledTimes(1);
     });
@@ -220,7 +221,7 @@ describe('WorkspaceService', () => {
       const currentAwsSsoIntegration = workspaceService.getWorkspace().awsSsoIntegrations[0];
       const expiration = new Date(Date.now()).toISOString();
       workspaceService.updateAwsSsoIntegration(currentAwsSsoIntegration.id, currentAwsSsoIntegration.alias, currentAwsSsoIntegration.region, currentAwsSsoIntegration.portalUrl, currentAwsSsoIntegration.browserOpening, expiration);
-      const awsSsoIntegrationTokenInfo = await workspaceService.getAwsSsoIntegrationTokenInfo(currentAwsSsoIntegration.id);
+      const awsSsoIntegrationTokenInfo = await AwsSsoIntegrationService.getInstance().getAwsSsoIntegrationTokenInfo(currentAwsSsoIntegration.id);
       expect(awsSsoIntegrationTokenInfo.accessToken).toEqual('fake-secret');
       expect(awsSsoIntegrationTokenInfo.expiration).toEqual(new Date(expiration).getTime());
     });

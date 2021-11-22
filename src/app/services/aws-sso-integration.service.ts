@@ -182,6 +182,7 @@ export class AwsSsoIntegrationService {
 
       this.workspaceService.updateAwsSsoIntegration(
         awsSsoIntegration.id,
+        awsSsoIntegration.alias,
         awsSsoIntegration.region,
         loginResponse.portalUrlUnrolled,
         awsSsoIntegration.browserOpening,

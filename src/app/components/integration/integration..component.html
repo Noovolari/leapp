@@ -3,14 +3,14 @@
   <ng-container *ngIf="!loadingInBrowser">
 
     <div class="container-fluid">
-      <h1><a (click)="modifying === 0 ? goBack() : openAddModal(0, selectedAwsSsoConfiguration);" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-link"></i> Identity Providers</h1>
+      <h1><a (click)="modifying === 0 ? goBack() : gotoForm(0, selectedAwsSsoConfiguration);" class="back-link"><i class="fa fa-arrow-left"></i></a><i class="fa fa-link"></i> Identity Providers</h1>
 
       <ng-container *ngIf="chooseIntegration">
         <br><br>
         <div>
           <label><strong>My integration type is:</strong>&nbsp;&nbsp;<i class="fa fa-info-circle" tooltip="integration is a way to obtain credential to access services"></i></label>
           <br>
-          <div class="integration-button" (click)="openAddModal(1, selectedAwsSsoConfiguration);">AWS Single Sign-On</div>
+          <div class="integration-button" (click)="gotoForm(1, selectedAwsSsoConfiguration);">AWS Single Sign-On</div>
         </div>
       </ng-container>
 
@@ -74,7 +74,7 @@
             </ng-container>
           </span>
 
-          <button class="button pull-apart" (click)="openAddModal(2, awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-edit"></i> Edit</button>
+          <button class="button pull-apart" (click)="gotoForm(2, awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-edit"></i> Edit</button>
           <button class="button pull-apart-2" (click)="delete(awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-trash"></i> Delete</button>
 
           <button class="button pull-left" (click)="logout(awsSsoConfiguration.id)" *ngIf="isOnline(awsSsoConfiguration)">

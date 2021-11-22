@@ -12,10 +12,10 @@ import {AwsSsoIntegrationService} from '../../services/aws-sso-integration.servi
 
 @Component({
   selector: 'app-aws-sso',
-  templateUrl: './aws-sso.component.html',
-  styleUrls: ['./aws-sso.component.scss']
+  templateUrl: './integration..component.html',
+  styleUrls: ['./integration.component.scss']
 })
-export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
+export class IntegrationComponent implements OnInit, BrowserWindowClosing {
 
   eConstants = Constants;
   regions = [];
@@ -61,7 +61,6 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
 
     this.loadingInBrowser = false;
     this.loadingInApp = false;
-
     this.setValues();
   }
 
@@ -92,10 +91,10 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     await this.router.navigate(['/sessions', 'session-selected']);
   }
 
-  async gotoWebForm(configurationId: string) {
-    // TODO: call aws sso oidc service directly
+  async gotoWebForm(integrationId: string) {
+    // TODO: check if we need to put this method in IntegrationService singleton - sync method
     this.awsSsoRoleService.interrupt();
-    await this.forceSync(configurationId);
+    await this.forceSync(integrationId);
   }
 
   setValues() {
@@ -129,14 +128,9 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
     this.loadingInApp = false;
   }
 
-  async isAwsSsoActive(awsSsoConfiguration: AwsSsoIntegration) {
-    const isAwsSsoAccessTokenExpired = await AwsSsoIntegrationService.getInstance().isAwsSsoAccessTokenExpired(awsSsoConfiguration.id);
-    return !isAwsSsoAccessTokenExpired;
-  }
-
-  openAddModal(modifying, currentAwsSsoConfiguration) {
+  gotoForm(modifying, currentAwsSsoConfiguration) {
+    // Change graphical values to show the form
     this.chooseIntegration = false;
-
     this.modifying = modifying;
     this.selectedAwsSsoConfiguration = currentAwsSsoConfiguration;
 
@@ -175,7 +169,7 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       }
 
       this.setValues();
-      this.openAddModal(0, this.selectedAwsSsoConfiguration);
+      this.gotoForm(0, this.selectedAwsSsoConfiguration);
     } else {
       this.appService.toast('Form is not valid', ToastLevel.warn, 'Form validation');
     }
@@ -199,12 +193,8 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
   }
 
   remainingHours(awsSsoConfiguration: AwsSsoIntegration) {
-    const expiringTime = new Date(awsSsoConfiguration.accessTokenExpiration).getTime();
-    const now = new Date().getTime();
-    const diff = expiringTime - now;
-
-    const hours = Math.floor(Math.abs(diff) / (1000 * 60 * 60) % 24);
-
+    const diff =((new Date(awsSsoConfiguration.accessTokenExpiration).getTime() - new Date().getTime()) / 1000) / 3600;
+    const hours =  Math.abs(Math.round(diff));
     return hours + 'hours';
   }
 }

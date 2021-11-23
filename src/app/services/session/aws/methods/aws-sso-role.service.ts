@@ -14,6 +14,7 @@ import SSO, {
 import {AwsSsoOidcService, BrowserWindowClosing} from '../../../aws-sso-oidc.service';
 import {AwsSsoIntegrationService} from '../../../aws-sso-integration.service';
 
+// TODO: move the following interfaces under models
 export interface AwsSsoRoleSessionRequest {
   sessionName: string;
   region: string;
@@ -82,14 +83,6 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     this.awsSsoOidcService.listeners.push(this);
   }
 
-  static getProtocol(aliasedUrl: string): string {
-    let protocol = aliasedUrl.split('://')[0];
-    if (protocol.indexOf('http') === -1) {
-      protocol = 'https';
-    }
-    return protocol;
-  }
-
   static sessionTokenFromGetSessionTokenResponse(getRoleCredentialResponse: SSO.GetRoleCredentialsResponse): { sessionToken: any } {
     return {
       sessionToken: {
@@ -137,7 +130,9 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const region = awsSsoConfiguration.region;
     const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
 
-    const accessToken = await AwsSsoIntegrationService.getInstance().getAccessToken(awsSsoConfiguration);
+    await AwsSsoIntegrationService.getInstance().login(awsSsoConfiguration.id);
+    const awsSsoIntegrationTokenInfo = await AwsSsoIntegrationService.getInstance().getAwsSsoIntegrationTokenInfo(awsSsoConfiguration.id);
+    const accessToken = awsSsoIntegrationTokenInfo.accessToken;
     const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
 
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);

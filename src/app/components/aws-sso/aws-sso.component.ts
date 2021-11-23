@@ -71,7 +71,8 @@ export class AwsSsoComponent implements OnInit, BrowserWindowClosing {
       this.loadingInApp = (this.selectedAwsSsoConfiguration.browserOpening === Constants.inApp.toString());
 
       try {
-        const ssoRoleSessions: SsoRoleSession[] = await AwsSsoIntegrationService.getInstance().sync(this.selectedAwsSsoConfiguration.id);
+        await AwsSsoIntegrationService.getInstance().login(this.selectedAwsSsoConfiguration.id);
+        const ssoRoleSessions: SsoRoleSession[] = await AwsSsoIntegrationService.getInstance().provisionSessions(this.selectedAwsSsoConfiguration.id);
         ssoRoleSessions.forEach(ssoRoleSession => {
           ssoRoleSession.awsSsoConfigurationId = configurationId;
           this.awsSsoRoleService.create(ssoRoleSession, this.workspaceService.getDefaultProfileId());

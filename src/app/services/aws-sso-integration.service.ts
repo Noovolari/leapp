@@ -68,6 +68,7 @@ export class AwsSsoIntegrationService {
   async login(awsSsoIntegrationId: string): Promise<void> {
     if (await this.isAwsSsoAccessTokenExpired(awsSsoIntegrationId)) {
       const awsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
+      console.log('integration:', awsSsoIntegration);
       const followRedirectClient = this.appService.getFollowRedirects()[this.getProtocol(awsSsoIntegration.portalUrl)];
 
       awsSsoIntegration.portalUrl = await new Promise((resolve, _) => {
@@ -79,6 +80,7 @@ export class AwsSsoIntegrationService {
 
       this.workspaceService.updateAwsSsoIntegration(
         awsSsoIntegration.id,
+        awsSsoIntegration.alias,
         awsSsoIntegration.region,
         awsSsoIntegration.portalUrl,
         awsSsoIntegration.browserOpening,

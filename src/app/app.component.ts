@@ -14,10 +14,10 @@ import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {LoggingService} from './services/logging.service';
 import {LeappParseError} from './errors/leapp-parse-error';
-import {AwsSsoIntegrationService} from "./services/aws-sso-integration.service";
-import {AwsSsoOidcService} from "./services/aws-sso-oidc.service";
-import {AwsSsoRoleService} from "./services/session/aws/methods/aws-sso-role.service";
-import {KeychainService} from "./services/keychain.service";
+import {AwsSsoIntegrationService} from './services/aws-sso-integration.service';
+import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
+import {AwsSsoRoleService} from './services/session/aws/methods/aws-sso-role.service';
+import {KeychainService} from './services/keychain.service';
 
 @Component({
   selector: 'app-root',

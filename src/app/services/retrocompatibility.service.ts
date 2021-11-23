@@ -201,7 +201,9 @@ export class RetrocompatibilityService {
         let portalUrl;
         let expirationTime;
         let browserOpening;
+        let alias;
         try {
+          alias = 'AWs Single Sign-On';
           region = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_REGION');
           portalUrl = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_PORTAL_URL');
           expirationTime = await this.keychainService.getSecret(environment.appName, 'AWS_SSO_EXPIRATION_TIME');
@@ -214,6 +216,7 @@ export class RetrocompatibilityService {
         if(workspace.awsSsoIntegrations.length === 0)  {
           workspace.awsSsoIntegrations = [{
             id: uuid.v4(),
+            alias,
             region,
             portalUrl,
             accessTokenExpiration: expirationTime,

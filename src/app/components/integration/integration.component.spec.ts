@@ -1,13 +1,13 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
-import {AwsSsoComponent} from './aws-sso.component';
+import {IntegrationComponent} from './integration.component';
 import {mustInjected} from '../../../base-injectables';
 import {RouterTestingModule} from '@angular/router/testing';
 import {KeychainService} from '../../services/keychain.service';
 
 describe('AwsSsoComponent', () => {
-  let component: AwsSsoComponent;
-  let fixture: ComponentFixture<AwsSsoComponent>;
+  let component: IntegrationComponent;
+  let fixture: ComponentFixture<IntegrationComponent>;
 
   const secretManager = [];
   const spyKeychainService = jasmine.createSpyObj('KeychainService', ['saveSecret', 'getSecret', 'deletePassword']);
@@ -22,11 +22,11 @@ describe('AwsSsoComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule],
-      declarations: [AwsSsoComponent],
+      declarations: [IntegrationComponent],
       providers: [{ provide: KeychainService, useValue: spyKeychainService }].concat(mustInjected())
     }).compileComponents();
 
-    fixture = TestBed.createComponent(AwsSsoComponent);
+    fixture = TestBed.createComponent(IntegrationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -9,9 +9,6 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import * as uuid from 'uuid';
 import {AwsSsoIntegration} from '../models/aws-sso-integration';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
-import {KeychainService} from './keychain.service';
-import {SessionType} from "../models/session-type";
-import {AwsIamRoleChainedSession} from "../models/aws-iam-role-chained-session";
 
 @Injectable({
   providedIn: 'root'
@@ -177,9 +174,9 @@ export class WorkspaceService {
     this.persistWorkspace(workspace);
   }
 
-  addAwsSsoIntegration(portalUrl: string, region: string, browserOpening: string) {
+  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string) {
     const workspace = this.getWorkspace();
-    workspace.awsSsoIntegrations.push({ id: uuid.v4(), portalUrl, region, accessTokenExpiration: undefined, browserOpening });
+    workspace.awsSsoIntegrations.push({ id: uuid.v4(), alias, portalUrl, region, accessTokenExpiration: undefined, browserOpening });
     this.persistWorkspace(workspace);
   }
 
@@ -197,10 +194,11 @@ export class WorkspaceService {
     return workspace.awsSsoIntegrations;
   }
 
-  updateAwsSsoIntegration(id: string, region: string, portalUrl: string, browserOpening: string, expirationTime?: string): void {
+  updateAwsSsoIntegration(id: string, alias: string, region: string, portalUrl: string, browserOpening: string, expirationTime?: string): void {
     const workspace = this.getWorkspace();
     const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
     if(index > -1) {
+      workspace.awsSsoIntegrations[index].alias = alias;
       workspace.awsSsoIntegrations[index].region = region;
       workspace.awsSsoIntegrations[index].portalUrl = portalUrl;
       workspace.awsSsoIntegrations[index].browserOpening = browserOpening;
@@ -216,15 +214,6 @@ export class WorkspaceService {
     const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
     if(index > -1) {
       workspace.awsSsoIntegrations[index].accessTokenExpiration = undefined;
-      this.persistWorkspace(workspace);
-    }
-  }
-
-  updateBrowserOpening(id: string, browserOpening: string) {
-    const workspace = this.getWorkspace();
-    const index = workspace.awsSsoIntegrations.findIndex(sso => sso.id === id);
-    if(index > -1) {
-      workspace.awsSsoIntegrations[index].browserOpening = browserOpening;
       this.persistWorkspace(workspace);
     }
   }

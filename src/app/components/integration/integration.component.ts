@@ -12,7 +12,7 @@ import {AwsSsoIntegrationService} from '../../services/aws-sso-integration.servi
 
 @Component({
   selector: 'app-aws-sso',
-  templateUrl: './integration..component.html',
+  templateUrl: './integration.component.html',
   styleUrls: ['./integration.component.scss']
 })
 export class IntegrationComponent implements OnInit, BrowserWindowClosing {

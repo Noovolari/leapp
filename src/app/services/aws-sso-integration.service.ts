@@ -68,7 +68,6 @@ export class AwsSsoIntegrationService {
   async login(awsSsoIntegrationId: string): Promise<void> {
     if (await this.isAwsSsoAccessTokenExpired(awsSsoIntegrationId)) {
       const awsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
-      console.log('integration:', awsSsoIntegration);
       const followRedirectClient = this.appService.getFollowRedirects()[this.getProtocol(awsSsoIntegration.portalUrl)];
 
       awsSsoIntegration.portalUrl = await new Promise((resolve, _) => {
@@ -87,7 +86,7 @@ export class AwsSsoIntegrationService {
         generateSsoTokenResponse.expirationTime.toISOString()
       );
 
-      this.keychainService.saveSecret(
+      await this.keychainService.saveSecret(
         environment.appName,
         `aws-sso-integration-access-token-${awsSsoIntegration.id}`,
         generateSsoTokenResponse.accessToken

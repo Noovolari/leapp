@@ -9,7 +9,9 @@ We devised two main methods to store data, based on its sensitiveness.
 
 ## End-to-end Encryption
 
-We leverage [Zero Knowledge]() to provide end-to-end encryption on tiers that require to save your data outside of your workstation to deliver specific features. Zero Knowledge is designed that no one, except you, can access your secured data.
+We leverage [Zero Knowledge]() to provide end-to-end encryption on tiers that require to save your data outside of your workstation to deliver specific features.
+
+**Zero Knowledge is designed that no one, except you, can access your secured data.**
 
 !!! Warning
     We CAN'T access your data under any circumstances, even if you ask us really nice.

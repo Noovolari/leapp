@@ -22,6 +22,8 @@ export class Workspace {
     password: string;
   };
 
+  private _version: string;
+
   constructor() {
     this._sessions = [];
     this._defaultRegion = environment.defaultRegion;
@@ -96,5 +98,9 @@ export class Workspace {
 
   set proxyConfiguration(value: { proxyProtocol: string; proxyUrl: string; proxyPort: string; username: string; password: string }) {
     this._proxyConfiguration = value;
+  }
+
+  get version(): string {
+    return this._version;
   }
 }

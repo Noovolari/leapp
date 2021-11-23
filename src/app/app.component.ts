@@ -77,13 +77,15 @@ export class AppComponent implements OnInit {
       await this.retrocompatibilityService.adaptOldWorkspaceFile();
     }
 
+    if (this.retrocompatibilityService.isIntegrationPatchNecessary()) {
+      await this.retrocompatibilityService.adaptIntegrationPatch();
+    }
+
     let workspace;
     try {
       workspace = this.workspaceService.getWorkspace();
+      console.log(workspace);
 
-      if (this.retrocompatibilityService.isIntegrationPatchNecessary()) {
-        await this.retrocompatibilityService.adaptIntegrationPatch(workspace);
-      }
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
     }

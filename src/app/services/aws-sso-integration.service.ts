@@ -20,7 +20,7 @@ import {LeappBaseError} from '../errors/leapp-base-error';
 export class AwsSsoIntegrationService {
 
   private static instance: AwsSsoIntegrationService;
-  private ssoPortal: SSO;
+  private _ssoPortal: SSO;
   private appService: AppService;
   private awsSsoOidcService: AwsSsoOidcService;
   private awsSsoRoleService: AwsSsoRoleService;
@@ -39,6 +39,13 @@ export class AwsSsoIntegrationService {
     this.awsSsoRoleService = awsSsoRoleService;
     this.keychainService = keychainService;
     this.workspaceService = workspaceService;
+  }
+
+  get ssoPortal(): SSO {
+    return this._ssoPortal;
+  }
+  set ssoPortal(sso: SSO) {
+    this._ssoPortal = sso;
   }
 
   static getInstance(): AwsSsoIntegrationService  {

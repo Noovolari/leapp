@@ -65,7 +65,7 @@ describe('AwsIamUserService', () => {
       mockedSecret[name] = {};
       mockedSecret[name][account] = secret;
     });
-    spyKeychainService.getSecret.and.callFake((_: string, _2: string, _3: string) => 'fake-secret');
+    spyKeychainService.getSecret.and.callFake((_: string, __: string, ____: string) => 'fake-secret');
 
     TestBed.configureTestingModule({
       providers: [
@@ -251,7 +251,7 @@ describe('AwsIamUserService', () => {
       spyOn(awsIamUserService, 'generateCredentials').and.callThrough();
       spyOn<any>(awsIamUserService, 'generateSessionToken').and.callFake(() => true);
 
-      spyAppService.inputDialog.and.callFake((_: string, _2: string, _3: string, callback: any) => callback('fake-code'));
+      spyAppService.inputDialog.and.callFake((_: string, __: string, ___: string, callback: any) => callback('fake-code'));
 
       await awsIamUserService.generateCredentials('fakeid');
 

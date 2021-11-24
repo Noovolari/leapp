@@ -36,7 +36,7 @@ describe('WorkspaceService', () => {
     spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()) );
 
     spyKeychainService = jasmine.createSpyObj('KeychainService' , ['getSecret']);
-    spyKeychainService.getSecret.and.callFake((_: string, _2: string) => 'fake-secret');
+    spyKeychainService.getSecret.and.callFake((_: string, __: string) => 'fake-secret');
 
     TestBed.configureTestingModule({
       providers: [

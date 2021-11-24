@@ -11,7 +11,7 @@ import SSO, {
 import {environment} from '../../environments/environment';
 import {AwsSsoIntegrationTokenInfo} from '../models/aws-sso-integration-token-info';
 import {KeychainService} from './keychain.service';
-import {AwsSsoRoleService, LoginResponse, SsoRoleSession} from './session/aws/methods/aws-sso-role.service';
+import {AwsSsoRoleService, SsoRoleSession} from './session/aws/methods/aws-sso-role.service';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {SessionType} from '../models/session-type';
 import {AppService, LoggerLevel} from './app.service';
@@ -68,6 +68,7 @@ export class AwsSsoIntegrationService {
   async login(awsSsoIntegrationId: string): Promise<void> {
     if (await this.isAwsSsoAccessTokenExpired(awsSsoIntegrationId)) {
       const awsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
+
       const followRedirectClient = this.appService.getFollowRedirects()[this.getProtocol(awsSsoIntegration.portalUrl)];
 
       awsSsoIntegration.portalUrl = await new Promise((resolve, _) => {
@@ -90,8 +91,7 @@ export class AwsSsoIntegrationService {
         environment.appName,
         `aws-sso-integration-access-token-${awsSsoIntegration.id}`,
         generateSsoTokenResponse.accessToken
-      ).then(_ => {
-      });
+      ).then(_ => {});
     }
   }
 

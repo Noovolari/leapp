@@ -186,7 +186,7 @@ export class WorkspaceService {
   }
 
   getAwsSsoIntegrationSessions(id: string | number): Session[] {
-    return this.workspace.sessions.filter((sess) => sess instanceof AwsSsoRoleSession && sess.awsSsoConfigurationId === id);
+    return this.workspace.sessions.filter((sess) => (sess as AwsSsoRoleSession).awsSsoConfigurationId === id);
   }
 
   listAwsSsoIntegrations() {

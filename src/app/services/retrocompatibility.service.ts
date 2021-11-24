@@ -93,7 +93,6 @@ export class RetrocompatibilityService {
     workspace._sessions.push(azureSession);
   }
 
-
   private static createNewAwsFederatedOrIamRoleChainedSessionNew(session: any, workspace: any) {
     if(!(session as AwsIamRoleChainedSession).parentSessionId) {
       // Federated
@@ -146,7 +145,6 @@ export class RetrocompatibilityService {
     azureSession.sessionId = session.sessionId;
     workspace._sessions.push(azureSession);
   }
-
 
   isRetroPatchNecessary(): boolean {
     if (this.fileService.exists(this.appService.getOS().homedir() + '/' + environment.lockFileDestination)) {
@@ -260,9 +258,14 @@ export class RetrocompatibilityService {
       const sessionType = session.account.type;
       switch (sessionType) {
         case 'AWS': RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
+        case 'aws': RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
         case 'AWS_TRUSTER': RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
+        case 'aws_truster': RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
         case 'AWS_PLAIN_USER': await this.createNewAwsIamUserSession(session, workspace); break;
+        case 'aws_plain_user': await this.createNewAwsIamUserSession(session, workspace); break;
+        case 'AWS_SSO': RetrocompatibilityService.createNewAwsSingleSignOnSession(session, workspace); break;
         case 'aws_sso': RetrocompatibilityService.createNewAwsSingleSignOnSession(session, workspace); break;
+        case 'AZURE': RetrocompatibilityService.createNewAzureSession(session, workspace); break;
         case 'azure': RetrocompatibilityService.createNewAzureSession(session, workspace); break;
       }
     }
@@ -293,7 +296,7 @@ export class RetrocompatibilityService {
     for(let i = 0; i < sessions.length; i++) {
       const session = sessions[i];
       // We have changed the enum type so we must check it manually
-      if (session.account.type === 'aws_sso') {
+      if (session.account.type === 'aws_sso' || session.account.type === 'AWS_SSO') {
         // OK, let's check if we have data saved in the keychain
         let region;
         let portalUrl;
@@ -348,7 +351,11 @@ export class RetrocompatibilityService {
       workspace._profiles[0].id,
       (session as AwsIamUserSession).mfaDevice
     );
+
+    console.log(workspace, workspace._profiles[0].id);
+
     iamUserSession.sessionId = session.sessionId;
+
     workspace._sessions.push(iamUserSession);
   }
 
@@ -357,25 +364,32 @@ export class RetrocompatibilityService {
       workspace.awsSsoIntegrations = [];
     }
 
-    await this.adaptNewSessions(oldWorkspace, workspace);
     workspace.idpUrls = oldWorkspace._idpUrls;
     workspace.profiles = oldWorkspace._profiles;
     workspace.proxyConfiguration = oldWorkspace._proxyConfiguration;
     workspace.defaultRegion   = oldWorkspace._defaultRegion;
     workspace.defaultLocation = oldWorkspace._defaultLocation;
+    await this.adaptNewSessions(oldWorkspace, workspace);
+
+    // Get AWS SSO Configuration from both intermediate and old configs
+    const awsSsoConfiguration = oldWorkspace._awsSsoConfiguration || oldWorkspace.awsSsoConfiguration;
 
     if(workspace.sessions.filter(sess => sess.type === SessionType.awsSsoRole.toString()).length > 0) {
 
       if(workspace.awsSsoIntegrations.length === 0) {
-        console.log('ciccio');
         workspace.awsSsoIntegrations.push({
           id: uuid.v4(),
           alias: 'Aws Single Sign-On',
-          region: oldWorkspace._awsSsoConfiguration.region,
-          portalUrl: oldWorkspace._awsSsoConfiguration.portalUrl,
-          accessTokenExpiration: oldWorkspace._awsSsoConfiguration.expirationTime,
+          region: awsSsoConfiguration.region,
+          portalUrl: awsSsoConfiguration.portalUrl,
+          accessTokenExpiration: awsSsoConfiguration.expirationTime,
           browserOpening: Constants.inApp
         });
+
+        try {
+          const accessToken = await this.keychainService.getSecret(environment.appName, `aws-sso-access-token`);
+          await this.keychainService.saveSecret(environment.appName, `aws-sso-integration-access-token-${workspace.awsSsoIntegrations[0].id}`, accessToken);
+        } catch (_) {}
       }
 
       for (let i = 0; i < workspace.sessions.length; i++) {

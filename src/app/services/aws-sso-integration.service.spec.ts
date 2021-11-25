@@ -6,7 +6,7 @@ import {KeychainService} from './keychain.service';
 import {mustInjected} from '../../base-injectables';
 import SpyObj = jasmine.SpyObj;
 import {AwsSsoOidcService} from './aws-sso-oidc.service';
-import {AwsSsoRoleService} from './session/aws/methods/aws-sso-role.service';
+import {AwsSsoRoleService, SsoRoleSession} from './session/aws/methods/aws-sso-role.service';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {serialize} from 'class-transformer';
 import {Workspace} from '../models/workspace';
@@ -14,8 +14,11 @@ import {FileService} from './file.service';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import AWSMock from 'aws-sdk-mock';
 import * as AWS from 'aws-sdk';
+import sinon from 'sinon';
 
 import {environment} from '../../environments/environment';
+import {AwsSsoIntegration} from "../models/aws-sso-integration";
+import {AccountIdType, AccountInfo, AccountNameType, EmailAddressType} from "aws-sdk/clients/sso";
 
 
 describe('AwsSsoIntegrationService', () => {
@@ -258,5 +261,86 @@ describe('AwsSsoIntegrationService', () => {
       }, 1000);
     });
 
+  });
+
+  describe('provisionSessions', () => {
+    it('calls all the internal methods and provides an array of sessions equal to the length of account retrieved, given a specific configuration', async () => {
+      const fakeId = 'fake-id';
+      const fakeRole = {
+        id: 'fake-id-role',
+        name: 'fake-role',
+        arn: 'fake-arn'
+      };
+      const workspace: Workspace = new Workspace();
+      const notExpiredAccessTokenExpiration = new Date(Date.now() + oneHourInMilliseconds).toISOString();
+
+      workspace.awsSsoIntegrations.push({
+        id: fakeId,
+        alias: 'fake-alias',
+        portalUrl: 'https://fake.portal.url',
+        region: 'eu-west-1',
+        accessTokenExpiration: notExpiredAccessTokenExpiration,
+        browserOpening: 'fake-browser-opening'
+      });
+
+      spyOn(service, 'login').and.callFake((_: string): Promise<void> => new Promise((resolve, __) => {
+        resolve();
+      }));
+
+      spyOn<any>(workspaceService, 'getAwsSsoIntegration').and.returnValue(workspace.awsSsoIntegrations[0]);
+
+      spyOn<any>(service, 'getAwsSsoIntegrationTokenInfo').and.returnValue(
+        new Promise((resolve, _) => resolve({
+          accessToken: 'fake-token',
+          expiration: new Date(workspaceService.getAwsSsoIntegration(fakeId).accessTokenExpiration).getTime()
+        }))
+      );
+
+      spyOn<any>(service, 'getSsoPortalClient').and.callThrough();
+
+      spyOn<any>(service, 'findOldSession').and.callThrough();
+
+      spyOn<any>(service, 'listAccounts').and.returnValue(
+        new Promise((resolve, _) => resolve(
+          [
+            {
+              accountId: 'fake-id',
+              accountName: 'fake-name',
+              emailAddress: 'fake-email'
+            }
+          ]
+        ))
+      );
+
+      spyOn<any>(service, 'recursiveListRoles').and.callFake((rolesToBeFilled, _, resolve) => {
+        rolesToBeFilled.push(fakeRole);
+        resolve(true);
+      });
+
+      spyOn<any>(workspaceService, 'removeSession').and.callThrough();
+      spyOn<any>(awsSsoRoleService, 'stop').and.callFake((_: string) => new Promise((resolve, __) => resolve(true)));
+      spyOn<any>(workspaceService, 'getWorkspace').and.returnValue(workspace);
+
+      const sessions = await service.provisionSessions('fake-id');
+
+      const caller = setTimeout(()=> {
+        expect(workspaceService.getAwsSsoIntegration).toHaveBeenCalledTimes(2);
+        expect(service.getAwsSsoIntegrationTokenInfo).toHaveBeenCalledTimes(1);
+        expect((service as any).findOldSession).toHaveBeenCalledTimes(1);
+        expect(workspaceService.removeSession).toHaveBeenCalled();
+        expect(awsSsoRoleService.stop).toHaveBeenCalled();
+        expect(sessions).toBe(
+          [{
+            email: 'fake-email',
+            region: 'us-east-1',
+            roleArn: 'arn:aws:iam::fake-id/undefined',
+            sessionName: 'fake-name',
+            profileId: 'ec23a3db-551c-4527-bb63-1abfacad2955',
+            awsSsoConfigurationId: 'fake-id'
+          }]
+        );
+        clearTimeout(caller);
+      }, 1000);
+    });
   });
 });

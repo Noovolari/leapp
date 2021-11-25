@@ -9,6 +9,7 @@ import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oi
 import {LoggingService} from '../../services/logging.service';
 import {AwsSsoIntegration} from '../../models/aws-sso-integration';
 import {AwsSsoIntegrationService} from '../../services/aws-sso-integration.service';
+import formatDistance from 'date-fns/formatDistance';
 
 @Component({
   selector: 'app-aws-sso',
@@ -193,8 +194,10 @@ export class IntegrationComponent implements OnInit, BrowserWindowClosing {
   }
 
   remainingHours(awsSsoConfiguration: AwsSsoIntegration) {
-    const diff =((new Date(awsSsoConfiguration.accessTokenExpiration).getTime() - new Date().getTime()) / 1000) / 3600;
-    const hours =  Math.abs(Math.round(diff));
-    return hours + 'hours';
+    return formatDistance(
+      new Date(awsSsoConfiguration.accessTokenExpiration),
+      new Date(),
+      { addSuffix: true }
+    )
   }
 }

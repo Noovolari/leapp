@@ -67,7 +67,7 @@
             <ng-container *ngIf=" isOnline(awsSsoConfiguration)">
               Online <i class="green-dot"></i>
               <br>
-              <span>Expiring in {{remainingHours(awsSsoConfiguration)}}</span>
+              <span>Expiring {{remainingHours(awsSsoConfiguration)}}</span>
             </ng-container>
             <ng-container *ngIf="!isOnline(awsSsoConfiguration)">
               Offline <i class="red-dot"></i>

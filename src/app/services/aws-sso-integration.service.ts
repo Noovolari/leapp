@@ -236,7 +236,7 @@ export class AwsSsoIntegrationService {
     const awsSsoSessions: SsoRoleSession[] = [];
 
     accountRoles.forEach((accountRole) => {
-      const oldSession = this.findOldSession(accountInfo, accountRole);
+      const oldSession = this.findOldSession(configurationId, accountInfo, accountRole);
 
       const awsSsoSession = {
         email: accountInfo.emailAddress,
@@ -266,12 +266,13 @@ export class AwsSsoIntegrationService {
     });
   }
 
-  private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
+  private findOldSession(configurationId: string, accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
     for (let i = 0; i < this.workspaceService.sessions.length; i++) {
       const sess = this.workspaceService.sessions[i];
 
       if(sess.type === SessionType.awsSsoRole) {
         if (
+          ((sess as AwsSsoRoleSession).awsSsoConfigurationId === configurationId ) &&
           ((sess as AwsSsoRoleSession).email === accountInfo.emailAddress ) &&
           ((sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}` )
         ) {

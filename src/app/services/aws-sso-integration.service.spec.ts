@@ -323,7 +323,7 @@ describe('AwsSsoIntegrationService', () => {
 
       const sessions = await service.provisionSessions('fake-id');
 
-      const caller = setTimeout(()=> {
+      const caller = setTimeout(() => {
         expect(workspaceService.getAwsSsoIntegration).toHaveBeenCalledTimes(2);
         expect(service.getAwsSsoIntegrationTokenInfo).toHaveBeenCalledTimes(1);
         expect((service as any).findOldSession).toHaveBeenCalledTimes(1);

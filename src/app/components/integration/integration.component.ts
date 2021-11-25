@@ -9,7 +9,7 @@ import {AwsSsoOidcService, BrowserWindowClosing} from '../../services/aws-sso-oi
 import {LoggingService} from '../../services/logging.service';
 import {AwsSsoIntegration} from '../../models/aws-sso-integration';
 import {AwsSsoIntegrationService} from '../../services/aws-sso-integration.service';
-import formatDistance from 'date-fns/formatDistance';
+import {formatDistance, isPast} from 'date-fns';
 
 @Component({
   selector: 'app-aws-sso',
@@ -188,9 +188,10 @@ export class IntegrationComponent implements OnInit, BrowserWindowClosing {
   }
 
   isOnline(awsSsoConfiguration: AwsSsoIntegration) {
-    return awsSsoConfiguration.accessTokenExpiration !== null &&
+    return (awsSsoConfiguration.accessTokenExpiration !== null &&
            awsSsoConfiguration.accessTokenExpiration !== undefined &&
-           awsSsoConfiguration.accessTokenExpiration !== '';
+           awsSsoConfiguration.accessTokenExpiration !== '') &&
+           !isPast(new Date(awsSsoConfiguration.accessTokenExpiration));
   }
 
   remainingHours(awsSsoConfiguration: AwsSsoIntegration) {
@@ -198,6 +199,6 @@ export class IntegrationComponent implements OnInit, BrowserWindowClosing {
       new Date(awsSsoConfiguration.accessTokenExpiration),
       new Date(),
       { addSuffix: true }
-    )
+    );
   }
 }

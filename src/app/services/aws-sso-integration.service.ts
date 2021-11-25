@@ -178,7 +178,7 @@ export class AwsSsoIntegrationService {
 
   async getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId: string): Promise<AwsSsoIntegrationTokenInfo> {
     const accessToken = await this.keychainService.getSecret(environment.appName, `aws-sso-integration-access-token-${awsSsoIntegrationId}`);
-    const expiration = new Date(this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId).accessTokenExpiration).getTime();
+    const expiration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId) ? new Date(this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId).accessTokenExpiration).getTime() : undefined;
     return { accessToken, expiration };
   }
 

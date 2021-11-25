@@ -63,7 +63,7 @@
         <div class="sso-card" *ngFor="let awsSsoConfiguration of awsSsoConfigurations">
           <p class="alias"><strong>{{awsSsoConfiguration.alias}}</strong></p>
           <p class="underlined">{{awsSsoConfiguration.portalUrl}}</p>
-          <p class="uppercased">{{awsSsoConfiguration.region}}</p>
+          <p class="uppercase region-font">{{awsSsoConfiguration.region}}</p>
 
           <span class="status">
             <ng-container *ngIf=" isOnline(awsSsoConfiguration)">

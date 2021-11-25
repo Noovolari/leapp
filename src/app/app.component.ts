@@ -18,6 +18,7 @@ import {AwsSsoIntegrationService} from './services/aws-sso-integration.service';
 import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
 import {AwsSsoRoleService} from './services/session/aws/methods/aws-sso-role.service';
 import {KeychainService} from './services/keychain.service';
+import {SessionType} from "./models/session-type";
 
 @Component({
   selector: 'app-root',
@@ -84,8 +85,6 @@ export class AppComponent implements OnInit {
     let workspace;
     try {
       workspace = this.workspaceService.getWorkspace();
-      console.log(workspace);
-
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
     }

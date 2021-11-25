@@ -48,7 +48,9 @@
             <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedAwsSsoConfiguration.browserOpening" dropdownPosition="top"></ng-select>
           </div>
 
-          <button class="button pull-center" (click)="save();">
+
+          <button class="button pull-left" (click)="delete(selectedAwsSsoConfiguration)"><i class="fa fa-trash"></i> Delete</button>
+          <button class="button pull-right" (click)="save();">
             <ng-container *ngIf="modifying === 1">Add integration</ng-container>
             <ng-container *ngIf="modifying === 2">Edit integration</ng-container>
           </button>
@@ -61,7 +63,7 @@
         <div class="sso-card" *ngFor="let awsSsoConfiguration of awsSsoConfigurations">
           <p class="alias"><strong>{{awsSsoConfiguration.alias}}</strong></p>
           <p class="underlined">{{awsSsoConfiguration.portalUrl}}</p>
-          <p class="uppercased">{{awsSsoConfiguration.region}} - {{awsSsoConfiguration.browserOpening}}</p>
+          <p class="uppercased">{{awsSsoConfiguration.region}}</p>
 
           <span class="status">
             <ng-container *ngIf=" isOnline(awsSsoConfiguration)">
@@ -75,7 +77,6 @@
           </span>
 
           <button class="button pull-apart" (click)="gotoForm(2, awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-edit"></i> Edit</button>
-          <button class="button pull-apart-2" (click)="delete(awsSsoConfiguration)" *ngIf="!loadingInBrowser"><i class="fa fa-trash"></i> Delete</button>
 
           <button class="button pull-left" (click)="logout(awsSsoConfiguration.id)" *ngIf="isOnline(awsSsoConfiguration)">
             <ng-container *ngIf="logoutLoadings[awsSsoConfiguration.id]">

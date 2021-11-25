@@ -183,6 +183,7 @@ export class IntegrationComponent implements OnInit, BrowserWindowClosing {
         this.loggingService.logger(`Removing sessions with attached aws sso config id: ${awsSsoConfiguration.id}`, LoggerLevel.info, this);
         this.logout(awsSsoConfiguration.id);
         this.workspaceService.deleteAwsSsoIntegration(awsSsoConfiguration.id);
+        this.modifying = 0;
       }
     });
   }

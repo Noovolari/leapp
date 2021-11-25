@@ -240,7 +240,7 @@ button.disabled {
 .sso-card {
   position: relative;
   margin: 10px 40px;
-  padding: 15px 20px 40px 20px;
+  padding: 15px 20px 50px 20px;
   border-radius: 5px;
   border: 1px solid #78E0CF;
   background: rgba(120, 224, 207, 0.4);
@@ -355,3 +355,5 @@ button.disabled {
   .green-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #8fc92a; }
   .red-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #d64123; }
 }
+
+.region-font {font-size: 10px;}

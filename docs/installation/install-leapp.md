@@ -2,7 +2,10 @@
 
 ## MacOS, Windows, and Linux
 
-You can install Leapp by downloading the pre-built binaries for your OS [here](https://www.leapp.cloud/releases).
+You can install Leapp by downloading the pre-built binaries for your OS in the website release page
+
+[Download Leapp :fontawesome-solid-download:](https://www.leapp.cloud/releases){ .md-button .md-button--primary }
+
 
 **Unzip** the package and **double-click on the executable** to install.
 

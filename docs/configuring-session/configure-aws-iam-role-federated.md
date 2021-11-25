@@ -8,6 +8,15 @@ We currently support only SAML 2.0 federation.
     - Refer to [this guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_saml.html) to provision your own federated roles.
     - Refer to [this guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_saml.html) to configure and trust your SAML 2.0 Identity Provider.
 
+## Supported SAML Identity Providers
+
+| Identity Provider          | AWS                                  | Azure                               |
+| -------------------------- | ------------------------------------ | ------------------------------------|
+| `GSUITE`                   | :fontawesome-solid-check-circle:     | :fontawesome-solid-times-circle:    |
+| `OKTA`                     | :fontawesome-solid-check-circle:     | :fontawesome-solid-times-circle:    |
+| `ONELOGIN`                 | :fontawesome-solid-check-circle:     | :fontawesome-solid-times-circle:    |
+| `AZURE AD`                 | :fontawesome-solid-check-circle:     | :fontawesome-solid-check-circle:    |
+
 ## Fields
 
 | Field                      | Description                          |
@@ -19,3 +28,8 @@ We currently support only SAML 2.0 federation.
 | `AWS IDENTIY PROVIDER ARN` | Your Identity Provider ID in AWS. You can find it in IAM section Identity Providers.|
 
 ![](../../images/screens/aws-iam-role-federated.png?style=center-img "Add AWS IAM Role Federated Screen")
+
+## Video tutoriaL
+
+![AWS IAM Federated Role Access Use Case](../../videos/Federated.gif)
+

@@ -15,5 +15,5 @@ Every key is stored in the vault under the name **Leapp**, in the description yo
 !!! Info
     
     We're currently supporting only System Vaults installed by default on the OS. We're planning on extending support to other vaults and online password managers (LastPass, BitWarden, 1Password, etc.). 
-    If you'd like other services to be supported feel free to open an Issue or make a Pull Request (check our [contributing guidelines](/contributing/get-involved)). 
+    If you'd like other services to be supported feel free to [open an Issue](https://github.com/Noovolari/leapp/issues/new?assignees=&labels=enhancement&template=feature_request.md&title=) or make a Pull Request (check our [contributing guidelines](/contributing/get-involved)). 
 

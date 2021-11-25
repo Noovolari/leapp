@@ -14,4 +14,4 @@ We leverage [Zero Knowledge]() to provide end-to-end encryption on tiers that re
 **Zero Knowledge is designed that no one, except you, can access your secured data.**
 
 !!! Warning
-    We CAN'T access your data under any circumstances, even if you ask us really nice.
+    We CAN'T access your data under any circumstances, even if you ask us.

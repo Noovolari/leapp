@@ -119,3 +119,7 @@ details p, .admonition p {
   background-color: rgba(0,184,212,.1);
   border-color: #78E0CF;
 }
+
+.md-typeset a:hover, .md-button:hover {
+ color: #080B38!important;
+}

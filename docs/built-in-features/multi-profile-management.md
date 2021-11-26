@@ -10,10 +10,18 @@ Named Profiles have a default profile which is the one you get from [aws configu
 
 Named Profiles can be created in **3 ways**:
 
-=== Option Panel
+=== "Option Panel"
 
-  Click on ![hamburger](../images/hamburger.png){: style="height:20px;width:20px"} and got to **Options**. 
-  Find the **Named profiles** tab, and click on the ![plus_sign](../images/built-in-features/plus.png)
+    Click on the hamburger icon and go to **Options**. 
+    Find the **Named profiles** tab, and click on the plus icon.
+
+=== "When creating a new Session"
+
+    When creating a new session a selector will be available to choose or **add** a new profile.
+
+=== "Edit Profile in Contextual Menu"
+
+    Click on the kebab icon and select **edit profile** an option to select or add a new profile will be available.
 
 
 !!! info

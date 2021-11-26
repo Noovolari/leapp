@@ -1,6 +1,6 @@
 import {Component, OnInit, ViewEncapsulation} from '@angular/core';
 import {Workspace} from '../../../models/workspace';
-import {FormControl, FormGroup} from '@angular/forms';
+import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AppService, LoggerLevel, ToastLevel} from '../../../services/app.service';
 import {FileService} from '../../../services/file.service';
 import {Router} from '@angular/router';
@@ -14,6 +14,8 @@ import {SessionFactoryService} from '../../../services/session-factory.service';
 import {SessionType} from '../../../models/session-type';
 import {AwsSessionService} from '../../../services/session/aws/aws-session.service';
 import {LoggingService} from '../../../services/logging.service';
+import {AwsSsoRoleSession} from '../../../models/aws-sso-role-session';
+import {AwsSsoIntegration} from "../../../models/aws-sso-integration";
 
 @Component({
   selector: 'app-profile-page',
@@ -60,6 +62,7 @@ export class ProfilePageComponent implements OnInit {
 
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: any;
+  private selectedAwsSsoPortalUrl: string;
 
   constructor(
     private appService: AppService,
@@ -72,7 +75,7 @@ export class ProfilePageComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.workspace = this.workspaceService.get();
+    this.workspace = this.workspaceService.getWorkspace();
     this.idpUrlValue = '';
     this.proxyProtocol = this.workspace.proxyConfiguration.proxyProtocol;
     this.proxyUrl = this.workspace.proxyConfiguration.proxyUrl;
@@ -98,7 +101,6 @@ export class ProfilePageComponent implements OnInit {
     this.locations = this.appService.getLocations();
     this.selectedRegion   = this.workspace.defaultRegion || environment.defaultRegion;
     this.selectedLocation = this.workspace.defaultLocation || environment.defaultLocation;
-    this.selectedBrowserOpening = this.workspace.awsSsoConfiguration.browserOpening || Constants.inApp.toString();
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -121,8 +123,8 @@ export class ProfilePageComponent implements OnInit {
       this.workspace.defaultLocation = this.selectedLocation;
       this.workspaceService.updateDefaultLocation(this.workspace.defaultLocation);
 
-      this.workspace.awsSsoConfiguration.browserOpening = this.selectedBrowserOpening;
-      this.workspaceService.updateBrowserOpening(this.selectedBrowserOpening);
+      // this.workspace.awsSsoConfiguration.browserOpening = this.selectedBrowserOpening;
+      // this.workspaceService.updateBrowserOpening(this.selectedBrowserOpening);
 
       if (this.checkIfNeedDialogBox()) {
 
@@ -172,7 +174,7 @@ export class ProfilePageComponent implements OnInit {
     this.editingIdpUrl = false;
     this.idpUrlValue = undefined;
     this.form.get('idpUrl').setValue('');
-    this.workspace = this.workspaceService.get();
+    this.workspace = this.workspaceService.getWorkspace();
   }
 
   editIdpUrl(id) {
@@ -210,14 +212,14 @@ export class ProfilePageComponent implements OnInit {
           this.sessionService.delete(session.sessionId);
         });
 
-        this.workspace = this.workspaceService.get();
+        this.workspace = this.workspaceService.getWorkspace();
       }
     });
   }
 
   async manageAwsProfile(id: string | number) {
 
-    const profileIndex = this.workspaceService.get().profiles.findIndex(p => p.id === id.toString());
+    const profileIndex = this.workspaceService.getWorkspace().profiles.findIndex(p => p.id === id.toString());
     if (this.form.get('awsProfile').value !== '') {
       if (profileIndex === -1) {
         this.workspaceService.addProfile({ id: uuid.v4(), name: this.form.get('awsProfile').value });
@@ -240,7 +242,7 @@ export class ProfilePageComponent implements OnInit {
     this.editingAwsProfile = false;
     this.awsProfileValue = undefined;
     this.form.get('awsProfile').setValue('');
-    this.workspace = this.workspaceService.get();
+    this.workspace = this.workspaceService.getWorkspace();
   }
 
   editAwsProfile(id: string) {
@@ -284,7 +286,7 @@ export class ProfilePageComponent implements OnInit {
           }
         }
 
-        this.workspace = this.workspaceService.get();
+        this.workspace = this.workspaceService.getWorkspace();
       }
     });
   }

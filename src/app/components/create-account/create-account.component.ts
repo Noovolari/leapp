@@ -92,7 +92,7 @@ export class CreateAccountComponent implements OnInit {
     this.activatedRoute.queryParams.subscribe(params => {
 
       // Get the workspace and the accounts you need
-      const workspace = this.workspaceService.get();
+      const workspace = this.workspaceService.getWorkspace();
 
       // We get all the applicable idp urls
       if (workspace.idpUrls && workspace.idpUrls.length > 0) {
@@ -214,7 +214,7 @@ export class CreateAccountComponent implements OnInit {
    *
    */
   goToAwsSso() {
-    this.router.navigate(['/', 'aws-sso']).then(_ => {});
+    this.router.navigate(['/', 'integration']).then(_ => {});
   }
 
   /**

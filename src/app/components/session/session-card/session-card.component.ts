@@ -79,7 +79,7 @@ export class SessionCardComponent implements OnInit {
     const azureLocations = this.appService.getLocations();
 
     // Get profiles
-    this.profiles = this.workspaceService.get().profiles;
+    this.profiles = this.workspaceService.getWorkspace().profiles;
 
     // Array and labels for regions and locations
     this.regionOrLocations = this.session.type !== SessionType.azure ? this.awsRegions : azureLocations;
@@ -153,7 +153,7 @@ export class SessionCardComponent implements OnInit {
   async copyCredentials(session: Session, type: number, event) {
     event.stopPropagation();
     try {
-      const workspace = this.workspaceService.get();
+      const workspace = this.workspaceService.getWorkspace();
       if (workspace) {
         const texts = {
           1: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn.split('/')[0].substring(13, 25)}` : '',

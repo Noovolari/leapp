@@ -10,10 +10,10 @@ import SSOOIDC, {
 } from 'aws-sdk/clients/ssooidc';
 import {Injectable} from '@angular/core';
 import {Constants} from '../models/constants';
-import {WorkspaceService} from './workspace.service';
 import {AppService, LoggerLevel} from './app.service';
 import {ElectronService} from './electron.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
+import {AwsSsoIntegration} from '../models/aws-sso-integration';
 
 export interface BrowserWindowClosing {
   catchClosingBrowserWindow(): void;
@@ -39,11 +39,11 @@ export class AwsSsoOidcService {
   private mainIntervalId: any;
 
   private index: number;
+  private awsSsoIntegration: AwsSsoIntegration;
 
   constructor(
     private appService: AppService,
-    private electronService: ElectronService,
-    private workspaceService: WorkspaceService
+    private electronService: ElectronService
   ) {
     this.listeners = [];
     this.ssoOidc = null;
@@ -72,14 +72,15 @@ export class AwsSsoOidcService {
     this.loginMutex = false;
   }
 
-  async login(region: string, portalUrl: string): Promise<GenerateSSOTokenResponse> {
+  async login(awsSsoIntegration: AwsSsoIntegration): Promise<GenerateSSOTokenResponse> {
     if (!this.loginMutex && this.setIntervalQueue.length === 0) {
       this.loginMutex = true;
 
-      this.ssoOidc = new SSOOIDC({ region });
+      this.awsSsoIntegration = awsSsoIntegration;
+      this.ssoOidc = new SSOOIDC({ region: awsSsoIntegration.region });
       this.ssoWindow = null;
-      this.currentRegion = region;
-      this.currentPortalUrl = portalUrl;
+      this.currentRegion = awsSsoIntegration.region;
+      this.currentPortalUrl = awsSsoIntegration.portalUrl;
       this.registerClientResponse = null;
       this.startDeviceAuthorizationResponse = null;
       this.startDeviceAuthorizationResponseExpiresAt = null;
@@ -93,7 +94,7 @@ export class AwsSsoOidcService {
       const startDeviceAuthorizationRequest: StartDeviceAuthorizationRequest = {
         clientId: this.registerClientResponse.clientId,
         clientSecret: this.registerClientResponse.clientSecret,
-        startUrl: portalUrl
+        startUrl: this.awsSsoIntegration.portalUrl
       };
 
       const baseTimeInMilliseconds = Date.now();
@@ -154,7 +155,7 @@ export class AwsSsoOidcService {
   }
 
   private async openVerificationBrowserWindow(registerClientResponse: RegisterClientResponse, startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse): Promise<VerificationResponse> {
-    if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp.toString()) {
+    if(this.awsSsoIntegration.browserOpening === Constants.inApp.toString()) {
       const pos = this.electronService.currentWindow.getPosition();
 
       this.ssoWindow = null;
@@ -243,7 +244,7 @@ export class AwsSsoOidcService {
 
     let createTokenResponse;
 
-    if(this.workspaceService.getAwsSsoConfiguration().browserOpening === Constants.inApp) {
+    if(this.awsSsoIntegration.browserOpening === Constants.inApp) {
       createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest);

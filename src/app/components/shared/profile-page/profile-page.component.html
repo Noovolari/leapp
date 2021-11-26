@@ -25,11 +25,13 @@
             <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="down"></ng-select>
           </div>
 
+          <!--
           <h2 style="margin-top: 10px;">AWS SSO</h2>
           <div class="form-group" style="width: 43%; display: inline-block;">
             <label>Default browser opening</label>
             <ng-select formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedBrowserOpening" dropdownPosition="down"></ng-select>
           </div>
+          -->
 
         </div>
       </mat-tab>
@@ -103,8 +105,8 @@
             </table>
           </div>
         </div>
-
       </mat-tab>
+
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon class="mat-tab-icon">lan</mat-icon>

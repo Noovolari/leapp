@@ -14,7 +14,10 @@ import compareVersions from 'compare-versions';
 import {RetrocompatibilityService} from './services/retrocompatibility.service';
 import {LoggingService} from './services/logging.service';
 import {LeappParseError} from './errors/leapp-parse-error';
-import {Constants} from './models/constants';
+import {AwsSsoIntegrationService} from './services/aws-sso-integration.service';
+import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
+import {AwsSsoRoleService} from './services/session/aws/methods/aws-sso-role.service';
+import {KeychainService} from './services/keychain.service';
 
 @Component({
   selector: 'app-root',
@@ -33,10 +36,21 @@ export class AppComponent implements OnInit {
     private router: Router,
     private timerService: TimerService,
     private updaterService: UpdaterService,
-    private loggingService: LoggingService
+    private loggingService: LoggingService,
+    private awsSsoOidcService: AwsSsoOidcService,
+    private awsSsoRoleService: AwsSsoRoleService,
+    private keychainService: KeychainService
   ) {}
 
   async ngOnInit() {
+    AwsSsoIntegrationService.init(
+      this.app,
+      this.awsSsoOidcService,
+      this.awsSsoRoleService,
+      this.keychainService,
+      this.workspaceService
+    );
+
     // We get the right moment to set an hook to app close
     const ipc = this.app.getIpcRenderer();
     ipc.on('app-close', () => {
@@ -63,14 +77,13 @@ export class AppComponent implements OnInit {
       await this.retrocompatibilityService.adaptOldWorkspaceFile();
     }
 
+    if (this.retrocompatibilityService.isIntegrationPatchNecessary()) {
+      await this.retrocompatibilityService.adaptIntegrationPatch();
+    }
+
     let workspace;
     try {
-      workspace = this.workspaceService.get();
-
-      if (!workspace.awsSsoConfiguration.browserOpening) {
-        workspace.awsSsoConfiguration.browserOpening = Constants.inApp.toString();
-        this.workspaceService.persist(workspace);
-      }
+      workspace = this.workspaceService.getWorkspace();
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
     }

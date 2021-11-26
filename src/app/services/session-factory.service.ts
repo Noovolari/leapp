@@ -22,14 +22,14 @@ export class SessionFactoryService {
   private sessionServiceCache: SessionService[];
 
   constructor(
-    private workspaceService: WorkspaceService,
-    private keychainService: KeychainService,
     private appService: AppService,
-    private executeService: ExecuteService,
+    private awsSsoOidcService: AwsSsoOidcService,
     private electronService: ElectronService,
+    private executeService: ExecuteService,
     private fileService: FileService,
-    private awsSsoOidcService: AwsSsoOidcService) {
-
+    private keychainService: KeychainService,
+    private workspaceService: WorkspaceService,
+  ) {
     this.sessionServiceCache = [];
   }
 
@@ -64,13 +64,14 @@ export class SessionFactoryService {
   }
 
   private getAwsIamRoleChainedSessionService(accountType: SessionType) {
-    const service = new AwsIamRoleChainedService(this.workspaceService, this.appService, this.fileService, this.keychainService, this.electronService, this.awsSsoOidcService);
+    const service = new AwsIamRoleChainedService(this.appService, this.awsSsoOidcService, this.electronService, this.fileService, this.keychainService, this.workspaceService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }
 
   private getAwsSsoRoleSessionService(accountType: SessionType) {
-    const service = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService, this.awsSsoOidcService);
+    const service = new AwsSsoRoleService(this.appService, this.awsSsoOidcService,
+      this.fileService, this.workspaceService);
     this.sessionServiceCache[accountType.toString()] = service;
     return service;
   }

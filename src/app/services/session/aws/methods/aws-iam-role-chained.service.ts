@@ -15,7 +15,7 @@ import {KeychainService} from '../../../keychain.service';
 import {AwsIamUserService} from './aws-iam-user.service';
 import {AwsSsoRoleService} from './aws-sso-role.service';
 import {ElectronService} from '../../../electron.service';
-import {AwsSsoOidcService} from "../../../aws-sso-oidc.service";
+import {AwsSsoOidcService} from '../../../aws-sso-oidc.service';
 
 export interface AwsIamRoleChainedSessionRequest {
   accountName: string;
@@ -31,12 +31,12 @@ export interface AwsIamRoleChainedSessionRequest {
 export class AwsIamRoleChainedService extends AwsSessionService {
 
   constructor(
-    protected workspaceService: WorkspaceService,
     private appService: AppService,
+    private awsSsoOidcService: AwsSsoOidcService,
+    private electronService: ElectronService,
     private fileService: FileService,
     private keychainService: KeychainService,
-    private electronService: ElectronService,
-    private awsSsoOidcService: AwsSsoOidcService
+    protected workspaceService: WorkspaceService
   ) {
     super(workspaceService);
   }
@@ -102,7 +102,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     } else if(parentSession.type === SessionType.awsIamUser) {
       parentSessionService = new AwsIamUserService(this.workspaceService, this.keychainService, this.appService, this.fileService) as AwsSessionService;
     } else if(parentSession.type === SessionType.awsSsoRole) {
-      parentSessionService = new AwsSsoRoleService(this.workspaceService, this.fileService, this.appService, this.keychainService, this.awsSsoOidcService) as AwsSessionService;
+      parentSessionService = new AwsSsoRoleService(this.appService, this.awsSsoOidcService, this.fileService, this.workspaceService) as AwsSessionService;
     }
 
     const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);

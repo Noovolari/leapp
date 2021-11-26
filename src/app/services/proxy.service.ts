@@ -11,7 +11,7 @@ export class ProxyService {
   constructor(private appService: AppService, private workspaceService: WorkspaceService) {}
 
   configureBrowserWindow(browserWindow: any): void {
-    const workspace = this.workspaceService.get();
+    const workspace = this.workspaceService.getWorkspace();
 
     let proxyUrl;
     let proxyPort;
@@ -33,7 +33,7 @@ export class ProxyService {
 
   getHttpClientOptions(url: string): any {
     const options = this.appService.getUrl().parse(url);
-    const workspace = this.workspaceService.get();
+    const workspace = this.workspaceService.getWorkspace();
 
     let proxyUrl;
     let proxyPort;

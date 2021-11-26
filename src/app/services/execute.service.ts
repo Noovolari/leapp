@@ -56,7 +56,7 @@ export class ExecuteService {
     if (this.electronService.process.platform === 'darwin') {
       return this.execute(`osascript -e "tell app \\"Terminal\\"
                               do script \\"${command}\\"
-                              end tell"`, env);
+                              end tell"`, Object.assign(this.electronService.process.env, env));
     } else if (this.electronService.process.platform === 'win32') {
       return this.execute(`start cmd /k ${command}`, env);
     } else {

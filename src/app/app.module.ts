@@ -9,7 +9,7 @@ import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform
 import { ConfirmationDialogComponent } from './components/shared/confirmation-dialog/confirmation-dialog.component';
 import {SharedModule} from './components/shared/shared.module';
 import {InputDialogComponent} from './components/shared/input-dialog/input-dialog.component';
-import { AwsSsoComponent } from './components/aws-sso/aws-sso.component';
+import {IntegrationComponent} from './components/integration/integration.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgSelectModule} from '@ng-select/ng-select';
 import {TrayMenuComponent} from './components/shared/tray-menu/tray-menu.component';
@@ -20,7 +20,7 @@ import {ErrorService} from './services/middleware/error.service';
 @NgModule({
   declarations: [
     AppComponent,
-    AwsSsoComponent,
+    IntegrationComponent,
     TrayMenuComponent
   ],
   imports: [

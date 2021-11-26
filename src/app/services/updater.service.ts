@@ -43,7 +43,11 @@ export class UpdaterService {
   }
 
   getSavedAppVersion(): string {
-    return this.electronService.fs.readFileSync(this.electronService.os.homedir() + `/.Leapp/.latest.json`).toString();
+    if(this.appService.detectOs() !== Constants.windows) {
+      return this.electronService.fs.readFileSync(this.electronService.os.homedir() + `/.Leapp/.latest.json`).toString();
+    } else {
+      return this.electronService.fs.readFileSync(this.electronService.os.homedir() + `\\.Leapp\\.latest.json`).toString();
+    }
   }
 
   getSavedVersionComparison(): boolean {
@@ -87,7 +91,11 @@ export class UpdaterService {
   }
 
   updateVersionJson(version: string): void {
-    this.electronService.fs.writeFileSync(this.electronService.os.homedir() + '/.Leapp/.latest.json', version);
+    if(this.appService.detectOs() !== Constants.windows) {
+      this.electronService.fs.writeFileSync(this.electronService.os.homedir() + '/.Leapp/.latest.json', version);
+    } else {
+      this.electronService.fs.writeFileSync(this.electronService.os.homedir() + '\\.Leapp\\.latest.json', version);
+    }
   }
 
   async getReleaseNote(): Promise<string> {

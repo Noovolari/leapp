@@ -88,6 +88,11 @@ the following tools:
 
 </details>
 
+# Our Sponsors
+
+[<img hspace="5" src="https://avatars.githubusercontent.com/u/1290287?s=60&amp;v=4" width="90" height="90" alt="@taimos">](https://github.com/taimos)
+[<img hspace="5" src="https://avatars.githubusercontent.com/u/2232217?s=60&amp;v=4" width="90" height="90" alt="@aws">](https://github.com/aws)
+
 
 # Documentation
 Refer to the documentation [website](https://docs.leapp.cloud).

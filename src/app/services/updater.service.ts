@@ -112,4 +112,15 @@ export class UpdaterService {
   isReady() {
     return (this.version !== undefined);
   }
+
+  createFoldersIfMissing() {
+    try {
+      if(!this.electronService.fs.existsSync(this.electronService.os.homedir() + '/.Leapp/')) {
+        this.electronService.fs.mkdirSync(this.electronService.os.homedir() + '/.Leapp/');
+      }
+      if(!this.electronService.fs.existsSync(this.electronService.os.homedir() + '/.aws/')) {
+        this.electronService.fs.mkdirSync(this.electronService.os.homedir() + '/.aws/');
+      }
+    } catch(_) {}
+  }
 }

@@ -71,6 +71,9 @@ export class AppComponent implements OnInit {
     // Prevent Dev Tool to show on production mode
     this.app.blockDevToolInProductionMode();
 
+    // Create folders if missing
+    this.updaterService.createFoldersIfMissing();
+
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
     if (this.retrocompatibilityService.isRetroPatchNecessary()) {

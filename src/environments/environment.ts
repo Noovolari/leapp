@@ -5,7 +5,7 @@
 const environment = {
   appName: 'Leapp',
   samlRoleSessionDuration: 3600, // 1h
-  sessionDuration: 60, // 1200, // 20 min
+  sessionDuration: 1200, // 20 min
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
   lockFileDestination: '.Leapp/Leapp-lock.json',

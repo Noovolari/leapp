@@ -6,7 +6,7 @@ import {KeychainService} from './keychain.service';
 import {mustInjected} from '../../base-injectables';
 import SpyObj = jasmine.SpyObj;
 import {AwsSsoOidcService} from './aws-sso-oidc.service';
-import {AwsSsoRoleService, SsoRoleSession} from './session/aws/methods/aws-sso-role.service';
+import {AwsSsoRoleService} from './session/aws/methods/aws-sso-role.service';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {serialize} from 'class-transformer';
 import {Workspace} from '../models/workspace';
@@ -14,12 +14,7 @@ import {FileService} from './file.service';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import AWSMock from 'aws-sdk-mock';
 import * as AWS from 'aws-sdk';
-import sinon from 'sinon';
-
 import {environment} from '../../environments/environment';
-import {AwsSsoIntegration} from "../models/aws-sso-integration";
-import {AccountIdType, AccountInfo, AccountNameType, EmailAddressType} from "aws-sdk/clients/sso";
-
 
 describe('AwsSsoIntegrationService', () => {
   const oneHourInMilliseconds: number = 1000 * 60 * 60;
@@ -147,7 +142,7 @@ describe('AwsSsoIntegrationService', () => {
       it('retrieves the AwsSsoIntegration object', async () => {
         spyOn<any>(workspaceService, 'getAwsSsoIntegration').and.callThrough();
         await service.login('fake-id');
-        expect(workspaceService.getAwsSsoIntegration).toHaveBeenCalledTimes(2);
+        expect(workspaceService.getAwsSsoIntegration).toHaveBeenCalledTimes(3);
         expect(workspaceService.getAwsSsoIntegration).toHaveBeenCalledWith('fake-id');
       });
 

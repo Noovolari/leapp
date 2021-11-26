@@ -4,16 +4,25 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [0.8.0](https://github.com/Noovolari/leapp/compare/v0.7.4...v0.8.0) (2021-11-26)
 
+### Features
+
+* Added support for multiple AWS Single Sign-On through Integrations Menu
 
 ### Bug Fixes
 
 * added await statement in front of AwsSsoIntegrationService login saveSecret ([67bdc18](https://github.com/Noovolari/leapp/commit/67bdc185d7e63cd14ac17ac06a8d2e21b5af33be))
 * added backslashes for windows path in updater service ([63ec0e5](https://github.com/Noovolari/leapp/commit/63ec0e555f97945af5ca6696012cc7ef722077ac))
-* added check for creating .Leapp .aws directories if missing ([25e720e](https://github.com/Noovolari/leapp/commit/25e720e3fc4eb4e329cbc604e7fa19ebd8fd7ba5))
-* added provisionsessions test ([a8fb706](https://github.com/Noovolari/leapp/commit/a8fb70653e415af30c7fe05b877d0ab0a7040923))
-* fixed aws sso integration service test ([1bfc8da](https://github.com/Noovolari/leapp/commit/1bfc8da98663551c2995e0ba33d40205fe57eb1e))
 * fixed log path ([3c09da8](https://github.com/Noovolari/leapp/commit/3c09da8d4a91c979f49be275b0ea57dda49dac29))
 * sso role sessions maintain their region and profiles on sync ([40f023a](https://github.com/Noovolari/leapp/commit/40f023adb950070fe4c52ff4d53a7c272467cc84))
+* added check for creating .Leapp .aws directories if missing [#190](https://github.com/Noovolari/leapp/issues/190) ([25e720e](https://github.com/Noovolari/leapp/commit/25e720e3fc4eb4e329cbc604e7fa19ebd8fd7ba5))
+
+### Bug Fixes
+
+* added await statement in front of AwsSsoIntegrationService login saveSecret ([67bdc18](https://github.com/Noovolari/leapp/commit/67bdc185d7e63cd14ac17ac06a8d2e21b5af33be))
+* added backslashes for windows path in updater service ([63ec0e5](https://github.com/Noovolari/leapp/commit/63ec0e555f97945af5ca6696012cc7ef722077ac))
+* fixed log path ([3c09da8](https://github.com/Noovolari/leapp/commit/3c09da8d4a91c979f49be275b0ea57dda49dac29))
+* sso role sessions maintain their region and profiles on sync ([40f023a](https://github.com/Noovolari/leapp/commit/40f023adb950070fe4c52ff4d53a7c272467cc84))
+* added check for creating .Leapp .aws directories if missing [#190](https://github.com/Noovolari/leapp/issues/190) ([25e720e](https://github.com/Noovolari/leapp/commit/25e720e3fc4eb4e329cbc604e7fa19ebd8fd7ba5))
 
 ### [0.7.4](https://github.com/Noovolari/leapp/compare/v0.7.3...v0.7.4) (2021-11-15)
 

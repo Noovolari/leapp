@@ -76,9 +76,9 @@ export class AppService {
     // Global Configure logger
     if (this.electronService.log) {
       const logPaths = {
-        mac: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
-        linux: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
-        windows: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`
+        mac: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.log`,
+        linux: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.log`,
+        windows: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.log`
       };
 
       this.electronService.log.transports.console.format = '[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}';

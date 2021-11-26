@@ -29,7 +29,6 @@ nav:
       - FAQ: 'security/faq.md'
   - 'Built-in features':
       - 'EC2 connector through AWS System manager': 'built-in-features/ec2-connector-through-aws-system-manager.md'
-      - 'Proxy Server': 'built-in-features/proxy-server.md'
       - 'Multi-profile management': 'built-in-features/multi-profile-management.md'
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'

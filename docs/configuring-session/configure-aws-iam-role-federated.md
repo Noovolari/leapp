@@ -29,7 +29,7 @@ We currently support only SAML 2.0 federation.
 
 ![](../../images/screens/aws-iam-role-federated.png?style=center-img "Add AWS IAM Role Federated Screen")
 
-## Video tutoriaL
+## Video tutorial
 
-![AWS IAM Federated Role Access Use Case](../../videos/Federated.gif)
+![AWS IAM Federated Role Access Use Case](../../videos/Federated.gif?style=center-img)
 

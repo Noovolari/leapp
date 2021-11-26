@@ -19,3 +19,8 @@ Role chaining occurs when you use a role to assume a second role through the AWS
 | `ASSUMER SESSION`   | Your session from which this Role will be assumed. The `assume-role` call will be automatically made by Leapp. |
 
 ![](../../images/screens/aws-iam-role-chained.png?style=center-img "Add AWS IAM Role Chained Screen")
+
+## Video Tutorial
+
+![](../../videos/Chained.gif?style=center-img)
+

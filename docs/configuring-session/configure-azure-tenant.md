@@ -15,4 +15,10 @@ An Azure Tenant consists of a name and a set of long-term credentials. Leapp enh
 | `TENANT ID`         | Your default region of choice. Select the one which you use the most for this Session. |
 | `LOCATION`          | Your MFA device ID to set up multi-factor authentication. See below how to achieve that. |
 
-![](../../images/screens/azure.png?style=center-img "Add AWS IAM User Screen")
+
+
+![](../../images/screens/azure-tenant?style=center-img "Add Azure Tenant Screen")
+
+## Video Tutorial
+
+![](../../videos/Azure.gif?style=center-img)

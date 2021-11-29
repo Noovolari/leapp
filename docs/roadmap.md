@@ -40,7 +40,7 @@ Release Leapp PRO for individuals.
 
 ## Leapp Team
 ### 2022 Q2
-Release Leapp for Teams (SaaS). Include PRO features.
+Release Leapp for Teams (SaaS). Include PRO features for all team members.
 
 | Milestone | Description |
 | --------- | ----------- |

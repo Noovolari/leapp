@@ -6,27 +6,30 @@ copyright: '© 2021 Noovolari, All rights reserved. | Powered by beSharp'
 
 nav:
   - 'Get Started':
-      - Intro: index.md
+      - Overview: 'index.md'
       - Installation:
           - 'Requirements': 'installation/requirements.md'
           - 'Install Leapp': 'installation/install-leapp.md'
           - 'Update Leapp': 'installation/update-leapp.md'
-      - Sessions: 'sessions.md'
-      - Integrations: 'integrations.md'
-  - 'Configuring a Session':
-      - 'Configure AWS IAM User': 'configuring-session/configure-aws-iam-user.md'
-      - 'Configure AWS IAM Role Federated': 'configuring-session/configure-aws-iam-role-federated.md'
-      - 'Configure AWS IAM Role Chained': 'configuring-session/configure-aws-iam-role-chained.md'
-      - 'Configure Azure Tenant': 'configuring-session/configure-azure-tenant.md'
-  - 'Configuring Integration':
-      - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
+      - 'Configuration':
+          - Add your first configuration: 'configuration.md'
+          - 'Configuring a Session':
+              - 'Configure AWS IAM User': 'configuring-session/configure-aws-iam-user.md'
+              - 'Configure AWS IAM Role Federated': 'configuring-session/configure-aws-iam-role-federated.md'
+              - 'Configure AWS IAM Role Chained': 'configuring-session/configure-aws-iam-role-chained.md'
+              - 'Configure Azure Tenant': 'configuring-session/configure-azure-tenant.md'
+          - 'Configuring an Integration':
+              - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
+      - 'Concepts':
+          - Sessions: 'sessions.md'
+          - Integrations: 'integrations.md'
   - Security:
       - 'Intro': 'security/intro.md'
       - 'Credentials generation':
           - AWS: 'security/credentials-generation/aws.md'
           - Azure: 'security/credentials-generation/azure.md'
       - System Vault: 'security/system-vault.md'
-      - '0-Knowledge':  'security/0-knowledge.md'
+      - 'Zero Knowledge':  'security/zero-knowledge.md'
   - 'Built-in features':
       - 'EC2 connector through AWS System manager': 'built-in-features/ec2-connector-through-aws-system-manager.md'
       - 'Multi-profile management': 'built-in-features/multi-profile-management.md'
@@ -35,8 +38,8 @@ nav:
       - 'Get involved': 'contributing/get-involved.md'
       - 'Project structure': 'contributing/project-structure.md'
   - Troubleshooting:
-      - 'FAQ': 'troubleshooting/faq.md'
       - 'Application Data': 'troubleshooting/app-data.md'
+      - 'FAQ': 'troubleshooting/faq.md'
 
 theme:
   logo: images/logo.png

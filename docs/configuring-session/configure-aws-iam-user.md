@@ -4,7 +4,7 @@ A IAM User in AWS consists of a name and a set of long-term credentials. Leapp n
 
 !!! Info
   
-    If you want to know how Leapp generates and refresh short-term credentials refer to [this section]() in the documentation.
+    If you want to know how Leapp generates and refresh short-term credentials refer to the [credentials generation](/security/credentials-generation/aws/) section in the documentation.
 
 ## Fields
 

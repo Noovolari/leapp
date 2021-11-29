@@ -2,9 +2,9 @@
 
 ## Welcome to Leapp :rocket:
 
-Leapp is a tool for developers to manage, secure, and access to the Cloud.
+Leapp is a tool for developers to manage, secure, and access to the cloud.
 
-Leapp information needed to retrieve credentials are stored **LOCALLY** inside his [workspace](concepts.md). Critical information such as Cloud secrets and token are stored inside the **System Vault**.
+All data is **persisted and encrypted on your workstation**. Head to our [Security](/security/intro) section to know how we guarantee the highest level of security.
 
 ![Leapp Main Window](images/main-window.png?style=center-img)
 

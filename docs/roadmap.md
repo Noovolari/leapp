@@ -27,7 +27,7 @@
 
 ## Leapp PRO
 ### 2022 Q1
-Release Leapp PRO for individuals.
+Release Leapp PRO for individuals (SaaS).
 
 | Milestone | Description |
 | --------- | ----------- |

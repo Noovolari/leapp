@@ -31,8 +31,8 @@ nav:
       - System Vault: 'security/system-vault.md'
       - 'Zero Knowledge':  'security/zero-knowledge.md'
   - 'Built-in features':
-      - 'EC2 connector through AWS System manager': 'built-in-features/ec2-connector-through-aws-system-manager.md'
-      - 'Multi-profile management': 'built-in-features/multi-profile-management.md'
+      - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
+      - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'
   - 'Roadmap': 'roadmap.md'
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'

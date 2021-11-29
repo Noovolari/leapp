@@ -1,4 +1,4 @@
-Leapp gives a User the ability to group and activate more than one credential set at a time with **Named Profiles**.
+With Leapp you can group and activate more than one credential set at a time through [Named Profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
 
 ## Named Profiles
 

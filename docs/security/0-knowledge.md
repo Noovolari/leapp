@@ -6,7 +6,7 @@
   
     You don't know PRO and TEAM versions yet? Come and check the [roadmap](#).
 
-Leapp PRO and Leapp TEAM implements the concept introduced by [BitWarden](https://bitwarden.com/) and known as **0-Knowledge**. 
+Leapp PRO and Leapp TEAM implement the concept known as **0-Knowledge**, used for instance by [BitWarden](https://bitwarden.com/). 
 0-Knowledge means that there is no data left unencrypted on our side. All information is **encrypted end-to-end** 
 and only the **final user as the encryption key needed to view the data**.
 

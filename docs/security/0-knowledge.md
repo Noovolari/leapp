@@ -28,6 +28,6 @@ This is **the fundamental premise** on which [0-knowledge managers work](https:/
 
 - **PBKDF2** for client hashing. 
 - **AES 256** for simmetric cypher.
-- **RSA** asimmetric cypher.
+- **RSA** with 4096 bit keys for asimmetric cypher.
 - **BCrypt** for server hashing.
 

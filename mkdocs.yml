@@ -30,6 +30,7 @@ nav:
   - 'Built-in features':
       - 'EC2 connector through AWS System manager': 'built-in-features/ec2-connector-through-aws-system-manager.md'
       - 'Multi-profile management': 'built-in-features/multi-profile-management.md'
+  - 'Roadmap': 'roadmap.md'
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'
       - 'Project structure': 'contributing/project-structure.md'

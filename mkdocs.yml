@@ -26,6 +26,7 @@ nav:
           - AWS: 'security/credentials-generation/aws.md'
           - Azure: 'security/credentials-generation/azure.md'
       - System Vault: 'security/system-vault.md'
+      - '0-Knowledge':  'security/0-knowledge.md'
   - 'Built-in features':
       - 'EC2 connector through AWS System manager': 'built-in-features/ec2-connector-through-aws-system-manager.md'
       - 'Multi-profile management': 'built-in-features/multi-profile-management.md'

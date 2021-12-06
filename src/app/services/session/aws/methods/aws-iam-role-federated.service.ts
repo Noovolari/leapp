@@ -167,8 +167,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
           'https://*.okta.com/*',
           'https://accounts.google.com/ServiceLogin*',
           'https://login.microsoftonline.com/*',
-          'https://signin.aws.amazon.com/saml',
-          'https://myapps.microsoft.com/signin/'
+          'https://signin.aws.amazon.com/saml'
         ]
       };
 
@@ -191,15 +190,9 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
           resolve(true);
         }
         // AzureAD
-        if (details.url.indexOf('https://myapps.microsoft.com/signin/') !== -1) {
+        if (details.url.indexOf('https://login.microsoftonline.com') !== -1 && details.url.indexOf('/oauth2/authorize') !== -1) {
           idpWindow = null;
           resolve(true);
-        }
-        if (details.url.indexOf('https://login.microsoftonline.com') !== -1) {
-          if(details.url.indexOf('/oauth2/authorize') !== -1 || details.url.indexOf('/saml2') !== -1) {
-            idpWindow = null;
-            resolve(true);
-          }
         }
         // Do not show window: already logged by means of session cookies
         if (details.url.indexOf('https://signin.aws.amazon.com/saml') !== -1) {

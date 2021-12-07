@@ -11,18 +11,18 @@ nav:
           - 'Requirements': 'installation/requirements.md'
           - 'Install Leapp': 'installation/install-leapp.md'
           - 'Update Leapp': 'installation/update-leapp.md'
-      - 'Configuration':
-          - Add your first configuration: 'configuration.md'
-          - 'Configuring a Session':
-              - 'Configure AWS IAM User': 'configuring-session/configure-aws-iam-user.md'
-              - 'Configure AWS IAM Role Federated': 'configuring-session/configure-aws-iam-role-federated.md'
-              - 'Configure AWS IAM Role Chained': 'configuring-session/configure-aws-iam-role-chained.md'
-              - 'Configure Azure Tenant': 'configuring-session/configure-azure-tenant.md'
-          - 'Configuring an Integration':
-              - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
       - 'Concepts':
           - Sessions: 'sessions.md'
           - Integrations: 'integrations.md'
+  - 'Configuration':
+      - Add your first configuration: 'configuration.md'
+      - 'Configuring a Session':
+          - 'Configure AWS IAM User': 'configuring-session/configure-aws-iam-user.md'
+          - 'Configure AWS IAM Role Federated': 'configuring-session/configure-aws-iam-role-federated.md'
+          - 'Configure AWS IAM Role Chained': 'configuring-session/configure-aws-iam-role-chained.md'
+          - 'Configure Azure Tenant': 'configuring-session/configure-azure-tenant.md'
+      - 'Configuring an Integration':
+          - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
   - Security:
       - 'Intro': 'security/intro.md'
       - 'Credentials generation':

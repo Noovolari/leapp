@@ -28,7 +28,7 @@ The App is designed to **manage and secure Cloud Access in multi-account environ
 
 - **[No long-lived](https://docs.leapp.cloud/concepts/) credentials**
 
-- **Generate and use sessions directly from [your aws Organization](https://docs.leapp.cloud/use-cases/aws_sso/)**
+- **Generate and use sessions directly from [your aws Organization](https://docs.leapp.cloud/configuring-integration/configure-aws-single-sign-on-integration/)**
 
 - **Connect EC2 instances straight away**
 

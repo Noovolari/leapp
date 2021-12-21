@@ -1,0 +1,21 @@
+
+name: "Bump Homebrew formula"
+
+on:
+  push:
+    tags: 'v*'
+
+jobs:
+  homebrew:
+    name: Bump Homebrew formula
+    runs-on: ubuntu-latest
+    steps:
+      - uses: mislav/bump-homebrew-formula-action@v1
+        with:
+          formula-name: leapp
+          formula-path: Casks/leapp.rb
+          homebrew-tap: Homebrew/homebrew-cask
+          base-branch: master
+          download-url: https://asset.noovolari.com/${{ version }}/Leapp-${{ version }}.dmg
+        env:
+          COMMITTER_TOKEN: ${{ secrets.GITHUB_TOKEN }}

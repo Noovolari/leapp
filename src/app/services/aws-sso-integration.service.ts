@@ -16,6 +16,7 @@ import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {SessionType} from '../models/session-type';
 import {AppService, LoggerLevel} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
+import {Session} from "../models/session";
 
 export class AwsSsoIntegrationService {
 
@@ -157,21 +158,30 @@ export class AwsSsoIntegrationService {
     });
 
     const sessionsNotFlattened = await Promise.all(promiseArray);
-    const sessions = sessionsNotFlattened.flat();
+    let sessions = sessionsNotFlattened.flat();
 
-    const sessionsToBeRemoved = this.workspaceService.getAwsSsoIntegrationSessions(awsSsoIntegration.id);
+    const persistedSessions = this.workspaceService.getAwsSsoIntegrationSessions(awsSsoIntegration.id);
+    const sessionsToBeDeleted: SsoRoleSession[] = [];
 
-    for (let i = 0; i < sessionsToBeRemoved.length; i++) {
-      const sess = sessionsToBeRemoved[i];
-      const iamRoleChainedSessions = this.awsSsoRoleService.listIamRoleChained(sess);
+    for (let i = 0; i < persistedSessions.length; i++) {
+      const persistedSession = persistedSessions[i];
+      const shouldBeDeleted = sessions.indexOf(persistedSession as unknown as SsoRoleSession) === -1;
 
-      for (let j = 0; j < iamRoleChainedSessions.length; j++) {
-        await this.awsSsoRoleService.delete(iamRoleChainedSessions[j].sessionId);
+      if (shouldBeDeleted) {
+        sessionsToBeDeleted.push(persistedSession as unknown as SsoRoleSession);
+
+        const iamRoleChainedSessions = this.awsSsoRoleService.listIamRoleChained(persistedSession);
+
+        for (let j = 0; j < iamRoleChainedSessions.length; j++) {
+          await this.awsSsoRoleService.delete(iamRoleChainedSessions[j].sessionId);
+        }
+
+        await this.awsSsoRoleService.stop(persistedSession.sessionId);
+        this.workspaceService.removeSession(persistedSession.sessionId);
       }
-
-      await this.awsSsoRoleService.stop(sess.sessionId);
-      this.workspaceService.removeSession(sess.sessionId);
     }
+
+    sessions = sessions.filter(session => !persistedSessions.includes(session as unknown as Session));
 
     return sessions;
   }

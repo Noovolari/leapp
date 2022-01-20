@@ -30,4 +30,4 @@ In this modal, a user has the ability to:
 ## macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)
 
 Leapp can also be updated via [Homebrew Cask](https://brew.sh/) with:
-`brew update leapp`
+`brew upgrade leapp`

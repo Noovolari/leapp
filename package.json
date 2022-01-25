@@ -190,7 +190,7 @@
     "electron-updater": "^4.3.8",
     "extract-zip": "~2.0.1",
     "fix-path": "~3.0.0",
-    "follow-redirects": "1.14.0",
+    "follow-redirects": "^1.14.7",
     "fs-extra": "~9.1.0",
     "fs-web": "1.0.1",
     "github-url-to-object": "^4.0.6",

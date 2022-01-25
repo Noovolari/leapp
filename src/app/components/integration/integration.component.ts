@@ -148,8 +148,6 @@ export class IntegrationComponent implements OnInit, BrowserWindowClosing {
       const region = this.form.get('awsRegion').value;
       const browserOpening = this.form.get('defaultBrowserOpening').value;
 
-      console.log(portalUrl, region, browserOpening);
-
       if(this.modifying === 1) {
         // Save
         this.workspaceService.addAwsSsoIntegration(

@@ -16,7 +16,7 @@ import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {SessionType} from '../models/session-type';
 import {AppService, LoggerLevel} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
-import {Session} from "../models/session";
+import {Session} from '../models/session';
 
 export class AwsSsoIntegrationService {
 
@@ -165,7 +165,10 @@ export class AwsSsoIntegrationService {
 
     for (let i = 0; i < persistedSessions.length; i++) {
       const persistedSession = persistedSessions[i];
-      const shouldBeDeleted = sessions.indexOf(persistedSession as unknown as SsoRoleSession) === -1;
+      const shouldBeDeleted = sessions.filter(s =>
+        (persistedSession as unknown as SsoRoleSession).sessionName === s.sessionName &&
+        (persistedSession as unknown as SsoRoleSession).roleArn === s.roleArn &&
+        (persistedSession as unknown as SsoRoleSession).email === s.email).length === 0;
 
       if (shouldBeDeleted) {
         sessionsToBeDeleted.push(persistedSession as unknown as SsoRoleSession);
@@ -181,9 +184,26 @@ export class AwsSsoIntegrationService {
       }
     }
 
-    sessions = sessions.filter(session => !persistedSessions.includes(session as unknown as Session));
+    const finalSessions = [];
 
-    return sessions;
+    for (let j = 0; j < sessions.length; j++) {
+      const session = sessions[j];
+      let found = false;
+      for (let i = 0; i < persistedSessions.length; i++) {
+        const persistedSession = persistedSessions[i];
+        if((persistedSession as unknown as SsoRoleSession).sessionName === session.sessionName &&
+          (persistedSession as unknown as SsoRoleSession).roleArn === session.roleArn &&
+          (persistedSession as unknown as SsoRoleSession).email === session.email) {
+          found = true;
+          break;
+        }
+      }
+      if(!found) {
+        finalSessions.push(session);
+      }
+    }
+
+    return finalSessions;
   }
 
   async getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId: string): Promise<AwsSsoIntegrationTokenInfo> {

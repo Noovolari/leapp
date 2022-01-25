@@ -16,7 +16,7 @@ import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {SessionType} from '../models/session-type';
 import {AppService, LoggerLevel} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
-import {Session} from "../models/session";
+import {Session} from '../models/session';
 
 export class AwsSsoIntegrationService {
 

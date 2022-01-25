@@ -1,0 +1,291 @@
+
+up to date, audited 2374 packages in 10s
+
+193 packages are looking for funding
+  run `npm fund` for details
+
+# npm audit report
+
+ansi-regex  >2.1.1 <5.0.1
+Severity: moderate
+ Inefficient Regular Expression Complexity in chalk/ansi-regex - https://github.com/advisories/GHSA-93q8-gq69-wqmw
+fix available via `npm audit fix --force`
+Will install @angular-devkit/build-angular@13.1.4, which is a breaking change
+node_modules/webpack-dev-server/node_modules/cliui/node_modules/ansi-regex
+node_modules/webpack-dev-server/node_modules/string-width/node_modules/ansi-regex
+node_modules/webpack-dev-server/node_modules/wrap-ansi/node_modules/ansi-regex
+  strip-ansi  4.0.0 - 5.2.0
+  Depends on vulnerable versions of ansi-regex
+  node_modules/webpack-dev-server/node_modules/cliui/node_modules/strip-ansi
+  node_modules/webpack-dev-server/node_modules/string-width/node_modules/strip-ansi
+  node_modules/webpack-dev-server/node_modules/wrap-ansi/node_modules/strip-ansi
+    cliui  4.0.0 - 5.0.0
+    Depends on vulnerable versions of strip-ansi
+    Depends on vulnerable versions of wrap-ansi
+    node_modules/webpack-dev-server/node_modules/cliui
+      yargs  10.1.0 - 15.0.0
+      Depends on vulnerable versions of cliui
+      Depends on vulnerable versions of string-width
+      node_modules/webpack-dev-server/node_modules/yargs
+        webpack-dev-server  2.0.0-beta - 4.7.2
+        Depends on vulnerable versions of chokidar
+        Depends on vulnerable versions of selfsigned
+        Depends on vulnerable versions of yargs
+        node_modules/webpack-dev-server
+          @angular-devkit/build-angular  <=13.2.0-next.2
+          Depends on vulnerable versions of @angular-devkit/build-webpack
+          Depends on vulnerable versions of postcss-preset-env
+          Depends on vulnerable versions of resolve-url-loader
+          Depends on vulnerable versions of webpack-dev-server
+          node_modules/@angular-devkit/build-angular
+          @angular-devkit/build-webpack  <=0.1300.0-rc.3
+          Depends on vulnerable versions of webpack-dev-server
+          node_modules/@angular-devkit/build-webpack
+    string-width  2.1.0 - 4.1.0
+    Depends on vulnerable versions of strip-ansi
+    node_modules/webpack-dev-server/node_modules/string-width
+      wrap-ansi  3.0.0 - 6.1.0
+      Depends on vulnerable versions of string-width
+      Depends on vulnerable versions of strip-ansi
+      node_modules/webpack-dev-server/node_modules/wrap-ansi
+
+follow-redirects  <1.14.7
+Severity: high
+Exposure of sensitive information in follow-redirects - https://github.com/advisories/GHSA-74fj-2j2h-c42q
+fix available via `npm audit fix --force`
+Will install follow-redirects@1.14.7, which is outside the stated dependency range
+node_modules/follow-redirects
+
+glob-parent  <5.1.2
+Severity: high
+Regular expression denial of service - https://github.com/advisories/GHSA-ww39-953v-wcq6
+fix available via `npm audit fix --force`
+Will install @angular-devkit/build-angular@13.1.4, which is a breaking change
+node_modules/webpack-dev-server/node_modules/glob-parent
+  chokidar  1.0.0-rc1 - 2.1.8
+  Depends on vulnerable versions of glob-parent
+  node_modules/webpack-dev-server/node_modules/chokidar
+    webpack-dev-server  2.0.0-beta - 4.7.2
+    Depends on vulnerable versions of chokidar
+    Depends on vulnerable versions of selfsigned
+    Depends on vulnerable versions of yargs
+    node_modules/webpack-dev-server
+      @angular-devkit/build-angular  <=13.2.0-next.2
+      Depends on vulnerable versions of @angular-devkit/build-webpack
+      Depends on vulnerable versions of postcss-preset-env
+      Depends on vulnerable versions of resolve-url-loader
+      Depends on vulnerable versions of webpack-dev-server
+      node_modules/@angular-devkit/build-angular
+      @angular-devkit/build-webpack  <=0.1300.0-rc.3
+      Depends on vulnerable versions of webpack-dev-server
+      node_modules/@angular-devkit/build-webpack
+
+lodash  <=4.17.20
+Severity: critical
+Prototype Pollution in lodash - https://github.com/advisories/GHSA-p6mc-m468-83gw
+Prototype Pollution in lodash - https://github.com/advisories/GHSA-jf85-cpcp-j695
+Prototype Pollution in lodash - https://github.com/advisories/GHSA-4xc9-xhrj-v574
+Prototype Pollution in lodash - https://github.com/advisories/GHSA-fvqr-27wr-82fm
+Regular Expression Denial of Service (ReDoS) in lodash - https://github.com/advisories/GHSA-29mw-wpgm-hmr9
+No fix available
+node_modules/global-tunnel/node_modules/lodash
+  global-tunnel  *
+  Depends on vulnerable versions of lodash
+  node_modules/global-tunnel
+
+node-forge  <1.0.0
+Severity: moderate
+Open Redirect in node-forge - https://github.com/advisories/GHSA-8fr3-hfg3-gpgp
+fix available via `npm audit fix --force`
+Will install @angular-devkit/build-angular@13.1.4, which is a breaking change
+node_modules/node-forge
+  selfsigned  1.1.1 - 1.10.14
+  Depends on vulnerable versions of node-forge
+  node_modules/selfsigned
+    webpack-dev-server  2.0.0-beta - 4.7.2
+    Depends on vulnerable versions of chokidar
+    Depends on vulnerable versions of selfsigned
+    Depends on vulnerable versions of yargs
+    node_modules/webpack-dev-server
+      @angular-devkit/build-angular  <=13.2.0-next.2
+      Depends on vulnerable versions of @angular-devkit/build-webpack
+      Depends on vulnerable versions of postcss-preset-env
+      Depends on vulnerable versions of resolve-url-loader
+      Depends on vulnerable versions of webpack-dev-server
+      node_modules/@angular-devkit/build-angular
+      @angular-devkit/build-webpack  <=0.1300.0-rc.3
+      Depends on vulnerable versions of webpack-dev-server
+      node_modules/@angular-devkit/build-webpack
+
+postcss  <8.2.13
+Severity: moderate
+Regular Expression Denial of Service in postcss - https://github.com/advisories/GHSA-566m-qj78-rww5
+fix available via `npm audit fix --force`
+Will install @angular-devkit/build-angular@13.1.4, which is a breaking change
+node_modules/autoprefixer/node_modules/postcss
+node_modules/css-blank-pseudo/node_modules/postcss
+node_modules/css-has-pseudo/node_modules/postcss
+node_modules/css-prefers-color-scheme/node_modules/postcss
+node_modules/postcss-attribute-case-insensitive/node_modules/postcss
+node_modules/postcss-color-functional-notation/node_modules/postcss
+node_modules/postcss-color-gray/node_modules/postcss
+node_modules/postcss-color-hex-alpha/node_modules/postcss
+node_modules/postcss-color-mod-function/node_modules/postcss
+node_modules/postcss-color-rebeccapurple/node_modules/postcss
+node_modules/postcss-custom-media/node_modules/postcss
+node_modules/postcss-custom-properties/node_modules/postcss
+node_modules/postcss-custom-selectors/node_modules/postcss
+node_modules/postcss-dir-pseudo-class/node_modules/postcss
+node_modules/postcss-double-position-gradients/node_modules/postcss
+node_modules/postcss-env-function/node_modules/postcss
+node_modules/postcss-focus-visible/node_modules/postcss
+node_modules/postcss-focus-within/node_modules/postcss
+node_modules/postcss-font-variant/node_modules/postcss
+node_modules/postcss-gap-properties/node_modules/postcss
+node_modules/postcss-image-set-function/node_modules/postcss
+node_modules/postcss-initial/node_modules/postcss
+node_modules/postcss-lab-function/node_modules/postcss
+node_modules/postcss-logical/node_modules/postcss
+node_modules/postcss-media-minmax/node_modules/postcss
+node_modules/postcss-nesting/node_modules/postcss
+node_modules/postcss-overflow-shorthand/node_modules/postcss
+node_modules/postcss-page-break/node_modules/postcss
+node_modules/postcss-place/node_modules/postcss
+node_modules/postcss-preset-env/node_modules/postcss
+node_modules/postcss-pseudo-class-any-link/node_modules/postcss
+node_modules/postcss-replace-overflow-wrap/node_modules/postcss
+node_modules/postcss-selector-matches/node_modules/postcss
+node_modules/postcss-selector-not/node_modules/postcss
+node_modules/resolve-url-loader/node_modules/postcss
+  autoprefixer  1.0.20131222 - 9.8.8
+  Depends on vulnerable versions of postcss
+  node_modules/autoprefixer
+    postcss-preset-env  <=7.0.0
+    Depends on vulnerable versions of autoprefixer
+    Depends on vulnerable versions of css-blank-pseudo
+    Depends on vulnerable versions of css-prefers-color-scheme
+    Depends on vulnerable versions of postcss
+    Depends on vulnerable versions of postcss-color-gray
+    Depends on vulnerable versions of postcss-color-mod-function
+    Depends on vulnerable versions of postcss-double-position-gradients
+    Depends on vulnerable versions of postcss-focus-visible
+    Depends on vulnerable versions of postcss-focus-within
+    Depends on vulnerable versions of postcss-initial
+    Depends on vulnerable versions of postcss-page-break
+    node_modules/postcss-preset-env
+      @angular-devkit/build-angular  <=13.2.0-next.2
+      Depends on vulnerable versions of @angular-devkit/build-webpack
+      Depends on vulnerable versions of postcss-preset-env
+      Depends on vulnerable versions of resolve-url-loader
+      Depends on vulnerable versions of webpack-dev-server
+      node_modules/@angular-devkit/build-angular
+  css-blank-pseudo  <=1.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/css-blank-pseudo
+  css-has-pseudo  <=1.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/css-has-pseudo
+  css-prefers-color-scheme  <=4.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/css-prefers-color-scheme
+  postcss-attribute-case-insensitive  <=4.0.2
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-attribute-case-insensitive
+  postcss-color-functional-notation  <=3.0.2
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-color-functional-notation
+  postcss-color-gray  >=3.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-color-gray
+  postcss-color-hex-alpha  1.3.0 - 6.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-color-hex-alpha
+  postcss-color-mod-function  *
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-color-mod-function
+  postcss-color-rebeccapurple  1.2.0 - 6.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-color-rebeccapurple
+  postcss-custom-media  4.0.0 - 7.0.8
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-custom-media
+  postcss-custom-properties  3.3.0 - 10.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-custom-properties
+  postcss-custom-selectors  2.3.0 - 5.1.2
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-custom-selectors
+  postcss-dir-pseudo-class  <=5.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-dir-pseudo-class
+  postcss-double-position-gradients  <=2.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-double-position-gradients
+  postcss-env-function  <=3.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-env-function
+  postcss-focus-visible  <=5.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-focus-visible
+  postcss-focus-within  <=4.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-focus-within
+  postcss-font-variant  1.2.0 - 4.0.1
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-font-variant
+  postcss-gap-properties  <=2.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-gap-properties
+  postcss-image-set-function  <=3.0.1
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-image-set-function
+  postcss-initial  <=3.0.4
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-initial
+  postcss-lab-function  <=3.1.2
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-lab-function
+  postcss-logical  <=4.0.2
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-logical
+  postcss-media-minmax  1.2.0 - 4.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-media-minmax
+  postcss-nesting  <=7.0.1
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-nesting
+  postcss-overflow-shorthand  <=2.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-overflow-shorthand
+  postcss-page-break  <=2.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-page-break
+  postcss-place  <=5.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-place
+  postcss-pseudo-class-any-link  <=6.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-pseudo-class-any-link
+  postcss-replace-overflow-wrap  <=3.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-replace-overflow-wrap
+  postcss-selector-matches  *
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-selector-matches
+  postcss-selector-not  <=4.0.1
+  Depends on vulnerable versions of postcss
+  node_modules/postcss-selector-not
+  resolve-url-loader  0.0.1-experiment-postcss || 3.0.0-alpha.1 - 4.0.0
+  Depends on vulnerable versions of postcss
+  node_modules/resolve-url-loader
+
+52 vulnerabilities (45 moderate, 6 high, 1 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues possible (including breaking changes), run:
+  npm audit fix --force
+
+Some issues need review, and may require choosing
+a different dependency.

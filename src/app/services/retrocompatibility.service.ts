@@ -352,8 +352,6 @@ export class RetrocompatibilityService {
       (session as AwsIamUserSession).mfaDevice
     );
 
-    console.log(workspace, workspace._profiles[0].id);
-
     iamUserSession.sessionId = session.sessionId;
 
     workspace._sessions.push(iamUserSession);

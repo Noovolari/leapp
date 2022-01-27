@@ -69,12 +69,18 @@ license your work under the same license as that used by the project.
 
 ## Submitting changes
 
-Please send a [GitHub Pull Request to Leapp](https://github.com/noovolari/leapp/pull/new/master) with a clear list of what you've done (read more about [pull requests](http://help.github.com/pull-requests/)). 
+Please send a [GitHub Pull Request to Leapp](https://github.com/noovolari/leapp/pull/new/master) with a clear list of what you have changed. You can use the provided template to fill in the details. Tip: Learn more about [pull requests](http://help.github.com/pull-requests/)). 
 
-This project uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
-You can find the list of supported commit types [here](https://github.com/conventional-changelog/commitlint/blob/master/%40commitlint/config-conventional/README.md#type-enum) .
+This project uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/). Examples:
 
-Always write a clear log message for your commits. One-line messages are fine for small changes, but bigger changes should look like this:
+    feat: Add new cloud provider
+    
+    docs: Fix typo in Readme
+
+
+You can find the list of supported commit types [here](https://github.com/conventional-changelog/commitlint/blob/master/%40commitlint/config-conventional/README.md#type-enum).
+
+Please ensure to always write a clear log message for your commits. One-line messages are fine for small changes, bigger changes should include more context to understand the change quickly. Example:
 
     $ git commit -m "feat: a brief summary of the commit
     > 
@@ -120,5 +126,19 @@ The DCO requires a sign-off message in the following format appear on each commi
     Signed-off-by: John Doe <johndoe@leapp.cloud>
 
 The DCO text can either be manually added to your commit body, or you can add either **-s** or **--signoff** to your usual git commit commands. If you are using the GitHub UI to make a change you can add the sign-off message directly to the commit message when creating the pull request. If you forget to add the sign-off you can also amend a previous commit with the sign-off by running **git commit --amend -s**. If you've pushed your changes to GitHub already you'll need to force push your branch after this with **git push -f**.
+
+Example for updating a PR after missing the sign-off:
+
+    $ git clone https://github.com/<yournamespace>/leapp.git
+    $ cd leapp
+    $ git checkout <branch-name-in-your-fork>
+    
+    $ git commit --amend -s
+    $ git push -f 
+    
+If there are multiple commits to be signed off, you can use **git rebase --signoff HEAD~<number-of-changes** since Git 2.12. Example for the latest 2 commits:
+
+    $ git rebase --signoff HEAD~2
+    $ git push -f
 
 For more info about the sign-off process, please refer to [this](https://www.secondstate.io/articles/dco/) guide by WasmEdge.

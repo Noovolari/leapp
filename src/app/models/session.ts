@@ -9,6 +9,7 @@ export class Session {
   sessionName: string;
   status: SessionStatus;
   startDateTime: string;
+  duration: number;
   region: string;
   type: SessionType;
 
@@ -17,12 +18,13 @@ export class Session {
     this.sessionName = sessionName;
     this.status = SessionStatus.inactive;
     this.startDateTime = undefined;
+    this.duration = environment.sessionDuration;
     this.region = region;
   }
 
   expired(): boolean {
     const currentTime = new Date().getTime();
     const startTime = new Date(this.startDateTime).getTime();
-    return (currentTime - startTime) / 1000 > environment.sessionDuration;
+    return (currentTime - startTime) / 1000 > this.duration;
   };
 }

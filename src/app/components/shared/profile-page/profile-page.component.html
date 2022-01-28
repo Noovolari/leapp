@@ -25,6 +25,12 @@
             <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="down"></ng-select>
           </div>
 
+          <h2 style="margin-top: 10px;">Default Session Options</h2>
+          <div class="form-group" style="width: 43%; display: inline-block;">
+            <label>Session Duration (seconds)</label>
+            <input formControlName="sessionDuration" type="text" class="form-control" [value]="sessionDuration" >
+          </div>
+
           <!--
           <h2 style="margin-top: 10px;">AWS SSO</h2>
           <div class="form-group" style="width: 43%; display: inline-block;">

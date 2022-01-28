@@ -45,6 +45,7 @@ export abstract class SessionService {
       const currentSession: Session = this.workspaceService.sessions[index];
       currentSession.status = SessionStatus.active;
       currentSession.startDateTime = new Date().toISOString();
+      currentSession.duration = this.workspaceService.workspace.defaultSessionDuration;
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }
@@ -67,6 +68,7 @@ export abstract class SessionService {
       const index = this.workspaceService.sessions.indexOf(session);
       const currentSession: Session = this.workspaceService.sessions[index];
       currentSession.startDateTime = new Date().toISOString();
+      currentSession.duration = this.workspaceService.workspace.defaultSessionDuration;
       currentSession.status = SessionStatus.active;
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];

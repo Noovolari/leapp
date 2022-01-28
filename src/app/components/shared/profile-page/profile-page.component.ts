@@ -31,6 +31,8 @@ export class ProfilePageComponent implements OnInit {
   editingIdpUrl: boolean;
   editingAwsProfile: boolean;
 
+  sessionDuration = environment.sessionDuration; // Default
+
   showProxyAuthentication = false;
   proxyProtocol = 'https'; // Default
   proxyUrl;
@@ -49,6 +51,7 @@ export class ProfilePageComponent implements OnInit {
   public form = new FormGroup({
     idpUrl: new FormControl(''),
     awsProfile: new FormControl(''),
+    sessionDuration: new FormControl(''),
     proxyUrl: new FormControl(''),
     proxyProtocol: new FormControl(''),
     proxyPort: new FormControl(''),
@@ -77,6 +80,7 @@ export class ProfilePageComponent implements OnInit {
   ngOnInit() {
     this.workspace = this.workspaceService.getWorkspace();
     this.idpUrlValue = '';
+    this.sessionDuration = this.workspace.defaultSessionDuration;
     this.proxyProtocol = this.workspace.proxyConfiguration.proxyProtocol;
     this.proxyUrl = this.workspace.proxyConfiguration.proxyUrl;
     this.proxyPort = this.workspace.proxyConfiguration.proxyPort;
@@ -84,6 +88,7 @@ export class ProfilePageComponent implements OnInit {
     this.proxyPassword = this.workspace.proxyConfiguration.password || '';
 
     this.form.controls['idpUrl'].setValue(this.idpUrlValue);
+    this.form.controls['sessionDuration'].setValue(this.sessionDuration);
     this.form.controls['proxyUrl'].setValue(this.proxyUrl);
     this.form.controls['proxyProtocol'].setValue(this.proxyProtocol);
     this.form.controls['proxyPort'].setValue(this.proxyPort);
@@ -110,6 +115,7 @@ export class ProfilePageComponent implements OnInit {
    */
   saveOptions() {
     if (this.form.valid) {
+      this.workspace.defaultSessionDuration = this.form.controls['sessionDuration'].value;
       this.workspace.proxyConfiguration.proxyUrl = this.form.controls['proxyUrl'].value;
       this.workspace.proxyConfiguration.proxyProtocol = this.form.controls['proxyProtocol'].value;
       this.workspace.proxyConfiguration.proxyPort = this.form.controls['proxyPort'].value;

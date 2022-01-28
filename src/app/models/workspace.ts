@@ -9,6 +9,7 @@ export class Workspace {
   private _sessions: Session[];
   private _defaultRegion: string;
   private _defaultLocation: string;
+  private _defaultSessionDuration: number;
   private _idpUrls: { id: string; url: string }[];
   private _profiles: { id: string; name: string }[];
 
@@ -28,6 +29,7 @@ export class Workspace {
     this._sessions = [];
     this._defaultRegion = environment.defaultRegion;
     this._defaultLocation = environment.defaultLocation;
+    this._defaultSessionDuration = environment.sessionDuration;
     this._idpUrls = [];
     this._profiles = [
       { id: uuid.v4(), name: environment.defaultAwsProfileName }
@@ -66,6 +68,14 @@ export class Workspace {
 
   set defaultLocation(value: string) {
     this._defaultLocation = value;
+  }
+
+  get defaultSessionDuration(): number {
+    return this._defaultSessionDuration;
+  }
+
+  set defaultSessionDuration(value: number) {
+    this._defaultSessionDuration = value;
   }
 
   get idpUrls(): { id: string; url: string }[] {

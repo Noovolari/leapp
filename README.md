@@ -38,7 +38,9 @@ All the covered access methods can be found [here](https://docs.leapp.cloud/use-
 
 
 # Installation
-Get [here](https://www.leapp.cloud/releases) the latest release.
+
+- Verify that all [requirements](https://docs.leapp.cloud/installation/requirements/) are satisfied.
+- Follow the [installation documentation](https://docs.leapp.cloud/installation/install-leapp/). 
 
 # Contributing
 

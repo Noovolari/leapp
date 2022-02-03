@@ -1,10 +1,11 @@
 This section provides an overview of Leapp's integrations, useful to extend the functionality of Leapp to 3rd party services.
 
-Integrations help manage access and identities on your preferred service of choice and use Leapp on your daily activities by automatically mapping them into [Sessions](/sessions).
+An Integration contains all the information needed to connect to a 3rd party tool (e.g. AWS Single Sign-On) and *automatically* map access information into [Leapp Sessions](/sessions) in one time.
+
 
 ## Actions
 
-Integrations have four main actions available: **Create** **Delete**, **Sync**, and **Logout**.
+Integrations have four main actions available: **Create**, **Delete**, **Sync**, and **Logout**.
 
 | Action    | Description |
 | --------- | ----------- |

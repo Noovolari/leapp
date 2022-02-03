@@ -7,7 +7,7 @@ Leapp manages 4 types of AWS access methods:
 
 For each access method Leapp **generates** through [STS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html) a set of ```temporary credentials``` and a **rotation** logic is triggered every **20 minutes**.
 
-Temporary credentials **ensures that no long-term credentials are written in the AWS credentials file** located in ```~/.aws/credentrials```.
+Temporary credentials **ensures that no long-term credentials are written in the AWS credentials file** located in ```~/.aws/credentials```.
 
 Leapp manages information inserted by the user using the following logic for each access method.
 

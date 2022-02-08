@@ -2,6 +2,7 @@ import {Session} from './session';
 import * as uuid from 'uuid';
 import {environment} from '../../environments/environment';
 import {Type} from 'class-transformer';
+import {Constants} from './constants';
 import {AwsSsoIntegration} from './aws-sso-integration';
 
 export class Workspace {

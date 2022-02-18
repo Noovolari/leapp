@@ -23,7 +23,7 @@ jobs:
       - run: | 
              echo "${{env.PACKAGE_VERSION}}"
       - run: ls -la
-      # - run: mike deploy --push --update-aliases ${{env.PACKAGE_VERSION}} latest
+      - run: mike deploy --push --update-aliases ${{env.PACKAGE_VERSION}} latest
       # - run: mkdocs gh-deploy --force
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}

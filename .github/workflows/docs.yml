@@ -22,7 +22,8 @@ jobs:
              echo "PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')" >> $GITHUB_ENV
       - run: | 
              echo "${{env.PACKAGE_VERSION}}"
-      - run: mike deploy --push --update-aliases ${{env.PACKAGE_VERSION}} latest
+      - run: ls -la
+      # - run: mike deploy --push --update-aliases ${{env.PACKAGE_VERSION}} latest
       # - run: mkdocs gh-deploy --force
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}

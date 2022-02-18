@@ -75,6 +75,8 @@ extra_css:
   - stylesheets/extra.css
 
 extra:
+  version:
+    provider: mike
   analytics:
     provider: google
     property: G-FB1NX90MYZ

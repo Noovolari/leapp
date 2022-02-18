@@ -33,3 +33,6 @@ If applicable, add screenshots to help explain your problem.
 
 **Additional context**
 Add any other context about the problem here.
+
+**How it is important to you**
+Nice to have, important, or critical?

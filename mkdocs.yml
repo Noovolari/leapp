@@ -69,6 +69,7 @@ plugins:
   - search
   - mkdocs-video
   - img2fig
+  - tags #from insiders to test it is installed correctly
 
 extra_css:
   - stylesheets/extra.css

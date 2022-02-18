@@ -17,6 +17,9 @@ jobs:
       - run: pip install mkdocs-video
       - run: pip install mkdocs-img2fig-plugin
       - run: pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
-      - run: mkdocs gh-deploy --force
+      - run: pip install mike
+      - run: echo "PACKAGE_VERSION=$(cat package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')"
+      - run: echo "::debug::$PACKAGE_VERSION"
+      # - run: mkdocs gh-deploy --force
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}

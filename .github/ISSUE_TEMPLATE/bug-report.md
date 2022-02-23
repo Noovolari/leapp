@@ -35,6 +35,6 @@ If applicable, add screenshots to help explain your problem.
 Add any other context about the problem here.
 
 **How it is important to you**
-- [ ] \ :heavy_check_mark: Nice to have
-- [ ] \ :exclamation: Important
-- [ ] \ :bangbang: Critical
+- [ ] :heavy_check_mark: Nice to have
+- [ ] :exclamation: Important
+- [ ] :bangbang: Critical

@@ -82,7 +82,7 @@ Do you want to implement something from scratch or fix an issue?
 
 This is the first time you’re contributing to Leapp. “good first issues” and “help wanted” issues could be a nice starting point for you to get your hands dirty with the codebase.
 
-For more info about how to start developing and proposing changes, please refer to the development.md [DEVELOPMENT.md](./DEVELOPMENT.md) document.
+For more info about how to start developing and proposing changes, please refer to the [DEVELOPMENT.md](./DEVELOPMENT.md) document.
 
 # Conventional Commits
 

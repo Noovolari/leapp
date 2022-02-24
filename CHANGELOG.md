@@ -2,7 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.8.0](https://github.com/Noovolari/leapp/compare/v0.7.4...v0.8.0) (2021-11-26)
+## [0.9.0](https://github.com/Noovolari/leapp/compare/v0.8.1...v0.9.0) (2022-02-24)
+
+### Features
+
+* brand new UX/UI! ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+* new Segment-based Session filtering ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+
+### Bug Fixes
+
+* Maintain IAM Role Chained Configurations based on SSO Assumer session ([#209](https://github.com/Noovolari/leapp/issues/209)) ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+* gpu_init on WSL2 - Leapp_0.8.1_amd64.deb ([#217](https://github.com/Noovolari/leapp/issues/217)) ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+* AWS Session Expiration Issue ([#220](https://github.com/Noovolari/leapp/issues/220)) ([7d8e2a9](https://github.com/Noovolari/leapp/commit/7d8e2a949edb6671885715cfb34932e7268c265b))
+* Enhancement - easier access to commonly used profiles ([#214](https://github.com/Noovolari/leapp/issues/214))
+* Add grouping and/or prefix on integration name for session overview ([#203](https://github.com/Noovolari/leapp/issues/203))
+* Cancel connecting ([#199](https://github.com/Noovolari/leapp/issues/199))
+* The Leapp icon is larger than all other icons in the MacOSX Dock ([#196](https://github.com/Noovolari/leapp/issues/196))
+* Add a search option in the SSM session panel ([#87](https://github.com/Noovolari/leapp/issues/87))
+* SSO Sync session somewhere on the front page ([#181](https://github.com/Noovolari/leapp/issues/181))
+* Make the window resizable ([#43](https://github.com/Noovolari/leapp/issues/43))
+* Enhancement - easier access to commonly used profiles ([#214](https://github.com/Noovolari/leapp/issues/214))
+* Add grouping and/or prefix on integration name for session overview ([#203](https://github.com/Noovolari/leapp/issues/203))
+
+Thank you! A huge shout out to the community members who contributed to this release of Leapp!
+
+@dnsmichi #215 #216
+
+### [0.8.0](https://github.com/Noovolari/leapp/compare/v0.7.4...v0.8.0) (2021-11-26)
 
 ### Features
 

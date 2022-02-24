@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
@@ -19,11 +19,9 @@
     "build": "rm -rf electron/dist && cp src/assets/icons/* dist/leapp-client/ && ng build --base-href ./",
     "test": "ng test",
     "prepare": "husky install",
-
     "dist-mac": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build",
     "dist-deb": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
     "dist-win": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --configuration production --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64",
-
     "clean": "gushio scripts/gushio/target-clean.js",
     "build-dev": "gushio scripts/gushio/target-build.js aot",
     "build-stag": "gushio scripts/gushio/target-build.js 'configuration staging'",

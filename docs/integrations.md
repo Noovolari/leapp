@@ -19,7 +19,7 @@ Integrations have four main actions available: **Create**, **Delete**, **Sync**,
 
 | Service     | Supported |
 | ----------- | --------- |
-| AWS SSO     | :fontawesome-solid-check: |
+| AWS SSO     | :white_check_mark: |
 | Okta        | Coming Soon |
 | OneLogin    | Coming Soon |
 | AzureAD     | Coming Soon |

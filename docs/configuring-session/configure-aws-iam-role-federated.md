@@ -12,10 +12,10 @@ We currently only support SAML 2.0 federation.
 
 | Identity Provider          | AWS                                  | Azure                               |
 | -------------------------- | ------------------------------------ | ------------------------------------|
-| `GSUITE`                   | :fontawesome-solid-check-circle:     | :fontawesome-solid-times-circle:    |
-| `OKTA`                     | :fontawesome-solid-check-circle:     | :fontawesome-solid-times-circle:    |
-| `ONELOGIN`                 | :fontawesome-solid-check-circle:     | :fontawesome-solid-times-circle:    |
-| `AZURE AD`                 | :fontawesome-solid-check-circle:     | :fontawesome-solid-check-circle:    |
+| `GSUITE`                   | :white_check_mark:                   | :x:                                 |
+| `OKTA`                     | :white_check_mark:                   | :x:                                 |
+| `ONELOGIN`                 | :white_check_mark:                   | :x:                                 |
+| `AZURE AD`                 | :white_check_mark:                   | :white_check_mark:                  |
 
 ## Fields
 

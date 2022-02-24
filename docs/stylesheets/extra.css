@@ -22,10 +22,10 @@ code {
   --md-primary-fg-color--dark:  #90030C;
   --md-primary-bg-color:        hsla(0, 0%, 100%, 1);
   --md-primary-bg-color--light: hsla(0, 0%, 100%, 0.7);
-  --md-text-link-color:         #78E0CF;
+  --md-text-link-color:         #A4D6D5;
 
   /* Accent color shades */
-  --md-accent-fg-color: #78E0CF;
+  --md-accent-fg-color: #A4D6D5;
   --md-accent-fg-color--transparent: hsla(189, 100%, 37%, 0.1);
   --md-accent-bg-color: hsla(0, 0%, 100%, 1);
   --md-accent-bg-color--light: hsla(0, 0%, 100%, 0.7);

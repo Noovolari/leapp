@@ -36,7 +36,7 @@ Based on the Session Service Pattern, we created the Aws Session Service to exte
 - **applyCredentials**
 - **deApplyCredentials**
 
-```tsx
+```
 async generateCredentials(sessionId: string): Promise<CredentialsInfo> {}
 
 async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {}
@@ -50,7 +50,7 @@ Let's check Start, Stop, and Rotate in detail.
 
 The start method is called when a user clicks on an **AWS session in the Session List** in the Client UI, and it marks the **activation** of a session thus **generating** and **applying** new temporary credentials.
 
-```tsx
+```
 async start(sessionId: string): Promise<void> {
     try {	
       this.stopAllWithSameNameProfile(sessionId);
@@ -80,7 +80,7 @@ In case of an error we call the generic method **sessionError** which will send 
 
 **Rotate()**
 
-```tsx
+```
 async rotate(sessionId: string): Promise<void> {
     try {
       this.sessionLoading(sessionId);
@@ -106,7 +106,7 @@ In case of an error we call the generic method **sessionError** which will send 
 
 **Stop()**
 
-```tsx
+```
 async stop(sessionId: string): Promise<void> {
     try {
       **await this.deApplyCredentials(sessionId);**
@@ -142,7 +142,7 @@ Each access method service implements actions to **Create**, **Delete**, and **E
 
 As the first thing we need to create an interface of all the required information to a specific Access Method:
 
-```tsx
+```
 export interface AwsPlainSessionRequest {
   accountName: string;
   accessKey: string;
@@ -154,7 +154,7 @@ export interface AwsPlainSessionRequest {
 
 To set up a specific session from an Access Method we have to create it with a **Create** method, which uses the interface previously defined:
 
-```tsx
+```
 create(accountRequest: AwsPlainSessionRequest, profileId: string): void {
     const session = new AwsPlainSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-plain-aws-session-access-key-id`, accountRequest.accessKey);
@@ -167,7 +167,7 @@ At the moment **edit** and **delete are defined** generally in **SessionService*
 
 To allow using other services to construct our logic we define them in the constructor of the service class.
 
-```tsx
+```
 constructor(
     protected workspaceService: WorkspaceService,
     private keychainService: KeychainService,
@@ -181,7 +181,7 @@ We also need to define a **super(workspaceService)** as we are extending AwsSess
 
 To fulfill its tasks an Access Method must extend **AwsSessionService**; doing so, will require to implement these three methods:
 
-```tsx
+```
 async generateCredentials(sessionId: string): Promise<CredentialsInfo> {}
 
 async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {}
@@ -201,7 +201,7 @@ The Set is stored securely upon session creation in the OS Vault and is used at 
 
 Let's start with two helper methods:
 
-```tsx
+```
 static isTokenExpired(tokenExpiration: string): boolean {
     const now = Date.now();
     return now > new Date(tokenExpiration).getTime();
@@ -210,7 +210,7 @@ static isTokenExpired(tokenExpiration: string): boolean {
 
 With **isTokenExpired** we check the SessionToken expiration **given with the temporary credentials** to see if they are still valid or not (thus the method returning a boolean).
 
-```tsx
+```
 static sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse: GetSessionTokenResponse): { sessionToken: any } {
     return {
       sessionToken: {
@@ -229,7 +229,7 @@ The second helper method constructs a **CredentialInfo** object to return to the
 
 It has the SessionTokenResponse from the STS client as the input parameter. It maps all the relevant attributes to the returned object.
 
-```tsx
+```
 create(accountRequest: AwsIamUserSessionRequest, profileId: string): void {
     const session = new AwsIamUserSession(accountRequest.accountName, accountRequest.region, profileId, accountRequest.mfaDevice);
     this.keychainService.saveSecret(environment.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, accountRequest.accessKey);
@@ -246,7 +246,7 @@ In this particular case we also save the static credentials in the OS Vault usin
 
 Finally, we add the session to the workspace (our configuration object).
 
-```tsx
+```
 async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
       // Get the session in question
       const session = this.get(sessionId);
@@ -286,21 +286,21 @@ async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
   }
 ```
 
-The first of the abstract methods we need to implement in the Access Method Service. We use this to generate credentials and return them in the form of a **Javascript Promise -** because the procedure is potentially not immediate and asynchronous.
+The first of the abstract methods we need to implement in the Access Method Service. We use this to generate credentials and return them in the form of a **Javascript Promise** - because the procedure is potentially not immediate and asynchronous.
 
 We retrieve the session previously created using the **sessionId**, which is passed as a parameter; from there we check its token expiration to see if we need to generate new credentials or reuse the one previously created.
 
-If we already have a valid session token, we retrieve it from the OS vault, parse the JSON string to construct a valid object to return for further processing. Note that when the return type is a Promise, any normal object will be directly cast to Promise<Object>.
+If we already have a valid session token, we retrieve it from the OS vault, parse the JSON string to construct a valid object to return for further processing. Note that when the return type is a Promise, any normal object will be directly cast to Promise&lt;Object&gt;.
 
 If we don't have any token expiration property (first generation) or the token is expired, we retrieve static credentials from the OS vault and use them in combination with the IAM STS client to generate a new Session Token with temporary credentials using
 
-```tsx
+```
 this.generateSessionToken(session, sts, params);
 ```
 
 In case we have configured Multi-Factor Authentication, we call for a helper method to show a modal window, retrieve the MFA code, add it to the STS parameters and then obtain the session token.
 
-```tsx
+```
 private generateSessionTokenCallingMfaModal( session: Session, sts: AWS.STS, params: { DurationSeconds: number }): Promise<CredentialsInfo> {
     return new Promise((resolve, reject) => {
       this.appService.inputDialog('MFA Code insert', 'Insert MFA Code', 'please insert MFA code from your app or device', (value) => {
@@ -319,7 +319,7 @@ private generateSessionTokenCallingMfaModal( session: Session, sts: AWS.STS, par
 
 We can see that we return a promise to adhere to the **generateCredentials** signature.
 
-```tsx
+```
 async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.get(sessionId);
     const profileName = this.workspaceService.getProfileName((session as AwsIamUserSession).profileId);
@@ -339,7 +339,7 @@ async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Pro
 
 Applying credentials is just a matter of getting the current profile name for the session, construct a suitable credential object using the profile name and the CredentialInfo object from **generateCredentials** and write it in the AWS credential file.
 
-```tsx
+```
 async deApplyCredentials(sessionId: string): Promise<void> {
     const session = this.get(sessionId);
     const profileName = this.workspaceService.getProfileName((session as AwsIamUserSession).profileId);
@@ -351,7 +351,7 @@ async deApplyCredentials(sessionId: string): Promise<void> {
 
 To de-apply a credential we retrieve its profile name and use it to find and remove the credential set from the credential file.
 
-```tsx
+```
 private async getAccessKeyFromKeychain(sessionId: string): Promise<string> {
     return await this.keychainService.getSecret(environment.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
 }
@@ -386,7 +386,7 @@ The first two methods are used to simplify getting secrets in the OS vault.
 
 **generateSessionToken**() is used to call STS for generating a new session, save the expiration time from token in the session, save the session token in the OS vault and finally return the session token for further processing.
 
-```tsx
+```
 private saveSessionTokenResponseInTheSession(session: Session, getSessionTokenResponse: AWS.STS.GetSessionTokenResponse): void {
     const index = this.workspaceService.sessions.indexOf(session);
     const currentSession: Session = this.workspaceService.sessions[index];

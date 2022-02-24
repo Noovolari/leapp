@@ -26,6 +26,7 @@ jobs:
              git config --global user.name Alessandro Gaggia
              git config --global user.email alex@besharp.it
       - run: mike deploy --force --push --update-aliases ${{env.PACKAGE_VERSION}} latest
+      - run: mike set-default --push latest
       #- run: mkdocs gh-deploy --force
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}

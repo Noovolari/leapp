@@ -18,7 +18,7 @@ An Azure Tenant consists of a name and a set of long-term credentials.
 | `LOCATION`        | The Azure datacenters are located around the world in strategic places that best meet the customer demands. These areas are known as Azure locations. Specific services requires the user to select a specific location.|
 
 
-![](../../images/screens/newuxui/azure-tenant.png?style=center-img "Add Azure Tenant Screen"){: .centered-image}
+![](../../images/screens/newuxui/azure-tenant.png?style=center-img "Add Azure Tenant Screen")
 ## Video Tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/azure.mp4" type="video/mp4"> </video>

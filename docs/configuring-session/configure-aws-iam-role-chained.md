@@ -18,7 +18,7 @@ Role chaining occurs when you use a role to assume a second role through the AWS
 | `ROLE SESSION NAME` | Your session name. You can query and search this on AWS Cloudtrail or any other linked audit service to find out what action were performed by the linked Identity. |
 | `ASSUMER SESSION`   | Your session from which this Role will be assumed. The `assume-role` call will be automatically made by Leapp. |
 
-![](../../images/screens/newuxui/aws-iam-role-chained.png?style=center-img "Add AWS IAM Role Chained Screen"){: .centered-image}
+![](../../images/screens/newuxui/aws-iam-role-chained.png?style=center-img "Add AWS IAM Role Chained Screen")
 ## Video Tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-chained.mp4" type="video/mp4"> </video>

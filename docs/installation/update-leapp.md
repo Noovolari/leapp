@@ -4,7 +4,7 @@ Leapp checks if a new version is available every **10 minutes** (starting from t
 If so, a dialog message will pop up and show a `version number`, the `release date` and the `changelog`
 
 
-![](../../images/screens/newuxui/update.png){: .update-image}
+![](../../images/screens/newuxui/update.png)
 In this modal, a user can do the following:
 
 === "Remind me later"

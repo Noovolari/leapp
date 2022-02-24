@@ -28,7 +28,7 @@ We currently only support SAML 2.0 federation.
 | `AWS IDENTIY PROVIDER ARN` | Your Identity Provider ID in AWS. You can find it in IAM section Identity Providers.                                     |
 | `ROLE ARN`                 | Your IAM Role unique ID. The active Session will refer to this Role.                                     |
 
-![](../../images/screens/newuxui/aws-iam-role-federated.png?style=center-img "Add AWS IAM Role Federated Screen"){: .centered-image}
+![](../../images/screens/newuxui/aws-iam-role-federated.png?style=center-img "Add AWS IAM Role Federated Screen")
 ## Video tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-federated.mp4" type="video/mp4"> </video>

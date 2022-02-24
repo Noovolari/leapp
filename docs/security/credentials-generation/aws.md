@@ -5,11 +5,11 @@ Leapp manages 4 types of AWS access methods:
 3. IAM Single Sign-On
 4. IAM Role chained
 
-For each access method Leapp **generates** through [STS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html) a set of ```temporary credentials``` and a **rotation** logic is triggered every **20 minutes**.
+For each access method, Leapp **generates** a set of ```temporary credentials``` through [STS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html) and a **rotation** logic is triggered every **20 minutes**.
 
-Temporary credentials **ensures that no long-term credentials are written in the AWS credentials file** located in ```~/.aws/credentials```.
+Temporary credentials **ensures that no long-term credentials are written in the AWS credentials file** located in ```~/.aws/credentrials```.
 
-Leapp manages information inserted by the user using the following logic for each access method.
+Leapp manages information entered by the user using the following logic for each access method.
 
 ## IAM Federated Role
 
@@ -29,17 +29,17 @@ Your role session lasts for the specified duration, or until the time specified 
 
 ## IAM Chained Role
 
-A IAM Chained Role is used to access another AWS account services through a main session with a trust relationship.
+An IAM Chained Role is used to access another AWS account services through a main session with a trust relationship.
 
 [https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#assumeRole-property](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#assumeRole-property)
 
 [https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
 
-**If you do not pass DurationSeconds parameter (this is Leapp's case), the temporary credentials expire in 1 hour.**
+**If you do not pass DurationSeconds parameter (as in the case of Leapp), the temporary credentials expire in 1 hour.**
 
 ## IAM User
 
-The *GetSessionToken* operation must be called by using the **long-term AWS security credentials** of the AWS IAM user, which . Credentials that are created by **IAM users are valid for the duration that you specify**. This duration can range from **900 seconds** (15 minutes) up to a **maximum of 129,600 seconds (36 hours)**, with a **default of 43,200 seconds (12 hours)**. Credentials based on **account credentials** can range **from 900 seconds (15 minutes)** up to **3,600 seconds (1 hour)**, with a default of **1 hour**.
+The *GetSessionToken* operation must be called by using the **long-term AWS security credentials** of the AWS IAM user. Credentials that are created by **IAM users are valid for the duration that you specify**. This duration can range from **900 seconds** (15 minutes) up to a **maximum of 129,600 seconds (36 hours)**, with a **default of 43,200 seconds (12 hours)**. Credentials based on **account credentials** can range **from 900 seconds (15 minutes)** up to **3,600 seconds (1 hour)**, with a default of **1 hour**.
 
 **Leapp sets the token duration to 10 hours.**
 
@@ -53,6 +53,6 @@ The *GetSessionToken* operation must be called by using the **long-term AWS secu
 
 !!! Info
 
-    The access token is valid for 8 hours as noted in the expiresAt timestamp in the JSON file. Expired tokens must re-authenticate using the get-role-credentials API call.
+    The access token is valid for 8 hours as noted in the expiresAt timestamp in the JSON file. Expired tokens must be re-authenticated using the get-role-credentials API call.
 
 **Token duration is fixed to 8 hours.**

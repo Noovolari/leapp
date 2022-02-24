@@ -42,7 +42,7 @@ describe('RotationService', () => {
   });
 
   describe('rotate()', () => {
-    it('should rotate an active session when expired', () => {
+    it('should rotate an active sessions when expired', () => {
 
       spyOn(sessionActive, 'expired').and.returnValue(true);
       spyOn(concreteSessionServiceFake, 'rotate').and.callThrough();

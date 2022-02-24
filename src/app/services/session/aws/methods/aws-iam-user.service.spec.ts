@@ -196,7 +196,7 @@ describe('AwsIamUserService', () => {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             SecretAccessKey: 'secret-key-1',
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            SessionToken: 'session-token'
+            SessionToken: 'sessions-token'
           }
         });
       });
@@ -217,7 +217,7 @@ describe('AwsIamUserService', () => {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_secret_access_key: 'secret-key-1',
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          aws_session_token: 'session-token',
+          aws_session_token: 'sessions-token',
         }
       });
 
@@ -237,7 +237,7 @@ describe('AwsIamUserService', () => {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             SecretAccessKey: 'secret-key-1',
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            SessionToken: 'session-token'
+            SessionToken: 'sessions-token'
           }
         });
       });
@@ -274,7 +274,7 @@ describe('AwsIamUserService', () => {
             // eslint-disable-next-line @typescript-eslint/naming-convention
             SecretAccessKey: 'secret-key-1',
             // eslint-disable-next-line @typescript-eslint/naming-convention
-            SessionToken: 'session-token'
+            SessionToken: 'sessions-token'
           }
         });
       });
@@ -295,7 +295,7 @@ describe('AwsIamUserService', () => {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_secret_access_key: 'secret-key-file',
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          aws_session_token: 'session-token-file'
+          aws_session_token: 'sessions-token-file'
         }
       };
 
@@ -310,7 +310,7 @@ describe('AwsIamUserService', () => {
           // eslint-disable-next-line @typescript-eslint/naming-convention
           aws_secret_access_key: 'secret-key-file',
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          aws_session_token: 'session-token-file',
+          aws_session_token: 'sessions-token-file',
         }
       });
 

@@ -1,0 +1,49 @@
+@import "mixins/palette";
+@import "mixins/utility";
+@import "global";
+
+h4 {
+  color: $text-color;
+  font-size: 17px;
+  font-weight: 600;
+  margin-top: 7px;
+}
+
+.modal-header {
+  color: $text-color!important;
+  background: $white-text-color;
+
+  .close {
+    font-size: 36px;
+    color: $text-color!important;
+  }
+}
+
+.modal-content {
+  padding: $modal-padding;
+  border-radius: $modal-border-radius;
+  box-shadow: 0 14px 28px rgba(0,0,0,0.25), 0 10px 10px rgba(0,0,0,0.22);
+
+}
+
+.modal {
+  top: 50px;
+}
+.modal-backdrop {
+  top: $commandbar-height;
+  background-color: #292044;
+  &::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    height: $commandbar-height;
+    left: 0;
+    right: 0;
+    background-color: #292044;
+  }
+}
+
+.modal-dialog {
+  margin: 0 auto;
+}
+

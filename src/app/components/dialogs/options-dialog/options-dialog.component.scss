@@ -1,0 +1,107 @@
+@import "../../../../assets/scss/mixins/palette";
+@import "../../../../assets/scss/mixins/utility";
+@import "../../../../assets/scss/modals";
+
+.option-modal {
+  max-width: 520px;
+  width: 100%;
+  .modal-content {
+    padding: 0 0 20px;
+
+    h2 { margin: 0; }
+  }
+}
+
+.proxy-length-1 { width: 18%!important; }
+.proxy-length-2 { position: relative; top: 3px; display: inline-block; width: 22%!important; padding: 0 3px; text-align: right; color: $silver-dark; }
+.proxy-length-3 { position: relative; top: 3px; width: 60%!important; }
+.proxy-length-4 { position: relative; top: 3px; display: inline-block; width: 3%!important; padding: 0 3px; text-align: center; color: $silver-dark; }
+.proxy-length-5 { position: relative; top: 3px; width: 15%!important; }
+
+.option-table {
+  td {
+    padding-left: 10px!important;
+    padding-right: 10px!important;
+  }
+  td:nth-child(1) {
+    font-size: 13px;
+    font-weight: 400;
+    color: $text-black;
+    width: 83%
+  }
+  td:nth-child(2) {
+    width: 60px;
+    button {
+      display: inline-block!important;
+      margin-left: 10px;
+    }
+  }
+}
+
+.hero-unit {
+  height: 136px;
+  margin-top: -68px;
+  position: absolute;
+  top: 50%;
+  width: 99%;
+  display: flex;
+  align-content: space-around;
+  justify-content: center;
+  border-radius: 5px;
+  border: 1px solid $silver-50;
+
+  img {
+    display: inline-flex;
+    justify-self: center;
+  }
+  p {
+    width: 71%;
+    padding: 20px 10px;
+
+    strong {
+      font-weight: 500;
+      font-size: 18px;
+      display: block;
+    }
+    span {
+      display: block;
+      font-size: 16px;
+    }
+  }
+}
+
+.panel{
+  animation: fadein .8s;
+  overflow-x: hidden;
+  padding: 0 1px;
+}
+
+.margin-fix {
+  margin: 0 20px 0;
+}
+
+.max-height-200 {
+  max-height: 200px;
+}
+
+.max-height-230 {
+  max-height: 230px;
+}
+
+@keyframes fadein {
+  from {
+    opacity:0;
+  }
+  to {
+    opacity:1;
+  }
+}
+
+.proxy-settings-section {
+  display: none;
+}
+
+.join-community-button {
+  position: relative;
+  top: -15px;
+}

@@ -1,210 +1,201 @@
-@import "palette";
+@import "mixins/utility";
+@import "mixins/palette";
+@import "global";
 
-.btn {
-  border: none!important;
-}
-.form-group {
-  height: 62px;
-  margin-bottom: 10px;
-  vertical-align: middle;
-}
-.form-group small { float: right; }
-
-.no-data {
-  position: absolute;
-  top: 21px;
-  height: 90vh;
-  width: 89%;
-  display: flex;
-  flex-direction: column;
-  align-content: center;
-  justify-content: center;
-  align-items: center;
-  color: #707070;
-  font-size: 16px;
-}
-
-input { height: 36px!important; }
-
-.ng-untouched:not(.ng-select-opened) .ng-placeholder { top: 11px!important; }
-.ng-placeholder { color: #cfcfd0; font-size: 12px; position: absolute; top: 16px!important; }
-.ng-select-opened .ng-placeholder { position: absolute; top: 16px!important; }
-.ng-select-opened .ng-placeholder { opacity: 0.4; }
-
-.ng-arrow {
-  top: 4px;
-  border-color: transparent transparent #999;
-  border-width: 0 5px 5px;
-}
-
-.ng-select { margin-top: 0!important; }
-.ng-select .ng-select-container { height: 36px; }
-
-.ng-select .ng-arrow-wrapper {
-   -moz-user-select: none;
-   -ms-user-select: none;
-   -webkit-user-select: none;
-   cursor: pointer;
-   position: relative;
-   text-align: center;
-   user-select: none;
-}
-
-.ng-select .ng-arrow-wrapper {
-  width: 25px;
-  height: 25px;
-  text-align: center!important;
-  padding: 0;
-  vertical-align: middle;
-  margin: 4px;
-  top: 1px;
-  border-radius: 4px;
-  background-color: $main-color-light;
-}
-
-.ng-select > .ng-select-container .ng-arrow {
-  top: 1px;
-  border-color: #ffffff transparent transparent!important;
-  border-width: 5px 5px 0;
-}
-
-.ng-select.ng-select-opened > .ng-select-container .ng-arrow {
-  top: 1px;
-  border-color: transparent transparent #ffffff!important;
-  border-width: 0 5px 5px;
-}
-
-.ng-option {
-  box-sizing: border-box;
-  cursor: pointer;
+form {
+  position: relative;
   display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  font-size: 12px;
-  text-overflow: ellipsis;
+  width: 100%;
 }
 
-.ng-select .ng-clear-wrapper { display: none; }
+form {
+  h1 {
+    font: 500 20px/32px Roboto, "Helvetica Neue", sans-serif!important;
+    letter-spacing: normal!important;
+    margin: 0 0 16px!important;
+    color: $main-color;
+    padding: 0;
+  }
 
-.ng-select span { font-size: 12px; }
-
-.ng-untouched:not(.ng-select-opened) .ng-value-label { font-size: 12px; position: absolute; top: 11px; }
-.ng-value-label {
-  font-size: 12px;
-  position: absolute;
-  top: 9px!important;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: inline-block;
-  width: 90%;
-}
-
-.ng-select.ng-select-single .ng-select-container .ng-value-container .ng-input {
-  top: 0!important;
-  left: 0;
-  padding-left: 10px;
-  padding-right: 50px;
-}
-
-form button {
-  position: relative;
-  bottom: 5px;
-}
-
-.form-control:focus {
-  outline: 0;
-  border: 1px solid $main-color-light;
-  box-shadow: 0 0 0 0.2rem $focused-element;
-}
-
-.toggable {
-  position: relative;
-  margin-top: 30px; /* 10px more than before height */
-  cursor: pointer;
-}
-.toggable.opened > div.shrinkable {
-  height: auto;
-  transition: height 0.4s ease-in;
-}
-.toggable.closed > div.shrinkable {
-  height: 0;
-  transition: height 0.4s ease-out;
-}
-.toggable > div.titable::before {
-  position: absolute;
-  top: -20px;
-  left: 0;
-  right: 0;
-  content: attr(title);
-  height: 20px;
-  background: #ededed;
-  color: #707070;
-  font-weight: bold;
-  font-size: 12px;
-  padding: 2px 10px;
-}
-.toggable.opened > div.titable::after {
-  z-index: 1;
-  position: absolute;
-  right: 10px;
-  top: -20px;
-  content: '\25BE';
-  transform: rotate(180deg);
-}
-.toggable.closed > div.titable::after {
-  z-index: 1;
-  position: absolute;
-  right: 10px;
-  top: -23px;
-  content: '\25BE';
-}
-.toggable > div.shrinkable {
-  overflow: hidden;
-}
-
-hr {
-  margin: 10px 0;
-}
-
-.ng-dropdown-panel .ng-dropdown-panel-items {
-  max-height: 188px!important;
-}
-
-.adder-btn {
-  outline: none;
-  min-width: 30px;
-  max-width: 30px;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  position: absolute;
-  right: 3px;
-  top: 3px;
-  border-radius: 30px;
-  background: linear-gradient(-90deg, #f9d423 0%, #e65c00 80%) !important;;
-
-  i {
-    color: white;
+  h2 {
+    display: block;
+    font-weight: bold;
+    font-size: 16px !important;
+    color: $main-color;
+    padding: 20px 0 10px;
   }
 }
-.adder-btn.disabled {
-  background: #bababa!important;
-}
 
-::-webkit-scrollbar-track
-{
-  border-radius: 10px;
-  background-color: $focused-element;
-}
+  .form-control {
+    display: inline-block;
+    width: 100%;
+    height: $form-control-height;
+    background: $silver-25;
+    border-radius: $border-radius;
+    border: 1px solid $silver-25;
+    color: $text-color;
+    font-size: $font-size-form-control;
+    padding: $padding-form-control;
+    transition: all 0.3s ease;
 
-::-webkit-scrollbar
-{
-  width: 12px;
-  background-color: $focused-element;
-}
+    &:focus {
+      background: $white-text-color;
+      border: 1px solid $text-color;
+      box-shadow: none;
+      outline: $text-color solid 1px!important;
+      color: $text-color;
+    }
+  }
 
-::-webkit-scrollbar-thumb
-{
-  border-radius: 10px;
-  background-color: $main-color-light;
-}
+  .form-control-input-button {
+    display: inline-block;
+    position: relative;
+    .form-control {
+      padding-right: 32px!important;
+    }
+    button {
+      position: absolute;
+      right: -10px;
+      top: 0;
+      outline: none!important;
+      border: none!important;
+      background: none!important;
+      color: $text-color;
+
+      i {
+        font-size: 23px;
+        position: relative;
+        top: -1px;
+      }
+    }
+  }
+
+  .form-control-input-icon {
+    display: inline-block;
+    position: relative;
+    .form-control {
+      padding-left: 32px!important;
+    }
+    i {
+      position: absolute;
+      left: 15px;
+      top: 15px;
+    }
+  }
+
+  .form-field {
+    margin-bottom: 7px;
+    position: relative;
+    label:not(.mat-checkbox-layout) {
+      display: inline-flex;
+      font-weight: 500;
+      font-size: 13px;
+      color: $main-color;
+      justify-content: flex-end;
+      justify-self: center;
+      width: 28%;
+      padding: 15px 15px 0 0;
+    }
+    ng-select {
+      display: inline-flex;
+      width: 72%;
+      position: absolute;
+      top: 3px;
+    }
+    input {
+      display: inline-flex;
+      width: 72%;
+    }
+    button {
+      padding: 0;
+      margin-right: 25px;
+      margin-top: 10px;
+    }
+  }
+
+  form button, .btn-control {
+    background: $black;
+    border-radius: $border-radius;
+    color: $white-text-color;
+    outline: none;
+    border: none;
+    transition: all 0.3s ease;
+    padding: $form-button-padding;
+
+    &:hover {
+      opacity: 0.6;
+    }
+
+    .rounded-button {
+      border-radius: 50%;
+      background: $silver-dark;
+      color: $white-text-color;
+    }
+
+    &.toggle-button {
+      background: $white-text-color;
+      color: $text-color;
+      padding: $toggle-button-padding;
+      border: 1px solid $table-text;
+      font-size: 15px;
+
+      i {
+        font-size: 20px;
+        position: relative;
+        top: 2px;
+      }
+
+      &.toggled {
+        background: $silver-25;
+        border: 1px solid $silver-25;
+      }
+    }
+  }
+
+  .mat-button-disabled {
+    background: $silver-dark;
+  }
+
+  .btn-right-margin {
+    margin-right: 20px;
+  }
+
+  .toggle-button {
+    margin-right: 10px;
+  }
+
+  .mat-checkbox-layout {
+    width: auto!important;
+    padding-right: 3px!important;
+  }
+
+  .mat-checkbox-frame {
+    border-radius: 0!important;
+    border-width: 1px!important;
+  }
+  .mat-checkbox-checked:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element,
+  .mat-checkbox:active:not(.mat-checkbox-disabled).mat-accent .mat-ripple-element,
+  .mat-checkbox-indeterminate.mat-accent .mat-checkbox-background,
+  .mat-checkbox-checked.mat-accent .mat-checkbox-background {
+    background: $black;
+  }
+  .mat-checkbox-inner-container {
+    width: 18px!important;
+    height: 18px!important;
+  }
+
+  .mat-menu-panel {
+    width: 300px;
+    min-width: 300px;
+    max-width: 500px;
+    margin-top: 10px;
+    border: 1px solid $silver-75;
+    border-radius: $context-menu-border-radius;
+
+    .mat-menu-item {
+      line-height: 36px;
+      height: 36px;
+      padding: 0 20px;
+      font-size: 15px;
+    }
+  }

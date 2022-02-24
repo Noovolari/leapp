@@ -93,7 +93,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
-    // Get the session in question
+    // Get the sessions in question
     const session = this.get(sessionId);
 
     // Get idpUrl
@@ -194,7 +194,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
           idpWindow = null;
           resolve(true);
         }
-        // Do not show window: already logged by means of session cookies
+        // Do not show window: already logged by means of sessions cookies
         if (details.url.indexOf('https://signin.aws.amazon.com/saml') !== -1) {
           idpWindow = null;
           resolve(false);

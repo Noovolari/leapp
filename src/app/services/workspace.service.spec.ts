@@ -69,7 +69,7 @@ describe('WorkspaceService', () => {
   });
 
   describe('set sessions()', () => {
-    it('should set sessions to an array of session', () => {
+    it('should set sessions to an array of sessions', () => {
       workspace = new Workspace();
       workspace.sessions.push(mockedSession);
 
@@ -126,7 +126,7 @@ describe('WorkspaceService', () => {
   });
 
   describe('addSession()', () => {
-    it('should add a session to the session array of workspace service', () => {
+    it('should add a sessions to the sessions array of workspace service', () => {
       const oldLength = workspaceService.sessions.length;
       workspaceService.addSession(mockedSession);
       expect(workspaceService.sessions.length).toEqual(oldLength + 1);
@@ -146,7 +146,7 @@ describe('WorkspaceService', () => {
   });
 
   describe('removeSession()', () => {
-    it('should remove a session from the workspace sessions', () => {
+    it('should remove a sessions from the workspace sessions', () => {
       workspaceService.addSession(mockedSession);
 
       const sessionId = mockedSession.sessionId;
@@ -182,9 +182,9 @@ describe('WorkspaceService', () => {
     it('returns the list of AwsSsoRoleSession objects associated to an AwsSsoIntegration', () => {
       workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region', 'fake-browser-opening');
       workspace = workspaceService.getWorkspace();
-      const awsSsoRoleSession = new AwsSsoRoleSession('fake-session-name', 'fake-region',
+      const awsSsoRoleSession = new AwsSsoRoleSession('fake-sessions-name', 'fake-region',
         'fake-role-arn', 'fake-profile-id', workspace.awsSsoIntegrations[0].id);
-      const awsSsoRoleSession2 = new AwsSsoRoleSession('fake-session-name', 'fake-region',
+      const awsSsoRoleSession2 = new AwsSsoRoleSession('fake-sessions-name', 'fake-region',
         'fake-role-arn', 'fake-profile-id', workspace.awsSsoIntegrations[0].id);
       workspaceService.addSession(awsSsoRoleSession);
       workspaceService.addSession(awsSsoRoleSession2);

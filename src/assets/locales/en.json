@@ -1,0 +1,31 @@
+{
+  "SignUpFormTitle": "Please sign up",
+  "SignInFormTitle": "Please sign in",
+  "FirstName": "First Name",
+  "FirstNamePlaceholder": "Enter first name",
+  "LastName": "Last Name",
+  "LastNamePlaceholder": "Enter last name",
+  "EmailAddress": "Email",
+  "EmailAddressPlaceholder": "Enter email",
+  "Password": "Password",
+  "PasswordPlaceholder": "Enter password",
+  "ConfirmPassword": "Confirm password",
+  "ConfirmPasswordPlaceholder": "Confirm your password",
+  "HidePassword": "Hide password",
+  "SignUpButtonLabel": "Sign Up",
+  "SignInButtonLabel": "Sign In",
+  "Ok": "Ok",
+
+  "error": {
+    "UnknownError": "Unknown error",
+    "0": "Network error",
+    "Required": "Field is required",
+    "Email": "Invalid email",
+    "MinLength": "Minimum length is {{requiredLength}} characters",
+    "PasswordPattern": "Password requires at least a lowercase char (abc), a uppercase char (ABC), a digit (123) and a symbol ($€!)",
+    "PasswordMismatch": "Password confirm mismatch",
+    "EmailAlreadyTaken": "Email is already in use",
+    "InvalidCredentials": "Invalid email or password",
+    "AccountNotActiveYet": "Account not active yet"
+  }
+}

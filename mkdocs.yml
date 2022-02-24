@@ -33,7 +33,7 @@ nav:
   - 'Built-in features':
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
       - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'
-  - 'Roadmap': 'roadmap.md'
+  - 'Roadmap': https://roadmap.leapp.cloud/tabs/4-in-progress
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'
       - 'Project structure': 'contributing/project-structure.md'
@@ -42,9 +42,9 @@ nav:
       - 'FAQ': 'troubleshooting/faq.md'
 
 theme:
-  logo: images/logo.png
+  logo: images/leapp.png
   titles_only: true
-  favicon: images/favicon.ico
+  favicon: images/icon.ico
   name: material
   features:
     - navigation.instant
@@ -52,7 +52,7 @@ theme:
     - navigation.top
     - content.code.annotate
   font:
-    text: Lato
+    text: Montserrat
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -64,12 +64,6 @@ theme:
       toggle:
         icon: material/toggle-switch
         name: Switch to light mode
-
-plugins:
-  - search
-  - mkdocs-video
-  - img2fig
-  - tags #from insiders to test it is installed correctly
 
 extra_css:
   - stylesheets/extra.css
@@ -100,10 +94,15 @@ markdown_extensions:
   - pymdownx.inlinehilite
   - pymdownx.snippets
   - pymdownx.keys
+  - meta
+  - attr_list
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.superfences
   - pymdownx.tabbed:
       alternate_style: true
-  - meta
-  - attr_list
+
+plugins:
+  - search
+  - mkdocs-video
+  - img2fig

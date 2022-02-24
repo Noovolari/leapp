@@ -3,6 +3,9 @@ import * as uuid from 'uuid';
 import {environment} from '../../environments/environment';
 import {Type} from 'class-transformer';
 import {AwsSsoIntegration} from './aws-sso-integration';
+import Folder from './folder';
+import Segment from './Segment';
+
 
 export class Workspace {
   @Type(() => Session)
@@ -13,6 +16,10 @@ export class Workspace {
   private _profiles: { id: string; name: string }[];
 
   private _awsSsoIntegrations: AwsSsoIntegration[];
+
+  private _pinned: string[];
+  private _folders: Folder[];
+  private _segments: Segment[];
 
   private _proxyConfiguration: {
     proxyProtocol: string;
@@ -25,7 +32,10 @@ export class Workspace {
   private _version: string;
 
   constructor() {
+    this._pinned = [];
     this._sessions = [];
+    this._folders = [];
+    this._segments = [];
     this._defaultRegion = environment.defaultRegion;
     this._defaultLocation = environment.defaultLocation;
     this._idpUrls = [];
@@ -102,5 +112,29 @@ export class Workspace {
 
   get version(): string {
     return this._version;
+  }
+
+  get pinned() {
+    return this._pinned;
+  }
+
+  set pinned(pinned: string[] ) {
+    this._pinned = pinned;
+  }
+
+  get folders() {
+    return this._folders;
+  }
+
+  set folders(folders: Folder[] ) {
+    this._folders = folders;
+  }
+
+  get segments() {
+    return this._segments;
+  }
+
+  set segments(segments: Segment[] ) {
+    this._segments = segments;
   }
 }

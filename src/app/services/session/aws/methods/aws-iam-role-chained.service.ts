@@ -115,10 +115,10 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     });
 
     // Assume Role from parent
-    // Prepare session credentials set parameters and client
+    // Prepare sessions credentials set parameters and client
     const sts = new AWS.STS(this.appService.stsOptions(session));
 
-    // Configure IamRoleChained Account session parameters
+    // Configure IamRoleChained Account sessions parameters
     const roleSessionName = (session as AwsIamRoleChainedSession).roleSessionName;
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -137,7 +137,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     try {
       // Assume Role
       const assumeRoleResponse: AssumeRoleResponse = await sts.assumeRole(params).promise();
-      // Generate correct object from session token response and return
+      // Generate correct object from sessions token response and return
       return AwsIamRoleChainedService.sessionTokenFromAssumeRoleResponse(assumeRoleResponse);
     } catch (err) {
       throw new LeappAwsStsError(this, err.message);

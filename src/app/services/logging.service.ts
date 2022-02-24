@@ -2,15 +2,24 @@ import { Injectable } from '@angular/core';
 import {environment} from '../../environments/environment';
 import {LoggerLevel, ToastLevel} from './app.service';
 import {ElectronService} from './electron.service';
-import {ToastrService} from 'ngx-toastr';
+import {
+  MatSnackBar,
+  MatSnackBarHorizontalPosition,
+  MatSnackBarVerticalPosition,
+} from '@angular/material/snack-bar';
+import {SnackbarComponent} from '../components/snackbar/snackbar.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LoggingService {
 
+  horizontalPosition: MatSnackBarHorizontalPosition = 'left';
+  verticalPosition: MatSnackBarVerticalPosition = 'bottom';
+  snackbarRef;
+
   constructor(
-    private toastr: ToastrService,
+    private matSnackBar: MatSnackBar,
     private electronService: ElectronService
   ) { }
 
@@ -66,11 +75,25 @@ export class LoggingService {
    */
   toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
     switch (type) {
-      case ToastLevel.success: this.toastr.success(message, title); break;
-      case ToastLevel.info || LoggerLevel.info: this.toastr.info(message, title); break;
-      case ToastLevel.warn || LoggerLevel.warn: this.toastr.warning(message, title); break;
-      case ToastLevel.error || LoggerLevel.error: this.toastr.error(message, title ? title : 'Invalid Action!'); break;
-      default: this.toastr.error(message, title); break;
+      case ToastLevel.success: this.openSnackBar(message, title, 'toast-success'); break;
+      case ToastLevel.info || LoggerLevel.info: this.openSnackBar(message, title, 'toast-info'); break;
+      case ToastLevel.warn || LoggerLevel.warn: this.openSnackBar(message, title, 'toast-warning'); break;
+      case ToastLevel.error || LoggerLevel.error: this.openSnackBar(message, title ? title : 'Invalid Action!', 'toast-error'); break;
+      default: this.openSnackBar(message, title, 'toast-error'); break;
     }
+  }
+
+  private openSnackBar(message: string, _: string, className: string) {
+    if(this.snackbarRef) {
+      this.snackbarRef.dismiss();
+    }
+
+    this.snackbarRef = this.matSnackBar.openFromComponent(SnackbarComponent, {
+      data: { html: message, className },
+      duration: className === 'toast-error' ? 0 : 3000,
+      panelClass: [className],
+      horizontalPosition: this.horizontalPosition,
+      verticalPosition: this.verticalPosition,
+    });
   }
 }

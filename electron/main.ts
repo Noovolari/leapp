@@ -1,7 +1,7 @@
 import * as path from 'path';
 import {environment} from '../src/environments/environment';
 
-const {app, BrowserWindow, globalShortcut, ipcMain } = require('electron');
+const {app, BrowserWindow, globalShortcut, ipcMain, Tray, Menu } = require('electron');
 const { autoUpdater } = require('electron-updater');
 
 const url = require('url');
@@ -20,11 +20,11 @@ app.disableHardwareAcceleration();
 const windowDefaultConfig = {
   dir: path.join(__dirname, `/../../../dist/leapp-client`),
   browserWindow: {
-    width: 514,
-    height: 650,
+    width: 1200,
+    height: 680,
     title: ``,
     icon: path.join(__dirname, `assets/images/Leapp.png`),
-    resizable: false,
+    resizable: true,
     webPreferences: {
       devTools: !environment.production,
       contextIsolation: false,
@@ -33,10 +33,17 @@ const windowDefaultConfig = {
     }
   }
 };
-
 if(process.platform !== 'win32') {
   windowDefaultConfig.browserWindow['titleBarStyle'] = 'hidden';
   windowDefaultConfig.browserWindow['titleBarOverlay'] = true;
+} else {
+  windowDefaultConfig.browserWindow['titleBarStyle'] = 'hidden';
+  Menu.setApplicationMenu(null);
+}
+
+
+if(process.platform === 'darwin') {
+  windowDefaultConfig.browserWindow['trafficLightPosition'] = {x: 20, y: 20};
 }
 
 const buildAutoUpdater = (win: any): void => {
@@ -71,6 +78,9 @@ const generateMainWindow = () => {
 
   let win;
   let forceQuit = false;
+  let taskbar;
+  let trayOpen = false;
+  let trayWin;
 
   const createWindow = () => {
     // Generate the App Window
@@ -80,6 +90,9 @@ const generateMainWindow = () => {
     win.setMenu(null);
     win.loadURL(url.format({ pathname: windowDefaultConfig.dir + '/index.html', protocol: 'file:', slashes: true }));
     win.center();
+
+    // Set new minimum windows for opened tool. Note: it can also be modified at runtime
+    win.setMinimumSize(1200, 680);
 
     // Open the dev tools only if not in production
     if (!environment.production) {
@@ -101,6 +114,20 @@ const generateMainWindow = () => {
       app.quit();
     });
 
+    ipc.on('resize-window', (evt, data) => {
+      if(evt.sender.getOwnerBrowserWindow().id === win.id) {
+        if (data.compactMode) {
+          win.setMinimumSize(560, 680);
+          win.setSize(560, 680);
+          win.resizable = false;
+        } else {
+          win.setMinimumSize(1200, 680);
+          win.setSize(1200, 680);
+          win.resizable = true;
+        }
+      }
+    });
+
     app.on('browser-window-focus', () => {
       globalShortcut.register('CommandOrControl+R', () => {
         console.log('CommandOrControl+R is pressed: Shortcut Disabled');
@@ -118,9 +145,66 @@ const generateMainWindow = () => {
     remote.enable(win.webContents);
   };
 
+  const createTrayWindow = () => {
+    // Generate the App Window
+    const opts = {...windowDefaultConfig.browserWindow, frame: false};
+    opts['titleBarStyle'] = 'CustomOnHover';
+    opts['titleBarOverlay'] = true;
+    opts['minimizable'] = false;
+    opts['maximizable'] = false;
+    opts['closable'] = false;
+
+    trayWin = new BrowserWindow(opts);
+    trayWin.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
+    trayWin.removeMenu(); // Remove Window Menu inside App, to make it compliant with Linux
+    trayWin.setMenu(null);
+    trayWin.loadURL(url.format({ pathname: windowDefaultConfig.dir + '/index.html', protocol: 'file:', slashes: true }));
+
+    const taskbarWidth = 362;
+    const taskbarHeight = 480;
+
+    // Set position of taskbar
+    // Need to be modified to accommodate for various scenarios
+    trayWin.setPosition(taskbar.getBounds().x - taskbarWidth + taskbar.getBounds().width, taskbar.getBounds().y + taskbar.getBounds().height);
+
+    // Set new minimum windows for opened tool.
+    trayWin.setMinimumSize(taskbarWidth, taskbarHeight);
+    trayWin.setSize(taskbarWidth, taskbarHeight);
+
+    // Open the dev tools only if not in production
+    if (!environment.production) {
+      // Open web tools for diagnostics
+      trayWin.webContents.once('dom-ready', () => {});
+    }
+
+    remote.enable(trayWin.webContents);
+  };
+
+  const createTray = () => {
+    if(!taskbar) {
+      taskbar = new Tray(windowDefaultConfig.dir + `/assets/images/LeappTemplate.png`);
+      taskbar.setToolTip('Leapp');
+      taskbar.on('click', () => {
+        trayOpen = !trayOpen;
+        if(trayOpen) {
+          // open
+          createTrayWindow();
+        } else {
+          // close
+          if(trayWin) {
+            trayWin.setClosable(true);
+            trayWin.close();
+            trayWin = null;
+          }
+        }
+      });
+    }
+  };
+
   app.on('activate', () => {
     if (win === undefined) {
       createWindow();
+      require('electron-disable-file-drop');
     } else {
       win.show();
     }
@@ -132,6 +216,7 @@ const generateMainWindow = () => {
 
   app.on('ready', () => {
     createWindow();
+    // createTray();
     buildAutoUpdater(win);
   });
 
@@ -147,6 +232,9 @@ const generateMainWindow = () => {
         win.focus();
       }
     });
+  }
+  if (process.platform === 'win32') {
+    app.setAppUserModelId('Leapp');
   }
 };
 

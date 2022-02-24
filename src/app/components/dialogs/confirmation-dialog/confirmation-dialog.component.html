@@ -1,0 +1,10 @@
+<a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
+<h4>Action Required</h4>
+
+<div class="content">
+  <div [innerHTML]="message" class="message"></div>
+  <br>
+
+  <button (click)="confirm();" class="btn-control btn-right-margin">{{confirmText || 'Confirm'}}</button>
+  <a (click)="close();">{{cancelText || 'Cancel'}}</a>
+</div>

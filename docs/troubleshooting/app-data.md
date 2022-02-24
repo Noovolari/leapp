@@ -24,7 +24,7 @@ By default, Leapp is installed in the following locations:
     ```
 
 ### Configuration files
-By default, Leapp stores configuration files in the following locations:
+By default, Leapp stores the configuration files in the following locations:
 
 === "MacOS"
 
@@ -47,10 +47,10 @@ By default, Leapp stores configuration files in the following locations:
 !!! Info
 
     - **Leapp-lock.json** is used to store your actual configuration and is **encrypted**.
-    - **.latest** contains the latest version of your Leapp application. In case the file is removed accidentally or intentionally it will be recreated on next app restart.
+    - **.latest** contains the latest version of your Leapp application. In case the file is removed accidentally or intentionally it will be created again when the app is restarted.
 
 ### Credentials file
-By default, Leapp writes credentials file in the following locations:
+By default, Leapp writes the credentials file in the following locations:
 
 === "MacOS"
 
@@ -99,5 +99,5 @@ By default, Leapp writes logs to the following locations:
 
 !!! Warning
 
-    please always add logs whenever possible to any issue you want to fill to enable the team identify 
+    Please always add logs to any issue you want to fill whenever possible, so you can help the team identify 
     the problem quickly

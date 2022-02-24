@@ -64,7 +64,7 @@ describe('AwsSessionService', () => {
   });
 
   describe('get()', () => {
-    it('should return a session given the id', () => {
+    it('should return a sessions given the id', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
       expect(service.get('fakeid')).toBeInstanceOf(Session);
@@ -72,7 +72,7 @@ describe('AwsSessionService', () => {
       expect(service.get('fakeid').sessionName).toEqual('fakeaccount');
     });
 
-    it('should return null if session is not found given the id', () => {
+    it('should return null if sessions is not found given the id', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
       expect(service.get('notfoundid')).toBe(null);
@@ -80,7 +80,7 @@ describe('AwsSessionService', () => {
   });
 
   describe('list()', () => {
-    it('should return a session list retrieved from workspace', () => {
+    it('should return a sessions list retrieved from workspace', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
       expect(service.list()).toBeInstanceOf(Array);
@@ -90,7 +90,7 @@ describe('AwsSessionService', () => {
   });
 
   describe('listChildren()', () => {
-    it('should return a session list composed only of IAM Role Chained accounts', () => {
+    it('should return a sessions list composed only of IAM Role Chained accounts', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
       expect(service.listIamRoleChained()).toBeInstanceOf(Array);
@@ -114,7 +114,7 @@ describe('AwsSessionService', () => {
   });
 
   describe('listActive()', () => {
-    it('should return a session list of active sessins only', () => {
+    it('should return a sessions list of active sessins only', () => {
       const service: AwsSessionService = TestBed.inject(AwsSessionService);
 
       expect(service.listActive()).toBeInstanceOf(Array);
@@ -138,7 +138,7 @@ describe('AwsSessionService', () => {
   });
 
   describe('start()', () => {
-    it('should start a session', (done) => {
+    it('should start a sessions', (done) => {
       const service: AwsSessionService = TestBed.inject(AwsIamUserService);
 
       // <any> is a trick to spy on private methods!
@@ -199,7 +199,7 @@ describe('AwsSessionService', () => {
   });
 
   describe('stop()', () => {
-    it('should stop a session', (done) => {
+    it('should stop a sessions', (done) => {
       const service: AwsSessionService = TestBed.inject(AwsIamUserService);
 
       mockedSession.status = SessionStatus.active;
@@ -261,7 +261,7 @@ describe('AwsSessionService', () => {
   });
 
   describe('rotate()', () => {
-    it('should rotate a session when expired', (done) => {
+    it('should rotate a sessions when expired', (done) => {
       const service: AwsSessionService = TestBed.inject(AwsIamUserService);
 
       // <any> is a trick to spy on private methods!

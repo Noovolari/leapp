@@ -1,0 +1,20 @@
+<ng-container [formGroup]="form">
+  <ng-select #ngSelectComponent
+             class="{{uppercased ? 'uppercased' : ''}}"
+             type="text"
+             placeholder="{{placeholder}}"
+
+             [bindLabel]="bindLabel"
+             [bindValue]="bindValue"
+             (keyup)="setTemporaryName($event)"
+             [items]="items"
+             (change)="change();"
+             (reset)="reset();"
+             dropdownPosition="{{dropdownPosition || 'down'}}">
+    }}
+    <ng-template ng-footer-tmp>
+      <div class="create-new" *ngIf="!checkNewElement()"><i class="moon-Add"></i>&nbsp;Add new {{whatToAddName}}</div>
+      <div class="create-new add" (click)="addNewElement()" *ngIf="checkNewElement()"><i class="moon-Add"></i>&nbsp;Add "<strong class="temp-name">{{temporaryName}}</strong>"</div>
+    </ng-template>
+  </ng-select>
+</ng-container>

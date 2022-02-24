@@ -1,4 +1,3 @@
-import {ToastrService} from 'ngx-toastr';
 import {PositioningService} from 'ngx-bootstrap/positioning';
 import {ComponentLoaderFactory} from 'ngx-bootstrap/component-loader';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
@@ -15,7 +14,6 @@ const mustInjected = (): any[] => [
   PositioningService,
   ComponentLoaderFactory,
   BsModalRef,
-  BsModalService,
-  { provide: ToastrService, useValue: spyToasterService }
+  BsModalService
 ];
 export { mustInjected};

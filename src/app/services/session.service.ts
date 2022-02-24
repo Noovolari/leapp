@@ -79,7 +79,7 @@ export abstract class SessionService {
       const index = this.workspaceService.sessions.indexOf(session);
       const currentSession: Session = this.workspaceService.sessions[index];
       currentSession.status = SessionStatus.inactive;
-      currentSession.startDateTime = undefined;
+      //currentSession.startDateTime = undefined;
       this.workspaceService.sessions[index] = currentSession;
       this.workspaceService.sessions = [...this.workspaceService.sessions];
     }

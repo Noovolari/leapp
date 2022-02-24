@@ -3,7 +3,6 @@ import { TestBed } from '@angular/core/testing';
 import { ErrorService } from './error.service';
 import {mustInjected} from '../../../base-injectables';
 import {AppService, LoggerLevel} from '../app.service';
-import {ToastrModule} from 'ngx-toastr';
 import {LeappBaseError} from '../../errors/leapp-base-error';
 import {ErrorHandler} from '@angular/core';
 import {AppModule} from '../../app.module';
@@ -19,7 +18,7 @@ describe('ErrorService', () => {
     spyAppService.toast.and.returnValue(true);
 
     handler = TestBed.configureTestingModule({
-      imports: [AppModule, ToastrModule.forRoot()],
+      imports: [AppModule],
       providers: [
         { provide: ErrorHandler, useClass: ErrorService },
         { provide: AppService, useValue: spyAppService },

@@ -188,7 +188,7 @@ export class RetrocompatibilityService {
     };
     const oldWorkspace = this.parseWorkspaceFile();
 
-    // if there are no session, remove it, is useless, and let Leapp generate a fresh one
+    // if there are no sessions, remove it, is useless, and let Leapp generate a fresh one
     if (oldWorkspace.workspaces.length === 0 || oldWorkspace.workspaces[0].sessions.length === 0) {
       // Just persist a fresh workspace data
       const freshWorkspace = new Workspace();
@@ -254,7 +254,7 @@ export class RetrocompatibilityService {
     // Loop through sessions and generate data
     for(let i = 0; i < sessions.length; i++) {
       const session = sessions[i];
-      // Get session type
+      // Get sessions type
       const sessionType = session.account.type;
       switch (sessionType) {
         case 'AWS': RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace); break;
@@ -277,7 +277,7 @@ export class RetrocompatibilityService {
     // Loop through sessions and generate data
     for(let i = 0; i < sessions.length; i++) {
       const session = sessions[i];
-      // Get session type
+      // Get sessions type
       const sessionType = session.type;
       switch (sessionType) {
         case SessionType.awsIamRoleFederated: RetrocompatibilityService.createNewAwsFederatedOrIamRoleChainedSessionNew(session, workspace); break;
@@ -291,7 +291,7 @@ export class RetrocompatibilityService {
 
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace.workspaces[0].sessions;
-    // check if we have at least one SSO session
+    // check if we have at least one SSO sessions
     // otherwise standard generated properties are just fine
     for(let i = 0; i < sessions.length; i++) {
       const session = sessions[i];
@@ -351,6 +351,8 @@ export class RetrocompatibilityService {
       workspace._profiles[0].id,
       (session as AwsIamUserSession).mfaDevice
     );
+
+    console.log(workspace, workspace._profiles[0].id);
 
     iamUserSession.sessionId = session.sessionId;
 

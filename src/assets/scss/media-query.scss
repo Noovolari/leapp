@@ -1,0 +1,102 @@
+@media only screen and (max-width: 363px) {
+  * {
+    -webkit-user-drag: none!important;
+    -webkit-app-region: none!important;
+  }
+
+  .show-in-taskbar-only {
+    display: flex!important;
+  }
+
+  .hide-in-taskbar {
+    display: none!important;
+  }
+
+  .filter-menu {
+    max-height: 280px!important;
+  }
+
+  .left, .side-bar {
+    display: none!important;
+  }
+  .right, .sessions {
+    width: 100%!important;
+  }
+
+  .sessions {
+    .centered {
+      margin-top: -34%!important;
+    }
+  }
+
+  .option-bar {
+    left: 0!important;
+  }
+
+  .session-name {
+    display: none!important;
+  }
+
+  .opt-bar-session-button {
+    height: 48px;
+    width: 40px !important;
+    overflow-x: hidden;
+    overflow-y: visible;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    top: 0!important;
+  }
+
+  .start-session {
+    height: 48px!important;
+    overflow-y: visible;
+    span {
+      display: none;
+    }
+  }
+
+  .search-bar {
+    width: 218px!important;
+  }
+  .table-account-cards {
+    thead {
+      display: none!important;
+    }
+    td {
+      padding: 0 5px!important;
+      height: 48px!important;
+    }
+
+    td:nth-child(1) {
+      width: 166px!important;
+      padding-left: 13px!important;
+      font-size: 12px!important;
+      overflow: hidden!important;
+
+      img {
+        width: 22px!important;
+      }
+
+      span {
+        overflow: hidden!important;
+        text-overflow: ellipsis!important;
+        display: inline-block!important;
+        width: 90px!important;
+        white-space: nowrap!important;
+        position: relative;
+        top: 4px;
+      }
+    }
+
+    td:nth-child(2) {
+      font-size: 12px!important;
+    }
+
+    td:nth-child(3),
+    td:nth-child(4),
+    td:nth-child(5) {
+      display: none!important;
+    }
+  }
+}

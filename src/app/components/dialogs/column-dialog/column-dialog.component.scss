@@ -1,0 +1,18 @@
+@import "../../../../assets/scss/mixins/palette";
+@import "../../../../assets/scss/modals";
+
+::ng-deep {
+  .column-modal {
+    max-width: 520px!important;
+    width: 100%;
+  }
+}
+
+form {
+  margin-top: 20px;
+
+  a {
+    display: inline-block;
+    margin-left: 10px;
+  }
+}

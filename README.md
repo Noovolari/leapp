@@ -1,106 +1,82 @@
-Leapp
-=========
-[![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/Noovolari/leapp.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Noovolari/leapp/context:javascript)
-- Website: [leapp.cloud](https://www.leapp.cloud/)
-- Documentation Website: [docs.leapp.cloud](https://docs.leapp.cloud/)
-- Roadmap: [Roadmap](https://github.com/Noovolari/leapp/discussions/178)
-- Chat with us: [Slack](https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q)
+<p align="center">
+  <img src=".github/images/README-1.png#gh-dark-mode-only" alt="Leapp" height="150" />
+    <img src=".github/images/README-1-dark.png#gh-light-mode-only" alt="Leapp" height="150" />
+</p>
 
-![logo](.github/images/README-1.png)
+<h1 align="center">Leapp</h1>
 
-Leapp is a Cross-Platform Cloud access App, built on top of [Electron](https://github.com/electron/electron).
+<h4 align="center">
+  <a href="https://www.leapp.cloud">Website</a> |
+  <a href="https://roadmap.leapp.cloud/tabs/4-in-progress">Roadmap</a> |
+  <a href="https://medium.com/leapp-cloud">Blog</a> |
+  <a href="https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q">Slack</a> |
+  <a href="https://docs.leapp.cloud">Documentation</a> |
+  <a href="https://docs.leapp.cloud/troubleshooting/app-data/">Troubleshooting</a>
+</h4>
 
-The App is designed to **manage and secure Cloud Access in multi-account environments.**
+<p align="center">
+  <a href="https://lgtm.com/projects/g/Noovolari/leapp/context:javascript"><img src="https://img.shields.io/lgtm/grade/javascript/g/Noovolari/leapp.svg?logo=lgtm&logoWidth=18" alt="Javascript"></a>
+  <a href="https://github.com/Noovolari/leapp/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/noovolari/leapp"></a>
+  <a href="https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q"><img src="https://img.shields.io/badge/slack-online-green" alt="Slack"></a>
+</p>
 
-![Securing aws Credentials on DevOps machines 001](https://user-images.githubusercontent.com/9497292/114399348-1e942f80-9ba1-11eb-8b4a-74b60bd29189.jpeg)
+<p align="center">⚡ Lightning Fast, Safe, Desktop App for Cloud credentials managing and generation</p>
 
-# Key features
+**Leapp** is a Cross-Platform Cloud access App, built on top of [Electron](https://github.com/electron/electron).
 
-> We Strongly believe that access information to Cloud in `~/.aws` or `~/.azure` files are not safe, and **[we prefer to store that information in an encrypted file managed by the system.](https://docs.leapp.cloud/contributing/system_vault/)**
-> Credentials will be hourly rotated and accessible in those files only when they are needed, so only when Leapp is active.
+The App is designed to **manage and secure Cloud Access in multi-account environments,** and it is available for MacOS, Windows, and Linux.
 
+For more information about features go to [our documentation](https://docs.leapp.cloud/).
 
-- **Switch Cloud Profile in a click**
+<p align="center">
+  <img src=".github/images/Leapp-animation.gif" alt="Web interface gif" />
+</p>
 
-- **[Secure](https://docs.leapp.cloud/contributing/system_vault/) repository for your access data**
+# ✨ Features
 
-- **Multiple Cloud-Access [strategies](https://docs.leapp.cloud/use-cases/intro/)**
-
-- **[No long-lived](https://docs.leapp.cloud/concepts/) credentials**
-
-- **Generate and use sessions directly from [your aws Organization](https://docs.leapp.cloud/configuring-integration/configure-aws-single-sign-on-integration/)**
-
-- **Connect EC2 instances straight away**
+- **Cloud credentials generation in 1 click**
+- **Data [stored locally encrypted](https://docs.leapp.cloud/contributing/system_vault/) in the OS System Vault**
+- **Multiple Cloud-Access supported [strategies](https://docs.leapp.cloud/use-cases/intro/)**
+- **Automatic [short-lived credentials rotation](https://docs.leapp.cloud/concepts/)**
+- **Automatic provisioning of [Sessions](https://docs.leapp.cloud/sessions/) from [AWS Single Sign-on](https://docs.leapp.cloud/use-cases/aws_sso/)**
+- **Connect to EC2 instances straight away**
 
 All the covered access methods can be found [here](https://docs.leapp.cloud/use-cases/intro/).
 
-![Leapp App animation](.github/images/Leapp-animation.gif)
 
+# Download
+You can find all the information needed to download and install Leapp in the [documentation](https://docs.leapp.cloud/installation/install-leapp/).
+Leapp can be installed on macOS, Linux, and Windows systems.
 
-# Installation
-
-- Verify that all [requirements](https://docs.leapp.cloud/installation/requirements/) are satisfied.
-- Follow the [installation documentation](https://docs.leapp.cloud/installation/install-leapp/). 
+... and nothing stops you from compiling Leapp yourself! You can find more information about how to
+compile Leapp in our [contributing guidelines](CONTRIBUTING.md).
 
 # Contributing
 
-Please read through our [contributing guidelines](.github/CONTRIBUTING.md) and [code of conduct](.github/CODE_OF_CONDUCT.md). Included are directions
-for opening issues, coding standards, and notes on development.
+Thank you for thinking about contributing to Leapp! 
 
-Editor preferences are available in the [editor config](.editorconfig) for easy use in
-common text editors. Read more and download plugins at [editorconfig.org](http://editorconfig.org).
+Read through our [contributing guidelines](CONTRIBUTING.md)
+to learn how you can bring your value to our project by submitting your first contribution.
 
-# Developing
+You can report bugs or suggest features using the GitHub issues channel; moreover, you can pick
+[a good first issue](https://github.com/noovolari/leapp/contribute) and make your first code contribution.
 
-Development on Leapp can be done on Mac, Windows, or Linux as long as you have
-[NodeJS](https://nodejs.org) and [Git](https://git-scm.com/). See the `.nvmrc` file located in the project for the correct Node version.
+We want to thank you all!
 
-<details>
-<summary>Initial Dev Setup</summary>
-
-This repository is structured as a monorepo and contains many Node.JS packages. Each package has
-its own set of commands, but the most common commands are available from the
-root [`package.json`](package.json) and can be accessed using the `npm run ...` command. Here
-are the only three commands you should need to start developing on the app.
-
-```bash
-# Install and Link Dependencies
-npm install
-
-
-# Start App without Live Reload
-npm run electron-dev
-```
-
-If Electron is failing building the native Library `Keytar` just run before `npm run electron-dev`:
-```bash
-# Clear Electron and Keytar conflicts
-npm run rebuild-keytar
-```
-
-</details>
-
-<details>
-<summary>Editor Requirements</summary>
-
-You can use any editor you'd like, but make sure to have support/plugins for
-the following tools:
-
-- [ESLint](http://eslint.org/) – For catching syntax problems and common errors
-
-</details>
+<a href="https://github.com/noovolari/leapp/graphs/contributors"><img src="https://opencollective.com/noovolari/contributors.svg?width=800&button=false" /></a>
 
 # Our Sponsors
 
 [<img hspace="5" src="https://avatars.githubusercontent.com/u/1290287?s=60&amp;v=4" width="90" height="90" alt="@taimos">](https://github.com/taimos)
 [<img hspace="5" src="https://avatars.githubusercontent.com/u/2232217?s=60&amp;v=4" width="90" height="90" alt="@aws">](https://github.com/aws)
 
-
 # Documentation
+
 Refer to the documentation [website](https://docs.leapp.cloud).
 
-# Links
-- [Glossary](.github/GLOSSARY.md): find other information about the system
-- [Contributing](./.github/CONTRIBUTING.md): follow the guidelines if you'd like to contribute to the project
+# Contacts
+
+You can chat with us inside our community so [join us](https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA), or send us a message through the [contacts form](https://www.leapp.cloud/contacts).
+
 # License
 [Mozilla Public License v2.0](https://github.com/Noovolari/leapp/blob/master/LICENSE)

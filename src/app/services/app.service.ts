@@ -1,13 +1,14 @@
-import {EventEmitter, Injectable} from '@angular/core';
+import {EventEmitter, Injectable, TemplateRef} from '@angular/core';
 import {FileService} from './file.service';
-import {ConfirmationDialogComponent} from '../components/shared/confirmation-dialog/confirmation-dialog.component';
+import {ConfirmationDialogComponent} from '../components/dialogs/confirmation-dialog/confirmation-dialog.component';
 import {FormControl, FormGroup} from '@angular/forms';
 import {environment} from '../../environments/environment';
-import {InputDialogComponent} from '../components/shared/input-dialog/input-dialog.component';
+import {InputDialogComponent} from '../components/dialogs/input-dialog/input-dialog.component';
 import {Constants} from '../models/constants';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {ElectronService} from './electron.service';
 import {LoggingService} from './logging.service';
+import {MatMenuTrigger} from '@angular/material/menu';
 
 /*
 * External enum to the logger level so we can use this to define the type of log
@@ -32,8 +33,6 @@ export enum ToastLevel {
   providedIn: 'root'
 })
 export class AppService {
-
-  profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
 
   stsEndpointsPerRegion = new Map([
     ['af-south-1', 'https://sts.af-south-1.amazonaws.com'],
@@ -63,8 +62,12 @@ export class AppService {
     ['us-west-2', 'https://sts.us-west-2.amazonaws.com']
   ]);
 
+  /* Is used to detect if application is in compact or full mode */
+  private _compactMode: boolean;
+
   /* This service is defined to provide different app wide methods as utilities */
   private newWin: any;
+  private triggers: MatMenuTrigger[];
 
   constructor(
     private fileService: FileService,
@@ -72,6 +75,7 @@ export class AppService {
     private electronService: ElectronService,
     private loggingService: LoggingService
   ) {
+    this.triggers = [];
 
     // Global Configure logger
     if (this.electronService.log) {
@@ -112,6 +116,10 @@ export class AppService {
 
   getHttpsProxyAgent() {
     return this.electronService.httpsProxyAgent;
+  }
+
+  getPath() {
+    return this.electronService.path;
   }
 
   /**
@@ -328,19 +336,28 @@ export class AppService {
     return JSON.parse(jsonPayload);
   }
 
+  closeModal() {
+    // @ts-ignore: Accessing private variable as workaround for missing feature
+    this.modalService.loaders.forEach(loader => loader.instance.hide());
+  }
+
   /**
    * Confirmation dialog popup!
    *
    * @param message - the message to show
    * @param callback - the callback for the ok button to launch
+   * @param confirmText - the text to confirm the action
+   * @param cancelText - the text to cancel the action
+   * @param isDoubleModal - want to nest 2 dialogs
    */
-  confirmDialog(message: string, callback: any) {
-    for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
-      this.modalService.hide(i);
+  confirmDialog(message: string, callback: any, confirmText?: string, cancelText?: string, isDoubleModal?: boolean) {
+    if(!isDoubleModal) {
+      for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
+        this.modalService.hide(i);
+      }
     }
-
     this.getCurrentWindow().show();
-    this.modalService.show(ConfirmationDialogComponent, { backdrop: 'static', animated: false, class: 'confirm-modal', initialState: { message, callback}});
+    this.modalService.show(ConfirmationDialogComponent, { animated: false, class: `confirm-modal`, initialState: { message, callback, confirmText, cancelText }});
 
   }
 
@@ -352,9 +369,11 @@ export class AppService {
    * @param message - the message to show
    * @param callback - the callback for the ok button to launch
    */
-  inputDialog(title: string, placeholder: string, message: string, callback: any) {
-    for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
-      this.modalService.hide(i);
+  inputDialog(title: string, placeholder: string, message: string, callback: any, isDoubleModal?: boolean) {
+    if(!isDoubleModal) {
+      for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
+        this.modalService.hide(i);
+      }
     }
 
     this.getCurrentWindow().show();
@@ -523,7 +542,7 @@ export class AppService {
   /**
    * Check if the account is of type azure or not
    *
-   * @param s - the session containing the account
+   * @param s - the sessions containing the account
    */
   isAzure(s) {
    return s.subscriptionId !== null && s.subscriptionId !== undefined;
@@ -561,5 +580,26 @@ export class AppService {
 
   toast(message: string, level: ToastLevel, title: string) {
     this.loggingService.toast(message, level, title);
+  }
+
+  about() {
+    const version = this.getApp().getVersion();
+    this.getCurrentWindow().show();
+    this.getDialog().showMessageBox({
+      icon: __dirname + `/assets/images/Leapp.png`,
+      message: `Leapp\n` + `Version ${version} (${version})\n` + '© 2022 Noovolari',
+      buttons: ['Ok']
+    });
+  }
+
+  setMenuTrigger(trigger) {
+    this.triggers.push(trigger);
+  }
+
+  closeAllMenuTriggers() {
+    this.triggers.forEach(t => {
+      t.closeMenu();
+    });
+    this.triggers = [];
   }
 }

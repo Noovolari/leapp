@@ -1,0 +1,31 @@
+{
+  "SignUpFormTitle": "Registrati",
+  "SignInFormTitle": "Accedi",
+  "FirstName": "Nome",
+  "FirstNamePlaceholder": "Inserisci il nome",
+  "LastName": "Cognome",
+  "LastNamePlaceholder": "Inserisci il cognome",
+  "EmailAddress": "Email",
+  "EmailAddressPlaceholder": "Inserisci l'email",
+  "Password": "Password",
+  "PasswordPlaceholder": "Inserisci la password",
+  "ConfirmPassword": "Conferma password",
+  "ConfirmPasswordPlaceholder": "Conferma la tua password",
+  "HidePassword": "Nascondi password",
+  "SignUpButtonLabel": "Registrati",
+  "SignInButtonLabel": "Accedi",
+  "Ok": "Ok",
+
+  "error": {
+    "UnknownError": "Errore sconosciuto",
+    "0": "Errore di rete",
+    "Required": "Campo richiesto",
+    "Email": "Email invalida",
+    "MinLength": "Lunghezza minima richiesta: {{requiredLength}} caratteri",
+    "PasswordPattern": "La password richiede almeno un carattere minuscolo (abc), uno maiuscolo (ABC), un numero (123) e un simbolo ($€!)",
+    "PasswordMismatch": "Le password non coincidono",
+    "EmailAlreadyTaken": "Email già utilizzata",
+    "InvalidCredentials": "Email o password non validi",
+    "AccountNotActiveYet": "Account non ancora attivato, controlla la tua casella di posta"
+  }
+}

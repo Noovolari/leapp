@@ -27,7 +27,7 @@ import {KeychainService} from './services/keychain.service';
 export class AppComponent implements OnInit {
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
-    private app: AppService,
+    public app: AppService,
     private workspaceService: WorkspaceService,
     private retrocompatibilityService: RetrocompatibilityService,
     private fileService: FileService,
@@ -110,11 +110,12 @@ export class AppComponent implements OnInit {
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
-    if (workspace.sessions.length > 0) {
-      await this.router.navigate(['/sessions', 'session-selected']);
-    } else {
-      await this.router.navigate(['/start', 'start-page']);
-    }
+    await this.router.navigate(['/dashboard']);
+    //document.querySelector('#loader').classList.add('disable-loader');
+  }
+
+  closeAllRightClickMenus() {
+    this.app.closeAllMenuTriggers();
   }
 
   /**
@@ -195,4 +196,6 @@ export class AppComponent implements OnInit {
       }
     });
   }
+
+
 }

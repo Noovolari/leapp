@@ -1,4 +1,4 @@
-Information that can be used, or potentially exploited, to gain access to cloud environments are stored your workstation's System Vault, leveraging its own integrated encryption. The user can access at any time the secrets stored in the System Vault through user password.
+Information that can be used, or potentially exploited, to gain access to cloud environments are stored your workstation's System Vault, leveraging its own integrated encryption. The user can access the secrets stored in the System Vault at any time, using their user password.
 
 Leapp uses [Keytar](https://github.com/atom/node-keytar) as an interface to the secure vault on macOS, Windows and Linux systems.
 

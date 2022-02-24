@@ -35,6 +35,7 @@ export class ElectronService {
   nativeTheme: any;
   notification: any;
   process: any;
+  enable: any;
 
   get isElectron(): boolean {
     return !!(window && window.process && (window.process as any).type);
@@ -72,6 +73,7 @@ export class ElectronService {
       this.nativeTheme = window.require('@electron/remote').nativeTheme;
       this.notification = window.require('@electron/remote').Notification;
       this.process = (window as any).process;
+      this.enable = window.require('@electron/remote').enable;
     }
   }
 }

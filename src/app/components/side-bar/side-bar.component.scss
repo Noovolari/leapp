@@ -1,0 +1,126 @@
+@import "../../../assets/scss/global";
+@import "../../../assets/scss/mixins/palette";
+
+::ng-deep {
+  .mat-list.mat-list-base {
+    user-select: none;
+  }
+  /* .mat-list-item:hover {
+    transition: all 0.2s ease;
+    opacity: 0.7;
+  } */
+  .mat-line {
+    font-size: 15px;
+    &:hover {
+      all: unset!important;
+      transition: all 0.2s ease;
+      opacity: 0.7;
+    }
+  }
+  .mat-list-item-content {
+    cursor: pointer;
+    margin-top: 2px;
+    margin-bottom: 2px;
+
+    i {
+      font-size: 20px;
+      margin-right: 8px;
+      position: relative;
+      top: -1px;
+    }
+
+    .moon-Close {
+      display: none;
+      position: absolute;
+      top: 2px;
+      right: 15px;
+      opacity: 0.7;
+    }
+  }
+  .moon-Row {
+    top: -2px!important;
+  }
+
+  .mat-list-item-content:hover i.moon-Close {
+    display: inline-block!important;
+    color: $text-color;
+    font-size: 18px;
+    margin-top: 6px;
+    margin-right: 3px;
+    opacity: 0.7;
+    right: 3px;
+  }
+
+  .visible-option-menu {
+    flex-grow: 1;
+  }
+}
+
+::ng-deep {
+  .mat-list-text div span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    width: 150px;
+    margin-top: 5px;
+  }
+}
+
+.selected-segment {
+  background-color: $silver-25;
+  border-radius: 6px;
+  margin-left: 10px!important;
+  width: 218px!important;
+  transition: all 0.2s ease;
+}
+
+::ng-deep {
+  .mat-expansion-panel-header {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"!important;
+    font-size: 14px!important;
+    font-weight: 500!important;
+  }
+  .selected-segment .mat-list-item-content .mat-list-text {
+    margin-left: -10px;
+  }
+}
+
+div.space-between-mat-lists {
+  position: relative;
+  height: 13px;
+}
+
+::ng-deep {
+  .mat-expansion-indicator {
+    display: none;
+    margin-top: -4px;
+  }
+  .mat-list-item.selected-segment:hover {
+    background-color:$silver-25!important;
+  }
+  .mat-list-item.selected-segment:hover .mat-list-item-content .mat-list-text .mat-line {
+    transition: unset;
+    opacity: 1;
+  }
+}
+
+i.moon-Caret-down {
+  position: relative;
+  top: 2px;
+  left: 87px;
+  font-size: 20px;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+::ng-deep {
+  .mat-expansion-panel-header:not([aria-disabled=true]) {
+    width: 250px;
+  }
+  .mat-expanded .mat-content mat-panel-title .mat-subheader i.moon-Caret-down {
+    display: inline-block;
+    transform: rotate(180deg);
+    transition: all 0.3s ease;
+  }
+}

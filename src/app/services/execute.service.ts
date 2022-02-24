@@ -55,7 +55,7 @@ export class ExecuteService {
   public openTerminal(command: string, env?: any): Promise<string> {
     if (this.electronService.process.platform === 'darwin') {
       return this.execute(`osascript -e "tell app \\"Terminal\\"
-                              do script \\"${command}\\"
+                              activate (do script \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\")
                               end tell"`, Object.assign(this.electronService.process.env, env));
     } else if (this.electronService.process.platform === 'win32') {
       return this.execute(`start cmd /k ${command}`, env);

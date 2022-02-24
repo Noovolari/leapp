@@ -10,4 +10,4 @@ To keep the backlog clean and actionable, issues should be opened using [one the
 
 If you got a question or need help with any aspect of the project feel free to [join the community](https://www.nordtheme.com/community) and ensure to read the [extensive project documentations](https://www.nordtheme.com/docs).
 
-You can also search for already opened and related issue using the search for the [“question“](https://github.com/noovolari/leapp/labels/type-question) issue label.
+You can also searchFilter for already opened and related issue using the searchFilter for the [“question“](https://github.com/noovolari/leapp/labels/type-question) issue label.

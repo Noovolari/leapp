@@ -4,23 +4,21 @@ An Azure Tenant consists of a name and a set of long-term credentials.
 
 !!! Info
 
-    Leapp enhances security of Azure credentials by removing *refresh token* from accessTokens.json file 
+    For azure-cli version < 2.30.0: Leapp enhances security of Azure credentials by removing *refresh token* from the accessTokens.json file 
     which could potentially allow an attacker accessing a User's PC to regenerate valid credentials even 
     if a valid access token is not present and by **rotating** Azure access token.
 
 ## Fields
 
-| Field                      | Description                          |
-| ---------------------------| ------------------------------------ |
-| `ALIAS`                    | Your friendly session name in Leapp. Give it a meaningful name so it will be easier to search for it inside Leapp. |
-| `TENANT ID`                | A **tenant ID** identifies a tenant. You can have multiple clients on a given tenant database. |
-| `SUBSCRIPTION ID`          | The **subscription ID** is a unique alphanumeric string that identifies your Azure subscription. |
-| `LOCATION`                 | The Azure datacenters are located around the world in strategic places that best meets the customer demands. These areas are known as Azure locations. Specific services requires the user to select a specific location.|
+| Field             | Description                          |
+|-------------------| ------------------------------------ |
+| `SESSION ALIAS`   | Your friendly session name in Leapp. Give it a meaningful name so it will be easier to find inside Leapp. |
+| `TENANT ID`       | A **tenant ID** identifies a tenant. You can have multiple clients on a given tenant database. |
+| `SUBSCRIPTION ID` | The **subscription ID** is a unique alphanumeric string that identifies your Azure subscription. |
+| `LOCATION`        | The Azure datacenters are located around the world in strategic places that best meet the customer demands. These areas are known as Azure locations. Specific services requires the user to select a specific location.|
 
 
-
-![](../../images/screens/azure-tenant.png?style=center-img "Add Azure Tenant Screen")
-
+![](../../images/screens/newuxui/azure-tenant.png?style=center-img "Add Azure Tenant Screen"){: .centered-image}
 ## Video Tutorial
 
-![](../../videos/Azure.gif?style=center-img)
+<video width="100%" muted autoplay loop> <source src="../../videos/newuxui/azure.mp4" type="video/mp4"> </video>

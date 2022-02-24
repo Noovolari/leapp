@@ -16,7 +16,6 @@ import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
 import {SessionType} from '../models/session-type';
 import {AppService, LoggerLevel} from './app.service';
 import {LeappBaseError} from '../errors/leapp-base-error';
-import {Session} from '../models/session';
 
 export class AwsSsoIntegrationService {
 
@@ -158,7 +157,7 @@ export class AwsSsoIntegrationService {
     });
 
     const sessionsNotFlattened = await Promise.all(promiseArray);
-    let sessions = sessionsNotFlattened.flat();
+    const sessions = sessionsNotFlattened.flat();
 
     const persistedSessions = this.workspaceService.getAwsSsoIntegrationSessions(awsSsoIntegration.id);
     const sessionsToBeDeleted: SsoRoleSession[] = [];

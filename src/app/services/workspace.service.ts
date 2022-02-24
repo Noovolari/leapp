@@ -9,13 +9,14 @@ import {BehaviorSubject, Observable} from 'rxjs';
 import * as uuid from 'uuid';
 import {AwsSsoIntegration} from '../models/aws-sso-integration';
 import {AwsSsoRoleSession} from '../models/aws-sso-role-session';
+import Folder from '../models/folder';
+import Segment from '../models/Segment';
 
 @Injectable({
   providedIn: 'root'
 })
 
 export class WorkspaceService {
-
   // Expose the observable$ part of the _sessions subject (read only stream)
   readonly sessions$: Observable<Session[]>;
 
@@ -34,7 +35,6 @@ export class WorkspaceService {
     private appService: AppService,
     private fileService: FileService
   ) {
-
     this._sessions = new BehaviorSubject<Session[]>([]);
     this.sessions$ = this._sessions.asObservable();
 
@@ -86,7 +86,7 @@ export class WorkspaceService {
   }
 
   addSession(session: Session) {
-    // we assign a new copy of session by adding a new session to it
+    // we assign a new copy of sessions by adding a new sessions to it
     this.sessions = [
       ...this.sessions,
       session
@@ -233,6 +233,55 @@ export class WorkspaceService {
     this.persistWorkspace(workspace);
   }
 
+  getFolders() {
+    const workspace = this.getWorkspace();
+    return workspace.folders;
+  }
+
+  setFolders(folders: Folder[]) {
+    const workspace = this.getWorkspace();
+    workspace.folders = folders;
+    this.persistWorkspace(workspace);
+  }
+
+  getSegments() {
+    const workspace = this.getWorkspace();
+    return workspace.segments;
+  }
+
+  setSegments(segments: Segment[]) {
+    const workspace = this.getWorkspace();
+    workspace.segments = segments;
+    this.persistWorkspace(workspace);
+  }
+
+  getSegment(segmentName: string) {
+    const workspace = this.getWorkspace();
+    return workspace.segments.find(s => s.name === segmentName);
+  }
+
+  pinSession(session: Session) {
+    const workspace = this.getWorkspace();
+    if(workspace.pinned.indexOf(session.sessionId) === -1) {
+      workspace.pinned.push(session.sessionId);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  unpinSession(session: Session) {
+    const workspace = this.getWorkspace();
+    const index = workspace.pinned.indexOf(session.sessionId);
+    if(index > -1) {
+      workspace.pinned.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  getProfiles() {
+    const workspace = this.getWorkspace();
+    return workspace.profiles;
+  }
+
   private getPersistedSessions(): Session[] {
     const workspace = this.getWorkspace();
     return workspace.sessions;
@@ -242,5 +291,14 @@ export class WorkspaceService {
     const workspace = this.getWorkspace();
     workspace.sessions = sessions;
     this.persistWorkspace(workspace);
+  }
+
+  removeSegment(segment: Segment) {
+    const workspace = this.getWorkspace();
+    const index = workspace.segments.findIndex(s => s.name === segment.name);
+    if(index > -1) {
+      workspace.segments.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
   }
 }

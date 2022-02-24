@@ -1,0 +1,56 @@
+@import "../../../../assets/scss/mixins/palette";
+@import "../../../../assets/scss/mixins/utility";
+@import "../../../../assets/scss/global";
+
+::ng-deep {
+  .create-modal {
+    max-width: 520px!important;
+    width: 100%;
+  }
+}
+
+.strategy-list {
+  margin-top: 25px;
+
+  .providers {
+    width: 100%;
+    background: $white-text-color;
+    color: $text-color;
+    border-radius: $filter-border-radius;
+    border: 1px solid $silver-50;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: left;
+    margin-bottom: 8px;
+    transition: all 0.3s ease;
+    &:hover {
+      border: 1px solid $table-text;
+    }
+    &.disabled {
+      filter: grayscale(1);
+    }
+
+    img {
+      margin-right: 15px;
+    }
+  }
+}
+
+.title-img {
+  width: 32px;
+  margin-right: 12px;
+}
+
+p {
+  font-size: 13px;
+  font-weight: normal;
+  color: $medium-dark;
+  margin-top: 10px;
+
+  a {
+    color: $medium-dark;
+  }
+  &.smaller {
+    padding-left: 135px;
+  }
+}

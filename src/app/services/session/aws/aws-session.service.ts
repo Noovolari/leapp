@@ -14,7 +14,7 @@ import {LoggerLevel} from '../../app.service';
 })
 export abstract class AwsSessionService extends SessionService {
 
-  /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
+  /* This service manage the sessions manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(protected workspaceService: WorkspaceService) {
     super(workspaceService);
   }
@@ -39,7 +39,7 @@ export abstract class AwsSessionService extends SessionService {
   async start(sessionId: string): Promise<void> {
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
-        throw new LeappBaseError('Pending session with same named profile', this, LoggerLevel.info, 'Pending session with same named profile');
+        throw new LeappBaseError('Pending sessions with same named profile', this, LoggerLevel.info, 'Pending sessions with same named profile');
       }
       this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);

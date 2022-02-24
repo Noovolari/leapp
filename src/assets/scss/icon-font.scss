@@ -1,0 +1,182 @@
+@font-face {
+  font-family: 'icomoon';
+  src: url('../fonts/icomoon.ttf?qhicew') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="moon-"], [class*=" moon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon', serif !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.moon-Add-simple:before {
+  content: "\e900";
+}
+.moon-Add:before {
+  content: "\e901";
+}
+.moon-Bookmark-filled:before {
+  content: "\e902";
+}
+.moon-Bookmark:before {
+  content: "\e903";
+}
+.moon-Caret-down:before {
+  content: "\e904";
+}
+.moon-Check:before {
+  content: "\e905";
+}
+.moon-Checkbox-filled:before {
+  content: "\e906";
+}
+.moon-Checkbox-intermediate:before {
+  content: "\e907";
+}
+.moon-Checkbox:before {
+  content: "\e908";
+}
+.moon-Circle:before {
+  content: "\e909";
+}
+.moon-Clock:before {
+  content: "\e90a";
+}
+.moon-Close:before {
+  content: "\e90b";
+}
+.moon-Cloud:before {
+  content: "\e90c";
+}
+.moon-Copy:before {
+  content: "\e90d";
+}
+.moon-Delete-filled:before {
+  content: "\e90e";
+}
+.moon-Delete:before {
+  content: "\e90f";
+}
+.moon-Dropdown:before {
+  content: "\e910";
+}
+.moon-Edit:before {
+  content: "\e911";
+}
+.moon-Error:before {
+  content: "\e912";
+}
+.moon-Filter:before {
+  content: "\e913";
+}
+.moon-Folder:before {
+  content: "\e914";
+}
+.moon-Help:before {
+  content: "\e915";
+}
+.moon-Home:before {
+  content: "\e916";
+}
+.moon-Lock:before {
+  content: "\e917";
+}
+.moon-Menu:before {
+  content: "\e918";
+}
+.moon-More:before {
+  content: "\e919";
+}
+.moon-Order:before {
+  content: "\e91a";
+}
+.moon-Pin-filled:before {
+  content: "\e91b";
+}
+.moon-Pin:before {
+  content: "\e91c";
+}
+.moon-Play-filled:before {
+  content: "\e91d";
+}
+.moon-Play:before {
+  content: "\e91e";
+}
+.moon-Puzzle:before {
+  content: "\e91f";
+}
+.moon-Refresh:before {
+  content: "\e920";
+}
+.moon-Region-filled:before {
+  content: "\e921";
+}
+.moon-Region:before {
+  content: "\e922";
+}
+.moon-Remove:before {
+  content: "\e923";
+}
+.moon-Row:before {
+  content: "\e924";
+}
+.moon-Search:before {
+  content: "\e925";
+}
+.moon-Server-filled:before {
+  content: "\e926";
+}
+.moon-Server:before {
+  content: "\e927";
+}
+.moon-Settings:before {
+  content: "\e928";
+}
+.moon-Sidebar:before {
+  content: "\e929";
+}
+.moon-Star-filled:before {
+  content: "\e92a";
+}
+.moon-Star:before {
+  content: "\e92b";
+}
+.moon-Stop:before {
+  content: "\e92c";
+}
+.moon-Table:before {
+  content: "\e92d";
+}
+.moon-Tag:before {
+  content: "\e92e";
+}
+.moon-Team:before {
+  content: "\e92f";
+}
+.moon-Terminal:before {
+  content: "\e930";
+}
+.moon-User-add:before {
+  content: "\e931";
+}
+.moon-User-filled:before {
+  content: "\e932";
+}
+.moon-User:before {
+  content: "\e933";
+}
+.moon-Warning:before {
+  content: "\e934";
+}

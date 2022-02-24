@@ -1,0 +1,45 @@
+@import "../../../assets/scss/mixins/palette";
+
+.float { float: left; }
+.clear { clear: both; }
+
+.holder {
+  position: relative;
+  z-index: 9999;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  width: 8%;
+  height: 100%;
+  i {
+    font-size: 20px;
+    color: white;
+  }
+}
+
+.large {
+  width: 84%;
+  padding: 0 10px;
+  overflow-wrap: break-word;
+}
+
+.small {
+  width: 8%;
+  height: 100%;
+  font-size: 22px;
+  font-weight: lighter;
+  text-decoration: none;
+  color: $background;
+  opacity: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  display: inline-flex;
+  justify-content: flex-end;
+  &:hover { opacity: 0.6; }
+}
+

@@ -249,7 +249,7 @@ describe('AwsSsoIntegrationService', () => {
         expect(spyKeychainService.deletePassword).toHaveBeenCalled();
         // Removed expiration time
         expect(workspace.awsSsoIntegrations[0].accessTokenExpiration).not.toBeDefined();
-        // removed session of a specific integration id
+        // removed sessions of a specific integration id
         expect(workspace.sessions.filter((sess) => (sess as AwsSsoRoleSession).awsSsoConfigurationId === fakeId).length).toBe(0);
 
         clearTimeout(caller);

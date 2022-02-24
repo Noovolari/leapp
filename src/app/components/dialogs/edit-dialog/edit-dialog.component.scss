@@ -1,0 +1,29 @@
+@import "../../../../assets/scss/modals";
+@import "../../../../assets/scss/mixins/palette";
+@import "../../../../assets/scss/mixins/utility";
+@import "../../../../assets/scss/global";
+
+::ng-deep {
+  .edit-modal {
+    max-width: 520px!important;
+    width: 100%;
+  }
+}
+
+.title-img {
+  width: 32px;
+  margin-right: 12px;
+}
+
+form {
+  margin-top: 20px;
+
+  a {
+    display: inline-block;
+    margin-left: 10px;
+  }
+}
+
+.disabled {
+  background: $silver-dark!important;
+}

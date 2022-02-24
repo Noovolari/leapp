@@ -149,7 +149,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const sessions = this.listAwsSsoRoles();
 
     for (let i = 0; i < sessions.length; i++) {
-      // Stop session
+      // Stop sessions
       const sess = sessions[i];
       await this.stop(sess.sessionId).then(_ => {});
     }

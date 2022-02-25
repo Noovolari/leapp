@@ -36,7 +36,6 @@ nav:
   - 'Roadmap': https://roadmap.leapp.cloud/tabs/4-in-progress
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'
-      - 'Project structure': 'contributing/project-structure.md'
   - Troubleshooting:
       - 'Application Data': 'troubleshooting/app-data.md'
       - 'FAQ': 'troubleshooting/faq.md'

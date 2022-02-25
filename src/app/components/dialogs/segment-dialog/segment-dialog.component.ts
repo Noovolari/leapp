@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild} from '@angular/core';
 import {AppService} from '../../../services/app.service';
 import {LoggingService} from '../../../services/logging.service';
 import {WorkspaceService} from '../../../services/workspace.service';
@@ -47,6 +47,8 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
   }
 
   addNewSegment(): void {
+    console.log(this.ngSelectComponent.items);
+
     const newSegment = { name: this.temporaryName, filterGroup: Object.assign({}, this.currentFilterGroup) };
     console.log(newSegment);
 
@@ -56,6 +58,7 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
 
   saveSegment() {
     console.log(this.selectedSegment);
+    console.log(this.ngSelectComponent.items);
 
     const segments = [...this.workspaceService.getSegments()];
     const index = segments.findIndex(s => s.name === this.selectedSegment);
@@ -83,5 +86,11 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
 
   formValid() {
     return this.form.get('segmentName').valid;
+  }
+
+  setByEnter() {
+    if(this.checkNewSegment()) {
+      this.addNewSegment();
+    }
   }
 }

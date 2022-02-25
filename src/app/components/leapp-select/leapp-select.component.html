@@ -7,6 +7,7 @@
              [bindLabel]="bindLabel"
              [bindValue]="bindValue"
              (keyup)="setTemporaryName($event)"
+             (keydown.enter)="setByEnter()"
              [items]="items"
              (change)="change();"
              (reset)="reset();"

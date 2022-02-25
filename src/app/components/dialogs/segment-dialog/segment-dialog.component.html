@@ -8,9 +8,10 @@
     placeholder="Enter new segment name"
     formControlName="segmentName"
     bindLabel="name"
-    bindValue="name"
+    bindValue="filterGroup"
     [closeOnSelect]="true"
     (keyup)="setTemporaryName($event)"
+    (keydown.enter)="setByEnter()"
     [items]="segments"
     [(ngModel)]="selectedSegment" dropdownPosition="down">
     <ng-template ng-footer-tmp>
@@ -18,6 +19,7 @@
       <div class="create-new add" (click)="addNewSegment()" *ngIf="checkNewSegment()"><i class="fal fa-plus-circle"></i>&nbsp;Add "<strong>{{temporaryName}}</strong>"</div>
     </ng-template>
   </ng-select>
+
   <small>This segment will show in your sidebar.</small>
   <br>
   <br>

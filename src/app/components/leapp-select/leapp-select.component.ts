@@ -87,5 +87,11 @@ export class LeappSelectComponent implements AfterViewInit {
     }
   }
 
+  setByEnter() {
+    if(this.checkNewElement()) {
+      this.addNewElement();
+    }
+  }
+
   reset() {}
 }

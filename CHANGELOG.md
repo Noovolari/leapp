@@ -28,6 +28,17 @@ Thank you! A huge shout out to the community members who contributed to this rel
 
 @dnsmichi #215 #216
 
+### [0.8.1](https://github.com/Noovolari/leapp/compare/v0.8.0...v0.8.1) (2022-01-25)
+
+### Features
+
+* added github action for bumping homebrew formula ([cc30a12](https://github.com/Noovolari/leapp/commit/cc30a12c37fbb4ae35a7c3fdbc147c75f8d28a86))
+
+### Bug Fixes
+
+* **LEAP-371:** fixed aws sso sessions synchronization logic ([fc09fce](https://github.com/Noovolari/leapp/commit/fc09fcedc51141c52159bd82a7a47adda870a1f3))
+* removed unwanted and unused pages from docs sitemap ([3d3d5b4](https://github.com/Noovolari/leapp/commit/3d3d5b4618910bc0e7049cdd87619b48a55ec417))
+
 ### [0.8.0](https://github.com/Noovolari/leapp/compare/v0.7.4...v0.8.0) (2021-11-26)
 
 ### Features

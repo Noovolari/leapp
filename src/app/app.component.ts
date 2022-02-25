@@ -18,6 +18,7 @@ import {AwsSsoIntegrationService} from './services/aws-sso-integration.service';
 import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
 import {AwsSsoRoleService} from './services/session/aws/methods/aws-sso-role.service';
 import {KeychainService} from './services/keychain.service';
+import {Constants} from "./models/constants";
 
 @Component({
   selector: 'app-root',
@@ -84,9 +85,16 @@ export class AppComponent implements OnInit {
       await this.retrocompatibilityService.adaptIntegrationPatch();
     }
 
+
+
     let workspace;
     try {
       workspace = this.workspaceService.getWorkspace();
+      // Patch for introducing default terminal option for macOS
+      if(!workspace.macOsTerminal) {
+        workspace.macOsTerminal = Constants.macOsTerminal;
+        this.workspaceService.persistWorkspace(workspace);
+      }
     } catch {
       throw new LeappParseError(this, 'We had trouble parsing your Leapp-lock.json file. It is either corrupt, obsolete, or with an error.');
     }

@@ -28,6 +28,21 @@
             </div>
           </div>
 
+
+          <ng-container *ngIf="appService.detectOs() === eConstants.mac">
+            <h2>MacOS Terminal</h2>
+
+            <div class="form-container">
+              <div class="form-group">
+                <div class="form-field">
+                  <label>Terminal</label>
+                  <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal" [appendTo]="'body'"></ng-select>
+                </div>
+              </div>
+            </div>
+          </ng-container>
+
+
           <hr class="proxy-settings-section">
 
           <h2 class="proxy-settings-section">Proxy settings</h2>

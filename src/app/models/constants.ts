@@ -9,4 +9,6 @@ export enum Constants {
   inApp = 'In-app',
   inBrowser = 'In-browser',
   forcedCloseBrowserWindow = 'ForceCloseBrowserWindow',
+  macOsTerminal = 'Terminal',
+  macOsIterm2 = 'iTerm2'
 }

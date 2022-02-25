@@ -282,6 +282,21 @@ export class WorkspaceService {
     return workspace.profiles;
   }
 
+  removeSegment(segment: Segment) {
+    const workspace = this.getWorkspace();
+    const index = workspace.segments.findIndex(s => s.name === segment.name);
+    if(index > -1) {
+      workspace.segments.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  updateMacOsTerminal(macOsTerminal: string) {
+    const workspace = this.getWorkspace();
+    workspace.macOsTerminal = macOsTerminal;
+    this.persistWorkspace(workspace);
+  }
+
   private getPersistedSessions(): Session[] {
     const workspace = this.getWorkspace();
     return workspace.sessions;
@@ -291,14 +306,5 @@ export class WorkspaceService {
     const workspace = this.getWorkspace();
     workspace.sessions = sessions;
     this.persistWorkspace(workspace);
-  }
-
-  removeSegment(segment: Segment) {
-    const workspace = this.getWorkspace();
-    const index = workspace.segments.findIndex(s => s.name === segment.name);
-    if(index > -1) {
-      workspace.segments.splice(index, 1);
-      this.persistWorkspace(workspace);
-    }
   }
 }

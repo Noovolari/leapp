@@ -12,6 +12,7 @@ export class Workspace {
   private _sessions: Session[];
   private _defaultRegion: string;
   private _defaultLocation: string;
+  private _macOsTerminal: string;
   private _idpUrls: { id: string; url: string }[];
   private _profiles: { id: string; name: string }[];
 
@@ -76,6 +77,14 @@ export class Workspace {
 
   set defaultLocation(value: string) {
     this._defaultLocation = value;
+  }
+
+  get macOsTerminal(): string {
+    return this._macOsTerminal;
+  }
+
+  set macOsTerminal(value: string) {
+    this._macOsTerminal = value;
   }
 
   get idpUrls(): { id: string; url: string }[] {

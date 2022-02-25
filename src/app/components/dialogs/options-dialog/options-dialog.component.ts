@@ -51,6 +51,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   selectedLocation: string;
   selectedRegion: string;
   selectedBrowserOpening = Constants.inApp.toString();
+  selectedTerminal;
 
   form = new FormGroup({
     idpUrl: new FormControl(''),
@@ -63,21 +64,24 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     showAuthCheckbox: new FormControl(''),
     regionsSelect: new FormControl(''),
     locationsSelect: new FormControl(''),
-    defaultBrowserOpening: new FormControl('')
+    defaultBrowserOpening: new FormControl(''),
+    terminalSelect: new FormControl(''),
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: any;
 
   constructor(
-    private appService: AppService,
+    public appService: AppService,
     private loggingService: LoggingService,
     private fileService: FileService,
     private sessionProviderService: SessionFactoryService,
     private awsSessionService: AwsSessionService,
     private workspaceService: WorkspaceService,
     private router: Router
-  ) {}
+  ) {
+    this.selectedTerminal = this.workspaceService.getWorkspace().macOsTerminal || Constants.macOsTerminal;
+  }
 
   ngOnInit() {
     this.workspace = this.workspaceService.getWorkspace();
@@ -135,6 +139,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
       this.workspace.defaultLocation = this.selectedLocation;
       this.workspaceService.updateDefaultLocation(this.workspace.defaultLocation);
+
+      this.workspace.macOsTerminal = this.selectedTerminal;
+      this.workspaceService.updateMacOsTerminal(this.workspace.macOsTerminal);
 
       if (this.checkIfNeedDialogBox()) {
         this.appService.confirmDialog('You\'ve set a proxy url: the app must be restarted to update the configuration.', (res) => {

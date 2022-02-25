@@ -1,9 +1,14 @@
 import {Injectable} from '@angular/core';
 import {ElectronService} from './electron.service';
+import {WorkspaceService} from "./workspace.service";
+import {Constants} from "../models/constants";
 
 @Injectable({ providedIn: 'root' })
 export class ExecuteService {
-  constructor(private electronService: ElectronService) {
+  constructor(
+    private electronService: ElectronService,
+    private workspaceService: WorkspaceService
+  ) {
   }
 
   /**
@@ -54,9 +59,20 @@ export class ExecuteService {
    */
   public openTerminal(command: string, env?: any): Promise<string> {
     if (this.electronService.process.platform === 'darwin') {
-      return this.execute(`osascript -e "tell app \\"Terminal\\"
+
+      const terminalType = this.workspaceService.getWorkspace().macOsTerminal;
+      if(terminalType === Constants.macOsTerminal) {
+        return this.execute(`osascript -e "tell app \\"Terminal\\"
                               activate (do script \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\")
                               end tell"`, Object.assign(this.electronService.process.env, env));
+      } else {
+        return this.execute(`osascript -e "tell app \\"iTerm\\"
+                              set newWindow to (create window with default profile)
+                              tell current session of newWindow
+                                write text \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\"
+                              end tell
+                            end tell"`, Object.assign(this.electronService.process.env, env));
+      }
     } else if (this.electronService.process.platform === 'win32') {
       return this.execute(`start cmd /k ${command}`, env);
     } else {

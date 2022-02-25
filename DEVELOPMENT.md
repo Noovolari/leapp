@@ -148,6 +148,33 @@ The Workspace includes:
 - the AWS SSO Integrations;
 - all the Segments created by the user to filter out Sessions while using the desktop application.
 
+For what concerns Sessions, all models share some basic information, common to all of them. These variables must always be defined.
+
+```
+...
+export class Session {
+
+  sessionId: string;
+  sessionName: string;
+  status: SessionStatus;
+  startDateTime: string;
+  region: string;
+  type: SessionType;
+
+  ...
+}
+
+```
+
+| Session Variable| Description|
+| ---------------- | ------------------------------------ |
+| `sessionId`      | A**Unique identifier** for the Session. It is defined at Model instantiation, and represents a unique ID for the session. Every operation involving a specific session must start by getting a session through its`sessionId`  |
+| `sessionName`    | A**fancy name**, chosen by the user when creating the Session, to make it recognizable at first glance.|
+| `status`         | Represents the**State Management** of a single session; when the**status** of a session is`active`, temporary credentials are available to the user. The possible values are:`inactive`,`pending`,`active` |
+| `startDateTime`  | A**UTC DateTime** string representing the last time a specific Session has started; this is useful for rotation and sorting purposes|
+| `region`         | The**AWS Region** or**Azure Location** the Session is working on. For a complete list of AWS Regions go [here](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.RegionsAndAvailabilityZones.html), and for Azure Locations, go [here](https://azure.microsoft.com/it-it/global-infrastructure/data-residency/#overview)|
+| `type`           | Uniquely identifies two important aspects to determine the Session:**Cloud Provider** and**Access Method.**. Possible values are:`awsIamRoleFederated`,`awsIamUser`,`awsIamRoleChained`,`awsSsoRole`,`azure`. The naming convention we are using is*cloudProvider-accessMethod*:**Cloud Provider** on which you are connecting (i.e., AWS, Azure, GCP...), and the**Access Method** used to generate credentials (i.e., AWS IAM User, Azure Tenant, AWS IAM Role...)|
+
 ### Services
 
 Leapp's project is built on a set of **services** that realize the **core functionalities**.

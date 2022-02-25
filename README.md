@@ -45,7 +45,7 @@ All the covered access methods can be found [here](https://docs.leapp.cloud/use-
 
 
 # Download
-You can find all the information needed to download and install Leapp in the [documentation](https://docs.leapp.cloud/installation/install-leapp/).
+You can find all the information needed to download and install Leapp in the [documentation](https://docs.leapp.cloud/latest/installation/install-leapp/).
 Leapp can be installed on macOS, Linux, and Windows systems.
 
 ... and nothing stops you from compiling Leapp yourself! You can find more information about how to

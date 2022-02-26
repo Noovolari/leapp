@@ -11,7 +11,7 @@
   <a href="https://medium.com/leapp-cloud">Blog</a> |
   <a href="https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q">Slack</a> |
   <a href="https://docs.leapp.cloud">Documentation</a> |
-  <a href="https://docs.leapp.cloud/troubleshooting/app-data/">Troubleshooting</a>
+  <a href="https://docs.leapp.cloud/latest/troubleshooting/app-data/">Troubleshooting</a>
 </h4>
 
 <p align="center">
@@ -35,13 +35,13 @@ For more information about features go to [our documentation](https://docs.leapp
 # ✨ Features
 
 - **Cloud credentials generation in 1 click**
-- **Data [stored locally encrypted](https://docs.leapp.cloud/contributing/system_vault/) in the OS System Vault**
-- **Multiple Cloud-Access supported [strategies](https://docs.leapp.cloud/use-cases/intro/)**
-- **Automatic [short-lived credentials rotation](https://docs.leapp.cloud/concepts/)**
-- **Automatic provisioning of [Sessions](https://docs.leapp.cloud/sessions/) from [AWS Single Sign-on](https://docs.leapp.cloud/use-cases/aws_sso/)**
+- **Data [stored locally encrypted](https://docs.leapp.cloud/latest/security/system-vault/) in the OS System Vault**
+- **Multiple Cloud-Access supported [strategies](https://docs.leapp.cloud/latest/configuration/)**
+- **Automatic [short-lived credentials rotation](https://docs.leapp.cloud/latest/security/credentials-generation/aws/)**
+- **Automatic provisioning of [Sessions](https://docs.leapp.cloud/latest/sessions/) from [AWS Single Sign-on](https://docs.leapp.cloud/latest/configuring-integration/configure-aws-single-sign-on-integration/)**
 - **Connect to EC2 instances straight away**
 
-All the covered access methods can be found [here](https://docs.leapp.cloud/use-cases/intro/).
+All the covered access methods can be found [here](https://docs.leapp.cloud/latest/configuration/).
 
 
 # Download

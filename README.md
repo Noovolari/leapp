@@ -12,6 +12,7 @@
   <a href="https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q">Slack</a> |
   <a href="https://docs.leapp.cloud">Documentation</a> |
   <a href="https://docs.leapp.cloud/latest/troubleshooting/app-data/">Troubleshooting</a>
+
 </h4>
 
 <p align="center">

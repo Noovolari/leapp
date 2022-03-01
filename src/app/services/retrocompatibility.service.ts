@@ -49,7 +49,7 @@ export class RetrocompatibilityService {
         session.account.idpUrl,
         session.account.idpArn,
         session.account.role.roleArn,
-        workspace._profiles[0].id
+        session.profileId ? session.profileId : workspace._profiles[0].id
       );
       federatedSession.sessionId = session.id;
 
@@ -74,7 +74,7 @@ export class RetrocompatibilityService {
       session.account.accountName,
       session.account.region,
       `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
-      workspace._profiles[0].id,
+      session.profileId ? session.profileId : workspace._profiles[0].id,
       undefined,
       session.account.email
     );
@@ -102,7 +102,7 @@ export class RetrocompatibilityService {
         (session as AwsIamRoleFederatedSession).idpUrlId,
         (session as AwsIamRoleFederatedSession).idpArn,
         (session as AwsIamRoleFederatedSession).roleArn,
-        workspace._profiles[0].id
+        session.profileId ? session.profileId : workspace._profiles[0].id
       );
       federatedSession.sessionId = session.sessionId;
 
@@ -127,7 +127,7 @@ export class RetrocompatibilityService {
       (session as AwsSsoRoleSession).sessionName,
       (session as AwsSsoRoleSession).region,
       (session as AwsSsoRoleSession).roleArn,
-      workspace._profiles[0].id,
+      session.profileId ? session.profileId : workspace._profiles[0].id,
       undefined,
       (session as AwsSsoRoleSession).email
     );
@@ -327,7 +327,7 @@ export class RetrocompatibilityService {
     const iamUserSession = new AwsIamUserSession(
       session.account.accountName,
       session.account.region,
-      workspace._profiles[0].id,
+      session.profileId ? session.profileId : workspace._profiles[0].id,
       session.account.mfaDevice
     );
     iamUserSession.sessionId = session.id;
@@ -348,11 +348,9 @@ export class RetrocompatibilityService {
     const iamUserSession = new AwsIamUserSession(
       (session as AwsIamUserSession).sessionName,
       (session as AwsIamUserSession).region,
-      workspace._profiles[0].id,
+      session.profileId ? session.profileId : workspace._profiles[0].id,
       (session as AwsIamUserSession).mfaDevice
     );
-
-    console.log(workspace, workspace._profiles[0].id);
 
     iamUserSession.sessionId = session.sessionId;
 

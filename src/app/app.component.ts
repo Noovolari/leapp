@@ -85,8 +85,6 @@ export class AppComponent implements OnInit {
       await this.retrocompatibilityService.adaptIntegrationPatch();
     }
 
-
-
     let workspace;
     try {
       workspace = this.workspaceService.getWorkspace();

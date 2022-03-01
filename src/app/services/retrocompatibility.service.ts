@@ -60,7 +60,7 @@ export class RetrocompatibilityService {
         session.account.accountName,
         session.account.region,
         session.account.role.roleArn,
-        workspace.profiles[0].id,
+        session.profileId ? session.profileId : workspace._profiles[0].id,
         session.account.parent
       );
       iamRoleChainedSession.sessionId = session.id;
@@ -113,7 +113,7 @@ export class RetrocompatibilityService {
         (session as AwsIamRoleChainedSession).sessionName,
         (session as AwsIamRoleChainedSession).region,
         (session as AwsIamRoleChainedSession).roleArn,
-        workspace.profiles[0].id,
+        session.profileId ? session.profileId : workspace._profiles[0].id,
         (session as AwsIamRoleChainedSession).parentSessionId
       );
       iamRoleChainedSession.sessionId = session.id;

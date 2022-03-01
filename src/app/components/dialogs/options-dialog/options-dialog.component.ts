@@ -23,6 +23,8 @@ import {MatTabGroup} from '@angular/material/tabs';
   encapsulation: ViewEncapsulation.None
 })
 export class OptionsDialogComponent implements OnInit, AfterViewInit {
+  colorTheme: string;
+  selectedColorTheme: string;
 
   @Input()
   selectedIndex;
@@ -66,6 +68,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     locationsSelect: new FormControl(''),
     defaultBrowserOpening: new FormControl(''),
     terminalSelect: new FormControl(''),
+    colorThemeSelect: new FormControl('')
   });
 
   /* Simple profile page: shows the Idp Url and the workspace json */
@@ -81,6 +84,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     private router: Router
   ) {
     this.selectedTerminal = this.workspaceService.getWorkspace().macOsTerminal || Constants.macOsTerminal;
+    this.colorTheme = this.workspaceService.getWorkspace().colorTheme || environment.colorTheme;
+    this.selectedColorTheme = this.colorTheme;
   }
 
   ngOnInit() {
@@ -119,6 +124,21 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     if(this.selectedIndex) {
       this.tabGroup.selectedIndex = this.selectedIndex;
+    }
+  }
+
+  setColorTheme(theme: string): void {
+    this.workspaceService.updateColorTheme(theme);
+    this.colorTheme = this.workspaceService.getWorkspace().colorTheme;
+    this.selectedColorTheme = this.colorTheme;
+    if(this.colorTheme === Constants.darkTheme) {
+      document.querySelector('body').classList.add('dark-theme');
+    }
+    else if(this.colorTheme === Constants.lightTheme) {
+      document.querySelector('body').classList.remove('dark-theme');
+    }
+    else if(this.colorTheme === Constants.systemDefaultTheme) {
+      document.querySelector('body').classList.toggle('dark-theme', this.appService.isDarkMode() );
     }
   }
 

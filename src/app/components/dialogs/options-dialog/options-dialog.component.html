@@ -42,6 +42,25 @@
             </div>
           </ng-container>
 
+          <h2>Color Theme</h2>
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label>Color</label>
+                <ng-select formControlName="colorThemeSelect"
+                           bindLabel="colorTheme"
+                           bindValue="colorTheme"
+                           [clearable]="false"
+                           [items]="[{colorTheme: eConstants.darkTheme}, {colorTheme: eConstants.lightTheme},{colorTheme: eConstants.systemDefaultTheme}]"
+                           [(ngModel)]="selectedColorTheme"
+                           (change)="setColorTheme(selectedColorTheme)"
+                           [appendTo]="'body'">
+                </ng-select>
+              </div>
+            </div>
+          </div>
+
+
 
           <hr class="proxy-settings-section">
 

@@ -27,6 +27,7 @@ import {Constants} from "./models/constants";
 })
 export class AppComponent implements OnInit {
   /* Main app file: launches the Angular framework inside Electron app */
+  darkMode: any;
   constructor(
     public app: AppService,
     private workspaceService: WorkspaceService,
@@ -41,7 +42,24 @@ export class AppComponent implements OnInit {
     private awsSsoOidcService: AwsSsoOidcService,
     private awsSsoRoleService: AwsSsoRoleService,
     private keychainService: KeychainService
-  ) {}
+  ) {
+    const workspace = this.workspaceService.getWorkspace();
+    if(workspace) {
+      const colorTheme = workspace.colorTheme || environment.colorTheme;
+      if(colorTheme === Constants.darkTheme) {
+        document.querySelector('body').classList.add('dark-theme');
+      }
+      else if(colorTheme === Constants.lightTheme) {
+        document.querySelector('body').classList.remove('dark-theme');
+      }
+      else if(colorTheme === Constants.systemDefaultTheme) {
+        if(this.app.isDarkMode()) {
+          document.querySelector('body').classList.add('dark-theme');
+        }
+        else document.querySelector('body').classList.remove('dark-theme');
+      }
+    }
+  }
 
   async ngOnInit() {
     AwsSsoIntegrationService.init(

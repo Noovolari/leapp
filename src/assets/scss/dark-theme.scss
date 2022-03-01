@@ -1,0 +1,56 @@
+body.dark-theme {
+
+  border: none!important;
+
+  background-color: $dark-main-background;
+
+  .selected-segment {
+    background-color: $dark-selected-sidebar;
+  }
+  .mat-expansion-panel {
+    background-color: inherit;
+  }
+
+  .mat-list-item:hover {
+      background-color: $dark-hover-sidebar;
+  }
+
+  .mat-list-base .mat-list-item {
+    color: $dark-main-text-color;
+  }
+
+  .table thead th,
+  .sessions,
+  td {
+    background-color: $dark-table-background!important;
+    color: $dark-main-text-color!important;
+  }
+
+  .table thead th {
+    border-bottom: .5px solid $dark-tablehead-border;
+  }
+
+  .table tbody td {
+    border-bottom: none;
+  }
+
+  .side-bar {
+    border: none;
+  }
+
+  .main-bar {
+    border: none;
+  }
+
+  .option-bar {
+    background-color: $dark-main-background;
+  }
+
+  input.search-bar {
+    background-color: $dark-main-background;
+  }
+
+  .moon-Sidebar, .moon-Filter, .moon-Add, .moon-Refresh, .moon-Setting {
+    color: $dark-main-text-color!important;
+  }
+}

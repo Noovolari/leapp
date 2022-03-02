@@ -5,8 +5,6 @@ import { AppComponent } from './app.component';
 import { LayoutModule } from './layout/layout.module';
 import { HttpClientModule} from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ConfirmationDialogComponent } from './components/dialogs/confirmation-dialog/confirmation-dialog.component';
-import {InputDialogComponent} from './components/dialogs/input-dialog/input-dialog.component';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {NgSelectModule} from '@ng-select/ng-select';
 import {TrayMenuComponent} from './components/tray-menu/tray-menu.component';

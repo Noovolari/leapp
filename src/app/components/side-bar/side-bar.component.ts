@@ -35,9 +35,6 @@ export const sidebarHighlight = new BehaviorSubject<HighlightSettings>({ showAll
 })
 export class SideBarComponent implements OnInit, OnDestroy {
 
-  @ViewChild(IntegrationBarComponent)
-  integrationComponent: IntegrationBarComponent;
-
   folders: Folder[];
   segments: Segment[];
   selectedS: SelectedSegment[];

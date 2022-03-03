@@ -60,6 +60,7 @@ export class SessionCardComponent implements OnInit {
   eSessionType = SessionType;
   eSessionStatus = SessionStatus;
   eOptionIds = optionBarIds;
+  eConstants = Constants;
 
   modalRef: BsModalRef;
 
@@ -87,8 +88,8 @@ export class SessionCardComponent implements OnInit {
   private sessionService: SessionService;
 
   constructor(public workspaceService: WorkspaceService,
+              public appService: AppService,
               private keychainService: KeychainService,
-              private appService: AppService,
               private fileService: FileService,
               private router: Router,
               private ssmService: SsmService,
@@ -226,6 +227,7 @@ export class SessionCardComponent implements OnInit {
   // ============================== //
   // ========== SSM AREA ========== //
   // ============================== //
+
   addNewProfile(tag: string) {
     return {id: uuid.v4(), name: tag};
   }

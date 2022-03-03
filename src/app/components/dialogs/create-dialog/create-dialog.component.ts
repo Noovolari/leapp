@@ -21,6 +21,7 @@ import {AzureService, AzureSessionRequest} from '../../../services/session/azure
 import {LoggingService} from '../../../services/logging.service';
 import {BsModalService} from 'ngx-bootstrap/modal';
 import {openIntegrationEvent} from '../../integration-bar/integration-bar.component';
+import {Constants} from "../../../models/constants";
 
 @Component({
   selector: 'app-create-dialog',
@@ -43,6 +44,7 @@ export class CreateDialogComponent implements OnInit {
   typeSelection = false;
   hasOneGoodSession = false;
   hasSsoUrl = false;
+  eConstants = Constants;
 
   sessionType;
   provider;
@@ -86,10 +88,10 @@ export class CreateDialogComponent implements OnInit {
 
   /* Setup the first account for the application */
   constructor(
-    private appService: AppService,
+    public appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
-    private workspaceService: WorkspaceService,
+    public workspaceService: WorkspaceService,
     private awsIamRoleFederatedService: AwsIamRoleFederatedService,
     private awsIamUserService: AwsIamUserService,
     private awsIamRoleChainedService: AwsIamRoleChainedService,
@@ -284,7 +286,7 @@ export class CreateDialogComponent implements OnInit {
       case SessionType.azure: return 'azure-logo.svg';
       case SessionType.google: return 'google.png';
       case SessionType.alibaba: return 'alibaba.png';
-      default: return 'aws-logo.svg';
+      default: return (this.workspaceService.getWorkspace().colorTheme === Constants.darkTheme || this.workspaceService.getWorkspace().colorTheme === Constants.systemDefaultTheme && this.appService.isDarkMode()) ? 'aws-dark.png' : 'aws.png';
     }
   }
 

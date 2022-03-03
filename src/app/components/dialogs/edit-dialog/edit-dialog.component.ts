@@ -9,6 +9,7 @@ import {WorkspaceService} from '../../../services/workspace.service';
 import {KeychainService} from '../../../services/keychain.service';
 import {environment} from '../../../../environments/environment';
 import {SessionService} from '../../../services/session.service';
+import {Constants} from "../../../models/constants";
 
 @Component({
   selector: 'app-edit-dialog',
@@ -116,7 +117,7 @@ export class EditDialogComponent implements OnInit {
       case SessionType.azure: return 'azure-logo.svg';
       case SessionType.google: return 'google.png';
       case SessionType.alibaba: return 'alibaba.png';
-      default: return 'aws-logo.svg';
+      default: return (this.workspaceService.getWorkspace().colorTheme === Constants.darkTheme || this.workspaceService.getWorkspace().colorTheme === Constants.systemDefaultTheme && this.appService.isDarkMode()) ? 'aws-dark.png' : 'aws.png';
     }
   }
 

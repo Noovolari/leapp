@@ -65,11 +65,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   menuX: number;
   menuY: number;
 
-  constructor(private appService: AppService,
+  constructor(public appService: AppService,
+              public workspaceService: WorkspaceService,
               private bsModalService: BsModalService,
               private awsSsoRoleService: AwsSsoRoleService,
               private router: Router,
-              private workspaceService: WorkspaceService,
               private awsSsoOidcService: AwsSsoOidcService,
               private loggingService: LoggingService) { }
 

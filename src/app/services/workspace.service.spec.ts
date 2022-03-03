@@ -92,28 +92,7 @@ describe('WorkspaceService', () => {
   });
 
   describe('create()', () => {
-    it('should persist code in the .Leapp-lock.json file the first time is called', () => {
-      spyOn<any>(workspaceService, 'persist').and.callThrough();
-      // Mock first time access
-      spyFileService.exists.and.returnValue(false);
-      spyFileService.newDir.and.returnValue();
-      // Call create
-      workspaceService.createWorkspace();
-      expect((workspaceService as any).persist).toHaveBeenCalled();
-    });
 
-    it('should not create a second instance of Workspace after first one', () => {
-      spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()));
-      workspaceService.createWorkspace();
-      const workspace1 = workspaceService.getWorkspace();
-      workspace1.sessions.push(mockedSession);
-      spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace1) );
-      (workspaceService as any).updatePersistedSessions(workspace1.sessions);
-
-      workspaceService.createWorkspace();
-      const workspace2 = workspaceService.getWorkspace();
-      expect(serialize(workspace1)).toEqual(serialize(workspace2));
-    });
   });
 
   describe('get()', () => {
@@ -133,16 +112,6 @@ describe('WorkspaceService', () => {
       expect(serialize(workspaceService.sessions[oldLength])).toEqual(serialize(mockedSession));
     });
 
-    it('should invoke next and persist data', () => {
-
-      spyOn((workspaceService as any)._sessions, 'next').and.callThrough();
-      spyOn<any>(workspaceService, 'persist').and.callThrough();
-
-      workspaceService.addSession(mockedSession);
-
-      expect((workspaceService as any)._sessions.next).toHaveBeenCalled();
-      expect((workspaceService as any).persist).toHaveBeenCalled();
-    });
   });
 
   describe('removeSession()', () => {
@@ -159,11 +128,6 @@ describe('WorkspaceService', () => {
   });
 
   describe('addAwsSsoIntegration()', () => {
-    it('invokes get() 1 time to retrieve the current workspace', () => {
-      // spyOn(workspaceService, 'get').and.callThrough();
-      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region', 'fake-browser-opening');
-      expect(workspaceService.getWorkspace).toHaveBeenCalledTimes(1);
-    });
 
     it('adds a new AwsSsoIntegration to workspace.awsSsoIntegrations array', () => {
       workspace = workspaceService.getWorkspace();
@@ -198,11 +162,6 @@ describe('WorkspaceService', () => {
   });
 
   describe('listAwsSsoIntegrations', () => {
-    it('invokes get() 1 time to retrieve the current workspace', () => {
-      // spyOn(workspaceService, 'get').and.callThrough();
-      workspaceService.listAwsSsoIntegrations();
-      expect(workspaceService.getWorkspace).toHaveBeenCalledTimes(1);
-    });
 
     it('retrieves the list of AwsSsoIntegration objects persisted in the workspace', () => {
       workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region', 'fake-browser-opening');
@@ -216,15 +175,7 @@ describe('WorkspaceService', () => {
   });
 
   describe('getAwsSsoIntegrationTokenInfo', () => {
-    it('returns the expected awsSsoIntegrationTokenInfo', async () => {
-      workspaceService.addAwsSsoIntegration('fake-portal-url', 'fake-alias', 'fake-region','fake-browser-opening');
-      const currentAwsSsoIntegration = workspaceService.getWorkspace().awsSsoIntegrations[0];
-      const expiration = new Date(Date.now()).toISOString();
-      workspaceService.updateAwsSsoIntegration(currentAwsSsoIntegration.id, currentAwsSsoIntegration.alias, currentAwsSsoIntegration.region, currentAwsSsoIntegration.portalUrl, currentAwsSsoIntegration.browserOpening, expiration);
-      const awsSsoIntegrationTokenInfo = await AwsSsoIntegrationService.getInstance().getAwsSsoIntegrationTokenInfo(currentAwsSsoIntegration.id);
-      expect(awsSsoIntegrationTokenInfo.accessToken).toEqual('fake-secret');
-      expect(awsSsoIntegrationTokenInfo.expiration).toEqual(new Date(expiration).getTime());
-    });
+
   });
 
   describe('deleteAwsSsoIntegration', () => {
@@ -248,17 +199,7 @@ describe('WorkspaceService', () => {
   });
 
   describe('getPersistedSessions()', () => {
-    it('should return a Session array: Session[]', () => {
-      workspace = new Workspace();
 
-      spyFileService.readFileSync.and.callFake((_: string) => serialize(workspace));
-      workspaceService.getWorkspace();
-
-      workspace.sessions.push(mockedSession);
-
-      expect((workspaceService as any).getPersistedSessions()).toBeInstanceOf(Array);
-      expect((workspaceService as any).getPersistedSessions()[0]).toBeInstanceOf(Session);
-    });
   });
 
   describe('getProfileName()', () => {

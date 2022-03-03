@@ -643,6 +643,11 @@ button, a, input, i {
     font-size: 10px;
     background-color: $text-black;
   }
+
+.dark-theme .mat-tooltip {
+    font-size: 10px;
+    background-color: $dark-tooltip-color;
+  }
 }
 
 .modal + .modal {

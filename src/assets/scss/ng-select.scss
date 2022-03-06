@@ -133,3 +133,11 @@ ng-select select-dropdown > div {
   padding: 10px 0 !important;
   box-shadow: 0 14px 28px rgb(0 0 0 / 25%), 0 10px 10px rgb(0 0 0 / 22%) !important;
 }
+
+body.dark-theme .form-field .ng-select .ng-dropdown-panel.ng-select-top {
+    background-color: $dark-select-component !important;
+    border-color: $dark-input-form-border!important;
+    div.ng-dropdown-panel-items::-webkit-scrollbar-track-piece {
+      background-color: $dark-select-component !important;
+    }
+}

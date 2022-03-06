@@ -45,6 +45,9 @@ body.dark-theme {
       background-color: $dark-selected-session!important;
     }
   }
+  .selected.table-column-6 i.fa-circle{
+    color: $dark-main-text-color!important;
+  }
 
   .table tbody td, .table thead th {
     border-bottom: 0.5px solid $dark-tablehead-border!important;
@@ -104,18 +107,6 @@ body.dark-theme {
       background-color: $dark-session-card-border;
     }
 
-    /* .mat-menu-item:hover:not([disabled])::after,
-    .mat-menu-item.cdk-program-focused:not([disabled])::after,
-    .mat-menu-item.cdk-keyboard-focused:not([disabled])::after,
-    .mat-menu-item-highlighted:not([disabled])::after {
-      background-color: $dark-hover-sidebar;
-    }
-    .mat-menu-item {
-      i, span, polygon {
-        color: $dark-main-text-color;
-      }
-    }   */
-
     .mat-menu-item-highlighted:not([disabled]) {
       background-color: $dark-modal-background;
     }
@@ -141,8 +132,6 @@ body.dark-theme {
       color: $dark-main-text-color;
     }
     i.moon-Play-filled, i.moon-Stop {
-      border-radius: 30px;
-      background-color: $dark-main-text-color;
       color: $dark-start-button!important;
     }
   }
@@ -156,6 +145,7 @@ body.dark-theme {
   input.form-control {
     background-color: $dark-main-background!important;
     border-color: $dark-input-form-border;
+    color: $dark-main-text-color;
   }
 
   .moon-Sidebar, .moon-Filter, .moon-Add, .moon-Refresh, .moon-Setting {
@@ -228,6 +218,9 @@ body.dark-theme {
   }
 
   .modal-content {
+    span {
+      color: $dark-main-text-color;
+    }
     background-color: $dark-modal-background;
     border: 1px solid $dark-session-card-border;
     ::-webkit-scrollbar-track-piece {
@@ -249,9 +242,9 @@ body.dark-theme {
     label, h2, h4, p {
       color: $dark-main-text-color;
       a {
-        color: $dark-hover-sidebar;
+        color: $dark-button-color;
         &:hover {
-          color: $dark-selected-session;
+          color: #00d9ff;
         }
       }
     }
@@ -286,6 +279,7 @@ body.dark-theme {
     }
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
       background-color: $dark-select-component!important;
+      color: $dark-main-text-color!important;
       span {
         color: $dark-main-text-color;
       }
@@ -352,11 +346,51 @@ body.dark-theme {
     outline: $dark-input-form-border solid 1px !important;
   }
 
+  .ng-select .ng-select-container .ng-value-container .ng-input>input {
+    color: $dark-main-text-color;
+  }
+
   .mat-menu-panel .mat-menu-item {
     color: $dark-main-text-color;
   }
 
   .mat-menu-item:hover:not([disabled])::after {
     background: rgba(255, 255, 255, 0.1);
+  }
+
+  .form-control:focus {
+    outline: 1px solid $dark-input-form-border!important;
+  }
+
+  .sessions tr:hover td:not(.selected) {
+    background: rgba(40, 40, 40, 0.4);
+  }
+
+  ///* Placeholder text color *///
+  ::placeholder {
+    color: $dark-placeholder-color;
+    opacity: 1;
+  }
+  .ng-select .ng-select-container .ng-value-container .ng-placeholder {
+    color: $dark-placeholder-color;
+    opacity: 1;
+  }
+
+  .create-new {
+    border-top: 1px solid $dark-input-form-border!important;
+  }
+
+  .add {
+    color: $dark-main-text-color!important;
+  }
+
+  .dark-theme-filling {
+    background-color: $dark-main-text-color;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 5px;
+    left: 10px;
+    z-index: -1;
   }
 }

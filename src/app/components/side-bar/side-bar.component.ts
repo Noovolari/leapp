@@ -1,4 +1,4 @@
-import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {WorkspaceService} from '../../services/workspace.service';
 import Folder from '../../models/folder';
 import Segment from '../../models/Segment';
@@ -8,11 +8,11 @@ import {
   globalResetFilter, globalSegmentFilter
 } from '../command-bar/command-bar.component';
 import {Session} from '../../models/session';
-import {BehaviorSubject, Observable} from 'rxjs';
+import {BehaviorSubject} from 'rxjs';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {ConfirmationDialogComponent} from '../dialogs/confirmation-dialog/confirmation-dialog.component';
 import {Constants} from '../../models/constants';
-import {IntegrationBarComponent, integrationHighlight} from "../integration-bar/integration-bar.component";
+import {integrationHighlight} from "../integration-bar/integration-bar.component";
 
 export interface SelectedSegment {
   name: string;

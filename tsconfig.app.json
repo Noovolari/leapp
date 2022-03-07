@@ -9,7 +9,7 @@
     "baseUrl": "./",
     "declaration": false,
     "experimentalDecorators": true,
-    "lib": ["ES2019", "DOM"],
+    "lib": ["ES2021", "DOM"],
     "module": "esnext",
     "moduleResolution": "node",
     "sourceMap": true,

@@ -167,7 +167,12 @@ export class AppComponent implements OnInit {
    * Show that we created a copy of original credential file if present in the system
    */
   private showCredentialBackupMessageIfNeeded(workspace: Workspace) {
-    const oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
+    let oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
+    if(this.app.detectOs() === Constants.windows) {
+      oldAwsCredentialsPath = oldAwsCredentialsPath.replaceAll('/', '\\');
+      console.log(oldAwsCredentialsPath);
+    }
+
     const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
     const check = workspace.sessions.length === 0 &&
                   this.app.getFs().existsSync(oldAwsCredentialsPath) &&

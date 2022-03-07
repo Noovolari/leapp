@@ -164,6 +164,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       const filter = {
         urls: [
           'https://*.onelogin.com/*',
+          'https://*/adfs/ls/idpinitiatedsignon*',
           'https://*.okta.com/*',
           'https://accounts.google.com/ServiceLogin*',
           'https://login.microsoftonline.com/*',
@@ -181,6 +182,11 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
         }
         // One Login
         if (details.url.indexOf('.onelogin.com/login') !== -1) {
+          idpWindow = null;
+          resolve(true);
+        }
+        // ADFS 2.0
+        if (details.url.indexOf('adfs/ls/idpinitiatedsignon') !== -1 && details.url.indexOf('loginToRp=urn:amazon:webservices') !== -1) {
           idpWindow = null;
           resolve(true);
         }

@@ -72,6 +72,10 @@ export class AwsSsoOidcService {
     this.loginMutex = false;
   }
 
+  isPending(): boolean {
+    return this.loginMutex;
+  }
+
   async login(awsSsoIntegration: AwsSsoIntegration): Promise<GenerateSSOTokenResponse> {
     if (!this.loginMutex && this.setIntervalQueue.length === 0) {
       this.loginMutex = true;

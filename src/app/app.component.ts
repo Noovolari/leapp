@@ -170,7 +170,6 @@ export class AppComponent implements OnInit {
     let oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
     if(this.app.detectOs() === Constants.windows) {
       oldAwsCredentialsPath = oldAwsCredentialsPath.replaceAll('/', '\\');
-      console.log(oldAwsCredentialsPath);
     }
 
     const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';

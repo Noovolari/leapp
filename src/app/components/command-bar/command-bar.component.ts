@@ -12,7 +12,7 @@ import {SessionType} from '../../models/session-type';
 import Segment from '../../models/Segment';
 import {globalOrderingFilter} from '../sessions/sessions.component';
 import {syncAllEvent} from '../integration-bar/integration-bar.component';
-import {Constants} from "../../models/constants";
+import {Constants} from '../../models/constants';
 
 export interface GlobalFilters {
   searchFilter: string;
@@ -75,8 +75,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private subscription4;
   private subscription5;
   private subscription6;
-
-  private currentSegment: Segment;
 
   constructor(private bsModalService: BsModalService, public workspaceService: WorkspaceService, public appService: AppService) {
     this.filterExtended = false;
@@ -177,19 +175,22 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   toggleCompactMode() {
     this.compactMode = !this.compactMode;
     this.filterExtended = false;
-    if(this.appService.getOS() === Constants.windows) {
-      this.appService.getCurrentWindow().restore();
+
+    this.appService.getCurrentWindow().unmaximize();
+    this.appService.getCurrentWindow().restore();
+
+    if(this.appService.detectOs() === Constants.mac && this.appService.getCurrentWindow().isFullScreen()) {
+      this.appService.getCurrentWindow().setFullScreen(false);
     }
+
     compactMode.next(this.compactMode);
     globalHasFilter.next(this.filterExtended);
     document.querySelector('.sessions').classList.remove('filtered');
-    // this.saveTemporarySegmentAndApply();
   }
 
   toggleFilters() {
     this.filterExtended = !this.filterExtended;
     globalHasFilter.next(this.filterExtended);
-    // this.saveTemporarySegmentAndApply();
     CommandBarComponent.changeSessionsTableHeight();
   }
 
@@ -374,26 +375,4 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.regions = this.appService.getRegions().map(element => ({ name: element.region, value: false, show: true }));
   }
-
-  private saveTemporarySegmentAndApply() {
-    if (!this.filterExtended) {
-      this.currentSegment = JSON.parse(JSON.stringify({
-        name: 'temp',
-        filterGroup: {
-          dateFilter: this.filterForm.get('dateFilter').value,
-          integrationFilter: this.filterForm.get('integrationFilter').value,
-          profileFilter: this.filterForm.get('profileFilter').value,
-          providerFilter: this.filterForm.get('providerFilter').value,
-          regionFilter: this.filterForm.get('regionFilter').value,
-          searchFilter: this.filterForm.get('searchFilter').value,
-          typeFilter: this.filterForm.get('typeFilter').value
-        }
-      }));
-      globalResetFilter.next(true);
-    } else {
-      globalSegmentFilter.next(this.currentSegment);
-    }
-  }
-
-
 }

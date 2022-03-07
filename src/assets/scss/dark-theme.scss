@@ -53,12 +53,6 @@ body.dark-theme {
     border-bottom: 0.5px solid $dark-tablehead-border!important;
   }
 
-  ::ng-deep {
-    tr:hover td:not(.selected) {
-      background: $dark-hover-session!important;
-    }
-  }
-
   .table thead th {
     border-bottom: 0.5px solid $dark-tablehead-border;
   }
@@ -148,7 +142,11 @@ body.dark-theme {
     color: $dark-main-text-color;
   }
 
-  .moon-Sidebar, .moon-Filter, .moon-Add, .moon-Refresh, .moon-Setting {
+  .moon-Sidebar, .moon-Filter, .moon-Refresh, .moon-Setting {
+    color: $dark-icons!important;
+  }
+
+  .moon-Add {
     color: $dark-main-text-color!important;
   }
 
@@ -218,6 +216,9 @@ body.dark-theme {
   }
 
   .modal-content {
+    .segment-hint {
+      color: #9A9A9A;
+    }
     span {
       color: $dark-main-text-color;
     }
@@ -363,7 +364,7 @@ body.dark-theme {
   }
 
   .sessions tr:hover td:not(.selected) {
-    background: rgba(40, 40, 40, 0.4);
+    background-color: $dark-hover-session!important;
   }
 
   ///* Placeholder text color *///
@@ -378,6 +379,17 @@ body.dark-theme {
 
   .create-new {
     border-top: 1px solid $dark-input-form-border!important;
+    color: $dark-placeholder-color;
+    i {
+      color: $dark-placeholder-color!important;
+    }
+  }
+
+  .add {
+    color: $dark-main-text-color;
+    i {
+      color: $dark-main-text-color!important;
+    }
   }
 
   .add {
@@ -393,4 +405,23 @@ body.dark-theme {
     left: 10px;
     z-index: -1;
   }
+
+  .form-control-input-button button i.moon-Edit {
+    color: $dark-main-text-color;
+  }
+
+  .mat-checkbox-checked .mat-checkbox-checkmark {
+    opacity: 1!important;
+    background: $dark-button-color!important;
+    border-radius: 2px;
+  }
+
+  .mat-checkbox-frame {
+    border-color: $dark-input-form-border;
+  }
+
+  .filter-menu::-webkit-scrollbar-track-piece {
+    background-color: $dark-modal-background!important;
+  }
+
 }

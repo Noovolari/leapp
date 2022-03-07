@@ -177,6 +177,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.filterExtended = false;
     compactMode.next(this.compactMode);
     globalHasFilter.next(this.filterExtended);
+    document.querySelector('.sessions').classList.remove('filtered');
     // this.saveTemporarySegmentAndApply();
   }
 

@@ -143,6 +143,7 @@ export class SessionCardComponent implements OnInit {
     this.sessionService.start(this.session.sessionId).then(_ => {this.clearOptionIds();});
     this.logSessionData(this.session, `Starting Session`);
     this.trigger.closeMenu();
+    document.querySelector('.table thead tr').scrollIntoView();
   }
 
   /**

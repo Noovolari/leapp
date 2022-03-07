@@ -177,6 +177,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   toggleCompactMode() {
     this.compactMode = !this.compactMode;
     this.filterExtended = false;
+    if(this.appService.getOS() === Constants.windows) {
+      this.appService.getCurrentWindow().restore();
+    }
     compactMode.next(this.compactMode);
     globalHasFilter.next(this.filterExtended);
     document.querySelector('.sessions').classList.remove('filtered');

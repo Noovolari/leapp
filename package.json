@@ -32,6 +32,7 @@
     "release-linux": "gushio scripts/gushio/target-release.js 'configuration production' linux",
     "release-win": "gushio scripts/gushio/target-release.js 'configuration production' win",
     "release-all": "gushio scripts/gushio/target-release.js 'configuration production' all",
+    "dist-deb-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --linux",
     "dist-win-dev": "rm -rf electron/dist && rm -rf release && rm -rf dist && tsc --p electron && ng build --aot --base-href ./ && mkdir -p electron/dist/electron/assets/images && cp -a electron/assets/images/* electron/dist/electron/assets/images/ && electron-builder build --win --x64"
   },
   "build": {

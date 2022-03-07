@@ -24,6 +24,7 @@ import {IGlobalColumns} from '../../command-bar/command-bar.component';
 import {EditDialogComponent} from '../../dialogs/edit-dialog/edit-dialog.component';
 import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {AwsSsoOidcService} from '../../../services/aws-sso-oidc.service';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -94,6 +95,7 @@ export class SessionCardComponent implements OnInit {
               private router: Router,
               private ssmService: SsmService,
               private bsModalService: BsModalService,
+              private awsSsoOidcService: AwsSsoOidcService,
               private sessionProviderService: SessionFactoryService,
               private loggingService: LoggingService,
               private modalService: BsModalService) {
@@ -140,7 +142,9 @@ export class SessionCardComponent implements OnInit {
    * Start the selected sessions
    */
   startSession() {
-    this.sessionService.start(this.session.sessionId).then(_ => {this.clearOptionIds();});
+    this.sessionService.start(this.session.sessionId).then(_ => {
+this.clearOptionIds();
+});
     this.logSessionData(this.session, `Starting Session`);
     this.trigger.closeMenu();
     document.querySelector('.table thead tr').scrollIntoView();
@@ -150,7 +154,13 @@ export class SessionCardComponent implements OnInit {
    * Stop sessions
    */
   stopSession() {
-    this.sessionService.stop(this.session.sessionId).then(_ => {this.clearOptionIds();});
+    this.sessionService.stop(this.session.sessionId).then(_ => {
+      this.clearOptionIds();
+      const awsSsoLoginThroughSession = this.session.type === SessionType.awsSsoRole && this.awsSsoOidcService.isPending();
+      if(awsSsoLoginThroughSession) {
+        this.awsSsoOidcService.interrupt();
+      }
+    });
     this.logSessionData(this.session, `Stopped Session`);
     this.trigger.closeMenu();
   }

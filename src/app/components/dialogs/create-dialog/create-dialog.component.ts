@@ -97,8 +97,7 @@ export class CreateDialogComponent implements OnInit {
     private awsIamRoleChainedService: AwsIamRoleChainedService,
     private awsSessionService: AwsSessionService,
     private azureService: AzureService,
-    private loggingService: LoggingService,
-    private bsModalService: BsModalService
+    private loggingService: LoggingService
   ) {}
 
   ngOnInit() {

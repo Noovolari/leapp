@@ -12,6 +12,7 @@ import {SessionType} from '../../models/session-type';
 import Segment from '../../models/Segment';
 import {globalOrderingFilter} from '../sessions/sessions.component';
 import {syncAllEvent} from '../integration-bar/integration-bar.component';
+import {Constants} from "../../models/constants";
 
 export interface GlobalFilters {
   searchFilter: string;
@@ -47,6 +48,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   @ViewChild('parent') parent: ElementRef;
   @ViewChild('child') child: ElementRef;
   overflowed = false;
+  eConstants = Constants;
 
   filterForm = new FormGroup({
     searchFilter: new FormControl(''),
@@ -76,7 +78,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   private currentSegment: Segment;
 
-  constructor(private bsModalService: BsModalService, private workspaceService: WorkspaceService, public appService: AppService) {
+  constructor(private bsModalService: BsModalService, public workspaceService: WorkspaceService, public appService: AppService) {
     this.filterExtended = false;
     this.compactMode = false;
 

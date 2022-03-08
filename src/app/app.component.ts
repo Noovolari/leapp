@@ -59,6 +59,12 @@ export class AppComponent implements OnInit {
         else document.querySelector('body').classList.remove('dark-theme');
       }
     }
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+      if(this.workspaceService.getWorkspace().colorTheme === Constants.systemDefaultTheme) {
+        if(this.app.isDarkMode()) document.querySelector('body').classList.add('dark-theme');
+        else document.querySelector('body').classList.remove('dark-theme');
+      }
+    });
   }
 
   async ngOnInit() {

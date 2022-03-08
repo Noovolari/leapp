@@ -37,6 +37,7 @@
                          [bindValue]="'value'"
                          (change)="setAccessStrategy(provider);"
                          [clearable]="false"
+                         [searchable]="false"
                          [items]="[{value: eSessionType.awsIamRoleFederated, label: 'AWS IAM Role Federated'}, {value: eSessionType.awsIamUser, label: 'AWS IAM User'}, {value: eSessionType.awsIamRoleChained, label: 'AWS IAM Role Chained'}]"
                          placeholder="Select Session Strategy"
                          [addTag]="false"

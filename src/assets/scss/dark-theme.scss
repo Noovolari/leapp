@@ -306,6 +306,8 @@ body.dark-theme {
 
   .search-bar input {
     background: unset!important;
+    color: $dark-main-text-color!important;
+    caret-color: $dark-main-text-color;
   }
 
   hr {
@@ -424,4 +426,7 @@ body.dark-theme {
     background-color: $dark-modal-background!important;
   }
 
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    color: $dark-main-text-color!important;
+  }
 }

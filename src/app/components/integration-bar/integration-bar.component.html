@@ -13,14 +13,14 @@
   <a class="close-modal" (click)="modalRef.hide();"><i class="moon-Close"></i></a>
   <h4>{{modifying === 1 ? 'Add New Integration' : 'Edit ' + selectedAwsSsoConfiguration.alias}}</h4>
 
-  <form [formGroup]="form">
+  <form [formGroup]="form" spellcheck="false">
     <div class="form-container">
 
       <div class="form-group">
         <div class="form-field">
           <div class="form-group">
             <label>Integration type</label>
-            <input  type="text" class="form-control blue-control btn-control" value="Aws Single Sign-On" readonly>
+            <input  type="text" class="form-control blue-control btn-control" disabled="true" value="Aws Single Sign-On" readonly>
           </div>
         </div>
       </div>
@@ -58,7 +58,7 @@
         <div class="form-field">
           <div class="form-group">
             <label>Auth. method</label>
-            <ng-select placeholder="Choose an Authentication method" formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [clearable]="false" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedAwsSsoConfiguration.browserOpening"></ng-select>
+            <ng-select placeholder="Choose an Authentication method" formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [clearable]="false" [searchable]="false" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedAwsSsoConfiguration.browserOpening"></ng-select>
           </div>
         </div>
       </div>

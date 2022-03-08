@@ -19,9 +19,8 @@ import {
 } from '../../../services/session/aws/methods/aws-iam-role-federated.service';
 import {AzureService, AzureSessionRequest} from '../../../services/session/azure/azure.service';
 import {LoggingService} from '../../../services/logging.service';
-import {BsModalService} from 'ngx-bootstrap/modal';
 import {openIntegrationEvent} from '../../integration-bar/integration-bar.component';
-import {Constants} from "../../../models/constants";
+import {Constants} from '../../../models/constants';
 
 @Component({
   selector: 'app-create-dialog',
@@ -261,7 +260,9 @@ export class CreateDialogComponent implements OnInit {
    */
   goToAwsSso() {
     this.appService.closeModal();
-    setTimeout(() => { openIntegrationEvent.next(true) }, 100)
+    setTimeout(() => {
+     openIntegrationEvent.next(true);
+    }, 100);
   }
 
   /**

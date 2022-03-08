@@ -25,6 +25,7 @@ import {EditDialogComponent} from '../../dialogs/edit-dialog/edit-dialog.compone
 import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AwsSsoOidcService} from '../../../services/aws-sso-oidc.service';
+import {ElectronService} from '../../../services/electron.service';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -97,6 +98,7 @@ export class SessionCardComponent implements OnInit {
               private bsModalService: BsModalService,
               private awsSsoOidcService: AwsSsoOidcService,
               private sessionProviderService: SessionFactoryService,
+              private electronService: ElectronService,
               private loggingService: LoggingService,
               private modalService: BsModalService) {
   }
@@ -504,6 +506,32 @@ this.clearOptionIds();
 
   addNewUUID(): string {
     return uuid.v4();
+  }
+
+  logoutFromFederatedSession(): void {
+    try {
+      // Clear all extra data
+      const url = this.workspaceService.getIdpUrl((this.session as AwsIamRoleFederatedSession).idpUrlId);
+      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), environment.appName);
+      this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(url)}`);
+
+      this.stopSession();
+
+      this.loggingService.toast('Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.', ToastLevel.info, 'Cleaning configuration file');
+
+      // Restart
+      setTimeout(() => {
+        // a bit of timeout to make everything reset as expected and give time to read message
+        this.appService.restart();
+      }, 3000);
+    } catch (err) {
+      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
+      if(this.appService.detectOs() === Constants.windows) {
+        this.loggingService.toast(`Leapp needs Admin permissions to do this: please restart the application as an Administrator and retry.`, ToastLevel.warn, 'Cleaning configuration file');
+      } else {
+        this.loggingService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
+      }
+    }
   }
 
   private logSessionData(session: Session, message: string): void {

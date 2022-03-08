@@ -31,6 +31,7 @@ nav:
       - System Vault: 'security/system-vault.md'
       - 'Zero Knowledge':  'security/zero-knowledge.md'
   - 'Built-in features':
+      - 'General Options': 'built-in-features/general-options.md'
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
       - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'
   - 'Roadmap': https://roadmap.leapp.cloud/tabs/4-in-progress

@@ -434,15 +434,18 @@ body.dark-theme {
     color: $dark-main-text-color!important;
   }
 
-  .app-windows-detected .window-buttons .minimize:hover img,
-  .app-windows-detected .window-buttons .maximize:hover img {
-    filter: invert(1);
+  .app-windows-detected .window-buttons .minimize img,
+  .app-windows-detected .window-buttons .maximize img,
+  .app-windows-detected .window-buttons .quit img {
     position: relative;
     top: 1px;
   }
+
+  .app-windows-detected .window-buttons .minimize:hover img,
+  .app-windows-detected .window-buttons .maximize:hover img {
+    filter: invert(1);
+  }
   .app-windows-detected .window-buttons .quit:hover img {
     filter: invert(0);
-    position: relative;
-    top: 1px;
   }
 }

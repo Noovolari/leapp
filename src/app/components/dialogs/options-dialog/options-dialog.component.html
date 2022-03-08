@@ -30,13 +30,13 @@
 
 
           <ng-container *ngIf="appService.detectOs() === eConstants.mac">
-            <h2>MacOS Terminal</h2>
+            <h2>Terminal Selection</h2>
 
             <div class="form-container">
               <div class="form-group">
                 <div class="form-field">
-                  <label>Terminal</label>
-                  <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal" [appendTo]="'body'"></ng-select>
+                  <label>MacOS Terminal</label>
+                  <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [searchable]="false" [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal" [appendTo]="'body'"></ng-select>
                 </div>
               </div>
             </div>
@@ -51,6 +51,7 @@
                            bindLabel="colorTheme"
                            bindValue="colorTheme"
                            [clearable]="false"
+                           [searchable]="false"
                            [items]="[{colorTheme: eConstants.darkTheme}, {colorTheme: eConstants.lightTheme},{colorTheme: eConstants.systemDefaultTheme}]"
                            [(ngModel)]="selectedColorTheme"
                            (change)="setColorTheme(selectedColorTheme)"

@@ -257,6 +257,10 @@ body.dark-theme {
     button {
       background-color: $dark-button-color;
     }
+    button.mat-button-disabled {
+      background-color: #848484;
+      color: #4F4F4F;
+    }
     div.ng-select-container {
       caret-color: $dark-main-text-color;
       background-color: $dark-select-component;
@@ -428,5 +432,11 @@ body.dark-theme {
 
   .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
     color: $dark-main-text-color!important;
+  }
+
+  .app-windows-detected .window-buttons .minimize:hover img,
+  .app-windows-detected .window-buttons .maximize:hover img,
+  .app-windows-detected .window-buttons .quit:hover img {
+    filter: invert(1);
   }
 }

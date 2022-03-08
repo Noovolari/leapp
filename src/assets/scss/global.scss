@@ -672,6 +672,11 @@ button, a, input, i {
   left: -10px;
 }
 
+.app-windows-detected .command-bar:not(.compact) .top-right-option-button {
+  position: relative!important;
+  left: 10px!important;
+}
+
 ::ng-deep {
   .ng-select .ng-arrow-wrapper:hover .ng-arrow {
     border-color: #666;

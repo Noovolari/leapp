@@ -47,6 +47,13 @@
     <span style="margin-left: 7px;">Stop Session</span>
   </button>
 
+  <ng-container *ngIf="session.type === eSessionType.awsIamRoleFederated">
+    <button mat-menu-item (click)="logoutFromFederatedSession();">
+      <i class="moon-Close"></i>
+      <span>&nbsp;&nbsp;Logout</span>
+    </button>
+  </ng-container>
+
   <div class="divider"></div>
 
   <button mat-menu-item [matMenuTriggerFor]="change">

@@ -89,8 +89,6 @@ To install the AWS SSM agent locally, follow [this](https://docs.leapp.cloud/lat
 
 # Project Structure
 
-Capire se descrivere le project folder o se inserirle mano a mano, in base al contesto.
-
 Leapp is an application built using Electron and Angular. The first is used in order to generate executables for different OSs: macOS, Windows, and Linux distros. It serves as a wrapper for the Angular site which hosts the application logic, by serving it through a combination of [Chromium](https://www.chromium.org/Home/) and Node.js.
 
 If you are new to Electron, please refer to the official [documentation](https://www.electronjs.org/docs/latest).

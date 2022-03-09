@@ -136,6 +136,9 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     let normalIcon = 'LeappTemplate';
     if (this.appService.detectOs() === Constants.linux) {
       normalIcon = 'LeappMini';
+      if(this.appService.isDarkMode()) {
+        normalIcon = 'LeappTemplate';
+      }
     }
     if (!this.currentTray) {
       this.currentTray = new (this.appService.getTray())(__dirname + `/assets/images/${normalIcon}.png`);

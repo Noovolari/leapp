@@ -26,6 +26,7 @@ import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {AwsSsoOidcService} from '../../../services/aws-sso-oidc.service';
 import {ElectronService} from '../../../services/electron.service';
+import {OpeningWebConsoleService} from '../../../services/opening-web-console.service';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -100,7 +101,8 @@ export class SessionCardComponent implements OnInit {
               private sessionProviderService: SessionFactoryService,
               private electronService: ElectronService,
               private loggingService: LoggingService,
-              private modalService: BsModalService) {
+              private modalService: BsModalService,
+              private openingWebConsoleService: OpeningWebConsoleService) {
   }
 
   ngOnInit() {
@@ -492,10 +494,13 @@ this.clearOptionIds();
     document.querySelector('.sessions').classList.remove('option-bar-opened');
   }
 
-  openAmazonConsole(event: MouseEvent, session: Session) {
+  async openAwsWebConsole(event: MouseEvent, session: Session) {
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
+    const credentials = await (this.sessionService as AwsSessionService).generateCredentials(session.sessionId);
+    const sessionRegion = session.region;
+    this.openingWebConsoleService.openingWebConsole(credentials, sessionRegion);
   }
 
   openTerminal(event: MouseEvent, session: Session) {

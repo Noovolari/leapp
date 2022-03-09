@@ -26,7 +26,7 @@ You can start contributing to Leapp by
 
 Any other idea to contribute that we missed? Submit a Pull Request to share it with us!
 
-[GitHub Issues](https://github.com/Noovolari/leapp/issues) is the preferred contribution channel, but not the only one! You can suggest enhancements or new features in Leapp’s [public roadmap](https://roadmap.leapp.cloud/tabs/4-in-progress). TOCHANGE LINK
+[GitHub Issues](https://github.com/Noovolari/leapp/issues) is the preferred contribution channel, but not the only one! You can suggest enhancements or new features in Leapp’s [public roadmap](https://roadmap.leapp.cloud/tabs/4-in-progress).
 
 When creating a new issue through the [GitHub Issues](https://github.com/Noovolari/leapp/issues) channel, it’s really important to understand if it is a “beginner-friendly” one. Beginner-friendly issues can be a good starting point for new contributors; that’s the reason why you can label them as “good first issue”. Visit [here](https://github.com/noovolari/leapp/contribute) and make your first contribution to this repository by tackling one of the listed good first issues.
 

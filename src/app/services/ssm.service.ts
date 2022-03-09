@@ -123,16 +123,19 @@ export class SsmService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const params = { MaxResults: 50 };
       const reservations = await this.ec2Client.describeInstances(params).promise();
-
-      instances.forEach(instance => {
-        const foundInstance = reservations.Reservations.filter(r => r.Instances[0].InstanceId === instance.Name);
-        if (foundInstance.length > 0) {
-          const foundName = foundInstance[0].Instances[0].Tags.filter(t => t.Key === 'Name');
-          if (foundName.length > 0) {
-            instance.Name = foundName[0].Value;
+      reservations.Reservations.forEach(reservation => {
+        instances.forEach(instance => {
+          const foundInstance = reservation.Instances.filter(i => i.InstanceId === instance.Name);
+          console.log(foundInstance);
+          if (foundInstance.length > 0) {
+            const foundName = foundInstance[0].Tags.filter(t => t.Key === 'Name');
+            if (foundName.length > 0) {
+              instance.Name = foundName[0].Value;
+            }
           }
-        }
+        });
       });
+
 
       return instances;
     } catch(err) {

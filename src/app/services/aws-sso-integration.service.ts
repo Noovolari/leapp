@@ -72,8 +72,8 @@ export class AwsSsoIntegrationService {
     );
   }
 
-  async login(awsSsoIntegrationId: string): Promise<void> {
-    if (await this.isAwsSsoAccessTokenExpired(awsSsoIntegrationId)) {
+  async login(awsSsoIntegrationId: string, force?: boolean): Promise<void> {
+    if (force || await this.isAwsSsoAccessTokenExpired(awsSsoIntegrationId)) {
       const awsSsoIntegration = this.workspaceService.getAwsSsoIntegration(awsSsoIntegrationId);
 
       const followRedirectClient = this.appService.getFollowRedirects()[this.getProtocol(awsSsoIntegration.portalUrl)];

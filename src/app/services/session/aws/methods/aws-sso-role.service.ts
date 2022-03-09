@@ -130,10 +130,24 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const region = awsSsoConfiguration.region;
     const roleArn = (this.get(sessionId) as AwsSsoRoleSession).roleArn;
 
-    await AwsSsoIntegrationService.getInstance().login(awsSsoConfiguration.id);
-    const awsSsoIntegrationTokenInfo = await AwsSsoIntegrationService.getInstance().getAwsSsoIntegrationTokenInfo(awsSsoConfiguration.id);
-    const accessToken = awsSsoIntegrationTokenInfo.accessToken;
-    const credentials = await this.getRoleCredentials(accessToken, region, roleArn);
+    let awsSsoIntegrationTokenInfo;
+    let credentials;
+
+    try {
+      // Normal flow
+      await AwsSsoIntegrationService.getInstance().login(awsSsoConfiguration.id);
+      awsSsoIntegrationTokenInfo = await AwsSsoIntegrationService.getInstance().getAwsSsoIntegrationTokenInfo(awsSsoConfiguration.id);
+      const accessToken = awsSsoIntegrationTokenInfo.accessToken;
+      credentials = await this.getRoleCredentials(accessToken, region, roleArn);
+    } catch(err) {
+      // Forced flow when token is invalidated from external logout:
+      // https://github.com/Noovolari/leapp/issues/108#issuecomment-1029219480
+      const force = true;
+      await AwsSsoIntegrationService.getInstance().login(awsSsoConfiguration.id, force);
+      awsSsoIntegrationTokenInfo = await AwsSsoIntegrationService.getInstance().getAwsSsoIntegrationTokenInfo(awsSsoConfiguration.id);
+      const accessToken = awsSsoIntegrationTokenInfo.accessToken;
+      credentials = await this.getRoleCredentials(accessToken, region, roleArn);
+    }
 
     return AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse(credentials);
   }

@@ -448,4 +448,9 @@ body.dark-theme {
   .app-windows-detected .window-buttons .quit:hover img {
     filter: invert(0);
   }
+
+  ///* SSM Loader *///
+  .loader .fa-spinner{
+    color: $dark-main-text-color;
+  }
 }

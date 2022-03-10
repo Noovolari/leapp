@@ -234,7 +234,10 @@ body.dark-theme {
       color: $dark-main-text-color!important;
     }
     .mat-tab-header {
-      border: 0.3px solid $dark-session-card-border;
+      border-bottom: 0.3px solid $dark-session-card-border;
+      border-top: none;
+      border-right: none;
+      border-left: none;
     }
     div.mat-tab-label {
       background-color: $dark-modal-background;

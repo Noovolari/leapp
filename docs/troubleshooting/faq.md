@@ -22,3 +22,7 @@ Every key stored by Leapp in the vault is named Leapp. The account name shows th
 ## Where do I find the Leapp logs?
 
 Head to the [Application data section](app-data.md).
+
+## SSM terminal is opening but no session is starting, what can I do?
+
+Just close the terminal and relaunch the SSM command.

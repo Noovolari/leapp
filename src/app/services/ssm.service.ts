@@ -88,7 +88,7 @@ export class SsmService {
 
     try {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const describeInstanceInformationResponse = await this.ssmClient.describeInstanceInformation({ MaxResults: 50 }).promise();
+      const describeInstanceInformationResponse = await this.ssmClient.describeInstanceInformation({}).promise();
 
       // Once we have obtained data from SSM and EC2, we verify the list are not empty
       if (describeInstanceInformationResponse['InstanceInformationList'] && describeInstanceInformationResponse['InstanceInformationList'].length > 0) {

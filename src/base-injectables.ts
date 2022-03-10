@@ -2,12 +2,12 @@ import {PositioningService} from 'ngx-bootstrap/positioning';
 import {ComponentLoaderFactory} from 'ngx-bootstrap/component-loader';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import 'jasmine';
-import {MatSnackBar} from "@angular/material/snack-bar";
-import {serialize} from "class-transformer";
-import {Workspace} from "./app/models/workspace";
-import {AppService} from "./app/services/app.service";
-import {FileService} from "./app/services/file.service";
-import {KeychainService} from "./app/services/keychain.service";
+import {MatSnackBar} from '@angular/material/snack-bar';
+import {serialize} from 'class-transformer';
+import {Workspace} from './app/models/workspace';
+import {AppService} from './app/services/app.service';
+import {FileService} from './app/services/file.service';
+import {KeychainService} from './app/services/keychain.service';
 
 const spyToasterService = jasmine.createSpyObj('ToastrService', ['success', 'warning', 'error', 'info']);
 spyToasterService.success.and.callFake(() => {});

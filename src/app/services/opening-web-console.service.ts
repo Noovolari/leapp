@@ -1,9 +1,6 @@
 import { Injectable } from '@angular/core';
 import {AppService, LoggerLevel} from './app.service';
 import {LoggingService} from './logging.service';
-import {ExecuteService} from './execute.service';
-import {AwsSessionService} from './session/aws/aws-session.service';
-import {SessionService} from './session.service';
 import {CredentialsInfo} from '../models/credentials-info';
 
 @Injectable({
@@ -13,9 +10,7 @@ export class OpeningWebConsoleService {
 
   constructor(
     private app: AppService,
-    private loggingService: LoggingService,
-    private exec: ExecuteService,
-    private sessionService: AwsSessionService) {}
+    private loggingService: LoggingService){}
 
   async openingWebConsole(credentialsInfo: CredentialsInfo, sessionRegion: string, sessionDuration: number = 3200) {
 

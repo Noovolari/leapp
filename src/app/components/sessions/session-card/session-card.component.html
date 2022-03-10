@@ -1,7 +1,8 @@
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-1">
   <div class="session-name-td">
-    <img src="assets/images/{{getSessionTypeIcon(session.type)}}{{workspaceService.getColorTheme() === eConstants.darkTheme || (workspaceService.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="" title="" />
+    <img class="provider-icon" src="assets/images/{{getSessionTypeIcon(session.type)}}{{workspaceService.getColorTheme() === eConstants.darkTheme || (workspaceService.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="" title="" />
     &nbsp;
+    <i class="moon-Hover-{{session.status !== eSessionStatus.active ? 'Start' : 'Stop'}} moon-hover-session hover-item {{session.type === eSessionType.azure ? 'hover-azure' : ''}}" (click)="session.status === eSessionStatus.active ? stopSession() : startSession()"></i>
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session.sessionName}}</span>
     <i class="moon-Pin" *ngIf="workspaceService.getWorkspace().pinned.indexOf(session.sessionId) !== -1"></i>
   </div>

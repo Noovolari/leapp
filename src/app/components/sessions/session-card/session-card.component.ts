@@ -24,6 +24,9 @@ import {IGlobalColumns} from '../../command-bar/command-bar.component';
 import {EditDialogComponent} from '../../dialogs/edit-dialog/edit-dialog.component';
 import {LeappBaseError} from '../../../errors/leapp-base-error';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
+import {AwsSsoOidcService} from '../../../services/aws-sso-oidc.service';
+import {ElectronService} from '../../../services/electron.service';
+import {OpeningWebConsoleService} from '../../../services/opening-web-console.service';
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -60,6 +63,7 @@ export class SessionCardComponent implements OnInit {
   eSessionType = SessionType;
   eSessionStatus = SessionStatus;
   eOptionIds = optionBarIds;
+  eConstants = Constants;
 
   modalRef: BsModalRef;
 
@@ -87,15 +91,18 @@ export class SessionCardComponent implements OnInit {
   private sessionService: SessionService;
 
   constructor(public workspaceService: WorkspaceService,
+              public appService: AppService,
               private keychainService: KeychainService,
-              private appService: AppService,
               private fileService: FileService,
               private router: Router,
               private ssmService: SsmService,
               private bsModalService: BsModalService,
+              private awsSsoOidcService: AwsSsoOidcService,
               private sessionProviderService: SessionFactoryService,
+              private electronService: ElectronService,
               private loggingService: LoggingService,
-              private modalService: BsModalService) {
+              private modalService: BsModalService,
+              private openingWebConsoleService: OpeningWebConsoleService) {
   }
 
   ngOnInit() {
@@ -139,16 +146,25 @@ export class SessionCardComponent implements OnInit {
    * Start the selected sessions
    */
   startSession() {
-    this.sessionService.start(this.session.sessionId).then(_ => {this.clearOptionIds();});
+    this.sessionService.start(this.session.sessionId).then(_ => {
+this.clearOptionIds();
+});
     this.logSessionData(this.session, `Starting Session`);
     this.trigger.closeMenu();
+    document.querySelector('.table thead tr').scrollIntoView();
   }
 
   /**
    * Stop sessions
    */
   stopSession() {
-    this.sessionService.stop(this.session.sessionId).then(_ => {this.clearOptionIds();});
+    this.sessionService.stop(this.session.sessionId).then(_ => {
+      this.clearOptionIds();
+      const awsSsoLoginThroughSession = this.session.type === SessionType.awsSsoRole && this.awsSsoOidcService.isPending();
+      if(awsSsoLoginThroughSession) {
+        this.awsSsoOidcService.interrupt();
+      }
+    });
     this.logSessionData(this.session, `Stopped Session`);
     this.trigger.closeMenu();
   }
@@ -226,6 +242,7 @@ export class SessionCardComponent implements OnInit {
   // ============================== //
   // ========== SSM AREA ========== //
   // ============================== //
+
   addNewProfile(tag: string) {
     return {id: uuid.v4(), name: tag};
   }
@@ -477,10 +494,13 @@ export class SessionCardComponent implements OnInit {
     document.querySelector('.sessions').classList.remove('option-bar-opened');
   }
 
-  openAmazonConsole(event: MouseEvent, session: Session) {
+  async openAwsWebConsole(event: MouseEvent, session: Session) {
     event.preventDefault();
     event.stopPropagation();
     this.trigger.closeMenu();
+    const credentials = await (this.sessionService as AwsSessionService).generateCredentials(session.sessionId);
+    const sessionRegion = session.region;
+    this.openingWebConsoleService.openingWebConsole(credentials, sessionRegion);
   }
 
   openTerminal(event: MouseEvent, session: Session) {
@@ -491,6 +511,32 @@ export class SessionCardComponent implements OnInit {
 
   addNewUUID(): string {
     return uuid.v4();
+  }
+
+  logoutFromFederatedSession(): void {
+    try {
+      // Clear all extra data
+      const url = this.workspaceService.getIdpUrl((this.session as AwsIamRoleFederatedSession).idpUrlId);
+      const getAppPath = this.electronService.path.join(this.electronService.app.getPath('appData'), environment.appName);
+      this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(url)}`);
+
+      this.stopSession();
+
+      this.loggingService.toast('Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.', ToastLevel.info, 'Cleaning configuration file');
+
+      // Restart
+      setTimeout(() => {
+        // a bit of timeout to make everything reset as expected and give time to read message
+        this.appService.restart();
+      }, 3000);
+    } catch (err) {
+      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
+      if(this.appService.detectOs() === Constants.windows) {
+        this.loggingService.toast(`Leapp needs Admin permissions to do this: please restart the application as an Administrator and retry.`, ToastLevel.warn, 'Cleaning configuration file');
+      } else {
+        this.loggingService.toast(`Leapp has an error re-creating your configuration file and cache.`, ToastLevel.error, 'Cleaning configuration file');
+      }
+    }
   }
 
   private logSessionData(session: Session, message: string): void {

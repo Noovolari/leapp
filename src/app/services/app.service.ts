@@ -211,20 +211,12 @@ export class AppService {
       resizable: true,
       show,
       title,
-      titleBarStyle: 'hidden',
       webPreferences: {
         devTools: !environment.production,
         worldSafeExecuteJavaScript: true,
         partition: `persist:Leapp-${btoa(url)}`
       }
     };
-
-    if (x && y) {
-      Object.assign(opts, {
-        x: x + 50,
-        y: y + 50
-      });
-    }
 
     if (this.newWin) {
       try {
@@ -233,6 +225,12 @@ export class AppService {
       this.newWin = null;
     }
     this.newWin = new this.electronService.browserWindow(opts);
+    if(this.detectOs() === Constants.windows) {
+      this.getMenu().setApplicationMenu(null);
+    }
+    this.newWin.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
+    this.newWin.removeMenu(); // Remove Window Menu inside App, to make it compliant with Linux
+    this.newWin.setMenu(null);
     return this.newWin;
 
   }

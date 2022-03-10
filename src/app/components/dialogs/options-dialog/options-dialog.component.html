@@ -30,17 +30,37 @@
 
 
           <ng-container *ngIf="appService.detectOs() === eConstants.mac">
-            <h2>MacOS Terminal</h2>
+            <h2>Terminal Selection</h2>
 
             <div class="form-container">
               <div class="form-group">
                 <div class="form-field">
-                  <label>Terminal</label>
-                  <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal" [appendTo]="'body'"></ng-select>
+                  <label>MacOS Terminal</label>
+                  <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [searchable]="false" [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal" [appendTo]="'body'"></ng-select>
                 </div>
               </div>
             </div>
           </ng-container>
+
+          <h2>Color Theme</h2>
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label>Color</label>
+                <ng-select formControlName="colorThemeSelect"
+                           bindLabel="colorTheme"
+                           bindValue="colorTheme"
+                           [clearable]="false"
+                           [searchable]="false"
+                           [items]="[{colorTheme: eConstants.darkTheme}, {colorTheme: eConstants.lightTheme},{colorTheme: eConstants.systemDefaultTheme}]"
+                           [(ngModel)]="selectedColorTheme"
+                           (change)="setColorTheme(selectedColorTheme)"
+                           [appendTo]="'body'">
+                </ng-select>
+              </div>
+            </div>
+          </div>
+
 
 
           <hr class="proxy-settings-section">
@@ -171,7 +191,7 @@
               <strong>Leapp Pro coming soon</strong>
               <span>Join our community and give us feedback</span>
               <br>
-              <button type="button" class="join-community-button" href="https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA">Join</button>
+              <button type="button" class="join-community-button" (click)="appService.openExternalUrl('https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA')">Join Us</button>
             </p>
           </div>
         </div>

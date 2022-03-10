@@ -297,6 +297,17 @@ export class WorkspaceService {
     this.persistWorkspace(workspace);
   }
 
+  updateColorTheme(colorTheme: string) {
+    const workspace = this.getWorkspace();
+    workspace.colorTheme = colorTheme;
+    this.persistWorkspace(workspace);
+  }
+
+  getColorTheme() {
+    const workspace = this.getWorkspace();
+    return workspace.colorTheme;
+  }
+
   private getPersistedSessions(): Session[] {
     const workspace = this.getWorkspace();
     return workspace.sessions;

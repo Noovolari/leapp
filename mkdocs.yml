@@ -33,6 +33,7 @@ nav:
   - 'Built-in features':
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
       - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'
+  - 'General Options': 'built-in-features/general-options.md'
   - 'Roadmap': https://roadmap.leapp.cloud/tabs/4-in-progress
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'

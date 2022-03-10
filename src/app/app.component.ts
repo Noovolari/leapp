@@ -18,7 +18,7 @@ import {AwsSsoIntegrationService} from './services/aws-sso-integration.service';
 import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
 import {AwsSsoRoleService} from './services/session/aws/methods/aws-sso-role.service';
 import {KeychainService} from './services/keychain.service';
-import {Constants} from "./models/constants";
+import {Constants} from './models/constants';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +27,7 @@ import {Constants} from "./models/constants";
 })
 export class AppComponent implements OnInit {
   /* Main app file: launches the Angular framework inside Electron app */
+  darkMode: any;
   constructor(
     public app: AppService,
     private workspaceService: WorkspaceService,
@@ -41,7 +42,10 @@ export class AppComponent implements OnInit {
     private awsSsoOidcService: AwsSsoOidcService,
     private awsSsoRoleService: AwsSsoRoleService,
     private keychainService: KeychainService
-  ) {}
+  ) {
+    this.setInitialColorSchema();
+    this.setColorSchemaChangeEventListener();
+  }
 
   async ngOnInit() {
     AwsSsoIntegrationService.init(
@@ -147,7 +151,11 @@ export class AppComponent implements OnInit {
    * Show that we created a copy of original credential file if present in the system
    */
   private showCredentialBackupMessageIfNeeded(workspace: Workspace) {
-    const oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
+    let oldAwsCredentialsPath = this.app.getOS().homedir() + '/' + environment.credentialsDestination;
+    if(this.app.detectOs() === Constants.windows) {
+      oldAwsCredentialsPath = oldAwsCredentialsPath.replaceAll('/', '\\');
+    }
+
     const newAwsCredentialsPath = oldAwsCredentialsPath + '.leapp.bkp';
     const check = workspace.sessions.length === 0 &&
                   this.app.getFs().existsSync(oldAwsCredentialsPath) &&
@@ -203,5 +211,34 @@ export class AppComponent implements OnInit {
     });
   }
 
+  private setInitialColorSchema() {
+    const workspace = this.workspaceService.getWorkspace();
+    if(workspace) {
+      const colorTheme = workspace.colorTheme || environment.colorTheme;
+      workspace.colorTheme = workspace.colorTheme || environment.colorTheme;
+      if(colorTheme === Constants.darkTheme) {
+        document.querySelector('body').classList.add('dark-theme');
+      } else if(colorTheme === Constants.lightTheme) {
+        document.querySelector('body').classList.remove('dark-theme');
+      } else if(colorTheme === Constants.systemDefaultTheme) {
+        if(this.app.isDarkMode()) {
+          document.querySelector('body').classList.add('dark-theme');
+        } else {
+          document.querySelector('body').classList.remove('dark-theme');
+        }
+      }
+    }
+  }
 
+  private setColorSchemaChangeEventListener() {
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+      if(this.workspaceService.getWorkspace().colorTheme === Constants.systemDefaultTheme) {
+        if(this.app.isDarkMode()) {
+          document.querySelector('body').classList.add('dark-theme');
+        } else {
+          document.querySelector('body').classList.remove('dark-theme');
+        }
+      }
+    });
+  }
 }

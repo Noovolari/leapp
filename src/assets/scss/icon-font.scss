@@ -6,6 +6,14 @@
   font-display: block;
 }
 
+@font-face {
+  font-family: 'icomoon-2';
+  src: url('../fonts/icomoon-2.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
 [class^="moon-"], [class*=" moon-"] {
   /* use !important to prevent issues with browser extensions that change fonts */
   font-family: 'icomoon', serif !important;
@@ -179,4 +187,20 @@
 }
 .moon-Warning:before {
   content: "\e934";
+}
+.moon-Stop-Session:before {
+  font-family: 'icomoon-2', serif !important;
+  content: "\ea17";
+}
+.moon-Open-Web-Console:before {
+  font-family: 'icomoon-2', serif !important;
+  content: "\ea7e";
+}
+.moon-Hover-Start:before {
+  font-family: 'icomoon-2', serif !important;
+  content: "\ea1c";
+}
+.moon-Hover-Stop:before {
+  font-family: 'icomoon-2', serif !important;
+  content: "\ea1e";
 }

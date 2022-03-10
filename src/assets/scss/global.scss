@@ -1,6 +1,7 @@
 @import "mixins/palette.scss";
 @import "media-query";
-@import"loader";
+@import "loader";
+@import "dark-theme";
 
 $border-radius: 10px;
 $filter-border-radius: 5px;
@@ -86,7 +87,7 @@ html, body {
   }
   .mat-tab-body-wrapper {
     padding: 0 19px;
-    min-height: 366px;
+    min-height: 386px;
   }
   .modal-content {
     .ng-dropdown-panel .ng-dropdown-panel-items {
@@ -246,7 +247,7 @@ small.text-error {
 
   &.badge-rounded { height: 20px; border-radius: 12px; text-transform: none; font-size: 10px; }
   &.badge-gray { background: $silver-50; color: $text-color; }
-  &.badge-black { background: $text-color; color: $white-text-color; }
+  &.badge-black { background: $text-color!important; color: $white-text-color; }
   &.badge-blue { background: $dark-sky-blue; color: $white-text-color; }
   &.badge-orange { background: $aws; color: $white-text-color; }
   &.badge-red { background: $danger-color; color: $white-text-color; }
@@ -513,7 +514,7 @@ small.text-error {
 }
 
 i.fal.fa-plus-circle {
-  color: black!important;
+  color: black;
 }
 
 .tooltip-inner {
@@ -642,6 +643,11 @@ button, a, input, i {
     font-size: 10px;
     background-color: $text-black;
   }
+
+.dark-theme .mat-tooltip {
+    font-size: 10px;
+    background-color: $dark-tooltip-color;
+  }
 }
 
 .modal + .modal {
@@ -666,6 +672,11 @@ button, a, input, i {
   left: -10px;
 }
 
+.app-windows-detected .command-bar:not(.compact) .top-right-option-button {
+  position: relative!important;
+  left: 10px!important;
+}
+
 ::ng-deep {
   .ng-select .ng-arrow-wrapper:hover .ng-arrow {
     border-color: #666;
@@ -673,4 +684,22 @@ button, a, input, i {
   .mat-menu-panel {
     min-height: initial!important;
   }
+}
+
+tr:hover img.provider-icon {
+  display: none;
+}
+
+tr:hover .moon-hover-session {
+  position: relative;
+  padding-top: 0!important;
+  padding-left: 14px!important;
+  margin-top: -1px;
+  right: 16px;
+  top: 3px;
+}
+
+tr:hover i.hover-azure ~ span {
+  position: relative;
+  top: -1.5px;
 }

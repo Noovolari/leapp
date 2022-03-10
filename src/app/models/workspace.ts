@@ -32,6 +32,8 @@ export class Workspace {
 
   private _version: string;
 
+  private _colorTheme: string;
+
   constructor() {
     this._pinned = [];
     this._sessions = [];
@@ -145,5 +147,13 @@ export class Workspace {
 
   set segments(segments: Segment[] ) {
     this._segments = segments;
+  }
+
+  get colorTheme() {
+    return this._colorTheme;
+  }
+
+  set colorTheme(value: string) {
+    this._colorTheme = value;
   }
 }

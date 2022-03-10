@@ -21,7 +21,7 @@ export abstract class AwsSessionService extends SessionService {
 
   // TODO: are they assumable (maybe assumer) or generic aws sessions?
   listAssumable(): Session[] {
-    return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure ) : [];
+    return (this.list().length > 0) ? this.list().filter( (session) => session.type !== SessionType.azure && session.type !== SessionType.awsIamRoleChained) : [];
   }
 
   listIamRoleChained(parentSession?: Session): Session[] {

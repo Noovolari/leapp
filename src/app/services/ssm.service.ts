@@ -88,7 +88,7 @@ export class SsmService {
 
     try {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      const describeInstanceInformationResponse = await this.ssmClient.describeInstanceInformation({ MaxResults: 50 }).promise();
+      const describeInstanceInformationResponse = await this.ssmClient.describeInstanceInformation({}).promise();
 
       // Once we have obtained data from SSM and EC2, we verify the list are not empty
       if (describeInstanceInformationResponse['InstanceInformationList'] && describeInstanceInformationResponse['InstanceInformationList'].length > 0) {
@@ -123,17 +123,17 @@ export class SsmService {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const params = { MaxResults: 50 };
       const reservations = await this.ec2Client.describeInstances(params).promise();
-
-      instances.forEach(instance => {
-        const foundInstance = reservations.Reservations.filter(r => r.Instances[0].InstanceId === instance.Name);
-        if (foundInstance.length > 0) {
-          const foundName = foundInstance[0].Instances[0].Tags.filter(t => t.Key === 'Name');
-          if (foundName.length > 0) {
-            instance.Name = foundName[0].Value;
+      reservations.Reservations.forEach(reservation => {
+        instances.forEach(instance => {
+          const foundInstance = reservation.Instances.filter(i => i.InstanceId === instance.Name);
+          if (foundInstance.length > 0) {
+            const foundName = foundInstance[0].Tags.filter(t => t.Key === 'Name');
+            if (foundName.length > 0) {
+              instance.Name = foundName[0].Value;
+            }
           }
-        }
+        });
       });
-
       return instances;
     } catch(err) {
       throw new LeappBaseError('Leapp', this, LoggerLevel.warn, err.message);

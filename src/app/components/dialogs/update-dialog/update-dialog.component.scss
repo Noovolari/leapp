@@ -37,7 +37,7 @@ div.updater > div.html-content {
 
   h2 {
     text-align: center!important;
-    color: $text-color!important;
+    color: $text-color;
     font-size: 19px!important;
     font-weight: bold!important;
     margin-top: 10px;
@@ -45,7 +45,7 @@ div.updater > div.html-content {
   }
   h3 {
     text-align: left!important;
-    color: $text-color!important;
+    color: $text-color;
     font-size: 17px!important;
     font-weight: bold!important;
     margin-left: 2px;

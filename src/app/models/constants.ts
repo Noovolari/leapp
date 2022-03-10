@@ -10,5 +10,8 @@ export enum Constants {
   inBrowser = 'In-browser',
   forcedCloseBrowserWindow = 'ForceCloseBrowserWindow',
   macOsTerminal = 'Terminal',
-  macOsIterm2 = 'iTerm2'
+  macOsIterm2 = 'iTerm2',
+  systemDefaultTheme = 'System Default',
+  lightTheme = 'Light Theme',
+  darkTheme = 'Dark Theme'
 }

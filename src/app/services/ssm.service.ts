@@ -126,7 +126,6 @@ export class SsmService {
       reservations.Reservations.forEach(reservation => {
         instances.forEach(instance => {
           const foundInstance = reservation.Instances.filter(i => i.InstanceId === instance.Name);
-          console.log(foundInstance);
           if (foundInstance.length > 0) {
             const foundName = foundInstance[0].Tags.filter(t => t.Key === 'Name');
             if (foundName.length > 0) {
@@ -135,8 +134,6 @@ export class SsmService {
           }
         });
       });
-
-
       return instances;
     } catch(err) {
       throw new LeappBaseError('Leapp', this, LoggerLevel.warn, err.message);

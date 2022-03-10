@@ -26,7 +26,7 @@ jobs:
              git config --global user.name Alessandro Gaggia
              git config --global user.email alex@besharp.it
       - run: git fetch origin gh-pages --depth=1       
-      - run: mike deploy --force --push ${{env.PACKAGE_VERSION}} -u latest
+      - run: mike deploy --force --push --update-aliases ${{env.PACKAGE_VERSION}} latest
       - run: mike set-default --push latest
       
       # - run: mkdocs gh-deploy --force

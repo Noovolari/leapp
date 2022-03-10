@@ -18,7 +18,7 @@ import {AwsSsoIntegrationService} from './services/aws-sso-integration.service';
 import {AwsSsoOidcService} from './services/aws-sso-oidc.service';
 import {AwsSsoRoleService} from './services/session/aws/methods/aws-sso-role.service';
 import {KeychainService} from './services/keychain.service';
-import {Constants} from "./models/constants";
+import {Constants} from './models/constants';
 
 @Component({
   selector: 'app-root',
@@ -43,7 +43,6 @@ export class AppComponent implements OnInit {
     private awsSsoRoleService: AwsSsoRoleService,
     private keychainService: KeychainService
   ) {
-
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
   }
@@ -218,17 +217,17 @@ export class AppComponent implements OnInit {
     const workspace = this.workspaceService.getWorkspace();
     if(workspace) {
       const colorTheme = workspace.colorTheme || environment.colorTheme;
+      workspace.colorTheme = workspace.colorTheme || environment.colorTheme;
       if(colorTheme === Constants.darkTheme) {
         document.querySelector('body').classList.add('dark-theme');
-      }
-      else if(colorTheme === Constants.lightTheme) {
+      } else if(colorTheme === Constants.lightTheme) {
         document.querySelector('body').classList.remove('dark-theme');
-      }
-      else if(colorTheme === Constants.systemDefaultTheme) {
+      } else if(colorTheme === Constants.systemDefaultTheme) {
         if(this.app.isDarkMode()) {
           document.querySelector('body').classList.add('dark-theme');
+        } else {
+          document.querySelector('body').classList.remove('dark-theme');
         }
-        else document.querySelector('body').classList.remove('dark-theme');
       }
     }
   }
@@ -236,10 +235,12 @@ export class AppComponent implements OnInit {
   private setColorSchemaChangeEventListener() {
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
       if(this.workspaceService.getWorkspace().colorTheme === Constants.systemDefaultTheme) {
-        if(this.app.isDarkMode()) document.querySelector('body').classList.add('dark-theme');
-        else document.querySelector('body').classList.remove('dark-theme');
+        if(this.app.isDarkMode()) {
+          document.querySelector('body').classList.add('dark-theme');
+        } else {
+          document.querySelector('body').classList.remove('dark-theme');
+        }
       }
     });
   }
-
 }

@@ -15,7 +15,7 @@ import {formatDistance, isPast} from 'date-fns';
 import {BsModalRef, BsModalService} from 'ngx-bootstrap/modal';
 import {BehaviorSubject} from 'rxjs';
 import {MatMenuTrigger} from '@angular/material/menu';
-import {sidebarHighlight} from "../side-bar/side-bar.component";
+import {sidebarHighlight} from '../side-bar/side-bar.component';
 
 export interface SelectedIntegration {
   id: string;
@@ -259,7 +259,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.form.get('awsRegion').setValue(this.selectedAwsSsoConfiguration.region);
     this.form.get('defaultBrowserOpening').setValue(this.selectedAwsSsoConfiguration.browserOpening);
 
-    this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: 'sso-modal'});
+    this.modalRef = this.bsModalService.show(this.ssoModalTemplate, {animated: false, class: 'sso-modal'});
   }
 
   save() {

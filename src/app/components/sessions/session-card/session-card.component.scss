@@ -154,7 +154,7 @@ span.badge-region {
 }
 
 span.badge-region.badge-black {
-  background-color: $region-tag-active-color !important;
+  background-color: $region-tag-active-color;
 }
 
 i.active {
@@ -322,4 +322,9 @@ img.moon-stop-outline {
   width:23px;
   margin-left: -2px;
   margin-bottom: 2px;
+}
+
+.open-web-console {
+  position: relative;
+  right: 10px;
 }

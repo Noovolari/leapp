@@ -453,4 +453,31 @@ body.dark-theme {
   .loader .fa-spinner{
     color: $dark-main-text-color;
   }
+
+  ///* Update - Changelog Modal *///
+  .updater-header {
+    border-bottom: 1px solid $dark-session-card-border !important;
+    .modal-title .modal-title-icon i {
+      background-color: $dark-region-label-color-active!important;
+    }
+    .modal-title .modal-title-message div {
+      color: $dark-main-text-color !important;
+    }
+  }
+  .html-content {
+    h1, h2, h3, p, ul, li {
+      color: $dark-main-text-color!important;
+    }
+    a {
+      color: $dark-region-label-color-active!important;
+    }
+  }
+  .button-equalizer {
+    border-top: 1px solid $dark-session-card-border!important;
+    .disabled {
+      background-color: grey !important;
+      color: #373737;
+      border-radius: 5px;
+    }
+  }
 }

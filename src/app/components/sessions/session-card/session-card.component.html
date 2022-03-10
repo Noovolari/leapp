@@ -1,7 +1,8 @@
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-1">
   <div class="session-name-td">
-    <img src="assets/images/{{getSessionTypeIcon(session.type)}}{{workspaceService.getColorTheme() === eConstants.darkTheme || (workspaceService.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="" title="" />
+    <img class="provider-icon" src="assets/images/{{getSessionTypeIcon(session.type)}}{{workspaceService.getColorTheme() === eConstants.darkTheme || (workspaceService.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="" title="" />
     &nbsp;
+    <i class="moon-Hover-{{session.status !== eSessionStatus.active ? 'Start' : 'Stop'}} moon-hover-session hover-item {{session.type === eSessionType.azure ? 'hover-azure' : ''}}" (click)="session.status === eSessionStatus.active ? stopSession() : startSession()"></i>
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session.sessionName}}</span>
     <i class="moon-Pin" *ngIf="workspaceService.getWorkspace().pinned.indexOf(session.sessionId) !== -1"></i>
   </div>
@@ -65,6 +66,13 @@
     <i class="moon-Server"></i>&nbsp;
     <span>View SSM Sessions</span>
   </button>
+
+  <ng-container *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained">
+    <button mat-menu-item (click)="openAwsWebConsole($event, session);">
+      <i class="moon-Open-Web-Console"></i>
+      <span>&nbsp;&nbsp;Open Web Console</span>
+    </button>
+  </ng-container>
 
   <div class="divider"></div>
 
@@ -132,6 +140,7 @@
     </div>
     <div [ngClass]="(session.type === eSessionType.awsIamUser && session.status !== eSessionStatus.active) ? 'iam-session-selected' : ''" class="opt-bar-middle-section">
       <div class="opt-bar-middle-left-buttons">
+        <a class="icon-button open-web-console" *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained" (click)="openAwsWebConsole($event, session);" matTooltip="Open Web Console"><i class="moon-Open-Web-Console"></i></a>
         <a class="icon-button" (click)="changeRegionModalOpen($event, session);" matTooltip="Change Region"><i class="moon-Region"></i></a>
         <a class="icon-button" *ngIf="session.type !== eSessionType.azure" (click)="changeProfileModalOpen($event);" matTooltip="Change Named Profile"><i class="moon-User"></i></a>
         <a class="icon-button" (click)="ssmModalOpen($event, session);" *ngIf="session.type !== eSessionType.azure" matTooltip="View SSM sessions"><i class="moon-Server"></i></a>

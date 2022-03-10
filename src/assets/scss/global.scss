@@ -247,7 +247,7 @@ small.text-error {
 
   &.badge-rounded { height: 20px; border-radius: 12px; text-transform: none; font-size: 10px; }
   &.badge-gray { background: $silver-50; color: $text-color; }
-  &.badge-black { background: $text-color; color: $white-text-color; }
+  &.badge-black { background: $text-color!important; color: $white-text-color; }
   &.badge-blue { background: $dark-sky-blue; color: $white-text-color; }
   &.badge-orange { background: $aws; color: $white-text-color; }
   &.badge-red { background: $danger-color; color: $white-text-color; }
@@ -684,4 +684,22 @@ button, a, input, i {
   .mat-menu-panel {
     min-height: initial!important;
   }
+}
+
+tr:hover img.provider-icon {
+  display: none;
+}
+
+tr:hover .moon-hover-session {
+  position: relative;
+  padding-top: 0!important;
+  padding-left: 14px!important;
+  margin-top: -1px;
+  right: 16px;
+  top: 3px;
+}
+
+tr:hover i.hover-azure ~ span {
+  position: relative;
+  top: -1.5px;
 }

@@ -4,7 +4,7 @@
 
 Leapp is a tool for developers to manage, secure, and access the cloud.
 
-All data is **persisted and encrypted on your workstation**. Head to our [Security](/security/intro) section to know how we guarantee the highest level of security.
+All data is **persisted and encrypted on your workstation**. Head to our [Security](security/intro) section to know how we guarantee the highest level of security.
 
 ![Leapp Main Window](images/screens/newuxui/main-window.png?style=center-img)
 

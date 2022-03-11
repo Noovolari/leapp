@@ -1,6 +1,6 @@
 Once you opened the Leapp option menu - which can be accessed by clicking the top right gear icon - you can edit the following settings in the General tab
 
-![](../../images/screens/newuxui/leapp-options.png?style=center-img)
+![](images/screens/newuxui/leapp-options.png?style=center-img)
 
 ## Default Regions
 
@@ -24,7 +24,7 @@ Leapp now comes with a slick new Dark Theme!
 
 With this option, you can switch between light and dark theme, or use your system default.
 
-![](../../images/screens/newuxui/leapp-dark.png?style=center-img)
+![](images/screens/newuxui/leapp-dark.png?style=center-img)
 
 
 

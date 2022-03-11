@@ -36,6 +36,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://docs.leapp.cloud/0.10.0/built-in-features/opening-web-console/</loc>
+         <lastmod>2022-03-11</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://docs.leapp.cloud/0.10.0/configuring-integration/configure-aws-single-sign-on-integration/</loc>
          <lastmod>2022-03-11</lastmod>
          <changefreq>daily</changefreq>

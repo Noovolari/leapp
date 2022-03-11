@@ -445,7 +445,7 @@ body.dark-theme {
   }
 
   .app-windows-detected .window-buttons .minimize:hover img,
-  .app-windows-detected .window-buttons .maximize:hover img {
+  .app-windows-detected .window-buttons .maximize:not(.disabled):hover img {
     filter: invert(1);
   }
   .app-windows-detected .window-buttons .quit:hover img {

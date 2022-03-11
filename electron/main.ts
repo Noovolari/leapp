@@ -119,13 +119,15 @@ const generateMainWindow = () => {
         if (data.compactMode) {
           win.setMinimumSize(560, 680);
           win.setSize(560, 680);
-          win.resizable = false;
+          win.setResizable(false);
           win.setMaximizable(false);
+          win.setFullScreenable(false);
         } else {
           win.setMinimumSize(1200, 680);
           win.setSize(1200, 680);
-          win.resizable = true;
+          win.setResizable(true);
           win.setMaximizable(true);
+          win.setFullScreenable(true);
         }
       }
     });

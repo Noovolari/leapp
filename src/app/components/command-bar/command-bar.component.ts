@@ -218,6 +218,24 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     syncAllEvent.next(true);
   }
 
+  windowMaximizeAction() {
+    if (!this.compactMode) {
+      if(this.appService.getCurrentWindow().isMaximized()) {
+        this.appService.getCurrentWindow().restore();
+      } else {
+        this.appService.getCurrentWindow().maximize();
+      }
+    }
+  }
+
+  windowButtonDetectTheme(): string {
+      if(this.workspaceService.getColorTheme() === Constants.darkTheme || (this.workspaceService.getColorTheme() === Constants.systemDefaultTheme && this.appService.isDarkMode())) {
+        return '_dark';
+      } else {
+        return '';
+      }
+  }
+
   private applyFiltersToSessions(values: GlobalFilters, sessions: Session[]) {
 
     let filteredSessions = sessions;

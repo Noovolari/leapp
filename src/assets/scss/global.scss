@@ -605,6 +605,9 @@ button, a, input, i {
           opacity: 1;
         }
       }
+      .maximize.disabled:hover {
+        background: transparent!important;
+      }
       .quit:hover {
         background: #FD0007;
         color: $white-text-color;

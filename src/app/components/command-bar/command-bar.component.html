@@ -36,9 +36,9 @@
       </div>
 
       <div class="window-buttons">
-        <span class="minimize" (click)="appService.getCurrentWindow().minimize()"><img src="assets/images/windows_minimize{{workspaceService.getColorTheme() === eConstants.darkTheme || (workspaceService.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
-        <span class="maximize" (click)="appService.getCurrentWindow().isMaximized() ? appService.getCurrentWindow().restore() : appService.getCurrentWindow().maximize()"><img src="assets/images/windows_maximize{{workspaceService.getColorTheme() === eConstants.darkTheme || (workspaceService.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
-        <span class="quit" (click)="appService.getCurrentWindow().hide()"><img src="assets/images/windows_close{{workspaceService.getColorTheme() === eConstants.darkTheme || (workspaceService.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
+        <span class="minimize" (click)="appService.getCurrentWindow().minimize()"><img src="assets/images/windows_minimize{{windowButtonDetectTheme()}}.png" alt="" title=""></span>
+        <span class="maximize {{compactMode ? 'disabled' : ''}}" (click)="windowMaximizeAction();"><img src="assets/images/windows_maximize{{windowButtonDetectTheme()}}.png" alt="" title=""></span>
+        <span class="quit" (click)="appService.getCurrentWindow().hide()"><img src="assets/images/windows_close{{windowButtonDetectTheme()}}.png" alt="" title=""></span>
       </div>
     </div>
 

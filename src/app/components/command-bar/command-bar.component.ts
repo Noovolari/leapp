@@ -181,6 +181,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     if(this.appService.detectOs() === Constants.mac && this.appService.getCurrentWindow().isFullScreen()) {
       this.appService.getCurrentWindow().setFullScreen(false);
+      this.appService.getCurrentWindow().setMaximizable(false);
     }
 
     compactMode.next(this.compactMode);

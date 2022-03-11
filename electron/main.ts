@@ -120,10 +120,12 @@ const generateMainWindow = () => {
           win.setMinimumSize(560, 680);
           win.setSize(560, 680);
           win.resizable = false;
+          win.setMaximizable(false);
         } else {
           win.setMinimumSize(1200, 680);
           win.setSize(1200, 680);
           win.resizable = true;
+          win.setMaximizable(true);
         }
       }
     });

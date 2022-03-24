@@ -106,14 +106,14 @@
         {
           "target": "zip",
           "arch": [
-            "amd64",
+            "x64",
             "arm64"
           ]
         },
         {
           "target": "dmg",
           "arch": [
-            "amd64",
+            "x64",
             "arm64"
           ]
         }

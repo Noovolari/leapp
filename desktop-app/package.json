@@ -26,7 +26,6 @@
     "release-all": "gushio gushio/target-release.js 'configuration production' all"
   },
   "build": {
-    "artifactName": "Leapp-${version}-${os}-${arch}.${ext}",
     "publish": [
       {
         "provider": "github",

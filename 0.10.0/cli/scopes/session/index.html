@@ -10,24 +10,24 @@
       
       
       
-        <link rel="canonical" href="https://docs.leapp.cloud/0.10.0/built-in-features/aws-named-profiles/">
+        <link rel="canonical" href="https://docs.leapp.cloud/0.10.0/cli/scopes/session/">
       
       
         
       
-      <link rel="icon" href="../../images/icon.ico">
+      <link rel="icon" href="../../../images/icon.ico">
       <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.2.8+insiders-4.12.0">
     
     
       
-        <title>AWS Multi-profile management - Leapp - Docs</title>
+        <title>Session - Leapp - Docs</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.7d01766c.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7d01766c.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.e6a45f82.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.e6a45f82.min.css">
         
       
       
@@ -43,9 +43,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
   
@@ -152,7 +152,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#named-profiles" class="md-skip">
+        <a href="#leapp-session" class="md-skip">
           Skip to content
         </a>
       
@@ -170,9 +170,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Leapp - Docs" class="md-header__button md-logo" aria-label="Leapp - Docs" data-md-component="logo">
+    <a href="../../.." title="Leapp - Docs" class="md-header__button md-logo" aria-label="Leapp - Docs" data-md-component="logo">
       
-  <img src="../../images/leapp.png" alt="logo">
+  <img src="../../../images/leapp.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -188,7 +188,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              AWS Multi-profile management
+              Session
             
           </span>
         </div>
@@ -289,9 +289,9 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Leapp - Docs" class="md-nav__button md-logo" aria-label="Leapp - Docs" data-md-component="logo">
+    <a href="../../.." title="Leapp - Docs" class="md-nav__button md-logo" aria-label="Leapp - Docs" data-md-component="logo">
       
-  <img src="../../images/leapp.png" alt="logo">
+  <img src="../../../images/leapp.png" alt="logo">
 
     </a>
     Leapp - Docs
@@ -341,7 +341,7 @@
         
         
         <div class="md-nav__link md-nav__container">
-          <a href="../.." class="md-nav__link ">
+          <a href="../../.." class="md-nav__link ">
             
   
   <span class="md-ellipsis">
@@ -410,7 +410,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../installation/requirements/" class="md-nav__link">
+      <a href="../../../installation/requirements/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -429,7 +429,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../installation/install-leapp/" class="md-nav__link">
+      <a href="../../../installation/install-leapp/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -448,7 +448,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../installation/update-leapp/" class="md-nav__link">
+      <a href="../../../installation/update-leapp/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -511,7 +511,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../sessions/" class="md-nav__link">
+      <a href="../../../sessions/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -530,7 +530,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../integrations/" class="md-nav__link">
+      <a href="../../../integrations/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -563,12 +563,14 @@
 
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2" type="checkbox" id="__nav_2" checked>
       
       
       
@@ -584,7 +586,7 @@
         
         
         <div class="md-nav__link md-nav__container">
-          <a href="../../cli/" class="md-nav__link ">
+          <a href="../../" class="md-nav__link ">
             
   
   <span class="md-ellipsis">
@@ -612,12 +614,14 @@
               
   
   
+    
+  
   
     
-    <li class="md-nav__item md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2" type="checkbox" id="__nav_2_2" >
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_2_2" type="checkbox" id="__nav_2_2" checked>
       
       
       
@@ -659,7 +663,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/scopes/help/" class="md-nav__link">
+      <a href="../help/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -676,9 +680,28 @@
               
   
   
+    
   
-    <li class="md-nav__item">
-      <a href="../../cli/scopes/session/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Session
+  </span>
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   <span class="md-ellipsis">
@@ -686,6 +709,110 @@
   </span>
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-add" class="md-nav__link">
+    leapp session add
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-change-profile" class="md-nav__link">
+    leapp session change-profile
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-change-region" class="md-nav__link">
+    leapp session change-region
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-current" class="md-nav__link">
+    leapp session current
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-delete" class="md-nav__link">
+    leapp session delete
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-generate-sessionid" class="md-nav__link">
+    leapp session generate SESSIONID
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-get-id" class="md-nav__link">
+    leapp session get-id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-list" class="md-nav__link">
+    leapp session list
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-open-web-console" class="md-nav__link">
+    leapp session open-web-console
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-start" class="md-nav__link">
+    leapp session start
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-start-ssm-session" class="md-nav__link">
+    leapp session start-ssm-session
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-stop" class="md-nav__link">
+    leapp session stop
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -697,7 +824,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/scopes/integration/" class="md-nav__link">
+      <a href="../integration/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -716,7 +843,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/scopes/profile/" class="md-nav__link">
+      <a href="../profile/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -735,7 +862,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/scopes/region/" class="md-nav__link">
+      <a href="../region/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -754,7 +881,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../cli/scopes/idp-url/" class="md-nav__link">
+      <a href="../idp-url/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -828,7 +955,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../configuration/" class="md-nav__link">
+      <a href="../../../configuration/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -888,7 +1015,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../configuring-session/configure-aws-iam-user/" class="md-nav__link">
+      <a href="../../../configuring-session/configure-aws-iam-user/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -907,7 +1034,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../configuring-session/configure-aws-iam-role-federated/" class="md-nav__link">
+      <a href="../../../configuring-session/configure-aws-iam-role-federated/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -926,7 +1053,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../configuring-session/configure-aws-iam-role-chained/" class="md-nav__link">
+      <a href="../../../configuring-session/configure-aws-iam-role-chained/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -945,7 +1072,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../configuring-session/configure-azure-tenant/" class="md-nav__link">
+      <a href="../../../configuring-session/configure-azure-tenant/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1006,7 +1133,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../configuring-integration/configure-aws-single-sign-on-integration/" class="md-nav__link">
+      <a href="../../../configuring-integration/configure-aws-single-sign-on-integration/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1082,7 +1209,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/intro/" class="md-nav__link">
+      <a href="../../../security/intro/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1138,7 +1265,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/credentials-generation/aws/" class="md-nav__link">
+      <a href="../../../security/credentials-generation/aws/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1157,7 +1284,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/credentials-generation/azure/" class="md-nav__link">
+      <a href="../../../security/credentials-generation/azure/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1183,7 +1310,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/system-vault/" class="md-nav__link">
+      <a href="../../../security/system-vault/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1202,7 +1329,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../security/zero-knowledge/" class="md-nav__link">
+      <a href="../../../security/zero-knowledge/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1228,14 +1355,12 @@
 
   
   
-    
-  
   
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
       
-        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" checked>
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5" type="checkbox" id="__nav_5" >
       
       
       
@@ -1271,7 +1396,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../aws-ec2-connect/" class="md-nav__link">
+      <a href="../../../built-in-features/aws-ec2-connect/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1288,26 +1413,9 @@
               
   
   
-    
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
-      
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  <span class="md-ellipsis">
-    AWS Multi-profile management
-  </span>
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../../built-in-features/aws-named-profiles/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1315,45 +1423,6 @@
   </span>
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#named-profiles" class="md-nav__link">
-    Named Profiles
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#create-a-new-named-profile" class="md-nav__link">
-    Create a new Named Profile
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#named-profile-list" class="md-nav__link">
-    Named Profile List
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1365,7 +1434,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../opening-web-console/" class="md-nav__link">
+      <a href="../../../built-in-features/opening-web-console/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1393,7 +1462,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../general-options/" class="md-nav__link">
+      <a href="../../../built-in-features/general-options/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1470,7 +1539,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../contributing/get-involved/" class="md-nav__link">
+      <a href="../../../contributing/get-involved/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1535,7 +1604,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../troubleshooting/app-data/" class="md-nav__link">
+      <a href="../../../troubleshooting/app-data/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1554,7 +1623,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../troubleshooting/faq/" class="md-nav__link">
+      <a href="../../../troubleshooting/faq/" class="md-nav__link">
         
   
   <span class="md-ellipsis">
@@ -1590,6 +1659,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -1598,22 +1669,85 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#named-profiles" class="md-nav__link">
-    Named Profiles
+  <a href="#leapp-session-add" class="md-nav__link">
+    leapp session add
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#create-a-new-named-profile" class="md-nav__link">
-    Create a new Named Profile
+  <a href="#leapp-session-change-profile" class="md-nav__link">
+    leapp session change-profile
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#named-profile-list" class="md-nav__link">
-    Named Profile List
+  <a href="#leapp-session-change-region" class="md-nav__link">
+    leapp session change-region
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-current" class="md-nav__link">
+    leapp session current
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-delete" class="md-nav__link">
+    leapp session delete
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-generate-sessionid" class="md-nav__link">
+    leapp session generate SESSIONID
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-get-id" class="md-nav__link">
+    leapp session get-id
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-list" class="md-nav__link">
+    leapp session list
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-open-web-console" class="md-nav__link">
+    leapp session open-web-console
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-start" class="md-nav__link">
+    leapp session start
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-start-ssm-session" class="md-nav__link">
+    leapp session start-ssm-session
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-session-stop" class="md-nav__link">
+    leapp session stop
   </a>
   
 </li>
@@ -1630,49 +1764,185 @@
             <article class="md-content__inner md-typeset">
               
                 
-<a href="https://github.com/Noovolari/leapp/edit/master/docs/built-in-features/aws-named-profiles.md" title="Edit this page" class="md-content__button md-icon">
+<a href="https://github.com/Noovolari/leapp/edit/master/docs/cli/scopes/session.md" title="Edit this page" class="md-content__button md-icon">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
 </a>
 
 
 
-  <h1>AWS Multi-profile management</h1>
+<h1 id="leapp-session"><code>leapp session</code></h1>
+<p>Sessions management</p>
+<ul>
+<li><a href="#leapp-session-add"><code>leapp session add</code></a></li>
+<li><a href="#leapp-session-change-profile"><code>leapp session change-profile</code></a></li>
+<li><a href="#leapp-session-change-region"><code>leapp session change-region</code></a></li>
+<li><a href="#leapp-session-current"><code>leapp session current</code></a></li>
+<li><a href="#leapp-session-delete"><code>leapp session delete</code></a></li>
+<li><a href="#leapp-session-generate-sessionid"><code>leapp session generate SESSIONID</code></a></li>
+<li><a href="#leapp-session-get-id"><code>leapp session get-id</code></a></li>
+<li><a href="#leapp-session-list"><code>leapp session list</code></a></li>
+<li><a href="#leapp-session-open-web-console"><code>leapp session open-web-console</code></a></li>
+<li><a href="#leapp-session-start"><code>leapp session start</code></a></li>
+<li><a href="#leapp-session-start-ssm-session"><code>leapp session start-ssm-session</code></a></li>
+<li><a href="#leapp-session-stop"><code>leapp session stop</code></a></li>
+</ul>
+<h2 id="leapp-session-add"><code>leapp session add</code></h2>
+<p>Add a new session</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session add
 
-<p>With Leapp you can group and activate more than one credential set at a time through <a href="https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html">Named Profiles</a>.</p>
-<h2 id="named-profiles">Named Profiles</h2>
-<p>Named Profiles are used by AWS to maintain more than one set of active credentials for you to use with AWS-CLI, SDK, or other third-party tools. Named profiles are stored in <em>~/.aws/credentials</em> file in the <strong>ini</strong> file format.</p>
-<p>Named Profiles have a default profile which is the one you get from <a href="https://docs.aws.amazon.com/cli/latest/reference/configure/">aws configure</a> command.</p>
-<h2 id="create-a-new-named-profile">Create a new Named Profile</h2>
-<p>Named Profiles can be created in <strong>3 ways</strong>:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Option Panel</label><label for="__tabbed_1_2">When creating a new Session</label><label for="__tabbed_1_3">Edit Profile in Contextual Menu</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p>Click on the gear icon <img width="24" alt="Screenshot 2022-02-03 at 15 22 34" src="https://user-images.githubusercontent.com/9497292/152361141-75b5edec-f68f-47af-9a72-fd189706cb2a.png"> 
-and select the <strong>Profiles</strong> tab. Insert the name of the new Named Profile in the input form, then click on the plus icon.</p>
-</div>
-<div class="tabbed-block">
-<p>When creating a new session, the user will have the option to choose a Named Profile or <strong>add</strong> a new one.</p>
-</div>
-<div class="tabbed-block">
-<p>Right-click on a session and select <strong>Change</strong> then <strong>Named Profile</strong>: an option to select or add a new Named Profile will be available.
-<br><br><br />
-<img width="560" alt="Screenshot 2022-02-03 at 15 25 43" src="https://user-images.githubusercontent.com/9497292/152361872-0f52d40b-7c02-4dce-999c-c1bd2db517af.png"></p>
-</div>
-</div>
-</div>
-<p>The new name is directly added to the Named Profile list and can then be used for other sessions too.</p>
-<div class="admonition info">
-<p class="admonition-title">Info</p>
-<p>AWS SSO sessions will have the Named Profile <code>default</code> when obtained via Login or Sync. To change the Named Profile associated to a session you have to use the "Change Profile" option in the session list.</p>
-</div>
-<h2 id="named-profile-list">Named Profile List</h2>
-<p>Named profiles can be managed from the Option menu.</p>
-<p>In the Option menu, under the Profiles tab, you can add or edit a new Named Profile, and you can also remove unwanted ones. When removing a Named Profile, Leapp will warn you about which sessions are using that profile, and those sessions will be reverted to the default Named Profile.</p>
-<p>The input form can be used to add or edit a Named Profile: if it's empty, you can use it to add a new named profile. When selecting the <img width="32" alt="Screenshot 2022-02-03 at 15 32 11" src="https://user-images.githubusercontent.com/9497292/152363026-6b933ce9-6ad1-4ae6-a6db-eefa5769764e.png"> button, you will be able to edit the name of the Named Profile from within the input form.</p>
-<div class="admonition warning">
-<p class="admonition-title">Warning</p>
-<p>Remember that when you change the profile of a session, the session will be immediately put in stop mode. That's because Leapp would have to change the credential file, so you will need to restart the session again.</p>
-</div>
+<span class="go">DESCRIPTION</span>
+<span class="go">  Add a new session</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session add
+</code></pre></div>
+<h2 id="leapp-session-change-profile"><code>leapp session change-profile</code></h2>
+<p>Change a session named-profile</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session change-profile
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Change a session named-profile</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session change-profile
+</code></pre></div>
+<h2 id="leapp-session-change-region"><code>leapp session change-region</code></h2>
+<p>Change a session region</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session change-region
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Change a session region</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session change-region
+</code></pre></div>
+<h2 id="leapp-session-current"><code>leapp session current</code></h2>
+<p>Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session current <span class="o">[</span>-i<span class="o">]</span> <span class="o">[</span>-p &lt;value&gt;<span class="o">]</span> <span class="o">[</span>-r aws<span class="p">|</span>azure<span class="o">]</span> <span class="o">[</span>-f &lt;value&gt;<span class="o">]</span>
+
+<span class="go">FLAGS</span>
+<span class="go">  -f, --format=&lt;value&gt;     allows filtering data to show</span>
+<span class="go">                           - aws -&gt; alias, accountNumber, roleArn</span>
+<span class="go">                           - azure -&gt; tenantId, subscriptionId</span>
+<span class="go">  -i, --inline</span>
+<span class="go">  -p, --profile=&lt;value&gt;    [default: default] aws named profile of which gets info</span>
+<span class="go">  -r, --provider=&lt;option&gt;  filters sessions by the cloud provider service</span>
+<span class="go">                           &lt;options: aws|azure&gt;</span>
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Provides info about the current active session for a selected profile (if no profile is provided it uses default</span>
+<span class="go">  profile)</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session current --format <span class="s2">&quot;alias accountNumber&quot;</span> --inline --provider aws
+</code></pre></div>
+<h2 id="leapp-session-delete"><code>leapp session delete</code></h2>
+<p>Delete a session</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session delete
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Delete a session</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session delete
+</code></pre></div>
+<h2 id="leapp-session-generate-sessionid"><code>leapp session generate SESSIONID</code></h2>
+<p>Generate temporary credentials for the given AWS session id</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session generate <span class="o">[</span>SESSIONID<span class="o">]</span>
+
+<span class="go">ARGUMENTS</span>
+<span class="go">  SESSIONID  id of the session</span>
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Generate temporary credentials for the given AWS session id</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d
+</code></pre></div>
+<h2 id="leapp-session-get-id"><code>leapp session get-id</code></h2>
+<p>Get session id</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session get-id
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Get session id</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session get_id
+</code></pre></div>
+<h2 id="leapp-session-list"><code>leapp session list</code></h2>
+<p>Show sessions list</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session list <span class="o">[</span>--columns &lt;value&gt; <span class="p">|</span> -x<span class="o">]</span> <span class="o">[</span>--sort &lt;value&gt;<span class="o">]</span> <span class="o">[</span>--filter &lt;value&gt;<span class="o">]</span> <span class="o">[</span>--output csv<span class="p">|</span>json<span class="p">|</span>yaml <span class="p">|</span>  <span class="p">|</span>
+<span class="go">    [--csv | --no-truncate]] [--no-header | ]</span>
+
+<span class="go">FLAGS</span>
+<span class="go">  -x, --extended     show extra columns</span>
+<span class="go">  --columns=&lt;value&gt;  only show provided columns (comma-separated)</span>
+<span class="go">  --csv              output is csv format [alias: --output=csv]</span>
+<span class="go">  --filter=&lt;value&gt;   filter property by partial string matching, ex: name=foo</span>
+<span class="go">  --no-header        hide table header from output</span>
+<span class="go">  --no-truncate      do not truncate output to fit screen</span>
+<span class="go">  --output=&lt;option&gt;  output in a more machine friendly format</span>
+<span class="go">                     &lt;options: csv|json|yaml&gt;</span>
+<span class="go">  --sort=&lt;value&gt;     property to sort by (prepend &#39;-&#39; for descending)</span>
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Show sessions list</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session list
+</code></pre></div>
+<h2 id="leapp-session-open-web-console"><code>leapp session open-web-console</code></h2>
+<p>Open an AWS Web Console</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session open-web-console
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Open an AWS Web Console</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session open-web-console
+</code></pre></div>
+<h2 id="leapp-session-start"><code>leapp session start</code></h2>
+<p>Start a session</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session start
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Start a session</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session start
+</code></pre></div>
+<h2 id="leapp-session-start-ssm-session"><code>leapp session start-ssm-session</code></h2>
+<p>Start an AWS SSM session</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session start-ssm-session
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Start an AWS SSM session</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session start-ssm-session
+</code></pre></div>
+<h2 id="leapp-session-stop"><code>leapp session stop</code></h2>
+<p>Stop a session</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session stop
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Stop a session</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session stop
+</code></pre></div>
 
   
 
@@ -1697,7 +1967,7 @@ and select the <strong>Profiles</strong> tab. Insert the name of the new Named P
     <nav class="md-footer__inner md-grid" aria-label="Footer">
       
         
-        <a href="../aws-ec2-connect/" class="md-footer__link md-footer__link--prev" aria-label="Previous: EC2 connect through AWS SSM" rel="prev">
+        <a href="../help/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Help" rel="prev">
           <div class="md-footer__button md-icon">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
           </div>
@@ -1706,20 +1976,20 @@ and select the <strong>Profiles</strong> tab. Insert the name of the new Named P
               <span class="md-footer__direction">
                 Previous
               </span>
-              EC2 connect through AWS SSM
+              Help
             </div>
           </div>
         </a>
       
       
         
-        <a href="../opening-web-console/" class="md-footer__link md-footer__link--next" aria-label="Next: Opening AWS Web Console" rel="next">
+        <a href="../integration/" class="md-footer__link md-footer__link--next" aria-label="Next: Integration" rel="next">
           <div class="md-footer__title">
             <div class="md-ellipsis">
               <span class="md-footer__direction">
                 Next
               </span>
-              Opening AWS Web Console
+              Integration
             </div>
           </div>
           <div class="md-footer__button md-icon">
@@ -1791,10 +2061,10 @@ and select the <strong>Profiles</strong> tab. Insert the name of the new Named P
       </div>
       <script>var consent=__md_get("__consent");if(consent)for(var input of document.forms.consent.elements)input.name&&(input.checked=consent[input.name]||!1);else"file:"!==location.protocol&&setTimeout(function(){document.querySelector("[data-md-component=consent]").hidden=!1},250);var form=document.forms.consent;form.addEventListener("submit",function(n){n.preventDefault(),__md_set("__consent",Object.fromEntries(Array.from(new FormData(form).keys()).map(function(n){return[n,!0]}))),location.hash="",location.reload()})</script>
     
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.instant", "navigation.indexes", "navigation.top", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c028271.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.indexes", "navigation.top", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.2c028271.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.714a356a.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.714a356a.min.js"></script>
       
     
   </body>

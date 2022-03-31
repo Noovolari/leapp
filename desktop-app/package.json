@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "author": {
     "name": "besharp",
     "email": "info@besharp.it"
@@ -26,7 +26,6 @@
     "release-all": "gushio gushio/target-release.js 'configuration production' all"
   },
   "build": {
-    "artifactName": "Leapp-${version}-${os}-${arch}.${ext}",
     "publish": [
       {
         "provider": "github",
@@ -97,14 +96,12 @@
         {
           "target": "zip",
           "arch": [
-            "x64",
             "arm64"
           ]
         },
         {
           "target": "dmg",
           "arch": [
-            "x64",
             "arm64"
           ]
         }

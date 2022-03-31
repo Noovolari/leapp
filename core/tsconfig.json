@@ -34,8 +34,7 @@
   },
   "include": [
     "./**/*.ts",
-    "./package.json",
-    "./README.md"
+    "./package.json"
   ],
   "exclude": [
     "./dist/**",

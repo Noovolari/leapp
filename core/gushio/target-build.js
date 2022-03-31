@@ -8,6 +8,7 @@ module.exports = {
     const path = require('path')
     const shellJs = require('shelljs')
     const compileFunction = require('./compile-func')
+    const fs = require('fs')
 
     try {
       await gushio.run(path.join(__dirname, './target-clean.js'))
@@ -15,6 +16,8 @@ module.exports = {
       console.log('Building leapp-core library... ')
       await compileFunction(path, shellJs)
       console.log('Build completed successfully')
+
+      fs.copyFileSync("README.md", "dist/README.md");
     } catch (e) {
       e.message = e.message.red
       throw e

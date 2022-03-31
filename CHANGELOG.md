@@ -2,8 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.10.0](https://github.com/Noovolari/leapp/compare/v0.9.0...v0.10.0) (2022-03-10)
+## [0.11.0](https://github.com/Noovolari/leapp/compare/v0.10.0...v0.11.0) (2022-03-31)
 
+### Features
+
+* released [Leapp CLI](https://www.npmjs.com/package/@noovolari/leapp-cli) that extends Leapp Desktop App features ([a45597e](https://github.com/Noovolari/leapp/commit/a45597e13e5db0d89f322dff9829a76939aa2709))
+* released [Leapp Core library](https://www.npmjs.com/package/@noovolari/leapp-core) ([a45597e](https://github.com/Noovolari/leapp/commit/a45597e13e5db0d89f322dff9829a76939aa2709))
+* added support for M1 arm-based macOS, thanks to [PR #242](https://github.com/Noovolari/leapp/pull/242) by [@nwouda](https://github.com/nwouda)
+* you can now report a GitHub issue directly from the Desktop App's tray menu
+
+### Bug Fixes
+
+* clicking outside the session create modal cancels the action [#231](https://github.com/Noovolari/leapp/issues/231)
+
+### [0.10.0](https://github.com/Noovolari/leapp/compare/v0.9.0...v0.10.0) (2022-03-10)
 
 ### Features
 

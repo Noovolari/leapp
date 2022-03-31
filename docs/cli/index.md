@@ -2,7 +2,8 @@ Leapp's Command Line Interface.
 
 !!! warning
 
-    Leapp CLI will works only if the Desktop App is installed and running.
+    Leapp CLI will works only with the Desktop App is installed and running.
+    Note that version >= v0.11.0 of the Desktop App is required.
     Check the [installation guide](../installation/install-leapp/){: target='_blank'} to install the Desktop App.
 
 

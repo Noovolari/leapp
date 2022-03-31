@@ -1,0 +1,201 @@
+
+<form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
+
+  <mat-tab-group [animationDuration]="'0ms'" #tabs>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-Settings"></i>
+        <span class="mat-tab-label-text">General</span>
+      </ng-template>
+
+      <div class="panel">
+        <h2>Default Regions</h2>
+
+        <div class="form-container">
+          <div class="form-group">
+            <div class="form-field">
+              <label>AWS Region</label>
+              <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions" [(ngModel)]="selectedRegion" [appendTo]="'body'"></ng-select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-field">
+              <label>Azure Location</label>
+              <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [clearable]="false" [items]="locations" [(ngModel)]="selectedLocation" [appendTo]="'body'"></ng-select>
+            </div>
+          </div>
+        </div>
+
+
+        <ng-container *ngIf="appService.detectOs() === eConstants.mac">
+          <h2>MacOS Terminal</h2>
+
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label>Terminal</label>
+                <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal" [appendTo]="'body'"></ng-select>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <h2>Color Theme</h2>
+        <div class="form-container">
+          <div class="form-group">
+            <div class="form-field">
+              <label>Color</label>
+              <ng-select formControlName="colorThemeSelect"
+                         bindLabel="colorTheme"
+                         bindValue="colorTheme"
+                         [clearable]="false"
+                         [searchable]="false"
+                         [items]="[{colorTheme: eConstants.darkTheme}, {colorTheme: eConstants.lightTheme},{colorTheme: eConstants.systemDefaultTheme}]"
+                         [(ngModel)]="selectedColorTheme"
+                         (change)="setColorTheme(selectedColorTheme)"
+                         [appendTo]="'body'">
+              </ng-select>
+            </div>
+          </div>
+        </div>
+
+        <hr class="proxy-settings-section">
+
+        <h2 class="proxy-settings-section">Proxy settings</h2>
+
+        <div class="form-container proxy-settings-section">
+
+          <div class="form-group">
+            <div class="form-field">
+              <ng-select formControlName="proxyProtocol" [items]="['HTTP', 'HTTPS']" [(ngModel)]="proxyProtocol" [appendTo]="'body'" class="proxy-length-1"></ng-select>
+
+              <span class="proxy-length-2">://</span>
+
+              <input formControlName="proxyUrl" type="text" class="form-control proxy-length-3" placeholder="Enter Proxy Url" [value]="proxyUrl" >
+
+              <span class="proxy-length-4">:</span>
+
+              <input formControlName="proxyPort" type="text" class="form-control proxy-length-5" placeholder="Enter Proxy Port" [value]="proxyPort" >
+            </div>
+          </div>
+
+          <div class="form-group">
+            <div class="form-field">
+              <mat-checkbox formControlName="showAuthCheckbox" [(ngModel)]="showProxyAuthentication"></mat-checkbox> Use authentication
+            </div>
+          </div>
+
+          <div class="form-group" *ngIf="showProxyAuthentication">
+            <div class="form-field">
+              <label>Username</label>
+              <input formControlName="proxyUsername" type="text" class="form-control" placeholder="Proxy Username" [value]="proxyUsername" >
+            </div>
+
+            <div class="form-field">
+              <label>Password</label>
+              <input formControlName="proxyPassword" type="password" class="form-control" placeholder="Proxy Password" [value]="proxyPassword" >
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-Terminal"></i>
+        <span class="mat-tab-label-text">IdP Url</span>
+      </ng-template>
+
+      <div class="no-padding no-margin panel">
+        <h2>IdP URL</h2>
+
+        <div class="form-container">
+
+          <div class="form-group">
+            <div class="form-field form-control-input-button max-width">
+              <input formControlName="idpUrl" type="text" class="form-control max-width" placeholder="Add SAML 2.0 IdP URL" (keydown.enter)="$event.preventDefault(); manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);" [value]="idpUrlValue ? idpUrlValue.url : ''" >
+              <button type="button" (click)="manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"><i class="{{editingIdpUrl ? 'moon-Edit' : 'moon-Add'}}"></i></button>
+            </div>
+          </div>
+
+          <div class="form-group scrollable max-height-230">
+            <table class="table option-table">
+              <tbody>
+              <ng-container *ngFor="let idpUrl of appProviderService.repository.getIdpUrls()">
+                <tr *ngIf="idpUrl">
+                  <td>{{idpUrl.url}}</td>
+                  <td>
+                    <button class="icon-button inline" type="button" (click)="editIdpUrl(idpUrl.id);"><i class="moon-Edit"></i></button>
+                    <button class="icon-button inline" type="button" (click)="deleteIdpUrl(idpUrl.id);"><i class="moon-Delete"></i></button>
+                  </td>
+                </tr>
+              </ng-container>
+              </tbody>
+            </table>
+          </div>
+
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-Team"></i>
+        <span class="mat-tab-label-text">Profiles</span>
+      </ng-template>
+      <div class="no-padding no-margin panel">
+        <h2>Named Profiles</h2>
+
+        <div class="form-group">
+          <div class="form-field form-control-input-button max-width">
+            <input formControlName="awsProfile" type="text" class="form-control max-width" placeholder="Add a new Named Profile" (keydown.enter)="$event.preventDefault(); manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);" [value]="awsProfileValue ? awsProfileValue.name : ''" >
+            <button class="button" type="button" (click)="manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);"><i class="{{editingAwsProfile ? 'moon-Edit' : 'moon-Add'}}"></i></button>
+          </div>
+        </div>
+
+        <div class="form-group scrollable max-height-230">
+          <table class="table option-table">
+            <tbody>
+            <ng-container *ngFor="let profile of appProviderService.repository.getProfiles()">
+              <tr *ngIf="profile">
+                <td>{{profile.name}}</td>
+                <td>
+                  <ng-container *ngIf="profile.name !== 'default'">
+                    <button class="icon-button inline" type="button" (click)="editAwsProfile(profile.id);"><i class="moon-Edit"></i></button>
+                    <button class="icon-button inline" type="button" (click)="deleteAwsProfile(profile.id);"><i class="moon-Delete size-up"></i></button>
+                  </ng-container>
+                </td>
+              </tr>
+            </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-User"></i>
+        <span class="mat-tab-label-text">Account</span>
+      </ng-template>
+      <div class="no-padding no-margin panel">
+
+        <div class="hero-unit">
+          <img src="assets/images/account-hero.png" alt="">
+          <p>
+            <strong>Leapp Pro coming soon</strong>
+            <span>Join our community and give us feedback</span>
+            <br>
+            <button type="button" class="join-community-button" (click)="openJoinUs()">Join</button>
+          </p>
+        </div>
+      </div>
+    </mat-tab>
+
+  </mat-tab-group>
+
+  <button type="button" (click)="saveOptions();" [disabled]="!form.valid" class="margin-fix">Done</button>
+</form>

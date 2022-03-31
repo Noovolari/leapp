@@ -1,0 +1,486 @@
+@import "mixins/palette.scss";
+
+body.dark-theme {
+
+  border: none!important;
+  background-color: $dark-main-background;
+
+  .selected-segment {
+    background-color: $dark-selected-sidebar;
+  }
+  .mat-expansion-panel {
+    background-color: inherit;
+  }
+
+  .left {
+    border: none;
+  }
+
+  .right .main-bar {
+    padding-bottom: 11px!important;
+    padding-top: 12px!important;
+  }
+
+  .mat-list-item:hover {
+      background-color: $dark-hover-sidebar;
+  }
+
+  .mat-list-base .mat-list-item {
+    color: $dark-main-text-color;
+  }
+
+  .fa-circle.fas.offline {
+    color: $dark-offline-session!important;
+  }
+
+  .table thead th,
+  .sessions,
+  td {
+    background-color: $dark-table-background!important;
+    color: $dark-main-text-color!important;
+    &.active {
+      background-color: $dark-active-session!important;
+    }
+    &.selected {
+      background-color: $dark-selected-session!important;
+    }
+  }
+  .selected.table-column-6 i.fa-circle{
+    color: $dark-main-text-color!important;
+  }
+
+  .table tbody td, .table thead th {
+    border-bottom: 0.5px solid $dark-tablehead-border!important;
+  }
+
+  .table thead th {
+    border-bottom: 0.5px solid $dark-tablehead-border;
+  }
+
+  .table tbody td {
+    border-bottom: 0.5px solid $dark-session-card-border;
+  }
+
+  .side-bar {
+    border: none;
+  }
+
+  .main-bar {
+    border: none;
+  }
+
+  .option-bar {
+    background-color: $dark-main-background;
+  }
+
+  input.search-bar {
+    background-color: $dark-main-background;
+  }
+
+  ///* Region Badges *///
+
+  .badge.badge-gray {
+    background-color: $dark-region-label-color!important;
+  }
+
+  .badge.badge-black {
+    background-color: $dark-region-label-color-active!important;
+  }
+
+  ///* Contextual Menu *///
+
+  .mat-menu-panel {
+    border: 1px solid $dark-mat-menu;
+    background-color: $dark-modal-background;
+
+    i, span, .mat-menu-submenu-item, polygon {
+      color: $dark-main-text-color;
+    }
+
+    .divider {
+      background-color: $dark-session-card-border;
+    }
+
+    .mat-menu-item-highlighted:not([disabled]) {
+      background-color: $dark-modal-background;
+    }
+
+    .mat-menu-item:hover {
+      background-color: $dark-modal-background;
+    }
+
+    .mat-checkbox-frame {
+      border-color: $dark-input-form-border;
+    }
+    .btn-control {
+      background: $dark-button-color;
+    }
+  }
+
+  div.centered span {
+    color: $dark-main-text-color!important;
+  }
+
+  .opt-bar-session-button {
+    span {
+      color: $dark-main-text-color;
+    }
+    i.moon-Play-filled, i.moon-Stop {
+      color: $dark-start-button!important;
+    }
+  }
+
+  .opt-bar-middle-section {
+    span, i {
+      color: $dark-main-text-color!important;
+    }
+  }
+
+  input.form-control {
+    background-color: $dark-main-background!important;
+    border-color: $dark-input-form-border;
+    color: $dark-main-text-color;
+  }
+
+  .moon-Sidebar, .moon-Filter, .moon-Refresh, .moon-Setting {
+    color: $dark-icons!important;
+  }
+
+  .moon-Add {
+    color: $dark-main-text-color!important;
+  }
+
+  ///* ScrollBar Style *///
+  ::-webkit-scrollbar-track-piece {
+    background-color: $dark-table-background;
+  }
+
+  ///* SideBar Style *///
+  .mat-list-base .mat-list-item:hover, .mat-list-item.selected-integration {
+    background-color: $dark-hover-sidebar!important;
+    .moon-More, .moon-Close {
+      color: $dark-main-text-color!important;
+    }
+  }
+
+  ///* Filter Bar *///
+  .right.extended {
+    .main-bar {
+      position: relative;
+      top: -2px;
+      margin-bottom: -3px!important;
+    }
+    .save-segments {
+      position: absolute;
+      top: 7px;
+    }
+    .tag-filters {
+      padding: 12px 20px;
+    }
+  }
+  .tag-filters {
+    background-color: $dark-table-background;
+    border-top: none!important;
+    button {
+      background-color: $dark-region-label-color;
+      border: .5px solid $dark-session-card-border;
+      color: $dark-main-text-color;
+    }
+    .search-bar {
+      border-bottom: 1px solid $dark-input-form-border!important;
+
+      input {
+        background: $dark-modal-background!important;
+      }
+      hr {
+        border-top: 1px solid $dark-input-form-border!important;
+      }
+    }
+
+  }
+
+  ///* Form Control *///
+  .form-control:focus {
+    color: $dark-main-text-color;
+    border: 1px solid $dark-session-card-border;
+  }
+
+  ///* Modals *///
+  .modal-backdrop.show, .modal-backdrop::after, .modal-backdrop {
+    background-color: #292426!important;
+    opacity: 0.7;
+  }
+
+  small.text-error {
+    color: $dark-button-color;
+  }
+
+  .modal-content {
+    .segment-hint {
+      color: #9A9A9A;
+    }
+    span {
+      color: $dark-main-text-color;
+    }
+    background-color: $dark-modal-background;
+    border: 1px solid $dark-session-card-border;
+    ::-webkit-scrollbar-track-piece {
+      background-color: $dark-modal-background!important;
+    }
+    td {
+      background-color: $dark-modal-background!important;
+    }
+    div.message {
+      color: $dark-main-text-color!important;
+    }
+    .mat-tab-header {
+      border-bottom: 0.3px solid $dark-session-card-border;
+      border-top: none;
+      border-right: none;
+      border-left: none;
+    }
+    div.mat-tab-label {
+      background-color: $dark-modal-background;
+      color: $dark-main-text-color;
+    }
+    label, h2, h4, p {
+      color: $dark-main-text-color;
+      a {
+        color: $dark-button-color;
+        &:hover {
+          color: #00d9ff;
+        }
+      }
+    }
+    .strategy-list .providers {
+      color: $dark-main-text-color;
+      background-color: unset!important;
+      border: 1px solid $dark-input-form-border;
+    }
+    button {
+      background-color: $dark-button-color;
+    }
+    button.mat-button-disabled {
+      background-color: #848484;
+      color: #4F4F4F;
+    }
+    div.ng-select-container {
+      caret-color: $dark-main-text-color;
+      background-color: $dark-select-component;
+      border: none;
+      color: $dark-component-value;
+    }
+    .ng-select.ng-select-opened.ng-select-single .ng-select-container {
+      background-color: $dark-select-component!important;
+      border: 0.3px solid $dark-session-card-border!important;
+      color: $dark-main-text-color!important;
+    }
+    input.form-control {
+      border: none;
+    }
+    .ng-dropdown-panel.ng-select-bottom {
+      background-color: $dark-select-component!important;
+      border: 1px solid $dark-input-form-border!important;
+      & ::-webkit-scrollbar-track-piece {
+        background-color: $dark-select-component!important;
+      }
+    }
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+      background-color: $dark-select-component!important;
+      color: $dark-main-text-color!important;
+      span {
+        color: $dark-main-text-color;
+      }
+    }
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked span  {
+      background-color: $dark-ng-selected!important;
+    }
+  }
+
+  ::ng-deep {
+    .ng-dropdown-panel {
+      background-color: $dark-select-component!important;
+      border: none !important;
+    }
+    .ng-dropdown-panel-items {
+      background-color: $dark-select-component!important;
+    }
+  }
+
+  .toggled-filter {
+    background-color: $dark-main-text-color!important;
+  }
+
+  .search-bar input {
+    background: unset!important;
+    color: $dark-main-text-color!important;
+    caret-color: $dark-main-text-color;
+  }
+
+  hr {
+    border-top: 1px solid $dark-input-form-border!important;
+  }
+
+  .search-bar{
+    border-bottom: 1px solid $dark-input-form-border!important;
+  }
+
+  .hero-unit {
+    border: none;
+    img {
+      border-radius: 10px;
+    }
+  }
+
+  .ng-select > .ng-select-container .ng-arrow, .ng-select.ng-select-opened > .ng-select-container .ng-arrow {
+    border-color: $dark-arrow-border;
+  }
+
+  .ng-dropdown-panel.ng-select-bottom {
+    background-color: $dark-select-component!important;
+    border: 1px solid $dark-input-form-border!important;
+    & ::-webkit-scrollbar-track-piece {
+      background-color: $dark-select-component!important;
+    }
+  }
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    background-color: $dark-select-component!important;
+    span {
+      color: $dark-main-text-color;
+    }
+  }
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked span  {
+    background-color: $dark-ng-selected!important;
+  }
+  .ng-select.ng-select-opened.ng-select-single .ng-select-container {
+    outline: $dark-input-form-border solid 1px !important;
+  }
+
+  .ng-select .ng-select-container .ng-value-container .ng-input>input {
+    color: $dark-main-text-color;
+  }
+
+  .mat-menu-panel .mat-menu-item {
+    color: $dark-main-text-color;
+  }
+
+  .mat-menu-item:hover:not([disabled])::after {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .form-control:focus {
+    outline: 1px solid $dark-input-form-border!important;
+  }
+
+  .sessions tr:hover td:not(.selected) {
+    background-color: $dark-hover-session!important;
+  }
+
+  ///* Placeholder text color *///
+  ::placeholder {
+    color: $dark-placeholder-color;
+    opacity: 1;
+  }
+  .ng-select .ng-select-container .ng-value-container .ng-placeholder {
+    color: $dark-placeholder-color;
+    opacity: 1;
+  }
+
+  .create-new {
+    border-top: 1px solid $dark-input-form-border!important;
+    color: $dark-placeholder-color;
+    i {
+      color: $dark-placeholder-color!important;
+    }
+  }
+
+  .add {
+    color: $dark-main-text-color;
+    i {
+      color: $dark-main-text-color!important;
+    }
+  }
+
+  .add {
+    color: $dark-main-text-color!important;
+  }
+
+  .dark-theme-filling {
+    background-color: $dark-main-text-color;
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    top: 5px;
+    left: 10px;
+    z-index: -1;
+  }
+
+  .form-control-input-button button i.moon-Edit {
+    color: $dark-main-text-color;
+  }
+
+  .mat-checkbox-checked .mat-checkbox-checkmark {
+    opacity: 1!important;
+    background: $dark-button-color!important;
+    border-radius: 2px;
+  }
+
+  .mat-checkbox-frame {
+    border-color: $dark-input-form-border;
+  }
+
+  .filter-menu::-webkit-scrollbar-track-piece {
+    background-color: $dark-modal-background!important;
+  }
+
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    color: $dark-main-text-color!important;
+  }
+
+  .app-windows-detected .window-buttons .minimize img,
+  .app-windows-detected .window-buttons .maximize img,
+  .app-windows-detected .window-buttons .quit img {
+    position: relative;
+    top: 1px;
+  }
+
+  .app-windows-detected .window-buttons .minimize:hover img,
+  .app-windows-detected .window-buttons .maximize:not(.disabled):hover img {
+    filter: invert(1);
+  }
+  .app-windows-detected .window-buttons .quit:hover img {
+    filter: invert(0);
+  }
+
+  ///* SSM Loader *///
+  .loader .fa-spinner{
+    color: $dark-main-text-color;
+  }
+
+  ///* Update - Changelog Modal *///
+  .updater-header {
+    border-bottom: 1px solid $dark-session-card-border !important;
+    .modal-title .modal-title-icon i {
+      background-color: $dark-region-label-color-active!important;
+    }
+    .modal-title .modal-title-message div {
+      color: $dark-main-text-color !important;
+    }
+  }
+  .html-content {
+    h1, h2, h3, p, ul, li {
+      color: $dark-main-text-color!important;
+    }
+    a {
+      color: $dark-region-label-color-active!important;
+    }
+  }
+  .button-equalizer {
+    border-top: 1px solid $dark-session-card-border!important;
+    .disabled {
+      background-color: grey !important;
+      color: #373737;
+      border-radius: 5px;
+    }
+  }
+}

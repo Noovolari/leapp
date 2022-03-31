@@ -1,30 +1,30 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-/dist
-/tmp
-/out-tsc
-/release
+desktop-app/dist
+desktop-app/tmp
+desktop-app/out-tsc
+desktop-app/release
 # Only exists if Bazel was run
-/bazel-out
+desktop-app/bazel-out
+desktop-app/.angular
 
 # dependencies
-/node_modules
+**/node_modules
 
 # profiling files
-chrome-profiler-events.json
-speed-measure-plugin.json
+**/chrome-profiler-events.json
+**/speed-measure-plugin.json
 
 # IDEs and editors
 /.idea
 .project
 .classpath
 .c9/
-.cache/
-.python-version
 *.launch
 .settings/
 *.sublime-workspace
+release/
 
 # IDE - VSCode
 .vscode/*
@@ -35,26 +35,25 @@ speed-measure-plugin.json
 .history/*
 
 # misc
-/.angular/cache
-/.sass-cache
-/connect.lock
-/coverage
-/libpeerconnection.log
-npm-debug.log
-yarn-error.log
-testem.log
-/typings
+**/.sass-cache
+**/connect.lock
+**/coverage
+**/libpeerconnection.log
+**/npm-debug.log
+**/yarn-error.log
+**/testem.log
+**/typings
 
 # System Files
 .DS_Store
 Thumbs.db
 
 # Windows certificate
-windows.pfx
+desktop-app/windows.pfx
 
-package-lock.json
+**/package-lock.json
 
-/electron/dist
+desktop-app/electron/dist
 
 start.sh
 buildAll.sh
@@ -62,3 +61,19 @@ buildAll.sh
 #Mkdocs
 site/
 temp/
+
+core/package-lock.json
+core/node_modules
+core/dist
+
+cli/*-debug.log
+cli/*-error.log
+cli/.nyc_output
+cli/dist
+cli/lib
+cli/package-lock.json
+cli/tmp
+cli/yarn.lock
+cli/node_modules
+cli/oclif.manifest.json
+/release/

@@ -1,0 +1,4 @@
+{
+  "arrow-parens": ["error", "always"],
+  "trailing-spaces": "off"
+}

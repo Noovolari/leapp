@@ -1,0 +1,40 @@
+<a class="close-modal" (click)="goBack();"><i class="moon-Close"></i></a>
+
+<form [formGroup]="form" class="edit-form form center-vertical text-left">
+
+  <h4><img src="./assets/images/{{getIconForProvider(provider)}}" alt="" title="" class="title-img" /> {{form.controls['name'].value}}</h4>
+  <br>
+
+  <!-- =============================== -->
+  <!-- aws IAM USER ACCOUNT PROPERTIES -->
+  <!-- =============================== -->
+  <div class="form-group">
+    <label>Session Alias</label>
+    <input formControlName="name" type="text" class="form-control" placeholder="Session Alias *">
+    <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert a Session Alias</small>
+  </div>
+
+  <div class="form-group">
+    <label>Aws Region</label>
+    <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion"></ng-select>
+  </div>
+
+  <div class="form-group">
+    <label>Mfa Device</label>
+    <input formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
+  </div>
+
+  <div class="form-group">
+    <label>Access Key ID</label>
+    <input formControlName="accessKey" type="password" class="form-control" placeholder="Access Key *">
+  </div>
+
+  <div class="form-group">
+    <label>Secret Access Key</label>
+    <input formControlName="secretKey" type="password" class="form-control" placeholder="Secret Key *">
+  </div>
+
+  <br>
+  <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'mat-button-disabled': ''" *ngIf="accountType">Edit session</button>
+  <a (click)="closeModal()">Cancel</a>
+</form>

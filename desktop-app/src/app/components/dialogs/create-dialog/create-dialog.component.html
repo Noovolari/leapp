@@ -1,0 +1,206 @@
+<a class="close-modal" (click)="goBack();"><i class="moon-Close"></i></a>
+
+<form spellcheck="false" [formGroup]="form">
+
+  <!-- ================================================================== -->
+  <!-- == CASES FOR MANAGING PROVIDER AND ACCOUNT SELECTION STRATEGIES == -->
+  <!-- ================================================================== -->
+  <ng-container *ngIf="!providerSelected">
+    <h4>Choose your Cloud Provider</h4>
+
+    <div class="strategy-list">
+      <button type="button" class="providers" (click)="setProvider(eSessionType.awsIamRoleFederated);"><img src="./assets/images/aws{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" width="36" alt=""> Amazon AWS</button>
+      <button type="button" class="providers" (click)="setProvider(eSessionType.azure);"><img src="./assets/images/azure-logo.svg" width="36" alt=""> Microsoft Azure</button>
+
+      <button type="button" class="providers disabled" (click)="false; //setProvider(eSessionType.google);"><img src="./assets/images/google.png" width="36" alt=""> Google Cloud</button>
+      <button type="button" class="providers disabled" (click)="false; //setProvider(eSessionType.alibaba);"><img src="./assets/images/alibaba.png" width="36" alt=""> Alibaba Cloud</button>
+    </div>
+    <p>Do you want to add an Integration? <a class="btn-link" (click)="goToAwsSso()">View Integration settings</a></p>
+  </ng-container>
+
+  <!-- ================================================================== -->
+  <!-- ================================================================== -->
+  <!-- ================================================================== -->
+
+  <ng-container *ngIf="providerSelected">
+    <h4><img src="./assets/images/{{getIconForProvider(provider)}}" alt="" title="" class="title-img" /> {{getNameForProvider(provider)}}</h4>
+    <br>
+
+    <ng-container *ngIf="provider.toString().indexOf('aws') > -1">
+      <div class="form-container">
+        <div class="form-group">
+          <div class="form-field">
+            <label>Access method</label>
+            <ng-select formControlName="selectAccessStrategy"
+                       [(ngModel)]="provider"
+                       [bindLabel]="'label'"
+                       [bindValue]="'value'"
+                       (change)="setAccessStrategy(provider);"
+                       [clearable]="false"
+                       [items]="[{value: eSessionType.awsIamRoleFederated, label: 'AWS IAM Role Federated'}, {value: eSessionType.awsIamUser, label: 'AWS IAM User'}, {value: eSessionType.awsIamRoleChained, label: 'AWS IAM Role Chained'}]"
+                       placeholder="Select Session Strategy"
+                       [addTag]="false"
+            ></ng-select>
+          </div>
+          <p class="smaller">Not sure what your method is? <a class="btn-link" (click)="openAccessStrategyDocumentation();">Discover more</a></p>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="form-container">
+      <!-- ================================================================== -->
+      <!-- ==                      PROFILE ID SELECTION                    == -->
+      <!-- ================================================================== -->
+      <ng-container *ngIf="sessionType.toString().indexOf('aws') > -1">
+        <div class="form-group">
+          <div class="form-field">
+            <label>Named profile</label>
+            <app-leapp-select [controlName]="'awsProfile'"
+                              [form]="form"
+                              [placeholder]="'add a new named profile'"
+                              [items]="profiles"
+                              [dropdownPosition]="'down'"
+                              [whatToAddName]="'Named Profile'"
+                              [defaultNewValue]="addNewUUID"
+                              [bindLabel]="'label'"
+                              [bindValue]="'value'"
+                              [uppercased]="false"
+                              (selected)="profiles = $event.items; selectedProfile = $event.item;"></app-leapp-select>
+            <small class="text-error" *ngIf="(form.controls['awsProfile'].dirty || form.controls['awsProfile'].touched) && form.get('awsProfile')?.value === undefined">Insert the Named Profile</small>
+          </div>
+        </div>
+      </ng-container>
+
+      <!-- ================================================================== -->
+      <!-- ==              ACCOUNT ALIAS FOR ALL ACCOUNTS TYPE             == -->
+      <!-- ================================================================== -->
+      <div class="form-field">
+        <label>Session Alias</label>
+        <input formControlName="name" type="text" class="form-control" placeholder="Session Alias *">
+        <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert a Session Alias</small>
+      </div>
+
+      <!-- ====================== -->
+      <!-- aws SESSION PROPERTIES -->
+      <!-- ====================== -->
+      <ng-container *ngIf="sessionType.toString().indexOf('aws') > -1">
+        <!-- ================================================================== -->
+        <!-- ==                        aws REGION ALL                        == -->
+        <!-- ================================================================== -->
+        <div class="form-field">
+          <label>Region</label>
+          <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions" [(ngModel)]="selectedRegion"></ng-select>
+        </div>
+
+        <!-- ================================================================== -->
+        <!-- ==         ARN IAM ROLE FEDERATED & IAM ROLE CHAINED            == -->
+        <!-- ================================================================== -->
+        <ng-container *ngIf="sessionType === eSessionType.awsIamRoleFederated || sessionType === eSessionType.awsIamRoleChained">
+          <div class="form-field">
+            <label>Role ARN</label>
+            <input formControlName="roleArn" type="text" class="form-control" placeholder="Role ARN" />
+            <small class="text-error" *ngIf="(form.controls['roleArn'].dirty || form.controls['roleArn'].touched) && form.controls['roleArn'].errors">Insert the Role ARN</small>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="sessionType === eSessionType.awsIamRoleFederated">
+          <!-- ================================================================== -->
+          <!-- ==             SAML & IDP ARN FOR IAM ROLE FEDERATED            == -->
+          <!-- ================================================================== -->
+          <div class="form-field">
+            <label>SAML 2.0 Url</label>
+            <app-leapp-select [controlName]="'federationUrl'"
+                              [form]="form"
+                              [placeholder]="'SAML 2.0 Url*'"
+                              [items]="idpUrls"
+                              [dropdownPosition]="'up'"
+                              [whatToAddName]="'SAML 2.0 Url'"
+                              [defaultNewValue]="addNewUUID"
+                              [bindLabel]="'label'"
+                              [bindValue]="'value'"
+                              [uppercased]="false"
+                              (selected)="selectedIdpUrlEvent($event);"></app-leapp-select>
+
+            <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.get('federationUrl')?.value === undefined">Insert the SAML 2.0 Url</small>
+          </div>
+
+          <div class="form-field">
+            <label>Identity Provider</label>
+            <input formControlName="idpArn" type="text" class="form-control" placeholder="Identity Provider ARN *">
+            <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the AWS Identity Provider ARN</small>
+          </div>
+        </ng-container>
+
+        <!-- ================================================================== -->
+        <!-- ==                         MFA DEVICE ARN                       == -->
+        <!-- ================================================================== -->
+        <div class="form-field" *ngIf="sessionType === eSessionType.awsIamUser">
+          <label>Mfa Device</label>
+          <input formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA ARN or SN (optional)" />
+        </div>
+
+        <!-- ================================================================== -->
+        <!-- ==                      SECRET & ACCESS KEYS                    == -->
+        <!-- ================================================================== -->
+        <ng-container *ngIf="sessionType === eSessionType.awsIamUser">
+          <div class="form-field">
+            <label>Access Key ID</label>
+            <input formControlName="accessKey" type="password" class="form-control" placeholder="Access Key ID *">
+            <small class="text-error" *ngIf="(form.controls['accessKey'].dirty || form.controls['accessKey'].touched) && form.controls['accessKey'].errors">Insert the AWS Access Key ID</small>
+          </div>
+          <div class="form-field">
+            <label>Secret Access Key</label>
+            <input formControlName="secretKey" type="password" class="form-control" placeholder="Secret Access Key *">
+            <small class="text-error" *ngIf="(form.controls['secretKey'].dirty || form.controls['secretKey'].touched) && form.controls['secretKey'].errors">Insert the AWS Secret Access Key</small>
+          </div>
+        </ng-container>
+
+        <!-- ================================================================== -->
+        <!-- ==                       ASSUMER SESSIONS                       == -->
+        <!-- ================================================================== -->
+        <ng-container *ngIf="sessionType === eSessionType.awsIamRoleChained">
+          <div class="form-field">
+            <label>Role Session Name</label>
+            <input formControlName="roleSessionName" type="text" class="form-control" placeholder="Role Session Name" />
+            <small class="text-error" *ngIf="(form.controls['roleSessionName'].dirty || form.controls['roleSessionName'].touched) && form.controls['roleSessionName'].errors">Invalid Role Session Name</small>
+          </div>
+          <div class="form-field">
+            <label>Assumer Session</label>
+            <ng-select formControlName="assumerSession" bindLabel="sessionName" bindValue="session" dropdownPosition="top" [items]="assumerAwsSessions" [(ngModel)]="selectedSession" [disabled]="true"></ng-select>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <!-- ================================================================= -->
+      <!-- ==                  azure SESSION PROPERTIES                   == -->
+      <!-- ================================================================= -->
+      <ng-container *ngIf="sessionType === eSessionType.azure">
+        <div class="form-field">
+          <label>Subscription Id</label>
+          <input formControlName="subscriptionId" type="password" class="form-control" placeholder="Subscription Id *">
+          <small class="text-error" *ngIf="(form.controls['subscriptionId'].dirty || form.controls['subscriptionId'].touched) && form.controls['subscriptionId'].errors">Insert the Subscription Id</small>
+        </div>
+
+        <div class="form-field">
+          <label>Tenant Id</label>
+          <input formControlName="tenantId" type="password" class="form-control" placeholder="Tenant Id *">
+          <small class="text-error" *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert the Tenant Id</small>
+        </div>
+
+        <div class="form-field">
+          <label>Location</label>
+          <ng-select formControlName="azureLocation" bindLabel="location" bindValue="location" [clearable]="false" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="top"></ng-select>
+        </div>
+      </ng-container>
+    </div>
+
+
+
+    <!-- ================================================================== -->
+    <!-- ==                             BUTTONS                          == -->
+    <!-- ================================================================== -->
+    <br>
+    <button type="button" (click)="saveSession();" [disabled]="!formValid()" *ngIf="sessionType" class="btn-right-margin {{formValid() ? '': 'mat-button-disabled'}}">Create Session</button>
+    <a (click)="closeModal()">Cancel</a>
+  </ng-container>
+
+</form>

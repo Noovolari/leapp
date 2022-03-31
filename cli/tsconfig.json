@@ -1,0 +1,50 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "downlevelIteration": true,
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "importHelpers": true,
+    "declaration": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "inlineSourceMap": true,
+    "inlineSources": true,
+    "experimentalDecorators": true,
+    "strictPropertyInitialization": false,
+    "emitDecoratorMetadata": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "target": "ES2019",
+    "types": ["node"],
+    "lib": ["ES2019", "DOM"],
+    "outDir": "dist",
+    "baseUrl": ".",
+    "skipLibCheck": true,
+    "paths": {
+      "*": [
+        "node_modules/*"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
+    "coverage",
+    "node_modules",
+    "env",
+    "**/dist/**",
+    "dev",
+    "spec"
+  ]
+}

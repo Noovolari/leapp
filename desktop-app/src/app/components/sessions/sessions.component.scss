@@ -1,0 +1,103 @@
+@import "../../../assets/scss/mixins/palette";
+@import "../../../assets/scss/global";
+
+.vertical-rule {
+  display: inline-block;
+  width: 1px;
+  height: 20px;
+  border-left: 1px solid $silver-50;
+  margin-right: 10px;
+}
+
+.centered {
+  width: 100%;
+  text-align: center;
+  position: absolute;
+  top: 50%;
+  margin-top: -14%;
+
+  &.corrected {
+    margin-top: calc(-14% - #{$commandbar-extended-height} + 87px);
+  }
+
+  img { height: 210px; }
+  span { display: block; margin-top: 10px; font-size: 18px; color: $text-color; }
+}
+
+th {
+  padding-bottom: 14px!important;
+  z-index: 1;
+  a {
+    color: $text-color;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.3s ease;
+    &:hover {
+      opacity: 0.6;
+    }
+  }
+}
+
+i.moon-Table {
+  color: $silver-dark;
+  font-size: 23px;
+  padding-left: 27px;
+  position: relative;
+  top: 4px;
+}
+
+span.vertical-rule {
+  margin-right: 0!important;
+  margin-block: -4px!important;
+  height: 22px!important;
+}
+
+th:nth-child(1) {
+  padding-left: 22px!important;
+}
+
+.compact th a span.vertical-rule {
+  margin-block: -1px!important;
+}
+
+.compact i.moon-Table {
+  padding-left: 22px;
+}
+
+i.moon-Dropdown,
+i.moon-Caret-down {
+  position: relative;
+  top: 3px;
+  left: 3px;
+  font-size: 16px;
+  color: inherit;
+  opacity: 0;
+  &.ascendent-order-arrow.hidden-arrow {
+    display:inline-block;
+    opacity: 0!important;
+  }
+  &.active-arrow.descendent-order-arrow {
+    display:inline-block;
+    opacity: 1!important;
+  }
+  &.hidden-arrow.descendent-order-arrow {
+    display:inline-block;
+    opacity: 1!important;
+    transition: all 0.2s ease;
+    transform: rotate(180deg);
+  }
+}
+
+tr .status-item {display: inline-block; }
+tr .hover-item { display: none; }
+
+::ng-deep {
+  th:hover i.moon-Dropdown.hidden-arrow.ascendent-order-arrow,
+  th:hover i.moon-Caret-down.hidden-arrow.ascendent-order-arrow {
+    opacity: 1!important;
+  }
+  tr:hover {
+    .status-item { display: none; }
+    .hover-item { display: inline-block!important; }
+  }
+}

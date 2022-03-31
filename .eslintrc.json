@@ -1,27 +1,75 @@
 {
   "root": true,
   "ignorePatterns": [
-    "projects/**/*",
-    "electron/**/*"
+    "cli/gushio",
+    "cli/coverage/**/*",
+    "cli/dist/**/*",
+    "cli/tmp/**/*",
+    "core/coverage/**/*",
+    "core/dist/**/*",
+    "core/gushio",
+    "desktop-app/coverage/**/*",
+    "desktop-app/dist/**/*",
+    "desktop-app/electron/**/*",
+    "desktop-app/e2e/**/*",
+    "desktop-app/gushio",
+    "desktop-app/scripts/notarize.js",
+    "gushio/**/*"
   ],
   "overrides": [
     {
       "files": [
         "*.ts"
       ],
-      "parserOptions": {
-        "project": [
-          "tsconfig.app.json",
-          "e2e/tsconfig.json"
-        ],
-        "createDefaultProgram": true
-      },
+      "parser": "@typescript-eslint/parser",
+      "plugins": ["prettier"],
       "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/ng-cli-compat",
         "plugin:@angular-eslint/ng-cli-compat--formatting-add-on",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "prettier"
       ],
       "rules": {
+        "prettier/prettier": "error",
+        "brace-style": ["error", "1tbs"],
+        "id-blacklist": ["error"],
+        "no-underscore-dangle": "off",
+        "no-case-declarations": "off",
+        "no-dupe-else-if": "warn",
+        "no-unused-vars": [
+          "error",
+          {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "caughtErrorsIgnorePattern": "^_"
+          }
+        ],
+        "@typescript-eslint/explicit-module-boundary-types": [
+          "warn",
+          {
+            "allowArgumentsExplicitlyTypedAsAny": true
+          }
+        ],
+        "@typescript-eslint/no-unused-vars": "off",
+        "@typescript-eslint/prefer-for-of": "off",
+        "@typescript-eslint/consistent-type-definitions": "error",
+        "@typescript-eslint/dot-notation": "off",
+        "@typescript-eslint/explicit-member-accessibility": [
+          "warn",
+          {
+            "accessibility": "explicit",
+            "overrides": {
+              "accessors": "off",
+              "constructors": "no-public",
+              "methods": "no-public",
+              "properties": "off",
+              "parameterProperties": "off"
+            }
+          }
+        ],
+        "@typescript-eslint/no-use-before-define": "error",
         "@angular-eslint/component-selector": [
           "error",
           {
@@ -37,35 +85,7 @@
             "prefix": "app",
             "style": "camelCase"
           }
-        ],
-        "@typescript-eslint/consistent-type-definitions": "error",
-        "@typescript-eslint/dot-notation": "off",
-        "@typescript-eslint/explicit-member-accessibility": [
-          "off",
-          {
-            "accessibility": "explicit"
-          }
-        ],
-        "@typescript-eslint/no-use-before-define": "error",
-        "@typescript-eslint/prefer-for-of": "off",
-        "arrow-parens": [
-          "off",
-          "always"
-        ],
-        "brace-style": [
-          "error",
-          "1tbs"
-        ],
-        "id-blacklist": "error",
-        "import/order": "off",
-        "max-len": [
-          "error",
-          {
-            "code": 1024
-          }
-        ],
-        "no-trailing-spaces": "off",
-        "no-underscore-dangle": "off"
+        ]
       }
     },
     {

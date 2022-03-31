@@ -1,0 +1,42 @@
+@import "../../../../assets/scss/mixins/palette";
+@import "../../../../assets/scss/mixins/utility";
+@import "../../../../assets/scss/global";
+
+::ng-deep {
+  .segment-modal {
+    max-width: 520px!important;
+    width: 100%;
+  }
+}
+
+form {
+  margin-top: 20px;
+
+  a {
+    display: inline-block;
+    margin-left: 10px;
+  }
+}
+
+.create-new {
+  border-top: 1px solid $silver-50;
+  color: $silver-dark;
+  padding: 5px 0;
+
+  i {
+    color: $silver-dark;
+  }
+}
+
+.add {
+  cursor: pointer;
+  color: $text-color;
+  i {
+    color: $text-color;
+  }
+}
+
+small {
+  color: $small-color;
+  font-size: 12px;
+}

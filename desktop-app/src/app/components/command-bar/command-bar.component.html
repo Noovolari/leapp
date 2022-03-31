@@ -1,0 +1,67 @@
+<div class="left">
+  <div class="windows-menu">
+    <button class="icon-button" mat-menu-item [matMenuTriggerFor]="window_menu"><i class="moon-More"></i></button>
+    <mat-menu #window_menu>
+      <button mat-menu-item (click)="appService.about();">
+        <span>About</span>
+      </button>
+      <button mat-menu-item (click)="appService.quit();">
+        <span>Quit</span>
+      </button>
+    </mat-menu>
+  </div>
+
+  <button class="icon-button line-end" (click)="toggleCompactMode();"><i class="moon-Sidebar"></i></button>
+</div>
+<div class="right {{filterExtended ? 'extended' : ''}}">
+  <form [formGroup]="filterForm">
+
+    <div class="main-bar">
+      <button class="icon-button show-in-taskbar-only" (click)="false;" matTooltip="Sync all Integrations"><i class="moon-Refresh"></i></button>
+
+      <button class="icon-button line-start hide-in-taskbar" (click)="showCreateDialog();" matTooltip="Add a new Session"><i class="moon-Add"></i></button>
+
+      <button class="icon-button hide-in-taskbar filtering {{filterExtended ? 'toggled-filter' : ''}}" (click)="toggleFilters();" matTooltip="Filter the Session list"><i class="moon-Filter"></i></button>
+
+      <div class="form-control-input-icon">
+        <input formControlName="searchFilter" type="text" class="form-control search-bar" placeholder="Search session" />
+        <i class="moon-Search"></i>
+      </div>
+
+      <button class="icon-button hide-in-taskbar" (click)="syncAll();" matTooltip="Sync all Integrations"><i class="moon-Refresh"></i></button>
+
+      <div class="line-end">
+        <button class="icon-button top-right-option-button" (click)="showOptionDialog();"
+                matTooltip="Show Leapp Options"><i class="moon-Settings"></i></button>
+      </div>
+
+      <div class="window-buttons">
+        <span class="minimize" (click)="electronService.currentWindow.minimize()"><img src="assets/images/windows_minimize{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
+        <span class="maximize {{compactMode ? 'disabled' : ''}}" (click)="windowMaximizeAction();"><img src="assets/images/windows_maximize{{windowButtonDetectTheme()}}.png" alt="" title=""></span>
+        <span class="quit" (click)="electronService.currentWindow.hide()"><img src="assets/images/windows_close{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
+      </div>
+    </div>
+
+    <div class="tag-filters">
+      <span class="left-shadow" *ngIf="overflowed"></span>
+      <span class="right-shadow" *ngIf="overflowed"></span>
+      <div class="tag-filters-area" #parent>
+
+        <div #child>
+          <input formControlName="dateFilter" type="checkbox" class="hidden" />
+          <button class="toggle-button filter-button {{filterForm.get('dateFilter').value ? 'toggled' : ''}}" (click)="toggleDateFilter();"><i class="moon-Order"></i> Order by date</button>
+
+          <app-filter-menu [control]="'providerFilter'" [data]="providers" [icon]="'moon-Cloud'" [name]="'Providers'" [form]="filterForm"></app-filter-menu>
+          <app-filter-menu [control]="'profileFilter'" [data]="profiles" [icon]="'moon-User'" [name]="'Profile'" [form]="filterForm" [searchable]="true"></app-filter-menu>
+          <app-filter-menu [control]="'regionFilter'" [data]="regions" [icon]="'moon-Region'" [name]="'Region'" [form]="filterForm" [searchable]="true"></app-filter-menu>
+          <app-filter-menu [control]="'typeFilter'" [data]="types" [icon]="'moon-Bookmark'" [name]="'Type'" [form]="filterForm" [categories]="['Amazon AWS', 'Microsoft Azure']"></app-filter-menu>
+        </div>
+      </div>
+
+      <a class="save-segments" (click)="openSaveSegmentDialog();" *ngIf="checkFormIsDirty();">Save{{compactMode ? '': ' Segments'}}</a>
+    </div>
+
+  </form>
+
+</div>
+<div class="clear"></div>

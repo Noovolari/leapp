@@ -1,0 +1,245 @@
+{
+  "name": "Leapp",
+  "version": "0.10.0",
+  "author": {
+    "name": "besharp",
+    "email": "info@besharp.it"
+  },
+  "description": "Leapp is a Cross-Platform Cloud access App, built on top of Electron.",
+  "main": "electron/dist/electron/main.js",
+  "homepage": "https://github.com/Noovolari/leapp",
+  "scripts": {
+    "clean": "gushio gushio/target-clean.js",
+    "postinstall": "electron-builder install-app-deps",
+    "postinstall-m1": "electron-builder install-app-deps --arch=arm64 --platform=darwin",
+    "rebuild-keytar": "electron-rebuild -f -w keytar",
+    "release": "standard-version",
+    "ng": "ng",
+    "test": "ng test",
+    "build-dev": "gushio gushio/target-build.js aot",
+    "build-prod": "gushio gushio/target-build.js 'configuration production'",
+    "run-local": "electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
+    "build-and-run-dev": "gushio gushio/target-build-and-run.js aot",
+    "release-mac": "gushio gushio/target-release.js 'configuration production' mac",
+    "release-linux": "gushio gushio/target-release.js 'configuration production' linux",
+    "release-win": "gushio gushio/target-release.js 'configuration production' win",
+    "release-all": "gushio gushio/target-release.js 'configuration production' all"
+  },
+  "build": {
+    "artifactName": "Leapp-${version}-${os}-${arch}.${ext}",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "Noovolari",
+        "repo": "leapp",
+        "releaseType": "release"
+      }
+    ],
+    "afterSign": "scripts/notarize.js",
+    "productName": "Leapp",
+    "icon": "src/assets/icons/icon.icns",
+    "files": [
+      "dist/assets/images/Leapp.icns",
+      "dist/assets/images/Leapp.ico",
+      "dist/assets/images/Leapp.png",
+      "dist/icon.icns",
+      "dist/icon.ico",
+      "dist/icon.png",
+      "dist/leapp-client/*",
+      "dist/leapp-client/**/*",
+      "electron/dist/*",
+      "electron/dist/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "dist"
+    },
+    "appId": "com.leapp.app",
+    "dmg": {
+      "icon": "src/assets/icons/icon.icns",
+      "background": "src/assets/icons/background.png",
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "category": "Utility",
+      "synopsis": "Leapp Client is a tool that allows the user to obtain secure, temporary and refreshable credentials to access AWS Services with AWS CLI and tools based on it",
+      "description": "Leapp Client is a tool that allows the user to obtain secure, temporary and refreshable credentials to access AWS Services with AWS CLI and tools based on it, with versioning tools that work with AWS CodeCommit service and to easily use AWS SDK from your local environment during your everyday development.",
+      "icon": "src/assets/icons/1024x1024.png",
+      "desktop": {
+        "Icon": "/usr/share/icons/hicolor/256x256/apps/leapp.png"
+      },
+      "target": [
+        "deb",
+        "AppImage"
+      ]
+    },
+    "mac": {
+      "icon": "src/assets/images/Leapp.icns",
+      "forceCodeSigning": true,
+      "hardenedRuntime": true,
+      "entitlements": "./build/entitlements.mac.plist",
+      "entitlementsInherit": "./build/entitlements.mac.plist",
+      "gatekeeperAssess": false,
+      "target": [
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "zip"
+      ],
+      "icon": "src/assets/images/Leapp.ico",
+      "legalTrademarks": "beSharp",
+      "publisherName": "beSharp",
+      "requestedExecutionLevel": "highestAvailable",
+      "verifyUpdateCodeSignature": false,
+      "certificateFile": "windows_sign_certificate.pfx"
+    }
+  },
+  "dependencies": {
+    "@angular/animations": "^13.2.2",
+    "@angular/cdk": "^13.2.2",
+    "@angular/common": "^13.2.2",
+    "@angular/compiler": "^13.2.2",
+    "@angular/core": "^13.2.2",
+    "@angular/forms": "^13.2.2",
+    "@angular/material": "^13.2.2",
+    "@angular/platform-browser": "^13.2.2",
+    "@angular/platform-browser-dynamic": "^13.2.2",
+    "@angular/router": "^13.2.2",
+    "@electron/remote": "^2.0.1",
+    "@ng-select/ng-select": "8.1.1",
+    "@ngx-translate/core": "~13.0.0",
+    "@ngx-translate/http-loader": "~6.0.0",
+    "@noovolari/leapp-core": "file:../core/dist",
+    "@sebgroup/magic-iframe": "1.1.2",
+    "@types/aws-sdk": "^2.7.0",
+    "assert": "2.0.0",
+    "aws-sdk": "2.928.0",
+    "aws-sdk-mock": "5.3.0",
+    "bootstrap": "~4.6.0",
+    "chdir": "0.0.0",
+    "class-transformer": "^0.4.0",
+    "compare-versions": "^3.6.0",
+    "copy-dir": "~1.3.0",
+    "crypto-js": "~4.0.0",
+    "date-fns": "^2.26.0",
+    "electron-default-menu": "~1.0.2",
+    "electron-is-dev": "^2.0.0",
+    "electron-log": "~4.3.4",
+    "electron-notarize": "~1.0.0",
+    "electron-osx-sign": "~0.5.0",
+    "electron-reload": "^1.5.0",
+    "electron-updater": "^4.3.8",
+    "extract-zip": "~2.0.1",
+    "fix-path": "~3.0.0",
+    "follow-redirects": "^1.14.7",
+    "fs-extra": "~9.1.0",
+    "fs-web": "1.0.1",
+    "github-url-to-object": "^4.0.6",
+    "http-proxy-agent": "4.0.1",
+    "https-proxy-agent": "5.0.0",
+    "ini": "~2.0.0",
+    "is-url": "^1.2.4",
+    "jwt-decode": "~3.1.2",
+    "keytar": "7.7.0",
+    "markdown-it": "^12.0.6",
+    "menubar": "~9.0.3",
+    "mousetrap": "~1.6.5",
+    "ms": "^2.1.3",
+    "ngx-bootstrap": "^8.0.0",
+    "ngx-electron": "^2.2.0",
+    "ngx-infinite-scroll": "^10.0.1",
+    "ngx-json-viewer": "~3.0.2",
+    "ngx-toastr": "~13.2.1",
+    "node-ipc": "9.2.1",
+    "node-log-rotate": "~0.1.5",
+    "node-machine-id": "~1.1.12",
+    "reflect-metadata": "^0.1.13",
+    "rimraf": "~3.0.2",
+    "rxjs": "~6.6.7",
+    "saml-encoder-decoder-js": "~1.0.1",
+    "semver": "~7.3.5",
+    "standard-version": "^9.3.0",
+    "stream-browserify": "3.0.0",
+    "sudo-prompt": "~9.2.1",
+    "tslib": "^2.3.1",
+    "update-electron-app": "~2.0.1",
+    "uuid": "~8.3.2",
+    "v8-compile-cache": "~2.3.0",
+    "wait-on": "^6.0.0",
+    "zlib": "~1.0.5",
+    "zone.js": "~0.11.4"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^13.2.2",
+    "@angular-eslint/builder": "^13.1.0",
+    "@angular-eslint/eslint-plugin": "^13.1.0",
+    "@angular-eslint/eslint-plugin-template": "^13.1.0",
+    "@angular-eslint/schematics": "^13.1.0",
+    "@angular-eslint/template-parser": "^13.1.0",
+    "@angular/cli": "^13.2.2",
+    "@angular/compiler-cli": "^13.2.2",
+    "@angular/language-service": "^13.2.2",
+    "@biesbjerg/ngx-translate-extract": "^7.0.4",
+    "@commitlint/cli": "16.2.1",
+    "@commitlint/config-conventional": "16.2.1",
+    "@types/jasmine": "^3.7.0",
+    "@types/jasminewd2": "~2.0.8",
+    "@types/node": "^16.9.4",
+    "@types/node-ipc": "9.2.0",
+    "@types/uuid": "^8.3.0",
+    "dotenv": "^10.0.0",
+    "electron": "^15.5.0",
+    "electron-builder": "22.14.3",
+    "electron-builder-squirrel-windows": "22.14.3",
+    "electron-installer-dmg": "3.0.0",
+    "electron-packager": "15.4.0",
+    "electron-rebuild": "3.2.3",
+    "gushio": "~0.5.0",
+    "husky": "^7.0.0",
+    "jasmine": "^3.7.0",
+    "jasmine-core": "~3.7.1",
+    "jasmine-spec-reporter": "~7.0.0",
+    "karma": "^6.3.2",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage-istanbul-reporter": "~3.0.3",
+    "karma-firefox-launcher": "^2.1.0",
+    "karma-jasmine": "~4.0.1",
+    "karma-jasmine-html-reporter": "~1.5.4",
+    "karma-requirejs": "^1.1.0",
+    "node-abi": "^2.26.0",
+    "nyc": "^15.1.0",
+    "protractor": "^7.0.0",
+    "ts-node": "^9.1.1",
+    "typescript": "4.5.5",
+    "util": "^0.12.4"
+  }
+}

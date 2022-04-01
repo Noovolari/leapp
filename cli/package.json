@@ -9,7 +9,7 @@
   "bugs": "https://github.com/Noovolari/leapp/issues",
   "dependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.5",
-    "@noovolari/leapp-core": "file:../core/dist",
+    "@noovolari/leapp-core": "^0.1.104",
     "@oclif/core": "1.6.0",
     "@oclif/plugin-help": "^5.1.12",
     "@types/inquirer": "^8.2.0",

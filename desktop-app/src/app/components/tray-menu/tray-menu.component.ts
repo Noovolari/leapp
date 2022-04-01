@@ -16,6 +16,8 @@ import { WindowService } from "../../services/window.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { AppNativeService } from "../../services/app-native.service";
+import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
+import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 
 @Component({
   selector: "app-tray-menu",
@@ -42,13 +44,14 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     private electronService: AppNativeService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private leappCoreService: AppProviderService
+    private messageToasterService: MessageToasterService,
+    private appProviderService: AppProviderService
   ) {
-    this.awsCoreService = leappCoreService.awsCoreService;
-    this.loggingService = leappCoreService.loggingService;
-    this.repository = leappCoreService.repository;
-    this.sessionServiceFactory = leappCoreService.sessionFactory;
-    this.workspaceService = leappCoreService.workspaceService;
+    this.awsCoreService = appProviderService.awsCoreService;
+    this.loggingService = appProviderService.loggingService;
+    this.repository = appProviderService.repository;
+    this.sessionServiceFactory = appProviderService.sessionFactory;
+    this.workspaceService = appProviderService.workspaceService;
   }
 
   ngOnInit(): void {
@@ -251,27 +254,64 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   }
 
   private getMetadata() {
-    if (!this.awsCliVersion) {
-      this.leappCoreService.executeService.execute("aws --version").then((awsCliVersion: string) => {
-        this.awsCliVersion = awsCliVersion;
-        if (!this.awsSsmPluginVersion) {
-          this.leappCoreService.executeService.execute("session-manager-plugin --version").then((ssmVersion: string) => {
-            this.awsSsmPluginVersion = ssmVersion.replace(/(\r\n|\n|\r)/gm, "");
-          });
+    const printError = (error) => {
+      this.loggingService.logger(error, LoggerLevel.error, this, error.stack);
+      this.messageToasterService.toast(error, ToastLevel.error, "");
+    };
 
-          this.issueBody = `### Description:
+    this.getAwsCliVersion()
+      .then(() => {
+        this.getSessionManagerPluginVersion().then(() => {
+          this.setIssueBody();
+        });
+      })
+      .catch((error) => {
+        printError(error.toString());
+      });
+  }
+
+  private async getAwsCliVersion(): Promise<void> {
+    if (!this.awsCliVersion) {
+      try {
+        this.awsCliVersion = await this.appProviderService.executeService.execute("aws --version");
+      } catch (error) {
+        throw new LeappBaseError(
+          "An error occurred getting AWS CLI version. Please check if it is installed.",
+          this,
+          LoggerLevel.error,
+          "An error occurred getting AWS CLI version. Please check if it is installed."
+        );
+      }
+    }
+  }
+
+  private async getSessionManagerPluginVersion(): Promise<void> {
+    if (!this.awsSsmPluginVersion) {
+      try {
+        const sessionManagerPluginVersion = await this.appProviderService.executeService.execute("session-manager-plugin --version");
+        this.awsSsmPluginVersion = sessionManagerPluginVersion.replace(/(\r\n|\n|\r)/gm, "");
+      } catch (error) {
+        throw new LeappBaseError(
+          "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed.",
+          this,
+          LoggerLevel.error,
+          "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed."
+        );
+      }
+    }
+  }
+
+  private setIssueBody(): void {
+    this.issueBody = `### Description:
 > Please include a detailed description of the issue (and an image or screen recording, if applicable)
 
 
 ### Details:
 | Leapp Version | ${this.electronService.app.getVersion()} |
-| - | - |
+| --- | --- |
 | SsmPluginVersion | ${this.awsSsmPluginVersion} |
-| Platform | ${process.platform}|
+| Platform | ${process.platform} |
 | Awscli | ${this.awsCliVersion}
 `;
-        }
-      });
-    }
   }
 }

@@ -59,7 +59,7 @@ export default class CurrentSession extends LeappCommand {
 
   async currentSession(session: Session, dataFormat: string, dataFilter?: string[]): Promise<void> {
     const currentSessionData = this.formatSessionData(this.filterSessionData(await this.getSessionData(session), dataFilter), dataFormat);
-    this.log(currentSessionData);
+    this.log(currentSessionData.trim());
   }
 
   getSessionFromProfile(profileName: string, provider: string | undefined): Session {

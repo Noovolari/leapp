@@ -2,162 +2,162 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/configuration/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/integrations/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/sessions/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/built-in-features/aws-ec2-connect/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/built-in-features/aws-named-profiles/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/built-in-features/general-options/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/built-in-features/opening-web-console/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/cli/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/cli/scopes/help/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/cli/scopes/idp-url/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/cli/scopes/integration/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/cli/scopes/profile/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/cli/scopes/region/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/cli/scopes/session/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/configuring-integration/configure-aws-single-sign-on-integration/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/configuring-session/configure-aws-iam-role-chained/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/configuring-session/configure-aws-iam-role-federated/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/configuring-session/configure-aws-iam-user/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/configuring-session/configure-azure-tenant/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/contributing/get-involved/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/contributing/project-structure/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/installation/install-leapp/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/installation/requirements/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/installation/update-leapp/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/security/intro/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/security/system-vault/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/security/zero-knowledge/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/security/credentials-generation/aws/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/security/credentials-generation/azure/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/troubleshooting/app-data/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.leapp.cloud/0.11.0/troubleshooting/faq/</loc>
-         <lastmod>2022-03-31</lastmod>
+         <lastmod>2022-04-01</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>

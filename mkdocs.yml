@@ -24,7 +24,7 @@ nav:
           - Region: 'cli/scopes/region.md'
           - 'Idp Url': 'cli/scopes/idp-url.md'
   - 'Configuration':
-      - Add your first configuration: 'configuration.md'
+      - 'Add your first configuration': 'configuration.md'
       - 'Configuring a Session':
           - 'Configure AWS IAM User': 'configuring-session/configure-aws-iam-user.md'
           - 'Configure AWS IAM Role Federated': 'configuring-session/configure-aws-iam-role-federated.md'
@@ -37,7 +37,7 @@ nav:
       - 'Credentials generation':
           - AWS: 'security/credentials-generation/aws.md'
           - Azure: 'security/credentials-generation/azure.md'
-      - System Vault: 'security/system-vault.md'
+      - 'System Vault': 'security/system-vault.md'
       - 'Zero Knowledge':  'security/zero-knowledge.md'
   - 'Built-in features':
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'

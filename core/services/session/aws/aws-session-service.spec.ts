@@ -1,10 +1,11 @@
-import { jest, describe, test, expect } from "@jest/globals";
+import { describe, expect, jest, test } from "@jest/globals";
 import { AwsProcessCredentials } from "../../../models/aws-process-credential";
 import { SessionType } from "../../../models/session-type";
 import { AwsSessionService } from "./aws-session-service";
 import { LeappBaseError } from "../../../errors/leapp-base-error";
 import { LoggerLevel } from "../../logging-service";
 import { CredentialsInfo } from "../../../models/credentials-info";
+import { SessionStatus } from "../../../models/session-status";
 
 describe("AwsSessionService", () => {
   test("should be created", () => {
@@ -113,20 +114,68 @@ describe("AwsSessionService", () => {
     const sessionNotifier = {} as any;
     const credentialsInfo = {} as any;
     const sessionLoading = jest.fn((_: string): void => {});
-    const sessionRotate = jest.fn((_: string): void => {});
+    const sessionRotated = jest.fn((_: string): void => {});
     const generateCredentials = jest.fn((_: string): Promise<CredentialsInfo> => Promise.resolve(credentialsInfo));
     const applyCredentials = jest.fn((_: string, __: CredentialsInfo): void => {});
     const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
     (awsSessionService as any).generateCredentials = generateCredentials;
     (awsSessionService as any).sessionLoading = sessionLoading;
-    (awsSessionService as any).sessionRotate = sessionRotate;
+    (awsSessionService as any).sessionRotated = sessionRotated;
     (awsSessionService as any).applyCredentials = applyCredentials;
     await awsSessionService.rotate("sessionId");
 
     expect(sessionLoading).toHaveBeenCalledWith("sessionId");
-    expect(sessionRotate).toHaveBeenCalledWith("sessionId");
+    expect(sessionRotated).toHaveBeenCalledWith("sessionId");
     expect(generateCredentials).toHaveBeenCalledWith("sessionId");
     expect(applyCredentials).toHaveBeenCalledWith("sessionId", credentialsInfo);
+  });
+
+  test("stop - stop an active session", async () => {
+    const repository = {
+      listIamRoleChained: jest.fn(() => ["session1", "session2"]),
+      getSessionById: jest.fn(() => "session1"),
+      getSessions: jest.fn(() => []),
+    } as any;
+    const sessionNotifier = {} as any;
+    const sessionDeactivated = jest.fn((_: string): void => {});
+    const deApplyCredentials = jest.fn((_: string): void => {});
+    const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
+    (awsSessionService as any).deApplyCredentials = deApplyCredentials;
+    (awsSessionService as any).sessionDeactivated = sessionDeactivated;
+    await awsSessionService.stop("sessionId");
+
+    expect(sessionDeactivated).toHaveBeenCalledWith("sessionId");
+    expect(deApplyCredentials).toHaveBeenCalledWith("sessionId");
+  });
+
+  test("delete - delete an active session", async () => {
+    const repository = {
+      listIamRoleChained: jest.fn(() => ["session1", "session2"]),
+      getSessionById: jest.fn(() => ({ sessionName: "session1", sessionId: "sessionId", status: SessionStatus.active })),
+      getSessions: jest.fn(() => []),
+      deleteSession: jest.fn(),
+    } as any;
+    const sessionNotifier = {
+      deleteSession: jest.fn((_: string) => {}),
+    } as any;
+    const removeSecrets = jest.fn((_: string): void => {});
+    const deApplyCredentials = jest.fn((_: string): void => {});
+    const getDependantSessions = jest.fn(() => [{ sessionName: "dependant", sessionId: "1d", status: SessionStatus.active }]);
+    const stop = jest.fn((_: string): void => {});
+    const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
+    (awsSessionService as any).deApplyCredentials = deApplyCredentials;
+    (awsSessionService as any).removeSecrets = removeSecrets;
+    (awsSessionService as any).getDependantSessions = getDependantSessions;
+    (awsSessionService as any).stop = stop;
+
+    await awsSessionService.delete("sessionId");
+
+    expect(repository.deleteSession).toHaveBeenCalledWith("1d");
+    expect(repository.deleteSession).toHaveBeenCalledWith("sessionId");
+    expect(removeSecrets).toHaveBeenCalledWith("sessionId");
+    expect(getDependantSessions).toHaveBeenCalledWith("sessionId");
+    expect(stop).toHaveBeenCalledWith("sessionId");
+    expect(stop).toHaveBeenCalledWith("1d");
   });
 
   test("generateProcessCredentials - success", async () => {
@@ -171,5 +220,53 @@ describe("AwsSessionService", () => {
     awsSessionService.repository = repository;
 
     await expect(awsSessionService.generateProcessCredentials("sessionId")).rejects.toThrow(new Error("only AWS sessions are supported"));
+  });
+
+  test("isThereAnotherPendingSessionWithSameNamedProfile - true if another session with the same name profile is pending", () => {
+    const repository = {
+      getSessionById: jest.fn(() => ({ sessionId: "session1", type: SessionType.awsIamUser, status: SessionStatus.pending, profileId: "xxx" })),
+      listPending: jest.fn(() => [
+        { sessionId: "session1", type: SessionType.awsIamUser, status: SessionStatus.pending, profileId: "xxx" },
+        { sessionId: "session2", type: SessionType.awsIamUser, status: SessionStatus.pending, profileId: "xxx" },
+      ]),
+    };
+
+    const awsSessionService = new (AwsSessionService as any)();
+    awsSessionService.repository = repository;
+
+    expect((awsSessionService as any).isThereAnotherPendingSessionWithSameNamedProfile("session1")).toBe(true);
+  });
+
+  test("isThereAnotherPendingSessionWithSameNamedProfile - false if another session with different name profile is pending", () => {
+    const repository = {
+      getSessionById: jest.fn(() => ({ sessionId: "session1", type: SessionType.awsIamUser, status: SessionStatus.pending, profileId: "xxx" })),
+      listPending: jest.fn(() => [
+        { sessionId: "session1", type: SessionType.awsIamUser, status: SessionStatus.pending, profileId: "xxx" },
+        { sessionId: "session2", type: SessionType.awsIamUser, status: SessionStatus.pending, profileId: "111" },
+      ]),
+    };
+
+    const awsSessionService = new (AwsSessionService as any)();
+    awsSessionService.repository = repository;
+
+    expect((awsSessionService as any).isThereAnotherPendingSessionWithSameNamedProfile("session1")).toBe(false);
+  });
+
+  test("stopAllWithSameNameProfile - stop active sessions with the same name profile", async () => {
+    const sessionToCheck = { sessionId: "session2", type: SessionType.awsIamUser, status: SessionStatus.active, profileId: "xxx" };
+    const repository = {
+      getSessionById: jest.fn(() => ({ sessionId: "session1", type: SessionType.awsIamUser, status: SessionStatus.pending, profileId: "xxx" })),
+      listActive: jest.fn(() => [sessionToCheck]),
+    };
+    const stop = jest.fn((_: string): void => {
+      sessionToCheck.status = SessionStatus.inactive;
+    });
+    const awsSessionService = new (AwsSessionService as any)();
+    awsSessionService.repository = repository;
+    (awsSessionService as any).stop = stop;
+    await (awsSessionService as any).stopAllWithSameNameProfile("session1");
+
+    expect(stop).toHaveBeenCalledWith("session2");
+    expect(sessionToCheck.status).toBe(SessionStatus.inactive);
   });
 });

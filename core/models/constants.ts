@@ -6,7 +6,7 @@ export const constants = {
 
   //Aws
   samlRoleSessionDuration: 3600, // 1h
-  sessionDuration: 1200, // 1200, // 20 min
+  sessionDuration: 1200, // 20 min
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
   credentialsDestination: ".aws/credentials",

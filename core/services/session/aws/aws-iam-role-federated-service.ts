@@ -92,7 +92,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     } catch (err) {
       throw new LeappSamlError(this, err.message);
     } finally {
-      await this.awsAuthenticationService.closeAuthenticationWindow();
+      // await this.awsAuthenticationService.closeAuthenticationWindow();
     }
 
     // AwsSignIn: retrieve the response hook
@@ -100,7 +100,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     try {
       samlResponse = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
     } finally {
-      await this.awsAuthenticationService.closeAuthenticationWindow();
+      // await this.awsAuthenticationService.closeAuthenticationWindow();
     }
 
     // Setup STS to generate the credentials

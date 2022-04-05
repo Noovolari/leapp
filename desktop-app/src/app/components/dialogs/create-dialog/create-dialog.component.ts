@@ -22,6 +22,7 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
+import {Session} from "@noovolari/leapp-core/models/session";
 
 @Component({
   selector: "app-create-dialog",
@@ -33,6 +34,13 @@ export class CreateDialogComponent implements OnInit {
   @Input() selectedAccountNumber = "";
   @Input() selectedRole = "";
   @Input() selectedSamlUrl = "";
+
+  @Input() shortcut = false;
+  @Input() shortcutAlias;
+  @Input() shortcutRegion;
+  @Input() shortcutSessionId;
+  @Input() shortcutSessionName;
+  @Input() shortcutSessionTag;
 
   @ViewChild("roleInput", { static: false })
   roleInput: ElementRef;
@@ -156,7 +164,21 @@ export class CreateDialogComponent implements OnInit {
       this.selectedRegion = workspace.defaultRegion || constants.defaultRegion || this.regions[0].region;
       this.selectedLocation = workspace.defaultLocation || constants.defaultLocation || this.locations[0].location;
       this.selectedProfile = workspace.profiles.filter((p) => p.name === "default").map((p) => ({ value: p.id, label: p.name }))[0];
+
+      // if Shortcut apply default values
+      if (this.shortcut) {
+        this.setProvider(SessionType.awsIamRoleChained);
+        this.form.controls["name"].setValue(this.shortcutAlias);
+        this.selectedRegion = this.shortcutRegion;
+        this.selectedSession = this.assumerAwsSessions.find((ass: any) => ass.session.sessionId === this.shortcutSessionId)?.session;
+        this.form.controls["roleSessionName"].setValue(this.shortcutSessionTag);
+      }
     });
+  }
+
+  compareAssumerSessions(a: any, b: any): boolean {
+    console.log(a, b);
+    return a?.session?.sessionId === b?.session?.sessionId;
   }
 
   /**
@@ -201,7 +223,7 @@ export class CreateDialogComponent implements OnInit {
           this.form.get("awsRegion").value !== null &&
           this.form.get("roleArn").valid &&
           this.form.get("roleSessionName").valid &&
-          this.selectedSession;
+          this.selectedSession?.sessionId;
         break;
       case SessionType.awsIamUser:
         result =
@@ -352,6 +374,7 @@ export class CreateDialogComponent implements OnInit {
           this.awsIamUserService.create(awsIamUserSessionRequest).then(() => {});
           break;
         case SessionType.awsIamRoleChained:
+          console.log(this.selectedSession);
           const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
             sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,

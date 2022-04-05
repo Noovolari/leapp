@@ -31,6 +31,7 @@ import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
+import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -543,6 +544,31 @@ export class SessionCardComponent implements OnInit {
     const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
     const sessionRegion = this.session.region;
     await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion);
+  }
+
+  createAChainedSessionFromSelectedOne(): void {
+    const aliasConstructed = `ChainedFrom${this.session.sessionName}`;
+    const regionConstructed = this.session.region;
+    const assumerSessionIdConstructed = this.session.sessionId;
+    const assumerSessionNameConstructed = this.session.sessionName;
+    const assumerSessionTagConstructed = `chained-from-${this.session.sessionName}`;
+
+    const initialState = {
+      shortcutAlias: aliasConstructed,
+      shortcutRegion: regionConstructed,
+      shortcutSessionId: assumerSessionIdConstructed,
+      shortcutSessionName: assumerSessionNameConstructed,
+      shortcutSessionTag: assumerSessionTagConstructed,
+      shortcut: true,
+    };
+
+    this.bsModalService.show(CreateDialogComponent, {
+      animated: false,
+      class: "create-modal",
+      backdrop: "static",
+      keyboard: false,
+      initialState,
+    });
   }
 
   private logSessionData(session: Session, message: string): void {

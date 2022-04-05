@@ -165,7 +165,7 @@
           </div>
           <div class="form-field">
             <label>Assumer Session</label>
-            <ng-select formControlName="assumerSession" bindLabel="sessionName" bindValue="session" dropdownPosition="top" [items]="assumerAwsSessions" [(ngModel)]="selectedSession" [disabled]="true"></ng-select>
+            <ng-select formControlName="assumerSession" bindLabel="sessionName" bindValue="session" dropdownPosition="top" [items]="assumerAwsSessions" [(ngModel)]="selectedSession" [disabled]="true" [compareWith]="compareAssumerSessions"></ng-select>
           </div>
         </ng-container>
       </ng-container>

@@ -177,7 +177,6 @@ export class CreateDialogComponent implements OnInit {
   }
 
   compareAssumerSessions(a: any, b: any): boolean {
-    console.log(a, b);
     return a?.session?.sessionId === b?.session?.sessionId;
   }
 

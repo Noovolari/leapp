@@ -1,4 +1,4 @@
-@import "../../../../assets/scss/modals";
+
 @import "../../../../assets/scss/mixins/palette";
 @import "../../../../assets/scss/mixins/utility";
 @import "../../../../assets/scss/global";
@@ -27,3 +27,6 @@ form {
 .disabled {
   background: $silver-dark!important;
 }
+
+.check-validity { margin-left: 20px; margin-right: 10px; }
+.cancel { color: $silver-dark; }

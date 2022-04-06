@@ -159,5 +159,6 @@
 
   <br>
   <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'mat-button-disabled': ''" *ngIf="accountType">Edit session</button>
-  <a (click)="closeModal()">Cancel</a>
+  <button type="button" (click)="tryProperties();" [disabled]="!formValid() " [ngClass]="!formValid() ? 'check-validity mat-button-disabled': 'check-validity'" *ngIf="accountType">Check credentials</button>
+  <a (click)="closeModal()" class="cancel">Cancel</a>
 </form>

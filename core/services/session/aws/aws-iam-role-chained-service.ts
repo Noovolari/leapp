@@ -119,6 +119,18 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     return this.generateSessionToken(session, sts, params);
   }
 
+  validateCredentials(sessionId: string): Promise<boolean> {
+    return new Promise((resolve, _) => {
+      this.generateCredentials(sessionId)
+        .then((__) => {
+          resolve(true);
+        })
+        .catch((__) => {
+          resolve(false);
+        });
+    });
+  }
+
   removeSecrets(_: string): void {}
 
   async getAccountNumberFromCallerIdentity(session: AwsIamRoleChainedSession): Promise<string> {

@@ -98,4 +98,6 @@ export abstract class SessionService {
   abstract delete(sessionId: string): Promise<void>;
 
   abstract getDependantSessions(sessionId: string): Session[];
+
+  abstract validateCredentials(sessionId: string): Promise<boolean>;
 }

@@ -180,6 +180,18 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     super.sessionDeactivated(sessionId);
   }
 
+  validateCredentials(sessionId: string): Promise<boolean> {
+    return new Promise((resolve, _) => {
+      this.generateCredentials(sessionId)
+        .then((__) => {
+          resolve(true);
+        })
+        .catch((__) => {
+          resolve(false);
+        });
+    });
+  }
+
   removeSecrets(_: string): void {}
 
   private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {

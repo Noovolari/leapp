@@ -169,6 +169,18 @@ export class AwsIamUserService extends AwsSessionService {
     }
   }
 
+  validateCredentials(sessionId: string): Promise<boolean> {
+    return new Promise((resolve, _) => {
+      this.generateCredentials(sessionId)
+        .then((__) => {
+          resolve(true);
+        })
+        .catch((__) => {
+          resolve(false);
+        });
+    });
+  }
+
   removeSecrets(sessionId: string): void {
     this.removeAccessKeyFromKeychain(sessionId)
       .then((_) => {

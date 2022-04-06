@@ -19,10 +19,6 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
-import {AwsIamRoleFederatedSessionRequest} from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request";
-import {AwsIamUserSessionRequest} from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
-import {AwsIamRoleChainedSessionRequest} from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
-import {AzureSessionRequest} from "@noovolari/leapp-core/services/session/azure/azure-session-request";
 
 @Component({
   selector: "app-edit-dialog",
@@ -231,6 +227,19 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       this.closeModal();
     } else {
       this.messageToasterService.toast(`One or more parameters are invalid, check your choices.`, ToastLevel.warn, "");
+    }
+  }
+
+  async tryProperties(): Promise<void> {
+    try {
+      const check = await this.sessionService.validateCredentials(this.selectedSession.sessionId);
+      if (check) {
+        this.messageToasterService.toast(`Session: ${this.form.value.name} is able to generate credentials correctly.`, ToastLevel.success, "");
+      } else {
+        this.messageToasterService.toast(`One or more parameters are invalid, please check.`, ToastLevel.warn, "");
+      }
+    } catch (err) {
+      this.messageToasterService.toast(`One or more parameters are invalid: ${err.toString()}.`, ToastLevel.warn, "");
     }
   }
 

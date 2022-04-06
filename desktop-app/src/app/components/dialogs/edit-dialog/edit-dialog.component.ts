@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AppService } from "../../../services/app.service";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -13,16 +13,31 @@ import { WindowService } from "../../../services/window.service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import * as uuid from "uuid";
-import {Session} from "@noovolari/leapp-core/models/session";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { AzureLocation } from "@noovolari/leapp-core/services/azure-location";
+import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
+import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
+import {AwsIamRoleFederatedSessionRequest} from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request";
+import {AwsIamUserSessionRequest} from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
+import {AwsIamRoleChainedSessionRequest} from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
+import {AzureSessionRequest} from "@noovolari/leapp-core/services/session/azure/azure-session-request";
 
 @Component({
   selector: "app-edit-dialog",
   templateUrl: "./edit-dialog.component.html",
   styleUrls: ["./edit-dialog.component.scss"],
 })
-export class EditDialogComponent implements OnInit {
+export class EditDialogComponent implements OnInit, AfterViewInit {
   @ViewChild("roleInput", { static: false })
   public roleInput: ElementRef;
+
+  @ViewChild("namedProfileSelect", { static: false })
+  public namedProfileSelect: LeappSelectComponent;
+
+  @ViewChild("idpUrlSelect", { static: false })
+  public idpUrlSelect: LeappSelectComponent;
 
   @Input()
   public selectedSessionId: string;
@@ -30,6 +45,7 @@ export class EditDialogComponent implements OnInit {
   public accountType = SessionType.aws;
   public provider = SessionType.awsIamRoleFederated;
   public selectedSession: any;
+  public selectedParentSession: any;
   public selectedAccountNumber = "";
   public selectedIdpUrl;
   public selectedRegion;
@@ -59,13 +75,16 @@ export class EditDialogComponent implements OnInit {
     assumerSession: new FormControl("", [Validators.required]),
   });
 
-  idpUrls: { value: string; label: string }[] = [];
+  public idpUrls: { value: string; label: string }[] = [];
 
-  profiles: { value: string; label: string }[] = [];
-  selectedProfile: { value: string; label: string };
+  public profiles: { value: string; label: string }[] = [];
+  public selectedProfile: { value: string; label: string };
 
   /* Setup the first account for the application */
-  assumerAwsSessions: { session: Session; sessionName: string }[];
+  public assumerAwsSessions: { session: Session; sessionName: string }[];
+
+  public locations = [];
+  public selectedLocation;
 
   private workspaceService: WorkspaceService;
   private keychainService: KeychainService;
@@ -119,23 +138,48 @@ export class EditDialogComponent implements OnInit {
 
     // Get the region
     this.regions = this.leappCoreService.awsCoreService.getRegions();
-    this.selectedRegion = this.regions.find((r) => r.region === this.selectedSession.region).region;
+    this.locations = this.leappCoreService.azureCoreService.getLocations();
+
+    this.selectedRegion = this.regions.find((r) => r.region === this.selectedSession?.region)?.region;
     this.form.controls["awsRegion"].setValue(this.selectedRegion);
 
+    this.selectedLocation = this.locations.find((l: AzureLocation) => l.location === this.selectedSession?.region)?.location;
+    this.form.controls["azureLocation"].setValue(this.selectedLocation);
+  }
+
+  ngAfterViewInit(): void {
     if (this.accountType === SessionType.awsIamRoleFederated) {
+      this.form.controls["name"].setValue(this.selectedSession.sessionName);
+      this.form.controls["roleArn"].setValue((this.selectedSession as AwsIamRoleFederatedSession).roleArn);
+      this.form.controls["idpArn"].setValue((this.selectedSession as AwsIamRoleFederatedSession).idpArn);
+
+      this.idpUrlSelect.selectValue({
+        value: this.selectedSession.idpUrlId,
+        label: this.leappCoreService.repository.getIdpUrl(this.selectedSession.idpUrlId),
+      });
+      this.namedProfileSelect.selectValue({
+        value: this.selectedSession.profileId,
+        label: this.leappCoreService.repository.getProfileName(this.selectedSession.profileId),
+      });
     }
 
     if (this.accountType === SessionType.awsIamRoleChained) {
-    }
-
-    if (this.accountType === SessionType.azure) {
+      this.form.controls["name"].setValue(this.selectedSession.sessionName);
+      this.form.controls["roleSessionName"].setValue((this.selectedSession as AwsIamRoleChainedSession).roleSessionName);
+      this.form.controls["roleArn"].setValue((this.selectedSession as AwsIamRoleChainedSession).roleArn);
+      this.selectedParentSession = this.assumerAwsSessions.find(
+        (ass: any) => ass.session.sessionId === (this.selectedSession as AwsIamRoleChainedSession).parentSessionId
+      )?.session;
+      this.namedProfileSelect.selectValue({
+        value: this.selectedSession.profileId,
+        label: this.leappCoreService.repository.getProfileName(this.selectedSession.profileId),
+      });
     }
 
     if (this.accountType === SessionType.awsIamUser) {
       // Get other readonly properties
       this.form.controls["name"].setValue(this.selectedSession.sessionName);
       this.form.controls["mfaDevice"].setValue(this.selectedSession.mfaDevice);
-
       // eslint-disable-next-line max-len
       this.keychainService.getSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`).then((value) => {
         this.form.controls["accessKey"].setValue(value);
@@ -144,6 +188,16 @@ export class EditDialogComponent implements OnInit {
       this.keychainService.getSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`).then((value) => {
         this.form.controls["secretKey"].setValue(value);
       });
+      this.namedProfileSelect.selectValue({
+        value: this.selectedSession.profileId,
+        label: this.leappCoreService.repository.getProfileName(this.selectedSession.profileId),
+      });
+    }
+
+    if (this.accountType === SessionType.azure) {
+      this.form.controls["name"].setValue((this.selectedSession as AzureSession).sessionName);
+      this.form.controls["tenantId"].setValue((this.selectedSession as AzureSession).tenantId);
+      this.form.controls["subscriptionId"].setValue((this.selectedSession as AzureSession).subscriptionId);
     }
   }
 
@@ -153,7 +207,6 @@ export class EditDialogComponent implements OnInit {
   }
 
   compareAssumerSessions(a: any, b: any): boolean {
-    console.log(a, b);
     return a?.session?.sessionId === b?.session?.sessionId;
   }
 
@@ -169,21 +222,7 @@ export class EditDialogComponent implements OnInit {
    */
   saveAccount(): void {
     if (this.formValid()) {
-      this.selectedSession.sessionName = this.form.controls["name"].value;
-      this.selectedSession.region = this.selectedRegion;
-      this.selectedSession.mfaDevice = this.form.controls["mfaDevice"].value;
-      // eslint-disable-next-line max-len
-      this.keychainService
-        .saveSecret(constants.appName, `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`, this.form.controls["accessKey"].value)
-        .then((_) => {});
-      // eslint-disable-next-line max-len
-      this.keychainService
-        .saveSecret(
-          constants.appName,
-          `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`,
-          this.form.controls["secretKey"].value
-        )
-        .then((_) => {});
+      this.updateProperties();
 
       this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
       this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
@@ -195,12 +234,64 @@ export class EditDialogComponent implements OnInit {
     }
   }
 
+  updateProperties(): void {
+    switch (this.accountType) {
+      case SessionType.awsIamRoleFederated:
+        (this.selectedSession as AwsIamRoleFederatedSession).sessionName = this.form.controls["name"].value;
+        (this.selectedSession as AwsIamRoleFederatedSession).region = this.selectedRegion;
+        (this.selectedSession as AwsIamRoleFederatedSession).idpUrlId = this.selectedIdpUrl.value.trim();
+        (this.selectedSession as AwsIamRoleFederatedSession).idpArn = this.form.value.idpArn.trim();
+        (this.selectedSession as AwsIamRoleFederatedSession).roleArn = this.form.value.roleArn.trim();
+        (this.selectedSession as AwsIamRoleFederatedSession).profileId = this.selectedProfile.value;
+        break;
+      case SessionType.awsIamUser:
+        this.selectedSession.sessionName = this.form.controls["name"].value;
+        this.selectedSession.region = this.selectedRegion;
+        this.selectedSession.mfaDevice = this.form.controls["mfaDevice"].value;
+        // eslint-disable-next-line max-len
+        this.keychainService
+          .saveSecret(
+            constants.appName,
+            `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`,
+            this.form.controls["accessKey"].value
+          )
+          .then((_) => {});
+        // eslint-disable-next-line max-len
+        this.keychainService
+          .saveSecret(
+            constants.appName,
+            `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`,
+            this.form.controls["secretKey"].value
+          )
+          .then((_) => {});
+        break;
+      case SessionType.awsIamRoleChained:
+        (this.selectedSession as AwsIamRoleChainedSession).sessionName = this.form.controls["name"].value;
+        (this.selectedSession as AwsIamRoleChainedSession).region = this.selectedRegion;
+        (this.selectedSession as AwsIamRoleChainedSession).roleSessionName = this.form.value.roleSessionName.trim();
+        (this.selectedSession as AwsIamRoleChainedSession).parentSessionId = this.selectedParentSession.sessionId;
+        (this.selectedSession as AwsIamRoleChainedSession).roleArn = this.form.value.roleArn.trim();
+        (this.selectedSession as AwsIamRoleChainedSession).profileId = this.selectedProfile.value;
+        break;
+      case SessionType.azure:
+        (this.selectedSession as AzureSession).region = this.selectedLocation;
+        (this.selectedSession as AzureSession).sessionName = this.form.value.name;
+        (this.selectedSession as AzureSession).subscriptionId = this.form.value.subscriptionId;
+        (this.selectedSession as AzureSession).tenantId = this.form.value.tenantId;
+        break;
+    }
+  }
+
+  /**
+   * Form validation mechanic
+   */
   formValid(): boolean {
     let result = false;
     switch (this.accountType) {
       case SessionType.awsIamRoleFederated:
         result =
           this.form.get("name").valid &&
+          this.selectedProfile &&
           this.form.get("awsRegion").valid &&
           this.form.get("awsRegion").value !== null &&
           this.form.get("roleArn").valid &&
@@ -210,6 +301,7 @@ export class EditDialogComponent implements OnInit {
       case SessionType.awsIamRoleChained:
         result =
           this.form.get("name").valid &&
+          this.selectedProfile &&
           this.form.get("awsRegion").valid &&
           this.form.get("awsRegion").value !== null &&
           this.form.get("roleArn").valid &&
@@ -219,6 +311,7 @@ export class EditDialogComponent implements OnInit {
       case SessionType.awsIamUser:
         result =
           this.form.get("name").valid &&
+          this.selectedProfile &&
           this.form.get("awsRegion").valid &&
           this.form.get("awsRegion").value !== null &&
           this.form.get("mfaDevice").valid &&

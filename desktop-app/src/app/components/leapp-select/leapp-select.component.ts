@@ -12,6 +12,9 @@ export class LeappSelectComponent implements AfterViewInit {
   ngSelectComponent: NgSelectComponent;
 
   @Input()
+  ngModel: any;
+
+  @Input()
   placeholder: string;
 
   @Input()
@@ -88,6 +91,17 @@ export class LeappSelectComponent implements AfterViewInit {
       });
     } else {
       this.selected.emit({ items: this.items, item: null });
+    }
+  }
+
+  selectValue(value: any) {
+    const found = this.items.findIndex((i) => i[this.bindValue] === value[this.bindValue]);
+    if (found > -1) {
+      this.ngSelectComponent.select(value);
+      this.selected.emit({ items: this.items, item: value });
+      console.log("leapp-select updated value: ", this.items, value);
+    } else {
+      console.log("leapp-select item not found in collection: ", this.items, value);
     }
   }
 

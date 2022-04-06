@@ -92,7 +92,7 @@
     <div class="divider"></div>
   </ng-container>
 
-  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type === eSessionType.awsIamUser">
+  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type !== eSessionType.awsSsoRole">
     <i class="moon-Edit"></i>&nbsp;
     <span>Edit Session</span>
   </button>

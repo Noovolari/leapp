@@ -19,6 +19,7 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
+import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
 
 @Component({
   selector: "app-edit-dialog",
@@ -218,6 +219,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
    */
   saveAccount(): void {
     if (this.formValid()) {
+      this.addProfileToWorkspace();
+      this.addIpdUrlToWorkspace();
       this.updateProperties();
 
       this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
@@ -232,9 +235,14 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
   async tryProperties(): Promise<void> {
     try {
-      const check = await this.sessionService.validateCredentials(this.selectedSession.sessionId);
-      if (check) {
-        this.messageToasterService.toast(`Session: ${this.form.value.name} is able to generate credentials correctly.`, ToastLevel.success, "");
+      if (this.formValid()) {
+        this.updateProperties();
+        const check = await this.sessionService.validateCredentials(this.selectedSession.sessionId);
+        if (check) {
+          this.messageToasterService.toast(`Session: ${this.form.value.name} is able to generate credentials correctly.`, ToastLevel.success, "");
+        } else {
+          this.messageToasterService.toast(`One or more parameters are invalid, please check.`, ToastLevel.warn, "");
+        }
       } else {
         this.messageToasterService.toast(`One or more parameters are invalid, please check.`, ToastLevel.warn, "");
       }
@@ -362,5 +370,41 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
   closeModal(): void {
     this.appService.closeModal();
+  }
+
+  /**
+   * Save a new Single Sign on object in workspace if new
+   *
+   * @private
+   */
+  private addIpdUrlToWorkspace() {
+    if (this.accountType === SessionType.awsIamRoleFederated) {
+      const validate = this.leappCoreService.idpUrlService.validateIdpUrl(this.selectedIdpUrl.label);
+      if (validate === true) {
+        const idpUrl = this.leappCoreService.idpUrlService.createIdpUrl(this.selectedIdpUrl.label);
+        this.selectedIdpUrl.value = idpUrl.id;
+      } else {
+        if (validate.toString() !== "IdP URL already exists") {
+          throw new LeappParseError(this, validate.toString());
+        }
+      }
+    }
+  }
+
+  /**
+   * Save a New profile if is not in the workspace
+   *
+   * @private
+   */
+  private addProfileToWorkspace() {
+    const validate = this.leappCoreService.namedProfileService.validateNewProfileName(this.selectedProfile.label);
+    if (validate === true) {
+      const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
+      this.selectedProfile.value = profile.id;
+    } else {
+      if (validate.toString() !== "Profile already exists" && this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value) {
+        throw new LeappParseError(this, validate.toString());
+      }
+    }
   }
 }

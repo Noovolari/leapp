@@ -120,7 +120,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
     // We got all the applicable profiles
     // Note: we don't use azure profile so we remove default azure profile from the list
-    workspace.profiles.forEach((idp) => {
+    workspace.profiles?.forEach((idp) => {
       if (idp !== null && idp.name !== constants.defaultAzureProfileName && idp.id) {
         this.profiles.push({ value: idp.id, label: idp.name });
       }

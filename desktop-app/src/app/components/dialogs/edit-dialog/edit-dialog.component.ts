@@ -20,6 +20,7 @@ import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-r
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
 import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
+import {AppMfaCodePromptService} from "../../../services/app-mfa-code-prompt.service";
 
 @Component({
   selector: "app-edit-dialog",
@@ -94,7 +95,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     private messageToasterService: MessageToasterService,
     private router: Router,
     private windowService: WindowService,
-    private leappCoreService: AppProviderService
+    private leappCoreService: AppProviderService,
+    private mfaPrompter: AppMfaCodePromptService
   ) {
     this.workspaceService = leappCoreService.workspaceService;
     this.repository = this.leappCoreService.repository;
@@ -237,7 +239,11 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     try {
       if (this.formValid()) {
         this.updateProperties();
+
+        this.mfaPrompter.keepUnderlyingModal = true;
         const check = await this.sessionService.validateCredentials(this.selectedSession.sessionId);
+        this.mfaPrompter.keepUnderlyingModal = false;
+
         if (check) {
           this.messageToasterService.toast(`Session: ${this.form.value.name} is able to generate credentials correctly.`, ToastLevel.success, "");
         } else {

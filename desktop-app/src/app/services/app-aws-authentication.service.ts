@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import {Injectable, SecurityContext} from "@angular/core";
 import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import { AppProviderService } from "./app-provider.service";
@@ -10,6 +10,7 @@ import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
 import { AppNativeService } from "./app-native.service";
 import { AppService } from "./app.service";
 import { Session } from "@noovolari/leapp-core/models/session";
+import { DomSanitizer } from "@angular/platform-browser";
 
 @Injectable({ providedIn: "root" })
 export class AppAwsAuthenticationService implements IAwsSamlAuthenticationService {
@@ -18,17 +19,19 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
     private appService: AppService,
     private windowService: WindowService,
     private electronService: AppNativeService,
-    private messageToasterService: MessageToasterService
+    private messageToasterService: MessageToasterService,
+    private domSanitizer: DomSanitizer
   ) {}
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
+    const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, idpUrl);
     return new Promise((resolve) => {
       // Get active window position for extracting new windows coordinate
       const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
       const nearX = 200;
       const nearY = 50;
       // Generate a new singleton browser window for the check
-      let idpWindow = this.windowService.newWindow(idpUrl, false, "", activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY);
+      let idpWindow = this.windowService.newWindow(sanitizedField, false, "", activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY);
 
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response
@@ -48,18 +51,19 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
         });
       });
       // Start the process
-      idpWindow.loadURL(idpUrl);
+      idpWindow.loadURL(sanitizedField);
     });
   }
 
   async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<string> {
+    const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, idpUrl);
     // 1. Show or not browser window depending on needToAuthenticate
     const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
     const nearX = 200;
     const nearY = 50;
     // 2. Prepare browser window
     let idpWindow = this.windowService.newWindow(
-      idpUrl,
+      sanitizedField,
       needToAuthenticate,
       "IDP - Login",
       activeWindowPosition[0] + nearX,
@@ -92,7 +96,7 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
         }
       });
       // 4. Navigate to idpUrl
-      idpWindow.loadURL(idpUrl);
+      idpWindow.loadURL(sanitizedField);
     });
   }
 
@@ -102,8 +106,10 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
     try {
       // Clear all extra data
       const url = this.leappCoreService.repository.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
+      const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, url);
+
       const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
-      this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(url)}`);
+      this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(sanitizedField)}`);
 
       if (session) {
         const sessionService = this.leappCoreService.sessionFactory.getSessionService(session.type);

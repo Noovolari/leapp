@@ -16,6 +16,14 @@ export class NamedProfilesService {
     return this.repository.getProfiles().filter((profile) => profile.id !== excludedProfileId);
   }
 
+  getProfileName(profileId: string): string {
+    return this.repository.getProfileName(profileId);
+  }
+
+  getDefaultProfileId(): string {
+    return this.repository.getDefaultProfileId();
+  }
+
   getNamedProfilesMap(): Map<string, AwsNamedProfile> {
     return new Map(this.getNamedProfiles().map((profile) => [profile.id, profile] as [string, AwsNamedProfile]));
   }

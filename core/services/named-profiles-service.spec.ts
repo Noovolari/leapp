@@ -1,4 +1,4 @@
-import { expect } from "@jest/globals";
+import { expect, describe, test } from "@jest/globals";
 import { NamedProfilesService } from "./named-profiles-service";
 import { SessionStatus } from "../models/session-status";
 import { constants } from "../models/constants";
@@ -185,7 +185,7 @@ describe("NamedProfilesService", () => {
       type: "type",
       profileId: "profileId",
     } as any;
-    const sessionService = new (AwsSessionService as any)(null, null);
+    const sessionService = new (AwsSessionService as any)(null, null, null, null);
     sessionService.start = jest.fn();
     sessionService.stop = jest.fn();
     const sessionFactory = {

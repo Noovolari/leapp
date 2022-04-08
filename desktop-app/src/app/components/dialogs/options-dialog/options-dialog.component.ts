@@ -11,6 +11,8 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AppProviderService } from "../../../services/app-provider.service";
+import { BsModalService } from "ngx-bootstrap/modal";
+import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
 
 @Component({
   selector: "app-options-dialog",
@@ -63,7 +65,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     defaultBrowserOpening: new FormControl(""),
     terminalSelect: new FormControl(""),
     colorThemeSelect: new FormControl(""),
+    credentialMethodSelect: new FormControl(""),
   });
+
+  selectedCredentialMethod: string;
 
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: SessionService;
@@ -73,12 +78,15 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     public appService: AppService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,
+    private modalService: BsModalService,
     private router: Router
   ) {
     this.selectedTerminal = this.appProviderService.repository.getWorkspace().macOsTerminal || constants.macOsTerminal;
 
     this.colorTheme = this.appProviderService.repository.getWorkspace().colorTheme || constants.colorTheme;
     this.selectedColorTheme = this.colorTheme;
+
+    this.selectedCredentialMethod = this.appProviderService.repository.getWorkspace().credentialMethod || constants.credentialFile;
   }
 
   ngOnInit(): void {
@@ -232,16 +240,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   deleteIdpUrl(id: string): void {
-    // Assumable sessions with this id
-    /// this.sessionService = this.leappCoreService.sessionFactory.getSessionService(SessionType.awsIamRoleFederated);
-    // let sessions = this.leappCoreService.repository.getSessions().filter((s) => (s as AwsIamRoleFederatedSession).idpUrlId === id);
-
-    // Add iam Role Chained from iam role iam_federated_role
-    // sessions.forEach((parent) => {
-    //  const childs = this.leappCoreService.repository.listIamRoleChained(parent);
-    //  sessions = sessions.concat(childs);
-    // });
-
     const sessions = this.appProviderService.idpUrlService.getDependantSessions(id);
 
     // Get only names for display
@@ -371,5 +369,72 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   openJoinUs() {
     this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA");
+  }
+
+  async showWarningModalForCredentialProcess() {
+    const workspace = this.appProviderService.repository.getWorkspace();
+    if (this.selectedCredentialMethod === constants.credentialProcess) {
+      const confirmText = "I acknowledge it";
+      const callback = async (answerString: string) => {
+        if (answerString === constants.confirmed.toString()) {
+          workspace.credentialMethod = this.selectedCredentialMethod;
+          this.appProviderService.repository.persistWorkspace(workspace);
+          // Create Config file if missing
+          if (!this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsConfigPath())) {
+            this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsConfigPath(), "");
+          }
+          // When selecting this one we need to clean the credential file and create a backup
+          if (this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsCredentialPath())) {
+            this.appProviderService.fileService.writeFileSync(
+              this.appProviderService.awsCoreService.awsBkpCredentialPath(),
+              this.appProviderService.fileService.readFileSync(this.appProviderService.awsCoreService.awsCredentialPath())
+            );
+          }
+          this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsCredentialPath(), "");
+
+
+        } else {
+          this.selectedCredentialMethod = constants.credentialFile;
+        }
+
+        workspace.credentialMethod = this.selectedCredentialMethod;
+        this.appProviderService.repository.persistWorkspace(workspace);
+
+        // Now we need to check for started sessions and restart them
+        const activeSessions = this.appProviderService.repository.listActive();
+        for (let i = 0; i < activeSessions.length; i++) {
+          const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
+          await sessionService.stop(activeSessions[i].sessionId);
+          await sessionService.start(activeSessions[i].sessionId);
+        }
+      };
+
+      this.modalService.show(CredentialProcessDialogComponent, {
+        animated: false,
+        initialState: {
+          callback,
+          confirmText,
+        },
+      });
+    } else {
+      workspace.credentialMethod = this.selectedCredentialMethod;
+      this.appProviderService.repository.persistWorkspace(workspace);
+      // backup config file and delete normal one
+      if (this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsConfigPath())) {
+        this.appProviderService.fileService.writeFileSync(
+          this.appProviderService.awsCoreService.awsBkpConfigPath(),
+          this.appProviderService.fileService.readFileSync(this.appProviderService.awsCoreService.awsConfigPath())
+        );
+        this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsConfigPath(), "");
+      }
+
+      // Now we need to check for started sessions and restart them
+      const activeSessions = this.appProviderService.repository.listActive();
+      for (let i = 0; i < activeSessions.length; i++) {
+        const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
+        await sessionService.stop(activeSessions[i].sessionId);
+        await sessionService.start(activeSessions[i].sessionId);
+      }
+    }
   }
 }

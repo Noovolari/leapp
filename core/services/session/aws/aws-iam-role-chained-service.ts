@@ -20,12 +20,12 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   constructor(
     iSessionNotifier: ISessionNotifier,
     repository: Repository,
-    private awsCoreService: AwsCoreService,
-    private fileService: FileService,
+    awsCoreService: AwsCoreService,
+    fileService: FileService,
     private awsIamUserService: AwsIamUserService,
     private parentSessionServiceFactory: AwsParentSessionFactory
   ) {
-    super(iSessionNotifier, repository);
+    super(iSessionNotifier, repository, awsCoreService, fileService);
   }
 
   static sessionTokenFromAssumeRoleResponse(assumeRoleResponse: AssumeRoleResponse): { sessionToken: any } {

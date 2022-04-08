@@ -8,10 +8,18 @@ import { SessionType } from "../../../models/session-type";
 import { LoggerLevel } from "../../logging-service";
 import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
+import { constants } from "../../../models/constants";
+import { AwsCoreService } from "../../aws-core-service";
+import { FileService } from "../../file-service";
 
 export abstract class AwsSessionService extends SessionService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
-  protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {
+  protected constructor(
+    protected sessionNotifier: ISessionNotifier,
+    protected repository: Repository,
+    protected awsCoreService: AwsCoreService,
+    protected fileService: FileService
+  ) {
     super(sessionNotifier, repository);
   }
 
@@ -26,8 +34,12 @@ export abstract class AwsSessionService extends SessionService {
       }
       await this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);
-      const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(sessionId, credentialsInfo);
+      if (this.repository.getWorkspace().credentialMethod === constants.credentialFile) {
+        const credentialsInfo = await this.generateCredentials(sessionId);
+        await this.applyCredentials(sessionId, credentialsInfo);
+      } else {
+        await this.applyConfigProfileCommand(sessionId);
+      }
       this.sessionActivate(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
@@ -36,10 +48,13 @@ export abstract class AwsSessionService extends SessionService {
 
   async rotate(sessionId: string): Promise<void> {
     try {
-      this.sessionLoading(sessionId);
-      const credentialsInfo = await this.generateCredentials(sessionId);
-      await this.applyCredentials(sessionId, credentialsInfo);
-      this.sessionRotated(sessionId);
+      // We don't need to rotate credentials when in  credential process mode
+      if (this.repository.getWorkspace().credentialMethod === constants.credentialFile) {
+        this.sessionLoading(sessionId);
+        const credentialsInfo = await this.generateCredentials(sessionId);
+        await this.applyCredentials(sessionId, credentialsInfo);
+        this.sessionRotated(sessionId);
+      }
     } catch (error) {
       this.sessionError(sessionId, error);
     }
@@ -47,7 +62,11 @@ export abstract class AwsSessionService extends SessionService {
 
   async stop(sessionId: string): Promise<void> {
     try {
-      await this.deApplyCredentials(sessionId);
+      if (this.repository.getWorkspace().credentialMethod === constants.credentialFile) {
+        await this.deApplyCredentials(sessionId);
+      } else {
+        await this.deApplyConfigProfileCommand(sessionId);
+      }
       this.sessionDeactivated(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
@@ -88,6 +107,34 @@ export abstract class AwsSessionService extends SessionService {
     } else {
       throw new Error("only AWS sessions are supported");
     }
+  }
+
+  async applyConfigProfileCommand(sessionId: string) {
+    try {
+      const session = this.repository.getSessionById(sessionId) as any;
+      const command = `leapp session generate ${sessionId}`;
+      const profileName = this.repository.getProfileName(session.profileId);
+      const profile = `profile ${profileName}`;
+      const credentialProcess: { [key: string]: any } = {};
+      credentialProcess[profile] = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        credential_process: command,
+        region: session.region,
+      };
+
+      return await this.fileService.iniWriteSync(this.awsCoreService.awsConfigPath(), credentialProcess);
+    } catch (error) {
+      this.sessionError(sessionId, error);
+    }
+  }
+
+  async deApplyConfigProfileCommand(sessionId: string): Promise<void> {
+    const session = this.repository.getSessionById(sessionId);
+    const profileName = this.repository.getProfileName((session as any).profileId);
+    const profile = `profile ${profileName}`;
+    const credentialProcess = await this.fileService.iniParseSync(this.awsCoreService.awsConfigPath());
+    delete credentialProcess[profile];
+    return await this.fileService.replaceWriteSync(this.awsCoreService.awsConfigPath(), credentialProcess);
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {

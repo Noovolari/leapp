@@ -19,12 +19,12 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
     iSessionNotifier: ISessionNotifier,
     repository: Repository,
-    private fileService: FileService,
-    private awsCoreService: AwsCoreService,
+    fileService: FileService,
+    awsCoreService: AwsCoreService,
     private awsAuthenticationService: IAwsSamlAuthenticationService,
     private samlRoleSessionDuration: number
   ) {
-    super(iSessionNotifier, repository);
+    super(iSessionNotifier, repository, awsCoreService, fileService);
   }
 
   static sessionTokenFromGetSessionTokenResponse(assumeRoleResponse: Aws.STS.AssumeRoleWithSAMLResponse): { sessionToken: any } {

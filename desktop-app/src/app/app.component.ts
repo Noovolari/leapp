@@ -120,10 +120,10 @@ export class AppComponent implements OnInit {
 
     // All sessions start stopped when app is launched
     if (this.workspaceService.sessions.length > 0) {
-      this.workspaceService.sessions.forEach((sess) => {
-        const concreteSessionService = this.sessionServiceFactory.getSessionService(sess.type);
-        concreteSessionService.stop(sess.sessionId);
-      });
+      for (let i = 0; i < this.workspaceService.sessions.length; i++) {
+        const concreteSessionService = this.sessionServiceFactory.getSessionService(this.workspaceService.sessions[i].type);
+        await concreteSessionService.stop(this.workspaceService.sessions[i].sessionId);
+      }
     }
 
     // Start Global Timer

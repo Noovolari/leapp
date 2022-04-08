@@ -158,7 +158,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       });
       this.namedProfileSelect.selectValue({
         value: this.selectedSession.profileId,
-        label: this.leappCoreService.repository.getProfileName(this.selectedSession.profileId),
+        label: this.leappCoreService.namedProfileService.getProfileName(this.selectedSession.profileId),
       });
     }
 
@@ -171,7 +171,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       )?.session;
       this.namedProfileSelect.selectValue({
         value: this.selectedSession.profileId,
-        label: this.leappCoreService.repository.getProfileName(this.selectedSession.profileId),
+        label: this.leappCoreService.namedProfileService.getProfileName(this.selectedSession.profileId),
       });
     }
 
@@ -189,7 +189,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       });
       this.namedProfileSelect.selectValue({
         value: this.selectedSession.profileId,
-        label: this.leappCoreService.repository.getProfileName(this.selectedSession.profileId),
+        label: this.leappCoreService.namedProfileService.getProfileName(this.selectedSession.profileId),
       });
     }
 
@@ -408,7 +408,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
       this.selectedProfile.value = profile.id;
     } else {
-      if (validate.toString() !== "Profile already exists" && this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value) {
+      if (validate.toString() !== "Profile already exists" && this.leappCoreService.namedProfileService.getDefaultProfileId() !== this.selectedProfile.value) {
         throw new LeappParseError(this, validate.toString());
       }
     }

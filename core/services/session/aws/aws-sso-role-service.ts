@@ -67,13 +67,13 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   constructor(
     protected sessionNotifier: ISessionNotifier,
     protected repository: Repository,
-    private fileService: FileService,
+    fileService: FileService,
     private keyChainService: KeychainService,
-    private awsCoreService: AwsCoreService,
+    awsCoreService: AwsCoreService,
     private nativeService: INativeService,
     private awsSsoOidcService: AwsSsoOidcService
   ) {
-    super(sessionNotifier, repository);
+    super(sessionNotifier, repository, awsCoreService, fileService);
     awsSsoOidcService.appendListener(this);
   }
 

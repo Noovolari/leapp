@@ -33,10 +33,10 @@ export class AwsIamUserService extends AwsSessionService {
     repository: Repository,
     private mfaCodePrompter: IMfaCodePrompter,
     private keychainService: KeychainService,
-    private fileService: FileService,
-    private awsCoreService: AwsCoreService
+    fileService: FileService,
+    awsCoreService: AwsCoreService
   ) {
-    super(iSessionNotifier, repository);
+    super(iSessionNotifier, repository, awsCoreService, fileService);
   }
 
   static isTokenExpired(tokenExpiration: string): boolean {

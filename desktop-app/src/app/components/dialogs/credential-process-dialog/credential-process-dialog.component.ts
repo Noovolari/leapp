@@ -1,15 +1,14 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { WindowService } from "../../../services/window.service";
 
 @Component({
-  selector: "app-confirmation-dialog",
-  templateUrl: "./confirmation-dialog.component.html",
-  styleUrls: ["./confirmation-dialog.component.scss"],
+  selector: "app-credential-process-dialog",
+  templateUrl: "./credential-process-dialog.component.html",
+  styleUrls: ["./credential-process-dialog.component.scss"],
 })
-export class ConfirmationDialogComponent implements OnInit {
-  @Input()
-  message: string;
+export class CredentialProcessDialogComponent implements OnInit {
   @Input()
   callback: any;
 
@@ -20,7 +19,7 @@ export class ConfirmationDialogComponent implements OnInit {
   cancelText: string;
 
   /* Just a restyled modal to show a confirmation for delete actions */
-  constructor(private bsModalRef: BsModalRef) {}
+  constructor(private bsModalRef: BsModalRef, private windowService: WindowService) {}
 
   ngOnInit(): void {}
 
@@ -39,5 +38,9 @@ export class ConfirmationDialogComponent implements OnInit {
       this.bsModalRef.hide();
       this.callback(constants.confirmClosed);
     }
+  }
+
+  openDoc(): void {
+    this.windowService.openExternalUrl("https://docs.leapp.cloud/latest/cli/");
   }
 }

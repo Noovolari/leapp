@@ -263,7 +263,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
         try {
           test ||=
-            this.leappCoreService.repository
+            this.leappCoreService.namedProfileService
               .getProfileName((session as any).profileId)
               ?.toLowerCase()
               .indexOf(searchText.toLowerCase()) > -1;
@@ -413,8 +413,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       { show: true, id: SessionType.azure, category: "Microsoft Azure", name: "Azure Subscription", value: false },
     ];
 
-    this.profiles = this.leappCoreService.repository
-      .getProfiles()
+    this.profiles = this.leappCoreService.namedProfileService
+      .getNamedProfiles()
       .map((element) => ({ name: element.name, id: element.id, value: false, show: true }));
 
     this.regions = this.leappCoreService.awsCoreService.getRegions().map((element) => ({ name: element.region, value: false, show: true }));

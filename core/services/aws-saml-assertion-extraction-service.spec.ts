@@ -15,7 +15,7 @@ describe("AwsSamlAssertionExtractionService", () => {
     );
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX/adfs/ls/idpinitiatedsignonXX")).toBe(false);
 
-    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX.okta.com/XX")).toBe(true);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://login.okta.com/XX")).toBe(true);
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX.okta.com")).toBe(false);
 
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://accounts.google.com/ServiceLoginXX")).toBe(true);

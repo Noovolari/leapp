@@ -403,13 +403,15 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
    * @private
    */
   private addProfileToWorkspace() {
-    const validate = this.leappCoreService.namedProfileService.validateNewProfileName(this.selectedProfile.label);
-    if (validate === true) {
-      const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
-      this.selectedProfile.value = profile.id;
-    } else {
-      if (validate.toString() !== "Profile already exists" && this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value) {
-        throw new LeappParseError(this, validate.toString());
+    if(this.selectedSession.type !== 'azure') {
+      const validate = this.leappCoreService.namedProfileService.validateNewProfileName(this.selectedProfile.label);
+      if (validate === true) {
+        const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
+        this.selectedProfile.value = profile.id;
+      } else {
+        if (validate.toString() !== "Profile already exists" && this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value) {
+          throw new LeappParseError(this, validate.toString());
+        }
       }
     }
   }

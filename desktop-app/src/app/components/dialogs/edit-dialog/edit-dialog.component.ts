@@ -19,8 +19,8 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
-import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
-import {AppMfaCodePromptService} from "../../../services/app-mfa-code-prompt.service";
+import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
+import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
 
 @Component({
   selector: "app-edit-dialog",
@@ -154,7 +154,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
       this.idpUrlSelect.selectValue({
         value: this.selectedSession.idpUrlId,
-        label: this.leappCoreService.repository.getIdpUrl(this.selectedSession.idpUrlId),
+        label: this.leappCoreService.idpUrlService.getIdpUrl(this.selectedSession.idpUrlId),
       });
       this.namedProfileSelect.selectValue({
         value: this.selectedSession.profileId,
@@ -366,8 +366,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         return "alibaba.png";
       default:
         return `aws${
-          this.repository.getColorTheme() === constants.darkTheme ||
-          (this.repository.getColorTheme() === constants.systemDefaultTheme && this.appService.isDarkMode())
+          this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
+          (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
             ? "-dark"
             : ""
         }.png`;

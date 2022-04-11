@@ -146,7 +146,7 @@
           <div class="form-group scrollable max-height-230">
             <table class="table option-table">
               <tbody>
-              <ng-container *ngFor="let idpUrl of appProviderService.repository.getIdpUrls()">
+              <ng-container *ngFor="let idpUrl of appProviderService.workspaceOptionService.idpUrls">
                 <tr *ngIf="idpUrl">
                   <td>{{idpUrl.url}}</td>
                   <td>
@@ -181,7 +181,7 @@
         <div class="form-group scrollable max-height-230">
           <table class="table option-table">
             <tbody>
-            <ng-container *ngFor="let profile of appProviderService.repository.getProfiles()">
+            <ng-container *ngFor="let profile of appProviderService.workspaceOptionService.profiles">
               <tr *ngIf="profile">
                 <td>{{profile.name}}</td>
                 <td>

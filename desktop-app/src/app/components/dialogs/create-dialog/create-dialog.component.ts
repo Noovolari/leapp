@@ -325,8 +325,8 @@ export class CreateDialogComponent implements OnInit {
         return "alibaba.png";
       default:
         return `aws${
-          this.repository.getColorTheme() === constants.darkTheme ||
-          (this.repository.getColorTheme() === constants.systemDefaultTheme && this.appService.isDarkMode())
+          this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
+          (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
             ? "-dark"
             : ""
         }.png`;

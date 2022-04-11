@@ -12,6 +12,10 @@ export class IdpUrlsService {
     return this.repository.getIdpUrls();
   }
 
+  getIdpUrl(idpUrlId: string): string {
+    return this.repository.getIdpUrl(idpUrlId);
+  }
+
   createIdpUrl(idpUrl: string): IdpUrl {
     const newIdpUrl = new IdpUrl(this.getNewId(), idpUrl.trim());
     this.repository.addIdpUrl(newIdpUrl);

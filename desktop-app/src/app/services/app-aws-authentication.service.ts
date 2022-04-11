@@ -1,4 +1,4 @@
-import {Injectable, SecurityContext} from "@angular/core";
+import { Injectable, SecurityContext } from "@angular/core";
 import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import { AppProviderService } from "./app-provider.service";

@@ -228,8 +228,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   windowButtonDetectTheme(): string {
     if (
-      this.repository.getColorTheme() === constants.darkTheme ||
-      (this.repository.getColorTheme() === constants.systemDefaultTheme && this.appService.isDarkMode())
+      this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
+      (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
     ) {
       return "_dark";
     } else {
@@ -343,10 +343,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
 
     filteredSessions = filteredSessions.sort((x, y) => {
-      const pinnedList = this.leappCoreService.repository.getWorkspace().pinned;
+      const pinnedList = this.leappCoreService.workspaceOptionService.pinned;
       if ((pinnedList.indexOf(x.sessionId) !== -1) === (pinnedList.indexOf(y.sessionId) !== -1)) {
         return 0;
-      } else if (this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) {
+      } else if (this.leappCoreService.workspaceOptionService.pinned.indexOf(x.sessionId) !== -1) {
         return -1;
       } else {
         return 1;

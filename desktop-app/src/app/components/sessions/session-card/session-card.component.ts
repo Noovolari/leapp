@@ -500,7 +500,9 @@ export class SessionCardComponent implements OnInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  openContextMenu(event): void {
+  openContextMenu(event: any, session: Session): void {
+    this.clearOptionIds();
+    optionBarIds[session.sessionId] = true;
     this.appService.closeAllMenuTriggers();
 
     setTimeout(() => {

@@ -228,6 +228,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
       this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
 
+      //this.leappCoreService.namedProfileService.changeNamedProfile(this.selectedSession, this.selectedProfile.value);
+
       this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
       this.closeModal();
     } else {
@@ -403,7 +405,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
    * @private
    */
   private addProfileToWorkspace() {
-    if(this.selectedSession.type !== 'azure') {
+    if(this.selectedSession.type !== SessionType.azure) {
       const validate = this.leappCoreService.namedProfileService.validateNewProfileName(this.selectedProfile.label);
       if (validate === true) {
         const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);

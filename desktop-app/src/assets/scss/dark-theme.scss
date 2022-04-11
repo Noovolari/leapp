@@ -483,4 +483,9 @@ body.dark-theme {
       border-radius: 5px;
     }
   }
+
+  tr:hover .session-name-td {
+    position: relative!important;
+    top: -1px;
+  }
 }

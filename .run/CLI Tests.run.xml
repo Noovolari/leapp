@@ -4,7 +4,9 @@
     <node-options value="" />
     <jest-package value="$PROJECT_DIR$/packages/cli/node_modules/jest" />
     <working-dir value="$PROJECT_DIR$/packages/cli" />
-    <envs />
+    <envs>
+      <env name="SKIP_INTEGRATION_TESTS" value="true" />
+    </envs>
     <scope-kind value="ALL" />
     <method v="2" />
   </configuration>

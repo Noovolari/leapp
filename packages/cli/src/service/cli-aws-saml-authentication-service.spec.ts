@@ -1,8 +1,9 @@
 import { jest, describe, expect, test } from "@jest/globals";
-import { CliAwsAuthenticationService } from "./cli-aws-authentication-service";
+import { CliAwsSamlAuthenticationService } from "./cli-aws-saml-authentication-service";
 import { of } from "rxjs";
 import { Page, HTTPRequest } from "puppeteer";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
+import * as process from "process";
 
 class PageStub {
   public onPageCalled;
@@ -39,6 +40,11 @@ class PageStub {
 }
 
 describe("CliAwsAuthenticationService", () => {
+  if (process.env["SKIP_INTEGRATION_TESTS"]) {
+    test("Skipping integration tests", () => {});
+    return;
+  }
+
   const cases = [true, false];
   test.each(cases)("needAuthentication: %p", async (needAuthentication) => {
     const idpUrl = "https://idpUrl";
@@ -52,7 +58,7 @@ describe("CliAwsAuthenticationService", () => {
       isSamlAssertionUrl: jest.fn(() => !needAuthentication),
     };
 
-    const cliAwsAuthenticationService = new CliAwsAuthenticationService(authenticationService as any);
+    const cliAwsAuthenticationService = new CliAwsSamlAuthenticationService(authenticationService as any);
     cliAwsAuthenticationService.getNavigationPage = async (headlessMode: boolean) => {
       expect(headlessMode).toBeTruthy();
       return of(page as unknown as Page).toPromise();
@@ -83,7 +89,7 @@ describe("CliAwsAuthenticationService", () => {
         return "samlResponse";
       },
     };
-    const cliAwsAuthenticationService = new CliAwsAuthenticationService(authenticationService as any);
+    const cliAwsAuthenticationService = new CliAwsSamlAuthenticationService(authenticationService as any);
     cliAwsAuthenticationService.getNavigationPage = async (headlessMode: boolean) => {
       expect(headlessMode).toEqual(!needToAuthenticate);
       return of(page as unknown as Page).toPromise();
@@ -124,7 +130,7 @@ describe("CliAwsAuthenticationService", () => {
       },
     };
 
-    const cliAwsAuthenticationService = new CliAwsAuthenticationService(authenticationService as any);
+    const cliAwsAuthenticationService = new CliAwsSamlAuthenticationService(authenticationService as any);
     cliAwsAuthenticationService.getNavigationPage = async (headlessMode: boolean) => {
       expect(headlessMode).toEqual(!needToAuthenticate);
       return of(page as unknown as Page).toPromise();
@@ -139,16 +145,16 @@ describe("CliAwsAuthenticationService", () => {
   });
 
   test("getNavigationPage and closeAuthenticationWindow", async () => {
-    const cliAwsAuthenticationService = new CliAwsAuthenticationService(null);
+    const cliAwsAuthenticationService = new CliAwsSamlAuthenticationService(null);
 
     const page = await cliAwsAuthenticationService.getNavigationPage(false);
-    const process = page.browser().process();
-    expect(process).toBeDefined();
-    expect(process?.killed).toBeFalsy();
-    expect(process?.signalCode).toBeNull();
+    const browserProcess = page.browser().process();
+    expect(browserProcess).toBeDefined();
+    expect(browserProcess?.killed).toBeFalsy();
+    expect(browserProcess?.signalCode).toBeNull();
 
     await cliAwsAuthenticationService.closeAuthenticationWindow();
-    expect(process?.killed).toBeTruthy();
-    expect(process?.signalCode).toEqual("SIGKILL");
+    expect(browserProcess?.killed).toBeTruthy();
+    expect(browserProcess?.signalCode).toEqual("SIGKILL");
   });
 });

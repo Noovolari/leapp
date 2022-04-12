@@ -4,7 +4,7 @@ import { LeappModalClosedError } from "@noovolari/leapp-core/errors/leapp-modal-
 import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 
-export class CliAwsAuthenticationService implements IAwsSamlAuthenticationService {
+export class CliAwsSamlAuthenticationService implements IAwsSamlAuthenticationService {
   private browser: puppeteer.Browser;
 
   constructor(private awsSamlAssertionExtractionService: AwsSamlAssertionExtractionService) {}

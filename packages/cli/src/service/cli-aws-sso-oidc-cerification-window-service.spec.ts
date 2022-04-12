@@ -1,7 +1,13 @@
 import { describe, jest, expect, test } from "@jest/globals";
 import { CliAwsSsoOidcVerificationWindowService } from "./cli-aws-sso-oidc-verification-window-service";
+import * as process from "process";
 
-describe("CliVerificationWindowService", () => {
+describe("CliAwsSsoOidcVerificationWindowService", () => {
+  if (process.env["SKIP_INTEGRATION_TESTS"]) {
+    test("Skipping integration tests", () => {});
+    return;
+  }
+
   test("openVerificationWindow", async () => {
     const registerClientResponse = { clientId: "clientId", clientSecret: "clientSecret" } as any;
     const startDeviceAuthorizationResponse = { verificationUriComplete: "verUri", deviceCode: "deviceCode" } as any;
@@ -27,14 +33,14 @@ describe("CliVerificationWindowService", () => {
     const cliAwsSsoOidcVerificationWindowService = new CliAwsSsoOidcVerificationWindowService();
     const page = await (cliAwsSsoOidcVerificationWindowService as any).getNavigationPage(false);
 
-    const process = page.browser().process();
-    expect(process).toBeDefined();
-    expect(process?.killed).toBeFalsy();
-    expect(process?.signalCode).toBeNull();
+    const browserProcess = page.browser().process();
+    expect(browserProcess).toBeDefined();
+    expect(browserProcess?.killed).toBeFalsy();
+    expect(browserProcess?.signalCode).toBeNull();
 
     await cliAwsSsoOidcVerificationWindowService.closeBrowser();
-    expect(process?.killed).toBeTruthy();
-    expect(process?.signalCode).toEqual("SIGKILL");
+    expect(browserProcess?.killed).toBeTruthy();
+    expect(browserProcess?.signalCode).toEqual("SIGKILL");
   });
 
   test("closeBrowser, no opened browser", async () => {

@@ -35,7 +35,7 @@
   },
   "scripts": {
     "setup": "npm install && gushio gushio/setup-package.js core cli desktop-app",
-    "bootstrap": "lerna bootstrap",
+    "bootstrap": "npm install && lerna bootstrap",
     "release-core": "gushio gushio/target-release-core.js",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",

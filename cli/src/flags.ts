@@ -54,3 +54,9 @@ export const profileName = Flags.string({
   description: "an AWS named profile Alias used to identify the profile in both config and credential file",
   hidden: false,
 });
+
+// AWS Region
+export const awsRegion = Flags.string({
+  description: "a valid AWS region to set",
+  hidden: false,
+});

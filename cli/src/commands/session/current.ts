@@ -35,7 +35,7 @@ export default class CurrentSession extends LeappCommand {
     }),
     format: Flags.string({
       char: "f",
-      description: "allows filtering data to show \n\t- aws -> alias, accountNumber, roleArn\n\t- azure -> tenantId, subscriptionId",
+      description: "allows formatting data to show \n\t- aws -> id alias, accountNumber, roleArn\n\t- azure -> id tenantId, subscriptionId",
       default: undefined,
       required: false,
     }),
@@ -98,6 +98,7 @@ export default class CurrentSession extends LeappCommand {
     const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
     if (sessionService instanceof AwsSessionService) {
       return {
+        id: session.sessionId,
         alias: session.sessionName,
         accountNumber: await sessionService.getAccountNumberFromCallerIdentity(session),
         roleArn: session.type === SessionType.awsIamUser ? "none" : (session as any).roleArn,
@@ -105,6 +106,7 @@ export default class CurrentSession extends LeappCommand {
     } else if (sessionService instanceof AzureService) {
       const azureSession = session as AzureSession;
       return {
+        id: azureSession.sessionId,
         alias: azureSession.sessionName,
         tenantId: azureSession.tenantId,
         subscriptionId: azureSession.subscriptionId,

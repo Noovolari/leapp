@@ -66,6 +66,7 @@ describe("ListSessions", () => {
     await command.showSessions();
     expect(tableSpy.mock.calls[0][0]).toEqual([
       {
+        id: sessions[0].sessionId,
         profileId: "profileName",
         region: "region",
         sessionName: "sessionName",
@@ -74,6 +75,7 @@ describe("ListSessions", () => {
       },
     ]);
     expect(tableSpy.mock.calls[0][1]).toEqual({
+      id: { header: "ID", extended: true },
       sessionName: { header: "Session Name" },
       type: { header: "Type" },
       profileId: { header: "Named Profile" },

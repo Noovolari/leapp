@@ -28,6 +28,7 @@ export default class ListSessions extends LeappCommand {
     const sessionTypeLabelMap = this.cliProviderService.cloudProviderService.getSessionTypeMap();
     const namedProfilesMap = this.cliProviderService.namedProfilesService.getNamedProfilesMap();
     const data = this.cliProviderService.repository.getSessions().map((session) => ({
+      id: session.sessionId,
       sessionName: session.sessionName,
       type: sessionTypeLabelMap.get(session.type),
       profileId: "profileId" in session ? namedProfilesMap.get((session as any).profileId)?.name : "-",
@@ -36,6 +37,7 @@ export default class ListSessions extends LeappCommand {
     })) as any as Record<string, unknown>[];
 
     const columns = {
+      id: { header: "ID", extended: true },
       sessionName: { header: "Session Name" },
       type: { header: "Type" },
       profileId: { header: "Named Profile" },

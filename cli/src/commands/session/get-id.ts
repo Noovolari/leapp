@@ -6,7 +6,7 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 export default class GetIdSession extends LeappCommand {
   static description = "Get session id";
 
-  static examples = [`$leapp session get_id`];
+  static examples = [`$leapp session get-id`];
 
   constructor(argv: string[], config: Config) {
     super(argv, config);

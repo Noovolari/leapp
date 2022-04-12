@@ -394,7 +394,10 @@ Change the default region
 
 ```
 USAGE
-  $ leapp region set-default
+  $ leapp region set-default [--awsRegion <value>]
+
+FLAGS
+  --awsRegion=<value>  a valid AWS region to set
 
 DESCRIPTION
   Change the default region
@@ -457,9 +460,9 @@ USAGE
   $ leapp session current [-i] [-p <value>] [-r aws|azure] [-f <value>]
 
 FLAGS
-  -f, --format=<value>     allows filtering data to show
-                           - aws -> alias, accountNumber, roleArn
-                           - azure -> tenantId, subscriptionId
+  -f, --format=<value>     allows formatting data to show
+                           - aws -> id alias, accountNumber, roleArn
+                           - azure -> id tenantId, subscriptionId
   -i, --inline
   -p, --profile=<value>    [default: default] aws named profile of which gets info
   -r, --provider=<option>  filters sessions by the cloud provider service
@@ -518,7 +521,7 @@ DESCRIPTION
   Get session id
 
 EXAMPLES
-  $leapp session get_id
+  $leapp session get-id
 ```
 
 ## `leapp session list`

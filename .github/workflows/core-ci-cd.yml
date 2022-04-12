@@ -1,0 +1,39 @@
+name: Leapp Core CI/CD
+
+on:
+  push:
+    branches:
+      - 'master'
+
+  workflow_dispatch:
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        node_version: [ 16 ]
+    env:
+      OS: ${{ matrix.os }}
+      NODEJS: ${{ matrix.node_version }}
+      SKIP_INTEGRATION_TESTS: "true"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: Bootstrap
+        run: |
+          npm run bootstrap
+      - name: Build
+        run: |
+          cd packages/core
+          npm run build
+      - name: Test
+        run: |
+          cd packages/core
+          npm test
+      - name: Lint
+        run: |
+          npm run lint

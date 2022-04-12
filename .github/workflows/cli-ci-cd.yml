@@ -1,0 +1,86 @@
+name: Leapp CLI CI/CD
+
+on:
+  workflow_run:
+    workflows: [ "Leapp Core CI/CD" ]
+    branches: [ master ]
+    types:
+      - completed
+
+  workflow_dispatch:
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
+        node_version: [ 16 ]
+    env:
+      OS: ${{ matrix.os }}
+      NODEJS: ${{ matrix.node_version }}
+      SKIP_INTEGRATION_TESTS: "true"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: Bootstrap
+        run: |
+          npm run bootstrap
+      - name: Build Core
+        run: |
+          cd packages/core
+          npm run build
+      - name: Build CLI
+        run: |
+          cd packages/cli
+          npm run prepack
+      - name: Test
+        run: |
+          cd packages/cli
+          npm test
+      - name: Lint
+        run: |
+          npm run lint
+
+  publish:
+    needs: build_and_test
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        node_version: [ 16 ]
+    env:
+      OS: ${{ matrix.os }}
+      NODEJS: ${{ matrix.node_version }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: Bootstrap
+        run: |
+          npm run bootstrap
+      - name: Install AWS SDK
+        run: |
+          cd packages/cli
+          npm install --save-dev aws-sdk
+      - name: Build Core
+        run: |
+          cd packages/core
+          npm run build
+      - name: Publish Homebrew
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GIT_PUSH_TOKEN: ${{ secrets.GIT_PUSH_TOKEN }}
+        run: |
+          git config --global user.name "Noovolari Bot"
+          git config --global user.email "info@noovolari.com"
+          cd packages/cli
+#          npm run release-homebrew
+#      - name: Publish npm
+#        run: |
+#          cd packages/cli
+#          npm run release-npm

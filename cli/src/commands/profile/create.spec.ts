@@ -8,6 +8,27 @@ describe("CreateNamedProfile", () => {
     return command;
   };
 
+  test("createNamedProfile", async () => {
+    const cliProviderService: any = {
+      namedProfilesService: {
+        createNamedProfile: jest.fn(),
+      },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+    };
+
+    let command = getTestCommand(cliProviderService, ["--profileName"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --profileName expects a value");
+
+    command = getTestCommand(cliProviderService, ["--profileName", "mockProfile"]);
+    command.log = jest.fn();
+    await command.createNamedProfile("mockProfile");
+
+    expect(cliProviderService.namedProfilesService.createNamedProfile).toHaveBeenCalledWith("mockProfile");
+    expect(command.log).toHaveBeenCalledWith("profile created");
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+  });
+
   test("getProfileName", async () => {
     const cliProviderService: any = {
       inquirer: {

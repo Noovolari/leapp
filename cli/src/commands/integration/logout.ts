@@ -1,11 +1,16 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { integrationId } from "../../flags";
 
 export default class LogoutIntegration extends LeappCommand {
   static description = "Logout from integration";
 
   static examples = ["$leapp integration logout"];
+
+  static flags = {
+    integrationId,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -13,8 +18,14 @@ export default class LogoutIntegration extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedIntegration = await this.selectIntegration();
-      await this.logout(selectedIntegration);
+      const { flags } = await this.parse(LogoutIntegration);
+      if (flags.integrationId && flags.integrationId !== "") {
+        const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        await this.logout(selectedIntegration);
+      } else {
+        const selectedIntegration = await this.selectIntegration();
+        await this.logout(selectedIntegration);
+      }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }

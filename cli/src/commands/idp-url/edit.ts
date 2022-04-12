@@ -71,7 +71,6 @@ export default class EditIdpUrl extends LeappCommand {
   }
 
   validateMyFlags(flags: any): boolean {
-    this.log(flags);
     if (flags.idpUrlId === "") {
       throw new Error("IdP URL ID can't be empty");
     }
@@ -82,7 +81,7 @@ export default class EditIdpUrl extends LeappCommand {
     if (flags.idpUrl === "") {
       throw new Error("IdP URL can't be empty");
     }
-    if (flags.idpUrl.indexOf("http://") < 0 || flags.idpUrl.indexOf("https://") < 0) {
+    if (flags.idpUrl.indexOf("http://") < 0 && flags.idpUrl.indexOf("https://") < 0) {
       throw new Error("IdP URL is not valid");
     }
     return true;

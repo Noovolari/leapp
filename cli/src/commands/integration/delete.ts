@@ -1,11 +1,16 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { integrationId } from "../../flags";
 
 export default class DeleteIntegration extends LeappCommand {
   static description = "Delete an integration";
 
   static examples = ["$leapp integration delete"];
+
+  static flags = {
+    integrationId,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -13,8 +18,14 @@ export default class DeleteIntegration extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedIntegration = await this.selectIntegration();
-      await this.delete(selectedIntegration);
+      const { flags } = await this.parse(DeleteIntegration);
+      if (flags.integrationId && flags.integrationId !== "") {
+        const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        await this.delete(selectedIntegration);
+      } else {
+        const selectedIntegration = await this.selectIntegration();
+        await this.delete(selectedIntegration);
+      }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }

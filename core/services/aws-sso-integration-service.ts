@@ -60,6 +60,10 @@ export class AwsSsoIntegrationService {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
 
+  getIntegration(id: string): AwsSsoIntegration {
+    return this.repository.getAwsSsoIntegration(id);
+  }
+
   getIntegrations(): AwsSsoIntegration[] {
     return this.repository.listAwsSsoIntegrations();
   }

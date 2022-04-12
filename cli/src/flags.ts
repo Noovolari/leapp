@@ -19,6 +19,11 @@ export const idpUrlId = Flags.string({
 });
 
 // INTEGRATIONS
+export const integrationId = Flags.string({
+  description: "the Integration Id used to identify the integration inside Leapp",
+  hidden: false,
+});
+
 export const integrationAlias = Flags.string({
   description: "alias that identifies an integration",
   hidden: false,
@@ -35,6 +40,17 @@ export const integrationRegion = Flags.string({
 });
 
 export const integrationMethod = Flags.string({
-  description: "either in-app or in-browser",
+  description: "either in-app or in-browser, identifies the preferred method to authenticate against portal URL",
+  hidden: false,
+});
+
+// PROFILES
+export const profileId = Flags.string({
+  description: "an AWS named profile ID in Leapp",
+  hidden: false,
+});
+
+export const profileName = Flags.string({
+  description: "an AWS named profile Alias used to identify the profile in both config and credential file",
   hidden: false,
 });

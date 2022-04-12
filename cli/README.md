@@ -172,13 +172,23 @@ Create a new AWS SSO integration
 
 ```
 USAGE
-  $ leapp integration create
+  $ leapp integration create [--integrationAlias <value>] [--integrationPortalUrl <value>] [--integrationRegion <value>]
+    [--integrationMethod <value>]
+
+FLAGS
+  --integrationAlias=<value>      alias that identifies an integration
+  --integrationMethod=<value>     either in-app or in-browser, identifies the preferred method to authenticate against
+                                  portal URL
+  --integrationPortalUrl=<value>  url that identifies the integration portal where you authenticate
+  --integrationRegion=<value>     an AWS valid region code for the integration
 
 DESCRIPTION
   Create a new AWS SSO integration
 
 EXAMPLES
   $leapp integration create
+
+  $leapp integration create --integrationAlias ALIAS --integrationPortalUrl URL --integrationRegion REGION --integrationMethod [In-app, In-browser]
 ```
 
 ## `leapp integration delete`
@@ -187,7 +197,10 @@ Delete an integration
 
 ```
 USAGE
-  $ leapp integration delete
+  $ leapp integration delete [--integrationId <value>]
+
+FLAGS
+  --integrationId=<value>  the Integration Id used to identify the integration inside Leapp
 
 DESCRIPTION
   Delete an integration
@@ -229,7 +242,10 @@ Login to synchronize integration sessions
 
 ```
 USAGE
-  $ leapp integration login
+  $ leapp integration login [--integrationId <value>]
+
+FLAGS
+  --integrationId=<value>  the Integration Id used to identify the integration inside Leapp
 
 DESCRIPTION
   Login to synchronize integration sessions
@@ -244,7 +260,10 @@ Logout from integration
 
 ```
 USAGE
-  $ leapp integration logout
+  $ leapp integration logout [--integrationId <value>]
+
+FLAGS
+  --integrationId=<value>  the Integration Id used to identify the integration inside Leapp
 
 DESCRIPTION
   Logout from integration
@@ -259,7 +278,10 @@ Synchronize integration sessions
 
 ```
 USAGE
-  $ leapp integration sync
+  $ leapp integration sync [--integrationId <value>]
+
+FLAGS
+  --integrationId=<value>  the Integration Id used to identify the integration inside Leapp
 
 DESCRIPTION
   Synchronize integration sessions
@@ -274,7 +296,10 @@ Create a new AWS named profile
 
 ```
 USAGE
-  $ leapp profile create
+  $ leapp profile create [--profileName <value>]
+
+FLAGS
+  --profileName=<value>  an AWS named profile Alias used to identify the profile in both config and credential file
 
 DESCRIPTION
   Create a new AWS named profile

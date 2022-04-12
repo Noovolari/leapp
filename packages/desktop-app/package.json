@@ -1,6 +1,7 @@
 {
   "name": "Leapp",
   "version": "0.11.0",
+  "private": true,
   "author": {
     "name": "besharp",
     "email": "info@besharp.it"
@@ -9,6 +10,7 @@
   "main": "electron/dist/electron/main.js",
   "homepage": "https://github.com/Noovolari/leapp",
   "scripts": {
+    "setup": "gushio ../../gushio/setup-package.js desktop-app",
     "clean": "gushio gushio/target-clean.js",
     "postinstall": "electron-builder install-app-deps",
     "postinstall-m1": "electron-builder install-app-deps --arch=arm64 --platform=darwin",

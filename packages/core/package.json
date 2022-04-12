@@ -57,11 +57,28 @@
     "jest": "^27.4.5",
     "typescript": "4.5.5"
   },
+  "exports": {
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "setup": "gushio ../../gushio/setup-package.js core",
     "clean": "gushio gushio/target-clean.js",
     "build": "gushio gushio/target-build.js",
-    "release": "gushio gushio/target-release.js",
-    "test": "jest"
+    "test": "jest",
+    "release": "gushio gushio/target-release.js"
   },
   "repository": {
     "type": "git",

@@ -1,19 +1,19 @@
 {
   "root": true,
   "ignorePatterns": [
-    "cli/gushio",
-    "cli/coverage/**/*",
-    "cli/dist/**/*",
-    "cli/tmp/**/*",
-    "core/coverage/**/*",
-    "core/dist/**/*",
-    "core/gushio",
-    "desktop-app/coverage/**/*",
-    "desktop-app/dist/**/*",
-    "desktop-app/electron/**/*",
-    "desktop-app/e2e/**/*",
-    "desktop-app/gushio",
-    "desktop-app/scripts/notarize.js",
+    "packages/cli/gushio",
+    "packages/cli/coverage/**/*",
+    "packages/cli/dist/**/*",
+    "packages/cli/tmp/**/*",
+    "packages/core/coverage/**/*",
+    "packages/core/dist/**/*",
+    "packages/core/gushio",
+    "packages/desktop-app/coverage/**/*",
+    "packages/desktop-app/dist/**/*",
+    "packages/desktop-app/electron/**/*",
+    "packages/desktop-app/e2e/**/*",
+    "packages/desktop-app/gushio",
+    "packages/desktop-app/scripts/notarize.js",
     "gushio/**/*"
   ],
   "overrides": [
@@ -22,7 +22,9 @@
         "*.ts"
       ],
       "parser": "@typescript-eslint/parser",
-      "plugins": ["prettier"],
+      "plugins": [
+        "prettier"
+      ],
       "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
@@ -33,8 +35,13 @@
       ],
       "rules": {
         "prettier/prettier": "error",
-        "brace-style": ["error", "1tbs"],
-        "id-blacklist": ["error"],
+        "brace-style": [
+          "error",
+          "1tbs"
+        ],
+        "id-blacklist": [
+          "error"
+        ],
         "no-underscore-dangle": "off",
         "no-case-declarations": "off",
         "no-dupe-else-if": "warn",

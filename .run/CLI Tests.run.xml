@@ -2,12 +2,10 @@
   <configuration default="false" name="CLI Tests" type="JavaScriptTestRunnerJest">
     <node-interpreter value="project" />
     <node-options value="" />
-    <jest-package value="$PROJECT_DIR$/cli/node_modules/jest" />
-    <working-dir value="$PROJECT_DIR$/cli" />
+    <jest-package value="$PROJECT_DIR$/packages/cli/node_modules/jest" />
+    <working-dir value="$PROJECT_DIR$/packages/cli" />
     <envs />
     <scope-kind value="ALL" />
-    <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Build CLI" run_configuration_type="js.build_tools.npm" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>

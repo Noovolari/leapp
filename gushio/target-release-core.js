@@ -7,13 +7,13 @@ module.exports = {
   run: async () => {
     const path = require('path')
     const shellJs = require('shelljs')
-    const bumpDepVersionsFunction = require('./bump-dep-func')
+    const syncDepCoreVersions = require('./sync-dep-core-version-func')
 
     try {
-      await gushio.run(path.join(__dirname, '../core/gushio/target-release.js'))
+      await gushio.run(path.join(__dirname, '../packages/core/gushio/target-release.js'))
 
       console.log('updating leapp-core dependencies versions... ')
-      await bumpDepVersionsFunction(path, shellJs)
+      await syncDepCoreVersions(path, shellJs)
       console.log('leapp-core dependencies versions updated')
     } catch (e) {
       e.message = e.message.red

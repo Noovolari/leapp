@@ -237,7 +237,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
-  windowMaximizeAction() {
+  windowMaximizeAction(): void {
     if (!this.compactMode) {
       if (this.windowService.getCurrentWindow().isMaximized()) {
         this.windowService.getCurrentWindow().restore();

@@ -1,13 +1,14 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # compiled output
-desktop-app/dist
-desktop-app/tmp
-desktop-app/out-tsc
-desktop-app/release
+packages/desktop-app/dist
+packages/desktop-app/tmp
+packages/desktop-app/out-tsc
+packages/desktop-app/release
+packages/desktop-app/electron/dist
 # Only exists if Bazel was run
-desktop-app/bazel-out
-desktop-app/.angular
+packages/desktop-app/bazel-out
+packages/desktop-app/.angular
 
 # dependencies
 **/node_modules
@@ -49,11 +50,9 @@ release/
 Thumbs.db
 
 # Windows certificate
-desktop-app/windows.pfx
+packages/desktop-app/windows.pfx
 
 **/package-lock.json
-
-desktop-app/electron/dist
 
 start.sh
 buildAll.sh
@@ -62,18 +61,18 @@ buildAll.sh
 site/
 temp/
 
-core/package-lock.json
-core/node_modules
-core/dist
+packages/core/package-lock.json
+packages/core/node_modules
+packages/core/dist
 
-cli/*-debug.log
-cli/*-error.log
-cli/.nyc_output
-cli/dist
-cli/lib
-cli/package-lock.json
-cli/tmp
-cli/yarn.lock
-cli/node_modules
-cli/oclif.manifest.json
+packages/cli/*-debug.log
+packages/cli/*-error.log
+packages/cli/.nyc_output
+packages/cli/dist
+packages/cli/lib
+packages/cli/package-lock.json
+packages/cli/tmp
+packages/cli/yarn.lock
+packages/cli/node_modules
+packages/cli/oclif.manifest.json
 /release/

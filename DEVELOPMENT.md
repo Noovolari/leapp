@@ -73,28 +73,40 @@ Inside the project root folder, run
 nvm use
 ```
 
-to set the Node.js version to the one specified in the .nvmrc; then, from the root folder, run
-
-```bash
-npm install
-```
-
-to install all the dependencies specified in the root package.json file.
-
-At this point, you can setup the entire project running a [Gushio](https://github.com/Forge-Srl/gushio) script called _setup_ from the root package.json.
-
-> Gushio* is built on top of battle-tested libraries like commander and shelljs and allows you to write a multiplatform shell script in a single JavaScript file without having to worry about package.json and dependencies installation.
-
-Run the setup script using the following command:
+to set the Node.js version to the one specified in the _.nvmrc_; then, from the root folder, run
 
 ```bash
 npm run setup
 ```
 
-The _setup_ script installs node_modules dependencies for each package, and builds Leapp Core and Leapp CLI. 
-To build and run Leapp Desktop App in the development environment, there is a specific script - called _build-and-run-dev_ -
-available in Leapp Desktop App's package.json.
+The _setup_ script:
+ * installs _node_modules_ dependencies specified in the root package.json
+ * for each package
+   * cleans all _node_modules_ directories and _package-lock.json_ files
+   * runs the *clean* script (removing other dev temporary directories)
+   * installs _node_modules_ dependencies
 
+A _setup_ script is also available for every package, with a scope limited to the single package.
+
+Setup script and other scripts in Leapp are powered by [Gushio](https://github.com/Forge-Srl/gushio).
+
+> Gushio* is built on top of battle-tested libraries like commander and shelljs and allows you to write a multiplatform shell script in a single JavaScript file without having to worry about package.json and dependencies installation.
+
+To build Leapp Core there is a script called _build_ available in Leapp Core's _package.json_.
+
+```bash
+npm run build
+```
+
+To build Leapp CLI a script called _prepack_ in Leapp CLI's _package.json_ can be called.
+
+```bash
+npm run prepack
+```
+
+To build and run Leapp Desktop App in the development environment, there is a specific script - called _build-and-run-dev_ -
+available in Leapp Desktop App's _package.json_.
+ 
 To run the _build-and-run-dev_ script, use the following command:
 
 ```bash
@@ -123,14 +135,14 @@ To install the AWS SSM agent locally, follow [this](https://docs.leapp.cloud/lat
 
 Leapp project is structured as a monorepo and these are its packages:
 
-| package       | folder       |
-|---------------|--------------|
-| Leapp Core    | /core        |
-| Leapp CLI     | /cli         |
-| Leapp Desktop App | /desktop-app |
+| package       | folder         |
+|---------------|----------------|
+| Leapp Core    | /packages/core |
+| Leapp CLI     | /packages/cli           |
+| Leapp Desktop App | /packages/desktop-app   |
 
 
-To facilitate and keep track of contributions, we approached a monorepo architecture; it allows maintaining different projects under the same repository.
+To facilitate and keep track of contributions, we approached a monorepo architecture using [Lerna](https://github.com/lerna/lerna); it allows maintaining different projects under the same repository.
 The Core contains the application logic.
 
 It acts as a library on top of which clients will run. 
@@ -364,42 +376,34 @@ Leapp CLI's commands.
 This section addresses local development, not releases.
 
 Remember that the root folder's package.json contains the _setup_ script, that can be used to setup all the packages,
-i.e. Leapp Core, Leapp CLI and Leapp Desktop App. This script does not build the Desktop App; you've to do it using 
-the `npm run build-and-run-dev` command.
+i.e. Leapp Core, Leapp CLI and Leapp Desktop App. This script does not build the packages, you've to do it using 
+the scripts described below.
 
-When developing locally, remember to make the two Clients - Desktop App and CLI - depend on the local Leapp Core build.
+## /packages/core
 
-To do that, please run the following command from the root of the project:
+In _/packages/core/package.json_ you can find the _build_ script that you can use to build Leapp Core. The output folder is
+placed under /packages/core/dist.
 
-```bash
-npm run set-core-dependency-to-local
-```
-
-## /core
-
-In /core/package.json you can find the _build_ script that you can use to build Leapp Core. The output folder is
-placed under /core/dist.
-
-You can run it using the following command from the /core folder:
+You can run it using the following command from the _/packages/core_ folder:
 
 ```bash
 npm run build
 ```
 
-## /cli
+## /packages/cli
 
-In /core/package.json you can find the _prepack_ script that you can use to build Leapp CLI and generate the
+In _/packages/core/package.json_ you can find the _prepack_ script that you can use to build Leapp CLI and generate the
 oclif.manifest.json file, which is needed to make Oclif aware of the commands available.
 
-You can run it using the following command from the /cli folder:
+You can run it using the following command from the _/packages/cli_ folder:
 
 ```bash
 npm run prepack
 ```
 
-## /desktop-app
+## /packages/desktop-app
 
-In /desktop-app/package.json you can find the _build-and-run-dev_ script that you can use to build and run the Electron 
+In _/packages/desktop-app/package.json_ you can find the _build-and-run-dev_ script that you can use to build and run the Electron 
 application locally.
 
 If Electron is failing building the native Library `Keytar` just run the following command, before `npm run build-and-run-dev`:

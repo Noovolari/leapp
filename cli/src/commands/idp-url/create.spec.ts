@@ -1,5 +1,6 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import CreateIdpUrl from "./create";
+import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("CreateIdpUrl", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): CreateIdpUrl => {
@@ -17,6 +18,47 @@ describe("CreateIdpUrl", () => {
 
     expect(command.createIdpUrl).toHaveBeenCalledWith("idpUrl");
     expect(newIdpUrl).toBe("newIdpUrl");
+  });
+
+  test("Flags - idpUrl", async () => {
+    let command = getTestCommand(new CliProviderService(), ["--idpUrl", "myURL"]);
+    (command as any).cliProviderService = {
+      idpUrlsService: {
+        validateIdpUrl: jest.fn((url: string) => new CliProviderService().idpUrlsService.validateIdpUrl(url)),
+      },
+    };
+
+    try {
+      await command.run();
+    } catch (_) {}
+
+    expect((command as any).cliProviderService.idpUrlsService.validateIdpUrl).toHaveBeenCalledWith("myURL");
+    expect((command as any).cliProviderService.idpUrlsService.validateIdpUrl).toHaveReturnedWith("IdP URL is not a valid URL");
+
+    command = getTestCommand(new CliProviderService(), ["--idpUrl", ""]);
+    (command as any).cliProviderService = {
+      idpUrlsService: {
+        validateIdpUrl: jest.fn((url: string) => new CliProviderService().idpUrlsService.validateIdpUrl(url)),
+      },
+    };
+    try {
+      await command.run();
+    } catch (_) {}
+    expect((command as any).cliProviderService.idpUrlsService.validateIdpUrl).toHaveReturnedWith("Empty IdP URL");
+
+    command = getTestCommand(new CliProviderService(), ["--idpUrl", "https://www.google.it"]);
+    (command as any).cliProviderService = {
+      idpUrlsService: {
+        validateIdpUrl: jest.fn((url: string) => new CliProviderService().idpUrlsService.validateIdpUrl(url)),
+      },
+    };
+    command.createIdpUrl = jest.fn();
+
+    try {
+      await command.run();
+    } catch (_) {}
+    expect((command as any).cliProviderService.idpUrlsService.validateIdpUrl).toHaveReturnedWith(true);
+    expect(command.createIdpUrl).toHaveBeenCalledWith("https://www.google.it");
   });
 
   test("getIdpUrl", async () => {

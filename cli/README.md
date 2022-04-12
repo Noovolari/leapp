@@ -89,7 +89,10 @@ Create a new identity provider URL
 
 ```
 USAGE
-  $ leapp idp-url create
+  $ leapp idp-url create [--idpUrl <value>]
+
+FLAGS
+  --idpUrl=<value>  the idp url address we want to create
 
 DESCRIPTION
   Create a new identity provider URL
@@ -104,7 +107,11 @@ Delete an identity provider URL
 
 ```
 USAGE
-  $ leapp idp-url delete
+  $ leapp idp-url delete [--idpUrlId <value>] [-f]
+
+FLAGS
+  -f, --force         force a command without asking for confirmation (-f, --force)
+  --idpUrlId=<value>  the idp url id that we want to pass to the function like the delete one
 
 DESCRIPTION
   Delete an identity provider URL
@@ -119,7 +126,11 @@ Edit an identity provider URL
 
 ```
 USAGE
-  $ leapp idp-url edit
+  $ leapp idp-url edit [--idpUrlId <value>] [--idpUrl <value>]
+
+FLAGS
+  --idpUrl=<value>    the idp url address we want to create
+  --idpUrlId=<value>  the idp url id that we want to pass to the function like the delete one
 
 DESCRIPTION
   Edit an identity provider URL

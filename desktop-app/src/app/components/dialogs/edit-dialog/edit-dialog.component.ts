@@ -19,8 +19,8 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
-import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
-import {AppMfaCodePromptService} from "../../../services/app-mfa-code-prompt.service";
+import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
+import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
 
 @Component({
   selector: "app-edit-dialog",

@@ -3,6 +3,7 @@ import { Config } from "@oclif/core/lib/config/config";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsSsoIntegrationService, IntegrationCreationParams } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import {integrationAlias, integrationMethod, integrationPortalUrl, integrationRegion} from "../../flags";
 
 export default class CreateSsoIntegration extends LeappCommand {
   static description = "Create a new AWS SSO integration";
@@ -11,6 +12,13 @@ export default class CreateSsoIntegration extends LeappCommand {
   constructor(argv: string[], config: Config) {
     super(argv, config);
   }
+
+  static flags = {
+    integrationAlias,
+    integrationPortalUrl,
+    integrationRegion,
+    integrationMethod,
+  };
 
   async run(): Promise<void> {
     try {

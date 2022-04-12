@@ -1,11 +1,17 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
+import { profileId, profileName } from "../../flags";
 
 export default class EditNamedProfile extends LeappCommand {
   static description = "Rename an AWS named profile";
 
   static examples = [`$leapp profile edit`];
+
+  static flags = {
+    profileId,
+    profileName,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -13,9 +19,14 @@ export default class EditNamedProfile extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedNamedProfile = await this.selectNamedProfile();
-      const newProfileName = await this.getProfileName();
-      await this.editNamedProfile(selectedNamedProfile.id, newProfileName);
+      const { flags } = await this.parse(EditNamedProfile);
+      if (flags.profileId && flags.profileName && flags.profileId !== "" && flags.profileName !== "") {
+        await this.editNamedProfileByFlags(flags);
+      } else {
+        const selectedNamedProfile = await this.selectNamedProfile();
+        const newProfileName = await this.getProfileName();
+        await this.editNamedProfile(selectedNamedProfile.id, newProfileName);
+      }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
@@ -42,7 +53,7 @@ export default class EditNamedProfile extends LeappCommand {
       {
         name: "namedProfileName",
         message: `choose a new name for the profile`,
-        validate: (profileName) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileName),
+        validate: (profileNameString) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileNameString),
         type: "input",
       },
     ]);
@@ -55,6 +66,20 @@ export default class EditNamedProfile extends LeappCommand {
       this.log("profile edited");
     } finally {
       await this.cliProviderService.remoteProceduresClient.refreshSessions();
+    }
+  }
+
+  private async editNamedProfileByFlags(flags: any) {
+    const namedProfile = this.cliProviderService.namedProfilesService.getNamedProfiles()?.find((np) => np.id === flags.profileId);
+    if (namedProfile) {
+      const validation = this.cliProviderService.namedProfilesService.validateNewProfileName(flags.profileName);
+      if (validation) {
+        await this.editNamedProfile(flags.profileId, flags.profileName);
+      } else {
+        throw new Error(validation.toString());
+      }
+    } else {
+      throw new Error(`Named profile ${flags.profileId} not found`);
     }
   }
 }

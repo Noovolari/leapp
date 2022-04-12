@@ -314,7 +314,11 @@ Delete an AWS named profile
 
 ```
 USAGE
-  $ leapp profile delete
+  $ leapp profile delete [--profileId <value>] [-f]
+
+FLAGS
+  -f, --force          force a command without asking for confirmation (-f, --force)
+  --profileId=<value>  an AWS named profile ID in Leapp
 
 DESCRIPTION
   Delete an AWS named profile
@@ -329,7 +333,11 @@ Rename an AWS named profile
 
 ```
 USAGE
-  $ leapp profile edit
+  $ leapp profile edit [--profileId <value>] [--profileName <value>]
+
+FLAGS
+  --profileId=<value>    an AWS named profile ID in Leapp
+  --profileName=<value>  an AWS named profile Alias used to identify the profile in both config and credential file
 
 DESCRIPTION
   Rename an AWS named profile

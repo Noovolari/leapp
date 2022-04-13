@@ -14,18 +14,22 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         node_version: [ 16 ]
     env:
-      OS: ${{ matrix.os }}
-      NODEJS: ${{ matrix.node_version }}
       SKIP_INTEGRATION_TESTS: "true"
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Prepare GIT
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node_version }}
       - name: Bootstrap
         run: |
-          npm run bootstrap
+          npm install
+          cd packages/core
+          npm install
       - name: Build
         run: |
           cd packages/core

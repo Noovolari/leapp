@@ -16,11 +16,13 @@ jobs:
         os: [ ubuntu-latest, windows-latest, macos-latest ]
         node_version: [ 16 ]
     env:
-      OS: ${{ matrix.os }}
-      NODEJS: ${{ matrix.node_version }}
       SKIP_INTEGRATION_TESTS: "true"
     runs-on: ${{ matrix.os }}
     steps:
+      - name: Prepare GIT
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
@@ -46,19 +48,12 @@ jobs:
 
   publish:
     needs: build_and_test
-    strategy:
-      matrix:
-        os: [ ubuntu-latest ]
-        node_version: [ 16 ]
-    env:
-      OS: ${{ matrix.os }}
-      NODEJS: ${{ matrix.node_version }}
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node_version }}
+          node-version: 16
       - name: Bootstrap
         run: |
           npm run bootstrap

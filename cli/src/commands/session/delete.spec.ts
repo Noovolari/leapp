@@ -1,13 +1,48 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import DeleteSession from "./delete";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("DeleteSession", () => {
-  const getTestCommand = (cliProviderService: any = null): DeleteSession => {
-    const command = new DeleteSession([], {} as any);
+  const getTestCommand = (cliProviderService: any = null, argv = []): DeleteSession => {
+    const command = new DeleteSession(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - sessionId && force", async () => {
+    let command = getTestCommand(new CliProviderService(), ["--sessionId"]);
+    command.getAffectedSessions = jest.fn((): any => ["session1"]);
+    command.askForConfirmation = jest.fn(async () => true);
+    command.deleteSession = jest.fn(async (): Promise<any> => {});
+    await expect(command.run()).rejects.toThrow("");
+
+    const sessions = [{ sessionId: "session", sessionName: "sessionName" }];
+    const cliMockService = {
+      repository: {
+        getSessionById: jest.fn((id: string) => sessions.find((s) => s.sessionId === id)),
+      },
+    };
+    command = getTestCommand(cliMockService, ["--sessionId", "session"]);
+    command.getAffectedSessions = jest.fn((): any => ["session1"]);
+    command.askForConfirmation = jest.fn(async () => true);
+    command.deleteSession = jest.fn(async (): Promise<any> => {});
+    await command.run();
+
+    expect(command.deleteSession).toHaveBeenCalledWith(sessions[0]);
+    expect(command.getAffectedSessions).toHaveBeenCalledWith(sessions[0]);
+    expect(command.askForConfirmation).toHaveBeenCalledWith(["session1"]);
+
+    command = getTestCommand(cliMockService, ["--sessionId", "session", "--force"]);
+    command.getAffectedSessions = jest.fn((): any => ["session1"]);
+    command.askForConfirmation = jest.fn(async () => true);
+    command.deleteSession = jest.fn(async (): Promise<any> => {});
+    await command.run();
+
+    expect(command.deleteSession).toHaveBeenCalledWith(sessions[0]);
+    expect(command.getAffectedSessions).toHaveBeenCalledWith(sessions[0]);
+    expect(command.askForConfirmation).not.toHaveBeenCalled();
+  });
 
   test("deleteSession", async () => {
     const sessionService: any = {

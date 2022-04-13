@@ -70,6 +70,7 @@ describe("ListSessions", () => {
         profileId: "profileName",
         region: "region",
         sessionName: "sessionName",
+        role: (command as any).getRole(sessions[0]),
         status: "inactive",
         type: "sessionTypeLabel",
       },
@@ -80,6 +81,7 @@ describe("ListSessions", () => {
       type: { header: "Type" },
       profileId: { header: "Named Profile" },
       region: { header: "Region/Location" },
+      role: { header: "Role", extended: true },
       status: { header: "Status" },
     });
   });

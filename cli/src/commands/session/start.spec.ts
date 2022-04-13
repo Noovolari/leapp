@@ -3,11 +3,54 @@ import StartSession from "./start";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("StartSession", () => {
-  const getTestCommand = (cliProviderService: any = null): StartSession => {
-    const command = new StartSession([], {} as any);
+  const getTestCommand = (cliProviderService: any = null, argv = []): StartSession => {
+    const command = new StartSession(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - Session Id", async () => {
+    const sessionService: any = {
+      start: jest.fn(async () => {}),
+      sessionDeactivated: jest.fn(async () => {}),
+    };
+    const sessionFactory: any = {
+      getSessionService: jest.fn(() => sessionService),
+    };
+    const remoteProceduresClient: any = { refreshSessions: jest.fn() };
+    const session: any = { sessionId: "sessionId", type: "sessionType" };
+    const cliProviderService: any = {
+      sessionFactory,
+      remoteProceduresClient,
+      repository: {
+        getSessionById: jest.fn((id: string) => [session].find((s) => s.sessionId === id)),
+      },
+    };
+    const processOn = jest.spyOn(process, "on").mockImplementation((event: any, callback: any): any => {
+      expect(event).toBe("SIGINT");
+      callback();
+    });
+    const processExit = jest.spyOn(process, "exit").mockImplementation((): any => {});
+
+    let command = getTestCommand(cliProviderService, ["--sessionId"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --sessionId expects a value");
+
+    command = getTestCommand(cliProviderService, ["--sessionId", "lfdjhjk"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("No session found with id lfdjhjk");
+
+    command = getTestCommand(cliProviderService, ["--sessionId", "sessionId"]);
+    command.log = jest.fn();
+    await command.run();
+    expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
+    expect(sessionService.start).toHaveBeenCalledWith("sessionId");
+    expect(command.log).toHaveBeenCalledWith("session started");
+    expect(processOn).toHaveBeenCalled();
+    expect(sessionService.sessionDeactivated).toHaveBeenCalledWith("sessionId");
+    expect(processExit).toHaveBeenCalledWith(0);
+    expect(remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+  });
 
   test("startSession", async () => {
     const sessionService: any = {

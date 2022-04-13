@@ -3,11 +3,46 @@ import StopSession from "./stop";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("StopSession", () => {
-  const getTestCommand = (cliProviderService: any = null): StopSession => {
-    const command = new StopSession([], {} as any);
+  const getTestCommand = (cliProviderService: any = null, argv = []): StopSession => {
+    const command = new StopSession(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - Session Id", async () => {
+    const sessionService: any = {
+      stop: jest.fn(async () => {}),
+      sessionDeactivated: jest.fn(async () => {}),
+    };
+    const sessionFactory: any = {
+      getSessionService: jest.fn(() => sessionService),
+    };
+    const remoteProceduresClient: any = { refreshSessions: jest.fn() };
+    const session: any = { sessionId: "sessionId", type: "sessionType" };
+    const cliProviderService: any = {
+      sessionFactory,
+      remoteProceduresClient,
+      repository: {
+        getSessionById: jest.fn((id: string) => [session].find((s) => s.sessionId === id)),
+      },
+    };
+
+    let command = getTestCommand(cliProviderService, ["--sessionId"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --sessionId expects a value");
+
+    command = getTestCommand(cliProviderService, ["--sessionId", "lfdjhjk"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("No session found with id lfdjhjk");
+
+    command = getTestCommand(cliProviderService, ["--sessionId", "sessionId"]);
+    command.log = jest.fn();
+    await command.run();
+    expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
+    expect(sessionService.stop).toHaveBeenCalledWith("sessionId");
+    expect(command.log).toHaveBeenCalledWith("session stopped");
+    expect(remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+  });
 
   test("stopSession", async () => {
     const sessionService: any = {

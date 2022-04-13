@@ -412,7 +412,31 @@ Add a new session
 
 ```
 USAGE
-  $ leapp session add
+  $ leapp session add [--providerType aws|azure] [--accessKey <value>] [--idpArn <value>] [--idpUrlId <value>]
+    [--mfaDevice <value>] [--sessionName <value>] [--parentSessionId <value>] [--profileId <value>] [--region <value>]
+    [--roleArn <value>] [--roleSessionName <value>] [--secretKey <value>] [--subscriptionId <value>] [--tenantId
+    <value>] [--sessionType awsIamRoleFederated|awsIamUser|awsIamRoleChained|azure]
+
+FLAGS
+  --accessKey=<value>        AWS Access Key ID of the IAM User
+  --idpArn=<value>           AWS IAM Federated Role IdP Arn value, obtain it from your AWS Account
+  --idpUrlId=<value>         the idp url id that we want to pass to the function like the delete one
+  --mfaDevice=<value>        MFA Device Arn retrieved from your AWS Account
+  --parentSessionId=<value>  For AWS IAM Role Chained is the session Id of the session that will assume the chained
+                             role. Retrieve it using $leapp session list -x
+  --profileId=<value>        an AWS named profile ID in Leapp
+  --providerType=<option>    Identify the provider for your sessions. Valid types are [aws, azure]
+                             <options: aws|azure>
+  --region=<value>           Session Region for session in Leapp, use it for both AWS Region and Azure Location
+  --roleArn=<value>          AWS IAM Federated Role Arn value, obtain it from your AWS Account
+  --roleSessionName=<value>  Optional Alias for the Assumed Role Session name
+  --secretKey=<value>        AWS Secret Access Key of the IAM User
+  --sessionName=<value>      Session Alias to identify the session in Leapp
+  --sessionType=<option>     Identify the session type for both AWS and Azure. Valid types are [awsIamRoleFederated,
+                             awsIamUser, awsIamRoleChained, azure]
+                             <options: awsIamRoleFederated|awsIamUser|awsIamRoleChained|azure>
+  --subscriptionId=<value>   The Azure session Subscriptin Id
+  --tenantId=<value>         The Azure session Tenant Id
 
 DESCRIPTION
   Add a new session
@@ -427,13 +451,19 @@ Change a session named-profile
 
 ```
 USAGE
-  $ leapp session change-profile
+  $ leapp session change-profile [--sessionId <value>] [--profileId <value>]
+
+FLAGS
+  --profileId=<value>  an AWS named profile ID in Leapp
+  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
   Change a session named-profile
 
 EXAMPLES
   $leapp session change-profile
+
+  $leapp session change-profile --profileId PROFILEID --sessionId SESSIONID
 ```
 
 ## `leapp session change-region`
@@ -442,13 +472,19 @@ Change a session region
 
 ```
 USAGE
-  $ leapp session change-region
+  $ leapp session change-region [--sessionId <value>] [--region <value>]
+
+FLAGS
+  --region=<value>     Session Region for session in Leapp, use it for both AWS Region and Azure Location
+  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
   Change a session region
 
 EXAMPLES
   $leapp session change-region
+
+  $leapp session change-region --sessionId SESSIONID --region REGION
 ```
 
 ## `leapp session current`
@@ -482,7 +518,11 @@ Delete a session
 
 ```
 USAGE
-  $ leapp session delete
+  $ leapp session delete [--sessionId <value>] [-f]
+
+FLAGS
+  -f, --force          force a command without asking for confirmation (-f, --force)
+  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
   Delete a session
@@ -493,7 +533,7 @@ EXAMPLES
 
 ## `leapp session generate SESSIONID`
 
-Generate temporary credentials for the given AWS session id
+Generate STS temporary credentials for the given AWS session id
 
 ```
 USAGE
@@ -503,7 +543,7 @@ ARGUMENTS
   SESSIONID  id of the session
 
 DESCRIPTION
-  Generate temporary credentials for the given AWS session id
+  Generate STS temporary credentials for the given AWS session id
 
 EXAMPLES
   $leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d
@@ -557,7 +597,10 @@ Open an AWS Web Console
 
 ```
 USAGE
-  $ leapp session open-web-console
+  $ leapp session open-web-console [--sessionId <value>]
+
+FLAGS
+  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
   Open an AWS Web Console
@@ -572,7 +615,10 @@ Start a session
 
 ```
 USAGE
-  $ leapp session start
+  $ leapp session start [--sessionId <value>]
+
+FLAGS
+  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
   Start a session
@@ -587,7 +633,12 @@ Start an AWS SSM session
 
 ```
 USAGE
-  $ leapp session start-ssm-session
+  $ leapp session start-ssm-session [--sessionId <value>] [--region <value>] [--ssmInstanceId <value>]
+
+FLAGS
+  --region=<value>         Session Region for session in Leapp, use it for both AWS Region and Azure Location
+  --sessionId=<value>      Session Id to identify the session in Leapp, recover it with $leapp session list -x
+  --ssmInstanceId=<value>  Instance ID for EC2 instance we want to access with SSM
 
 DESCRIPTION
   Start an AWS SSM session
@@ -602,7 +653,10 @@ Stop a session
 
 ```
 USAGE
-  $ leapp session stop
+  $ leapp session stop [--sessionId <value>]
+
+FLAGS
+  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
   Stop a session

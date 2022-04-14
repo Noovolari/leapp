@@ -1,24 +1,23 @@
 # What should I know before I get started?
 If you want to start a code contribution to Leapp, whether it is a bug fix or a new feature, it is important for you to understand Leapp concepts and way to work.
 
-Inside Leapp's documentation site you can find following concepts and topics:
+# Project Structure
 
-- Sessions
-- Integrations
-- Security
-  - Short-term credentials generation
-  - System Vault for storing sensitive information (e.g. AWS IAM User access keys)
-- Built-in features
-  - EC2 connect through AWS SSM
-  - AWS Multi-profile management
+Leapp project is structured as a monorepo architecture with [Lerna](https://github.com/lerna/lerna).
 
-These concepts are implemented in Leapp Core. Leapp Core is a library that decouples Leapp's domain logic from the Client that is going to use it.
-Leapp Core is delivered as [NPM package](https://www.npmjs.com/package/@noovolari/leapp-core), and each client depends on it.
+| package       | folder         |
+|---------------|----------------|
+| [Leapp Core](#core)    | /packages/core |
+| [Leapp CLI](#cli)     | /packages/cli           |
+| [Leapp Desktop App](#desktop-app) | /packages/desktop-app   |
 
-A Client can be rather a GUI or a TUI represented, respectively, by Leapp Desktop App and Leapp CLI. 
 
-Leapp CLI requires the Desktop app to be installed and running.
-The Leapp CLI is delivered as an NPM package and can be installed globally, using the *npm* developer tool.
+The Core contains the application logic.
+
+It acts as a library on top of which clients will run. 
+In the monorepo scenario, Desktop Application, CLI, and Core are three different projects under the same repository.
+
+In order to better understanding the Leapp App, firstly check out the [Concept page](https://docs.leapp.cloud/latest/sessions/) in our documentation.
 
 # Development environment setup
 
@@ -131,22 +130,7 @@ To install the AWS SSM agent locally, follow [this](https://docs.leapp.cloud/lat
 
 [Here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) you can find the official installation guide.
 
-# Project Structure
 
-Leapp project is structured as a monorepo and these are its packages:
-
-| package       | folder         |
-|---------------|----------------|
-| Leapp Core    | /packages/core |
-| Leapp CLI     | /packages/cli           |
-| Leapp Desktop App | /packages/desktop-app   |
-
-
-To facilitate and keep track of contributions, we approached a monorepo architecture using [Lerna](https://github.com/lerna/lerna); it allows maintaining different projects under the same repository.
-The Core contains the application logic.
-
-It acts as a library on top of which clients will run. 
-In the monorepo scenario, Desktop Application, CLI, and Core are three different projects under the same repository.
 
 ## Core
 

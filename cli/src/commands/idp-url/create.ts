@@ -6,7 +6,7 @@ import { idpUrl } from "../../flags";
 export default class CreateIdpUrl extends LeappCommand {
   static description = "Create a new identity provider URL";
 
-  static examples = [`$leapp idp-url create`];
+  static examples = [`$leapp idp-url create`, `$leapp idp-url create --idpUrl ADDRESS`];
 
   static flags = {
     idpUrl,

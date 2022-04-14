@@ -99,6 +99,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp idp-url create
+
+  $leapp idp-url create --idpUrl ADDRESS
 ```
 
 ## `leapp idp-url delete`
@@ -118,6 +120,10 @@ DESCRIPTION
 
 EXAMPLES
   $leapp idp-url delete
+
+  $leapp idp-url delete --idpUrl ADDRESS
+
+  $leapp idp-url delete --idpUrl ADDRESS [--force, -f]
 ```
 
 ## `leapp idp-url edit`
@@ -137,6 +143,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp idp-url edit
+
+  $leapp idp-url edit --idpUrlId ID --idpUrl ADDRESS
 ```
 
 ## `leapp idp-url list`
@@ -207,6 +215,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp integration delete
+
+  $leapp integration delete --integrationId ID
 ```
 
 ## `leapp integration list`
@@ -252,6 +262,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp integration login
+
+  $leapp integration login --integrationId ID
 ```
 
 ## `leapp integration logout`
@@ -270,6 +282,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp integration logout
+
+  $leapp integration logout --integrationId ID
 ```
 
 ## `leapp integration sync`
@@ -288,6 +302,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp integration sync
+
+  $leapp integration sync --integrationId ID
 ```
 
 ## `leapp profile create`
@@ -306,6 +322,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp profile create
+
+  $leapp profile create --profileName PROFILENAME
 ```
 
 ## `leapp profile delete`
@@ -325,6 +343,10 @@ DESCRIPTION
 
 EXAMPLES
   $leapp profile delete
+
+  $leapp profile delete --profileId PROFILEID
+
+  $leapp profile delete --profileId PROFILEID [--force, -f]
 ```
 
 ## `leapp profile edit`
@@ -344,6 +366,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp profile edit
+
+  $leapp profile edit --profileId ID --profileName PROFILENAME
 ```
 
 ## `leapp profile list`
@@ -394,16 +418,18 @@ Change the default region
 
 ```
 USAGE
-  $ leapp region set-default [--awsRegion <value>]
+  $ leapp region set-default [--region <value>]
 
 FLAGS
-  --awsRegion=<value>  a valid AWS region to set
+  --region=<value>  Session Region for session in Leapp, use it for both AWS Region and Azure Location
 
 DESCRIPTION
   Change the default region
 
 EXAMPLES
   $leapp region set-default
+
+  $leapp region set-default --region AWSREGION
 ```
 
 ## `leapp session add`
@@ -412,7 +438,7 @@ Add a new session
 
 ```
 USAGE
-  $ leapp session add [--providerType aws|azure] [--accessKey <value>] [--idpArn <value>] [--idpUrlId <value>]
+  $ leapp session add [--providerType aws|azure] [--accessKey <value>] [--idpArn <value>] [--idpUrl <value>]
     [--mfaDevice <value>] [--sessionName <value>] [--parentSessionId <value>] [--profileId <value>] [--region <value>]
     [--roleArn <value>] [--roleSessionName <value>] [--secretKey <value>] [--subscriptionId <value>] [--tenantId
     <value>] [--sessionType awsIamRoleFederated|awsIamUser|awsIamRoleChained|azure]
@@ -420,7 +446,7 @@ USAGE
 FLAGS
   --accessKey=<value>        AWS Access Key ID of the IAM User
   --idpArn=<value>           AWS IAM Federated Role IdP Arn value, obtain it from your AWS Account
-  --idpUrlId=<value>         the idp url id that we want to pass to the function like the delete one
+  --idpUrl=<value>           the idp url address we want to create
   --mfaDevice=<value>        MFA Device Arn retrieved from your AWS Account
   --parentSessionId=<value>  For AWS IAM Role Chained is the session Id of the session that will assume the chained
                              role. Retrieve it using $leapp session list -x
@@ -443,6 +469,16 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session add
+
+  $leapp session add --providerType [aws, azure] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser, azure] --region [AWSREGION, AZURELOCATION] --sessionName NAME ...[combination of flags relative to the session]
+
+  $leapp session add --providerType azure --sessionType azure --sessionName NAME --region AZURELOCATION --tenantID TENANTID --subscriptionId SUBSCRIPTIONID
+
+  $leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN
+
+  $leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionUId ID (--roleSessionName ROLESESSIONNAME)
+
+  $leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY (--mfaDevice MFADEVICEARN)
 ```
 
 ## `leapp session change-profile`
@@ -529,6 +565,10 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session delete
+
+  $leapp session delete --sessionId SESSIONID
+
+  $leapp session delete --sessionId SESSIONID [--force, -f]
 ```
 
 ## `leapp session generate SESSIONID`
@@ -607,6 +647,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session open-web-console
+
+  $leapp session open-web-console --sessionId SESSIONID
 ```
 
 ## `leapp session start`
@@ -625,6 +667,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session start
+
+  $leapp session start --sessionId SESSIONID
 ```
 
 ## `leapp session start-ssm-session`
@@ -645,6 +689,8 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session start-ssm-session
+
+  $leapp session start-ssm-session --sessionId SESSIONID --region AWSREGION --ssmInstanceId EC2INSTANCEID
 ```
 
 ## `leapp session stop`
@@ -663,5 +709,7 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session stop
+
+  $leapp session stop --sessionId SESSIONID
 ```
 <!-- commandsstop -->

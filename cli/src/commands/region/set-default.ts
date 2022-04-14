@@ -1,15 +1,15 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { awsRegion } from "../../flags";
+import { region } from "../../flags";
 
 export default class ChangeDefaultRegion extends LeappCommand {
   static description = "Change the default region";
 
-  static examples = [`$leapp region set-default`];
+  static examples = [`$leapp region set-default`, `$leapp region set-default --region AWSREGION`];
 
   static flags = {
-    awsRegion,
+    region,
   };
 
   constructor(argv: string[], config: Config) {
@@ -19,14 +19,14 @@ export default class ChangeDefaultRegion extends LeappCommand {
   async run(): Promise<void> {
     let selectedDefaultRegion;
     const { flags } = await this.parse(ChangeDefaultRegion);
-    if (flags.awsRegion && flags.awsRegion !== "") {
+    if (flags.region && flags.region !== "") {
       const validation =
         this.cliProviderService.awsCoreService
           .getRegions()
           .map((r) => r.region)
-          .indexOf(flags.awsRegion) > -1;
+          .indexOf(flags.region) > -1;
       if (validation) {
-        selectedDefaultRegion = flags.awsRegion;
+        selectedDefaultRegion = flags.region;
       } else {
         throw new Error("Region is not a valid AWS region");
       }
@@ -49,7 +49,7 @@ export default class ChangeDefaultRegion extends LeappCommand {
         name: "selectedDefaultRegion",
         message: `current default region is ${defaultRegion}, select a new default region`,
         type: "list",
-        choices: availableRegions.map((region) => ({ name: region.fieldName, value: region.fieldValue })),
+        choices: availableRegions.map((r) => ({ name: r.fieldName, value: r.fieldValue })),
       },
     ]);
     return answer.selectedDefaultRegion;

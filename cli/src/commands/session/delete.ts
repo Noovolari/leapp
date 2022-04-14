@@ -6,7 +6,11 @@ import { force, sessionId } from "../../flags";
 export default class DeleteSession extends LeappCommand {
   static description = "Delete a session";
 
-  static examples = [`$leapp session delete`];
+  static examples = [
+    `$leapp session delete`,
+    `$leapp session delete --sessionId SESSIONID`,
+    "$leapp session delete --sessionId SESSIONID [--force, -f]",
+  ];
 
   static flags = {
     sessionId,

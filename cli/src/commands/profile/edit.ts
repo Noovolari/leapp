@@ -6,7 +6,7 @@ import { profileId, profileName } from "../../flags";
 export default class EditNamedProfile extends LeappCommand {
   static description = "Rename an AWS named profile";
 
-  static examples = [`$leapp profile edit`];
+  static examples = [`$leapp profile edit`, `$leapp profile edit --profileId ID --profileName PROFILENAME`];
 
   static flags = {
     profileId,

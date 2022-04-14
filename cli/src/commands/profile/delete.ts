@@ -7,7 +7,11 @@ import { profileId, force } from "../../flags";
 export default class DeleteNamedProfile extends LeappCommand {
   static description = "Delete an AWS named profile";
 
-  static examples = [`$leapp profile delete`];
+  static examples = [
+    `$leapp profile delete`,
+    `$leapp profile delete --profileId PROFILEID`,
+    `$leapp profile delete --profileId PROFILEID [--force, -f]`,
+  ];
 
   static flags = {
     profileId,

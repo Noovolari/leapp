@@ -6,7 +6,7 @@ import { idpUrl, idpUrlId } from "../../flags";
 export default class EditIdpUrl extends LeappCommand {
   static description = "Edit an identity provider URL";
 
-  static examples = [`$leapp idp-url edit`];
+  static examples = [`$leapp idp-url edit`, `$leapp idp-url edit --idpUrlId ID --idpUrl ADDRESS`];
 
   static flags = {
     idpUrlId,

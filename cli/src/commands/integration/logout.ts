@@ -6,7 +6,7 @@ import { integrationId } from "../../flags";
 export default class LogoutIntegration extends LeappCommand {
   static description = "Logout from integration";
 
-  static examples = ["$leapp integration logout"];
+  static examples = ["$leapp integration logout", "$leapp integration logout --integrationId ID"];
 
   static flags = {
     integrationId,

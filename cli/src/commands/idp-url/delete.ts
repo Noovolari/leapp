@@ -7,7 +7,7 @@ import { idpUrlId, force } from "../../flags";
 export default class DeleteIdpUrl extends LeappCommand {
   static description = "Delete an identity provider URL";
 
-  static examples = [`$leapp idp-url delete`];
+  static examples = [`$leapp idp-url delete`, `$leapp idp-url delete --idpUrl ADDRESS`, `$leapp idp-url delete --idpUrl ADDRESS [--force, -f]`];
 
   static flags = {
     idpUrlId,

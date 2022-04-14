@@ -56,12 +56,6 @@ export const profileName = Flags.string({
   hidden: false,
 });
 
-// AWS Region
-export const awsRegion = Flags.string({
-  description: "a valid AWS region to set",
-  hidden: false,
-});
-
 // SESSION
 export const sessionId = Flags.string({
   description: "Session Id to identify the session in Leapp, recover it with $leapp session list -x",

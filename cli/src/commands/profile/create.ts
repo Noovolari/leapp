@@ -5,7 +5,7 @@ import { profileName } from "../../flags";
 export default class CreateNamedProfile extends LeappCommand {
   static description = "Create a new AWS named profile";
 
-  static examples = [`$leapp profile create`];
+  static examples = [`$leapp profile create`, `$leapp profile create --profileName PROFILENAME`];
 
   static flags = {
     profileName,

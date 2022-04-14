@@ -6,7 +6,7 @@ import { integrationId } from "../../flags";
 export default class SyncIntegration extends LeappCommand {
   static description = "Synchronize integration sessions";
 
-  static examples = ["$leapp integration sync"];
+  static examples = ["$leapp integration sync", "$leapp integration sync --integrationId ID"];
 
   static flags = {
     integrationId,

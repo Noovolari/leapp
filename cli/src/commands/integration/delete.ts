@@ -6,7 +6,7 @@ import { integrationId } from "../../flags";
 export default class DeleteIntegration extends LeappCommand {
   static description = "Delete an integration";
 
-  static examples = ["$leapp integration delete"];
+  static examples = ["$leapp integration delete", "$leapp integration delete --integrationId ID"];
 
   static flags = {
     integrationId,

@@ -9,7 +9,10 @@ import { region, sessionId, ssmInstanceId } from "../../flags";
 export default class StartSsmSession extends LeappCommand {
   static description = "Start an AWS SSM session";
 
-  static examples = [`$leapp session start-ssm-session`];
+  static examples = [
+    `$leapp session start-ssm-session`,
+    `$leapp session start-ssm-session --sessionId SESSIONID --region AWSREGION --ssmInstanceId EC2INSTANCEID`,
+  ];
 
   static flags = {
     sessionId,

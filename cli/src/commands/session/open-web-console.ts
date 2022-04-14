@@ -9,7 +9,7 @@ import { sessionId } from "../../flags";
 export default class OpenWebConsole extends LeappCommand {
   static description = "Open an AWS Web Console";
 
-  static examples = [`$leapp session open-web-console`];
+  static examples = [`$leapp session open-web-console`, `$leapp session open-web-console --sessionId SESSIONID`];
 
   static flags = {
     sessionId,

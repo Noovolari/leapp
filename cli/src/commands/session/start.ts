@@ -7,7 +7,7 @@ import { sessionId } from "../../flags";
 export default class StartSession extends LeappCommand {
   static description = "Start a session";
 
-  static examples = [`$leapp session start`];
+  static examples = [`$leapp session start`, `$leapp session start --sessionId SESSIONID`];
 
   static flags = {
     sessionId,

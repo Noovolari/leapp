@@ -126,9 +126,10 @@
   },
   "repository": "noovolari/leapp",
   "scripts": {
+    "prepare docs": "gushio gushio/replace-header-cli-index-doc.js",
     "clean": "gushio gushio/target-clean.js",
     "test": "jest",
-    "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme",
+    "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme --multi --dir scopes && gushio gushio/replace-header-cli-index-doc.js",
     "release": "gushio gushio/target-release.js"
   },
   "types": "dist/index.d.ts"

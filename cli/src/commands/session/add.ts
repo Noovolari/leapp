@@ -22,6 +22,8 @@ import {
   sessionType,
 } from "../../flags";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
 
 export default class AddSession extends LeappCommand {
   static description = "Add a new session";
@@ -62,7 +64,7 @@ export default class AddSession extends LeappCommand {
       if (this.verifyFlags(flags)) {
         const selectedCloudProvider = this.extractProviderFromFlags(flags);
         const selectedAccessMethod = this.extractAccessMethodFromFlags(flags, selectedCloudProvider);
-        const selectedParams = this.extractCorrectParamsFromFlags(flags, selectedAccessMethod);
+        const selectedParams = await this.extractCorrectParamsFromFlags(flags, selectedAccessMethod);
         await this.createSession(selectedAccessMethod, selectedParams);
       } else {
         const selectedCloudProvider = await this.chooseCloudProvider();
@@ -183,39 +185,135 @@ export default class AddSession extends LeappCommand {
         flags.secretKey !== "" &&
         flags.accessKey &&
         flags.accessKey !== "");
+    // Special condition
+    if (
+      (firstStep && flags.sessionType.indexOf(SessionType.aws.toString()) > -1 && flags.providerType === SessionType.azure.toString()) ||
+      (flags.sessionType === SessionType.azure.toString() && flags.providerType === SessionType.aws.toString())
+    ) {
+      throw new Error("Session Type and Provider Type are not valid together");
+    }
 
     return firstStep && secondStep;
   }
 
   private extractAccessMethodFromFlags(flags: any, cloudProvider: string): AccessMethod {
-    if (
-      (flags.sessionType.indexOf(SessionType.aws.toString()) && cloudProvider === SessionType.azure.toString()) ||
-      (flags.sessionType === SessionType.azure && cloudProvider === SessionType.aws.toString())
-    ) {
-      throw new Error("Session Type and Provider Type are not valid together");
-    }
-
     const accessMethods = this.cliProviderService.cloudProviderService.creatableAccessMethods(cloudProvider as CloudProviderType);
-    return accessMethods.filter((aM: AccessMethod) => aM.label === flags.sessionType)[0];
+    const accessMethod = accessMethods.filter((aM: AccessMethod) => aM.sessionType === flags.sessionType)[0];
+    if (!accessMethod) {
+      throw new Error(`Cannot find a suitable access method for provider ${flags.providerType} and session type ${flags.sessionType}`);
+    }
+    return accessMethod;
   }
 
-  private extractCorrectParamsFromFlags(flags: any, selectedAccessMethod: AccessMethod): Map<string, string> {
+  private async extractCorrectParamsFromFlags(flags: any, selectedAccessMethod: AccessMethod): Promise<Map<string, string>> {
     const fieldValuesMap = new Map<string, string>();
-
     for (const field of selectedAccessMethod.accessMethodFields) {
       let fieldAnswerValue = flags[field.creationRequestField];
-      if (!fieldAnswerValue && field.creationRequestField !== "mfaDevice" && field.creationRequestField !== "profileId") {
-        throw new Error(`Property ${field.creationRequestField} was not found for given Access Method`);
-      }
-      if (!fieldAnswerValue && field.creationRequestField === "mfaDevice") {
-        fieldAnswerValue = "";
-      }
-      if (!fieldAnswerValue && field.creationRequestField === "profileId") {
-        fieldAnswerValue = this.cliProviderService.repository.getDefaultProfileId();
-      }
+      this.checkAnomalousFieldForAccessMethod(fieldAnswerValue, field);
+      fieldAnswerValue = this.setDefaultParameterValues(fieldAnswerValue, field);
+      this.checkRegionOrLocationValidity(field, flags, fieldAnswerValue);
+      this.checkIdpUrlValidity(fieldAnswerValue, field);
+      this.checkProfileIdValidity(fieldAnswerValue, field);
+      this.checkParentIdValidity(fieldAnswerValue, field);
+      fieldAnswerValue = this.getOrCreateIdpUrlAndObtainId(field, fieldAnswerValue);
       fieldValuesMap.set(field.creationRequestField, fieldAnswerValue);
     }
-
     return fieldValuesMap;
+  }
+
+  private getOrCreateIdpUrlAndObtainId(field: any, fieldAnswerValue: any) {
+    if (field instanceof IdpUrlAccessMethodField) {
+      if (
+        this.cliProviderService.idpUrlsService
+          .getIdpUrls()
+          .map((i: IdpUrl) => i.url)
+          .indexOf(fieldAnswerValue) < 0
+      ) {
+        fieldAnswerValue = this.cliProviderService.idpUrlsService.createIdpUrl(fieldAnswerValue).id;
+      } else {
+        fieldAnswerValue = this.cliProviderService.idpUrlsService.getIdpUrls().find((i) => i.url === fieldAnswerValue)?.id;
+      }
+    }
+    return fieldAnswerValue;
+  }
+
+  private checkIdpUrlValidity(fieldAnswerValue: any, field: any) {
+    if (fieldAnswerValue.indexOf("https://") < 0 && fieldAnswerValue.indexOf("http://") < 0 && field.creationRequestField === "idpUrl") {
+      throw new Error(`Invalid Idp URL`);
+    }
+  }
+
+  private checkRegionOrLocationValidity(field: any, flags: any, fieldAnswerValue: any) {
+    if (
+      field.creationRequestField === "region" &&
+      flags.providerType === SessionType.aws.toString() &&
+      !this.cliProviderService.awsCoreService
+        .getRegions()
+        .map((r) => r.region)
+        .includes(fieldAnswerValue)
+    ) {
+      throw new Error(`AWS Region not valid`);
+    }
+    if (
+      field.creationRequestField === "region" &&
+      flags.providerType === SessionType.azure.toString() &&
+      !this.cliProviderService.azureCoreService
+        .getLocations()
+        .map((l) => l.location)
+        .includes(fieldAnswerValue)
+    ) {
+      throw new Error(`Azure location not valid`);
+    }
+  }
+
+  private setDefaultParameterValues(fieldAnswerValue: any, field: any) {
+    if (!fieldAnswerValue && field.creationRequestField === "mfaDevice") {
+      fieldAnswerValue = "";
+    }
+    if (!fieldAnswerValue && field.creationRequestField === "profileId") {
+      fieldAnswerValue = this.cliProviderService.repository.getDefaultProfileId();
+    }
+    if (!fieldAnswerValue && field.creationRequestField === "roleSessionName") {
+      fieldAnswerValue = constants.roleSessionName;
+    }
+    return fieldAnswerValue;
+  }
+
+  private checkAnomalousFieldForAccessMethod(fieldAnswerValue: any, field: any) {
+    if (
+      !fieldAnswerValue &&
+      field.creationRequestField !== "mfaDevice" &&
+      field.creationRequestField !== "profileId" &&
+      field.creationRequestField !== "roleSessionName"
+    ) {
+      throw new Error(`Property ${field.creationRequestField} was not found for given Access Method`);
+    }
+  }
+
+  private checkProfileIdValidity(fieldAnswerValue: any, field: any) {
+    if (
+      this.cliProviderService.namedProfilesService
+        .getNamedProfiles()
+        .map((np) => np.id)
+        .indexOf(fieldAnswerValue) < 0 &&
+      field.creationRequestField === "profileId"
+    ) {
+      throw new Error(`Invalid Profile Id`);
+    }
+  }
+
+  private checkParentIdValidity(fieldAnswerValue: any, field: any) {
+    const found = this.cliProviderService.repository.getSessions().find((s) => s.sessionId === fieldAnswerValue);
+
+    if (!found && field.creationRequestField === "parentSessionId") {
+      throw new Error(`Invalid Parent Id`);
+    }
+    if (
+      found &&
+      (found.type === SessionType.awsIamRoleChained || found.type === SessionType.azure) &&
+      field.creationRequestField === "parentSessionId"
+    ) {
+      throw new Error(`Invalid Parent: cannot chain from ${found.type.toString()}`);
+    }
   }
 }

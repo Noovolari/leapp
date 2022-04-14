@@ -3,13 +3,472 @@ import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-t
 import AddSession from "./add";
 import { IdpUrlAccessMethodField } from "@noovolari/leapp-core/models/idp-url-access-method-field";
 import { AccessMethodFieldType } from "@noovolari/leapp-core/models/access-method-field-type";
+import { CliProviderService } from "../../service/cli-provider-service";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("AddSession", () => {
-  const getTestCommand = (cliProviderService: any = null, createIdpUrlCommand: any = null): AddSession => {
-    const command = new AddSession([], {} as any, createIdpUrlCommand);
+  const getTestCommand = (cliProviderService: any = null, createIdpUrlCommand: any = null, argv = []): AddSession => {
+    const command = new AddSession(argv, {} as any, createIdpUrlCommand);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - test all flags and combinations", async () => {
+    const cliProviderService: any = {
+      repository: {
+        getSessions: jest.fn(() => [{}]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
+      awsCoreService: new CliProviderService().awsCoreService,
+      azureCoreService: new CliProviderService().azureCoreService,
+      cloudProviderService: new CliProviderService().cloudProviderService,
+      sessionFactory: { createSession: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+    };
+    let command = getTestCommand(cliProviderService, null, ["--providerType"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --providerType expects a value");
+
+    command = getTestCommand(cliProviderService, null, ["--providerType", "fake"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Expected --providerType=fake to be one of: aws, azure");
+
+    command = getTestCommand(cliProviderService, null, ["--providerType", "azure", "--sessionType"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --sessionType expects a value");
+
+    command = getTestCommand(cliProviderService, null, ["--providerType", "azure", "--sessionType", "fake"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow(
+      "Expected --sessionType=fake to be one of: awsIamRoleFederated, awsIamUser, awsIamRoleChained, azure"
+    );
+
+    command = getTestCommand(cliProviderService, null, ["--providerType", "azure", "--sessionType", "awsIamUser"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrowError();
+
+    command = getTestCommand(cliProviderService, null, ["--providerType", "aws", "--sessionType", "azure"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrowError();
+
+    command = getTestCommand(cliProviderService, null, ["--providerType", "azure", "--sessionType", "azure", "--region"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --region expects a value");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "azure",
+      "--sessionType",
+      "azure",
+      "--region",
+      "southcentralus",
+      "--sessionName",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --sessionName expects a value");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "azure",
+      "--sessionType",
+      "azure",
+      "--region",
+      "southcentralus",
+      "--sessionName",
+      "test",
+      "--tenantId",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --tenantId expects a value");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "azure",
+      "--sessionType",
+      "azure",
+      "--region",
+      "southcentralus",
+      "--sessionName",
+      "test",
+      "--tenantId",
+      "id",
+      "--subscriptionId",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --subscriptionId expects a value");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "azure",
+      "--sessionType",
+      "azure",
+      "--region",
+      "nottrue",
+      "--sessionName",
+      "test",
+      "--tenantId",
+      "id",
+      "--subscriptionId",
+      "sid",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Azure location not valid");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "azure",
+      "--sessionType",
+      "awsIamUser",
+      "--region",
+      "nottrue",
+      "--sessionName",
+      "test",
+      "--tenantId",
+      "id",
+      "--subscriptionId",
+      "sid",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Session Type and Provider Type are not valid together");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "azure",
+      "--region",
+      "nottrue",
+      "--sessionName",
+      "test",
+      "--tenantId",
+      "id",
+      "--subscriptionId",
+      "sid",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Session Type and Provider Type are not valid together");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamUser",
+      "--region",
+      "nottrue",
+      "--sessionName",
+      "test",
+      "--profileId",
+      "id",
+      "--accessKey",
+      "aid",
+      "--secretKey",
+      "sid",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("AWS Region not valid");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamUser",
+      "--region",
+      "eu-west-1",
+      "--sessionName",
+      "test",
+      "--profileId",
+      "id",
+      "--accessKey",
+      "aid",
+      "--secretKey",
+      "sid",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Invalid Profile Id");
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamUser",
+      "--region",
+      "eu-west-1",
+      "--sessionName",
+      "test",
+      "--accessKey",
+      "aid",
+      "--secretKey",
+      "sid",
+    ]);
+    command.log = jest.fn();
+    await command.run();
+
+    command = getTestCommand(cliProviderService, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamRoleFederated",
+      "--region",
+      "eu-west-1",
+      "--sessionName",
+      "test",
+      "--roleArn",
+      "role",
+      "--idpArn",
+      "idp",
+      "--idpUrl",
+      "idpUrlTest",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Invalid Idp URL");
+
+    const cliMock2: any = {
+      repository: {
+        getSessions: jest.fn(() => [{}]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
+      awsCoreService: new CliProviderService().awsCoreService,
+      azureCoreService: new CliProviderService().azureCoreService,
+      cloudProviderService: new CliProviderService().cloudProviderService,
+      sessionFactory: { createSession: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+    };
+    command = getTestCommand(cliMock2, null, [
+      "--providerType",
+      "azure",
+      "--sessionType",
+      "azure",
+      "--region",
+      "southcentralus",
+      "--sessionName",
+      "test",
+      "--tenantId",
+      "aid",
+      "--subscriptionId",
+      "sid",
+    ]);
+    command.log = jest.fn();
+    await command.run();
+
+    expect(cliMock2.sessionFactory.createSession).toHaveBeenCalledWith("azure", {
+      sessionName: "test",
+      region: "southcentralus",
+      subscriptionId: "sid",
+      tenantId: "aid",
+    });
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(command.log).toHaveBeenCalledWith("session added");
+
+    const cliMock3: any = {
+      repository: {
+        getSessions: jest.fn(() => [{}]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
+      awsCoreService: new CliProviderService().awsCoreService,
+      azureCoreService: new CliProviderService().azureCoreService,
+      cloudProviderService: new CliProviderService().cloudProviderService,
+      sessionFactory: { createSession: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+      idpUrlsService: {
+        getIdpUrls: jest.fn(() => [{ id: "idpId", url: "http://idpUrlTest" }]),
+        createIdpUrl: jest.fn((url) => ({ id: "newId", url })),
+      },
+    };
+    command = getTestCommand(cliMock3, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamRoleFederated",
+      "--region",
+      "eu-west-1",
+      "--sessionName",
+      "test",
+      "--roleArn",
+      "role",
+      "--idpArn",
+      "idp",
+      "--idpUrl",
+      "http://idpUrlTest",
+    ]);
+    command.log = jest.fn();
+    await command.run();
+
+    expect(cliMock3.sessionFactory.createSession).toHaveBeenCalledWith("awsIamRoleFederated", {
+      sessionName: "test",
+      region: "eu-west-1",
+      roleArn: "role",
+      idpArn: "idp",
+      idpUrl: "idpId",
+      profileId: "defaultId",
+    });
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(command.log).toHaveBeenCalledWith("session added");
+
+    const cliMock4: any = {
+      repository: {
+        getSessions: jest.fn(() => [{}]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
+      awsCoreService: new CliProviderService().awsCoreService,
+      azureCoreService: new CliProviderService().azureCoreService,
+      cloudProviderService: new CliProviderService().cloudProviderService,
+      sessionFactory: { createSession: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+      idpUrlsService: {
+        getIdpUrls: jest.fn(() => [{ id: "idpId", url: "http://idpUrlTest" }]),
+        createIdpUrl: jest.fn((url) => ({ id: "newId", url })),
+      },
+    };
+    command = getTestCommand(cliMock4, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamRoleFederated",
+      "--region",
+      "eu-west-1",
+      "--sessionName",
+      "test",
+      "--roleArn",
+      "role",
+      "--idpArn",
+      "idp",
+      "--idpUrl",
+      "http://idpUrlTest",
+      "--profileId",
+      "not",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Invalid Profile Id");
+
+    const cliMock5: any = {
+      repository: {
+        getSessions: jest.fn(() => [{ sessionId: "parentId", type: SessionType.awsIamRoleFederated }]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
+      awsCoreService: new CliProviderService().awsCoreService,
+      azureCoreService: new CliProviderService().azureCoreService,
+      cloudProviderService: new CliProviderService().cloudProviderService,
+      sessionFactory: { createSession: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+      idpUrlsService: {
+        getIdpUrls: jest.fn(() => [{ id: "idpId", url: "http://idpUrlTest" }]),
+        createIdpUrl: jest.fn((url) => ({ id: "newId", url })),
+      },
+    };
+    command = getTestCommand(cliMock5, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamRoleChained",
+      "--region",
+      "eu-west-1",
+      "--sessionName",
+      "test",
+      "--roleArn",
+      "role",
+      "--parentSessionId",
+      "parentId",
+    ]);
+    command.log = jest.fn();
+    await command.run();
+
+    expect(cliMock5.sessionFactory.createSession).toHaveBeenCalledWith("awsIamRoleChained", {
+      sessionName: "test",
+      region: "eu-west-1",
+      roleArn: "role",
+      parentSessionId: "parentId",
+      profileId: "defaultId",
+      roleSessionName: "assumed-from-leapp",
+    });
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(command.log).toHaveBeenCalledWith("session added");
+
+    const cliMock6: any = {
+      repository: {
+        getSessions: jest.fn(() => [{ sessionId: "parentId", type: SessionType.awsIamRoleFederated }]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
+      awsCoreService: new CliProviderService().awsCoreService,
+      azureCoreService: new CliProviderService().azureCoreService,
+      cloudProviderService: new CliProviderService().cloudProviderService,
+      sessionFactory: { createSession: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+      idpUrlsService: {
+        getIdpUrls: jest.fn(() => [{ id: "idpId", url: "http://idpUrlTest" }]),
+        createIdpUrl: jest.fn((url) => ({ id: "newId", url })),
+      },
+    };
+    command = getTestCommand(cliMock6, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamRoleChained",
+      "--region",
+      "eu-west-1",
+      "--sessionName",
+      "test",
+      "--roleArn",
+      "role",
+      "--parentSessionId",
+      "parentId",
+      "--roleSessionName",
+      "myRoleSessionName",
+    ]);
+    command.log = jest.fn();
+    await command.run();
+
+    expect(cliMock6.sessionFactory.createSession).toHaveBeenCalledWith("awsIamRoleChained", {
+      sessionName: "test",
+      region: "eu-west-1",
+      roleArn: "role",
+      parentSessionId: "parentId",
+      profileId: "defaultId",
+      roleSessionName: "myRoleSessionName",
+    });
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(command.log).toHaveBeenCalledWith("session added");
+
+    const cliMock7: any = {
+      repository: {
+        getSessions: jest.fn(() => [{ sessionId: "parentId", type: SessionType.awsIamRoleFederated }]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
+      awsCoreService: new CliProviderService().awsCoreService,
+      azureCoreService: new CliProviderService().azureCoreService,
+      cloudProviderService: new CliProviderService().cloudProviderService,
+      sessionFactory: { createSession: jest.fn() },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+      idpUrlsService: {
+        getIdpUrls: jest.fn(() => [{ id: "idpId", url: "http://idpUrlTest" }]),
+        createIdpUrl: jest.fn((url) => ({ id: "newId", url })),
+      },
+    };
+    command = getTestCommand(cliMock7, null, [
+      "--providerType",
+      "aws",
+      "--sessionType",
+      "awsIamRoleChained",
+      "--region",
+      "eu-west-1",
+      "--sessionName",
+      "test",
+      "--roleArn",
+      "role",
+      "--parentSessionId",
+      "notexistingparentId",
+      "--roleSessionName",
+      "myRoleSessionName",
+    ]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Invalid Parent Id");
+  });
 
   test("chooseCloudProvider", async () => {
     const cliProviderService: any = {

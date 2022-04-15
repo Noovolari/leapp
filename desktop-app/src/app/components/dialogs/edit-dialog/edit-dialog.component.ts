@@ -21,6 +21,7 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
 import {LeappParseError} from "@noovolari/leapp-core/errors/leapp-parse-error";
 import {AppMfaCodePromptService} from "../../../services/app-mfa-code-prompt.service";
+import {SessionStatus} from "@noovolari/leapp-core/models/session-status";
 
 @Component({
   selector: "app-edit-dialog",
@@ -219,16 +220,33 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   /**
    * Save the edited account in the workspace
    */
-  saveAccount(): void {
+  async saveAccount(): Promise<void> {
     if (this.formValid()) {
       this.addProfileToWorkspace();
       this.addIpdUrlToWorkspace();
       this.updateProperties();
 
+      let wasActive = false;
+      if (this.selectedSession.status === SessionStatus.active) {
+        // Stop temporary if the sessions is active
+        await this.sessionService.stop(this.selectedSession.sessionId);
+        wasActive = true;
+      }
+      const sessions: Session[] = this.repository.getSessions();
+      for (let i = 0; i < sessions.length; i++) {
+        if (sessions[i].sessionId === this.selectedSession.sessionId) {
+          sessions[i].region = this.form.get("awsRegion").value;
+        }
+      }
+
       this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
       this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
 
-      //this.leappCoreService.namedProfileService.changeNamedProfile(this.selectedSession, this.selectedProfile.value);
+      this.selectedSession.region = this.form.get("awsRegion").value;
+
+      if (wasActive) {
+        await this.sessionService.start(this.selectedSession.sessionId);
+      }
 
       this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
       this.closeModal();

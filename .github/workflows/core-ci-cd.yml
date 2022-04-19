@@ -41,3 +41,62 @@ jobs:
       - name: Lint
         run: |
           npm run lint
+
+  check_for_release:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    outputs:
+      to-release: ${{ steps.validator.outputs.VALID_TAG }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          ref: master
+
+      - name: Check Tag Validity
+        id: validator
+        run: |
+          git fetch
+          COMMIT_HASH=$(git log --format="%H" -n 1)
+          TAG=$(git tag --contains $COMMIT_HASH)
+          MATCH=$(echo "$TAG" | grep "^core-v[0-9]\+\.[0-9]\+\.[0-9]\+$" || true)
+          if [[ $MATCH != "" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
+          echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
+
+      - name: If valid tag set
+        if: steps.validator.outputs.VALID_TAG == 1
+        run: |
+          echo "Valid Tag - Releasing..."
+
+      - name: If not valid tag set
+        if: steps.validator.outputs.VALID_TAG != 1
+        run: |
+          echo "Invalid Tag - Not releasing"
+
+  release:
+    needs: check_for_release
+    runs-on: ubuntu-latest
+    if: needs.check_for_release.outputs.to-release == 1
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 16
+      - name: Bootstrap
+        run: |
+          npm install
+          cd packages/core
+          npm install
+      - name: Build
+        run: |
+          cd packages/core
+          npm run build
+      - name: Release npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/core
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+          echo "Releasing on npm... (ABORTED)"
+#          npm run release

@@ -1,11 +1,9 @@
 name: Leapp CLI CI/CD
 
 on:
-  workflow_run:
-    workflows: [ "Leapp Core CI/CD" ]
-    branches: [ master ]
-    types:
-      - completed
+  push:
+    branches:
+      - 'master'
 
   workflow_dispatch:
 
@@ -46,9 +44,42 @@ jobs:
         run: |
           npm run lint
 
-  publish:
+  check_for_release:
     needs: build_and_test
     runs-on: ubuntu-latest
+    outputs:
+      to-release: ${{ steps.validator.outputs.VALID_TAG }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          ref: master
+
+      - name: Check Tag Validity
+        id: validator
+        run: |
+          git fetch
+          COMMIT_HASH=$(git log --format="%H" -n 1)
+          TAG=$(git tag --contains $COMMIT_HASH)
+          MATCH=$(echo "$TAG" | grep "^cli-v[0-9]\+\.[0-9]\+\.[0-9]\+$" || true)
+          if [[ $MATCH != "" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
+          echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
+
+      - name: If valid tag set
+        if: steps.validator.outputs.VALID_TAG == 1
+        run: |
+          echo "Valid Tag - Releasing..."
+
+      - name: If not valid tag set
+        if: steps.validator.outputs.VALID_TAG != 1
+        run: |
+          echo "Invalid Tag - Not releasing"
+
+  release:
+    needs: check_for_release
+    runs-on: macos-latest
+    if: needs.check_for_release.outputs.to-release == 1
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
@@ -57,15 +88,23 @@ jobs:
       - name: Bootstrap
         run: |
           npm run bootstrap
-      - name: Install AWS SDK
-        run: |
-          cd packages/cli
-          npm install --save-dev aws-sdk
       - name: Build Core
         run: |
           cd packages/core
           npm run build
-      - name: Publish Homebrew
+      - name: Build CLI
+        run: |
+          cd packages/cli
+          npm run prepack
+      - name: Release npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/cli
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+          echo "Releasing on npm... (ABORTED)"
+#          npm run release-npm
+      - name: Release Homebrew
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -74,8 +113,5 @@ jobs:
           git config --global user.name "Noovolari Bot"
           git config --global user.email "info@noovolari.com"
           cd packages/cli
+          echo "Releasing on homebrew... (ABORTED)"
 #          npm run release-homebrew
-#      - name: Publish npm
-#        run: |
-#          cd packages/cli
-#          npm run release-npm

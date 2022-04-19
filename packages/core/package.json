@@ -1,6 +1,7 @@
 {
   "name": "@noovolari/leapp-core",
   "version": "0.1.105",
+
   "author": "besharp <info@besharp.it>",
   "description": "Leapp's core module",
   "peerDependencies": {
@@ -53,7 +54,7 @@
     "@commitlint/config-conventional": "16.2.1",
     "@types/aws-sdk": "^2.7.0",
     "@types/jest": "^27.4.1",
-    "gushio": "~0.5.0",
+    "gushio": "~0.7.0",
     "jest": "^27.4.5",
     "typescript": "4.5.5"
   },

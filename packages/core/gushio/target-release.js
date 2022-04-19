@@ -1,28 +1,23 @@
 module.exports = {
   cli: {
     name: 'release',
-    description: 'Prepare and release the leapp-core library on NPM',
+    description: 'Release the leapp-core library on NPM',
     version: '0.1',
   },
-  deps: [{name: 'semver', version: '^7.3.5'}],
+  deps: [],
   run: async () => {
-    const path = require('path')
-    const shellJs = require('shelljs')
-    const semver = require('semver')
-    const bumpVersionFunction = require('./bump-func')
+    const path = await gushio.import('path')
+    const shellJs = await gushio.import('shelljs')
 
     try {
       console.log('Publishing leapp-core library... ')
-      await bumpVersionFunction(path, semver)
-
-      await gushio.run(path.join(__dirname, './target-build.js'))
 
       shellJs.cd(path.join(__dirname, '..'))
       const result = shellJs.exec('npm publish')
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
-      console.log('leapp-core published on npm successfully')
+      console.log('leapp-core published on npm')
     } catch (e) {
       e.message = e.message.red
       throw e

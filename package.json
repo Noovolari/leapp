@@ -26,7 +26,7 @@
     "eslint-plugin-jsdoc": "latest",
     "eslint-plugin-prefer-arrow": "latest",
     "eslint-plugin-prettier": "^4.0.0",
-    "gushio": "~0.5.0",
+    "gushio": "~0.7.0",
     "husky": "^7.0.0",
     "lerna": "^4.0.0",
     "lint-staged": "12.3.5",
@@ -36,7 +36,6 @@
   "scripts": {
     "setup": "npm install && gushio gushio/setup-package.js core cli desktop-app",
     "bootstrap": "npm install && lerna bootstrap",
-    "release-core": "gushio gushio/target-release-core.js",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"

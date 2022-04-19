@@ -68,7 +68,7 @@
     "eslint-config-oclif": "^4",
     "eslint-config-oclif-typescript": "^1.0.2",
     "globby": "^11",
-    "gushio": "~0.5.0",
+    "gushio": "~0.7.0",
     "jest": "^27.4.5",
     "puppeteer": "~13.2.0",
     "ts-node": "^10.2.1",
@@ -85,9 +85,6 @@
     "/npm-shrinkwrap.json",
     "/oclif.manifest.json"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "homepage": "https://github.com/noovolari/leapp",
   "keywords": [
     "oclif"
@@ -122,12 +119,15 @@
     }
   },
   "repository": "noovolari/leapp",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
-    "setup": "gushio ../../gushio/setup-package.js cli",
     "clean": "gushio gushio/target-clean.js",
-    "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme",
     "test": "jest",
-    "release": "gushio gushio/target-release.js"
+    "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme",
+    "release-homebrew": "gushio gushio/target-brew-release.js",
+    "release-npm": "gushio gushio/target-npm-release.js"
   },
   "types": "dist/index.d.ts"
 }

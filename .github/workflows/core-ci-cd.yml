@@ -3,7 +3,7 @@ name: Leapp Core CI/CD
 on:
   push:
     branches:
-      - 'master'
+      - 'deploy-test'
 
   workflow_dispatch:
 
@@ -98,5 +98,4 @@ jobs:
         run: |
           cd packages/core
           echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-          echo "Releasing on npm... (ABORTED)"
-#          npm run release
+          npm run release

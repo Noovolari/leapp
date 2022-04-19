@@ -25,7 +25,9 @@
     "release-mac": "gushio gushio/target-release.js 'configuration production' mac",
     "release-linux": "gushio gushio/target-release.js 'configuration production' linux",
     "release-win": "gushio gushio/target-release.js 'configuration production' win",
-    "release-all": "gushio gushio/target-release.js 'configuration production' all"
+    "release-all": "gushio gushio/target-release.js 'configuration production' all",
+    "set-target-arm64": "gushio gushio/set-target-arch.js arm64",
+    "set-target-x64": "gushio gushio/set-target-arch.js x64"
   },
   "build": {
     "publish": [
@@ -217,7 +219,7 @@
     "@types/uuid": "^8.3.0",
     "dotenv": "^10.0.0",
     "electron": "^15.5.0",
-    "electron-builder": "22.14.3",
+    "electron-builder": "^23.0.2",
     "electron-builder-squirrel-windows": "22.14.3",
     "electron-installer-dmg": "3.0.0",
     "electron-packager": "15.4.0",

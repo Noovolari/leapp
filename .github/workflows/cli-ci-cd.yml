@@ -117,5 +117,4 @@ jobs:
           git config --global user.name "Noovolari Bot"
           git config --global user.email "info@noovolari.com"
           cd packages/cli
-          echo "Releasing on homebrew... (ABORTED)"
           npm run release-homebrew

@@ -3,16 +3,16 @@ name: Leapp Desktop App CD
 on:
   push:
     branches:
-      - master
+      - test-desktop-app-cd
 
 env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}
-  WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-  S3_BUCKET: s3://noovolari-leapp-website-distribution-test
-  CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
+  CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+  S3_BUCKET: s3://noovolari-leapp-website-distribution-test
+  WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
 
 jobs:
   tag-validation:
@@ -32,9 +32,7 @@ jobs:
         run: |
           git fetch
           LOG=$(git log --format="%H" -n 1)
-          echo "LOG: $LOG"
           TAG=$(git tag --contains $LOG)
-          echo "TAG: $TAG"
           REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
           if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
@@ -269,4 +267,4 @@ jobs:
 
       - name: Publish Changelog
         run: |
-          aws s3 cp CHANGELOG.md "${{ env.S3_BUCKET }}/"
+          # aws s3 cp CHANGELOG.md "${{ env.S3_BUCKET }}/"

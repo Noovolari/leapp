@@ -9,6 +9,7 @@ env:
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
+  DISTRIBUTION_ID: E26VMV2Y7MSACB
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
   S3_BUCKET: s3://noovolari-leapp-website-distribution-test
@@ -37,10 +38,12 @@ jobs:
           if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
           echo "::set-output name=TAG_VERSION::$TAG"
+
       - name: If valid tag set
         if: steps.validator.outputs.VALID_TAG == 1
         run: |
           echo "Valid Tag Found - Building Desktop App..."
+
       - name: If not valid tag set
         if: steps.validator.outputs.VALID_TAG != 1
         run: |
@@ -52,15 +55,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Read exported variables
+      - name: Build Win desktop app
         run: |
-          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
-          TAG_VERSION=${TAG_VERSION:1}
-          echo "OUTPUT: ${{ needs.first.outputs.var1 }}"
-          echo "TAG_VERSION: $TAG_VERSION"
-      - name: Build Win Desktop App
-        run: |
-          echo "tag: ${{ env.LAST_COMMIT_TAG }}"
           cd desktop-app
           npm install
           npm run release-win
@@ -68,6 +64,7 @@ jobs:
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -75,7 +72,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      - name: Release Draft to S3
+      - name: Release draft to S3
         run: |
           cd desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
@@ -88,7 +85,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build Linux Desktop App
+      - name: Build Linux desktop app
         run: |
           cd desktop-app
           npm install
@@ -97,14 +94,15 @@ jobs:
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
-      - name: Configure AWS Credentials
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      - name: Release Draft to S3
+      - name: Release draft to S3
         run: |
           cd desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
@@ -117,7 +115,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build macOS Desktop App
+      - name: Build macOS desktop app
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
         run: |
@@ -157,14 +155,15 @@ jobs:
           rm "./release/Leapp-$TAG_VERSION-mac.zip"
           rm "./release/Leapp-$TAG_VERSION-mac.zip.blockmap"
           zip "./release/Leapp-$TAG_VERSION-mac.zip" "./release/Leapp-$TAG_VERSION.dmg"
-      - name: Configure AWS Credentials
+
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      - name: Release Draft to S3
+      - name: Release draft to S3
         run: |
           cd desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
@@ -177,7 +176,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build macOS Desktop App
+      - name: Build macOS desktop app
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
         run: |
@@ -217,6 +216,7 @@ jobs:
           rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
           rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
           zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.dmg"
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -224,7 +224,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      - name: Release Draft to S3
+      - name: Release draft to S3
         run: |
           cd desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
@@ -237,14 +237,14 @@ jobs:
     if: needs.tag-validation.outputs.validator == 1
     steps:
 
-      - name: Configure AWS Credentials
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      - name: Move Draft to Latest
+      - name: Move draft to latest
         run: |
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
@@ -265,6 +265,24 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-1
 
-      - name: Publish Changelog
+      - name: Publish changelog
         run: |
           aws s3 cp CHANGELOG.md "${{ env.S3_BUCKET }}/"
+  invalidate-distribution:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [ publish-changelog ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Invalidate distribution
+        run: |
+          # aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths "/*"

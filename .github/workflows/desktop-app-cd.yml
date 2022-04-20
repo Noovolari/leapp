@@ -1,4 +1,4 @@
-name: Leapp Desktop App CI/CD
+name: Leapp Desktop App CD
 
 on:
   push:

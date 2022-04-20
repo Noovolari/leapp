@@ -65,7 +65,7 @@ module.exports = {
 
       const bucketParams = {
         Bucket: s3Bucket,
-        Key: `versions/${tarballFileName}`,
+        Key: `${leappCliVersion}/${tarballFileName}`,
         Body: await fs.readFile(path.join(__dirname, '../dist', tarballFileName)),
       };
       const s3Client = new S3Client({region: bucketRegion});

@@ -248,8 +248,8 @@ jobs:
         run: |
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
-          # aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
-          # aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
+          aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
+          aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
   publish-changelog:
     runs-on: ubuntu-latest
     environment: prod
@@ -267,4 +267,4 @@ jobs:
 
       - name: Publish Changelog
         run: |
-          # aws s3 cp CHANGELOG.md "${{ env.S3_BUCKET }}/"
+          aws s3 cp CHANGELOG.md "${{ env.S3_BUCKET }}/"

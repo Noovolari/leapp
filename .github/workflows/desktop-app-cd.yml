@@ -248,6 +248,7 @@ jobs:
         run: |
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
+          echo "${{ env.S3_BUCKET }}/$TAG_VERSION/"
           aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
           aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
   publish-changelog:

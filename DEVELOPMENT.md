@@ -91,13 +91,13 @@ Setup script and other scripts in Leapp are powered by [Gushio](https://github.c
 
 > Gushio* is built on top of battle-tested libraries like commander and shelljs and allows you to write a multiplatform shell script in a single JavaScript file without having to worry about package.json and dependencies installation.
 
-To build Leapp Core there is a script called _build_ available in Leapp Core's _package.json_.
+To build Leapp Core there is a script called _build_ available in _packages/core/package.json_.
 
 ```bash
 npm run build
 ```
 
-To build Leapp CLI a script called _prepack_ in Leapp CLI's _package.json_ can be called.
+To build Leapp CLI a script called _prepack_ in _packages/cli/package.json_ can be called.
 
 ```bash
 npm run prepack

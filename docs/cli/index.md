@@ -29,7 +29,7 @@ $ brew install Noovolari/brew/leapp-cli
 OR
 
 ```console
-brew tap Noovolari/brew && brew install leapp-cli
+$ brew tap Noovolari/brew && brew install leapp-cli
 ```
 <!-- usagestop -->
 

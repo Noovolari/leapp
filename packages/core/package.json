@@ -1,7 +1,10 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.106",
-  "author": "besharp <info@besharp.it>",
+  "version": "0.1.107",
+  "author": {
+    "name": "Noovolari",
+    "email": "info@noovolari.com"
+  },
   "description": "Leapp's core module",
   "peerDependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.5",

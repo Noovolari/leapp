@@ -12,7 +12,7 @@ env:
   DISTRIBUTION_ID: ${{ secrets.DISTRIBUTION_ID }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
-  S3_BUCKET: s3://noovolari-leapp-website-distribution-test
+  S3_BUCKET: s3://noovolari-leapp-website-distribution
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
 
 jobs:

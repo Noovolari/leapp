@@ -3,8 +3,8 @@
   "version": "0.11.0",
   "private": true,
   "author": {
-    "name": "besharp",
-    "email": "info@besharp.it"
+    "name": "Noovolari",
+    "email": "info@noovolari.com"
   },
   "description": "Leapp is a Cross-Platform Cloud access App, built on top of Electron.",
   "main": "electron/dist/electron/main.js",
@@ -139,7 +139,7 @@
     "@ng-select/ng-select": "8.1.1",
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
-    "@noovolari/leapp-core": "0.1.106",
+    "@noovolari/leapp-core": "0.1.107",
     "@sebgroup/magic-iframe": "1.1.2",
     "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",

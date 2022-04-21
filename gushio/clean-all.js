@@ -5,6 +5,9 @@ module.exports = {
     description: 'Run npm install on all submodules',
     version: '0.1',
   },
+  deps: [
+    {name: '@aws-sdk/client-s3', version: '^3.67.0'},
+  ],
   run: async () => {
     const deleteFunction = require("./delete-func")
     const path = require('path')

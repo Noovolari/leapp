@@ -10,17 +10,12 @@ export class ErrorService implements ErrorHandler {
   // Don't use regular dependency injection but instead use injector!
   constructor(private injector: Injector) {}
 
-  handleError(error: any): void {
+  handleError(error: LeappBaseError): void {
     error = error.rejection ? error.rejection : error;
     const loggingService = this.injector.get(AppProviderService).loggingService;
     const messageToasterService = this.injector.get(MessageToasterService);
 
-    loggingService.logger(
-      (error as LeappBaseError).message,
-      (error as LeappBaseError).severity,
-      (error as LeappBaseError).context,
-      (error as LeappBaseError).stack
-    );
-    messageToasterService.toast((error as LeappBaseError).message, (error as LeappBaseError).severity, (error as LeappBaseError).name);
+    loggingService.logger(error.message, error.severity, error.context, error.stack);
+    messageToasterService.toast(error.message, error.severity, error.name);
   }
 }

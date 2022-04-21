@@ -1687,17 +1687,23 @@
 <p><strong>Unzip</strong> the package and <strong>double-click the executable</strong> to install.</p>
 <h3 id="macos-homebrew-linux-linuxbrew">macOS (Homebrew) &amp; Linux (Linuxbrew)</h3>
 <p>Leapp can also be installed on <strong>macOS</strong> or <strong>Linux</strong> via <a href="https://brew.sh/">Homebrew Cask</a> with:
-<div class="highlight"><pre><span></span><code>brew install leapp
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>brew install leapp
 </code></pre></div></p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>In addition, Leapp can also be installed with Linuxbrew on Windows via <a href="https://docs.microsoft.com/en-us/windows/wsl/about">WSL</a></p>
 </div>
 <h2 id="install-leapp-cli">Install Leapp CLI</h2>
-<p>You can install Leapp CLI by downloading the library from <a href="https://www.npmjs.com/package/@noovolari/leapp-cli">npm</a> globally.</p>
-<p>All the available commands are listed in the <a href="../../cli">Leapp CLI section of the documentation</a>.</p>
-<div class="highlight"><pre><span></span><code>npm install -g @noovolari/leapp-cli
+<p>You can install Leapp CLI from <a href="https://www.npmjs.com/package/@noovolari/leapp-cli">npm</a>, installing it as a global package. </p>
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>npm install -g @noovolari/leapp-cli
 </code></pre></div>
+<p>In macOS, you can install Leapp CLI through a Homebrew Formula:</p>
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>brew install Noovolari/brew/leapp-cli
+</code></pre></div>
+<p>OR</p>
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>brew tap Noovolari/brew <span class="o">&amp;&amp;</span> brew install leapp-cli
+</code></pre></div>
+<p>All the available commands are listed in the <a href="../../cli">Leapp CLI section of the documentation</a>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Leapp CLI will works only if the Desktop App is installed and running.</p>

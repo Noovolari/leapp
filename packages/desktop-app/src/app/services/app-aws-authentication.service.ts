@@ -103,7 +103,9 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
       // Clear all extra data
       const url = this.leappCoreService.repository.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
       const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
-      this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(url)}`);
+      if (this.electronService.fs.existsSync(getAppPath + `/Partitions/leapp-${btoa(url)}`)) {
+        this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(url)}`);
+      }
 
       if (session) {
         const sessionService = this.leappCoreService.sessionFactory.getSessionService(session.type);

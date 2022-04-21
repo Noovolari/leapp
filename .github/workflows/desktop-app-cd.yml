@@ -3,13 +3,13 @@ name: Leapp Desktop App CD
 on:
   push:
     branches:
-      - test-desktop-app-cd
+      - master
 
 env:
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
-  DISTRIBUTION_ID: E26VMV2Y7MSACB
+  DISTRIBUTION_ID: ${{ secrets.DISTRIBUTION_ID }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
   S3_BUCKET: s3://noovolari-leapp-website-distribution-test
@@ -26,7 +26,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 1
-          ref: test-desktop-app-cd
+          ref: master
 
       - name: Check Tag Validity
         id: validator
@@ -211,6 +211,7 @@ jobs:
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
+          rm -Rf ./release/mac-arm64
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
@@ -285,4 +286,4 @@ jobs:
 
       - name: Invalidate distribution
         run: |
-          # aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths "/*"
+          aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths "/*"

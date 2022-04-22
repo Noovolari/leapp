@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.11.0](https://github.com/Noovolari/leapp/compare/v0.10.0...v0.11.0) (2022-03-31)
+## [0.11.1](https://github.com/Noovolari/leapp/compare/v0.11.0...v0.11.1) (2022-04-21)
+
+### Bug Fixes
+
+* fixed v0.11.0 MFA push notification pops up every minute [#248](https://github.com/Noovolari/leapp/issues/248)
+* fixed v0.11.0 with okta keeps popping up the logging window every few seconds [#255](https://github.com/Noovolari/leapp/issues/255)
+
+### [0.11.0](https://github.com/Noovolari/leapp/compare/v0.10.0...v0.11.0) (2022-03-31)
 
 ### Features
 

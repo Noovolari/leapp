@@ -1,14 +1,16 @@
 {
   "name": "Leapp",
-  "version": "0.11.0",
+  "version": "0.11.1",
+  "private": true,
   "author": {
-    "name": "besharp",
-    "email": "info@besharp.it"
+    "name": "Noovolari",
+    "email": "info@noovolari.com"
   },
   "description": "Leapp is a Cross-Platform Cloud access App, built on top of Electron.",
   "main": "electron/dist/electron/main.js",
   "homepage": "https://github.com/Noovolari/leapp",
   "scripts": {
+    "setup": "gushio ../../gushio/setup-package.js desktop-app",
     "clean": "gushio gushio/target-clean.js",
     "postinstall": "electron-builder install-app-deps",
     "postinstall-m1": "electron-builder install-app-deps --arch=arm64 --platform=darwin",
@@ -23,7 +25,9 @@
     "release-mac": "gushio gushio/target-release.js 'configuration production' mac",
     "release-linux": "gushio gushio/target-release.js 'configuration production' linux",
     "release-win": "gushio gushio/target-release.js 'configuration production' win",
-    "release-all": "gushio gushio/target-release.js 'configuration production' all"
+    "release-all": "gushio gushio/target-release.js 'configuration production' all",
+    "set-target-arm64": "gushio gushio/set-target-arch.js arm64",
+    "set-target-x64": "gushio gushio/set-target-arch.js x64"
   },
   "build": {
     "publish": [
@@ -96,13 +100,13 @@
         {
           "target": "zip",
           "arch": [
-            "arm64"
+            "x64"
           ]
         },
         {
           "target": "dmg",
           "arch": [
-            "arm64"
+            "x64"
           ]
         }
       ]
@@ -135,7 +139,7 @@
     "@ng-select/ng-select": "8.1.1",
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
-    "@noovolari/leapp-core": "file:../core/dist",
+    "@noovolari/leapp-core": "0.1.107",
     "@sebgroup/magic-iframe": "1.1.2",
     "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",
@@ -215,12 +219,12 @@
     "@types/uuid": "^8.3.0",
     "dotenv": "^10.0.0",
     "electron": "^15.5.0",
-    "electron-builder": "22.14.3",
+    "electron-builder": "^23.0.2",
     "electron-builder-squirrel-windows": "22.14.3",
     "electron-installer-dmg": "3.0.0",
     "electron-packager": "15.4.0",
     "electron-rebuild": "3.2.3",
-    "gushio": "~0.5.0",
+    "gushio": "~0.7.0",
     "husky": "^7.0.0",
     "jasmine": "^3.7.0",
     "jasmine-core": "~3.7.1",

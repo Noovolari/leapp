@@ -74,6 +74,10 @@ We want to thank you all!
 [<img hspace="5" src="https://avatars.githubusercontent.com/u/1290287?s=60&amp;v=4" width="90" height="90" alt="@taimos">](https://github.com/taimos)
 [<img hspace="5" src="https://avatars.githubusercontent.com/u/2232217?s=60&amp;v=4" width="90" height="90" alt="@aws">](https://github.com/aws)
 
+A special thanks to our individual sponsors!
+
+[<img hspace="5" src="https://avatars.githubusercontent.com/u/1392040?v=4" width="90" height="90" alt="@Gowiem">](https://github.com/Gowiem)
+
 # Documentation
 
 Refer to the documentation [website](https://docs.leapp.cloud).

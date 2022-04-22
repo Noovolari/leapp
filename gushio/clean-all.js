@@ -13,20 +13,20 @@ module.exports = {
 
     try {
       console.log("Cleaning core...");
-      await deleteFunction(path, '../core/dist')
-      await deleteFunction(path, '../core/node_modules')
-      await deleteFunction(path, '../core/package-lock.json')
+      await deleteFunction(path, '../packages/core/dist')
+      await deleteFunction(path, '../packages/core/node_modules')
+      await deleteFunction(path, '../packages/core/package-lock.json')
 
       console.log("Cleaning cli...");
-      await deleteFunction(path, '../cli/dist')
-      await deleteFunction(path, '../cli/node_modules')
-      await deleteFunction(path, '../cli/oclif.manifest.json')
-      await deleteFunction(path, '../cli/package-lock.json')
+      await deleteFunction(path, '../packages/cli/dist')
+      await deleteFunction(path, '../packages/cli/node_modules')
+      await deleteFunction(path, '../packages/cli/oclif.manifest.json')
+      await deleteFunction(path, '../packages/cli/package-lock.json')
 
       console.log("Cleaning desktop-app...");
-      await deleteFunction(path, '../desktop-app/dist')
-      await deleteFunction(path, '../desktop-app/node_modules')
-      await deleteFunction(path, '../desktop-app/package-lock.json')
+      await deleteFunction(path, '../packages/desktop-app/dist')
+      await deleteFunction(path, '../packages/desktop-app/node_modules')
+      await deleteFunction(path, '../packages/desktop-app/package-lock.json')
     } catch (e) {
       e.message = e.message.red
       throw e

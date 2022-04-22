@@ -75,19 +75,19 @@ By default, Leapp writes logs to the following locations:
 === "MacOS"
 
     ```
-    ~/Library/Logs/Leapp/log.log
+    ~/Library/Logs/Leapp/log.electronService.log
     ```
 
 === "Linux"
 
     ```
-    ~/.config/Leapp/log.log
+    ~/.config/Leapp/log.electronService.log
     ```
 
 === "Windows"
 
     ```
-    %USERPROFILE%\\AppData\\Roaming\\Leapp\\log.log
+    %USERPROFILE%\\AppData\\Roaming\\Leapp\\log.electronService.log
     ```
 !!! Info
 

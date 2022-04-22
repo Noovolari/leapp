@@ -19,6 +19,18 @@ USAGE
   $ leapp COMMAND
 ...
 ```
+
+In macOS, you can install Leapp CLI through a Homebrew Formula:
+
+```console
+$ brew install Noovolari/brew/leapp-cli
+```
+
+OR
+
+```console
+$ brew tap Noovolari/brew && brew install leapp-cli
+```
 <!-- usagestop -->
 
 <!-- commands -->

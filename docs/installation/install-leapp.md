@@ -12,8 +12,8 @@ You can install Leapp by downloading the pre-built binaries for your OS on the w
 ### macOS (Homebrew) & Linux (Linuxbrew)
 
 Leapp can also be installed on **macOS** or **Linux** via [Homebrew Cask](https://brew.sh/) with:
-```
-brew install leapp
+```console
+$ brew install leapp
 ```
 
 !!! info
@@ -23,13 +23,25 @@ brew install leapp
 
 ## Install Leapp CLI
 
-You can install Leapp CLI by downloading the library from [npm](https://www.npmjs.com/package/@noovolari/leapp-cli) globally.
+You can install Leapp CLI from [npm](https://www.npmjs.com/package/@noovolari/leapp-cli), installing it as a global package. 
+
+```console
+$ npm install -g @noovolari/leapp-cli
+```
+
+In macOS, you can install Leapp CLI through a Homebrew Formula:
+
+```console
+$ brew install Noovolari/brew/leapp-cli
+```
+
+OR
+
+```console
+$ brew tap Noovolari/brew && brew install leapp-cli
+```
 
 All the available commands are listed in the [Leapp CLI section of the documentation](../../cli).
-
-```
-npm install -g @noovolari/leapp-cli
-```
 
 !!! warning
 

@@ -21,6 +21,7 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 @Component({
   selector: "app-edit-dialog",
@@ -219,14 +220,38 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   /**
    * Save the edited account in the workspace
    */
-  saveAccount(): void {
+  async saveAccount(): Promise<void> {
     if (this.formValid()) {
       this.addProfileToWorkspace();
       this.addIpdUrlToWorkspace();
       this.updateProperties();
 
+      try {
+        this.repository.getProfileName(this.selectedProfile.value);
+      } catch (e) {
+        this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
+      }
+
+      let wasActive = false;
+      if (this.selectedSession.status === SessionStatus.active) {
+        await this.sessionService.stop(this.selectedSession.sessionId);
+        wasActive = true;
+      }
+
+      this.leappCoreService.namedProfileService.changeNamedProfile(this.selectedSession, this.selectedProfile.value);
+
+      if (this.selectedSession.type !== SessionType.azure) {
+        this.selectedSession.region = this.form.get("awsRegion").value;
+      } else {
+        this.selectedSession.region = this.form.get("azureLocation").value;
+      }
+
       this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
       this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
+
+      if (wasActive) {
+        await this.sessionService.start(this.selectedSession.sessionId);
+      }
 
       this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
       this.closeModal();
@@ -265,7 +290,6 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         (this.selectedSession as AwsIamRoleFederatedSession).idpUrlId = this.selectedIdpUrl.value.trim();
         (this.selectedSession as AwsIamRoleFederatedSession).idpArn = this.form.value.idpArn.trim();
         (this.selectedSession as AwsIamRoleFederatedSession).roleArn = this.form.value.roleArn.trim();
-        (this.selectedSession as AwsIamRoleFederatedSession).profileId = this.selectedProfile.value;
         break;
       case SessionType.awsIamUser:
         this.selectedSession.sessionName = this.form.controls["name"].value;
@@ -294,7 +318,6 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         (this.selectedSession as AwsIamRoleChainedSession).roleSessionName = this.form.value.roleSessionName.trim();
         (this.selectedSession as AwsIamRoleChainedSession).parentSessionId = this.selectedParentSession.sessionId;
         (this.selectedSession as AwsIamRoleChainedSession).roleArn = this.form.value.roleArn.trim();
-        (this.selectedSession as AwsIamRoleChainedSession).profileId = this.selectedProfile.value;
         break;
       case SessionType.azure:
         (this.selectedSession as AzureSession).region = this.selectedLocation;
@@ -403,16 +426,18 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
    * @private
    */
   private addProfileToWorkspace() {
-    const validate = this.leappCoreService.namedProfileService.validateNewProfileName(this.selectedProfile.label);
-    if (validate === true) {
-      const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
-      this.selectedProfile.value = profile.id;
-    } else {
-      if (
-        validate.toString() !== "Profile already exists" &&
-        this.leappCoreService.namedProfileService.getDefaultProfileId() !== this.selectedProfile.value
-      ) {
-        throw new LeappParseError(this, validate.toString());
+    if (this.selectedSession.type !== SessionType.azure) {
+      const validate = this.leappCoreService.namedProfileService.validateNewProfileName(this.selectedProfile.label);
+      if (validate === true) {
+        const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
+        this.selectedProfile.value = profile.id;
+      } else {
+        if (
+          validate.toString() !== "Profile already exists" &&
+          this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value
+        ) {
+          throw new LeappParseError(this, validate.toString());
+        }
       }
     }
   }

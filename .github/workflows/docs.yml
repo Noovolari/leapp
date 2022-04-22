@@ -19,7 +19,7 @@ jobs:
       - run: pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
       - run: pip install mike
       - run: |
-             echo "PACKAGE_VERSION=$(cat desktop-app/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')" >> $GITHUB_ENV
+             echo "PACKAGE_VERSION=$(cat packages/desktop-app/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')" >> $GITHUB_ENV
       - run: |
              echo "${{env.PACKAGE_VERSION}}"
       - run: |

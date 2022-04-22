@@ -1,7 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 export default class GetIdSession extends LeappCommand {
   static description = "Get session id";
@@ -28,7 +27,6 @@ export default class GetIdSession extends LeappCommand {
   async selectSession(): Promise<Session> {
     const availableSessions = this.cliProviderService.repository
       .getSessions()
-      .filter((session: Session) => session.status === SessionStatus.inactive);
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }

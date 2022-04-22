@@ -19,23 +19,10 @@ export class LogService {
   constructor(private logger: ILogger) {}
 
   log(loggedEntry: LoggedEntry): void {
-    const contextPart: string = loggedEntry.context ? `[${loggedEntry.context.constructor["name"]}]` : "";
-    const finalMessage = [contextPart, loggedEntry.message, loggedEntry.stack].join(" ");
-    this.logger.log(finalMessage, loggedEntry.level);
+    const contextPart = loggedEntry.context ? [`[${loggedEntry.context.constructor["name"]}]`] : [];
+    this.logger.log([...contextPart, loggedEntry.stack].join(" "), loggedEntry.level);
     if (loggedEntry.display) {
-      this.logger.show(finalMessage, loggedEntry.level);
+      this.logger.show(loggedEntry.message, loggedEntry.level);
     }
-  }
-}
-
-export class Context {
-  logService = new LogService(null);
-
-  method1() {
-    this.logService.log(new LoggedEntry("something to log", this, LogLevel.warn, true));
-  }
-
-  method2() {
-    throw new LoggedException("something to log", this, LogLevel.error, true);
   }
 }

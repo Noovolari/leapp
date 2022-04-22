@@ -31,7 +31,7 @@ import { WindowService } from "./window.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
-import {WorkspaceOptionService} from "@noovolari/leapp-core/services/workspace-option-service";
+import { WorkspaceOptionService } from "@noovolari/leapp-core/services/workspace-option-service";
 
 @Injectable({
   providedIn: "root",
@@ -322,6 +322,7 @@ export class AppProviderService {
         this.electronService,
         this.verificationWindowService,
         this.awsAuthenticationService,
+        this.mfaCodePrompter,
         this.repository,
         this.workspaceService,
         (uiSafeBlock) => this.ngZone.run(() => uiSafeBlock())

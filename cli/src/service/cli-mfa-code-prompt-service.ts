@@ -1,18 +1,12 @@
 import { IMfaCodePrompter } from "@noovolari/leapp-core/interfaces/i-mfa-code-prompter";
-import CliInquirer from "inquirer";
+import { RemoteProceduresClient } from "@noovolari/leapp-core/services/remote-procedures-client";
 
 export class CliMfaCodePromptService implements IMfaCodePrompter {
-  constructor(private inquirer: CliInquirer.Inquirer) {}
+  constructor(private remoteProcedureClient: RemoteProceduresClient) {}
 
   promptForMFACode(sessionName: string, callback: (code: string) => void): void {
-    this.inquirer
-      .prompt([
-        {
-          name: "mfaCode",
-          message: `Insert MFA code for session ${sessionName}`,
-          type: "input",
-        },
-      ])
-      .then((mfaResponse) => callback(mfaResponse.mfaCode));
+    this.remoteProcedureClient.needMfa(sessionName).then((code: string) => {
+      callback(code);
+    });
   }
 }

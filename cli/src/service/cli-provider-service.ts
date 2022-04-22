@@ -109,7 +109,7 @@ export class CliProviderService {
 
   public get cliMfaCodePromptService(): CliMfaCodePromptService {
     if (!this.cliMfaCodePromptServiceInstance) {
-      this.cliMfaCodePromptServiceInstance = new CliMfaCodePromptService(this.inquirer);
+      this.cliMfaCodePromptServiceInstance = new CliMfaCodePromptService(this.remoteProceduresClient);
     }
     return this.cliMfaCodePromptServiceInstance;
   }

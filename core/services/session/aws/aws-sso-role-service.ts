@@ -141,6 +141,10 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile);
   }
 
+  generateCredentialsProxy(sessionId: string): Promise<CredentialsInfo> {
+    return this.generateCredentials(sessionId);
+  }
+
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     const session: AwsSsoRoleSession = this.repository.getSessionById(sessionId) as AwsSsoRoleSession;
     const awsSsoConfiguration = this.repository.getAwsSsoIntegration(session.awsSsoConfigurationId);

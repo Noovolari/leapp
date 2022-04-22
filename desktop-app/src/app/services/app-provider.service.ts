@@ -114,6 +114,7 @@ export class AppProviderService {
         this.workspaceService,
         this.repository,
         this.mfaCodePrompter,
+        this.mfaCodePrompter,
         this.keyChainService,
         this.fileService,
         this.awsCoreService

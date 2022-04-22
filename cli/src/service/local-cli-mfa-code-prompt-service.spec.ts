@@ -1,5 +1,5 @@
 import { describe, test, expect, jest } from "@jest/globals";
-import { CliMfaCodePromptService } from "./cli-mfa-code-prompt-service";
+import { CliMfaCodePromptService } from "./remote-cli-mfa-code-prompt-service";
 import { of } from "rxjs";
 
 describe("CliMfaCodePromptService", () => {

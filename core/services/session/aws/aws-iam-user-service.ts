@@ -28,15 +28,19 @@ export interface GenerateSessionTokenCallingMfaParams {
 }
 
 export class AwsIamUserService extends AwsSessionService {
+  private mfaCodePrompterProxy: IMfaCodePrompter;
+
   constructor(
     iSessionNotifier: ISessionNotifier,
     repository: Repository,
-    private mfaCodePrompter: IMfaCodePrompter,
+    private localMfaCodePrompter: IMfaCodePrompter,
+    private remoteMfaCodePrompter: IMfaCodePrompter,
     private keychainService: KeychainService,
     fileService: FileService,
     awsCoreService: AwsCoreService
   ) {
     super(iSessionNotifier, repository, awsCoreService, fileService);
+    this.mfaCodePrompterProxy = localMfaCodePrompter;
   }
 
   static isTokenExpired(tokenExpiration: string): boolean {
@@ -101,6 +105,21 @@ export class AwsIamUserService extends AwsSessionService {
     const credentialsFile = await this.fileService.iniParseSync(this.awsCoreService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile);
+  }
+
+  generateCredentialsProxy(sessionId: string): Promise<CredentialsInfo> {
+    return new Promise<CredentialsInfo>((resolve, reject) => {
+      this.mfaCodePrompterProxy = this.remoteMfaCodePrompter;
+      this.generateCredentials(sessionId)
+        .then((credentialsInfo: CredentialsInfo) => {
+          this.mfaCodePrompterProxy = this.localMfaCodePrompter;
+          resolve(credentialsInfo);
+        })
+        .catch((err) => {
+          this.mfaCodePrompterProxy = this.localMfaCodePrompter;
+          reject(err);
+        });
+    });
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
@@ -209,7 +228,7 @@ export class AwsIamUserService extends AwsSessionService {
       // TODO: think about timeout management
       //  handle condition in which mfaCodePrompter is null
       //  convert promptForMFACode into an async function (without callback...)!
-      this.mfaCodePrompter.promptForMFACode(session.sessionName, (value: string) => {
+      this.mfaCodePrompterProxy.promptForMFACode(session.sessionName, (value: string) => {
         if (value !== constants.confirmClosed) {
           params.SerialNumber = (session as AwsIamUserSession).mfaDevice;
           params.TokenCode = value;

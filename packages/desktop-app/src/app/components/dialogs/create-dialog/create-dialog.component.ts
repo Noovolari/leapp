@@ -22,7 +22,6 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
-import {Session} from "@noovolari/leapp-core/models/session";
 
 @Component({
   selector: "app-create-dialog",

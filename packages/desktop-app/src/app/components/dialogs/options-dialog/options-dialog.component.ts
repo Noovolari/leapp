@@ -367,7 +367,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     );
   }
 
-  openJoinUs() {
+  openJoinUs(): void {
     this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA");
   }
 

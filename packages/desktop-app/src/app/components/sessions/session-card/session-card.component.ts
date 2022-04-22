@@ -549,7 +549,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   createAChainedSessionFromSelectedOne(): void {
-    const aliasConstructed = `ChainedFrom${this.session.sessionName}`;
+    const aliasConstructed = `chained-from-${this.session.sessionName}`;
     const regionConstructed = this.session.region;
     const assumerSessionIdConstructed = this.session.sessionId;
     const assumerSessionNameConstructed = this.session.sessionName;

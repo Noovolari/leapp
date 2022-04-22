@@ -14,7 +14,6 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 
 describe("EditDialogComponent", () => {
   let component: EditDialogComponent;
@@ -44,24 +43,20 @@ describe("EditDialogComponent", () => {
         // @ts-ignore
         mockedWorkspace,
     });
+    //const spyKeychainService = jasmine.createSpyObj("KeychainService", ["getSecret"]);
+    //spyKeychainService.getSecret.and.callFake((_: string, __: string) => Promise.resolve("fake-secret"));
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       workspaceService: spyWorkspaceService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [{ region: "eu-west-1" }] },
       azureCoreService: { getLocations: () => [] },
       sessionFactory: { getSessionService: () => {} },
+      keyChainService: { getSecret: () => Promise.resolve("fake-secret") },
     });
-    const spyKeychainService = jasmine.createSpyObj("KeychainService", ["getSecret"]);
-    spyKeychainService.getSecret.and.callFake((_: string, __: string) => Promise.resolve("fake-secret"));
 
     TestBed.configureTestingModule({
       declarations: [EditDialogComponent],
-      providers: [].concat(
-        mustInjected().concat([
-          { provide: AppProviderService, useValue: spyLeappCoreService },
-          { provide: KeychainService, useValue: spyKeychainService },
-        ])
-      ),
+      providers: [].concat(mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])),
       imports: [RouterTestingModule],
     }).compileComponents();
   }));

@@ -1,7 +1,10 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.105",
-  "author": "besharp <info@besharp.it>",
+  "version": "0.1.107",
+  "author": {
+    "name": "Noovolari",
+    "email": "info@noovolari.com"
+  },
   "description": "Leapp's core module",
   "peerDependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.5",
@@ -53,15 +56,32 @@
     "@commitlint/config-conventional": "16.2.1",
     "@types/aws-sdk": "^2.7.0",
     "@types/jest": "^27.4.1",
-    "gushio": "~0.5.0",
+    "gushio": "~0.7.0",
     "jest": "^27.4.5",
     "typescript": "4.5.5"
   },
+  "exports": {
+    "./*": "./dist/*.js"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "dist/*"
+      ]
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "setup": "gushio ../../gushio/setup-package.js core",
     "clean": "gushio gushio/target-clean.js",
     "build": "gushio gushio/target-build.js",
-    "release": "gushio gushio/target-release.js",
-    "test": "jest"
+    "test": "jest",
+    "release": "gushio gushio/target-release.js"
   },
   "repository": {
     "type": "git",

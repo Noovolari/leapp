@@ -74,3 +74,5 @@ packages/cli/oclif.manifest.json
 /release/
 
 lerna-debug.log
+
+.run

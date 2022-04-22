@@ -226,10 +226,12 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       this.addIpdUrlToWorkspace();
       this.updateProperties();
 
-      try {
-        this.repository.getProfileName(this.selectedProfile.value);
-      } catch (e) {
-        this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
+      if (this.selectedSession.type !== SessionType.azure) {
+        try {
+          this.repository.getProfileName(this.selectedProfile.value);
+        } catch (e) {
+          this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
+        }
       }
 
       let wasActive = false;
@@ -238,9 +240,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         wasActive = true;
       }
 
-      this.leappCoreService.namedProfileService.changeNamedProfile(this.selectedSession, this.selectedProfile.value);
-
       if (this.selectedSession.type !== SessionType.azure) {
+        this.leappCoreService.namedProfileService.changeNamedProfile(this.selectedSession, this.selectedProfile.value);
         this.selectedSession.region = this.form.get("awsRegion").value;
       } else {
         this.selectedSession.region = this.form.get("azureLocation").value;

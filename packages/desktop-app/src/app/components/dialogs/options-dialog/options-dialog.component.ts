@@ -367,10 +367,12 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     );
   }
 
-  openJoinUs(): void {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  openJoinUs() {
     this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA");
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async showWarningModalForCredentialProcess() {
     const workspace = this.appProviderService.repository.getWorkspace();
     if (this.selectedCredentialMethod === constants.credentialProcess) {
@@ -391,8 +393,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
             );
           }
           this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsCredentialPath(), "");
-
-
         } else {
           this.selectedCredentialMethod = constants.credentialFile;
         }

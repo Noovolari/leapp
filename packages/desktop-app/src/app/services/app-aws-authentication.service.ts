@@ -109,13 +109,7 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
       const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, url);
 
       const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
-<<<<<<< HEAD:packages/desktop-app/src/app/services/app-aws-authentication.service.ts
       this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(sanitizedField)}`);
-=======
-      if (this.electronService.fs.existsSync(getAppPath + `/Partitions/leapp-${btoa(url)}`)) {
-        this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(url)}`);
-      }
->>>>>>> 357664b9fdfebf80309e34ef3a55e3ba50d32ef0:desktop-app/src/app/services/app-aws-authentication.service.ts
 
       if (session) {
         const sessionService = this.leappCoreService.sessionFactory.getSessionService(session.type);

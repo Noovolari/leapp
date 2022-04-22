@@ -237,7 +237,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
-  windowMaximizeAction(): void {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  windowMaximizeAction() {
     if (!this.compactMode) {
       if (this.windowService.getCurrentWindow().isMaximized()) {
         this.windowService.getCurrentWindow().restore();

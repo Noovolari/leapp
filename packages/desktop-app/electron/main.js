@@ -112,14 +112,25 @@ var generateMainWindow = function () {
         ipc.on("resize-window", function (evt, data) {
             if (evt.sender.getOwnerBrowserWindow().id === win.id) {
                 if (data.compactMode) {
+                    // Double setSize/setMinimumSize here is to address a strange behavior between mac and windows,
+                    // where the first is used by windows and the last by mac. If we don't put either the first or the last
+                    // couple the behaviour is not consistent.
                     win.setMinimumSize(560, 680);
                     win.setSize(560, 680);
-                    win.resizable = false;
+                    win.setResizable(false);
+                    win.setMaximizable(false);
+                    win.setFullScreenable(false);
+                    win.setMinimumSize(560, 680);
+                    win.setSize(560, 680);
                 }
                 else {
                     win.setMinimumSize(1200, 680);
                     win.setSize(1200, 680);
-                    win.resizable = true;
+                    win.setResizable(true);
+                    win.setMaximizable(true);
+                    win.setFullScreenable(true);
+                    win.setMinimumSize(1200, 680);
+                    win.setSize(1200, 680);
                 }
             }
         });
@@ -217,6 +228,9 @@ var generateMainWindow = function () {
                 win.focus();
             }
         });
+    }
+    if (process.platform === "win32") {
+        app.setAppUserModelId("Leapp");
     }
 };
 // =============================== //

@@ -11,7 +11,7 @@ export class ErrorService implements ErrorHandler {
   constructor(private injector: Injector) {}
 
   handleError(error: LeappBaseError): void {
-    error = error.rejection ? error.rejection : error;
+    error = (error as any).rejection ? (error as any).rejection : error;
     const loggingService = this.injector.get(AppProviderService).loggingService;
     const messageToasterService = this.injector.get(MessageToasterService);
 

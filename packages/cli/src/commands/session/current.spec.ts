@@ -20,19 +20,19 @@ describe("CurrentSession", () => {
     const dataFormat = "dataFormat";
     const dataFilter = "dataFilter";
     command.getSessionData = jest.fn(async () => "sessionData");
-    command.filterSessionData = jest.fn(() => "filteredSessionData");
-    command.formatSessionData = jest.fn(() => "   formattedSessionData   ");
+    command.filterSessionData = jest.fn(() => "filterSessionData");
+    command.formatSessionData = jest.fn(() => "  currentSessionData  ");
     command.log = jest.fn();
 
     await command.currentSession(session as any, dataFormat, dataFilter as any);
 
     expect(command.getSessionData).toHaveBeenCalledWith(session);
     expect(command.filterSessionData).toHaveBeenCalledWith("sessionData", dataFilter);
-    expect(command.formatSessionData).toHaveBeenCalledWith("filteredSessionData", dataFormat);
-    expect(command.log).toHaveBeenCalledWith("formattedSessionData");
+    expect(command.formatSessionData).toHaveBeenCalledWith("filterSessionData", dataFormat);
+    expect(command.log).toHaveBeenCalledWith("currentSessionData");
   });
 
-  test("getSessionFromProfile - default, with provider", () => {
+  test("getSessionFromProfile - with provider", () => {
     const sessions = [
       { profileId: "profileId1", type: "type1" },
       { profileId: "profileId1", type: "type2" },
@@ -40,13 +40,13 @@ describe("CurrentSession", () => {
     ];
     const cliProviderService: any = {
       repository: {
-        getDefaultProfileId: jest.fn(() => "profileId1"),
         listActive: jest.fn(() => sessions),
       },
     };
     const command = getTestCommand(cliProviderService);
+    command.getProfileId = jest.fn(() => "profileId1");
 
-    const profileName = "default";
+    const profileName = "profileName";
     const provider = "provider";
 
     const sessionTypes = ["type1"];
@@ -55,12 +55,12 @@ describe("CurrentSession", () => {
     const sessionFromProfile = command.getSessionFromProfile(profileName, provider);
 
     expect(sessionFromProfile).toEqual({ profileId: "profileId1", type: "type1" });
-    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
+    expect(command.getProfileId).toHaveBeenCalledWith(profileName);
     expect(cliProviderService.repository.listActive).toHaveBeenCalled();
     expect(command.getProviderAssociatedSessionTypes).toHaveBeenCalledWith(provider);
   });
 
-  test("getSessionFromProfile - no default, without provider", () => {
+  test("getSessionFromProfile - without provider", () => {
     const sessions = [
       { profileId: "profileId1", type: "type1" },
       { profileId: "profileId2", type: "type2" },
@@ -92,12 +92,12 @@ describe("CurrentSession", () => {
       },
     };
     const command = getTestCommand(cliProviderService);
+    command.getProfileId = () => "profileId1";
 
-    const profileName = "default";
+    const profileName = "profileName";
     const provider = undefined;
 
     expect(() => command.getSessionFromProfile(profileName, provider)).toThrow(new Error("no active sessions available for the specified criteria"));
-    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
     expect(cliProviderService.repository.listActive).toHaveBeenCalled();
   });
 
@@ -113,16 +113,16 @@ describe("CurrentSession", () => {
       },
     };
     const command = getTestCommand(cliProviderService);
+    command.getProfileId = () => "profileId1";
     const sessionTypes = ["type1"];
     (command.getProviderAssociatedSessionTypes as any) = jest.fn(() => sessionTypes);
 
-    const profileName = "default";
+    const profileName = "profileName";
     const provider = "provider";
 
     expect(() => command.getSessionFromProfile(profileName, provider)).toThrow(
       new Error("multiple active sessions found, please specify a provider with --provider")
     );
-    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
     expect(cliProviderService.repository.listActive).toHaveBeenCalled();
     expect(command.getProviderAssociatedSessionTypes).toHaveBeenCalledWith(provider);
   });
@@ -136,14 +136,14 @@ describe("CurrentSession", () => {
       },
     };
     const command = getTestCommand(cliProviderService);
+    command.getProfileId = () => "profileId1";
 
-    const profileName = "default";
+    const profileName = "profileName";
     const provider = undefined;
 
     expect(() => command.getSessionFromProfile(profileName, provider)).toThrow(
       new Error("multiple active sessions found, please specify a provider with --provider")
     );
-    expect(cliProviderService.repository.getDefaultProfileId).toHaveBeenCalled();
     expect(cliProviderService.repository.listActive).toHaveBeenCalled();
   });
 
@@ -209,7 +209,7 @@ describe("CurrentSession", () => {
   });
 
   test("getSessionData - aws iam user", async () => {
-    const sessionService = new AwsIamUserService(null, null, null, null, null, null);
+    const sessionService = new AwsIamUserService(null, null, null, null, null, null, null);
     sessionService.getAccountNumberFromCallerIdentity = jest.fn(async () => "000");
 
     const cliProviderService: any = {
@@ -235,7 +235,7 @@ describe("CurrentSession", () => {
   });
 
   test("getSessionData - aws role federated", async () => {
-    const sessionService = new AwsIamUserService(null, null, null, null, null, null);
+    const sessionService = new AwsIamUserService(null, null, null, null, null, null, null);
     sessionService.getAccountNumberFromCallerIdentity = jest.fn(async () => "000");
 
     const cliProviderService: any = {

@@ -24,7 +24,7 @@ $ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@noovolari/leapp-cli/0.1.8 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli/0.1.9 darwin-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -55,6 +55,7 @@ USAGE
 * [`leapp session change-region`](#leapp-session-change-region)
 * [`leapp session current`](#leapp-session-current)
 * [`leapp session delete`](#leapp-session-delete)
+* [`leapp session export-env-variables`](#leapp-session-export-env-variables)
 * [`leapp session generate SESSIONID`](#leapp-session-generate-sessionid)
 * [`leapp session get-id`](#leapp-session-get-id)
 * [`leapp session list`](#leapp-session-list)
@@ -442,6 +443,25 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session delete
+```
+
+## `leapp session export-env-variables`
+
+Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)
+
+```
+USAGE
+  $ leapp session export-env-variables [-p <value>]
+
+FLAGS
+  -p, --profile=<value>  [default: default] aws named profile of which exports environment variables
+
+DESCRIPTION
+  Provides info about the current active session for a selected profile (if no profile is provided it uses default
+  profile)
+
+EXAMPLES
+  $leapp session current --format "alias accountNumber" --inline --provider aws
 ```
 
 ## `leapp session generate SESSIONID`

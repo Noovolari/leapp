@@ -6,7 +6,7 @@ import { LeappBaseError } from "../../../errors/leapp-base-error";
 import { LoggerLevel } from "../../logging-service";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { SessionStatus } from "../../../models/session-status";
-import {constants} from "../../../models/constants";
+import { constants } from "../../../models/constants";
 
 describe("AwsSessionService", () => {
   test("should be created", () => {
@@ -197,16 +197,16 @@ describe("AwsSessionService", () => {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       aws_session_token: "aws_session_token",
     };
-    const generateCredentials = jest.fn(() => ({ sessionToken }));
+    const generateCredentialsProxy = jest.fn(() => ({ sessionToken }));
 
     const awsSessionService = new (AwsSessionService as any)();
     awsSessionService.repository = repository;
-    awsSessionService.generateCredentials = generateCredentials;
+    awsSessionService.generateCredentialsProxy = generateCredentialsProxy;
 
     const generateProcessCredentials = await awsSessionService.generateProcessCredentials("sessionId");
 
     expect(repository.getSessionById).toHaveBeenCalledWith("sessionId");
-    expect(awsSessionService.generateCredentials).toHaveBeenCalledWith("sessionId");
+    expect(awsSessionService.generateCredentialsProxy).toHaveBeenCalledWith("sessionId");
     expect(generateProcessCredentials).toBeInstanceOf(AwsProcessCredentials);
     expect(generateProcessCredentials.Version).toBe(1);
     expect(generateProcessCredentials.AccessKeyId).toBe("aws_access_key_id");

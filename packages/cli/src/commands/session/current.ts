@@ -63,8 +63,7 @@ export default class CurrentSession extends LeappCommand {
   }
 
   getSessionFromProfile(profileName: string, provider: string | undefined): Session {
-    const profileId =
-      profileName === constants.defaultAwsProfileName ? this.cliProviderService.repository.getDefaultProfileId() : this.getProfileId(profileName);
+    const profileId = this.getProfileId(profileName);
     let sessions = this.cliProviderService.repository.listActive().filter((session: Session) => {
       const anySession = session as any;
       return anySession.profileId === undefined || anySession.profileId === profileId;

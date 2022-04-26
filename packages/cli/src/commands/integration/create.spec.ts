@@ -3,6 +3,7 @@ import CreateSsoIntegration from "./create";
 import { AwsSsoIntegrationService, IntegrationCreationParams } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("CreateSsoIntegration", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): CreateSsoIntegration => {
@@ -10,6 +11,129 @@ describe("CreateSsoIntegration", () => {
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - Validation and Existance", async () => {
+    const command1 = getTestCommand(new CliProviderService(), ["--integrationAlias", ""]);
+    const command2 = getTestCommand(new CliProviderService(), ["--integrationAlias", "", "--integrationPortalUrl", ""]);
+    const command3 = getTestCommand(new CliProviderService(), ["--integrationAlias", "", "--integrationPortalUrl", "", "--integrationRegion", ""]);
+    const command4 = getTestCommand(new CliProviderService(), [
+      "--integrationAlias",
+      "",
+      "--integrationPortalUrl",
+      "",
+      "--integrationRegion",
+      "",
+      "--integrationMethod",
+      "",
+    ]);
+
+    const mock1 = jest.fn(() =>
+      Promise.resolve({
+        alias: "testAlias1",
+        region: "eu-west-1",
+        browserOpening: "In-app",
+        portalUrl: "https://test",
+      })
+    );
+
+    const mock2 = jest.fn((_: IntegrationCreationParams) => Promise.resolve());
+
+    command1.createIntegration = mock2;
+    command1.askConfigurationParameters = mock1;
+    command2.createIntegration = mock2;
+    command2.askConfigurationParameters = mock1;
+    command3.createIntegration = mock2;
+    command3.askConfigurationParameters = mock1;
+    command4.createIntegration = mock2;
+    command4.askConfigurationParameters = mock1;
+
+    const spy1 = jest.spyOn(command1 as any, "checkFlags");
+    const spy2 = jest.spyOn(command2 as any, "checkFlags");
+    const spy3 = jest.spyOn(command3 as any, "checkFlags");
+    const spy4 = jest.spyOn(command4 as any, "checkFlags");
+
+    await command1.run();
+    await command2.run();
+    await command3.run();
+    await expect(command4.run()).rejects.toThrowError("Alias must not be empty");
+
+    expect(spy1).toHaveReturnedWith(false);
+    expect(spy2).toHaveReturnedWith(false);
+    expect(spy3).toHaveReturnedWith(false);
+    expect(spy4).toHaveReturnedWith(true);
+
+    const command5 = getTestCommand(new CliProviderService(), [
+      "--integrationAlias",
+      "Alias",
+      "--integrationPortalUrl",
+      "",
+      "--integrationRegion",
+      "",
+      "--integrationMethod",
+      "",
+    ]);
+    command5.createIntegration = mock2;
+    await expect(command5.run()).rejects.toThrowError("Portal URL must not be empty");
+
+    const command6 = getTestCommand(new CliProviderService(), [
+      "--integrationAlias",
+      "Alias",
+      "--integrationPortalUrl",
+      "ciao",
+      "--integrationRegion",
+      "",
+      "--integrationMethod",
+      "",
+    ]);
+    command6.createIntegration = mock2;
+    await expect(command6.run()).rejects.toThrowError("Portal URL is not valid");
+
+    const command7 = getTestCommand(new CliProviderService(), [
+      "--integrationAlias",
+      "Alias",
+      "--integrationPortalUrl",
+      "https://www.google.com",
+      "--integrationRegion",
+      "ciao",
+      "--integrationMethod",
+      "",
+    ]);
+    command7.createIntegration = mock2;
+    await expect(command7.run()).rejects.toThrowError("Provided region is not a valid AWS region");
+
+    const command8 = getTestCommand(new CliProviderService(), [
+      "--integrationAlias",
+      "Alias",
+      "--integrationPortalUrl",
+      "https://www.google.com",
+      "--integrationRegion",
+      "eu-west-1",
+      "--integrationMethod",
+      "",
+    ]);
+    command8.createIntegration = mock2;
+    await expect(command8.run()).rejects.toThrowError("Provided method is not a valid integration method. Please use either In-app or In-browser");
+
+    const command9 = getTestCommand(new CliProviderService(), [
+      "--integrationAlias",
+      "Alias",
+      "--integrationPortalUrl",
+      "https://www.google.it",
+      "--integrationRegion",
+      "eu-west-1",
+      "--integrationMethod",
+      "In-app",
+    ]);
+    const mock3 = jest.fn((_: IntegrationCreationParams) => Promise.resolve());
+    command9.createIntegration = mock3;
+    await command9.run();
+    expect(mock3).toHaveBeenCalledWith({
+      alias: "Alias",
+      portalUrl: "https://www.google.it",
+      region: "eu-west-1",
+      browserOpening: "In-app",
+    });
+  });
 
   test("askConfigurationParameters", async () => {
     const cliProviderService = {

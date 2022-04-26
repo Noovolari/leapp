@@ -4,11 +4,16 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { sessionId } from "../../flags";
 
 export default class OpenWebConsole extends LeappCommand {
   static description = "Open an AWS Web Console";
 
-  static examples = [`$leapp session open-web-console`];
+  static examples = [`$leapp session open-web-console`, `$leapp session open-web-console --sessionId SESSIONID`];
+
+  static flags = {
+    sessionId,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -16,8 +21,17 @@ export default class OpenWebConsole extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedSession = await this.selectSession();
-      await this.openWebConsole(selectedSession);
+      const { flags } = await this.parse(OpenWebConsole);
+      if (flags.sessionId && flags.sessionId !== "") {
+        const selectedSession = this.cliProviderService.repository.getSessionById(flags.sessionId);
+        if (!selectedSession) {
+          throw new Error("No session found with id " + flags.sessionId);
+        }
+        await this.openWebConsole(selectedSession);
+      } else {
+        const selectedSession = await this.selectSession();
+        await this.openWebConsole(selectedSession);
+      }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }

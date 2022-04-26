@@ -1,5 +1,6 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import SyncIntegration from "./sync";
+import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("SyncIntegration", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): SyncIntegration => {
@@ -7,6 +8,40 @@ describe("SyncIntegration", () => {
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - integrationId", async () => {
+    let command = getTestCommand(new CliProviderService(), ["--integrationId"]);
+    await expect(command.run()).rejects.toThrow("Flag --integrationId expects a value");
+
+    const mockIntegration = {
+      id: "validId",
+      alias: "mock",
+      portalUrl: "url",
+      browserOpening: "In-app",
+    };
+
+    command = getTestCommand(new CliProviderService(), ["--integrationId", ""]);
+    (command as any).selectIntegration = jest.fn(() => Promise.resolve(mockIntegration));
+    command.sync = jest.fn();
+    await command.run();
+    expect(command.selectIntegration).toHaveBeenCalled();
+
+    const cliProviderService = {
+      awsSsoIntegrationService: {
+        getIntegration: jest.fn((id: string) => {
+          if (id === "validId") {
+            return mockIntegration;
+          } else return null;
+        }),
+      },
+    };
+
+    command = getTestCommand(cliProviderService, ["--integrationId", "validId"]);
+    (command as any).selectIntegration = jest.fn(() => Promise.resolve(mockIntegration));
+    command.sync = jest.fn();
+    await command.run();
+    expect(command.sync).toHaveBeenCalledWith(mockIntegration);
+  });
 
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };

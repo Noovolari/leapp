@@ -1,6 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import ChangeDefaultRegion from "./set-default";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("ChangeDefaultRegion", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ChangeDefaultRegion => {
@@ -8,6 +9,37 @@ describe("ChangeDefaultRegion", () => {
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - awsRegion", async () => {
+    const badNewRegion = "newRegion";
+    const goodNewRegion = "eu-west-1";
+    const cliProviderService: any = {
+      regionsService: {
+        changeDefaultAwsRegion: jest.fn(),
+      },
+      remoteProceduresClient: {
+        refreshSessions: jest.fn(),
+      },
+      awsCoreService: {
+        getRegions: new CliProviderService().awsCoreService.getRegions,
+      },
+    };
+
+    let command = getTestCommand(cliProviderService, ["--region"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --region expects a value");
+
+    command = getTestCommand(cliProviderService, ["--region", badNewRegion]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Region is not a valid AWS region");
+
+    command = getTestCommand(cliProviderService, ["--region", goodNewRegion]);
+    command.log = jest.fn();
+    await command.run();
+    expect(cliProviderService.regionsService.changeDefaultAwsRegion).toHaveBeenCalledWith(goodNewRegion);
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+    expect(command.log).toHaveBeenCalledWith("default region changed");
+  });
 
   test("selectDefaultRegion", async () => {
     const cliProviderService: any = {

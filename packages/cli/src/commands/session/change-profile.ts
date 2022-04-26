@@ -2,11 +2,17 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
+import { profileId, sessionId } from "../../flags";
 
 export default class ChangeSessionProfile extends LeappCommand {
   static description = "Change a session named-profile";
 
-  static examples = [`$leapp session change-profile`];
+  static examples = [`$leapp session change-profile`, `$leapp session change-profile --profileId PROFILEID --sessionId SESSIONID`];
+
+  static flags = {
+    sessionId,
+    profileId,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -14,9 +20,22 @@ export default class ChangeSessionProfile extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedSession = await this.selectSession();
-      const selectedProfile = await this.selectProfile(selectedSession);
-      await this.changeSessionProfile(selectedSession, selectedProfile);
+      const { flags } = await this.parse(ChangeSessionProfile);
+      if (flags.profileId && flags.profileId !== "" && flags.sessionId && flags.sessionId !== "") {
+        const selectedSession = this.cliProviderService.repository.getSessionById(flags.sessionId);
+        const selectedProfile = this.cliProviderService.repository.getProfiles().find((p) => p.id === flags.profileId);
+        if (!selectedSession) {
+          throw new Error("Session not found with id " + flags.sessionId);
+        }
+        if (!selectedProfile) {
+          throw new Error("Profile not found with id " + flags.profileId);
+        }
+        await this.changeSessionProfile(selectedSession, flags.profileId);
+      } else {
+        const selectedSession = await this.selectSession();
+        const selectedProfile = await this.selectProfile(selectedSession);
+        await this.changeSessionProfile(selectedSession, selectedProfile);
+      }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }

@@ -20,8 +20,10 @@ describe("CommandBarComponent", () => {
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       workspaceService: spyWorkspaceService,
+      workspaceOptionService: { colorTheme: "dark-theme" },
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
+      namedProfileService: { getNamedProfiles: () => [] },
     });
     await TestBed.configureTestingModule({
       declarations: [CommandBarComponent],

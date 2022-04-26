@@ -68,6 +68,10 @@ describe("ListProfiles", () => {
     expect(tableSpy.mock.calls[0][0]).toEqual(expectedData);
 
     const expectedColumns = {
+      id: {
+        extended: true,
+        header: "ID",
+      },
       name: { header: "Profile Name" },
     };
     expect(tableSpy.mock.calls[0][1]).toEqual(expectedColumns);

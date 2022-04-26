@@ -13,7 +13,7 @@ export class DetailPipe implements PipeTransform {
   transform(session: Session): string {
     switch (session.type) {
       case SessionType.awsIamRoleFederated:
-        return (session as AwsIamRoleFederatedSession).roleArn.split("role/")[1];
+        return (session as AwsIamRoleFederatedSession).roleArn.split("role/")[1] || "";
       case SessionType.azure:
         return (session as AzureSession).subscriptionId;
       case SessionType.awsIamUser:
@@ -23,7 +23,7 @@ export class DetailPipe implements PipeTransform {
         splittedRoleArn.splice(0, 1);
         return splittedRoleArn.join("/");
       case SessionType.awsIamRoleChained:
-        return (session as AwsIamRoleChainedSession).roleArn.split("role/")[1];
+        return (session as AwsIamRoleChainedSession).roleArn.split("role/")[1] || "";
     }
   }
 }

@@ -10,7 +10,6 @@ export const constants = {
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
   credentialsDestination: ".aws/credentials",
-  configDestination: ".aws/config",
   defaultRegion: "us-east-1",
 
   //Azure
@@ -45,6 +44,7 @@ export const constants = {
   cliRefreshSessionsChannel: "refresh-sessions-channel",
   ipcServerId: "leapp_da",
 
+  roleSessionName: "assumed-from-leapp",
   // Credential Process
   credentialFile: "credential-file-method",
   credentialProcess: "credential-process-method",

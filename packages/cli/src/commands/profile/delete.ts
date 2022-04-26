@@ -2,11 +2,21 @@ import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
 import { Session } from "@noovolari/leapp-core/models/session";
+import { profileId, force } from "../../flags";
 
 export default class DeleteNamedProfile extends LeappCommand {
   static description = "Delete an AWS named profile";
 
-  static examples = [`$leapp profile delete`];
+  static examples = [
+    `$leapp profile delete`,
+    `$leapp profile delete --profileId PROFILEID`,
+    `$leapp profile delete --profileId PROFILEID [--force, -f]`,
+  ];
+
+  static flags = {
+    profileId,
+    force,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -14,10 +24,18 @@ export default class DeleteNamedProfile extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedNamedProfile = await this.selectNamedProfile();
-      const affectedSessions = this.getAffectedSessions(selectedNamedProfile.id);
-      if (await this.askForConfirmation(affectedSessions)) {
-        await this.deleteNamedProfile(selectedNamedProfile.id);
+      const { flags } = await this.parse(DeleteNamedProfile);
+      if (flags.profileId && flags.profileId !== "") {
+        const affectedSessions = this.getAffectedSessions(flags.profileId);
+        if (flags.force || (await this.askForConfirmation(affectedSessions))) {
+          await this.deleteNamedProfile(flags.profileId);
+        }
+      } else {
+        const selectedNamedProfile = await this.selectNamedProfile();
+        const affectedSessions = this.getAffectedSessions(selectedNamedProfile.id);
+        if (await this.askForConfirmation(affectedSessions)) {
+          await this.deleteNamedProfile(selectedNamedProfile.id);
+        }
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);

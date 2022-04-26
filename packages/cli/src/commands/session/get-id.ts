@@ -5,7 +5,7 @@ import { Session } from "@noovolari/leapp-core/models/session";
 export default class GetIdSession extends LeappCommand {
   static description = "Get session id";
 
-  static examples = [`$leapp session get_id`];
+  static examples = [`$leapp session get-id`];
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -25,8 +25,7 @@ export default class GetIdSession extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.cliProviderService.repository
-      .getSessions()
+    const availableSessions = this.cliProviderService.repository.getSessions();
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }

@@ -12,8 +12,11 @@ export class IdpUrlsService {
     return this.repository.getIdpUrls();
   }
 
-  getIdpUrl(idpUrlId: string): string {
-    return this.repository.getIdpUrl(idpUrlId);
+  getIdpUrl(id: string): IdpUrl {
+    const idpUrl = this.repository.getIdpUrl(id);
+    if (idpUrl) {
+      return new IdpUrl(id, idpUrl);
+    } else return null;
   }
 
   createIdpUrl(idpUrl: string): IdpUrl {
@@ -39,6 +42,12 @@ export class IdpUrlsService {
     if (trimmedUrl.length === 0) {
       return "Empty IdP URL";
     }
+
+    const isUrl = trimmedUrl.startsWith("http://") || trimmedUrl.startsWith("https://");
+    if (!isUrl) {
+      return "IdP URL is not a valid URL";
+    }
+
     const existingUrls = this.getIdpUrls().map((idpUrl) => idpUrl.url);
     if (existingUrls.includes(trimmedUrl)) {
       return "IdP URL already exists";

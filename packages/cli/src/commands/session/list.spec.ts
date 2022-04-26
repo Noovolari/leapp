@@ -66,18 +66,22 @@ describe("ListSessions", () => {
     await command.showSessions();
     expect(tableSpy.mock.calls[0][0]).toEqual([
       {
+        id: sessions[0].sessionId,
         profileId: "profileName",
         region: "region",
         sessionName: "sessionName",
+        role: (command as any).getRole(sessions[0]),
         status: "inactive",
         type: "sessionTypeLabel",
       },
     ]);
     expect(tableSpy.mock.calls[0][1]).toEqual({
+      id: { header: "ID", extended: true },
       sessionName: { header: "Session Name" },
       type: { header: "Type" },
       profileId: { header: "Named Profile" },
       region: { header: "Region/Location" },
+      role: { header: "Role", extended: true },
       status: { header: "Status" },
     });
   });

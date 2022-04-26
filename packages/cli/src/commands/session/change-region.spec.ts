@@ -1,12 +1,76 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import ChangeSessionRegion from "./change-region";
+import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("ChangeRegion", () => {
-  const getTestCommand = (cliProviderService: any = null): ChangeSessionRegion => {
-    const command = new ChangeSessionRegion([], {} as any);
+  const getTestCommand = (cliProviderService: any = null, argv = []): ChangeSessionRegion => {
+    const command = new ChangeSessionRegion(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - sessionId && region", async () => {
+    const sessions = [
+      {
+        sessionId: "Session1",
+        profileId: "profile1",
+      },
+      {
+        sessionId: "Session2",
+        profileId: "profile2",
+      },
+    ];
+    const profiles = [
+      {
+        id: "profile1",
+        name: "myProfile1",
+      },
+      {
+        id: "profile2",
+        name: "myProfile2",
+      },
+      {
+        id: "profile3",
+        name: "myProfile3",
+      },
+    ];
+
+    const cliProviderService: any = {
+      namedProfilesService: {
+        changeNamedProfile: jest.fn(),
+      },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+      repository: {
+        getSessions: jest.fn(() => sessions),
+        getSessionById: jest.fn((id: string) => sessions.find((s) => s.sessionId === id)),
+        getProfiles: jest.fn(() => profiles),
+      },
+      awsCoreService: new CliProviderService().awsCoreService,
+    };
+
+    let command = getTestCommand(cliProviderService, ["--region"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --region expects a value");
+
+    command = getTestCommand(cliProviderService, ["--region", "", "--sessionId"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --sessionId expects a value");
+
+    command = getTestCommand(cliProviderService, ["--region", "profileXX", "--sessionId", "Session1"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Region not found with name profileXX");
+
+    command = getTestCommand(cliProviderService, ["--region", "eu-west-1", "--sessionId", "sessionXX"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Session not found with id sessionXX");
+
+    command = getTestCommand(cliProviderService, ["--region", "eu-west-1", "--sessionId", "Session1"]);
+    command.log = jest.fn();
+    command.changeSessionRegion = jest.fn();
+    await command.run();
+
+    expect(command.changeSessionRegion).toHaveBeenCalledWith(sessions[0], "eu-west-1");
+  });
 
   test("selectSession", async () => {
     const session1 = { sessionName: "sessionName" };

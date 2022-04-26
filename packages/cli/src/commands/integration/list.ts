@@ -27,6 +27,7 @@ export default class ListIntegrations extends LeappCommand {
     const data = this.cliProviderService.awsSsoIntegrationService.getIntegrations().map((integration: any) => {
       const isOnline = this.cliProviderService.awsSsoIntegrationService.isOnline(integration);
       return {
+        integrationId: integration.id,
         integrationName: integration.alias,
         portalUrl: integration.portalUrl,
         region: integration.region,
@@ -36,6 +37,7 @@ export default class ListIntegrations extends LeappCommand {
     }) as any as Record<string, unknown>[];
 
     const columns = {
+      integrationId: { header: "ID", extended: true },
       integrationName: { header: "Integration Name" },
       portalUrl: { header: "Portal URL" },
       region: { header: "Region" },

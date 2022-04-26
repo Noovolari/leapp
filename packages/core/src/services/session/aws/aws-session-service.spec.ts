@@ -6,7 +6,7 @@ import { LeappBaseError } from "../../../errors/leapp-base-error";
 import { LoggerLevel } from "../../logging-service";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { SessionStatus } from "../../../models/session-status";
-import {constants} from "../../../models/constants";
+import { constants } from "../../../models/constants";
 
 describe("AwsSessionService", () => {
   test("should be created", () => {
@@ -202,6 +202,7 @@ describe("AwsSessionService", () => {
     const awsSessionService = new (AwsSessionService as any)();
     awsSessionService.repository = repository;
     awsSessionService.generateCredentials = generateCredentials;
+    awsSessionService.generateCredentialsProxy = generateCredentials;
 
     const generateProcessCredentials = await awsSessionService.generateProcessCredentials("sessionId");
 

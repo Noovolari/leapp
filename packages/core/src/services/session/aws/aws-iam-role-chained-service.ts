@@ -15,6 +15,7 @@ import { AwsParentSessionFactory } from "./aws-parent-session.factory";
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
 import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
+import { constants } from "../../../models/constants";
 
 export class AwsIamRoleChainedService extends AwsSessionService {
   constructor(
@@ -114,7 +115,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     const roleSessionName = (session as AwsIamRoleChainedSession).roleSessionName;
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleSessionName: roleSessionName ? roleSessionName : "assumed-from-leapp",
+      RoleSessionName: roleSessionName ? roleSessionName : constants.roleSessionName,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       RoleArn: (session as AwsIamRoleChainedSession).roleArn,
     };

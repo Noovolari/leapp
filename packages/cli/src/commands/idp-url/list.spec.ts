@@ -68,6 +68,7 @@ describe("ListIdpUrls", () => {
     expect(tableSpy.mock.calls[0][0]).toEqual(expectedData);
 
     const expectedColumns = {
+      id: { header: "ID", extended: true },
       url: { header: "Identity Provider URL" },
     };
     expect(tableSpy.mock.calls[0][1]).toEqual(expectedColumns);

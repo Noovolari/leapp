@@ -21,6 +21,7 @@ describe("SegmentDialogComponent", () => {
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       workspaceService: spyWorkspaceService,
+      workspaceOptionService: { segments: [] },
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       azureCoreService: { getLocations: () => [] },

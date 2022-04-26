@@ -3,11 +3,74 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import ChangeSessionProfile from "./change-profile";
 
 describe("ChangeProfile", () => {
-  const getTestCommand = (cliProviderService: any = null): ChangeSessionProfile => {
-    const command = new ChangeSessionProfile([], {} as any);
+  const getTestCommand = (cliProviderService: any = null, argv = []): ChangeSessionProfile => {
+    const command = new ChangeSessionProfile(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - sessionId && profileId", async () => {
+    const sessions = [
+      {
+        sessionId: "Session1",
+        profileId: "profile1",
+      },
+      {
+        sessionId: "Session2",
+        profileId: "profile2",
+      },
+    ];
+    const profiles = [
+      {
+        id: "profile1",
+        name: "myProfile1",
+      },
+      {
+        id: "profile2",
+        name: "myProfile2",
+      },
+      {
+        id: "profile3",
+        name: "myProfile3",
+      },
+    ];
+
+    const cliProviderService: any = {
+      namedProfilesService: {
+        changeNamedProfile: jest.fn(),
+      },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+      repository: {
+        getSessions: jest.fn(() => sessions),
+        getSessionById: jest.fn((id: string) => sessions.find((s) => s.sessionId === id)),
+        getProfiles: jest.fn(() => profiles),
+      },
+    };
+
+    let command = getTestCommand(cliProviderService, ["--profileId"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --profileId expects a value");
+
+    command = getTestCommand(cliProviderService, ["--profileId", "", "--sessionId"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --sessionId expects a value");
+
+    command = getTestCommand(cliProviderService, ["--profileId", "profileXX", "--sessionId", "Session1"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Profile not found with id profileXX");
+
+    command = getTestCommand(cliProviderService, ["--profileId", "profile3", "--sessionId", "sessionXX"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Session not found with id sessionXX");
+
+    command = getTestCommand(cliProviderService, ["--profileId", "profile3", "--sessionId", "Session1"]);
+    command.log = jest.fn();
+    await command.run();
+
+    expect(cliProviderService.namedProfilesService.changeNamedProfile).toHaveBeenCalledWith(sessions[0], profiles[2].id);
+    expect(command.log).toHaveBeenCalledWith("session profile changed");
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+  });
 
   test("selectSession", async () => {
     const session1 = { sessionName: "sessionName" };

@@ -1,5 +1,5 @@
 import { describe, test, expect, jest } from "@jest/globals";
-import { CliMfaCodePromptService } from "./remote-cli-mfa-code-prompt-service";
+import { LocalCliMfaCodePromptService } from "./local-cli-mfa-code-prompt-service";
 import { of } from "rxjs";
 
 describe("CliMfaCodePromptService", () => {
@@ -22,7 +22,7 @@ describe("CliMfaCodePromptService", () => {
       expect(mfaCode).toEqual(selectedMfaCode);
     });
 
-    const cliMfaCodePromptService = new CliMfaCodePromptService(inquirer);
+    const cliMfaCodePromptService = new LocalCliMfaCodePromptService(inquirer);
     cliMfaCodePromptService.promptForMFACode(sessionName, callbackFunction);
     await Promise.all([inquirer.prompt]);
     expect(callbackFunction).toHaveBeenCalled();

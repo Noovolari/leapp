@@ -2,11 +2,17 @@ import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
+import { idpUrlId, force } from "../../flags";
 
 export default class DeleteIdpUrl extends LeappCommand {
   static description = "Delete an identity provider URL";
 
-  static examples = [`$leapp idp-url delete`];
+  static examples = [`$leapp idp-url delete`, `$leapp idp-url delete --idpUrl ADDRESS`, `$leapp idp-url delete --idpUrl ADDRESS [--force, -f]`];
+
+  static flags = {
+    idpUrlId,
+    force,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -14,10 +20,22 @@ export default class DeleteIdpUrl extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedIdpUrl = await this.selectIdpUrl();
-      const affectedSessions = this.getAffectedSessions(selectedIdpUrl.id);
-      if (await this.askForConfirmation(affectedSessions)) {
-        await this.deleteIdpUrl(selectedIdpUrl.id);
+      const { flags } = await this.parse(DeleteIdpUrl);
+      if (flags.idpUrlId !== undefined) {
+        const affectedSessions = this.getAffectedSessions(flags.idpUrlId);
+        if (flags.force) {
+          await this.deleteIdpUrl(flags.idpUrlId);
+        } else {
+          if (await this.askForConfirmation(affectedSessions)) {
+            await this.deleteIdpUrl(flags.idpUrlId);
+          }
+        }
+      } else {
+        const selectedIdpUrl = await this.selectIdpUrl();
+        const affectedSessions = this.getAffectedSessions(selectedIdpUrl.id);
+        if (await this.askForConfirmation(affectedSessions)) {
+          await this.deleteIdpUrl(selectedIdpUrl.id);
+        }
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
@@ -40,8 +58,8 @@ export default class DeleteIdpUrl extends LeappCommand {
     return answer.selectedIdUrl;
   }
 
-  getAffectedSessions(idpUrlId: string): Session[] {
-    return this.cliProviderService.idpUrlsService.getDependantSessions(idpUrlId);
+  getAffectedSessions(idpUrlIdString: string): Session[] {
+    return this.cliProviderService.idpUrlsService.getDependantSessions(idpUrlIdString);
   }
 
   async askForConfirmation(affectedSessions: Session[]): Promise<boolean> {
@@ -60,8 +78,12 @@ export default class DeleteIdpUrl extends LeappCommand {
   }
 
   async deleteIdpUrl(id: string): Promise<void> {
-    await this.cliProviderService.idpUrlsService.deleteIdpUrl(id);
-    await this.cliProviderService.remoteProceduresClient.refreshSessions();
-    this.log("identity provider URL deleted");
+    if (this.cliProviderService.idpUrlsService.getIdpUrl(id)) {
+      await this.cliProviderService.idpUrlsService.deleteIdpUrl(id);
+      await this.cliProviderService.remoteProceduresClient.refreshSessions();
+      this.log("identity provider URL deleted");
+    } else {
+      throw new Error("IdP URL not found");
+    }
   }
 }

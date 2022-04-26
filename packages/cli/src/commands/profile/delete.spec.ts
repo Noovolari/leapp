@@ -8,6 +8,40 @@ describe("DeleteNamedProfile", () => {
     return command;
   };
 
+  test("Flags - profileId & force", async () => {
+    const cliProviderService: any = {
+      namedProfilesService: {
+        deleteNamedProfile: jest.fn(),
+        getSessionsWithNamedProfile: jest.fn(() => []),
+      },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+    };
+
+    let command = getTestCommand(cliProviderService, ["--profileId"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --profileId expects a value");
+
+    command = getTestCommand(cliProviderService, ["--profileId", "mockedProfile"]);
+    command.log = jest.fn();
+    command.askForConfirmation = jest.fn(() => Promise.resolve(true));
+    await command.run();
+
+    expect(command.askForConfirmation).toHaveBeenCalled();
+    expect(cliProviderService.namedProfilesService.deleteNamedProfile).toHaveBeenCalledWith("mockedProfile");
+    expect(command.log).toHaveBeenCalledWith("profile deleted");
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+
+    command = getTestCommand(cliProviderService, ["--profileId", "mockedProfile", "--force"]);
+    command.log = jest.fn();
+    command.askForConfirmation = jest.fn(() => Promise.resolve(true));
+    await command.run();
+
+    expect(command.askForConfirmation).not.toHaveBeenCalled();
+    expect(cliProviderService.namedProfilesService.deleteNamedProfile).toHaveBeenCalledWith("mockedProfile");
+    expect(command.log).toHaveBeenCalledWith("profile deleted");
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+  });
+
   test("selectNamedProfile", async () => {
     const namedProfile = { name: "profileName" };
     const cliProviderService: any = {

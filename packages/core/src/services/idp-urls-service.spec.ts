@@ -107,7 +107,7 @@ describe("IdpUrlsService", () => {
     const idpUrlsService = new IdpUrlsService(null, null);
     idpUrlsService.getIdpUrls = () => [];
 
-    expect(idpUrlsService.validateIdpUrl("www.url.com")).toBe(true);
+    expect(idpUrlsService.validateIdpUrl("http://www.url.com")).toBe(true);
   });
 
   test("validateIdpUrl, empty url", () => {
@@ -122,8 +122,8 @@ describe("IdpUrlsService", () => {
 
   test("validateIdpUrl, existent url", () => {
     const idpUrlsService = new IdpUrlsService(null, null);
-    idpUrlsService.getIdpUrls = () => [new IdpUrl("1", "url1")];
+    idpUrlsService.getIdpUrls = () => [new IdpUrl("1", "http://url1")];
 
-    expect(idpUrlsService.validateIdpUrl(" url1 ")).toBe("IdP URL already exists");
+    expect(idpUrlsService.validateIdpUrl(" http://url1 ")).toBe("IdP URL already exists");
   });
 });

@@ -2,13 +2,59 @@ import { describe, expect, jest, test } from "@jest/globals";
 import StartSsmSession from "./start-ssm-session";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { CliProviderService } from "../../service/cli-provider-service";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("StartSsmSession", () => {
-  const getTestCommand = (cliProviderService: any = null): StartSsmSession => {
-    const command = new StartSsmSession([], {} as any);
+  const getTestCommand = (cliProviderService: any = null, argv = []): StartSsmSession => {
+    const command = new StartSsmSession(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - sessionId && region && ssmInstanceId", async () => {
+    let command = getTestCommand(new CliProviderService(), ["--sessionId"]);
+    await expect(command.run()).rejects.toThrow("Flag --sessionId expects a value");
+
+    command = getTestCommand(new CliProviderService(), ["--sessionId", "sgsg", "--region", "eu-west-1", "--ssmInstanceId", "ssmInstance"]);
+    await expect(command.run()).rejects.toThrow("session with id sgsg not found.");
+
+    command = getTestCommand(new CliProviderService(), ["--sessionId", "session", "--region"]);
+    await expect(command.run()).rejects.toThrow("Flag --region expects a value");
+
+    const sessions = [
+      {
+        sessionId: "session",
+        sessionName: "sessionName",
+        type: SessionType.awsIamUser,
+      },
+    ];
+    const cliMockService = {
+      repository: {
+        getSessionById: jest.fn((id: string) => sessions.find((s) => s.sessionId === id)),
+        getSessions: jest.fn(() => sessions),
+      },
+      sessionFactory: new CliProviderService().sessionFactory,
+      cloudProviderService: new CliProviderService().cloudProviderService,
+    };
+
+    command = getTestCommand(cliMockService, ["--sessionId", "session", "--region", "x", "--ssmInstanceId", "ssmInstance"]);
+    command.generateCredentials = jest.fn(async (): Promise<any> => "credentials");
+    await expect(command.run()).rejects.toThrow("No region found with name x");
+
+    command = getTestCommand(cliMockService, ["--sessionId", "session", "--region", "eu-west-1", "--ssmInstanceId"]);
+    await expect(command.run()).rejects.toThrow("Flag --ssmInstanceId expects a value");
+
+    command = getTestCommand(cliMockService, ["--sessionId", "session", "--region", "region", "--ssmInstanceId", "ssmInstance"]);
+    command.selectSession = jest.fn(async (): Promise<any> => "session");
+    command.generateCredentials = jest.fn(async (): Promise<any> => "credentials");
+    (command as any).availableRegions = jest.fn((): any => [{ fieldName: "region" }]);
+    command.selectSsmInstance = jest.fn(async (): Promise<any> => "ssmInstance");
+    command.startSsmSession = jest.fn(async () => {});
+    await command.run();
+    expect(command.generateCredentials).toHaveBeenCalledWith({ sessionId: "session", sessionName: "sessionName", type: "awsIamUser" });
+    expect(command.startSsmSession).toHaveBeenCalledWith("credentials", "ssmInstance", "region");
+  });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
     const command = getTestCommand();

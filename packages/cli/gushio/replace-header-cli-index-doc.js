@@ -36,15 +36,15 @@ module.exports = {
     });
     console.log("...conversion completed");
 
-    fs.copyFileSync("index.md", "../docs/cli/index.md");
+    fs.copyFileSync("index.md", "../../docs/cli/index.md");
     console.log('...Successfully moved index.md in docs/cli');
 
-    if (!fs.existsSync("../docs/cli/scopes")) {
-      fs.mkdirSync("../docs/cli/scopes");
+    if (!fs.existsSync("../../docs/cli/scopes")) {
+      fs.mkdirSync("../../docs/cli/scopes");
     }
 
     filenames.forEach((filename) => {
-      fs.copyFileSync("scopes/" + filename, "../docs/cli/scopes/" + filename);
+      fs.copyFileSync("scopes/" + filename, "../../docs/cli/scopes/" + filename);
       console.log("...Successfully moved " + filename + " in docs/cli/scopes");
     });
   }

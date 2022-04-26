@@ -159,7 +159,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         },
       },
       {
-        label: "Join Community Slack",
+        label: "Join Slack Community",
         type: "normal",
         click: () => {
           this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q");

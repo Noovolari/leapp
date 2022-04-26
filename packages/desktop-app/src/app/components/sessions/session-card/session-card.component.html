@@ -157,7 +157,7 @@
         <a class="icon-button" (click)="changeRegionModalOpen($event);" matTooltip="Change Region"><i class="moon-Region"></i></a>
         <a class="icon-button" *ngIf="session.type !== eSessionType.azure" (click)="changeProfileModalOpen($event);" matTooltip="Change Named Profile"><i class="moon-User"></i></a>
         <a class="icon-button" (click)="ssmModalOpen($event);" *ngIf="session.type !== eSessionType.azure" matTooltip="View SSM sessions"><i class="moon-Server"></i></a>
-        <a class="icon-button" *ngIf="session.type === eSessionType.awsIamUser && session.status !== eSessionStatus.active" (click)="editSession(session, $event);" matTooltip="Edit Session"><i class="moon-Edit"></i></a>
+        <a class="icon-button" *ngIf="session.type === eSessionType.awsIamUser || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained" (click)="editSession(session, $event);" matTooltip="Edit Session"><i class="moon-Edit"></i></a>
       </div>
       <span class="separator"></span>
 

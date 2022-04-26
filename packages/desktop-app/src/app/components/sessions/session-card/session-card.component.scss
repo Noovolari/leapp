@@ -29,7 +29,7 @@ a { color: $text-color; }
   @include box-shadow(3px -1px 5px -3px $text-color);
   a {
     display: inline-flex;
-    margin: 0 12px;
+    margin: 0 10px;
     i { color: $medium-dark; }
     &:hover {
       i {

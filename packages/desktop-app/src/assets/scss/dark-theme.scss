@@ -260,6 +260,12 @@ body.dark-theme {
     button {
       background-color: $dark-button-color;
     }
+    a {
+      color: $dark-main-text-color;
+      &:hover {
+        color: #949494;
+      }
+    }
     button.mat-button-disabled {
       background-color: #848484;
       color: #4F4F4F;

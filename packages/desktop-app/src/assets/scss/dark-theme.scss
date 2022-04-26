@@ -243,7 +243,7 @@ body.dark-theme {
       background-color: $dark-modal-background;
       color: $dark-main-text-color;
     }
-    label, h2, h4, p {
+    label, h2, h4, p, .note {
       color: $dark-main-text-color;
       a {
         color: $dark-button-color;
@@ -482,5 +482,10 @@ body.dark-theme {
       color: #373737;
       border-radius: 5px;
     }
+  }
+
+  tr:hover .session-name-td {
+    position: relative!important;
+    top: -1px;
   }
 }

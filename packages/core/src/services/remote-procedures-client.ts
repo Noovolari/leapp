@@ -26,6 +26,15 @@ export class RemoteProceduresClient {
     );
   }
 
+  async needMfa(sessionName: string): Promise<string> {
+    return this.remoteProcedureCall(
+      { method: "needMFA", params: { sessionName } },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      () => null,
+      (_, reject) => reject(connectionError)
+    );
+  }
+
   async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
     return this.remoteProcedureCall(
       { method: "awsSignIn", params: { idpUrl, needToAuthenticate } },

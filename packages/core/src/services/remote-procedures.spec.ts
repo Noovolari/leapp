@@ -29,7 +29,7 @@ describe("RemoteProcedures", () => {
     nativeService = { nodeIpc: ipc };
     const testId = `rpc_test${Math.random() * 10000}`;
     client = new RemoteProceduresClient(nativeService as any, testId);
-    server = new RemoteProceduresServer(nativeService as any, null, null, null, null, (f) => f(), testId);
+    server = new RemoteProceduresServer(nativeService as any, null, null, null, null, null, (f) => f(), testId);
   });
 
   test("isDesktopAppRunning, server not running", async () => {

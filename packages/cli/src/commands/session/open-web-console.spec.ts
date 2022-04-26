@@ -4,14 +4,66 @@ import OpenWebConsole from "./open-web-console";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("OpenWebConsole", () => {
-  const getTestCommand = (cliProviderService: any = null): OpenWebConsole => {
-    const command = new OpenWebConsole([], {} as any);
+  const getTestCommand = (cliProviderService: any = null, argv = []): OpenWebConsole => {
+    const command = new OpenWebConsole(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
   const credentialInfo = { sessionToken: { aws_access_key_id: "123", aws_secret_access_key: "345", aws_session_token: "678" } };
+
+  test("Flags - Session id", async () => {
+    const sessionService: any = {
+      generateCredentials: jest.fn(async () => credentialInfo),
+    };
+    const sessionFactory: any = {
+      getSessionService: jest.fn(() => sessionService),
+    };
+
+    const ssmService: any = {
+      startSession: jest.fn((_0: CredentialsInfo, _1: string, _2: string) => {}),
+      getSsmInstances: jest.fn(() => []),
+    };
+
+    const webConsoleService: any = {
+      openWebConsole: jest.fn(async () => {}),
+    };
+
+    const inquirer: any = {
+      prompt: jest.fn(() => ({ selectedInstance: {} })),
+    };
+
+    const session: any = { sessionId: "sessionId", type: "sessionType", region: "eu-west-1" };
+
+    const cliProviderService: any = {
+      sessionFactory,
+      ssmService,
+      inquirer,
+      webConsoleService,
+      repository: {
+        getSessionById: jest.fn((id: string) => [session].find((s) => s.sessionId === id)),
+      },
+    };
+
+    let command = getTestCommand(cliProviderService, ["--sessionId"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --sessionId expects a value");
+
+    command = getTestCommand(cliProviderService, ["--sessionId", "sjklhnjkl"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("No session found with id sjklhnjkl");
+
+    command = getTestCommand(cliProviderService, ["--sessionId", "sessionId"]);
+    command.log = jest.fn();
+    await command.run();
+
+    expect(command.log).toHaveBeenCalledWith("opened AWS Web Console for this session");
+    expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
+    expect(sessionService.generateCredentials).toHaveBeenCalledWith("sessionId");
+
+    expect(webConsoleService.openWebConsole).toHaveBeenCalledWith(credentialInfo, "eu-west-1");
+  });
 
   test("openWebConsole", async () => {
     const sessionService: any = {

@@ -15,17 +15,18 @@ import { AwsParentSessionFactory } from "./aws-parent-session.factory";
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
 import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
+import { constants } from "../../../models/constants";
 
 export class AwsIamRoleChainedService extends AwsSessionService {
   constructor(
     iSessionNotifier: ISessionNotifier,
     repository: Repository,
-    private awsCoreService: AwsCoreService,
-    private fileService: FileService,
+    awsCoreService: AwsCoreService,
+    fileService: FileService,
     private awsIamUserService: AwsIamUserService,
     private parentSessionServiceFactory: AwsParentSessionFactory
   ) {
-    super(iSessionNotifier, repository);
+    super(iSessionNotifier, repository, awsCoreService, fileService);
   }
 
   static sessionTokenFromAssumeRoleResponse(assumeRoleResponse: AssumeRoleResponse): { sessionToken: any } {
@@ -79,6 +80,10 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     return await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile);
   }
 
+  generateCredentialsProxy(sessionId: string): Promise<CredentialsInfo> {
+    return this.generateCredentials(sessionId);
+  }
+
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Retrieve Session
     const session = this.repository.getSessionById(sessionId);
@@ -110,13 +115,25 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     const roleSessionName = (session as AwsIamRoleChainedSession).roleSessionName;
     const params = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleSessionName: roleSessionName ? roleSessionName : "assumed-from-leapp",
+      RoleSessionName: roleSessionName ? roleSessionName : constants.roleSessionName,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       RoleArn: (session as AwsIamRoleChainedSession).roleArn,
     };
 
     // Generate Session token
     return this.generateSessionToken(session, sts, params);
+  }
+
+  validateCredentials(sessionId: string): Promise<boolean> {
+    return new Promise((resolve, _) => {
+      this.generateCredentials(sessionId)
+        .then((__) => {
+          resolve(true);
+        })
+        .catch((__) => {
+          resolve(false);
+        });
+    });
   }
 
   removeSecrets(_: string): void {}

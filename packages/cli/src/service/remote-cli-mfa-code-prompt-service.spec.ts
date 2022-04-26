@@ -1,28 +1,18 @@
 import { describe, test, expect, jest } from "@jest/globals";
-import { CliMfaCodePromptService } from "./cli-mfa-code-prompt-service";
-import { of } from "rxjs";
+import { RemoteCliMfaCodePromptService } from "./remote-cli-mfa-code-prompt-service";
 
-describe("CliMfaCodePromptService", () => {
+describe("RemoteCliMfaCodePromptService", () => {
   test("promptForMFACode", async () => {
     const sessionName = "sessionName";
     const selectedMfaCode = "selectedMfaCode";
     const inquirer: any = {
-      prompt: (param: any) => {
-        expect(param).toEqual([
-          {
-            name: "mfaCode",
-            message: `Insert MFA code for session ${sessionName}`,
-            type: "input",
-          },
-        ]);
-        return of({ mfaCode: selectedMfaCode }).toPromise();
-      },
+      needMfa: (_: string) => Promise.resolve(selectedMfaCode),
     };
     const callbackFunction = jest.fn((mfaCode: string) => {
       expect(mfaCode).toEqual(selectedMfaCode);
     });
 
-    const cliMfaCodePromptService = new CliMfaCodePromptService(inquirer);
+    const cliMfaCodePromptService = new RemoteCliMfaCodePromptService(inquirer);
     cliMfaCodePromptService.promptForMFACode(sessionName, callbackFunction);
     await Promise.all([inquirer.prompt]);
     expect(callbackFunction).toHaveBeenCalled();

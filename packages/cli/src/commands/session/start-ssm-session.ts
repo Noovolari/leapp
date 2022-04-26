@@ -4,11 +4,21 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { region, sessionId, ssmInstanceId } from "../../flags";
 
 export default class StartSsmSession extends LeappCommand {
   static description = "Start an AWS SSM session";
 
-  static examples = [`$leapp session start-ssm-session`];
+  static examples = [
+    `$leapp session start-ssm-session`,
+    `$leapp session start-ssm-session --sessionId SESSIONID --region AWSREGION --ssmInstanceId EC2INSTANCEID`,
+  ];
+
+  static flags = {
+    sessionId,
+    region,
+    ssmInstanceId,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -16,11 +26,26 @@ export default class StartSsmSession extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedSession = await this.selectSession();
-      const credentials = await this.generateCredentials(selectedSession);
-      const selectedRegion = await this.selectRegion(selectedSession);
-      const selectedSsmInstanceId = await this.selectSsmInstance(credentials, selectedRegion);
-      await this.startSsmSession(credentials, selectedSsmInstanceId, selectedRegion);
+      const { flags } = await this.parse(StartSsmSession);
+      if (this.validateFlags(flags)) {
+        const selectedSession = this.cliProviderService.repository.getSessionById(`${flags.sessionId}`);
+        if (!selectedSession) {
+          throw new Error("No session found with id " + flags.sessionId);
+        }
+        const credentials = await this.generateCredentials(selectedSession);
+        const aRegions = this.availableRegions(selectedSession);
+        const selectedRegion = aRegions.find((r) => r.fieldName === flags.region);
+        if (!selectedRegion) {
+          throw new Error("No region found with name " + flags.region);
+        }
+        await this.startSsmSession(credentials, `${flags.ssmInstanceId}`, `${flags.region}`);
+      } else {
+        const selectedSession = await this.selectSession();
+        const credentials = await this.generateCredentials(selectedSession);
+        const selectedRegion = await this.selectRegion(selectedSession);
+        const selectedSsmInstanceId = await this.selectSsmInstance(credentials, selectedRegion);
+        await this.startSsmSession(credentials, selectedSsmInstanceId, selectedRegion);
+      }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
@@ -51,21 +76,21 @@ export default class StartSsmSession extends LeappCommand {
 
   async selectRegion(session: Session): Promise<string> {
     // TODO: check if is possible to filter out unavailable regions
-    const availableRegions = this.cliProviderService.cloudProviderService.availableRegions(session.type);
+    const availableRegions = this.availableRegions(session);
 
     const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedRegion",
         message: `select region`,
         type: "list",
-        choices: availableRegions.map((region) => ({ name: region.fieldName, value: region.fieldValue })),
+        choices: availableRegions.map((r) => ({ name: r.fieldName, value: r.fieldValue })),
       },
     ]);
     return answer.selectedRegion;
   }
 
-  async selectSsmInstance(credentials: CredentialsInfo, region: string): Promise<string> {
-    const availableInstances = await this.cliProviderService.ssmService.getSsmInstances(credentials, region);
+  async selectSsmInstance(credentials: CredentialsInfo, r: string): Promise<string> {
+    const availableInstances = await this.cliProviderService.ssmService.getSsmInstances(credentials, r);
     const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedInstance",
@@ -77,14 +102,22 @@ export default class StartSsmSession extends LeappCommand {
     return answer.selectedInstance;
   }
 
-  async startSsmSession(credentials: CredentialsInfo, ssmInstanceId: string, region: string): Promise<void> {
+  async startSsmSession(credentials: CredentialsInfo, ssmInstanceIdString: string, r: string): Promise<void> {
     let macOsTerminalType;
     const process = this.cliProviderService.cliNativeService.process;
     if (process.platform === "darwin") {
       const terminalProgram = process.env["TERM_PROGRAM"];
       macOsTerminalType = terminalProgram && terminalProgram.toLowerCase().includes("iterm") ? constants.macOsIterm2 : constants.macOsTerminal;
     }
-    await this.cliProviderService.ssmService.startSession(credentials, ssmInstanceId, region, macOsTerminalType);
+    await this.cliProviderService.ssmService.startSession(credentials, ssmInstanceIdString, r, macOsTerminalType);
     this.log("started AWS SSM session");
+  }
+
+  private validateFlags(flags: any) {
+    return flags.sessionId && flags.sessionId !== "" && flags.ssmInstanceId && flags.ssmInstanceId !== "" && flags.region && flags.region !== "";
+  }
+
+  private availableRegions(selectedSession: Session) {
+    return this.cliProviderService.cloudProviderService.availableRegions(selectedSession.type);
   }
 }

@@ -18,7 +18,7 @@ import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-servi
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
-import { CliMfaCodePromptService } from "./cli-mfa-code-prompt-service";
+import { RemoteCliMfaCodePromptService } from "./remote-cli-mfa-code-prompt-service";
 import { CliNativeService } from "./cli-native-service";
 import { RemoteProceduresClient } from "@noovolari/leapp-core/services/remote-procedures-client";
 import { constants } from "@noovolari/leapp-core/models/constants";
@@ -35,6 +35,7 @@ import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { CliRpcAwsSsoOidcVerificationWindowService } from "./cli-rpc-aws-sso-oidc-verification-window-service";
 import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { CliRpcAwsSamlAuthenticationService } from "./cli-rpc-aws-saml-authentication-service";
+import { LocalCliMfaCodePromptService } from "./local-cli-mfa-code-prompt-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -43,7 +44,8 @@ export class CliProviderService {
   private awsSamlAssertionExtractionServiceInstance: AwsSamlAssertionExtractionService;
   private cliRpcAwsSamlAuthenticationServiceInstance: CliRpcAwsSamlAuthenticationService;
   private remoteProceduresClientInstance: RemoteProceduresClient;
-  private cliMfaCodePromptServiceInstance: CliMfaCodePromptService;
+  private localCliMfaCodePromptServiceInstance: LocalCliMfaCodePromptService;
+  private remoteCliMfaCodePromptServiceInstance: RemoteCliMfaCodePromptService;
   private workspaceServiceInstance: WorkspaceService;
   private awsIamUserServiceInstance: AwsIamUserService;
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
@@ -107,11 +109,18 @@ export class CliProviderService {
     return this.remoteProceduresClientInstance;
   }
 
-  public get cliMfaCodePromptService(): CliMfaCodePromptService {
-    if (!this.cliMfaCodePromptServiceInstance) {
-      this.cliMfaCodePromptServiceInstance = new CliMfaCodePromptService(this.inquirer);
+  public get localCliMfaCodePromptService(): LocalCliMfaCodePromptService {
+    if (!this.localCliMfaCodePromptServiceInstance) {
+      this.localCliMfaCodePromptServiceInstance = new LocalCliMfaCodePromptService(this.inquirer);
     }
-    return this.cliMfaCodePromptServiceInstance;
+    return this.localCliMfaCodePromptServiceInstance;
+  }
+
+  public get remoteCliMfaCodePromptService(): RemoteCliMfaCodePromptService {
+    if (!this.remoteCliMfaCodePromptServiceInstance) {
+      this.remoteCliMfaCodePromptServiceInstance = new RemoteCliMfaCodePromptService(this.remoteProceduresClient);
+    }
+    return this.remoteCliMfaCodePromptServiceInstance;
   }
 
   public get workspaceService(): WorkspaceService {
@@ -123,8 +132,8 @@ export class CliProviderService {
 
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
-      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository, this.cliMfaCodePromptService,
-        this.keyChainService, this.fileService, this.awsCoreService);
+      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository, this.localCliMfaCodePromptService,
+        this.remoteCliMfaCodePromptService, this.keyChainService, this.fileService, this.awsCoreService);
     }
     return this.awsIamUserServiceInstance;
   }

@@ -1,6 +1,8 @@
-import { AfterViewInit, Component, EventEmitter, Input, Output, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, EventEmitter, Input, Output, SecurityContext, ViewChild } from "@angular/core";
 import { NgSelectComponent } from "@ng-select/ng-select";
 import { FormGroup } from "@angular/forms";
+import { DomSanitizer } from "@angular/platform-browser";
+import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 
 @Component({
   selector: "app-leapp-select",
@@ -10,6 +12,9 @@ import { FormGroup } from "@angular/forms";
 export class LeappSelectComponent implements AfterViewInit {
   @ViewChild("ngSelectComponent")
   ngSelectComponent: NgSelectComponent;
+
+  @Input()
+  ngModel: any;
 
   @Input()
   placeholder: string;
@@ -46,7 +51,7 @@ export class LeappSelectComponent implements AfterViewInit {
 
   temporaryName: string;
 
-  constructor() {
+  constructor(private domSanitizer: DomSanitizer, private messageToasterService: MessageToasterService) {
     this.temporaryName = "";
     this.uppercased = this.uppercased || true;
   }
@@ -69,6 +74,11 @@ export class LeappSelectComponent implements AfterViewInit {
   }
 
   addNewElement(): void {
+    if (this.checkCrossScriptingInjection(this.temporaryName)) {
+      this.messageToasterService.toast("Attention, your inputted data is potentially unsafe and would led to a XSS attack!", ToastLevel.warn);
+      return;
+    }
+
     const newElement = {};
     newElement[this.bindLabel] = this.temporaryName;
     newElement[this.bindValue] = LeappSelectComponent.isFunction(this.defaultNewValue) ? this.defaultNewValue() : this.defaultNewValue;
@@ -91,6 +101,17 @@ export class LeappSelectComponent implements AfterViewInit {
     }
   }
 
+  selectValue(value: any) {
+    const found = this.items.findIndex((i) => i[this.bindValue] === value[this.bindValue]);
+    if (found > -1) {
+      this.ngSelectComponent.select(value);
+      this.selected.emit({ items: this.items, item: value });
+      console.log("leapp-select updated value: ", this.items, value);
+    } else {
+      console.log("leapp-select item not found in collection: ", this.items, value);
+    }
+  }
+
   setByEnter(): void {
     if (this.checkNewElement()) {
       this.addNewElement();
@@ -98,4 +119,9 @@ export class LeappSelectComponent implements AfterViewInit {
   }
 
   reset(): void {}
+
+  private checkCrossScriptingInjection(temporaryName: string): boolean {
+    const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, temporaryName);
+    return sanitizedField.indexOf("unsafe:") > -1;
+  }
 }

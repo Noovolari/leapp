@@ -61,6 +61,28 @@
           </div>
         </div>
 
+        <ng-container>
+          <h2>AWS Credential Generation</h2>
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label><i class="moon-Help fix-top" matTooltip="Note: when switching method a backup of your credentials and config files will be created and the original files cleaned."></i>&nbsp;Method</label>
+                <ng-select formControlName="credentialMethodSelect"
+                           bindLabel="credentialMethod"
+                           bindValue="credentialMethod"
+                           [clearable]="false"
+                           [searchable]="false"
+                           [items]="[{credentialMethod: eConstants.credentialFile}, {credentialMethod: eConstants.credentialProcess}]"
+                           [(ngModel)]="selectedCredentialMethod"
+                           (change)="showWarningModalForCredentialProcess()"
+                           [appendTo]="'body'">
+                </ng-select>
+
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
         <hr class="proxy-settings-section">
 
         <h2 class="proxy-settings-section">Proxy settings</h2>
@@ -124,7 +146,7 @@
           <div class="form-group scrollable max-height-230">
             <table class="table option-table">
               <tbody>
-              <ng-container *ngFor="let idpUrl of appProviderService.repository.getIdpUrls()">
+              <ng-container *ngFor="let idpUrl of appProviderService.workspaceOptionService.idpUrls">
                 <tr *ngIf="idpUrl">
                   <td>{{idpUrl.url}}</td>
                   <td>
@@ -159,7 +181,7 @@
         <div class="form-group scrollable max-height-230">
           <table class="table option-table">
             <tbody>
-            <ng-container *ngFor="let profile of appProviderService.repository.getProfiles()">
+            <ng-container *ngFor="let profile of appProviderService.workspaceOptionService.profiles">
               <tr *ngIf="profile">
                 <td>{{profile.name}}</td>
                 <td>

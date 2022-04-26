@@ -11,6 +11,8 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AppProviderService } from "../../../services/app-provider.service";
+import { BsModalService } from "ngx-bootstrap/modal";
+import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
 
 @Component({
   selector: "app-options-dialog",
@@ -63,7 +65,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     defaultBrowserOpening: new FormControl(""),
     terminalSelect: new FormControl(""),
     colorThemeSelect: new FormControl(""),
+    credentialMethodSelect: new FormControl(""),
   });
+
+  selectedCredentialMethod: string;
 
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: SessionService;
@@ -73,21 +78,24 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     public appService: AppService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,
+    private modalService: BsModalService,
     private router: Router
   ) {
-    this.selectedTerminal = this.appProviderService.repository.getWorkspace().macOsTerminal || constants.macOsTerminal;
+    this.selectedTerminal = this.appProviderService.workspaceOptionService.macOsTerminal || constants.macOsTerminal;
 
-    this.colorTheme = this.appProviderService.repository.getWorkspace().colorTheme || constants.colorTheme;
+    this.colorTheme = this.appProviderService.workspaceOptionService.colorTheme || constants.colorTheme;
     this.selectedColorTheme = this.colorTheme;
+
+    this.selectedCredentialMethod = this.appProviderService.workspaceOptionService.credentialMethod || constants.credentialFile;
   }
 
   ngOnInit(): void {
     this.idpUrlValue = "";
-    this.proxyProtocol = this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyProtocol;
-    this.proxyUrl = this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyUrl;
-    this.proxyPort = this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyPort;
-    this.proxyUsername = this.appProviderService.repository.getWorkspace().proxyConfiguration.username || "";
-    this.proxyPassword = this.appProviderService.repository.getWorkspace().proxyConfiguration.password || "";
+    this.proxyProtocol = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyProtocol;
+    this.proxyUrl = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl;
+    this.proxyPort = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyPort;
+    this.proxyUsername = this.appProviderService.workspaceOptionService.proxyConfiguration.username || "";
+    this.proxyPassword = this.appProviderService.workspaceOptionService.proxyConfiguration.password || "";
 
     this.form.controls["idpUrl"].setValue(this.idpUrlValue);
     this.form.controls["proxyUrl"].setValue(this.proxyUrl);
@@ -97,9 +105,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.form.controls["proxyPassword"].setValue(this.proxyPassword);
 
     const isProxyUrl =
-      this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyUrl &&
-      this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyUrl !== "undefined";
-    this.proxyUrl = isProxyUrl ? this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyUrl : "";
+      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl &&
+      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl !== "undefined";
+    this.proxyUrl = isProxyUrl ? this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl : "";
 
     if (this.proxyUsername || this.proxyPassword) {
       this.showProxyAuthentication = true;
@@ -107,8 +115,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
     this.regions = this.appProviderService.awsCoreService.getRegions();
     this.locations = this.appProviderService.azureCoreService.getLocations();
-    this.selectedRegion = this.appProviderService.repository.getWorkspace().defaultRegion || constants.defaultRegion;
-    this.selectedLocation = this.appProviderService.repository.getWorkspace().defaultLocation || constants.defaultLocation;
+    this.selectedRegion = this.appProviderService.workspaceOptionService.defaultRegion || constants.defaultRegion;
+    this.selectedLocation = this.appProviderService.workspaceOptionService.defaultLocation || constants.defaultLocation;
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -120,8 +128,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   setColorTheme(theme: string): void {
-    this.appProviderService.repository.updateColorTheme(theme);
-    this.colorTheme = this.appProviderService.repository.getWorkspace().colorTheme;
+    this.appProviderService.workspaceOptionService.colorTheme = theme;
+    this.colorTheme = this.appProviderService.workspaceOptionService.colorTheme;
     this.selectedColorTheme = this.colorTheme;
     if (this.colorTheme === constants.darkTheme) {
       document.querySelector("body").classList.add("dark-theme");
@@ -137,17 +145,17 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
    */
   saveOptions(): void {
     if (this.form.valid) {
-      this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyUrl = this.form.controls["proxyUrl"].value;
+      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl = this.form.controls["proxyUrl"].value;
       // eslint-disable-next-line max-len
-      this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyProtocol = this.form.controls["proxyProtocol"].value;
+      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyProtocol = this.form.controls["proxyProtocol"].value;
       // eslint-disable-next-line max-len
-      this.appProviderService.repository.getWorkspace().proxyConfiguration.proxyPort = this.form.controls["proxyPort"].value;
+      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyPort = this.form.controls["proxyPort"].value;
       // eslint-disable-next-line max-len
-      this.appProviderService.repository.getWorkspace().proxyConfiguration.username = this.form.controls["proxyUsername"].value;
+      this.appProviderService.workspaceOptionService.proxyConfiguration.username = this.form.controls["proxyUsername"].value;
       // eslint-disable-next-line max-len
-      this.appProviderService.repository.getWorkspace().proxyConfiguration.password = this.form.controls["proxyPassword"].value;
+      this.appProviderService.workspaceOptionService.proxyConfiguration.password = this.form.controls["proxyPassword"].value;
       // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateProxyConfiguration(this.appProviderService.repository.getWorkspace().proxyConfiguration);
+      this.appProviderService.repository.updateProxyConfiguration(this.appProviderService.workspaceOptionService.proxyConfiguration);
 
       this.appProviderService.repository.getWorkspace().defaultRegion = this.selectedRegion;
       // eslint-disable-next-line max-len
@@ -232,16 +240,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   deleteIdpUrl(id: string): void {
-    // Assumable sessions with this id
-    /// this.sessionService = this.leappCoreService.sessionFactory.getSessionService(SessionType.awsIamRoleFederated);
-    // let sessions = this.leappCoreService.repository.getSessions().filter((s) => (s as AwsIamRoleFederatedSession).idpUrlId === id);
-
-    // Add iam Role Chained from iam role iam_federated_role
-    // sessions.forEach((parent) => {
-    //  const childs = this.leappCoreService.repository.listIamRoleChained(parent);
-    //  sessions = sessions.concat(childs);
-    // });
-
     const sessions = this.appProviderService.idpUrlService.getDependantSessions(id);
 
     // Get only names for display
@@ -369,7 +367,74 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     );
   }
 
-  openJoinUs(): void {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  openJoinUs() {
     this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA");
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  async showWarningModalForCredentialProcess() {
+    const workspace = this.appProviderService.repository.getWorkspace();
+    if (this.selectedCredentialMethod === constants.credentialProcess) {
+      const confirmText = "I acknowledge it";
+      const callback = async (answerString: string) => {
+        if (answerString === constants.confirmed.toString()) {
+          workspace.credentialMethod = this.selectedCredentialMethod;
+          this.appProviderService.repository.persistWorkspace(workspace);
+          // Create Config file if missing
+          if (!this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsConfigPath())) {
+            this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsConfigPath(), "");
+          }
+          // When selecting this one we need to clean the credential file and create a backup
+          if (this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsCredentialPath())) {
+            this.appProviderService.fileService.writeFileSync(
+              this.appProviderService.awsCoreService.awsBkpCredentialPath(),
+              this.appProviderService.fileService.readFileSync(this.appProviderService.awsCoreService.awsCredentialPath())
+            );
+          }
+          this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsCredentialPath(), "");
+        } else {
+          this.selectedCredentialMethod = constants.credentialFile;
+        }
+
+        workspace.credentialMethod = this.selectedCredentialMethod;
+        this.appProviderService.repository.persistWorkspace(workspace);
+
+        // Now we need to check for started sessions and restart them
+        const activeSessions = this.appProviderService.repository.listActive();
+        for (let i = 0; i < activeSessions.length; i++) {
+          const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
+          await sessionService.stop(activeSessions[i].sessionId);
+          await sessionService.start(activeSessions[i].sessionId);
+        }
+      };
+
+      this.modalService.show(CredentialProcessDialogComponent, {
+        animated: false,
+        initialState: {
+          callback,
+          confirmText,
+        },
+      });
+    } else {
+      workspace.credentialMethod = this.selectedCredentialMethod;
+      this.appProviderService.repository.persistWorkspace(workspace);
+      // backup config file and delete normal one
+      if (this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsConfigPath())) {
+        this.appProviderService.fileService.writeFileSync(
+          this.appProviderService.awsCoreService.awsBkpConfigPath(),
+          this.appProviderService.fileService.readFileSync(this.appProviderService.awsCoreService.awsConfigPath())
+        );
+        this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsConfigPath(), "");
+      }
+
+      // Now we need to check for started sessions and restart them
+      const activeSessions = this.appProviderService.repository.listActive();
+      for (let i = 0; i < activeSessions.length; i++) {
+        const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
+        await sessionService.stop(activeSessions[i].sessionId);
+        await sessionService.start(activeSessions[i].sessionId);
+      }
+    }
   }
 }

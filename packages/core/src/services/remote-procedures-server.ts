@@ -5,6 +5,7 @@ import { IAwsSsoOidcVerificationWindowService } from "../interfaces/i-aws-sso-oi
 import { IAwsSamlAuthenticationService } from "../interfaces/i-aws-saml-authentication-service";
 import { Repository } from "./repository";
 import { WorkspaceService } from "./workspace-service";
+import { IMfaCodePrompter } from "../interfaces/i-mfa-code-prompter";
 
 export interface RpcResponse {
   result?: any;
@@ -27,6 +28,7 @@ export class RemoteProceduresServer {
     private nativeService: INativeService,
     private verificationWindowService: IAwsSsoOidcVerificationWindowService,
     private awsAuthenticationService: IAwsSamlAuthenticationService,
+    private mfaCodePrompter: IMfaCodePrompter,
     private repository: Repository,
     private workspaceService: WorkspaceService,
     private uiSafeFn: (uiSafeBlock: () => void) => void,
@@ -35,6 +37,7 @@ export class RemoteProceduresServer {
     this.rpcMethods = new Map([
       ["isDesktopAppRunning", this.isDesktopAppRunning],
       ["needAuthentication", this.needAuthentication],
+      ["needMFA", this.needMfa],
       ["awsSignIn", this.awsSignIn],
       ["openVerificationWindow", this.openVerificationWindow],
       ["refreshIntegrations", this.refreshIntegrations],
@@ -67,6 +70,16 @@ export class RemoteProceduresServer {
 
   private isDesktopAppRunning(emitFunction: EmitFunction, socket: Socket): void {
     emitFunction(socket, "message", { result: true });
+  }
+
+  private needMfa(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
+    try {
+      this.mfaCodePrompter.promptForMFACode(data.params.sessionName, (result) => {
+        emitFunction(socket, "message", { result });
+      });
+    } catch (error) {
+      emitFunction(socket, "message", { error: error.message });
+    }
   }
 
   private needAuthentication(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {

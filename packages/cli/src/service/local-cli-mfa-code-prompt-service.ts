@@ -1,7 +1,7 @@
 import { IMfaCodePrompter } from "@noovolari/leapp-core/interfaces/i-mfa-code-prompter";
 import CliInquirer from "inquirer";
 
-export class CliMfaCodePromptService implements IMfaCodePrompter {
+export class LocalCliMfaCodePromptService implements IMfaCodePrompter {
   constructor(private inquirer: CliInquirer.Inquirer) {}
 
   promptForMFACode(sessionName: string, callback: (code: string) => void): void {

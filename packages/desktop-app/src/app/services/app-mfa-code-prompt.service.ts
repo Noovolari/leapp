@@ -8,11 +8,19 @@ import { IMfaCodePrompter } from "@noovolari/leapp-core/interfaces/i-mfa-code-pr
   providedIn: "root",
 })
 export class AppMfaCodePromptService implements IMfaCodePrompter {
-  constructor(private modalService: BsModalService, private electronService: AppNativeService) {}
+  private _keepUnderlyingModals;
+
+  constructor(private modalService: BsModalService, private electronService: AppNativeService) {
+    this._keepUnderlyingModals = false;
+  }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   promptForMFACode(sessionName: string, callback: any): void {
     this.inputDialog("MFA Code insert", "Insert MFA Code", `please insert MFA code from your app or device for ${sessionName}`, callback);
+  }
+
+  set keepUnderlyingModal(keep: boolean) {
+    this._keepUnderlyingModals = keep;
   }
 
   /**
@@ -25,8 +33,10 @@ export class AppMfaCodePromptService implements IMfaCodePrompter {
    */
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   private inputDialog(title: string, placeholder: string, message: string, callback: any) {
-    for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
-      this.modalService.hide(i);
+    if (!this._keepUnderlyingModals) {
+      for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
+        this.modalService.hide(i);
+      }
     }
 
     this.electronService.currentWindow.show();

@@ -17,12 +17,12 @@ nav:
   - 'CLI':
       - Index: 'cli/index.md'
       - Usage:
-          - Help: 'cli/scopes/help.md'
-          - Session: 'cli/scopes/session.md'
-          - Integration: 'cli/scopes/integration.md'
-          - Profile: 'cli/scopes/profile.md'
-          - Region: 'cli/scopes/region.md'
-          - 'Idp Url': 'cli/scopes/idp-url.md'
+          - Help: 'cli/s.ò,lmds./help.md'
+          - Session: 'cli/s.ò,lmds./session.md'
+          - Integration: 'cli/s.ò,lmds./integration.md'
+          - Profile: 'cli/s.ò,lmds./profile.md'
+          - Region: 'cli/s.ò,lmds./region.md'
+          - 'Idp Url': 'cli/s.ò,lmds./idp-url.md'
   - 'Configuration':
       - 'Add your first configuration': 'configuration.md'
       - 'Configuring a Session':

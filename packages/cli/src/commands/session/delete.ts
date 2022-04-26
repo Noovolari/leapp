@@ -1,11 +1,21 @@
 import { Session } from "@noovolari/leapp-core/models/session";
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
+import { force, sessionId } from "../../flags";
 
 export default class DeleteSession extends LeappCommand {
   static description = "Delete a session";
 
-  static examples = [`$leapp session delete`];
+  static examples = [
+    `$leapp session delete`,
+    `$leapp session delete --sessionId SESSIONID`,
+    "$leapp session delete --sessionId SESSIONID [--force, -f]",
+  ];
+
+  static flags = {
+    sessionId,
+    force,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -13,10 +23,22 @@ export default class DeleteSession extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const selectedSession = await this.selectSession();
-      const affectedSessions = this.getAffectedSessions(selectedSession);
-      if (await this.askForConfirmation(affectedSessions)) {
-        await this.deleteSession(selectedSession);
+      const { flags } = await this.parse(DeleteSession);
+      if (this.validateFlags(flags)) {
+        const selectedSession = this.cliProviderService.repository.getSessionById(`${flags.sessionId}`);
+        if (!selectedSession) {
+          throw new Error("Session not found with id " + flags.sessionId);
+        }
+        const affectedSessions = this.getAffectedSessions(selectedSession);
+        if (flags.force || (await this.askForConfirmation(affectedSessions))) {
+          await this.deleteSession(selectedSession);
+        }
+      } else {
+        const selectedSession = await this.selectSession();
+        const affectedSessions = this.getAffectedSessions(selectedSession);
+        if (await this.askForConfirmation(affectedSessions)) {
+          await this.deleteSession(selectedSession);
+        }
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
@@ -67,5 +89,9 @@ export default class DeleteSession extends LeappCommand {
       },
     ]);
     return answer.confirmation;
+  }
+
+  private validateFlags(flags: any) {
+    return flags.sessionId && flags.sessionId !== "";
   }
 }

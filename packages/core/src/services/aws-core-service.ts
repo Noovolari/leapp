@@ -39,6 +39,18 @@ export class AwsCoreService {
     return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "credentials");
   }
 
+  awsBkpCredentialPath(): string {
+    return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "credentials.bkp");
+  }
+
+  awsConfigPath(): string {
+    return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "config");
+  }
+
+  awsBkpConfigPath(): string {
+    return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "config.bkp");
+  }
+
   stsOptions(session: Session): any {
     let options: any = {
       maxRetries: 0,

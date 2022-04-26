@@ -5,8 +5,41 @@ describe("EditIdpUrl", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): EditIdpUrl => {
     const command = new EditIdpUrl(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
+    (command as any).validateMyFlags = jest.fn((_: any) => {
+      if (argv[1] === "") {
+        throw new Error("IdP URL ID can't be empty");
+      }
+
+      if (!cliProviderService.idpUrlsService.getIdpUrl(argv[1])) {
+        throw new Error("IdP URL not found");
+      }
+      if (argv[3] === "") {
+        throw new Error("IdP URL can't be empty");
+      }
+      if (argv[3].indexOf("http://") < 0 || argv[3].indexOf("https://") < 0) {
+        throw new Error("IdP URL is not valid");
+      }
+      return true;
+    });
     return command;
   };
+
+  test("Flags - IdPUrlId & IdPUrl", async () => {
+    const cliProviderService = {
+      idpUrlsService: {
+        getIdpUrl: (idpUrlId: string) => idpUrlId === "foundId",
+      },
+    };
+
+    let command = getTestCommand(cliProviderService, ["--idpUrlId", "", "--idpUrl", ""]);
+    await expect((command as any).run()).rejects.toThrow("IdP URL ID can't be empty");
+
+    command = getTestCommand(cliProviderService, ["--idpUrlId", "foundId", "--idpUrl", ""]);
+    await expect((command as any).run()).rejects.toThrow("IdP URL can't be empty");
+
+    command = getTestCommand(cliProviderService, ["--idpUrlId", "foundId", "--idpUrl", "ciccio"]);
+    await expect((command as any).run()).rejects.toThrow("IdP URL is not valid");
+  });
 
   test("selectIdpUrl", async () => {
     const idpUrl = { url: "url1" };

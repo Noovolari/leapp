@@ -31,6 +31,7 @@ import { WindowService } from "./window.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
+import { WorkspaceOptionService } from "@noovolari/leapp-core/services/workspace-option-service";
 
 @Injectable({
   providedIn: "root",
@@ -68,6 +69,7 @@ export class AppProviderService {
   private idpUrlServiceInstance: IdpUrlsService;
   private namedProfileInstance: NamedProfilesService;
   private remoteProceduresServerInstance: RemoteProceduresServer;
+  private workspaceOptionInstance: WorkspaceOptionService;
 
   constructor(private electronService: AppNativeService, private ngZone: NgZone) {}
 
@@ -76,6 +78,13 @@ export class AppProviderService {
       this.idpUrlServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository);
     }
     return this.idpUrlServiceInstance;
+  }
+
+  public get workspaceOptionService(): WorkspaceOptionService {
+    if (!this.workspaceOptionInstance) {
+      this.workspaceOptionInstance = new WorkspaceOptionService(this.repository);
+    }
+    return this.workspaceOptionInstance;
   }
 
   public get namedProfileService(): NamedProfilesService {
@@ -104,6 +113,7 @@ export class AppProviderService {
       this.awsIamUserServiceInstance = new AwsIamUserService(
         this.workspaceService,
         this.repository,
+        this.mfaCodePrompter,
         this.mfaCodePrompter,
         this.keyChainService,
         this.fileService,
@@ -313,6 +323,7 @@ export class AppProviderService {
         this.electronService,
         this.verificationWindowService,
         this.awsAuthenticationService,
+        this.mfaCodePrompter,
         this.repository,
         this.workspaceService,
         (uiSafeBlock) => this.ngZone.run(() => uiSafeBlock())

@@ -29,13 +29,15 @@ export class ConfirmationDialogComponent implements OnInit {
    */
   confirm(): void {
     if (this.callback) {
+      this.bsModalRef.hide();
       this.callback(constants.confirmed);
-      this.close();
     }
   }
 
   close(): void {
-    this.bsModalRef.hide();
-    this.callback(constants.confirmClosed);
+    if (this.callback) {
+      this.bsModalRef.hide();
+      this.callback(constants.confirmClosed);
+    }
   }
 }

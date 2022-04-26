@@ -19,12 +19,12 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
     iSessionNotifier: ISessionNotifier,
     repository: Repository,
-    private fileService: FileService,
-    private awsCoreService: AwsCoreService,
+    fileService: FileService,
+    awsCoreService: AwsCoreService,
     private awsAuthenticationService: IAwsSamlAuthenticationService,
     private samlRoleSessionDuration: number
   ) {
-    super(iSessionNotifier, repository);
+    super(iSessionNotifier, repository, awsCoreService, fileService);
   }
 
   static sessionTokenFromGetSessionTokenResponse(assumeRoleResponse: Aws.STS.AssumeRoleWithSAMLResponse): { sessionToken: any } {
@@ -76,6 +76,10 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     const credentialsFile = await this.fileService.iniParseSync(this.awsCoreService.awsCredentialPath());
     delete credentialsFile[profileName];
     return await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile);
+  }
+
+  generateCredentialsProxy(sessionId: string): Promise<CredentialsInfo> {
+    return this.generateCredentials(sessionId);
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
@@ -139,6 +143,18 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     } else {
       throw new Error("AWS IAM Role Federated Session required");
     }
+  }
+
+  validateCredentials(sessionId: string): Promise<boolean> {
+    return new Promise((resolve, _) => {
+      this.generateCredentials(sessionId)
+        .then((__) => {
+          resolve(true);
+        })
+        .catch((__) => {
+          resolve(false);
+        });
+    });
   }
 
   removeSecrets(_: string): void {}

@@ -34,6 +34,8 @@ export class Workspace {
     password?: string;
   };
 
+  private _credentialMethod: string;
+
   constructor() {
     this._pinned = [];
     this._sessions = [];
@@ -54,6 +56,8 @@ export class Workspace {
       username: undefined,
       password: undefined,
     };
+
+    this._credentialMethod = constants.credentialFile;
   }
 
   addIpUrl(idpUrl: IdpUrl): void {
@@ -154,5 +158,13 @@ export class Workspace {
 
   set colorTheme(value: string) {
     this._colorTheme = value;
+  }
+
+  get credentialMethod(): string {
+    return this._credentialMethod;
+  }
+
+  set credentialMethod(credentialMethod: string) {
+    this._credentialMethod = credentialMethod;
   }
 }

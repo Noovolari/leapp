@@ -30,7 +30,7 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
 
   constructor(private appService: AppService, private appProviderService: AppProviderService) {
     this.temporaryName = "";
-    this.segments = [...this.appProviderService.repository.getSegments()];
+    this.segments = [...this.appProviderService.workspaceOptionService.segments];
     this.subscription = globalFilterGroup.subscribe((value) => (this.currentFilterGroup = Object.assign({}, value)));
   }
 
@@ -48,15 +48,15 @@ export class SegmentDialogComponent implements OnInit, OnDestroy {
   }
 
   saveSegment(): void {
-    const segments = [...this.appProviderService.repository.getSegments()];
+    const segments = [...this.appProviderService.workspaceOptionService.segments];
     const index = segments.findIndex((s) => s.name === this.selectedSegment);
     if (index === -1) {
       segments.push({ name: this.selectedSegment, filterGroup: this.currentFilterGroup });
     } else {
       segments[index].filterGroup = this.currentFilterGroup;
     }
-    this.appProviderService.repository.setSegments(segments);
-    segmentFilter.next(this.appProviderService.repository.getSegments());
+    this.appProviderService.workspaceOptionService.segments = segments;
+    segmentFilter.next(this.appProviderService.workspaceOptionService.segments);
     this.appService.closeModal();
   }
 

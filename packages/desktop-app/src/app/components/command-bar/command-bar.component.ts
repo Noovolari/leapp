@@ -228,8 +228,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   windowButtonDetectTheme(): string {
     if (
-      this.repository.getColorTheme() === constants.darkTheme ||
-      (this.repository.getColorTheme() === constants.systemDefaultTheme && this.appService.isDarkMode())
+      this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
+      (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
     ) {
       return "_dark";
     } else {
@@ -237,7 +237,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
-  windowMaximizeAction(): void {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  windowMaximizeAction() {
     if (!this.compactMode) {
       if (this.windowService.getCurrentWindow().isMaximized()) {
         this.windowService.getCurrentWindow().restore();
@@ -263,7 +264,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
         try {
           test ||=
-            this.leappCoreService.repository
+            this.leappCoreService.namedProfileService
               .getProfileName((session as any).profileId)
               ?.toLowerCase()
               .indexOf(searchText.toLowerCase()) > -1;
@@ -343,10 +344,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
 
     filteredSessions = filteredSessions.sort((x, y) => {
-      const pinnedList = this.leappCoreService.repository.getWorkspace().pinned;
+      const pinnedList = this.leappCoreService.workspaceOptionService.pinned;
       if ((pinnedList.indexOf(x.sessionId) !== -1) === (pinnedList.indexOf(y.sessionId) !== -1)) {
         return 0;
-      } else if (this.leappCoreService.repository.getWorkspace().pinned.indexOf(x.sessionId) !== -1) {
+      } else if (this.leappCoreService.workspaceOptionService.pinned.indexOf(x.sessionId) !== -1) {
         return -1;
       } else {
         return 1;
@@ -413,8 +414,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       { show: true, id: SessionType.azure, category: "Microsoft Azure", name: "Azure Subscription", value: false },
     ];
 
-    this.profiles = this.leappCoreService.repository
-      .getProfiles()
+    this.profiles = this.leappCoreService.namedProfileService
+      .getNamedProfiles()
       .map((element) => ({ name: element.name, id: element.id, value: false, show: true }));
 
     this.regions = this.leappCoreService.awsCoreService.getRegions().map((element) => ({ name: element.region, value: false, show: true }));

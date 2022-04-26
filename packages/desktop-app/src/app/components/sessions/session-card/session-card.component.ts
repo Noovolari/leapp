@@ -500,7 +500,9 @@ export class SessionCardComponent implements OnInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  openContextMenu(event): void {
+  openContextMenu(event: any, session: Session): void {
+    this.clearOptionIds();
+    optionBarIds[session.sessionId] = true;
     this.appService.closeAllMenuTriggers();
 
     setTimeout(() => {
@@ -547,7 +549,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   createAChainedSessionFromSelectedOne(): void {
-    const aliasConstructed = `chained-from-${this.session.sessionName}`;
+    const aliasConstructed = `ChainedFrom${this.session.sessionName}`;
     const regionConstructed = this.session.region;
     const assumerSessionIdConstructed = this.session.sessionId;
     const assumerSessionNameConstructed = this.session.sessionName;

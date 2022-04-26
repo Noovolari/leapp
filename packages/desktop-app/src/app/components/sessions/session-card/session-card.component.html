@@ -1,21 +1,21 @@
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-1">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-1">
   <div class="session-name-td">
     <img class="provider-icon" src="assets/images/{{getSessionTypeIcon(session.type)}}{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="" title="" />
     &nbsp;
-    <i class="moon-Hover-{{session.status !== eSessionStatus.active ? 'Start' : 'Stop'}} moon-hover-session hover-item {{session.type === eSessionType.azure ? 'hover-azure' : ''}}" (click)="session.status === eSessionStatus.active ? stopSession() : startSession()"></i>
+    <i class="moon-Hover-{{session.status !== eSessionStatus.active && session.status !== eSessionStatus.pending ? 'Start' : 'Stop'}} moon-hover-session hover-item {{session.type === eSessionType.azure ? 'hover-azure' : ''}}" (click)="session.status === eSessionStatus.active || session.status === eSessionStatus.pending ? stopSession() : startSession()"></i>
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session.sessionName}}</span>
     <i class="moon-Pin" *ngIf="repository.getWorkspace().pinned.indexOf(session.sessionId) !== -1"></i>
   </div>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-2" *ngIf="globalColumns.role">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-2" *ngIf="globalColumns.role">
   <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
     <ng-container *ngIf="session.type !== eSessionType.awsIamUser && session.type !== eSessionType.azure">{{ session | detail }}</ng-container>
   </span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-3" *ngIf="globalColumns.provider">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-3" *ngIf="globalColumns.provider">
   <span class="badge badge-rounded badge-{{getSessionProviderClass(session.type)}}">{{getSessionProviderLabel(session.type)}}</span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-4" *ngIf="globalColumns.namedProfile">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-4" *ngIf="globalColumns.namedProfile">
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
       <ng-container *ngIf="session.type !== eSessionType.azure">
       {{getProfileName(getProfileId(session))}}
@@ -23,13 +23,13 @@
       </ng-container>
     </span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-5" *ngIf="!compactMode && globalColumns.region">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-5" *ngIf="!compactMode && globalColumns.region">
   <span class="badge badge-region badge-{{session.status === eSessionStatus.active ? 'black' : 'gray'}}">{{session.region}}</span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-6">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-6">
   <i class="status-item fas fa-circle {{session.status === eSessionStatus.active ? 'active' : 'offline'}}" *ngIf="session.status !== eSessionStatus.pending"></i>
   <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.status === eSessionStatus.pending"></i>
-  <i class="hover-item moon-More" (click)="openContextMenu($event);"></i>
+  <i class="hover-item moon-More" (click)="openContextMenu($event, session);"></i>
 </td>
 
 
@@ -55,13 +55,13 @@
     </button>
   </ng-container>
 
-  <!--<ng-container *ngIf="session.type !== eSessionType.azure && session.type !== eSessionType.awsIamRoleChained">
+  <ng-container *ngIf="session.type !== eSessionType.azure && session.type !== eSessionType.awsIamRoleChained">
     <div class="divider"></div>
     <button mat-menu-item (click)="createAChainedSessionFromSelectedOne();">
       <i class="moon-Add"></i>
       <span>&nbsp;&nbsp;Create IAM Role Chained Session</span>
     </button>
-  </ng-container>-->
+  </ng-container>
 
   <div class="divider"></div>
 
@@ -92,7 +92,7 @@
     <div class="divider"></div>
   </ng-container>
 
-  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type === eSessionType.awsIamUser">
+  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type !== eSessionType.awsSsoRole">
     <i class="moon-Edit"></i>&nbsp;
     <span>Edit Session</span>
   </button>

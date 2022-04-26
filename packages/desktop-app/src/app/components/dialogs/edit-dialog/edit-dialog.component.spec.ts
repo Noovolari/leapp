@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { async, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { EditDialogComponent } from "./edit-dialog.component";
 import { mustInjected } from "../../../../base-injectables";
@@ -14,12 +14,13 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 
 describe("EditDialogComponent", () => {
   let component: EditDialogComponent;
   let fixture: ComponentFixture<EditDialogComponent>;
 
-  beforeEach(async () => {
+  beforeEach(async(() => {
     const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
@@ -27,38 +28,106 @@ describe("EditDialogComponent", () => {
     const spyRepositoryService = jasmine.createSpyObj("Repository", {
       getProfiles: [],
       getColorTheme: () => constants.darkTheme,
+      listAssumable: (): Session[] => [
+        {
+          sessionName: "test",
+          sessionId: "id",
+          region: "eu-west-1",
+          type: SessionType.awsSsoRole,
+          status: SessionStatus.inactive,
+          startDateTime: undefined,
+          expired: () => false,
+        },
+      ],
+      getWorkspace: (): Workspace =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        mockedWorkspace,
     });
-    //const spyKeychainService = jasmine.createSpyObj("KeychainService", ["getSecret"]);
-    //spyKeychainService.getSecret.and.callFake((_: string, __: string) => Promise.resolve("fake-secret"));
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       workspaceService: spyWorkspaceService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [{ region: "eu-west-1" }] },
       azureCoreService: { getLocations: () => [] },
       sessionFactory: { getSessionService: () => {} },
-      keyChainService: { getSecret: () => Promise.resolve("fake-secret") },
     });
+    const spyKeychainService = jasmine.createSpyObj("KeychainService", ["getSecret"]);
+    spyKeychainService.getSecret.and.callFake((_: string, __: string) => Promise.resolve("fake-secret"));
 
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       declarations: [EditDialogComponent],
-      providers: [].concat(mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])),
+      providers: [].concat(
+        mustInjected().concat([
+          { provide: AppProviderService, useValue: spyLeappCoreService },
+          { provide: KeychainService, useValue: spyKeychainService },
+        ])
+      ),
       imports: [RouterTestingModule],
     }).compileComponents();
-  });
+  }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(EditDialogComponent);
+
+    const mockedWorkspace = {
+      _awsSsoIntegrations: undefined,
+      _defaultLocation: undefined,
+      _defaultRegion: undefined,
+      _folders: undefined,
+      _idpUrls: undefined,
+      _macOsTerminal: undefined,
+      _pinned: undefined,
+      _profiles: [],
+      _proxyConfiguration: undefined,
+      _segments: undefined,
+      _sessions: undefined,
+      _colorTheme: "dark-theme",
+      get awsSsoIntegrations(): AwsSsoIntegration[] {
+        return [];
+      },
+      get defaultLocation(): string {
+        return "";
+      },
+      get defaultRegion(): string {
+        return "";
+      },
+      get folders(): Folder[] {
+        return [];
+      },
+      get idpUrls(): IdpUrl[] {
+        return [];
+      },
+      get macOsTerminal(): string {
+        return "";
+      },
+      get profiles(): AwsNamedProfile[] {
+        return [];
+      },
+      get proxyConfiguration(): { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string } {
+        return { proxyPort: "", proxyProtocol: "" };
+      },
+      get segments(): Segment[] {
+        return [];
+      },
+      get sessions(): Session[] {
+        return [];
+      },
+      get colorTheme(): string {
+        return "dark-theme";
+      },
+      addIpUrl: (_: IdpUrl) => void {},
+      pinned: [],
+    };
+
     component = fixture.componentInstance;
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    component.repository = {
-      _workspace: undefined,
+
+    (component as any).repository = {
+      _workspace: mockedWorkspace,
       fileService: undefined,
       nativeService: undefined,
       get workspace(): Workspace {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        return mockedWorkspace;
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        return <Workspace>(<unknown>mockedWorkspace);
       },
       // eslint-disable-next-line @typescript-eslint/naming-convention
       addAwsSsoIntegration: (_: string, __: string, ___: string, ____: string): void => {},
@@ -96,7 +165,17 @@ describe("EditDialogComponent", () => {
         // @ts-ignore
         mockedWorkspace,
       listActive: (): Session[] => [],
-      listAssumable: (): Session[] => [],
+      listAssumable: (): Session[] => [
+        {
+          sessionName: "test",
+          sessionId: "id",
+          region: "eu-west-1",
+          type: SessionType.awsSsoRole,
+          status: SessionStatus.inactive,
+          startDateTime: undefined,
+          expired: () => false,
+        },
+      ],
       listAwsSsoIntegrations: (): AwsSsoIntegration[] => [],
       listAwsSsoRoles: (): Session[] => [],
       listIamRoleChained: (_?: Session): Session[] => [],
@@ -122,7 +201,8 @@ describe("EditDialogComponent", () => {
       updateSessions: (_: Session[]) => void {},
       getColorTheme: () => constants.darkTheme,
     };
-    fixture.detectChanges();
+
+    // fixture.detectChanges();
   });
 
   it("should create", () => {

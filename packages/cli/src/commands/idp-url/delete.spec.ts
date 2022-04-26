@@ -1,5 +1,6 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import DeleteIdpUrl from "./delete";
+import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("DeleteIdpUrl", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): DeleteIdpUrl => {
@@ -7,6 +8,41 @@ describe("DeleteIdpUrl", () => {
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  test("Flags - idpUrlId & force", async () => {
+    let command = getTestCommand(new CliProviderService(), ["--idpUrlId", "myURLId"]);
+    (command as any).askForConfirmation = jest.fn(() => true);
+    (command as any).deleteIdpUrl = jest.fn();
+
+    try {
+      await command.run();
+    } catch (_) {}
+
+    expect(command.askForConfirmation).toHaveBeenCalled();
+    expect(command.deleteIdpUrl).toHaveBeenCalledWith("myURLId");
+
+    command = getTestCommand(new CliProviderService(), ["--idpUrlId", "myURLId", "--force"]);
+    (command as any).askForConfirmation = jest.fn(() => true);
+    (command as any).deleteIdpUrl = jest.fn();
+
+    try {
+      await command.run();
+    } catch (_) {}
+
+    expect(command.askForConfirmation).not.toHaveBeenCalled();
+    expect(command.deleteIdpUrl).toHaveBeenCalledWith("myURLId");
+
+    command = getTestCommand(new CliProviderService(), ["--idpUrlId", "myURLId", "-f"]);
+    (command as any).askForConfirmation = jest.fn(() => true);
+    (command as any).deleteIdpUrl = jest.fn();
+
+    try {
+      await command.run();
+    } catch (_) {}
+
+    expect(command.askForConfirmation).not.toHaveBeenCalled();
+    expect(command.deleteIdpUrl).toHaveBeenCalledWith("myURLId");
+  });
 
   test("selectIdpUrl", async () => {
     const ipdUrl = { url: "url1" };
@@ -95,6 +131,7 @@ describe("DeleteIdpUrl", () => {
     const cliProviderService: any = {
       idpUrlsService: {
         deleteIdpUrl: jest.fn(),
+        getIdpUrl: jest.fn((id: string) => ({ id })),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
     };

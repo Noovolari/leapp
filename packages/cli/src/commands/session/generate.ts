@@ -5,7 +5,7 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 
 export default class GenerateSession extends LeappCommand {
-  static description = "Generate temporary credentials for the given AWS session id";
+  static description = "Generate STS temporary credentials for the given AWS session id";
   static examples = [`$leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d`];
   static args = [{ name: "sessionId", description: "id of the session", required: true }];
 

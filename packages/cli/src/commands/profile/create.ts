@@ -1,10 +1,15 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
+import { profileName } from "../../flags";
 
 export default class CreateNamedProfile extends LeappCommand {
   static description = "Create a new AWS named profile";
 
-  static examples = [`$leapp profile create`];
+  static examples = [`$leapp profile create`, `$leapp profile create --profileName PROFILENAME`];
+
+  static flags = {
+    profileName,
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);
@@ -12,8 +17,18 @@ export default class CreateNamedProfile extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const profileName = await this.getProfileName();
-      await this.createNamedProfile(profileName);
+      const { flags } = await this.parse(CreateNamedProfile);
+      if (flags.profileName && flags.profileName !== "") {
+        const validation = this.cliProviderService.namedProfilesService.validateNewProfileName(flags.profileName);
+        if (validation === true) {
+          await this.createNamedProfile(flags.profileName);
+        } else {
+          throw new Error(validation.toString());
+        }
+      } else {
+        const profileNameString = await this.getProfileName();
+        await this.createNamedProfile(profileNameString);
+      }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
@@ -24,15 +39,15 @@ export default class CreateNamedProfile extends LeappCommand {
       {
         name: "namedProfileName",
         message: `choose a name for the profile`,
-        validate: (profileName) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileName),
+        validate: (profileNameString) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileNameString),
         type: "input",
       },
     ]);
     return answer.namedProfileName;
   }
 
-  async createNamedProfile(profileName: string): Promise<void> {
-    this.cliProviderService.namedProfilesService.createNamedProfile(profileName);
+  async createNamedProfile(profileNameString: string): Promise<void> {
+    this.cliProviderService.namedProfilesService.createNamedProfile(profileNameString);
     await this.cliProviderService.remoteProceduresClient.refreshSessions();
     this.log("profile created");
   }

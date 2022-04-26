@@ -80,6 +80,7 @@ describe("ListIntegrations", () => {
     expect(cliProviderService.awsSsoIntegrationService.remainingHours).toHaveBeenCalledWith(integrations[0]);
 
     const expectedColumns = {
+      integrationId: { header: "ID", extended: true },
       integrationName: { header: "Integration Name" },
       portalUrl: { header: "Portal URL" },
       region: { header: "Region" },

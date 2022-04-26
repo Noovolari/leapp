@@ -8,6 +8,37 @@ describe("EditNamedProfile", () => {
     return command;
   };
 
+  test("Flags - profileId & profileName", async () => {
+    const cliProviderService: any = {
+      namedProfilesService: {
+        editNamedProfile: jest.fn(),
+        getNamedProfiles: jest.fn(() => [{ id: "mockedProfileId", name: "mockProfile" }]),
+        validateNewProfileName: jest.fn(() => Promise.resolve(true)),
+      },
+      remoteProceduresClient: { refreshSessions: jest.fn() },
+    };
+
+    let command = getTestCommand(cliProviderService, ["--profileId"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --profileId expects a value");
+
+    command = getTestCommand(cliProviderService, ["--profileId", "not-found", "--profileName", "mock"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Named profile not-found not found");
+
+    command = getTestCommand(cliProviderService, ["--profileId", "mockedProfileId", "--profileName"]);
+    command.log = jest.fn();
+    await expect(command.run()).rejects.toThrow("Flag --profileName expects a value");
+
+    command = getTestCommand(cliProviderService, ["--profileId", "mockedProfileId", "--profileName", "newMockName"]);
+    command.log = jest.fn();
+    await command.run();
+
+    expect(cliProviderService.namedProfilesService.editNamedProfile).toHaveBeenCalledWith("mockedProfileId", "newMockName");
+    expect(command.log).toHaveBeenCalledWith("profile edited");
+    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
+  });
+
   test("selectNamedProfile", async () => {
     const namedProfile = { name: "profileName" };
     const cliProviderService: any = {

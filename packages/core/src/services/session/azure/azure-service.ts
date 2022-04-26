@@ -49,41 +49,7 @@ export class AzureService extends SessionService {
 
     const session = this.repository.getSessionById(sessionId);
 
-    // Try parse accessToken.json
-    let accessTokensFile = this.parseAccessTokens();
-
-    // extract accessToken corresponding to the specific tenant (if not present, require az login)
-    let accessTokenExpirationTime;
-    accessTokenExpirationTime = await this.extractAccessTokenExpirationTime(
-      accessTokensFile,
-      (session as AzureSession).tenantId,
-      (session as AzureSession).subscriptionId
-    );
-
-    if (!accessTokenExpirationTime) {
-      try {
-        await this.executeService.execute(`az login --tenant ${(session as AzureSession).tenantId} 2>&1`);
-        accessTokensFile = this.parseAccessTokens();
-        accessTokenExpirationTime = await this.extractAccessTokenExpirationTime(
-          accessTokensFile,
-          (session as AzureSession).tenantId,
-          (session as AzureSession).subscriptionId
-        );
-      } catch (err) {
-        this.sessionDeactivated(sessionId);
-        throw new LeappExecuteError(this, err.message);
-      }
-    }
-
-    // if access token is expired
-    if (!accessTokenExpirationTime || new Date(accessTokenExpirationTime).getTime() < Date.now()) {
-      try {
-        await this.executeService.execute(`az account get-access-token --subscription ${(session as AzureSession).subscriptionId}`);
-      } catch (err) {
-        this.sessionDeactivated(sessionId);
-        throw new LeappExecuteError(this, err.message);
-      }
-    }
+    await this.generateCredentials(sessionId);
 
     try {
       // az account set —subscription <xxx> 2>&1
@@ -129,6 +95,59 @@ export class AzureService extends SessionService {
     } catch (error) {
       throw new LeappParseError(this, error.message);
     }
+  }
+
+  async generateCredentials(sessionId: string): Promise<void> {
+    const session = this.repository.getSessionById(sessionId);
+    // Try parse accessToken.json
+    let accessTokensFile = this.parseAccessTokens();
+
+    // extract accessToken corresponding to the specific tenant (if not present, require az login)
+    let accessTokenExpirationTime;
+    accessTokenExpirationTime = await this.extractAccessTokenExpirationTime(
+      accessTokensFile,
+      (session as AzureSession).tenantId,
+      (session as AzureSession).subscriptionId
+    );
+
+    if (!accessTokenExpirationTime) {
+      try {
+        await this.executeService.execute(`az login --tenant ${(session as AzureSession).tenantId} 2>&1`);
+        accessTokensFile = this.parseAccessTokens();
+        accessTokenExpirationTime = await this.extractAccessTokenExpirationTime(
+          accessTokensFile,
+          (session as AzureSession).tenantId,
+          (session as AzureSession).subscriptionId
+        );
+      } catch (err) {
+        this.sessionDeactivated(sessionId);
+        throw new LeappExecuteError(this, err.message);
+      }
+    }
+
+    // if access token is expired
+    if (!accessTokenExpirationTime || new Date(accessTokenExpirationTime).getTime() < Date.now()) {
+      try {
+        await this.executeService.execute(`az account get-access-token --subscription ${(session as AzureSession).subscriptionId}`);
+      } catch (err) {
+        this.sessionDeactivated(sessionId);
+        throw new LeappExecuteError(this, err.message);
+      }
+    }
+  }
+
+  validateCredentials(sessionId: string): Promise<boolean> {
+    return new Promise((resolve, _) => {
+      this.generateCredentials(sessionId)
+        .then((__) => {
+          this.sessionDeactivated(sessionId);
+          resolve(true);
+        })
+        .catch((__) => {
+          this.sessionDeactivated(sessionId);
+          resolve(false);
+        });
+    });
   }
 
   private async extractAccessTokenExpirationTime(accessTokens: AzureSessionToken[], tenantId: string, subscriptionId: string): Promise<string> {

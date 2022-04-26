@@ -176,7 +176,6 @@ export class CreateDialogComponent implements OnInit {
   }
 
   compareAssumerSessions(a: any, b: any): boolean {
-    console.log(a, b);
     return a?.session?.sessionId === b?.session?.sessionId;
   }
 
@@ -325,8 +324,8 @@ export class CreateDialogComponent implements OnInit {
         return "alibaba.png";
       default:
         return `aws${
-          this.repository.getColorTheme() === constants.darkTheme ||
-          (this.repository.getColorTheme() === constants.systemDefaultTheme && this.appService.isDarkMode())
+          this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
+          (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
             ? "-dark"
             : ""
         }.png`;
@@ -433,7 +432,10 @@ export class CreateDialogComponent implements OnInit {
       const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
       this.selectedProfile.value = profile.id;
     } else {
-      if (validate.toString() !== "Profile already exists" && this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value) {
+      if (
+        validate.toString() !== "Profile already exists" &&
+        this.leappCoreService.namedProfileService.getDefaultProfileId() !== this.selectedProfile.value
+      ) {
         throw new LeappParseError(this, validate.toString());
       }
     }

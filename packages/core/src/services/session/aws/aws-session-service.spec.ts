@@ -6,6 +6,7 @@ import { LeappBaseError } from "../../../errors/leapp-base-error";
 import { LoggerLevel } from "../../logging-service";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { SessionStatus } from "../../../models/session-status";
+import { constants } from "../../../models/constants";
 
 describe("AwsSessionService", () => {
   test("should be created", () => {
@@ -79,6 +80,7 @@ describe("AwsSessionService", () => {
       listIamRoleChained: jest.fn(() => ["session1", "session2"]),
       getSessionById: jest.fn(() => "session1"),
       getSessions: jest.fn(() => []),
+      getWorkspace: jest.fn(() => ({ credentialMethod: constants.credentialFile })),
     } as any;
     const sessionNotifier = {} as any;
     const credentialsInfo = {} as any;
@@ -110,6 +112,7 @@ describe("AwsSessionService", () => {
       listIamRoleChained: jest.fn(() => ["session1", "session2"]),
       getSessionById: jest.fn(() => "session1"),
       getSessions: jest.fn(() => []),
+      getWorkspace: jest.fn(() => ({ credentialMethod: constants.credentialFile })),
     } as any;
     const sessionNotifier = {} as any;
     const credentialsInfo = {} as any;
@@ -135,6 +138,7 @@ describe("AwsSessionService", () => {
       listIamRoleChained: jest.fn(() => ["session1", "session2"]),
       getSessionById: jest.fn(() => "session1"),
       getSessions: jest.fn(() => []),
+      getWorkspace: jest.fn(() => ({ credentialMethod: constants.credentialFile })),
     } as any;
     const sessionNotifier = {} as any;
     const sessionDeactivated = jest.fn((_: string): void => {});
@@ -198,6 +202,7 @@ describe("AwsSessionService", () => {
     const awsSessionService = new (AwsSessionService as any)();
     awsSessionService.repository = repository;
     awsSessionService.generateCredentials = generateCredentials;
+    awsSessionService.generateCredentialsProxy = generateCredentials;
 
     const generateProcessCredentials = await awsSessionService.generateProcessCredentials("sessionId");
 

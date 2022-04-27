@@ -19,9 +19,9 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
-import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Component({
   selector: "app-edit-dialog",
@@ -415,7 +415,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         this.selectedIdpUrl.value = idpUrl.id;
       } else {
         if (validate.toString() !== "IdP URL already exists") {
-          throw new LeappParseError(this, validate.toString());
+          throw new LoggedException(validate.toString(), this, LogLevel.warn);
         }
       }
     }
@@ -437,7 +437,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
           validate.toString() !== "Profile already exists" &&
           this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value
         ) {
-          throw new LeappParseError(this, validate.toString());
+          throw new LoggedException(validate.toString(), this, LogLevel.warn);
         }
       }
     }

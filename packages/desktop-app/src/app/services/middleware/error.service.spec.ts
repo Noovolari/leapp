@@ -1,14 +1,12 @@
 import { TestBed } from "@angular/core/testing";
-
 import { ErrorService } from "./error.service";
 import { mustInjected } from "../../../base-injectables";
 import { ToastrModule } from "ngx-toastr";
-import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { ErrorHandler } from "@angular/core";
 import { AppModule } from "../../app.module";
-import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
 import { AppProviderService } from "../app-provider.service";
 import { MessageToasterService } from "../message-toaster.service";
+import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 describe("ErrorService", () => {
   let spyMessageToasterService;
@@ -46,13 +44,13 @@ describe("ErrorService", () => {
 
   it("should call the Error Handler is an error is thrown in code", () => {
     const spyErrorHandler = spyOn(errorService, "handleError");
-    const error = new LeappBaseError("Mock Error", "testing", LoggerLevel.warn, "custom test message");
+    const error = new LoggedException("custom test message", "testing", LogLevel.warn);
     errorService.handleError(error);
     expect(spyErrorHandler).toHaveBeenCalled();
   });
 
   it("should call logger and toast", () => {
-    const error = new LeappBaseError("Mock Error", "testing", LoggerLevel.warn, "custom test message");
+    const error = new LoggedException("custom test message", "testing", LogLevel.warn);
     errorService.handleError(error);
 
     expect(spyLoggingService.logger).toHaveBeenCalled();

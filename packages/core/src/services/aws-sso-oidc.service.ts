@@ -1,5 +1,3 @@
-import { LeappBaseError } from "../errors/leapp-base-error";
-import { LoggerLevel } from "./logging-service";
 import { constants } from "../models/constants";
 import { Repository } from "./repository";
 import {
@@ -11,6 +9,7 @@ import {
 import { IAwsSsoOidcVerificationWindowService } from "../interfaces/i-aws-sso-oidc-verification-window-service";
 import { BrowserWindowClosing } from "../interfaces/i-browser-window-closing";
 import SSOOIDC, { CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest } from "aws-sdk/clients/ssooidc";
+import { LoggedException, LogLevel } from "./log-service";
 
 export class AwsSsoOidcService {
   public readonly listeners: BrowserWindowClosing[];
@@ -84,8 +83,7 @@ export class AwsSsoOidcService {
 
             const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
             this.setIntervalQueue.splice(resolvedIndex, 1);
-
-            reject(new LeappBaseError("AWS SSO Interrupted", this, LoggerLevel.info, "AWS SSO Interrupted."));
+            reject(new LoggedException("AWS SSO Interrupted.", this, LogLevel.info));
           } else if (this.generateSSOTokenResponse) {
             clearInterval(resolved);
 
@@ -98,8 +96,7 @@ export class AwsSsoOidcService {
 
             const resolvedIndex = this.setIntervalQueue.indexOf(resolved);
             this.setIntervalQueue.splice(resolvedIndex, 1);
-
-            reject(new LeappBaseError("AWS SSO Timeout", this, LoggerLevel.error, "AWS SSO Timeout occurred. Please redo login procedure."));
+            reject(new LoggedException("AWS SSO Timeout occurred. Please redo login procedure.", this, LogLevel.error));
           }
         }, repeatEvery);
 
@@ -183,7 +180,7 @@ export class AwsSsoOidcService {
               // AWS SSO Timeout occurred
               clearInterval(this.mainIntervalId);
               this.timeoutOccurred = true;
-              reject(new LeappBaseError("AWS SSO Timeout", this, LoggerLevel.error, "AWS SSO Timeout occurred. Please redo login procedure."));
+              reject(new LoggedException("AWS SSO Timeout occurred. Please redo login procedure.", this, LogLevel.error));
             }
           });
       }, intervalInMilliseconds);

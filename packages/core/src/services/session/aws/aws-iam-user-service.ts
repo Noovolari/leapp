@@ -1,9 +1,5 @@
 import * as AWS from "aws-sdk";
 import { GetSessionTokenResponse } from "aws-sdk/clients/sts";
-import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
-import { LeappMissingMfaTokenError } from "../../../errors/leapp-missing-mfa-token-error";
-import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
-import { LeappParseError } from "../../../errors/leapp-parse-error";
 import { IMfaCodePrompter } from "../../../interfaces/i-mfa-code-prompter";
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
@@ -17,6 +13,7 @@ import { KeychainService } from "../../keychain-service";
 import { Repository } from "../../repository";
 import { AwsIamUserSessionRequest } from "./aws-iam-user-session-request";
 import { AwsSessionService } from "./aws-session-service";
+import { LoggedException, LogLevel } from "../../log-service";
 
 export interface GenerateSessionTokenCallingMfaParams {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -50,7 +47,7 @@ export class AwsIamUserService extends AwsSessionService {
 
   static sessionTokenFromGetSessionTokenResponse(getSessionTokenResponse: GetSessionTokenResponse): { sessionToken: any } {
     if (getSessionTokenResponse.Credentials === undefined) {
-      throw new LeappAwsStsError(this, "an error occurred during session token generation.");
+      throw new LoggedException("an error occurred during session token generation.", this, LogLevel.warn);
     }
     return {
       sessionToken: {
@@ -127,7 +124,7 @@ export class AwsIamUserService extends AwsSessionService {
     //const session = this.workspaceService.get(sessionId);
     const session = this.repository.getSessions().find((sess) => sess.sessionId === sessionId);
     if (session === undefined) {
-      throw new LeappNotFoundError(this, `session with id ${sessionId} not found.`);
+      throw new LoggedException(`session with id ${sessionId} not found.`, this, LogLevel.warn);
     }
 
     // Retrieve session token expiration
@@ -165,7 +162,7 @@ export class AwsIamUserService extends AwsSessionService {
         // Retrieve session token from keychain
         return JSON.parse(await this.keychainService.getSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-token`));
       } catch (err: any) {
-        throw new LeappParseError(this, err.message);
+        throw new LoggedException(err.message, this, LogLevel.warn);
       }
     }
   }
@@ -184,7 +181,7 @@ export class AwsIamUserService extends AwsSessionService {
       const response = await sts.getCallerIdentity({}).promise();
       return response.Account ?? "";
     } catch (err: any) {
-      throw new LeappAwsStsError(this, err.message);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     }
   }
 
@@ -235,7 +232,7 @@ export class AwsIamUserService extends AwsSessionService {
           // Return session token in the form of CredentialsInfo
           resolve(this.generateSessionToken(session, sts, params));
         } else {
-          reject(new LeappMissingMfaTokenError(this, "Missing Multi Factor Authentication code"));
+          reject(new LoggedException("Missing Multi Factor Authentication code", this, LogLevel.warn));
         }
       });
     });
@@ -278,7 +275,7 @@ export class AwsIamUserService extends AwsSessionService {
       // Return Session Token
       return sessionToken;
     } catch (err: any) {
-      throw new LeappAwsStsError(this, err.message);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     }
   }
 

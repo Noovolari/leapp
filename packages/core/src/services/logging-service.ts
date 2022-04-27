@@ -6,6 +6,7 @@ export enum LoggerLevel {
   error,
 }
 
+//TODO: to remove
 export class LoggingService {
   static instance: LoggingService;
 

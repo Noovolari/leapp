@@ -1,16 +1,15 @@
-import { LeappBaseError } from "../../../errors/leapp-base-error";
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { AwsProcessCredentials } from "../../../models/aws-process-credential";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { SessionStatus } from "../../../models/session-status";
 import { SessionType } from "../../../models/session-type";
-import { LoggerLevel } from "../../logging-service";
 import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { constants } from "../../../models/constants";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
+import { LoggedException, LogLevel } from "../../log-service";
 
 export abstract class AwsSessionService extends SessionService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
@@ -30,7 +29,7 @@ export abstract class AwsSessionService extends SessionService {
   async start(sessionId: string): Promise<void> {
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
-        throw new LeappBaseError("Pending session with same named profile", this, LoggerLevel.info, "Pending session with same named profile");
+        throw new LoggedException("Pending session with same named profile", this, LogLevel.info);
       }
       await this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);

@@ -1,7 +1,7 @@
 import { describe, test, expect, jest } from "@jest/globals";
-import { LeappParseError } from "../errors/leapp-parse-error";
 import { AwsSamlAssertionExtractionService } from "./aws-saml-assertion-extraction-service";
 import { CloudProviderType } from "../models/cloud-provider-type";
+import { LoggedException, LogLevel } from "./log-service";
 
 describe("AwsSamlAssertionExtractionService", () => {
   test("isAuthenticationUrl", () => {
@@ -59,6 +59,7 @@ describe("AwsSamlAssertionExtractionService", () => {
     };
 
     const service = new AwsSamlAssertionExtractionService();
-    expect(() => service.extractAwsSamlResponse(responseHookDetails as any)).toThrow(new LeappParseError(service, ""));
+
+    expect(() => service.extractAwsSamlResponse(responseHookDetails as any)).toThrow(new LoggedException("", this, LogLevel.warn));
   });
 });

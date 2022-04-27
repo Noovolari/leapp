@@ -1,5 +1,3 @@
-import { LeappExecuteError } from "../../../errors/leapp-execute-error";
-import { LeappParseError } from "../../../errors/leapp-parse-error";
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { AzureSession } from "../../../models/azure-session";
 import { Session } from "../../../models/session";
@@ -8,6 +6,7 @@ import { FileService } from "../../file-service";
 import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { AzureSessionRequest } from "./azure-session-request";
+import { LoggedException, LogLevel } from "../../log-service";
 
 export interface AzureSessionToken {
   tokenType: string;
@@ -63,7 +62,7 @@ export class AzureService extends SessionService {
       }
     } catch (err) {
       this.sessionDeactivated(sessionId);
-      throw new LeappExecuteError(this, err.message);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     }
 
     this.sessionActivate(sessionId);
@@ -80,7 +79,7 @@ export class AzureService extends SessionService {
       await this.executeService.execute(`az account clear 2>&1`);
       await this.executeService.execute(`az configure --defaults location='' 2>&1`);
     } catch (err) {
-      throw new LeappExecuteError(this, err.message);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     } finally {
       this.sessionDeactivated(sessionId);
     }
@@ -93,7 +92,7 @@ export class AzureService extends SessionService {
       this.repository.deleteSession(sessionId);
       this.sessionNotifier?.deleteSession(sessionId);
     } catch (error) {
-      throw new LeappParseError(this, error.message);
+      throw new LoggedException(error.message, this, LogLevel.warn);
     }
   }
 
@@ -121,7 +120,7 @@ export class AzureService extends SessionService {
         );
       } catch (err) {
         this.sessionDeactivated(sessionId);
-        throw new LeappExecuteError(this, err.message);
+        throw new LoggedException(err.message, this, LogLevel.warn);
       }
     }
 
@@ -131,7 +130,7 @@ export class AzureService extends SessionService {
         await this.executeService.execute(`az account get-access-token --subscription ${(session as AzureSession).subscriptionId}`);
       } catch (err) {
         this.sessionDeactivated(sessionId);
-        throw new LeappExecuteError(this, err.message);
+        throw new LoggedException(err.message, this, LogLevel.warn);
       }
     }
   }

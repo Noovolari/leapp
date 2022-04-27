@@ -1,5 +1,5 @@
 import { CloudProviderType } from "../models/cloud-provider-type";
-import { LeappParseError } from "../errors/leapp-parse-error";
+import { LoggedException, LogLevel } from "./log-service";
 
 interface ResponseHookDetails {
   uploadData: { bytes: any[] }[];
@@ -36,7 +36,7 @@ export class AwsSamlAssertionExtractionService {
       rawData = n2 !== -1 ? rawData.substring(n + 13, n2) : rawData.substring(n + 13);
       return decodeURIComponent(rawData);
     } catch (err) {
-      throw new LeappParseError(this, err.message);
+      throw new LoggedException("no default named profile found.", this, LogLevel.warn);
     }
   }
 }

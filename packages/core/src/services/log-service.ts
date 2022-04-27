@@ -8,7 +8,7 @@ export enum LogLevel {
 }
 
 export class LoggedEntry extends Error {
-  constructor(message: string, public context: any, public level: LogLevel, public display: boolean) {
+  constructor(message: string, public context: any, public level: LogLevel, public display: boolean = true) {
     super(message);
   }
 }

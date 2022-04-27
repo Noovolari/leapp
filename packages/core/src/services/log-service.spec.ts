@@ -32,7 +32,7 @@ describe("LogService", () => {
     };
 
     class MyService {
-      logService = new LogService(nativeLogger, true);
+      logService = new LogService(nativeLogger);
       errorHandler = (code) => {
         try {
           code();

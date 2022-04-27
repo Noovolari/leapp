@@ -19,9 +19,9 @@ import { AwsIamUserSessionRequest } from "@noovolari/leapp-core/services/session
 import { AwsIamRoleChainedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
 import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azure/azure-session-request";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
-import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
+import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Component({
   selector: "app-create-dialog",
@@ -415,7 +415,7 @@ export class CreateDialogComponent implements OnInit {
         this.selectedIdpUrl.value = idpUrl.id;
       } else {
         if (validate.toString() !== "IdP URL already exists") {
-          throw new LeappParseError(this, validate.toString());
+          throw new LoggedException(validate.toString(), this, LogLevel.warn);
         }
       }
     }
@@ -436,7 +436,7 @@ export class CreateDialogComponent implements OnInit {
         validate.toString() !== "Profile already exists" &&
         this.leappCoreService.namedProfileService.getDefaultProfileId() !== this.selectedProfile.value
       ) {
-        throw new LeappParseError(this, validate.toString());
+        throw new LoggedException(validate.toString(), this, LogLevel.warn);
       }
     }
   }

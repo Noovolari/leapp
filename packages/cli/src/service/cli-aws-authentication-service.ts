@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
 import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
-import { LeappModalClosedError } from "@noovolari/leapp-core/errors/leapp-modal-closed-error";
 import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
+import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 export class CliAwsSamlAuthenticationService implements IAwsSamlAuthenticationService {
   private browser: puppeteer.Browser;
@@ -58,7 +58,7 @@ export class CliAwsSamlAuthenticationService implements IAwsSamlAuthenticationSe
       });
 
       page.on("close", () => {
-        reject(new LeappModalClosedError(this, "request window closed by user"));
+        reject(new LoggedException("request window closed by user", this, LogLevel.info));
       });
 
       try {

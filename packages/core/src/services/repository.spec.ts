@@ -1,4 +1,4 @@
-import { describe, test } from "@jest/globals";
+import { beforeEach, describe, test, jest, expect } from "@jest/globals";
 import { Repository } from "./repository";
 import { FileService } from "./file-service";
 import { Workspace } from "../models/workspace";
@@ -6,8 +6,8 @@ import { constants } from "../models/constants";
 import { Session } from "../models/session";
 import { SessionType } from "../models/session-type";
 import { SessionStatus } from "../models/session-status";
-import { LeappNotFoundError } from "../errors/leapp-not-found-error";
 import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
+import { LoggedException } from "./log-service";
 
 describe("Repository", () => {
   let mockedWorkspace;
@@ -524,7 +524,7 @@ describe("Repository", () => {
     repository.removeProfile("2345");
 
     expect(repository.getProfiles().length).toStrictEqual(1);
-    expect(() => repository.getProfileName("2345")).toThrow(LeappNotFoundError);
+    expect(() => repository.getProfileName("2345")).toThrow(LoggedException);
   });
 
   test("listAwsSsoIntegrations() - get all the aws sso integration we have in the workspace", () => {

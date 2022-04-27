@@ -1,6 +1,4 @@
 import * as Aws from "aws-sdk";
-import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
-import { LeappSamlError } from "../../../errors/leapp-saml-error";
 import { IAwsSamlAuthenticationService } from "../../../interfaces/i-aws-saml-authentication-service";
 import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
 import { AwsIamRoleFederatedSession } from "../../../models/aws-iam-role-federated-session";
@@ -14,6 +12,7 @@ import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
 import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
+import { LoggedException, LogLevel } from "../../log-service";
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
@@ -94,7 +93,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       idpUrl = this.repository.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
       needToAuthenticate = await this.awsAuthenticationService.needAuthentication(idpUrl);
     } catch (err) {
-      throw new LeappSamlError(this, err.message);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     } finally {
       // await this.awsAuthenticationService.closeAuthenticationWindow();
     }
@@ -127,7 +126,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     try {
       assumeRoleWithSamlResponse = await sts.assumeRoleWithSAML(params).promise();
     } catch (err) {
-      throw new LeappAwsStsError(this, err.message);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     }
 
     // Save session token expiration

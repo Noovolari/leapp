@@ -1,5 +1,4 @@
 import { deserialize, serialize } from "class-transformer";
-import { LeappNotFoundError } from "../errors/leapp-not-found-error";
 import { INativeService } from "../interfaces/i-native-service";
 import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session";
 import { AwsNamedProfile } from "../models/aws-named-profile";
@@ -14,6 +13,7 @@ import { FileService } from "./file-service";
 import { IdpUrl } from "../models/idp-url";
 import * as uuid from "uuid";
 import Folder from "../models/folder";
+import { LoggedException, LogLevel } from "./log-service";
 
 export class Repository {
   // Private singleton workspace
@@ -71,7 +71,7 @@ export class Repository {
     const workspace = this.getWorkspace();
     const session = workspace.sessions.find((sess) => sess.sessionId === sessionId);
     if (session === undefined) {
-      throw new LeappNotFoundError(this, `session with id ${sessionId} not found.`);
+      throw new LoggedException(`session with id ${sessionId} not found.`, this, LogLevel.warn);
     }
     return session;
   }
@@ -214,7 +214,7 @@ export class Repository {
   getProfileName(profileId: string): string {
     const profileFiltered = this.getWorkspace().profiles.find((profile) => profile.id === profileId);
     if (profileFiltered === undefined) {
-      throw new LeappNotFoundError(this, `named profile with id ${profileId} not found.`);
+      throw new LoggedException(`named profile with id ${profileId} not found.`, this, LogLevel.warn);
     }
     return profileFiltered.name;
   }
@@ -227,7 +227,7 @@ export class Repository {
     const workspace = this.getWorkspace();
     const profileFiltered = workspace.profiles.find((profile) => profile.name === constants.defaultAwsProfileName);
     if (profileFiltered === undefined) {
-      throw new LeappNotFoundError(this, "no default named profile found.");
+      throw new LoggedException("no default named profile found.", this, LogLevel.warn);
     }
     return profileFiltered.id;
   }

@@ -1,7 +1,7 @@
 import { LoggerLevel, LoggingService } from "./logging-service";
 import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
-import { LeappBaseError } from "../errors/leapp-base-error";
+import { LoggedException, LogLevel } from "./log-service";
 
 export class SsmService {
   aws;
@@ -74,7 +74,7 @@ export class SsmService {
     this.executeService.openTerminal(`aws ssm start-session --region ${region} --target ${quote}${instanceId}${quote}`, env, macOsTerminalType).then(
       () => {},
       (err) => {
-        throw new LeappBaseError("Start SSM error", this, LoggerLevel.error, err.message);
+        throw new LoggedException(err.message, this, LogLevel.error);
       }
     );
   }
@@ -118,7 +118,7 @@ export class SsmService {
         throw new Error("No instances are accessible by this Role.");
       }
     } catch (err) {
-      throw new LeappBaseError("Leapp SSM error", this, LoggerLevel.warn, err.message);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     }
   }
 
@@ -140,7 +140,7 @@ export class SsmService {
 
       return instances;
     } catch (err) {
-      throw new LeappBaseError("Leapp", this, LoggerLevel.warn, err.message);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     }
   }
 }

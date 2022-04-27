@@ -255,8 +255,10 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   private getMetadata() {
     const printError = (error) => {
-      this.loggingService.logger(error, LoggerLevel.error, this, error.stack);
-      this.messageToasterService.toast(error, ToastLevel.error, "");
+      this.loggingService.logger(error.toString(), LoggerLevel.error, this, error.stack);
+      if ((error as LeappBaseError).severity === LoggerLevel.error) {
+        this.messageToasterService.toast(error.toString(), ToastLevel.error, "");
+      }
     };
 
     this.getAwsCliVersion()
@@ -266,7 +268,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         });
       })
       .catch((error) => {
-        printError(error.toString());
+        printError(error);
       });
   }
 
@@ -294,7 +296,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         throw new LeappBaseError(
           "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed.",
           this,
-          LoggerLevel.error,
+          LoggerLevel.warn,
           "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed."
         );
       }

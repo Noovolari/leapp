@@ -314,11 +314,6 @@ td:nth-child(4) {
   }
 }
 
-.azure-opt-bar .opt-bar-middle-section {
-  position: relative;
-  left: 1px;
-}
-
 img.moon-stop-outline {
   width:23px;
   margin-left: -2px;
@@ -328,4 +323,21 @@ img.moon-stop-outline {
 .open-web-console {
   position: relative;
   right: 10px;
+}
+
+.azure-opt-bar .opt-bar-middle-section {
+  position: relative;
+  left: 37px;
+}
+
+.awsiamrolefederated-opt-bar .opt-bar-middle-section,
+.awsiamrolechained-opt-bar .opt-bar-middle-section {
+  position: relative;
+  left: -43px;
+}
+
+.awsiamuser-opt-bar .opt-bar-middle-section,
+.awsssorole-opt-bar .opt-bar-middle-section {
+  position: relative;
+  left: -23px!important;
 }

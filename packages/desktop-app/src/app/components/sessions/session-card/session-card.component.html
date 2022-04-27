@@ -141,7 +141,7 @@
 </mat-menu>
 
 <ng-container *ngIf="eOptionIds[session.sessionId]">
-  <div class="option-bar" [ngClass]="(session.type === eSessionType.azure) ? 'azure-opt-bar' : ''">
+  <div class="option-bar" [ngClass]="session.type.toLowerCase() + '-opt-bar'">
     <div class="opt-bar-session-button">
       <a class="icon-button start-session" (click)="startSession();" *ngIf="session.status === eSessionStatus.inactive"><i class="moon-Play-filled"><div class="dark-theme-filling"></div></i><span>{{compactMode ? '' : '&nbsp;Start Session'}}</span></a>
       <a class="icon-button stop-session" (click)="stopSession();" *ngIf="session.status === eSessionStatus.active || session.status === eSessionStatus.pending"><i class="moon-Stop"><div class="dark-theme-filling"></div></i><span>{{compactMode ? '' : '&nbsp;Stop Session'}}</span></a>

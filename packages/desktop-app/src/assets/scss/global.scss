@@ -721,3 +721,8 @@ body:not(.dark-theme) tr:hover td.table-column-1.selected .session-name-td .hove
   position: relative;
   top: -1px!important;
 }
+
+.compact tr:hover i.hover-azure ~ span {
+  position: relative;
+  top: 2px;
+}

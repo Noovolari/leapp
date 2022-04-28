@@ -36,7 +36,7 @@ export class AwsSamlAssertionExtractionService {
       rawData = n2 !== -1 ? rawData.substring(n + 13, n2) : rawData.substring(n + 13);
       return decodeURIComponent(rawData);
     } catch (err) {
-      throw new LoggedException("no default named profile found.", this, LogLevel.warn);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     }
   }
 }

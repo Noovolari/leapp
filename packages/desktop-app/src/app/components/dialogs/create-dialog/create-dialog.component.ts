@@ -17,7 +17,6 @@ import { AwsIamRoleFederatedSessionRequest } from "@noovolari/leapp-core/service
 import { AwsIamUserSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
 import { AwsIamRoleChainedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
 import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azure/azure-session-request";
-import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { LoggedException, LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
@@ -105,8 +104,7 @@ export class CreateDialogComponent implements OnInit {
     private activatedRoute: ActivatedRoute,
     private bsModalService: BsModalService,
     private leappCoreService: AppProviderService,
-    private windowService: WindowService,
-    private messageToasterService: MessageToasterService
+    private windowService: WindowService
   ) {
     this.repository = leappCoreService.repository;
     this.workspaceService = leappCoreService.workspaceService;
@@ -393,11 +391,10 @@ export class CreateDialogComponent implements OnInit {
           break;
       }
 
-      this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, "");
+      this.logService.log(new LoggedEntry(`Session: ${this.form.value.name}, created.`, this, LogLevel.success, true));
       this.closeModal();
     } else {
-      // eslint-disable-next-line max-len
-      this.messageToasterService.toast(`Session is missing some required properties, please fill them.`, ToastLevel.warn, "");
+      this.logService.log(new LoggedEntry("Session is missing some required properties, please fill them.", this, LogLevel.warn, true));
     }
   }
 

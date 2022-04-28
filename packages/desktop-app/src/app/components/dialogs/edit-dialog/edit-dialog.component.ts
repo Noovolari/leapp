@@ -8,7 +8,6 @@ import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-servi
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
-import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
@@ -21,7 +20,7 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
 import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { LoggedEntry, LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Component({
   selector: "app-edit-dialog",
@@ -93,7 +92,6 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private appService: AppService,
-    private messageToasterService: MessageToasterService,
     private router: Router,
     private windowService: WindowService,
     private leappCoreService: AppProviderService,
@@ -254,10 +252,10 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         await this.sessionService.start(this.selectedSession.sessionId);
       }
 
-      this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
+      this.leappCoreService.logService.log(new LoggedEntry(`Session: ${this.form.value.name}, edited.`, this, LogLevel.success, true));
       this.closeModal();
     } else {
-      this.messageToasterService.toast(`One or more parameters are invalid, check your choices.`, ToastLevel.warn, "");
+      this.leappCoreService.logService.log(new LoggedEntry("One or more parameters are invalid, check your choices.", this, LogLevel.warn, true));
     }
   }
 
@@ -271,15 +269,17 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         this.mfaPrompter.keepUnderlyingModal = false;
 
         if (check) {
-          this.messageToasterService.toast(`Session: ${this.form.value.name} is able to generate credentials correctly.`, ToastLevel.success, "");
+          this.leappCoreService.logService.log(
+            new LoggedEntry(`Session: ${this.form.value.name} is able to generate credentials correctly.`, this, LogLevel.success, true)
+          );
         } else {
-          this.messageToasterService.toast(`One or more parameters are invalid, please check.`, ToastLevel.warn, "");
+          this.leappCoreService.logService.log(new LoggedEntry("One or more parameters are invalid, please check.", this, LogLevel.warn, true));
         }
       } else {
-        this.messageToasterService.toast(`One or more parameters are invalid, please check.`, ToastLevel.warn, "");
+        this.leappCoreService.logService.log(new LoggedEntry("One or more parameters are invalid, please check.", this, LogLevel.warn, true));
       }
     } catch (err) {
-      this.messageToasterService.toast(`One or more parameters are invalid: ${err.toString()}.`, ToastLevel.warn, "");
+      this.leappCoreService.logService.log(new LoggedEntry(`One or more parameters are invalid: ${err.toString()}.`, this, LogLevel.warn, true));
     }
   }
 

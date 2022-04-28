@@ -92,7 +92,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     try {
       parentSession = this.repository.getSessionById((session as AwsIamRoleChainedSession).parentSessionId);
     } catch (err) {
-      throw new LoggedException(`Parent Account Session  not found for Chained Account ${session.sessionName}`, this, LogLevel.warn);
+      throw new LoggedException(`Parent Account Session not found for Chained Account ${session.sessionName}`, this, LogLevel.warn);
     }
 
     // Generate a credential set from Parent Session

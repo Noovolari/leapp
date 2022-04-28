@@ -2,7 +2,8 @@ import { AfterViewInit, Component, EventEmitter, Input, Output, SecurityContext,
 import { NgSelectComponent } from "@ng-select/ng-select";
 import { FormGroup } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
-import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
+import { AppProviderService } from "../../services/app-provider.service";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Component({
   selector: "app-leapp-select",
@@ -51,7 +52,7 @@ export class LeappSelectComponent implements AfterViewInit {
 
   temporaryName: string;
 
-  constructor(private domSanitizer: DomSanitizer, private messageToasterService: MessageToasterService) {
+  constructor(private domSanitizer: DomSanitizer, private appProviderService: AppProviderService) {
     this.temporaryName = "";
     this.uppercased = this.uppercased || true;
   }
@@ -75,7 +76,9 @@ export class LeappSelectComponent implements AfterViewInit {
 
   addNewElement(): void {
     if (this.checkCrossScriptingInjection(this.temporaryName)) {
-      this.messageToasterService.toast("Attention, your inputted data is potentially unsafe and would led to a XSS attack!", ToastLevel.warn);
+      this.appProviderService.logService.log(
+        new LoggedEntry("Attention, your inputted data is potentially unsafe and would led to a XSS attack!", this, LogLevel.warn, true)
+      );
       return;
     }
 

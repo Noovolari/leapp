@@ -1,5 +1,4 @@
 import { jest, describe, expect, test } from "@jest/globals";
-import { LoggerLevel } from "./logging-service";
 import { WebConsoleService } from "./web-console-service";
 import { CredentialsInfo } from "../models/credentials-info";
 
@@ -9,8 +8,8 @@ describe("WebConsoleService", () => {
       openExternalUrl: jest.fn((_loginUrl: string): void => {}),
     };
 
-    const loggingService: any = {
-      logger: jest.fn((_message: any, _type: LoggerLevel, _instance?: any, _stackTrace?: string): void => {}),
+    const logService: any = {
+      log: jest.fn(),
     };
 
     const fetch: any = () => ({
@@ -19,7 +18,7 @@ describe("WebConsoleService", () => {
         SigninToken: "mocked-aws_session_token",
       }),
     });
-    return new WebConsoleService(shellService, loggingService, fetch);
+    return new WebConsoleService(shellService, logService, fetch);
   };
 
   test("openWebConsole - throws error if session's region starts with us-gov- or cn-", async () => {

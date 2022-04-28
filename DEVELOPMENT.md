@@ -138,39 +138,53 @@ As described in the introduction of this document, Leapp Core is a library that 
 
 The core package consists of four main folders: _errors_, _interfaces_, _models_, _services_.
 
-### Errors
+### Errors and logging
 
-This folder contains errors that belong to the domain of Leapp.
-Here you can find a base implementation, i.e. the _LeappBaseError_ class; all the other errors are an implementation of
-_LeappBaseError_.
+Errors and events notification or logging are managed using the two classes _LoggedEntry_ and _LoggedException_.
+_LoggedException_ can be instantiated and then thrown specifying the following fields:
+* __message__: a human-readable message
+* __context__: the class from which the exception is thrown
+* __logLevel__: a constant defined in the enum _LogLevel_
+* __display__: a boolean value that specifies whether to show the event or error in a toast (only for the desktop app)
+* __customStack__: specifies a call stack to attach to the error/event, if not specified, the stack of the method instantiating the object is used
+
+Throwing a _LoggedException_, causes the exit from the current call stack and, if not caught, it will be properly logged (and optionally shown to the user) by the error handler.
+```typescript
+class LoggedException extends LoggedEntry {
+  constructor(message: string, public context: any, public level: LogLevel, public display: boolean = true, public customStack?: string) {
+    super(message, context, level, display, customStack);
+  }
+}
+```
+```typescript
+// The following row logs and shows to the user a toast.
+throw new LoggedException("To log and show...", this, LogLevel.warn, true);
+```
+```typescript
+// The following row just logs
+throw new LoggedException("To log...", this, LogLevel.info, false);
+```
+
+_LoggedEntry_ is the superclass of _LoggedException_ and has the same fields.
+It __should not be thrown__ but instantiated and passed to the _LoggerService_'s _log()_ method. 
 
 ```typescript
-export class LeappBaseError extends Error {
-  private readonly _context: any;
-  private readonly _severity: LoggerLevel;
-
-  constructor(name: string, context: any, severity: LoggerLevel, message?: string) {
+class LoggedEntry extends Error {
+  constructor(message: string, public context: any, public level: LogLevel, public display: boolean = false, public customStack?: string) {
     super(message);
-    this.name = name;
-    this._context = context;
-    this._severity = severity;
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-
-  public get severity(): LoggerLevel {
-    return this._severity;
-  }
-
-  public get context(): any {
-    return this._context;
   }
 }
 ```
 
-As you can see from the code quote above, the _LeappBaseError_ class extends the TypeScript _Error_ class and provides
-additional information: _name_, _context_, and _severity_.
+```typescript
+// The following row logs and shows to the user a toast.
+this.logService.log(new LoggedEntry("To log and show...", this, LogLevel.warn, true));
 
-If you consider it useful, you can implement a new error that extends _LeappBaseError_ one.
+// The following row just logs
+this.logService.log(new LoggedEntry("To log...", this, LogLevel.info, false));
+```
+
+_LoggedEntry_ and _log()_ can be used wherever you want to log without causing the current call stack to exit.
 
 ### Models
 

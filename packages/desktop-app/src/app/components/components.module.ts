@@ -35,7 +35,7 @@ import { ColumnDialogComponent } from "./dialogs/column-dialog/column-dialog.com
 import { LeappSelectComponent } from "./leapp-select/leapp-select.component";
 import { IntegrationBarComponent } from "./integration-bar/integration-bar.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
-import { CredentialProcessDialogComponent } from './dialogs/credential-process-dialog/credential-process-dialog.component';
+import { CredentialProcessDialogComponent } from "./dialogs/credential-process-dialog/credential-process-dialog.component";
 
 @NgModule({
   declarations: [

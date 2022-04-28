@@ -1,18 +1,17 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { CredentialProcessDialogComponent } from './credential-process-dialog.component';
-import {mustInjected} from "../../../../base-injectables";
+import { CredentialProcessDialogComponent } from "./credential-process-dialog.component";
+import { mustInjected } from "../../../../base-injectables";
 
-describe('CredentialProcessDialogComponent', () => {
+describe("CredentialProcessDialogComponent", () => {
   let component: CredentialProcessDialogComponent;
   let fixture: ComponentFixture<CredentialProcessDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ CredentialProcessDialogComponent ],
+      declarations: [CredentialProcessDialogComponent],
       providers: [].concat(mustInjected()),
-    })
-    .compileComponents();
+    }).compileComponents();
   });
 
   beforeEach(() => {
@@ -21,7 +20,7 @@ describe('CredentialProcessDialogComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it("should create", () => {
     expect(component).toBeTruthy();
   });
 });

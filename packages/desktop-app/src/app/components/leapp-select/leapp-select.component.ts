@@ -2,7 +2,7 @@ import { AfterViewInit, Component, EventEmitter, Input, Output, SecurityContext,
 import { NgSelectComponent } from "@ng-select/ng-select";
 import { FormGroup } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
-import {MessageToasterService, ToastLevel} from "../../services/message-toaster.service";
+import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 
 @Component({
   selector: "app-leapp-select",
@@ -101,7 +101,7 @@ export class LeappSelectComponent implements AfterViewInit {
     }
   }
 
-  selectValue(value: any) {
+  selectValue(value: any): void {
     const found = this.items.findIndex((i) => i[this.bindValue] === value[this.bindValue]);
     if (found > -1) {
       this.ngSelectComponent.select(value);

@@ -432,7 +432,10 @@ export class CreateDialogComponent implements OnInit {
       const profile = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label);
       this.selectedProfile.value = profile.id;
     } else {
-      if (validate.toString() !== "Profile already exists" && this.leappCoreService.namedProfileService.getDefaultProfileId() !== this.selectedProfile.value) {
+      if (
+        validate.toString() !== "Profile already exists" &&
+        this.leappCoreService.namedProfileService.getDefaultProfileId() !== this.selectedProfile.value
+      ) {
         throw new LeappParseError(this, validate.toString());
       }
     }

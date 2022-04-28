@@ -131,7 +131,8 @@
     "test": "jest",
     "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme --multi --dir scopes",
     "release": "gushio gushio/target-release.js",
-    "release-npm": "gushio gushio/target-npm-release.js"
+    "release-npm": "gushio gushio/target-npm-release.js",
+    "release-homebrew": "gushio gushio/target-brew-release.js"
   },
   "types": "dist/index.d.ts"
 }

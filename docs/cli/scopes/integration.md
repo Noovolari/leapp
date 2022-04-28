@@ -21,8 +21,8 @@ USAGE
 
 FLAGS
   --integrationAlias=<value>      alias that identifies an integration
-  --integrationMethod=<value>     either in-app or in-browser, identifies the preferred method to authenticate against
-                                  portal URL
+  --integrationMethod=<value>     value is either In-app or In-browser, identifies the preferred method to authenticate
+                                  against portal URL
   --integrationPortalUrl=<value>  url that identifies the integration portal where you authenticate
   --integrationRegion=<value>     an AWS valid region code for the integration
 

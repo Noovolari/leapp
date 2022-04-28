@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.12.0](https://github.com/Noovolari/leapp/compare/v0.11.1...v0.12.0) (2022-04-28)
+
+### Features
+
+* ability to edit any type of Session! [#230](https://github.com/Noovolari/leapp/issues/230) [#136](https://github.com/Noovolari/leapp/issues/136) [#42](https://github.com/Noovolari/leapp/issues/42)
+* added shortcut to create an IAM Role Chained Session from an IAM User, IAM Role Federated, or AWS SSO Role Session
+* added support to credential_process in ~/.aws/config file
+* Leapp CLI now supports scripting using flags for each available command [#259](https://github.com/Noovolari/leapp/issues/259)
+
 ## [0.11.1](https://github.com/Noovolari/leapp/compare/v0.11.0...v0.11.1) (2022-04-21)
 
 ### Bug Fixes

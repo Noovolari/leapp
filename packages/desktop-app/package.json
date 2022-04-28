@@ -20,7 +20,7 @@
     "test": "ng test",
     "build-dev": "gushio gushio/target-build.js aot",
     "build-prod": "gushio gushio/target-build.js 'configuration production'",
-    "run-local": "electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
+    "run-local": "electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist --inspect-brk=5858 .",
     "build-and-run-dev": "gushio gushio/target-build-and-run.js aot",
     "release-mac": "gushio gushio/target-release.js 'configuration production' mac",
     "release-linux": "gushio gushio/target-release.js 'configuration production' linux",

@@ -5,7 +5,7 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
-import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
@@ -32,6 +32,7 @@ import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { WorkspaceOptionService } from "@noovolari/leapp-core/services/workspace-option-service";
+import { NativeLoggerService } from "./native-logger-service";
 
 @Injectable({
   providedIn: "root",
@@ -58,7 +59,7 @@ export class AppProviderService {
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
   private keyChainServiceInstance: KeychainService;
-  private loggingServiceInstance: LoggingService;
+  private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
   private rotationServiceInstance: RotationService;
@@ -71,7 +72,7 @@ export class AppProviderService {
   private remoteProceduresServerInstance: RemoteProceduresServer;
   private workspaceOptionInstance: WorkspaceOptionService;
 
-  constructor(private electronService: AppNativeService, private ngZone: NgZone) {}
+  constructor(private electronService: AppNativeService, private ngZone: NgZone, private nativeLogger: NativeLoggerService) {}
 
   public get idpUrlService(): IdpUrlsService {
     if (!this.idpUrlServiceInstance) {
@@ -96,7 +97,7 @@ export class AppProviderService {
 
   public get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.loggingService, window.fetch.bind(window));
+      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.logService, window.fetch.bind(window));
     }
     return this.webConsoleServiceInstance;
   }
@@ -190,7 +191,7 @@ export class AppProviderService {
 
   public get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.electronService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.electronService, this.logService);
     }
     return this.awsCoreServiceInstance;
   }
@@ -231,7 +232,7 @@ export class AppProviderService {
 
   public get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
+      this.ssmServiceInstance = new SsmService(this.logService, this.executeService);
     }
     return this.ssmServiceInstance;
   }
@@ -268,11 +269,11 @@ export class AppProviderService {
     return this.keyChainServiceInstance;
   }
 
-  public get loggingService(): LoggingService {
-    if (!this.loggingServiceInstance) {
-      this.loggingServiceInstance = new LoggingService(this.electronService);
+  public get logService(): LogService {
+    if (!this.logServiceInstance) {
+      this.logServiceInstance = new LogService(this.nativeLogger);
     }
-    return this.loggingServiceInstance;
+    return this.logServiceInstance;
   }
 
   public get timerService(): TimerService {

@@ -1,14 +1,13 @@
-import { LoggerLevel, LoggingService } from "./logging-service";
 import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
-import { LoggedException, LogLevel } from "./log-service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "./log-service";
 
 export class SsmService {
   aws;
   ssmClient;
   ec2Client;
 
-  constructor(private loggingService: LoggingService, private executeService: ExecuteService) {
+  constructor(private logService: LogService, private executeService: ExecuteService) {
     this.aws = require("aws-sdk");
   }
 
@@ -107,7 +106,7 @@ export class SsmService {
           });
 
           // We have found and managed a list of instances
-          this.loggingService.logger("Obtained smm info from aws for SSM", LoggerLevel.info, this);
+          this.logService.log(new LoggedEntry("Obtained smm info from aws for SSM", this, LogLevel.info));
           return instances;
         } else {
           // No instances usable

@@ -3,8 +3,9 @@ import { AppNativeService } from "./app-native.service";
 import { environment } from "../../environments/environment";
 import { ConfirmationDialogComponent } from "../components/dialogs/confirmation-dialog/confirmation-dialog.component";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
 import { IOpenExternalUrlService } from "@noovolari/leapp-core/interfaces/i-open-external-url-service";
+import { AppProviderService } from "./app-provider.service";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Injectable({
   providedIn: "root",
@@ -13,7 +14,7 @@ export class WindowService implements IOpenExternalUrlService {
   private currentWindow: any;
   private windowOs = "win32";
 
-  constructor(private modalService: BsModalService, private electronService: AppNativeService) {}
+  constructor(private modalService: BsModalService, private electronService: AppNativeService, private appProviderService: AppProviderService) {}
 
   /**
    * Create a new browser window
@@ -100,7 +101,7 @@ export class WindowService implements IOpenExternalUrlService {
   blockDevToolInProductionMode(): void {
     this.getCurrentWindow().webContents.on("devtools-opened", () => {
       if (environment.production) {
-        this.electronService.log("Closing Web tools in production mode", LoggerLevel.info, this);
+        this.appProviderService.logService.log(new LoggedEntry("Closing Web tools in production mode", this, LogLevel.info));
         this.getCurrentWindow().webContents.closeDevTools();
       }
     });

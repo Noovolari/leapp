@@ -5,12 +5,11 @@ import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { MessageToasterService, ToastLevel } from "./message-toaster.service";
-import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
 import { AppNativeService } from "./app-native.service";
 import { AppService } from "./app.service";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { DomSanitizer } from "@angular/platform-browser";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Injectable({ providedIn: "root" })
 export class AppAwsAuthenticationService implements IAwsSamlAuthenticationService {
@@ -19,7 +18,6 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
     private appService: AppService,
     private windowService: WindowService,
     private electronService: AppNativeService,
-    private messageToasterService: MessageToasterService,
     private domSanitizer: DomSanitizer
   ) {}
 
@@ -119,10 +117,8 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
         }
       }
 
-      this.messageToasterService.toast(
-        "Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.",
-        ToastLevel.info,
-        "Cleaning configuration file"
+      this.leappCoreService.logService.log(
+        new LoggedEntry("Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.", this, LogLevel.info, true)
       );
 
       // Restart
@@ -131,23 +127,21 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
         this.appService.restart();
       }, 3000);
     } catch (err) {
-      this.leappCoreService.loggingService.logger(
-        `Leapp has an error re-creating your configuration file and cache.`,
-        LoggerLevel.error,
-        this,
-        err.stack
+      this.leappCoreService.logService.log(
+        new LoggedEntry("Leapp has an error re-creating your configuration file and cache.", this, LogLevel.error, false, err.stack)
       );
       if (this.appService.detectOs() === constants.windows) {
-        this.messageToasterService.toast(
-          `Leapp needs Admin permissions to do this: please restart the application as an Administrator and retry.`,
-          ToastLevel.warn,
-          "Cleaning configuration file"
+        this.leappCoreService.logService.log(
+          new LoggedEntry(
+            "Leapp needs Admin permissions to do this: please restart the application as an Administrator and retry.",
+            this,
+            LogLevel.warn,
+            true
+          )
         );
       } else {
-        this.messageToasterService.toast(
-          `Leapp has an error re-creating your configuration file and cache.`,
-          ToastLevel.error,
-          "Cleaning configuration file"
+        this.leappCoreService.logService.log(
+          new LoggedEntry("Leapp has an error re-creating your configuration file and cache.", this, LogLevel.error, true)
         );
       }
     }

@@ -1,5 +1,4 @@
 import { Injectable } from "@angular/core";
-import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
 import { SnackbarComponent } from "../components/snackbar/snackbar.component";
 import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from "@angular/material/snack-bar";
 
@@ -25,19 +24,19 @@ export class MessageToasterService {
    * @param type - the type of message from Toast Level
    * @param title - [optional]
    */
-  toast(message: string, type: ToastLevel | LoggerLevel, title?: string): void {
+  toast(message: string, type: ToastLevel, title?: string): void {
     switch (type) {
       case ToastLevel.success:
         this.openSnackBar(message, title, "toast-success");
         break;
-      case ToastLevel.info || LoggerLevel.info:
+      case ToastLevel.info:
         this.openSnackBar(message, title, "toast-info");
         break;
-      case ToastLevel.warn || LoggerLevel.warn:
+      case ToastLevel.warn:
         this.openSnackBar(message, title, "toast-warning");
         break;
       // eslint-disable-next-line max-len
-      case ToastLevel.error || LoggerLevel.error:
+      case ToastLevel.error:
         this.openSnackBar(message, title ? title : "Invalid Action!", "toast-error");
         break;
       default:

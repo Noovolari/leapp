@@ -1,7 +1,7 @@
 import { constants } from "../models/constants";
 import { Session } from "../models/session";
 import { INativeService } from "../interfaces/i-native-service";
-import { LoggerLevel } from "./logging-service";
+import { LoggedEntry, LogLevel, LogService } from "./log-service";
 
 // TODO: rename it. This naming is ambiguous.
 export class AwsCoreService {
@@ -33,7 +33,7 @@ export class AwsCoreService {
     ["us-west-2", "https://sts.us-west-2.amazonaws.com"],
   ]);
 
-  constructor(private nativeService: INativeService) {}
+  constructor(private nativeService: INativeService, private logService: LogService) {}
 
   awsCredentialPath(): string {
     return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "credentials");
@@ -74,7 +74,9 @@ export class AwsCoreService {
       // Rewrite credential file
       this.nativeService.fs.writeFileSync(awsCredentialsPath, "");
     } catch (error) {
-      this.nativeService.log(`Can't delete aws credential file probably missing: ${error.toString()}`, LoggerLevel.warn, this, error.stack);
+      this.logService.log(
+        new LoggedEntry(`Can't delete aws credential file probably missing: ${error.toString()}`, this, LogLevel.warn, false, error.stack)
+      );
     }
   }
 

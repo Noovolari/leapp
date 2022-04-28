@@ -1,12 +1,12 @@
 import { IOpenExternalUrlService } from "../interfaces/i-open-external-url-service";
 import { CredentialsInfo } from "../models/credentials-info";
-import { LoggerLevel, LoggingService } from "./logging-service";
+import { LoggedEntry, LogLevel, LogService } from "./log-service";
 
 export class WebConsoleService {
   private secondsInAHour = 3200;
   private sessionDurationInHours = 1;
 
-  constructor(private shellService: IOpenExternalUrlService, private loggingService: LoggingService, private fetch: any) {}
+  constructor(private shellService: IOpenExternalUrlService, private logService: LogService, private fetch: any) {}
 
   async openWebConsole(
     credentialsInfo: CredentialsInfo,
@@ -20,7 +20,7 @@ export class WebConsoleService {
       throw new Error("Unsupported Region");
     }
 
-    this.loggingService.logger(`Starting opening Web Console`, LoggerLevel.info, this);
+    this.logService.log(new LoggedEntry("Starting opening Web Console", this, LogLevel.info));
 
     const sessionStringJSON = {
       sessionId: credentialsInfo.sessionToken.aws_access_key_id,

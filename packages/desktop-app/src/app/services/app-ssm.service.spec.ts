@@ -17,7 +17,7 @@ describe("SsmService", () => {
         getSsmInstances: (_0: CredentialsInfo, _1: string, _2?: any) => {},
         startSession: (_0: CredentialsInfo, _1: string, _2: string) => {},
       },
-      loggingService: {},
+      logService: {},
       executeService: {},
     });
 
@@ -27,7 +27,7 @@ describe("SsmService", () => {
 
     service = TestBed.inject(AppSsmService);
     (service as any).coreSsmService = appProviderService.ssmService;
-    (service as any).loggingService = appProviderService.loggingService;
+    (service as any).logService = appProviderService.logService;
     (service as any).executeService = appProviderService.executeService;
   });
 

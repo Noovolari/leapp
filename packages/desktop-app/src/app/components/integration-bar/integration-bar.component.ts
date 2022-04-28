@@ -12,12 +12,11 @@ import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-servi
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
-import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
 import { WindowService } from "../../services/window.service";
 import { sidebarHighlight } from "../side-bar/side-bar.component";
+import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 export interface SelectedIntegration {
   id: string;
@@ -69,14 +68,13 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   private awsSsoRoleService: AwsSsoRoleService;
   private workspaceService: WorkspaceService;
   private awsSsoOidcService: AwsSsoOidcService;
-  private loggingService: LoggingService;
+  private logService: LogService;
 
   constructor(
     public appService: AppService,
     private bsModalService: BsModalService,
     private router: Router,
     private windowService: WindowService,
-    private messageToasterService: MessageToasterService,
     private leappCoreService: AppProviderService,
     private ngZone: NgZone
   ) {
@@ -84,7 +82,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.awsSsoRoleService = this.leappCoreService.awsSsoRoleService;
     this.workspaceService = this.leappCoreService.workspaceService;
     this.awsSsoOidcService = this.leappCoreService.awsSsoOidcService;
-    this.loggingService = this.leappCoreService.loggingService;
+    this.logService = this.leappCoreService.logService;
   }
 
   ngOnInit(): void {
@@ -111,7 +109,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
             await this.forceSync(integration.id);
           }
         }
-        this.messageToasterService.toast("Integrations synchronized.", ToastLevel.info, "");
+        this.logService.log(new LoggedEntry("Integrations synchronized.", this, LogLevel.info, true));
       }
     });
 
@@ -200,8 +198,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       } catch (err) {
         this.awsSsoOidcService.interrupt();
         await this.logout(integrationId);
-        this.loggingService.logger(`Error during SSO Login: ${err.toString()}`, LoggerLevel.error);
-        this.messageToasterService.toast(`Error during SSO Login: ${err.toString()}`, ToastLevel.error);
+        this.logService.log(new LoggedEntry(`Error during SSO Login: ${err.toString()}`, this, LogLevel.error, true));
       } finally {
         if (this.modalRef) {
           this.modalRef.hide();
@@ -296,7 +293,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       });
       this.modalRef.hide();
     } else {
-      this.messageToasterService.toast("Form is not valid", ToastLevel.warn, "Form validation");
+      this.logService.log(new LoggedEntry("Form is not valid", this, LogLevel.warn, true));
     }
   }
 
@@ -307,8 +304,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       `Deleting this configuration will also logout from its sessions: do you want to proceed?`,
       async (res) => {
         if (res !== constants.confirmClosed) {
-          // eslint-disable-next-line max-len
-          this.loggingService.logger(`Removing sessions with attached aws sso config id: ${awsSsoIntegration.id}`, LoggerLevel.info, this);
+          this.logService.log(new LoggedEntry(`Removing sessions with attached aws sso config id: ${awsSsoIntegration.id}`, this, LogLevel.info));
           await this.logout(awsSsoIntegration.id);
           this.repository.deleteAwsSsoIntegration(awsSsoIntegration.id);
           this.modifying = 0;

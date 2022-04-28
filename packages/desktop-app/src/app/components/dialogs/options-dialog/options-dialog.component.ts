@@ -4,8 +4,6 @@ import { AppService } from "../../../services/app.service";
 import { Router } from "@angular/router";
 import { MatTabGroup } from "@angular/material/tabs";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
-import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
@@ -13,6 +11,7 @@ import { SessionService } from "@noovolari/leapp-core/services/session/session-s
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Component({
   selector: "app-options-dialog",
@@ -77,7 +76,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     public appProviderService: AppProviderService,
     public appService: AppService,
     private windowService: WindowService,
-    private toasterService: MessageToasterService,
     private modalService: BsModalService,
     private router: Router
   ) {
@@ -175,11 +173,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           "You've set a proxy url: the app must be restarted to update the configuration.",
           (res) => {
             if (res !== constants.confirmClosed) {
-              // eslint-disable-next-line max-len
-              this.appProviderService.loggingService.logger(
-                "User have set a proxy url: the app must be restarted to update the configuration.",
-                LoggerLevel.info,
-                this
+              this.appProviderService.logService.log(
+                new LoggedEntry("User have set a proxy url: the app must be restarted to update the configuration.", this, LogLevel.info)
               );
               this.appService.restart();
             }
@@ -189,8 +184,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         );
       } else {
         this.appService.closeModal();
-        this.appProviderService.loggingService.logger("Option saved.", LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
-        this.toasterService.toast("Option saved.", ToastLevel.info, "Options");
+
+        this.appProviderService.logService.log(
+          new LoggedEntry("Option saved.", this, LogLevel.info, true, JSON.stringify(this.form.getRawValue(), null, 3))
+        );
       }
     }
   }
@@ -262,7 +259,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       `Deleting this IdP URL will also remove these sessions: <br><ul>${sessionsNames.join("")}</ul>Do you want to proceed?`,
       (res) => {
         if (res !== constants.confirmClosed) {
-          this.appProviderService.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
+          this.appProviderService.logService.log(new LoggedEntry(`Removing idp url with id: ${id}`, this, LogLevel.info));
 
           sessions.forEach((session) => {
             this.appProviderService.repository.deleteSession(session.sessionId);
@@ -300,7 +297,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         }
       }
     } else {
-      this.toasterService.toast(validate.toString(), ToastLevel.warn);
+      this.appProviderService.logService.log(new LoggedEntry(validate.toString(), this, LogLevel.warn, true));
     }
 
     this.editingAwsProfile = false;
@@ -336,7 +333,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       `Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join("")}</ul>Do you want to proceed?`,
       async (res) => {
         if (res !== constants.confirmClosed) {
-          this.appProviderService.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
+          this.appProviderService.logService.log(new LoggedEntry(`Reverting to default profile with id: ${id}`, this, LogLevel.info));
 
           // Reverting all sessions to default profile
           // eslint-disable-next-line @typescript-eslint/prefer-for-of

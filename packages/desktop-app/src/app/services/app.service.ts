@@ -3,12 +3,11 @@ import { FormControl, FormGroup } from "@angular/forms";
 import { AppNativeService } from "./app-native.service";
 
 import { AppProviderService } from "./app-provider.service";
-import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { WindowService } from "./window.service";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Injectable({
   providedIn: "root",
@@ -20,29 +19,27 @@ export class AppService {
   private triggers: MatMenuTrigger[];
 
   /* This service is defined to provide different app wide methods as utilities */
-  private loggingService: LoggingService;
+  private logService: LogService;
 
   constructor(
     private electronService: AppNativeService,
-    private messageToasterService: MessageToasterService,
     private windowService: WindowService,
     private modalService: BsModalService,
     leappCoreService: AppProviderService
   ) {
     this.triggers = [];
 
-    this.loggingService = leappCoreService.loggingService;
+    this.logService = leappCoreService.logService;
 
     // Global Configure logger
     if (this.electronService.log) {
       const logPaths = {
-        mac: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
-        linux: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
-        windows: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
+        [constants.mac]: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
+        [constants.linux]: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
+        [constants.windows]: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
       };
 
       this.electronService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
-      // eslint-disable-next-line max-len
       this.electronService.log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}";
       this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
@@ -112,19 +109,14 @@ export class AppService {
       // Clean localStorage
       localStorage.clear();
 
-      this.messageToasterService.toast("Cache and configuration file cleaned.", ToastLevel.success, "Cleaning configuration file");
+      this.logService.log(new LoggedEntry("Cache and configuration file cleaned.", this, LogLevel.success, true));
 
       // Restart
       setTimeout(() => {
         this.restart();
       }, 2000);
     } catch (err) {
-      this.loggingService.logger(`Leapp has an error re-creating your configuration file and cache.`, LoggerLevel.error, this, err.stack);
-      this.messageToasterService.toast(
-        `Leapp has an error re-creating your configuration file and cache.`,
-        ToastLevel.error,
-        "Cleaning configuration file"
-      );
+      this.logService.log(new LoggedEntry("Leapp has an error re-creating your configuration file and cache.", this, LogLevel.error, true));
     }
   }
 

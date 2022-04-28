@@ -5,33 +5,25 @@ import { ToastrModule } from "ngx-toastr";
 import { ErrorHandler } from "@angular/core";
 import { AppModule } from "../../app.module";
 import { AppProviderService } from "../app-provider.service";
-import { MessageToasterService } from "../message-toaster.service";
 import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 describe("ErrorService", () => {
-  let spyMessageToasterService;
-  let spyLoggingService;
+  let spyLogService;
   let errorService;
   let handler;
 
   beforeEach(() => {
-    spyLoggingService = jasmine.createSpyObj("LoggingService", ["logger"]);
-    spyLoggingService.logger.and.returnValue(true);
-
-    spyMessageToasterService = jasmine.createSpyObj("MessageToasterService", ["toast"]);
-    spyMessageToasterService.toast.and.returnValue(true);
+    spyLogService = jasmine.createSpyObj("LogService", ["log"]);
+    spyLogService.log.and.returnValue(true);
 
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
-      loggingService: spyLoggingService,
+      logService: spyLogService,
     });
 
     handler = TestBed.configureTestingModule({
       imports: [AppModule, ToastrModule.forRoot()],
       providers: [{ provide: ErrorHandler, useClass: ErrorService }].concat(
-        mustInjected().concat([
-          { provide: MessageToasterService, useValue: spyMessageToasterService },
-          { provide: AppProviderService, useValue: spyLeappCoreService },
-        ])
+        mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])
       ),
     }).inject(ErrorHandler) as any;
 
@@ -49,12 +41,11 @@ describe("ErrorService", () => {
     expect(spyErrorHandler).toHaveBeenCalled();
   });
 
-  it("should call logger and toast", () => {
+  it("should log LoggedException", () => {
     const error = new LoggedException("custom test message", "testing", LogLevel.warn);
     errorService.handleError(error);
 
-    expect(spyLoggingService.logger).toHaveBeenCalled();
-    expect(spyMessageToasterService.toast).toHaveBeenCalled();
+    expect(spyLogService.log).toHaveBeenCalledWith(error);
   });
 
   it("should be registered on the AppModule", () => {

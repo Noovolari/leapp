@@ -11,7 +11,6 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AppProviderService } from "../../../services/app-provider.service";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { AppSsmService } from "../../../services/app-ssm.service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
@@ -25,13 +24,12 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
-import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
-import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
+import { LoggedException, LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -94,7 +92,7 @@ export class SessionCardComponent implements OnInit {
     awsProfile: new FormControl("", [Validators.required]),
   });
 
-  private loggingService: LoggingService;
+  private logService: LogService;
   private sessionFactory: SessionFactory;
   private fileService: FileService;
   private keychainService: KeychainService;
@@ -111,11 +109,10 @@ export class SessionCardComponent implements OnInit {
     private ssmService: AppSsmService,
     private windowService: WindowService,
     private electronService: AppNativeService,
-    private messageToasterService: MessageToasterService,
     private appProviderService: AppProviderService,
     private awsAuthenticationService: AppAwsAuthenticationService
   ) {
-    this.loggingService = appProviderService.loggingService;
+    this.logService = appProviderService.logService;
     this.sessionFactory = appProviderService.sessionFactory;
     this.fileService = appProviderService.fileService;
     this.keychainService = appProviderService.keyChainService;
@@ -259,11 +256,10 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-        this.messageToasterService.toast("Your information have been successfully copied!", ToastLevel.success, "Information copied!");
+        this.logService.log(new LoggedEntry("Your information have been successfully copied!", this, LogLevel.success, true));
       }
     } catch (err) {
-      this.messageToasterService.toast(err, ToastLevel.warn);
-      this.loggingService.logger(err, LoggerLevel.error, this, err.stack);
+      this.logService.log(new LoggedEntry(err.message, this, LogLevel.warn, true, err.stack));
     }
   }
 
@@ -332,7 +328,7 @@ export class SessionCardComponent implements OnInit {
         this.instances = await this.ssmService.getSsmInstances(credentials, this.selectedSsmRegion);
         this.duplicateInstances = this.instances;
       } catch (err) {
-        throw new LeappBaseError("SSM Error", this, LoggerLevel.error, err.message);
+        throw new LoggedException(err.message, this, LogLevel.error, true, err.stack);
       } finally {
         this.ssmLoading = false;
         this.firstTimeSsm = false;
@@ -368,7 +364,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession();
       }
 
-      this.messageToasterService.toast("Default region has been changed!", ToastLevel.success, "Region changed!");
+      this.logService.log(new LoggedEntry("Default region has been changed!", this, LogLevel.success, true));
       this.modalRef.hide();
     }
   }
@@ -441,7 +437,7 @@ export class SessionCardComponent implements OnInit {
 
       this.appProviderService.namedProfileService.changeNamedProfile(this.session, this.selectedProfile.value);
 
-      this.messageToasterService.toast("Profile has been changed!", ToastLevel.success, "Profile changed!");
+      this.logService.log(new LoggedEntry("Profile has been changed!", this, LogLevel.success, true));
       this.modalRef.hide();
     }
   }
@@ -495,7 +491,7 @@ export class SessionCardComponent implements OnInit {
 
   copyProfile(profileName: string): void {
     this.appService.copyToClipboard(profileName);
-    this.messageToasterService.toast("Profile name copied!", ToastLevel.success, "Information copied!");
+    this.logService.log(new LoggedEntry("Profile name copied!", this, LogLevel.success, true));
     this.trigger.closeMenu();
   }
 
@@ -574,19 +570,22 @@ export class SessionCardComponent implements OnInit {
   }
 
   private logSessionData(session: Session, message: string): void {
-    this.loggingService.logger(
-      message,
-      LoggerLevel.info,
-      this,
-      JSON.stringify(
-        {
-          timestamp: new Date().toISOString(),
-          id: session.sessionId,
-          account: session.sessionName,
-          type: session.type,
-        },
-        null,
-        3
+    this.logService.log(
+      new LoggedEntry(
+        message,
+        this,
+        LogLevel.info,
+        false,
+        JSON.stringify(
+          {
+            timestamp: new Date().toISOString(),
+            id: session.sessionId,
+            account: session.sessionName,
+            type: session.type,
+          },
+          null,
+          3
+        )
       )
     );
   }

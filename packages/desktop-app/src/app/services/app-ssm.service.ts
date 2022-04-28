@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { AppService } from "./app.service";
 import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
-import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
 import { AppProviderService } from "./app-provider.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
+import { LogService } from "@noovolari/leapp-core/services/log-service";
 
 @Injectable({
   providedIn: "root",
@@ -13,13 +13,13 @@ export class AppSsmService {
   ssmClient;
   ec2Client;
 
-  private loggingService: LoggingService;
+  private logService: LogService;
   private executeService: ExecuteService;
   private coreSsmService: SsmService;
 
   constructor(private appService: AppService, private leappCoreService: AppProviderService) {
     this.coreSsmService = leappCoreService.ssmService;
-    this.loggingService = leappCoreService.loggingService;
+    this.logService = leappCoreService.logService;
     this.executeService = leappCoreService.executeService;
   }
 

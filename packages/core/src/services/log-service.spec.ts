@@ -1,23 +1,8 @@
-import { describe, test } from "@jest/globals";
+import { describe, test, expect } from "@jest/globals";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "./log-service";
 import { ILogger } from "../interfaces/i-logger";
 
 describe("LogService", () => {
-  /*
-  - Throw Error:
-      - L’utente può vedere o non vedere il messaggio
-      - Il messaggio può avere diverse severità
-      - Il messaggio viene sempre loggato con stack trace
-      - Si esce dallo stack di chiamata
-  - logService.log(…)
-      - L’utente può vedere o non vedere il messaggio
-      - Il messaggio può avere diverse severità
-      - Il messaggio viene sempre loggato con stack trace
-      - Non si esce dallo stack di chiamata
-  - Il “title” dei toast non viene mai mostrato né loggato
-  - Il “name” delle eccezioni (che proviene dalle varie sottoclassi di LeappBaseError) viene passato solo nel titolo del toast e quindi scartato.
-   */
-
   test("log", () => {
     const logMessages = [];
     const toasts = [];
@@ -30,36 +15,23 @@ describe("LogService", () => {
         toasts.push({ message, level });
       },
     };
+    const logService = new LogService(nativeLogger);
+    logService.log(new LoggedEntry("message1", "context1", LogLevel.info));
+    logService.log(new LoggedEntry("message2", 12, LogLevel.warn, true, "stack2"));
+    logService.log(new LoggedException("message3", new Date(), LogLevel.error, undefined, "stack3"));
 
-    class MyService {
-      logService = new LogService(nativeLogger);
-      errorHandler = (code) => {
-        try {
-          code();
-        } catch (error: any) {
-          this.logService.log(error);
-        }
-      };
+    expect(logMessages[0].level).toBe(LogLevel.info);
+    expect(logMessages[0].message.startsWith("[String] Error: message1\n    at Object.")).toBe(true);
 
-      method1() {
-        this.logService.log(new LoggedEntry("something to log", this, LogLevel.warn, false));
-      }
+    expect(logMessages[1].level).toBe(LogLevel.warn);
+    expect(logMessages[1].message).toBe("[Number] stack2");
 
-      method2() {
-        this.errorHandler(() => {
-          throw new LoggedException("something to show", this, LogLevel.error, true);
-        });
-      }
-    }
+    expect(logMessages[2].level).toBe(LogLevel.error);
+    expect(logMessages[2].message).toBe("[Date] stack3");
 
-    const myService = new MyService();
-
-    myService.method1();
-    myService.method2();
-
-    console.log("logMessages");
-    console.log(logMessages);
-    console.log("\n\ntoasts");
-    console.log(toasts);
+    expect(toasts).toEqual([
+      { level: 2, message: "message2" },
+      { level: 3, message: "message3" },
+    ]);
   });
 });

@@ -495,9 +495,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#desktop-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      Desktop App
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desktop App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#macos-homebrew-linux-linuxbrew-and-windows-via-wsl" class="md-nav__link">
     <span class="md-ellipsis">
       macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      CLI
     </span>
   </a>
   
@@ -1593,9 +1617,33 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#desktop-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      Desktop App
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Desktop App">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#macos-homebrew-linux-linuxbrew-and-windows-via-wsl" class="md-nav__link">
     <span class="md-ellipsis">
       macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      CLI
     </span>
   </a>
   
@@ -1620,6 +1668,7 @@
 
 
 <h1 id="update-leapp">Update Leapp</h1>
+<h2 id="desktop-app">Desktop App</h2>
 <p>Leapp checks if a new version is available every <strong>10 minutes</strong> (starting from the application launch). 
 If so, a dialog message will pop up and show a <code>version number</code>, the <code>release date</code> and the <code>changelog</code></p>
 <figure class="figure-image">
@@ -1646,9 +1695,23 @@ Note that you can do this for every version and maintain the one you prefer.</p>
 </div>
 </div>
 </div>
-<h2 id="macos-homebrew-linux-linuxbrew-and-windows-via-wsl">macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)</h2>
+<h3 id="macos-homebrew-linux-linuxbrew-and-windows-via-wsl">macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)</h3>
 <p>Leapp can also be updated via <a href="https://brew.sh/">Homebrew Cask</a> with:
 <code>brew upgrade leapp</code></p>
+<h2 id="cli">CLI</h2>
+<p>Depeding on which method you used to install the CLI (<a href="https://www.npmjs.com/package/@noovolari/leapp-cli">npm</a> or Homebrew on macOS) you can update it with the following commands:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">npm</label><label for="__tabbed_2_2">Homebrew (macOS)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>npm update -g @noovolari/leapp-cli
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="gp">$ </span>brew upgrade Noovolari/brew/leapp-cli
+</code></pre></div>
+</div>
+</div>
+</div>
 
   
 

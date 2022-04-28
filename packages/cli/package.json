@@ -2,7 +2,10 @@
   "name": "@noovolari/leapp-cli",
   "description": "Leapp's Command Line Interface\n\nIt relies on Leapp Core, which encapsulates the domain logic.\n\nFor more information about the project visit the [site](www.leapp.cloud).",
   "version": "0.1.12",
-  "author": "besharp <info@besharp.it>",
+  "author": {
+    "name": "Noovolari",
+    "email": "info@noovolari.com"
+  },
   "bin": {
     "leapp": "./bin/run"
   },
@@ -125,6 +128,9 @@
     }
   },
   "repository": "noovolari/leapp",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "prepare docs": "gushio gushio/replace-header-cli-index-doc.js",
     "clean": "gushio gushio/target-clean.js",

@@ -549,7 +549,8 @@ export class SessionCardComponent implements OnInit {
     const regionConstructed = this.session.region;
     const assumerSessionIdConstructed = this.session.sessionId;
     const assumerSessionNameConstructed = this.session.sessionName;
-    const assumerSessionTagConstructed = `chained-from-${this.session.sessionName}`;
+    const sessionName = this.session.sessionName.replace(/ /g, "-");
+    const assumerSessionTagConstructed = `chained-from-${sessionName}`;
 
     const initialState = {
       shortcutAlias: aliasConstructed,

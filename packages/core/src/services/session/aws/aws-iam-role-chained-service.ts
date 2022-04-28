@@ -97,7 +97,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
     // Generate a credential set from Parent Session
     const parentSessionService = this.parentSessionServiceFactory.getSessionService(parentSession.type);
-    const parentCredentialsInfo = await parentSessionService.generateCredentials(parentSession.sessionId);
+    const parentCredentialsInfo = await parentSessionService.generateCredentialsProxy(parentSession.sessionId);
 
     // Make second jump: configure aws SDK with parent credentials set
     AWS.config.update({

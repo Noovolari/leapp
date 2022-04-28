@@ -75,6 +75,16 @@ describe("AwsIamRoleChainedService", () => {
           aws_secret_access_key: "",
         },
       })),
+      generateCredentialsProxy: jest.fn((_: string) => ({
+        sessionToken: {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_session_token: "",
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_access_key_id: "",
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          aws_secret_access_key: "",
+        },
+      })),
     };
     parentSessionServiceFactory = {
       getSessionService: jest.fn(() => parentSessionService),

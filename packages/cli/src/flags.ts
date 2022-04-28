@@ -41,7 +41,7 @@ export const integrationRegion = Flags.string({
 });
 
 export const integrationMethod = Flags.string({
-  description: "either in-app or in-browser, identifies the preferred method to authenticate against portal URL",
+  description: "value is either In-app or In-browser, identifies the preferred method to authenticate against portal URL",
   hidden: false,
 });
 

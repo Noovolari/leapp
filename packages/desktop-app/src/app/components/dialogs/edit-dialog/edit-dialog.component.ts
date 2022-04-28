@@ -155,7 +155,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
       this.idpUrlSelect.selectValue({
         value: this.selectedSession.idpUrlId,
-        label: this.leappCoreService.idpUrlService.getIdpUrl(this.selectedSession.idpUrlId),
+        label: this.leappCoreService.idpUrlService.getIdpUrl(this.selectedSession.idpUrlId).url,
       });
       this.namedProfileSelect.selectValue({
         value: this.selectedSession.profileId,

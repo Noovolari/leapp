@@ -704,7 +704,7 @@ tr:hover .moon-hover-session {
 
 tr:hover i.hover-azure ~ span {
   position: relative;
-  top: -1.5px;
+  top: -1px;
 }
 
 body:not(.dark-theme) td.table-column-1.selected .session-name-td span {
@@ -715,4 +715,14 @@ body:not(.dark-theme) td.table-column-1.selected .session-name-td span {
 body:not(.dark-theme) tr:hover td.table-column-1.selected .session-name-td span {
   position: relative;
   top: 0!important;
+}
+
+body:not(.dark-theme) tr:hover td.table-column-1.selected .session-name-td .hover-azure ~ span {
+  position: relative;
+  top: -1px!important;
+}
+
+.compact tr:hover i.hover-azure ~ span {
+  position: relative;
+  top: 2px;
 }

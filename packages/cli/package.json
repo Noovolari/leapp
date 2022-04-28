@@ -1,8 +1,11 @@
 {
   "name": "@noovolari/leapp-cli",
   "description": "Leapp's Command Line Interface\n\nIt relies on Leapp Core, which encapsulates the domain logic.\n\nFor more information about the project visit the [site](www.leapp.cloud).",
-  "version": "0.1.8",
-  "author": "besharp <info@besharp.it>",
+  "version": "0.1.12",
+  "author": {
+    "name": "Noovolari",
+    "email": "info@noovolari.com"
+  },
   "bin": {
     "leapp": "./bin/run"
   },
@@ -69,7 +72,7 @@
     "eslint-config-oclif": "^4",
     "eslint-config-oclif-typescript": "^1.0.2",
     "globby": "^11",
-    "gushio": "~0.5.0",
+    "gushio": "~0.7.0",
     "jest": "^27.4.5",
     "puppeteer": "~13.2.0",
     "ts-node": "^10.2.1",
@@ -120,12 +123,17 @@
     }
   },
   "repository": "noovolari/leapp",
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "prepare docs": "gushio gushio/replace-header-cli-index-doc.js",
     "clean": "gushio gushio/target-clean.js",
     "test": "jest",
     "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme --multi --dir scopes",
-    "release": "gushio gushio/target-release.js"
+    "release": "gushio gushio/target-release.js",
+    "release-homebrew": "gushio gushio/target-brew-release.js",
+    "release-npm": "gushio gushio/target-npm-release.js"
   },
   "types": "dist/index.d.ts"
 }

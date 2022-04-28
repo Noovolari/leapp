@@ -31,7 +31,7 @@ module.exports = {
     filenames.forEach((filename) => {
       console.log("   |...corrected " + filename);
       let fileData = fs.readFileSync("scopes/" + filename, 'utf-8');
-      fileData = fileData.replaceAll("```\nUSAGE", "```console\nUSAGE").replaceAll("##", "#");
+      fileData = fileData.replace(/```\nUSAGE/g, "```console\nUSAGE").replace(/##/g, "#");
       fs.writeFileSync("scopes/" + filename, fileData);
     });
     console.log("...conversion completed");

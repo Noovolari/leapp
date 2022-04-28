@@ -108,7 +108,7 @@ export abstract class AwsSessionService extends SessionService {
     }
   }
 
-  async applyConfigProfileCommand(sessionId: string) {
+  async applyConfigProfileCommand(sessionId: string): Promise<any> {
     try {
       const session = this.repository.getSessionById(sessionId) as any;
       const command = `leapp session generate ${sessionId}`;

@@ -104,7 +104,7 @@ export class LeappSelectComponent implements AfterViewInit {
     }
   }
 
-  selectValue(value: any) {
+  selectValue(value: any): void {
     const found = this.items.findIndex((i) => i[this.bindValue] === value[this.bindValue]);
     if (found > -1) {
       this.ngSelectComponent.select(value);

@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { ILogger } from "@noovolari/leapp-core/interfaces/i-logger";
-import { LogLevel } from "@noovolari/leapp-core/services/log-service";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { AppNativeService } from "./app-native.service";
+import { LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 const toastLevelMap = {
   [LogLevel.success]: ToastLevel.success,
@@ -12,7 +12,7 @@ const toastLevelMap = {
 };
 
 @Injectable({ providedIn: "root" })
-export class NativeLoggerService implements ILogger {
+export class AppNativeLoggerService implements ILogger {
   constructor(private nativeService: AppNativeService, private messageToasterService: MessageToasterService) {}
 
   log(message: string, level: LogLevel) {

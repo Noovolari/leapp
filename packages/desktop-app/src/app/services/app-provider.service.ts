@@ -32,7 +32,7 @@ import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { WorkspaceOptionService } from "@noovolari/leapp-core/services/workspace-option-service";
-import { NativeLoggerService } from "./native-logger-service";
+import { AppNativeLoggerService } from "./app-native-logger-service";
 
 @Injectable({
   providedIn: "root",
@@ -72,7 +72,7 @@ export class AppProviderService {
   private remoteProceduresServerInstance: RemoteProceduresServer;
   private workspaceOptionInstance: WorkspaceOptionService;
 
-  constructor(private electronService: AppNativeService, private ngZone: NgZone, private nativeLogger: NativeLoggerService) {}
+  constructor(private electronService: AppNativeService, private ngZone: NgZone, private nativeLogger: AppNativeLoggerService) {}
 
   public get idpUrlService(): IdpUrlsService {
     if (!this.idpUrlServiceInstance) {
@@ -285,7 +285,7 @@ export class AppProviderService {
 
   public get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository);
+      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository, this.logService);
     }
     return this.executeServiceInstance;
   }

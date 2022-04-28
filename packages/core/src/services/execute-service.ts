@@ -1,9 +1,10 @@
 import { INativeService } from "../interfaces/i-native-service";
 import { constants } from "../models/constants";
 import { Repository } from "./repository";
+import { LoggedEntry, LogLevel, LogService } from "./log-service";
 
 export class ExecuteService {
-  constructor(private nativeService: INativeService, private repository: Repository) {}
+  constructor(private nativeService: INativeService, private repository: Repository, private logService: LogService) {}
 
   getQuote(): string {
     return this.nativeService.process.platform === "darwin" ? "'" : "";
@@ -35,7 +36,8 @@ export class ExecuteService {
       }
 
       exec(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {
-        this.nativeService.log.info("execute from Leapp: ", { error: err, standardout: stdout, standarderror: stderr });
+        const output = { error: err, stdout, stderr };
+        this.logService.log(new LoggedEntry("execute from Leapp: " + JSON.stringify(output), this, LogLevel.info, false));
         if (err) {
           reject(err);
         } else {

@@ -1,7 +1,6 @@
 import * as ipc from "node-ipc";
 
 export interface INativeService {
-  log: any;
   url: any;
   fs: any;
   rimraf: any;

@@ -1,7 +1,6 @@
 import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
 
 export class CliNativeService implements INativeService {
-  log: any;
   url: any;
   fs: any;
   rimraf: any;
@@ -40,16 +39,5 @@ export class CliNativeService implements INativeService {
     this.followRedirects = require("follow-redirects");
     this.httpProxyAgent = require("http-proxy-agent");
     this.httpsProxyAgent = require("https-proxy-agent");
-    this.log = {
-      info: (msg: string) => {
-        global.console.info(msg);
-      },
-      warn: (msg: string) => {
-        global.console.warn(msg);
-      },
-      error: (msg: string) => {
-        global.console.error(msg);
-      },
-    };
   }
 }

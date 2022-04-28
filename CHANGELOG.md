@@ -7,9 +7,9 @@ All notable changes to this project will be documented in this file. See [standa
 ### Features
 
 * ability to edit any type of Session! [#230](https://github.com/Noovolari/leapp/issues/230) [#136](https://github.com/Noovolari/leapp/issues/136) [#42](https://github.com/Noovolari/leapp/issues/42)
-* added shortcut to create an IAM Role Chained Session from an IAM User, IAM Role Federated, or AWS SSO Role Session
+* added shortcut to create an [IAM Role Chained Session](https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-role-chained/) from an IAM User, IAM Role Federated, or AWS SSO Role Session
 * added support to credential_process in ~/.aws/config file
-* Leapp CLI now supports scripting using flags for each available command [#259](https://github.com/Noovolari/leapp/issues/259)
+* Leapp CLI now [supports scripting using flags](https://docs.leapp.cloud/latest/cli/) for each available command [#259](https://github.com/Noovolari/leapp/issues/259)
 
 ## [0.11.1](https://github.com/Noovolari/leapp/compare/v0.11.0...v0.11.1) (2022-04-21)
 

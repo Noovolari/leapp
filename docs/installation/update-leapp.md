@@ -1,5 +1,7 @@
 # Update Leapp
 
+## Desktop App
+
 Leapp checks if a new version is available every **10 minutes** (starting from the application launch). 
 If so, a dialog message will pop up and show a `version number`, the `release date` and the `changelog`
 
@@ -27,7 +29,23 @@ In this modal, a user can do the following:
     
     Leapp will close the modal and another one will appear in **10 minutes**.
 
-## macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)
+### macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)
 
 Leapp can also be updated via [Homebrew Cask](https://brew.sh/) with:
 `brew upgrade leapp`
+
+## CLI
+
+Depeding on which method you used to install the CLI ([npm](https://www.npmjs.com/package/@noovolari/leapp-cli) or Homebrew on macOS) you can update it with the following commands:
+
+=== "npm"
+
+    ```console
+    $ npm update -g @noovolari/leapp-cli
+    ```
+
+=== "Homebrew (macOS)"
+
+    ```console
+    $ brew upgrade Noovolari/brew/leapp-cli
+    ```

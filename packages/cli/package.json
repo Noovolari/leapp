@@ -59,7 +59,6 @@
     "tslib": "^2.3.1",
     "uuid": "~8.3.2",
     "wait-on": "^6.0.0",
-    "winston": "^3.7.2",
     "zlib": "~1.0.5"
   },
   "devDependencies": {

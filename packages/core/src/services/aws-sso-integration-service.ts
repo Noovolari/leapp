@@ -160,7 +160,6 @@ export class AwsSsoIntegrationService {
       // Delete access token and remove sso integration info from workspace
       await this.keyChainService.deletePassword(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
       this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
-      await this.removeSsoSessionsFromWorkspace(integrationId);
     }
   }
 

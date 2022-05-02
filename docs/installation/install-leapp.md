@@ -29,7 +29,7 @@ You can install Leapp CLI from [npm](https://www.npmjs.com/package/@noovolari/le
 $ npm install -g @noovolari/leapp-cli
 ```
 
-In macOS, you can install Leapp CLI through a Homebrew Formula:
+On macOS, you can install Leapp CLI through a Homebrew Formula:
 
 ```console
 $ brew install Noovolari/brew/leapp-cli

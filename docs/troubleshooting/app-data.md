@@ -81,13 +81,13 @@ By default, Leapp writes logs to the following locations:
 === "Linux"
 
     ```
-    ~/.config/Leapp/log.electronService.log
+    ~/.config/Leapp/logs/log.electronService.log
     ```
 
 === "Windows"
 
     ```
-    %USERPROFILE%\\AppData\\Roaming\\Leapp\\log.electronService.log
+    C:\Users\<USER>\AppData\Roaming\Leapp\log.electronService.log
     ```
 !!! Info
 

@@ -241,13 +241,13 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.awsSsoOidcService.interrupt();
     this.loadingInBrowser = false;
     this.loadingInApp = false;
-    this.modalRef.hide();
+    this.modalRef?.hide();
   }
 
   catchClosingBrowserWindow(): void {
     this.loadingInBrowser = false;
     this.loadingInApp = false;
-    this.modalRef.hide();
+    this.modalRef?.hide();
   }
 
   gotoForm(modifying: number, awsSsoIntegration: AwsSsoIntegration): void {

@@ -42,5 +42,8 @@
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"
+  },
+  "dependencies": {
+    "electron-localshortcut": "^3.2.1"
   }
 }

@@ -252,15 +252,23 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   }
 
   private getMetadata() {
+    const logError = (error) => {
+      const toShow = (error as LoggedEntry).level === LogLevel.error;
+      this.logService.log(new LoggedEntry(error.message, this, LogLevel.error, toShow, error.stack));
+    };
+
     this.getAwsCliVersion()
       .then(() => {
-        this.getSessionManagerPluginVersion().then(() => {
-          this.setIssueBody();
-        });
+        this.getSessionManagerPluginVersion()
+          .then(() => {
+            this.setIssueBody();
+          })
+          .catch((error) => {
+            logError(error);
+          });
       })
       .catch((error) => {
-        const toShow = (error as LoggedEntry).level === LogLevel.error;
-        this.logService.log(new LoggedEntry(error.message, this, LogLevel.error, toShow, error.stack));
+        logError(error);
       });
   }
 

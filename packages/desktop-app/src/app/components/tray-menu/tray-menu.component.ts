@@ -264,6 +264,8 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
             this.setIssueBody();
           })
           .catch((error) => {
+            this.awsSsmPluginVersion = " / ";
+            this.setIssueBody();
             logError(error);
           });
       })

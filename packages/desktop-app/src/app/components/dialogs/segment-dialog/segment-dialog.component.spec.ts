@@ -10,7 +10,7 @@ describe("SegmentDialogComponent", () => {
   let fixture: ComponentFixture<SegmentDialogComponent>;
 
   beforeEach(async () => {
-    const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
+    const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
     });
@@ -20,7 +20,7 @@ describe("SegmentDialogComponent", () => {
       getColorTheme: () => constants.darkTheme,
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
-      workspaceService: spyWorkspaceService,
+      workspaceService: spyBehaviouralSubjectService,
       workspaceOptionService: { segments: [] },
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },

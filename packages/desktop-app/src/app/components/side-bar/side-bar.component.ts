@@ -5,7 +5,7 @@ import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { ConfirmationDialogComponent } from "../dialogs/confirmation-dialog/confirmation-dialog.component";
 import Segment from "@noovolari/leapp-core/models/segment";
 import Folder from "@noovolari/leapp-core/models/folder";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { AppProviderService } from "../../services/app-provider.service";
@@ -42,11 +42,11 @@ export class SideBarComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
 
   private repository: Repository;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(private bsModalService: BsModalService, private leappCoreService: AppProviderService) {
     this.repository = leappCoreService.repository;
-    this.workspaceService = leappCoreService.workspaceService;
+    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
     this.showAll = true;
     this.showPinned = false;
   }
@@ -56,7 +56,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
       this.segments = segments;
       this.selectedS = this.segments.map((segment) => ({ name: segment.name, selected: false }));
     });
-    segmentFilter.next(this.repository.getSegments());
+    segmentFilter.next(this.leappCoreService.segmentService.list());
 
     sidebarHighlight.subscribe((value) => {
       this.highlightSelectedRow(value.showAll, value.showPinned, value.selectedSegment);
@@ -71,7 +71,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   resetFilters(): void {
     document.querySelector(".sessions").classList.remove("filtered");
     sidebarHighlight.next({ showAll: true, showPinned: false, selectedSegment: -1 });
-    globalFilteredSessions.next(this.workspaceService.sessions);
+    globalFilteredSessions.next(this.behaviouralSubjectService.sessions);
     globalHasFilter.next(false);
     globalResetFilter.next(true);
   }
@@ -79,7 +79,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   showOnlyPinned(): void {
     sidebarHighlight.next({ showAll: false, showPinned: true, selectedSegment: -1 });
     globalFilteredSessions.next(
-      this.workspaceService.sessions.filter((s: Session) => this.repository.getWorkspace().pinned.indexOf(s.sessionId) !== -1)
+      this.behaviouralSubjectService.sessions.filter((s: Session) => this.repository.getWorkspace().pinned.indexOf(s.sessionId) !== -1)
     );
   }
 
@@ -100,8 +100,8 @@ export class SideBarComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    this.repository.removeSegment(segment);
-    this.segments = JSON.parse(JSON.stringify(this.repository.getSegments()));
+    this.leappCoreService.segmentService.removeSegment(segment);
+    this.segments = JSON.parse(JSON.stringify(this.leappCoreService.segmentService.list()));
   }
 
   selectedSegmentCheck(segment: Segment): string {

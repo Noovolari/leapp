@@ -1,6 +1,6 @@
 import { LeappExecuteError } from "../../../errors/leapp-execute-error";
 import { LeappParseError } from "../../../errors/leapp-parse-error";
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AzureSession } from "../../../models/azure-session";
 import { Session } from "../../../models/session";
 import { ExecuteService } from "../../execute-service";
@@ -25,7 +25,7 @@ export interface AzureSessionToken {
 
 export class AzureService extends SessionService {
   constructor(
-    iSessionNotifier: ISessionNotifier,
+    iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
     private fileService: FileService,
     private executeService: ExecuteService,
@@ -41,7 +41,7 @@ export class AzureService extends SessionService {
   async create(sessionRequest: AzureSessionRequest): Promise<void> {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region, sessionRequest.subscriptionId, sessionRequest.tenantId);
     this.repository.addSession(session);
-    this.sessionNotifier?.addSession(session);
+    this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
   async start(sessionId: string): Promise<void> {
@@ -91,7 +91,7 @@ export class AzureService extends SessionService {
       //TODO: check if session is currently active before trying to stop it?
       await this.stop(sessionId);
       this.repository.deleteSession(sessionId);
-      this.sessionNotifier?.deleteSession(sessionId);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
     } catch (error) {
       throw new LeappParseError(this, error.message);
     }

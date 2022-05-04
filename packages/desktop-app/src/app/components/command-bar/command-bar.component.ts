@@ -9,7 +9,7 @@ import { globalOrderingFilter } from "../sessions/sessions.component";
 import { Session } from "@noovolari/leapp-core/models/session";
 import Segment, { GlobalFilters } from "@noovolari/leapp-core/models/segment";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { syncAllEvent } from "../integration-bar/integration-bar.component";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AppNativeService } from "../../services/app-native.service";
@@ -74,7 +74,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private subscription6;
 
   private currentSegment: Segment;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
     private bsModalService: BsModalService,
@@ -83,13 +83,13 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     public electronService: AppNativeService,
     private windowService: WindowService
   ) {
-    this.workspaceService = leappCoreService.workspaceService;
+    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
     this.repository = leappCoreService.repository;
 
     this.filterExtended = false;
     this.compactMode = false;
 
-    globalFilteredSessions.next(this.workspaceService.sessions);
+    globalFilteredSessions.next(this.behaviouralSubjectService.sessions);
 
     globalColumns.next({
       role: true,
@@ -108,7 +108,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   ngOnInit(): void {
     this.subscription = this.filterForm.valueChanges.subscribe((values: GlobalFilters) => {
       globalFilterGroup.next(values);
-      this.applyFiltersToSessions(values, this.workspaceService.sessions);
+      this.applyFiltersToSessions(values, this.behaviouralSubjectService.sessions);
     });
 
     this.subscription2 = globalHasFilter.subscribe((value) => {
@@ -127,7 +127,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       this.filterForm.get("typeFilter").setValue(this.types);
     });
 
-    this.subscription4 = this.workspaceService.sessions$.subscribe((sessions) => {
+    this.subscription4 = this.behaviouralSubjectService.sessions$.subscribe((sessions) => {
       const actualFilterValues: GlobalFilters = {
         dateFilter: this.filterForm.get("dateFilter").value,
         integrationFilter: this.filterForm.get("integrationFilter").value,
@@ -146,7 +146,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         const values = segment.filterGroup;
         globalFilterGroup.next(values);
         this.updateFilterForm(values);
-        this.applyFiltersToSessions(values, this.workspaceService.sessions);
+        this.applyFiltersToSessions(values, this.behaviouralSubjectService.sessions);
       }
     });
 

@@ -19,7 +19,7 @@ describe("SessionCardComponent", () => {
   let fixture: ComponentFixture<SessionCardComponent>;
 
   beforeEach(async(() => {
-    const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
+    const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
     });
@@ -27,7 +27,7 @@ describe("SessionCardComponent", () => {
       getProfiles: [],
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
-      workspaceService: spyWorkspaceService,
+      workspaceService: spyBehaviouralSubjectService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       azureCoreService: { getLocations: () => [] },

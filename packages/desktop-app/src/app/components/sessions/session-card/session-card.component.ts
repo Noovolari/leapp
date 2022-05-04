@@ -16,7 +16,7 @@ import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { AppSsmService } from "../../../services/app-ssm.service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
@@ -98,7 +98,7 @@ export class SessionCardComponent implements OnInit {
   private sessionFactory: SessionFactory;
   private fileService: FileService;
   private keychainService: KeychainService;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
   private sessionService: SessionService;
   private awsCoreService: AwsCoreService;
   private azureCoreService: AzureCoreService;
@@ -119,7 +119,7 @@ export class SessionCardComponent implements OnInit {
     this.sessionFactory = appProviderService.sessionFactory;
     this.fileService = appProviderService.fileService;
     this.keychainService = appProviderService.keyChainService;
-    this.workspaceService = appProviderService.workspaceService;
+    this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.repository = appProviderService.repository;
     this.awsCoreService = appProviderService.awsCoreService;
     this.azureCoreService = appProviderService.azureCoreService;
@@ -360,7 +360,7 @@ export class SessionCardComponent implements OnInit {
         }
       }
       this.repository.updateSessions(sessions);
-      this.workspaceService.updateSession(this.session.sessionId, this.session);
+      this.behaviouralSubjectService.setSessions(this.repository.getSessions());
 
       this.session.region = this.selectedDefaultRegion;
 
@@ -426,7 +426,7 @@ export class SessionCardComponent implements OnInit {
   getProfileName(profileId: string): string {
     let profileName = constants.defaultAwsProfileName;
     try {
-      profileName = this.repository.getProfileName(profileId);
+      profileName = this.appProviderService.namedProfileService.getProfileName(profileId);
     } catch (e) {}
     return profileName;
   }
@@ -449,7 +449,7 @@ export class SessionCardComponent implements OnInit {
   changeProfileModalOpen(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.profiles = this.repository.getProfiles().map((el) => ({ value: el.id, label: el.name }));
+    this.profiles = this.appProviderService.namedProfileService.getNamedProfiles().map((el) => ({ value: el.id, label: el.name }));
     this.trigger.closeMenu();
     this.selectedProfile = null;
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: "ssm-modal" });

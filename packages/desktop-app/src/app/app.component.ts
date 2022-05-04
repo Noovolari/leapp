@@ -10,7 +10,7 @@ import { UpdaterService } from "./services/updater.service";
 import compareVersions from "compare-versions";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
@@ -38,7 +38,7 @@ export class AppComponent implements OnInit {
   private loggingService: LoggingService;
   private timerService: TimerService;
   private sessionServiceFactory: SessionFactory;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
   private retroCompatibilityService: RetroCompatibilityService;
   private rotationService: RotationService;
   private awsSsoIntegrationService: AwsSsoIntegrationService;
@@ -68,7 +68,7 @@ export class AppComponent implements OnInit {
     this.loggingService = appProviderService.loggingService;
     this.timerService = appProviderService.timerService;
     this.sessionServiceFactory = appProviderService.sessionFactory;
-    this.workspaceService = appProviderService.workspaceService;
+    this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.retroCompatibilityService = appProviderService.retroCompatibilityService;
     this.rotationService = appProviderService.rotationService;
     this.awsSsoIntegrationService = appProviderService.awsSsoIntegrationService;
@@ -119,10 +119,10 @@ export class AppComponent implements OnInit {
     this.showCredentialBackupMessageIfNeeded();
 
     // All sessions start stopped when app is launched
-    if (this.workspaceService.sessions.length > 0) {
-      for (let i = 0; i < this.workspaceService.sessions.length; i++) {
-        const concreteSessionService = this.sessionServiceFactory.getSessionService(this.workspaceService.sessions[i].type);
-        await concreteSessionService.stop(this.workspaceService.sessions[i].sessionId);
+    if (this.behaviouralSubjectService.sessions.length > 0) {
+      for (let i = 0; i < this.behaviouralSubjectService.sessions.length; i++) {
+        const concreteSessionService = this.sessionServiceFactory.getSessionService(this.behaviouralSubjectService.sessions[i].type);
+        await concreteSessionService.stop(this.behaviouralSubjectService.sessions[i].sessionId);
       }
     }
 
@@ -179,7 +179,7 @@ export class AppComponent implements OnInit {
     const oldAwsCredentialsPath = this.fileService.homeDir() + "/" + constants.credentialsDestination;
     const newAwsCredentialsPath = oldAwsCredentialsPath + ".leapp.bkp";
     const check =
-      this.workspaceService.sessions.length === 0 &&
+      this.behaviouralSubjectService.sessions.length === 0 &&
       this.fileService.existsSync(oldAwsCredentialsPath) &&
       !this.fileService.existsSync(newAwsCredentialsPath);
 
@@ -228,8 +228,8 @@ export class AppComponent implements OnInit {
       this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
       if (this.updaterService.isUpdateNeeded()) {
         this.updaterService.updateDialog();
-        this.workspaceService.sessions = [...this.workspaceService.sessions];
-        this.repository.updateSessions(this.workspaceService.sessions);
+        this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
+        this.repository.updateSessions(this.behaviouralSubjectService.sessions);
       }
     });
   }

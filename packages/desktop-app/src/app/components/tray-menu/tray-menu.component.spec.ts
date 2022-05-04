@@ -9,7 +9,7 @@ describe("TrayMenuComponent", () => {
   let fixture: ComponentFixture<TrayMenuComponent>;
 
   beforeEach(async(() => {
-    const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
+    const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
     });
@@ -18,7 +18,7 @@ describe("TrayMenuComponent", () => {
       getSessions: [],
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
-      workspaceService: spyWorkspaceService,
+      behaviouralSubjectService: spyBehaviouralSubjectService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       executeService: { execute: () => ({ then: () => {} }) },

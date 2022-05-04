@@ -2,7 +2,7 @@ import * as AWS from "aws-sdk";
 import { AssumeRoleResponse } from "aws-sdk/clients/sts";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsIamRoleChainedSession } from "../../../models/aws-iam-role-chained-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
@@ -19,7 +19,7 @@ import { constants } from "../../../models/constants";
 
 export class AwsIamRoleChainedService extends AwsSessionService {
   constructor(
-    iSessionNotifier: ISessionNotifier,
+    iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
     awsCoreService: AwsCoreService,
     fileService: FileService,
@@ -53,7 +53,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     );
 
     this.repository.addSession(session);
-    this.sessionNotifier?.addSession(session);
+    this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {

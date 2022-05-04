@@ -20,7 +20,7 @@ import { Repository } from "@noovolari/leapp-core/services/repository";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { AppVerificationWindowService } from "./app-verification-window.service";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
@@ -32,6 +32,7 @@ import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { WorkspaceOptionService } from "@noovolari/leapp-core/services/workspace-option-service";
+import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 
 @Injectable({
   providedIn: "root",
@@ -43,7 +44,7 @@ export class AppProviderService {
   verificationWindowService: AppVerificationWindowService;
   windowService: WindowService;
 
-  private workspaceServiceInstance: WorkspaceService;
+  private behaviouralSubjectServiceInstance: BehaviouralSubjectService;
   private awsIamUserServiceInstance: AwsIamUserService;
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
@@ -70,8 +71,16 @@ export class AppProviderService {
   private namedProfileInstance: NamedProfilesService;
   private remoteProceduresServerInstance: RemoteProceduresServer;
   private workspaceOptionInstance: WorkspaceOptionService;
+  private segmentServiceInstance: SegmentService;
 
   constructor(private electronService: AppNativeService, private ngZone: NgZone) {}
+
+  public get segmentService(): SegmentService {
+    if (!this.segmentServiceInstance) {
+      this.segmentServiceInstance = new SegmentService(this.repository);
+    }
+    return this.segmentServiceInstance;
+  }
 
   public get idpUrlService(): IdpUrlsService {
     if (!this.idpUrlServiceInstance) {
@@ -89,7 +98,7 @@ export class AppProviderService {
 
   public get namedProfileService(): NamedProfilesService {
     if (!this.namedProfileInstance) {
-      this.namedProfileInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService);
+      this.namedProfileInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.behaviouralSubjectService);
     }
     return this.namedProfileInstance;
   }
@@ -101,17 +110,17 @@ export class AppProviderService {
     return this.webConsoleServiceInstance;
   }
 
-  public get workspaceService(): WorkspaceService {
-    if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+  public get behaviouralSubjectService(): BehaviouralSubjectService {
+    if (!this.behaviouralSubjectServiceInstance) {
+      this.behaviouralSubjectServiceInstance = new BehaviouralSubjectService(this.repository);
     }
-    return this.workspaceServiceInstance;
+    return this.behaviouralSubjectServiceInstance;
   }
 
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
       this.awsIamUserServiceInstance = new AwsIamUserService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.mfaCodePrompter,
         this.mfaCodePrompter,
@@ -126,7 +135,7 @@ export class AppProviderService {
   public get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
       this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.fileService,
         this.awsCoreService,
@@ -140,7 +149,7 @@ export class AppProviderService {
   public get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
       this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.awsCoreService,
         this.fileService,
@@ -158,7 +167,7 @@ export class AppProviderService {
         this.awsSsoOidcService,
         this.awsSsoRoleService,
         this.keyChainService,
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.electronService,
         this.sessionFactory
       );
@@ -169,7 +178,7 @@ export class AppProviderService {
   public get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.fileService,
         this.keyChainService,
@@ -198,7 +207,7 @@ export class AppProviderService {
   public get azureService(): AzureService {
     if (!this.azureServiceInstance) {
       this.azureServiceInstance = new AzureService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.fileService,
         this.executeService,
@@ -302,9 +311,8 @@ export class AppProviderService {
         this.fileService,
         this.keyChainService,
         this.repository,
-        this.workspaceService,
-        constants.appName,
-        constants.lockFileDestination
+        this.behaviouralSubjectService,
+        constants.appName
       );
     }
     return this.retroCompatibilityServiceInstance;
@@ -325,7 +333,7 @@ export class AppProviderService {
         this.awsAuthenticationService,
         this.mfaCodePrompter,
         this.repository,
-        this.workspaceService,
+        this.behaviouralSubjectService,
         (uiSafeBlock) => this.ngZone.run(() => uiSafeBlock())
       );
     }

@@ -1,4 +1,5 @@
 export enum SessionType {
+  anytype = "any",
   aws = "aws",
   awsIamRoleFederated = "awsIamRoleFederated",
   awsIamUser = "awsIamUser",

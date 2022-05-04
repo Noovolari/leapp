@@ -1,11 +1,11 @@
 import { Session } from "../../models/session";
 import { SessionStatus } from "../../models/session-status";
 import { Repository } from "../repository";
-import { ISessionNotifier } from "../../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../../interfaces/i-behavioural-notifier";
 import { CreateSessionRequest } from "./create-session-request";
 
 export abstract class SessionService {
-  protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {}
+  protected constructor(protected sessionNotifier: IBehaviouralNotifier, protected repository: Repository) {}
 
   sessionDeactivated(sessionId: string): void {
     const sessions = this.repository.getSessions();
@@ -24,6 +24,30 @@ export abstract class SessionService {
         this.sessionNotifier?.setSessions([...sessions]);
       }
     }
+  }
+
+  getSessions(): Session[] {
+    return this.repository.getSessions();
+  }
+
+  getAssumableSessions(): Session[] {
+    return this.repository.listAssumable();
+  }
+
+  getActiveAndPendingSessions(): Session[] {
+    return this.repository.listActiveAndPending();
+  }
+
+  getActiveSessions(): Session[] {
+    return this.repository.listActive();
+  }
+
+  getPendingSessions(): Session[] {
+    return this.repository.listPending();
+  }
+
+  getSessionById(selectedSessionId: string): Session {
+    return this.getSessions().find((s) => s.sessionId === selectedSessionId);
   }
 
   protected sessionActivate(sessionId: string): void {

@@ -1,5 +1,5 @@
 import { LeappBaseError } from "../../../errors/leapp-base-error";
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsProcessCredentials } from "../../../models/aws-process-credential";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
@@ -15,7 +15,7 @@ import { FileService } from "../../file-service";
 export abstract class AwsSessionService extends SessionService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(
-    protected sessionNotifier: ISessionNotifier,
+    protected sessionNotifier: IBehaviouralNotifier,
     protected repository: Repository,
     protected awsCoreService: AwsCoreService,
     protected fileService: FileService
@@ -85,7 +85,7 @@ export abstract class AwsSessionService extends SessionService {
         this.repository.deleteSession(sess.sessionId);
       }
       this.repository.deleteSession(sessionId);
-      this.sessionNotifier?.deleteSession(sessionId);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
       await this.removeSecrets(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);

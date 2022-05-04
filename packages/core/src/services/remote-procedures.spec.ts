@@ -2,6 +2,7 @@ import { jest, beforeEach, expect, describe, test } from "@jest/globals";
 import { RemoteProceduresServer } from "./remote-procedures-server";
 import * as ipc from "node-ipc";
 import { RemoteProceduresClient } from "./remote-procedures-client";
+import { Workspace } from "../models/workspace";
 
 describe("RemoteProcedures", () => {
   let nativeService;
@@ -49,15 +50,15 @@ describe("RemoteProcedures", () => {
   test("refreshSessions, server running", async () => {
     const sessions = ["session1"];
     const repository = { reloadWorkspace: jest.fn(), getSessions: () => sessions } as any;
-    const workspaceService = { setSessions: jest.fn() } as any;
+    const behaviouralSubjectService = { setSessions: jest.fn() } as any;
     (server as any).repository = repository;
-    (server as any).workspaceService = workspaceService;
+    (server as any).behaviouralSubjectService = behaviouralSubjectService;
     server.startServer();
 
     await retry(async () => {
       await client.refreshSessions();
       expect(repository.reloadWorkspace).toHaveBeenCalled();
-      expect(workspaceService.setSessions).toHaveBeenCalledWith(sessions);
+      expect(behaviouralSubjectService.setSessions).toHaveBeenCalledWith(sessions);
     });
 
     server.stopServer();
@@ -85,16 +86,21 @@ describe("RemoteProcedures", () => {
 
   test("refreshIntegrations, server running", async () => {
     const integrations = ["integration1"];
-    const repository = { reloadWorkspace: jest.fn(), listAwsSsoIntegrations: () => integrations } as any;
-    const workspaceService = { setIntegrations: jest.fn() } as any;
+    const repository = {
+      persistWorkspace: jest.fn(),
+      reloadWorkspace: jest.fn(),
+      getWorkspace: jest.fn(() => new Workspace()),
+      listAwsSsoIntegrations: () => integrations,
+    } as any;
+    const behaviouralSubjectService = { setSessions: jest.fn() } as any;
     (server as any).repository = repository;
-    (server as any).workspaceService = workspaceService;
+    (server as any).behaviouralSubjectService = behaviouralSubjectService;
     server.startServer();
 
     await retry(async () => {
       await client.refreshIntegrations();
       expect(repository.reloadWorkspace).toHaveBeenCalled();
-      expect(workspaceService.setIntegrations).toHaveBeenCalledWith(integrations);
+      expect(repository.persistWorkspace).toHaveBeenCalled();
     });
 
     server.stopServer();

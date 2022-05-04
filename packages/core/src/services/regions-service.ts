@@ -1,11 +1,11 @@
 import { SessionFactory } from "./session-factory";
 import { Repository } from "./repository";
-import { WorkspaceService } from "./workspace-service";
+import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { Session } from "../models/session";
 import { SessionStatus } from "../models/session-status";
 
 export class RegionsService {
-  constructor(private sessionFactory: SessionFactory, private repository: Repository, private workspaceService: WorkspaceService) {}
+  constructor(private sessionFactory: SessionFactory, private repository: Repository, private behaviouralSubjectService: BehaviouralSubjectService) {}
 
   async changeRegion(session: Session, newRegion: string): Promise<void> {
     const sessionService = this.sessionFactory.getSessionService(session.type);
@@ -16,8 +16,7 @@ export class RegionsService {
 
     session.region = newRegion;
     this.repository.updateSession(session.sessionId, session);
-    // TODO: it should call iSessionNotifier, not workspaceService
-    this.workspaceService.updateSession(session.sessionId, session);
+    this.behaviouralSubjectService.setSessions(this.repository.getSessions());
 
     if (wasActive) {
       await sessionService.start(session.sessionId);

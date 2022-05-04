@@ -13,7 +13,7 @@ import { Repository } from '@noovolari/leapp-core/services/repository';
 
 describe('RetrocompatibilityService', () => {
   let service: RetrocompatibilityService;
-  let workspaceService: Repository;
+  let behaviouralSubjectService: Repository;
 
   let spyAppService: SpyObj<AppService>;
   let spyFileService;
@@ -184,7 +184,7 @@ describe('RetrocompatibilityService', () => {
     });
 
     service = TestBed.inject(RetrocompatibilityService);
-    workspaceService = TestBed.inject(Repository);
+    behaviouralSubjectService = TestBed.inject(Repository);
   });
 
   it('should be created', () => {
@@ -213,16 +213,16 @@ describe('RetrocompatibilityService', () => {
     });
 
     it('should return a default workspace if false', () => {
-      workspaceService = TestBed.inject(Repository);
+      behaviouralSubjectService = TestBed.inject(Repository);
 
       const retroService = TestBed.inject(RetrocompatibilityService);
       spyFileService.decryptText.and.callFake((text: string) => JSON.stringify({}));
       expect(retroService.isRetroPatchNecessary()).toEqual(false);
 
       const workspace = new Workspace();
-      workspace.profiles = workspaceService.getProfiles();
+      workspace.profiles = behaviouralSubjectService.getProfiles();
 
-      expect(JSON.stringify(workspace)).toEqual(JSON.stringify(workspaceService.getWorkspace()));
+      expect(JSON.stringify(workspace)).toEqual(JSON.stringify(behaviouralSubjectService.getWorkspace()));
     });
   });
 
@@ -269,11 +269,11 @@ describe("RetroCompatibilityService", () => {
     const fileService = {};
     const keychainService = {};
     const repository = {};
-    const workspaceService = {};
+    const behaviouralSubjectService = {};
     const appName = "test";
     const lockPath = "";
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    expect(new RetroCompatibilityService(fileService, keychainService, repository, workspaceService, appName, lockPath)).not.toBe(undefined);
+    expect(new RetroCompatibilityService(fileService, keychainService, repository, behaviouralSubjectService, appName, lockPath)).not.toBe(undefined);
   });
 });

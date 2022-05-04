@@ -107,27 +107,26 @@ describe("NamedProfilesService", () => {
     const sessionFactory = {
       getSessionService: jest.fn(() => sessionService),
     };
+    const behaviouralSubjectService = {
+      setSessions: jest.fn(),
+    };
+
+    const sessions = [
+      { sessionId: "1", status: SessionStatus.pending, type: "type1" },
+      { sessionId: "2", status: SessionStatus.inactive, type: "type2" },
+      { sessionId: "3", status: SessionStatus.active, type: "type3" },
+    ];
     const repository = {
       getDefaultProfileId: () => "defaultProfileId",
+      getSessions: jest.fn(() => sessions),
       updateSession: jest.fn((sessionId, session) => {
         expect((session as any).profileId).toBe("defaultProfileId");
         expect(sessionId === "3" && sessionIsRunning).toBe(false);
       }),
       removeProfile: jest.fn(),
     };
-    const workspaceService = {
-      updateSession: jest.fn((sessionId, session) => {
-        expect((session as any).profileId).toBe("defaultProfileId");
-        expect(sessionId === "3" && sessionIsRunning).toBe(false);
-      }),
-    };
 
-    const namedProfileService = new NamedProfilesService(sessionFactory as any, repository as any, workspaceService as any);
-    const sessions = [
-      { sessionId: "1", status: SessionStatus.pending, type: "type1" },
-      { sessionId: "2", status: SessionStatus.inactive, type: "type2" },
-      { sessionId: "3", status: SessionStatus.active, type: "type3" },
-    ];
+    const namedProfileService = new NamedProfilesService(sessionFactory as any, repository as any, behaviouralSubjectService as any);
     namedProfileService.getSessionsWithNamedProfile = jest.fn(() => sessions) as any;
 
     await namedProfileService.deleteNamedProfile("profileId");
@@ -140,9 +139,7 @@ describe("NamedProfilesService", () => {
     expect(repository.updateSession).toHaveBeenCalledWith("1", sessions[0]);
     expect(repository.updateSession).toHaveBeenCalledWith("2", sessions[1]);
     expect(repository.updateSession).toHaveBeenCalledWith("3", sessions[2]);
-    expect(workspaceService.updateSession).toHaveBeenCalledWith("1", sessions[0]);
-    expect(workspaceService.updateSession).toHaveBeenCalledWith("2", sessions[1]);
-    expect(workspaceService.updateSession).toHaveBeenCalledWith("3", sessions[2]);
+    expect(behaviouralSubjectService.setSessions).toHaveBeenCalledTimes(3);
     expect(sessionService.start).toHaveBeenCalledWith("3");
     expect(repository.removeProfile).toHaveBeenCalledWith("profileId");
   });
@@ -162,19 +159,20 @@ describe("NamedProfilesService", () => {
     } as any;
     const repository = {
       updateSession: jest.fn(),
+      getSessions: jest.fn(),
     } as any;
-    const workspaceService = {
-      updateSession: jest.fn(),
+    const behaviouralSubjectService = {
+      setSessions: jest.fn(),
     } as any;
 
-    const namedProfileService = new NamedProfilesService(sessionFactory, repository, workspaceService);
+    const namedProfileService = new NamedProfilesService(sessionFactory, repository, behaviouralSubjectService);
 
     await namedProfileService.changeNamedProfile(session, "newProfileId");
 
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(sessionService.stop).toHaveBeenCalledWith(session.sessionId);
     expect(repository.updateSession).toHaveBeenCalledWith(session.sessionId, session);
-    expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session);
+    expect(behaviouralSubjectService.setSessions).toHaveBeenCalled();
     expect(sessionService.start).toHaveBeenCalledWith(session.sessionId);
   });
 
@@ -193,19 +191,20 @@ describe("NamedProfilesService", () => {
     } as any;
     const repository = {
       updateSession: jest.fn(),
+      getSessions: jest.fn(() => [session]),
     } as any;
-    const workspaceService = {
-      updateSession: jest.fn(),
+    const behaviouralSubjectService = {
+      setSessions: jest.fn(),
     } as any;
 
-    const namedProfileService = new NamedProfilesService(sessionFactory, repository, workspaceService);
+    const namedProfileService = new NamedProfilesService(sessionFactory, repository, behaviouralSubjectService);
 
     await namedProfileService.changeNamedProfile(session, "newProfileId");
 
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(sessionService.stop).toHaveBeenCalledTimes(0);
     expect(repository.updateSession).toHaveBeenCalledWith(session.sessionId, session);
-    expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session);
+    expect(behaviouralSubjectService.setSessions).toHaveBeenCalled();
     expect(sessionService.start).toHaveBeenCalledTimes(0);
   });
 
@@ -226,18 +225,18 @@ describe("NamedProfilesService", () => {
     const repository = {
       updateSession: jest.fn(),
     } as any;
-    const workspaceService = {
+    const behaviouralSubjectService = {
       updateSession: jest.fn(),
     } as any;
 
-    const namedProfileService = new NamedProfilesService(sessionFactory, repository, workspaceService);
+    const namedProfileService = new NamedProfilesService(sessionFactory, repository, behaviouralSubjectService);
 
     await namedProfileService.changeNamedProfile(session, "newProfileId");
 
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(sessionService.stop).toHaveBeenCalledTimes(0);
     expect(repository.updateSession).toHaveBeenCalledTimes(0);
-    expect(workspaceService.updateSession).toHaveBeenCalledTimes(0);
+    expect(behaviouralSubjectService.updateSession).toHaveBeenCalledTimes(0);
     expect(sessionService.start).toHaveBeenCalledTimes(0);
   });
 

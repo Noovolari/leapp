@@ -10,7 +10,7 @@ describe("CommandBarComponent", () => {
   let fixture: ComponentFixture<CommandBarComponent>;
 
   beforeEach(async () => {
-    const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
+    const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
     });
@@ -19,7 +19,7 @@ describe("CommandBarComponent", () => {
       getColorTheme: () => constants.darkTheme,
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
-      workspaceService: spyWorkspaceService,
+      behaviouralSubjectService: spyBehaviouralSubjectService,
       workspaceOptionService: { colorTheme: "dark-theme" },
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },

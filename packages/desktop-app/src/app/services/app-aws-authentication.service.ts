@@ -105,7 +105,7 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
   async logoutFromFederatedSession(session: Session, callback?: any): Promise<void> {
     try {
       // Clear all extra data
-      const url = this.leappCoreService.repository.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
+      const url = this.leappCoreService.idpUrlService.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
       const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, url);
 
       const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);

@@ -9,7 +9,7 @@
     <h4>Choose your Cloud Provider</h4>
 
     <div class="strategy-list">
-      <button type="button" class="providers" (click)="setProvider(eSessionType.awsIamRoleFederated);"><img src="./assets/images/aws{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" width="36" alt=""> Amazon AWS</button>
+      <button type="button" class="providers" (click)="setProvider(eSessionType.awsIamRoleFederated);"><img src="./assets/images/aws{{leappCoreService.workspaceOptionService.colorTheme === eConstants.darkTheme || (leappCoreService.workspaceOptionService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" width="36" alt=""> Amazon AWS</button>
       <button type="button" class="providers" (click)="setProvider(eSessionType.azure);"><img src="./assets/images/azure-logo.svg" width="36" alt=""> Microsoft Azure</button>
 
       <button type="button" class="providers disabled" (click)="false; //setProvider(eSessionType.google);"><img src="./assets/images/google.png" width="36" alt=""> Google Cloud</button>

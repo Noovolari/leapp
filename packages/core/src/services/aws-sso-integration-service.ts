@@ -17,7 +17,7 @@ import SSO, {
 } from "aws-sdk/clients/sso";
 import { SessionType } from "../models/session-type";
 import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
-import { ISessionNotifier } from "../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
 import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
 import { SessionFactory } from "./session-factory";
 
@@ -43,7 +43,7 @@ export class AwsSsoIntegrationService {
     private awsSsoOidcService: AwsSsoOidcService,
     private awsSsoRoleService: AwsSsoRoleService,
     private keyChainService: KeychainService,
-    private sessionNotifier: ISessionNotifier,
+    private sessionNotifier: IBehaviouralNotifier,
     private nativeService: INativeService,
     private sessionFactory: SessionFactory
   ) {}
@@ -58,6 +58,10 @@ export class AwsSsoIntegrationService {
 
   createIntegration(creationParams: IntegrationCreationParams): void {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
+  }
+
+  updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void {
+    this.repository.updateAwsSsoIntegration(id, updateParams.alias, updateParams.region, updateParams.portalUrl, updateParams.browserOpening);
   }
 
   getIntegration(id: string): AwsSsoIntegration {

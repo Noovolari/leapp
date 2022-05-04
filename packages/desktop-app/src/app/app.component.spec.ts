@@ -7,7 +7,7 @@ import { Workspace } from "@noovolari/leapp-core/models/workspace";
 
 describe("AppComponent", () => {
   beforeEach(waitForAsync(() => {
-    const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
+    const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
     });
@@ -18,7 +18,7 @@ describe("AppComponent", () => {
       getWorkspace: (): Workspace => new Workspace(),
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
-      workspaceService: spyWorkspaceService,
+      workspaceService: spyBehaviouralSubjectService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
     });

@@ -5,7 +5,7 @@ import { LeappMissingMfaTokenError } from "../../../errors/leapp-missing-mfa-tok
 import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
 import { LeappParseError } from "../../../errors/leapp-parse-error";
 import { IMfaCodePrompter } from "../../../interfaces/i-mfa-code-prompter";
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 import { constants } from "../../../models/constants";
 import { Credentials } from "../../../models/credentials";
@@ -31,7 +31,7 @@ export class AwsIamUserService extends AwsSessionService {
   private mfaCodePrompterProxy: IMfaCodePrompter;
 
   constructor(
-    iSessionNotifier: ISessionNotifier,
+    iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
     private localMfaCodePrompter: IMfaCodePrompter,
     private remoteMfaCodePrompter: IMfaCodePrompter,
@@ -77,7 +77,7 @@ export class AwsIamUserService extends AwsSessionService {
       .catch((err: any) => console.error(err));
 
     this.repository.addSession(session);
-    this.sessionNotifier?.addSession(session);
+    this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
@@ -99,7 +99,7 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   async deApplyCredentials(sessionId: string): Promise<void> {
-    //const session = this.workspaceService.get(sessionId);
+    //const session = this.behaviouralSubjectService.get(sessionId);
     const session = this.repository.getSessions().find((sess) => sess.sessionId === sessionId);
     const profileName = this.repository.getProfileName((session as AwsIamUserSession).profileId);
     const credentialsFile = await this.fileService.iniParseSync(this.awsCoreService.awsCredentialPath());
@@ -124,7 +124,7 @@ export class AwsIamUserService extends AwsSessionService {
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Get the session in question
-    //const session = this.workspaceService.get(sessionId);
+    //const session = this.behaviouralSubjectService.get(sessionId);
     const session = this.repository.getSessions().find((sess) => sess.sessionId === sessionId);
     if (session === undefined) {
       throw new LeappNotFoundError(this, `session with id ${sessionId} not found.`);

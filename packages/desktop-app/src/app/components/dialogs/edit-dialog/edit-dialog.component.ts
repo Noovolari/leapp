@@ -4,13 +4,12 @@ import { AppService } from "../../../services/app.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { Workspace } from "@noovolari/leapp-core/models/workspace";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import * as uuid from "uuid";
 import { Session } from "@noovolari/leapp-core/models/session";
@@ -85,9 +84,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   public locations = [];
   public selectedLocation;
 
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
   private keychainService: KeychainService;
-  private repository: Repository;
   private sessionService: SessionService;
 
   constructor(
@@ -99,14 +97,13 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     private leappCoreService: AppProviderService,
     private mfaPrompter: AppMfaCodePromptService
   ) {
-    this.workspaceService = leappCoreService.workspaceService;
-    this.repository = this.leappCoreService.repository;
+    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
     this.keychainService = this.leappCoreService.keyChainService;
   }
 
   ngOnInit(): void {
     // Get the workspace and the account you need
-    this.selectedSession = this.repository.getSessionById(this.selectedSessionId) as any;
+    this.selectedSession = this.leappCoreService.sessionFactory.getSessionService(SessionType.anytype).getSessionById(this.selectedSessionId) as any;
     this.sessionService = this.leappCoreService.sessionFactory.getSessionService(this.selectedSession.type);
     this.accountType = this.selectedSession.type;
 
@@ -131,10 +128,13 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     });
 
     // Show the assumable accounts
-    this.assumerAwsSessions = this.leappCoreService.repository.listAssumable().map((session) => ({
-      sessionName: session.sessionName,
-      session,
-    }));
+    this.assumerAwsSessions = this.leappCoreService.sessionFactory
+      .getSessionService(SessionType.anytype)
+      .getAssumableSessions()
+      .map((session) => ({
+        sessionName: session.sessionName,
+        session,
+      }));
 
     // Get the region
     this.regions = this.leappCoreService.awsCoreService.getRegions();
@@ -228,7 +228,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
       if (this.selectedSession.type !== SessionType.azure) {
         try {
-          this.repository.getProfileName(this.selectedProfile.value);
+          this.leappCoreService.repository.getProfileName(this.selectedProfile.value);
         } catch (e) {
           this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
         }
@@ -247,8 +247,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         this.selectedSession.region = this.form.get("azureLocation").value;
       }
 
-      this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
-      this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
+      this.leappCoreService.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
+      this.behaviouralSubjectService.setSessions(this.leappCoreService.repository.getSessions());
 
       if (wasActive) {
         await this.sessionService.start(this.selectedSession.sessionId);

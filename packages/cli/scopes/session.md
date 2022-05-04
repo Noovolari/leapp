@@ -16,11 +16,11 @@ Sessions management
 * [`leapp session start-ssm-session`](#leapp-session-start-ssm-session)
 * [`leapp session stop`](#leapp-session-stop)
 
-# `leapp session add`
+## `leapp session add`
 
 Add a new session
 
-```console
+```
 USAGE
   $ leapp session add [--providerType aws|azure] [--accessKey <value>] [--idpArn <value>] [--idpUrl <value>]
     [--mfaDevice <value>] [--sessionName <value>] [--parentSessionId <value>] [--profileId <value>] [--region <value>]
@@ -65,11 +65,11 @@ EXAMPLES
   $leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY (--mfaDevice MFADEVICEARN)
 ```
 
-# `leapp session change-profile`
+## `leapp session change-profile`
 
 Change a session named-profile
 
-```console
+```
 USAGE
   $ leapp session change-profile [--sessionId <value>] [--profileId <value>]
 
@@ -86,11 +86,11 @@ EXAMPLES
   $leapp session change-profile --profileId PROFILEID --sessionId SESSIONID
 ```
 
-# `leapp session change-region`
+## `leapp session change-region`
 
 Change a session region
 
-```console
+```
 USAGE
   $ leapp session change-region [--sessionId <value>] [--region <value>]
 
@@ -107,11 +107,11 @@ EXAMPLES
   $leapp session change-region --sessionId SESSIONID --region REGION
 ```
 
-# `leapp session current`
+## `leapp session current`
 
 Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)
 
-```console
+```
 USAGE
   $ leapp session current [-i] [-p <value>] [-r aws|azure] [-f <value>]
 
@@ -132,11 +132,11 @@ EXAMPLES
   $leapp session current --format "alias accountNumber" --inline --provider aws
 ```
 
-# `leapp session delete`
+## `leapp session delete`
 
 Delete a session
 
-```console
+```
 USAGE
   $ leapp session delete [--sessionId <value>] [-f]
 
@@ -155,11 +155,11 @@ EXAMPLES
   $leapp session delete --sessionId SESSIONID [--force, -f]
 ```
 
-# `leapp session generate SESSIONID`
+## `leapp session generate SESSIONID`
 
 Generate STS temporary credentials for the given AWS session id
 
-```console
+```
 USAGE
   $ leapp session generate [SESSIONID]
 
@@ -173,11 +173,11 @@ EXAMPLES
   $leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d
 ```
 
-# `leapp session get-id`
+## `leapp session get-id`
 
 Get session id
 
-```console
+```
 USAGE
   $ leapp session get-id
 
@@ -188,11 +188,11 @@ EXAMPLES
   $leapp session get-id
 ```
 
-# `leapp session list`
+## `leapp session list`
 
 Show sessions list
 
-```console
+```
 USAGE
   $ leapp session list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
     [--csv | --no-truncate]] [--no-header | ]
@@ -215,11 +215,11 @@ EXAMPLES
   $leapp session list
 ```
 
-# `leapp session open-web-console`
+## `leapp session open-web-console`
 
 Open an AWS Web Console
 
-```console
+```
 USAGE
   $ leapp session open-web-console [--sessionId <value>]
 
@@ -235,11 +235,11 @@ EXAMPLES
   $leapp session open-web-console --sessionId SESSIONID
 ```
 
-# `leapp session start`
+## `leapp session start`
 
 Start a session
 
-```console
+```
 USAGE
   $ leapp session start [--sessionId <value>]
 
@@ -255,11 +255,11 @@ EXAMPLES
   $leapp session start --sessionId SESSIONID
 ```
 
-# `leapp session start-ssm-session`
+## `leapp session start-ssm-session`
 
 Start an AWS SSM session
 
-```console
+```
 USAGE
   $ leapp session start-ssm-session [--sessionId <value>] [--region <value>] [--ssmInstanceId <value>]
 
@@ -277,11 +277,11 @@ EXAMPLES
   $leapp session start-ssm-session --sessionId SESSIONID --region AWSREGION --ssmInstanceId EC2INSTANCEID
 ```
 
-# `leapp session stop`
+## `leapp session stop`
 
 Stop a session
 
-```console
+```
 USAGE
   $ leapp session stop [--sessionId <value>]
 

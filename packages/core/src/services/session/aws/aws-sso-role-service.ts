@@ -1,7 +1,7 @@
 import SSO from "aws-sdk/clients/sso";
 import { BrowserWindowClosing } from "../../../interfaces/i-browser-window-closing";
 import { INativeService } from "../../../interfaces/i-native-service";
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsSsoRoleSession } from "../../../models/aws-sso-role-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
@@ -65,7 +65,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   private awsIntegrationDelegate: IAwsIntegrationDelegate;
 
   constructor(
-    protected sessionNotifier: ISessionNotifier,
+    protected sessionNotifier: IBehaviouralNotifier,
     protected repository: Repository,
     fileService: FileService,
     private keyChainService: KeychainService,
@@ -114,7 +114,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     );
 
     this.repository.addSession(session);
-    this.sessionNotifier?.addSession(session);
+    this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {

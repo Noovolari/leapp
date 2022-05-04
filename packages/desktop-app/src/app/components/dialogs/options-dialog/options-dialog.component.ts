@@ -266,7 +266,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
           sessions.forEach((session) => {
             this.appProviderService.repository.deleteSession(session.sessionId);
-            this.appProviderService.workspaceService.deleteSession(session.sessionId);
+            this.appProviderService.behaviouralSubjectService.setSessions(this.appProviderService.repository.getSessions());
           });
           this.appProviderService.idpUrlService.deleteIdpUrl(id);
         }
@@ -287,8 +287,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         this.appProviderService.namedProfileService.editNamedProfile(id.toString(), this.form.get("awsProfile").value);
 
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < this.appProviderService.workspaceService.sessions.length; i++) {
-          const sess = this.appProviderService.workspaceService.sessions[i];
+        for (let i = 0; i < this.appProviderService.behaviouralSubjectService.sessions.length; i++) {
+          const sess = this.appProviderService.behaviouralSubjectService.sessions[i];
           this.sessionService = this.appProviderService.sessionFactory.getSessionService(sess.type);
 
           if ((sess as any).profileId === id.toString()) {
@@ -353,7 +353,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
             (sess as any).profileId = this.appProviderService.repository.getDefaultProfileId();
 
             this.appProviderService.repository.updateSession(sess.sessionId, sess);
-            this.appProviderService.workspaceService.updateSession(sess.sessionId, sess);
+            this.appProviderService.behaviouralSubjectService.setSessions(this.appProviderService.repository.getSessions());
             if (wasActive) {
               this.sessionService.start(sess.sessionId);
             }

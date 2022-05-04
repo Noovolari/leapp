@@ -11,4 +11,8 @@ export class SegmentService {
   getSegmentByName(segmentName: string): Segment {
     return this.repository.getSegment(segmentName);
   }
+
+  removeSegment(segment: Segment): void {
+    this.repository.removeSegment(segment);
+  }
 }

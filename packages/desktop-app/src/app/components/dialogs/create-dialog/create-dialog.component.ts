@@ -6,7 +6,7 @@ import * as uuid from "uuid";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { openIntegrationEvent } from "../../integration-bar/integration-bar.component";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
@@ -21,7 +21,6 @@ import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azur
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 
 @Component({
   selector: "app-create-dialog",
@@ -91,8 +90,7 @@ export class CreateDialogComponent implements OnInit {
     selectAccessStrategy: new FormControl(SessionType.awsIamRoleFederated, [Validators.required]),
   });
 
-  repository: Repository;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
   private awsIamRoleFederatedService: AwsIamRoleFederatedService;
   private awsIamUserService: AwsIamUserService;
   private awsIamRoleChainedService: AwsIamRoleChainedService;
@@ -105,12 +103,11 @@ export class CreateDialogComponent implements OnInit {
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private bsModalService: BsModalService,
-    private leappCoreService: AppProviderService,
+    public leappCoreService: AppProviderService,
     private windowService: WindowService,
     private messageToasterService: MessageToasterService
   ) {
-    this.repository = leappCoreService.repository;
-    this.workspaceService = leappCoreService.workspaceService;
+    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
     this.awsIamRoleFederatedService = leappCoreService.awsIamRoleFederatedService;
     this.awsIamUserService = leappCoreService.awsIamUserService;
     this.awsIamRoleChainedService = leappCoreService.awsIamRoleChainedService;
@@ -145,10 +142,13 @@ export class CreateDialogComponent implements OnInit {
       this.firstTime = params["firstTime"] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
-      this.assumerAwsSessions = this.leappCoreService.repository.listAssumable().map((session) => ({
-        sessionName: session.sessionName,
-        session,
-      }));
+      this.assumerAwsSessions = this.leappCoreService.sessionFactory
+        .getSessionService(SessionType.anytype)
+        .getAssumableSessions()
+        .map((session) => ({
+          sessionName: session.sessionName,
+          session,
+        }));
 
       // Only for start screen: disable IAM Chained creation
       if (this.firstTime) {

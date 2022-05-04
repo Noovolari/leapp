@@ -7,7 +7,7 @@ import md from "markdown-it";
 import { AppNativeService } from "./app-native.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { Repository } from "@noovolari/leapp-core/services/repository";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
 
@@ -22,7 +22,7 @@ export class UpdaterService {
   bsModalRef: BsModalRef;
   markdown: any;
   private repository: Repository;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
     private bsModalService: BsModalService,
@@ -33,7 +33,7 @@ export class UpdaterService {
   ) {
     this.markdown = md();
     this.repository = leappCoreService.repository;
-    this.workspaceService = leappCoreService.workspaceService;
+    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
   }
 
   isUpdateNeeded(): boolean {
@@ -60,8 +60,8 @@ export class UpdaterService {
     this.releaseDate = releaseDate;
     this.releaseNotes = releaseNotes;
 
-    this.workspaceService.sessions = [...this.workspaceService.sessions];
-    this.repository.updateSessions(this.workspaceService.sessions);
+    this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
+    this.repository.updateSessions(this.behaviouralSubjectService.sessions);
   }
 
   updateDialog(): void {
@@ -74,8 +74,8 @@ export class UpdaterService {
         if (event === constants.confirmClosedAndIgnoreUpdate) {
           this.updateVersionJson(this.version);
 
-          this.workspaceService.sessions = [...this.workspaceService.sessions];
-          this.repository.updateSessions(this.workspaceService.sessions);
+          this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
+          this.repository.updateSessions(this.behaviouralSubjectService.sessions);
         } else if (event === constants.confirmCloseAndDownloadUpdate) {
           this.windowService.openExternalUrl(`${constants.latestUrl}`);
         }

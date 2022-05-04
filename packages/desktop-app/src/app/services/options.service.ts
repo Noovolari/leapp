@@ -1,21 +1,16 @@
-import { Repository } from "./repository";
-import { IdpUrl } from "../models/idp-url";
-import { AwsNamedProfile } from "../models/aws-named-profile";
-import { Session } from "../models/session";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
-import Folder from "../models/folder";
-import Segment from "../models/segment";
-import { Workspace } from "../models/workspace";
+import { Injectable } from "@angular/core";
+import { Workspace } from "@noovolari/leapp-core/models/workspace";
+import { Repository } from "@noovolari/leapp-core/services/repository";
+import Folder from "@noovolari/leapp-core/models/folder";
+import { AppProviderService } from "./app-provider.service";
 
-export class WorkspaceOptionService {
+@Injectable({ providedIn: "root" })
+export class OptionsService {
   _workspace: Workspace;
+  repository: Repository;
 
-  constructor(private repository: Repository) {}
-
-  addIpUrl(idpUrl: IdpUrl): void {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.idpUrls.push(idpUrl);
-    this.repository.persistWorkspace(this._workspace);
+  constructor(private appProviderService: AppProviderService) {
+    this.repository = this.appProviderService.repository;
   }
 
   get macOsTerminal(): string {
@@ -29,45 +24,12 @@ export class WorkspaceOptionService {
     this.repository.persistWorkspace(this._workspace);
   }
 
-  get idpUrls(): IdpUrl[] {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.idpUrls;
-  }
-
-  set idpUrls(value: IdpUrl[]) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.idpUrls = value;
-    this.repository.persistWorkspace(this._workspace);
-  }
-
-  get profiles(): AwsNamedProfile[] {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.profiles;
-  }
-
-  set profiles(value: AwsNamedProfile[]) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.profiles = value;
-    this.repository.persistWorkspace(this._workspace);
-  }
-
-  get sessions(): Session[] {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.sessions;
-  }
-
-  set sessions(value: Session[]) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.sessions = value;
-    this.repository.persistWorkspace(this._workspace);
-  }
-
   get proxyConfiguration(): { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string } {
     this._workspace = this.repository.getWorkspace();
     return this._workspace.proxyConfiguration;
   }
 
-  set proxyConfiguration(value: { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string }) {
+  updateProxyConfiguration(value: { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string }) {
     this._workspace = this.repository.getWorkspace();
     this._workspace.proxyConfiguration = value;
     this.repository.persistWorkspace(this._workspace);
@@ -95,17 +57,6 @@ export class WorkspaceOptionService {
     this.repository.persistWorkspace(this._workspace);
   }
 
-  get awsSsoIntegrations(): AwsSsoIntegration[] {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.awsSsoIntegrations;
-  }
-
-  set awsSsoIntegrations(value: AwsSsoIntegration[]) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.awsSsoIntegrations = value;
-    this.repository.persistWorkspace(this._workspace);
-  }
-
   get pinned(): string[] {
     this._workspace = this.repository.getWorkspace();
     return this._workspace.pinned;
@@ -125,17 +76,6 @@ export class WorkspaceOptionService {
   set folders(folders: Folder[]) {
     this._workspace = this.repository.getWorkspace();
     this._workspace.folders = folders;
-    this.repository.persistWorkspace(this._workspace);
-  }
-
-  get segments(): Segment[] {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.segments;
-  }
-
-  set segments(segments: Segment[]) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.segments = segments;
     this.repository.persistWorkspace(this._workspace);
   }
 

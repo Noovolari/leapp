@@ -18,6 +18,7 @@ import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-ses
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../services/window.service";
+import { OptionsService } from "../../services/options.service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -77,6 +78,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
+    private optionsService: OptionsService,
     private bsModalService: BsModalService,
     private leappCoreService: AppProviderService,
     public appService: AppService,
@@ -228,8 +230,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   windowButtonDetectTheme(): string {
     if (
-      this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
-      (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
+      this.optionsService.colorTheme === constants.darkTheme ||
+      (this.optionsService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
     ) {
       return "_dark";
     } else {
@@ -344,10 +346,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
 
     filteredSessions = filteredSessions.sort((x, y) => {
-      const pinnedList = this.leappCoreService.workspaceOptionService.pinned;
+      const pinnedList = this.optionsService.pinned;
       if ((pinnedList.indexOf(x.sessionId) !== -1) === (pinnedList.indexOf(y.sessionId) !== -1)) {
         return 0;
-      } else if (this.leappCoreService.workspaceOptionService.pinned.indexOf(x.sessionId) !== -1) {
+      } else if (this.optionsService.pinned.indexOf(x.sessionId) !== -1) {
         return -1;
       } else {
         return 1;

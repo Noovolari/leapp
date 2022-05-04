@@ -21,6 +21,7 @@ import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azur
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { OptionsService } from "../../../services/options.service";
 
 @Component({
   selector: "app-create-dialog",
@@ -99,6 +100,7 @@ export class CreateDialogComponent implements OnInit {
 
   /* Setup the first account for the application */
   constructor(
+    public optionsService: OptionsService,
     public appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -142,13 +144,10 @@ export class CreateDialogComponent implements OnInit {
       this.firstTime = params["firstTime"] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
-      this.assumerAwsSessions = this.leappCoreService.sessionFactory
-        .getSessionService(SessionType.anytype)
-        .getAssumableSessions()
-        .map((session) => ({
-          sessionName: session.sessionName,
-          session,
-        }));
+      this.assumerAwsSessions = this.leappCoreService.sessionManagementService.getAssumableSessions().map((session) => ({
+        sessionName: session.sessionName,
+        session,
+      }));
 
       // Only for start screen: disable IAM Chained creation
       if (this.firstTime) {
@@ -324,8 +323,8 @@ export class CreateDialogComponent implements OnInit {
         return "alibaba.png";
       default:
         return `aws${
-          this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
-          (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
+          this.optionsService.colorTheme === constants.darkTheme ||
+          (this.optionsService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
             ? "-dark"
             : ""
         }.png`;

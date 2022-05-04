@@ -36,6 +36,7 @@ import { CliRpcAwsSsoOidcVerificationWindowService } from "./cli-rpc-aws-sso-oid
 import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { CliRpcAwsSamlAuthenticationService } from "./cli-rpc-aws-saml-authentication-service";
 import { LocalCliMfaCodePromptService } from "./local-cli-mfa-code-prompt-service";
+import { SessionManagementService } from "@noovolari/leapp-core/services/session-management-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -73,12 +74,20 @@ export class CliProviderService {
   private cliOpenWebConsoleServiceInstance: CliOpenWebConsoleService;
   private webConsoleServiceInstance: WebConsoleService;
   private ssmServiceInstance: SsmService;
+  private sessionManagementServiceInstance: SessionManagementService;
 
   public get cliNativeService(): CliNativeService {
     if (!this.cliNativeServiceInstance) {
       this.cliNativeServiceInstance = new CliNativeService();
     }
     return this.cliNativeServiceInstance;
+  }
+
+  public get sessionManagementService(): SessionManagementService {
+    if (!this.sessionManagementServiceInstance) {
+      this.sessionManagementServiceInstance = new SessionManagementService(this.repository);
+    }
+    return this.sessionManagementServiceInstance;
   }
 
   public get cliAwsSsoOidcVerificationWindowService(): IAwsSsoOidcVerificationWindowService {

@@ -18,6 +18,7 @@ import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-ses
 import { WindowService } from "../../services/window.service";
 import { sidebarHighlight } from "../side-bar/side-bar.component";
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
+import { OptionsService } from "../../services/options.service";
 
 export interface SelectedIntegration {
   id: string;
@@ -72,6 +73,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   private segmentService: SegmentService;
 
   constructor(
+    public optionsService: OptionsService,
     public appService: AppService,
     private bsModalService: BsModalService,
     private router: Router,

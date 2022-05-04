@@ -6,7 +6,6 @@ import { HttpClient } from "@angular/common/http";
 import md from "markdown-it";
 import { AppNativeService } from "./app-native.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
@@ -21,7 +20,7 @@ export class UpdaterService {
   releaseNotes: string;
   bsModalRef: BsModalRef;
   markdown: any;
-  private repository: Repository;
+
   private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
@@ -32,7 +31,6 @@ export class UpdaterService {
     private leappCoreService: AppProviderService
   ) {
     this.markdown = md();
-    this.repository = leappCoreService.repository;
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
   }
 
@@ -61,7 +59,7 @@ export class UpdaterService {
     this.releaseNotes = releaseNotes;
 
     this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
-    this.repository.updateSessions(this.behaviouralSubjectService.sessions);
+    this.leappCoreService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
   }
 
   updateDialog(): void {
@@ -75,7 +73,7 @@ export class UpdaterService {
           this.updateVersionJson(this.version);
 
           this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
-          this.repository.updateSessions(this.behaviouralSubjectService.sessions);
+          this.leappCoreService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
         } else if (event === constants.confirmCloseAndDownloadUpdate) {
           this.windowService.openExternalUrl(`${constants.latestUrl}`);
         }

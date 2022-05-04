@@ -69,13 +69,11 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   async generateMenu(): Promise<void> {
     let voices = [];
-    const actives = this.appProviderService.sessionFactory
-      .getSessionService(SessionType.anytype)
+    const actives = this.appProviderService.sessionManagementService
       .getSessions()
       .filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
     const allSessions = actives.concat(
-      this.appProviderService.sessionFactory
-        .getSessionService(SessionType.anytype)
+      this.appProviderService.sessionManagementService
         .getSessions()
         .filter((s) => s.status === SessionStatus.inactive)
         .filter((_, index) => index < 10 - actives.length)
@@ -236,7 +234,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     // We need the Try/Catch as we have the possibility to call the method without sessions
     try {
       // Stop the sessions...
-      const activeSessions = this.appProviderService.sessionFactory.getSessionService(SessionType.anytype).getActiveAndPendingSessions();
+      const activeSessions = this.appProviderService.sessionManagementService.getActiveAndPendingSessions();
       activeSessions.forEach((sess) => {
         const factorizedService = this.sessionServiceFactory.getSessionService(sess.type);
         factorizedService.stop(sess.sessionId);

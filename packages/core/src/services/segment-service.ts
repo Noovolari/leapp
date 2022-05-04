@@ -8,6 +8,10 @@ export class SegmentService {
     return this.repository.getSegments();
   }
 
+  setSegments(segments: Segment[]) {
+    this.repository.setSegments(segments);
+  }
+
   getSegmentByName(segmentName: string): Segment {
     return this.repository.getSegment(segmentName);
   }

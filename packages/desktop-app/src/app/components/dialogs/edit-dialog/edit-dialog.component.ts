@@ -21,6 +21,7 @@ import { LeappSelectComponent } from "../../leapp-select/leapp-select.component"
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { OptionsService } from "../../../services/options.service";
 
 @Component({
   selector: "app-edit-dialog",
@@ -89,6 +90,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   private sessionService: SessionService;
 
   constructor(
+    private optionsService: OptionsService,
     private activatedRoute: ActivatedRoute,
     private appService: AppService,
     private messageToasterService: MessageToasterService,
@@ -103,7 +105,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // Get the workspace and the account you need
-    this.selectedSession = this.leappCoreService.sessionFactory.getSessionService(SessionType.anytype).getSessionById(this.selectedSessionId) as any;
+    this.selectedSession = this.leappCoreService.sessionManagementService.getSessionById(this.selectedSessionId) as any;
     this.sessionService = this.leappCoreService.sessionFactory.getSessionService(this.selectedSession.type);
     this.accountType = this.selectedSession.type;
 
@@ -128,13 +130,10 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     });
 
     // Show the assumable accounts
-    this.assumerAwsSessions = this.leappCoreService.sessionFactory
-      .getSessionService(SessionType.anytype)
-      .getAssumableSessions()
-      .map((session) => ({
-        sessionName: session.sessionName,
-        session,
-      }));
+    this.assumerAwsSessions = this.leappCoreService.sessionManagementService.getAssumableSessions().map((session) => ({
+      sessionName: session.sessionName,
+      session,
+    }));
 
     // Get the region
     this.regions = this.leappCoreService.awsCoreService.getRegions();
@@ -390,8 +389,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         return "alibaba.png";
       default:
         return `aws${
-          this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
-          (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
+          this.optionsService.colorTheme === constants.darkTheme ||
+          (this.optionsService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
             ? "-dark"
             : ""
         }.png`;

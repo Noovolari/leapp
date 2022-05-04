@@ -9,7 +9,6 @@ import { AppAwsAuthenticationService } from "./services/app-aws-authentication.s
 import { UpdaterService } from "./services/updater.service";
 import compareVersions from "compare-versions";
 import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
@@ -25,6 +24,7 @@ import { AppNativeService } from "./services/app-native.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { OptionsService } from "./services/options.service";
 
 @Component({
   selector: "app-root",
@@ -33,7 +33,6 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 })
 export class AppComponent implements OnInit {
   private fileService: FileService;
-  private repository: Repository;
   private awsCoreService: AwsCoreService;
   private loggingService: LoggingService;
   private timerService: TimerService;
@@ -47,12 +46,13 @@ export class AppComponent implements OnInit {
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
-    appProviderService: AppProviderService,
-    mfaCodePrompter: AppMfaCodePromptService,
-    awsAuthenticationService: AppAwsAuthenticationService,
-    verificationWindowService: AppVerificationWindowService,
+    public appProviderService: AppProviderService,
+    public mfaCodePrompter: AppMfaCodePromptService,
+    public awsAuthenticationService: AppAwsAuthenticationService,
+    public verificationWindowService: AppVerificationWindowService,
     public appService: AppService,
     private router: Router,
+    private optionsService: OptionsService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
     private electronService: AppNativeService
@@ -62,7 +62,6 @@ export class AppComponent implements OnInit {
     appProviderService.verificationWindowService = verificationWindowService;
     appProviderService.windowService = windowService;
 
-    this.repository = appProviderService.repository;
     this.fileService = appProviderService.fileService;
     this.awsCoreService = appProviderService.awsCoreService;
     this.loggingService = appProviderService.loggingService;
@@ -153,11 +152,11 @@ export class AppComponent implements OnInit {
     this.remoteProceduresServer.stopServer();
 
     // Stop all the sessions
-    const sessions = this.repository.getSessions();
+    const sessions = this.appProviderService.sessionManagementService.getSessions();
     sessions.forEach((s) => {
       s.status = SessionStatus.inactive;
     });
-    this.repository.updateSessions(sessions);
+    this.appProviderService.sessionManagementService.updateSessions(sessions);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
@@ -229,13 +228,13 @@ export class AppComponent implements OnInit {
       if (this.updaterService.isUpdateNeeded()) {
         this.updaterService.updateDialog();
         this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
-        this.repository.updateSessions(this.behaviouralSubjectService.sessions);
+        this.appProviderService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
       }
     });
   }
 
   private setInitialColorSchema() {
-    const workspace = this.repository.getWorkspace();
+    const workspace = this.appProviderService.repository.getWorkspace();
     if (workspace) {
       const colorTheme = workspace.colorTheme || constants.colorTheme;
       workspace.colorTheme = workspace.colorTheme || constants.colorTheme;
@@ -255,7 +254,7 @@ export class AppComponent implements OnInit {
 
   private setColorSchemaChangeEventListener() {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-      if (this.repository.getWorkspace().colorTheme === constants.systemDefaultTheme) {
+      if (this.optionsService.colorTheme === constants.systemDefaultTheme) {
         if (this.appService.isDarkMode()) {
           document.querySelector("body").classList.add("dark-theme");
         } else {

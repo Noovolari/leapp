@@ -13,6 +13,7 @@ import { SessionService } from "@noovolari/leapp-core/services/session/session-s
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
+import { OptionsService } from "../../../services/options.service";
 
 @Component({
   selector: "app-options-dialog",
@@ -76,26 +77,27 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   constructor(
     public appProviderService: AppProviderService,
     public appService: AppService,
+    private optionsService: OptionsService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,
     private modalService: BsModalService,
     private router: Router
   ) {
-    this.selectedTerminal = this.appProviderService.workspaceOptionService.macOsTerminal || constants.macOsTerminal;
+    this.selectedTerminal = this.optionsService.macOsTerminal || constants.macOsTerminal;
 
-    this.colorTheme = this.appProviderService.workspaceOptionService.colorTheme || constants.colorTheme;
+    this.colorTheme = this.optionsService.colorTheme || constants.colorTheme;
     this.selectedColorTheme = this.colorTheme;
 
-    this.selectedCredentialMethod = this.appProviderService.workspaceOptionService.credentialMethod || constants.credentialFile;
+    this.selectedCredentialMethod = this.optionsService.credentialMethod || constants.credentialFile;
   }
 
   ngOnInit(): void {
     this.idpUrlValue = "";
-    this.proxyProtocol = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyProtocol;
-    this.proxyUrl = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl;
-    this.proxyPort = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyPort;
-    this.proxyUsername = this.appProviderService.workspaceOptionService.proxyConfiguration.username || "";
-    this.proxyPassword = this.appProviderService.workspaceOptionService.proxyConfiguration.password || "";
+    this.proxyProtocol = this.optionsService.proxyConfiguration.proxyProtocol;
+    this.proxyUrl = this.optionsService.proxyConfiguration.proxyUrl;
+    this.proxyPort = this.optionsService.proxyConfiguration.proxyPort;
+    this.proxyUsername = this.optionsService.proxyConfiguration.username || "";
+    this.proxyPassword = this.optionsService.proxyConfiguration.password || "";
 
     this.form.controls["idpUrl"].setValue(this.idpUrlValue);
     this.form.controls["proxyUrl"].setValue(this.proxyUrl);
@@ -104,10 +106,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.form.controls["proxyUsername"].setValue(this.proxyUsername);
     this.form.controls["proxyPassword"].setValue(this.proxyPassword);
 
-    const isProxyUrl =
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl &&
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl !== "undefined";
-    this.proxyUrl = isProxyUrl ? this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl : "";
+    const isProxyUrl = this.optionsService.proxyConfiguration.proxyUrl && this.optionsService.proxyConfiguration.proxyUrl !== "undefined";
+    this.proxyUrl = isProxyUrl ? this.optionsService.proxyConfiguration.proxyUrl : "";
 
     if (this.proxyUsername || this.proxyPassword) {
       this.showProxyAuthentication = true;
@@ -115,8 +115,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
     this.regions = this.appProviderService.awsCoreService.getRegions();
     this.locations = this.appProviderService.azureCoreService.getLocations();
-    this.selectedRegion = this.appProviderService.workspaceOptionService.defaultRegion || constants.defaultRegion;
-    this.selectedLocation = this.appProviderService.workspaceOptionService.defaultLocation || constants.defaultLocation;
+    this.selectedRegion = this.optionsService.defaultRegion || constants.defaultRegion;
+    this.selectedLocation = this.optionsService.defaultLocation || constants.defaultLocation;
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -128,8 +128,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   setColorTheme(theme: string): void {
-    this.appProviderService.workspaceOptionService.colorTheme = theme;
-    this.colorTheme = this.appProviderService.workspaceOptionService.colorTheme;
+    this.optionsService.colorTheme = theme;
+    this.colorTheme = this.optionsService.colorTheme;
     this.selectedColorTheme = this.colorTheme;
     if (this.colorTheme === constants.darkTheme) {
       document.querySelector("body").classList.add("dark-theme");
@@ -145,29 +145,17 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
    */
   saveOptions(): void {
     if (this.form.valid) {
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl = this.form.controls["proxyUrl"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyProtocol = this.form.controls["proxyProtocol"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyPort = this.form.controls["proxyPort"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.workspaceOptionService.proxyConfiguration.username = this.form.controls["proxyUsername"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.workspaceOptionService.proxyConfiguration.password = this.form.controls["proxyPassword"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateProxyConfiguration(this.appProviderService.workspaceOptionService.proxyConfiguration);
+      this.optionsService.updateProxyConfiguration({
+        proxyUrl: this.form.controls["proxyUrl"].value,
+        proxyProtocol: this.form.controls["proxyProtocol"].value,
+        proxyPort: this.form.controls["proxyPort"].value,
+        username: this.form.controls["proxyUsername"].value,
+        password: this.form.controls["proxyPassword"].value,
+      });
 
-      this.appProviderService.repository.getWorkspace().defaultRegion = this.selectedRegion;
-      // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateDefaultRegion(this.appProviderService.repository.getWorkspace().defaultRegion);
-
-      this.appProviderService.repository.getWorkspace().defaultLocation = this.selectedLocation;
-      // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateDefaultLocation(this.appProviderService.repository.getWorkspace().defaultLocation);
-
-      this.appProviderService.repository.getWorkspace().macOsTerminal = this.selectedTerminal;
-      // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateMacOsTerminal(this.appProviderService.repository.getWorkspace().macOsTerminal);
+      this.optionsService.defaultRegion = this.selectedRegion;
+      this.optionsService.defaultLocation = this.selectedLocation;
+      this.optionsService.macOsTerminal = this.selectedTerminal;
 
       if (this.checkIfNeedDialogBox()) {
         // eslint-disable-next-line max-len

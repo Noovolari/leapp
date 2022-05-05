@@ -17,7 +17,7 @@ describe("StartSsmSession", () => {
     await expect(command.run()).rejects.toThrow("Flag --sessionId expects a value");
 
     command = getTestCommand(new CliProviderService(), ["--sessionId", "sgsg", "--region", "eu-west-1", "--ssmInstanceId", "ssmInstance"]);
-    await expect(command.run()).rejects.toThrow("session with id sgsg not found.");
+    await expect(command.run()).rejects.toThrow("No session found with id sgsg");
 
     command = getTestCommand(new CliProviderService(), ["--sessionId", "session", "--region"]);
     await expect(command.run()).rejects.toThrow("Flag --region expects a value");
@@ -30,9 +30,12 @@ describe("StartSsmSession", () => {
       },
     ];
     const cliMockService = {
-      repository: {
+      sessionManagementService: {
         getSessionById: jest.fn((id: string) => sessions.find((s) => s.sessionId === id)),
         getSessions: jest.fn(() => sessions),
+      },
+      workspaceService: {
+        getDefaultProfileId: jest.fn(() => "defaultId"),
       },
       sessionFactory: new CliProviderService().sessionFactory,
       cloudProviderService: new CliProviderService().cloudProviderService,
@@ -95,7 +98,7 @@ describe("StartSsmSession", () => {
 
   test("selectSession", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{ sessionName: "awsSession", type: "aws" }, { sessionName: "azureSession" }]),
       },
       sessionFactory: {

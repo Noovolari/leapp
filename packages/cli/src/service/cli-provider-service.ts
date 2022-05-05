@@ -37,6 +37,8 @@ import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/inte
 import { CliRpcAwsSamlAuthenticationService } from "./cli-rpc-aws-saml-authentication-service";
 import { LocalCliMfaCodePromptService } from "./local-cli-mfa-code-prompt-service";
 import { SessionManagementService } from "@noovolari/leapp-core/services/session-management-service";
+import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -75,6 +77,22 @@ export class CliProviderService {
   private webConsoleServiceInstance: WebConsoleService;
   private ssmServiceInstance: SsmService;
   private sessionManagementServiceInstance: SessionManagementService;
+  private segmentServiceInstance: SegmentService;
+  private workspaceServiceInstance: WorkspaceService;
+
+  public get workspaceService(): WorkspaceService {
+    if (!this.workspaceServiceInstance) {
+      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+    }
+    return this.workspaceServiceInstance;
+  }
+
+  public get segmentService(): SegmentService {
+    if (!this.segmentServiceInstance) {
+      this.segmentServiceInstance = new SegmentService(this.repository);
+    }
+    return this.segmentServiceInstance;
+  }
 
   public get cliNativeService(): CliNativeService {
     if (!this.cliNativeServiceInstance) {

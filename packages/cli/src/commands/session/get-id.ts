@@ -25,7 +25,7 @@ export default class GetIdSession extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.cliProviderService.repository.getSessions();
+    const availableSessions = this.cliProviderService.sessionManagementService.getSessions();
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }

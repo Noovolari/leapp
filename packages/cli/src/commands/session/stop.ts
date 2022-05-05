@@ -21,7 +21,7 @@ export default class StopSession extends LeappCommand {
     try {
       const { flags } = await this.parse(StopSession);
       if (flags.sessionId && flags.sessionId !== "") {
-        const selectedSession = this.cliProviderService.repository.getSessionById(flags.sessionId);
+        const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId);
         if (!selectedSession) {
           throw new Error("No session found with id " + flags.sessionId);
         }
@@ -46,7 +46,7 @@ export default class StopSession extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.cliProviderService.repository
+    const availableSessions = this.cliProviderService.sessionManagementService
       .getSessions()
       .filter((session: Session) => session.status === SessionStatus.active || session.status === SessionStatus.pending);
     if (availableSessions.length === 0) {

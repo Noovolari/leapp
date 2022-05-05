@@ -23,7 +23,7 @@ export default class OpenWebConsole extends LeappCommand {
     try {
       const { flags } = await this.parse(OpenWebConsole);
       if (flags.sessionId && flags.sessionId !== "") {
-        const selectedSession = this.cliProviderService.repository.getSessionById(flags.sessionId);
+        const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId);
         if (!selectedSession) {
           throw new Error("No session found with id " + flags.sessionId);
         }
@@ -50,7 +50,7 @@ export default class OpenWebConsole extends LeappCommand {
   }
 
   private async selectSession(): Promise<Session> {
-    const availableSessions = this.cliProviderService.repository
+    const availableSessions = this.cliProviderService.sessionManagementService
       .getSessions()
       .filter((session: Session) => session.status === SessionStatus.inactive && session.type !== SessionType.azure);
     if (availableSessions.length === 0) {

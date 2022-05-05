@@ -206,7 +206,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   manageIdpUrl(id: string): void {
-    const idpUrl = this.appProviderService.repository.getIdpUrl(id);
+    const idpUrl = this.appProviderService.idpUrlService.getIdpUrl(id);
     const validate = this.appProviderService.idpUrlService.validateIdpUrl(this.form.get("idpUrl").value);
     if (validate === true) {
       if (!idpUrl) {
@@ -253,8 +253,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           this.appProviderService.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
 
           sessions.forEach((session) => {
-            this.appProviderService.repository.deleteSession(session.sessionId);
-            this.appProviderService.behaviouralSubjectService.setSessions(this.appProviderService.repository.getSessions());
+            this.appProviderService.sessionManagementService.deleteSession(session.sessionId);
+            this.appProviderService.behaviouralSubjectService.setSessions(this.appProviderService.sessionManagementService.getSessions());
           });
           this.appProviderService.idpUrlService.deleteIdpUrl(id);
         }
@@ -265,7 +265,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   async manageAwsProfile(id: string | number): Promise<void> {
-    const profileIndex = this.appProviderService.repository.getWorkspace().profiles.findIndex((p) => p.id === id.toString());
+    const profileIndex = this.appProviderService.namedProfileService.getNamedProfiles().findIndex((p) => p.id === id.toString());
 
     const validate = this.appProviderService.namedProfileService.validateNewProfileName(this.form.get("awsProfile").value);
     if (validate === true) {
@@ -305,7 +305,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   deleteAwsProfile(id: string): void {
     // With profile
-    const sessions = this.appProviderService.repository.getSessions().filter((sess) => (sess as any).profileId === id);
+    const sessions = this.appProviderService.sessionManagementService.getSessions().filter((sess) => (sess as any).profileId === id);
 
     // Get only names for display
     let sessionsNames = sessions.map(
@@ -329,21 +329,19 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           // Reverting all sessions to default profile
           // eslint-disable-next-line @typescript-eslint/prefer-for-of
           for (let i = 0; i < sessions.length; i++) {
-            const sess = sessions[i];
-            this.sessionService = this.appProviderService.sessionFactory.getSessionService(sess.type);
+            this.sessionService = this.appProviderService.sessionFactory.getSessionService(sessions[i].type);
 
             let wasActive = false;
-            if ((sess as any).status === SessionStatus.active) {
+            if ((sessions[i] as any).status === SessionStatus.active) {
               wasActive = true;
-              await this.sessionService.stop(sess.sessionId);
+              await this.sessionService.stop(sessions[i].sessionId);
             }
 
-            (sess as any).profileId = this.appProviderService.repository.getDefaultProfileId();
-
-            this.appProviderService.repository.updateSession(sess.sessionId, sess);
-            this.appProviderService.behaviouralSubjectService.setSessions(this.appProviderService.repository.getSessions());
+            (sessions[i] as any).profileId = this.appProviderService.workspaceService.getDefaultProfileId();
+            this.appProviderService.sessionManagementService.updateSessions(sessions);
+            this.appProviderService.behaviouralSubjectService.setSessions(sessions);
             if (wasActive) {
-              this.sessionService.start(sess.sessionId);
+              this.sessionService.start(sessions[i].sessionId);
             }
           }
 
@@ -362,13 +360,13 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async showWarningModalForCredentialProcess() {
-    const workspace = this.appProviderService.repository.getWorkspace();
+    const workspace = this.appProviderService.workspaceService.getWorkspace();
     if (this.selectedCredentialMethod === constants.credentialProcess) {
       const confirmText = "I acknowledge it";
       const callback = async (answerString: string) => {
         if (answerString === constants.confirmed.toString()) {
           workspace.credentialMethod = this.selectedCredentialMethod;
-          this.appProviderService.repository.persistWorkspace(workspace);
+          this.appProviderService.workspaceService.persistWorkspace(workspace);
           // Create Config file if missing
           if (!this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsConfigPath())) {
             this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsConfigPath(), "");
@@ -386,10 +384,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         }
 
         workspace.credentialMethod = this.selectedCredentialMethod;
-        this.appProviderService.repository.persistWorkspace(workspace);
+        this.appProviderService.workspaceService.persistWorkspace(workspace);
 
         // Now we need to check for started sessions and restart them
-        const activeSessions = this.appProviderService.repository.listActive();
+        const activeSessions = this.appProviderService.sessionManagementService.getActiveSessions();
         for (let i = 0; i < activeSessions.length; i++) {
           const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
           await sessionService.stop(activeSessions[i].sessionId);
@@ -406,7 +404,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       });
     } else {
       workspace.credentialMethod = this.selectedCredentialMethod;
-      this.appProviderService.repository.persistWorkspace(workspace);
+      this.appProviderService.workspaceService.persistWorkspace(workspace);
       // backup config file and delete normal one
       if (this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsConfigPath())) {
         this.appProviderService.fileService.writeFileSync(
@@ -417,7 +415,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       }
 
       // Now we need to check for started sessions and restart them
-      const activeSessions = this.appProviderService.repository.listActive();
+      const activeSessions = this.appProviderService.sessionManagementService.getActiveSessions();
       for (let i = 0; i < activeSessions.length; i++) {
         const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
         await sessionService.stop(activeSessions[i].sessionId);

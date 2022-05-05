@@ -7,7 +7,6 @@ import Segment from "@noovolari/leapp-core/models/segment";
 import Folder from "@noovolari/leapp-core/models/folder";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { Session } from "@noovolari/leapp-core/models/session";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { AppProviderService } from "../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { integrationHighlight } from "../integration-bar/integration-bar.component";
@@ -42,11 +41,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
   showPinned: boolean;
   modalRef: BsModalRef;
 
-  private repository: Repository;
   private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(private bsModalService: BsModalService, private leappCoreService: AppProviderService, private optionsService: OptionsService) {
-    this.repository = leappCoreService.repository;
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
     this.showAll = true;
     this.showPinned = false;

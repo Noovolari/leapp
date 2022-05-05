@@ -234,10 +234,9 @@ export class AppComponent implements OnInit {
   }
 
   private setInitialColorSchema() {
-    const workspace = this.appProviderService.repository.getWorkspace();
-    if (workspace) {
-      const colorTheme = workspace.colorTheme || constants.colorTheme;
-      workspace.colorTheme = workspace.colorTheme || constants.colorTheme;
+    if (this.appProviderService.workspaceService.workspaceExists()) {
+      const colorTheme = this.optionsService.colorTheme || constants.colorTheme;
+      this.optionsService.colorTheme = this.optionsService.colorTheme || constants.colorTheme;
       if (colorTheme === constants.darkTheme) {
         document.querySelector("body").classList.add("dark-theme");
       } else if (colorTheme === constants.lightTheme) {

@@ -110,7 +110,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     this.accountType = this.selectedSession.type;
 
     // Get the workspace and the accounts you need
-    const workspace = this.leappCoreService.repository.getWorkspace();
+    const workspace = this.leappCoreService.workspaceService.getWorkspace();
 
     // We get all the applicable idp urls
     if (workspace.idpUrls && workspace.idpUrls.length > 0) {
@@ -227,7 +227,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
       if (this.selectedSession.type !== SessionType.azure) {
         try {
-          this.leappCoreService.repository.getProfileName(this.selectedProfile.value);
+          this.leappCoreService.namedProfileService.getProfileName(this.selectedProfile.value);
         } catch (e) {
           this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
         }
@@ -246,8 +246,11 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         this.selectedSession.region = this.form.get("azureLocation").value;
       }
 
-      this.leappCoreService.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
-      this.behaviouralSubjectService.setSessions(this.leappCoreService.repository.getSessions());
+      const sessions = this.leappCoreService.sessionManagementService.getSessions();
+      const index = sessions.findIndex((s) => s.sessionId === this.selectedSession.sessionId);
+      sessions[index] = this.selectedSession;
+      this.leappCoreService.sessionManagementService.updateSessions(sessions);
+      this.behaviouralSubjectService.setSessions(this.leappCoreService.sessionManagementService.getSessions());
 
       if (wasActive) {
         await this.sessionService.start(this.selectedSession.sessionId);
@@ -434,7 +437,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       } else {
         if (
           validate.toString() !== "Profile already exists" &&
-          this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value
+          this.leappCoreService.workspaceService.getDefaultProfileId() !== this.selectedProfile.value
         ) {
           throw new LeappParseError(this, validate.toString());
         }

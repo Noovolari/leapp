@@ -15,7 +15,6 @@ import { AppProviderService } from "../../services/app-provider.service";
 import { AppNativeService } from "../../services/app-native.service";
 import { AppService } from "../../services/app.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
@@ -65,7 +64,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   compactMode: boolean;
 
   eConstants = constants;
-  repository: Repository;
 
   private subscription;
   private subscription2;
@@ -86,7 +84,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     private windowService: WindowService
   ) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
-    this.repository = leappCoreService.repository;
 
     this.filterExtended = false;
     this.compactMode = false;

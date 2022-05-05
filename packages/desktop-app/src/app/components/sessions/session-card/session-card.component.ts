@@ -20,7 +20,6 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
@@ -32,6 +31,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
+import { OptionsService } from "../../../services/options.service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -88,8 +88,6 @@ export class SessionCardComponent implements OnInit {
   menuX: number;
   menuY: number;
 
-  repository: Repository;
-
   form = new FormGroup({
     awsProfile: new FormControl("", [Validators.required]),
   });
@@ -113,14 +111,14 @@ export class SessionCardComponent implements OnInit {
     private electronService: AppNativeService,
     private messageToasterService: MessageToasterService,
     private appProviderService: AppProviderService,
-    private awsAuthenticationService: AppAwsAuthenticationService
+    private awsAuthenticationService: AppAwsAuthenticationService,
+    private optionService: OptionsService
   ) {
     this.loggingService = appProviderService.loggingService;
     this.sessionFactory = appProviderService.sessionFactory;
     this.fileService = appProviderService.fileService;
     this.keychainService = appProviderService.keyChainService;
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
-    this.repository = appProviderService.repository;
     this.awsCoreService = appProviderService.awsCoreService;
     this.azureCoreService = appProviderService.azureCoreService;
   }
@@ -134,7 +132,7 @@ export class SessionCardComponent implements OnInit {
     const azureLocations = this.azureCoreService.getLocations();
 
     // Get profiles
-    this.profiles = this.repository.getProfiles().map((p) => ({ label: p.name, value: p.id }));
+    this.profiles = this.appProviderService.namedProfileService.getNamedProfiles().map((p) => ({ label: p.name, value: p.id }));
 
     // Array and labels for regions and locations
     this.regionOrLocations = this.session.type !== SessionType.azure ? this.awsRegions : azureLocations;
@@ -240,8 +238,7 @@ export class SessionCardComponent implements OnInit {
     this.trigger.closeMenu();
 
     try {
-      const workspace = this.repository.getWorkspace();
-      if (workspace) {
+      if (this.appProviderService.workspaceService.workspaceExists()) {
         const texts = {
           // eslint-disable-next-line max-len
           1: (session as AwsIamRoleFederatedSession).roleArn
@@ -353,14 +350,14 @@ export class SessionCardComponent implements OnInit {
         wasActive = true;
       }
 
-      const sessions: Session[] = this.repository.getSessions();
+      const sessions: Session[] = this.appProviderService.sessionManagementService.getSessions();
       for (let i = 0; i < sessions.length; i++) {
         if (sessions[i].sessionId === this.session.sessionId) {
           sessions[i].region = this.selectedDefaultRegion;
         }
       }
-      this.repository.updateSessions(sessions);
-      this.behaviouralSubjectService.setSessions(this.repository.getSessions());
+      this.appProviderService.sessionManagementService.updateSessions(sessions);
+      this.behaviouralSubjectService.setSessions(this.appProviderService.sessionManagementService.getSessions());
 
       this.session.region = this.selectedDefaultRegion;
 
@@ -434,7 +431,7 @@ export class SessionCardComponent implements OnInit {
   async changeProfile(): Promise<void> {
     if (this.selectedProfile) {
       try {
-        this.repository.getProfileName(this.selectedProfile.value);
+        this.appProviderService.namedProfileService.getProfileName(this.selectedProfile.value);
       } catch (e) {
         this.selectedProfile.value = this.appProviderService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
       }
@@ -517,14 +514,14 @@ export class SessionCardComponent implements OnInit {
   pinSession(session: Session, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.repository.pinSession(session);
+    this.optionService.pinSession(session);
     this.trigger.closeMenu();
   }
 
   unpinSession(session: Session, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.repository.unpinSession(session);
+    this.optionService.unpinSession(session);
     this.trigger.closeMenu();
   }
 

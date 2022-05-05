@@ -33,6 +33,7 @@ import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service"
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { SessionManagementService } from "@noovolari/leapp-core/services/session-management-service";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 
 @Injectable({
   providedIn: "root",
@@ -72,8 +73,16 @@ export class AppProviderService {
   private remoteProceduresServerInstance: RemoteProceduresServer;
   private segmentServiceInstance: SegmentService;
   private sessionManagementServiceInstance: SessionManagementService;
+  private workspaceServiceInstance: WorkspaceService;
 
   constructor(private electronService: AppNativeService, private ngZone: NgZone) {}
+
+  public get workspaceService(): WorkspaceService {
+    if (!this.workspaceServiceInstance) {
+      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+    }
+    return this.workspaceServiceInstance;
+  }
 
   public get segmentService(): SegmentService {
     if (!this.segmentServiceInstance) {

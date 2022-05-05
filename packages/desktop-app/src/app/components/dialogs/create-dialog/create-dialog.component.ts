@@ -120,7 +120,7 @@ export class CreateDialogComponent implements OnInit {
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
       // Get the workspace and the accounts you need
-      const workspace = this.leappCoreService.repository.getWorkspace();
+      const workspace = this.leappCoreService.workspaceService.getWorkspace();
 
       // We get all the applicable idp urls
       if (workspace.idpUrls && workspace.idpUrls.length > 0) {

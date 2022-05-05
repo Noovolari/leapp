@@ -1,103 +1,118 @@
 import { Injectable } from "@angular/core";
-import { Workspace } from "@noovolari/leapp-core/models/workspace";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import Folder from "@noovolari/leapp-core/models/folder";
 import { AppProviderService } from "./app-provider.service";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { Session } from "@noovolari/leapp-core/models/session";
 
 @Injectable({ providedIn: "root" })
 export class OptionsService {
-  _workspace: Workspace;
-  repository: Repository;
+  workspaceService: WorkspaceService;
 
   constructor(private appProviderService: AppProviderService) {
-    this.repository = this.appProviderService.repository;
+    this.workspaceService = this.appProviderService.workspaceService;
   }
 
   get macOsTerminal(): string {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.macOsTerminal;
+    return this.workspaceService.getWorkspace().macOsTerminal;
   }
 
   set macOsTerminal(value: string) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.macOsTerminal = value;
-    this.repository.persistWorkspace(this._workspace);
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.macOsTerminal = value;
+    this.workspaceService.persistWorkspace(workspace);
   }
 
   get proxyConfiguration(): { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string } {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.proxyConfiguration;
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.proxyConfiguration;
   }
 
   updateProxyConfiguration(value: { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string }) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.proxyConfiguration = value;
-    this.repository.persistWorkspace(this._workspace);
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.proxyConfiguration = value;
+    this.workspaceService.persistWorkspace(workspace);
   }
 
   get defaultRegion(): string {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.defaultRegion;
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.defaultRegion;
   }
 
   set defaultRegion(value: string) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.defaultRegion = value;
-    this.repository.persistWorkspace(this._workspace);
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.defaultRegion = value;
+    this.workspaceService.persistWorkspace(workspace);
   }
 
   get defaultLocation(): string {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.defaultLocation;
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.defaultLocation;
   }
 
   set defaultLocation(value: string) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.defaultLocation = value;
-    this.repository.persistWorkspace(this._workspace);
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.defaultLocation = value;
+    this.workspaceService.persistWorkspace(workspace);
   }
 
   get pinned(): string[] {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.pinned;
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.pinned;
   }
 
   set pinned(pinned: string[]) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.pinned = pinned;
-    this.repository.persistWorkspace(this._workspace);
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.pinned = pinned;
+    this.workspaceService.persistWorkspace(workspace);
   }
 
   get folders(): Folder[] {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.folders;
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.folders;
   }
 
   set folders(folders: Folder[]) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.folders = folders;
-    this.repository.persistWorkspace(this._workspace);
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.folders = folders;
+    this.workspaceService.persistWorkspace(workspace);
   }
 
   get colorTheme(): string {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.colorTheme;
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.colorTheme;
   }
 
   set colorTheme(value: string) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.colorTheme = value;
-    this.repository.persistWorkspace(this._workspace);
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.colorTheme = value;
+    this.workspaceService.persistWorkspace(workspace);
   }
 
   get credentialMethod(): string {
-    this._workspace = this.repository.getWorkspace();
-    return this._workspace.credentialMethod;
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.credentialMethod;
   }
 
   set credentialMethod(credentialMethod: string) {
-    this._workspace = this.repository.getWorkspace();
-    this._workspace.credentialMethod = credentialMethod;
-    this.repository.persistWorkspace(this._workspace);
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.credentialMethod = credentialMethod;
+    this.workspaceService.persistWorkspace(workspace);
+  }
+
+  pinSession(session: Session): void {
+    const workspace = this.workspaceService.getWorkspace();
+    if (workspace.pinned.indexOf(session.sessionId) === -1) {
+      workspace.pinned.push(session.sessionId);
+      this.workspaceService.persistWorkspace(workspace);
+    }
+  }
+
+  unpinSession(session: Session): void {
+    const workspace = this.workspaceService.getWorkspace();
+    const index = workspace.pinned.indexOf(session.sessionId);
+    if (index > -1) {
+      workspace.pinned.splice(index, 1);
+      this.workspaceService.persistWorkspace(workspace);
+    }
   }
 }

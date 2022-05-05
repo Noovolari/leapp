@@ -13,10 +13,14 @@ export class WebConsoleService {
     sessionRegion: string,
     sessionDuration: number = this.sessionDurationInHours * this.secondsInAHour
   ): Promise<void> {
-    const federationUrl = "https://signin.aws.amazon.com/federation";
-    const consoleHomeURL = `https://${sessionRegion}.console.aws.amazon.com/console/home?region=${sessionRegion}`;
+    const isUSGovCloud = sessionRegion.startsWith("us-gov-");
 
-    if (sessionRegion.startsWith("us-gov-") || sessionRegion.startsWith("cn-")) {
+    const federationUrl = isUSGovCloud ? "https://signin.amazonaws-us-gov.com/federation" : "https://signin.aws.amazon.com/federation";
+    const consoleHomeURL = isUSGovCloud
+      ? `https://console.amazonaws-us-gov.com/console/home?region=${sessionRegion}`
+      : `https://${sessionRegion}.console.aws.amazon.com/console/home?region=${sessionRegion}`;
+
+    if (sessionRegion.startsWith("cn-")) {
       throw new Error("Unsupported Region");
     }
 

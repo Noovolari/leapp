@@ -14,10 +14,15 @@ const authenticationUrlRegexes = new Map([
       /^https:\/\/login\.okta\.com\/.*/,
       /^https:\/\/accounts\.google\.com\/ServiceLogin.*/,
       /^https:\/\/login\.microsoftonline\.com\/.*\/oauth2\/authorize.*/,
+      /^https:\/\/account\.activedirectory\.windowsazure\.com\/applications\/signin\/*?tenantId=*/,
     ],
   ],
 ]);
-const samlAssertionRegexes = new Map([[CloudProviderType.aws, [/^https:\/\/signin\.aws\.amazon\.com\/saml/]]]);
+
+
+const samlAssertionRegexes = new Map([
+  [CloudProviderType.aws, [/^https:\/\/signin\.amazonaws-us-gov\.com\/saml/, /^https:\/\/signin\.aws\.amazon\.com\/saml/]],
+]);
 
 export class AwsSamlAssertionExtractionService {
   isAuthenticationUrl(cloudProvider: CloudProviderType, url: string): boolean {

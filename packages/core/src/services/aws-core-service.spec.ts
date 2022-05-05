@@ -3,7 +3,7 @@ import { AwsCoreService } from "./aws-core-service";
 
 describe("awsCoreService", () => {
   test("getRegions", () => {
-    const awsCoreService = new AwsCoreService(null);
+    const awsCoreService = new AwsCoreService(null, null);
 
     expect(awsCoreService.getRegions()).toEqual([
       {

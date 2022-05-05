@@ -1,6 +1,5 @@
 import { beforeEach, describe, test, expect, jest } from "@jest/globals";
 import { SsmService } from "./ssm-service";
-import { LoggingService } from "./logging-service";
 import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
 
@@ -8,7 +7,6 @@ jest.mock("../models/session");
 
 describe("SsmService", () => {
   let ssmService: SsmService;
-  let loggingService: LoggingService;
   let executeService: ExecuteService;
   let credentialInfo: CredentialsInfo;
   let mockedCallback: any;
@@ -39,7 +37,7 @@ describe("SsmService", () => {
     (executeService as any).nativeService = null;
     (executeService as any).repository = null;
 
-    ssmService = new SsmService(loggingService, executeService);
+    ssmService = new SsmService(null, executeService);
     ssmService.aws = {
       config: {
         update: jest.fn((_: any) => {}),

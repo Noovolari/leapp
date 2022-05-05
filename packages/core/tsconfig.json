@@ -37,7 +37,7 @@
   "exclude": [
     "./dist/**",
     "./gushio/**",
-    "/**/*.test.ts",
-    "/**/*.spec.ts"
+    "**/*.test.ts",
+    "**/*.spec.ts"
   ]
 }

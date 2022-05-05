@@ -23,6 +23,7 @@ describe("SegmentDialogComponent", () => {
       workspaceService: spyBehaviouralSubjectService,
       workspaceOptionService: { segments: [] },
       repository: spyRepositoryService,
+      segmentService: { list: () => [] },
       awsCoreService: { getRegions: () => [] },
       azureCoreService: { getLocations: () => [] },
       sessionFactory: { getSessionService: () => {} },

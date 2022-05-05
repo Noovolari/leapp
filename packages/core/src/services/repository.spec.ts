@@ -895,44 +895,6 @@ describe("Repository", () => {
     expect(repository.getFolders()[1].name).toBe("test2");
   });
 
-  test("pinSession() - set a session as favourite", () => {
-    const workspace = new Workspace();
-    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    workspace.pinned = [];
-
-    repository.workspace = workspace;
-    repository.persistWorkspace(workspace);
-
-    expect(workspace.pinned.length).toBe(0);
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    repository.pinSession({ sessionId: "1234" });
-
-    expect(workspace.pinned.length).toBe(1);
-    expect(workspace.pinned[0]).toBe("1234");
-  });
-
-  test("unpinSession() - unset a session as favourite", () => {
-    const workspace = new Workspace();
-    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    workspace.pinned = ["1234"];
-
-    repository.workspace = workspace;
-    repository.persistWorkspace(workspace);
-
-    expect(workspace.pinned.length).toBe(1);
-    expect(workspace.pinned[0]).toBe("1234");
-
-    repository.unpinSession({ sessionId: "1234" });
-    expect(workspace.pinned.length).toBe(0);
-    expect(workspace.pinned[0]).toBe(undefined);
-  });
-
   test("updateMacOsTerminal() - set the terminal option for MacOs in the workspace", () => {
     const workspace = new Workspace();
     mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));

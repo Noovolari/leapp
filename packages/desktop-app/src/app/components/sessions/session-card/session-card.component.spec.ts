@@ -29,6 +29,7 @@ describe("SessionCardComponent", () => {
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       workspaceService: spyBehaviouralSubjectService,
       repository: spyRepositoryService,
+      namedProfileService: { getNamedProfiles: () => [] },
       awsCoreService: { getRegions: () => [] },
       azureCoreService: { getLocations: () => [] },
       sessionFactory: { getSessionService: () => {} },

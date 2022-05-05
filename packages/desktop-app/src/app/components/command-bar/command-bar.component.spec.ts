@@ -4,6 +4,8 @@ import { CommandBarComponent } from "./command-bar.component";
 import { mustInjected } from "../../../base-injectables";
 import { AppProviderService } from "../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { Workspace } from "@noovolari/leapp-core/models/workspace";
+import { OptionsService } from "../../services/options.service";
 
 describe("CommandBarComponent", () => {
   let component: CommandBarComponent;
@@ -20,14 +22,21 @@ describe("CommandBarComponent", () => {
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       behaviouralSubjectService: spyBehaviouralSubjectService,
-      workspaceOptionService: { colorTheme: "dark-theme" },
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       namedProfileService: { getNamedProfiles: () => [] },
     });
+
+    const optionsService = { colorTheme: "dark-theme" };
+
     await TestBed.configureTestingModule({
       declarations: [CommandBarComponent],
-      providers: [].concat(mustInjected().concat({ provide: AppProviderService, useValue: spyLeappCoreService })),
+      providers: [].concat(
+        mustInjected().concat([
+          { provide: AppProviderService, useValue: spyLeappCoreService },
+          { provide: OptionsService, useValue: optionsService },
+        ])
+      ),
     }).compileComponents();
   });
 
@@ -54,6 +63,7 @@ describe("CommandBarComponent", () => {
     (component as any).subscription6 = {
       unsubscribe: () => {},
     };
+    (component as any).optionsService = { colorTheme: "dark-theme", workspaceService: { getWorkspace: () => new Workspace() } };
   });
 
   it("should create", () => {

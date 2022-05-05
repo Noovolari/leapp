@@ -5,6 +5,7 @@ import { mustInjected } from "../../../../base-injectables";
 import { RouterTestingModule } from "@angular/router/testing";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
+import { Workspace } from "@noovolari/leapp-core/models/workspace";
 
 describe("CreateDialogComponent", () => {
   let component: CreateDialogComponent;
@@ -22,6 +23,7 @@ describe("CreateDialogComponent", () => {
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       behaviouralSubjectService: spyBehaviouralSubjectService,
       repository: spyRepositoryService,
+      workspaceService: { workspaceExists: () => true, getWorkspace: () => new Workspace() },
       awsCoreService: { getRegions: () => [] },
       azureCoreService: { getLocations: () => [] },
       sessionFactory: { getSessionService: () => {} },

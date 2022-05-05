@@ -10,6 +10,9 @@ describe("AppComponent", () => {
     const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
+      workspaceExists: () => true,
+      getWorkspace: () => new Workspace(),
+      persistWorkspace: () => {},
     });
     const spyRepositoryService = jasmine.createSpyObj("Repository", {
       getProfiles: [],

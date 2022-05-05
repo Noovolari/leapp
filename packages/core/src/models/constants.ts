@@ -1,7 +1,13 @@
 export const constants = {
-  //General
+  // General
+
+  /** Name of the app */
   appName: "Leapp",
+
+  /** Path of the file containing the user's workspace */
   lockFileDestination: ".Leapp/Leapp-lock.json",
+
+  /** Url of the page with the latest releases */
   latestUrl: "https://leapp.cloud/releases.html",
 
   //Aws

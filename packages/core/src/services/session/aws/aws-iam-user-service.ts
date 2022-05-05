@@ -258,7 +258,7 @@ export class AwsIamUserService extends AwsSessionService {
     await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-token`);
   }
 
-  private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {
+  private async generateSessionToken(session: Session, sts: AWS.STS, params: GenerateSessionTokenCallingMfaParams): Promise<CredentialsInfo> {
     try {
       // Invoke sts get-session-token api
       const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();

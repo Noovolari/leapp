@@ -1,3 +1,4 @@
+import { describe, it, expect } from "@jest/globals";
 import { AccessMethod } from "./access-method";
 import { AccessMethodField } from "./access-method-field";
 import { AccessMethodFieldType } from "./access-method-field-type";

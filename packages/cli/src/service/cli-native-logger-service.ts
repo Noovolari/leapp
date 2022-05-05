@@ -4,7 +4,7 @@ import { LogLevel } from "@noovolari/leapp-core/services/log-service";
 export class CliNativeLoggerService implements ILogger {
   constructor() {}
 
-  log(message: string, level: LogLevel) {
+  log(message: string, level: LogLevel): void {
     if (level === LogLevel.info || level === LogLevel.success) {
       global.console.info(message);
     } else if (level === LogLevel.warn) {
@@ -14,7 +14,7 @@ export class CliNativeLoggerService implements ILogger {
     }
   }
 
-  show(_message: string, _level: LogLevel) {
+  show(_message: string, _level: LogLevel): void {
     // TODO: implement a user notification service
   }
 }

@@ -7,13 +7,13 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
 import { OptionsService } from "../../../services/options.service";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 @Component({
   selector: "app-options-dialog",
@@ -338,8 +338,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
             }
 
             (sessions[i] as any).profileId = this.appProviderService.workspaceService.getDefaultProfileId();
-            this.appProviderService.sessionManagementService.updateSessions(sessions);
-            this.appProviderService.behaviouralSubjectService.setSessions(sessions);
+            this.appProviderService.sessionManagementService.updateSession(sessions[i].sessionId, sessions[i]);
+            this.appProviderService.behaviouralSubjectService.setSessions(this.appProviderService.sessionManagementService.getSessions());
             if (wasActive) {
               this.sessionService.start(sessions[i].sessionId);
             }

@@ -34,7 +34,7 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
   }
 
   setSessions(sessions: Session[]): void {
-    this.sessions = sessions;
+    this.sessions = [...sessions];
   }
 
   get integrations(): AwsSsoIntegration[] {

@@ -22,6 +22,7 @@ describe("SessionCardComponent", () => {
     const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
+      getWorkspace: () => new Workspace(),
     });
     const spyRepositoryService = jasmine.createSpyObj("Repository", {
       getProfiles: [],

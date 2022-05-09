@@ -112,7 +112,7 @@ export class SessionCardComponent implements OnInit {
     private messageToasterService: MessageToasterService,
     private appProviderService: AppProviderService,
     private awsAuthenticationService: AppAwsAuthenticationService,
-    private optionService: OptionsService
+    public optionService: OptionsService
   ) {
     this.loggingService = appProviderService.loggingService;
     this.sessionFactory = appProviderService.sessionFactory;

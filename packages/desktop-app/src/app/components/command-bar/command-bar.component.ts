@@ -76,11 +76,11 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
-    private optionsService: OptionsService,
+    public optionsService: OptionsService,
     private bsModalService: BsModalService,
-    private leappCoreService: AppProviderService,
     public appService: AppService,
     public electronService: AppNativeService,
+    private leappCoreService: AppProviderService,
     private windowService: WindowService
   ) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;

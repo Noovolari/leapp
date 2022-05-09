@@ -36,6 +36,10 @@ export class SessionManagementService {
     this.repository.updateSessions(sessions);
   }
 
+  updateSession(id: string, session: Session): void {
+    this.repository.updateSession(id, session);
+  }
+
   deleteSession(sessionId: string): void {
     this.repository.deleteSession(sessionId);
   }

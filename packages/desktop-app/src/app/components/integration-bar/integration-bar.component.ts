@@ -109,9 +109,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       if (value) {
         for (let i = 0; i < this.awsSsoConfigurations.length; i++) {
           const integration = this.awsSsoConfigurations[i];
-          if (this.isOnline(integration)) {
-            await this.forceSync(integration.id);
-          }
+          await this.forceSync(integration.id);
         }
         this.messageToasterService.toast("Integrations synchronized.", ToastLevel.info, "");
       }

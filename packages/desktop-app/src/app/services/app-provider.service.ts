@@ -203,7 +203,7 @@ export class AppProviderService {
         this.repository,
         this.fileService,
         this.executeService,
-        constants.azureAccessTokens
+        constants.azureMsalCacheFile
       );
     }
 

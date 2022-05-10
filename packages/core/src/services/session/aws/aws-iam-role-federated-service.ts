@@ -11,7 +11,6 @@ import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
-import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 import { LoggedException, LogLevel } from "../../log-service";
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
@@ -164,7 +163,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     const currentSession: Session = sessions[index];
 
     if (credentials !== undefined) {
-      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+      currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 
     sessions[index] = currentSession;

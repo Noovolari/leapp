@@ -24,8 +24,6 @@
     "crypto-js": "~4.0.0",
     "date-fns": "^2.26.0",
     "es6-shim": "^0.35.6",
-    "express": "^4.18.1",
-    "express-session": "^1.17.2",
     "extract-zip": "~2.0.1",
     "fix-path": "~3.0.0",
     "follow-redirects": "^1.14.9",

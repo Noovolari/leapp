@@ -9,6 +9,6 @@ describe("AzureService Integration", () => {
     const cacheFilePersistence = await FilePersistence.create(path.join(homedir(), ".azure/msal_token_cache.json"));
     const cacheFile = await cacheFilePersistence.load();
     const memoryCache = NodeStorage.generateInMemoryCache(cacheFile);
-    console.log(memoryCache);
+    console.log(memoryCache.refreshTokens);
   });
 });

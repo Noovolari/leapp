@@ -6,7 +6,6 @@ export class AwsIamRoleFederatedSession extends Session {
   idpArn: string;
   roleArn: string;
   profileId: string;
-  sessionTokenExpiration: string;
 
   constructor(sessionName: string, region: string, idpUrlId: string, idpArn: string, roleArn: string, profileId: string) {
     super(sessionName, region);

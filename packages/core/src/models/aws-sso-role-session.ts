@@ -6,7 +6,6 @@ export class AwsSsoRoleSession extends Session {
   roleArn: string;
   profileId: string;
   awsSsoConfigurationId: string;
-  sessionTokenExpiration: string;
 
   constructor(sessionName: string, region: string, roleArn: string, profileId: string, awsSsoConfigurationId: string, email?: string) {
     super(sessionName, region);

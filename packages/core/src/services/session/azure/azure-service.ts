@@ -7,6 +7,11 @@ import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { AzureSessionRequest } from "./azure-session-request";
 import { LoggedException, LogLevel } from "../../log-service";
+import { DataProtectionScope, FilePersistence, FilePersistenceWithDataProtection } from "@azure/msal-node-extensions";
+import { INativeService } from "../../../interfaces/i-native-service";
+import path from "path";
+import { homedir } from "os";
+import { IPersistence } from "@azure/msal-node-extensions/src/persistence/IPersistence";
 
 export interface AzureSessionToken {
   tokenType: string;
@@ -22,13 +27,29 @@ export interface AzureSessionToken {
   _authority: string;
 }
 
+interface JsonCache {
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  Account: any;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  IdToken: any;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  AccessToken: any;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  RefreshToken: any;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  AppMetadata: any;
+}
+
 export class AzureService extends SessionService {
+  private vault: any; // TODO: remove!
+
   constructor(
     iSessionNotifier: ISessionNotifier,
     repository: Repository,
     private fileService: FileService,
     private executeService: ExecuteService,
-    private azureAccessTokens: string
+    private azureMsalCacheFile: string,
+    private nativeService: INativeService
   ) {
     super(iSessionNotifier, repository);
   }
@@ -48,7 +69,7 @@ export class AzureService extends SessionService {
 
     const session = this.repository.getSessionById(sessionId);
 
-    await this.generateCredentials(sessionId);
+    //await this.generateCredentials(sessionId);
 
     try {
       // az account set —subscription <xxx> 2>&1
@@ -57,9 +78,9 @@ export class AzureService extends SessionService {
       await this.executeService.execute(`az configure --default location=${(session as AzureSession).region} 2>&1`);
       // delete refresh token from accessTokens
       //(FOR VERSION >= 2.30.0)
-      if (this.accessTokenFileExists()) {
+      /*if (this.accessTokenFileExists()) {
         this.deleteRefreshToken();
-      }
+      }*/
     } catch (err) {
       this.sessionDeactivated(sessionId);
       throw new LoggedException(err.message, this, LogLevel.warn);
@@ -96,47 +117,9 @@ export class AzureService extends SessionService {
     }
   }
 
-  async generateCredentials(sessionId: string): Promise<void> {
-    const session = this.repository.getSessionById(sessionId);
-    // Try parse accessToken.json
-    let accessTokensFile = this.parseAccessTokens();
-
-    // extract accessToken corresponding to the specific tenant (if not present, require az login)
-    let accessTokenExpirationTime;
-    accessTokenExpirationTime = await this.extractAccessTokenExpirationTime(
-      accessTokensFile,
-      (session as AzureSession).tenantId,
-      (session as AzureSession).subscriptionId
-    );
-
-    if (!accessTokenExpirationTime) {
-      try {
-        await this.executeService.execute(`az login --tenant ${(session as AzureSession).tenantId} 2>&1`);
-        accessTokensFile = this.parseAccessTokens();
-        accessTokenExpirationTime = await this.extractAccessTokenExpirationTime(
-          accessTokensFile,
-          (session as AzureSession).tenantId,
-          (session as AzureSession).subscriptionId
-        );
-      } catch (err) {
-        this.sessionDeactivated(sessionId);
-        throw new LoggedException(err.message, this, LogLevel.warn);
-      }
-    }
-
-    // if access token is expired
-    if (!accessTokenExpirationTime || new Date(accessTokenExpirationTime).getTime() < Date.now()) {
-      try {
-        await this.executeService.execute(`az account get-access-token --subscription ${(session as AzureSession).subscriptionId}`);
-      } catch (err) {
-        this.sessionDeactivated(sessionId);
-        throw new LoggedException(err.message, this, LogLevel.warn);
-      }
-    }
-  }
-
-  validateCredentials(sessionId: string): Promise<boolean> {
-    return new Promise((resolve, _) => {
+  validateCredentials(_sessionId: string): Promise<boolean> {
+    return Promise.resolve(false);
+    /*return new Promise((resolve, _) => {
       this.generateCredentials(sessionId)
         .then((__) => {
           this.sessionDeactivated(sessionId);
@@ -146,53 +129,105 @@ export class AzureService extends SessionService {
           this.sessionDeactivated(sessionId);
           resolve(false);
         });
-    });
+    });*/
   }
 
-  private async extractAccessTokenExpirationTime(accessTokens: AzureSessionToken[], tenantId: string, subscriptionId: string): Promise<string> {
-    if (accessTokens) {
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
-      //!!! FOR AZURE CLI PRIOR TO 2.30.0 https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli//
-      console.log(accessTokens);
-      const correctToken = accessTokens.find(
-        (accessToken) => accessToken._authority.split("/")[accessToken._authority.split("/").length - 1] === tenantId
-      );
-      /////////////////////////////////////////////////////////////////////////////////////////////////////
-      return correctToken ? correctToken.expiresOn : undefined;
-    } else {
-      ///////////////////////////////////////////////////////////////////////////////////////////////
-      //!!! FOR AZURE CLI >= 2.30.0 https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli//
-      ///////////////////////////////////////////////////////////////////////////////////////////////
-      try {
-        const result = await this.executeService.execute(`az account get-access-token --subscription ${subscriptionId}`);
-        const correctToken = JSON.parse(result);
-        return correctToken ? correctToken.expiresOn : undefined;
-      } catch (err) {
-        return undefined;
+  /*
+
+
+  *******
+
+
+   */
+
+  async checkCliVersion(): Promise<void> {
+    let output;
+    try {
+      output = await this.executeService.execute(`az --version`);
+    } catch (stdError) {
+      throw new LoggedException("Azure CLI is not installed", this, LogLevel.error, true);
+    }
+
+    const tokens = output.split(/\s+/);
+    const versionToken = tokens.find((token) => token.match(/^\d+\.\d+\.\d+$/));
+    if (versionToken) {
+      const [major, minor, _patch] = versionToken.split(".").map((v) => parseInt(v, 10));
+      if (major < 2 || (major === 2 && minor < 30)) {
+        throw new LoggedException("Unsupported Azure CLI version (< 2.30). Please update.", this, LogLevel.error, true);
       }
+    } else {
+      throw new LoggedException("Unknown Azure CLI version", this, LogLevel.error, true);
     }
   }
 
-  private deleteRefreshToken(): void {
-    const accessTokensString = this.fileService.readFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`);
-    let azureSessionTokens = JSON.parse(accessTokensString) as AzureSessionToken[];
-    azureSessionTokens = azureSessionTokens.map((azureSessionToken) => {
-      delete azureSessionToken.refreshToken;
-      return azureSessionToken;
-    });
-    this.fileService.writeFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`, JSON.stringify(azureSessionTokens));
-  }
-
-  private parseAccessTokens(): AzureSessionToken[] {
-    if (!this.accessTokenFileExists()) {
-      return undefined;
+  async login(session: AzureSession): Promise<void> {
+    try {
+      await this.executeService.execute(`az login --tenant ${session.tenantId} 2>&1`);
+      await this.secureRefreshToken();
+      await this.updateAccessTokenExpiration(session);
+    } catch (err) {
+      this.sessionDeactivated(session.sessionId);
+      throw new LoggedException(err.message, this, LogLevel.warn);
     }
-
-    const accessTokensString = this.fileService.readFileSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`);
-    return JSON.parse(accessTokensString) as AzureSessionToken[];
   }
 
-  private accessTokenFileExists(): boolean {
-    return this.fileService.existsSync(`${this.fileService.homeDir()}/${this.azureAccessTokens}`);
+  async refreshAccessToken(session: AzureSession): Promise<void> {
+    try {
+      await this.restoreRefreshToken();
+      await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`);
+      await this.secureRefreshToken();
+      await this.updateAccessTokenExpiration(session);
+    } catch (error) {
+      await this.logout();
+      await this.login(session);
+    }
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await this.executeService.execute("az logout");
+    } catch (stdError) {}
+  }
+
+  async secureRefreshToken(): Promise<void> {
+    const msalCache = await this.loadMsalCache();
+    this.vault = { refreshToken: msalCache.RefreshToken };
+    msalCache.RefreshToken = {};
+    await this.persistMsalCache(msalCache);
+  }
+
+  async restoreRefreshToken(): Promise<void> {
+    const msalCache = await this.loadMsalCache();
+    msalCache.AccessToken = {};
+    msalCache.IdToken = {};
+    msalCache.RefreshToken = this.vault.refreshToken;
+    await this.persistMsalCache(msalCache);
+  }
+
+  async updateAccessTokenExpiration(session: AzureSession): Promise<void> {
+    const msalCache = await this.loadMsalCache();
+    const accessTokenKey = Object.keys(msalCache.AccessToken)[0];
+    const accessToken = msalCache.AccessToken[accessTokenKey];
+    const expirationTime = new Date(parseInt(accessToken["expires_on"], 10) * 1000);
+    session.sessionTokenExpiration = expirationTime.toISOString();
+  }
+
+  private async loadMsalCache(): Promise<JsonCache> {
+    const filePersistence = await this.getMsalCachePersistence();
+    return JSON.parse(await filePersistence.load());
+  }
+
+  private async persistMsalCache(msalCache: JsonCache): Promise<void> {
+    const filePersistence = await this.getMsalCachePersistence();
+    await filePersistence.save(JSON.stringify(msalCache, null, 4));
+  }
+
+  private async getMsalCachePersistence(): Promise<IPersistence> {
+    const msalCacheFileLocation = path.join(homedir(), this.azureMsalCacheFile);
+    if (this.nativeService.os.platform() === "win32") {
+      return await FilePersistenceWithDataProtection.create(msalCacheFileLocation, DataProtectionScope.CurrentUser);
+    } else {
+      return await FilePersistence.create(msalCacheFileLocation);
+    }
   }
 }

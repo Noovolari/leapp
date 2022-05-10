@@ -6,7 +6,6 @@ export class AwsIamRoleChainedSession extends Session {
   profileId: string;
   parentSessionId: string;
   roleSessionName?: string;
-  sessionTokenExpiration: string;
 
   constructor(sessionName: string, region: string, roleArn: string, profileId: string, parentSessionId: string, roleSessionName?: string) {
     super(sessionName, region);

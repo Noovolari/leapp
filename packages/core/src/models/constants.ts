@@ -13,8 +13,7 @@ export const constants = {
   defaultRegion: "us-east-1",
 
   //Azure
-  azureAccessTokens: ".azure/accessTokens.json",
-  azureProfile: ".azure/azureProfile.json",
+  azureMsalCacheFile: ".azure/msal_token_cache.json",
   defaultLocation: "eastus",
   defaultAwsProfileName: "default",
   defaultAzureProfileName: "default-azure",

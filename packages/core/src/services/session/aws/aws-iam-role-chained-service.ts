@@ -12,7 +12,6 @@ import { AwsIamUserService } from "./aws-iam-user-service";
 import { AwsParentSessionFactory } from "./aws-parent-session.factory";
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
-import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 import { constants } from "../../../models/constants";
 import { LoggedException, LogLevel } from "../../log-service";
 
@@ -166,7 +165,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     const currentSession: Session = sessions[index];
 
     if (credentials !== undefined) {
-      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+      currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 
     sessions[index] = currentSession;

@@ -128,7 +128,7 @@ export class AwsIamUserService extends AwsSessionService {
     }
 
     // Retrieve session token expiration
-    const tokenExpiration = (session as AwsIamUserSession).sessionTokenExpiration;
+    const tokenExpiration = session.sessionTokenExpiration;
 
     // Check if token is expired
     if (!tokenExpiration || AwsIamUserService.isTokenExpired(tokenExpiration)) {
@@ -285,7 +285,7 @@ export class AwsIamUserService extends AwsSessionService {
     const currentSession: Session = sessions[index];
 
     if (credentials !== undefined) {
-      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+      currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 
     sessions[index] = currentSession;

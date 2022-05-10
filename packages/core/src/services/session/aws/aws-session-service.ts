@@ -101,7 +101,7 @@ export abstract class AwsSessionService extends SessionService {
         token.aws_access_key_id,
         token.aws_secret_access_key,
         token.aws_session_token,
-        (session as any).sessionTokenExpiration
+        session.sessionTokenExpiration
       );
     } else {
       throw new Error("only AWS sessions are supported");

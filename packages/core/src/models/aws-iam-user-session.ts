@@ -3,7 +3,6 @@ import { Session } from "./session";
 
 export class AwsIamUserSession extends Session {
   mfaDevice?: string;
-  sessionTokenExpiration: string;
   profileId: string;
 
   constructor(sessionName: string, region: string, profileId: string, mfaDevice?: string) {

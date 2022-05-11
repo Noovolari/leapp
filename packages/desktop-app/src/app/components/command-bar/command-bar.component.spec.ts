@@ -4,13 +4,15 @@ import { CommandBarComponent } from "./command-bar.component";
 import { mustInjected } from "../../../base-injectables";
 import { AppProviderService } from "../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { Workspace } from "@noovolari/leapp-core/models/workspace";
+import { OptionsService } from "../../services/options.service";
 
 describe("CommandBarComponent", () => {
   let component: CommandBarComponent;
   let fixture: ComponentFixture<CommandBarComponent>;
 
   beforeEach(async () => {
-    const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
+    const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
     });
@@ -19,15 +21,22 @@ describe("CommandBarComponent", () => {
       getColorTheme: () => constants.darkTheme,
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
-      workspaceService: spyWorkspaceService,
-      workspaceOptionService: { colorTheme: "dark-theme" },
+      behaviouralSubjectService: spyBehaviouralSubjectService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       namedProfileService: { getNamedProfiles: () => [] },
     });
+
+    const optionsService = { colorTheme: "dark-theme" };
+
     await TestBed.configureTestingModule({
       declarations: [CommandBarComponent],
-      providers: [].concat(mustInjected().concat({ provide: AppProviderService, useValue: spyLeappCoreService })),
+      providers: [].concat(
+        mustInjected().concat([
+          { provide: AppProviderService, useValue: spyLeappCoreService },
+          { provide: OptionsService, useValue: optionsService },
+        ])
+      ),
     }).compileComponents();
   });
 
@@ -54,6 +63,7 @@ describe("CommandBarComponent", () => {
     (component as any).subscription6 = {
       unsubscribe: () => {},
     };
+    (component as any).optionsService = { colorTheme: "dark-theme", workspaceService: { getWorkspace: () => new Workspace() } };
   });
 
   it("should create", () => {

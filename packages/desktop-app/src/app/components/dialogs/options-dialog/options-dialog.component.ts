@@ -4,14 +4,16 @@ import { AppService } from "../../../services/app.service";
 import { Router } from "@angular/router";
 import { MatTabGroup } from "@angular/material/tabs";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
+import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
-import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { OptionsService } from "../../../services/options.service";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 @Component({
   selector: "app-options-dialog",
@@ -75,25 +77,27 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   constructor(
     public appProviderService: AppProviderService,
     public appService: AppService,
+    private optionsService: OptionsService,
     private windowService: WindowService,
+    private toasterService: MessageToasterService,
     private modalService: BsModalService,
     private router: Router
   ) {
-    this.selectedTerminal = this.appProviderService.workspaceOptionService.macOsTerminal || constants.macOsTerminal;
+    this.selectedTerminal = this.optionsService.macOsTerminal || constants.macOsTerminal;
 
-    this.colorTheme = this.appProviderService.workspaceOptionService.colorTheme || constants.colorTheme;
+    this.colorTheme = this.optionsService.colorTheme || constants.colorTheme;
     this.selectedColorTheme = this.colorTheme;
 
-    this.selectedCredentialMethod = this.appProviderService.workspaceOptionService.credentialMethod || constants.credentialFile;
+    this.selectedCredentialMethod = this.optionsService.credentialMethod || constants.credentialFile;
   }
 
   ngOnInit(): void {
     this.idpUrlValue = "";
-    this.proxyProtocol = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyProtocol;
-    this.proxyUrl = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl;
-    this.proxyPort = this.appProviderService.workspaceOptionService.proxyConfiguration.proxyPort;
-    this.proxyUsername = this.appProviderService.workspaceOptionService.proxyConfiguration.username || "";
-    this.proxyPassword = this.appProviderService.workspaceOptionService.proxyConfiguration.password || "";
+    this.proxyProtocol = this.optionsService.proxyConfiguration.proxyProtocol;
+    this.proxyUrl = this.optionsService.proxyConfiguration.proxyUrl;
+    this.proxyPort = this.optionsService.proxyConfiguration.proxyPort;
+    this.proxyUsername = this.optionsService.proxyConfiguration.username || "";
+    this.proxyPassword = this.optionsService.proxyConfiguration.password || "";
 
     this.form.controls["idpUrl"].setValue(this.idpUrlValue);
     this.form.controls["proxyUrl"].setValue(this.proxyUrl);
@@ -102,10 +106,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.form.controls["proxyUsername"].setValue(this.proxyUsername);
     this.form.controls["proxyPassword"].setValue(this.proxyPassword);
 
-    const isProxyUrl =
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl &&
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl !== "undefined";
-    this.proxyUrl = isProxyUrl ? this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl : "";
+    const isProxyUrl = this.optionsService.proxyConfiguration.proxyUrl && this.optionsService.proxyConfiguration.proxyUrl !== "undefined";
+    this.proxyUrl = isProxyUrl ? this.optionsService.proxyConfiguration.proxyUrl : "";
 
     if (this.proxyUsername || this.proxyPassword) {
       this.showProxyAuthentication = true;
@@ -113,8 +115,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
     this.regions = this.appProviderService.awsCoreService.getRegions();
     this.locations = this.appProviderService.azureCoreService.getLocations();
-    this.selectedRegion = this.appProviderService.workspaceOptionService.defaultRegion || constants.defaultRegion;
-    this.selectedLocation = this.appProviderService.workspaceOptionService.defaultLocation || constants.defaultLocation;
+    this.selectedRegion = this.optionsService.defaultRegion || constants.defaultRegion;
+    this.selectedLocation = this.optionsService.defaultLocation || constants.defaultLocation;
 
     this.appService.validateAllFormFields(this.form);
   }
@@ -126,8 +128,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   setColorTheme(theme: string): void {
-    this.appProviderService.workspaceOptionService.colorTheme = theme;
-    this.colorTheme = this.appProviderService.workspaceOptionService.colorTheme;
+    this.optionsService.colorTheme = theme;
+    this.colorTheme = this.optionsService.colorTheme;
     this.selectedColorTheme = this.colorTheme;
     if (this.colorTheme === constants.darkTheme) {
       document.querySelector("body").classList.add("dark-theme");
@@ -143,29 +145,17 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
    */
   saveOptions(): void {
     if (this.form.valid) {
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyUrl = this.form.controls["proxyUrl"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyProtocol = this.form.controls["proxyProtocol"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.workspaceOptionService.proxyConfiguration.proxyPort = this.form.controls["proxyPort"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.workspaceOptionService.proxyConfiguration.username = this.form.controls["proxyUsername"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.workspaceOptionService.proxyConfiguration.password = this.form.controls["proxyPassword"].value;
-      // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateProxyConfiguration(this.appProviderService.workspaceOptionService.proxyConfiguration);
+      this.optionsService.updateProxyConfiguration({
+        proxyUrl: this.form.controls["proxyUrl"].value,
+        proxyProtocol: this.form.controls["proxyProtocol"].value,
+        proxyPort: this.form.controls["proxyPort"].value,
+        username: this.form.controls["proxyUsername"].value,
+        password: this.form.controls["proxyPassword"].value,
+      });
 
-      this.appProviderService.repository.getWorkspace().defaultRegion = this.selectedRegion;
-      // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateDefaultRegion(this.appProviderService.repository.getWorkspace().defaultRegion);
-
-      this.appProviderService.repository.getWorkspace().defaultLocation = this.selectedLocation;
-      // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateDefaultLocation(this.appProviderService.repository.getWorkspace().defaultLocation);
-
-      this.appProviderService.repository.getWorkspace().macOsTerminal = this.selectedTerminal;
-      // eslint-disable-next-line max-len
-      this.appProviderService.repository.updateMacOsTerminal(this.appProviderService.repository.getWorkspace().macOsTerminal);
+      this.optionsService.defaultRegion = this.selectedRegion;
+      this.optionsService.defaultLocation = this.selectedLocation;
+      this.optionsService.macOsTerminal = this.selectedTerminal;
 
       if (this.checkIfNeedDialogBox()) {
         // eslint-disable-next-line max-len
@@ -173,8 +163,11 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           "You've set a proxy url: the app must be restarted to update the configuration.",
           (res) => {
             if (res !== constants.confirmClosed) {
-              this.appProviderService.logService.log(
-                new LoggedEntry("User have set a proxy url: the app must be restarted to update the configuration.", this, LogLevel.info)
+              // eslint-disable-next-line max-len
+              this.appProviderService.loggingService.logger(
+                "User have set a proxy url: the app must be restarted to update the configuration.",
+                LoggerLevel.info,
+                this
               );
               this.appService.restart();
             }
@@ -184,10 +177,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         );
       } else {
         this.appService.closeModal();
-
-        this.appProviderService.logService.log(
-          new LoggedEntry("Option saved.", this, LogLevel.info, true, JSON.stringify(this.form.getRawValue(), null, 3))
-        );
+        this.appProviderService.loggingService.logger("Option saved.", LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
+        this.toasterService.toast("Option saved.", ToastLevel.info, "Options");
       }
     }
   }
@@ -215,7 +206,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   manageIdpUrl(id: string): void {
-    const idpUrl = this.appProviderService.repository.getIdpUrl(id);
+    const idpUrl = this.appProviderService.idpUrlService.getIdpUrl(id);
     const validate = this.appProviderService.idpUrlService.validateIdpUrl(this.form.get("idpUrl").value);
     if (validate === true) {
       if (!idpUrl) {
@@ -259,11 +250,11 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       `Deleting this IdP URL will also remove these sessions: <br><ul>${sessionsNames.join("")}</ul>Do you want to proceed?`,
       (res) => {
         if (res !== constants.confirmClosed) {
-          this.appProviderService.logService.log(new LoggedEntry(`Removing idp url with id: ${id}`, this, LogLevel.info));
+          this.appProviderService.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
 
           sessions.forEach((session) => {
-            this.appProviderService.repository.deleteSession(session.sessionId);
-            this.appProviderService.workspaceService.deleteSession(session.sessionId);
+            this.appProviderService.sessionManagementService.deleteSession(session.sessionId);
+            this.appProviderService.behaviouralSubjectService.setSessions(this.appProviderService.sessionManagementService.getSessions());
           });
           this.appProviderService.idpUrlService.deleteIdpUrl(id);
         }
@@ -274,7 +265,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   async manageAwsProfile(id: string | number): Promise<void> {
-    const profileIndex = this.appProviderService.repository.getWorkspace().profiles.findIndex((p) => p.id === id.toString());
+    const profileIndex = this.appProviderService.namedProfileService.getNamedProfiles().findIndex((p) => p.id === id.toString());
 
     const validate = this.appProviderService.namedProfileService.validateNewProfileName(this.form.get("awsProfile").value);
     if (validate === true) {
@@ -284,8 +275,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         this.appProviderService.namedProfileService.editNamedProfile(id.toString(), this.form.get("awsProfile").value);
 
         // eslint-disable-next-line @typescript-eslint/prefer-for-of
-        for (let i = 0; i < this.appProviderService.workspaceService.sessions.length; i++) {
-          const sess = this.appProviderService.workspaceService.sessions[i];
+        for (let i = 0; i < this.appProviderService.behaviouralSubjectService.sessions.length; i++) {
+          const sess = this.appProviderService.behaviouralSubjectService.sessions[i];
           this.sessionService = this.appProviderService.sessionFactory.getSessionService(sess.type);
 
           if ((sess as any).profileId === id.toString()) {
@@ -297,7 +288,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         }
       }
     } else {
-      this.appProviderService.logService.log(new LoggedEntry(validate.toString(), this, LogLevel.warn, true));
+      this.toasterService.toast(validate.toString(), ToastLevel.warn);
     }
 
     this.editingAwsProfile = false;
@@ -314,7 +305,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   deleteAwsProfile(id: string): void {
     // With profile
-    const sessions = this.appProviderService.repository.getSessions().filter((sess) => (sess as any).profileId === id);
+    const sessions = this.appProviderService.sessionManagementService.getSessions().filter((sess) => (sess as any).profileId === id);
 
     // Get only names for display
     let sessionsNames = sessions.map(
@@ -333,26 +324,24 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       `Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join("")}</ul>Do you want to proceed?`,
       async (res) => {
         if (res !== constants.confirmClosed) {
-          this.appProviderService.logService.log(new LoggedEntry(`Reverting to default profile with id: ${id}`, this, LogLevel.info));
+          this.appProviderService.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
 
           // Reverting all sessions to default profile
           // eslint-disable-next-line @typescript-eslint/prefer-for-of
           for (let i = 0; i < sessions.length; i++) {
-            const sess = sessions[i];
-            this.sessionService = this.appProviderService.sessionFactory.getSessionService(sess.type);
+            this.sessionService = this.appProviderService.sessionFactory.getSessionService(sessions[i].type);
 
             let wasActive = false;
-            if ((sess as any).status === SessionStatus.active) {
+            if ((sessions[i] as any).status === SessionStatus.active) {
               wasActive = true;
-              await this.sessionService.stop(sess.sessionId);
+              await this.sessionService.stop(sessions[i].sessionId);
             }
 
-            (sess as any).profileId = this.appProviderService.repository.getDefaultProfileId();
-
-            this.appProviderService.repository.updateSession(sess.sessionId, sess);
-            this.appProviderService.workspaceService.updateSession(sess.sessionId, sess);
+            (sessions[i] as any).profileId = this.appProviderService.workspaceService.getDefaultProfileId();
+            this.appProviderService.sessionManagementService.updateSession(sessions[i].sessionId, sessions[i]);
+            this.appProviderService.behaviouralSubjectService.setSessions(this.appProviderService.sessionManagementService.getSessions());
             if (wasActive) {
-              this.sessionService.start(sess.sessionId);
+              this.sessionService.start(sessions[i].sessionId);
             }
           }
 
@@ -371,13 +360,13 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   async showWarningModalForCredentialProcess() {
-    const workspace = this.appProviderService.repository.getWorkspace();
+    const workspace = this.appProviderService.workspaceService.getWorkspace();
     if (this.selectedCredentialMethod === constants.credentialProcess) {
       const confirmText = "I acknowledge it";
       const callback = async (answerString: string) => {
         if (answerString === constants.confirmed.toString()) {
           workspace.credentialMethod = this.selectedCredentialMethod;
-          this.appProviderService.repository.persistWorkspace(workspace);
+          this.appProviderService.workspaceService.persistWorkspace(workspace);
           // Create Config file if missing
           if (!this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsConfigPath())) {
             this.appProviderService.fileService.writeFileSync(this.appProviderService.awsCoreService.awsConfigPath(), "");
@@ -395,10 +384,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         }
 
         workspace.credentialMethod = this.selectedCredentialMethod;
-        this.appProviderService.repository.persistWorkspace(workspace);
+        this.appProviderService.workspaceService.persistWorkspace(workspace);
 
         // Now we need to check for started sessions and restart them
-        const activeSessions = this.appProviderService.repository.listActive();
+        const activeSessions = this.appProviderService.sessionManagementService.getActiveSessions();
         for (let i = 0; i < activeSessions.length; i++) {
           const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
           await sessionService.stop(activeSessions[i].sessionId);
@@ -415,7 +404,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       });
     } else {
       workspace.credentialMethod = this.selectedCredentialMethod;
-      this.appProviderService.repository.persistWorkspace(workspace);
+      this.appProviderService.workspaceService.persistWorkspace(workspace);
       // backup config file and delete normal one
       if (this.appProviderService.fileService.existsSync(this.appProviderService.awsCoreService.awsConfigPath())) {
         this.appProviderService.fileService.writeFileSync(
@@ -426,7 +415,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       }
 
       // Now we need to check for started sessions and restart them
-      const activeSessions = this.appProviderService.repository.listActive();
+      const activeSessions = this.appProviderService.sessionManagementService.getActiveSessions();
       for (let i = 0; i < activeSessions.length; i++) {
         const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
         await sessionService.stop(activeSessions[i].sessionId);

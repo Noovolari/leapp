@@ -49,7 +49,7 @@ describe("ListSessions", () => {
     const namedProfileMap = new Map([["profileId", { id: "profileId", name: "profileName" }]]);
     const sessionTypeMap = new Map([[SessionType.awsIamUser, "sessionTypeLabel"]]);
     const cliProviderService = {
-      repository: {
+      sessionManagementService: {
         getSessions: () => sessions,
       },
       cloudProviderService: {

@@ -5,7 +5,7 @@ import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session
 import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
 import { AzureSession } from "../models/azure-session";
 import { FileService } from "./file-service";
-import { WorkspaceService } from "./workspace-service";
+import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { KeychainService } from "./keychain-service";
 import { constants } from "../models/constants";
 import { AwsIamUserSession } from "../models/aws-iam-user-session";
@@ -18,9 +18,8 @@ export class RetroCompatibilityService {
     private fileService: FileService,
     private keyChainService: KeychainService,
     private repository: Repository,
-    private workspaceService: WorkspaceService,
-    private appName: string,
-    private lockFileDestination: string
+    private behaviouralSubjectService: BehaviouralSubjectService,
+    private appName: string
   ) {}
 
   private static adaptIdpUrls(oldWorkspace: any, workspace: any) {
@@ -165,7 +164,7 @@ export class RetroCompatibilityService {
   }
 
   async adaptOldWorkspaceFile(): Promise<Workspace> {
-    (this.workspaceService as any).workspace = undefined;
+    (this.behaviouralSubjectService as any).workspace = undefined;
 
     // We need to adapt Sessions, IdpUrls, AwsSso Config, Proxy Config
     const workspace: any = {
@@ -191,7 +190,7 @@ export class RetroCompatibilityService {
       const freshWorkspace = new Workspace();
       this.persists(freshWorkspace);
       // Apply sessions to behaviour subject
-      this.workspaceService.sessions = freshWorkspace.sessions;
+      this.behaviouralSubjectService.sessions = freshWorkspace.sessions;
       return freshWorkspace;
     } else {
       // Adapt data structure
@@ -203,7 +202,7 @@ export class RetroCompatibilityService {
       // Persist adapted workspace data
       this.persistsTemp(workspace);
       // Apply sessions to behaviour subject
-      this.workspaceService.sessions = workspace._sessions;
+      this.behaviouralSubjectService.sessions = workspace._sessions;
       return workspace;
     }
   }
@@ -218,7 +217,7 @@ export class RetroCompatibilityService {
     this.persists(workspace);
 
     // Apply sessions to behaviour subject
-    this.workspaceService.sessions = workspace.sessions;
+    this.behaviouralSubjectService.sessions = workspace.sessions;
     this.repository.workspace = workspace;
     return workspace;
   }

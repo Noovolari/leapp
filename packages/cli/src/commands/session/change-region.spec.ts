@@ -40,7 +40,7 @@ describe("ChangeRegion", () => {
         changeNamedProfile: jest.fn(),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => sessions),
         getSessionById: jest.fn((id: string) => sessions.find((s) => s.sessionId === id)),
         getProfiles: jest.fn(() => profiles),
@@ -75,7 +75,7 @@ describe("ChangeRegion", () => {
   test("selectSession", async () => {
     const session1 = { sessionName: "sessionName" };
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: () => [session1],
       },
       inquirer: {

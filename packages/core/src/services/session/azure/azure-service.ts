@@ -1,4 +1,6 @@
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { LeappExecuteError } from "../../../errors/leapp-execute-error";
+import { LeappParseError } from "../../../errors/leapp-parse-error";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AzureSession } from "../../../models/azure-session";
 import { Session } from "../../../models/session";
 import { ExecuteService } from "../../execute-service";
@@ -6,7 +8,6 @@ import { FileService } from "../../file-service";
 import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { AzureSessionRequest } from "./azure-session-request";
-import { LoggedException, LogLevel } from "../../log-service";
 
 export interface AzureSessionToken {
   tokenType: string;
@@ -24,7 +25,7 @@ export interface AzureSessionToken {
 
 export class AzureService extends SessionService {
   constructor(
-    iSessionNotifier: ISessionNotifier,
+    iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
     private fileService: FileService,
     private executeService: ExecuteService,
@@ -40,7 +41,7 @@ export class AzureService extends SessionService {
   async create(sessionRequest: AzureSessionRequest): Promise<void> {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region, sessionRequest.subscriptionId, sessionRequest.tenantId);
     this.repository.addSession(session);
-    this.sessionNotifier?.addSession(session);
+    this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
   async start(sessionId: string): Promise<void> {
@@ -62,7 +63,7 @@ export class AzureService extends SessionService {
       }
     } catch (err) {
       this.sessionDeactivated(sessionId);
-      throw new LoggedException(err.message, this, LogLevel.warn);
+      throw new LeappExecuteError(this, err.message);
     }
 
     this.sessionActivate(sessionId);
@@ -79,7 +80,7 @@ export class AzureService extends SessionService {
       await this.executeService.execute(`az account clear 2>&1`);
       await this.executeService.execute(`az configure --defaults location='' 2>&1`);
     } catch (err) {
-      throw new LoggedException(err.message, this, LogLevel.warn);
+      throw new LeappExecuteError(this, err.message);
     } finally {
       this.sessionDeactivated(sessionId);
     }
@@ -90,9 +91,9 @@ export class AzureService extends SessionService {
       //TODO: check if session is currently active before trying to stop it?
       await this.stop(sessionId);
       this.repository.deleteSession(sessionId);
-      this.sessionNotifier?.deleteSession(sessionId);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
     } catch (error) {
-      throw new LoggedException(error.message, this, LogLevel.warn);
+      throw new LeappParseError(this, error.message);
     }
   }
 
@@ -120,7 +121,7 @@ export class AzureService extends SessionService {
         );
       } catch (err) {
         this.sessionDeactivated(sessionId);
-        throw new LoggedException(err.message, this, LogLevel.warn);
+        throw new LeappExecuteError(this, err.message);
       }
     }
 
@@ -130,7 +131,7 @@ export class AzureService extends SessionService {
         await this.executeService.execute(`az account get-access-token --subscription ${(session as AzureSession).subscriptionId}`);
       } catch (err) {
         this.sessionDeactivated(sessionId);
-        throw new LoggedException(err.message, this, LogLevel.warn);
+        throw new LeappExecuteError(this, err.message);
       }
     }
   }

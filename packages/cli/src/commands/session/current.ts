@@ -64,8 +64,10 @@ export default class CurrentSession extends LeappCommand {
 
   getSessionFromProfile(profileName: string, provider: string | undefined): Session {
     const profileId =
-      profileName === constants.defaultAwsProfileName ? this.cliProviderService.repository.getDefaultProfileId() : this.getProfileId(profileName);
-    let sessions = this.cliProviderService.repository.listActive().filter((session: Session) => {
+      profileName === constants.defaultAwsProfileName
+        ? this.cliProviderService.workspaceService.getDefaultProfileId()
+        : this.getProfileId(profileName);
+    let sessions = this.cliProviderService.sessionManagementService.getActiveSessions().filter((session: Session) => {
       const anySession = session as any;
       return anySession.profileId === undefined || anySession.profileId === profileId;
     });
@@ -81,7 +83,9 @@ export default class CurrentSession extends LeappCommand {
   }
 
   getProfileId(profileName: string): string {
-    const profiles = this.cliProviderService.repository.getProfiles().filter((profile: AwsNamedProfile) => profile.name === profileName);
+    const profiles = this.cliProviderService.namedProfilesService
+      .getNamedProfiles()
+      .filter((profile: AwsNamedProfile) => profile.name === profileName);
     if (profiles.length === 0) {
       throw new Error(`AWS named profile "${profileName}" not found`);
     } else if (profiles.length > 1) {

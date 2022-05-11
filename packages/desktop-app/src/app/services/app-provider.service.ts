@@ -5,7 +5,7 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
-import { LogService } from "@noovolari/leapp-core/services/log-service";
+import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
@@ -20,7 +20,7 @@ import { Repository } from "@noovolari/leapp-core/services/repository";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { AppVerificationWindowService } from "./app-verification-window.service";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
@@ -31,8 +31,9 @@ import { WindowService } from "./window.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
-import { WorkspaceOptionService } from "@noovolari/leapp-core/services/workspace-option-service";
-import { AppNativeLoggerService } from "./app-native-logger-service";
+import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
+import { SessionManagementService } from "@noovolari/leapp-core/services/session-management-service";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 
 @Injectable({
   providedIn: "root",
@@ -44,7 +45,7 @@ export class AppProviderService {
   verificationWindowService: AppVerificationWindowService;
   windowService: WindowService;
 
-  private workspaceServiceInstance: WorkspaceService;
+  private behaviouralSubjectServiceInstance: BehaviouralSubjectService;
   private awsIamUserServiceInstance: AwsIamUserService;
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
@@ -59,7 +60,7 @@ export class AppProviderService {
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
   private keyChainServiceInstance: KeychainService;
-  private logServiceInstance: LogService;
+  private loggingServiceInstance: LoggingService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
   private rotationServiceInstance: RotationService;
@@ -70,37 +71,11 @@ export class AppProviderService {
   private idpUrlServiceInstance: IdpUrlsService;
   private namedProfileInstance: NamedProfilesService;
   private remoteProceduresServerInstance: RemoteProceduresServer;
-  private workspaceOptionInstance: WorkspaceOptionService;
+  private segmentServiceInstance: SegmentService;
+  private sessionManagementServiceInstance: SessionManagementService;
+  private workspaceServiceInstance: WorkspaceService;
 
-  constructor(private electronService: AppNativeService, private ngZone: NgZone, private nativeLogger: AppNativeLoggerService) {}
-
-  public get idpUrlService(): IdpUrlsService {
-    if (!this.idpUrlServiceInstance) {
-      this.idpUrlServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository);
-    }
-    return this.idpUrlServiceInstance;
-  }
-
-  public get workspaceOptionService(): WorkspaceOptionService {
-    if (!this.workspaceOptionInstance) {
-      this.workspaceOptionInstance = new WorkspaceOptionService(this.repository);
-    }
-    return this.workspaceOptionInstance;
-  }
-
-  public get namedProfileService(): NamedProfilesService {
-    if (!this.namedProfileInstance) {
-      this.namedProfileInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService);
-    }
-    return this.namedProfileInstance;
-  }
-
-  public get webConsoleService(): WebConsoleService {
-    if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.logService, window.fetch.bind(window));
-    }
-    return this.webConsoleServiceInstance;
-  }
+  constructor(private electronService: AppNativeService, private ngZone: NgZone) {}
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -109,10 +84,52 @@ export class AppProviderService {
     return this.workspaceServiceInstance;
   }
 
+  public get segmentService(): SegmentService {
+    if (!this.segmentServiceInstance) {
+      this.segmentServiceInstance = new SegmentService(this.repository);
+    }
+    return this.segmentServiceInstance;
+  }
+
+  public get sessionManagementService(): SessionManagementService {
+    if (!this.sessionManagementServiceInstance) {
+      this.sessionManagementServiceInstance = new SessionManagementService(this.repository);
+    }
+    return this.sessionManagementServiceInstance;
+  }
+
+  public get idpUrlService(): IdpUrlsService {
+    if (!this.idpUrlServiceInstance) {
+      this.idpUrlServiceInstance = new IdpUrlsService(this.sessionFactory, this.repository);
+    }
+    return this.idpUrlServiceInstance;
+  }
+
+  public get namedProfileService(): NamedProfilesService {
+    if (!this.namedProfileInstance) {
+      this.namedProfileInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.behaviouralSubjectService);
+    }
+    return this.namedProfileInstance;
+  }
+
+  public get webConsoleService(): WebConsoleService {
+    if (!this.webConsoleServiceInstance) {
+      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.loggingService, window.fetch.bind(window));
+    }
+    return this.webConsoleServiceInstance;
+  }
+
+  public get behaviouralSubjectService(): BehaviouralSubjectService {
+    if (!this.behaviouralSubjectServiceInstance) {
+      this.behaviouralSubjectServiceInstance = new BehaviouralSubjectService(this.repository);
+    }
+    return this.behaviouralSubjectServiceInstance;
+  }
+
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
       this.awsIamUserServiceInstance = new AwsIamUserService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.mfaCodePrompter,
         this.mfaCodePrompter,
@@ -127,7 +144,7 @@ export class AppProviderService {
   public get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
       this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.fileService,
         this.awsCoreService,
@@ -141,7 +158,7 @@ export class AppProviderService {
   public get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
       this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.awsCoreService,
         this.fileService,
@@ -159,7 +176,7 @@ export class AppProviderService {
         this.awsSsoOidcService,
         this.awsSsoRoleService,
         this.keyChainService,
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.electronService,
         this.sessionFactory
       );
@@ -170,7 +187,7 @@ export class AppProviderService {
   public get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
       this.awsSsoRoleServiceInstance = new AwsSsoRoleService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.fileService,
         this.keyChainService,
@@ -191,7 +208,7 @@ export class AppProviderService {
 
   public get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.electronService, this.logService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.electronService);
     }
     return this.awsCoreServiceInstance;
   }
@@ -199,7 +216,7 @@ export class AppProviderService {
   public get azureService(): AzureService {
     if (!this.azureServiceInstance) {
       this.azureServiceInstance = new AzureService(
-        this.workspaceService,
+        this.behaviouralSubjectService,
         this.repository,
         this.fileService,
         this.executeService,
@@ -232,7 +249,7 @@ export class AppProviderService {
 
   public get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.logService, this.executeService);
+      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
     }
     return this.ssmServiceInstance;
   }
@@ -269,11 +286,11 @@ export class AppProviderService {
     return this.keyChainServiceInstance;
   }
 
-  public get logService(): LogService {
-    if (!this.logServiceInstance) {
-      this.logServiceInstance = new LogService(this.nativeLogger);
+  public get loggingService(): LoggingService {
+    if (!this.loggingServiceInstance) {
+      this.loggingServiceInstance = new LoggingService(this.electronService);
     }
-    return this.logServiceInstance;
+    return this.loggingServiceInstance;
   }
 
   public get timerService(): TimerService {
@@ -285,7 +302,7 @@ export class AppProviderService {
 
   public get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository, this.logService);
+      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository);
     }
     return this.executeServiceInstance;
   }
@@ -303,9 +320,8 @@ export class AppProviderService {
         this.fileService,
         this.keyChainService,
         this.repository,
-        this.workspaceService,
-        constants.appName,
-        constants.lockFileDestination
+        this.behaviouralSubjectService,
+        constants.appName
       );
     }
     return this.retroCompatibilityServiceInstance;
@@ -326,7 +342,7 @@ export class AppProviderService {
         this.awsAuthenticationService,
         this.mfaCodePrompter,
         this.repository,
-        this.workspaceService,
+        this.behaviouralSubjectService,
         (uiSafeBlock) => this.ngZone.run(() => uiSafeBlock())
       );
     }

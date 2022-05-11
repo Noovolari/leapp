@@ -22,8 +22,8 @@ export default class ChangeSessionProfile extends LeappCommand {
     try {
       const { flags } = await this.parse(ChangeSessionProfile);
       if (flags.profileId && flags.profileId !== "" && flags.sessionId && flags.sessionId !== "") {
-        const selectedSession = this.cliProviderService.repository.getSessionById(flags.sessionId);
-        const selectedProfile = this.cliProviderService.repository.getProfiles().find((p) => p.id === flags.profileId);
+        const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId);
+        const selectedProfile = this.cliProviderService.namedProfilesService.getNamedProfiles().find((p) => p.id === flags.profileId);
         if (!selectedSession) {
           throw new Error("Session not found with id " + flags.sessionId);
         }
@@ -42,7 +42,7 @@ export default class ChangeSessionProfile extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.cliProviderService.repository
+    const availableSessions = this.cliProviderService.sessionManagementService
       .getSessions()
       .filter((session) => this.cliProviderService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService);
 
@@ -58,8 +58,10 @@ export default class ChangeSessionProfile extends LeappCommand {
   }
 
   async selectProfile(session: Session): Promise<string> {
-    const currentProfileName = this.cliProviderService.repository.getProfileName((session as any).profileId);
-    const availableProfiles = this.cliProviderService.repository.getProfiles().filter((profile) => profile.id !== (session as any).profileId);
+    const currentProfileName = this.cliProviderService.namedProfilesService.getProfileName((session as any).profileId);
+    const availableProfiles = this.cliProviderService.namedProfilesService
+      .getNamedProfiles()
+      .filter((profile) => profile.id !== (session as any).profileId);
 
     if (availableProfiles.length === 0) {
       throw new Error("no profiles available");

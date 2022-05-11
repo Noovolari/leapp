@@ -15,17 +15,17 @@ describe("RegionsService", () => {
       updateSession: jest.fn(),
     };
 
-    const workspaceService = {
-      updateSession: jest.fn(),
+    const behaviouralSubjectService = {
+      setSessions: jest.fn(),
     };
 
-    const regionService = new RegionsService(sessionFactory as any, repository as any, workspaceService as any);
+    const regionService = new RegionsService(sessionFactory as any, repository as any, behaviouralSubjectService as any);
     await regionService.changeRegion(session as any, "newRegion");
 
     expect(session.region).toBe("newRegion");
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(repository.updateSession).toHaveBeenCalledWith(session.sessionId, session);
-    expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session);
+    expect(behaviouralSubjectService.setSessions).toHaveBeenCalled();
   });
 
   test("changeRegion, session active", async () => {
@@ -49,21 +49,18 @@ describe("RegionsService", () => {
       }),
     };
 
-    const workspaceService = {
-      updateSession: jest.fn((sessionId, sessionToUpdate: any) => {
-        expect(sessionToUpdate.region).toBe("newRegion");
-        expect(isSessionActive).toBe(false);
-      }),
+    const behaviouralSubjectService = {
+      setSessions: jest.fn(),
     };
 
-    const regionService = new RegionsService(sessionFactory as any, repository as any, workspaceService as any);
+    const regionService = new RegionsService(sessionFactory as any, repository as any, behaviouralSubjectService as any);
     await regionService.changeRegion(session as any, "newRegion");
 
     expect(isSessionActive).toBe(true);
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(sessionService.stop).toHaveBeenCalledWith(session.sessionId);
     expect(repository.updateSession).toHaveBeenCalledWith(session.sessionId, session);
-    expect(workspaceService.updateSession).toHaveBeenCalledWith(session.sessionId, session);
+    expect(behaviouralSubjectService.setSessions).toHaveBeenCalled();
     expect(sessionService.start).toHaveBeenCalledWith(session.sessionId);
   });
 

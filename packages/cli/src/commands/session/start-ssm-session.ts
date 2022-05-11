@@ -28,7 +28,7 @@ export default class StartSsmSession extends LeappCommand {
     try {
       const { flags } = await this.parse(StartSsmSession);
       if (this.validateFlags(flags)) {
-        const selectedSession = this.cliProviderService.repository.getSessionById(`${flags.sessionId}`);
+        const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(`${flags.sessionId}`);
         if (!selectedSession) {
           throw new Error("No session found with id " + flags.sessionId);
         }
@@ -52,7 +52,7 @@ export default class StartSsmSession extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.cliProviderService.repository
+    const availableSessions = this.cliProviderService.sessionManagementService
       .getSessions()
       .filter((session: Session) => this.cliProviderService.sessionFactory.getSessionService(session.type) instanceof AwsSessionService);
     if (availableSessions.length === 0) {

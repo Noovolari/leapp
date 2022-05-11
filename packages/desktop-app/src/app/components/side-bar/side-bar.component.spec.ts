@@ -16,6 +16,7 @@ describe("SideBarComponent", () => {
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       repository: spyRepositoryService,
+      segmentService: { list: () => [] },
       awsCoreService: { getRegions: () => [] },
     });
 

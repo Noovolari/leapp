@@ -4,12 +4,12 @@ import { AppService } from "../../../services/app.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { Workspace } from "@noovolari/leapp-core/models/workspace";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
+import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import * as uuid from "uuid";
 import { Session } from "@noovolari/leapp-core/models/session";
@@ -18,9 +18,10 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
+import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { LoggedEntry, LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { OptionsService } from "../../../services/options.service";
 
 @Component({
   selector: "app-edit-dialog",
@@ -84,32 +85,32 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   public locations = [];
   public selectedLocation;
 
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
   private keychainService: KeychainService;
-  private repository: Repository;
   private sessionService: SessionService;
 
   constructor(
+    private optionsService: OptionsService,
     private activatedRoute: ActivatedRoute,
     private appService: AppService,
+    private messageToasterService: MessageToasterService,
     private router: Router,
     private windowService: WindowService,
     private leappCoreService: AppProviderService,
     private mfaPrompter: AppMfaCodePromptService
   ) {
-    this.workspaceService = leappCoreService.workspaceService;
-    this.repository = this.leappCoreService.repository;
+    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
     this.keychainService = this.leappCoreService.keyChainService;
   }
 
   ngOnInit(): void {
     // Get the workspace and the account you need
-    this.selectedSession = this.repository.getSessionById(this.selectedSessionId) as any;
+    this.selectedSession = this.leappCoreService.sessionManagementService.getSessionById(this.selectedSessionId) as any;
     this.sessionService = this.leappCoreService.sessionFactory.getSessionService(this.selectedSession.type);
     this.accountType = this.selectedSession.type;
 
     // Get the workspace and the accounts you need
-    const workspace = this.leappCoreService.repository.getWorkspace();
+    const workspace = this.leappCoreService.workspaceService.getWorkspace();
 
     // We get all the applicable idp urls
     if (workspace.idpUrls && workspace.idpUrls.length > 0) {
@@ -129,7 +130,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     });
 
     // Show the assumable accounts
-    this.assumerAwsSessions = this.leappCoreService.repository.listAssumable().map((session) => ({
+    this.assumerAwsSessions = this.leappCoreService.sessionManagementService.getAssumableSessions().map((session) => ({
       sessionName: session.sessionName,
       session,
     }));
@@ -226,7 +227,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
       if (this.selectedSession.type !== SessionType.azure) {
         try {
-          this.repository.getProfileName(this.selectedProfile.value);
+          this.leappCoreService.namedProfileService.getProfileName(this.selectedProfile.value);
         } catch (e) {
           this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
         }
@@ -245,17 +246,20 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         this.selectedSession.region = this.form.get("azureLocation").value;
       }
 
-      this.repository.updateSession(this.selectedSession.sessionId, this.selectedSession);
-      this.workspaceService.updateSession(this.selectedSession.sessionId, this.selectedSession);
+      const sessions = this.leappCoreService.sessionManagementService.getSessions();
+      const index = sessions.findIndex((s) => s.sessionId === this.selectedSession.sessionId);
+      sessions[index] = this.selectedSession;
+      this.leappCoreService.sessionManagementService.updateSessions(sessions);
+      this.behaviouralSubjectService.setSessions(this.leappCoreService.sessionManagementService.getSessions());
 
       if (wasActive) {
         await this.sessionService.start(this.selectedSession.sessionId);
       }
 
-      this.leappCoreService.logService.log(new LoggedEntry(`Session: ${this.form.value.name}, edited.`, this, LogLevel.success, true));
+      this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
       this.closeModal();
     } else {
-      this.leappCoreService.logService.log(new LoggedEntry("One or more parameters are invalid, check your choices.", this, LogLevel.warn, true));
+      this.messageToasterService.toast(`One or more parameters are invalid, check your choices.`, ToastLevel.warn, "");
     }
   }
 
@@ -269,17 +273,15 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         this.mfaPrompter.keepUnderlyingModal = false;
 
         if (check) {
-          this.leappCoreService.logService.log(
-            new LoggedEntry(`Session: ${this.form.value.name} is able to generate credentials correctly.`, this, LogLevel.success, true)
-          );
+          this.messageToasterService.toast(`Session: ${this.form.value.name} is able to generate credentials correctly.`, ToastLevel.success, "");
         } else {
-          this.leappCoreService.logService.log(new LoggedEntry("One or more parameters are invalid, please check.", this, LogLevel.warn, true));
+          this.messageToasterService.toast(`One or more parameters are invalid, please check.`, ToastLevel.warn, "");
         }
       } else {
-        this.leappCoreService.logService.log(new LoggedEntry("One or more parameters are invalid, please check.", this, LogLevel.warn, true));
+        this.messageToasterService.toast(`One or more parameters are invalid, please check.`, ToastLevel.warn, "");
       }
     } catch (err) {
-      this.leappCoreService.logService.log(new LoggedEntry(`One or more parameters are invalid: ${err.toString()}.`, this, LogLevel.warn, true));
+      this.messageToasterService.toast(`One or more parameters are invalid: ${err.toString()}.`, ToastLevel.warn, "");
     }
   }
 
@@ -390,8 +392,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         return "alibaba.png";
       default:
         return `aws${
-          this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
-          (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
+          this.optionsService.colorTheme === constants.darkTheme ||
+          (this.optionsService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
             ? "-dark"
             : ""
         }.png`;
@@ -415,7 +417,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         this.selectedIdpUrl.value = idpUrl.id;
       } else {
         if (validate.toString() !== "IdP URL already exists") {
-          throw new LoggedException(validate.toString(), this, LogLevel.warn);
+          throw new LeappParseError(this, validate.toString());
         }
       }
     }
@@ -435,9 +437,9 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       } else {
         if (
           validate.toString() !== "Profile already exists" &&
-          this.leappCoreService.repository.getDefaultProfileId() !== this.selectedProfile.value
+          this.leappCoreService.workspaceService.getDefaultProfileId() !== this.selectedProfile.value
         ) {
-          throw new LoggedException(validate.toString(), this, LogLevel.warn);
+          throw new LeappParseError(this, validate.toString());
         }
       }
     }

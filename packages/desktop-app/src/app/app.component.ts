@@ -8,8 +8,8 @@ import { AppMfaCodePromptService } from "./services/app-mfa-code-prompt.service"
 import { AppAwsAuthenticationService } from "./services/app-aws-authentication.service";
 import { UpdaterService } from "./services/updater.service";
 import compareVersions from "compare-versions";
-import { Repository } from "@noovolari/leapp-core/services/repository";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
@@ -24,7 +24,7 @@ import { AppNativeService } from "./services/app-native.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { OptionsService } from "./services/options.service";
 
 @Component({
   selector: "app-root",
@@ -33,12 +33,11 @@ import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/service
 })
 export class AppComponent implements OnInit {
   private fileService: FileService;
-  private repository: Repository;
   private awsCoreService: AwsCoreService;
-  private logService: LogService;
+  private loggingService: LoggingService;
   private timerService: TimerService;
   private sessionServiceFactory: SessionFactory;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
   private retroCompatibilityService: RetroCompatibilityService;
   private rotationService: RotationService;
   private awsSsoIntegrationService: AwsSsoIntegrationService;
@@ -47,12 +46,13 @@ export class AppComponent implements OnInit {
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
-    appProviderService: AppProviderService,
-    mfaCodePrompter: AppMfaCodePromptService,
-    awsAuthenticationService: AppAwsAuthenticationService,
-    verificationWindowService: AppVerificationWindowService,
+    public appProviderService: AppProviderService,
+    public mfaCodePrompter: AppMfaCodePromptService,
+    public awsAuthenticationService: AppAwsAuthenticationService,
+    public verificationWindowService: AppVerificationWindowService,
     public appService: AppService,
     private router: Router,
+    private optionsService: OptionsService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
     private electronService: AppNativeService
@@ -62,13 +62,12 @@ export class AppComponent implements OnInit {
     appProviderService.verificationWindowService = verificationWindowService;
     appProviderService.windowService = windowService;
 
-    this.repository = appProviderService.repository;
     this.fileService = appProviderService.fileService;
     this.awsCoreService = appProviderService.awsCoreService;
-    this.logService = appProviderService.logService;
+    this.loggingService = appProviderService.loggingService;
     this.timerService = appProviderService.timerService;
     this.sessionServiceFactory = appProviderService.sessionFactory;
-    this.workspaceService = appProviderService.workspaceService;
+    this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.retroCompatibilityService = appProviderService.retroCompatibilityService;
     this.rotationService = appProviderService.rotationService;
     this.awsSsoIntegrationService = appProviderService.awsSsoIntegrationService;
@@ -85,7 +84,7 @@ export class AppComponent implements OnInit {
     // We get the right moment to set an hook to app close
     const ipcRenderer = this.electronService.ipcRenderer;
     ipcRenderer.on("app-close", () => {
-      this.logService.log(new LoggedEntry("Preparing for closing instruction...", this, LogLevel.info));
+      this.loggingService.logger("Preparing for closing instruction...", LoggerLevel.info, this);
       this.beforeCloseInstructions();
     });
 
@@ -119,10 +118,10 @@ export class AppComponent implements OnInit {
     this.showCredentialBackupMessageIfNeeded();
 
     // All sessions start stopped when app is launched
-    if (this.workspaceService.sessions.length > 0) {
-      for (let i = 0; i < this.workspaceService.sessions.length; i++) {
-        const concreteSessionService = this.sessionServiceFactory.getSessionService(this.workspaceService.sessions[i].type);
-        await concreteSessionService.stop(this.workspaceService.sessions[i].sessionId);
+    if (this.behaviouralSubjectService.sessions.length > 0) {
+      for (let i = 0; i < this.behaviouralSubjectService.sessions.length; i++) {
+        const concreteSessionService = this.sessionServiceFactory.getSessionService(this.behaviouralSubjectService.sessions[i].type);
+        await concreteSessionService.stop(this.behaviouralSubjectService.sessions[i].sessionId);
       }
     }
 
@@ -148,23 +147,23 @@ export class AppComponent implements OnInit {
    */
   private beforeCloseInstructions() {
     // Check if we are here
-    this.logService.log(new LoggedEntry("Closing app with cleaning process...", this, LogLevel.info));
+    this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
 
     this.remoteProceduresServer.stopServer();
 
     // Stop all the sessions
-    const sessions = this.repository.getSessions();
+    const sessions = this.appProviderService.sessionManagementService.getSessions();
     sessions.forEach((s) => {
       s.status = SessionStatus.inactive;
     });
-    this.repository.updateSessions(sessions);
+    this.appProviderService.sessionManagementService.updateSessions(sessions);
 
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
       this.awsCoreService.cleanCredentialFile();
     } catch (err) {
-      this.logService.log(new LoggedEntry("No sessions to stop, skipping...", this, LogLevel.error, err.stack));
+      this.loggingService.logger("No sessions to stop, skipping...", LoggerLevel.error, this, err.stack);
     }
 
     // Finally quit
@@ -179,11 +178,11 @@ export class AppComponent implements OnInit {
     const oldAwsCredentialsPath = this.fileService.homeDir() + "/" + constants.credentialsDestination;
     const newAwsCredentialsPath = oldAwsCredentialsPath + ".leapp.bkp";
     const check =
-      this.workspaceService.sessions.length === 0 &&
+      this.behaviouralSubjectService.sessions.length === 0 &&
       this.fileService.existsSync(oldAwsCredentialsPath) &&
       !this.fileService.existsSync(newAwsCredentialsPath);
 
-    this.logService.log(new LoggedEntry(`Check existing credential file: ${check}`, this, LogLevel.info));
+    this.loggingService.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
 
     if (check) {
       this.fileService.renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
@@ -228,17 +227,16 @@ export class AppComponent implements OnInit {
       this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
       if (this.updaterService.isUpdateNeeded()) {
         this.updaterService.updateDialog();
-        this.workspaceService.sessions = [...this.workspaceService.sessions];
-        this.repository.updateSessions(this.workspaceService.sessions);
+        this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
+        this.appProviderService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
       }
     });
   }
 
   private setInitialColorSchema() {
-    const workspace = this.repository.getWorkspace();
-    if (workspace) {
-      const colorTheme = workspace.colorTheme || constants.colorTheme;
-      workspace.colorTheme = workspace.colorTheme || constants.colorTheme;
+    if (this.appProviderService.workspaceService.workspaceExists()) {
+      const colorTheme = this.optionsService.colorTheme || constants.colorTheme;
+      this.optionsService.colorTheme = this.optionsService.colorTheme || constants.colorTheme;
       if (colorTheme === constants.darkTheme) {
         document.querySelector("body").classList.add("dark-theme");
       } else if (colorTheme === constants.lightTheme) {
@@ -255,7 +253,7 @@ export class AppComponent implements OnInit {
 
   private setColorSchemaChangeEventListener() {
     window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-      if (this.repository.getWorkspace().colorTheme === constants.systemDefaultTheme) {
+      if (this.optionsService.colorTheme === constants.systemDefaultTheme) {
         if (this.appService.isDarkMode()) {
           document.querySelector("body").classList.add("dark-theme");
         } else {

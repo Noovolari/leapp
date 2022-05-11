@@ -3,19 +3,20 @@ import { AppService } from "../../services/app.service";
 import { environment } from "../../../environments/environment";
 import { UpdaterService } from "../../services/updater.service";
 import { AppProviderService } from "../../services/app-provider.service";
-import { LogService, LoggedEntry, LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
 import { WindowService } from "../../services/window.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { AppNativeService } from "../../services/app-native.service";
+import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
+import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 
 @Component({
   selector: "app-tray-menu",
@@ -28,10 +29,9 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private subscribed;
 
   private awsCoreService: AwsCoreService;
-  private logService: LogService;
-  private repository: Repository;
+  private loggingService: LoggingService;
   private sessionServiceFactory: SessionFactory;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
 
   private awsCliVersion: string;
   private awsSsmPluginVersion: string;
@@ -42,17 +42,17 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     private electronService: AppNativeService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
+    private messageToasterService: MessageToasterService,
     private appProviderService: AppProviderService
   ) {
     this.awsCoreService = appProviderService.awsCoreService;
-    this.logService = appProviderService.logService;
-    this.repository = appProviderService.repository;
+    this.loggingService = appProviderService.loggingService;
     this.sessionServiceFactory = appProviderService.sessionFactory;
-    this.workspaceService = appProviderService.workspaceService;
+    this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
   }
 
   ngOnInit(): void {
-    this.subscribed = this.workspaceService.sessions$.subscribe(() => {
+    this.subscribed = this.behaviouralSubjectService.sessions$.subscribe(() => {
       this.generateMenu();
     });
     this.generateMenu();
@@ -69,9 +69,11 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   async generateMenu(): Promise<void> {
     let voices = [];
-    const actives = this.repository.getSessions().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
+    const actives = this.appProviderService.sessionManagementService
+      .getSessions()
+      .filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
     const allSessions = actives.concat(
-      this.repository
+      this.appProviderService.sessionManagementService
         .getSessions()
         .filter((s) => s.status === SessionStatus.inactive)
         .filter((_, index) => index < 10 - actives.length)
@@ -80,7 +82,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     allSessions.forEach((session: Session) => {
       let icon = "";
       let label = "";
-      const profile = this.repository.getProfiles().filter((p) => p.id === this.getProfileId(session))[0];
+      const profile = this.appProviderService.namedProfileService.getNamedProfiles().filter((p) => p.id === this.getProfileId(session))[0];
       const iconValue = profile && profile.name === "default" ? "home" : "user";
       switch (session.type) {
         case SessionType.awsIamUser:
@@ -223,17 +225,16 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
     this.currentTray.setContextMenu(contextMenu);
   }
-
   /**
    * Remove session and credential file before exiting program
    */
   async cleanBeforeExit(): Promise<void> {
     // Check if we are here
-    this.logService.log(new LoggedEntry("Closing app with cleaning process...", this, LogLevel.info));
+    this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
     // We need the Try/Catch as we have the possibility to call the method without sessions
     try {
       // Stop the sessions...
-      const activeSessions = this.repository.listActiveAndPending();
+      const activeSessions = this.appProviderService.sessionManagementService.getActiveAndPendingSessions();
       activeSessions.forEach((sess) => {
         const factorizedService = this.sessionServiceFactory.getSessionService(sess.type);
         factorizedService.stop(sess.sessionId);
@@ -241,7 +242,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       // Clean the config file
       this.awsCoreService.cleanCredentialFile();
     } catch (err) {
-      this.logService.log(new LoggedEntry("No sessions to stop, skipping...", this, LogLevel.error, false, err.stack));
+      this.loggingService.logger("No sessions to stop, skipping...", LoggerLevel.error, this, err.stack);
     }
     // Finally quit
     this.appService.quit();
@@ -252,25 +253,21 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   }
 
   private getMetadata() {
-    const logError = (error) => {
-      const toShow = (error as LoggedEntry).level === LogLevel.error;
-      this.logService.log(new LoggedEntry(error.message, this, LogLevel.error, toShow, error.stack));
+    const printError = (error) => {
+      this.loggingService.logger(error.toString(), LoggerLevel.error, this, error.stack);
+      if ((error as LeappBaseError).severity === LoggerLevel.error) {
+        this.messageToasterService.toast(error.toString(), ToastLevel.error, "");
+      }
     };
 
     this.getAwsCliVersion()
       .then(() => {
-        this.getSessionManagerPluginVersion()
-          .then(() => {
-            this.setIssueBody();
-          })
-          .catch((error) => {
-            this.awsSsmPluginVersion = " / ";
-            this.setIssueBody();
-            logError(error);
-          });
+        this.getSessionManagerPluginVersion().then(() => {
+          this.setIssueBody();
+        });
       })
       .catch((error) => {
-        logError(error);
+        printError(error);
       });
   }
 
@@ -279,7 +276,12 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       try {
         this.awsCliVersion = await this.appProviderService.executeService.execute("aws --version");
       } catch (error) {
-        throw new LoggedException("An error occurred getting AWS CLI version. Please check if it is installed.", this, LogLevel.error);
+        throw new LeappBaseError(
+          "An error occurred getting AWS CLI version. Please check if it is installed.",
+          this,
+          LoggerLevel.error,
+          "An error occurred getting AWS CLI version. Please check if it is installed."
+        );
       }
     }
   }
@@ -290,10 +292,11 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         const sessionManagerPluginVersion = await this.appProviderService.executeService.execute("session-manager-plugin --version");
         this.awsSsmPluginVersion = sessionManagerPluginVersion.replace(/(\r\n|\n|\r)/gm, "");
       } catch (error) {
-        throw new LoggedException(
+        throw new LeappBaseError(
           "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed.",
           this,
-          LogLevel.warn
+          LoggerLevel.warn,
+          "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed."
         );
       }
     }

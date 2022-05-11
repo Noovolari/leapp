@@ -3,7 +3,7 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
-import { LogService } from "@noovolari/leapp-core/services/log-service";
+import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
@@ -14,7 +14,7 @@ import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
@@ -26,6 +26,7 @@ import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profi
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import CliInquirer from "inquirer";
+import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { CliOpenWebConsoleService } from "./cli-open-web-console-service";
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
 import fetch from "node-fetch";
@@ -35,20 +36,20 @@ import { CliRpcAwsSsoOidcVerificationWindowService } from "./cli-rpc-aws-sso-oid
 import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { CliRpcAwsSamlAuthenticationService } from "./cli-rpc-aws-saml-authentication-service";
 import { LocalCliMfaCodePromptService } from "./local-cli-mfa-code-prompt-service";
-import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
-import { CliNativeLoggerService } from "./cli-native-logger-service";
+import { SessionManagementService } from "@noovolari/leapp-core/services/session-management-service";
+import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 
 /* eslint-disable */
 export class CliProviderService {
   private cliNativeServiceInstance: CliNativeService;
-  private cliNativeLoggerServiceInstance: CliNativeLoggerService;
   private cliAwsSsoOidcVerificationWindowServiceInstance: IAwsSsoOidcVerificationWindowService;
   private awsSamlAssertionExtractionServiceInstance: AwsSamlAssertionExtractionService;
   private cliRpcAwsSamlAuthenticationServiceInstance: CliRpcAwsSamlAuthenticationService;
   private remoteProceduresClientInstance: RemoteProceduresClient;
   private localCliMfaCodePromptServiceInstance: LocalCliMfaCodePromptService;
   private remoteCliMfaCodePromptServiceInstance: RemoteCliMfaCodePromptService;
-  private workspaceServiceInstance: WorkspaceService;
+  private behaviouralSubjectServiceInstance: BehaviouralSubjectService;
   private awsIamUserServiceInstance: AwsIamUserService;
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
@@ -64,7 +65,7 @@ export class CliProviderService {
   private idpUrlsServiceInstance: IdpUrlsService;
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
   private keyChainServiceInstance: KeychainService;
-  private logServiceInstance: LogService;
+  private loggingServiceInstance: LoggingService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
   private rotationServiceInstance: RotationService;
@@ -75,6 +76,23 @@ export class CliProviderService {
   private cliOpenWebConsoleServiceInstance: CliOpenWebConsoleService;
   private webConsoleServiceInstance: WebConsoleService;
   private ssmServiceInstance: SsmService;
+  private sessionManagementServiceInstance: SessionManagementService;
+  private segmentServiceInstance: SegmentService;
+  private workspaceServiceInstance: WorkspaceService;
+
+  public get workspaceService(): WorkspaceService {
+    if (!this.workspaceServiceInstance) {
+      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+    }
+    return this.workspaceServiceInstance;
+  }
+
+  public get segmentService(): SegmentService {
+    if (!this.segmentServiceInstance) {
+      this.segmentServiceInstance = new SegmentService(this.repository);
+    }
+    return this.segmentServiceInstance;
+  }
 
   public get cliNativeService(): CliNativeService {
     if (!this.cliNativeServiceInstance) {
@@ -83,11 +101,11 @@ export class CliProviderService {
     return this.cliNativeServiceInstance;
   }
 
-  public get cliNativeLoggerService(): CliNativeLoggerService {
-    if (!this.cliNativeLoggerServiceInstance) {
-      this.cliNativeLoggerServiceInstance = new CliNativeLoggerService();
+  public get sessionManagementService(): SessionManagementService {
+    if (!this.sessionManagementServiceInstance) {
+      this.sessionManagementServiceInstance = new SessionManagementService(this.repository);
     }
-    return this.cliNativeLoggerServiceInstance;
+    return this.sessionManagementServiceInstance;
   }
 
   public get cliAwsSsoOidcVerificationWindowService(): IAwsSsoOidcVerificationWindowService {
@@ -132,16 +150,16 @@ export class CliProviderService {
     return this.remoteCliMfaCodePromptServiceInstance;
   }
 
-  public get workspaceService(): WorkspaceService {
-    if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+  public get behaviouralSubjectService(): BehaviouralSubjectService {
+    if (!this.behaviouralSubjectServiceInstance) {
+      this.behaviouralSubjectServiceInstance = new BehaviouralSubjectService(this.repository);
     }
-    return this.workspaceServiceInstance;
+    return this.behaviouralSubjectServiceInstance;
   }
 
   public get awsIamUserService(): AwsIamUserService {
     if (!this.awsIamUserServiceInstance) {
-      this.awsIamUserServiceInstance = new AwsIamUserService(this.workspaceService, this.repository, this.localCliMfaCodePromptService,
+      this.awsIamUserServiceInstance = new AwsIamUserService(this.behaviouralSubjectService, this.repository, this.localCliMfaCodePromptService,
         this.remoteCliMfaCodePromptService, this.keyChainService, this.fileService, this.awsCoreService);
     }
     return this.awsIamUserServiceInstance;
@@ -149,7 +167,7 @@ export class CliProviderService {
 
   get awsIamRoleFederatedService(): AwsIamRoleFederatedService {
     if (!this.awsIamRoleFederatedServiceInstance) {
-      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.workspaceService, this.repository,
+      this.awsIamRoleFederatedServiceInstance = new AwsIamRoleFederatedService(this.behaviouralSubjectService, this.repository,
         this.fileService, this.awsCoreService, this.cliRpcAwsSamlAuthenticationService, constants.samlRoleSessionDuration);
     }
     return this.awsIamRoleFederatedServiceInstance;
@@ -157,7 +175,7 @@ export class CliProviderService {
 
   get awsIamRoleChainedService(): AwsIamRoleChainedService {
     if (!this.awsIamRoleChainedServiceInstance) {
-      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.workspaceService, this.repository,
+      this.awsIamRoleChainedServiceInstance = new AwsIamRoleChainedService(this.behaviouralSubjectService, this.repository,
         this.awsCoreService, this.fileService, this.awsIamUserService, this.awsParentSessionFactory);
     }
     return this.awsIamRoleChainedServiceInstance;
@@ -165,7 +183,7 @@ export class CliProviderService {
 
   get awsSsoRoleService(): AwsSsoRoleService {
     if (!this.awsSsoRoleServiceInstance) {
-      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.workspaceService, this.repository, this.fileService,
+      this.awsSsoRoleServiceInstance = new AwsSsoRoleService(this.behaviouralSubjectService, this.repository, this.fileService,
         this.keyChainService, this.awsCoreService, this.cliNativeService, this.awsSsoOidcService);
     }
     return this.awsSsoRoleServiceInstance;
@@ -180,7 +198,7 @@ export class CliProviderService {
 
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(this.workspaceService, this.repository, this.fileService, this.executeService,
+      this.azureServiceInstance = new AzureService(this.behaviouralSubjectService, this.repository, this.fileService, this.executeService,
         constants.azureAccessTokens);
     }
     return this.azureServiceInstance;
@@ -218,14 +236,14 @@ export class CliProviderService {
 
   get regionsService(): RegionsService {
     if (!this.regionsServiceInstance) {
-      this.regionsServiceInstance = new RegionsService(this.sessionFactory, this.repository, this.workspaceService);
+      this.regionsServiceInstance = new RegionsService(this.sessionFactory, this.repository, this.behaviouralSubjectService);
     }
     return this.regionsServiceInstance;
   }
 
   get namedProfilesService(): NamedProfilesService {
     if (!this.namedProfilesServiceInstance) {
-      this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.workspaceService);
+      this.namedProfilesServiceInstance = new NamedProfilesService(this.sessionFactory, this.repository, this.behaviouralSubjectService);
     }
     return this.namedProfilesServiceInstance;
   }
@@ -240,7 +258,7 @@ export class CliProviderService {
   get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
-        this.awsSsoRoleService, this.keyChainService, this.workspaceService, this.cliNativeService, this.sessionFactory);
+        this.awsSsoRoleService, this.keyChainService, this.behaviouralSubjectService, this.cliNativeService, this.sessionFactory);
     }
     return this.awsSsoIntegrationServiceInstance;
   }
@@ -252,11 +270,11 @@ export class CliProviderService {
     return this.keyChainServiceInstance;
   }
 
-  get logService(): LogService {
-    if (!this.logServiceInstance) {
-      this.logServiceInstance = new LogService(this.cliNativeLoggerService);
+  get loggingService(): LoggingService {
+    if (!this.loggingServiceInstance) {
+      this.loggingServiceInstance = new LoggingService(this.cliNativeService);
     }
-    return this.logServiceInstance;
+    return this.loggingServiceInstance;
   }
 
   get timerService(): TimerService {
@@ -268,7 +286,7 @@ export class CliProviderService {
 
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository, this.logService);
+      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository);
     }
     return this.executeServiceInstance;
   }
@@ -283,7 +301,7 @@ export class CliProviderService {
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
       this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
-        this.repository, this.workspaceService, constants.appName, constants.lockFileDestination);
+        this.repository, this.behaviouralSubjectService, constants.appName);
     }
     return this.retroCompatibilityServiceInstance;
   }
@@ -298,7 +316,7 @@ export class CliProviderService {
 
   get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService, this.logService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService);
     }
     return this.awsCoreServiceInstance;
   }
@@ -319,14 +337,14 @@ export class CliProviderService {
 
   get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.logService, fetch);
+      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.loggingService, fetch);
     }
     return this.webConsoleServiceInstance;
   }
 
   get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.logService, this.executeService);
+      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
     }
     return this.ssmServiceInstance;
   }

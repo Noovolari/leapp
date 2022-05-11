@@ -41,7 +41,7 @@ describe("OpenWebConsole", () => {
       ssmService,
       inquirer,
       webConsoleService,
-      repository: {
+      sessionManagementService: {
         getSessionById: jest.fn((id: string) => [session].find((s) => s.sessionId === id)),
       },
     };
@@ -129,7 +129,7 @@ describe("OpenWebConsole", () => {
       prompt: jest.fn(() => ({ selectedSession: session })),
     };
 
-    const repository: any = {
+    const sessionManagementService: any = {
       getSessions: jest.fn(() => [session, session2]),
     };
 
@@ -138,7 +138,7 @@ describe("OpenWebConsole", () => {
       ssmService,
       inquirer,
       webConsoleService,
-      repository,
+      sessionManagementService,
     };
 
     let command = getTestCommand(cliProviderService);
@@ -146,9 +146,9 @@ describe("OpenWebConsole", () => {
 
     const result = await (command as any).selectSession();
 
-    expect(repository.getSessions).toHaveBeenCalledTimes(1);
-    expect(repository.getSessions).toReturnWith([session, session2]);
-    expect(repository.getSessions().filter((s) => s.status === SessionStatus.inactive)).toStrictEqual([session]);
+    expect(sessionManagementService.getSessions).toHaveBeenCalledTimes(1);
+    expect(sessionManagementService.getSessions).toReturnWith([session, session2]);
+    expect(sessionManagementService.getSessions().filter((s) => s.status === SessionStatus.inactive)).toStrictEqual([session]);
     expect(inquirer.prompt).toHaveBeenCalledTimes(1);
     expect(inquirer.prompt).toHaveBeenCalledWith([
       {
@@ -161,7 +161,7 @@ describe("OpenWebConsole", () => {
 
     expect(result).toBe(session);
 
-    cliProviderService.repository.getSessions = () => [];
+    cliProviderService.sessionManagementService.getSessions = () => [];
     command = getTestCommand(cliProviderService);
     try {
       await (command as any).selectSession();

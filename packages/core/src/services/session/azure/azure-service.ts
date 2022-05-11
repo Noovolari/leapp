@@ -189,14 +189,14 @@ export class AzureService extends SessionService {
     } catch (stdError) {}
   }
 
-  async secureRefreshToken(): Promise<void> {
+  private async secureRefreshToken(): Promise<void> {
     const msalCache = await this.loadMsalCache();
     this.vault = { refreshToken: msalCache.RefreshToken };
     msalCache.RefreshToken = {};
     await this.persistMsalCache(msalCache);
   }
 
-  async restoreRefreshToken(): Promise<void> {
+  private async restoreRefreshToken(): Promise<void> {
     const msalCache = await this.loadMsalCache();
     msalCache.AccessToken = {};
     msalCache.IdToken = {};
@@ -204,7 +204,7 @@ export class AzureService extends SessionService {
     await this.persistMsalCache(msalCache);
   }
 
-  async updateAccessTokenExpiration(session: AzureSession): Promise<void> {
+  private async updateAccessTokenExpiration(session: AzureSession): Promise<void> {
     const msalCache = await this.loadMsalCache();
     const accessTokenKey = Object.keys(msalCache.AccessToken)[0];
     const accessToken = msalCache.AccessToken[accessTokenKey];

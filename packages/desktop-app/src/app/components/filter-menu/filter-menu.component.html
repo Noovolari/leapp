@@ -9,7 +9,7 @@
     <ng-container *ngIf="!categories || categories.length === 0">
       <ng-container *ngFor="let element of data">
         <ng-container *ngIf="element.show">
-          <mat-checkbox (click)="$event.stopPropagation();" (change)="element.value = $event.checked; updateValue($event, data, form);" checked="{{element.value ? 'checked' : ''}}"></mat-checkbox><span>{{element.name}}</span>
+          <mat-checkbox (click)="$event.stopPropagation();" (change)="element.value = $event.checked; updateValue($event, data, form);" [checked]="element.value"></mat-checkbox><span>{{element.name}}</span>
           <br>
         </ng-container>
       </ng-container>
@@ -19,7 +19,7 @@
         <small class="category">{{category}}</small><br>
         <ng-container *ngFor="let element of data">
           <ng-container *ngIf="element.show && element.category === category">
-            <mat-checkbox (click)="$event.stopPropagation();" (change)="element.value = $event.checked; updateValue($event, data, form);" checked="{{element.value ? 'checked' : ''}}"></mat-checkbox><span>{{element.name}}</span>
+            <mat-checkbox (click)="$event.stopPropagation();" (change)="element.value = $event.checked; updateValue($event, data, form);" [checked]="element.value"></mat-checkbox><span>{{element.name}}</span>
             <br>
           </ng-container>
         </ng-container>

@@ -1,6 +1,7 @@
 import { CreateSessionRequest } from "../create-session-request";
 
 export interface AwsIamUserSessionRequest extends CreateSessionRequest {
+  sessionId?: string;
   accessKey: string;
   secretKey: string;
   region: string;

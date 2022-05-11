@@ -38,6 +38,15 @@ export class NamedProfilesService {
     return namedProfile;
   }
 
+  mergeProfileName(name: string): AwsNamedProfile {
+    const actualNamedProfile = this.repository.getProfiles().find((profile) => profile.name === name);
+    if (actualNamedProfile) {
+      return actualNamedProfile;
+    } else {
+      return this.createNamedProfile(name);
+    }
+  }
+
   async editNamedProfile(id: string, newName: string): Promise<void> {
     const activeSessions = this.getSessionsWithNamedProfile(id).filter((session) => session.status === SessionStatus.active);
 

@@ -38,6 +38,7 @@ export class Repository {
       this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
     );
     this._workspace = deserialize(Workspace, workspaceJSON);
+    // TODO: instantiate sessions with the proper runtime type (eg. AwsIamUserSession instead of Session)
   }
 
   getWorkspace(): Workspace {

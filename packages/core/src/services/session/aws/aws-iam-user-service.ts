@@ -63,6 +63,9 @@ export class AwsIamUserService extends AwsSessionService {
 
   async create(request: AwsIamUserSessionRequest): Promise<void> {
     const session = new AwsIamUserSession(request.sessionName, request.region, request.profileId, request.mfaDevice);
+    if (request.sessionId) {
+      session.sessionId = request.sessionId;
+    }
 
     this.keychainService
       .saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, request.accessKey)

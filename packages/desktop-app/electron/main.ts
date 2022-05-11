@@ -1,7 +1,8 @@
 import * as path from "path";
 import { environment } from "../src/environments/environment";
 
-const { app, BrowserWindow, globalShortcut, ipcMain, Tray, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
+const electronLocalshortcut = require('electron-localshortcut');
 const { autoUpdater } = require("electron-updater");
 
 const url = require("url");
@@ -139,17 +140,11 @@ const generateMainWindow = () => {
     });
 
     app.on("browser-window-focus", () => {
-      globalShortcut.register("CommandOrControl+R", () => {
-        console.log("CommandOrControl+R is pressed: Shortcut Disabled");
-      });
-      globalShortcut.register("F5", () => {
-        console.log("F5 is pressed: Shortcut Disabled");
-      });
+      electronLocalshortcut.register(win, ['CommandOrControl+R','CommandOrControl+Shift+R', 'F5'], () => {});
     });
 
     app.on("browser-window-blur", () => {
-      globalShortcut.unregister("CommandOrControl+R");
-      globalShortcut.unregister("F5");
+      electronLocalshortcut.unregisterAll(win);
     });
 
     remote.enable(win.webContents);

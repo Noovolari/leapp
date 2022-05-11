@@ -12,7 +12,7 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LogLevel, LogService, LoggedEntry, LoggedException } from "@noovolari/leapp-core/services/log-service";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
 import { WindowService } from "../../services/window.service";
@@ -69,7 +69,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   private awsSsoRoleService: AwsSsoRoleService;
   private behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoOidcService: AwsSsoOidcService;
-  private loggingService: LoggingService;
+  private loggingService: LogService;
   private segmentService: SegmentService;
 
   constructor(
@@ -85,7 +85,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.awsSsoRoleService = this.leappCoreService.awsSsoRoleService;
     this.behaviouralSubjectService = this.leappCoreService.behaviouralSubjectService;
     this.awsSsoOidcService = this.leappCoreService.awsSsoOidcService;
-    this.loggingService = this.leappCoreService.loggingService;
+    this.loggingService = this.leappCoreService.logService;
     this.segmentService = this.leappCoreService.segmentService;
   }
 
@@ -200,7 +200,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       } catch (err) {
         this.awsSsoOidcService.interrupt();
         await this.logout(integrationId);
-        this.loggingService.logger(`Error during SSO Login: ${err.toString()}`, LoggerLevel.error);
+        this.loggingService.log(new LoggedException(`Error during SSO Login: ${err.toString()}`, this, LogLevel.error));
         this.messageToasterService.toast(`Error during SSO Login: ${err.toString()}`, ToastLevel.error);
       } finally {
         if (this.modalRef) {
@@ -313,7 +313,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       async (res) => {
         if (res !== constants.confirmClosed) {
           // eslint-disable-next-line max-len
-          this.loggingService.logger(`Removing sessions with attached aws sso config id: ${awsSsoIntegration.id}`, LoggerLevel.info, this);
+          this.loggingService.log(new LoggedEntry(`Removing sessions with attached aws sso config id: ${awsSsoIntegration.id}`, this, LogLevel.info));
           await this.logout(awsSsoIntegration.id);
           this.leappCoreService.awsSsoIntegrationService.deleteIntegration(awsSsoIntegration.id);
           this.modifying = 0;

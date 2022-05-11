@@ -5,7 +5,7 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
-import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
@@ -34,6 +34,8 @@ import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profi
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { SessionManagementService } from "@noovolari/leapp-core/services/session-management-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { AppNativeLoggerService } from "./app-native-logger-service";
+import { MessageToasterService } from "./message-toaster.service";
 
 @Injectable({
   providedIn: "root",
@@ -60,7 +62,7 @@ export class AppProviderService {
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
   private keyChainServiceInstance: KeychainService;
-  private loggingServiceInstance: LoggingService;
+  private loggingServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
   private rotationServiceInstance: RotationService;
@@ -75,7 +77,7 @@ export class AppProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private workspaceServiceInstance: WorkspaceService;
 
-  constructor(private electronService: AppNativeService, private ngZone: NgZone) {}
+  constructor(private electronService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -114,7 +116,7 @@ export class AppProviderService {
 
   public get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.loggingService, window.fetch.bind(window));
+      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.logService, window.fetch.bind(window));
     }
     return this.webConsoleServiceInstance;
   }
@@ -208,7 +210,7 @@ export class AppProviderService {
 
   public get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.electronService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.electronService, this.logService);
     }
     return this.awsCoreServiceInstance;
   }
@@ -249,7 +251,7 @@ export class AppProviderService {
 
   public get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
+      this.ssmServiceInstance = new SsmService(this.logService, this.executeService);
     }
     return this.ssmServiceInstance;
   }
@@ -286,9 +288,9 @@ export class AppProviderService {
     return this.keyChainServiceInstance;
   }
 
-  public get loggingService(): LoggingService {
+  public get logService(): LogService {
     if (!this.loggingServiceInstance) {
-      this.loggingServiceInstance = new LoggingService(this.electronService);
+      this.loggingServiceInstance = new LogService(new AppNativeLoggerService(this.electronService, this.messageToaster));
     }
     return this.loggingServiceInstance;
   }
@@ -302,7 +304,7 @@ export class AppProviderService {
 
   public get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository);
+      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository, this.logService);
     }
     return this.executeServiceInstance;
   }

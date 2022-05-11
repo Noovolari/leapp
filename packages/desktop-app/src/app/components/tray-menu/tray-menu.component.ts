@@ -3,7 +3,6 @@ import { AppService } from "../../services/app.service";
 import { environment } from "../../../environments/environment";
 import { UpdaterService } from "../../services/updater.service";
 import { AppProviderService } from "../../services/app-provider.service";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { Session } from "@noovolari/leapp-core/models/session";
@@ -17,6 +16,7 @@ import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service"
 import { AppNativeService } from "../../services/app-native.service";
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 
 @Component({
   selector: "app-tray-menu",
@@ -29,7 +29,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private subscribed;
 
   private awsCoreService: AwsCoreService;
-  private loggingService: LoggingService;
+  private loggingService: LogService;
   private sessionServiceFactory: SessionFactory;
   private behaviouralSubjectService: BehaviouralSubjectService;
 
@@ -46,7 +46,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     private appProviderService: AppProviderService
   ) {
     this.awsCoreService = appProviderService.awsCoreService;
-    this.loggingService = appProviderService.loggingService;
+    this.loggingService = appProviderService.logService;
     this.sessionServiceFactory = appProviderService.sessionFactory;
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
   }
@@ -230,7 +230,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
    */
   async cleanBeforeExit(): Promise<void> {
     // Check if we are here
-    this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
+    this.loggingService.log(new LoggedEntry("Closing app with cleaning process...", this, LogLevel.info));
     // We need the Try/Catch as we have the possibility to call the method without sessions
     try {
       // Stop the sessions...
@@ -242,7 +242,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       // Clean the config file
       this.awsCoreService.cleanCredentialFile();
     } catch (err) {
-      this.loggingService.logger("No sessions to stop, skipping...", LoggerLevel.error, this, err.stack);
+      this.loggingService.log(new LoggedEntry("No sessions to stop, skipping...", this, LogLevel.error, false, err.stack));
     }
     // Finally quit
     this.appService.quit();
@@ -254,8 +254,8 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   private getMetadata() {
     const printError = (error) => {
-      this.loggingService.logger(error.toString(), LoggerLevel.error, this, error.stack);
-      if ((error as LeappBaseError).severity === LoggerLevel.error) {
+      this.loggingService.log(new LoggedException(error.toString(), this, LogLevel.error, true, error.stack));
+      if ((error as LeappBaseError).severity === LogLevel.error) {
         this.messageToasterService.toast(error.toString(), ToastLevel.error, "");
       }
     };
@@ -279,7 +279,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         throw new LeappBaseError(
           "An error occurred getting AWS CLI version. Please check if it is installed.",
           this,
-          LoggerLevel.error,
+          LogLevel.error,
           "An error occurred getting AWS CLI version. Please check if it is installed."
         );
       }
@@ -295,7 +295,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         throw new LeappBaseError(
           "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed.",
           this,
-          LoggerLevel.warn,
+          LogLevel.warn,
           "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed."
         );
       }

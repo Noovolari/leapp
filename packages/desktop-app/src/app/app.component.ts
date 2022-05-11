@@ -8,7 +8,7 @@ import { AppMfaCodePromptService } from "./services/app-mfa-code-prompt.service"
 import { AppAwsAuthenticationService } from "./services/app-aws-authentication.service";
 import { UpdaterService } from "./services/updater.service";
 import compareVersions from "compare-versions";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
@@ -34,7 +34,7 @@ import { OptionsService } from "./services/options.service";
 export class AppComponent implements OnInit {
   private fileService: FileService;
   private awsCoreService: AwsCoreService;
-  private loggingService: LoggingService;
+  private loggingService: LogService;
   private timerService: TimerService;
   private sessionServiceFactory: SessionFactory;
   private behaviouralSubjectService: BehaviouralSubjectService;
@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
 
     this.fileService = appProviderService.fileService;
     this.awsCoreService = appProviderService.awsCoreService;
-    this.loggingService = appProviderService.loggingService;
+    this.loggingService = appProviderService.logService;
     this.timerService = appProviderService.timerService;
     this.sessionServiceFactory = appProviderService.sessionFactory;
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
@@ -84,7 +84,7 @@ export class AppComponent implements OnInit {
     // We get the right moment to set an hook to app close
     const ipcRenderer = this.electronService.ipcRenderer;
     ipcRenderer.on("app-close", () => {
-      this.loggingService.logger("Preparing for closing instruction...", LoggerLevel.info, this);
+      this.loggingService.log(new LoggedEntry("Preparing for closing instruction...", this, LogLevel.info));
       this.beforeCloseInstructions();
     });
 
@@ -147,7 +147,7 @@ export class AppComponent implements OnInit {
    */
   private beforeCloseInstructions() {
     // Check if we are here
-    this.loggingService.logger("Closing app with cleaning process...", LoggerLevel.info, this);
+    this.loggingService.log(new LoggedEntry("Closing app with cleaning process...", this, LogLevel.info));
 
     this.remoteProceduresServer.stopServer();
 
@@ -163,7 +163,7 @@ export class AppComponent implements OnInit {
       // Clean the config file
       this.awsCoreService.cleanCredentialFile();
     } catch (err) {
-      this.loggingService.logger("No sessions to stop, skipping...", LoggerLevel.error, this, err.stack);
+      this.loggingService.log(new LoggedException("No sessions to stop, skipping...", this, LogLevel.error, true, err.stack));
     }
 
     // Finally quit
@@ -182,7 +182,7 @@ export class AppComponent implements OnInit {
       this.fileService.existsSync(oldAwsCredentialsPath) &&
       !this.fileService.existsSync(newAwsCredentialsPath);
 
-    this.loggingService.logger(`Check existing credential file: ${check}`, LoggerLevel.info, this);
+    this.loggingService.log(new LoggedEntry(`Check existing credential file: ${check}`, this, LogLevel.info));
 
     if (check) {
       this.fileService.renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);

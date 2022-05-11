@@ -10,7 +10,7 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LogLevel, LogService, LoggedEntry } from "@noovolari/leapp-core/services/log-service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
@@ -96,7 +96,7 @@ export class CreateDialogComponent implements OnInit {
   private awsIamUserService: AwsIamUserService;
   private awsIamRoleChainedService: AwsIamRoleChainedService;
   private azureService: AzureService;
-  private loggingService: LoggingService;
+  private loggingService: LogService;
 
   /* Setup the first account for the application */
   constructor(
@@ -114,7 +114,7 @@ export class CreateDialogComponent implements OnInit {
     this.awsIamUserService = leappCoreService.awsIamUserService;
     this.awsIamRoleChainedService = leappCoreService.awsIamRoleChainedService;
     this.azureService = leappCoreService.azureService;
-    this.loggingService = leappCoreService.loggingService;
+    this.loggingService = leappCoreService.logService;
   }
 
   ngOnInit(): void {
@@ -189,7 +189,7 @@ export class CreateDialogComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveSession(): void {
-    this.loggingService.logger(`Saving account...`, LoggerLevel.info, this);
+    this.loggingService.log(new LoggedEntry(`Saving account...`, this, LogLevel.info));
     this.addProfileToWorkspace();
     this.addIpdUrlToWorkspace();
     this.createSession();

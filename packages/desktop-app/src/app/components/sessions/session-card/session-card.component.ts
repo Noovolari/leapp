@@ -11,7 +11,7 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AppProviderService } from "../../../services/app-provider.service";
-import { LoggerLevel, LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { AppSsmService } from "../../../services/app-ssm.service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
@@ -92,7 +92,7 @@ export class SessionCardComponent implements OnInit {
     awsProfile: new FormControl("", [Validators.required]),
   });
 
-  private loggingService: LoggingService;
+  private loggingService: LogService;
   private sessionFactory: SessionFactory;
   private fileService: FileService;
   private keychainService: KeychainService;
@@ -114,7 +114,7 @@ export class SessionCardComponent implements OnInit {
     private awsAuthenticationService: AppAwsAuthenticationService,
     public optionService: OptionsService
   ) {
-    this.loggingService = appProviderService.loggingService;
+    this.loggingService = appProviderService.logService;
     this.sessionFactory = appProviderService.sessionFactory;
     this.fileService = appProviderService.fileService;
     this.keychainService = appProviderService.keyChainService;
@@ -260,7 +260,7 @@ export class SessionCardComponent implements OnInit {
       }
     } catch (err) {
       this.messageToasterService.toast(err, ToastLevel.warn);
-      this.loggingService.logger(err, LoggerLevel.error, this, err.stack);
+      this.loggingService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));
     }
   }
 
@@ -329,7 +329,7 @@ export class SessionCardComponent implements OnInit {
         this.instances = await this.ssmService.getSsmInstances(credentials, this.selectedSsmRegion);
         this.duplicateInstances = this.instances;
       } catch (err) {
-        throw new LeappBaseError("SSM Error", this, LoggerLevel.error, err.message);
+        throw new LeappBaseError("SSM Error", this, LogLevel.error, err.message);
       } finally {
         this.ssmLoading = false;
         this.firstTimeSsm = false;
@@ -572,19 +572,13 @@ export class SessionCardComponent implements OnInit {
   }
 
   private logSessionData(session: Session, message: string): void {
-    this.loggingService.logger(
-      message,
-      LoggerLevel.info,
-      this,
-      JSON.stringify(
-        {
-          timestamp: new Date().toISOString(),
-          id: session.sessionId,
-          account: session.sessionName,
-          type: session.type,
-        },
-        null,
-        3
+    this.loggingService.log(
+      new LoggedEntry(
+        message,
+        this,
+        LogLevel.info,
+        false,
+        JSON.stringify({ timestamp: new Date().toISOString(), id: session.sessionId, account: session.sessionName, type: session.type }, null, 3)
       )
     );
   }

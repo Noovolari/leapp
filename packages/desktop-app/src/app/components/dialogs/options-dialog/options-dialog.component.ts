@@ -4,7 +4,7 @@ import { AppService } from "../../../services/app.service";
 import { Router } from "@angular/router";
 import { MatTabGroup } from "@angular/material/tabs";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { LoggerLevel } from "@noovolari/leapp-core/services/logging-service";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
 import { AppProviderService } from "../../../services/app-provider.service";
@@ -164,10 +164,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
           (res) => {
             if (res !== constants.confirmClosed) {
               // eslint-disable-next-line max-len
-              this.appProviderService.loggingService.logger(
-                "User have set a proxy url: the app must be restarted to update the configuration.",
-                LoggerLevel.info,
-                this
+              this.appProviderService.logService.log(
+                new LoggedEntry("User have set a proxy url: the app must be restarted to update the configuration.", this, LogLevel.info)
               );
               this.appService.restart();
             }
@@ -177,7 +175,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         );
       } else {
         this.appService.closeModal();
-        this.appProviderService.loggingService.logger("Option saved.", LoggerLevel.info, this, JSON.stringify(this.form.getRawValue(), null, 3));
+        this.appProviderService.logService.log(
+          new LoggedEntry("Option saved.", this, LogLevel.info, false, JSON.stringify(this.form.getRawValue(), null, 3))
+        );
         this.toasterService.toast("Option saved.", ToastLevel.info, "Options");
       }
     }
@@ -250,7 +250,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       `Deleting this IdP URL will also remove these sessions: <br><ul>${sessionsNames.join("")}</ul>Do you want to proceed?`,
       (res) => {
         if (res !== constants.confirmClosed) {
-          this.appProviderService.loggingService.logger(`Removing idp url with id: ${id}`, LoggerLevel.info, this);
+          this.appProviderService.logService.log(new LoggedEntry(`Removing idp url with id: ${id}`, this, LogLevel.info));
 
           sessions.forEach((session) => {
             this.appProviderService.sessionManagementService.deleteSession(session.sessionId);
@@ -324,7 +324,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       `Deleting this profile will set default to these sessions: <br><ul>${sessionsNames.join("")}</ul>Do you want to proceed?`,
       async (res) => {
         if (res !== constants.confirmClosed) {
-          this.appProviderService.loggingService.logger(`Reverting to default profile with id: ${id}`, LoggerLevel.info, this);
+          this.appProviderService.logService.log(new LoggedEntry(`Reverting to default profile with id: ${id}`, this, LogLevel.info));
 
           // Reverting all sessions to default profile
           // eslint-disable-next-line @typescript-eslint/prefer-for-of

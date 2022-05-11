@@ -5,7 +5,7 @@ import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { SessionStatus } from "../../../models/session-status";
 import { SessionType } from "../../../models/session-type";
-import { LoggerLevel } from "../../logging-service";
+import { LogLevel } from "../../log-service";
 import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { constants } from "../../../models/constants";
@@ -30,7 +30,7 @@ export abstract class AwsSessionService extends SessionService {
   async start(sessionId: string): Promise<void> {
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
-        throw new LeappBaseError("Pending session with same named profile", this, LoggerLevel.info, "Pending session with same named profile");
+        throw new LeappBaseError("Pending session with same named profile", this, LogLevel.info, "Pending session with same named profile");
       }
       await this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);

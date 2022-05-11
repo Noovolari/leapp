@@ -3,7 +3,7 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
-import { LoggingService } from "@noovolari/leapp-core/services/logging-service";
+import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
@@ -39,6 +39,7 @@ import { LocalCliMfaCodePromptService } from "./local-cli-mfa-code-prompt-servic
 import { SessionManagementService } from "@noovolari/leapp-core/services/session-management-service";
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { CliNativeLoggerService } from "./cli-native-logger-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -65,7 +66,7 @@ export class CliProviderService {
   private idpUrlsServiceInstance: IdpUrlsService;
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
   private keyChainServiceInstance: KeychainService;
-  private loggingServiceInstance: LoggingService;
+  private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
   private rotationServiceInstance: RotationService;
@@ -270,11 +271,11 @@ export class CliProviderService {
     return this.keyChainServiceInstance;
   }
 
-  get loggingService(): LoggingService {
-    if (!this.loggingServiceInstance) {
-      this.loggingServiceInstance = new LoggingService(this.cliNativeService);
+  get loggingService(): LogService {
+    if (!this.logServiceInstance) {
+      this.logServiceInstance = new LogService(new CliNativeLoggerService());
     }
-    return this.loggingServiceInstance;
+    return this.logServiceInstance;
   }
 
   get timerService(): TimerService {
@@ -286,7 +287,7 @@ export class CliProviderService {
 
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository);
+      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository, this.loggingService);
     }
     return this.executeServiceInstance;
   }
@@ -316,7 +317,7 @@ export class CliProviderService {
 
   get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService, this.loggingService);
     }
     return this.awsCoreServiceInstance;
   }

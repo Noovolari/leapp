@@ -103,7 +103,7 @@ describe("GenerateSession", () => {
   test("isAwsSession - false", () => {
     const command = getTestCommand();
     const session = {} as Session;
-    const isAwsSession = command.isAwsSession(session);
+    const isAwsSession = command.isAwsSession(session as any);
 
     expect(isAwsSession).toBe(false);
   });

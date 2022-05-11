@@ -111,10 +111,12 @@
     </button>
   </ng-container>
 
-  <button mat-menu-item (click)="deleteSession(session, $event);">
-    <i class="moon-Delete"></i>&nbsp;
-    <span>Delete Session</span>
-  </button>
+  <ng-container *ngIf="session.type !== eSessionType.awsSsoRole">
+    <button mat-menu-item (click)="deleteSession(session, $event);">
+      <i class="moon-Delete"></i>&nbsp;
+      <span>Delete Session</span>
+    </button>
+  </ng-container>
 
 </mat-menu>
 
@@ -164,7 +166,9 @@
       <div class="opt-bar-middle-right-buttons">
         <a class="icon-button" (click)="pinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) === -1" matTooltip="Pin Session"><i class="moon-Pin"></i></a>
         <a class="icon-button" (click)="unpinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1" matTooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
+        <ng-container *ngIf="session.type !== eSessionType.awsSsoRole">
         <a class="icon-button" (click)="deleteSession(session, $event);" matTooltip="Delete Session"><i class="moon-Delete"></i></a>
+        </ng-container>
       </div>
     </div>
 

@@ -22,6 +22,7 @@
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",
     "aws-sdk-mock": "5.3.0",
+    "axios": "^0.27.2",
     "chdir": "0.0.0",
     "class-transformer": "^0.4.0",
     "compare-versions": "^3.6.0",
@@ -132,7 +133,8 @@
     "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme --multi --dir scopes",
     "release": "gushio gushio/target-release.js",
     "release-homebrew": "gushio gushio/target-brew-release.js",
-    "release-npm": "gushio gushio/target-npm-release.js"
+    "release-npm": "gushio gushio/target-npm-release.js",
+    "sync-pro": "./bin/run integration sync-pro"
   },
   "types": "dist/index.d.ts"
 }

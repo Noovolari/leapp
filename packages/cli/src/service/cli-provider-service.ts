@@ -40,6 +40,7 @@ import { SessionManagementService } from "@noovolari/leapp-core/services/session
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
+import { WebSyncService } from "@noovolari/leapp-core/services/web-sync-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -80,6 +81,7 @@ export class CliProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private segmentServiceInstance: SegmentService;
   private workspaceServiceInstance: WorkspaceService;
+  private webSyncServiceInstance: WebSyncService;
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -348,6 +350,13 @@ export class CliProviderService {
       this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
     }
     return this.ssmServiceInstance;
+  }
+
+  get webSyncService(): WebSyncService {
+    if (!this.webSyncServiceInstance) {
+      this.webSyncServiceInstance = new WebSyncService(this.sessionFactory, this.namedProfilesService, this.sessionManagementService);
+    }
+    return this.webSyncServiceInstance;
   }
 
   get inquirer(): CliInquirer.Inquirer {

@@ -9,15 +9,15 @@ import { globalOrderingFilter } from "../sessions/sessions.component";
 import { Session } from "@noovolari/leapp-core/models/session";
 import Segment, { GlobalFilters } from "@noovolari/leapp-core/models/segment";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { syncAllEvent } from "../integration-bar/integration-bar.component";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AppNativeService } from "../../services/app-native.service";
 import { AppService } from "../../services/app.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../services/window.service";
+import { OptionsService } from "../../services/options.service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -64,7 +64,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   compactMode: boolean;
 
   eConstants = constants;
-  repository: Repository;
 
   private subscription;
   private subscription2;
@@ -74,22 +73,22 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private subscription6;
 
   private currentSegment: Segment;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
+    public optionsService: OptionsService,
     private bsModalService: BsModalService,
-    private leappCoreService: AppProviderService,
     public appService: AppService,
     public electronService: AppNativeService,
+    private leappCoreService: AppProviderService,
     private windowService: WindowService
   ) {
-    this.workspaceService = leappCoreService.workspaceService;
-    this.repository = leappCoreService.repository;
+    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
 
     this.filterExtended = false;
     this.compactMode = false;
 
-    globalFilteredSessions.next(this.workspaceService.sessions);
+    globalFilteredSessions.next(this.behaviouralSubjectService.sessions);
 
     globalColumns.next({
       role: true,
@@ -108,7 +107,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   ngOnInit(): void {
     this.subscription = this.filterForm.valueChanges.subscribe((values: GlobalFilters) => {
       globalFilterGroup.next(values);
-      this.applyFiltersToSessions(values, this.workspaceService.sessions);
+      this.applyFiltersToSessions(values, this.behaviouralSubjectService.sessions);
     });
 
     this.subscription2 = globalHasFilter.subscribe((value) => {
@@ -127,7 +126,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       this.filterForm.get("typeFilter").setValue(this.types);
     });
 
-    this.subscription4 = this.workspaceService.sessions$.subscribe((sessions) => {
+    this.subscription4 = this.behaviouralSubjectService.sessions$.subscribe((sessions) => {
       const actualFilterValues: GlobalFilters = {
         dateFilter: this.filterForm.get("dateFilter").value,
         integrationFilter: this.filterForm.get("integrationFilter").value,
@@ -146,7 +145,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         const values = segment.filterGroup;
         globalFilterGroup.next(values);
         this.updateFilterForm(values);
-        this.applyFiltersToSessions(values, this.workspaceService.sessions);
+        this.applyFiltersToSessions(values, this.behaviouralSubjectService.sessions);
       }
     });
 
@@ -228,8 +227,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   windowButtonDetectTheme(): string {
     if (
-      this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
-      (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
+      this.optionsService.colorTheme === constants.darkTheme ||
+      (this.optionsService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
     ) {
       return "_dark";
     } else {
@@ -344,10 +343,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
 
     filteredSessions = filteredSessions.sort((x, y) => {
-      const pinnedList = this.leappCoreService.workspaceOptionService.pinned;
+      const pinnedList = this.optionsService.pinned;
       if ((pinnedList.indexOf(x.sessionId) !== -1) === (pinnedList.indexOf(y.sessionId) !== -1)) {
         return 0;
-      } else if (this.leappCoreService.workspaceOptionService.pinned.indexOf(x.sessionId) !== -1) {
+      } else if (this.optionsService.pinned.indexOf(x.sessionId) !== -1) {
         return -1;
       } else {
         return 1;

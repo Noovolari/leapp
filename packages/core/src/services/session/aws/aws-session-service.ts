@@ -1,20 +1,21 @@
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { LeappBaseError } from "../../../errors/leapp-base-error";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsProcessCredentials } from "../../../models/aws-process-credential";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { SessionStatus } from "../../../models/session-status";
 import { SessionType } from "../../../models/session-type";
+import { LogLevel } from "../../log-service";
 import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { constants } from "../../../models/constants";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
-import { LoggedException, LogLevel } from "../../log-service";
 
 export abstract class AwsSessionService extends SessionService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
   protected constructor(
-    protected sessionNotifier: ISessionNotifier,
+    protected sessionNotifier: IBehaviouralNotifier,
     protected repository: Repository,
     protected awsCoreService: AwsCoreService,
     protected fileService: FileService
@@ -29,7 +30,7 @@ export abstract class AwsSessionService extends SessionService {
   async start(sessionId: string): Promise<void> {
     try {
       if (this.isThereAnotherPendingSessionWithSameNamedProfile(sessionId)) {
-        throw new LoggedException("Pending session with same named profile", this, LogLevel.info);
+        throw new LeappBaseError("Pending session with same named profile", this, LogLevel.info, "Pending session with same named profile");
       }
       await this.stopAllWithSameNameProfile(sessionId);
       this.sessionLoading(sessionId);
@@ -84,7 +85,7 @@ export abstract class AwsSessionService extends SessionService {
         this.repository.deleteSession(sess.sessionId);
       }
       this.repository.deleteSession(sessionId);
-      this.sessionNotifier?.deleteSession(sessionId);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
       await this.removeSecrets(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);

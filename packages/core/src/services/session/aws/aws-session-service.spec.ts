@@ -159,6 +159,7 @@ describe("AwsSessionService", () => {
       deleteSession: jest.fn(),
     } as any;
     const sessionNotifier = {
+      setSessions: jest.fn(),
       deleteSession: jest.fn((_: string) => {}),
     } as any;
     const removeSecrets = jest.fn((_: string): void => {});

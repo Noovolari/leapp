@@ -16,7 +16,7 @@ import { BehaviorSubject } from "rxjs";
 import { SessionCardComponent } from "./session-card/session-card.component";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { GlobalFilters } from "@noovolari/leapp-core/models/segment";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
@@ -64,7 +64,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
   private subscriptions = [];
   private awsCoreService: AwsCoreService;
 
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
     private ref: ChangeDetectorRef,
@@ -75,7 +75,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     private appService: AppService,
     private leappCoreService: AppProviderService
   ) {
-    this.workspaceService = this.leappCoreService.workspaceService;
+    this.behaviouralSubjectService = this.leappCoreService.behaviouralSubjectService;
     this.awsCoreService = this.leappCoreService.awsCoreService;
 
     this.columnSettings = Array.from(Array(5)).map((): ArrowSettings => ({ activeArrow: false, orderStyle: false }));
@@ -101,7 +101,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     this.subscriptions.push(subscription4);
     this.subscriptions.push(subscription5);
 
-    globalOrderingFilter.next(JSON.parse(JSON.stringify(this.workspaceService.sessions)));
+    globalOrderingFilter.next(JSON.parse(JSON.stringify(this.behaviouralSubjectService.sessions)));
   }
 
   ngOnInit(): void {

@@ -57,7 +57,7 @@ describe("GenerateSession", () => {
 
   test("getSession", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{ sessionId: "sessionId1" }, { sessionId: "sessionId2" }, { sessionId: "sessionId3" }]),
       },
     };
@@ -70,7 +70,7 @@ describe("GenerateSession", () => {
 
   test("getSession, no session available", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => []),
       },
     };
@@ -82,7 +82,7 @@ describe("GenerateSession", () => {
 
   test("getSession, id not unique", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{ sessionId: "sessionId1" }, { sessionId: "sessionId1" }, { sessionId: "sessionId3" }]),
       },
     };
@@ -103,7 +103,7 @@ describe("GenerateSession", () => {
   test("isAwsSession - false", () => {
     const command = getTestCommand();
     const session = {} as Session;
-    const isAwsSession = command.isAwsSession(session);
+    const isAwsSession = command.isAwsSession(session as any);
 
     expect(isAwsSession).toBe(false);
   });

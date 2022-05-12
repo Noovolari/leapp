@@ -22,7 +22,7 @@ describe("StartSession", () => {
     const cliProviderService: any = {
       sessionFactory,
       remoteProceduresClient,
-      repository: {
+      sessionManagementService: {
         getSessionById: jest.fn((id: string) => [session].find((s) => s.sessionId === id)),
       },
     };
@@ -88,7 +88,7 @@ describe("StartSession", () => {
 
   test("selectSession", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [
           { sessionName: "sessionActive", status: SessionStatus.active },
           { sessionName: "sessionPending", status: SessionStatus.pending },
@@ -120,7 +120,7 @@ describe("StartSession", () => {
 
   test("selectSession, no session available", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => []),
       },
     };

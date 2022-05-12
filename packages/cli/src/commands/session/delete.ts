@@ -25,7 +25,7 @@ export default class DeleteSession extends LeappCommand {
     try {
       const { flags } = await this.parse(DeleteSession);
       if (this.validateFlags(flags)) {
-        const selectedSession = this.cliProviderService.repository.getSessionById(`${flags.sessionId}`);
+        const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(`${flags.sessionId}`);
         if (!selectedSession) {
           throw new Error("Session not found with id " + flags.sessionId);
         }
@@ -46,7 +46,7 @@ export default class DeleteSession extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.cliProviderService.repository.getSessions();
+    const availableSessions = this.cliProviderService.sessionManagementService.getSessions();
     if (availableSessions.length === 0) {
       throw new Error("no sessions available");
     }

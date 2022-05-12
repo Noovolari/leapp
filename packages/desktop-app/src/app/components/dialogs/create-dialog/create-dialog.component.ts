@@ -6,10 +6,11 @@ import * as uuid from "uuid";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { openIntegrationEvent } from "../../integration-bar/integration-bar.component";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
+import { LogLevel, LogService, LoggedEntry } from "@noovolari/leapp-core/services/log-service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
@@ -17,9 +18,10 @@ import { AwsIamRoleFederatedSessionRequest } from "@noovolari/leapp-core/service
 import { AwsIamUserSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
 import { AwsIamRoleChainedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
 import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azure/azure-session-request";
+import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
+import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
-import { Repository } from "@noovolari/leapp-core/services/repository";
-import { LoggedException, LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
+import { OptionsService } from "../../../services/options.service";
 
 @Component({
   selector: "app-create-dialog",
@@ -89,36 +91,36 @@ export class CreateDialogComponent implements OnInit {
     selectAccessStrategy: new FormControl(SessionType.awsIamRoleFederated, [Validators.required]),
   });
 
-  repository: Repository;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
   private awsIamRoleFederatedService: AwsIamRoleFederatedService;
   private awsIamUserService: AwsIamUserService;
   private awsIamRoleChainedService: AwsIamRoleChainedService;
   private azureService: AzureService;
-  private logService: LogService;
+  private loggingService: LogService;
 
   /* Setup the first account for the application */
   constructor(
+    public optionsService: OptionsService,
     public appService: AppService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private bsModalService: BsModalService,
-    private leappCoreService: AppProviderService,
-    private windowService: WindowService
+    public leappCoreService: AppProviderService,
+    private windowService: WindowService,
+    private messageToasterService: MessageToasterService
   ) {
-    this.repository = leappCoreService.repository;
-    this.workspaceService = leappCoreService.workspaceService;
+    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
     this.awsIamRoleFederatedService = leappCoreService.awsIamRoleFederatedService;
     this.awsIamUserService = leappCoreService.awsIamUserService;
     this.awsIamRoleChainedService = leappCoreService.awsIamRoleChainedService;
     this.azureService = leappCoreService.azureService;
-    this.logService = leappCoreService.logService;
+    this.loggingService = leappCoreService.logService;
   }
 
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe((params) => {
       // Get the workspace and the accounts you need
-      const workspace = this.leappCoreService.repository.getWorkspace();
+      const workspace = this.leappCoreService.workspaceService.getWorkspace();
 
       // We get all the applicable idp urls
       if (workspace.idpUrls && workspace.idpUrls.length > 0) {
@@ -142,7 +144,7 @@ export class CreateDialogComponent implements OnInit {
       this.firstTime = params["firstTime"] || !this.hasOneGoodSession;
 
       // Show the assumable accounts
-      this.assumerAwsSessions = this.leappCoreService.repository.listAssumable().map((session) => ({
+      this.assumerAwsSessions = this.leappCoreService.sessionManagementService.getAssumableSessions().map((session) => ({
         sessionName: session.sessionName,
         session,
       }));
@@ -187,7 +189,7 @@ export class CreateDialogComponent implements OnInit {
    * Save the first account in the workspace
    */
   saveSession(): void {
-    this.logService.log(new LoggedEntry("Saving account...", this, LogLevel.info));
+    this.loggingService.log(new LoggedEntry(`Saving account...`, this, LogLevel.info));
     this.addProfileToWorkspace();
     this.addIpdUrlToWorkspace();
     this.createSession();
@@ -321,8 +323,8 @@ export class CreateDialogComponent implements OnInit {
         return "alibaba.png";
       default:
         return `aws${
-          this.leappCoreService.workspaceOptionService.colorTheme === constants.darkTheme ||
-          (this.leappCoreService.workspaceOptionService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
+          this.optionsService.colorTheme === constants.darkTheme ||
+          (this.optionsService.colorTheme === constants.systemDefaultTheme && this.appService.isDarkMode())
             ? "-dark"
             : ""
         }.png`;
@@ -391,10 +393,11 @@ export class CreateDialogComponent implements OnInit {
           break;
       }
 
-      this.logService.log(new LoggedEntry(`Session: ${this.form.value.name}, created.`, this, LogLevel.success, true));
+      this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, "");
       this.closeModal();
     } else {
-      this.logService.log(new LoggedEntry("Session is missing some required properties, please fill them.", this, LogLevel.warn, true));
+      // eslint-disable-next-line max-len
+      this.messageToasterService.toast(`Session is missing some required properties, please fill them.`, ToastLevel.warn, "");
     }
   }
 
@@ -411,7 +414,7 @@ export class CreateDialogComponent implements OnInit {
         this.selectedIdpUrl.value = idpUrl.id;
       } else {
         if (validate.toString() !== "IdP URL already exists") {
-          throw new LoggedException(validate.toString(), this, LogLevel.warn);
+          throw new LeappParseError(this, validate.toString());
         }
       }
     }
@@ -432,7 +435,7 @@ export class CreateDialogComponent implements OnInit {
         validate.toString() !== "Profile already exists" &&
         this.leappCoreService.namedProfileService.getDefaultProfileId() !== this.selectedProfile.value
       ) {
-        throw new LoggedException(validate.toString(), this, LogLevel.warn);
+        throw new LeappParseError(this, validate.toString());
       }
     }
   }

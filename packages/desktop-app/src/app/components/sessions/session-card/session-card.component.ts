@@ -11,25 +11,27 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AppProviderService } from "../../../services/app-provider.service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { AppSsmService } from "../../../services/app-ssm.service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
-import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
-import { Repository } from "@noovolari/leapp-core/services/repository";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
+import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
+import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
-import { LoggedException, LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
+import { OptionsService } from "../../../services/options.service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -86,17 +88,15 @@ export class SessionCardComponent implements OnInit {
   menuX: number;
   menuY: number;
 
-  repository: Repository;
-
   form = new FormGroup({
     awsProfile: new FormControl("", [Validators.required]),
   });
 
-  private logService: LogService;
+  private loggingService: LogService;
   private sessionFactory: SessionFactory;
   private fileService: FileService;
   private keychainService: KeychainService;
-  private workspaceService: WorkspaceService;
+  private behaviouralSubjectService: BehaviouralSubjectService;
   private sessionService: SessionService;
   private awsCoreService: AwsCoreService;
   private azureCoreService: AzureCoreService;
@@ -109,15 +109,16 @@ export class SessionCardComponent implements OnInit {
     private ssmService: AppSsmService,
     private windowService: WindowService,
     private electronService: AppNativeService,
+    private messageToasterService: MessageToasterService,
     private appProviderService: AppProviderService,
-    private awsAuthenticationService: AppAwsAuthenticationService
+    private awsAuthenticationService: AppAwsAuthenticationService,
+    public optionService: OptionsService
   ) {
-    this.logService = appProviderService.logService;
+    this.loggingService = appProviderService.logService;
     this.sessionFactory = appProviderService.sessionFactory;
     this.fileService = appProviderService.fileService;
     this.keychainService = appProviderService.keyChainService;
-    this.workspaceService = appProviderService.workspaceService;
-    this.repository = appProviderService.repository;
+    this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.awsCoreService = appProviderService.awsCoreService;
     this.azureCoreService = appProviderService.azureCoreService;
   }
@@ -131,7 +132,7 @@ export class SessionCardComponent implements OnInit {
     const azureLocations = this.azureCoreService.getLocations();
 
     // Get profiles
-    this.profiles = this.repository.getProfiles().map((p) => ({ label: p.name, value: p.id }));
+    this.profiles = this.appProviderService.namedProfileService.getNamedProfiles().map((p) => ({ label: p.name, value: p.id }));
 
     // Array and labels for regions and locations
     this.regionOrLocations = this.session.type !== SessionType.azure ? this.awsRegions : azureLocations;
@@ -237,8 +238,7 @@ export class SessionCardComponent implements OnInit {
     this.trigger.closeMenu();
 
     try {
-      const workspace = this.repository.getWorkspace();
-      if (workspace) {
+      if (this.appProviderService.workspaceService.workspaceExists()) {
         const texts = {
           // eslint-disable-next-line max-len
           1: (session as AwsIamRoleFederatedSession).roleArn
@@ -256,10 +256,11 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-        this.logService.log(new LoggedEntry("Your information have been successfully copied!", this, LogLevel.success, true));
+        this.messageToasterService.toast("Your information have been successfully copied!", ToastLevel.success, "Information copied!");
       }
     } catch (err) {
-      this.logService.log(new LoggedEntry(err.message, this, LogLevel.warn, true, err.stack));
+      this.messageToasterService.toast(err, ToastLevel.warn);
+      this.loggingService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));
     }
   }
 
@@ -328,7 +329,7 @@ export class SessionCardComponent implements OnInit {
         this.instances = await this.ssmService.getSsmInstances(credentials, this.selectedSsmRegion);
         this.duplicateInstances = this.instances;
       } catch (err) {
-        throw new LoggedException(err.message, this, LogLevel.error, true, err.stack);
+        throw new LeappBaseError("SSM Error", this, LogLevel.error, err.message);
       } finally {
         this.ssmLoading = false;
         this.firstTimeSsm = false;
@@ -349,14 +350,14 @@ export class SessionCardComponent implements OnInit {
         wasActive = true;
       }
 
-      const sessions: Session[] = this.repository.getSessions();
+      const sessions: Session[] = this.appProviderService.sessionManagementService.getSessions();
       for (let i = 0; i < sessions.length; i++) {
         if (sessions[i].sessionId === this.session.sessionId) {
           sessions[i].region = this.selectedDefaultRegion;
         }
       }
-      this.repository.updateSessions(sessions);
-      this.workspaceService.updateSession(this.session.sessionId, this.session);
+      this.appProviderService.sessionManagementService.updateSessions(sessions);
+      this.behaviouralSubjectService.setSessions(this.appProviderService.sessionManagementService.getSessions());
 
       this.session.region = this.selectedDefaultRegion;
 
@@ -364,7 +365,7 @@ export class SessionCardComponent implements OnInit {
         this.startSession();
       }
 
-      this.logService.log(new LoggedEntry("Default region has been changed!", this, LogLevel.success, true));
+      this.messageToasterService.toast("Default region has been changed!", ToastLevel.success, "Region changed!");
       this.modalRef.hide();
     }
   }
@@ -422,7 +423,7 @@ export class SessionCardComponent implements OnInit {
   getProfileName(profileId: string): string {
     let profileName = constants.defaultAwsProfileName;
     try {
-      profileName = this.repository.getProfileName(profileId);
+      profileName = this.appProviderService.namedProfileService.getProfileName(profileId);
     } catch (e) {}
     return profileName;
   }
@@ -430,14 +431,14 @@ export class SessionCardComponent implements OnInit {
   async changeProfile(): Promise<void> {
     if (this.selectedProfile) {
       try {
-        this.repository.getProfileName(this.selectedProfile.value);
+        this.appProviderService.namedProfileService.getProfileName(this.selectedProfile.value);
       } catch (e) {
         this.selectedProfile.value = this.appProviderService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
       }
 
       this.appProviderService.namedProfileService.changeNamedProfile(this.session, this.selectedProfile.value);
 
-      this.logService.log(new LoggedEntry("Profile has been changed!", this, LogLevel.success, true));
+      this.messageToasterService.toast("Profile has been changed!", ToastLevel.success, "Profile changed!");
       this.modalRef.hide();
     }
   }
@@ -445,7 +446,7 @@ export class SessionCardComponent implements OnInit {
   changeProfileModalOpen(event: Event): void {
     event.preventDefault();
     event.stopPropagation();
-    this.profiles = this.repository.getProfiles().map((el) => ({ value: el.id, label: el.name }));
+    this.profiles = this.appProviderService.namedProfileService.getNamedProfiles().map((el) => ({ value: el.id, label: el.name }));
     this.trigger.closeMenu();
     this.selectedProfile = null;
     this.modalRef = this.modalService.show(this.defaultProfileModalTemplate, { class: "ssm-modal" });
@@ -491,7 +492,7 @@ export class SessionCardComponent implements OnInit {
 
   copyProfile(profileName: string): void {
     this.appService.copyToClipboard(profileName);
-    this.logService.log(new LoggedEntry("Profile name copied!", this, LogLevel.success, true));
+    this.messageToasterService.toast("Profile name copied!", ToastLevel.success, "Information copied!");
     this.trigger.closeMenu();
   }
 
@@ -513,14 +514,14 @@ export class SessionCardComponent implements OnInit {
   pinSession(session: Session, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.repository.pinSession(session);
+    this.optionService.pinSession(session);
     this.trigger.closeMenu();
   }
 
   unpinSession(session: Session, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
-    this.repository.unpinSession(session);
+    this.optionService.unpinSession(session);
     this.trigger.closeMenu();
   }
 
@@ -571,22 +572,13 @@ export class SessionCardComponent implements OnInit {
   }
 
   private logSessionData(session: Session, message: string): void {
-    this.logService.log(
+    this.loggingService.log(
       new LoggedEntry(
         message,
         this,
         LogLevel.info,
         false,
-        JSON.stringify(
-          {
-            timestamp: new Date().toISOString(),
-            id: session.sessionId,
-            account: session.sessionName,
-            type: session.type,
-          },
-          null,
-          3
-        )
+        JSON.stringify({ timestamp: new Date().toISOString(), id: session.sessionId, account: session.sessionName, type: session.type }, null, 3)
       )
     );
   }
@@ -594,7 +586,7 @@ export class SessionCardComponent implements OnInit {
   private generateDeleteDialogMessage(session: Session): string {
     let iamRoleChainedSessions = [];
     if (session.type !== SessionType.azure) {
-      iamRoleChainedSessions = this.repository.listIamRoleChained(session);
+      iamRoleChainedSessions = this.appProviderService.sessionManagementService.getIamRoleChained(session);
     }
 
     let iamRoleChainedSessionString = "";

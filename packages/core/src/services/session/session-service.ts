@@ -1,11 +1,11 @@
 import { Session } from "../../models/session";
 import { SessionStatus } from "../../models/session-status";
 import { Repository } from "../repository";
-import { ISessionNotifier } from "../../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../../interfaces/i-behavioural-notifier";
 import { CreateSessionRequest } from "./create-session-request";
 
 export abstract class SessionService {
-  protected constructor(protected sessionNotifier: ISessionNotifier, protected repository: Repository) {}
+  protected constructor(protected sessionNotifier: IBehaviouralNotifier, protected repository: Repository) {}
 
   sessionDeactivated(sessionId: string): void {
     const sessions = this.repository.getSessions();

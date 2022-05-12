@@ -1,10 +1,10 @@
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-1">
   <div class="session-name-td">
-    <img class="provider-icon" src="assets/images/{{getSessionTypeIcon(session.type)}}{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="" title="" />
+    <img class="provider-icon" src="assets/images/{{getSessionTypeIcon(session.type)}}{{optionService.colorTheme === eConstants.darkTheme || (optionService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="" title="" />
     &nbsp;
     <i class="moon-Hover-{{session.status !== eSessionStatus.active && session.status !== eSessionStatus.pending ? 'Start' : 'Stop'}} moon-hover-session hover-item {{session.type === eSessionType.azure ? 'hover-azure' : ''}}" (click)="session.status === eSessionStatus.active || session.status === eSessionStatus.pending ? stopSession() : startSession()"></i>
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session.sessionName}}</span>
-    <i class="moon-Pin" *ngIf="repository.getWorkspace().pinned.indexOf(session.sessionId) !== -1"></i>
+    <i class="moon-Pin" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1"></i>
   </div>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-2" *ngIf="globalColumns.role">
@@ -44,7 +44,7 @@
   </button>
 
   <button mat-menu-item (click)="stopSession();" *ngIf="session.status === eSessionStatus.active || session.status === eSessionStatus.pending">
-    <img class="moon-stop-outline" src="assets/images/stop-circle-light{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="stop-circle">
+    <img class="moon-stop-outline" src="assets/images/stop-circle-light{{optionService.colorTheme === eConstants.darkTheme || (optionService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="stop-circle">
     <span style="margin-left: 7px;">Stop Session</span>
   </button>
 
@@ -97,24 +97,26 @@
     <span>Edit Session</span>
   </button>
 
-  <ng-container *ngIf="repository.getWorkspace().pinned.indexOf(session.sessionId) === -1">
+  <ng-container *ngIf="optionService.pinned.indexOf(session.sessionId) === -1">
     <button mat-menu-item (click)="pinSession(session, $event);">
       <i class="moon-Pin"></i>&nbsp;
       <span>Pin Session</span>
     </button>
   </ng-container>
 
-  <ng-container *ngIf="repository.getWorkspace().pinned.indexOf(session.sessionId) !== -1">
+  <ng-container *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1">
     <button mat-menu-item (click)="unpinSession(session, $event);">
       <i class="moon-Pin"></i>&nbsp;
       <span>Unpin Session</span>
     </button>
   </ng-container>
 
-  <button mat-menu-item (click)="deleteSession(session, $event);">
-    <i class="moon-Delete"></i>&nbsp;
-    <span>Delete Session</span>
-  </button>
+  <ng-container *ngIf="session.type !== eSessionType.awsSsoRole">
+    <button mat-menu-item (click)="deleteSession(session, $event);">
+      <i class="moon-Delete"></i>&nbsp;
+      <span>Delete Session</span>
+    </button>
+  </ng-container>
 
 </mat-menu>
 
@@ -162,9 +164,11 @@
       <span class="separator"></span>
 
       <div class="opt-bar-middle-right-buttons">
-        <a class="icon-button" (click)="pinSession(session, $event);" *ngIf="this.repository.getWorkspace().pinned.indexOf(session.sessionId) === -1" matTooltip="Pin Session"><i class="moon-Pin"></i></a>
-        <a class="icon-button" (click)="unpinSession(session, $event);" *ngIf="this.repository.getWorkspace().pinned.indexOf(session.sessionId) !== -1" matTooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
+        <a class="icon-button" (click)="pinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) === -1" matTooltip="Pin Session"><i class="moon-Pin"></i></a>
+        <a class="icon-button" (click)="unpinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1" matTooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
+        <ng-container *ngIf="session.type !== eSessionType.awsSsoRole">
         <a class="icon-button" (click)="deleteSession(session, $event);" matTooltip="Delete Session"><i class="moon-Delete"></i></a>
+        </ng-container>
       </div>
     </div>
 

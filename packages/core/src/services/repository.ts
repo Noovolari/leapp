@@ -375,25 +375,6 @@ export class Repository {
     this.persistWorkspace(workspace);
   }
 
-  // PINS
-
-  pinSession(session: Session): void {
-    const workspace = this.getWorkspace();
-    if (workspace.pinned.indexOf(session.sessionId) === -1) {
-      workspace.pinned.push(session.sessionId);
-      this.persistWorkspace(workspace);
-    }
-  }
-
-  unpinSession(session: Session): void {
-    const workspace = this.getWorkspace();
-    const index = workspace.pinned.indexOf(session.sessionId);
-    if (index > -1) {
-      workspace.pinned.splice(index, 1);
-      this.persistWorkspace(workspace);
-    }
-  }
-
   // MACOS TERMINAL
 
   updateMacOsTerminal(macOsTerminal: string): void {

@@ -1,6 +1,6 @@
 import * as Aws from "aws-sdk";
 import { IAwsSamlAuthenticationService } from "../../../interfaces/i-aws-saml-authentication-service";
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsIamRoleFederatedSession } from "../../../models/aws-iam-role-federated-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
@@ -16,7 +16,7 @@ import { LoggedException, LogLevel } from "../../log-service";
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
-    iSessionNotifier: ISessionNotifier,
+    iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
     fileService: FileService,
     awsCoreService: AwsCoreService,
@@ -50,7 +50,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     );
 
     this.repository.addSession(session);
-    this.sessionNotifier?.addSession(session);
+    this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {

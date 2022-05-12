@@ -36,9 +36,9 @@
       </div>
 
       <div class="window-buttons">
-        <span class="minimize" (click)="electronService.currentWindow.minimize()"><img src="assets/images/windows_minimize{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
+        <span class="minimize" (click)="electronService.currentWindow.minimize()"><img src="assets/images/windows_minimize{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
         <span class="maximize {{compactMode ? 'disabled' : ''}}" (click)="windowMaximizeAction();"><img src="assets/images/windows_maximize{{windowButtonDetectTheme()}}.png" alt="" title=""></span>
-        <span class="quit" (click)="electronService.currentWindow.hide()"><img src="assets/images/windows_close{{repository.getColorTheme() === eConstants.darkTheme || (repository.getColorTheme() === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
+        <span class="quit" (click)="electronService.currentWindow.hide()"><img src="assets/images/windows_close{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
       </div>
     </div>
 

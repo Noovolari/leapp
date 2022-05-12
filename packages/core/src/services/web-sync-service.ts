@@ -4,14 +4,14 @@ import { SessionType } from "../models/session-type";
 import { CreateSessionRequest } from "./session/create-session-request";
 import { NamedProfilesService } from "./named-profiles-service";
 import { IamUserSessionFieldsDto } from "../models/web-dto/iam-user-session-fields-dto";
-import { Repository } from "./repository";
 import { LoggedException, LogLevel } from "./log-service";
+import { SessionManagementService } from "./session-management-service";
 
 export class WebSyncService {
   constructor(
     private readonly sessionFactory: SessionFactory,
     private readonly namedProfilesService: NamedProfilesService,
-    private readonly repository: Repository
+    private readonly sessionManagementService: SessionManagementService
   ) {}
 
   async getSessionRequest(createSessionDto: CreateSessionDto): Promise<CreateSessionRequest> {
@@ -31,7 +31,7 @@ export class WebSyncService {
 
   async createSession(createSessionDto: CreateSessionDto): Promise<void> {
     const sessionService = await this.sessionFactory.getSessionService(createSessionDto.sessionType);
-    if (this.repository.getSessionById(createSessionDto.sessionFields.sessionId)) {
+    if (this.sessionManagementService.getSessionById(createSessionDto.sessionFields.sessionId)) {
       throw new LoggedException(`Session "${createSessionDto.sessionFields.sessionName}" already exists`, this, LogLevel.error, true);
     }
     await sessionService.create(await this.getSessionRequest(createSessionDto));

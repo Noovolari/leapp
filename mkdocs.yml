@@ -32,13 +32,15 @@ nav:
           - 'Configure Azure Tenant': 'configuring-session/configure-azure-tenant.md'
       - 'Configuring an Integration':
           - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
+      - 'Editing a session': 'edit-session.md'
   - Security:
       - 'Intro': 'security/intro.md'
-      - 'Credentials generation':
+      - 'Credentials Generation':
           - AWS: 'security/credentials-generation/aws.md'
           - Azure: 'security/credentials-generation/azure.md'
       - 'System Vault': 'security/system-vault.md'
       - 'Zero Knowledge':  'security/zero-knowledge.md'
+      - 'Credential Process': 'security/credential-process.md'
   - 'Built-in features':
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
       - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'

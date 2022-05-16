@@ -15,11 +15,44 @@ env:
   S3_BUCKET: s3://noovolari-leapp-website-distribution
   WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-  TAG_VERSION: test
 
 jobs:
+  tag-validation:
+    outputs:
+      validator: ${{ steps.validator.outputs.VALID_TAG }}
+      tag-version: ${{ steps.validator.outputs.TAG_VERSION }}
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          ref: master
+
+      - name: Check Tag Validity
+        id: validator
+        run: |
+          git fetch
+          LOG=$(git log --format="%H" -n 1)
+          TAG=$(git tag --contains $LOG)
+          REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
+          if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
+          echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
+          echo "::set-output name=TAG_VERSION::$TAG"
+
+      - name: If valid tag set
+        if: steps.validator.outputs.VALID_TAG == 1
+        run: |
+          echo "Valid Tag Found - Building Desktop App..."
+
+      - name: If not valid tag set
+        if: steps.validator.outputs.VALID_TAG != 1
+        run: |
+          echo "Not a Desktop App Release Tag or Invalid one Found - Exiting..."
   build-win:
     runs-on: macos-latest
+    needs: [ tag-validation ]
+    if: needs.tag-validation.outputs.validator == 1
     steps:
       - uses: actions/checkout@v3
 
@@ -35,6 +68,8 @@ jobs:
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
           rm "./release/Leapp-$TAG_VERSION-win.zip"
           zip "./release/Leapp-$TAG_VERSION-win.zip" "./release/Leapp Setup $TAG_VERSION.exe"
 
@@ -48,5 +83,229 @@ jobs:
       - name: Release draft to S3
         run: |
           cd packages/desktop-app
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+  build-linux:
+    runs-on: ubuntu-latest
+    needs: [ tag-validation ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build Linux desktop app
+        run: |
+          cd packages/desktop-app
+          npm install
+          npm run release-linux
+          rm -Rf ./release/linux-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Release draft to S3
+        run: |
+          cd packages/desktop-app
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+  build-macos-x64:
+    runs-on: macos-latest
+    needs: [ tag-validation ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build macOS desktop app
+        env:
+          APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
+        run: |
+          cd packages/desktop-app
+          KEY_CHAIN=build.keychain
+          CERTIFICATE_P12=certificate.p12
+          CERTIFICATE_APPLICATION_P12=certificate-application.p12
+          echo "Recreate the certificate from the secure environment variable"
+          echo "security create-keychain"
+          echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
+          echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
+          security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+          echo "security list-keychains"
+          security list-keychains -s login.keychain build.keychain
+          echo "security default-keychain"
+          security default-keychain -s $KEY_CHAIN
+          echo "security unlock-keychain"
+          security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+          echo "security import"
+          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+          security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+          echo "security find-identity"
+          security find-identity -v
+          echo "security set-key-partition-list"
+          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+          rm -fr *.p12
+          npm install
+          npm run set-target-x64
+          npm run release-mac
+          rm -Rf ./release/mac
+          rm -Rf ./release/mac-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          rm "./release/Leapp-$TAG_VERSION-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-mac.zip.blockmap"
+          zip "./release/Leapp-$TAG_VERSION-mac.zip" "./release/Leapp-$TAG_VERSION.dmg"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Release draft to S3
+        run: |
+          cd packages/desktop-app
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+  build-macos-arm:
+    runs-on: macos-latest
+    needs: [ tag-validation, build-macos-x64 ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build macOS desktop app
+        env:
+          APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
+        run: |
+          cd packages/desktop-app
+          KEY_CHAIN=build.keychain
+          CERTIFICATE_P12=certificate.p12
+          CERTIFICATE_APPLICATION_P12=certificate-application.p12
+          echo "Recreate the certificate from the secure environment variable"
+          echo "security create-keychain"
+          echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
+          echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
+          security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+          echo "security list-keychains"
+          security list-keychains -s login.keychain build.keychain
+          echo "security default-keychain"
+          security default-keychain -s $KEY_CHAIN
+          echo "security unlock-keychain"
+          security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+          echo "security import"
+          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+          security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+          echo "security find-identity"
+          security find-identity -v
+          echo "security set-key-partition-list"
+          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+          rm -fr *.p12
+          npm install
+          npm run set-target-arm64
+          npm run release-mac
+          rm -Rf ./release/mac
+          rm -Rf ./release/mac-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+          rm -Rf ./release/mac-arm64
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
+          zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.dmg"
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Release draft to S3
+        run: |
+          cd packages/desktop-app
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+  publish-draft:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [ tag-validation, build-linux, build-win, build-macos-arm, build-macos-x64 ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Move draft to latest
+        run: |
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
+          aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
+  publish-changelog:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [ publish-draft ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Publish changelog
+        run: |
+          aws s3 cp CHANGELOG.md "${{ env.S3_BUCKET }}/"
+  invalidate-distribution:
+    runs-on: ubuntu-latest
+    environment: prod
+    needs: [ publish-changelog ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+
+      - name: Invalidate distribution
+        run: |
+          aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths "/*"
+  publish-github-release:
+    runs-on: ubuntu-latest
+    needs: [ invalidate-distribution, tag-validation ]
+    if: needs.tag-validation.outputs.validator == 1
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Create GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          body: "Full changelog & Downloads ⇒ https://www.leapp.cloud/releases"
+          tag: ${{ needs.tag-validation.outputs.tag-version }}
 

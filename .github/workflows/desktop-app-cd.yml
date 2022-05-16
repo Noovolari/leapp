@@ -25,6 +25,7 @@ jobs:
 
       - name: Build Win desktop app
         run: |
+          npm run setup
           cd packages/desktop-app
           WIN_CERTIFICATE=windows_sign_certificate.pfx
           echo "Recreate the window certificate from the secure environment variable"

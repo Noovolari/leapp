@@ -1,8 +1,8 @@
-With the latest release, Leapp comes with the **ability for the user to edit an existing session** (excluding those generated from an AWS integration).
+With the latest release, Leapp allows the user to **edit an existing session** (excluding those generated from an AWS integration).
 
 To edit an existing session just *right-click on a session* in the Leapp list (see below), and select "edit session".
 
-A new modal will be up letting the user choose which parameters to change.
+A new modal will appear, allowing the user to choose which parameters to change.
 
 ![edit session](../../images/editsession.png)
 
@@ -42,8 +42,9 @@ Below are the configuration options for every type of session:
 - Tenant ID
 - Location
 
-After modifying all the parameters, an option to test if they are valid is *test credential generation*:
+After modifying all the parameters, a user can test their validity with *test credential generation*:
 
 ![](../../images/testconnection.png)
 
-Clicking this link allow Leapp to do a dry run on your parameters, if valid a new set of credentials will be generated (but not used) and a successfull toast will appear.
+Clicking this button allows Leapp to do a dry run on your parameters, and if valid, a new set of credentials 
+will be generated (but not used) and an informative toast will appear to tell you that they can be used successfully.

@@ -36,11 +36,12 @@ nav:
   - Security:
       - 'Intro': 'security/intro.md'
       - 'Credentials Generation':
-          - AWS: 'security/credentials-generation/aws.md'
+          - AWS:
+            - 'Credential file': 'security/credentials-generation/aws.md'
+            - 'Credential Process': 'security/credential-process.md'
           - Azure: 'security/credentials-generation/azure.md'
       - 'System Vault': 'security/system-vault.md'
       - 'Zero Knowledge':  'security/zero-knowledge.md'
-      - 'Credential Process': 'security/credential-process.md'
   - 'Built-in features':
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
       - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'

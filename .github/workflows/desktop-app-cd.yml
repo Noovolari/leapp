@@ -25,6 +25,7 @@ jobs:
 
       - name: Build Win desktop app
         run: |
+          npm update
           npm install
           npm run setup
           cd packages/desktop-app

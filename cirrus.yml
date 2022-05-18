@@ -1,0 +1,17 @@
+macos_instance:
+  image: ghcr.io/cirruslabs/macos-monterey-base:latest
+
+task:
+  name: brew
+  script:
+    - echo "Hello World from macOS M1..."
+    - echo "Installing brew..."
+    - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    - echo "Installing node and node modules..."
+    - brew install node
+    - npm install
+    - echo "Try brew formula..."
+    - brew tap marcovanetti/homebrew-brew
+    - leapp --version
+
+

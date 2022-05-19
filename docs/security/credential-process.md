@@ -11,7 +11,7 @@ for example, you can configure the AWS CLI to use it by configuring the credenti
 The difference between Credential Process and Standard Credential file is that **credentials in the "credential file" are written in plain text** and so, 
 they are potentially unsecure, even if temporary. Credential process instead, generates **credentials that are consumed only when they are effectively needed**. 
 
-> No credential is written in any file. They are *printed* on the stdout when requested.
+> No credential is written in any file. They are *printed* on the stdout and consumed upon request.
 
 ### How Credential Process works?
 

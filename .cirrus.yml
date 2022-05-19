@@ -10,7 +10,7 @@ task:
     - echo "Installing node and node modules..."
     - brew install node
     - npm install
-    - echo "Try brew formula..."
+    - echo "Try brew formula....."
     - brew tap ericvilla/brew
     - brew install ericvilla/brew/leapp-cli
     - leapp --version

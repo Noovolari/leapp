@@ -24,7 +24,9 @@ export class LogService {
 
   log(loggedEntry: LoggedEntry): void {
     const contextPart = loggedEntry.context ? [`[${loggedEntry.context.constructor["name"]}]`] : [];
-    this.logger.log([...contextPart, loggedEntry.customStack ?? loggedEntry.stack].join(" "), loggedEntry.level);
+    if (loggedEntry.level === LogLevel.error)
+      this.logger.log([...contextPart, loggedEntry.customStack ?? loggedEntry.stack].join(" "), loggedEntry.level);
+    else this.logger.log(loggedEntry.message, loggedEntry.level);
     if (loggedEntry.display) {
       this.logger.show(loggedEntry.message, loggedEntry.level);
     }

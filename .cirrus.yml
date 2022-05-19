@@ -11,8 +11,8 @@ task:
     - brew install node
     - npm install
     - echo "Try brew formula..."
-    - brew tap marcovanetti/brew
-    - brew install marcovanetti/brew/leapp-cli
+    - brew tap ericvilla/brew
+    - brew install ericvilla/brew/leapp-cli
     - leapp --version
     - leapp session list
 

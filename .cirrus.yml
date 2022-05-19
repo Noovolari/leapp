@@ -14,7 +14,7 @@ task:
     - brew tap ericvilla/brew
     - brew install ericvilla/brew/leapp-cli
     - leapp --version
-    - leapp session add --providerType aws --sessionType awsIamUser --sessionName testSession --region eu-west-1 --profileId default --accessKey testAccessKey --secretKey testSecretKey
+    - leapp session add --providerType aws --sessionType awsIamUser --sessionName testSession --region eu-west-1 --accessKey testAccessKey --secretKey testSecretKey
     - leapp session list
 
 

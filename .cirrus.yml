@@ -14,5 +14,6 @@ task:
     - brew tap marcovanetti/brew
     - brew install marcovanetti/brew/leapp-cli
     - leapp --version
+    - leapp session list
 
 

@@ -259,7 +259,7 @@ export class CliProviderService {
   get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
-        this.awsSsoRoleService, this.keyChainService, this.behaviouralSubjectService, this.cliNativeService, this.sessionFactory);
+        this.awsSsoRoleService, this.keyChainService, this.behaviouralSubjectService, this.cliNativeService, this.sessionFactory, this.behaviouralSubjectService);
     }
     return this.awsSsoIntegrationServiceInstance;
   }

@@ -20,6 +20,7 @@ import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
 import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
 import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
 import { SessionFactory } from "./session-factory";
+import { BehaviouralSubjectService } from "./behavioural-subject-service";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -45,7 +46,8 @@ export class AwsSsoIntegrationService {
     private keyChainService: KeychainService,
     private sessionNotifier: IBehaviouralNotifier,
     private nativeService: INativeService,
-    private sessionFactory: SessionFactory
+    private sessionFactory: SessionFactory,
+    private behaviouralSubjectService: BehaviouralSubjectService
   ) {}
 
   static validateAlias(alias: string): boolean | string {
@@ -218,6 +220,7 @@ export class AwsSsoIntegrationService {
   async deleteIntegration(integrationId: string): Promise<void> {
     await this.logout(integrationId);
     this.repository.deleteAwsSsoIntegration(integrationId);
+    this.deleteDependentSessions(integrationId);
   }
 
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
@@ -387,6 +390,14 @@ export class AwsSsoIntegrationService {
     }
 
     return undefined;
+  }
+
+  private deleteDependentSessions(configurationId: string) {
+    const ssoSessions = this.repository.getSessions().filter((session) => (session as any).awsSsoConfigurationId === configurationId);
+    for (const session of ssoSessions) {
+      this.repository.deleteSession(session.sessionId);
+    }
+    this.behaviouralSubjectService.setSessions([...this.repository.getSessions()]);
   }
 
   private getProtocol(aliasedUrl: string): string {

@@ -50,7 +50,7 @@ describe("AwsSsoIntegrationService", () => {
       listAwsSsoIntegrations: () => expectedIntegrations,
     } as any;
 
-    const awsIntegrationsService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null, null);
 
     const integrations = awsIntegrationsService.getIntegrations();
 
@@ -59,7 +59,7 @@ describe("AwsSsoIntegrationService", () => {
 
   test("getOnlineIntegrations", () => {
     const expectedIntegrations = [{ id: 1 }];
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
     awsIntegrationsService.getIntegrations = () => expectedIntegrations as any;
     awsIntegrationsService.isOnline = jest.fn(() => true);
 
@@ -72,7 +72,7 @@ describe("AwsSsoIntegrationService", () => {
 
   test("getOfflineIntegrations", () => {
     const expectedIntegrations = [{ id: 1 }];
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
     awsIntegrationsService.getIntegrations = () => expectedIntegrations as any;
     awsIntegrationsService.isOnline = jest.fn(() => false);
 
@@ -84,7 +84,7 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("isOnline, token missing", () => {
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
     (awsIntegrationsService as any).getDate = () => new Date("2022-02-24T10:00:00");
 
     const isOnline = awsIntegrationsService.isOnline({} as any);
@@ -92,7 +92,7 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("isOnline, token expired", () => {
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
     (awsIntegrationsService as any).getDate = () => new Date("2022-02-24T10:00:00");
 
     const integration = {
@@ -104,7 +104,7 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("isOnline, token not expired", () => {
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
     (awsIntegrationsService as any).getDate = () => new Date("2022-02-24T10:00:00");
 
     const integration = {
@@ -116,7 +116,7 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("remainingHours", () => {
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
     const integration = {
       accessTokenExpiration: "2022-02-24T10:30:00",
     } as any;
@@ -182,7 +182,7 @@ describe("AwsSsoIntegrationService", () => {
     const sessions = caseSessions;
     const getSessions = jest.fn(async () => sessions);
 
-    const awsSsoIntegrationService = new AwsSsoIntegrationService(repository as any, null, null, null, null, null, null);
+    const awsSsoIntegrationService = new AwsSsoIntegrationService(repository as any, null, null, null, null, null, null, null);
     (awsSsoIntegrationService as any).getAccessToken = getAccessToken;
     (awsSsoIntegrationService as any).getSessions = getSessions;
 
@@ -221,7 +221,16 @@ describe("AwsSsoIntegrationService", () => {
     const sessionFactory = {
       getSessionService: jest.fn(() => sessionService),
     };
-    const awsSsoIntegrationService = new AwsSsoIntegrationService(null, null, awsSsoRoleService as any, null, null, null, sessionFactory as any);
+    const awsSsoIntegrationService = new AwsSsoIntegrationService(
+      null,
+      null,
+      awsSsoRoleService as any,
+      null,
+      null,
+      null,
+      sessionFactory as any,
+      null
+    );
     (awsSsoIntegrationService as any).loginAndGetSessionsDiff = loginAndGetSessionsDiff;
 
     const syncedSessions = await awsSsoIntegrationService.syncSessions(integrationId);
@@ -236,7 +245,7 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("getDate", () => {
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
     const time: Date = (awsIntegrationService as any).getDate();
 
     expect(time).toBeInstanceOf(Date);
@@ -244,7 +253,7 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("getIntegrationAccessTokenKey", () => {
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
     const integrationId = "integration1";
 
     const actualIntegrationAccessTokenKey = (awsIntegrationService as any).getIntegrationAccessTokenKey(integrationId);
@@ -257,7 +266,7 @@ describe("AwsSsoIntegrationService", () => {
       addAwsSsoIntegration: jest.fn(),
     } as any;
 
-    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null, null);
 
     const creationParams = {
       alias: "alias",
@@ -271,11 +280,19 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("deleteIntegration", async () => {
+    const expectedSessions = [];
+
     const repository = {
       deleteAwsSsoIntegration: jest.fn(),
+      getSessions: () => expectedSessions,
+      deleteSessions: jest.fn(),
     } as any;
 
-    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
+    const behaviouralSubjectService = {
+      setSessions: jest.fn(),
+    } as any;
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null, behaviouralSubjectService);
     awsIntegrationService.logout = jest.fn();
 
     const integrationId = "integrationId";

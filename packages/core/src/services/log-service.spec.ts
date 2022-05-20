@@ -16,12 +16,12 @@ describe("LogService", () => {
       },
     };
     const logService = new LogService(nativeLogger);
-    logService.log(new LoggedEntry("message1", "context1", LogLevel.info));
-    logService.log(new LoggedEntry("message2", 12, LogLevel.warn, true, "stack2"));
-    logService.log(new LoggedException("message3", new Date(), LogLevel.error, undefined, "stack3"));
+    logService.log(new LoggedEntry("[String] Error: message1\\n    at Object.", "context1", LogLevel.info));
+    logService.log(new LoggedEntry("[Number] stack2", 12, LogLevel.warn, true, "stack2"));
+    logService.log(new LoggedException("[Date] stack3", new Date(), LogLevel.error, undefined, "stack3"));
 
     expect(logMessages[0].level).toBe(LogLevel.info);
-    expect(logMessages[0].message.startsWith("[String] Error: message1\n    at Object.")).toBe(true);
+    expect(logMessages[0].message.startsWith("[String] Error")).toBe(true);
 
     expect(logMessages[1].level).toBe(LogLevel.warn);
     expect(logMessages[1].message).toBe("[Number] stack2");
@@ -30,8 +30,8 @@ describe("LogService", () => {
     expect(logMessages[2].message).toBe("[Date] stack3");
 
     expect(toasts).toEqual([
-      { level: 2, message: "message2" },
-      { level: 3, message: "message3" },
+      { level: 2, message: "[Number] stack2" },
+      { level: 3, message: "[Date] stack3" },
     ]);
   });
 });

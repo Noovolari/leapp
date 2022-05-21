@@ -28,6 +28,7 @@ export interface IntegrationCreationParams {
   portalUrl: string;
   region: string;
   browserOpening: string;
+  integrationId?: string;
 }
 
 export interface SsoSessionsDiff {
@@ -57,7 +58,13 @@ export class AwsSsoIntegrationService {
   }
 
   createIntegration(creationParams: IntegrationCreationParams): void {
-    this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
+    this.repository.addAwsSsoIntegration(
+      creationParams.portalUrl,
+      creationParams.alias,
+      creationParams.region,
+      creationParams.browserOpening,
+      creationParams.integrationId
+    );
   }
 
   updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void {

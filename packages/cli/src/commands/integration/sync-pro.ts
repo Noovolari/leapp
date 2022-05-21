@@ -14,10 +14,12 @@ export default class SyncProIntegration extends LeappCommand {
     try {
       const email = await this.getEmail();
       const password = await this.getPassword();
-      const sessionDtos = await this.cliProviderService.webSyncService.syncSessions(email, password);
-      this.log(`${sessionDtos.length} sessions synchronized.`);
+      const secretDtos = await this.cliProviderService.webSyncService.syncSecrets(email, password);
+      this.log(`${secretDtos.length} elements synchronized.`);
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
+    } finally {
+      await this.cliProviderService.remoteProceduresClient.refreshSessions();
     }
   }
 

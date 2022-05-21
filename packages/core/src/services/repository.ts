@@ -271,10 +271,10 @@ export class Repository {
     return this.workspace.sessions.filter((sess) => (sess as any).awsSsoConfigurationId === id);
   }
 
-  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string): void {
+  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string, integrationId?: string): void {
     const workspace = this.getWorkspace();
     workspace.awsSsoIntegrations.push({
-      id: uuid.v4(),
+      id: integrationId ?? uuid.v4(),
       alias,
       portalUrl,
       region,

@@ -1,9 +1,7 @@
-import { CreateSessionRequest } from "../create-session-request";
+import { CreateAwsSessionRequest } from "../create-aws-session-request";
 
-export interface AwsIamRoleChainedSessionRequest extends CreateSessionRequest {
-  region: string;
+export interface AwsIamRoleChainedSessionRequest extends CreateAwsSessionRequest {
   roleArn: string;
-  roleSessionName?: string;
   parentSessionId: string;
-  profileId: string;
+  roleSessionName?: string;
 }

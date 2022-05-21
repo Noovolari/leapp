@@ -354,7 +354,7 @@ export class CliProviderService {
 
   get webSyncService(): WebSyncService {
     if (!this.webSyncServiceInstance) {
-      this.webSyncServiceInstance = new WebSyncService(this.sessionFactory, this.namedProfilesService, this.sessionManagementService);
+      this.webSyncServiceInstance = new WebSyncService(this.sessionFactory, this.namedProfilesService, this.sessionManagementService, this.awsSsoIntegrationService);
     }
     return this.webSyncServiceInstance;
   }

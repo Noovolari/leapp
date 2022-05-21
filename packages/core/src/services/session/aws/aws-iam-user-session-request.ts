@@ -1,10 +1,8 @@
-import { CreateSessionRequest } from "../create-session-request";
+import { CreateAwsSessionRequest } from "../create-aws-session-request";
 
-export interface AwsIamUserSessionRequest extends CreateSessionRequest {
+export interface AwsIamUserSessionRequest extends CreateAwsSessionRequest {
   sessionId?: string;
   accessKey: string;
   secretKey: string;
-  region: string;
   mfaDevice?: string;
-  profileId: string;
 }

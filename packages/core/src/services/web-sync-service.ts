@@ -1,28 +1,36 @@
 import * as crypto from "crypto";
 import axios, { AxiosRequestConfig } from "axios";
 import { SessionFactory } from "./session-factory";
-import { CreateSessionDto } from "../models/web-dto/create-session-dto";
 import { SessionType } from "../models/session-type";
-import { CreateSessionRequest } from "./session/create-session-request";
 import { NamedProfilesService } from "./named-profiles-service";
-import { IamUserSessionFieldsDto } from "../models/web-dto/iam-user-session-fields-dto";
+import { LocalSecretDto } from "../models/web-dto/local-secret-dto";
+import { AwsIamUserLocalSessionDto } from "../models/web-dto/aws-iam-user-local-session-dto";
 import { SessionManagementService } from "./session-management-service";
 import { EncryptionProvider } from "../pro/encryption/encryption.provider";
-import { SessionProvider } from "../pro/session/session-provider";
+import { VaultProvider } from "../pro/vault/vault-provider";
 import { UserProvider } from "../pro/user/user.provider";
 import { HttpClientInterface } from "../pro/http/HttpClientInterface";
 import { User } from "../pro/user/user";
+import { SecretType } from "../models/web-dto/secret-type";
+import { AwsSsoLocalIntegrationDto } from "../models/web-dto/aws-sso-local-integration-dto";
+import { AwsSsoIntegrationService } from "./aws-sso-integration-service";
+import { AwsIamUserSession } from "../models/aws-iam-user-session";
+import { AwsIamRoleChainedLocalSessionDto } from "../models/web-dto/aws-iam-role-chained-local-session-dto";
+import { AwsSessionService } from "./session/aws/aws-session-service";
+import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-service";
+import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
 
 export class WebSyncService {
   private readonly encryptionProvider: EncryptionProvider;
-  private readonly sessionProvider: SessionProvider;
+  private readonly vaultProvider: VaultProvider;
   private readonly userProvider: UserProvider;
   private currentUser: User;
 
   constructor(
     private readonly sessionFactory: SessionFactory,
     private readonly namedProfilesService: NamedProfilesService,
-    private readonly sessionManagementService: SessionManagementService
+    private readonly sessionManagementService: SessionManagementService,
+    private readonly awsSsoIntegrationService: AwsSsoIntegrationService
   ) {
     const apiEndpoint = "http://localhost:3000";
     const httpClient: HttpClientInterface = {
@@ -31,47 +39,72 @@ export class WebSyncService {
       put: async <T>(url: string, body: any): Promise<T> => (await axios.put<T>(url, body, this.getHttpClientConfig())).data,
     };
     this.encryptionProvider = new EncryptionProvider((crypto as any).webcrypto);
-    this.sessionProvider = new SessionProvider(apiEndpoint, httpClient, this.encryptionProvider);
+    this.vaultProvider = new VaultProvider(apiEndpoint, httpClient, this.encryptionProvider);
     this.userProvider = new UserProvider(apiEndpoint, httpClient, this.encryptionProvider);
   }
 
-  async syncSessions(email: string, password: string): Promise<CreateSessionDto[]> {
+  async syncSecrets(email: string, password: string): Promise<LocalSecretDto[]> {
     this.currentUser = await this.userProvider.signIn(email, password);
     const rsaKeys = await this.getRSAKeys(this.currentUser);
-    const createSessionDtos = await this.sessionProvider.getSessions(rsaKeys.privateKey);
-    for (const createSessionDto of createSessionDtos) {
-      await this.syncSession(createSessionDto);
+    const createSessionDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
+    for (const localSecretDto of createSessionDtos) {
+      await this.syncSecret(localSecretDto);
     }
     return createSessionDtos;
   }
 
-  async syncSession(createSessionDto: CreateSessionDto): Promise<void> {
-    const sessionService = await this.sessionFactory.getSessionService(createSessionDto.sessionType);
-    if (this.sessionManagementService.getSessionById(createSessionDto.sessionFields.sessionId)) {
-      // TODO: In case the session already exists, the current local named profile should be kept and other session data updated
-      await sessionService.delete(createSessionDto.sessionFields.sessionId);
+  async syncSecret(localSecret: LocalSecretDto): Promise<void> {
+    if (localSecret.secretType === SecretType.awsSsoIntegration) {
+      const localIntegrationDto = localSecret as AwsSsoLocalIntegrationDto;
+      await this.awsSsoIntegrationService.createIntegration({
+        alias: localIntegrationDto.alias,
+        portalUrl: localIntegrationDto.portalUrl,
+        region: localIntegrationDto.region,
+        browserOpening: localIntegrationDto.browserOpening,
+        integrationId: localIntegrationDto.id,
+      });
+    } else if (localSecret.secretType === SecretType.awsIamUserSession) {
+      const localSessionDto = localSecret as AwsIamUserLocalSessionDto;
+      const sessionService = (await this.sessionFactory.getSessionService(SessionType.awsIamUser)) as AwsIamUserService;
+      const profileId = await this.setupAwsSession(sessionService, localSessionDto.sessionId, localSessionDto.profileName);
+      await sessionService.create({
+        sessionName: localSessionDto.sessionName,
+        accessKey: localSessionDto.accessKey,
+        secretKey: localSessionDto.secretKey,
+        region: localSessionDto.region,
+        mfaDevice: localSessionDto.mfaDevice,
+        profileId,
+        sessionId: localSessionDto.sessionId,
+      });
+    } else if (localSecret.secretType === SecretType.awsIamRoleChainedSession) {
+      const localSessionDto = localSecret as AwsIamRoleChainedLocalSessionDto;
+      const sessionService = (await this.sessionFactory.getSessionService(SessionType.awsIamRoleChained)) as AwsIamRoleChainedService;
+      const profileId = await this.setupAwsSession(sessionService, localSessionDto.sessionId, localSessionDto.profileName);
+      await sessionService.create({
+        sessionName: localSessionDto.sessionName,
+        region: localSessionDto.region,
+        roleArn: localSessionDto.roleArn,
+        profileId,
+        parentSessionId: localSessionDto.parentSessionId,
+        roleSessionName: localSessionDto.roleSessionName,
+        sessionId: localSessionDto.sessionId,
+      });
     }
-    await sessionService.create(await this.getSessionRequest(createSessionDto));
+  }
+
+  async setupAwsSession(sessionService: AwsSessionService, sessionId: string, profileName: string): Promise<string> {
+    const localSession = this.sessionManagementService.getSessionById(sessionId) as AwsIamUserSession;
+    if (localSession) {
+      await sessionService.delete(sessionId);
+      return localSession.profileId;
+    } else {
+      return this.namedProfilesService.mergeProfileName(profileName).id;
+    }
   }
 
   async getRSAKeys(user: User): Promise<CryptoKeyPair> {
     const rsaKeyJsonPair = { privateKey: user.privateRSAKey, publicKey: user.publicRSAKey };
     return await this.encryptionProvider.importRsaKeys(rsaKeyJsonPair);
-  }
-
-  async getSessionRequest(createSessionDto: CreateSessionDto): Promise<CreateSessionRequest> {
-    if (createSessionDto.sessionType === SessionType.awsIamUser) {
-      const sessionFields = createSessionDto.sessionFields as IamUserSessionFieldsDto;
-      const mergedProfile = this.namedProfilesService.mergeProfileName(sessionFields.profileName);
-      return {
-        sessionName: sessionFields.sessionName,
-        accessKey: sessionFields.accessKey,
-        secretKey: sessionFields.secretKey,
-        region: sessionFields.region,
-        mfaDevice: sessionFields.mfaDevice,
-        profileId: mergedProfile.id,
-      } as CreateSessionRequest;
-    }
   }
 
   getHttpClientConfig(): AxiosRequestConfig {

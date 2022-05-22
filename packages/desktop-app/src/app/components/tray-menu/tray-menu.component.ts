@@ -187,8 +187,11 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         label: "Leapp",
         submenu: [
           { label: "About", role: "about" },
+          { type: "separator" },
           { label: "Hide Leapp", accelerator: "CmdOrCtrl+H", role: "hide" },
           { label: "Hide Others", accelerator: "Alt+CmdOrCtrl+H", role: "hideOthers" },
+          { label: "Close Window", accelerator: "CmdOrCtrl+W", role: "close" },
+          { type: "separator" },
           { label: "Quit", role: "quit" },
         ],
       },

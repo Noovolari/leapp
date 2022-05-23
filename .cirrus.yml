@@ -8,7 +8,7 @@ task:
     - echo "Installing brew..."
     - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     - echo "Installing node and node modules..."
-    - brew install node
+    - brew install node@14
     - npm install
     - echo "Try brew formula..."
     - brew tap ericvilla/brew

@@ -9,6 +9,8 @@ task:
     - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     - echo "Installing node and node modules..."
     - echo 'export PATH="/opt/homebrew/opt/node@14/bin:$PATH"' >> ~/.zshrc
+    - export LDFLAGS="-L/opt/homebrew/opt/node@14/lib"
+    - export CPPFLAGS="-I/opt/homebrew/opt/node@14/include"
     - brew install node@14
     - npm install
     - echo "Try brew formula..."

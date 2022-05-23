@@ -114,6 +114,7 @@ export class RemoteProceduresServer {
         const workspace = this.repository.getWorkspace();
         workspace.awsSsoIntegrations = this.repository.listAwsSsoIntegrations();
         this.repository.persistWorkspace(workspace);
+        this.behaviouralSubjectService.setIntegrations(this.repository.listAwsSsoIntegrations());
       });
       emitFunction(socket, "message", {});
     } catch (error) {

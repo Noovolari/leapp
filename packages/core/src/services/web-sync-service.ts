@@ -19,6 +19,7 @@ import { AwsIamRoleChainedLocalSessionDto } from "../models/web-dto/aws-iam-role
 import { AwsSessionService } from "./session/aws/aws-session-service";
 import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-service";
 import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
+import { LoggedException, LogLevel } from "./log-service";
 
 export class WebSyncService {
   private readonly encryptionProvider: EncryptionProvider;
@@ -46,24 +47,34 @@ export class WebSyncService {
   async syncSecrets(email: string, password: string): Promise<LocalSecretDto[]> {
     this.currentUser = await this.userProvider.signIn(email, password);
     const rsaKeys = await this.getRSAKeys(this.currentUser);
-    const createSessionDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
-    for (const localSecretDto of createSessionDtos) {
-      await this.syncSecret(localSecretDto);
+    const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
+    const integrationDtos = localSecretDtos.filter((secret) => secret.secretType === SecretType.awsSsoIntegration);
+    for (const integrationDto of integrationDtos) {
+      await this.syncIntegrationSecret(integrationDto as AwsSsoLocalIntegrationDto);
     }
-    return createSessionDtos;
+    const sessionsDtos = localSecretDtos.filter((secret) => secret.secretType !== SecretType.awsSsoIntegration);
+    for (const sessionDto of sessionsDtos) {
+      await this.syncSessionsSecret(sessionDto);
+    }
+    return localSecretDtos;
   }
 
-  async syncSecret(localSecret: LocalSecretDto): Promise<void> {
-    if (localSecret.secretType === SecretType.awsSsoIntegration) {
-      const localIntegrationDto = localSecret as AwsSsoLocalIntegrationDto;
-      await this.awsSsoIntegrationService.createIntegration({
-        alias: localIntegrationDto.alias,
-        portalUrl: localIntegrationDto.portalUrl,
-        region: localIntegrationDto.region,
-        browserOpening: localIntegrationDto.browserOpening,
-        integrationId: localIntegrationDto.id,
-      });
-    } else if (localSecret.secretType === SecretType.awsIamUserSession) {
+  async syncIntegrationSecret(localIntegrationDto: AwsSsoLocalIntegrationDto): Promise<void> {
+    const localIntegration = this.awsSsoIntegrationService.getIntegration(localIntegrationDto.id);
+    if (localIntegration) {
+      await this.awsSsoIntegrationService.deleteIntegration(localIntegration.id);
+    }
+    await this.awsSsoIntegrationService.createIntegration({
+      alias: localIntegrationDto.alias,
+      portalUrl: localIntegrationDto.portalUrl,
+      region: localIntegrationDto.region,
+      browserOpening: localIntegrationDto.browserOpening,
+      integrationId: localIntegrationDto.id,
+    });
+  }
+
+  async syncSessionsSecret(localSecret: LocalSecretDto): Promise<void> {
+    if (localSecret.secretType === SecretType.awsIamUserSession) {
       const localSessionDto = localSecret as AwsIamUserLocalSessionDto;
       const sessionService = (await this.sessionFactory.getSessionService(SessionType.awsIamUser)) as AwsIamUserService;
       const profileId = await this.setupAwsSession(sessionService, localSessionDto.sessionId, localSessionDto.profileName);
@@ -80,15 +91,37 @@ export class WebSyncService {
       const localSessionDto = localSecret as AwsIamRoleChainedLocalSessionDto;
       const sessionService = (await this.sessionFactory.getSessionService(SessionType.awsIamRoleChained)) as AwsIamRoleChainedService;
       const profileId = await this.setupAwsSession(sessionService, localSessionDto.sessionId, localSessionDto.profileName);
+      const parentSessionId = await this.getAssumerSessionId(localSessionDto);
       await sessionService.create({
         sessionName: localSessionDto.sessionName,
         region: localSessionDto.region,
         roleArn: localSessionDto.roleArn,
         profileId,
-        parentSessionId: localSessionDto.parentSessionId,
+        parentSessionId,
         roleSessionName: localSessionDto.roleSessionName,
         sessionId: localSessionDto.sessionId,
       });
+    }
+  }
+
+  async getAssumerSessionId(localSessionDto: AwsIamRoleChainedLocalSessionDto): Promise<string> {
+    if (localSessionDto.assumerSessionId) {
+      return localSessionDto.assumerSessionId;
+    } else {
+      await this.awsSsoIntegrationService.syncSessions(localSessionDto.assumerIntegrationId);
+      const ssoSessions = this.sessionManagementService
+        .getAwsSsoRoles()
+        .filter(
+          (ssoSession) =>
+            ssoSession.awsSsoConfigurationId === localSessionDto.assumerIntegrationId &&
+            ssoSession.roleArn === `arn:aws:iam::${localSessionDto.assumerAccountId}/${localSessionDto.assumerRoleName}`
+        );
+      if (ssoSessions.length < 0) {
+        throw new LoggedException("Cannot find a proper SSO role from SSO integrations", this, LogLevel.error);
+      } else if (ssoSessions.length > 1) {
+        throw new LoggedException("Multiple SSO roles found in SSO integrations", this, LogLevel.error);
+      }
+      return ssoSessions[0].sessionId;
     }
   }
 

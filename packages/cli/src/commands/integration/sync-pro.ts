@@ -20,6 +20,7 @@ export default class SyncProIntegration extends LeappCommand {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     } finally {
       await this.cliProviderService.remoteProceduresClient.refreshSessions();
+      await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
     }
   }
 

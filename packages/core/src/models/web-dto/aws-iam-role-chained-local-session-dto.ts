@@ -7,8 +7,11 @@ export class AwsIamRoleChainedLocalSessionDto extends AwsLocalSessionDto {
     sessionName: string,
     region: string,
     public roleArn: string,
-    public parentSessionId: string,
     public roleSessionName?: string,
+    public assumerSessionId?: string,
+    public assumerRoleName?: string,
+    public assumerIntegrationId?: string,
+    public assumerAccountId?: string,
     profileName?: string
   ) {
     super(sessionId, sessionName, region, SecretType.awsIamRoleChainedSession, profileName);

@@ -1,5 +1,6 @@
 import { Session } from "../models/session";
 import { Repository } from "./repository";
+import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
 
 export class SessionManagementService {
   constructor(private repository: Repository) {}
@@ -30,6 +31,10 @@ export class SessionManagementService {
 
   getIamRoleChained(session: Session): Session[] {
     return this.repository.listIamRoleChained(session);
+  }
+
+  getAwsSsoRoles(): AwsSsoRoleSession[] {
+    return this.repository.listAwsSsoRoles() as AwsSsoRoleSession[];
   }
 
   updateSessions(sessions: Session[]): void {

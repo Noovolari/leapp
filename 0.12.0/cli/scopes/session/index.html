@@ -1656,7 +1656,7 @@
 
 <span class="gp">  $</span>leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN
 
-<span class="gp">  $</span>leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionId ID <span class="o">(</span>--roleSessionName ROLESESSIONNAME<span class="o">)</span>
+<span class="gp">  $</span>leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionUId ID <span class="o">(</span>--roleSessionName ROLESESSIONNAME<span class="o">)</span>
 
 <span class="gp">  $</span>leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY <span class="o">(</span>--mfaDevice MFADEVICEARN<span class="o">)</span>
 </code></pre></div>

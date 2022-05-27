@@ -7,10 +7,9 @@
   },
   "description": "Leapp's core module",
   "dependencies": {
-    "core-pro": "file:../../../leapp-pro-frontend/core-pro/dist"
+    "core-pro": "file:../../../leapp-pro-frontend/core-pro"
   },
   "peerDependencies": {
-    "core-pro": "file:../../../leapp-pro-frontend/core-pro",
     "@babel/plugin-proposal-decorators": "^7.16.5",
     "@types/aws-sdk": "^2.7.0",
     "@types/node": "^16.9.4",

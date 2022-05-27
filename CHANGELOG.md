@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.12.1](https://github.com/Noovolari/leapp/compare/v0.12.0...v0.12.1) (2022-05-25)
+
+### Features
+
+* added window options for Desktop App [#280](https://github.com/Noovolari/leapp/pull/280) a special thanks to [@mikedizon](https://github.com/mikedizon)
+* added AWS Federated Roles support to us govcloud [#270](https://github.com/Noovolari/leapp/pull/270) a special thanks to [@mikedizon](https://github.com/mikedizon)
+* added credentials process and edit session docs
+
+### Bug Fixes
+
+* fixed CTRL+R keybind issue after AWS SSO window closes [#185](https://github.com/Noovolari/leapp/issues/185)
+* fixed selected but not applied filters behavior
+* dependabot security issues
+* fixed docs param typo [#268](https://github.com/Noovolari/leapp/pull/268) [@RafPe](https://github.com/RafPe)
+* removed error message shown when AWS SSM plugin is not 
+* now it is possible to logout from AWS SSO Integrations without deleting sessions [#209](https://github.com/Noovolari/leapp/issues/209)
+
 ### [0.12.0](https://github.com/Noovolari/leapp/compare/v0.11.1...v0.12.0) (2022-04-28)
 
 ### Features

@@ -1,0 +1,23 @@
+macos_instance:
+  image: ghcr.io/cirruslabs/macos-monterey-base:latest
+
+task:
+  name: brew
+  script:
+    - echo "Hello World from macOS M1..."
+    - echo "Installing brew..."
+    - /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    - echo "Installing node and node modules..."
+    - echo 'export PATH="/opt/homebrew/opt/node@14/bin:$PATH"' >> ~/.zshrc
+    - export LDFLAGS="-L/opt/homebrew/opt/node@14/lib"
+    - export CPPFLAGS="-I/opt/homebrew/opt/node@14/include"
+    - brew install node@14
+    - npm install
+    - echo "Try brew formula..."
+    - brew tap ericvilla/brew
+    - brew install ericvilla/brew/leapp-cli
+    - leapp --version
+    - leapp session add --providerType aws --sessionType awsIamUser --sessionName testSession --region eu-west-1 --accessKey testAccessKey --secretKey testSecretKey
+    - leapp session list
+
+

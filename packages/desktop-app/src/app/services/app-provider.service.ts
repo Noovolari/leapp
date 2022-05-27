@@ -180,7 +180,8 @@ export class AppProviderService {
         this.keyChainService,
         this.behaviouralSubjectService,
         this.electronService,
-        this.sessionFactory
+        this.sessionFactory,
+        this.behaviouralSubjectService
       );
     }
     return this.awsSsoIntegrationServiceInstance;

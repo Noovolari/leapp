@@ -35,7 +35,7 @@ export class ExecuteService {
         }
       }
 
-      exec(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {
+      exec(command, { env, name: "Leapp-" + new Date().toDateString(), timeout: 60000 }, (err, stdout, stderr) => {
         const output = { error: err, stdout, stderr };
         this.logService.log(new LoggedEntry("execute from Leapp: " + JSON.stringify(output), this, LogLevel.info, false));
         if (err) {
@@ -56,30 +56,57 @@ export class ExecuteService {
    * @returns an {Promise<string>} stdout or stderr
    */
   openTerminal(command: string, env?: any, macOsTerminalType?: string): Promise<string> {
+    const newEnv = Object.assign({}, this.nativeService.process.env);
+
     if (this.nativeService.process.platform === "darwin") {
       const terminalType = macOsTerminalType ?? this.repository.getWorkspace().macOsTerminal;
       if (terminalType === constants.macOsTerminal) {
         return this.execute(
-          `osascript -e "tell app \\"Terminal\\"
-                              activate (do script \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\")
-                              end tell"`,
-          Object.assign(this.nativeService.process.env, env)
+          `osascript -e 'if application "Terminal" is running then\n
+                    \ttell application "Terminal"\n
+                    \t\tdo script "export AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"\n
+                    \t\tdelay 0.5\n
+                    \t\tactivate\n
+                    \t\tdelay 0.5\n
+                    \t\tdo script "export AWS_SECRET_ACCESS_KEY=\\"${env.AWS_SECRET_ACCESS_KEY}\\"" in window 1\n
+                    \t\tdelay 0.5\n
+                    \t\tdo script "export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}" in window 1\n
+                    \t\tdelay 0.5\n
+                    \t\tdo script "clear" in window 1\n
+                    \t\tdelay 0.5\n
+                    \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
+                    \tend tell\n
+                    else\n
+                    \ttell application "Terminal"\n
+                    \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
+                    \t\tactivate\n
+                    \tend tell\n
+                    end if'`,
+          Object.assign(newEnv, env)
         );
       } else {
         return this.execute(
-          `osascript -e "tell app \\"iTerm\\"
-                              set newWindow to (create window with default profile)
-                              tell current session of newWindow
-                                write text \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\"
-                              end tell
-                            end tell"`,
-          Object.assign(this.nativeService.process.env, env)
+          `osascript -e 'tell app "iTerm"\n
+                     \tset newWindow to (create window with default profile)\n
+                     \ttell current session of newWindow\n
+                     \t\twrite text "export AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"\n
+                     \t\tdelay 0.5\n
+                     \t\twrite text "export AWS_SECRET_ACCESS_KEY=\\"${env.AWS_SECRET_ACCESS_KEY}\\""\n
+                     \t\tdelay 0.5\n
+                     \t\twrite text "export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}"\n
+                     \t\tdelay 0.5\n
+                     \t\twrite text "clear"\n
+                     \t\tdelay 0.5\n
+                     \t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+                     \tend tell\n
+                     end tell'`,
+          Object.assign(newEnv, env)
         );
       }
     } else if (this.nativeService.process.platform === "win32") {
       return this.execute(`start cmd /k ${command}`, env);
     } else {
-      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.nativeService.process.env, env));
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(newEnv, env));
     }
   }
 }

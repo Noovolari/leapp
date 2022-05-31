@@ -13,7 +13,7 @@ const authenticationUrlRegexes = new Map([
       /^https:\/\/.*\/adfs\/ls\/idpinitiatedsignon.*loginToRp=urn:amazon:webservices.*/,
       /^https:\/\/login\.okta\.com\/.*/,
       /^https:\/\/accounts\.google\.com\/ServiceLogin.*/,
-      /^https:\/\/login\.microsoftonline\.com\/.*\/oauth2\/authorize.*/,
+      /^https:\/\/login\.microsoftonline\.com\/*.*\/oauth2\/authorize.*/,
     ],
   ],
 ]);

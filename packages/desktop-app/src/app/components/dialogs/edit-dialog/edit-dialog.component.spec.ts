@@ -21,7 +21,7 @@ describe("EditDialogComponent", () => {
   let fixture: ComponentFixture<EditDialogComponent>;
 
   beforeEach(async(() => {
-    const spyWorkspaceService = jasmine.createSpyObj("WorkspaceService", [], {
+    const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },
     });
@@ -45,7 +45,7 @@ describe("EditDialogComponent", () => {
         mockedWorkspace,
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
-      workspaceService: spyWorkspaceService,
+      workspaceService: spyBehaviouralSubjectService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [{ region: "eu-west-1" }] },
       azureCoreService: { getLocations: () => [] },

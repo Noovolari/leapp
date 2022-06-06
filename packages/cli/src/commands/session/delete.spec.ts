@@ -19,7 +19,7 @@ describe("DeleteSession", () => {
 
     const sessions = [{ sessionId: "session", sessionName: "sessionName" }];
     const cliMockService = {
-      repository: {
+      sessionManagementService: {
         getSessionById: jest.fn((id: string) => sessions.find((s) => s.sessionId === id)),
       },
     };
@@ -71,7 +71,7 @@ describe("DeleteSession", () => {
 
   test("selectSession", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [
           { sessionName: "sessionActive", status: SessionStatus.active },
           { sessionName: "sessionPending", status: SessionStatus.pending },
@@ -120,7 +120,7 @@ describe("DeleteSession", () => {
 
   test("selectSession, no session available", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => []),
       },
     };

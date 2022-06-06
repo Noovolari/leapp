@@ -13,6 +13,7 @@ env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
   S3_BUCKET: s3://noovolari-leapp-website-distribution
+  WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
 
 jobs:
@@ -58,6 +59,9 @@ jobs:
       - name: Build Win desktop app
         run: |
           cd packages/desktop-app
+          WIN_CERTIFICATE=windows_sign_certificate.pfx
+          echo "Recreate the window certificate from the secure environment variable"
+          echo "${{ env.WIN_CERTIFICATE }}" | base64 --decode > $WIN_CERTIFICATE
           npm install
           npm run release-win
           rm -Rf ./release/win-unpacked
@@ -304,3 +308,4 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}
           body: "Full changelog & Downloads ⇒ https://www.leapp.cloud/releases"
           tag: ${{ needs.tag-validation.outputs.tag-version }}
+

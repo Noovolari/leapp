@@ -271,7 +271,7 @@ export default class AddSession extends LeappCommand {
       fieldAnswerValue = "";
     }
     if (!fieldAnswerValue && field.creationRequestField === "profileId") {
-      fieldAnswerValue = this.cliProviderService.repository.getDefaultProfileId();
+      fieldAnswerValue = this.cliProviderService.workspaceService.getDefaultProfileId();
     }
     if (!fieldAnswerValue && field.creationRequestField === "roleSessionName") {
       fieldAnswerValue = constants.roleSessionName;
@@ -303,7 +303,7 @@ export default class AddSession extends LeappCommand {
   }
 
   private checkParentIdValidity(fieldAnswerValue: any, field: any) {
-    const found = this.cliProviderService.repository.getSessions().find((s) => s.sessionId === fieldAnswerValue);
+    const found = this.cliProviderService.sessionManagementService.getSessions().find((s) => s.sessionId === fieldAnswerValue);
 
     if (!found && field.creationRequestField === "parentSessionId") {
       throw new Error(`Invalid Parent Id`);

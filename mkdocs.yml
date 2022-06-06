@@ -32,10 +32,13 @@ nav:
           - 'Configure Azure Tenant': 'configuring-session/configure-azure-tenant.md'
       - 'Configuring an Integration':
           - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
+      - 'Editing a session': 'edit-session.md'
   - Security:
       - 'Intro': 'security/intro.md'
-      - 'Credentials generation':
-          - AWS: 'security/credentials-generation/aws.md'
+      - 'Credentials Generation':
+          - AWS:
+            - 'Credential file': 'security/credentials-generation/aws.md'
+            - 'Credential Process': 'security/credential-process.md'
           - Azure: 'security/credentials-generation/azure.md'
       - 'System Vault': 'security/system-vault.md'
       - 'Zero Knowledge':  'security/zero-knowledge.md'

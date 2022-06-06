@@ -97,7 +97,7 @@ describe("AwsIamRoleChainedService", () => {
     const awsIamRoleChainedService = new AwsIamRoleChainedService(sessionNotifier, repository, awsCoreService, null, null, null);
     await awsIamRoleChainedService.create(session);
 
-    expect(sessionNotifier.addSession).toHaveBeenCalled();
+    expect(sessionNotifier.setSessions).toHaveBeenCalled();
     expect(repository.addSession).toHaveBeenCalled();
   });
 

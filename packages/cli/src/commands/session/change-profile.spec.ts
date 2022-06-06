@@ -38,12 +38,12 @@ describe("ChangeProfile", () => {
     const cliProviderService: any = {
       namedProfilesService: {
         changeNamedProfile: jest.fn(),
+        getNamedProfiles: jest.fn(() => profiles),
       },
       remoteProceduresClient: { refreshSessions: jest.fn() },
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => sessions),
         getSessionById: jest.fn((id: string) => sessions.find((s) => s.sessionId === id)),
-        getProfiles: jest.fn(() => profiles),
       },
     };
 
@@ -75,11 +75,11 @@ describe("ChangeProfile", () => {
   test("selectSession", async () => {
     const session1 = { sessionName: "sessionName" };
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: () => [session1],
       },
       sessionFactory: {
-        getSessionService: () => new AwsIamUserService(null, null, null, null, null, null),
+        getSessionService: () => new AwsIamUserService(null, null, null, null, null, null, null),
       },
       inquirer: {
         prompt: async (params: any) => {
@@ -104,8 +104,8 @@ describe("ChangeProfile", () => {
   test("selectProfile", async () => {
     const profileFieldChoice = { name: "profileName1", id: "profileId1" };
     const cliProviderService: any = {
-      repository: {
-        getProfiles: jest.fn(() => [profileFieldChoice]),
+      namedProfilesService: {
+        getNamedProfiles: jest.fn(() => [profileFieldChoice]),
         getProfileName: jest.fn(() => "profileName1"),
       },
       inquirer: {
@@ -129,14 +129,14 @@ describe("ChangeProfile", () => {
     const selectedProfile = await command.selectProfile(session);
 
     expect(selectedProfile).toBe("selectedProfile");
-    expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
-    expect(cliProviderService.repository.getProfileName).toHaveBeenCalledWith(session.profileId);
+    expect(cliProviderService.namedProfilesService.getNamedProfiles).toHaveBeenCalled();
+    expect(cliProviderService.namedProfilesService.getProfileName).toHaveBeenCalledWith(session.profileId);
   });
 
   test("selectProfile - error: no profile available", async () => {
     const cliProviderService: any = {
-      repository: {
-        getProfiles: jest.fn(() => []),
+      namedProfilesService: {
+        getNamedProfiles: jest.fn(() => []),
         getProfileName: jest.fn(() => "profileName1"),
       },
     };
@@ -146,8 +146,8 @@ describe("ChangeProfile", () => {
     const session = { type: "type", profileId: "profileId2" } as any;
 
     await expect(command.selectProfile(session)).rejects.toThrow(new Error("no profiles available"));
-    expect(cliProviderService.repository.getProfiles).toHaveBeenCalled();
-    expect(cliProviderService.repository.getProfileName).toHaveBeenCalledWith(session.profileId);
+    expect(cliProviderService.namedProfilesService.getNamedProfiles).toHaveBeenCalled();
+    expect(cliProviderService.namedProfilesService.getProfileName).toHaveBeenCalledWith(session.profileId);
   });
 
   test("changeSessionProfile", async () => {

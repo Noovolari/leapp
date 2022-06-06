@@ -28,6 +28,8 @@ export class SessionFactory {
         return this.awsSsoRoleService;
       case SessionType.azure:
         return this.azureService;
+      case SessionType.anytype:
+        return this.azureService as SessionService;
     }
   }
 

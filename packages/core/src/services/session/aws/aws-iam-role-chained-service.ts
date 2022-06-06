@@ -1,6 +1,8 @@
 import * as AWS from "aws-sdk";
 import { AssumeRoleResponse } from "aws-sdk/clients/sts";
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
+import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
+import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsIamRoleChainedSession } from "../../../models/aws-iam-role-chained-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
@@ -13,11 +15,10 @@ import { AwsParentSessionFactory } from "./aws-parent-session.factory";
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
 import { constants } from "../../../models/constants";
-import { LoggedException, LogLevel } from "../../log-service";
 
 export class AwsIamRoleChainedService extends AwsSessionService {
   constructor(
-    iSessionNotifier: ISessionNotifier,
+    iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
     awsCoreService: AwsCoreService,
     fileService: FileService,
@@ -51,7 +52,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     );
 
     this.repository.addSession(session);
-    this.sessionNotifier?.addSession(session);
+    this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
@@ -91,7 +92,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     try {
       parentSession = this.repository.getSessionById((session as AwsIamRoleChainedSession).parentSessionId);
     } catch (err) {
-      throw new LoggedException(`Parent Account Session not found for Chained Account ${session.sessionName}`, this, LogLevel.warn);
+      throw new LeappNotFoundError(this, `Parent Account Session  not found for Chained Account ${session.sessionName}`);
     }
 
     // Generate a credential set from Parent Session
@@ -155,7 +156,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
       // Generate correct object from session token response and return
       return AwsIamRoleChainedService.sessionTokenFromAssumeRoleResponse(assumeRoleResponse);
     } catch (err) {
-      throw new LoggedException(err.message, this, LogLevel.warn);
+      throw new LeappAwsStsError(this, err.message);
     }
   }
 

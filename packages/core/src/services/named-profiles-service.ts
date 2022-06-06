@@ -6,10 +6,10 @@ import { Session } from "../models/session";
 import { SessionFactory } from "./session-factory";
 import { SessionStatus } from "../models/session-status";
 import { AwsSessionService } from "./session/aws/aws-session-service";
-import { WorkspaceService } from "./workspace-service";
+import { BehaviouralSubjectService } from "./behavioural-subject-service";
 
 export class NamedProfilesService {
-  constructor(private sessionFactory: SessionFactory, private repository: Repository, private workspaceService: WorkspaceService) {}
+  constructor(private sessionFactory: SessionFactory, private repository: Repository, private behaviouralSubjectService: BehaviouralSubjectService) {}
 
   getNamedProfiles(excludingDefault: boolean = false): AwsNamedProfile[] {
     const excludedProfileId = excludingDefault ? this.repository.getDefaultProfileId() : null;
@@ -63,8 +63,7 @@ export class NamedProfilesService {
 
       (session as any).profileId = defaultNamedProfileId;
       this.repository.updateSession(session.sessionId, session);
-      // TODO: it should call iSessionNotifier, not workspaceService
-      this.workspaceService.updateSession(session.sessionId, session);
+      this.behaviouralSubjectService.setSessions(this.repository.getSessions());
 
       if (wasActive) {
         await sessionService.start(session.sessionId);
@@ -83,7 +82,7 @@ export class NamedProfilesService {
 
       (session as any).profileId = newNamedProfileId;
       this.repository.updateSession(session.sessionId, session);
-      this.workspaceService.updateSession(session.sessionId, session);
+      this.behaviouralSubjectService.setSessions(this.repository.getSessions());
 
       if (wasActive) {
         await sessionService.start(session.sessionId);

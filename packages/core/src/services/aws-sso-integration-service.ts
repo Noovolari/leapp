@@ -17,9 +17,10 @@ import SSO, {
 } from "aws-sdk/clients/sso";
 import { SessionType } from "../models/session-type";
 import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
-import { ISessionNotifier } from "../interfaces/i-session-notifier";
+import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
 import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
 import { SessionFactory } from "./session-factory";
+import { BehaviouralSubjectService } from "./behavioural-subject-service";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -43,9 +44,10 @@ export class AwsSsoIntegrationService {
     private awsSsoOidcService: AwsSsoOidcService,
     private awsSsoRoleService: AwsSsoRoleService,
     private keyChainService: KeychainService,
-    private sessionNotifier: ISessionNotifier,
+    private sessionNotifier: IBehaviouralNotifier,
     private nativeService: INativeService,
-    private sessionFactory: SessionFactory
+    private sessionFactory: SessionFactory,
+    private behaviouralSubjectService: BehaviouralSubjectService
   ) {}
 
   static validateAlias(alias: string): boolean | string {
@@ -58,6 +60,10 @@ export class AwsSsoIntegrationService {
 
   createIntegration(creationParams: IntegrationCreationParams): void {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
+  }
+
+  updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void {
+    this.repository.updateAwsSsoIntegration(id, updateParams.alias, updateParams.region, updateParams.portalUrl, updateParams.browserOpening);
   }
 
   getIntegration(id: string): AwsSsoIntegration {
@@ -214,6 +220,7 @@ export class AwsSsoIntegrationService {
   async deleteIntegration(integrationId: string): Promise<void> {
     await this.logout(integrationId);
     this.repository.deleteAwsSsoIntegration(integrationId);
+    this.deleteDependentSessions(integrationId);
   }
 
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
@@ -383,6 +390,14 @@ export class AwsSsoIntegrationService {
     }
 
     return undefined;
+  }
+
+  private deleteDependentSessions(configurationId: string) {
+    const ssoSessions = this.repository.getSessions().filter((session) => (session as any).awsSsoConfigurationId === configurationId);
+    for (const session of ssoSessions) {
+      this.repository.deleteSession(session.sessionId);
+    }
+    this.behaviouralSubjectService.setSessions([...this.repository.getSessions()]);
   }
 
   private getProtocol(aliasedUrl: string): string {

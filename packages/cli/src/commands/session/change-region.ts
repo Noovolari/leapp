@@ -21,7 +21,7 @@ export default class ChangeSessionRegion extends LeappCommand {
     try {
       const { flags } = await this.parse(ChangeSessionRegion);
       if (this.validateFlags(flags)) {
-        const selectedSession = this.cliProviderService.repository.getSessionById(`${flags.sessionId}`);
+        const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(`${flags.sessionId}`);
         const selectedRegion = this.cliProviderService.awsCoreService.getRegions().find((r) => r.region === flags.region);
         if (!selectedSession) {
           throw new Error("Session not found with id " + flags.sessionId);
@@ -41,7 +41,7 @@ export default class ChangeSessionRegion extends LeappCommand {
   }
 
   async selectSession(): Promise<Session> {
-    const availableSessions = this.cliProviderService.repository.getSessions();
+    const availableSessions = this.cliProviderService.sessionManagementService.getSessions();
 
     const answer: any = await this.cliProviderService.inquirer.prompt([
       {

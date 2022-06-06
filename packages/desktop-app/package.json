@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.12.0",
+  "version": "0.12.2",
   "private": true,
   "author": {
     "name": "Noovolari",
@@ -139,7 +139,7 @@
     "@ng-select/ng-select": "8.1.1",
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
-    "@noovolari/leapp-core": "0.1.108",
+    "@noovolari/leapp-core": "0.1.110",
     "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",
@@ -158,6 +158,7 @@
     "electron-osx-sign": "~0.5.0",
     "electron-reload": "^1.5.0",
     "electron-updater": "^4.3.8",
+    "electron-localshortcut": "^3.2.1",
     "extract-zip": "~2.0.1",
     "fix-path": "~3.0.0",
     "follow-redirects": "^1.14.7",

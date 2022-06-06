@@ -15,8 +15,10 @@ describe("AddSession", () => {
 
   test("Flags - test all flags and combinations", async () => {
     const cliProviderService: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{}]),
+      },
+      workspaceService: {
         getDefaultProfileId: jest.fn(() => "defaultId"),
       },
       namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
@@ -224,8 +226,11 @@ describe("AddSession", () => {
     await expect(command.run()).rejects.toThrow("Invalid Idp URL");
 
     const cliMock2: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{}]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      workspaceService: {
         getDefaultProfileId: jest.fn(() => "defaultId"),
       },
       namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
@@ -262,8 +267,11 @@ describe("AddSession", () => {
     expect(command.log).toHaveBeenCalledWith("session added");
 
     const cliMock3: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{}]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      workspaceService: {
         getDefaultProfileId: jest.fn(() => "defaultId"),
       },
       namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
@@ -308,8 +316,11 @@ describe("AddSession", () => {
     expect(command.log).toHaveBeenCalledWith("session added");
 
     const cliMock4: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{}]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      workspaceService: {
         getDefaultProfileId: jest.fn(() => "defaultId"),
       },
       namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
@@ -345,8 +356,11 @@ describe("AddSession", () => {
     await expect(command.run()).rejects.toThrow("Invalid Profile Id");
 
     const cliMock5: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{ sessionId: "parentId", type: SessionType.awsIamRoleFederated }]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      workspaceService: {
         getDefaultProfileId: jest.fn(() => "defaultId"),
       },
       namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
@@ -389,8 +403,11 @@ describe("AddSession", () => {
     expect(command.log).toHaveBeenCalledWith("session added");
 
     const cliMock6: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{ sessionId: "parentId", type: SessionType.awsIamRoleFederated }]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      workspaceService: {
         getDefaultProfileId: jest.fn(() => "defaultId"),
       },
       namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
@@ -435,8 +452,11 @@ describe("AddSession", () => {
     expect(command.log).toHaveBeenCalledWith("session added");
 
     const cliMock7: any = {
-      repository: {
+      sessionManagementService: {
         getSessions: jest.fn(() => [{ sessionId: "parentId", type: SessionType.awsIamRoleFederated }]),
+        getDefaultProfileId: jest.fn(() => "defaultId"),
+      },
+      workspaceService: {
         getDefaultProfileId: jest.fn(() => "defaultId"),
       },
       namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },

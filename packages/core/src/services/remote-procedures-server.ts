@@ -4,7 +4,7 @@ import { INativeService } from "../interfaces/i-native-service";
 import { IAwsSsoOidcVerificationWindowService } from "../interfaces/i-aws-sso-oidc-verification-window-service";
 import { IAwsSamlAuthenticationService } from "../interfaces/i-aws-saml-authentication-service";
 import { Repository } from "./repository";
-import { WorkspaceService } from "./workspace-service";
+import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IMfaCodePrompter } from "../interfaces/i-mfa-code-prompter";
 
 export interface RpcResponse {
@@ -30,7 +30,7 @@ export class RemoteProceduresServer {
     private awsAuthenticationService: IAwsSamlAuthenticationService,
     private mfaCodePrompter: IMfaCodePrompter,
     private repository: Repository,
-    private workspaceService: WorkspaceService,
+    private behaviouralSubjectService: BehaviouralSubjectService,
     private uiSafeFn: (uiSafeBlock: () => void) => void,
     private serverId = constants.ipcServerId
   ) {
@@ -111,7 +111,10 @@ export class RemoteProceduresServer {
     try {
       this.repository.reloadWorkspace();
       this.uiSafeFn(() => {
-        this.workspaceService.setIntegrations(this.repository.listAwsSsoIntegrations());
+        const workspace = this.repository.getWorkspace();
+        workspace.awsSsoIntegrations = this.repository.listAwsSsoIntegrations();
+        this.repository.persistWorkspace(workspace);
+        this.behaviouralSubjectService.setIntegrations(this.repository.listAwsSsoIntegrations());
       });
       emitFunction(socket, "message", {});
     } catch (error) {
@@ -123,7 +126,7 @@ export class RemoteProceduresServer {
     try {
       this.repository.reloadWorkspace();
       this.uiSafeFn(() => {
-        this.workspaceService.setSessions(this.repository.getSessions());
+        this.behaviouralSubjectService.setSessions(this.repository.getSessions());
       });
       emitFunction(socket, "message", {});
     } catch (error) {

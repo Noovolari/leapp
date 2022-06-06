@@ -34,7 +34,9 @@ export default class GenerateSession extends LeappCommand {
   }
 
   async getSession(sessionId: string): Promise<Session> {
-    const selectedSessions = this.cliProviderService.repository.getSessions().filter((session: Session) => session.sessionId === sessionId);
+    const selectedSessions = this.cliProviderService.sessionManagementService
+      .getSessions()
+      .filter((session: Session) => session.sessionId === sessionId);
     if (selectedSessions.length === 0) {
       throw new Error("no sessions available");
     } else if (selectedSessions.length > 1) {

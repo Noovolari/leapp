@@ -2,8 +2,9 @@ import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { AwsSsoIntegrationService, IntegrationCreationParams } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
 import { integrationAlias, integrationMethod, integrationPortalUrl, integrationRegion } from "../../flags";
+import { IntegrationCreationParams } from "@noovolari/leapp-core/interfaces/IIntegrationCreateParams";
 
 export default class CreateSsoIntegration extends LeappCommand {
   static description = "Create a new AWS SSO integration";

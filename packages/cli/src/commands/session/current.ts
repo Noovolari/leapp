@@ -1,5 +1,4 @@
 import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
-import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { Flags } from "@oclif/core";
@@ -8,6 +7,7 @@ import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 
 const awsProvider = "aws";
 const azureProvider = "azure";

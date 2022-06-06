@@ -200,7 +200,7 @@ export class CliProviderService {
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
       this.azureServiceInstance = new AzureService(this.behaviouralSubjectService, this.repository, this.fileService, this.executeService,
-        constants.azureAccessTokens);
+        constants.azureMsalCacheFile, this.cliNativeService);
     }
     return this.azureServiceInstance;
   }

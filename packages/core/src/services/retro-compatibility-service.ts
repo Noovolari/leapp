@@ -3,7 +3,7 @@ import { Workspace } from "../models/workspace";
 import { AwsIamRoleFederatedSession } from "../models/aws-iam-role-federated-session";
 import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session";
 import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
-import { AzureSession } from "../models/azure-session";
+import { AzureSession } from "../models/azure/azure-session";
 import { FileService } from "./file-service";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { KeychainService } from "./keychain-service";
@@ -12,6 +12,7 @@ import { AwsIamUserSession } from "../models/aws-iam-user-session";
 import * as uuid from "uuid";
 import { SessionType } from "../models/session-type";
 import { Repository } from "./repository";
+import { IntegrationType } from "../models/integration-type";
 
 export class RetroCompatibilityService {
   constructor(
@@ -401,6 +402,7 @@ export class RetroCompatibilityService {
       if (workspace.awsSsoIntegrations.length === 0) {
         workspace.awsSsoIntegrations.push({
           id: uuid.v4(),
+          type: IntegrationType.awsSso,
           alias: "Aws Single Sign-On",
           region: awsSsoConfiguration.region,
           portalUrl: awsSsoConfiguration.portalUrl,

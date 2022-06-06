@@ -1,5 +1,5 @@
-import { ISessionNotifier } from "../../../interfaces/i-session-notifier";
-import { AzureSession } from "../../../models/azure-session";
+import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
+import { AzureSession } from "../../../models/azure/azure-session";
 import { Session } from "../../../models/session";
 import { ExecuteService } from "../../execute-service";
 import { FileService } from "../../file-service";
@@ -12,39 +12,13 @@ import { INativeService } from "../../../interfaces/i-native-service";
 import path from "path";
 import { homedir } from "os";
 import { IPersistence } from "@azure/msal-node-extensions/src/persistence/IPersistence";
-
-export interface AzureSessionToken {
-  tokenType: string;
-  expiresIn: number;
-  expiresOn: string;
-  resource: string;
-  accessToken: string;
-  refreshToken: string;
-  oid: string;
-  userId: string;
-  isMRRT: boolean;
-  _clientId: string;
-  _authority: string;
-}
-
-interface JsonCache {
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  Account: any;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  IdToken: any;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  AccessToken: any;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  RefreshToken: any;
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  AppMetadata: any;
-}
+import { JsonCache } from "@azure/msal-node";
 
 export class AzureService extends SessionService {
   private vault: any; // TODO: remove!
 
   constructor(
-    iSessionNotifier: ISessionNotifier,
+    iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
     private fileService: FileService,
     private executeService: ExecuteService,
@@ -61,7 +35,7 @@ export class AzureService extends SessionService {
   async create(sessionRequest: AzureSessionRequest): Promise<void> {
     const session = new AzureSession(sessionRequest.sessionName, sessionRequest.region, sessionRequest.subscriptionId, sessionRequest.tenantId);
     this.repository.addSession(session);
-    this.sessionNotifier?.addSession(session);
+    this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
   async start(sessionId: string): Promise<void> {
@@ -111,7 +85,7 @@ export class AzureService extends SessionService {
       //TODO: check if session is currently active before trying to stop it?
       await this.stop(sessionId);
       this.repository.deleteSession(sessionId);
-      this.sessionNotifier?.deleteSession(sessionId);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
     } catch (error) {
       throw new LoggedException(error.message, this, LogLevel.warn);
     }
@@ -151,7 +125,7 @@ export class AzureService extends SessionService {
     const tokens = output.split(/\s+/);
     const versionToken = tokens.find((token) => token.match(/^\d+\.\d+\.\d+$/));
     if (versionToken) {
-      const [major, minor, _patch] = versionToken.split(".").map((v) => parseInt(v, 10));
+      const [major, minor] = versionToken.split(".").map((v) => parseInt(v, 10));
       if (major < 2 || (major === 2 && minor < 30)) {
         throw new LoggedException("Unsupported Azure CLI version (< 2.30). Please update.", this, LogLevel.error, true);
       }
@@ -206,10 +180,15 @@ export class AzureService extends SessionService {
 
   private async updateAccessTokenExpiration(session: AzureSession): Promise<void> {
     const msalCache = await this.loadMsalCache();
-    const accessTokenKey = Object.keys(msalCache.AccessToken)[0];
-    const accessToken = msalCache.AccessToken[accessTokenKey];
-    const expirationTime = new Date(parseInt(accessToken["expires_on"], 10) * 1000);
-    session.sessionTokenExpiration = expirationTime.toISOString();
+    const accessTokenKeys = Object.keys(msalCache.AccessToken);
+    for (const accessTokenKey of accessTokenKeys) {
+      const accessToken = msalCache.AccessToken[accessTokenKey];
+      if (accessToken?.realm === session.tenantId) {
+        const expirationTime = new Date(parseInt(accessToken?.expires_on, 10) * 1000);
+        session.sessionTokenExpiration = expirationTime.toISOString();
+        break;
+      }
+    }
   }
 
   private async loadMsalCache(): Promise<JsonCache> {

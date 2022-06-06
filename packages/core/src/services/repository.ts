@@ -14,6 +14,7 @@ import { IdpUrl } from "../models/idp-url";
 import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
+import { IntegrationType } from "../models/integration-type";
 
 export class Repository {
   // Private singleton workspace
@@ -274,6 +275,7 @@ export class Repository {
     const workspace = this.getWorkspace();
     workspace.awsSsoIntegrations.push({
       id: uuid.v4(),
+      type: IntegrationType.awsSso,
       alias,
       portalUrl,
       region,

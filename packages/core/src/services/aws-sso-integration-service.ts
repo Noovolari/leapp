@@ -21,33 +21,28 @@ import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
 import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
 import { SessionFactory } from "./session-factory";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
+import { IIntegrationService } from "../interfaces/i-integration-service";
+import { IntegrationCreationParams } from "../interfaces/IIntegrationCreateParams";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
-
-export interface IntegrationCreationParams {
-  alias: string;
-  portalUrl: string;
-  region: string;
-  browserOpening: string;
-}
 
 export interface SsoSessionsDiff {
   sessionsToDelete: AwsSsoRoleSession[];
   sessionsToAdd: SsoRoleSession[];
 }
 
-export class AwsSsoIntegrationService {
+export class AwsSsoIntegrationService implements IIntegrationService {
   private ssoPortal: SSO;
 
   constructor(
-    private repository: Repository,
+    public repository: Repository,
     private awsSsoOidcService: AwsSsoOidcService,
     private awsSsoRoleService: AwsSsoRoleService,
-    private keyChainService: KeychainService,
-    private sessionNotifier: IBehaviouralNotifier,
-    private nativeService: INativeService,
-    private sessionFactory: SessionFactory,
-    private behaviouralSubjectService: BehaviouralSubjectService
+    public keyChainService: KeychainService,
+    public sessionNotifier: IBehaviouralNotifier,
+    public nativeService: INativeService,
+    public sessionFactory: SessionFactory,
+    public behaviouralSubjectService: BehaviouralSubjectService
   ) {}
 
   static validateAlias(alias: string): boolean | string {

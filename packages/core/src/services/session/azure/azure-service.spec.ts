@@ -4,7 +4,7 @@ import { ExecuteService } from "../../execute-service";
 import { INativeService } from "../../../interfaces/i-native-service";
 import { ILogger } from "../../../interfaces/i-logger";
 import { LogLevel, LogService } from "../../log-service";
-import { AzureSession } from "../../../models/azure-session";
+import { AzureSession } from "../../../models/azure/azure-session";
 
 export class CliNativeService implements INativeService {
   url: any;

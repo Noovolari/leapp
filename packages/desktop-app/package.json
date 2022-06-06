@@ -125,6 +125,8 @@
     }
   },
   "dependencies": {
+    "@azure/msal-node": "^1.9.0",
+    "@azure/msal-node-extensions": "1.0.0-alpha.17",
     "@angular/animations": "^13.2.2",
     "@angular/cdk": "^13.2.2",
     "@angular/common": "^13.2.2",

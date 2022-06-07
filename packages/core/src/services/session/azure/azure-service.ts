@@ -7,12 +7,9 @@ import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { AzureSessionRequest } from "./azure-session-request";
 import { LoggedException, LogLevel } from "../../log-service";
-import { DataProtectionScope, FilePersistence, FilePersistenceWithDataProtection } from "@azure/msal-node-extensions";
 import { INativeService } from "../../../interfaces/i-native-service";
-import path from "path";
-import { homedir } from "os";
-import { IPersistence } from "@azure/msal-node-extensions/src/persistence/IPersistence";
 import { JsonCache } from "@azure/msal-node";
+import { MsalPersistenceService } from "../../msal-persistence-service";
 
 export class AzureService extends SessionService {
   private vault: any; // TODO: remove!
@@ -23,7 +20,8 @@ export class AzureService extends SessionService {
     private fileService: FileService,
     private executeService: ExecuteService,
     private azureMsalCacheFile: string,
-    private nativeService: INativeService
+    private nativeService: INativeService,
+    private msalPersistenceService: MsalPersistenceService
   ) {
     super(iSessionNotifier, repository);
   }
@@ -192,21 +190,10 @@ export class AzureService extends SessionService {
   }
 
   private async loadMsalCache(): Promise<JsonCache> {
-    const filePersistence = await this.getMsalCachePersistence();
-    return JSON.parse(await filePersistence.load());
+    return this.msalPersistenceService.load();
   }
 
   private async persistMsalCache(msalCache: JsonCache): Promise<void> {
-    const filePersistence = await this.getMsalCachePersistence();
-    await filePersistence.save(JSON.stringify(msalCache, null, 4));
-  }
-
-  private async getMsalCachePersistence(): Promise<IPersistence> {
-    const msalCacheFileLocation = path.join(homedir(), this.azureMsalCacheFile);
-    if (this.nativeService.os.platform() === "win32") {
-      return await FilePersistenceWithDataProtection.create(msalCacheFileLocation, DataProtectionScope.CurrentUser);
-    } else {
-      return await FilePersistence.create(msalCacheFileLocation);
-    }
+    await this.msalPersistenceService.save(msalCache);
   }
 }

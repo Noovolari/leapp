@@ -1,11 +1,11 @@
-import { Repository } from "./repository";
-import { AwsSsoRoleService, LoginResponse, SsoRoleSession } from "./session/aws/aws-sso-role-service";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
+import { Repository } from "../repository";
+import { AwsSsoRoleService, LoginResponse, SsoRoleSession } from "../session/aws/aws-sso-role-service";
+import { AwsSsoIntegration } from "../../models/aws/aws-sso-integration";
 import { formatDistance } from "date-fns";
-import { INativeService } from "../interfaces/i-native-service";
-import { AwsSsoOidcService } from "./aws-sso-oidc.service";
-import { KeychainService } from "./keychain-service";
-import { constants } from "../models/constants";
+import { INativeService } from "../../interfaces/i-native-service";
+import { AwsSsoOidcService } from "../aws-sso-oidc.service";
+import { KeychainService } from "../keychain-service";
+import { constants } from "../../models/constants";
 import SSO, {
   AccountInfo,
   GetRoleCredentialsRequest,
@@ -15,14 +15,13 @@ import SSO, {
   LogoutRequest,
   RoleInfo,
 } from "aws-sdk/clients/sso";
-import { SessionType } from "../models/session-type";
-import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
-import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
-import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
-import { SessionFactory } from "./session-factory";
-import { BehaviouralSubjectService } from "./behavioural-subject-service";
-import { IIntegrationService } from "../interfaces/i-integration-service";
-import { IntegrationCreationParams } from "../interfaces/IIntegrationCreateParams";
+import { SessionType } from "../../models/session-type";
+import { AwsSsoRoleSession } from "../../models/aws/aws-sso-role-session";
+import { IBehaviouralNotifier } from "../../interfaces/i-behavioural-notifier";
+import { AwsSsoIntegrationTokenInfo } from "../../models/aws/aws-sso-integration-token-info";
+import { SessionFactory } from "../session-factory";
+import { BehaviouralSubjectService } from "../behavioural-subject-service";
+import { IIntegrationService } from "../../interfaces/i-integration-service";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -53,11 +52,11 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return portalUrlValidationRegex.test(portalUrl) ? true : "Invalid portal URL";
   }
 
-  createIntegration(creationParams: IntegrationCreationParams): void {
+  createIntegration(creationParams: AwsSsoIntegration): void {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
 
-  updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void {
+  updateAwsSsoIntegration(id: string, updateParams: AwsSsoIntegration): void {
     this.repository.updateAwsSsoIntegration(id, updateParams.alias, updateParams.region, updateParams.portalUrl, updateParams.browserOpening);
   }
 

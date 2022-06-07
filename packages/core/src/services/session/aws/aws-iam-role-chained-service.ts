@@ -3,7 +3,7 @@ import { AssumeRoleResponse } from "aws-sdk/clients/sts";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsIamRoleChainedSession } from "../../../models/aws-iam-role-chained-session";
+import { AwsIamRoleChainedSession } from "../../../models/aws/aws-iam-role-chained-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { AwsCoreService } from "../../aws-core-service";

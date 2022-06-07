@@ -1,8 +1,8 @@
 import { deserialize, serialize } from "class-transformer";
 import { INativeService } from "../interfaces/i-native-service";
-import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session";
-import { AwsNamedProfile } from "../models/aws-named-profile";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
+import { AwsIamRoleChainedSession } from "../models/aws/aws-iam-role-chained-session";
+import { AwsNamedProfile } from "../models/aws/aws-named-profile";
+import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 import { constants } from "../models/constants";
 import Segment from "../models/segment";
 import { Session } from "../models/session";
@@ -15,6 +15,7 @@ import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
 import { IntegrationType } from "../models/integration-type";
+import { AzureIntegration } from "../models/azure-integration";
 
 export class Repository {
   // Private singleton workspace
@@ -316,6 +317,30 @@ export class Repository {
       workspace.awsSsoIntegrations.splice(index, 1);
       this.persistWorkspace(workspace);
     }
+  }
+
+  addAzureIntegration(alias: string, tenantId: string): void {
+    const workspace = this.getWorkspace();
+    workspace.azureIntegrations.push({
+      id: uuid.v4(),
+      type: IntegrationType.azure,
+      alias,
+      tenantId,
+    });
+    this.persistWorkspace(workspace);
+  }
+
+  deleteAzureIntegration(id: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.azureIntegrations.findIndex((azureIntegration) => azureIntegration.id === id);
+    if (index > -1) {
+      workspace.azureIntegrations.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  getAzureIntegration(id: string | number): AzureIntegration {
+    return this.getWorkspace().azureIntegrations.filter((azureIntegration) => azureIntegration.id === id)[0];
   }
 
   // PROXY CONFIGURATION

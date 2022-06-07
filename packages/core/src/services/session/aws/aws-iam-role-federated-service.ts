@@ -1,7 +1,7 @@
 import * as Aws from "aws-sdk";
 import { IAwsSamlAuthenticationService } from "../../../interfaces/i-aws-saml-authentication-service";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsIamRoleFederatedSession } from "../../../models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "../../../models/aws/aws-iam-role-federated-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";

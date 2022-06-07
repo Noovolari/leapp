@@ -1,5 +1,5 @@
-import { SessionType } from "./session-type";
-import { Session } from "./session";
+import { SessionType } from "../session-type";
+import { Session } from "../session";
 
 export class AwsIamRoleChainedSession extends Session {
   roleArn: string;

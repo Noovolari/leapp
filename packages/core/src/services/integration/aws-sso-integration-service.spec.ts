@@ -1,5 +1,6 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import { AwsSsoIntegrationService } from "./aws-sso-integration-service";
+import { IntegrationType } from "../../models/integration-type";
 
 describe("AwsSsoIntegrationService", () => {
   test("validateAlias - empty alias", () => {
@@ -273,7 +274,8 @@ describe("AwsSsoIntegrationService", () => {
       portalUrl: "portalUrl",
       region: "region",
       browserOpening: "browserOpening",
-    };
+      type: IntegrationType.awsSso,
+    } as any;
     awsIntegrationService.createIntegration(creationParams);
 
     expect(repository.addAwsSsoIntegration).toHaveBeenCalledWith("portalUrl", "alias", "region", "browserOpening");

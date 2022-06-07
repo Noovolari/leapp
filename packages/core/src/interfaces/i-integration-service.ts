@@ -4,7 +4,6 @@ import { IBehaviouralNotifier } from "./i-behavioural-notifier";
 import { INativeService } from "./i-native-service";
 import { SessionFactory } from "../services/session-factory";
 import { BehaviouralSubjectService } from "../services/behavioural-subject-service";
-import { IntegrationCreationParams } from "./IIntegrationCreateParams";
 import { Integration } from "../models/integration";
 
 export interface IIntegrationService {
@@ -15,9 +14,9 @@ export interface IIntegrationService {
   sessionFactory: SessionFactory;
   behaviouralSubjectService: BehaviouralSubjectService;
 
-  createIntegration(creationParams: IntegrationCreationParams): void;
+  createIntegration(creationParams: Integration): void;
 
-  updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void;
+  updateAwsSsoIntegration(id: string, updateParams: Integration): void;
 
   getIntegration(id: string): Integration;
 

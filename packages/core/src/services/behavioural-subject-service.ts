@@ -1,5 +1,5 @@
 import { BehaviorSubject } from "rxjs";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
+import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 import { Repository } from "./repository";
 import { Session } from "../models/session";
 import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";

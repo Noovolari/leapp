@@ -2,7 +2,7 @@ import SSO from "aws-sdk/clients/sso";
 import { BrowserWindowClosing } from "../../../interfaces/i-browser-window-closing";
 import { INativeService } from "../../../interfaces/i-native-service";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsSsoRoleSession } from "../../../models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "../../../models/aws/aws-sso-role-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";

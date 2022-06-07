@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { AwsProcessCredentials } from "../../../models/aws-process-credential";
+import { AwsProcessCredentials } from "../../../models/aws/aws-process-credential";
 import { SessionType } from "../../../models/session-type";
 import { AwsSessionService } from "./aws-session-service";
 import { CredentialsInfo } from "../../../models/credentials-info";

@@ -1,6 +1,6 @@
 import { LeappBaseError } from "../../../errors/leapp-base-error";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsProcessCredentials } from "../../../models/aws-process-credential";
+import { AwsProcessCredentials } from "../../../models/aws/aws-process-credential";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { SessionStatus } from "../../../models/session-status";

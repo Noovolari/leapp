@@ -1,13 +1,14 @@
-import { AwsNamedProfile } from "./aws-named-profile";
+import { AwsNamedProfile } from "./aws/aws-named-profile";
 import { IdpUrl } from "./idp-url";
 import { Session } from "./session";
 import * as uuid from "uuid";
 import "reflect-metadata";
 import { Type } from "class-transformer";
 import { constants } from "./constants";
-import { AwsSsoIntegration } from "./aws-sso-integration";
+import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import Folder from "./folder";
 import Segment from "./segment";
+import { AzureIntegration } from "./azure-integration";
 
 export class Workspace {
   @Type(() => Session)
@@ -19,6 +20,7 @@ export class Workspace {
   private _profiles: AwsNamedProfile[];
 
   private _awsSsoIntegrations: AwsSsoIntegration[];
+  private _azureIntegrations: AzureIntegration[];
 
   private _pinned: string[];
   private _folders: Folder[];
@@ -48,6 +50,7 @@ export class Workspace {
     this._profiles = [{ id: uuid.v4(), name: constants.defaultAwsProfileName }];
 
     this._awsSsoIntegrations = [];
+    this._azureIntegrations = [];
 
     this._proxyConfiguration = {
       proxyProtocol: "https",
@@ -126,6 +129,14 @@ export class Workspace {
 
   set awsSsoIntegrations(value: AwsSsoIntegration[]) {
     this._awsSsoIntegrations = value;
+  }
+
+  get azureIntegrations(): AzureIntegration[] {
+    return this._azureIntegrations;
+  }
+
+  set azureIntegrations(value: AzureIntegration[]) {
+    this._azureIntegrations = value;
   }
 
   get pinned(): string[] {

@@ -1,5 +1,5 @@
 import { Session } from "../models/session";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
+import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 
 export interface IBehaviouralNotifier {
   getSessions(): Session[];

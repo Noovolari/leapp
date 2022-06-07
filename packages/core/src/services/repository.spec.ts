@@ -6,7 +6,7 @@ import { constants } from "../models/constants";
 import { Session } from "../models/session";
 import { SessionType } from "../models/session-type";
 import { SessionStatus } from "../models/session-status";
-import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "../models/aws/aws-sso-role-session";
 import { LoggedException } from "./log-service";
 
 describe("Repository", () => {

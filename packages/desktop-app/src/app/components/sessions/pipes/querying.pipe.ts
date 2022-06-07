@@ -2,7 +2,7 @@ import { Pipe, PipeTransform } from "@angular/core";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { Workspace } from "@noovolari/leapp-core/models/workspace";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
-import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
 
 @Pipe({

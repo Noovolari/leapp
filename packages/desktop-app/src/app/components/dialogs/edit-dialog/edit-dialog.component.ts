@@ -14,7 +14,7 @@ import { SessionService } from "@noovolari/leapp-core/services/session/session-s
 import * as uuid from "uuid";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { AzureLocation } from "@noovolari/leapp-core/services/azure-location";
-import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";

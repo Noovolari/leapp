@@ -136,7 +136,6 @@
     "@angular/platform-browser-dynamic": "^13.2.2",
     "@angular/router": "^13.2.2",
     "@azure/msal-node": "^1.9.0",
-    "@azure/msal-node-extensions": "^1.0.0-alpha.17",
     "@electron/remote": "^2.0.1",
     "@ng-select/ng-select": "8.1.1",
     "@ngx-translate/core": "~13.0.0",

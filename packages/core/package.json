@@ -8,7 +8,6 @@
   "description": "Leapp's core module",
   "peerDependencies": {
     "@azure/msal-node": "^1.9.0",
-    "@azure/msal-node-extensions": "^1.0.0-alpha.17",
     "@babel/plugin-proposal-decorators": "^7.16.5",
     "@types/aws-sdk": "^2.7.0",
     "@types/node": "^16.9.4",

@@ -12,13 +12,14 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
-import { LogLevel, LogService, LoggedEntry, LoggedException } from "@noovolari/leapp-core/services/log-service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
 import { WindowService } from "../../services/window.service";
 import { sidebarHighlight } from "../side-bar/side-bar.component";
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { OptionsService } from "../../services/options.service";
+import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 
 export interface SelectedIntegration {
   id: string;
@@ -229,6 +230,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     this.selectedAwsSsoConfiguration = {
       id: "new AWS Single Sign-On",
+      type: IntegrationType.awsSso,
       alias: "",
       region: this.regions[0].region,
       portalUrl: "",
@@ -259,6 +261,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     if (modifying === 1) {
       this.selectedAwsSsoConfiguration = {
         id: "new AWS Single Sign-On",
+        type: IntegrationType.awsSso,
         alias: "",
         region: this.regions[0].region,
         portalUrl: "",

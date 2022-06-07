@@ -36,6 +36,7 @@ import { SessionManagementService } from "@noovolari/leapp-core/services/session
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { AppNativeLoggerService } from "./app-native-logger-service";
 import { MessageToasterService } from "./message-toaster.service";
+import { MsalPersistenceService } from "@noovolari/leapp-core/services/msal-persistence-service";
 
 @Injectable({
   providedIn: "root",
@@ -76,6 +77,7 @@ export class AppProviderService {
   private segmentServiceInstance: SegmentService;
   private sessionManagementServiceInstance: SessionManagementService;
   private workspaceServiceInstance: WorkspaceService;
+  private msalPersistenceServiceInstance: MsalPersistenceService;
 
   constructor(private electronService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
 
@@ -223,11 +225,20 @@ export class AppProviderService {
         this.repository,
         this.fileService,
         this.executeService,
-        constants.azureMsalCacheFile
+        constants.azureMsalCacheFile,
+        this.electronService,
+        this.msalPersistenceService
       );
     }
 
     return this.azureServiceInstance;
+  }
+
+  public get msalPersistenceService(): MsalPersistenceService {
+    if (!this.msalPersistenceServiceInstance) {
+      this.msalPersistenceServiceInstance = new MsalPersistenceService(this.electronService);
+    }
+    return this.msalPersistenceServiceInstance;
   }
 
   public get authenticationService(): AwsSamlAssertionExtractionService {

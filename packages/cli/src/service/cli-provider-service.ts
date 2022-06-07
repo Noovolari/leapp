@@ -40,6 +40,7 @@ import { SessionManagementService } from "@noovolari/leapp-core/services/session
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
+import { MsalPersistenceService } from "@noovolari/leapp-core/services/msal-persistence-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -80,6 +81,7 @@ export class CliProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private segmentServiceInstance: SegmentService;
   private workspaceServiceInstance: WorkspaceService;
+  private msalPersistenceServiceInstance: MsalPersistenceService;
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -200,9 +202,16 @@ export class CliProviderService {
   get azureService(): AzureService {
     if (!this.azureServiceInstance) {
       this.azureServiceInstance = new AzureService(this.behaviouralSubjectService, this.repository, this.fileService, this.executeService,
-        constants.azureMsalCacheFile, this.cliNativeService);
+        constants.azureMsalCacheFile, this.cliNativeService, this.msalPersistenceService);
     }
     return this.azureServiceInstance;
+  }
+
+  get msalPersistenceService(): MsalPersistenceService {
+    if(!this.msalPersistenceServiceInstance) {
+      this.msalPersistenceServiceInstance = new MsalPersistenceService(this.cliNativeService);
+    }
+    return this.msalPersistenceServiceInstance;
   }
 
   get sessionFactory(): SessionFactory {

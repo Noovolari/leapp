@@ -69,14 +69,14 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   }
 
   getOnlineIntegrations(): AwsSsoIntegration[] {
-    return this.getIntegrations().filter((integration) => this.isOnline(integration));
+    return this.getIntegrations().filter(async (integration) => await this.isOnline(integration));
   }
 
   getOfflineIntegrations(): AwsSsoIntegration[] {
-    return this.getIntegrations().filter((integration) => !this.isOnline(integration));
+    return this.getIntegrations().filter(async (integration) => await !this.isOnline(integration));
   }
 
-  isOnline(integration: AwsSsoIntegration): boolean {
+  async isOnline(integration: AwsSsoIntegration): Promise<boolean> {
     const expiration = new Date(integration.accessTokenExpiration).getTime();
     const now = this.getDate().getTime();
     return !!integration.accessTokenExpiration && now < expiration;

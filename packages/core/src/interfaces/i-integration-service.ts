@@ -22,7 +22,7 @@ export interface IIntegrationService {
 
   getIntegrations(): Integration[];
 
-  isOnline(integration: Integration): boolean;
+  isOnline(integration: Integration): Promise<boolean>;
 
   remainingHours(integration: Integration): string;
 

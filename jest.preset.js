@@ -1,5 +1,6 @@
 module.exports = {
   verbose: true,
+  silent: false,
   testMatch: [
     "**/*.spec.ts",
     "!dist/",

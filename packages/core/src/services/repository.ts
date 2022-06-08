@@ -343,6 +343,11 @@ export class Repository {
     return this.getWorkspace().azureIntegrations.filter((azureIntegration) => azureIntegration.id === id)[0];
   }
 
+  listAzureIntegrations(): AzureIntegration[] {
+    const workspace = this.getWorkspace();
+    return workspace.azureIntegrations;
+  }
+
   // PROXY CONFIGURATION
 
   getProxyConfiguration(): any {

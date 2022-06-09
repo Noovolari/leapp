@@ -140,7 +140,7 @@
     "@ng-select/ng-select": "8.1.1",
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
-    "@noovolari/leapp-core": "file:../core",
+    "@noovolari/leapp-core": "^0.1.110",
     "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",
@@ -171,7 +171,7 @@
     "ini": "~2.0.0",
     "is-url": "^1.2.4",
     "jwt-decode": "~3.1.2",
-    "keytar": "^7.8.0",
+    "keytar": "7.9.0",
     "markdown-it": "^12.0.6",
     "menubar": "~9.0.3",
     "mousetrap": "~1.6.5",
@@ -241,6 +241,7 @@
     "protractor": "^7.0.0",
     "ts-node": "^9.1.1",
     "typescript": "4.5.5",
-    "util": "^0.12.4"
+    "util": "^0.12.4",
+    "nan": "^2.13.2"
   }
 }

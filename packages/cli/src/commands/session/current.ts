@@ -1,4 +1,4 @@
-import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
+import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { Flags } from "@oclif/core";

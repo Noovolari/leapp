@@ -3,7 +3,6 @@ import { Workspace } from "../models/workspace";
 import { AwsIamRoleFederatedSession } from "../models/aws/aws-iam-role-federated-session";
 import { AwsIamRoleChainedSession } from "../models/aws/aws-iam-role-chained-session";
 import { AwsSsoRoleSession } from "../models/aws/aws-sso-role-session";
-import { AzureSession } from "../models/azure/azure-session";
 import { FileService } from "./file-service";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { KeychainService } from "./keychain-service";
@@ -78,7 +77,7 @@ export class RetroCompatibilityService {
     workspace._sessions.push(ssoSession);
   }
 
-  private static createNewAzureSession(session: any, workspace: any) {
+  /*private static createNewAzureSession(session: any, workspace: any) {
     const azureSession = new AzureSession(
       session.account.accountName,
       session.account.region,
@@ -87,7 +86,7 @@ export class RetroCompatibilityService {
     );
     azureSession.sessionId = session.id;
     workspace._sessions.push(azureSession);
-  }
+  }*/
 
   private static createNewAwsFederatedOrIamRoleChainedSessionNew(session: any, workspace: any) {
     if (!(session as AwsIamRoleChainedSession).parentSessionId) {
@@ -131,7 +130,7 @@ export class RetroCompatibilityService {
     workspace._sessions.push(ssoSession);
   }
 
-  private static createNewAzureSessionNew(session: any, workspace: any) {
+  /*private static createNewAzureSessionNew(session: any, workspace: any) {
     const azureSession = new AzureSession(
       (session as AzureSession).sessionName,
       (session as AzureSession).region,
@@ -140,7 +139,7 @@ export class RetroCompatibilityService {
     );
     azureSession.sessionId = session.sessionId;
     workspace._sessions.push(azureSession);
-  }
+  }*/
 
   isRetroPatchNecessary(): boolean {
     if (this.fileService.existsSync(this.fileService.homeDir() + "/" + constants.lockFileDestination)) {
@@ -199,7 +198,7 @@ export class RetroCompatibilityService {
       RetroCompatibilityService.adaptProxyConfig(oldWorkspace, workspace);
       RetroCompatibilityService.adaptGeneralProperties(oldWorkspace, workspace);
       await this.adaptAwsSsoConfig(oldWorkspace, workspace);
-      await this.adaptSessions(oldWorkspace, workspace);
+      //await this.adaptSessions(oldWorkspace, workspace);
       // Persist adapted workspace data
       this.persistsTemp(workspace);
       // Apply sessions to behaviour subject
@@ -244,7 +243,7 @@ export class RetroCompatibilityService {
     );
   }
 
-  private async adaptSessions(oldWorkspace: any, workspace: any): Promise<void> {
+  /*private async adaptSessions(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace.workspaces[0].sessions;
 
     // Loop through sessions and generate data
@@ -285,9 +284,9 @@ export class RetroCompatibilityService {
           break;
       }
     }
-  }
+  }*/
 
-  private async adaptNewSessions(oldWorkspace: any, workspace: any): Promise<void> {
+  /*private async adaptNewSessions(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace._sessions;
 
     // Loop through sessions and generate data
@@ -313,7 +312,7 @@ export class RetroCompatibilityService {
           break;
       }
     }
-  }
+  }*/
 
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace.workspaces[0].sessions;
@@ -393,7 +392,7 @@ export class RetroCompatibilityService {
     workspace.proxyConfiguration = oldWorkspace._proxyConfiguration;
     workspace.defaultRegion = oldWorkspace._defaultRegion;
     workspace.defaultLocation = oldWorkspace._defaultLocation;
-    await this.adaptNewSessions(oldWorkspace, workspace);
+    //await this.adaptNewSessions(oldWorkspace, workspace);
 
     // Get AWS SSO Configuration from both intermediate and old configs
     const awsSsoConfiguration = oldWorkspace._awsSsoConfiguration || oldWorkspace.awsSsoConfiguration;

@@ -15,7 +15,7 @@ import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
 import { IntegrationType } from "../models/integration-type";
-import { AzureIntegration } from "../models/azure-integration";
+import { AzureIntegration } from "../models/azure/azure-integration";
 
 export class Repository {
   // Private singleton workspace

@@ -8,7 +8,7 @@ import { constants } from "./constants";
 import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import Folder from "./folder";
 import Segment from "./segment";
-import { AzureIntegration } from "./azure-integration";
+import { AzureIntegration } from "./azure/azure-integration";
 
 export class Workspace {
   @Type(() => Session)

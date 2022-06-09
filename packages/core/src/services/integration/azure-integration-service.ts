@@ -6,7 +6,7 @@ import { KeychainService } from "../keychain-service";
 import { Repository } from "../repository";
 import { SessionFactory } from "../session-factory";
 import { Integration } from "../../models/integration";
-import { AzureIntegration } from "../../models/azure-integration";
+import { AzureIntegration } from "../../models/azure/azure-integration";
 import { ExecuteService } from "../execute-service";
 import { MsalPersistenceService } from "../msal-persistence-service";
 

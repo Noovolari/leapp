@@ -24,7 +24,7 @@ import { RemoteProceduresClient } from "@noovolari/leapp-core/services/remote-pr
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import CliInquirer from "inquirer";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { CliOpenWebConsoleService } from "./cli-open-web-console-service";
@@ -41,6 +41,7 @@ import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
 import { MsalPersistenceService } from "@noovolari/leapp-core/services/msal-persistence-service";
+import dpApi from "../dpapi-addon/DpApi";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -209,7 +210,7 @@ export class CliProviderService {
 
   get msalPersistenceService(): MsalPersistenceService {
     if(!this.msalPersistenceServiceInstance) {
-      this.msalPersistenceServiceInstance = new MsalPersistenceService(this.cliNativeService);
+      this.msalPersistenceServiceInstance = new MsalPersistenceService(this.cliNativeService, dpApi);
     }
     return this.msalPersistenceServiceInstance;
   }

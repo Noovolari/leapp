@@ -1,6 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
+import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { profileId, force } from "../../flags";
 

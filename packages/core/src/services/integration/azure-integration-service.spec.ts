@@ -3,7 +3,7 @@ import { AzureIntegrationService } from "./azure-integration-service";
 import { MsalPersistenceService } from "../msal-persistence-service";
 import * as os from "os";
 import * as fs from "fs";
-import { AzureIntegration } from "../../models/azure-integration";
+import { AzureIntegration } from "../../models/azure/azure-integration";
 import { IntegrationType } from "../../models/integration-type";
 
 describe("AzureIntegrationService", () => {

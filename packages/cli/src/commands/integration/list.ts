@@ -24,17 +24,20 @@ export default class ListIntegrations extends LeappCommand {
 
   async showIntegrations(): Promise<void> {
     const { flags } = await this.parse(ListIntegrations);
-    const data = this.cliProviderService.awsSsoIntegrationService.getIntegrations().map((integration: any) => {
-      const isOnline = this.cliProviderService.awsSsoIntegrationService.isOnline(integration);
-      return {
+    const data: Record<string, unknown>[] = [];
+    const integrations = this.cliProviderService.awsSsoIntegrationService.getIntegrations();
+
+    for (const integration of integrations) {
+      const isOnline = await this.cliProviderService.awsSsoIntegrationService.isOnline(integration);
+      data.push({
         integrationId: integration.id,
         integrationName: integration.alias,
         portalUrl: integration.portalUrl,
         region: integration.region,
         status: isOnline ? "Online" : "Offline",
         expirationInHours: isOnline ? `Expiring ${this.cliProviderService.awsSsoIntegrationService.remainingHours(integration)}` : "-",
-      };
-    }) as any as Record<string, unknown>[];
+      } as Record<string, unknown>);
+    }
 
     const columns = {
       integrationId: { header: "ID", extended: true },

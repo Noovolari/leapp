@@ -21,7 +21,7 @@ import { RotationService } from "@noovolari/leapp-core/services/rotation-service
 import { AppVerificationWindowService } from "./services/app-verification-window.service";
 import { WindowService } from "./services/window.service";
 import { AppNativeService } from "./services/app-native.service";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "./services/options.service";

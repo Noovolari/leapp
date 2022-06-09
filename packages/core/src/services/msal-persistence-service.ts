@@ -32,7 +32,7 @@ export class MsalPersistenceService implements IMsalPersistence {
 
   load(customPath?: string): Promise<JsonCache> {
     const msalTokenCacheFileExtension = this.iNativeService.process.platform === "win32" ? ".bin" : ".json";
-    const location = customPath || path.join(this.iNativeService.os.homedir(), ".azure/msal_token_cache", msalTokenCacheFileExtension);
+    const location = customPath || path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache.${msalTokenCacheFileExtension}`);
     try {
       const data = this.iNativeService.fs.readFileSync(location, "utf8");
       const finalData = this.iMsalEncryptionService.unprotectData(data, null, DataProtectionScope.toString()).toString();
@@ -45,7 +45,8 @@ export class MsalPersistenceService implements IMsalPersistence {
 
   save(cache: JsonCache, customPath?: string): Promise<void> {
     const data = JSON.stringify(cache, null, 4);
-    const location = customPath || path.join(this.iNativeService.os.homedir(), ".azure/msal_token_cache.json");
+    const msalTokenCacheFileExtension = this.iNativeService.process.platform === "win32" ? ".bin" : ".json";
+    const location = customPath || path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache.${msalTokenCacheFileExtension}`);
     const isWin = this.iNativeService.process.platform === "win32";
     const finalData = isWin ? this.iMsalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.toString()) : data;
 

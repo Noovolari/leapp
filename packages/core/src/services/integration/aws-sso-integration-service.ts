@@ -22,6 +22,7 @@ import { AwsSsoIntegrationTokenInfo } from "../../models/aws/aws-sso-integration
 import { SessionFactory } from "../session-factory";
 import { BehaviouralSubjectService } from "../behavioural-subject-service";
 import { IIntegrationService } from "../../interfaces/i-integration-service";
+import { AwsSsoIntegrationCreationParams } from "../../models/aws/aws-sso-integration-creation-params";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -52,11 +53,11 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return portalUrlValidationRegex.test(portalUrl) ? true : "Invalid portal URL";
   }
 
-  createIntegration(creationParams: AwsSsoIntegration): void {
+  createIntegration(creationParams: AwsSsoIntegrationCreationParams): void {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
 
-  updateAwsSsoIntegration(id: string, updateParams: AwsSsoIntegration): void {
+  updateAwsSsoIntegration(id: string, updateParams: AwsSsoIntegrationCreationParams): void {
     this.repository.updateAwsSsoIntegration(id, updateParams.alias, updateParams.region, updateParams.portalUrl, updateParams.browserOpening);
   }
 

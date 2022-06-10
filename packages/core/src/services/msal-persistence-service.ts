@@ -2,7 +2,6 @@ import { IMsalPersistence } from "../interfaces/i-msal-persistence";
 import { JsonCache } from "@azure/msal-node";
 import path from "path";
 import { INativeService } from "../interfaces/i-native-service";
-import { IMsalEncryptionService } from "../interfaces/i-msal-encryption-service";
 
 export interface AzureSubscription {
   id: string;
@@ -28,14 +27,14 @@ export enum DataProtectionScope {
 }
 
 export class MsalPersistenceService implements IMsalPersistence {
-  constructor(private iNativeService: INativeService, private iMsalEncryptionService: IMsalEncryptionService) {}
+  constructor(private iNativeService: INativeService) {}
 
   load(customPath?: string): Promise<JsonCache> {
     const msalTokenCacheFileExtension = this.iNativeService.process.platform === "win32" ? ".bin" : ".json";
     const location = customPath || path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
     try {
       const data = this.iNativeService.fs.readFileSync(location);
-      const finalData = this.iMsalEncryptionService.unprotectData(data, null, DataProtectionScope.toString()).toString();
+      const finalData = this.iNativeService.msalEncryptionService.unprotectData(data, null, DataProtectionScope.toString()).toString();
       const parsedData = JSON.parse(finalData.trim());
       return Promise.resolve(parsedData as JsonCache);
     } catch (err) {
@@ -48,7 +47,9 @@ export class MsalPersistenceService implements IMsalPersistence {
     const msalTokenCacheFileExtension = this.iNativeService.process.platform === "win32" ? ".bin" : ".json";
     const location = customPath || path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
     const isWin = this.iNativeService.process.platform === "win32";
-    const finalData = isWin ? this.iMsalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.toString()) : data;
+    const finalData = isWin
+      ? this.iNativeService.msalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.toString())
+      : data;
 
     try {
       this.iNativeService.fs.writeFileSync(location, finalData);

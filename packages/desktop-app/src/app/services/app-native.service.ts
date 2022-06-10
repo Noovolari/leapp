@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import * as Keytar from "keytar";
 import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
+import { IMsalEncryptionService } from "@noovolari/leapp-core/interfaces/i-msal-encryption-service";
 
 @Injectable({ providedIn: "root" })
 export class AppNativeService implements INativeService {
@@ -34,6 +35,7 @@ export class AppNativeService implements INativeService {
   notification: any;
   nodeIpc: any;
   process: any;
+  msalEncryptionService: IMsalEncryptionService;
 
   constructor() {
     if (this.isElectron) {
@@ -67,6 +69,7 @@ export class AppNativeService implements INativeService {
       this.notification = window.require("@electron/remote").Notification;
       this.nodeIpc = window.require("node-ipc");
       this.process = (window as any).process;
+      this.msalEncryptionService = (window as any).dpApi;
     }
   }
 

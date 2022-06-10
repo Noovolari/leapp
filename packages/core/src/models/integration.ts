@@ -1,7 +1,5 @@
 import { IntegrationType } from "./integration-type";
 
-export interface Integration {
-  id: string;
-  alias: string;
-  type: IntegrationType;
+export class Integration {
+  constructor(public id: string, public alias: string, public type: IntegrationType) {}
 }

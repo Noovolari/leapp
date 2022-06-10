@@ -1,8 +1,15 @@
 import { Integration } from "../integration";
+import { IntegrationType } from "../integration-type";
 
-export interface AwsSsoIntegration extends Integration {
-  portalUrl: string;
-  region: string;
-  accessTokenExpiration: string;
-  browserOpening: string;
+export class AwsSsoIntegration extends Integration {
+  constructor(
+    id: string,
+    alias: string,
+    public portalUrl: string,
+    public region: string,
+    public browserOpening: string,
+    public accessTokenExpiration: string
+  ) {
+    super(id, alias, IntegrationType.awsSso);
+  }
 }

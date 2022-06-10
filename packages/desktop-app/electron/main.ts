@@ -31,6 +31,7 @@ const windowDefaultConfig = {
       contextIsolation: false,
       enableRemoteModule: true,
       nodeIntegration: true,
+      preload: path.join(__dirname, "preload.js")
     },
   },
 };
@@ -140,7 +141,7 @@ const generateMainWindow = () => {
     });
 
     app.on("browser-window-focus", () => {
-      electronLocalshortcut.register(win, ['CommandOrControl+R','CommandOrControl+Shift+R', 'F5'], () => {});
+      electronLocalshortcut.register(win, ['CommandOrControl+R', 'CommandOrControl+Shift+R', 'F5'], () => {});
     });
 
     app.on("browser-window-blur", () => {

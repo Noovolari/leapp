@@ -25,7 +25,7 @@ import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
 import { WindowService } from "./window.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
@@ -79,7 +79,7 @@ export class AppProviderService {
   private workspaceServiceInstance: WorkspaceService;
   private msalPersistenceServiceInstance: MsalPersistenceService;
 
-  constructor(private electronService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
+  constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -181,7 +181,7 @@ export class AppProviderService {
         this.awsSsoRoleService,
         this.keyChainService,
         this.behaviouralSubjectService,
-        this.electronService,
+        this.appNativeService,
         this.sessionFactory,
         this.behaviouralSubjectService
       );
@@ -197,7 +197,7 @@ export class AppProviderService {
         this.fileService,
         this.keyChainService,
         this.awsCoreService,
-        this.electronService,
+        this.appNativeService,
         this.awsSsoOidcService
       );
     }
@@ -213,7 +213,7 @@ export class AppProviderService {
 
   public get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.electronService, this.logService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.appNativeService, this.logService);
     }
     return this.awsCoreServiceInstance;
   }
@@ -226,7 +226,7 @@ export class AppProviderService {
         this.fileService,
         this.executeService,
         constants.azureMsalCacheFile,
-        this.electronService,
+        this.appNativeService,
         this.msalPersistenceService
       );
     }
@@ -236,7 +236,7 @@ export class AppProviderService {
 
   public get msalPersistenceService(): MsalPersistenceService {
     if (!this.msalPersistenceServiceInstance) {
-      this.msalPersistenceServiceInstance = new MsalPersistenceService(this.electronService);
+      this.msalPersistenceServiceInstance = new MsalPersistenceService(this.appNativeService);
     }
     return this.msalPersistenceServiceInstance;
   }
@@ -281,28 +281,28 @@ export class AppProviderService {
 
   public get fileService(): FileService {
     if (!this.fileServiceInstance) {
-      this.fileServiceInstance = new FileService(this.electronService);
+      this.fileServiceInstance = new FileService(this.appNativeService);
     }
     return this.fileServiceInstance;
   }
 
   public get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.electronService, this.fileService);
+      this.repositoryInstance = new Repository(this.appNativeService, this.fileService);
     }
     return this.repositoryInstance;
   }
 
   public get keyChainService(): KeychainService {
     if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.electronService);
+      this.keyChainServiceInstance = new KeychainService(this.appNativeService);
     }
     return this.keyChainServiceInstance;
   }
 
   public get logService(): LogService {
     if (!this.loggingServiceInstance) {
-      this.loggingServiceInstance = new LogService(new AppNativeLoggerService(this.electronService, this.messageToaster));
+      this.loggingServiceInstance = new LogService(new AppNativeLoggerService(this.appNativeService, this.messageToaster));
     }
     return this.loggingServiceInstance;
   }
@@ -316,7 +316,7 @@ export class AppProviderService {
 
   public get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository, this.logService);
+      this.executeServiceInstance = new ExecuteService(this.appNativeService, this.repository, this.logService);
     }
     return this.executeServiceInstance;
   }
@@ -351,7 +351,7 @@ export class AppProviderService {
   public get remoteProceduresServer(): RemoteProceduresServer {
     if (!this.remoteProceduresServerInstance) {
       this.remoteProceduresServerInstance = new RemoteProceduresServer(
-        this.electronService,
+        this.appNativeService,
         this.verificationWindowService,
         this.awsAuthenticationService,
         this.mfaCodePrompter,

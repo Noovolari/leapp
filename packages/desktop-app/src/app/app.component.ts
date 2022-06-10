@@ -55,7 +55,7 @@ export class AppComponent implements OnInit {
     private optionsService: OptionsService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private electronService: AppNativeService
+    private appNativeService: AppNativeService
   ) {
     appProviderService.mfaCodePrompter = mfaCodePrompter;
     appProviderService.awsAuthenticationService = awsAuthenticationService;
@@ -82,7 +82,7 @@ export class AppComponent implements OnInit {
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
     // We get the right moment to set an hook to app close
-    const ipcRenderer = this.electronService.ipcRenderer;
+    const ipcRenderer = this.appNativeService.ipcRenderer;
     ipcRenderer.on("app-close", () => {
       this.loggingService.log(new LoggedEntry("Preparing for closing instruction...", this, LogLevel.info));
       this.beforeCloseInstructions();
@@ -221,7 +221,7 @@ export class AppComponent implements OnInit {
       this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion());
     }
 
-    const ipc = this.electronService.ipcRenderer;
+    const ipc = this.appNativeService.ipcRenderer;
     ipc.on("UPDATE_AVAILABLE", async (_, info) => {
       const releaseNote = await this.updaterService.getReleaseNote();
       this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);

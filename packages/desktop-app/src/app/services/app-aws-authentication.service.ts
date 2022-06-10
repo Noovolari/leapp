@@ -3,7 +3,7 @@ import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppNativeService } from "./app-native.service";
 import { AppService } from "./app.service";

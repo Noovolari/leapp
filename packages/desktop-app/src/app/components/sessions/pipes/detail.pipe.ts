@@ -1,10 +1,10 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
-import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
-import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
+import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
 
 @Pipe({
   name: "detail",

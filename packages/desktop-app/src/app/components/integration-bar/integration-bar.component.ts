@@ -5,7 +5,7 @@ import { Router } from "@angular/router";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { BehaviorSubject } from "rxjs";
 import { MatMenuTrigger } from "@angular/material/menu";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppService } from "../../services/app.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
@@ -14,7 +14,7 @@ import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
-import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
 import { WindowService } from "../../services/window.service";
 import { sidebarHighlight } from "../side-bar/side-bar.component";
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
@@ -44,11 +44,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   eConstants = constants;
   regions = [];
-  selectedAwsSsoConfiguration: AwsSsoIntegration;
+  selectedAwsSsoIntegration: AwsSsoIntegration;
   loadingInBrowser = false;
   loadingInApp = false;
   chooseIntegration = false;
-  awsSsoConfigurations: AwsSsoIntegration[];
+  awsSsoIntegrations: AwsSsoIntegration[];
   modifying: number;
   subscription;
   subscription2;
@@ -93,7 +93,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscription = this.behaviouralSubjectService.integrations$.subscribe(() => {
       this.setValues();
-      this.selectedIntegrations = this.awsSsoConfigurations.map((awsIntegration) => ({
+      this.selectedIntegrations = this.awsSsoIntegrations.map((awsIntegration) => ({
         id: awsIntegration.id,
         selected: false,
       }));
@@ -102,14 +102,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if (value) {
-        this.gotoForm(1, this.selectedAwsSsoConfiguration);
+        this.gotoForm(1, this.selectedAwsSsoIntegration);
       }
     });
 
     this.subscription3 = syncAllEvent.subscribe(async (value) => {
       if (value) {
-        for (let i = 0; i < this.awsSsoConfigurations.length; i++) {
-          const integration = this.awsSsoConfigurations[i];
+        for (let i = 0; i < this.awsSsoIntegrations.length; i++) {
+          const integration = this.awsSsoIntegrations[i];
           await this.forceSync(integration.id);
         }
         this.messageToasterService.toast("Integrations synchronized.", ToastLevel.info, "");
@@ -133,13 +133,13 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.subscription3.unsubscribe();
   }
 
-  selectedSsoConfigurationCheck(awsSsoConfiguration: AwsSsoIntegration): string {
-    const index = this.selectedIntegrations.findIndex((s) => s.id === awsSsoConfiguration.id);
+  selectedSsoIntegrationCheck(awsSsoIntegration: AwsSsoIntegration): string {
+    const index = this.selectedIntegrations.findIndex((s) => s.id === awsSsoIntegration.id);
     return this.selectedIntegrations[index].selected ? "selected-integration" : "";
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  applyContextMenu(index: number, awsSsoConfiguration: AwsSsoIntegration, event: any): void {
+  applyContextMenu(index: number, awsSsoIntegration: AwsSsoIntegration, event: any): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -147,7 +147,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     this.selectedIntegrations.forEach((s) => (s.selected = false));
 
-    const selectedIndex = this.selectedIntegrations.findIndex((s) => s.id === awsSsoConfiguration.id);
+    const selectedIndex = this.selectedIntegrations.findIndex((s) => s.id === awsSsoIntegration.id);
     this.selectedIntegrations[selectedIndex].selected = true;
 
     setTimeout(() => {
@@ -159,7 +159,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     }, 100);
   }
 
-  applySegmentFilter(awsSsoConfiguration: AwsSsoIntegration, event: MouseEvent): void {
+  applySegmentFilter(awsSsoIntegration: AwsSsoIntegration, event: MouseEvent): void {
     event.preventDefault();
     event.stopPropagation();
 
@@ -167,18 +167,18 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     sidebarHighlight.next({ showAll: false, showPinned: false });
 
-    const selectedIndex = this.selectedIntegrations.findIndex((s) => s.id === awsSsoConfiguration.id);
+    const selectedIndex = this.selectedIntegrations.findIndex((s) => s.id === awsSsoIntegration.id);
     this.selectedIntegrations[selectedIndex].selected = true;
     document.querySelector(".sessions").classList.remove("option-bar-opened");
     globalFilteredSessions.next(
-      this.behaviouralSubjectService.sessions.filter((s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === awsSsoConfiguration.id)
+      this.behaviouralSubjectService.sessions.filter((s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === awsSsoIntegration.id)
     );
   }
 
   async logout(configurationId: string): Promise<void> {
     this.logoutLoadings[configurationId] = true;
-    this.selectedAwsSsoConfiguration = this.leappCoreService.awsSsoIntegrationService.getIntegration(configurationId);
-    this.leappCoreService.awsSsoIntegrationService.logout(this.selectedAwsSsoConfiguration.id);
+    this.selectedAwsSsoIntegration = this.leappCoreService.awsSsoIntegrationService.getIntegration(configurationId);
+    this.leappCoreService.awsSsoIntegrationService.logout(this.selectedAwsSsoIntegration.id);
 
     this.loadingInBrowser = false;
     this.loadingInApp = false;
@@ -186,14 +186,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   async forceSync(integrationId: string): Promise<void> {
-    this.selectedAwsSsoConfiguration = this.leappCoreService.awsSsoIntegrationService.getIntegration(integrationId);
+    this.selectedAwsSsoIntegration = this.leappCoreService.awsSsoIntegrationService.getIntegration(integrationId);
 
-    if (this.selectedAwsSsoConfiguration && !this.loadingInApp) {
-      this.loadingInBrowser = this.selectedAwsSsoConfiguration.browserOpening === constants.inBrowser.toString();
-      this.loadingInApp = this.selectedAwsSsoConfiguration.browserOpening === constants.inApp.toString();
+    if (this.selectedAwsSsoIntegration && !this.loadingInApp) {
+      this.loadingInBrowser = this.selectedAwsSsoIntegration.browserOpening === constants.inBrowser.toString();
+      this.loadingInApp = this.selectedAwsSsoIntegration.browserOpening === constants.inApp.toString();
 
       try {
-        if (this.loadingInBrowser && !this.isOnline(this.selectedAwsSsoConfiguration)) {
+        if (this.loadingInBrowser && !this.isOnline(this.selectedAwsSsoIntegration)) {
           this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
         }
 
@@ -222,13 +222,13 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   setValues(): void {
     this.modifying = 0;
     this.regions = this.leappCoreService.awsCoreService.getRegions();
-    this.awsSsoConfigurations = this.leappCoreService.awsSsoIntegrationService.getIntegrations();
+    this.awsSsoIntegrations = this.leappCoreService.awsSsoIntegrationService.getIntegrations();
     this.logoutLoadings = {};
-    this.awsSsoConfigurations.forEach((sc) => {
+    this.awsSsoIntegrations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
     });
 
-    this.selectedAwsSsoConfiguration = {
+    this.selectedAwsSsoIntegration = {
       id: "new AWS Single Sign-On",
       type: IntegrationType.awsSso,
       alias: "",
@@ -256,10 +256,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     // Change graphical values to show the form
     this.chooseIntegration = false;
     this.modifying = modifying;
-    this.selectedAwsSsoConfiguration = awsSsoIntegration;
+    this.selectedAwsSsoIntegration = awsSsoIntegration;
 
     if (modifying === 1) {
-      this.selectedAwsSsoConfiguration = {
+      this.selectedAwsSsoIntegration = {
         id: "new AWS Single Sign-On",
         type: IntegrationType.awsSso,
         alias: "",
@@ -270,10 +270,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       };
     }
 
-    this.form.get("alias").setValue(this.selectedAwsSsoConfiguration.alias);
-    this.form.get("portalUrl").setValue(this.selectedAwsSsoConfiguration.portalUrl);
-    this.form.get("awsRegion").setValue(this.selectedAwsSsoConfiguration.region);
-    this.form.get("defaultBrowserOpening").setValue(this.selectedAwsSsoConfiguration.browserOpening);
+    this.form.get("alias").setValue(this.selectedAwsSsoIntegration.alias);
+    this.form.get("portalUrl").setValue(this.selectedAwsSsoIntegration.portalUrl);
+    this.form.get("awsRegion").setValue(this.selectedAwsSsoIntegration.region);
+    this.form.get("defaultBrowserOpening").setValue(this.selectedAwsSsoIntegration.browserOpening);
 
     this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
   }
@@ -288,10 +288,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       if (this.modifying === 1) {
         // Save
         this.leappCoreService.awsSsoIntegrationService.createIntegration({ alias, browserOpening, portalUrl, region });
-      } else if (this.modifying === 2 && this.selectedAwsSsoConfiguration.portalUrl !== "") {
+      } else if (this.modifying === 2 && this.selectedAwsSsoIntegration.portalUrl !== "") {
         // Edit
         // eslint-disable-next-line max-len
-        this.leappCoreService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedAwsSsoConfiguration.id, {
+        this.leappCoreService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedAwsSsoIntegration.id, {
           alias,
           region,
           portalUrl,
@@ -327,12 +327,12 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  isOnline(awsSsoConfiguration: AwsSsoIntegration): boolean {
-    return this.leappCoreService.awsSsoIntegrationService.isOnline(awsSsoConfiguration);
+  async isOnline(awsSsoIntegration: AwsSsoIntegration): Promise<boolean> {
+    return await this.leappCoreService.awsSsoIntegrationService.isOnline(awsSsoIntegration);
   }
 
-  remainingHours(awsSsoConfiguration: AwsSsoIntegration): string {
-    return this.leappCoreService.awsSsoIntegrationService.remainingHours(awsSsoConfiguration);
+  remainingHours(awsSsoIntegration: AwsSsoIntegration): string {
+    return this.leappCoreService.awsSsoIntegrationService.remainingHours(awsSsoIntegration);
   }
 
   formValid(): boolean {

@@ -24,8 +24,13 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "target": "ES2019",
-    "types": ["node"],
-    "lib": ["ES2019", "DOM"],
+    "types": [
+      "node"
+    ],
+    "lib": [
+      "ES2019",
+      "DOM"
+    ],
     "outDir": "dist",
     "baseUrl": ".",
     "skipLibCheck": true,

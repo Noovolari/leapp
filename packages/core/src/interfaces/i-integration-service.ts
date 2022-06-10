@@ -5,6 +5,7 @@ import { INativeService } from "./i-native-service";
 import { SessionFactory } from "../services/session-factory";
 import { BehaviouralSubjectService } from "../services/behavioural-subject-service";
 import { Integration } from "../models/integration";
+import { IntegrationCreationParams } from "../models/integration-creation-params";
 
 export interface IIntegrationService {
   repository: Repository;
@@ -14,9 +15,9 @@ export interface IIntegrationService {
   sessionFactory: SessionFactory;
   behaviouralSubjectService: BehaviouralSubjectService;
 
-  createIntegration(creationParams: Integration): void;
+  createIntegration(creationParams: IntegrationCreationParams): void;
 
-  updateAwsSsoIntegration(id: string, updateParams: Integration): void;
+  updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void;
 
   getIntegration(id: string): Integration;
 

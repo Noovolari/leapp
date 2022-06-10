@@ -89,7 +89,9 @@
     "/bin",
     "/dist",
     "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
+    "/oclif.manifest.json",
+    "src/dpapi-addon",
+    "binding.gyp"
   ],
   "homepage": "https://github.com/noovolari/leapp",
   "keywords": [

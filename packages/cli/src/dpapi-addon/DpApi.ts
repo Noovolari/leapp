@@ -9,7 +9,7 @@ const bindings = require("bindings");
 
 export const dpApi: IMsalEncryptionService = bindings({
   bindings: "dpapi",
-  userDefinedTries: [["module_root", "node_modules", "@azure", "msal-node-extensions", "build", "Release", "bindings"]],
+  userDefinedTries: [["module_root", "node_modules", "build", "Release", "bindings"]],
 });
 
 export default dpApi;

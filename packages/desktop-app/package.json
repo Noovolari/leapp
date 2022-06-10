@@ -198,7 +198,8 @@
     "v8-compile-cache": "~2.3.0",
     "wait-on": "^6.0.0",
     "zlib": "~1.0.5",
-    "zone.js": "~0.11.4"
+    "zone.js": "~0.11.4",
+    "bindings": "^1.5.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^13.2.2",

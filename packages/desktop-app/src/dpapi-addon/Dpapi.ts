@@ -7,7 +7,7 @@ import { IMsalEncryptionService } from "@noovolari/leapp-core/interfaces/i-msal-
 
 export const dpApi: IMsalEncryptionService = require("bindings")({
   bindings: "dpapi",
-  userDefinedTries: [["module_root", "node_modules", "@azure", "msal-node-extensions", "build", "Release", "bindings"]],
+  userDefinedTries: [["module_root", "node_modules", "build", "Release", "bindings"]],
 });
 
 export default dpApi;

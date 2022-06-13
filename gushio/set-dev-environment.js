@@ -1,33 +1,27 @@
 module.exports = {
   cli: {
-    name: 'project-bootstrap',
+    name: 'set-dev-environment',
     description: 'Set the environment in production mode (enable monorepo dependencies symlinks)',
     version: '0.1',
-    arguments: [
-      {name: '[packages...]'},
-    ],
+    arguments: [],
   },
-  run: async (args) => {
-    const shellJs = require('shelljs')
+  run: async () => {
     const path = require('path')
-    const currentPath = shellJs.pwd()
-    const packageNames = args[0]
+    const readPackageJsonFunction = require('./read-package-json-func')
+    const writePackageJsonFunction = require('./write-package-json-func')
+    const packageNames = ['desktop-app', 'cli']
 
     try {
       for (const packageName of packageNames) {
-        console.log('\n\n')
-        console.log(`installing dependencies for ${packageName}...`)
-        shellJs.cd(path.join(__dirname, '..', 'packages', packageName))
-        let result = shellJs.exec('npm install')
-        if (result.code !== 0) {
-          throw new Error(result.stderr)
-        }
+        console.log(`enabling monorepo dependencies symlinks for ${packageName}...`)
+        const packageToModify = await readPackageJsonFunction(path, packageName)
+        const corePackage = await readPackageJsonFunction(path, 'core')
+        packageToModify['dependencies'][corePackage['name']] = 'file:../core'
+        await writePackageJsonFunction(path, packageName, packageToModify)
       }
     } catch (e) {
       e.message = e.message.red
       throw e
-    } finally {
-      shellJs.cd(currentPath)
     }
   },
 }

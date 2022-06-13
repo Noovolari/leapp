@@ -78,7 +78,7 @@
     "access": "public"
   },
   "scripts": {
-    "setup": "gushio ../../gushio/setup-package.js core",
+    "setup": "gushio ../../gushio/clean-and-bootstrap.js core",
     "clean": "gushio gushio/target-clean.js",
     "build": "gushio gushio/target-build.js",
     "test": "jest",

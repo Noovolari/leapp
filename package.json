@@ -33,8 +33,10 @@
     "typescript": "4.5.5"
   },
   "scripts": {
-    "setup": "npm install && gushio gushio/setup-package.js core cli desktop-app",
-    "bootstrap": "npm install && gushio gushio/project-bootstrap.js core cli desktop-app",
+    "set-pro-environment": "npm install && gushio gushio/set-pro-environment.js",
+    "set-dev-environment": "npm install && gushio gushio/set-dev-environment.js",
+    "bootstrap": "npm install && gushio gushio/bootstrap.js core cli desktop-app",
+    "clean-and-bootstrap": "npm install && gushio gushio/clean-and-bootstrap.js core cli desktop-app",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install"

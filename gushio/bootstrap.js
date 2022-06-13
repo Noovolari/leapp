@@ -1,7 +1,7 @@
 module.exports = {
   cli: {
     name: 'project-bootstrap',
-    description: 'Bootstrap every package',
+    description: 'Bootstrap (npm install) every package',
     version: '0.1',
     arguments: [
       {name: '[packages...]'},

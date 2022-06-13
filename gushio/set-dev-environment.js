@@ -1,7 +1,7 @@
 module.exports = {
   cli: {
     name: 'set-dev-environment',
-    description: 'Set the environment in production mode (enable monorepo dependencies symlinks)',
+    description: 'Set the environment in development mode (enable monorepo dependencies symlinks)',
     version: '0.1',
     arguments: [],
   },

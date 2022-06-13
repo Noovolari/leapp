@@ -15,6 +15,9 @@ export class LeappSelectComponent implements AfterViewInit {
   ngSelectComponent: NgSelectComponent;
 
   @Input()
+  addTag: boolean;
+
+  @Input()
   ngModel: any;
 
   @Input()

@@ -3,7 +3,7 @@
              class="{{uppercased ? 'uppercased' : ''}}"
              type="text"
              placeholder="{{placeholder}}"
-
+             [addTag]="addTag ? addTag: true"
              [bindLabel]="bindLabel"
              [bindValue]="bindValue"
              (keyup)="setTemporaryName($event)"

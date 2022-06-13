@@ -14,6 +14,8 @@ import { IdpUrl } from "../models/idp-url";
 import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
+import { AzureIntegration } from "../models/azureIntegration";
+import { IntegrationType } from "../models/integration-type";
 
 export class Repository {
   // Private singleton workspace
@@ -279,6 +281,7 @@ export class Repository {
       region,
       accessTokenExpiration: undefined,
       browserOpening,
+      type: IntegrationType.awsSso,
     });
     this.persistWorkspace(workspace);
   }
@@ -312,6 +315,66 @@ export class Repository {
     const index = workspace.awsSsoIntegrations.findIndex((awsSsoIntegration) => awsSsoIntegration.id === id);
     if (index > -1) {
       workspace.awsSsoIntegrations.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  // AZURE INTEGRATION
+
+  listAzureIntegrations(): AzureIntegration[] {
+    const workspace = this.getWorkspace();
+    return workspace.azureIntegrations;
+  }
+
+  getAzureIntegration(id: string | number): AzureIntegration {
+    return this.getWorkspace().azureIntegrations.filter((ssoConfig) => ssoConfig.id === id)[0];
+  }
+
+  getAzureIntegrationSessions(id: string | number): Session[] {
+    return this.workspace.sessions.filter((sess) => (sess as any).azureConfigurationId === id);
+  }
+
+  addAzureIntegration(portalUrl: string, alias: string, tenantId: string): void {
+    const workspace = this.getWorkspace();
+    workspace.azureIntegrations.push({
+      id: uuid.v4(),
+      alias,
+      portalUrl,
+      accessTokenExpiration: undefined,
+      tenantId,
+      type: IntegrationType.azure,
+    });
+    this.persistWorkspace(workspace);
+  }
+
+  updateAzureIntegration(id: string, alias: string, portalUrl: string, tenantId: string, expirationTime?: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.azureIntegrations.findIndex((integration) => integration.id === id);
+    if (index > -1) {
+      workspace.azureIntegrations[index].alias = alias;
+      workspace.azureIntegrations[index].tenantId = tenantId;
+      workspace.azureIntegrations[index].portalUrl = portalUrl;
+      if (expirationTime) {
+        workspace.azureIntegrations[index].accessTokenExpiration = expirationTime;
+      }
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  unsetAzureIntegrationExpiration(id: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.azureIntegrations.findIndex((integration) => integration.id === id);
+    if (index > -1) {
+      workspace.azureIntegrations[index].accessTokenExpiration = undefined;
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  deleteAzureIntegration(id: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.azureIntegrations.findIndex((integration) => integration.id === id);
+    if (index > -1) {
+      workspace.azureIntegrations.splice(index, 1);
       this.persistWorkspace(workspace);
     }
   }

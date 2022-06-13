@@ -12,6 +12,7 @@ import { AwsIamUserSession } from "../models/aws-iam-user-session";
 import * as uuid from "uuid";
 import { SessionType } from "../models/session-type";
 import { Repository } from "./repository";
+import { IntegrationType } from "../models/integration-type";
 
 export class RetroCompatibilityService {
   constructor(
@@ -82,7 +83,8 @@ export class RetroCompatibilityService {
       session.account.accountName,
       session.account.region,
       session.account.subscriptionId,
-      session.account.tenantId
+      session.account.tenantId,
+      null
     );
     azureSession.sessionId = session.id;
     workspace._sessions.push(azureSession);
@@ -135,7 +137,8 @@ export class RetroCompatibilityService {
       (session as AzureSession).sessionName,
       (session as AzureSession).region,
       (session as AzureSession).subscriptionId,
-      (session as AzureSession).tenantId
+      (session as AzureSession).tenantId,
+      null
     );
     azureSession.sessionId = session.sessionId;
     workspace._sessions.push(azureSession);
@@ -406,6 +409,7 @@ export class RetroCompatibilityService {
           portalUrl: awsSsoConfiguration.portalUrl,
           accessTokenExpiration: awsSsoConfiguration.expirationTime,
           browserOpening: constants.inApp,
+          type: IntegrationType.awsSso,
         });
 
         try {

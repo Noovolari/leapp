@@ -1,16 +1,16 @@
 import { BehaviorSubject } from "rxjs";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
 import { Repository } from "./repository";
 import { Session } from "../models/session";
 import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
+import { Integration } from "../models/integration";
 
 export class BehaviouralSubjectService implements IBehaviouralNotifier {
   readonly sessions$: BehaviorSubject<Session[]>;
-  readonly integrations$: BehaviorSubject<AwsSsoIntegration[]>;
+  readonly integrations$: BehaviorSubject<Integration[]>;
 
   constructor(private repository: Repository) {
     this.sessions$ = new BehaviorSubject<Session[]>([]);
-    this.integrations$ = new BehaviorSubject<AwsSsoIntegration[]>([]);
+    this.integrations$ = new BehaviorSubject<Integration[]>([]);
     this.sessions = this.repository.getSessions();
   }
 
@@ -37,19 +37,19 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
     this.sessions = [...sessions];
   }
 
-  get integrations(): AwsSsoIntegration[] {
+  get integrations(): Integration[] {
     return this.integrations$.getValue();
   }
 
-  set integrations(integrations: AwsSsoIntegration[]) {
+  set integrations(integrations: Integration[]) {
     this.integrations$.next(integrations);
   }
 
-  getIntegrations(): AwsSsoIntegration[] {
+  getIntegrations(): Integration[] {
     return this.integrations;
   }
 
-  setIntegrations(integrations: AwsSsoIntegration[]) {
+  setIntegrations(integrations: Integration[]) {
     this.integrations = integrations;
   }
 }

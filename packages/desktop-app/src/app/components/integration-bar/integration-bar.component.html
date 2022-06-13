@@ -6,12 +6,12 @@
     <div class="loading-content">
       <img src="assets/images/in-browser.png" alt="" class="loading-pc" />
       <br>
-      <span class="loading-text">Don't see the secure AWS Single Sign-On Browser Page? </span><a (click)="gotoWebForm(selectedAwsSsoConfiguration.id)" class="loading-link">Re-launch the window</a>
+      <span class="loading-text">Don't see the secure AWS Single Sign-On Browser Page? </span><a (click)="gotoWebForm(selectedConfiguration.id)" class="loading-link">Re-launch the window</a>
     </div>
   </ng-container>
   <ng-container *ngIf="!loadingInBrowser">
     <a class="close-modal" (click)="modalRef.hide();"><i class="moon-Close"></i></a>
-    <h4>{{modifying === 1 ? 'Add New Integration' : 'Edit ' + selectedAwsSsoConfiguration.alias}}</h4>
+    <h4>{{modifying === 1 ? 'Add New Integration' : 'Edit ' + selectedConfiguration.alias}}</h4>
 
     <form [formGroup]="form">
       <div class="form-container">
@@ -20,7 +20,7 @@
           <div class="form-field">
             <div class="form-group">
               <label>Integration type</label>
-              <input  type="text" class="form-control blue-control btn-control" value="Aws Single Sign-On" readonly>
+              <ng-select formControlName="integrationType" bindLabel="label" bindValue="value" [clearable]="false" [items]="integrations" [(ngModel)]="selectedIntegration"></ng-select>
             </div>
           </div>
         </div>
@@ -29,7 +29,7 @@
           <div class="form-field">
             <div class="form-group">
               <label>Alias*</label>
-              <input formControlName="alias" type="url" class="form-control" placeholder="Custom name to identify the configuration" value="{{selectedAwsSsoConfiguration.alias}}">
+              <input formControlName="alias" type="url" class="form-control" placeholder="Custom name to identify the configuration" value="{{selectedConfiguration.alias}}">
               <small class="text-error" *ngIf="(form.controls['alias'].dirty || form.controls['alias'].touched) && form.controls['alias'].errors">Insert a custom alias</small>
             </div>
           </div>
@@ -39,29 +39,42 @@
           <div class="form-field">
             <div class="form-group">
               <label>Portal Url*</label>
-              <input formControlName="portalUrl" type="url" class="form-control" placeholder="AWS SSO URL (e.g. https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedAwsSsoConfiguration.portalUrl}}">
+              <input formControlName="portalUrl" type="url" class="form-control" placeholder="AWS SSO URL (e.g. https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedConfiguration.portalUrl}}">
               <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert a valid SSO portal URL</small>
             </div>
           </div>
         </div>
 
-        <div class="form-group">
-          <div class="form-field">
-            <div class="form-group">
-              <label>Aws Region</label>
-              <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions" [(ngModel)]="selectedAwsSsoConfiguration.region"></ng-select>
+        <ng-container *ngIf="selectedIntegration !== eIntegrationType.azure">
+          <div class="form-group">
+            <div class="form-field">
+              <div class="form-group">
+                <label>Aws Region</label>
+                <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions" [(ngModel)]="selectedConfiguration.region"></ng-select>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <div class="form-field">
-            <div class="form-group">
-              <label>Auth. method</label>
-              <ng-select placeholder="Choose an Authentication method" formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [clearable]="false" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedAwsSsoConfiguration.browserOpening"></ng-select>
+          <div class="form-group">
+            <div class="form-field">
+              <div class="form-group">
+                <label>Auth. method</label>
+                <ng-select placeholder="Choose an Authentication method" formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [clearable]="false" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedConfiguration.browserOpening"></ng-select>
+              </div>
             </div>
           </div>
-        </div>
+        </ng-container>
+        <ng-container *ngIf="selectedIntegration === eIntegrationType.azure">
+          <div class="form-group">
+            <div class="form-field">
+              <div class="form-group">
+                <label>Tenant ID</label>
+                <input formControlName="tenantId" type="text" class="form-control" placeholder="Tenant ID *" value="{{selectedConfiguration.tenantId}}">
+                <small class="text-error" *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert a valid Azure Tenant ID</small>
+              </div>
+            </div>
+          </div>
+        </ng-container>
 
         <button class="btn-right-margin {{formValid() ? '': 'mat-button-disabled'}}" [disabled]="!formValid()" (click)="save();">
           <ng-container *ngIf="modifying === 1">Add integration</ng-container>
@@ -75,32 +88,33 @@
 </ng-template>
 
 <mat-list>
-  <div mat-subheader class="panel-header"><span>Integrations</span><i class="moon-Add" (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedAwsSsoConfiguration);"></i></div>
+  <div mat-subheader class="panel-header"><span>Integrations</span><i class="moon-Add" (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedConfiguration);"></i></div>
 
   <mat-list-item
-    *ngFor="let awsSsoConfiguration of awsSsoConfigurations; let i = index;"
+    *ngFor="let intConfiguration of allIntegrations(); let i = index;"
     [disableRipple]="true"
-    [ngClass]="selectedSsoConfigurationCheck(awsSsoConfiguration)"
-    (contextmenu)="applyContextMenu(i, awsSsoConfiguration, $event);"
-    (click)="applySegmentFilter(awsSsoConfiguration, $event);"
-    (dblclick)="forceSync(awsSsoConfiguration.id)">
+    [ngClass]="selectedSsoConfigurationCheck(intConfiguration)"
+    (contextmenu)="applyContextMenu(i, intConfiguration, $event);"
+    (click)="applySegmentFilter(intConfiguration, $event);"
+    (dblclick)="forceSync(intConfiguration.id)">
 
     <div mat-line>
-      <img src="assets/images/aws{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" />
-      <section class="status" matTooltip="{{isOnline(awsSsoConfiguration) ? 'Expiring ' + remainingHours(awsSsoConfiguration) : 'Offline'}}">
-        <ng-container *ngIf="isOnline(awsSsoConfiguration)">
+      <img src="assets/images/{{intConfiguration.type === eIntegrationType.azure ? 'azure' : 'aws'}}{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" />
+      <section class="status" matTooltip="{{isOnline(intConfiguration) ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline'}}">
+        <ng-container *ngIf="isOnline(intConfiguration)">
           <b class="green-dot"></b>
         </ng-container>
-        <ng-container *ngIf="!isOnline(awsSsoConfiguration)">
+        <ng-container *ngIf="!isOnline(intConfiguration)">
           <b class="red-dot"></b>
         </ng-container>
       </section>
-      <span>{{awsSsoConfiguration.alias}}</span>
-      <b class="moon-More" (click)="applyContextMenu(i, awsSsoConfiguration, $event);" ></b>
+      <span>{{intConfiguration.alias}}</span>
+      <b class="moon-More" (click)="applyContextMenu(i, intConfiguration, $event);" ></b>
     </div>
-    <div [matMenuTriggerFor]="integrationMenu" [matMenuTriggerData]="{ configuration: awsSsoConfiguration }" [style.position]="'absolute'" [style.left.px]="menuX" [style.top.px]="menuY"></div>
+    <div [matMenuTriggerFor]="integrationMenu" [matMenuTriggerData]="{ configuration: intConfiguration }" [style.position]="'absolute'" [style.left.px]="menuX" [style.top.px]="menuY"></div>
   </mat-list-item>
-  <mat-list-item (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedAwsSsoConfiguration);">
+
+  <mat-list-item (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedConfiguration);">
     <div mat-line class="gray-line">
       <i class="moon-Add"></i><span>Add Integration</span></div>
   </mat-list-item>

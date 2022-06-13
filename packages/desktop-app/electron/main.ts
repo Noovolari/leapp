@@ -30,8 +30,7 @@ const windowDefaultConfig = {
       devTools: !environment.production,
       contextIsolation: false,
       enableRemoteModule: true,
-      nodeIntegration: true,
-      preload: path.join(__dirname, "preload.js")
+      nodeIntegration: true
     },
   },
 };

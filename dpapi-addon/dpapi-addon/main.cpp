@@ -29,4 +29,7 @@ NAN_MODULE_INIT(init)
 		Nan::GetFunction(Nan::New<v8::FunctionTemplate>(unprotectData)).ToLocalChecked());
 }
 
-NODE_MODULE(binding, init)
+NODE_MODULE_INIT()
+{
+  init(exports);
+}

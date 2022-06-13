@@ -136,6 +136,12 @@ export class AppComponent implements OnInit {
     this.router.navigate(["/dashboard"]);
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
+
+    const jsonCache = await this.appProviderService.msalPersistenceService.load();
+    const strJsonCache = JSON.stringify(jsonCache, null, 4);
+    this.appNativeService.fs.writeFileSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), "test.json"), strJsonCache, {
+      encoding: "utf8",
+    });
   }
 
   closeAllRightClickMenus(): void {

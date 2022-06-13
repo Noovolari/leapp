@@ -69,7 +69,7 @@ export class AppNativeService implements INativeService {
       this.notification = window.require("@electron/remote").Notification;
       this.nodeIpc = window.require("node-ipc");
       this.process = (window as any).process;
-      this.msalEncryptionService = (window as any).dpApi;
+      this.msalEncryptionService = window.require("@noovolari/dpapi-addon");
     }
   }
 

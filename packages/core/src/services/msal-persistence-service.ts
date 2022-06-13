@@ -1,6 +1,5 @@
 import { IMsalPersistence } from "../interfaces/i-msal-persistence";
 import { JsonCache } from "@azure/msal-node";
-import path from "path";
 import { INativeService } from "../interfaces/i-native-service";
 
 export interface AzureSubscription {
@@ -30,11 +29,15 @@ export class MsalPersistenceService implements IMsalPersistence {
   constructor(private iNativeService: INativeService) {}
 
   load(customPath?: string): Promise<JsonCache> {
-    const msalTokenCacheFileExtension = this.iNativeService.process.platform === "win32" ? ".bin" : ".json";
-    const location = customPath || path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
+    const isWin = this.iNativeService.process.platform === "win32";
+    const msalTokenCacheFileExtension = isWin ? ".bin" : ".json";
+    const location =
+      customPath || this.iNativeService.path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
     try {
       const data = this.iNativeService.fs.readFileSync(location);
-      const finalData = this.iNativeService.msalEncryptionService.unprotectData(data, null, DataProtectionScope.toString()).toString();
+      const finalData = isWin
+        ? this.iNativeService.msalEncryptionService.unprotectData(data, null, DataProtectionScope.toString()).toString()
+        : data.toString();
       const parsedData = JSON.parse(finalData.trim());
       return Promise.resolve(parsedData as JsonCache);
     } catch (err) {
@@ -44,9 +47,10 @@ export class MsalPersistenceService implements IMsalPersistence {
 
   save(cache: JsonCache, customPath?: string): Promise<void> {
     const data = JSON.stringify(cache, null, 4);
-    const msalTokenCacheFileExtension = this.iNativeService.process.platform === "win32" ? ".bin" : ".json";
-    const location = customPath || path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
     const isWin = this.iNativeService.process.platform === "win32";
+    const msalTokenCacheFileExtension = isWin ? ".bin" : ".json";
+    const location =
+      customPath || this.iNativeService.path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
     const finalData = isWin
       ? this.iNativeService.msalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.toString())
       : data;
@@ -59,7 +63,7 @@ export class MsalPersistenceService implements IMsalPersistence {
   }
 
   loadAzureProfile(customPath?: string): Promise<AzureProfile> {
-    const location = customPath || path.join(this.iNativeService.os.homedir(), ".azure/azureProfile.json");
+    const location = customPath || this.iNativeService.path.join(this.iNativeService.os.homedir(), ".azure/azureProfile.json");
     try {
       const data = this.iNativeService.fs.readFileSync(location, "utf8");
       console.log(data);

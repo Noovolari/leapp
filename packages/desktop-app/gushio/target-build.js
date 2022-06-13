@@ -19,7 +19,11 @@ module.exports = {
 
       await makeDirFunction(path, '../dist/leapp-client')
       await copyFunction(path, '../src/assets/icons', '../dist/leapp-client')
+
+      shellJs.exec('npx electron-rebuild -f -w @noovolari/dpapi-addon')
+
       await compileFunction(path, shellJs, args[0])
+
       await makeDirFunction(path, '../electron/dist/electron/assets/images')
       await copyFunction(path, '../electron/assets/images', '../electron/dist/electron/assets/images')
 

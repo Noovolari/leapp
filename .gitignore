@@ -78,3 +78,5 @@ packages/cli/oclif.manifest.json
 lerna-debug.log
 
 .run
+
+packages/dpapi-addon/build

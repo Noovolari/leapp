@@ -275,11 +275,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.isOnlineArray = {};
     this.awsSsoConfigurations.forEach(async (sc) => {
       this.logoutLoadings[sc.id] = false;
-      this.isOnlineArray[sc.id] = await this.isOnline(sc);
+      // this.isOnlineArray[sc.id] = await this.isOnline(sc);
     });
     this.azureConfigurations.forEach(async (sc) => {
       this.logoutLoadings[sc.id] = false;
-      this.isOnlineArray[sc.id] = await this.isOnline(sc);
+      // this.isOnlineArray[sc.id] = await this.isOnline(sc);
     });
 
     this.selectedConfiguration = {

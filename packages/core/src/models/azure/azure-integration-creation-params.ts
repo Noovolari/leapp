@@ -1,5 +1,5 @@
-import { IntegrationCreationParams } from "../integration-creation-params";
+import { IntegrationParams } from "../integration-params";
 
-export interface AzureIntegrationCreationParams extends IntegrationCreationParams {
+export interface AzureIntegrationCreationParams extends IntegrationParams {
   tenantId: string;
 }

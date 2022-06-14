@@ -1,7 +1,6 @@
 import { IBehaviouralNotifier } from "../../interfaces/i-behavioural-notifier";
 import { IIntegrationService } from "../../interfaces/i-integration-service";
 import { INativeService } from "../../interfaces/i-native-service";
-import { BehaviouralSubjectService } from "../behavioural-subject-service";
 import { KeychainService } from "../keychain-service";
 import { Repository } from "../repository";
 import { SessionFactory } from "../session-factory";
@@ -12,12 +11,11 @@ import { MsalPersistenceService } from "../msal-persistence-service";
 
 export class AzureIntegrationService implements IIntegrationService {
   constructor(
-    public behaviouralSubjectService: BehaviouralSubjectService,
-    public keyChainService: KeychainService,
-    public nativeService: INativeService,
     public repository: Repository,
+    public keyChainService: KeychainService,
+    public behaviouralNotifier: IBehaviouralNotifier,
+    public nativeService: INativeService,
     public sessionFactory: SessionFactory,
-    public sessionNotifier: IBehaviouralNotifier,
     public executeService: ExecuteService,
     public msalPersistenceService: MsalPersistenceService
   ) {}
@@ -40,7 +38,9 @@ export class AzureIntegrationService implements IIntegrationService {
     return this.repository.listAzureIntegrations();
   }
 
-  async isOnline(integration: AzureIntegration): Promise<boolean> {
+  async setOnline(integration: AzureIntegration, forcedState?: boolean): Promise<void> {
+    let isOnline: boolean;
+
     try {
       const msalTokenCache = await this.msalPersistenceService.load();
       const azureProfile = await this.msalPersistenceService.loadAzureProfile();
@@ -64,14 +64,21 @@ export class AzureIntegrationService implements IIntegrationService {
         subscriptionsBoundToTheSameTenant &&= subscription.tenantId === integration.tenantId;
       }
 
-      return accessTokensBoundToTheSameTenant && idTokensBoundToTheSameTenant && subscriptionsBoundToTheSameTenant;
+      isOnline = accessTokensBoundToTheSameTenant && idTokensBoundToTheSameTenant && subscriptionsBoundToTheSameTenant;
     } catch (err) {
-      return false;
+      isOnline = false;
     }
+
+    integration.isOnline = forcedState || isOnline;
+
+    this.repository.updateAzureIntegration(integration.id, integration.alias, integration.tenantId, integration.isOnline);
   }
 
-  async logout(_integrationId: string): Promise<void> {
+  async logout(integrationId: string): Promise<void> {
     this.executeService.execute("az logout");
+    const integration = this.getIntegration(integrationId);
+    this.setOnline(integration, false);
+    this.behaviouralNotifier.setIntegrations([...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()]);
   }
 
   remainingHours(_integration: Integration): string {
@@ -89,6 +96,6 @@ export class AzureIntegrationService implements IIntegrationService {
     for (const session of azureSessions) {
       this.repository.deleteSession(session.sessionId);
     }
-    this.behaviouralSubjectService.setSessions([...this.repository.getSessions()]);
+    this.behaviouralNotifier.setSessions([...this.repository.getSessions()]);
   }
 }

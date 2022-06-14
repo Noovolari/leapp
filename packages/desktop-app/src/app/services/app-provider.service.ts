@@ -37,6 +37,7 @@ import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-servi
 import { AppNativeLoggerService } from "./app-native-logger-service";
 import { MessageToasterService } from "./message-toaster.service";
 import { MsalPersistenceService } from "@noovolari/leapp-core/services/msal-persistence-service";
+import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 
 @Injectable({
   providedIn: "root",
@@ -78,6 +79,7 @@ export class AppProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private workspaceServiceInstance: WorkspaceService;
   private msalPersistenceServiceInstance: MsalPersistenceService;
+  private azureIntegrationServiceInstance: AzureIntegrationService;
 
   constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
 
@@ -86,6 +88,21 @@ export class AppProviderService {
       this.workspaceServiceInstance = new WorkspaceService(this.repository);
     }
     return this.workspaceServiceInstance;
+  }
+
+  public get azureIntegrationService(): AzureIntegrationService {
+    if (!this.azureIntegrationServiceInstance) {
+      this.azureIntegrationServiceInstance = new AzureIntegrationService(
+        this.repository,
+        this.keyChainService,
+        this.behaviouralSubjectService,
+        this.appNativeService,
+        this.sessionFactory,
+        this.executeService,
+        this.msalPersistenceService
+      );
+    }
+    return this.azureIntegrationServiceInstance;
   }
 
   public get segmentService(): SegmentService {
@@ -177,13 +194,12 @@ export class AppProviderService {
     if (!this.awsSsoIntegrationServiceInstance) {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
         this.repository,
-        this.awsSsoOidcService,
-        this.awsSsoRoleService,
         this.keyChainService,
         this.behaviouralSubjectService,
         this.appNativeService,
         this.sessionFactory,
-        this.behaviouralSubjectService
+        this.awsSsoOidcService,
+        this.awsSsoRoleService
       );
     }
     return this.awsSsoIntegrationServiceInstance;

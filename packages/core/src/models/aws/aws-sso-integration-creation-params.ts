@@ -1,6 +1,6 @@
-import { IntegrationCreationParams } from "../integration-creation-params";
+import { IntegrationParams } from "../integration-params";
 
-export interface AwsSsoIntegrationCreationParams extends IntegrationCreationParams {
+export interface AwsSsoIntegrationCreationParams extends IntegrationParams {
   portalUrl: string;
   region: string;
   browserOpening: string;

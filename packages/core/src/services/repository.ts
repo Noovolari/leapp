@@ -277,7 +277,15 @@ export class Repository {
     this.persistWorkspace(workspace);
   }
 
-  updateAwsSsoIntegration(id: string, alias: string, region: string, portalUrl: string, browserOpening: string, expirationTime?: string): void {
+  updateAwsSsoIntegration(
+    id: string,
+    alias: string,
+    region: string,
+    portalUrl: string,
+    browserOpening: string,
+    isOnline: boolean,
+    expirationTime?: string
+  ): void {
     const workspace = this.getWorkspace();
     const index = workspace.awsSsoIntegrations.findIndex((sso) => sso.id === id);
     if (index > -1) {
@@ -285,6 +293,7 @@ export class Repository {
       workspace.awsSsoIntegrations[index].region = region;
       workspace.awsSsoIntegrations[index].portalUrl = portalUrl;
       workspace.awsSsoIntegrations[index].browserOpening = browserOpening;
+      workspace.awsSsoIntegrations[index].isOnline = isOnline;
       if (expirationTime) {
         workspace.awsSsoIntegrations[index].accessTokenExpiration = expirationTime;
       }
@@ -316,12 +325,13 @@ export class Repository {
     this.persistWorkspace(workspace);
   }
 
-  updateAzureIntegration(id: string, alias: string, tenantId: string): void {
+  updateAzureIntegration(id: string, alias: string, tenantId: string, isOnline: boolean): void {
     const workspace = this.getWorkspace();
     const index = workspace.azureIntegrations.findIndex((integration) => integration.id === id);
     if (index > -1) {
       workspace.azureIntegrations[index].alias = alias;
       workspace.azureIntegrations[index].tenantId = tenantId;
+      workspace.azureIntegrations[index].isOnline = isOnline;
       this.persistWorkspace(workspace);
     }
   }

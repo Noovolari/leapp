@@ -83,8 +83,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   isOnlineArray = {};
 
+  public behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoRoleService: AwsSsoRoleService;
-  private behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoOidcService: AwsSsoOidcService;
   private loggingService: LogService;
   private segmentService: SegmentService;
@@ -234,7 +234,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       this.loadingInApp = this.selectedConfiguration.browserOpening === constants.inApp.toString();
 
       try {
-        if (this.loadingInBrowser && !this.isOnline(this.selectedConfiguration)) {
+        if (this.loadingInBrowser && !this.selectedConfiguration.isOnline) {
           this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
         }
 
@@ -272,14 +272,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.awsSsoConfigurations = this.leappCoreService.awsSsoIntegrationService.getIntegrations();
     this.azureConfigurations = this.leappCoreService.repository.listAzureIntegrations();
     this.logoutLoadings = {};
-    this.isOnlineArray = {};
-    this.awsSsoConfigurations.forEach(async (sc) => {
+
+    this.awsSsoConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
-      // this.isOnlineArray[sc.id] = await this.isOnline(sc);
+      //this.leappCoreService.awsSsoIntegrationService.setOnline(sc);
     });
-    this.azureConfigurations.forEach(async (sc) => {
+    this.azureConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
-      // this.isOnlineArray[sc.id] = await this.isOnline(sc);
+      //this.leappCoreService.azureIntegrationService.setOnline(sc);
     });
 
     this.selectedConfiguration = {
@@ -363,7 +363,12 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
             browserOpening,
           });
         } else {
-          this.leappCoreService.repository.updateAzureIntegration(this.selectedConfiguration.id, alias, tenantId);
+          this.leappCoreService.repository.updateAzureIntegration(
+            this.selectedConfiguration.id,
+            alias,
+            tenantId,
+            this.selectedConfiguration.isOnline
+          );
         }
       }
 
@@ -417,18 +422,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       return this.form.get("alias").valid && this.form.get("portalUrl").valid && this.form.get("awsRegion").value !== null;
     } else {
       return this.form.get("alias").valid && this.form.get("tenantId").valid;
-    }
-  }
-
-  allIntegrations() {
-    return this.behaviouralSubjectService.integrations$.value;
-  }
-
-  private async isOnline(integration: Integration): Promise<boolean> {
-    if (integration.type !== IntegrationType.azure) {
-      return await this.leappCoreService.awsSsoIntegrationService.isOnline(integration as AwsSsoIntegration);
-    } else {
-      return true;
     }
   }
 }

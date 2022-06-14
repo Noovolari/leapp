@@ -91,7 +91,7 @@
   <div mat-subheader class="panel-header"><span>Integrations</span><i class="moon-Add" (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedConfiguration);"></i></div>
 
   <mat-list-item
-    *ngFor="let intConfiguration of allIntegrations(); let i = index;"
+    *ngFor="let intConfiguration of behaviouralSubjectService.integrations$ | async; let i = index;"
     [disableRipple]="true"
     [ngClass]="selectedSsoConfigurationCheck(intConfiguration)"
     (contextmenu)="applyContextMenu(i, intConfiguration, $event);"
@@ -100,11 +100,11 @@
 
     <div mat-line>
       <img src="assets/images/{{intConfiguration.type === eIntegrationType.azure ? 'azure' : 'aws'}}{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" />
-      <section class="status" matTooltip="{{isOnlineArray[intConfiguration.id] ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline'}}">
-        <ng-container *ngIf="isOnlineArray[intConfiguration.id]">
+      <section class="status" matTooltip="{{(intConfiguration.isOnline) ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline'}}">
+        <ng-container *ngIf="intConfiguration.isOnline">
           <b class="green-dot"></b>
         </ng-container>
-        <ng-container *ngIf="!isOnlineArray[intConfiguration.id]">
+        <ng-container *ngIf="(intConfiguration.isOnline) === false">
           <b class="red-dot"></b>
         </ng-container>
       </section>
@@ -129,15 +129,15 @@
     </button>
 
     <ng-container *ngIf="!logoutLoadings[configuration.id]">
-      <button mat-menu-item (click)="logout(configuration.id)" *ngIf="isOnlineArray[configuration.id]">
+      <button mat-menu-item (click)="logout(configuration.id)" *ngIf="configuration.isOnline">
         <i class="moon-Close"></i>
         <span> Logout</span>
       </button>
     </ng-container>
 
     <button mat-menu-item (click)="forceSync(configuration.id)" *ngIf="!loadingInBrowser">
-      <ng-container *ngIf="isOnlineArray[configuration.id]"><i class="moon-Refresh"></i> Sync</ng-container>
-      <ng-container *ngIf="!isOnlineArray[configuration.id]"><i class="moon-Lock"></i> Login</ng-container>
+      <ng-container *ngIf="configuration.isOnline"><i class="moon-Refresh"></i> Sync</ng-container>
+      <ng-container *ngIf="(configuration.isOnline) === false"><i class="moon-Lock"></i> Login</ng-container>
     </button>
 
     <button mat-menu-item (click)="delete(configuration)"><i class="moon-Delete"></i> Delete</button>

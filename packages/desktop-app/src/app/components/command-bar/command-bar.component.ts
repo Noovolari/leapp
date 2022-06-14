@@ -361,7 +361,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   private updateFilterForm(values: GlobalFilters) {
-    console.log("inside filter form", values);
     this.filterForm.get("searchFilter").setValue(values.searchFilter);
     this.filterForm.get("dateFilter").setValue(values.dateFilter);
     this.filterForm.get("providerFilter").setValue(values.providerFilter);

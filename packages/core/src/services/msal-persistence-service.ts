@@ -29,7 +29,7 @@ export class MsalPersistenceService implements IMsalPersistence {
   constructor(private iNativeService: INativeService) {}
 
   load(customPath?: string): Promise<JsonCache> {
-    const isWin = this.iNativeService.process.platform === "win32";
+    const isWin = this.iNativeService.process?.platform === "win32";
     const msalTokenCacheFileExtension = isWin ? ".bin" : ".json";
     const location =
       customPath || this.iNativeService.path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
@@ -47,7 +47,7 @@ export class MsalPersistenceService implements IMsalPersistence {
 
   save(cache: JsonCache, customPath?: string): Promise<void> {
     const data = JSON.stringify(cache, null, 4);
-    const isWin = this.iNativeService.process.platform === "win32";
+    const isWin = this.iNativeService.process?.platform === "win32";
     const msalTokenCacheFileExtension = isWin ? ".bin" : ".json";
     const location =
       customPath || this.iNativeService.path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
@@ -66,7 +66,6 @@ export class MsalPersistenceService implements IMsalPersistence {
     const location = customPath || this.iNativeService.path.join(this.iNativeService.os.homedir(), ".azure/azureProfile.json");
     try {
       const data = this.iNativeService.fs.readFileSync(location, "utf8");
-      console.log(data);
       const parsedData = JSON.parse(data.trim());
       return Promise.resolve(parsedData as AzureProfile);
     } catch (err) {

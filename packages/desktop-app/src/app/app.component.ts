@@ -76,21 +76,18 @@ export class AppComponent implements OnInit {
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
-    this.appNativeService.currentWindow.webContents.openDevTools();
-    console.error(this.awsSsoIntegrationService.getIntegrations());
   }
 
   async ngOnInit(): Promise<void> {
-    console.log(99);
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
-    console.log(100);
+
     // We get the right moment to set an hook to app close
     const ipcRenderer = this.appNativeService.ipcRenderer;
     ipcRenderer.on("app-close", () => {
       this.loggingService.log(new LoggedEntry("Preparing for closing instruction...", this, LogLevel.info));
       this.beforeCloseInstructions();
     });
-    console.log(101);
+
     // Use ngx bootstrap 4
     setTheme("bs4");
 
@@ -100,26 +97,23 @@ export class AppComponent implements OnInit {
       console.warn = () => {};
       console.log = () => {};
     }
-    console.log(-1);
+
     // Prevent Dev Tool to show on production mode
     this.windowService.blockDevToolInProductionMode();
-    console.log(0);
+
     // Create folders and files if missing
     this.updaterService.createFoldersIfMissing();
 
-    console.log(1);
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
     if (this.retroCompatibilityService.isRetroPatchNecessary()) {
-      console.log("1a");
       await this.retroCompatibilityService.adaptOldWorkspaceFile();
     }
-    console.log(2);
+
     if (this.retroCompatibilityService.isIntegrationPatchNecessary()) {
-      console.log("2a");
       await this.retroCompatibilityService.adaptIntegrationPatch();
     }
-    console.log(3);
+
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded();
 
@@ -130,13 +124,13 @@ export class AppComponent implements OnInit {
         await concreteSessionService.stop(this.behaviouralSubjectService.sessions[i].sessionId);
       }
     }
-    console.log(4);
+
     // Start Global Timer
     this.timerService.start(() => this.timerFunction(this.rotationService, this.appProviderService));
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
-    console.log(5);
+
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     this.router.navigate(["/dashboard"]);

@@ -2,6 +2,8 @@ import { expect, describe, test } from "@jest/globals";
 import { MsalPersistenceService } from "./msal-persistence-service";
 import * as os from "os";
 import * as fs from "fs";
+import * as process from "process";
+import * as path from "path";
 
 describe("MsalPersistenceService", () => {
   const mockedMsal =
@@ -80,6 +82,8 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os,
       fs,
+      process,
+      path,
     };
     const service = new MsalPersistenceService(iNativeService);
     const parsedData = await service.load(customTestPath);
@@ -95,6 +99,8 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os,
       fs,
+      process,
+      path,
     };
     const service = new MsalPersistenceService(iNativeService);
     const parsedData = await service.load(customTestPath);

@@ -195,8 +195,8 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       const loginResponse = await this.login(integrationId, region, portalUrl);
       const integration: AwsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId);
 
-      const d = new Date();
-      d.setMinutes(d.getMinutes() + 1);
+      // const d = new Date();
+      // d.setMinutes(d.getMinutes() + 1);
 
       await this.configureAwsSso(
         integrationId,
@@ -204,7 +204,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
         region,
         loginResponse.portalUrlUnrolled,
         integration.browserOpening,
-        d.toISOString(), // loginResponse.expirationTime.toISOString(),
+        loginResponse.expirationTime.toISOString(), //d.toISOString(),
         loginResponse.accessToken
       );
 

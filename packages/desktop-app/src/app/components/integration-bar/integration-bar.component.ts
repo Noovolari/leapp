@@ -214,7 +214,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       this.leappCoreService.awsSsoIntegrationService.logout(this.selectedConfiguration.id);
     } else {
       this.selectedConfiguration = this.leappCoreService.repository.getAzureIntegration(configurationId);
-      // TODO: logout azure
+      this.leappCoreService.azureIntegrationService.logout(this.selectedConfiguration.id);
     }
 
     this.loadingInBrowser = false;
@@ -275,11 +275,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     this.awsSsoConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
-      //this.leappCoreService.awsSsoIntegrationService.setOnline(sc);
     });
     this.azureConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
-      //this.leappCoreService.azureIntegrationService.setOnline(sc);
     });
 
     this.selectedConfiguration = {
@@ -342,8 +340,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       const region = this.form.get("awsRegion").value;
       const browserOpening = this.form.get("defaultBrowserOpening").value;
       const tenantId = this.form.get("tenantId").value;
-
-      console.log(type);
 
       if (this.modifying === 1) {
         // Save

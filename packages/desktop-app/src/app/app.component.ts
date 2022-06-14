@@ -132,7 +132,7 @@ export class AppComponent implements OnInit {
     }
     console.log(4);
     // Start Global Timer
-    this.timerService.start(this.timerFunction);
+    this.timerService.start(() => this.timerFunction(this.rotationService, this.appProviderService));
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
@@ -148,27 +148,27 @@ export class AppComponent implements OnInit {
     this.appService.closeAllMenuTriggers();
   }
 
-  private timerFunction(): void {
-    this.rotationService.rotate.bind(this.rotationService);
+  private timerFunction(rotationService: RotationService, appProviderService): void {
+    rotationService.rotate();
 
-    const awsSsoIntegrations = this.appProviderService.awsSsoIntegrationService.getIntegrations();
-    const azureIntegrations = this.appProviderService.azureIntegrationService.getIntegrations();
+    const awsSsoIntegrations = appProviderService.awsSsoIntegrationService.getIntegrations();
+    const azureIntegrations = appProviderService.azureIntegrationService.getIntegrations();
 
     const promises: Promise<void>[] = [];
 
     for (const awsSsoIntegration of awsSsoIntegrations) {
-      promises.push(this.appProviderService.awsSsoIntegrationService.setOnline(awsSsoIntegration));
+      promises.push(appProviderService.awsSsoIntegrationService.setOnline(awsSsoIntegration));
     }
 
     for (const azureIntegration of azureIntegrations) {
-      promises.push(this.appProviderService.azureIntegrationService.setOnline(azureIntegration));
+      promises.push(appProviderService.azureIntegrationService.setOnline(azureIntegration));
     }
 
     Promise.all(promises).then(() => {
-      const updatedAwsSsoIntegrations = this.appProviderService.awsSsoIntegrationService.getIntegrations();
-      const updatedAzureIntegrations = this.appProviderService.azureIntegrationService.getIntegrations();
+      const updatedAwsSsoIntegrations = appProviderService.awsSsoIntegrationService.getIntegrations();
+      const updatedAzureIntegrations = appProviderService.azureIntegrationService.getIntegrations();
 
-      this.appProviderService.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
+      appProviderService.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
     });
   }
 

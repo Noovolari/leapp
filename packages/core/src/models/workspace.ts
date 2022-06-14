@@ -5,22 +5,23 @@ import * as uuid from "uuid";
 import "reflect-metadata";
 import { Type } from "class-transformer";
 import { constants } from "./constants";
-import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import Folder from "./folder";
 import Segment from "./segment";
+import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import { AzureIntegration } from "./azure/azure-integration";
 
 export class Workspace {
   @Type(() => Session)
   private _sessions: Session[];
+
+  private _awsSsoIntegrations: AwsSsoIntegration[];
+  private _azureIntegrations: AzureIntegration[];
+
   private _defaultRegion: string;
   private _defaultLocation: string;
   private _macOsTerminal: string;
   private _idpUrls: IdpUrl[];
   private _profiles: AwsNamedProfile[];
-
-  private _awsSsoIntegrations: AwsSsoIntegration[];
-  private _azureIntegrations: AzureIntegration[];
 
   private _pinned: string[];
   private _folders: Folder[];

@@ -14,8 +14,8 @@ import { IdpUrl } from "../models/idp-url";
 import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
-import { IntegrationType } from "../models/integration-type";
 import { AzureIntegration } from "../models/azure/azure-integration";
+import { IntegrationType } from "../models/integration-type";
 
 export class Repository {
   // Private singleton workspace
@@ -275,13 +275,13 @@ export class Repository {
   addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string): void {
     const workspace = this.getWorkspace();
     workspace.awsSsoIntegrations.push({
-      id: uuid.v4(),
       type: IntegrationType.awsSso,
+      id: uuid.v4(),
       alias,
       portalUrl,
       region,
-      accessTokenExpiration: undefined,
       browserOpening,
+      accessTokenExpiration: undefined,
     });
     this.persistWorkspace(workspace);
   }
@@ -321,13 +321,18 @@ export class Repository {
 
   addAzureIntegration(alias: string, tenantId: string): void {
     const workspace = this.getWorkspace();
-    workspace.azureIntegrations.push({
-      id: uuid.v4(),
-      type: IntegrationType.azure,
-      alias,
-      tenantId,
-    });
+    workspace.azureIntegrations.push({ type: IntegrationType.azure, id: uuid.v4(), alias, tenantId });
     this.persistWorkspace(workspace);
+  }
+
+  updateAzureIntegration(id: string, alias: string, tenantId: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.azureIntegrations.findIndex((integration) => integration.id === id);
+    if (index > -1) {
+      workspace.azureIntegrations[index].alias = alias;
+      workspace.azureIntegrations[index].tenantId = tenantId;
+      this.persistWorkspace(workspace);
+    }
   }
 
   deleteAzureIntegration(id: string): void {

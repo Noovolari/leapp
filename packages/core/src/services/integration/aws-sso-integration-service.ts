@@ -70,11 +70,11 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   }
 
   getOnlineIntegrations(): AwsSsoIntegration[] {
-    return this.getIntegrations().filter(async (integration) => await this.isOnline(integration));
+    return this.getIntegrations().filter((integration) => this.isOnline(integration));
   }
 
   getOfflineIntegrations(): AwsSsoIntegration[] {
-    return this.getIntegrations().filter(async (integration) => await !this.isOnline(integration));
+    return this.getIntegrations().filter((integration) => !this.isOnline(integration));
   }
 
   async isOnline(integration: AwsSsoIntegration): Promise<boolean> {

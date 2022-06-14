@@ -35,17 +35,17 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <div class="form-field">
-            <div class="form-group">
-              <label>Portal Url*</label>
-              <input formControlName="portalUrl" type="url" class="form-control" placeholder="AWS SSO URL (e.g. https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedConfiguration.portalUrl}}">
-              <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert a valid SSO portal URL</small>
+        <ng-container *ngIf="selectedIntegration !== eIntegrationType.azure">
+          <div class="form-group">
+            <div class="form-field">
+              <div class="form-group">
+                <label>Portal Url*</label>
+                <input formControlName="portalUrl" type="url" class="form-control" placeholder="AWS SSO URL (e.g. https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedConfiguration.portalUrl}}">
+                <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert a valid SSO portal URL</small>
+              </div>
             </div>
           </div>
-        </div>
 
-        <ng-container *ngIf="selectedIntegration !== eIntegrationType.azure">
           <div class="form-group">
             <div class="form-field">
               <div class="form-group">
@@ -100,11 +100,11 @@
 
     <div mat-line>
       <img src="assets/images/{{intConfiguration.type === eIntegrationType.azure ? 'azure' : 'aws'}}{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" />
-      <section class="status" matTooltip="{{isOnline(intConfiguration) ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline'}}">
-        <ng-container *ngIf="isOnline(intConfiguration)">
+      <section class="status" matTooltip="{{tooltipAsync(intConfiguration)|async}}">
+        <ng-container *ngIf="isOnline(intConfiguration)|async">
           <b class="green-dot"></b>
         </ng-container>
-        <ng-container *ngIf="!isOnline(intConfiguration)">
+        <ng-container *ngIf="(isOnline(intConfiguration)|async) === false">
           <b class="red-dot"></b>
         </ng-container>
       </section>
@@ -129,15 +129,15 @@
     </button>
 
     <ng-container *ngIf="!logoutLoadings[configuration.id]">
-      <button mat-menu-item (click)="logout(configuration.id)" *ngIf="isOnline(configuration)">
+      <button mat-menu-item (click)="logout(configuration.id)" *ngIf="isOnline(configuration)|async">
         <i class="moon-Close"></i>
         <span> Logout</span>
       </button>
     </ng-container>
 
     <button mat-menu-item (click)="forceSync(configuration.id)" *ngIf="!loadingInBrowser">
-      <ng-container *ngIf=" isOnline(configuration)"><i class="moon-Refresh"></i> Sync</ng-container>
-      <ng-container *ngIf="!isOnline(configuration)"><i class="moon-Lock"></i> Login</ng-container>
+      <ng-container *ngIf=" isOnline(configuration)|async"><i class="moon-Refresh"></i> Sync</ng-container>
+      <ng-container *ngIf="(isOnline(configuration)|async) === false"><i class="moon-Lock"></i> Login</ng-container>
     </button>
 
     <button mat-menu-item (click)="delete(configuration)"><i class="moon-Delete"></i> Delete</button>

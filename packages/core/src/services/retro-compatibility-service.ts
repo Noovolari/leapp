@@ -176,6 +176,7 @@ export class RetroCompatibilityService {
       _idpUrls: [],
       _profiles: [{ id: uuid.v4(), name: constants.defaultAwsProfileName }],
       _awsSsoIntegrations: [],
+      _azureIntegrations: [],
       _proxyConfiguration: {
         proxyProtocol: "https",
         proxyUrl: undefined,
@@ -403,12 +404,11 @@ export class RetroCompatibilityService {
       if (workspace.awsSsoIntegrations.length === 0) {
         workspace.awsSsoIntegrations.push({
           id: uuid.v4(),
-          type: IntegrationType.awsSso,
           alias: "Aws Single Sign-On",
-          region: awsSsoConfiguration.region,
           portalUrl: awsSsoConfiguration.portalUrl,
-          accessTokenExpiration: awsSsoConfiguration.expirationTime,
+          region: awsSsoConfiguration.region,
           browserOpening: constants.inApp,
+          accessTokenExpiration: awsSsoConfiguration.expirationTime,
           type: IntegrationType.awsSso,
         });
 

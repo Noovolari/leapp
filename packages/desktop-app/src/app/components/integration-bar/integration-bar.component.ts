@@ -5,7 +5,7 @@ import { Router } from "@angular/router";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { BehaviorSubject } from "rxjs";
 import { MatMenuTrigger } from "@angular/material/menu";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppService } from "../../services/app.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
@@ -14,15 +14,15 @@ import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
-import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
 import { WindowService } from "../../services/window.service";
 import { sidebarHighlight } from "../side-bar/side-bar.component";
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { OptionsService } from "../../services/options.service";
-import { AzureIntegration } from "@noovolari/leapp-core/models/azureIntegration";
+import { AzureIntegration } from "@noovolari/leapp-core/models/azure/azure-integration";
 import { Integration } from "@noovolari/leapp-core/models/integration";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
-import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 
 export interface SelectedIntegration {
   id: string;
@@ -117,12 +117,19 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           selected: false,
         })),
       ];
-      this.selectedIntegration = this.integrations[0].value; // default on AWS
     });
-    this.behaviouralSubjectService.setIntegrations([
-      ...this.leappCoreService.awsSsoIntegrationService.getIntegrations(),
-      ...this.leappCoreService.repository.listAzureIntegrations(),
-    ]);
+    this.setValues();
+    this.selectedIntegrations = [
+      ...this.awsSsoConfigurations.map((integration) => ({
+        id: integration.id,
+        selected: false,
+      })),
+      ...this.azureConfigurations.map((integration) => ({
+        id: integration.id,
+        selected: false,
+      })),
+    ];
+    this.selectedIntegration = this.integrations[0].value; // default on AWS
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if (value) {
@@ -200,7 +207,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     document.querySelector(".sessions").classList.remove("option-bar-opened");
     globalFilteredSessions.next(
       this.behaviouralSubjectService.sessions.filter(
-        (s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === configuration.id || (s as AzureSession).azureConfigurationId === configuration.id
+        (s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === configuration.id || (s as AzureSession).azureIntegrationId === configuration.id
       )
     );
   }
@@ -267,7 +274,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   setValues(): void {
     this.modifying = 0;
     this.regions = this.leappCoreService.awsCoreService.getRegions();
-    this.awsSsoConfigurations = this.leappCoreService.awsSsoIntegrationService.getIntegrations();
+    this.awsSsoConfigurations = this.leappCoreService.repository.getWorkspace().awsSsoIntegrations;
+    console.log(this.leappCoreService.repository.getWorkspace().awsSsoIntegrations);
     this.azureConfigurations = this.leappCoreService.repository.listAzureIntegrations();
     this.logoutLoadings = {};
     this.awsSsoConfigurations.forEach((sc) => {
@@ -332,8 +340,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   save(): void {
     if (this.formValid()) {
       const type = this.form.get("integrationType").value;
-      const alias = this.form.get("alias").value.trim();
-      const portalUrl = this.form.get("portalUrl").value.trim();
+      const alias = this.form.get("alias").value?.trim();
+      const portalUrl = this.form.get("portalUrl").value?.trim();
       const region = this.form.get("awsRegion").value;
       const browserOpening = this.form.get("defaultBrowserOpening").value;
       const tenantId = this.form.get("tenantId").value;
@@ -345,27 +353,28 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         if (type !== IntegrationType.azure.toString()) {
           this.leappCoreService.awsSsoIntegrationService.createIntegration({ alias, browserOpening, portalUrl, region });
         } else {
-          this.leappCoreService.repository.addAzureIntegration(portalUrl, alias, tenantId);
+          this.leappCoreService.repository.addAzureIntegration(alias, tenantId);
         }
-      } else if (this.modifying === 2 && this.selectedConfiguration.portalUrl !== "") {
+      } else if (this.modifying === 2) {
         // Edit
         // eslint-disable-next-line max-len
         if (type !== IntegrationType.azure.toString()) {
-          this.leappCoreService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedConfiguration.id, {
-            alias,
-            region,
-            portalUrl,
-            browserOpening,
-          });
+          if (this.selectedConfiguration.portalUrl !== "") {
+            this.leappCoreService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedConfiguration.id, {
+              alias,
+              region,
+              portalUrl,
+              browserOpening,
+            });
+          }
         } else {
-          this.leappCoreService.repository.updateAzureIntegration(this.selectedConfiguration.id, alias, portalUrl, tenantId);
+          this.leappCoreService.repository.updateAzureIntegration(this.selectedConfiguration.id, alias, tenantId);
         }
       }
 
       this.ngZone.run(() => {
-        this.setValues();
         this.behaviouralSubjectService.setIntegrations([
-          ...this.leappCoreService.awsSsoIntegrationService.getIntegrations(),
+          ...this.leappCoreService.repository.getWorkspace().awsSsoIntegrations,
           ...this.leappCoreService.repository.listAzureIntegrations(),
         ]);
       });
@@ -398,7 +407,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  isOnline(integration: Integration): boolean {
+  async isOnline(integration: Integration): Promise<boolean> {
     if (integration.type !== IntegrationType.azure) {
       return this.leappCoreService.awsSsoIntegrationService.isOnline(integration as AwsSsoIntegration);
     } else {
@@ -418,11 +427,17 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     if (this.selectedIntegration !== IntegrationType.azure) {
       return this.form.get("alias").valid && this.form.get("portalUrl").valid && this.form.get("awsRegion").value !== null;
     } else {
-      return this.form.get("alias").valid && this.form.get("portalUrl").valid && this.form.get("tenantId").valid;
+      return this.form.get("alias").valid && this.form.get("tenantId").valid;
     }
   }
 
   allIntegrations() {
-    return [...this.awsSsoConfigurations, ...this.azureConfigurations];
+    console.log([this.awsSsoConfigurations.flat(), ...this.azureConfigurations.flat()]);
+    return [...this.azureConfigurations];
+  }
+
+  async tooltipAsync(intConfiguration: AwsSsoIntegration | AzureIntegration): Promise<string> {
+    const online = await this.isOnline(intConfiguration);
+    return online ? "Expiring " + this.remainingHours(intConfiguration) : "Offline";
   }
 }

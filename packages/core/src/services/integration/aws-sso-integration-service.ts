@@ -26,6 +26,11 @@ import { AwsSsoIntegrationCreationParams } from "../../models/aws/aws-sso-integr
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
+const asyncFilter = async (arr, predicate) => {
+  const results = await Promise.all(arr.map(predicate));
+  return arr.filter((_v, index) => results[index]);
+};
+
 export interface SsoSessionsDiff {
   sessionsToDelete: AwsSsoRoleSession[];
   sessionsToAdd: SsoRoleSession[];
@@ -69,12 +74,12 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return this.repository.listAwsSsoIntegrations();
   }
 
-  getOnlineIntegrations(): AwsSsoIntegration[] {
-    return this.getIntegrations().filter((integration) => this.isOnline(integration));
+  async getOnlineIntegrations(): Promise<AwsSsoIntegration[]> {
+    return await asyncFilter(this.getIntegrations(), (integration) => this.isOnline(integration));
   }
 
-  getOfflineIntegrations(): AwsSsoIntegration[] {
-    return this.getIntegrations().filter((integration) => !this.isOnline(integration));
+  async getOfflineIntegrations(): Promise<AwsSsoIntegration[]> {
+    return await asyncFilter(this.getIntegrations(), (integration) => !this.isOnline(integration));
   }
 
   async isOnline(integration: AwsSsoIntegration): Promise<boolean> {

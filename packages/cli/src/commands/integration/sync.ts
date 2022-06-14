@@ -42,7 +42,7 @@ export default class SyncIntegration extends LeappCommand {
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {
-    const onlineIntegrations = this.cliProviderService.awsSsoIntegrationService.getOnlineIntegrations();
+    const onlineIntegrations = await this.cliProviderService.awsSsoIntegrationService.getOnlineIntegrations();
     if (onlineIntegrations.length === 0) {
       throw new Error("no online integrations available");
     }

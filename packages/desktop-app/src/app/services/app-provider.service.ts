@@ -36,7 +36,8 @@ import { SessionManagementService } from "@noovolari/leapp-core/services/session
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { AppNativeLoggerService } from "./app-native-logger-service";
 import { MessageToasterService } from "./message-toaster.service";
-import { MsalPersistenceService } from "@noovolari/leapp-core/services/msal-persistence-service";
+import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
+import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 
 @Injectable({
   providedIn: "root",
@@ -57,6 +58,7 @@ export class AppProviderService {
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private awsCoreServiceInstance: AwsCoreService;
   private azureServiceInstance: AzureService;
+  private azureIntegrationServiceInstance: AzureIntegrationService;
   private authenticationServiceInstance: AwsSamlAssertionExtractionService;
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
@@ -77,7 +79,7 @@ export class AppProviderService {
   private segmentServiceInstance: SegmentService;
   private sessionManagementServiceInstance: SessionManagementService;
   private workspaceServiceInstance: WorkspaceService;
-  private msalPersistenceServiceInstance: MsalPersistenceService;
+  private azurePersistenceServiceInstance: AzurePersistenceService;
 
   constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
 
@@ -227,18 +229,35 @@ export class AppProviderService {
         this.executeService,
         constants.azureMsalCacheFile,
         this.appNativeService,
-        this.msalPersistenceService
+        this.azurePersistenceService
       );
     }
 
     return this.azureServiceInstance;
   }
 
-  public get msalPersistenceService(): MsalPersistenceService {
-    if (!this.msalPersistenceServiceInstance) {
-      this.msalPersistenceServiceInstance = new MsalPersistenceService(this.appNativeService);
+  public get azureIntegrationService(): AzureIntegrationService {
+    if (!this.azureIntegrationServiceInstance) {
+      this.azureIntegrationServiceInstance = new AzureIntegrationService(
+        this.behaviouralSubjectService,
+        this.keyChainService,
+        this.appNativeService,
+        this.repository,
+        this.sessionFactory,
+        this.behaviouralSubjectService,
+        this.executeService,
+        this.azureService,
+        this.azurePersistenceService
+      );
     }
-    return this.msalPersistenceServiceInstance;
+    return this.azureIntegrationServiceInstance;
+  }
+
+  public get azurePersistenceService(): AzurePersistenceService {
+    if (!this.azurePersistenceServiceInstance) {
+      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.appNativeService);
+    }
+    return this.azurePersistenceServiceInstance;
   }
 
   public get authenticationService(): AwsSamlAssertionExtractionService {

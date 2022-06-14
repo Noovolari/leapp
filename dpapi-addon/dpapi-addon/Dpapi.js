@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-const bindings = require("bindings");
+var bindings = require("bindings");
 
 module.exports = bindings({
   bindings: "dpapi",

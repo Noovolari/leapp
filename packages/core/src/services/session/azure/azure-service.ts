@@ -9,7 +9,7 @@ import { AzureSessionRequest } from "./azure-session-request";
 import { LoggedException, LogLevel } from "../../log-service";
 import { INativeService } from "../../../interfaces/i-native-service";
 import { JsonCache } from "@azure/msal-node";
-import { MsalPersistenceService } from "../../msal-persistence-service";
+import { AzurePersistenceService } from "../../azure-persistence-service";
 
 export class AzureService extends SessionService {
   private vault: any; // TODO: remove!
@@ -21,7 +21,7 @@ export class AzureService extends SessionService {
     private executeService: ExecuteService,
     private azureMsalCacheFile: string,
     private nativeService: INativeService,
-    private msalPersistenceService: MsalPersistenceService
+    private msalPersistenceService: AzurePersistenceService
   ) {
     super(iSessionNotifier, repository);
   }
@@ -36,7 +36,7 @@ export class AzureService extends SessionService {
       sessionRequest.region,
       sessionRequest.subscriptionId,
       sessionRequest.tenantId,
-      "fake-integration-id"
+      sessionRequest.azureIntegrationId
     );
     this.repository.addSession(session);
     this.sessionNotifier?.setSessions(this.repository.getSessions());
@@ -118,26 +118,6 @@ export class AzureService extends SessionService {
 
    */
 
-  async checkCliVersion(): Promise<void> {
-    let output;
-    try {
-      output = await this.executeService.execute(`az --version`);
-    } catch (stdError) {
-      throw new LoggedException("Azure CLI is not installed", this, LogLevel.error, true);
-    }
-
-    const tokens = output.split(/\s+/);
-    const versionToken = tokens.find((token) => token.match(/^\d+\.\d+\.\d+$/));
-    if (versionToken) {
-      const [major, minor] = versionToken.split(".").map((v) => parseInt(v, 10));
-      if (major < 2 || (major === 2 && minor < 30)) {
-        throw new LoggedException("Unsupported Azure CLI version (< 2.30). Please update.", this, LogLevel.error, true);
-      }
-    } else {
-      throw new LoggedException("Unknown Azure CLI version", this, LogLevel.error, true);
-    }
-  }
-
   async login(session: AzureSession): Promise<void> {
     try {
       await this.executeService.execute(`az login --tenant ${session.tenantId} 2>&1`);
@@ -196,10 +176,10 @@ export class AzureService extends SessionService {
   }
 
   private async loadMsalCache(): Promise<JsonCache> {
-    return this.msalPersistenceService.load();
+    return this.msalPersistenceService.loadMsalCache();
   }
 
   private async persistMsalCache(msalCache: JsonCache): Promise<void> {
-    await this.msalPersistenceService.save(msalCache);
+    await this.msalPersistenceService.saveMsalCache(msalCache);
   }
 }

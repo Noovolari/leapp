@@ -40,7 +40,7 @@ import { SessionManagementService } from "@noovolari/leapp-core/services/session
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
-import { MsalPersistenceService } from "@noovolari/leapp-core/services/msal-persistence-service";
+import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
 import dpApi from "../dpapi-addon/DpApi";
 
 /* eslint-disable */
@@ -82,7 +82,7 @@ export class CliProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private segmentServiceInstance: SegmentService;
   private workspaceServiceInstance: WorkspaceService;
-  private msalPersistenceServiceInstance: MsalPersistenceService;
+  private msalPersistenceServiceInstance: AzurePersistenceService;
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -208,9 +208,9 @@ export class CliProviderService {
     return this.azureServiceInstance;
   }
 
-  get msalPersistenceService(): MsalPersistenceService {
+  get msalPersistenceService(): AzurePersistenceService {
     if(!this.msalPersistenceServiceInstance) {
-      this.msalPersistenceServiceInstance = new MsalPersistenceService(this.cliNativeService, dpApi);
+      this.msalPersistenceServiceInstance = new AzurePersistenceService(this.cliNativeService, dpApi);
     }
     return this.msalPersistenceServiceInstance;
   }

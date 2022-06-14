@@ -310,9 +310,9 @@ export class Repository {
     }
   }
 
-  addAzureIntegration(alias: string, tenantId: string): void {
+  addAzureIntegration(alias: string, tenantId: string, region: string): void {
     const workspace = this.getWorkspace();
-    workspace.azureIntegrations.push(new AzureIntegration(uuid.v4(), alias, tenantId));
+    workspace.azureIntegrations.push(new AzureIntegration(uuid.v4(), alias, tenantId, region));
     this.persistWorkspace(workspace);
   }
 

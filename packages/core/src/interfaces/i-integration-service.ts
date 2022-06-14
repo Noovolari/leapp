@@ -15,7 +15,7 @@ export interface IIntegrationService {
   sessionFactory: SessionFactory;
   behaviouralSubjectService: BehaviouralSubjectService;
 
-  createIntegration(creationParams: IntegrationCreationParams): void;
+  createIntegration(creationParams: IntegrationCreationParams): Promise<void>;
 
   updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void;
 

@@ -17,7 +17,6 @@ import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request";
 import { AwsIamUserSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
 import { AwsIamRoleChainedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
-import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azure/azure-session-request";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
@@ -383,13 +382,14 @@ export class CreateDialogComponent implements OnInit {
           this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
           break;
         case SessionType.azure:
-          const azureSessionRequest: AzureSessionRequest = {
+          // TODO: remove azure session creation
+          /*const azureSessionRequest: AzureSessionRequest = {
             region: this.selectedLocation,
             sessionName: this.form.value.name,
             subscriptionId: this.form.value.subscriptionId,
             tenantId: this.form.value.tenantId,
           };
-          this.azureService.create(azureSessionRequest);
+          this.azureService.create(azureSessionRequest);*/
           break;
       }
 

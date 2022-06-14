@@ -8,7 +8,11 @@ import { SessionFactory } from "../session-factory";
 import { Integration } from "../../models/integration";
 import { AzureIntegration } from "../../models/azure/azure-integration";
 import { ExecuteService } from "../execute-service";
-import { MsalPersistenceService } from "../msal-persistence-service";
+import { AzurePersistenceService } from "../azure-persistence-service";
+import { LoggedException, LogLevel } from "../log-service";
+import { AzureIntegrationCreationParams } from "../../models/azure/azure-integration-creation-params";
+import { AzureSessionRequest } from "../session/azure/azure-session-request";
+import { AzureService } from "../session/azure/azure-service";
 
 export class AzureIntegrationService implements IIntegrationService {
   constructor(
@@ -19,11 +23,33 @@ export class AzureIntegrationService implements IIntegrationService {
     public sessionFactory: SessionFactory,
     public sessionNotifier: IBehaviouralNotifier,
     public executeService: ExecuteService,
-    public msalPersistenceService: MsalPersistenceService
+    public azureService: AzureService,
+    public azurePersistenceService: AzurePersistenceService
   ) {}
 
-  createIntegration(creationParams: AzureIntegration): void {
-    this.repository.addAzureIntegration(creationParams.alias, creationParams.tenantId);
+  async checkCliVersion(): Promise<void> {
+    let output;
+    try {
+      output = await this.executeService.execute(`az --version`);
+    } catch (stdError) {
+      throw new LoggedException("Azure CLI is not installed", this, LogLevel.error, true);
+    }
+
+    const tokens = output.split(/\s+/);
+    const versionToken = tokens.find((token) => token.match(/^\d+\.\d+\.\d+$/));
+    if (versionToken) {
+      const [major, minor] = versionToken.split(".").map((v) => parseInt(v, 10));
+      if (major < 2 || (major === 2 && minor < 30)) {
+        throw new LoggedException("Unsupported Azure CLI version (< 2.30). Please update.", this, LogLevel.error, true);
+      }
+    } else {
+      throw new LoggedException("Unknown Azure CLI version", this, LogLevel.error, true);
+    }
+  }
+
+  async createIntegration(creationParams: AzureIntegrationCreationParams): Promise<void> {
+    await this.checkCliVersion();
+    this.repository.addAzureIntegration(creationParams.alias, creationParams.tenantId, creationParams.region);
   }
 
   async deleteIntegration(integrationId: string): Promise<void> {
@@ -42,44 +68,52 @@ export class AzureIntegrationService implements IIntegrationService {
 
   async isOnline(integration: AzureIntegration): Promise<boolean> {
     try {
-      const msalTokenCache = await this.msalPersistenceService.load();
-      const azureProfile = await this.msalPersistenceService.loadAzureProfile();
+      const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
+      const accessToken = Object.entries(msalTokenCache.AccessToken)
+        .map((keyWithTokenObj) => keyWithTokenObj[1])
+        .find((tokenObj) => tokenObj.realm === integration.tenantId);
 
-      let accessTokensBoundToTheSameTenant = true;
-      let idTokensBoundToTheSameTenant = true;
-      let subscriptionsBoundToTheSameTenant = true;
+      const idToken = Object.entries(msalTokenCache.IdToken)
+        .map((keyWithTokenObj) => keyWithTokenObj[1])
+        .find((tokenObj) => tokenObj.realm === integration.tenantId);
 
-      const accessTokenKeys = Object.keys(msalTokenCache.AccessToken);
-      for (const accessTokenKey of accessTokenKeys) {
-        accessTokensBoundToTheSameTenant &&= accessTokenKey.indexOf(integration.tenantId) > -1;
-      }
+      const azureProfile = await this.azurePersistenceService.loadProfile();
+      const subscription = azureProfile.subscriptions.find((sub) => sub.tenantId === integration.tenantId);
 
-      const idTokenKeys = Object.keys(msalTokenCache.IdToken);
-      for (const idTokenKey of idTokenKeys) {
-        idTokensBoundToTheSameTenant &&= idTokenKey.indexOf(integration.tenantId) > -1;
-      }
-
-      const subscriptions = azureProfile.subscriptions;
-      for (const subscription of subscriptions) {
-        subscriptionsBoundToTheSameTenant &&= subscription.tenantId === integration.tenantId;
-      }
-
-      return accessTokensBoundToTheSameTenant && idTokensBoundToTheSameTenant && subscriptionsBoundToTheSameTenant;
+      return !!accessToken && !!idToken && !!subscription;
     } catch (err) {
       return false;
     }
   }
 
   async logout(_integrationId: string): Promise<void> {
-    this.executeService.execute("az logout");
+    await this.executeService.execute("az logout");
   }
 
   remainingHours(_integration: Integration): string {
     return "";
   }
 
-  syncSessions(_integrationId: string): Promise<any> {
-    return Promise.resolve(undefined);
+  async syncSessions(integrationId: string): Promise<any> {
+    const integration = this.getIntegration(integrationId);
+    await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
+    const azureProfile = await this.azurePersistenceService.loadProfile();
+    // TODO: remove old integration's sessions
+    /*for (const session of this.repository.getSessions().filter(session => session.type === SessionType.azure)) {
+      if ((session as AzureSession).azureIntegrationId === integrationId) {
+        this.repository.deleteSession()
+      }
+    }*/
+    for (const subscription of azureProfile.subscriptions) {
+      const azureSessionRequest: AzureSessionRequest = {
+        region: integration.region,
+        subscriptionId: subscription.id,
+        tenantId: integration.tenantId,
+        sessionName: subscription.name,
+        azureIntegrationId: integrationId,
+      };
+      await this.azureService.create(azureSessionRequest);
+    }
   }
 
   updateAwsSsoIntegration(_id: string, _updateParams: Integration): void {}

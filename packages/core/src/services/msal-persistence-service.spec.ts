@@ -1,5 +1,5 @@
 import { expect, describe, test } from "@jest/globals";
-import { MsalPersistenceService } from "./msal-persistence-service";
+import { AzurePersistenceService } from "./azure-persistence-service";
 import * as os from "os";
 import * as fs from "fs";
 
@@ -81,8 +81,8 @@ describe("MsalPersistenceService", () => {
       os,
       fs,
     };
-    const service = new MsalPersistenceService(iNativeService);
-    const parsedData = await service.load(customTestPath);
+    const service = new AzurePersistenceService(iNativeService);
+    const parsedData = await service.loadMsalCache(customTestPath);
     console.log(parsedData);
     expect(parsedData).not.toBeNull();
 
@@ -96,11 +96,11 @@ describe("MsalPersistenceService", () => {
       os,
       fs,
     };
-    const service = new MsalPersistenceService(iNativeService);
-    const parsedData = await service.load(customTestPath);
+    const service = new AzurePersistenceService(iNativeService);
+    const parsedData = await service.loadMsalCache(customTestPath);
     parsedData["RefreshToken"] = {};
-    await service.save(parsedData);
-    const newParsedData = await service.load();
+    await service.saveMsalCache(parsedData);
+    const newParsedData = await service.loadMsalCache();
     expect(newParsedData).toEqual(parsedData);
 
     fs.unlinkSync(customTestPath);

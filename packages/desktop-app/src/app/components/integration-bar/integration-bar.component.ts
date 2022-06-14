@@ -96,14 +96,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     private router: Router,
     private windowService: WindowService,
     private messageToasterService: MessageToasterService,
-    public leappCoreService: AppProviderService,
+    public appProviderService: AppProviderService,
     private ngZone: NgZone
   ) {
-    this.awsSsoRoleService = this.leappCoreService.awsSsoRoleService;
-    this.behaviouralSubjectService = this.leappCoreService.behaviouralSubjectService;
-    this.awsSsoOidcService = this.leappCoreService.awsSsoOidcService;
-    this.loggingService = this.leappCoreService.logService;
-    this.segmentService = this.leappCoreService.segmentService;
+    this.awsSsoRoleService = this.appProviderService.awsSsoRoleService;
+    this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
+    this.awsSsoOidcService = this.appProviderService.awsSsoOidcService;
+    this.loggingService = this.appProviderService.logService;
+    this.segmentService = this.appProviderService.segmentService;
   }
 
   ngOnInit(): void {
@@ -122,8 +122,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       this.selectedIntegration = this.integrations[0].value; // default on AWS
     });
     this.behaviouralSubjectService.setIntegrations([
-      ...this.leappCoreService.awsSsoIntegrationService.getIntegrations(),
-      ...this.leappCoreService.repository.listAzureIntegrations(),
+      ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
+      ...this.appProviderService.repository.listAzureIntegrations(),
     ]);
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
@@ -207,57 +207,66 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  async logout(configurationId: string): Promise<void> {
-    this.logoutLoadings[configurationId] = true;
-    if (this.leappCoreService.awsSsoIntegrationService.getIntegration(configurationId)) {
-      this.selectedConfiguration = this.leappCoreService.awsSsoIntegrationService.getIntegration(configurationId);
-      this.leappCoreService.awsSsoIntegrationService.logout(this.selectedConfiguration.id);
+  async logout(integrationId: string): Promise<void> {
+    this.logoutLoadings[integrationId] = true;
+    const integration = this.getIntegration(integrationId);
+    if (integration.type === IntegrationType.awsSso) {
+      this.appProviderService.awsSsoIntegrationService.logout(integration.id);
     } else {
-      this.selectedConfiguration = this.leappCoreService.repository.getAzureIntegration(configurationId);
-      // TODO: logout azure
+      this.appProviderService.azureIntegrationService.logout(integration.id);
     }
-
     this.loadingInBrowser = false;
     this.loadingInApp = false;
     this.setValues();
   }
 
+  getIntegration(integrationId: string): Integration {
+    return this.allIntegrations().find((int) => int.id === integrationId);
+  }
+
   async forceSync(integrationId: string): Promise<void> {
-    if (this.leappCoreService.awsSsoIntegrationService.getIntegration(integrationId)) {
-      this.selectedConfiguration = this.leappCoreService.awsSsoIntegrationService.getIntegration(integrationId);
+    const integration = this.getIntegration(integrationId);
+    if (integration.type === IntegrationType.awsSso) {
+      await this.forceSyncAwsSso(integrationId);
     } else {
-      this.selectedConfiguration = this.leappCoreService.repository.getAzureIntegration(integrationId);
+      await this.forceSyncAzure(integrationId);
     }
+  }
 
-    if (this.selectedConfiguration && !this.loadingInApp) {
-      this.loadingInBrowser = this.selectedConfiguration.browserOpening === constants.inBrowser.toString();
-      this.loadingInApp = this.selectedConfiguration.browserOpening === constants.inApp.toString();
+  async forceSyncAwsSso(integrationId: string): Promise<void> {
+    this.selectedConfiguration = this.appProviderService.awsSsoIntegrationService.getIntegration(integrationId);
+    if (!this.selectedConfiguration || this.loadingInApp) {
+      return;
+    }
+    this.loadingInBrowser = this.selectedConfiguration.browserOpening === constants.inBrowser.toString();
+    this.loadingInApp = this.selectedConfiguration.browserOpening === constants.inApp.toString();
 
-      try {
-        if (this.loadingInBrowser && !this.isOnline(this.selectedConfiguration)) {
-          this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
-        }
-
-        if (this.selectedConfiguration.type !== IntegrationType.azure.toString()) {
-          await this.leappCoreService.awsSsoIntegrationService.syncSessions(integrationId);
-        } else {
-          // TODO: azure sync
-        }
-      } catch (err) {
-        if (this.selectedConfiguration.type !== IntegrationType.azure.toString()) {
-          this.awsSsoOidcService.interrupt();
-        }
-        await this.logout(integrationId);
-        this.loggingService.log(new LoggedException(`Error during SSO Login: ${err.toString()}`, this, LogLevel.error));
-        this.messageToasterService.toast(`Error during SSO Login: ${err.toString()}`, ToastLevel.error);
-      } finally {
-        if (this.modalRef) {
-          this.modalRef.hide();
-        }
-        this.loadingInBrowser = false;
-        this.loadingInApp = false;
+    try {
+      if (this.loadingInBrowser && !(await this.isOnline(this.selectedConfiguration))) {
+        this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
       }
+      await this.appProviderService.awsSsoIntegrationService.syncSessions(integrationId);
+    } catch (err) {
+      this.awsSsoOidcService.interrupt();
+      await this.logout(integrationId);
+      const errorMessage = `Error during SSO Login: ${err.toString()}`;
+      this.loggingService.log(new LoggedException(errorMessage, this, LogLevel.error));
+      this.messageToasterService.toast(errorMessage, ToastLevel.error);
+    } finally {
+      if (this.modalRef) {
+        this.modalRef.hide();
+      }
+      this.loadingInBrowser = false;
+      this.loadingInApp = false;
     }
+  }
+
+  async forceSyncAzure(integrationId: string): Promise<void> {
+    const integration = this.appProviderService.azureIntegrationService.getIntegration(integrationId);
+    if (!integration || this.loadingInApp) {
+      return;
+    }
+    await this.appProviderService.azureIntegrationService.syncSessions(integrationId);
   }
 
   async gotoWebForm(integrationId: string): Promise<void> {
@@ -268,9 +277,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   setValues(): void {
     this.modifying = 0;
-    this.regions = this.leappCoreService.awsCoreService.getRegions();
-    this.awsSsoConfigurations = this.leappCoreService.awsSsoIntegrationService.getIntegrations();
-    this.azureConfigurations = this.leappCoreService.repository.listAzureIntegrations();
+    this.regions = this.appProviderService.awsCoreService.getRegions();
+    this.awsSsoConfigurations = this.appProviderService.awsSsoIntegrationService.getIntegrations();
+    this.azureConfigurations = this.appProviderService.repository.listAzureIntegrations();
     this.logoutLoadings = {};
     this.isOnlineArray = {};
     this.awsSsoConfigurations.forEach(async (sc) => {
@@ -334,7 +343,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
   }
 
-  save(): void {
+  async save(): Promise<void> {
+    // TODO: Add spinner since the Azure is async...
     if (this.formValid()) {
       const type = this.form.get("integrationType").value;
       const alias = this.form.get("alias").value.trim();
@@ -348,30 +358,31 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       if (this.modifying === 1) {
         // Save
         if (type !== IntegrationType.azure.toString()) {
-          this.leappCoreService.awsSsoIntegrationService.createIntegration({ alias, browserOpening, portalUrl, region });
+          await this.appProviderService.awsSsoIntegrationService.createIntegration({ alias, browserOpening, portalUrl, region });
         } else {
-          this.leappCoreService.repository.addAzureIntegration(alias, tenantId);
+          // TODO: add region to azure!!!
+          await this.appProviderService.azureIntegrationService.createIntegration({ alias, tenantId, region: "region" });
         }
       } else if (this.modifying === 2 && this.selectedConfiguration.portalUrl !== "") {
         // Edit
         // eslint-disable-next-line max-len
         if (type !== IntegrationType.azure.toString()) {
-          this.leappCoreService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedConfiguration.id, {
+          this.appProviderService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedConfiguration.id, {
             alias,
             region,
             portalUrl,
             browserOpening,
           });
         } else {
-          this.leappCoreService.repository.updateAzureIntegration(this.selectedConfiguration.id, alias, tenantId);
+          this.appProviderService.repository.updateAzureIntegration(this.selectedConfiguration.id, alias, tenantId);
         }
       }
 
       this.ngZone.run(() => {
         this.setValues();
         this.behaviouralSubjectService.setIntegrations([
-          ...this.leappCoreService.awsSsoIntegrationService.getIntegrations(),
-          ...this.leappCoreService.repository.listAzureIntegrations(),
+          ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
+          ...this.appProviderService.repository.listAzureIntegrations(),
         ]);
       });
       this.modalRef.hide();
@@ -390,10 +401,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           // eslint-disable-next-line max-len
           this.loggingService.log(new LoggedEntry(`Removing sessions with attached config id: ${integration.id}`, this, LogLevel.info));
           await this.logout(integration.id);
-          if (integration.type !== IntegrationType.azure.toString()) {
-            this.leappCoreService.awsSsoIntegrationService.deleteIntegration(integration.id);
+          if (integration.type !== IntegrationType.azure) {
+            await this.appProviderService.awsSsoIntegrationService.deleteIntegration(integration.id);
           } else {
-            this.leappCoreService.repository.deleteAzureIntegration(integration.id);
+            await this.appProviderService.azureIntegrationService.deleteIntegration(integration.id);
           }
           this.modifying = 0;
         }
@@ -405,7 +416,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   remainingHours(integration: Integration): string {
     if (integration.type !== IntegrationType.azure) {
-      return this.leappCoreService.awsSsoIntegrationService.remainingHours(integration as AwsSsoIntegration);
+      return this.appProviderService.awsSsoIntegrationService.remainingHours(integration as AwsSsoIntegration);
     } else {
       // Todo: add method for azure remaining time if necessary
       return "8hrs";
@@ -420,13 +431,13 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  allIntegrations() {
+  allIntegrations(): Integration[] {
     return this.behaviouralSubjectService.integrations$.value;
   }
 
   private async isOnline(integration: Integration): Promise<boolean> {
     if (integration.type !== IntegrationType.azure) {
-      return await this.leappCoreService.awsSsoIntegrationService.isOnline(integration as AwsSsoIntegration);
+      return await this.appProviderService.awsSsoIntegrationService.isOnline(integration as AwsSsoIntegration);
     } else {
       return true;
     }

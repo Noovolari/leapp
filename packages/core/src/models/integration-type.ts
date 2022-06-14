@@ -1,4 +1,4 @@
 export enum IntegrationType {
-  awsSso = "awsSso",
-  azure = "azure",
+  awsSso = "AWS-SSO",
+  azure = "AZURE",
 }

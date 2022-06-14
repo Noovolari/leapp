@@ -15,7 +15,6 @@ import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
 import { AzureIntegration } from "../models/azure/azure-integration";
-import { IntegrationType } from "../models/integration-type";
 
 export class Repository {
   // Private singleton workspace
@@ -274,15 +273,7 @@ export class Repository {
 
   addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string): void {
     const workspace = this.getWorkspace();
-    workspace.awsSsoIntegrations.push({
-      type: IntegrationType.awsSso,
-      id: uuid.v4(),
-      alias,
-      portalUrl,
-      region,
-      browserOpening,
-      accessTokenExpiration: undefined,
-    });
+    workspace.awsSsoIntegrations.push(new AwsSsoIntegration(uuid.v4(), alias, portalUrl, region, browserOpening, undefined));
     this.persistWorkspace(workspace);
   }
 
@@ -321,7 +312,7 @@ export class Repository {
 
   addAzureIntegration(alias: string, tenantId: string): void {
     const workspace = this.getWorkspace();
-    workspace.azureIntegrations.push({ type: IntegrationType.azure, id: uuid.v4(), alias, tenantId });
+    workspace.azureIntegrations.push(new AzureIntegration(uuid.v4(), alias, tenantId));
     this.persistWorkspace(workspace);
   }
 

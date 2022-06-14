@@ -19,10 +19,10 @@ import { WindowService } from "../../services/window.service";
 import { sidebarHighlight } from "../side-bar/side-bar.component";
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { OptionsService } from "../../services/options.service";
-import { AzureIntegration } from "@noovolari/leapp-core/models/azure/azure-integration";
 import { Integration } from "@noovolari/leapp-core/models/integration";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
+import { AzureIntegration } from "@noovolari/leapp-core/models/azure/azure-integration";
 
 export interface SelectedIntegration {
   id: string;
@@ -81,6 +81,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   menuX: number;
   menuY: number;
 
+  isOnlineArray = {};
+
   private awsSsoRoleService: AwsSsoRoleService;
   private behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoOidcService: AwsSsoOidcService;
@@ -117,19 +119,12 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           selected: false,
         })),
       ];
+      this.selectedIntegration = this.integrations[0].value; // default on AWS
     });
-    this.setValues();
-    this.selectedIntegrations = [
-      ...this.awsSsoConfigurations.map((integration) => ({
-        id: integration.id,
-        selected: false,
-      })),
-      ...this.azureConfigurations.map((integration) => ({
-        id: integration.id,
-        selected: false,
-      })),
-    ];
-    this.selectedIntegration = this.integrations[0].value; // default on AWS
+    this.behaviouralSubjectService.setIntegrations([
+      ...this.leappCoreService.awsSsoIntegrationService.getIntegrations(),
+      ...this.leappCoreService.repository.listAzureIntegrations(),
+    ]);
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if (value) {
@@ -274,15 +269,17 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   setValues(): void {
     this.modifying = 0;
     this.regions = this.leappCoreService.awsCoreService.getRegions();
-    this.awsSsoConfigurations = this.leappCoreService.repository.getWorkspace().awsSsoIntegrations;
-    console.log(this.leappCoreService.repository.getWorkspace().awsSsoIntegrations);
+    this.awsSsoConfigurations = this.leappCoreService.awsSsoIntegrationService.getIntegrations();
     this.azureConfigurations = this.leappCoreService.repository.listAzureIntegrations();
     this.logoutLoadings = {};
-    this.awsSsoConfigurations.forEach((sc) => {
+    this.isOnlineArray = {};
+    this.awsSsoConfigurations.forEach(async (sc) => {
       this.logoutLoadings[sc.id] = false;
+      this.isOnlineArray[sc.id] = await this.isOnline(sc);
     });
-    this.azureConfigurations.forEach((sc) => {
+    this.azureConfigurations.forEach(async (sc) => {
       this.logoutLoadings[sc.id] = false;
+      this.isOnlineArray[sc.id] = await this.isOnline(sc);
     });
 
     this.selectedConfiguration = {
@@ -340,8 +337,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   save(): void {
     if (this.formValid()) {
       const type = this.form.get("integrationType").value;
-      const alias = this.form.get("alias").value?.trim();
-      const portalUrl = this.form.get("portalUrl").value?.trim();
+      const alias = this.form.get("alias").value.trim();
+      const portalUrl = this.form.get("portalUrl").value.trim();
       const region = this.form.get("awsRegion").value;
       const browserOpening = this.form.get("defaultBrowserOpening").value;
       const tenantId = this.form.get("tenantId").value;
@@ -355,26 +352,25 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         } else {
           this.leappCoreService.repository.addAzureIntegration(alias, tenantId);
         }
-      } else if (this.modifying === 2) {
+      } else if (this.modifying === 2 && this.selectedConfiguration.portalUrl !== "") {
         // Edit
         // eslint-disable-next-line max-len
         if (type !== IntegrationType.azure.toString()) {
-          if (this.selectedConfiguration.portalUrl !== "") {
-            this.leappCoreService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedConfiguration.id, {
-              alias,
-              region,
-              portalUrl,
-              browserOpening,
-            });
-          }
+          this.leappCoreService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedConfiguration.id, {
+            alias,
+            region,
+            portalUrl,
+            browserOpening,
+          });
         } else {
           this.leappCoreService.repository.updateAzureIntegration(this.selectedConfiguration.id, alias, tenantId);
         }
       }
 
       this.ngZone.run(() => {
+        this.setValues();
         this.behaviouralSubjectService.setIntegrations([
-          ...this.leappCoreService.repository.getWorkspace().awsSsoIntegrations,
+          ...this.leappCoreService.awsSsoIntegrationService.getIntegrations(),
           ...this.leappCoreService.repository.listAzureIntegrations(),
         ]);
       });
@@ -407,18 +403,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     );
   }
 
-  async isOnline(integration: Integration): Promise<boolean> {
-    if (integration.type !== IntegrationType.azure) {
-      return this.leappCoreService.awsSsoIntegrationService.isOnline(integration as AwsSsoIntegration);
-    } else {
-      return true;
-    }
-  }
-
   remainingHours(integration: Integration): string {
     if (integration.type !== IntegrationType.azure) {
       return this.leappCoreService.awsSsoIntegrationService.remainingHours(integration as AwsSsoIntegration);
     } else {
+      // Todo: add method for azure remaining time if necessary
       return "8hrs";
     }
   }
@@ -432,12 +421,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   allIntegrations() {
-    console.log([this.awsSsoConfigurations.flat(), ...this.azureConfigurations.flat()]);
-    return [...this.azureConfigurations];
+    return this.behaviouralSubjectService.integrations$.value;
   }
 
-  async tooltipAsync(intConfiguration: AwsSsoIntegration | AzureIntegration): Promise<string> {
-    const online = await this.isOnline(intConfiguration);
-    return online ? "Expiring " + this.remainingHours(intConfiguration) : "Offline";
+  private async isOnline(integration: Integration): Promise<boolean> {
+    if (integration.type !== IntegrationType.azure) {
+      return await this.leappCoreService.awsSsoIntegrationService.isOnline(integration as AwsSsoIntegration);
+    } else {
+      return true;
+    }
   }
 }

@@ -100,11 +100,11 @@
 
     <div mat-line>
       <img src="assets/images/{{intConfiguration.type === eIntegrationType.azure ? 'azure' : 'aws'}}{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" />
-      <section class="status" matTooltip="{{tooltipAsync(intConfiguration)|async}}">
-        <ng-container *ngIf="isOnline(intConfiguration)|async">
+      <section class="status" matTooltip="{{isOnlineArray[intConfiguration.id] ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline'}}">
+        <ng-container *ngIf="isOnlineArray[intConfiguration.id]">
           <b class="green-dot"></b>
         </ng-container>
-        <ng-container *ngIf="(isOnline(intConfiguration)|async) === false">
+        <ng-container *ngIf="!isOnlineArray[intConfiguration.id]">
           <b class="red-dot"></b>
         </ng-container>
       </section>
@@ -129,15 +129,15 @@
     </button>
 
     <ng-container *ngIf="!logoutLoadings[configuration.id]">
-      <button mat-menu-item (click)="logout(configuration.id)" *ngIf="isOnline(configuration)|async">
+      <button mat-menu-item (click)="logout(configuration.id)" *ngIf="isOnlineArray[configuration.id]">
         <i class="moon-Close"></i>
         <span> Logout</span>
       </button>
     </ng-container>
 
     <button mat-menu-item (click)="forceSync(configuration.id)" *ngIf="!loadingInBrowser">
-      <ng-container *ngIf=" isOnline(configuration)|async"><i class="moon-Refresh"></i> Sync</ng-container>
-      <ng-container *ngIf="(isOnline(configuration)|async) === false"><i class="moon-Lock"></i> Login</ng-container>
+      <ng-container *ngIf="isOnlineArray[configuration.id]"><i class="moon-Refresh"></i> Sync</ng-container>
+      <ng-container *ngIf="!isOnlineArray[configuration.id]"><i class="moon-Lock"></i> Login</ng-container>
     </button>
 
     <button mat-menu-item (click)="delete(configuration)"><i class="moon-Delete"></i> Delete</button>

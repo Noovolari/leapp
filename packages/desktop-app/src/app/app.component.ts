@@ -76,6 +76,8 @@ export class AppComponent implements OnInit {
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
+    this.appNativeService.currentWindow.webContents.openDevTools();
+    console.error(this.awsSsoIntegrationService.getIntegrations());
   }
 
   async ngOnInit(): Promise<void> {
@@ -140,9 +142,6 @@ export class AppComponent implements OnInit {
     this.router.navigate(["/dashboard"]);
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
-
-    this.appNativeService.currentWindow.webContents.openDevTools();
-    console.log(6);
   }
 
   closeAllRightClickMenus(): void {

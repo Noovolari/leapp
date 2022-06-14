@@ -11,7 +11,7 @@ import { AwsIamUserSession } from "../models/aws/aws-iam-user-session";
 import * as uuid from "uuid";
 import { SessionType } from "../models/session-type";
 import { Repository } from "./repository";
-import { IntegrationType } from "../models/integration-type";
+import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 
 export class RetroCompatibilityService {
   constructor(
@@ -402,15 +402,16 @@ export class RetroCompatibilityService {
 
     if (workspace.sessions.filter((sess) => sess.type === SessionType.awsSsoRole.toString()).length > 0) {
       if (workspace.awsSsoIntegrations.length === 0) {
-        workspace.awsSsoIntegrations.push({
-          id: uuid.v4(),
-          alias: "Aws Single Sign-On",
-          portalUrl: awsSsoConfiguration.portalUrl,
-          region: awsSsoConfiguration.region,
-          browserOpening: constants.inApp,
-          accessTokenExpiration: awsSsoConfiguration.expirationTime,
-          type: IntegrationType.awsSso,
-        });
+        workspace.awsSsoIntegrations.push(
+          new AwsSsoIntegration(
+            uuid.v4(),
+            "Aws Single Sign-On",
+            awsSsoConfiguration.portalUrl,
+            awsSsoConfiguration.region,
+            constants.inApp,
+            awsSsoConfiguration.expirationTime
+          )
+        );
 
         try {
           const accessToken = await this.keyChainService.getSecret(constants.appName, `aws-sso-access-token`);

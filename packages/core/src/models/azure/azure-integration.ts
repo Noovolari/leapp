@@ -1,9 +1,8 @@
 import { Integration } from "../integration";
 import { IntegrationType } from "../integration-type";
 
-export interface AzureIntegration extends Integration {
-  id: string;
-  alias: string;
-  tenantId: string;
-  type: IntegrationType;
+export class AzureIntegration extends Integration {
+  constructor(id: string, alias: string, public tenantId: string) {
+    super(id, alias, IntegrationType.awsSso);
+  }
 }

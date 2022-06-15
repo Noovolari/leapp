@@ -74,18 +74,13 @@ export class AzureIntegrationService implements IIntegrationService {
   }
 
   async setOnline(integration: AzureIntegration, forcedState?: boolean): Promise<void> {
-    if (forcedState) {
+    if (forcedState !== undefined) {
       integration.isOnline = forcedState;
     } else {
       try {
         const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
-        const accessToken = Object.entries(msalTokenCache.AccessToken)
-          .map((keyWithTokenObj) => keyWithTokenObj[1])
-          .find((tokenObj) => tokenObj.realm === integration.tenantId);
-
-        const idToken = Object.entries(msalTokenCache.IdToken)
-          .map((keyWithTokenObj) => keyWithTokenObj[1])
-          .find((tokenObj) => tokenObj.realm === integration.tenantId);
+        const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === integration.tenantId);
+        const idToken = Object.values(msalTokenCache.IdToken).find((tokenObj) => tokenObj.realm === integration.tenantId);
 
         const azureProfile = await this.azurePersistenceService.loadProfile();
         const subscription = azureProfile.subscriptions.find((sub) => sub.tenantId === integration.tenantId);

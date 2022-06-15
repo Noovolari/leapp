@@ -51,6 +51,7 @@ describe("Repository", () => {
     (repository as any)._workspace = mockedWorkspace;
 
     mockedSession = {
+      sessionTokenExpiration: "",
       region: "eu-west-1",
       sessionId: "123456789",
       sessionName: "mock-session",
@@ -137,6 +138,7 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     const mockedSession2: Session = {
+      sessionTokenExpiration: "",
       region: "eu-west-2",
       sessionId: "987654321",
       sessionName: "mocked-2",
@@ -159,6 +161,7 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     const mockedSession2: Session = {
+      sessionTokenExpiration: "",
       region: "eu-west-2",
       sessionId: "123456789",
       sessionName: "mocked-2",
@@ -183,6 +186,7 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     const mockedSession2: Session = {
+      sessionTokenExpiration: "",
       region: "eu-west-2",
       sessionId: "123456789",
       sessionName: "mocked-2",
@@ -554,7 +558,11 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     workspace.awsSsoIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
     ];
     repository.workspace = workspace;
@@ -586,6 +594,7 @@ describe("Repository", () => {
         type: SessionType.awsSsoRole,
         status: SessionStatus.inactive,
         region: "eu-west-1",
+        sessionTokenExpiration: "",
         expired: () => false,
       },
       {
@@ -594,12 +603,17 @@ describe("Repository", () => {
         type: SessionType.awsSsoRole,
         status: SessionStatus.inactive,
         region: "eu-west-1",
+        sessionTokenExpiration: "",
         expired: () => false,
       },
     ];
 
     workspace.awsSsoIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
     ];
     repository.workspace = workspace;
@@ -616,7 +630,11 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     workspace.awsSsoIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
     ];
     repository.workspace = workspace;
@@ -638,7 +656,11 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     workspace.awsSsoIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
     ];
     repository.workspace = workspace;
@@ -662,6 +684,8 @@ describe("Repository", () => {
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     workspace.awsSsoIntegrations = [{ id: "1234", alias: "1", region: "a", accessTokenExpiration: "1000", browserOpening: "", portalUrl: "" }];
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
@@ -681,6 +705,8 @@ describe("Repository", () => {
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     workspace.awsSsoIntegrations = [{ id: "1234", alias: "1", region: "a", accessTokenExpiration: "1000", browserOpening: "", portalUrl: "" }];
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
@@ -691,6 +717,124 @@ describe("Repository", () => {
 
     expect(repository.listAwsSsoIntegrations().length).toBe(0);
     expect(repository.listAwsSsoIntegrations()[0]).toBe(undefined);
+  });
+
+  test("listAzureIntegrations() - get all the azure integrations we have in the workspace", () => {
+    const workspace = new Workspace();
+    workspace.azureIntegrations = [];
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(0);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.azureIntegrations = [{}, {}];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(2);
+  });
+
+  test("getAzureIntegration() - get a specific integration given the id", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.azureIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "1234", alias: "1", tenantId: "1" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "4567", alias: "2", tenantId: "2" },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getAzureIntegration("1234").tenantId).toBe("1");
+    expect(repository.getAzureIntegration("4567").tenantId).toBe("2");
+    expect(repository.getAzureIntegration("8910")).toBe(undefined);
+  });
+
+  test("addAzureIntegration() - add a specific integration to the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.azureIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "1234", alias: "1", tenantId: "1" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "4567", alias: "2", tenantId: "2" },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(2);
+
+    repository.addAzureIntegration("alias", "1234", "region-1");
+
+    expect(repository.listAzureIntegrations().length).toBe(3);
+    expect(repository.listAzureIntegrations()[2].alias).toBe("alias");
+    expect(repository.listAzureIntegrations()[2].tenantId).toBe("1234");
+  });
+
+  test("updateAzureIntegration() - update a specific integration in the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.azureIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "1234", alias: "1", tenantId: "1", isOnline: false },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "4567", alias: "2", tenantId: "2", isOnline: false },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(2);
+
+    repository.updateAzureIntegration("1234", "alias", "ti1", "fake", true);
+
+    expect(repository.listAzureIntegrations().length).toBe(2);
+    expect(repository.listAzureIntegrations()[0].alias).toBe("alias");
+    expect(repository.listAzureIntegrations()[0].tenantId).toBe("ti1");
+    expect(repository.listAzureIntegrations()[0].isOnline).toBe(true);
+  });
+
+  test("deleteAzureIntegration() - remove an integration from the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.azureIntegrations = [{ id: "1234", alias: "1", tenantId: "1111", isOnline: false }];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(1);
+
+    repository.deleteAzureIntegration("1234");
+
+    expect(repository.listAzureIntegrations().length).toBe(0);
+    expect(repository.listAzureIntegrations()[0]).toBe(undefined);
   });
 
   test("getProxyConfiguration() - get the proxy config object from the workspace", () => {

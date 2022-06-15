@@ -232,7 +232,7 @@ describe("AwsSsoIntegrationService", () => {
       getSessions: () => expectedSessions,
       deleteSessions: jest.fn(),
     } as any;
-    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, { setSessions: () => {} }, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, { setSessions: () => {} } as any, null, null, null, null);
     awsIntegrationService.logout = jest.fn();
 
     const integrationId = "integrationId";

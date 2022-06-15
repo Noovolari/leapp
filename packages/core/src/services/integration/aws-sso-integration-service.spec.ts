@@ -115,17 +115,25 @@ describe("AwsSsoIntegrationService", () => {
       region: "region",
       portalUrl: "portalUrl",
     };
+    const aws1 = {};
+    const aws2 = {};
+    const azr1 = {};
+    const azr2 = {};
     const awsIntegrationSessions = caseAwsIntegrationSessions;
     const repository = {
       getAwsSsoIntegration: jest.fn(() => awsSsoIntegration),
       getAwsSsoIntegrationSessions: jest.fn(() => awsIntegrationSessions),
+      updateAwsSsoIntegration: jest.fn(() => {}),
+      listAwsSsoIntegrations: jest.fn(() => [aws1, aws2]),
+      listAzureIntegrations: jest.fn(() => [azr1, azr2]),
     };
     const accessToken = "accessToken";
     const getAccessToken = jest.fn(async () => accessToken);
     const sessions = caseSessions;
     const getSessions = jest.fn(async () => sessions);
+    const behaviouralService = { setIntegrations: jest.fn(() => {}) };
 
-    const awsSsoIntegrationService = new AwsSsoIntegrationService(repository as any, null, null, null, null, null, null);
+    const awsSsoIntegrationService = new AwsSsoIntegrationService(repository as any, null, behaviouralService as any, null, null, null, null);
     (awsSsoIntegrationService as any).getAccessToken = getAccessToken;
     (awsSsoIntegrationService as any).getSessions = getSessions;
 
@@ -137,6 +145,7 @@ describe("AwsSsoIntegrationService", () => {
     expect(getAccessToken).toHaveBeenCalledWith(integrationId, awsSsoIntegration.region, awsSsoIntegration.portalUrl);
     expect(getSessions).toHaveBeenCalledWith(integrationId, accessToken, awsSsoIntegration.region);
     expect(repository.getAwsSsoIntegrationSessions).toHaveBeenCalledWith(integrationId);
+    expect(behaviouralService.setIntegrations).toHaveBeenCalledWith([aws1, aws2, azr1, azr2]);
   });
 
   test("syncSessions", async () => {
@@ -164,7 +173,8 @@ describe("AwsSsoIntegrationService", () => {
     const sessionFactory = {
       getSessionService: jest.fn(() => sessionService),
     };
-    const awsSsoIntegrationService = new AwsSsoIntegrationService(null, null, awsSsoRoleService as any, null, null, null, sessionFactory as any);
+
+    const awsSsoIntegrationService = new AwsSsoIntegrationService(null, null, null, null, sessionFactory as any, null, awsSsoRoleService as any);
     (awsSsoIntegrationService as any).loginAndGetSessionsDiff = loginAndGetSessionsDiff;
 
     const syncedSessions = await awsSsoIntegrationService.syncSessions(integrationId);
@@ -222,7 +232,7 @@ describe("AwsSsoIntegrationService", () => {
       getSessions: () => expectedSessions,
       deleteSessions: jest.fn(),
     } as any;
-    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, { setSession: () => {} }, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, { setSessions: () => {} }, null, null, null, null);
     awsIntegrationService.logout = jest.fn();
 
     const integrationId = "integrationId";

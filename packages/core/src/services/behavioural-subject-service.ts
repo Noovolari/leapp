@@ -12,6 +12,7 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
     this.sessions$ = new BehaviorSubject<Session[]>([]);
     this.integrations$ = new BehaviorSubject<Integration[]>([]);
     this.sessions = this.repository.getSessions();
+    this.integrations = [...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()];
   }
 
   // the getter will return the last value emitted in _sessions subject
@@ -47,6 +48,10 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
 
   getIntegrations(): Integration[] {
     return this.integrations;
+  }
+
+  getIntegrationById(integrationId: string): Integration {
+    return this.integrations.find((i) => i.id === integrationId);
   }
 
   setIntegrations(integrations: Integration[]) {

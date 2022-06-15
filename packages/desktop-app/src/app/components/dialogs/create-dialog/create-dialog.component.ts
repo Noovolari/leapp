@@ -370,7 +370,6 @@ export class CreateDialogComponent implements OnInit {
           this.awsIamUserService.create(awsIamUserSessionRequest).then(() => {});
           break;
         case SessionType.awsIamRoleChained:
-          console.log(this.selectedSession);
           const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
             sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,

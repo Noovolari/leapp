@@ -132,7 +132,7 @@ export class AppComponent implements OnInit {
     }
     console.log(4);
     // Start Global Timer
-    this.timerService.start(this.rotationService.rotate.bind(this.rotationService));
+    this.timerService.start(() => this.timerFunction(this.rotationService, this.appProviderService));
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
@@ -146,6 +146,30 @@ export class AppComponent implements OnInit {
 
   closeAllRightClickMenus(): void {
     this.appService.closeAllMenuTriggers();
+  }
+
+  private timerFunction(rotationService: RotationService, appProviderService): void {
+    rotationService.rotate();
+
+    const awsSsoIntegrations = appProviderService.awsSsoIntegrationService.getIntegrations();
+    const azureIntegrations = appProviderService.azureIntegrationService.getIntegrations();
+
+    const promises: Promise<void>[] = [];
+
+    for (const awsSsoIntegration of awsSsoIntegrations) {
+      promises.push(appProviderService.awsSsoIntegrationService.setOnline(awsSsoIntegration));
+    }
+
+    for (const azureIntegration of azureIntegrations) {
+      promises.push(appProviderService.azureIntegrationService.setOnline(azureIntegration));
+    }
+
+    Promise.all(promises).then(() => {
+      const updatedAwsSsoIntegrations = appProviderService.awsSsoIntegrationService.getIntegrations();
+      const updatedAzureIntegrations = appProviderService.azureIntegrationService.getIntegrations();
+
+      appProviderService.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
+    });
   }
 
   /**

@@ -3,27 +3,25 @@ import { KeychainService } from "../services/keychain-service";
 import { IBehaviouralNotifier } from "./i-behavioural-notifier";
 import { INativeService } from "./i-native-service";
 import { SessionFactory } from "../services/session-factory";
-import { BehaviouralSubjectService } from "../services/behavioural-subject-service";
 import { Integration } from "../models/integration";
-import { IntegrationCreationParams } from "../models/integration-creation-params";
+import { IntegrationParams } from "../models/integration-params";
 
 export interface IIntegrationService {
   repository: Repository;
   keyChainService: KeychainService;
-  sessionNotifier: IBehaviouralNotifier;
+  behaviouralNotifier: IBehaviouralNotifier;
   nativeService: INativeService;
   sessionFactory: SessionFactory;
-  behaviouralSubjectService: BehaviouralSubjectService;
 
-  createIntegration(creationParams: IntegrationCreationParams): Promise<void>;
+  createIntegration(creationParams: IntegrationParams): void;
 
-  updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void;
+  updateIntegration(id: string, updateParams: IntegrationParams): void;
 
   getIntegration(id: string): Integration;
 
   getIntegrations(): Integration[];
 
-  isOnline(integration: Integration): Promise<boolean>;
+  setOnline(integration: Integration): Promise<void>;
 
   remainingHours(integration: Integration): string;
 

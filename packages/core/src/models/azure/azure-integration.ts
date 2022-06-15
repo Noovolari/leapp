@@ -3,10 +3,6 @@ import { IntegrationType } from "../integration-type";
 
 export class AzureIntegration extends Integration {
   constructor(id: string, alias: string, public tenantId: string, public region: string) {
-    super(id, alias, IntegrationType.azure);
-  }
-
-  get isOnline(): Promise<boolean> {
-    return Promise.resolve(true);
+    super(id, alias, IntegrationType.azure, false);
   }
 }

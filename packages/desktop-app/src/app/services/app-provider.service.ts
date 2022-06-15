@@ -179,13 +179,12 @@ export class AppProviderService {
     if (!this.awsSsoIntegrationServiceInstance) {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
         this.repository,
-        this.awsSsoOidcService,
-        this.awsSsoRoleService,
         this.keyChainService,
         this.behaviouralSubjectService,
         this.appNativeService,
         this.sessionFactory,
-        this.behaviouralSubjectService
+        this.awsSsoOidcService,
+        this.awsSsoRoleService
       );
     }
     return this.awsSsoIntegrationServiceInstance;
@@ -239,12 +238,11 @@ export class AppProviderService {
   public get azureIntegrationService(): AzureIntegrationService {
     if (!this.azureIntegrationServiceInstance) {
       this.azureIntegrationServiceInstance = new AzureIntegrationService(
-        this.behaviouralSubjectService,
-        this.keyChainService,
-        this.appNativeService,
         this.repository,
-        this.sessionFactory,
+        this.keyChainService,
         this.behaviouralSubjectService,
+        this.appNativeService,
+        this.sessionFactory,
         this.executeService,
         this.azureService,
         this.azurePersistenceService

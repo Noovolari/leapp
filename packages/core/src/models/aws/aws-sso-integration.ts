@@ -10,12 +10,12 @@ export class AwsSsoIntegration extends Integration {
     public browserOpening: string,
     public accessTokenExpiration: string
   ) {
-    super(id, alias, IntegrationType.awsSso);
+    super(id, alias, IntegrationType.awsSso, false);
   }
 
-  get isOnline(): Promise<boolean> {
+  /*get isOnline(): Promise<boolean> {
     const expiration = new Date(this.accessTokenExpiration).getTime();
     const now = new Date().getTime();
     return Promise.resolve(!!this.accessTokenExpiration && now < expiration);
-  }
+  }*/
 }

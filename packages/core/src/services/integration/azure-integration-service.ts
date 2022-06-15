@@ -1,7 +1,6 @@
 import { IBehaviouralNotifier } from "../../interfaces/i-behavioural-notifier";
 import { IIntegrationService } from "../../interfaces/i-integration-service";
 import { INativeService } from "../../interfaces/i-native-service";
-import { BehaviouralSubjectService } from "../behavioural-subject-service";
 import { KeychainService } from "../keychain-service";
 import { Repository } from "../repository";
 import { SessionFactory } from "../session-factory";
@@ -16,12 +15,11 @@ import { AzureService } from "../session/azure/azure-service";
 
 export class AzureIntegrationService implements IIntegrationService {
   constructor(
-    public behaviouralSubjectService: BehaviouralSubjectService,
-    public keyChainService: KeychainService,
-    public nativeService: INativeService,
     public repository: Repository,
+    public keyChainService: KeychainService,
+    public behaviouralNotifier: IBehaviouralNotifier,
+    public nativeService: INativeService,
     public sessionFactory: SessionFactory,
-    public sessionNotifier: IBehaviouralNotifier,
     public executeService: ExecuteService,
     public azureService: AzureService,
     public azurePersistenceService: AzurePersistenceService
@@ -52,6 +50,11 @@ export class AzureIntegrationService implements IIntegrationService {
     this.repository.addAzureIntegration(creationParams.alias, creationParams.tenantId, creationParams.region);
   }
 
+  updateIntegration(id: string, updateParams: AzureIntegrationCreationParams): void {
+    const isOnline = this.repository.getAzureIntegration(id).isOnline;
+    this.repository.updateAzureIntegration(id, updateParams.alias, updateParams.tenantId, updateParams.region, isOnline);
+  }
+
   async deleteIntegration(integrationId: string): Promise<void> {
     await this.logout(integrationId);
     this.repository.deleteAzureIntegration(integrationId);
@@ -66,28 +69,35 @@ export class AzureIntegrationService implements IIntegrationService {
     return this.repository.listAzureIntegrations();
   }
 
-  async isOnline(integration: AzureIntegration): Promise<boolean> {
-    try {
-      const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
-      const accessToken = Object.entries(msalTokenCache.AccessToken)
-        .map((keyWithTokenObj) => keyWithTokenObj[1])
-        .find((tokenObj) => tokenObj.realm === integration.tenantId);
+  async setOnline(integration: AzureIntegration, forcedState?: boolean): Promise<void> {
+    if (forcedState) {
+      integration.isOnline = forcedState;
+    } else {
+      try {
+        const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
+        const accessToken = Object.entries(msalTokenCache.AccessToken)
+          .map((keyWithTokenObj) => keyWithTokenObj[1])
+          .find((tokenObj) => tokenObj.realm === integration.tenantId);
 
-      const idToken = Object.entries(msalTokenCache.IdToken)
-        .map((keyWithTokenObj) => keyWithTokenObj[1])
-        .find((tokenObj) => tokenObj.realm === integration.tenantId);
+        const idToken = Object.entries(msalTokenCache.IdToken)
+          .map((keyWithTokenObj) => keyWithTokenObj[1])
+          .find((tokenObj) => tokenObj.realm === integration.tenantId);
 
-      const azureProfile = await this.azurePersistenceService.loadProfile();
-      const subscription = azureProfile.subscriptions.find((sub) => sub.tenantId === integration.tenantId);
-
-      return !!accessToken && !!idToken && !!subscription;
-    } catch (err) {
-      return false;
+        const azureProfile = await this.azurePersistenceService.loadProfile();
+        const subscription = azureProfile.subscriptions.find((sub) => sub.tenantId === integration.tenantId);
+        integration.isOnline = !!accessToken && !!idToken && !!subscription;
+      } catch (err) {
+        integration.isOnline = false;
+      }
     }
+    this.repository.updateAzureIntegration(integration.id, integration.alias, integration.tenantId, integration.region, integration.isOnline);
   }
 
-  async logout(_integrationId: string): Promise<void> {
-    await this.executeService.execute("az logout");
+  async logout(integrationId: string): Promise<void> {
+    this.executeService.execute("az logout");
+    const integration = this.getIntegration(integrationId);
+    this.setOnline(integration, false);
+    this.behaviouralNotifier.setIntegrations([...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()]);
   }
 
   remainingHours(_integration: Integration): string {
@@ -116,13 +126,11 @@ export class AzureIntegrationService implements IIntegrationService {
     }
   }
 
-  updateAwsSsoIntegration(_id: string, _updateParams: Integration): void {}
-
   private deleteDependentSessions(integrationId: string) {
     const azureSessions = this.repository.getSessions().filter((session) => (session as any).azureIntegrationId === integrationId);
     for (const session of azureSessions) {
       this.repository.deleteSession(session.sessionId);
     }
-    this.behaviouralSubjectService.setSessions([...this.repository.getSessions()]);
+    this.behaviouralNotifier.setSessions([...this.repository.getSessions()]);
   }
 }

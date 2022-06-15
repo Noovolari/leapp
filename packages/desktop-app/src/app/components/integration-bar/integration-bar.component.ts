@@ -83,8 +83,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   isOnlineArray = {};
 
+  public behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoRoleService: AwsSsoRoleService;
-  private behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoOidcService: AwsSsoOidcService;
   private loggingService: LogService;
   private segmentService: SegmentService;
@@ -221,7 +221,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   getIntegration(integrationId: string): Integration {
-    return this.allIntegrations().find((int) => int.id === integrationId);
+    return this.behaviouralSubjectService.integrations$.value.find((int) => int.id === integrationId);
   }
 
   async forceSync(integrationId: string): Promise<void> {
@@ -242,7 +242,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.loadingInApp = this.selectedConfiguration.browserOpening === constants.inApp.toString();
 
     try {
-      if (this.loadingInBrowser && !(await this.isOnline(this.selectedConfiguration))) {
+      if (this.loadingInBrowser && !this.selectedConfiguration.isOnline) {
         this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
       }
       await this.appProviderService.awsSsoIntegrationService.syncSessions(integrationId);
@@ -281,14 +281,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.awsSsoConfigurations = this.appProviderService.awsSsoIntegrationService.getIntegrations();
     this.azureConfigurations = this.appProviderService.repository.listAzureIntegrations();
     this.logoutLoadings = {};
-    this.isOnlineArray = {};
-    this.awsSsoConfigurations.forEach(async (sc) => {
+
+    this.awsSsoConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
-      // this.isOnlineArray[sc.id] = await this.isOnline(sc);
+      //this.leappCoreService.awsSsoIntegrationService.setOnline(sc);
     });
-    this.azureConfigurations.forEach(async (sc) => {
+    this.azureConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
-      // this.isOnlineArray[sc.id] = await this.isOnline(sc);
+      //this.leappCoreService.azureIntegrationService.setOnline(sc);
     });
 
     this.selectedConfiguration = {
@@ -366,15 +366,19 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       } else if (this.modifying === 2 && this.selectedConfiguration.portalUrl !== "") {
         // Edit
         // eslint-disable-next-line max-len
-        if (type !== IntegrationType.azure.toString()) {
-          this.appProviderService.awsSsoIntegrationService.updateAwsSsoIntegration(this.selectedConfiguration.id, {
+        if (type === IntegrationType.awsSso) {
+          this.appProviderService.awsSsoIntegrationService.updateIntegration(this.selectedConfiguration.id, {
             alias,
             region,
             portalUrl,
             browserOpening,
           });
         } else {
-          this.appProviderService.repository.updateAzureIntegration(this.selectedConfiguration.id, alias, tenantId);
+          this.appProviderService.azureIntegrationService.updateIntegration(this.selectedConfiguration.id, {
+            alias,
+            tenantId,
+            region,
+          });
         }
       }
 
@@ -428,18 +432,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       return this.form.get("alias").valid && this.form.get("portalUrl").valid && this.form.get("awsRegion").value !== null;
     } else {
       return this.form.get("alias").valid && this.form.get("tenantId").valid;
-    }
-  }
-
-  allIntegrations(): Integration[] {
-    return this.behaviouralSubjectService.integrations$.value;
-  }
-
-  private async isOnline(integration: Integration): Promise<boolean> {
-    if (integration.type !== IntegrationType.azure) {
-      return await this.appProviderService.awsSsoIntegrationService.isOnline(integration as AwsSsoIntegration);
-    } else {
-      return true;
     }
   }
 }

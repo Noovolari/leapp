@@ -1,6 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { AzureIntegrationService } from "./azure-integration-service";
 import { SessionType } from "../../models/session-type";
+import { constants } from "../../models/constants";
 
 describe("AzureIntegrationService", () => {
   test("getIntegration", async () => {
@@ -25,6 +26,9 @@ describe("AzureIntegrationService", () => {
     const repository = { getSessions: () => sessions } as any;
     const azureService = { create: jest.fn() } as any;
     const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    service.setOnline = jest.fn();
+    (service as any).moveSecretsToKeychain = jest.fn();
+    (service as any).notifyIntegrationChanges = jest.fn();
 
     const integrationId = "integrationId";
     const integration = { tenantId: "tenantId", region: "region" } as any;
@@ -41,6 +45,9 @@ describe("AzureIntegrationService", () => {
       sessionName: "subscriptionName",
       azureIntegrationId: integrationId,
     });
+    expect((service as any).moveSecretsToKeychain).toHaveBeenCalledWith(integration, azureProfile);
+    expect(service.setOnline).toHaveBeenCalledWith(integration, true);
+    expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
   });
 
   test("syncSessions, azure local session to keep", async () => {
@@ -63,6 +70,9 @@ describe("AzureIntegrationService", () => {
     const repository = { getSessions: () => sessions } as any;
     const azureService = { create: jest.fn() } as any;
     const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    service.setOnline = jest.fn();
+    (service as any).moveSecretsToKeychain = jest.fn();
+    (service as any).notifyIntegrationChanges = jest.fn();
 
     const integration = { tenantId: "tenantId", region: "region" } as any;
     service.getIntegration = jest.fn(() => integration);
@@ -72,6 +82,9 @@ describe("AzureIntegrationService", () => {
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
     expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");
     expect(azureService.create).not.toHaveBeenCalled();
+    expect((service as any).moveSecretsToKeychain).toHaveBeenCalledWith(integration, azureProfile);
+    expect(service.setOnline).toHaveBeenCalledWith(integration, true);
+    expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
   });
 
   test("syncSessions, azure local session to delete", async () => {
@@ -98,6 +111,9 @@ describe("AzureIntegrationService", () => {
       create: jest.fn(),
     } as any;
     const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    service.setOnline = jest.fn();
+    (service as any).moveSecretsToKeychain = jest.fn();
+    (service as any).notifyIntegrationChanges = jest.fn();
 
     const integration = { tenantId: "tenantId", region: "region" } as any;
     service.getIntegration = jest.fn(() => integration);
@@ -114,6 +130,9 @@ describe("AzureIntegrationService", () => {
       sessionName: "subscriptionName",
       azureIntegrationId: integrationId,
     });
+    expect((service as any).moveSecretsToKeychain).toHaveBeenCalledWith(integration, azureProfile);
+    expect(service.setOnline).toHaveBeenCalledWith(integration, true);
+    expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
   });
 
   test("setOnline, is online, forcedState", async () => {
@@ -141,60 +160,26 @@ describe("AzureIntegrationService", () => {
   });
 
   test("setOnline, is online, without forcedState", async () => {
+    const keychainService = { getSecret: jest.fn(() => "secret") } as any;
     const repository = { updateAzureIntegration: jest.fn() } as any;
-    const msalTokenCache = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      AccessToken: { token1: { realm: "tenant1" }, token2: { realm: "fakeTenant" } },
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      IdToken: { token1: { realm: "tenant1" }, token2: { realm: "fakeTenant" } },
-    };
-    const azureProfile = { subscriptions: [{ tenantId: "tenant1" }, { tenantId: "fakeTenant" }] };
-    const azurePersistenceService = {
-      loadMsalCache: jest.fn(() => msalTokenCache),
-      loadProfile: jest.fn(() => azureProfile),
-    } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, azurePersistenceService);
+    const service = new AzureIntegrationService(repository, keychainService, null, null, null, null, null, null);
     const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
     await service.setOnline(integration);
     expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", true);
-    expect(azurePersistenceService.loadMsalCache).toHaveBeenCalled();
-    expect(azurePersistenceService.loadProfile).toHaveBeenCalled();
+    expect(keychainService.getSecret).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeId");
+    expect(keychainService.getSecret).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeId");
+    expect(keychainService.getSecret).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeId");
   });
 
   test("setOnline, is not online, without forcedState", async () => {
+    const keychainService = { getSecret: jest.fn(() => null) } as any;
     const repository = { updateAzureIntegration: jest.fn() } as any;
-    const msalTokenCache = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      AccessToken: { token1: { realm: "tenant1" }, token2: { realm: "fakeTenant" } },
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      IdToken: { token1: { realm: "tenant1" }, token2: { realm: "fakeTenant" } },
-    };
-    const azureProfile = { subscriptions: [{ tenantId: "tenant1" }] };
-    const azurePersistenceService = {
-      loadMsalCache: jest.fn(() => msalTokenCache),
-      loadProfile: jest.fn(() => azureProfile),
-    } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, azurePersistenceService);
+    const service = new AzureIntegrationService(repository, keychainService, null, null, null, null, null, null);
     const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
     await service.setOnline(integration);
     expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", false);
-    expect(azurePersistenceService.loadMsalCache).toHaveBeenCalled();
-    expect(azurePersistenceService.loadProfile).toHaveBeenCalled();
-  });
-
-  test("setOnline, is not online because of loadMsalCache error", async () => {
-    const repository = { updateAzureIntegration: jest.fn() } as any;
-    const azurePersistenceService = {
-      loadMsalCache: jest.fn(() => {
-        throw new Error();
-      }),
-      loadProfile: jest.fn(),
-    } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, azurePersistenceService);
-    const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
-    await service.setOnline(integration);
-    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", false);
-    expect(azurePersistenceService.loadMsalCache).toHaveBeenCalled();
-    expect(azurePersistenceService.loadProfile).not.toHaveBeenCalled();
+    expect(keychainService.getSecret).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeId");
+    expect(keychainService.getSecret).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeId");
+    expect(keychainService.getSecret).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeId");
   });
 });

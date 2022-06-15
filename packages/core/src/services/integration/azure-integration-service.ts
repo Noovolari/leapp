@@ -7,13 +7,14 @@ import { SessionFactory } from "../session-factory";
 import { Integration } from "../../models/integration";
 import { AzureIntegration } from "../../models/azure/azure-integration";
 import { ExecuteService } from "../execute-service";
-import { AzurePersistenceService } from "../azure-persistence-service";
+import { AzurePersistenceService, AzureProfile } from "../azure-persistence-service";
 import { LoggedException, LogLevel } from "../log-service";
 import { AzureIntegrationCreationParams } from "../../models/azure/azure-integration-creation-params";
 import { AzureSessionRequest } from "../session/azure/azure-session-request";
 import { AzureService } from "../session/azure/azure-service";
 import { SessionType } from "../../models/session-type";
 import { AzureSession } from "../../models/azure/azure-session";
+import { constants } from "../../models/constants";
 
 export class AzureIntegrationService implements IIntegrationService {
   constructor(
@@ -62,7 +63,6 @@ export class AzureIntegrationService implements IIntegrationService {
   async deleteIntegration(integrationId: string): Promise<void> {
     await this.logout(integrationId);
     this.repository.deleteAzureIntegration(integrationId);
-    this.deleteDependentSessions(integrationId);
   }
 
   getIntegration(integrationId: string): AzureIntegration {
@@ -77,26 +77,24 @@ export class AzureIntegrationService implements IIntegrationService {
     if (forcedState !== undefined) {
       integration.isOnline = forcedState;
     } else {
-      try {
-        const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
-        const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === integration.tenantId);
-        const idToken = Object.values(msalTokenCache.IdToken).find((tokenObj) => tokenObj.realm === integration.tenantId);
-
-        const azureProfile = await this.azurePersistenceService.loadProfile();
-        const subscription = azureProfile.subscriptions.find((sub) => sub.tenantId === integration.tenantId);
-        integration.isOnline = !!accessToken && !!idToken && !!subscription;
-      } catch (err) {
-        integration.isOnline = false;
-      }
+      const profile = await this.keyChainService.getSecret(constants.appName, this.getProfileKeychainKey(integration.id));
+      const account = await this.keyChainService.getSecret(constants.appName, this.getAccountKeychainKey(integration.id));
+      const refreshToken = await this.keyChainService.getSecret(constants.appName, this.getRefreshTokenKeychainKey(integration.id));
+      integration.isOnline = !!profile && !!account && !!refreshToken;
     }
     this.repository.updateAzureIntegration(integration.id, integration.alias, integration.tenantId, integration.region, integration.isOnline);
   }
 
   async logout(integrationId: string): Promise<void> {
-    this.executeService.execute("az logout");
     const integration = this.getIntegration(integrationId);
-    this.setOnline(integration, false);
-    this.behaviouralNotifier.setIntegrations([...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()]);
+    if (integration.isOnline) {
+      this.keyChainService.deletePassword(constants.appName, this.getProfileKeychainKey(integration.id)).catch(() => {});
+      this.keyChainService.deletePassword(constants.appName, this.getAccountKeychainKey(integration.id)).catch(() => {});
+      this.keyChainService.deletePassword(constants.appName, this.getRefreshTokenKeychainKey(integration.id)).catch(() => {});
+    }
+    await this.setOnline(integration, false);
+    this.deleteDependentSessions(integrationId);
+    this.notifyIntegrationChanges();
   }
 
   remainingHours(_integration: Integration): string {
@@ -139,6 +137,38 @@ export class AzureIntegrationService implements IIntegrationService {
     for (const creationRequest of sessionCreationRequests) {
       await this.azureService.create(creationRequest);
     }
+    await this.moveSecretsToKeychain(integration, azureProfile);
+    await this.setOnline(integration, true);
+    this.notifyIntegrationChanges();
+  }
+
+  private notifyIntegrationChanges() {
+    this.behaviouralNotifier.setIntegrations([...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()]);
+  }
+
+  private async moveSecretsToKeychain(integration: AzureIntegration, azureProfile: AzureProfile): Promise<void> {
+    const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
+    const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === integration.tenantId);
+    const accountEntry = Object.entries(msalTokenCache.Account).find((accountArr) => accountArr[1].home_account_id === accessToken.home_account_id);
+    const refreshTokenEntry = Object.entries(msalTokenCache.RefreshToken).find(
+      (refreshTokenArr) => refreshTokenArr[1].home_account_id === accessToken.home_account_id
+    );
+    await this.keyChainService.saveSecret(constants.appName, this.getAccountKeychainKey(integration.id), JSON.stringify(accountEntry));
+    await this.keyChainService.saveSecret(constants.appName, this.getRefreshTokenKeychainKey(integration.id), JSON.stringify(refreshTokenEntry));
+    await this.keyChainService.saveSecret(constants.appName, this.getProfileKeychainKey(integration.id), JSON.stringify(azureProfile));
+    await this.executeService.execute("az logout");
+  }
+
+  private getAccountKeychainKey(integrationId: string) {
+    return `azure-integration-account-${integrationId}`;
+  }
+
+  private getRefreshTokenKeychainKey(integrationId: string) {
+    return `azure-integration-refresh-token-${integrationId}`;
+  }
+
+  private getProfileKeychainKey(integrationId: string) {
+    return `azure-integration-profile-${integrationId}`;
   }
 
   private deleteDependentSessions(integrationId: string) {

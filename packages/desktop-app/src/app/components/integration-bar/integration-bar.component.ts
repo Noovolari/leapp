@@ -126,7 +126,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     this.behaviouralSubjectService.setIntegrations([
       ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
-      ...this.appProviderService.repository.listAzureIntegrations(),
+      ...this.appProviderService.azureIntegrationService.getIntegrations(),
     ]);
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {

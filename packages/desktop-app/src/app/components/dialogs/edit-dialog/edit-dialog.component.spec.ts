@@ -30,12 +30,13 @@ describe("EditDialogComponent", () => {
       getColorTheme: () => constants.darkTheme,
       listAssumable: (): Session[] => [
         {
-          sessionName: "test",
           sessionId: "id",
-          region: "eu-west-1",
-          type: SessionType.awsSsoRole,
           status: SessionStatus.inactive,
           startDateTime: undefined,
+          type: SessionType.awsSsoRole,
+          sessionTokenExpiration: undefined,
+          sessionName: "test",
+          region: "eu-west-1",
           expired: () => false,
         },
       ],
@@ -153,11 +154,12 @@ describe("EditDialogComponent", () => {
       getSegments: (): Segment[] => [],
       getSessionById: (_: string): Session => ({
         sessionId: "mocked-session-id",
-        sessionName: "mocked-session-name",
         status: SessionStatus.active,
         type: SessionType.aws,
-        expired: () => false,
+        sessionTokenExpiration: undefined,
+        sessionName: "mocked-session-name",
         region: "eu-west-1",
+        expired: () => false,
       }),
       getSessions: (): Session[] => [],
       getWorkspace: (): Workspace =>
@@ -167,12 +169,13 @@ describe("EditDialogComponent", () => {
       listActive: (): Session[] => [],
       listAssumable: (): Session[] => [
         {
-          sessionName: "test",
           sessionId: "id",
-          region: "eu-west-1",
-          type: SessionType.awsSsoRole,
           status: SessionStatus.inactive,
           startDateTime: undefined,
+          type: SessionType.awsSsoRole,
+          sessionTokenExpiration: undefined,
+          sessionName: "test",
+          region: "eu-west-1",
           expired: () => false,
         },
       ],

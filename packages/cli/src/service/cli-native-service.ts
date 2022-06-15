@@ -1,4 +1,5 @@
 import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
+import { IMsalEncryptionService } from "@noovolari/leapp-core/dist/interfaces/i-msal-encryption-service";
 
 export class CliNativeService implements INativeService {
   url: any;
@@ -19,6 +20,7 @@ export class CliNativeService implements INativeService {
   httpsProxyAgent: any;
   process: any;
   nodeIpc: any;
+  msalEncryptionService: IMsalEncryptionService;
 
   constructor() {
     this.fs = require("fs-extra");

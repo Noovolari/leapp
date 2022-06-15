@@ -95,12 +95,13 @@ describe("SessionCardComponent", () => {
     component = fixture.componentInstance;
     component.globalColumns = { namedProfile: false, provider: false, region: false, role: false };
     component.session = {
-      region: "",
       sessionId: "",
-      sessionName: "",
       status: undefined,
-      expired: (): boolean => false,
       type: SessionType.awsSsoRole,
+      sessionTokenExpiration: undefined,
+      sessionName: "",
+      region: "",
+      expired: (): boolean => false,
     };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

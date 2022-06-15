@@ -107,8 +107,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.setValues();
+    this.selectedIntegration = this.integrations[0].value; // default on AWS
+
     this.subscription = this.behaviouralSubjectService.integrations$.subscribe(() => {
-      this.setValues();
+      this.refreshLists();
       this.selectedIntegrations = [
         ...this.awsSsoConfigurations.map((integration) => ({
           id: integration.id,
@@ -119,8 +122,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           selected: false,
         })),
       ];
-      this.selectedIntegration = this.integrations[0].value; // default on AWS
     });
+
     this.behaviouralSubjectService.setIntegrations([
       ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
       ...this.appProviderService.repository.listAzureIntegrations(),
@@ -275,13 +278,17 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     await this.forceSync(integrationId);
   }
 
-  setValues(): void {
-    this.modifying = 0;
+  refreshLists(): void {
     this.regions = this.appProviderService.awsCoreService.getRegions();
     this.awsSsoConfigurations = this.appProviderService.awsSsoIntegrationService.getIntegrations();
     this.azureConfigurations = this.appProviderService.repository.listAzureIntegrations();
-    this.logoutLoadings = {};
+  }
 
+  setValues(): void {
+    this.modifying = 0;
+    this.refreshLists();
+
+    this.logoutLoadings = {};
     this.awsSsoConfigurations.forEach((sc) => {
       this.logoutLoadings[sc.id] = false;
     });
@@ -345,8 +352,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     // TODO: Add spinner since the Azure is async...
     if (this.formValid()) {
       const type = this.form.get("integrationType").value;
-      const alias = this.form.get("alias").value.trim();
-      const portalUrl = this.form.get("portalUrl").value.trim();
+      const alias = this.form.get("alias").value?.trim();
+      const portalUrl = this.form.get("portalUrl").value?.trim();
       const region = this.form.get("awsRegion").value;
       const browserOpening = this.form.get("defaultBrowserOpening").value;
       const tenantId = this.form.get("tenantId").value;
@@ -399,14 +406,18 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       async (res) => {
         if (res !== constants.confirmClosed) {
           // eslint-disable-next-line max-len
-          this.loggingService.log(new LoggedEntry(`Removing sessions with attached config id: ${integration.id}`, this, LogLevel.info));
+          this.loggingService.log(new LoggedEntry(`Removing sessions with attached integration id: ${integration.id}`, this, LogLevel.info));
           await this.logout(integration.id);
           if (integration.type !== IntegrationType.azure) {
             await this.appProviderService.awsSsoIntegrationService.deleteIntegration(integration.id);
           } else {
             await this.appProviderService.azureIntegrationService.deleteIntegration(integration.id);
           }
-          this.modifying = 0;
+          this.setValues();
+          this.behaviouralSubjectService.setIntegrations([
+            ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
+            ...this.appProviderService.repository.listAzureIntegrations(),
+          ]);
         }
       },
       "Delete Configuration",

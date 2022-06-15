@@ -41,7 +41,6 @@ import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
-import dpApi from "../dpapi-addon/DpApi";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -82,7 +81,7 @@ export class CliProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private segmentServiceInstance: SegmentService;
   private workspaceServiceInstance: WorkspaceService;
-  private msalPersistenceServiceInstance: AzurePersistenceService;
+  private azurePersistenceServiceInstance: AzurePersistenceService;
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -200,19 +199,26 @@ export class CliProviderService {
     return this.awsSsoOidcServiceInstance;
   }
 
-  get azureService(): AzureService {
-    if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(this.behaviouralSubjectService, this.repository, this.fileService, this.executeService,
-        constants.azureMsalCacheFile, this.cliNativeService, this.msalPersistenceService);
+  public get azurePersistenceService(): AzurePersistenceService {
+    if (!this.azurePersistenceServiceInstance) {
+      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.cliNativeService);
     }
-    return this.azureServiceInstance;
+    return this.azurePersistenceServiceInstance;
   }
 
-  get msalPersistenceService(): AzurePersistenceService {
-    if(!this.msalPersistenceServiceInstance) {
-      this.msalPersistenceServiceInstance = new AzurePersistenceService(this.cliNativeService, dpApi);
+  get azureService(): AzureService {
+    if (!this.azureServiceInstance) {
+      this.azureServiceInstance = new AzureService(
+        this.behaviouralSubjectService,
+        this.repository,
+        this.fileService,
+        this.executeService,
+        constants.azureMsalCacheFile,
+        this.cliNativeService,
+        this.azurePersistenceService
+      );
     }
-    return this.msalPersistenceServiceInstance;
+    return this.azureServiceInstance;
   }
 
   get sessionFactory(): SessionFactory {
@@ -268,8 +274,9 @@ export class CliProviderService {
 
   get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
-      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
-        this.awsSsoRoleService, this.keyChainService, this.behaviouralSubjectService, this.cliNativeService, this.sessionFactory, this.behaviouralSubjectService);
+      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.keyChainService,
+        this.behaviouralSubjectService, this.cliNativeService,
+        this.sessionFactory, this.awsSsoOidcService, this.awsSsoRoleService);
     }
     return this.awsSsoIntegrationServiceInstance;
   }

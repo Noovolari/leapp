@@ -12,6 +12,8 @@ import { LoggedException, LogLevel } from "../log-service";
 import { AzureIntegrationCreationParams } from "../../models/azure/azure-integration-creation-params";
 import { AzureSessionRequest } from "../session/azure/azure-session-request";
 import { AzureService } from "../session/azure/azure-service";
+import { SessionType } from "../../models/session-type";
+import { AzureSession } from "../../models/azure/azure-session";
 
 export class AzureIntegrationService implements IIntegrationService {
   constructor(
@@ -47,12 +49,14 @@ export class AzureIntegrationService implements IIntegrationService {
 
   async createIntegration(creationParams: AzureIntegrationCreationParams): Promise<void> {
     await this.checkCliVersion();
-    this.repository.addAzureIntegration(creationParams.alias, creationParams.tenantId, creationParams.region);
+    const defaultLocation = this.repository.getDefaultLocation();
+    this.repository.addAzureIntegration(creationParams.alias, creationParams.tenantId, defaultLocation);
   }
 
   updateIntegration(id: string, updateParams: AzureIntegrationCreationParams): void {
     const isOnline = this.repository.getAzureIntegration(id).isOnline;
-    this.repository.updateAzureIntegration(id, updateParams.alias, updateParams.tenantId, updateParams.region, isOnline);
+    const defaultLocation = this.repository.getDefaultLocation();
+    this.repository.updateAzureIntegration(id, updateParams.alias, updateParams.tenantId, defaultLocation, isOnline);
   }
 
   async deleteIntegration(integrationId: string): Promise<void> {
@@ -108,21 +112,37 @@ export class AzureIntegrationService implements IIntegrationService {
     const integration = this.getIntegration(integrationId);
     await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
     const azureProfile = await this.azurePersistenceService.loadProfile();
-    // TODO: remove old integration's sessions
-    /*for (const session of this.repository.getSessions().filter(session => session.type === SessionType.azure)) {
-      if ((session as AzureSession).azureIntegrationId === integrationId) {
-        this.repository.deleteSession()
+    let sessionCreationRequests: AzureSessionRequest[] = azureProfile.subscriptions.map((sub) => ({
+      region: integration.region,
+      subscriptionId: sub.id,
+      tenantId: integration.tenantId,
+      sessionName: sub.name,
+      azureIntegrationId: integrationId,
+    }));
+
+    const azureSessions = this.repository
+      .getSessions()
+      .filter((session) => session.type === SessionType.azure)
+      .map((session) => session as AzureSession)
+      .filter((session) => session.azureIntegrationId === integrationId);
+
+    for (const azureSession of azureSessions) {
+      const creationRequest = sessionCreationRequests.find(
+        (request) =>
+          azureSession.sessionName === request.sessionName &&
+          azureSession.tenantId === request.tenantId &&
+          azureSession.subscriptionId === request.subscriptionId &&
+          azureSession.region === request.region
+      );
+      const isSessionToDelete = !creationRequest;
+      if (isSessionToDelete) {
+        await this.azureService.delete(azureSession.sessionId);
+      } else {
+        sessionCreationRequests = sessionCreationRequests.filter((request) => request !== creationRequest);
       }
-    }*/
-    for (const subscription of azureProfile.subscriptions) {
-      const azureSessionRequest: AzureSessionRequest = {
-        region: integration.region,
-        subscriptionId: subscription.id,
-        tenantId: integration.tenantId,
-        sessionName: subscription.name,
-        azureIntegrationId: integrationId,
-      };
-      await this.azureService.create(azureSessionRequest);
+    }
+    for (const creationRequest of sessionCreationRequests) {
+      await this.azureService.create(creationRequest);
     }
   }
 

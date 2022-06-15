@@ -17,6 +17,7 @@ describe("IntegrationBarComponent", () => {
       getSessions: [],
       getSegments: [],
       listAwsSsoIntegrations: [],
+      listAzureIntegrations: [],
     });
     const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       integrations: [],
@@ -24,12 +25,13 @@ describe("IntegrationBarComponent", () => {
       setIntegrations: (_awsSsoIntegrations: AwsSsoIntegration[]) => void {},
       getIntegrations: () => [],
     });
-    const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
+    const spyLeappCoreService = jasmine.createSpyObj("AppProviderService", [], {
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => ["mocked-region-1", "mocked-region-2"] },
       awsSsoOidcService: { listeners: [] },
       behaviouralSubjectService: spyBehaviouralSubjectService,
       awsSsoIntegrationService: { getIntegrations: () => [] },
+      azureIntegrationService: { getIntegrations: () => [] },
     });
 
     TestBed.configureTestingModule({

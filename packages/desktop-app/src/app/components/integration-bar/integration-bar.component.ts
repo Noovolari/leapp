@@ -126,7 +126,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     this.behaviouralSubjectService.setIntegrations([
       ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
-      ...this.appProviderService.repository.listAzureIntegrations(),
+      ...this.appProviderService.azureIntegrationService.getIntegrations(),
     ]);
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
@@ -363,8 +363,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         if (type !== IntegrationType.azure.toString()) {
           await this.appProviderService.awsSsoIntegrationService.createIntegration({ alias, browserOpening, portalUrl, region });
         } else {
-          // TODO: add region to azure!!!
-          await this.appProviderService.azureIntegrationService.createIntegration({ alias, tenantId, region: "region" });
+          await this.appProviderService.azureIntegrationService.createIntegration({ alias, tenantId });
         }
       } else if (this.modifying === 2 && this.selectedConfiguration.portalUrl !== "") {
         // Edit
@@ -380,7 +379,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           this.appProviderService.azureIntegrationService.updateIntegration(this.selectedConfiguration.id, {
             alias,
             tenantId,
-            region,
           });
         }
       }

@@ -1,7 +1,8 @@
+const path = require("path");
 module.exports = {
   cli: {
     name: 'project-bootstrap',
-    description: 'Bootstrap (npm install) every package',
+    description: 'Bootstrap (npm install) every package, builds the core',
     version: '0.1',
     arguments: [
       {name: '[packages...]'},
@@ -21,6 +22,15 @@ module.exports = {
         let result = shellJs.exec('npm install')
         if (result.code !== 0) {
           throw new Error(result.stderr)
+        }
+
+        if (packageName === 'core') {
+          // builds the core
+          shellJs.cd(path.join(__dirname, '../packages', packageName))
+          let result = shellJs.exec('npm run build')
+          if (result.code !== 0) {
+            throw new Error(result.stderr)
+          }
         }
       }
     } catch (e) {

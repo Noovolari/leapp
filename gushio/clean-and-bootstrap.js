@@ -1,7 +1,7 @@
 module.exports = {
   cli: {
     name: 'setup-package',
-    description: 'Clean and bootstrap every package',
+    description: 'Clean and bootstrap every package, builds the core',
     version: '0.1',
     arguments: [
       {name: '[packages...]'},

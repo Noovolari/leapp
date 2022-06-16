@@ -1,5 +1,8 @@
-import { JsonCache } from "@azure/msal-node";
+import { JsonCache, SerializedRefreshTokenEntity } from "@azure/msal-node";
 import { INativeService } from "../interfaces/i-native-service";
+import { constants } from "../models/constants";
+import { KeychainService } from "./keychain-service";
+import { SerializedAccountEntity } from "@azure/msal-node/dist/cache/serializer/SerializerTypes";
 
 export interface AzureSubscription {
   id: string;
@@ -14,6 +17,7 @@ export interface AzureSubscription {
 }
 
 export interface AzureProfile {
+  installationId: string;
   subscriptions: AzureSubscription[];
 }
 
@@ -22,28 +26,29 @@ export enum DataProtectionScope {
   localMachine = "LocalMachine",
 }
 
-export class AzurePersistenceService {
-  constructor(private iNativeService: INativeService) {}
+export interface AzureSecrets {
+  profile: AzureProfile;
+  account: [string, SerializedAccountEntity];
+  refreshToken: [string, SerializedRefreshTokenEntity];
+}
 
-  async loadMsalCache(customPath?: string): Promise<JsonCache> {
+export class AzurePersistenceService {
+  constructor(private iNativeService: INativeService, private keychainService: KeychainService) {}
+
+  async loadMsalCache(): Promise<JsonCache> {
     const isWin = this.iNativeService.process.platform === "win32";
-    const msalTokenCacheFileExtension = isWin ? ".bin" : ".json";
-    const location =
-      customPath || this.iNativeService.path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
+    const location = this.getMsalCacheLocation(isWin);
     const data = this.iNativeService.fs.readFileSync(location);
     const finalData = isWin
       ? this.iNativeService.msalEncryptionService.unprotectData(data, null, DataProtectionScope.currentUser).toString()
       : data.toString();
-    const parsedData = JSON.parse(finalData.trim());
-    return Promise.resolve(parsedData as JsonCache);
+    return JSON.parse(finalData.trim());
   }
 
-  async saveMsalCache(cache: JsonCache, customPath?: string): Promise<void> {
+  async saveMsalCache(cache: JsonCache): Promise<void> {
     const data = JSON.stringify(cache, null, 4);
     const isWin = this.iNativeService.process.platform === "win32";
-    const msalTokenCacheFileExtension = isWin ? ".bin" : ".json";
-    const location =
-      customPath || this.iNativeService.path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
+    const location = this.getMsalCacheLocation(isWin);
     const finalData = isWin
       ? this.iNativeService.msalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.currentUser)
       : data;
@@ -51,9 +56,58 @@ export class AzurePersistenceService {
   }
 
   async loadProfile(): Promise<AzureProfile> {
-    const location = this.iNativeService.path.join(this.iNativeService.os.homedir(), ".azure/azureProfile.json");
-    const data = this.iNativeService.fs.readFileSync(location, "utf8");
-    const parsedData = JSON.parse(data.trim());
-    return Promise.resolve(parsedData as AzureProfile);
+    const data = this.iNativeService.fs.readFileSync(this.getProfileLocation(), "utf8");
+    return JSON.parse(data.trim());
+  }
+
+  async saveProfile(profile: AzureProfile): Promise<void> {
+    this.iNativeService.fs.writeFileSync(this.getProfileLocation(), JSON.stringify(profile, null, 4));
+  }
+
+  async getAzureSecrets(integrationId: string): Promise<AzureSecrets> {
+    return {
+      profile: JSON.parse(await this.keychainService.getSecret(constants.appName, this.getProfileKeychainKey(integrationId))),
+      account: JSON.parse(await this.keychainService.getSecret(constants.appName, this.getAccountKeychainKey(integrationId))),
+      refreshToken: JSON.parse(await this.keychainService.getSecret(constants.appName, this.getRefreshTokenKeychainKey(integrationId))),
+    };
+  }
+
+  async setAzureSecrets(integrationId: string, secrets: AzureSecrets): Promise<void> {
+    await this.keychainService.saveSecret(constants.appName, this.getProfileKeychainKey(integrationId), JSON.stringify(secrets.profile));
+    await this.keychainService.saveSecret(constants.appName, this.getAccountKeychainKey(integrationId), JSON.stringify(secrets.account));
+    await this.keychainService.saveSecret(constants.appName, this.getRefreshTokenKeychainKey(integrationId), JSON.stringify(secrets.refreshToken));
+  }
+
+  async deleteAzureSecrets(integrationId: string): Promise<void> {
+    try {
+      await this.keychainService.deletePassword(constants.appName, this.getProfileKeychainKey(integrationId));
+    } catch (error) {}
+    try {
+      await this.keychainService.deletePassword(constants.appName, this.getAccountKeychainKey(integrationId));
+    } catch (error) {}
+    try {
+      await this.keychainService.deletePassword(constants.appName, this.getRefreshTokenKeychainKey(integrationId));
+    } catch (error) {}
+  }
+
+  private getMsalCacheLocation(isWin: boolean): string {
+    const msalTokenCacheFileExtension = isWin ? ".bin" : ".json";
+    return this.iNativeService.path.join(this.iNativeService.os.homedir(), `.azure/msal_token_cache${msalTokenCacheFileExtension}`);
+  }
+
+  private getProfileLocation(): string {
+    return this.iNativeService.path.join(this.iNativeService.os.homedir(), ".azure/azureProfile.json");
+  }
+
+  private getAccountKeychainKey(integrationId: string): string {
+    return `azure-integration-account-${integrationId}`;
+  }
+
+  private getRefreshTokenKeychainKey(integrationId: string): string {
+    return `azure-integration-refresh-token-${integrationId}`;
+  }
+
+  private getProfileKeychainKey(integrationId: string): string {
+    return `azure-integration-profile-${integrationId}`;
   }
 }

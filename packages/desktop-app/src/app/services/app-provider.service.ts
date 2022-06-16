@@ -65,7 +65,7 @@ export class AppProviderService {
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
   private keyChainServiceInstance: KeychainService;
-  private loggingServiceInstance: LogService;
+  private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
   private rotationServiceInstance: RotationService;
@@ -228,7 +228,8 @@ export class AppProviderService {
         this.executeService,
         constants.azureMsalCacheFile,
         this.appNativeService,
-        this.azurePersistenceService
+        this.azurePersistenceService,
+        this.logService
       );
     }
 
@@ -239,7 +240,6 @@ export class AppProviderService {
     if (!this.azureIntegrationServiceInstance) {
       this.azureIntegrationServiceInstance = new AzureIntegrationService(
         this.repository,
-        this.keyChainService,
         this.behaviouralSubjectService,
         this.appNativeService,
         this.sessionFactory,
@@ -253,7 +253,7 @@ export class AppProviderService {
 
   public get azurePersistenceService(): AzurePersistenceService {
     if (!this.azurePersistenceServiceInstance) {
-      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.appNativeService);
+      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.appNativeService, this.keyChainService);
     }
     return this.azurePersistenceServiceInstance;
   }
@@ -318,10 +318,10 @@ export class AppProviderService {
   }
 
   public get logService(): LogService {
-    if (!this.loggingServiceInstance) {
-      this.loggingServiceInstance = new LogService(new AppNativeLoggerService(this.appNativeService, this.messageToaster));
+    if (!this.logServiceInstance) {
+      this.logServiceInstance = new LogService(new AppNativeLoggerService(this.appNativeService, this.messageToaster));
     }
-    return this.loggingServiceInstance;
+    return this.logServiceInstance;
   }
 
   public get timerService(): TimerService {

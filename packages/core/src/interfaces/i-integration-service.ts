@@ -1,5 +1,4 @@
 import { Repository } from "../services/repository";
-import { KeychainService } from "../services/keychain-service";
 import { IBehaviouralNotifier } from "./i-behavioural-notifier";
 import { INativeService } from "./i-native-service";
 import { SessionFactory } from "../services/session-factory";
@@ -8,7 +7,6 @@ import { IntegrationParams } from "../models/integration-params";
 
 export interface IIntegrationService {
   repository: Repository;
-  keyChainService: KeychainService;
   behaviouralNotifier: IBehaviouralNotifier;
   nativeService: INativeService;
   sessionFactory: SessionFactory;

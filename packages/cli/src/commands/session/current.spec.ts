@@ -275,7 +275,7 @@ describe("CurrentSession", () => {
   test("getSessionData - azure", async () => {
     const cliProviderService: any = {
       sessionFactory: {
-        getSessionService: jest.fn(() => new AzureService(null, null, null, null, null)),
+        getSessionService: jest.fn(() => new AzureService(null, null, null, null, null, null, null, null)),
       },
     };
     const session = {

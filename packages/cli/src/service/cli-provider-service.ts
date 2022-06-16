@@ -201,7 +201,7 @@ export class CliProviderService {
 
   public get azurePersistenceService(): AzurePersistenceService {
     if (!this.azurePersistenceServiceInstance) {
-      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.cliNativeService);
+      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.cliNativeService, this.keyChainService);
     }
     return this.azurePersistenceServiceInstance;
   }
@@ -215,7 +215,8 @@ export class CliProviderService {
         this.executeService,
         constants.azureMsalCacheFile,
         this.cliNativeService,
-        this.azurePersistenceService
+        this.azurePersistenceService,
+        this.logService
       );
     }
     return this.azureServiceInstance;
@@ -288,7 +289,7 @@ export class CliProviderService {
     return this.keyChainServiceInstance;
   }
 
-  get loggingService(): LogService {
+  get logService(): LogService {
     if (!this.logServiceInstance) {
       this.logServiceInstance = new LogService(new CliNativeLoggerService());
     }
@@ -304,7 +305,7 @@ export class CliProviderService {
 
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository, this.loggingService);
+      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository, this.logService);
     }
     return this.executeServiceInstance;
   }
@@ -334,7 +335,7 @@ export class CliProviderService {
 
   get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService, this.loggingService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService, this.logService);
     }
     return this.awsCoreServiceInstance;
   }
@@ -355,14 +356,14 @@ export class CliProviderService {
 
   get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.loggingService, fetch);
+      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.logService, fetch);
     }
     return this.webConsoleServiceInstance;
   }
 
   get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
+      this.ssmServiceInstance = new SsmService(this.logService, this.executeService);
     }
     return this.ssmServiceInstance;
   }

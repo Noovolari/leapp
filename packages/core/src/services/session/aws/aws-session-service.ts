@@ -40,7 +40,7 @@ export abstract class AwsSessionService extends SessionService {
       } else {
         await this.applyConfigProfileCommand(sessionId);
       }
-      this.sessionActivate(sessionId);
+      this.sessionActivated(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
     }
@@ -53,7 +53,7 @@ export abstract class AwsSessionService extends SessionService {
         this.sessionLoading(sessionId);
         const credentialsInfo = await this.generateCredentials(sessionId);
         await this.applyCredentials(sessionId, credentialsInfo);
-        this.sessionRotated(sessionId);
+        this.sessionActivated(sessionId);
       }
     } catch (error) {
       this.sessionError(sessionId, error);

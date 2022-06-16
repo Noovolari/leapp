@@ -1,7 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import { AzureIntegrationService } from "./azure-integration-service";
 import { SessionType } from "../../models/session-type";
-import { constants } from "../../models/constants";
+import { SessionStatus } from "../../models/session-status";
 
 describe("AzureIntegrationService", () => {
   test("checkCliVersion, cli installed with version 2.30", async () => {
@@ -9,7 +9,7 @@ describe("AzureIntegrationService", () => {
     const executeService = {
       execute: jest.fn(async () => expectedCliOutput),
     } as any;
-    const service = new AzureIntegrationService(null, null, null, null, null, executeService, null, null);
+    const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
     await service.checkCliVersion();
 
     expect(executeService.execute).toHaveBeenCalledWith("az --version");
@@ -18,27 +18,27 @@ describe("AzureIntegrationService", () => {
   test("checkCliVersion, cli installed with version 2.31", async () => {
     const expectedCliOutput = `azure-cli                         2.31.0`;
     const executeService = { execute: async () => expectedCliOutput } as any;
-    const service = new AzureIntegrationService(null, null, null, null, null, executeService, null, null);
+    const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
     await service.checkCliVersion();
   });
 
   test("checkCliVersion, cli installed with version 2.29", async () => {
     const expectedCliOutput = `azure-cli                         2.29.0`;
     const executeService = { execute: async () => expectedCliOutput } as any;
-    const service = new AzureIntegrationService(null, null, null, null, null, executeService, null, null);
+    const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
     await expect(service.checkCliVersion()).rejects.toThrowError("Unsupported Azure CLI version (< 2.30). Please update Azure CLI.");
   });
 
   test("checkCliVersion, cli with unknown version", async () => {
     const executeService = { execute: async () => Promise.reject() } as any;
-    const service = new AzureIntegrationService(null, null, null, null, null, executeService, null, null);
+    const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
     await expect(service.checkCliVersion()).rejects.toThrowError("Azure CLI is not installed.");
   });
 
   test("checkCliVersion, cli not installed", async () => {
     const expectedCliOutput = `azure-cli version-2.31.0`;
     const executeService = { execute: async () => expectedCliOutput } as any;
-    const service = new AzureIntegrationService(null, null, null, null, null, executeService, null, null);
+    const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
     await expect(service.checkCliVersion()).rejects.toThrowError("Unknown Azure CLI version.");
   });
 
@@ -47,7 +47,7 @@ describe("AzureIntegrationService", () => {
       getDefaultLocation: jest.fn(() => "fakeLocation"),
       addAzureIntegration: jest.fn(),
     } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, null);
     service.checkCliVersion = jest.fn();
 
     await service.createIntegration({ alias: "fakeAlias", tenantId: "fakeTenantId" });
@@ -62,7 +62,7 @@ describe("AzureIntegrationService", () => {
       getDefaultLocation: jest.fn(() => "fakeLocation"),
       updateAzureIntegration: jest.fn(),
     } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, null);
 
     await service.updateIntegration("fakeId", { alias: "fakeAlias", tenantId: "fakeTenantId" });
     expect(repository.getAzureIntegration).toHaveBeenCalledWith("fakeId");
@@ -74,7 +74,7 @@ describe("AzureIntegrationService", () => {
     const repository = {
       deleteAzureIntegration: jest.fn(),
     } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, null);
     service.logout = jest.fn();
 
     await service.deleteIntegration("fakeId");
@@ -88,7 +88,7 @@ describe("AzureIntegrationService", () => {
     const repository = {
       getAzureIntegration: jest.fn(() => expectedIntegration),
     } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, null);
     const integration = await service.getIntegration(integrationId);
     expect(integration).toBe(expectedIntegration);
     expect(repository.getAzureIntegration).toHaveBeenCalledWith(integrationId);
@@ -98,7 +98,7 @@ describe("AzureIntegrationService", () => {
     const repository = {
       listAzureIntegrations: () => "integrations",
     } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, null);
 
     const integrations = service.getIntegrations();
     expect(integrations).toBe("integrations");
@@ -113,7 +113,7 @@ describe("AzureIntegrationService", () => {
     const sessions = [{ type: SessionType.awsIamUser }, { type: SessionType.azure, azureIntegrationId: "anotherIntegrationId" }];
     const repository = { getSessions: () => sessions } as any;
     const azureService = { create: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    const service = new AzureIntegrationService(repository, null, null, null, executeService, azureService, azurePersistenceService);
     service.setOnline = jest.fn();
     (service as any).moveSecretsToKeychain = jest.fn();
     (service as any).notifyIntegrationChanges = jest.fn();
@@ -138,7 +138,48 @@ describe("AzureIntegrationService", () => {
     expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
   });
 
-  test("syncSessions, azure local session to keep", async () => {
+  test("syncSessions, active azure local session to keep", async () => {
+    const executeService = { execute: jest.fn() } as any;
+    const azureProfile = {
+      subscriptions: [{ id: "subscriptionId", name: "subscriptionName" }],
+    };
+    const azurePersistenceService = { loadProfile: () => azureProfile } as any;
+    const integrationId = "integrationId";
+    const sessions = [
+      {
+        sessionId: "sessionId",
+        type: SessionType.azure,
+        sessionName: "subscriptionName",
+        tenantId: "tenantId",
+        subscriptionId: "subscriptionId",
+        region: "region",
+        status: SessionStatus.active,
+        azureIntegrationId: integrationId,
+      },
+    ];
+    const repository = { getSessions: () => sessions } as any;
+    const azureService = { create: jest.fn(), start: jest.fn(), stop: jest.fn() } as any;
+    const service = new AzureIntegrationService(repository, null, null, null, executeService, azureService, azurePersistenceService);
+    service.setOnline = jest.fn();
+    (service as any).moveSecretsToKeychain = jest.fn();
+    (service as any).notifyIntegrationChanges = jest.fn();
+
+    const integration = { tenantId: "tenantId", region: "region" } as any;
+    service.getIntegration = jest.fn(() => integration);
+
+    await service.syncSessions(integrationId);
+
+    expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
+    expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");
+    expect(azureService.stop).toHaveBeenCalledWith("sessionId");
+    expect(azureService.start).toHaveBeenCalledWith("sessionId");
+    expect(azureService.create).not.toHaveBeenCalled();
+    expect((service as any).moveSecretsToKeychain).toHaveBeenCalledWith(integration, azureProfile);
+    expect(service.setOnline).toHaveBeenCalledWith(integration, true);
+    expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
+  });
+
+  test("syncSessions, inactive azure local session to keep", async () => {
     const executeService = { execute: jest.fn() } as any;
     const azureProfile = {
       subscriptions: [{ id: "subscriptionId", name: "subscriptionName" }],
@@ -152,12 +193,13 @@ describe("AzureIntegrationService", () => {
         tenantId: "tenantId",
         subscriptionId: "subscriptionId",
         region: "region",
+        status: SessionStatus.inactive,
         azureIntegrationId: integrationId,
       },
     ];
     const repository = { getSessions: () => sessions } as any;
-    const azureService = { create: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    const azureService = { create: jest.fn(), start: jest.fn(), stop: jest.fn() } as any;
+    const service = new AzureIntegrationService(repository, null, null, null, executeService, azureService, azurePersistenceService);
     service.setOnline = jest.fn();
     (service as any).moveSecretsToKeychain = jest.fn();
     (service as any).notifyIntegrationChanges = jest.fn();
@@ -169,6 +211,8 @@ describe("AzureIntegrationService", () => {
 
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
     expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");
+    expect(azureService.stop).not.toHaveBeenCalled();
+    expect(azureService.start).not.toHaveBeenCalled();
     expect(azureService.create).not.toHaveBeenCalled();
     expect((service as any).moveSecretsToKeychain).toHaveBeenCalledWith(integration, azureProfile);
     expect(service.setOnline).toHaveBeenCalledWith(integration, true);
@@ -198,7 +242,7 @@ describe("AzureIntegrationService", () => {
       delete: jest.fn(),
       create: jest.fn(),
     } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    const service = new AzureIntegrationService(repository, null, null, null, executeService, azureService, azurePersistenceService);
     service.setOnline = jest.fn();
     (service as any).moveSecretsToKeychain = jest.fn();
     (service as any).notifyIntegrationChanges = jest.fn();
@@ -226,7 +270,7 @@ describe("AzureIntegrationService", () => {
   test("setOnline, is online, forcedState", async () => {
     const repository = { updateAzureIntegration: jest.fn() } as any;
     const azurePersistenceService = { loadMsalCache: jest.fn(), loadProfile: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, azurePersistenceService);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, azurePersistenceService);
 
     const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
     const forcedIsOnlineState = true;
@@ -239,7 +283,7 @@ describe("AzureIntegrationService", () => {
   test("setOnline, is not online, forcedState", async () => {
     const repository = { updateAzureIntegration: jest.fn() } as any;
     const azurePersistenceService = { loadMsalCache: jest.fn(), loadProfile: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, null, null, azurePersistenceService);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, azurePersistenceService);
 
     const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
     const forcedIsOnlineState = false;
@@ -250,35 +294,34 @@ describe("AzureIntegrationService", () => {
   });
 
   test("setOnline, is online, without forcedState", async () => {
-    const keychainService = { getSecret: jest.fn(() => "secret") } as any;
+    const azurePersistenceService = { getAzureSecrets: jest.fn(() => ({ profile: true, account: true, refreshToken: true })) } as any;
     const repository = { updateAzureIntegration: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, keychainService, null, null, null, null, null, null);
-    const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
-
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, azurePersistenceService);
+    const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: false } as any;
     await service.setOnline(integration);
+
     expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", true);
-    expect(keychainService.getSecret).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeId");
-    expect(keychainService.getSecret).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeId");
-    expect(keychainService.getSecret).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeId");
+    expect(azurePersistenceService.getAzureSecrets).toHaveBeenCalledWith("fakeId");
   });
 
   test("setOnline, is not online, without forcedState", async () => {
-    const keychainService = { getSecret: jest.fn(() => null) } as any;
+    const azurePersistenceService = { getAzureSecrets: jest.fn(() => ({ profile: false, account: true, refreshToken: true })) } as any;
     const repository = { updateAzureIntegration: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, keychainService, null, null, null, null, null, null);
-    const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, azurePersistenceService);
+    service.logout = jest.fn(async () => null);
 
+    const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: true } as any;
     await service.setOnline(integration);
+
     expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", false);
-    expect(keychainService.getSecret).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeId");
-    expect(keychainService.getSecret).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeId");
-    expect(keychainService.getSecret).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeId");
+    expect(azurePersistenceService.getAzureSecrets).toHaveBeenCalledWith("fakeId");
+    expect(service.logout).toHaveBeenCalledWith("fakeId");
   });
 
   test("logout, integration is offline", async () => {
-    const keychainService = { deletePassword: jest.fn(async () => null) } as any;
+    const azurePersistenceService = { deleteAzureSecrets: jest.fn(async () => null) } as any;
     const repository = { updateAzureIntegration: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, keychainService, null, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, azurePersistenceService);
     const integration = { isOnline: false };
     service.getIntegration = jest.fn(() => integration) as any;
     service.setOnline = jest.fn();
@@ -287,16 +330,16 @@ describe("AzureIntegrationService", () => {
 
     await service.logout("fakeId");
     expect(service.getIntegration).toHaveBeenCalledWith("fakeId");
-    expect(keychainService.deletePassword).not.toHaveBeenCalled();
+    expect(azurePersistenceService.deleteAzureSecrets).not.toHaveBeenCalled();
     expect(service.setOnline).toHaveBeenCalledWith(integration, false);
     expect((service as any).deleteDependentSessions).toHaveBeenCalledWith("fakeId");
     expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
   });
 
   test("logout, integration is online", async () => {
-    const keychainService = { deletePassword: jest.fn(async () => null) } as any;
+    const azurePersistenceService = { deleteAzureSecrets: jest.fn(async () => null) } as any;
     const repository = { updateAzureIntegration: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, keychainService, null, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, null, null, null, null, null, azurePersistenceService);
     const integration = { isOnline: true };
     service.getIntegration = jest.fn(() => integration) as any;
     service.setOnline = jest.fn();
@@ -305,16 +348,14 @@ describe("AzureIntegrationService", () => {
 
     await service.logout("fakeId");
     expect(service.getIntegration).toHaveBeenCalledWith("fakeId");
-    expect(keychainService.deletePassword).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeId");
-    expect(keychainService.deletePassword).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeId");
-    expect(keychainService.deletePassword).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeId");
+    expect(azurePersistenceService.deleteAzureSecrets).toHaveBeenCalledWith("fakeId");
     expect(service.setOnline).toHaveBeenCalledWith(integration, false);
     expect((service as any).deleteDependentSessions).toHaveBeenCalledWith("fakeId");
     expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
   });
 
   test("remainingHours", async () => {
-    const service = new AzureIntegrationService(null, null, null, null, null, null, null, null);
+    const service = new AzureIntegrationService(null, null, null, null, null, null, null);
     const remainingHours = service.remainingHours(null);
 
     expect(remainingHours).toBe("8hrs");
@@ -328,14 +369,13 @@ describe("AzureIntegrationService", () => {
     const behaviouralNotifier = {
       setIntegrations: jest.fn(),
     } as any;
-    const service = new AzureIntegrationService(repository, null, behaviouralNotifier, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, behaviouralNotifier, null, null, null, null, null);
     (service as any).notifyIntegrationChanges();
 
     expect(behaviouralNotifier.setIntegrations).toHaveBeenCalledWith(["fakeSsoIntegration", "fakeAzureIntegration"]);
   });
 
   test("moveSecretsToKeychain", async () => {
-    const keychainService = { saveSecret: jest.fn(async () => null) } as any;
     const executeService = { execute: jest.fn(async () => null) } as any;
     const msalTokenCache = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -378,41 +418,37 @@ describe("AzureIntegrationService", () => {
         },
       },
     };
-    const azurePersistenceService = { loadMsalCache: jest.fn(async () => msalTokenCache) } as any;
+    const azurePersistenceService = {
+      loadMsalCache: jest.fn(async () => msalTokenCache),
+      setAzureSecrets: jest.fn(async () => null),
+    } as any;
 
-    const service = new AzureIntegrationService(null, keychainService, null, null, null, executeService, null, azurePersistenceService);
+    const service = new AzureIntegrationService(null, null, null, null, executeService, null, azurePersistenceService);
 
     const integration = { id: "fakeId", tenantId: "fakeTenantId" } as any;
     const azureProfile = { fake: "azureProfile" } as any;
     await (service as any).moveSecretsToKeychain(integration, azureProfile);
 
-    expect(keychainService.saveSecret).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeId", '{"fake":"azureProfile"}');
-    expect(keychainService.saveSecret).toHaveBeenNthCalledWith(
-      2,
-      constants.appName,
-      "azure-integration-account-fakeId",
-      '["accountKey2",{"home_account_id":"fakeHomeAccountId","fake":"account2"}]'
-    );
-    expect(keychainService.saveSecret).toHaveBeenNthCalledWith(
-      3,
-      constants.appName,
-      "azure-integration-refresh-token-fakeId",
-      '["refreshTokenKey2",{"home_account_id":"fakeHomeAccountId","fake":"refreshToken2"}]'
-    );
+    expect(azurePersistenceService.setAzureSecrets).toHaveBeenCalledWith("fakeId", {
+      profile: { fake: "azureProfile" },
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      account: ["accountKey2", { home_account_id: "fakeHomeAccountId", fake: "account2" }],
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      refreshToken: ["refreshTokenKey2", { home_account_id: "fakeHomeAccountId", fake: "refreshToken2" }],
+    });
     expect(executeService.execute).toHaveBeenCalledWith("az logout");
   });
 
   test("deleteDependentSessions", async () => {
     const azureSession = { azureIntegrationId: "fakeIntegrationId", sessionId: "fakeSessionId" };
     const sessions = [{ azureIntegrationId: "wrongId" }, {}, azureSession];
-    const repository = { getSessions: jest.fn(() => sessions), deleteSession: jest.fn() } as any;
-    const behaviouralNotifier = { setSessions: jest.fn() } as any;
+    const repository = { getSessions: jest.fn(() => sessions) } as any;
+    const azureService = { delete: jest.fn(async () => null) } as any;
 
-    const service = new AzureIntegrationService(repository, null, behaviouralNotifier, null, null, null, null, null);
+    const service = new AzureIntegrationService(repository, null, null, null, null, azureService, null);
     (service as any).deleteDependentSessions("fakeIntegrationId");
 
-    expect(repository.getSessions).toHaveBeenCalledTimes(2);
-    expect(repository.deleteSession).toHaveBeenCalledWith(azureSession.sessionId);
-    expect(behaviouralNotifier.setSessions).toHaveBeenCalledWith(sessions);
+    expect(repository.getSessions).toHaveBeenCalled();
+    expect(azureService.delete).toHaveBeenCalledWith(azureSession.sessionId);
   });
 });

@@ -1,7 +1,6 @@
 import { IBehaviouralNotifier } from "../../interfaces/i-behavioural-notifier";
 import { IIntegrationService } from "../../interfaces/i-integration-service";
 import { INativeService } from "../../interfaces/i-native-service";
-import { KeychainService } from "../keychain-service";
 import { Repository } from "../repository";
 import { SessionFactory } from "../session-factory";
 import { Integration } from "../../models/integration";
@@ -14,12 +13,11 @@ import { AzureSessionRequest } from "../session/azure/azure-session-request";
 import { AzureService } from "../session/azure/azure-service";
 import { SessionType } from "../../models/session-type";
 import { AzureSession } from "../../models/azure/azure-session";
-import { constants } from "../../models/constants";
+import { SessionStatus } from "../../models/session-status";
 
 export class AzureIntegrationService implements IIntegrationService {
   constructor(
     public repository: Repository,
-    public keyChainService: KeychainService,
     public behaviouralNotifier: IBehaviouralNotifier,
     public nativeService: INativeService,
     public sessionFactory: SessionFactory,
@@ -77,10 +75,12 @@ export class AzureIntegrationService implements IIntegrationService {
     if (forcedState !== undefined) {
       integration.isOnline = forcedState;
     } else {
-      const profile = await this.keyChainService.getSecret(constants.appName, this.getProfileKeychainKey(integration.id));
-      const account = await this.keyChainService.getSecret(constants.appName, this.getAccountKeychainKey(integration.id));
-      const refreshToken = await this.keyChainService.getSecret(constants.appName, this.getRefreshTokenKeychainKey(integration.id));
-      integration.isOnline = !!profile && !!account && !!refreshToken;
+      const secret = await this.azurePersistenceService.getAzureSecrets(integration.id);
+      const isAlreadyOnline = !!secret.profile && !!secret.account && !!secret.refreshToken;
+      if (integration.isOnline && !isAlreadyOnline) {
+        await this.logout(integration.id);
+      }
+      integration.isOnline = isAlreadyOnline;
     }
     this.repository.updateAzureIntegration(integration.id, integration.alias, integration.tenantId, integration.region, integration.isOnline);
   }
@@ -88,13 +88,11 @@ export class AzureIntegrationService implements IIntegrationService {
   async logout(integrationId: string): Promise<void> {
     const integration = this.getIntegration(integrationId);
     if (integration.isOnline) {
-      this.keyChainService.deletePassword(constants.appName, this.getProfileKeychainKey(integrationId)).catch(() => {});
-      this.keyChainService.deletePassword(constants.appName, this.getAccountKeychainKey(integrationId)).catch(() => {});
-      this.keyChainService.deletePassword(constants.appName, this.getRefreshTokenKeychainKey(integrationId)).catch(() => {});
+      await this.azurePersistenceService.deleteAzureSecrets(integrationId);
     }
 
     await this.setOnline(integration, false);
-    this.deleteDependentSessions(integrationId);
+    await this.deleteDependentSessions(integrationId);
     this.notifyIntegrationChanges();
   }
 
@@ -107,6 +105,10 @@ export class AzureIntegrationService implements IIntegrationService {
     const integration = this.getIntegration(integrationId);
     await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
     const azureProfile = await this.azurePersistenceService.loadProfile();
+    await this.moveSecretsToKeychain(integration, azureProfile);
+    await this.setOnline(integration, true);
+    this.notifyIntegrationChanges();
+
     let sessionCreationRequests: AzureSessionRequest[] = azureProfile.subscriptions.map((sub) => ({
       region: integration.region,
       subscriptionId: sub.id,
@@ -133,15 +135,16 @@ export class AzureIntegrationService implements IIntegrationService {
       if (isSessionToDelete) {
         await this.azureService.delete(azureSession.sessionId);
       } else {
+        if (azureSession.status !== SessionStatus.inactive) {
+          await this.azureService.stop(azureSession.sessionId);
+          await this.azureService.start(azureSession.sessionId);
+        }
         sessionCreationRequests = sessionCreationRequests.filter((request) => request !== creationRequest);
       }
     }
     for (const creationRequest of sessionCreationRequests) {
       await this.azureService.create(creationRequest);
     }
-    await this.moveSecretsToKeychain(integration, azureProfile);
-    await this.setOnline(integration, true);
-    this.notifyIntegrationChanges();
   }
 
   private notifyIntegrationChanges() {
@@ -155,29 +158,18 @@ export class AzureIntegrationService implements IIntegrationService {
     const refreshTokenEntry = Object.entries(msalTokenCache.RefreshToken).find(
       (refreshTokenArr) => refreshTokenArr[1].home_account_id === accessToken.home_account_id
     );
-    await this.keyChainService.saveSecret(constants.appName, this.getProfileKeychainKey(integration.id), JSON.stringify(azureProfile));
-    await this.keyChainService.saveSecret(constants.appName, this.getAccountKeychainKey(integration.id), JSON.stringify(accountEntry));
-    await this.keyChainService.saveSecret(constants.appName, this.getRefreshTokenKeychainKey(integration.id), JSON.stringify(refreshTokenEntry));
+    await this.azurePersistenceService.setAzureSecrets(integration.id, {
+      profile: azureProfile,
+      account: accountEntry,
+      refreshToken: refreshTokenEntry,
+    });
     await this.executeService.execute("az logout");
   }
 
-  private getAccountKeychainKey(integrationId: string): string {
-    return `azure-integration-account-${integrationId}`;
-  }
-
-  private getRefreshTokenKeychainKey(integrationId: string): string {
-    return `azure-integration-refresh-token-${integrationId}`;
-  }
-
-  private getProfileKeychainKey(integrationId: string): string {
-    return `azure-integration-profile-${integrationId}`;
-  }
-
-  private deleteDependentSessions(integrationId: string): void {
+  private async deleteDependentSessions(integrationId: string): Promise<void> {
     const azureSessions = this.repository.getSessions().filter((session) => (session as any).azureIntegrationId === integrationId);
     for (const session of azureSessions) {
-      this.repository.deleteSession(session.sessionId);
+      await this.azureService.delete(session.sessionId);
     }
-    this.behaviouralNotifier.setSessions(this.repository.getSessions());
   }
 }

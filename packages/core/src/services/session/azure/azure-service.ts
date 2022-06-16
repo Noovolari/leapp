@@ -6,14 +6,12 @@ import { FileService } from "../../file-service";
 import { Repository } from "../../repository";
 import { SessionService } from "../session-service";
 import { AzureSessionRequest } from "./azure-session-request";
-import { LoggedException, LogLevel } from "../../log-service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "../../log-service";
 import { INativeService } from "../../../interfaces/i-native-service";
 import { JsonCache } from "@azure/msal-node";
 import { AzurePersistenceService } from "../../azure-persistence-service";
 
 export class AzureService extends SessionService {
-  private vault: any; // TODO: remove!
-
   constructor(
     iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
@@ -21,7 +19,8 @@ export class AzureService extends SessionService {
     private executeService: ExecuteService,
     private azureMsalCacheFile: string,
     private nativeService: INativeService,
-    private msalPersistenceService: AzurePersistenceService
+    private azurePersistenceService: AzurePersistenceService,
+    private logService: LogService
   ) {
     super(iSessionNotifier, repository);
   }
@@ -44,28 +43,20 @@ export class AzureService extends SessionService {
 
   async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
-
-    const session = this.repository.getSessionById(sessionId);
-
-    //await this.generateCredentials(sessionId);
-
+    let sessionTokenExpiration;
+    const session = this.repository.getSessionById(sessionId) as AzureSession;
     try {
-      // az account set —subscription <xxx> 2>&1
-      await this.executeService.execute(`az account set --subscription ${(session as AzureSession).subscriptionId} 2>&1`);
-      // az configure —default location <region(location)>
-      await this.executeService.execute(`az configure --default location=${(session as AzureSession).region} 2>&1`);
-      // delete refresh token from accessTokens
-      //(FOR VERSION >= 2.30.0)
-      /*if (this.accessTokenFileExists()) {
-        this.deleteRefreshToken();
-      }*/
+      await this.restoreSecretsFromKeychain(session.azureIntegrationId, session.subscriptionId);
+      await this.executeService.execute(`az configure --default location=${session.region}`);
+      await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`);
+      const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
+      await this.moveRefreshTokenToKeychain(msalTokenCache, session.azureIntegrationId, session.tenantId);
+      sessionTokenExpiration = await this.getAccessTokenExpiration(msalTokenCache, session.tenantId);
     } catch (err) {
       this.sessionDeactivated(sessionId);
       throw new LoggedException(err.message, this, LogLevel.warn);
     }
-
-    this.sessionActivate(sessionId);
-    return Promise.resolve(undefined);
+    this.sessionActivated(sessionId, sessionTokenExpiration);
   }
 
   async rotate(sessionId: string): Promise<void> {
@@ -75,10 +66,9 @@ export class AzureService extends SessionService {
   async stop(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
     try {
-      await this.executeService.execute(`az account clear 2>&1`);
-      await this.executeService.execute(`az configure --defaults location='' 2>&1`);
+      await this.executeService.execute("az logout");
     } catch (err) {
-      throw new LoggedException(err.message, this, LogLevel.warn);
+      this.logService.log(new LoggedEntry(err.message, this, LogLevel.warn));
     } finally {
       this.sessionDeactivated(sessionId);
     }
@@ -86,100 +76,54 @@ export class AzureService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      //TODO: check if session is currently active before trying to stop it?
       await this.stop(sessionId);
       this.repository.deleteSession(sessionId);
-      this.sessionNotifier?.setSessions(this.repository.getSessions());
+      this.sessionNotifier.setSessions(this.repository.getSessions());
     } catch (error) {
       throw new LoggedException(error.message, this, LogLevel.warn);
     }
   }
 
-  validateCredentials(_sessionId: string): Promise<boolean> {
-    return Promise.resolve(false);
-    /*return new Promise((resolve, _) => {
-      this.generateCredentials(sessionId)
-        .then((__) => {
-          this.sessionDeactivated(sessionId);
-          resolve(true);
-        })
-        .catch((__) => {
-          this.sessionDeactivated(sessionId);
-          resolve(false);
-        });
-    });*/
+  async validateCredentials(_sessionId: string): Promise<boolean> {
+    return false;
   }
 
-  /*
-
-
-  *******
-
-
-   */
-
-  async login(session: AzureSession): Promise<void> {
+  private async restoreSecretsFromKeychain(integrationId: string, subscriptionId: string): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/naming-convention
+    let msalTokenCache = { Account: {}, IdToken: {}, AccessToken: {}, RefreshToken: {}, AppMetadata: {} } as JsonCache;
     try {
-      await this.executeService.execute(`az login --tenant ${session.tenantId} 2>&1`);
-      await this.secureRefreshToken();
-      await this.updateAccessTokenExpiration(session);
-    } catch (err) {
-      this.sessionDeactivated(session.sessionId);
-      throw new LoggedException(err.message, this, LogLevel.warn);
-    }
+      msalTokenCache = await this.azurePersistenceService.loadMsalCache();
+    } catch (error) {}
+
+    const secrets = await this.azurePersistenceService.getAzureSecrets(integrationId);
+    msalTokenCache.Account = { [secrets.account[0]]: secrets.account[1] };
+    msalTokenCache.RefreshToken = { [secrets.refreshToken[0]]: secrets.refreshToken[1] };
+    msalTokenCache.AccessToken = {};
+    msalTokenCache.IdToken = {};
+    await this.azurePersistenceService.saveMsalCache(msalTokenCache);
+
+    const profile = secrets.profile;
+    const subscription = profile.subscriptions.find((sub) => sub.id === subscriptionId);
+    subscription.isDefault = true;
+    profile.subscriptions = [subscription];
+    await this.azurePersistenceService.saveProfile(profile);
   }
 
-  async refreshAccessToken(session: AzureSession): Promise<void> {
-    try {
-      await this.restoreRefreshToken();
-      await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`);
-      await this.secureRefreshToken();
-      await this.updateAccessTokenExpiration(session);
-    } catch (error) {
-      await this.logout();
-      await this.login(session);
-    }
+  private async moveRefreshTokenToKeychain(msalTokenCache: JsonCache, integrationId: string, tenantId: string): Promise<void> {
+    const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === tenantId);
+    const refreshTokenEntry = Object.entries(msalTokenCache.RefreshToken).find(
+      (refreshTokenArr) => refreshTokenArr[1].home_account_id === accessToken.home_account_id
+    );
+    const secrets = await this.azurePersistenceService.getAzureSecrets(integrationId);
+    secrets.refreshToken = refreshTokenEntry;
+    await this.azurePersistenceService.setAzureSecrets(integrationId, secrets);
+    msalTokenCache.RefreshToken = {};
+    await this.azurePersistenceService.saveMsalCache(msalTokenCache);
   }
 
-  async logout(): Promise<void> {
-    try {
-      await this.executeService.execute("az logout");
-    } catch (stdError) {}
-  }
-
-  private async secureRefreshToken(): Promise<void> {
-    const msalCache = await this.loadMsalCache();
-    this.vault = { refreshToken: msalCache.RefreshToken };
-    msalCache.RefreshToken = {};
-    await this.persistMsalCache(msalCache);
-  }
-
-  private async restoreRefreshToken(): Promise<void> {
-    const msalCache = await this.loadMsalCache();
-    msalCache.AccessToken = {};
-    msalCache.IdToken = {};
-    msalCache.RefreshToken = this.vault.refreshToken;
-    await this.persistMsalCache(msalCache);
-  }
-
-  private async updateAccessTokenExpiration(session: AzureSession): Promise<void> {
-    const msalCache = await this.loadMsalCache();
-    const accessTokenKeys = Object.keys(msalCache.AccessToken);
-    for (const accessTokenKey of accessTokenKeys) {
-      const accessToken = msalCache.AccessToken[accessTokenKey];
-      if (accessToken?.realm === session.tenantId) {
-        const expirationTime = new Date(parseInt(accessToken?.expires_on, 10) * 1000);
-        session.sessionTokenExpiration = expirationTime.toISOString();
-        break;
-      }
-    }
-  }
-
-  private async loadMsalCache(): Promise<JsonCache> {
-    return this.msalPersistenceService.loadMsalCache();
-  }
-
-  private async persistMsalCache(msalCache: JsonCache): Promise<void> {
-    await this.msalPersistenceService.saveMsalCache(msalCache);
+  private async getAccessTokenExpiration(msalTokenCache: JsonCache, tenantId: string): Promise<string> {
+    const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === tenantId);
+    const expirationTime = new Date(parseInt(accessToken.expires_on, 10) * 1000);
+    return expirationTime.toISOString();
   }
 }

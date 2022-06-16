@@ -434,11 +434,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   remainingHours(integration: Integration): string {
-    if (integration.type !== IntegrationType.azure) {
+    if (integration.type === IntegrationType.awsSso) {
       return this.appProviderService.awsSsoIntegrationService.remainingHours(integration as AwsSsoIntegration);
     } else {
-      // Todo: add method for azure remaining time if necessary
-      return "8hrs";
+      return this.appProviderService.azureIntegrationService.remainingHours(integration);
     }
   }
 

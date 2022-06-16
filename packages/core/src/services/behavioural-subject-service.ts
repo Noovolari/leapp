@@ -54,7 +54,7 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
     return this.integrations.find((i) => i.id === integrationId);
   }
 
-  setIntegrations(integrations: Integration[]) {
+  setIntegrations(integrations: Integration[]): void {
     this.integrations = integrations;
   }
 }

@@ -106,13 +106,7 @@ export class AppComponent implements OnInit {
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
-    if (this.retroCompatibilityService.isRetroPatchNecessary()) {
-      await this.retroCompatibilityService.adaptOldWorkspaceFile();
-    }
-
-    if (this.retroCompatibilityService.isIntegrationPatchNecessary()) {
-      await this.retroCompatibilityService.adaptIntegrationPatch();
-    }
+    await this.retroCompatibilityService.applyWorkspaceMigrations();
 
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded();
@@ -133,7 +127,7 @@ export class AppComponent implements OnInit {
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
-    this.router.navigate(["/dashboard"]);
+    await this.router.navigate(["/dashboard"]);
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
   }

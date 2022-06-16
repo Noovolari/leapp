@@ -143,6 +143,66 @@ export class RetroCompatibilityService {
     workspace._sessions.push(azureSession);
   }*/
 
+  async applyWorkspaceMigrations(): Promise<void> {
+    console.log("MIGRATE");
+
+    if (this.isRetroPatchNecessary()) {
+      await this.adaptOldWorkspaceFile();
+    }
+
+    if (this.isIntegrationPatchNecessary()) {
+      await this.adaptIntegrationPatch();
+    }
+
+    if (this.fileService.existsSync(this.fileService.homeDir() + "/" + constants.lockFileDestination)) {
+      const workspace = this.parseWorkspaceFile();
+      const leappCorePackageJson = JSON.parse(this.fileService.readFileSync("../core/package.json"));
+
+      this.migration1(workspace, leappCorePackageJson["version"]);
+    }
+  }
+
+  migration1(workspace: any, leappCorePackageJsonVersion: string): void {
+    const isTheFirstMigration = workspace._lastMigrationVersion === undefined && leappCorePackageJsonVersion === "0.1.111";
+
+    if (isTheFirstMigration) {
+      workspace._lastMigrationVersion = "0.1.111";
+      const awsSsoIntegrations = workspace._awsSsoIntegrations;
+
+      const newAwsSsoIntegrations: AwsSsoIntegration[] = [];
+
+      if (awsSsoIntegrations && awsSsoIntegrations.length > 0) {
+        for (let i = 0; i < awsSsoIntegrations.length; i++) {
+          let newAwsSsoIntegration: AwsSsoIntegration;
+
+          if (awsSsoIntegrations[i].isOnline === undefined) {
+            newAwsSsoIntegration = new AwsSsoIntegration(
+              awsSsoIntegrations[i].id,
+              awsSsoIntegrations[i].alias,
+              awsSsoIntegrations[i].portalUrl,
+              awsSsoIntegrations[i].region,
+              awsSsoIntegrations[i].browserOpening,
+              awsSsoIntegrations[i].accessTokenExpiration
+            );
+            newAwsSsoIntegration.isOnline = false;
+          } else {
+            newAwsSsoIntegration = awsSsoIntegrations[i];
+          }
+
+          newAwsSsoIntegrations.push(newAwsSsoIntegration);
+        }
+      }
+
+      workspace._awsSsoIntegrations = newAwsSsoIntegrations;
+      this.persists(workspace);
+      this.repository.reloadWorkspace();
+
+      const updatedAwsSsoIntegrations = this.repository.listAwsSsoIntegrations();
+      const updatedAzureIntegrations = this.repository.listAzureIntegrations();
+      this.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
+    }
+  }
+
   isRetroPatchNecessary(): boolean {
     if (this.fileService.existsSync(this.fileService.homeDir() + "/" + constants.lockFileDestination)) {
       const workspaceParsed = this.parseWorkspaceFile();

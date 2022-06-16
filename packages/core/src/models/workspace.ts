@@ -39,6 +39,8 @@ export class Workspace {
 
   private _credentialMethod: string;
 
+  private _lastMigrationVersion: string;
+
   constructor() {
     this._pinned = [];
     this._sessions = [];

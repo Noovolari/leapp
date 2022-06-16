@@ -124,10 +124,19 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       ];
     });
 
-    this.behaviouralSubjectService.setIntegrations([
-      ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
-      ...this.appProviderService.azureIntegrationService.getIntegrations(),
-    ]);
+    console.log("INTEGRATION BAR");
+    console.log("INTEGRATIONS", this.appProviderService.awsSsoIntegrationService.getIntegrations());
+
+    new Promise((resolve) => {
+      setTimeout(resolve, 10000);
+    }).then(() => {
+      console.log("INTEGRATIONS", this.appProviderService.awsSsoIntegrationService.getIntegrations());
+
+      this.behaviouralSubjectService.setIntegrations([
+        ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
+        ...this.appProviderService.azureIntegrationService.getIntegrations(),
+      ]);
+    });
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if (value) {
@@ -213,7 +222,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   async logout(integrationId: string): Promise<void> {
     this.logoutLoadings[integrationId] = true;
     const integration = this.getIntegration(integrationId);
-    if (integration.type === IntegrationType.awsSso) {
+    console.log("INTEGRATION", integration);
+    if (integration.type !== IntegrationType.azure) {
       this.appProviderService.awsSsoIntegrationService.logout(integration.id);
     } else {
       this.appProviderService.azureIntegrationService.logout(integration.id);

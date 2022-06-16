@@ -9,7 +9,7 @@ export class IntegrationIsOnlineStateRefreshService {
     private behaviouralSubjectService: BehaviouralSubjectService
   ) {}
 
-  refreshIsOnlineState(): void {
+  async refreshIsOnlineState(): Promise<void> {
     const awsSsoIntegrations = this.awsSsoIntegrationService.getIntegrations();
     const azureIntegrations = this.azureIntegrationService.getIntegrations();
 
@@ -23,11 +23,11 @@ export class IntegrationIsOnlineStateRefreshService {
       promises.push(this.azureIntegrationService.setOnline(azureIntegration));
     }
 
-    Promise.all(promises).then(() => {
-      const updatedAwsSsoIntegrations = this.awsSsoIntegrationService.getIntegrations();
-      const updatedAzureIntegrations = this.azureIntegrationService.getIntegrations();
+    await Promise.all(promises);
 
-      this.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
-    });
+    const updatedAwsSsoIntegrations = this.awsSsoIntegrationService.getIntegrations();
+    const updatedAzureIntegrations = this.azureIntegrationService.getIntegrations();
+
+    this.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
   }
 }

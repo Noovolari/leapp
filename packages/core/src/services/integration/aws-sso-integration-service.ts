@@ -82,6 +82,16 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return this.repository.listAwsSsoIntegrations();
   }
 
+  getOnlineIntegrations(): AwsSsoIntegration[] {
+    const integrations = this.repository.listAwsSsoIntegrations();
+    return integrations.filter((integration) => integration.isOnline);
+  }
+
+  getOfflineIntegrations(): AwsSsoIntegration[] {
+    const integrations = this.repository.listAwsSsoIntegrations();
+    return integrations.filter((integration) => !integration.isOnline);
+  }
+
   async setOnline(integration: AwsSsoIntegration, forcedState?: boolean): Promise<void> {
     const expiration = new Date(integration.accessTokenExpiration).getTime();
     const now = this.getDate().getTime();

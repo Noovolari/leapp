@@ -28,7 +28,7 @@ export default class ListIntegrations extends LeappCommand {
     const integrations = this.cliProviderService.awsSsoIntegrationService.getIntegrations();
 
     for (const integration of integrations) {
-      const isOnline = await this.cliProviderService.awsSsoIntegrationService.isOnline(integration);
+      const isOnline = integration.isOnline;
       data.push({
         integrationId: integration.id,
         integrationName: integration.alias,

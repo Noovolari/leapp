@@ -12,7 +12,6 @@ Sessions management
 * [`leapp session get-id`](#leapp-session-get-id)
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session open-web-console`](#leapp-session-open-web-console)
-* [`leapp session save-msal-cache`](#leapp-session-save-msal-cache)
 * [`leapp session start`](#leapp-session-start)
 * [`leapp session start-ssm-session`](#leapp-session-start-ssm-session)
 * [`leapp session stop`](#leapp-session-stop)
@@ -234,18 +233,6 @@ EXAMPLES
   $leapp session open-web-console
 
   $leapp session open-web-console --sessionId SESSIONID
-```
-
-## `leapp session save-msal-cache`
-
-Save msal cache
-
-```
-USAGE
-  $ leapp session save-msal-cache
-
-DESCRIPTION
-  Save msal cache
 ```
 
 ## `leapp session start`

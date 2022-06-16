@@ -44,7 +44,7 @@ export default class LoginIntegration extends LeappCommand {
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {
-    const offlineIntegrations = await this.cliProviderService.awsSsoIntegrationService.getOfflineIntegrations();
+    const offlineIntegrations = this.cliProviderService.awsSsoIntegrationService.getOfflineIntegrations();
     if (offlineIntegrations.length === 0) {
       throw new Error("no offline integrations available");
     }

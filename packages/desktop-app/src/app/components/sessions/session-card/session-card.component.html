@@ -92,7 +92,7 @@
     <div class="divider"></div>
   </ng-container>
 
-  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type !== eSessionType.awsSsoRole">
+  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type !== eSessionType.awsSsoRole && session.type !== eSessionType.azure">
     <i class="moon-Edit"></i>&nbsp;
     <span>Edit Session</span>
   </button>
@@ -111,7 +111,7 @@
     </button>
   </ng-container>
 
-  <ng-container *ngIf="session.type !== eSessionType.awsSsoRole">
+  <ng-container *ngIf="session.type !== eSessionType.awsSsoRole && session.type !== eSessionType.azure">
     <button mat-menu-item (click)="deleteSession(session, $event);">
       <i class="moon-Delete"></i>&nbsp;
       <span>Delete Session</span>

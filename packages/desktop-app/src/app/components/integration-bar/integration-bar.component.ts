@@ -124,19 +124,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       ];
     });
 
-    console.log("INTEGRATION BAR");
-    console.log("INTEGRATIONS", this.appProviderService.awsSsoIntegrationService.getIntegrations());
-
-    new Promise((resolve) => {
-      setTimeout(resolve, 10000);
-    }).then(() => {
-      console.log("INTEGRATIONS", this.appProviderService.awsSsoIntegrationService.getIntegrations());
-
-      this.behaviouralSubjectService.setIntegrations([
-        ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
-        ...this.appProviderService.azureIntegrationService.getIntegrations(),
-      ]);
-    });
+    this.behaviouralSubjectService.setIntegrations([
+      ...this.appProviderService.awsSsoIntegrationService.getIntegrations(),
+      ...this.appProviderService.azureIntegrationService.getIntegrations(),
+    ]);
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if (value) {

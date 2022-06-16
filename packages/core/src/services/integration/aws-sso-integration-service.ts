@@ -204,7 +204,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
         region,
         loginResponse.portalUrlUnrolled,
         integration.browserOpening,
-        loginResponse.expirationTime.toISOString(), //d.toISOString(),
+        loginResponse.expirationTime.toISOString(), // d.toISOString(),
         loginResponse.accessToken
       );
 

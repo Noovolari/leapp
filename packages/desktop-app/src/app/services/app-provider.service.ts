@@ -38,6 +38,7 @@ import { AppNativeLoggerService } from "./app-native-logger-service";
 import { MessageToasterService } from "./message-toaster.service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
+import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 
 @Injectable({
   providedIn: "root",
@@ -80,6 +81,7 @@ export class AppProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private workspaceServiceInstance: WorkspaceService;
   private azurePersistenceServiceInstance: AzurePersistenceService;
+  private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
 
   constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
 
@@ -378,5 +380,16 @@ export class AppProviderService {
       );
     }
     return this.remoteProceduresServerInstance;
+  }
+
+  public get integrationIsOnlineStateRefreshService(): IntegrationIsOnlineStateRefreshService {
+    if (!this.integrationIsOnlineStateRefreshServiceInstance) {
+      this.integrationIsOnlineStateRefreshServiceInstance = new IntegrationIsOnlineStateRefreshService(
+        this.awsSsoIntegrationService,
+        this.azureIntegrationService,
+        this.behaviouralSubjectService
+      );
+    }
+    return this.integrationIsOnlineStateRefreshServiceInstance;
   }
 }

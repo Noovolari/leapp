@@ -380,16 +380,16 @@ export class CreateDialogComponent implements OnInit {
           };
           this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
           break;
-        case SessionType.azure:
-          // TODO: remove azure session creation
-          /*const azureSessionRequest: AzureSessionRequest = {
+        /*case SessionType.azure:
+          const azureSessionRequest: AzureSessionRequest = {
+            azureIntegrationId: uuid.v4(),
             region: this.selectedLocation,
             sessionName: this.form.value.name,
             subscriptionId: this.form.value.subscriptionId,
             tenantId: this.form.value.tenantId,
           };
-          this.azureService.create(azureSessionRequest);*/
-          break;
+          this.azureService.create(azureSessionRequest);
+          break;*/
       }
 
       this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, "");

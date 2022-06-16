@@ -213,7 +213,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   async logout(integrationId: string): Promise<void> {
     this.logoutLoadings[integrationId] = true;
     const integration = this.getIntegration(integrationId);
-    if (integration.type === IntegrationType.awsSso) {
+    console.log("INTEGRATION", integration);
+    if (integration.type !== IntegrationType.azure) {
       this.appProviderService.awsSsoIntegrationService.logout(integration.id);
     } else {
       this.appProviderService.azureIntegrationService.logout(integration.id);

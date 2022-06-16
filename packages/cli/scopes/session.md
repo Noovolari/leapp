@@ -12,7 +12,6 @@ Sessions management
 * [`leapp session get-id`](#leapp-session-get-id)
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session open-web-console`](#leapp-session-open-web-console)
-* [`leapp session save-msal-cache`](#leapp-session-save-msal-cache)
 * [`leapp session start`](#leapp-session-start)
 * [`leapp session start-ssm-session`](#leapp-session-start-ssm-session)
 * [`leapp session stop`](#leapp-session-stop)
@@ -55,9 +54,7 @@ DESCRIPTION
 EXAMPLES
   $leapp session add
 
-  $leapp session add --providerType [aws, azure] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser, azure] --region [AWSREGION, AZURELOCATION] --sessionName NAME ...[combination of flags relative to the session]
-
-  $leapp session add --providerType azure --sessionType azure --sessionName NAME --region AZURELOCATION --tenantID TENANTID --subscriptionId SUBSCRIPTIONID
+  $leapp session add --providerType [aws] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser] --region [AWSREGION] --sessionName NAME ...[combination of flags relative to the session]
 
   $leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN
 
@@ -234,18 +231,6 @@ EXAMPLES
   $leapp session open-web-console
 
   $leapp session open-web-console --sessionId SESSIONID
-```
-
-## `leapp session save-msal-cache`
-
-Save msal cache
-
-```
-USAGE
-  $ leapp session save-msal-cache
-
-DESCRIPTION
-  Save msal cache
 ```
 
 ## `leapp session start`

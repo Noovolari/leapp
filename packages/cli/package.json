@@ -130,7 +130,6 @@
     "access": "public"
   },
   "scripts": {
-    "install": "node-gyp-build",
     "prepare docs": "gushio gushio/replace-header-cli-index-doc.js",
     "clean": "gushio gushio/target-clean.js",
     "test": "jest",

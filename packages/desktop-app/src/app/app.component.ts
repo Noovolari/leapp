@@ -25,6 +25,7 @@ import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integra
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "./services/options.service";
+import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 
 @Component({
   selector: "app-root",
@@ -43,6 +44,7 @@ export class AppComponent implements OnInit {
   private awsSsoIntegrationService: AwsSsoIntegrationService;
   private awsSsoRoleService: AwsSsoRoleService;
   private remoteProceduresServer: RemoteProceduresServer;
+  private integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -73,6 +75,7 @@ export class AppComponent implements OnInit {
     this.awsSsoIntegrationService = appProviderService.awsSsoIntegrationService;
     this.awsSsoRoleService = appProviderService.awsSsoRoleService;
     this.remoteProceduresServer = appProviderService.remoteProceduresServer;
+    this.integrationIsOnlineStateRefreshService = appProviderService.integrationIsOnlineStateRefreshService;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
@@ -106,13 +109,7 @@ export class AppComponent implements OnInit {
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
-    if (this.retroCompatibilityService.isRetroPatchNecessary()) {
-      await this.retroCompatibilityService.adaptOldWorkspaceFile();
-    }
-
-    if (this.retroCompatibilityService.isIntegrationPatchNecessary()) {
-      await this.retroCompatibilityService.adaptIntegrationPatch();
-    }
+    await this.retroCompatibilityService.applyWorkspaceMigrations();
 
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded();
@@ -126,14 +123,14 @@ export class AppComponent implements OnInit {
     }
 
     // Start Global Timer
-    this.timerService.start(() => this.timerFunction(this.rotationService, this.appProviderService));
+    this.timerService.start(() => this.timerFunction(this.rotationService, this.integrationIsOnlineStateRefreshService));
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
-    this.router.navigate(["/dashboard"]);
+    await this.router.navigate(["/dashboard"]);
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
   }
@@ -142,28 +139,9 @@ export class AppComponent implements OnInit {
     this.appService.closeAllMenuTriggers();
   }
 
-  private timerFunction(rotationService: RotationService, appProviderService): void {
+  private timerFunction(rotationService: RotationService, integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService): void {
     rotationService.rotate();
-
-    const awsSsoIntegrations = appProviderService.awsSsoIntegrationService.getIntegrations();
-    const azureIntegrations = appProviderService.azureIntegrationService.getIntegrations();
-
-    const promises: Promise<void>[] = [];
-
-    for (const awsSsoIntegration of awsSsoIntegrations) {
-      promises.push(appProviderService.awsSsoIntegrationService.setOnline(awsSsoIntegration));
-    }
-
-    for (const azureIntegration of azureIntegrations) {
-      promises.push(appProviderService.azureIntegrationService.setOnline(azureIntegration));
-    }
-
-    Promise.all(promises).then(() => {
-      const updatedAwsSsoIntegrations = appProviderService.awsSsoIntegrationService.getIntegrations();
-      const updatedAzureIntegrations = appProviderService.azureIntegrationService.getIntegrations();
-
-      appProviderService.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
-    });
+    integrationIsOnlineStateRefreshService.refreshIsOnlineState();
   }
 
   /**

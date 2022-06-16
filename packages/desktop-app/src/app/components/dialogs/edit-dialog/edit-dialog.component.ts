@@ -14,7 +14,6 @@ import { SessionService } from "@noovolari/leapp-core/services/session/session-s
 import * as uuid from "uuid";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { AzureLocation } from "@noovolari/leapp-core/services/azure-location";
-import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
@@ -193,11 +192,11 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       });
     }
 
-    if (this.accountType === SessionType.azure) {
+    /*if (this.accountType === SessionType.azure) {
       this.form.controls["name"].setValue((this.selectedSession as AzureSession).sessionName);
       this.form.controls["tenantId"].setValue((this.selectedSession as AzureSession).tenantId);
       this.form.controls["subscriptionId"].setValue((this.selectedSession as AzureSession).subscriptionId);
-    }
+    }*/
   }
 
   selectedIdpUrlEvent($event: { items: any[]; item: any }): void {
@@ -322,12 +321,12 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         (this.selectedSession as AwsIamRoleChainedSession).parentSessionId = this.selectedParentSession.sessionId;
         (this.selectedSession as AwsIamRoleChainedSession).roleArn = this.form.value.roleArn.trim();
         break;
-      case SessionType.azure:
+      /*case SessionType.azure:
         (this.selectedSession as AzureSession).region = this.selectedLocation;
         (this.selectedSession as AzureSession).sessionName = this.form.value.name;
         (this.selectedSession as AzureSession).subscriptionId = this.form.value.subscriptionId;
         (this.selectedSession as AzureSession).tenantId = this.form.value.tenantId;
-        break;
+        break;*/
     }
   }
 
@@ -367,13 +366,13 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
           this.form.get("accessKey").valid &&
           this.form.get("secretKey").valid;
         break;
-      case SessionType.azure:
+      /*case SessionType.azure:
         result =
           this.form.get("name").valid &&
           this.form.get("subscriptionId").valid &&
           this.form.get("tenantId").valid &&
           this.form.get("azureLocation").valid;
-        break;
+        break;*/
     }
     return result;
   }
@@ -384,8 +383,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
 
   getIconForProvider(provider: SessionType): string {
     switch (provider) {
-      case SessionType.azure:
-        return "azure-logo.svg";
+      /*case SessionType.azure:
+        return "azure-logo.svg";*/
       case SessionType.google:
         return "google.png";
       case SessionType.alibaba:

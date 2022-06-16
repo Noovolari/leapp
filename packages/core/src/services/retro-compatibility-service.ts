@@ -12,6 +12,9 @@ import * as uuid from "uuid";
 import { SessionType } from "../models/session-type";
 import { Repository } from "./repository";
 import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
+import { Session } from "../models/session";
+import { AzureSession } from "../models/azure/azure-session";
+import { AzureIntegration } from "../models/azure/azure-integration";
 
 export class RetroCompatibilityService {
   constructor(
@@ -194,6 +197,29 @@ export class RetroCompatibilityService {
       }
 
       workspace._awsSsoIntegrations = newAwsSsoIntegrations;
+
+      // Remove old Azure sessions and transform in appropriate integrations
+      // 0. Be sure to have a proper array of Azure integrations in the workspace
+      workspace._azureIntegrations = workspace._azureIntegrations || [];
+      // 1. Get all Azure Sessions
+      const azureSessions = workspace._sessions.filter((sess: Session) => sess.type === SessionType.azure);
+      // 2. Keep only NON Azure sessions
+      workspace._sessions = workspace._sessions.filter((sess: Session) => sess.type !== SessionType.azure);
+      // 3. Prepare a list of possible integrations
+      const defaultLocation = workspace.defaultLocation;
+      const possibleNewIntegrations: AzureIntegration[] = [];
+      azureSessions.forEach((sess: AzureSession) => {
+        if (possibleNewIntegrations.map((ai) => ai.tenantId).indexOf(sess.tenantId) < 0) {
+          // A new integration for Azure is found: add it to the list
+          possibleNewIntegrations.push(
+            new AzureIntegration(uuid.v4(), `AzureIntgr-${possibleNewIntegrations.length + 1}`, sess.tenantId, defaultLocation)
+          );
+        }
+      });
+      // 4. Add the new integrations to the current Azure Integrations array
+      workspace._azureIntegrations = workspace._azureIntegrations.concat(possibleNewIntegrations);
+
+      // Persists all the changes
       this.persists(workspace);
       this.repository.reloadWorkspace();
 

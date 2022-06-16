@@ -13,7 +13,7 @@ export interface IIntegrationService {
   nativeService: INativeService;
   sessionFactory: SessionFactory;
 
-  createIntegration(creationParams: IntegrationParams): void;
+  createIntegration(creationParams: IntegrationParams): Promise<void>;
 
   updateIntegration(id: string, updateParams: IntegrationParams): void;
 

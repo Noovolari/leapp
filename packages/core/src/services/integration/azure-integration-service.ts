@@ -10,7 +10,7 @@ import { AzurePersistenceService, AzureProfile } from "../azure-persistence-serv
 import { LoggedException, LogLevel } from "../log-service";
 import { AzureIntegrationCreationParams } from "../../models/azure/azure-integration-creation-params";
 import { AzureSessionRequest } from "../session/azure/azure-session-request";
-import { AzureService } from "../session/azure/azure-service";
+import { AzureSessionService } from "../session/azure/azure-session-service";
 import { SessionType } from "../../models/session-type";
 import { AzureSession } from "../../models/azure/azure-session";
 import { SessionStatus } from "../../models/session-status";
@@ -22,7 +22,7 @@ export class AzureIntegrationService implements IIntegrationService {
     public nativeService: INativeService,
     public sessionFactory: SessionFactory,
     public executeService: ExecuteService,
-    public azureService: AzureService,
+    public azureSessionService: AzureSessionService,
     public azurePersistenceService: AzurePersistenceService
   ) {}
 
@@ -120,10 +120,16 @@ export class AzureIntegrationService implements IIntegrationService {
     const azureSessions = this.repository
       .getSessions()
       .filter((session) => session.type === SessionType.azure)
-      .map((session) => session as AzureSession)
-      .filter((session) => session.azureIntegrationId === integrationId);
+      .map((session) => session as AzureSession);
 
-    for (const azureSession of azureSessions) {
+    for (const azureSession of azureSessions.filter(
+      (session) => session.azureIntegrationId !== integrationId && session.status !== SessionStatus.inactive
+    )) {
+      await this.azureSessionService.stop(azureSession.sessionId);
+    }
+
+    const integrationSessions = azureSessions.filter((session) => session.azureIntegrationId === integrationId);
+    for (const azureSession of integrationSessions) {
       const creationRequest = sessionCreationRequests.find(
         (request) =>
           azureSession.sessionName === request.sessionName &&
@@ -133,17 +139,17 @@ export class AzureIntegrationService implements IIntegrationService {
       );
       const isSessionToDelete = !creationRequest;
       if (isSessionToDelete) {
-        await this.azureService.delete(azureSession.sessionId);
+        await this.azureSessionService.delete(azureSession.sessionId);
       } else {
         if (azureSession.status !== SessionStatus.inactive) {
-          await this.azureService.stop(azureSession.sessionId);
-          await this.azureService.start(azureSession.sessionId);
+          await this.azureSessionService.stop(azureSession.sessionId);
+          await this.azureSessionService.start(azureSession.sessionId);
         }
         sessionCreationRequests = sessionCreationRequests.filter((request) => request !== creationRequest);
       }
     }
     for (const creationRequest of sessionCreationRequests) {
-      await this.azureService.create(creationRequest);
+      await this.azureSessionService.create(creationRequest);
     }
   }
 
@@ -169,7 +175,7 @@ export class AzureIntegrationService implements IIntegrationService {
   private async deleteDependentSessions(integrationId: string): Promise<void> {
     const azureSessions = this.repository.getSessions().filter((session) => (session as any).azureIntegrationId === integrationId);
     for (const session of azureSessions) {
-      await this.azureService.delete(session.sessionId);
+      await this.azureSessionService.delete(session.sessionId);
     }
   }
 }

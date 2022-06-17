@@ -3,7 +3,7 @@ import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-ser
 import { AwsIamRoleFederatedService } from "./session/aws/aws-iam-role-federated-service";
 import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
 import { AwsSsoRoleService } from "./session/aws/aws-sso-role-service";
-import { AzureService } from "./session/azure/azure-service";
+import { AzureSessionService } from "./session/azure/azure-session-service";
 import { CreateSessionRequest } from "./session/create-session-request";
 import { SessionService } from "./session/session-service";
 
@@ -13,7 +13,7 @@ export class SessionFactory {
     private readonly awsIamRoleFederatedService: AwsIamRoleFederatedService,
     private readonly awsIamRoleChainedService: AwsIamRoleChainedService,
     private readonly awsSsoRoleService: AwsSsoRoleService,
-    private readonly azureService: AzureService
+    private readonly azureSessionService: AzureSessionService
   ) {}
 
   getSessionService(sessionType: SessionType): SessionService {
@@ -27,9 +27,9 @@ export class SessionFactory {
       case SessionType.awsSsoRole:
         return this.awsSsoRoleService;
       case SessionType.azure:
-        return this.azureService;
+        return this.azureSessionService;
       case SessionType.anytype:
-        return this.azureService as SessionService;
+        return this.azureSessionService as SessionService;
     }
   }
 

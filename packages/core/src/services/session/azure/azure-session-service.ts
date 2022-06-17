@@ -12,6 +12,7 @@ import { JsonCache } from "@azure/msal-node";
 import { AzurePersistenceService } from "../../azure-persistence-service";
 import { SessionStatus } from "../../../models/session-status";
 import { constants } from "../../../models/constants";
+import { SessionType } from "../../../models/session-type";
 
 export class AzureSessionService extends SessionService {
   constructor(
@@ -45,12 +46,30 @@ export class AzureSessionService extends SessionService {
 
   async start(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
-    let sessionTokenExpiration;
     const session = this.repository.getSessionById(sessionId) as AzureSession;
+    const sessionsToStop = this.repository
+      .getSessions()
+      .filter(
+        (sess: AzureSession) =>
+          sess.type === SessionType.azure && sess.status !== SessionStatus.inactive && sess.azureIntegrationId !== session.azureIntegrationId
+      );
+    for (const sess of sessionsToStop) {
+      await this.stop(sess.sessionId);
+    }
+    const subscriptionIdsToStart = this.repository
+      .getSessions()
+      .filter(
+        (sess: AzureSession) =>
+          sess.type === SessionType.azure &&
+          (sess.status !== SessionStatus.inactive || sess.sessionId === session.sessionId) &&
+          sess.azureIntegrationId === session.azureIntegrationId
+      )
+      .map((sess: AzureSession) => sess.subscriptionId);
+    let sessionTokenExpiration;
     try {
-      await this.restoreSecretsFromKeychain(session.azureIntegrationId, session.subscriptionId);
+      await this.restoreSecretsFromKeychain(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
       await this.executeService.execute(`az configure --default location=${session.region}`);
-      await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`);
+      await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`, undefined, true);
       const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
       await this.moveRefreshTokenToKeychain(msalTokenCache, session.azureIntegrationId, session.tenantId);
       sessionTokenExpiration = await this.getAccessTokenExpiration(msalTokenCache, session.tenantId);
@@ -98,7 +117,7 @@ export class AzureSessionService extends SessionService {
     return false;
   }
 
-  private async restoreSecretsFromKeychain(integrationId: string, subscriptionId: string): Promise<void> {
+  private async restoreSecretsFromKeychain(integrationId: string, subscriptionIds: string[], defaultSubscriptionId: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     let msalTokenCache = { Account: {}, IdToken: {}, AccessToken: {}, RefreshToken: {}, AppMetadata: {} } as JsonCache;
     try {
@@ -113,9 +132,10 @@ export class AzureSessionService extends SessionService {
     await this.azurePersistenceService.saveMsalCache(msalTokenCache);
 
     const profile = secrets.profile;
-    const subscription = profile.subscriptions.find((sub) => sub.id === subscriptionId);
-    subscription.isDefault = true;
-    profile.subscriptions = [subscription];
+    const subscriptions = profile.subscriptions
+      .filter((sub) => subscriptionIds.includes(sub.id))
+      .map((sub) => Object.assign(sub, { isDefault: sub.id === defaultSubscriptionId }));
+    profile.subscriptions = subscriptions;
     await this.azurePersistenceService.saveProfile(profile);
   }
 

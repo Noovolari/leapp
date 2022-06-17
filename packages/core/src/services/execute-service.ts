@@ -37,7 +37,9 @@ export class ExecuteService {
 
       exec(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {
         const output = { error: err, stdout, stderr };
-        this.logService.log(new LoggedEntry("execute from Leapp: " + JSON.stringify(output), this, LogLevel.info, false));
+        this.logService.log(
+          new LoggedEntry("execute from Leapp\nstdout:" + JSON.stringify(output) + "\nstderr:" + JSON.stringify(stderr), this, LogLevel.info, false)
+        );
         if (err) {
           reject(err);
         } else {

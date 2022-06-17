@@ -238,8 +238,8 @@ describe("IntegrationIsOnlineStateRefreshService", () => {
     const azurePersistenceService = { loadProfile: () => azureProfile } as any;
     const sessions = [{ type: SessionType.awsIamUser }, { type: SessionType.azure, azureIntegrationId: "anotherIntegrationId" }];
     const repository = { getSessions: () => sessions } as any;
-    const azureService = { create: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    const azureSessionService = { create: jest.fn() } as any;
+    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureSessionService, azurePersistenceService);
     service.setOnline = jest.fn();
     (service as any).moveSecretsToKeychain = jest.fn();
     (service as any).notifyIntegrationChanges = jest.fn();
@@ -252,7 +252,7 @@ describe("IntegrationIsOnlineStateRefreshService", () => {
 
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
     expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");
-    expect(azureService.create).toHaveBeenCalledWith({
+    expect(azureSessionService.create).toHaveBeenCalledWith({
       region: "region",
       subscriptionId: "subscriptionId",
       tenantId: "tenantId",
@@ -282,8 +282,8 @@ describe("IntegrationIsOnlineStateRefreshService", () => {
       },
     ];
     const repository = { getSessions: () => sessions } as any;
-    const azureService = { create: jest.fn() } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    const azureSessionService = { create: jest.fn() } as any;
+    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureSessionService, azurePersistenceService);
     service.setOnline = jest.fn();
     (service as any).moveSecretsToKeychain = jest.fn();
     (service as any).notifyIntegrationChanges = jest.fn();
@@ -295,7 +295,7 @@ describe("IntegrationIsOnlineStateRefreshService", () => {
 
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
     expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");
-    expect(azureService.create).not.toHaveBeenCalled();
+    expect(azureSessionService.create).not.toHaveBeenCalled();
     expect((service as any).moveSecretsToKeychain).toHaveBeenCalledWith(integration, azureProfile);
     expect(service.setOnline).toHaveBeenCalledWith(integration, true);
     expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
@@ -320,11 +320,11 @@ describe("IntegrationIsOnlineStateRefreshService", () => {
       },
     ];
     const repository = { getSessions: () => sessions } as any;
-    const azureService = {
+    const azureSessionService = {
       delete: jest.fn(),
       create: jest.fn(),
     } as any;
-    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureService, azurePersistenceService);
+    const service = new AzureIntegrationService(repository, null, null, null, null, executeService, azureSessionService, azurePersistenceService);
     service.setOnline = jest.fn();
     (service as any).moveSecretsToKeychain = jest.fn();
     (service as any).notifyIntegrationChanges = jest.fn();
@@ -336,8 +336,8 @@ describe("IntegrationIsOnlineStateRefreshService", () => {
 
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
     expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");
-    expect(azureService.delete).toHaveBeenCalledWith("sessionId");
-    expect(azureService.create).toHaveBeenCalledWith({
+    expect(azureSessionService.delete).toHaveBeenCalledWith("sessionId");
+    expect(azureSessionService.create).toHaveBeenCalledWith({
       region: "region",
       subscriptionId: "subscriptionId",
       tenantId: "tenantId",

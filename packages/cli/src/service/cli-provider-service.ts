@@ -6,7 +6,7 @@ import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service"
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
-import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
 import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
 import { AwsParentSessionFactory } from "@noovolari/leapp-core/services/session/aws/aws-parent-session.factory";
@@ -57,7 +57,7 @@ export class CliProviderService {
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
   private awsSsoRoleServiceInstance: AwsSsoRoleService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
-  private azureServiceInstance: AzureService;
+  private azureServiceInstance: AzureSessionService;
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
@@ -206,9 +206,9 @@ export class CliProviderService {
     return this.azurePersistenceServiceInstance;
   }
 
-  get azureService(): AzureService {
+  get azureSessionService(): AzureSessionService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(
+      this.azureServiceInstance = new AzureSessionService(
         this.behaviouralSubjectService,
         this.repository,
         this.fileService,
@@ -225,7 +225,7 @@ export class CliProviderService {
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
-        this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureService);
+        this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureSessionService);
     }
     return this.sessionFactoryInstance;
   }

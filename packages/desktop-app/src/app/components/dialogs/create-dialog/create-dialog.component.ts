@@ -19,7 +19,7 @@ import { AwsIamUserSessionRequest } from "@noovolari/leapp-core/services/session
 import { AwsIamRoleChainedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
-import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { OptionsService } from "../../../services/options.service";
 
 @Component({
@@ -94,7 +94,7 @@ export class CreateDialogComponent implements OnInit {
   private awsIamRoleFederatedService: AwsIamRoleFederatedService;
   private awsIamUserService: AwsIamUserService;
   private awsIamRoleChainedService: AwsIamRoleChainedService;
-  private azureService: AzureService;
+  private azureSessionService: AzureSessionService;
   private loggingService: LogService;
 
   /* Setup the first account for the application */
@@ -112,7 +112,7 @@ export class CreateDialogComponent implements OnInit {
     this.awsIamRoleFederatedService = leappCoreService.awsIamRoleFederatedService;
     this.awsIamUserService = leappCoreService.awsIamUserService;
     this.awsIamRoleChainedService = leappCoreService.awsIamRoleChainedService;
-    this.azureService = leappCoreService.azureService;
+    this.azureSessionService = leappCoreService.azureSessionService;
     this.loggingService = leappCoreService.logService;
   }
 
@@ -388,7 +388,7 @@ export class CreateDialogComponent implements OnInit {
             subscriptionId: this.form.value.subscriptionId,
             tenantId: this.form.value.tenantId,
           };
-          this.azureService.create(azureSessionRequest);
+          this.azureSessionService.create(azureSessionRequest);
           break;*/
       }
 

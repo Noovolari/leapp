@@ -81,8 +81,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   menuX: number;
   menuY: number;
 
-  isOnlineArray = {};
-
   public behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoRoleService: AwsSsoRoleService;
   private awsSsoOidcService: AwsSsoOidcService;
@@ -213,7 +211,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   async logout(integrationId: string): Promise<void> {
     this.logoutLoadings[integrationId] = true;
     const integration = this.getIntegration(integrationId);
-    console.log("INTEGRATION", integration);
     if (integration.type !== IntegrationType.azure) {
       this.appProviderService.awsSsoIntegrationService.logout(integration.id);
     } else {
@@ -230,6 +227,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   async forceSync(integrationId: string): Promise<void> {
     const integration = this.getIntegration(integrationId);
+
     if (integration.type === IntegrationType.awsSso) {
       await this.forceSyncAwsSso(integrationId);
     } else {

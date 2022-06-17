@@ -10,8 +10,10 @@ import { LoggedEntry, LoggedException, LogLevel, LogService } from "../../log-se
 import { INativeService } from "../../../interfaces/i-native-service";
 import { JsonCache } from "@azure/msal-node";
 import { AzurePersistenceService } from "../../azure-persistence-service";
+import { SessionStatus } from "../../../models/session-status";
+import { constants } from "../../../models/constants";
 
-export class AzureService extends SessionService {
+export class AzureSessionService extends SessionService {
   constructor(
     iSessionNotifier: IBehaviouralNotifier,
     repository: Repository,
@@ -38,7 +40,7 @@ export class AzureService extends SessionService {
       sessionRequest.azureIntegrationId
     );
     this.repository.addSession(session);
-    this.sessionNotifier?.setSessions(this.repository.getSessions());
+    this.sessionNotifier.setSessions(this.repository.getSessions());
   }
 
   async start(sessionId: string): Promise<void> {
@@ -60,7 +62,13 @@ export class AzureService extends SessionService {
   }
 
   async rotate(sessionId: string): Promise<void> {
-    return this.start(sessionId);
+    const session = this.repository.getSessionById(sessionId);
+    const tokenExpiration = new Date(session.sessionTokenExpiration).getTime();
+    const oneMinuteMargin = 60 * 1000;
+    const nextRotation = new Date().getTime() + constants.sessionDuration * 1000 + oneMinuteMargin;
+    if (nextRotation > tokenExpiration) {
+      await this.start(sessionId);
+    }
   }
 
   async stop(sessionId: string): Promise<void> {
@@ -76,7 +84,9 @@ export class AzureService extends SessionService {
 
   async delete(sessionId: string): Promise<void> {
     try {
-      await this.stop(sessionId);
+      if (this.repository.getSessionById(sessionId).status !== SessionStatus.inactive) {
+        await this.stop(sessionId);
+      }
       this.repository.deleteSession(sessionId);
       this.sessionNotifier.setSessions(this.repository.getSessions());
     } catch (error) {

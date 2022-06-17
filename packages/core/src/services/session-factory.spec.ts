@@ -9,13 +9,13 @@ describe("sessionFactory", () => {
     const awsIamRoleFederatedService: any = { name: "IamRoleFederated" };
     const awsIamRoleChainedService: any = { name: "IamRoleChained" };
     const awsSsoRoleService: any = { name: "SsoRole" };
-    const azureService: any = { name: "Azure" };
+    const azureSessionService: any = { name: "Azure" };
     const sessionFactory = new SessionFactory(
       awsIamUserService,
       awsIamRoleFederatedService,
       awsIamRoleChainedService,
       awsSsoRoleService,
-      azureService
+      azureSessionService
     );
 
     expect((sessionFactory.getSessionService(SessionType.awsIamUser) as any).name).toEqual("IamUser");

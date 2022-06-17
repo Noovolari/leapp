@@ -20,7 +20,8 @@
           <div class="form-field">
             <div class="form-group">
               <label>Integration type</label>
-              <ng-select formControlName="integrationType" bindLabel="label" bindValue="value" [clearable]="false" [items]="integrations" [(ngModel)]="selectedIntegration"></ng-select>
+              <ng-select formControlName="integrationType" bindLabel="label" bindValue="value" [clearable]="false" [items]="integrations" [(ngModel)]="selectedIntegration" *ngIf="modifying === 1"></ng-select>
+              <input class="form-control" type="text" value="{{getIntegrationLabel()}}" readonly="true" *ngIf="modifying === 2"/>
             </div>
           </div>
         </div>

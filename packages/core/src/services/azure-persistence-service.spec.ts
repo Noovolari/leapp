@@ -5,8 +5,15 @@ import * as fs from "fs";
 import * as zlib from "zlib";
 import * as process from "process";
 import * as path from "path";
+import { constants } from "../models/constants";
 
 describe("MsalPersistenceService", () => {
+  const keyChainService = {
+    deletePassword: jest.fn(async () => Promise.resolve(true)),
+    getSecret: jest.fn(async () => Promise.resolve("")),
+    saveSecret: jest.fn(async () => {}),
+  };
+
   const mockedMsal =
     "{\n" +
     '    "AccessToken": {\n' +
@@ -81,8 +88,8 @@ describe("MsalPersistenceService", () => {
     fs.writeFileSync(customTestPath, mockedMsal);
 
     const iNativeService: any = { os, fs, process, path };
-    const service = new AzurePersistenceService(iNativeService);
-    const parsedData = await service.loadMsalCache(customTestPath);
+    const service = new AzurePersistenceService(iNativeService, keyChainService as any);
+    const parsedData = await service.loadMsalCache();
 
     expect(parsedData).not.toBeNull();
     expect(parsedData.AccessToken["mocked-2"].secret).toBe("LZqJh_3rhnsCvqLNyZHOb5TH1x5v302XuwMg27w2nSQv_3Agx_5655Vk---feCdMjjAQrXug");
@@ -100,17 +107,45 @@ describe("MsalPersistenceService", () => {
       unprotectData: jest.fn(() => decompressedFile),
     };
     msalEncryptionService.protectData();
-    // Test data is "fakely
 
-    const iNativeService: any = { os, fs, process: { platform: "win32" }, path, msalEncryptionService };
-    const service = new AzurePersistenceService(iNativeService);
-    const parsedData = await service.loadMsalCache(customTestPath);
+    const myfs = {
+      readFileSync: jest.fn((p: string) => {
+        expect(p.indexOf(".azure/msal_token_cache.bin")).toBeGreaterThan(-1);
+        return compressedFile;
+      }),
+    };
+    const iNativeService: any = { os, fs: myfs, process: { platform: "win32" }, path, msalEncryptionService };
+
+    const service = new AzurePersistenceService(iNativeService, keyChainService as any);
+    const parsedData = await service.loadMsalCache();
 
     expect(parsedData).not.toBeNull();
     expect(parsedData.AccessToken["mocked-2"].secret).toBe("LZqJh_3rhnsCvqLNyZHOb5TH1x5v302XuwMg27w2nSQv_3Agx_5655Vk---feCdMjjAQrXug");
-    expect(msalEncryptionService.unprotectData).toHaveBeenCalledWith(fs.readFileSync(customTestPath), null, DataProtectionScope.currentUser);
+    expect(msalEncryptionService.unprotectData).toHaveBeenCalledWith(compressedFile, null, DataProtectionScope.currentUser);
 
     fs.unlinkSync(customTestPath);
+  });
+
+  test("load - mimic other system", async () => {
+    const msalEncryptionService = {
+      protectData: jest.fn(() => {}),
+      unprotectData: jest.fn(() => {}),
+    };
+    msalEncryptionService.protectData();
+
+    const myfs = {
+      readFileSync: jest.fn((p: string) => {
+        expect(p.indexOf(".azure/msal_token_cache.json")).toBeGreaterThan(-1);
+        return mockedMsal;
+      }),
+    };
+    const iNativeService: any = { os, fs: myfs, process: { platform: "macOs" }, path, msalEncryptionService };
+
+    const service = new AzurePersistenceService(iNativeService, keyChainService as any);
+    const parsedData = await service.loadMsalCache();
+
+    expect(parsedData).not.toBeNull();
+    expect(parsedData.AccessToken["mocked-2"].secret).toBe("LZqJh_3rhnsCvqLNyZHOb5TH1x5v302XuwMg27w2nSQv_3Agx_5655Vk---feCdMjjAQrXug");
   });
 
   test("load - mimic windows - check extension", async () => {
@@ -124,7 +159,8 @@ describe("MsalPersistenceService", () => {
     };
 
     const iNativeService: any = { os, fs: mockedFs, process: { platform: "win32" }, path, msalEncryptionService };
-    const service = new AzurePersistenceService(iNativeService);
+
+    const service = new AzurePersistenceService(iNativeService, keyChainService as any);
     await service.loadMsalCache();
 
     expect(mockedFs.readFileSync).toHaveBeenCalledWith(path.join(os.homedir(), `.azure/msal_token_cache.bin`));
@@ -139,13 +175,117 @@ describe("MsalPersistenceService", () => {
       process,
       path,
     };
-    const service = new AzurePersistenceService(iNativeService);
-    const parsedData = await service.loadMsalCache(customTestPath);
+    const service = new AzurePersistenceService(iNativeService, keyChainService as any);
+    const parsedData = await service.loadMsalCache();
     parsedData["RefreshToken"] = {};
     await service.saveMsalCache(parsedData);
     const newParsedData = await service.loadMsalCache();
     expect(newParsedData).toEqual(parsedData);
 
     fs.unlinkSync(customTestPath);
+  });
+
+  test("load profile", async () => {
+    const mockedProfile = '{ "profile": "mockedProfile" }';
+    const mockedFs = {
+      readFileSync: jest.fn(() => mockedProfile),
+    };
+
+    const iNativeService: any = {
+      os: { homedir: jest.fn(() => "a/") },
+      fs: mockedFs,
+      process,
+      path: { join: jest.fn((_s1, _s2) => path.join(_s1, _s2)) },
+    };
+    const service = new AzurePersistenceService(iNativeService, null);
+
+    const load = (service as any).getProfileLocation;
+
+    (service as any).getProfileLocation = jest.fn(() => {
+      load.apply(service);
+
+      expect(iNativeService.os.homedir).toHaveBeenCalled();
+      expect(iNativeService.path.join).toHaveBeenCalledWith("a/", ".azure/azureProfile.json");
+      return path.join(iNativeService.os.homedir(), ".azure/azureProfile.json");
+    });
+    const result = await service.loadProfile();
+    expect(result).toStrictEqual(JSON.parse(mockedProfile));
+  });
+
+  test("save profile", async () => {
+    const mockedProfile = { profile: "mockedProfile" };
+    let resultData;
+    const mockedFs = {
+      writeFileSync: jest.fn((location, data) => {
+        expect(location).toStrictEqual("a/.azure/azureProfile.json");
+        expect(data).toStrictEqual(JSON.stringify(mockedProfile, null, 4));
+        resultData = data;
+      }),
+    };
+
+    const iNativeService: any = {
+      os: { homedir: jest.fn(() => "a/") },
+      fs: mockedFs,
+      process,
+      path: { join: jest.fn((_s1, _s2) => path.join(_s1, _s2)) },
+    };
+    const service = new AzurePersistenceService(iNativeService, null);
+    const load = (service as any).getProfileLocation;
+
+    (service as any).getProfileLocation = jest.fn(() => {
+      load.apply(service);
+
+      expect(iNativeService.os.homedir).toHaveBeenCalled();
+      expect(iNativeService.path.join).toHaveBeenCalledWith("a/", ".azure/azureProfile.json");
+      return path.join(iNativeService.os.homedir(), ".azure/azureProfile.json");
+    });
+
+    await service.saveProfile(mockedProfile as any);
+    expect(JSON.parse(JSON.stringify(mockedProfile))).toStrictEqual(JSON.parse(resultData));
+  });
+
+  test("getAzureSecrets", async () => {
+    const intId = "fake-integration-id";
+    const mockedKeyChain = {
+      deletePassword: jest.fn(async () => Promise.resolve(true)),
+      getSecret: jest.fn(async (_, str) => {
+        let value;
+        console.log(str);
+        if (str.indexOf(`azure-integration-profile-${intId}`) > -1) {
+          value = JSON.stringify({ p: "profile" });
+        }
+        if (str.indexOf(`azure-integration-account-${intId}`) > -1) {
+          value = JSON.stringify({ a: "account" });
+        }
+        if (str.indexOf(`azure-integration-refresh-token-${intId}`) > -1) {
+          value = JSON.stringify({ r: "rtoken" });
+        }
+        Promise.resolve(value);
+      }),
+      saveSecret: jest.fn(async () => {}),
+    };
+
+    const result = {
+      profile: { p: "profile" },
+      account: { a: "account" },
+      refreshToken: { r: "rtoken" },
+    };
+
+    const iNativeService: any = {
+      os,
+      fs,
+      process,
+      path,
+    };
+
+    const service = new AzurePersistenceService(iNativeService, mockedKeyChain as any);
+    expect(await service.getAzureSecrets(intId)).toStrictEqual(result);
+    expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(
+      3,
+      constants.appName,
+      `azure-integration-account-${intId}`,
+      `azure-integration-refresh-token-${intId}`,
+      `azure-integration-profile-${intId}`
+    );
   });
 });

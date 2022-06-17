@@ -8,7 +8,7 @@ import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service"
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
-import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { AppNativeService } from "./app-native.service";
 import { AppMfaCodePromptService } from "./app-mfa-code-prompt.service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
@@ -58,7 +58,7 @@ export class AppProviderService {
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private awsCoreServiceInstance: AwsCoreService;
-  private azureServiceInstance: AzureService;
+  private azureServiceInstance: AzureSessionService;
   private azureIntegrationServiceInstance: AzureIntegrationService;
   private authenticationServiceInstance: AwsSamlAssertionExtractionService;
   private sessionFactoryInstance: SessionFactory;
@@ -221,9 +221,9 @@ export class AppProviderService {
     return this.awsCoreServiceInstance;
   }
 
-  public get azureService(): AzureService {
+  public get azureSessionService(): AzureSessionService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(
+      this.azureServiceInstance = new AzureSessionService(
         this.behaviouralSubjectService,
         this.repository,
         this.fileService,
@@ -246,7 +246,7 @@ export class AppProviderService {
         this.appNativeService,
         this.sessionFactory,
         this.executeService,
-        this.azureService,
+        this.azureSessionService,
         this.azurePersistenceService
       );
     }
@@ -274,7 +274,7 @@ export class AppProviderService {
         this.awsIamRoleFederatedService,
         this.awsIamRoleChainedService,
         this.awsSsoRoleService,
-        this.azureService
+        this.azureSessionService
       );
     }
     return this.sessionFactoryInstance;

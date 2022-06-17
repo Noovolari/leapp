@@ -81,8 +81,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   menuX: number;
   menuY: number;
 
-  isOnlineArray = {};
-
   public behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoRoleService: AwsSsoRoleService;
   private awsSsoOidcService: AwsSsoOidcService;
@@ -213,7 +211,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   async logout(integrationId: string): Promise<void> {
     this.logoutLoadings[integrationId] = true;
     const integration = this.getIntegration(integrationId);
-    console.log("INTEGRATION", integration);
     if (integration.type !== IntegrationType.azure) {
       this.appProviderService.awsSsoIntegrationService.logout(integration.id);
     } else {
@@ -230,6 +227,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   async forceSync(integrationId: string): Promise<void> {
     const integration = this.getIntegration(integrationId);
+
     if (integration.type === IntegrationType.awsSso) {
       await this.forceSyncAwsSso(integrationId);
     } else {
@@ -352,7 +350,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   async save(): Promise<void> {
     // TODO: Add spinner since the Azure is async...
     if (this.formValid()) {
-      const type = this.form.get("integrationType").value;
       const alias = this.form.get("alias").value?.trim();
       const portalUrl = this.form.get("portalUrl").value?.trim();
       const region = this.form.get("awsRegion").value;
@@ -360,6 +357,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       const tenantId = this.form.get("tenantId").value;
 
       if (this.modifying === 1) {
+        const type = this.form.get("integrationType").value;
         // Save
         if (type !== IntegrationType.azure.toString()) {
           await this.appProviderService.awsSsoIntegrationService.createIntegration({ alias, browserOpening, portalUrl, region });
@@ -369,7 +367,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       } else if (this.modifying === 2 && this.selectedConfiguration.portalUrl !== "") {
         // Edit
         // eslint-disable-next-line max-len
-        if (type === IntegrationType.awsSso) {
+        if (this.selectedIntegration === IntegrationType.awsSso) {
           this.appProviderService.awsSsoIntegrationService.updateIntegration(this.selectedConfiguration.id, {
             alias,
             region,
@@ -377,6 +375,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
             browserOpening,
           });
         } else {
+          if (tenantId !== this.selectedConfiguration.tenantId) {
+            await this.appProviderService.azureIntegrationService.logout(this.selectedConfiguration.id);
+          }
           this.appProviderService.azureIntegrationService.updateIntegration(this.selectedConfiguration.id, {
             alias,
             tenantId,
@@ -438,5 +439,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     } else {
       return this.form.get("alias").valid && this.form.get("tenantId").valid;
     }
+  }
+
+  getIntegrationLabel() {
+    return this.integrations.find((i) => i.value === this.selectedIntegration).label;
   }
 }

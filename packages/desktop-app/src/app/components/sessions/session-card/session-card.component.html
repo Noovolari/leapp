@@ -70,10 +70,12 @@
     <span>&nbsp;&nbsp;Change</span>
   </button>
 
-  <button mat-menu-item (click)="ssmModalOpen($event);">
-    <i class="moon-Server"></i>&nbsp;
-    <span>View SSM Sessions</span>
-  </button>
+  <ng-container *ngIf="session.type !== eSessionType.azure">
+    <button mat-menu-item (click)="ssmModalOpen($event);">
+      <i class="moon-Server"></i>&nbsp;
+      <span>View SSM Sessions</span>
+    </button>
+  </ng-container>
 
   <ng-container *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained">
     <button mat-menu-item (click)="openAwsWebConsole($event);">

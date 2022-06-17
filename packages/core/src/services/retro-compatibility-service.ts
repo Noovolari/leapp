@@ -147,8 +147,6 @@ export class RetroCompatibilityService {
   }*/
 
   async applyWorkspaceMigrations(): Promise<void> {
-    console.log("MIGRATE");
-
     if (this.isRetroPatchNecessary()) {
       await this.adaptOldWorkspaceFile();
     }

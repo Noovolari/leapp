@@ -60,6 +60,7 @@ export class AzureService extends SessionService {
   }
 
   async rotate(sessionId: string): Promise<void> {
+    // Check if the access token will expire in the next (constants.sessionDuration seconds + 5min cushion)
     return this.start(sessionId);
   }
 

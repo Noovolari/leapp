@@ -98,7 +98,7 @@ export class AzureIntegrationService implements IIntegrationService {
 
   remainingHours(_integration: Integration): string {
     // Todo: handle azure remaining time if necessary
-    return "8hrs";
+    return "90 days";
   }
 
   async syncSessions(integrationId: string): Promise<any> {

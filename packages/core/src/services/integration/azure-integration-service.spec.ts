@@ -358,7 +358,7 @@ describe("AzureIntegrationService", () => {
     const service = new AzureIntegrationService(null, null, null, null, null, null, null);
     const remainingHours = service.remainingHours(null);
 
-    expect(remainingHours).toBe("8hrs");
+    expect(remainingHours).toBe("90 days");
   });
 
   test("notifyIntegrationChanges", async () => {

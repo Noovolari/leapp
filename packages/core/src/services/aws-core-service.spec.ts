@@ -31,6 +31,9 @@ describe("awsCoreService", () => {
         region: "ap-southeast-2",
       },
       {
+        region: "ap-southeast-3",
+      },
+      {
         region: "ca-central-1",
       },
       {

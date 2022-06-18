@@ -14,6 +14,7 @@ export class AwsCoreService {
     ["ap-south-1", "https://sts.ap-south-1.amazonaws.com"],
     ["ap-southeast-1", "https://sts.ap-southeast-1.amazonaws.com"],
     ["ap-southeast-2", "https://sts.ap-southeast-2.amazonaws.com"],
+    ["ap-southeast-3", "https://sts.ap-southeast-3.amazonaws.com"],
     ["ca-central-1", "https://sts.ca-central-1.amazonaws.com"],
     ["cn-north-1", "https://sts.cn-north-1.amazonaws.com.cn"],
     ["cn-northwest-1", "https://sts.cn-northwest-1.amazonaws.com.cn"],

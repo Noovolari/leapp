@@ -67,15 +67,44 @@ export class AzureSessionService extends SessionService {
       .map((sess: AzureSession) => sess.subscriptionId);
     let sessionTokenExpiration;
     try {
-      await this.restoreSecretsFromKeychain(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
       await this.executeService.execute(`az configure --default location=${session.region}`);
-      // TODO: execute this command only if there are no others sessions already active for this integration
-      // TODO: execute this command only if access token is expired. Where are we going to store the access token expiration? See the TODO below...
-      await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`, undefined, true);
-      // TODO: save access token expiration as an integration property
-      const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
-      await this.moveRefreshTokenToKeychain(msalTokenCache, session.azureIntegrationId, session.tenantId);
-      sessionTokenExpiration = await this.getAccessTokenExpiration(msalTokenCache, session.tenantId);
+
+      const activeSessions = this.repository
+        .getSessions()
+        .filter(
+          (sess: AzureSession) =>
+            sess.type === SessionType.azure && sess.status === SessionStatus.active && sess.azureIntegrationId === session.azureIntegrationId
+        );
+
+      const integration = this.repository.getAzureIntegration(session.azureIntegrationId);
+      const tokenExpiration = new Date(integration.tokenExpiration).getTime();
+      const currentTime = new Date().getTime();
+
+      //TODO: refactor this if statement
+      if (tokenExpiration === undefined || currentTime > tokenExpiration || activeSessions.length === 0) {
+        await this.restoreSecretsFromKeychain(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
+        await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`, undefined, true);
+        const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
+        const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === session.tenantId);
+        this.repository.updateAzureIntegration(
+          integration.id,
+          integration.alias,
+          integration.tenantId,
+          integration.region,
+          integration.isOnline,
+          accessToken.expires_on
+        );
+        await this.moveRefreshTokenToKeychain(msalTokenCache, session.azureIntegrationId, session.tenantId);
+        sessionTokenExpiration = await this.getAccessTokenExpiration(msalTokenCache, session.tenantId);
+      } else {
+        const secrets = await this.azurePersistenceService.getAzureSecrets(integration.id);
+        const profile = secrets.profile;
+        const subscriptions = profile.subscriptions
+          .filter((sub) => subscriptionIdsToStart.includes(sub.id))
+          .map((sub) => Object.assign(sub, { isDefault: sub.id === session.subscriptionId }));
+        profile.subscriptions = subscriptions;
+        await this.azurePersistenceService.saveProfile(profile);
+      }
     } catch (err) {
       this.sessionDeactivated(sessionId);
       throw new LoggedException(err.message, this, LogLevel.warn);
@@ -85,11 +114,15 @@ export class AzureSessionService extends SessionService {
 
   async rotate(sessionId: string): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
-    const tokenExpiration = new Date(session.sessionTokenExpiration).getTime();
-    const oneMinuteMargin = 60 * 1000;
-    const nextRotation = new Date().getTime() + constants.sessionDuration * 1000 + oneMinuteMargin;
-    if (nextRotation > tokenExpiration) {
-      await this.start(sessionId);
+    const integration = this.repository.getAzureIntegration((session as AzureSession).azureIntegrationId);
+    const currentTime = new Date().getTime();
+    const tokenExpiration = new Date(integration.tokenExpiration).getTime();
+    if (currentTime > tokenExpiration) {
+      const oneMinuteMargin = 60 * 1000;
+      const nextRotation = new Date().getTime() + constants.sessionDuration * 1000 + oneMinuteMargin;
+      if (nextRotation > tokenExpiration) {
+        await this.start(sessionId);
+      }
     }
   }
 
@@ -106,7 +139,7 @@ export class AzureSessionService extends SessionService {
 
       if (profile.subscriptions.length > 1) {
         newProfileSubscriptions = profile.subscriptions.filter((sub) => sub.id !== subscriptionId);
-        if (newProfileSubscriptions.filter((sub) => sub.isDefault === false).length === 0) {
+        if (newProfileSubscriptions.filter((sub) => sub.isDefault === true).length === 0) {
           newProfileSubscriptions[0].isDefault = true;
         }
         profile.subscriptions = newProfileSubscriptions;

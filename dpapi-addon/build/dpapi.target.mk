@@ -13,8 +13,6 @@ DEFS_Debug := \
 	'-D_DARWIN_USE_64_BIT_INODE=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
-	'-DOPENSSL_NO_PINSHARED' \
-	'-DOPENSSL_THREADS' \
 	'-DBUILDING_NODE_EXTENSION' \
 	'-DDEBUG' \
 	'-D_DEBUG' \
@@ -24,7 +22,7 @@ DEFS_Debug := \
 CFLAGS_Debug := \
 	-O0 \
 	-gdwarf-2 \
-	-mmacosx-version-min=10.13 \
+	-mmacosx-version-min=10.15 \
 	-arch x86_64 \
 	-Wall \
 	-Wendif-labels \
@@ -37,7 +35,7 @@ CFLAGS_C_Debug := \
 
 # Flags passed to only C++ files.
 CFLAGS_CC_Debug := \
-	-std=gnu++14 \
+	-std=gnu++17 \
 	-stdlib=libc++ \
 	-fno-rtti \
 	-fno-exceptions \
@@ -50,13 +48,13 @@ CFLAGS_OBJC_Debug :=
 CFLAGS_OBJCC_Debug :=
 
 INCS_Debug := \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/include/node \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/src \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/openssl/config \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/openssl/openssl/include \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/uv/include \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/zlib \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/v8/include \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/include/node \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/src \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/openssl/config \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/openssl/openssl/include \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/uv/include \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/zlib \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/v8/include \
 	-I$(srcdir)/node_modules/nan \
 	-I$(srcdir)/include
 
@@ -71,15 +69,14 @@ DEFS_Release := \
 	'-D_DARWIN_USE_64_BIT_INODE=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
-	'-DOPENSSL_NO_PINSHARED' \
-	'-DOPENSSL_THREADS' \
 	'-DBUILDING_NODE_EXTENSION'
 
 # Flags passed to all source files.
 CFLAGS_Release := \
 	-O3 \
 	-gdwarf-2 \
-	-mmacosx-version-min=10.13 \
+	-flto \
+	-mmacosx-version-min=10.15 \
 	-arch x86_64 \
 	-Wall \
 	-Wendif-labels \
@@ -92,7 +89,7 @@ CFLAGS_C_Release := \
 
 # Flags passed to only C++ files.
 CFLAGS_CC_Release := \
-	-std=gnu++14 \
+	-std=gnu++17 \
 	-stdlib=libc++ \
 	-fno-rtti \
 	-fno-exceptions \
@@ -105,13 +102,13 @@ CFLAGS_OBJC_Release :=
 CFLAGS_OBJCC_Release :=
 
 INCS_Release := \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/include/node \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/src \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/openssl/config \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/openssl/openssl/include \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/uv/include \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/zlib \
-	-I/Users/ericvilla/Library/Caches/node-gyp/16.14.0/deps/v8/include \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/include/node \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/src \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/openssl/config \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/openssl/openssl/include \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/uv/include \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/zlib \
+	-I/Users/riccardorotta/Library/Caches/node-gyp/18.1.0/deps/v8/include \
 	-I$(srcdir)/node_modules/nan \
 	-I$(srcdir)/include
 
@@ -147,7 +144,7 @@ $(obj).$(TOOLSET)/$(TARGET)/%.o: $(obj)/%.cpp FORCE_DO_CMD
 LDFLAGS_Debug := \
 	-undefined dynamic_lookup \
 	-Wl,-search_paths_first \
-	-mmacosx-version-min=10.13 \
+	-mmacosx-version-min=10.15 \
 	-arch x86_64 \
 	-L$(builddir) \
 	-stdlib=libc++
@@ -159,7 +156,7 @@ LIBTOOLFLAGS_Debug := \
 LDFLAGS_Release := \
 	-undefined dynamic_lookup \
 	-Wl,-search_paths_first \
-	-mmacosx-version-min=10.13 \
+	-mmacosx-version-min=10.15 \
 	-arch x86_64 \
 	-L$(builddir) \
 	-stdlib=libc++

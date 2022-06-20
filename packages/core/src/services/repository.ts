@@ -325,7 +325,7 @@ export class Repository {
     this.persistWorkspace(workspace);
   }
 
-  updateAzureIntegration(id: string, alias: string, tenantId: string, region: string, isOnline: boolean): void {
+  updateAzureIntegration(id: string, alias: string, tenantId: string, region: string, isOnline: boolean, tokenExpiration?: string): void {
     const workspace = this.getWorkspace();
     const index = workspace.azureIntegrations.findIndex((integration) => integration.id === id);
     if (index > -1) {
@@ -333,6 +333,7 @@ export class Repository {
       workspace.azureIntegrations[index].tenantId = tenantId;
       workspace.azureIntegrations[index].isOnline = isOnline;
       workspace.azureIntegrations[index].region = region;
+      workspace.azureIntegrations[index].tokenExpiration = tokenExpiration;
       this.persistWorkspace(workspace);
     }
   }

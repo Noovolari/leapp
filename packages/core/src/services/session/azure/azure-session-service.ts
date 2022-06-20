@@ -69,7 +69,10 @@ export class AzureSessionService extends SessionService {
     try {
       await this.restoreSecretsFromKeychain(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
       await this.executeService.execute(`az configure --default location=${session.region}`);
+      // TODO: execute this command only if there are no others sessions already active for this integration
+      // TODO: execute this command only if access token is expired. Where are we going to store the access token expiration? See the TODO below...
       await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`, undefined, true);
+      // TODO: save access token expiration as an integration property
       const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
       await this.moveRefreshTokenToKeychain(msalTokenCache, session.azureIntegrationId, session.tenantId);
       sessionTokenExpiration = await this.getAccessTokenExpiration(msalTokenCache, session.tenantId);
@@ -93,7 +96,26 @@ export class AzureSessionService extends SessionService {
   async stop(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
     try {
-      await this.executeService.execute("az logout");
+      const subscriptionId = this.repository
+        .getSessions()
+        .filter((sess: AzureSession) => sess.sessionId === sessionId)
+        .map((sess2: AzureSession) => sess2.subscriptionId)[0];
+
+      const profile = await this.azurePersistenceService.loadProfile();
+      let newProfileSubscriptions = [];
+
+      if (profile.subscriptions.length > 1) {
+        newProfileSubscriptions = profile.subscriptions.filter((sub) => sub.id !== subscriptionId);
+        if (newProfileSubscriptions.filter((sub) => sub.isDefault === false).length === 0) {
+          newProfileSubscriptions[0].isDefault = true;
+        }
+        profile.subscriptions = newProfileSubscriptions;
+        await this.azurePersistenceService.saveProfile(profile);
+      } else {
+        await this.executeService.execute("az logout");
+        profile.subscriptions = [];
+        await this.azurePersistenceService.saveProfile(profile);
+      }
     } catch (err) {
       this.logService.log(new LoggedEntry(err.message, this, LogLevel.warn));
     } finally {

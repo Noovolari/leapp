@@ -172,6 +172,7 @@ export class AzureSessionService extends SessionService {
     return false;
   }
 
+  // TODO: split this method in restoreTokens() and restoreProfiles()
   private async restoreSecretsFromKeychain(integrationId: string, subscriptionIds: string[], defaultSubscriptionId: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     let msalTokenCache = { Account: {}, IdToken: {}, AccessToken: {}, RefreshToken: {}, AppMetadata: {} } as JsonCache;

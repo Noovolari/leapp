@@ -1,4 +1,4 @@
-import { expect, describe, test } from "@jest/globals";
+import { expect, describe, test, jest } from "@jest/globals";
 import { AzurePersistenceService, DataProtectionScope } from "./azure-persistence-service";
 import * as os from "os";
 import * as fs from "fs";
@@ -179,6 +179,7 @@ describe("MsalPersistenceService", () => {
       path,
     };
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
+    (service as any).getMsalCacheLocation = () => customTestPath;
     const parsedData = await service.loadMsalCache();
     parsedData["RefreshToken"] = {};
     await service.saveMsalCache(parsedData);
@@ -251,9 +252,8 @@ describe("MsalPersistenceService", () => {
     const intId = "fake-integration-id";
     const mockedKeyChain = {
       deletePassword: jest.fn(async () => Promise.resolve(true)),
-      getSecret: jest.fn(async (_, str) => {
+      getSecret: jest.fn(async (_, str: string): Promise<string> => {
         let value;
-        console.log(str);
         if (str.indexOf(`azure-integration-profile-${intId}`) > -1) {
           value = JSON.stringify({ p: "profile" });
         }
@@ -263,7 +263,7 @@ describe("MsalPersistenceService", () => {
         if (str.indexOf(`azure-integration-refresh-token-${intId}`) > -1) {
           value = JSON.stringify({ r: "rtoken" });
         }
-        Promise.resolve(value);
+        return value;
       }),
       saveSecret: jest.fn(async () => {}),
     };
@@ -284,12 +284,8 @@ describe("MsalPersistenceService", () => {
     const service = new AzurePersistenceService(iNativeService, mockedKeyChain as any);
 
     expect(await service.getAzureSecrets(intId)).toStrictEqual(result);
-    expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(
-      3,
-      constants.appName,
-      `azure-integration-account-${intId}`,
-      `azure-integration-refresh-token-${intId}`,
-      `azure-integration-profile-${intId}`
-    );
+    expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(1, constants.appName, `azure-integration-profile-${intId}`);
+    expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(2, constants.appName, `azure-integration-account-${intId}`);
+    expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(3, constants.appName, `azure-integration-refresh-token-${intId}`);
   });
 });

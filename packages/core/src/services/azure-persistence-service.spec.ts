@@ -89,6 +89,9 @@ describe("MsalPersistenceService", () => {
 
     const iNativeService: any = { os, fs, process, path };
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
+
+    (service as any).getMsalCacheLocation = () => customTestPath;
+
     const parsedData = await service.loadMsalCache();
 
     expect(parsedData).not.toBeNull();
@@ -279,6 +282,7 @@ describe("MsalPersistenceService", () => {
     };
 
     const service = new AzurePersistenceService(iNativeService, mockedKeyChain as any);
+
     expect(await service.getAzureSecrets(intId)).toStrictEqual(result);
     expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(
       3,

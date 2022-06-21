@@ -43,7 +43,10 @@ describe("AzureSessionService", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2022, 12, 1, 10, 0, 0, 0));
     const sessionTokenExpiration = new Date(2022, 12, 1, 10, 21, 0, 0).toISOString();
-    const repository = { getSessionById: () => ({ sessionTokenExpiration }) } as any;
+    const repository = {
+      getSessionById: () => ({ integrationId: "fakeIntegrationId" }),
+      getAzureIntegration: () => ({ tokenExpiration: sessionTokenExpiration }),
+    } as any;
 
     const azureSessionService = new AzureSessionService(null, repository, null, null, null, null, null, null);
     azureSessionService.start = jest.fn(async () => null);
@@ -56,7 +59,10 @@ describe("AzureSessionService", () => {
     jest.useFakeTimers("modern");
     jest.setSystemTime(new Date(2022, 12, 1, 10, 0, 0, 1));
     const sessionTokenExpiration = new Date(2022, 12, 1, 10, 21, 0, 0).toISOString();
-    const repository = { getSessionById: () => ({ sessionTokenExpiration }) } as any;
+    const repository = {
+      getSessionById: () => ({ integrationId: "fakeIntegrationId" }),
+      getAzureIntegration: () => ({ tokenExpiration: sessionTokenExpiration }),
+    } as any;
 
     const azureSessionService = new AzureSessionService(null, repository, null, null, null, null, null, null);
     azureSessionService.start = jest.fn(async () => null);
@@ -65,13 +71,16 @@ describe("AzureSessionService", () => {
     expect(azureSessionService.start).toHaveBeenCalled();
   });
 
-  test("stop, 'az logout' command is executed when session is in pending state", () => {
+  test("stop, 'az logout' command is executed when profile contains less than 2 subscriptions", () => {
     const azureSession = new AzureSession("fake-session-name", "fake-region", "fake-subscription-id", "fake-tenant-id", "fake-azure-integration-id");
     azureSession.status = SessionStatus.active;
 
     const repository = {
+      getSessionById: () => ({}),
       getSessions: () => [azureSession],
       updateSessions: () => {},
+      getAzureIntegration: () => ({}),
+      updateAzureIntegration: () => {},
     } as any;
 
     const sessionNotifier = {
@@ -84,66 +93,50 @@ describe("AzureSessionService", () => {
       },
     } as any;
 
-    const azureSessionService = new AzureSessionService(sessionNotifier, repository, null, executeService, null, null, null, null);
+    const azurePersistenceService = {
+      loadProfile: () => ({ subscriptions: [{}] }),
+    } as any;
+
+    const logger = {
+      log: (loggedEntry: LoggedEntry) => {
+        console.log(loggedEntry);
+      },
+    } as any;
+
+    const azureSessionService = new AzureSessionService(
+      sessionNotifier,
+      repository,
+      null,
+      executeService,
+      null,
+      null,
+      azurePersistenceService,
+      logger
+    );
 
     azureSessionService.stop(azureSession.sessionId);
   });
 
-  test("stop, sessionDeactivated is called once after 'az logout' command execution", async () => {
+  test("stop, logService's log is called if an error is thrown inside try catch block", async () => {
     const azureSession = new AzureSession("fake-session-name", "fake-region", "fake-subscription-id", "fake-tenant-id", "fake-azure-integration-id");
     azureSession.status = SessionStatus.active;
-
-    const repository = {
-      getSessions: () => [azureSession],
-      updateSessions: () => {},
-    } as any;
-
-    const sessionNotifier = {
-      setSessions: () => {},
-    } as any;
-
-    const executeService = {
-      execute: jest.fn(() => {}),
-    } as any;
-
-    const azureSessionService = new AzureSessionService(sessionNotifier, repository, null, executeService, null, null, null, null);
-
-    azureSessionService.sessionDeactivated = jest.fn(() => {
-      expect(executeService.execute).toHaveBeenNthCalledWith(1, "az logout");
-    });
-
-    await azureSessionService.stop(azureSession.sessionId);
-
-    expect(azureSessionService.sessionDeactivated).toHaveBeenNthCalledWith(1, azureSession.sessionId);
-  });
-
-  test("stop, logService's log is called if executeService's execute throw error", async () => {
-    const azureSession = new AzureSession("fake-session-name", "fake-region", "fake-subscription-id", "fake-tenant-id", "fake-azure-integration-id");
-    azureSession.status = SessionStatus.active;
-
-    const repository = {
-      getSessions: () => [azureSession],
-      updateSessions: () => {},
-    } as any;
-
-    const sessionNotifier = {
-      setSessions: () => {},
-    } as any;
 
     const error = new Error("fake-error");
 
-    const executeService = {
-      execute: () => {
+    const repository = {
+      getSessionById: () => {
         throw error;
       },
+      getSessions: () => ["fakeId"],
     } as any;
 
     const logService = {
       log: jest.fn(() => {}),
-    };
+    } as any;
 
-    const azureSessionService = new AzureSessionService(sessionNotifier, repository, null, executeService, null, null, null, logService);
+    const azureSessionService = new AzureSessionService(null, repository, null, null, null, null, null, logService);
 
+    (azureSessionService as any).sessionLoading = jest.fn();
     await azureSessionService.stop(azureSession.sessionId);
 
     expect(logService.log).toHaveBeenNthCalledWith(1, new LoggedEntry(error.message, this, LogLevel.warn));

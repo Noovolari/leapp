@@ -46,15 +46,7 @@ export class AzureSessionService extends SessionService {
 
   async start(sessionId: string): Promise<void> {
     const session = this.repository.getSessionById(sessionId) as AzureSession;
-    const sessionsToStop = this.repository
-      .getSessions()
-      .filter(
-        (sess: AzureSession) =>
-          sess.type === SessionType.azure && sess.status !== SessionStatus.inactive && sess.azureIntegrationId === session.azureIntegrationId
-      );
-    for (const sess of sessionsToStop) {
-      await this.stop(sess.sessionId);
-    }
+    await this.stopSessionsByIntegrationId(session.azureIntegrationId);
     this.sessionLoading(sessionId);
     const subscriptionIdsToStart = this.repository
       .getSessions()
@@ -100,14 +92,13 @@ export class AzureSessionService extends SessionService {
   async rotate(sessionId: string): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
     const integration = this.repository.getAzureIntegration((session as AzureSession).azureIntegrationId);
-    const currentTime = new Date().getTime();
+
     const tokenExpiration = new Date(integration.tokenExpiration).getTime();
-    if (currentTime > tokenExpiration) {
-      const oneMinuteMargin = 60 * 1000;
-      const nextRotation = new Date().getTime() + constants.sessionDuration * 1000 + oneMinuteMargin;
-      if (nextRotation > tokenExpiration) {
-        await this.start(sessionId);
-      }
+    const oneMinuteMargin = 60 * 1000;
+    const nextRotation = new Date().getTime() + constants.sessionDuration * 1000 + oneMinuteMargin;
+
+    if (nextRotation > tokenExpiration) {
+      await this.start(sessionId);
     }
   }
 
@@ -205,5 +196,16 @@ export class AzureSessionService extends SessionService {
       .map((sub) => Object.assign(sub, { isDefault: sub.id === subscriptionId }));
     profile.subscriptions = subscriptions;
     await this.azurePersistenceService.saveProfile(profile);
+  }
+
+  private async stopSessionsByIntegrationId(integrationId: string): Promise<void> {
+    const sessionsToStop = this.repository
+      .getSessions()
+      .filter(
+        (sess: AzureSession) => sess.type === SessionType.azure && sess.status !== SessionStatus.inactive && sess.azureIntegrationId === integrationId
+      );
+    for (const sess of sessionsToStop) {
+      await this.stop(sess.sessionId);
+    }
   }
 }

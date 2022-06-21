@@ -45,17 +45,17 @@ export class AzureSessionService extends SessionService {
   }
 
   async start(sessionId: string): Promise<void> {
-    this.sessionLoading(sessionId);
     const session = this.repository.getSessionById(sessionId) as AzureSession;
     const sessionsToStop = this.repository
       .getSessions()
       .filter(
         (sess: AzureSession) =>
-          sess.type === SessionType.azure && sess.status !== SessionStatus.inactive && sess.azureIntegrationId !== session.azureIntegrationId
+          sess.type === SessionType.azure && sess.status !== SessionStatus.inactive && sess.azureIntegrationId === session.azureIntegrationId
       );
     for (const sess of sessionsToStop) {
       await this.stop(sess.sessionId);
     }
+    this.sessionLoading(sessionId);
     const subscriptionIdsToStart = this.repository
       .getSessions()
       .filter(
@@ -69,20 +69,13 @@ export class AzureSessionService extends SessionService {
     try {
       await this.executeService.execute(`az configure --default location=${session.region}`);
 
-      const activeSessions = this.repository
-        .getSessions()
-        .filter(
-          (sess: AzureSession) =>
-            sess.type === SessionType.azure && sess.status === SessionStatus.active && sess.azureIntegrationId === session.azureIntegrationId
-        );
-
       const integration = this.repository.getAzureIntegration(session.azureIntegrationId);
       const tokenExpiration = new Date(integration.tokenExpiration).getTime();
       const currentTime = new Date().getTime();
+      await this.updateProfiles(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
 
-      //TODO: refactor this if statement
-      if (tokenExpiration === undefined || currentTime > tokenExpiration || activeSessions.length === 0) {
-        await this.restoreSecretsFromKeychain(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
+      if (integration.tokenExpiration === undefined || currentTime > tokenExpiration) {
+        await this.restoreSecretsFromKeychain(session.azureIntegrationId);
         await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`, undefined, true);
         const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
         const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === session.tenantId);
@@ -96,14 +89,6 @@ export class AzureSessionService extends SessionService {
         );
         await this.moveRefreshTokenToKeychain(msalTokenCache, session.azureIntegrationId, session.tenantId);
         sessionTokenExpiration = await this.getAccessTokenExpiration(msalTokenCache, session.tenantId);
-      } else {
-        const secrets = await this.azurePersistenceService.getAzureSecrets(integration.id);
-        const profile = secrets.profile;
-        const subscriptions = profile.subscriptions
-          .filter((sub) => subscriptionIdsToStart.includes(sub.id))
-          .map((sub) => Object.assign(sub, { isDefault: sub.id === session.subscriptionId }));
-        profile.subscriptions = subscriptions;
-        await this.azurePersistenceService.saveProfile(profile);
       }
     } catch (err) {
       this.sessionDeactivated(sessionId);
@@ -129,10 +114,8 @@ export class AzureSessionService extends SessionService {
   async stop(sessionId: string): Promise<void> {
     this.sessionLoading(sessionId);
     try {
-      const subscriptionId = this.repository
-        .getSessions()
-        .filter((sess: AzureSession) => sess.sessionId === sessionId)
-        .map((sess2: AzureSession) => sess2.subscriptionId)[0];
+      const session = this.repository.getSessionById(sessionId) as AzureSession;
+      const subscriptionId = session.subscriptionId;
 
       const profile = await this.azurePersistenceService.loadProfile();
       let newProfileSubscriptions = [];
@@ -146,8 +129,15 @@ export class AzureSessionService extends SessionService {
         await this.azurePersistenceService.saveProfile(profile);
       } else {
         await this.executeService.execute("az logout");
-        profile.subscriptions = [];
-        await this.azurePersistenceService.saveProfile(profile);
+        const integration = this.repository.getAzureIntegration(session.azureIntegrationId);
+        this.repository.updateAzureIntegration(
+          integration.id,
+          integration.alias,
+          integration.tenantId,
+          integration.region,
+          integration.isOnline,
+          undefined
+        );
       }
     } catch (err) {
       this.logService.log(new LoggedEntry(err.message, this, LogLevel.warn));
@@ -172,13 +162,14 @@ export class AzureSessionService extends SessionService {
     return false;
   }
 
-  // TODO: split this method in restoreTokens() and restoreProfiles()
-  private async restoreSecretsFromKeychain(integrationId: string, subscriptionIds: string[], defaultSubscriptionId: string): Promise<void> {
+  private async restoreSecretsFromKeychain(integrationId: string): Promise<void> {
     // eslint-disable-next-line @typescript-eslint/naming-convention
     let msalTokenCache = { Account: {}, IdToken: {}, AccessToken: {}, RefreshToken: {}, AppMetadata: {} } as JsonCache;
     try {
       msalTokenCache = await this.azurePersistenceService.loadMsalCache();
-    } catch (error) {}
+    } catch (error) {
+      throw new LoggedException(error.message, this, LogLevel.warn);
+    }
 
     const secrets = await this.azurePersistenceService.getAzureSecrets(integrationId);
     msalTokenCache.Account = { [secrets.account[0]]: secrets.account[1] };
@@ -186,13 +177,6 @@ export class AzureSessionService extends SessionService {
     msalTokenCache.AccessToken = {};
     msalTokenCache.IdToken = {};
     await this.azurePersistenceService.saveMsalCache(msalTokenCache);
-
-    const profile = secrets.profile;
-    const subscriptions = profile.subscriptions
-      .filter((sub) => subscriptionIds.includes(sub.id))
-      .map((sub) => Object.assign(sub, { isDefault: sub.id === defaultSubscriptionId }));
-    profile.subscriptions = subscriptions;
-    await this.azurePersistenceService.saveProfile(profile);
   }
 
   private async moveRefreshTokenToKeychain(msalTokenCache: JsonCache, integrationId: string, tenantId: string): Promise<void> {
@@ -211,5 +195,15 @@ export class AzureSessionService extends SessionService {
     const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === tenantId);
     const expirationTime = new Date(parseInt(accessToken.expires_on, 10) * 1000);
     return expirationTime.toISOString();
+  }
+
+  private async updateProfiles(integrationId: string, subscriptionIdsToStart: string[], subscriptionId: string) {
+    const secrets = await this.azurePersistenceService.getAzureSecrets(integrationId);
+    const profile = secrets.profile;
+    const subscriptions = profile.subscriptions
+      .filter((sub) => subscriptionIdsToStart.includes(sub.id))
+      .map((sub) => Object.assign(sub, { isDefault: sub.id === subscriptionId }));
+    profile.subscriptions = subscriptions;
+    await this.azurePersistenceService.saveProfile(profile);
   }
 }

@@ -441,7 +441,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     }
   }
 
-  getIntegrationLabel() {
+  getIntegrationLabel(): string {
     return this.integrations.find((i) => i.value === this.selectedIntegration).label;
   }
 }

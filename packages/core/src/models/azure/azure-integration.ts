@@ -12,7 +12,7 @@ export class AzureIntegration extends Integration {
     this._tokenExpiration = tokenExpiration;
   }
 
-  get tokenExpiration() {
+  get tokenExpiration(): string {
     return this._tokenExpiration;
   }
 }

@@ -282,6 +282,44 @@ describe("AzureSessionService", () => {
     );
   });
 
+  test("stop, sessionDeactivated is called once and the stopped session becomes inactive", async () => {
+    const subscriptionId = "fake-subscription-1-id";
+    const tenantId = "fake-tenant-id";
+    const integrationId = "fake-integration-id";
+    const azureSession = new AzureSession("fake-session-name", "fake-region", subscriptionId, tenantId, integrationId);
+    azureSession.status = SessionStatus.active;
+    const azureIntegration = new AzureIntegration(integrationId, "fake-alias", tenantId, "fake-region");
+
+    const executeService = {
+      execute: () => {},
+    } as any;
+
+    const repository = {
+      getSessions: () => [azureSession],
+      getSessionById: () => azureSession,
+      updateAzureIntegration: () => {},
+      getAzureIntegration: () => azureIntegration,
+      updateSessions: () => {},
+    } as any;
+
+    const azurePersistenceService = {
+      loadProfile: () => ({
+        subscriptions: [],
+      }),
+      saveProfile: () => {},
+    } as any;
+
+    const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, azurePersistenceService, null);
+    (azureSessionService as any).sessionLoading = () => {};
+
+    const spySessionDeactivated = jest.spyOn(azureSessionService, "sessionDeactivated");
+    await azureSessionService.stop(azureSession.sessionId);
+
+    expect(spySessionDeactivated).toBeCalledTimes(1);
+    expect(spySessionDeactivated).toHaveBeenCalledWith(azureSession.sessionId);
+    expect(azureSession.status).toEqual(SessionStatus.inactive);
+  });
+
   test("start, Repository's getSessionById is called once to retrieve the Session to be started", async () => {
     const repository = {
       getSessionById: jest.fn(() => ({})),

@@ -109,6 +109,7 @@ export class AzureIntegrationService implements IIntegrationService {
     await this.setOnline(integration, true);
     this.notifyIntegrationChanges();
 
+    // TODO: region is a parameter that is conceptually associated with the integration, not the session
     let sessionCreationRequests: AzureSessionRequest[] = azureProfile.subscriptions.map((sub) => ({
       region: integration.region,
       subscriptionId: sub.id,

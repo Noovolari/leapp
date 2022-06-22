@@ -14,6 +14,7 @@ import { SessionStatus } from "../../../models/session-status";
 import { constants } from "../../../models/constants";
 import { SessionType } from "../../../models/session-type";
 
+// TODO: refactor by calling AzureIntegrationService instead of Repository
 export class AzureSessionService extends SessionService {
   constructor(
     iSessionNotifier: IBehaviouralNotifier,
@@ -46,17 +47,19 @@ export class AzureSessionService extends SessionService {
 
   async start(sessionId: string): Promise<void> {
     const session = this.repository.getSessionById(sessionId) as AzureSession;
-    await this.stopSessionsByIntegrationId(session.azureIntegrationId);
+    await this.stopAllOtherSessions(sessionId);
     this.sessionLoading(sessionId);
+
     const subscriptionIdsToStart = this.repository
       .getSessions()
       .filter(
         (sess: AzureSession) =>
           sess.type === SessionType.azure &&
-          (sess.status !== SessionStatus.inactive || sess.sessionId === session.sessionId) &&
+          (sess.status !== SessionStatus.inactive || sess.sessionId === sessionId) &&
           sess.azureIntegrationId === session.azureIntegrationId
       )
       .map((sess: AzureSession) => sess.subscriptionId);
+
     let sessionTokenExpiration;
     try {
       await this.executeService.execute(`az configure --default location=${session.region}`);
@@ -64,6 +67,7 @@ export class AzureSessionService extends SessionService {
       const integration = this.repository.getAzureIntegration(session.azureIntegrationId);
       const tokenExpiration = new Date(integration.tokenExpiration).getTime();
       const currentTime = new Date().getTime();
+
       await this.updateProfiles(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
 
       if (integration.tokenExpiration === undefined || currentTime > tokenExpiration) {
@@ -198,12 +202,10 @@ export class AzureSessionService extends SessionService {
     await this.azurePersistenceService.saveProfile(profile);
   }
 
-  private async stopSessionsByIntegrationId(integrationId: string): Promise<void> {
+  private async stopAllOtherSessions(sessionId: string): Promise<void> {
     const sessionsToStop = this.repository
       .getSessions()
-      .filter(
-        (sess: AzureSession) => sess.type === SessionType.azure && sess.status !== SessionStatus.inactive && sess.azureIntegrationId === integrationId
-      );
+      .filter((sess: AzureSession) => sess.type === SessionType.azure && sess.sessionId !== sessionId && sess.status !== SessionStatus.inactive);
     for (const sess of sessionsToStop) {
       await this.stop(sess.sessionId);
     }

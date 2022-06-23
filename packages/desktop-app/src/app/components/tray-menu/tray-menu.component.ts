@@ -37,6 +37,9 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private awsSsmPluginVersion: string;
   private issueBody: string;
 
+  private voices = [];
+  private show = false;
+
   constructor(
     private appService: AppService,
     private electronService: AppNativeService,
@@ -51,12 +54,20 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.subscribed = this.behaviouralSubjectService.sessions$.subscribe(() => {
       this.generateMenu();
     });
     this.generateMenu();
     this.getMetadata();
+
+    await new Promise((resolve, _reject) => {
+      setInterval(resolve, 5000);
+    });
+
+    this.show = true;
+
+    this.generateMenu();
   }
 
   getProfileId(session: Session): string {
@@ -68,15 +79,14 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   }
 
   async generateMenu(): Promise<void> {
-    let voices = [];
+    this.voices = [];
+    //let voices = [];
     const actives = this.appProviderService.sessionManagementService
       .getSessions()
       .filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
     const allSessions = actives.concat(
-      this.appProviderService.sessionManagementService
-        .getSessions()
-        .filter((s) => s.status === SessionStatus.inactive)
-        .filter((_, index) => index < 10 - actives.length)
+      this.appProviderService.sessionManagementService.getSessions().filter((s) => s.status === SessionStatus.inactive)
+      //.filter((_, index) => index < 10 - actives.length)
     );
 
     allSessions.forEach((session: Session) => {
@@ -118,7 +128,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
               : __dirname + `/assets/images/icon-offline.png`;
           label = "  " + session.sessionName;
       }
-      voices.push({
+      this.voices.push({
         label,
         type: "normal",
         icon,
@@ -130,6 +140,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
             await factorizedSessionService.stop(session.sessionId);
           }
         },
+        visible: this.show,
       });
     });
 
@@ -219,12 +230,12 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       }
     }
     if (this.updaterService.getSavedVersionComparison() && this.updaterService.isReady()) {
-      voices.push({ type: "separator" });
-      voices.push({ label: "Check for Updates...", type: "normal", click: () => this.updaterService.updateDialog() });
+      this.voices.push({ type: "separator" });
+      this.voices.push({ label: "Check for Updates...", type: "normal", click: () => this.updaterService.updateDialog() });
       this.appService.getApp().dock.setBadge("·");
     }
-    voices = voices.concat(extraInfo);
-    const contextMenu = this.appService.getMenu().buildFromTemplate(voices);
+    this.voices = this.voices.concat(extraInfo);
+    const contextMenu = this.appService.getMenu().buildFromTemplate(this.voices);
     if (this.appService.detectOs() !== constants.windows && this.appService.detectOs() !== constants.linux) {
       this.currentTray.setToolTip("Leapp");
     }

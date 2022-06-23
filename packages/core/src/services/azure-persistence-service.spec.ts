@@ -199,7 +199,7 @@ describe("MsalPersistenceService", () => {
       os: { homedir: jest.fn(() => "a/") },
       fs: mockedFs,
       process,
-      path: { join: jest.fn((_s1, _s2) => path.join(_s1, _s2)) },
+      path: { join: jest.fn((_s1: string, _s2: string) => path.join(_s1, _s2)) },
     };
     const service = new AzurePersistenceService(iNativeService, null);
 
@@ -231,7 +231,7 @@ describe("MsalPersistenceService", () => {
       os: { homedir: jest.fn(() => "a/") },
       fs: mockedFs,
       process,
-      path: { join: jest.fn((_s1, _s2) => path.join(_s1, _s2)) },
+      path: { join: jest.fn((_s1: string, _s2: string) => path.join(_s1, _s2)) },
     };
     const service = new AzurePersistenceService(iNativeService, null);
     const load = (service as any).getProfileLocation;
@@ -287,5 +287,52 @@ describe("MsalPersistenceService", () => {
     expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(1, constants.appName, `azure-integration-profile-${intId}`);
     expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(2, constants.appName, `azure-integration-account-${intId}`);
     expect(mockedKeyChain.getSecret).toHaveBeenNthCalledWith(3, constants.appName, `azure-integration-refresh-token-${intId}`);
+  });
+
+  test("setAzureSecrets", async () => {
+    const kcService = {
+      saveSecret: jest.fn(async () => {}),
+    } as any;
+
+    const secrets = {
+      profile: "profile-1",
+      account: "account-1",
+      refreshToken: "refreshToken-1",
+    };
+    const service = new AzurePersistenceService(null, kcService);
+    await service.setAzureSecrets("fakeIntegrationId", secrets as any);
+
+    expect(kcService.saveSecret).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeIntegrationId", '"profile-1"');
+    expect(kcService.saveSecret).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeIntegrationId", '"account-1"');
+    expect(kcService.saveSecret).toHaveBeenNthCalledWith(
+      3,
+      constants.appName,
+      "azure-integration-refresh-token-fakeIntegrationId",
+      '"refreshToken-1"'
+    );
+  });
+
+  test("deleteAzureSecrets", async () => {
+    const kcService = {
+      deletePassword: jest.fn(),
+    } as any;
+
+    const service = new AzurePersistenceService(null, kcService);
+    await service.deleteAzureSecrets("fakeIntegrationId");
+
+    expect(kcService.deletePassword).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeIntegrationId");
+    expect(kcService.deletePassword).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeIntegrationId");
+    expect(kcService.deletePassword).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeIntegrationId");
+  });
+
+  test("deleteAzureSecrets, deletePassword throws an exception", async () => {
+    const kcService = {
+      deletePassword: jest.fn(async () => {
+        throw new Error("Error message");
+      }),
+    } as any;
+
+    const service = new AzurePersistenceService(null, kcService);
+    await service.deleteAzureSecrets("fakeIntegrationId");
   });
 });

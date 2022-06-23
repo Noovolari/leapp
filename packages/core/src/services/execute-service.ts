@@ -63,19 +63,7 @@ export class ExecuteService {
       if (terminalType === constants.macOsTerminal) {
         return this.execute(
           `osascript -e 'if application "Terminal" is running then\n
-                    \ttell application "Terminal"\n
-                    \t\tdo script "export AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"\n
-                    \t\tdelay 0.5\n
-                    \t\tactivate\n
-                    \t\tdelay 0.5\n
-                    \t\tdo script "export AWS_SECRET_ACCESS_KEY=\\"${env.AWS_SECRET_ACCESS_KEY}\\"" in window 1\n
-                    \t\tdelay 0.5\n
-                    \t\tdo script "export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}" in window 1\n
-                    \t\tdelay 0.5\n
-                    \t\tdo script "clear" in window 1\n
-                    \t\tdelay 0.5\n
-                    \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
-                    \tend tell\n
+                    \tdisplay alert "Leapp SSM" message "To run an SSM session, please close all terminal instances"\n
                     else\n
                     \ttell application "Terminal"\n
                     \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
@@ -86,20 +74,16 @@ export class ExecuteService {
         );
       } else {
         return this.execute(
-          `osascript -e 'tell app "iTerm"\n
-                     \tset newWindow to (create window with default profile)\n
-                     \ttell current session of newWindow\n
-                     \t\twrite text "export AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}"\n
-                     \t\tdelay 0.5\n
-                     \t\twrite text "export AWS_SECRET_ACCESS_KEY=\\"${env.AWS_SECRET_ACCESS_KEY}\\""\n
-                     \t\tdelay 0.5\n
-                     \t\twrite text "export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}"\n
-                     \t\tdelay 0.5\n
-                     \t\twrite text "clear"\n
-                     \t\tdelay 0.5\n
-                     \t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+          `osascript -e 'if application "iTerm" is running then\n
+                     \tdisplay alert "Leapp SSM" message "To run an SSM session, please close all iTerm instances"\n
+                     else\n
+                     \ttell application "iTerm"\n
+                     \t\tset newWindow to (create window with default profile)\n
+                     \t\ttell current session of newWindow\n
+                     \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+                     \t\tend tell\n
                      \tend tell\n
-                     end tell'`,
+                     end if'`,
           Object.assign(newEnv, env)
         );
       }

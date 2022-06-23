@@ -705,4 +705,23 @@ describe("AzureSessionService", () => {
 
     expect(azurePersistenceService.saveProfile).toHaveBeenCalled();
   });
+
+  test("stopAllOtherSessions", async () => {
+    const repository = {
+      getSessions: () => [
+        { type: SessionType.awsIamUser, status: SessionStatus.active, sessionId: "id0" },
+        { type: SessionType.azure, status: SessionStatus.inactive, sessionId: "id1" },
+        { type: SessionType.azure, status: SessionStatus.active, sessionId: "id2" },
+        { type: SessionType.azure, status: SessionStatus.pending, sessionId: "id3" },
+      ],
+    } as any;
+    const service = new AzureSessionService(null, repository, null, null, null, null, null, null);
+    service.stop = jest.fn(async () => {});
+
+    await (service as any).stopAllOtherSessions();
+
+    expect(service.stop).toHaveBeenCalledTimes(2);
+    expect(service.stop).toHaveBeenNthCalledWith(1, "id2");
+    expect(service.stop).toHaveBeenNthCalledWith(2, "id3");
+  });
 });

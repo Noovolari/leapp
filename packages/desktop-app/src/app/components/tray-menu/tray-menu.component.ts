@@ -80,7 +80,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   }
 
   async generateMenu(): Promise<void> {
-    const sessionCollapseThreshold = 20;
+    const sessionCollapseThreshold = 10;
     this.voices = [];
     this.sessions = [];
     //let voices = [];

@@ -38,6 +38,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private issueBody: string;
 
   private voices = [];
+  private sessions = [];
   private show = false;
 
   constructor(
@@ -79,7 +80,9 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   }
 
   async generateMenu(): Promise<void> {
+    const sessionCollapseThreshold = 20;
     this.voices = [];
+    this.sessions = [];
     //let voices = [];
     const actives = this.appProviderService.sessionManagementService
       .getSessions()
@@ -128,7 +131,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
               : __dirname + `/assets/images/icon-offline.png`;
           label = "  " + session.sessionName;
       }
-      this.voices.push({
+      this.sessions.push({
         label,
         type: "normal",
         icon,
@@ -234,7 +237,12 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       this.voices.push({ label: "Check for Updates...", type: "normal", click: () => this.updaterService.updateDialog() });
       this.appService.getApp().dock.setBadge("·");
     }
-    this.voices = this.voices.concat(extraInfo);
+
+    this.voices = this.voices.concat([
+      ...(this.sessions.length > sessionCollapseThreshold ? [{ label: "Sessions", submenu: this.sessions }] : this.sessions),
+      ...extraInfo,
+    ]);
+
     const contextMenu = this.appService.getMenu().buildFromTemplate(this.voices);
     if (this.appService.detectOs() !== constants.windows && this.appService.detectOs() !== constants.linux) {
       this.currentTray.setToolTip("Leapp");

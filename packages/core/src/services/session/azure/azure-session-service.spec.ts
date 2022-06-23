@@ -320,7 +320,7 @@ describe("AzureSessionService", () => {
     expect((azureSessionService as any).sessionActivated).toHaveBeenCalledWith(sessionId, undefined);
   });
 
-  test("start, with integration token undefined", async () => {
+  test("start, with integration token expiration undefined", async () => {
     const sessionId = "fake-session-id";
     const session = {
       sessionId,
@@ -385,73 +385,89 @@ describe("AzureSessionService", () => {
     expect((azureSessionService as any).getAccessTokenExpiration).toHaveBeenCalledWith(msalTokenCache, "fakeTenantId");
   });
 
-  // TODO: review this test and add currentTime > tokenExpiration + throw case
-  test("start, default location is set once the session is in pending state", async () => {
+  test("start, with integration token expired", async () => {
     jest.useFakeTimers("modern");
-    jest.setSystemTime(new Date(2022, 12, 1, 10, 0, 0, 0));
-    const tokenExpiration = new Date(2022, 12, 1, 11, 0, 0, 0).toISOString();
+    jest.setSystemTime(new Date(2022, 1, 1, 10, 0, 0, 1));
+    const tokenExpiration = new Date(2022, 1, 1, 10, 0, 0, 0).toISOString();
 
-    const azureSession = new AzureSession("fake-session-name", "fake-region", "fake-subscription-id", "fake-tenant-id", "fake-azure-integration-id");
-    azureSession.status = SessionStatus.inactive;
-
-    const fakeAzureIntegrationId = "fake-azure-integration-id";
+    const sessionId = "fake-session-id";
+    const session = {
+      sessionId,
+      azureIntegrationId: "fakeIntegrationId",
+      subscriptionId: "fakeSubscriptionId",
+      tenantId: "fakeTenantId",
+      type: SessionType.azure,
+    } as AzureSession;
 
     const repository = {
-      getSessionById: jest.fn(() => ({ azureIntegrationId: fakeAzureIntegrationId })),
-      getSessions: () => [azureSession],
-      getAzureIntegration: () => ({ tokenExpiration }),
-      updateSessions: () => {},
+      getSessionById: () => session,
+      getSessions: () => [],
+      getAzureIntegration: () => ({
+        tokenExpiration,
+      }),
+      updateAzureIntegration: jest.fn(() => {}),
     } as any;
 
     const executeService = {
-      execute: jest.fn(() => {
-        expect(azureSession.status).not.toEqual(SessionStatus.inactive);
-        expect(azureSession.status).toEqual(SessionStatus.pending);
-        expect(azureSession.status).not.toEqual(SessionStatus.active);
+      execute: jest.fn(async () => {}),
+    } as any;
+
+    const msalTokenCache = {
+      ["AccessToken"]: {
+        tokenKey1: { realm: "wrongTenantId" },
+        tokenKey2: { realm: "fakeTenantId", ["expires_on"]: "fakeExpiresOn" },
+      },
+    };
+
+    const azurePersistenceService = {
+      loadMsalCache: jest.fn(async () => msalTokenCache),
+    } as any;
+
+    const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, azurePersistenceService, null);
+    (azureSessionService as any).stopAllOtherSessions = async () => {};
+    (azureSessionService as any).sessionLoading = () => {};
+    (azureSessionService as any).updateProfiles = async () => {};
+    (azureSessionService as any).sessionActivated = () => {};
+
+    (azureSessionService as any).restoreSecretsFromKeychain = jest.fn(async () => {});
+    (azureSessionService as any).moveRefreshTokenToKeychain = jest.fn(async () => {});
+    (azureSessionService as any).getAccessTokenExpiration = jest.fn(async () => {});
+
+    await azureSessionService.start(sessionId);
+
+    expect((azureSessionService as any).restoreSecretsFromKeychain).toHaveBeenCalledWith("fakeIntegrationId");
+    expect((azureSessionService as any).getAccessTokenExpiration).toHaveBeenCalledWith(msalTokenCache, "fakeTenantId");
+  });
+
+  test("start, with managed exception", async () => {
+    const sessionId = "fake-session-id";
+    const session = {
+      sessionId,
+      azureIntegrationId: "fakeIntegrationId",
+      subscriptionId: "fakeSubscriptionId",
+      tenantId: "fakeTenantId",
+      type: SessionType.azure,
+    } as AzureSession;
+
+    const repository = {
+      getSessionById: () => session,
+      getSessions: () => [],
+      updateAzureIntegration: jest.fn(() => {}),
+    } as any;
+
+    const executeService = {
+      execute: jest.fn(async () => {
+        throw new Error("Execute error");
       }),
     } as any;
 
     const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, null, null);
-    (azureSessionService as any).stopAllOtherSessions = () => {};
-    (azureSessionService as any).updateProfiles = () => {};
-    (azureSessionService as any).stopAllOtherSessions = jest.fn();
+    (azureSessionService as any).stopAllOtherSessions = async () => {};
+    (azureSessionService as any).sessionLoading = () => {};
+    (azureSessionService as any).sessionDeactivated = jest.fn(() => {});
 
-    await azureSessionService.start(azureSession.sessionId);
-  });
+    await expect(azureSessionService.start(sessionId)).rejects.toThrow("Execute error");
 
-  test("start, updateProfiles is invoked with expected parameters", async () => {
-    jest.useFakeTimers("modern");
-    jest.setSystemTime(new Date(2022, 12, 1, 10, 0, 0, 0));
-    const tokenExpiration = new Date(2022, 12, 1, 11, 0, 0, 0).toISOString();
-
-    const azureSession = new AzureSession("fake-session-name", "fake-region", "fake-subscription-id", "fake-tenant-id", "fake-azure-integration-id");
-    azureSession.status = SessionStatus.inactive;
-
-    const repository = {
-      getSessionById: () => azureSession,
-      getSessions: () => [azureSession],
-      getAzureIntegration: () => ({ tokenExpiration }),
-      updateSessions: () => {},
-    } as any;
-
-    const executeService = {
-      execute: jest.fn(() => {}),
-    } as any;
-
-    const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, null, null);
-    (azureSessionService as any).stopAllOtherSessions = () => {};
-    (azureSessionService as any).updateProfiles = jest.fn();
-    (azureSessionService as any).stopAllOtherSessions = () => {};
-
-    await azureSessionService.start(azureSession.sessionId);
-
-    const expectedSubscriptionIdsToStart = [azureSession.subscriptionId];
-
-    expect((azureSessionService as any).updateProfiles).toHaveBeenCalledTimes(1);
-    expect((azureSessionService as any).updateProfiles).toHaveBeenCalledWith(
-      azureSession.azureIntegrationId,
-      expectedSubscriptionIdsToStart,
-      azureSession.subscriptionId
-    );
+    expect((azureSessionService as any).sessionDeactivated).toHaveBeenCalledWith(sessionId);
   });
 });

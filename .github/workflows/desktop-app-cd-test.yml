@@ -5,6 +5,11 @@ on:
     branches:
       - azure-msal-spike
 
+env:
+  S3_BUCKET: s3://noovolari-leapp-website-distribution
+  WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
+  WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+
 jobs:
   build:
     strategy:
@@ -21,7 +26,37 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
+      - name: Set pro environment
+        run: npm run set-pro-environment
       - name: Bootstrap
         run: npm run bootstrap
       - name: ls
         run: ls -R packages/desktop-app/node_modules/@noovolari/dpapi-addon
+      - name: Build Win desktop app
+        run: |
+          cd packages/desktop-app
+          WIN_CERTIFICATE=windows_sign_certificate.pfx
+          echo "Recreate the window certificate from the secure environment variable"
+          echo "${{ env.WIN_CERTIFICATE }}" | base64 --decode > $WIN_CERTIFICATE
+          npm install
+          npm run release-win
+          rm -Rf ./release/win-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+          TAG_VERSION=v123.123.123
+          TAG_VERSION=${TAG_VERSION:1}
+          rm "./release/Leapp-$TAG_VERSION-win.zip"
+          zip "./release/Leapp-$TAG_VERSION-win.zip" "./release/Leapp Setup $TAG_VERSION.exe"
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      - name: Release draft to S3
+        run: |
+          cd packages/desktop-app
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive

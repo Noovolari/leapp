@@ -1,0 +1,25 @@
+name: Leapp Desktop App CD test
+
+on:
+  push:
+    branches:
+      - azure-msal-spike
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ windows-2022 ]
+        node_version: [ 16 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Prepare GIT
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: Bootstrap
+        run: npm run bootstrap

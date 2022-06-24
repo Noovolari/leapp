@@ -9,6 +9,7 @@ env:
   S3_BUCKET: s3://noovolari-leapp-website-distribution
   WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
 
 jobs:
   build:

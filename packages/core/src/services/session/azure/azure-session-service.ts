@@ -158,8 +158,7 @@ export class AzureSessionService extends SessionService {
   }
 
   private async restoreSecretsFromKeychain(integrationId: string): Promise<void> {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    let msalTokenCache = { Account: {}, IdToken: {}, AccessToken: {}, RefreshToken: {}, AppMetadata: {} } as JsonCache;
+    let msalTokenCache: JsonCache;
     try {
       msalTokenCache = await this.azurePersistenceService.loadMsalCache();
     } catch (error) {
@@ -192,7 +191,7 @@ export class AzureSessionService extends SessionService {
     return expirationTime.toISOString();
   }
 
-  private async updateProfiles(integrationId: string, subscriptionIdsToStart: string[], subscriptionId: string) {
+  private async updateProfiles(integrationId: string, subscriptionIdsToStart: string[], subscriptionId: string): Promise<void> {
     const secrets = await this.azurePersistenceService.getAzureSecrets(integrationId);
     const profile = secrets.profile;
     const subscriptions = profile.subscriptions

@@ -32,11 +32,8 @@ jobs:
         shell: bash
         run: npm run set-pro-environment
       - name: compress
-        run: tar.exe -cvzf test.tar.gz dpapi-addon
+        run: powershell Compress-Archive dpapi-addon test.zip
       - name: decompress
-        run: |
-          mkdir test
-          cd test
-          tar.exe -xf ../test.tar.gz
+        run: powershell expand-archive test.zip test
       - name: ls root
         run: ls -R test

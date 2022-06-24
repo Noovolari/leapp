@@ -52,7 +52,7 @@ jobs:
           rm -Rf ./release/builder-effective-config.yaml
           ls -R release
           rm "./release/Leapp-0.12.2-win.zip"
-          powershell Compress-Archive "./release/Leapp Setup 0.12.2.exe" "./release/Leapp-0.12.2-win.zip"
+          powershell "Compress-Archive './release/Leapp Setup 0.12.2.exe' './release/Leapp-0.12.2-win.zip'"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:

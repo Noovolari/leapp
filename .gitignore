@@ -2,7 +2,7 @@
 
 # compiled output
 packages/desktop-app/dist
-packages/desktop-app/build
+#packages/desktop-app/build
 packages/desktop-app/tmp
 packages/desktop-app/out-tsc
 packages/desktop-app/release

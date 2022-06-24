@@ -50,10 +50,9 @@ jobs:
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
-          TAG_VERSION=v123.123.123
-          TAG_VERSION=${TAG_VERSION:1}
-          rm "./release/Leapp-$TAG_VERSION-win.zip"
-          zip "./release/Leapp-$TAG_VERSION-win.zip" "./release/Leapp Setup $TAG_VERSION.exe"
+          ls -R release
+          rm "./release/Leapp-0.12.2-win.zip"
+          zip "./release/Leapp-0.12.2-win.zip" "./release/Leapp Setup 0.12.2.exe"
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -64,6 +63,6 @@ jobs:
         shell: bash
         run: |
           cd packages/desktop-app
-          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=v123.123.123
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive

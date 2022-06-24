@@ -24,7 +24,7 @@
     "build-and-run-dev": "gushio gushio/target-build-and-run.js aot",
     "release-mac": "gushio gushio/target-release.js 'configuration production' mac",
     "release-linux": "gushio gushio/target-release.js 'configuration production' linux",
-    "release-win": "gushio gushio/target-release.js 'configuration production' win",
+    "release-win": "gushio gushio/target-release.js \"configuration production\" win",
     "release-all": "gushio gushio/target-release.js 'configuration production' all",
     "set-target-arm64": "gushio gushio/set-target-arch.js arm64",
     "set-target-x64": "gushio gushio/set-target-arch.js x64"

@@ -23,3 +23,5 @@ jobs:
           node-version: ${{ matrix.node_version }}
       - name: Bootstrap
         run: npm run bootstrap
+      - name: ls
+        run: ls -R dpapi-addon

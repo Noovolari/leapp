@@ -147,7 +147,7 @@ export class RetroCompatibilityService {
   }*/
 
   async applyWorkspaceMigrations(): Promise<void> {
-    if (this.isRetroPatchNecessary()) {
+    /*if (this.isRetroPatchNecessary()) {
       await this.adaptOldWorkspaceFile();
     }
 
@@ -160,7 +160,7 @@ export class RetroCompatibilityService {
       const leappCorePackageJson = JSON.parse(this.fileService.readFileSync("../core/package.json"));
 
       this.migration1(workspace, leappCorePackageJson["version"]);
-    }
+    }*/
   }
 
   migration1(workspace: any, leappCorePackageJsonVersion: string): void {

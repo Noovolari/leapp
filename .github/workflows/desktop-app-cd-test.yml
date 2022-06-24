@@ -24,4 +24,4 @@ jobs:
       - name: Bootstrap
         run: npm run bootstrap
       - name: ls
-        run: ls -R dpapi-addon
+        run: ls -R packages/desktop-app/node_modules/@noovolari/dpapi-addon

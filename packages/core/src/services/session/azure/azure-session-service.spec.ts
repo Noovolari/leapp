@@ -7,6 +7,7 @@ import { LoggedEntry, LogLevel } from "../../log-service";
 import { AzureSecrets, AzureSubscription } from "../../azure-persistence-service";
 import { AzureIntegration } from "../../../models/azure/azure-integration";
 import { JsonCache } from "@azure/msal-node";
+import { constants } from "../../../models/constants";
 
 describe("AzureSessionService", () => {
   afterAll(() => {
@@ -337,17 +338,28 @@ describe("AzureSessionService", () => {
       getSessionById: jest.fn(() => session),
       getSessions: () => [session],
       getAzureIntegration: () => ({ tokenExpiration: new Date().toISOString() }),
+      updateSessions: () => {},
+      updateAzureIntegration: jest.fn(() => {}),
     } as any;
 
     const executeService = {
       execute: jest.fn(async () => {}),
     } as any;
 
-    const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, null, null);
+    const azurePersistenceService = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      loadMsalCache: jest.fn(async () => ({ AccessToken: jest.fn(() => "") })),
+      getAzureSecrets: jest.fn(() => {}),
+    };
+
+    const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, azurePersistenceService, null);
     (azureSessionService as any).stopAllOtherSessions = jest.fn(async () => {});
     (azureSessionService as any).sessionLoading = jest.fn();
     (azureSessionService as any).updateProfiles = jest.fn(async () => {});
     (azureSessionService as any).sessionActivated = jest.fn(async () => {});
+    (azureSessionService as any).restoreSecretsFromKeychain = jest.fn(async () => {});
+    (azureSessionService as any).moveRefreshTokenToKeychain = jest.fn(async () => {});
+    (azureSessionService as any).getAccessTokenExpiration = jest.fn(async () => Promise.resolve(new Date().toISOString()));
 
     await azureSessionService.start(sessionId);
 
@@ -358,7 +370,7 @@ describe("AzureSessionService", () => {
     expect(executeService.execute).toHaveBeenCalledWith("az configure --default location=fakeRegion");
 
     expect((azureSessionService as any).updateProfiles).toHaveBeenCalledWith("fakeIntegrationId", [session.subscriptionId], "fakeSubscriptionId");
-    expect((azureSessionService as any).sessionActivated).toHaveBeenCalledWith(sessionId, undefined);
+    expect((azureSessionService as any).sessionActivated).toHaveBeenCalledWith(sessionId, new Date().toISOString());
   });
 
   test("start, with integration token expiration undefined", async () => {
@@ -723,5 +735,20 @@ describe("AzureSessionService", () => {
     expect(service.stop).toHaveBeenCalledTimes(2);
     expect(service.stop).toHaveBeenNthCalledWith(1, "id2");
     expect(service.stop).toHaveBeenNthCalledWith(2, "id3");
+  });
+
+  test("getNextRotationTime", () => {
+    const repository = {
+      getSessions: () => [
+        { type: SessionType.awsIamUser, status: SessionStatus.active, sessionId: "id0" },
+        { type: SessionType.azure, status: SessionStatus.inactive, sessionId: "id1" },
+        { type: SessionType.azure, status: SessionStatus.active, sessionId: "id2" },
+        { type: SessionType.azure, status: SessionStatus.pending, sessionId: "id3" },
+      ],
+    } as any;
+    const service = new AzureSessionService(null, repository, null, null, null, null, null, null);
+
+    const oneMinuteMargin = 60 * 1000;
+    expect((service as any).getNextRotationTime()).toBe(new Date().getTime() + constants.sessionDuration * 1000 + oneMinuteMargin);
   });
 });

@@ -75,9 +75,6 @@ export class AzureSessionService extends SessionService {
         const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
         const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === session.tenantId);
 
-        const currentDate = new Date();
-        currentDate.setMinutes(currentDate.getMinutes() + 3);
-
         this.repository.updateAzureIntegration(
           integration.id,
           integration.alias,

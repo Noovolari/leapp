@@ -62,10 +62,10 @@ export class AzureSessionService extends SessionService {
 
     let sessionTokenExpiration;
     try {
-      await this.executeService.execute(`az configure --default location=${session.region}`);
-
       const integration = this.repository.getAzureIntegration(session.azureIntegrationId);
       const tokenExpiration = new Date(integration.tokenExpiration).getTime();
+
+      await this.executeService.execute(`az configure --default location=${integration.region}`);
 
       await this.updateProfiles(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
 

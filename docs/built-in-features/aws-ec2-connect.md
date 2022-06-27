@@ -6,6 +6,10 @@ You can directly connect to an AWS EC2 instance from Leapp through AWS System Ma
 
 ![](../../images/screens/newuxui/aws-ssm.png?style=center-img)
 
+!!! Warning
+
+    On macOS, be sure to close all terminal/iTerm windows beforehand to use this feature correctly. 
+
 To correctly connect follow these steps:
 
 1. Right-click on a suitable AWS session to open the contextual menu

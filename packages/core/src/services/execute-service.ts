@@ -60,24 +60,10 @@ export class ExecuteService {
 
     if (this.nativeService.process.platform === "darwin") {
       const terminalType = macOsTerminalType ?? this.repository.getWorkspace().macOsTerminal;
-      const clearScrollbackCharacters = "\u005C\u0022\u005C\u005Ce[3J\u005C\u0022";
       if (terminalType === constants.macOsTerminal) {
         return this.execute(
           `osascript -e 'if application "Terminal" is running then\n
-                    \ttell application "Terminal"\n
-                    \t\tdo script "export HISTCONTROL=ignorespace"\n
-                    \t\tdelay 0.01\n
-                    \t\tactivate\n
-                    \t\tdo script " export AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN}" in window 1\n
-                    \t\tdelay 0.01\n
-                    \t\tdo script " export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY}" in window 1\n
-                    \t\tdelay 0.01\n
-                    \t\tdo script " export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}" in window 1\n
-                    \t\tdelay 0.01\n
-                    \t\tdo script "clear && printf ${clearScrollbackCharacters}" in window 1\n
-                    \t\tdelay 0.01\n
-                    \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
-                    \tend tell\n
+                    \tdisplay alert "Leapp SSM" message "To run an SSM session, please close all terminal instances"\n
                     else\n
                     \ttell application "Terminal"\n
                     \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n

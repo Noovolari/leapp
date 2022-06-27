@@ -284,7 +284,7 @@ describe("AzureIntegrationService", () => {
     const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
     const forcedIsOnlineState = true;
     await service.setOnline(integration, forcedIsOnlineState);
-    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", forcedIsOnlineState);
+    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", forcedIsOnlineState, undefined);
     expect(azurePersistenceService.loadMsalCache).not.toHaveBeenCalled();
     expect(azurePersistenceService.loadProfile).not.toHaveBeenCalled();
   });
@@ -297,7 +297,7 @@ describe("AzureIntegrationService", () => {
     const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: "fakeOnline" } as any;
     const forcedIsOnlineState = false;
     await service.setOnline(integration, forcedIsOnlineState);
-    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", forcedIsOnlineState);
+    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", forcedIsOnlineState, undefined);
     expect(azurePersistenceService.loadMsalCache).not.toHaveBeenCalled();
     expect(azurePersistenceService.loadProfile).not.toHaveBeenCalled();
   });
@@ -309,7 +309,7 @@ describe("AzureIntegrationService", () => {
     const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: false } as any;
     await service.setOnline(integration);
 
-    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", true);
+    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", true, undefined);
     expect(azurePersistenceService.getAzureSecrets).toHaveBeenCalledWith("fakeId");
   });
 
@@ -322,7 +322,7 @@ describe("AzureIntegrationService", () => {
     const integration = { id: "fakeId", alias: "fakeAlias", tenantId: "fakeTenant", region: "fakeRegion", isOnline: true } as any;
     await service.setOnline(integration);
 
-    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", false);
+    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenant", "fakeRegion", false, undefined);
     expect(azurePersistenceService.getAzureSecrets).toHaveBeenCalledWith("fakeId");
     expect(service.logout).toHaveBeenCalledWith("fakeId");
   });

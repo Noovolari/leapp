@@ -82,7 +82,14 @@ export class AzureIntegrationService implements IIntegrationService {
       }
       integration.isOnline = isAlreadyOnline;
     }
-    this.repository.updateAzureIntegration(integration.id, integration.alias, integration.tenantId, integration.region, integration.isOnline);
+    this.repository.updateAzureIntegration(
+      integration.id,
+      integration.alias,
+      integration.tenantId,
+      integration.region,
+      integration.isOnline,
+      integration.tokenExpiration
+    );
   }
 
   async logout(integrationId: string): Promise<void> {

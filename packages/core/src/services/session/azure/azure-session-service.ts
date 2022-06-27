@@ -66,15 +66,18 @@ export class AzureSessionService extends SessionService {
 
       const integration = this.repository.getAzureIntegration(session.azureIntegrationId);
       const tokenExpiration = new Date(integration.tokenExpiration).getTime();
-      const currentTime = new Date().getTime();
 
       await this.updateProfiles(session.azureIntegrationId, subscriptionIdsToStart, session.subscriptionId);
 
-      if (integration.tokenExpiration === undefined || currentTime > tokenExpiration) {
+      if (integration.tokenExpiration === undefined || this.getNextRotationTime() > tokenExpiration) {
         await this.restoreSecretsFromKeychain(session.azureIntegrationId);
         await this.executeService.execute(`az account get-access-token --subscription ${session.subscriptionId}`, undefined, true);
         const msalTokenCache = await this.azurePersistenceService.loadMsalCache();
         const accessToken = Object.values(msalTokenCache.AccessToken).find((tokenObj) => tokenObj.realm === session.tenantId);
+
+        const currentDate = new Date();
+        currentDate.setMinutes(currentDate.getMinutes() + 3);
+
         this.repository.updateAzureIntegration(
           integration.id,
           integration.alias,
@@ -98,10 +101,8 @@ export class AzureSessionService extends SessionService {
     const integration = this.repository.getAzureIntegration((session as AzureSession).azureIntegrationId);
 
     const tokenExpiration = new Date(integration.tokenExpiration).getTime();
-    const oneMinuteMargin = 60 * 1000;
-    const nextRotation = new Date().getTime() + constants.sessionDuration * 1000 + oneMinuteMargin;
 
-    if (nextRotation > tokenExpiration) {
+    if (this.getNextRotationTime() > tokenExpiration) {
       await this.start(sessionId);
     }
   }
@@ -208,5 +209,10 @@ export class AzureSessionService extends SessionService {
     for (const sess of sessionsToStop) {
       await this.stop(sess.sessionId);
     }
+  }
+
+  private getNextRotationTime(): number {
+    const oneMinuteMargin = 60 * 1000;
+    return new Date().getTime() + constants.sessionDuration * 1000 + oneMinuteMargin;
   }
 }

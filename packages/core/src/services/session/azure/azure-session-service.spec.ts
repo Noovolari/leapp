@@ -367,7 +367,8 @@ describe("AzureSessionService", () => {
     expect(repository.getSessionById).toHaveBeenCalledWith(sessionId);
     expect((azureSessionService as any).stopAllOtherSessions).toHaveBeenCalledWith(sessionId);
     expect((azureSessionService as any).sessionLoading).toHaveBeenCalledWith(sessionId);
-    expect(executeService.execute).toHaveBeenCalledWith("az configure --default location=fakeRegion");
+    expect(executeService.execute).toHaveBeenCalledTimes(2);
+    expect(executeService.execute).toHaveBeenCalledWith("az configure --default location=undefined");
 
     expect((azureSessionService as any).updateProfiles).toHaveBeenCalledWith("fakeIntegrationId", [session.subscriptionId], "fakeSubscriptionId");
     expect((azureSessionService as any).sessionActivated).toHaveBeenCalledWith(sessionId, new Date().toISOString());
@@ -505,6 +506,7 @@ describe("AzureSessionService", () => {
     const repository = {
       getSessionById: () => session,
       getSessions: () => [],
+      getAzureIntegration: jest.fn(() => ({ tokenExpiration: "", region: "useast" })),
       updateAzureIntegration: jest.fn(() => {}),
     } as any;
 

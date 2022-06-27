@@ -75,6 +75,14 @@
               </div>
             </div>
           </div>
+          <div class="form-group">
+            <div class="form-field">
+              <div class="form-group">
+                <label><i class="fa fa-info-circle" matTooltip="Location is obtained from 'default Location' in general settings"></i>&nbsp;Location</label>
+                <input class="form-control disabled" value="{{defaultLocation}}" readonly>
+              </div>
+            </div>
+          </div>
         </ng-container>
 
         <button class="btn-right-margin {{formValid() ? '': 'mat-button-disabled'}}" [disabled]="!formValid()" (click)="save();">

@@ -352,7 +352,7 @@ describe("AzureSessionService", () => {
       getAzureSecrets: jest.fn(() => {}),
     };
 
-    const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, azurePersistenceService, null);
+    const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, azurePersistenceService as any, null);
     (azureSessionService as any).stopAllOtherSessions = jest.fn(async () => {});
     (azureSessionService as any).sessionLoading = jest.fn();
     (azureSessionService as any).updateProfiles = jest.fn(async () => {});

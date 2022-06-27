@@ -40,7 +40,6 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private voices = [];
   private sessions = [];
   private moreSessions = [];
-  private show = false;
 
   constructor(
     private appService: AppService,
@@ -60,16 +59,8 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     this.subscribed = this.behaviouralSubjectService.sessions$.subscribe(() => {
       this.generateMenu();
     });
-    this.generateMenu();
     this.getMetadata();
-
-    await new Promise((resolve, _reject) => {
-      setInterval(resolve, 5000);
-    });
-
-    this.show = true;
-
-    this.generateMenu();
+    await this.generateMenu();
   }
 
   getProfileId(session: Session): string {
@@ -340,7 +331,6 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
           await factorizedSessionService.stop(session.sessionId);
         }
       },
-      visible: this.show,
     };
   }
 }

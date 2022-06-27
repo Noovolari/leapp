@@ -26,6 +26,8 @@ import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aw
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "./services/options.service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 
 @Component({
   selector: "app-root",
@@ -45,6 +47,7 @@ export class AppComponent implements OnInit {
   private awsSsoRoleService: AwsSsoRoleService;
   private remoteProceduresServer: RemoteProceduresServer;
   private integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService;
+  private azureSessionService: AzureSessionService;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -76,6 +79,7 @@ export class AppComponent implements OnInit {
     this.awsSsoRoleService = appProviderService.awsSsoRoleService;
     this.remoteProceduresServer = appProviderService.remoteProceduresServer;
     this.integrationIsOnlineStateRefreshService = appProviderService.integrationIsOnlineStateRefreshService;
+    this.azureSessionService = appProviderService.azureSessionService;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
@@ -147,7 +151,7 @@ export class AppComponent implements OnInit {
   /**
    * This is an hook on the closing app to remove credential file and force stop using them
    */
-  private beforeCloseInstructions() {
+  private async beforeCloseInstructions() {
     // Check if we are here
     this.loggingService.log(new LoggedEntry("Closing app with cleaning process...", this, LogLevel.info));
 
@@ -155,6 +159,11 @@ export class AppComponent implements OnInit {
 
     // Stop all the sessions
     const sessions = this.appProviderService.sessionManagementService.getSessions();
+    for (const s of sessions) {
+      if (s.type === SessionType.azure) {
+        await this.azureSessionService.stop(s.sessionId);
+      }
+    }
     sessions.forEach((s) => {
       s.status = SessionStatus.inactive;
     });

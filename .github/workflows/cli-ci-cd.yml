@@ -28,10 +28,6 @@ jobs:
       - name: Bootstrap
         run: |
           npm run bootstrap
-      - name: Build Core
-        run: |
-          cd packages/core
-          npm run build
       - name: Build CLI
         run: |
           cd packages/cli
@@ -88,10 +84,6 @@ jobs:
       - name: Bootstrap
         run: |
           npm run bootstrap
-      - name: Build Core
-        run: |
-          cd packages/core
-          npm run build
       - name: Build CLI
         run: |
           cd packages/cli

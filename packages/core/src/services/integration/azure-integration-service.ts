@@ -55,7 +55,8 @@ export class AzureIntegrationService implements IIntegrationService {
   updateIntegration(id: string, updateParams: AzureIntegrationCreationParams): void {
     const isOnline = this.repository.getAzureIntegration(id).isOnline;
     const defaultLocation = this.repository.getDefaultLocation();
-    this.repository.updateAzureIntegration(id, updateParams.alias, updateParams.tenantId, defaultLocation, isOnline);
+    const tokenExpiration = this.repository.getAzureIntegration(id).tokenExpiration;
+    this.repository.updateAzureIntegration(id, updateParams.alias, updateParams.tenantId, defaultLocation, isOnline, tokenExpiration);
   }
 
   async deleteIntegration(id: string): Promise<void> {

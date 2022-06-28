@@ -1,5 +1,5 @@
 module.exports = (version, tarballUrl, tarballSha256) =>
-  `class LeappCliArm64 < Formula
+  `class LeappCliDarwinArm64 < Formula
   desc "Install Leapp CLI"
   homepage "https://leapp.cloud"
   version "${version}"

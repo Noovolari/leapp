@@ -106,7 +106,7 @@ module.exports = {
 
       console.log('Updating installer formula... ')
 
-      await fs.writeFile(path.join(formulaRepoPath, 'Formula/leapp-cli-arm64.rb'), installerFormula)
+      await fs.writeFile(path.join(formulaRepoPath, 'Formula/leapp-cli-darwin-arm64.rb'), installerFormula)
 
 
       console.log('Pushing updated formula repo... ')

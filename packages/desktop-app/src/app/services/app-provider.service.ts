@@ -362,7 +362,7 @@ export class AppProviderService {
 
   public get azureCoreService(): AzureCoreService {
     if (!this.azureCoreServiceInstance) {
-      this.azureCoreServiceInstance = new AzureCoreService();
+      this.azureCoreServiceInstance = new AzureCoreService(this.sessionManagementService, this.azureSessionService);
     }
     return this.azureCoreServiceInstance;
   }

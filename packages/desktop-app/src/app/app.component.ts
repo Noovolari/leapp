@@ -26,8 +26,8 @@ import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aw
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "./services/options.service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
-import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
+import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 
 @Component({
   selector: "app-root",
@@ -48,6 +48,7 @@ export class AppComponent implements OnInit {
   private remoteProceduresServer: RemoteProceduresServer;
   private integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService;
   private azureSessionService: AzureSessionService;
+  private azureCoreService: AzureCoreService;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -80,6 +81,7 @@ export class AppComponent implements OnInit {
     this.remoteProceduresServer = appProviderService.remoteProceduresServer;
     this.integrationIsOnlineStateRefreshService = appProviderService.integrationIsOnlineStateRefreshService;
     this.azureSessionService = appProviderService.azureSessionService;
+    this.azureCoreService = appProviderService.azureCoreService;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
@@ -159,11 +161,6 @@ export class AppComponent implements OnInit {
 
     // Stop all the sessions
     const sessions = this.appProviderService.sessionManagementService.getSessions();
-    for (const s of sessions) {
-      if (s.type === SessionType.azure) {
-        await this.azureSessionService.stop(s.sessionId);
-      }
-    }
     sessions.forEach((s) => {
       s.status = SessionStatus.inactive;
     });
@@ -172,6 +169,7 @@ export class AppComponent implements OnInit {
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
+      await this.azureCoreService.stopAllSessionsOnQuit();
       this.awsCoreService.cleanCredentialFile();
     } catch (err) {
       this.loggingService.log(new LoggedException("No sessions to stop, skipping...", this, LogLevel.error, true, err.stack));

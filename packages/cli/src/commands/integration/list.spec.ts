@@ -49,6 +49,8 @@ describe("ListIntegrations", () => {
         portalUrl: "portalUrl",
         region: "region",
         accessTokenExpiration: "expiration",
+        id: "integrationId",
+        isOnline: true,
       },
     ];
     const cliProviderService = {
@@ -66,6 +68,7 @@ describe("ListIntegrations", () => {
 
     const expectedData = [
       {
+        integrationId: "integrationId",
         integrationName: "integrationName",
         portalUrl: "portalUrl",
         region: "region",
@@ -76,7 +79,6 @@ describe("ListIntegrations", () => {
 
     expect(tableSpy.mock.calls[0][0]).toEqual(expectedData);
 
-    expect(cliProviderService.awsSsoIntegrationService.isOnline).toHaveBeenCalledWith(integrations[0]);
     expect(cliProviderService.awsSsoIntegrationService.remainingHours).toHaveBeenCalledWith(integrations[0]);
 
     const expectedColumns = {

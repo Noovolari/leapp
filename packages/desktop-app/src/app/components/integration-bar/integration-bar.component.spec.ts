@@ -18,6 +18,7 @@ describe("IntegrationBarComponent", () => {
       getSegments: [],
       listAwsSsoIntegrations: [],
       listAzureIntegrations: [],
+      getDefaultLocation: () => "defaultLocation",
     });
     const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       integrations: [],

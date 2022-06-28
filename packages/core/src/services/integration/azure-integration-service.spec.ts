@@ -67,7 +67,14 @@ describe("AzureIntegrationService", () => {
     await service.updateIntegration("fakeId", { alias: "fakeAlias", tenantId: "fakeTenantId" });
     expect(repository.getAzureIntegration).toHaveBeenCalledWith("fakeId");
     expect(repository.getDefaultLocation).toHaveBeenCalled();
-    expect(repository.updateAzureIntegration).toHaveBeenCalledWith("fakeId", "fakeAlias", "fakeTenantId", "fakeLocation", "fakeOnlineStatus");
+    expect(repository.updateAzureIntegration).toHaveBeenCalledWith(
+      "fakeId",
+      "fakeAlias",
+      "fakeTenantId",
+      "fakeLocation",
+      "fakeOnlineStatus",
+      undefined
+    );
   });
 
   test("deleteIntegration", async () => {

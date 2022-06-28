@@ -2,7 +2,7 @@ import { expect, describe, test, jest } from "@jest/globals";
 import { NamedProfilesService } from "./named-profiles-service";
 import { SessionStatus } from "../models/session-status";
 import { constants } from "../models/constants";
-import { AwsNamedProfile } from "../models/aws-named-profile";
+import { AwsNamedProfile } from "../models/aws/aws-named-profile";
 import { AwsSessionService } from "./session/aws/aws-session-service";
 
 describe("NamedProfilesService", () => {

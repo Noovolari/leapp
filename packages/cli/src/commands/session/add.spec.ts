@@ -27,6 +27,11 @@ describe("AddSession", () => {
       cloudProviderService: new CliProviderService().cloudProviderService,
       sessionFactory: { createSession: jest.fn() },
       remoteProceduresClient: { refreshSessions: jest.fn() },
+      inquirer: {
+        prompt: () => ({
+          selectedMethod: ["selectedMethod"],
+        }),
+      },
     };
     let command = getTestCommand(cliProviderService, null, ["--providerType"]);
     command.log = jest.fn();
@@ -35,121 +40,6 @@ describe("AddSession", () => {
     command = getTestCommand(cliProviderService, null, ["--providerType", "fake"]);
     command.log = jest.fn();
     await expect(command.run()).rejects.toThrow("Expected --providerType=fake to be one of: aws, azure");
-
-    command = getTestCommand(cliProviderService, null, ["--providerType", "azure", "--sessionType"]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Flag --sessionType expects a value");
-
-    command = getTestCommand(cliProviderService, null, ["--providerType", "azure", "--sessionType", "fake"]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow(
-      "Expected --sessionType=fake to be one of: awsIamRoleFederated, awsIamUser, awsIamRoleChained, azure"
-    );
-
-    command = getTestCommand(cliProviderService, null, ["--providerType", "azure", "--sessionType", "awsIamUser"]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrowError();
-
-    command = getTestCommand(cliProviderService, null, ["--providerType", "aws", "--sessionType", "azure"]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrowError();
-
-    command = getTestCommand(cliProviderService, null, ["--providerType", "azure", "--sessionType", "azure", "--region"]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Flag --region expects a value");
-
-    command = getTestCommand(cliProviderService, null, [
-      "--providerType",
-      "azure",
-      "--sessionType",
-      "azure",
-      "--region",
-      "southcentralus",
-      "--sessionName",
-    ]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Flag --sessionName expects a value");
-
-    command = getTestCommand(cliProviderService, null, [
-      "--providerType",
-      "azure",
-      "--sessionType",
-      "azure",
-      "--region",
-      "southcentralus",
-      "--sessionName",
-      "test",
-      "--tenantId",
-    ]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Flag --tenantId expects a value");
-
-    command = getTestCommand(cliProviderService, null, [
-      "--providerType",
-      "azure",
-      "--sessionType",
-      "azure",
-      "--region",
-      "southcentralus",
-      "--sessionName",
-      "test",
-      "--tenantId",
-      "id",
-      "--subscriptionId",
-    ]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Flag --subscriptionId expects a value");
-
-    command = getTestCommand(cliProviderService, null, [
-      "--providerType",
-      "azure",
-      "--sessionType",
-      "azure",
-      "--region",
-      "nottrue",
-      "--sessionName",
-      "test",
-      "--tenantId",
-      "id",
-      "--subscriptionId",
-      "sid",
-    ]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Azure location not valid");
-
-    command = getTestCommand(cliProviderService, null, [
-      "--providerType",
-      "azure",
-      "--sessionType",
-      "awsIamUser",
-      "--region",
-      "nottrue",
-      "--sessionName",
-      "test",
-      "--tenantId",
-      "id",
-      "--subscriptionId",
-      "sid",
-    ]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Session Type and Provider Type are not valid together");
-
-    command = getTestCommand(cliProviderService, null, [
-      "--providerType",
-      "aws",
-      "--sessionType",
-      "azure",
-      "--region",
-      "nottrue",
-      "--sessionName",
-      "test",
-      "--tenantId",
-      "id",
-      "--subscriptionId",
-      "sid",
-    ]);
-    command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Session Type and Provider Type are not valid together");
 
     command = getTestCommand(cliProviderService, null, [
       "--providerType",
@@ -224,47 +114,6 @@ describe("AddSession", () => {
     ]);
     command.log = jest.fn();
     await expect(command.run()).rejects.toThrow("Invalid Idp URL");
-
-    const cliMock2: any = {
-      sessionManagementService: {
-        getSessions: jest.fn(() => [{}]),
-        getDefaultProfileId: jest.fn(() => "defaultId"),
-      },
-      workspaceService: {
-        getDefaultProfileId: jest.fn(() => "defaultId"),
-      },
-      namedProfilesService: { getNamedProfiles: jest.fn(() => [{ id: "defaultId", name: "default" }]) },
-      awsCoreService: new CliProviderService().awsCoreService,
-      azureCoreService: new CliProviderService().azureCoreService,
-      cloudProviderService: new CliProviderService().cloudProviderService,
-      sessionFactory: { createSession: jest.fn() },
-      remoteProceduresClient: { refreshSessions: jest.fn() },
-    };
-    command = getTestCommand(cliMock2, null, [
-      "--providerType",
-      "azure",
-      "--sessionType",
-      "azure",
-      "--region",
-      "southcentralus",
-      "--sessionName",
-      "test",
-      "--tenantId",
-      "aid",
-      "--subscriptionId",
-      "sid",
-    ]);
-    command.log = jest.fn();
-    await command.run();
-
-    expect(cliMock2.sessionFactory.createSession).toHaveBeenCalledWith("azure", {
-      sessionName: "test",
-      region: "southcentralus",
-      subscriptionId: "sid",
-      tenantId: "aid",
-    });
-    expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
-    expect(command.log).toHaveBeenCalledWith("session added");
 
     const cliMock3: any = {
       sessionManagementService: {
@@ -658,7 +507,7 @@ describe("AddSession", () => {
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {
-    const cloudProvider = "cloudProvider";
+    const cloudProvider = "aws";
     const accessMethod = "accessMethod";
     const params = "params";
     const command = getTestCommand();
@@ -678,13 +527,14 @@ describe("AddSession", () => {
       occurredError = error;
     }
 
-    expect(command.chooseCloudProvider).toHaveBeenCalled();
-    expect(command.chooseAccessMethod).toHaveBeenCalledWith(cloudProvider);
-    expect(command.chooseAccessMethodParams).toHaveBeenCalledWith(accessMethod);
-    expect(command.createSession).toHaveBeenCalledWith(accessMethod, params);
     if (errorToThrow) {
       expect(occurredError).toEqual(new Error(expectedErrorMessage));
+    } else {
+      expect(command.chooseAccessMethod).toHaveBeenCalledWith(cloudProvider);
+      expect(command.chooseAccessMethodParams).toHaveBeenCalledWith(accessMethod);
     }
+
+    expect(command.createSession).toHaveBeenCalledWith(accessMethod, params);
   };
 
   test("run", async () => {

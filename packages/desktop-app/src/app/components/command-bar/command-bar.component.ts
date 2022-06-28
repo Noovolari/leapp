@@ -14,7 +14,7 @@ import { syncAllEvent } from "../integration-bar/integration-bar.component";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AppNativeService } from "../../services/app-native.service";
 import { AppService } from "../../services/app.service";
-import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
@@ -361,7 +361,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   private updateFilterForm(values: GlobalFilters) {
-    console.log("inside filter form", values);
     this.filterForm.get("searchFilter").setValue(values.searchFilter);
     this.filterForm.get("dateFilter").setValue(values.dateFilter);
     this.filterForm.get("providerFilter").setValue(values.providerFilter);

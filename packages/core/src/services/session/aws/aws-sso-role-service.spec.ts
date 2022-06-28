@@ -1,5 +1,5 @@
 import { jest, describe, test, expect } from "@jest/globals";
-import { AwsSsoRoleSession } from "../../../models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "../../../models/aws/aws-sso-role-session";
 import { AwsSsoRoleService } from "./aws-sso-role-service";
 import { SessionType } from "../../../models/session-type";
 

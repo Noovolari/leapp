@@ -17,9 +17,10 @@ export class ExecuteService {
    *
    * @param command - the command to launch
    * @param env - environment
+   * @param disableOutputLog - to disable logging of outputs
    * @returns an {Promise<string>} stdout or stderr
    */
-  execute(command: string, env?: any): Promise<string> {
+  execute(command: string, env?: any, maskOutputLog?: boolean): Promise<string> {
     return new Promise((resolve, reject) => {
       let exec = this.nativeService.exec;
       if (command.startsWith("sudo")) {
@@ -36,8 +37,14 @@ export class ExecuteService {
       }
 
       exec(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {
-        const output = { error: err, stdout, stderr };
-        this.logService.log(new LoggedEntry("execute from Leapp: " + JSON.stringify(output), this, LogLevel.info, false));
+        const info = { command, stdout, stderr, error: err };
+        if (info.error && info.error.cmd) {
+          delete info.error.cmd;
+        }
+        if (maskOutputLog) {
+          Object.assign(info, { stdout: "****", stderr: "****" });
+        }
+        this.logService.log(new LoggedEntry("execute from Leapp\ninfo:" + JSON.stringify(info, undefined, 4), this, LogLevel.info, false));
         if (err) {
           reject(err);
         } else {

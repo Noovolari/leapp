@@ -2,7 +2,7 @@ import * as AWS from "aws-sdk";
 import { GetSessionTokenResponse } from "aws-sdk/clients/sts";
 import { IMfaCodePrompter } from "../../../interfaces/i-mfa-code-prompter";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
+import { AwsIamUserSession } from "../../../models/aws/aws-iam-user-session";
 import { constants } from "../../../models/constants";
 import { Credentials } from "../../../models/credentials";
 import { CredentialsInfo } from "../../../models/credentials-info";
@@ -128,7 +128,7 @@ export class AwsIamUserService extends AwsSessionService {
     }
 
     // Retrieve session token expiration
-    const tokenExpiration = (session as AwsIamUserSession).sessionTokenExpiration;
+    const tokenExpiration = session.sessionTokenExpiration;
 
     // Check if token is expired
     if (!tokenExpiration || AwsIamUserService.isTokenExpired(tokenExpiration)) {
@@ -285,7 +285,7 @@ export class AwsIamUserService extends AwsSessionService {
     const currentSession: Session = sessions[index];
 
     if (credentials !== undefined) {
-      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+      currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 
     sessions[index] = currentSession;

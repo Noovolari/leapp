@@ -17,10 +17,9 @@ import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request";
 import { AwsIamUserSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
 import { AwsIamRoleChainedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
-import { AzureSessionRequest } from "@noovolari/leapp-core/services/session/azure/azure-session-request";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
-import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { OptionsService } from "../../../services/options.service";
 
 @Component({
@@ -95,7 +94,7 @@ export class CreateDialogComponent implements OnInit {
   private awsIamRoleFederatedService: AwsIamRoleFederatedService;
   private awsIamUserService: AwsIamUserService;
   private awsIamRoleChainedService: AwsIamRoleChainedService;
-  private azureService: AzureService;
+  private azureSessionService: AzureSessionService;
   private loggingService: LogService;
 
   /* Setup the first account for the application */
@@ -113,7 +112,7 @@ export class CreateDialogComponent implements OnInit {
     this.awsIamRoleFederatedService = leappCoreService.awsIamRoleFederatedService;
     this.awsIamUserService = leappCoreService.awsIamUserService;
     this.awsIamRoleChainedService = leappCoreService.awsIamRoleChainedService;
-    this.azureService = leappCoreService.azureService;
+    this.azureSessionService = leappCoreService.azureSessionService;
     this.loggingService = leappCoreService.logService;
   }
 
@@ -371,7 +370,6 @@ export class CreateDialogComponent implements OnInit {
           this.awsIamUserService.create(awsIamUserSessionRequest).then(() => {});
           break;
         case SessionType.awsIamRoleChained:
-          console.log(this.selectedSession);
           const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
             sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
@@ -382,15 +380,16 @@ export class CreateDialogComponent implements OnInit {
           };
           this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
           break;
-        case SessionType.azure:
+        /*case SessionType.azure:
           const azureSessionRequest: AzureSessionRequest = {
+            azureIntegrationId: uuid.v4(),
             region: this.selectedLocation,
             sessionName: this.form.value.name,
             subscriptionId: this.form.value.subscriptionId,
             tenantId: this.form.value.tenantId,
           };
-          this.azureService.create(azureSessionRequest);
-          break;
+          this.azureSessionService.create(azureSessionRequest);
+          break;*/
       }
 
       this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, "");

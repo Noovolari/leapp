@@ -1,5 +1,5 @@
 import { describe, test, expect } from "@jest/globals";
-import { AwsIamRoleFederatedSession } from "../../../models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "../../../models/aws/aws-iam-role-federated-session";
 import { AwsIamRoleFederatedService } from "./aws-iam-role-federated-service";
 import { SessionType } from "../../../models/session-type";
 

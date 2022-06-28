@@ -15,30 +15,27 @@ export abstract class SessionService {
       const currentSession: Session = sessions[index];
       currentSession.status = SessionStatus.inactive;
       currentSession.startDateTime = undefined;
-
       sessions[index] = currentSession;
-
       this.repository.updateSessions(sessions);
-
       if (this.sessionNotifier) {
         this.sessionNotifier?.setSessions([...sessions]);
       }
     }
   }
 
-  protected sessionActivate(sessionId: string): void {
+  protected sessionActivated(sessionId: string, sessionTokenExpiration?: string): void {
     const sessions = this.repository.getSessions();
     const index = sessions.findIndex((s) => s.sessionId === sessionId);
 
     if (index > -1) {
       const currentSession: Session = sessions[index];
-      currentSession.status = SessionStatus.active;
       currentSession.startDateTime = new Date().toISOString();
-
+      currentSession.status = SessionStatus.active;
+      if (sessionTokenExpiration) {
+        currentSession.sessionTokenExpiration = sessionTokenExpiration;
+      }
       sessions[index] = currentSession;
-
       this.repository.updateSessions(sessions);
-
       if (this.sessionNotifier) {
         this.sessionNotifier.setSessions([...sessions]);
       }
@@ -52,30 +49,8 @@ export abstract class SessionService {
     if (index > -1) {
       const currentSession: Session = sessions[index];
       currentSession.status = SessionStatus.pending;
-
       sessions[index] = currentSession;
-
       this.repository.updateSessions(sessions);
-
-      if (this.sessionNotifier) {
-        this.sessionNotifier.setSessions([...sessions]);
-      }
-    }
-  }
-
-  protected sessionRotated(sessionId: string): void {
-    const sessions = this.repository.getSessions();
-    const index = sessions.findIndex((s) => s.sessionId === sessionId);
-
-    if (index > -1) {
-      const currentSession: Session = sessions[index];
-      currentSession.startDateTime = new Date().toISOString();
-      currentSession.status = SessionStatus.active;
-
-      sessions[index] = currentSession;
-
-      this.repository.updateSessions(sessions);
-
       if (this.sessionNotifier) {
         this.sessionNotifier.setSessions([...sessions]);
       }

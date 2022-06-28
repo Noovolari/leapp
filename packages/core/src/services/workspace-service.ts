@@ -8,7 +8,7 @@ export class WorkspaceService {
     return this.repository.getWorkspace();
   }
 
-  persistWorkspace(workspace): void {
+  persistWorkspace(workspace: Workspace): void {
     this.repository.persistWorkspace(workspace);
   }
 

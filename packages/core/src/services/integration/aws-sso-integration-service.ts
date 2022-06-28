@@ -1,11 +1,11 @@
-import { Repository } from "./repository";
-import { AwsSsoRoleService, LoginResponse, SsoRoleSession } from "./session/aws/aws-sso-role-service";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
+import { Repository } from "../repository";
+import { AwsSsoRoleService, LoginResponse, SsoRoleSession } from "../session/aws/aws-sso-role-service";
+import { AwsSsoIntegration } from "../../models/aws/aws-sso-integration";
 import { formatDistance } from "date-fns";
-import { INativeService } from "../interfaces/i-native-service";
-import { AwsSsoOidcService } from "./aws-sso-oidc.service";
-import { KeychainService } from "./keychain-service";
-import { constants } from "../models/constants";
+import { INativeService } from "../../interfaces/i-native-service";
+import { AwsSsoOidcService } from "../aws-sso-oidc.service";
+import { KeychainService } from "../keychain-service";
+import { constants } from "../../models/constants";
 import SSO, {
   AccountInfo,
   GetRoleCredentialsRequest,
@@ -15,39 +15,39 @@ import SSO, {
   LogoutRequest,
   RoleInfo,
 } from "aws-sdk/clients/sso";
-import { SessionType } from "../models/session-type";
-import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
-import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
-import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
-import { SessionFactory } from "./session-factory";
-import { BehaviouralSubjectService } from "./behavioural-subject-service";
+import { SessionType } from "../../models/session-type";
+import { AwsSsoRoleSession } from "../../models/aws/aws-sso-role-session";
+import { IBehaviouralNotifier } from "../../interfaces/i-behavioural-notifier";
+import { AwsSsoIntegrationTokenInfo } from "../../models/aws/aws-sso-integration-token-info";
+import { SessionFactory } from "../session-factory";
+import { IIntegrationService } from "../../interfaces/i-integration-service";
+import { AwsSsoIntegrationCreationParams } from "../../models/aws/aws-sso-integration-creation-params";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
-export interface IntegrationCreationParams {
-  alias: string;
-  portalUrl: string;
-  region: string;
-  browserOpening: string;
-}
+/*
+const asyncFilter = async (arr, predicate) => {
+  const results = await Promise.all(arr.map(predicate));
+  return arr.filter((_v, index) => results[index]);
+};
+ */
 
 export interface SsoSessionsDiff {
   sessionsToDelete: AwsSsoRoleSession[];
   sessionsToAdd: SsoRoleSession[];
 }
 
-export class AwsSsoIntegrationService {
+export class AwsSsoIntegrationService implements IIntegrationService {
   private ssoPortal: SSO;
 
   constructor(
-    private repository: Repository,
+    public repository: Repository,
+    public keyChainService: KeychainService,
+    public behaviouralNotifier: IBehaviouralNotifier,
+    public nativeService: INativeService,
+    public sessionFactory: SessionFactory,
     private awsSsoOidcService: AwsSsoOidcService,
-    private awsSsoRoleService: AwsSsoRoleService,
-    private keyChainService: KeychainService,
-    private sessionNotifier: IBehaviouralNotifier,
-    private nativeService: INativeService,
-    private sessionFactory: SessionFactory,
-    private behaviouralSubjectService: BehaviouralSubjectService
+    private awsSsoRoleService: AwsSsoRoleService
   ) {}
 
   static validateAlias(alias: string): boolean | string {
@@ -58,12 +58,20 @@ export class AwsSsoIntegrationService {
     return portalUrlValidationRegex.test(portalUrl) ? true : "Invalid portal URL";
   }
 
-  createIntegration(creationParams: IntegrationCreationParams): void {
+  async createIntegration(creationParams: AwsSsoIntegrationCreationParams): Promise<void> {
     this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
 
-  updateAwsSsoIntegration(id: string, updateParams: IntegrationCreationParams): void {
-    this.repository.updateAwsSsoIntegration(id, updateParams.alias, updateParams.region, updateParams.portalUrl, updateParams.browserOpening);
+  updateIntegration(id: string, updateParams: AwsSsoIntegrationCreationParams): void {
+    const isOnline = this.repository.getAwsSsoIntegration(id).isOnline;
+    this.repository.updateAwsSsoIntegration(
+      id,
+      updateParams.alias,
+      updateParams.region,
+      updateParams.portalUrl,
+      updateParams.browserOpening,
+      isOnline
+    );
   }
 
   getIntegration(id: string): AwsSsoIntegration {
@@ -75,17 +83,31 @@ export class AwsSsoIntegrationService {
   }
 
   getOnlineIntegrations(): AwsSsoIntegration[] {
-    return this.getIntegrations().filter((integration) => this.isOnline(integration));
+    const integrations = this.repository.listAwsSsoIntegrations();
+    return integrations.filter((integration) => integration.isOnline);
   }
 
   getOfflineIntegrations(): AwsSsoIntegration[] {
-    return this.getIntegrations().filter((integration) => !this.isOnline(integration));
+    const integrations = this.repository.listAwsSsoIntegrations();
+    return integrations.filter((integration) => !integration.isOnline);
   }
 
-  isOnline(integration: AwsSsoIntegration): boolean {
+  async setOnline(integration: AwsSsoIntegration, forcedState?: boolean): Promise<void> {
     const expiration = new Date(integration.accessTokenExpiration).getTime();
     const now = this.getDate().getTime();
-    return !!integration.accessTokenExpiration && now < expiration;
+    const isOnline = !!integration.accessTokenExpiration && now < expiration;
+
+    integration.isOnline = forcedState || isOnline;
+
+    this.repository.updateAwsSsoIntegration(
+      integration.id,
+      integration.alias,
+      integration.region,
+      integration.portalUrl,
+      integration.browserOpening,
+      integration.isOnline,
+      integration.accessTokenExpiration
+    );
   }
 
   remainingHours(integration: AwsSsoIntegration): string {
@@ -124,6 +146,10 @@ export class AwsSsoIntegrationService {
         sessionsToAdd.push(onlineSession);
       }
     }
+
+    await this.setOnline(awsSsoIntegration, true);
+    this.behaviouralNotifier.setIntegrations([...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()]);
+
     return { sessionsToDelete, sessionsToAdd };
   }
 
@@ -167,6 +193,9 @@ export class AwsSsoIntegrationService {
       await this.keyChainService.deletePassword(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
       this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
     }
+
+    await this.setOnline(integration, false);
+    this.behaviouralNotifier.setIntegrations([...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()]);
   }
 
   async getAccessToken(integrationId: string, region: string, portalUrl: string): Promise<string> {
@@ -176,13 +205,16 @@ export class AwsSsoIntegrationService {
       const loginResponse = await this.login(integrationId, region, portalUrl);
       const integration: AwsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId);
 
+      // const d = new Date();
+      // d.setMinutes(d.getMinutes() + 1);
+
       await this.configureAwsSso(
         integrationId,
         integration.alias,
         region,
         loginResponse.portalUrlUnrolled,
         integration.browserOpening,
-        loginResponse.expirationTime.toISOString(),
+        loginResponse.expirationTime.toISOString(), // d.toISOString(),
         loginResponse.accessToken
       );
 
@@ -248,7 +280,8 @@ export class AwsSsoIntegrationService {
     expirationTime: string,
     accessToken: string
   ): Promise<void> {
-    this.repository.updateAwsSsoIntegration(integrationId, alias, region, portalUrl, browserOpening, expirationTime);
+    const isOnline = this.repository.getAwsSsoIntegration(integrationId).isOnline;
+    this.repository.updateAwsSsoIntegration(integrationId, alias, region, portalUrl, browserOpening, isOnline, expirationTime);
     await this.keyChainService.saveSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId), accessToken);
   }
 
@@ -397,7 +430,7 @@ export class AwsSsoIntegrationService {
     for (const session of ssoSessions) {
       this.repository.deleteSession(session.sessionId);
     }
-    this.behaviouralSubjectService.setSessions([...this.repository.getSessions()]);
+    this.behaviouralNotifier.setSessions([...this.repository.getSessions()]);
   }
 
   private getProtocol(aliasedUrl: string): string {

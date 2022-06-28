@@ -1,12 +1,11 @@
-import { SessionType } from "./session-type";
-import { Session } from "./session";
+import { SessionType } from "../session-type";
+import { Session } from "../session";
 
 export class AwsIamRoleFederatedSession extends Session {
   idpUrlId: string;
   idpArn: string;
   roleArn: string;
   profileId: string;
-  sessionTokenExpiration: string;
 
   constructor(sessionName: string, region: string, idpUrlId: string, idpArn: string, roleArn: string, profileId: string) {
     super(sessionName, region);

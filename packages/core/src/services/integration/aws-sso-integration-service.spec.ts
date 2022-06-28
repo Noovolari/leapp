@@ -1,5 +1,7 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import { AwsSsoIntegrationService } from "./aws-sso-integration-service";
+import { IntegrationType } from "../../models/integration-type";
+import { Session } from "../../models/session";
 
 describe("AwsSsoIntegrationService", () => {
   test("validateAlias - empty alias", () => {
@@ -50,73 +52,15 @@ describe("AwsSsoIntegrationService", () => {
       listAwsSsoIntegrations: () => expectedIntegrations,
     } as any;
 
-    const awsIntegrationsService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null, null);
+    const awsIntegrationsService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
 
     const integrations = awsIntegrationsService.getIntegrations();
 
     expect(integrations).toBe(expectedIntegrations);
   });
 
-  test("getOnlineIntegrations", () => {
-    const expectedIntegrations = [{ id: 1 }];
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
-    awsIntegrationsService.getIntegrations = () => expectedIntegrations as any;
-    awsIntegrationsService.isOnline = jest.fn(() => true);
-
-    const onlineIntegrations = awsIntegrationsService.getOnlineIntegrations();
-
-    expect(onlineIntegrations).not.toBe(expectedIntegrations);
-    expect(onlineIntegrations).toEqual(expectedIntegrations);
-    expect(awsIntegrationsService.isOnline).toHaveBeenCalledWith(expectedIntegrations[0]);
-  });
-
-  test("getOfflineIntegrations", () => {
-    const expectedIntegrations = [{ id: 1 }];
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
-    awsIntegrationsService.getIntegrations = () => expectedIntegrations as any;
-    awsIntegrationsService.isOnline = jest.fn(() => false);
-
-    const offlineIntegrations = awsIntegrationsService.getOfflineIntegrations();
-
-    expect(offlineIntegrations).not.toBe(expectedIntegrations);
-    expect(offlineIntegrations).toEqual(expectedIntegrations);
-    expect(awsIntegrationsService.isOnline).toHaveBeenCalledWith(expectedIntegrations[0]);
-  });
-
-  test("isOnline, token missing", () => {
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
-    (awsIntegrationsService as any).getDate = () => new Date("2022-02-24T10:00:00");
-
-    const isOnline = awsIntegrationsService.isOnline({} as any);
-    expect(isOnline).toBe(false);
-  });
-
-  test("isOnline, token expired", () => {
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
-    (awsIntegrationsService as any).getDate = () => new Date("2022-02-24T10:00:00");
-
-    const integration = {
-      accessTokenExpiration: "2022-02-24T10:00:00",
-    } as any;
-
-    const isOnline = awsIntegrationsService.isOnline(integration);
-    expect(isOnline).toBe(false);
-  });
-
-  test("isOnline, token not expired", () => {
-    const awsIntegrationsService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
-    (awsIntegrationsService as any).getDate = () => new Date("2022-02-24T10:00:00");
-
-    const integration = {
-      accessTokenExpiration: "2022-02-24T10:00:01",
-    } as any;
-
-    const isOnline = awsIntegrationsService.isOnline(integration);
-    expect(isOnline).toBe(true);
-  });
-
   test("remainingHours", () => {
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
     const integration = {
       accessTokenExpiration: "2022-02-24T10:30:00",
     } as any;
@@ -172,17 +116,32 @@ describe("AwsSsoIntegrationService", () => {
       region: "region",
       portalUrl: "portalUrl",
     };
+    const aws1 = {};
+    const aws2 = {};
+    const azr1 = {};
+    const azr2 = {};
     const awsIntegrationSessions = caseAwsIntegrationSessions;
     const repository = {
       getAwsSsoIntegration: jest.fn(() => awsSsoIntegration),
       getAwsSsoIntegrationSessions: jest.fn(() => awsIntegrationSessions),
+      updateAwsSsoIntegration: jest.fn(() => {}),
+      listAwsSsoIntegrations: jest.fn(() => [aws1, aws2]),
+      listAzureIntegrations: jest.fn(() => [azr1, azr2]),
+    };
+    const behavioralNotifier = {
+      setIntegrations: jest.fn(() => {}),
+      getSessions: () => [],
+      getSessionById: () => ({} as Session),
+      setSessions: () => {},
+      getIntegrations: () => [],
     };
     const accessToken = "accessToken";
     const getAccessToken = jest.fn(async () => accessToken);
     const sessions = caseSessions;
     const getSessions = jest.fn(async () => sessions);
 
-    const awsSsoIntegrationService = new AwsSsoIntegrationService(repository as any, null, null, null, null, null, null, null);
+    const awsSsoIntegrationService = new AwsSsoIntegrationService(repository as any, null, behavioralNotifier as any, null, null, null, null);
+
     (awsSsoIntegrationService as any).getAccessToken = getAccessToken;
     (awsSsoIntegrationService as any).getSessions = getSessions;
 
@@ -194,6 +153,7 @@ describe("AwsSsoIntegrationService", () => {
     expect(getAccessToken).toHaveBeenCalledWith(integrationId, awsSsoIntegration.region, awsSsoIntegration.portalUrl);
     expect(getSessions).toHaveBeenCalledWith(integrationId, accessToken, awsSsoIntegration.region);
     expect(repository.getAwsSsoIntegrationSessions).toHaveBeenCalledWith(integrationId);
+    expect(behavioralNotifier.setIntegrations).toHaveBeenCalledWith([aws1, aws2, azr1, azr2]);
   });
 
   test("syncSessions", async () => {
@@ -213,7 +173,7 @@ describe("AwsSsoIntegrationService", () => {
     };
     const loginAndGetSessionsDiff = jest.fn(async () => sessionDiff);
     const awsSsoRoleService = {
-      create: jest.fn(async () => {}),
+      create: jest.fn(() => {}),
     };
     const sessionService = {
       delete: jest.fn(async () => {}),
@@ -221,16 +181,8 @@ describe("AwsSsoIntegrationService", () => {
     const sessionFactory = {
       getSessionService: jest.fn(() => sessionService),
     };
-    const awsSsoIntegrationService = new AwsSsoIntegrationService(
-      null,
-      null,
-      awsSsoRoleService as any,
-      null,
-      null,
-      null,
-      sessionFactory as any,
-      null
-    );
+
+    const awsSsoIntegrationService = new AwsSsoIntegrationService(null, null, null, null, sessionFactory as any, null, awsSsoRoleService as any);
     (awsSsoIntegrationService as any).loginAndGetSessionsDiff = loginAndGetSessionsDiff;
 
     const syncedSessions = await awsSsoIntegrationService.syncSessions(integrationId);
@@ -245,7 +197,7 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("getDate", () => {
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
     const time: Date = (awsIntegrationService as any).getDate();
 
     expect(time).toBeInstanceOf(Date);
@@ -253,7 +205,7 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("getIntegrationAccessTokenKey", () => {
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
     const integrationId = "integration1";
 
     const actualIntegrationAccessTokenKey = (awsIntegrationService as any).getIntegrationAccessTokenKey(integrationId);
@@ -266,14 +218,15 @@ describe("AwsSsoIntegrationService", () => {
       addAwsSsoIntegration: jest.fn(),
     } as any;
 
-    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null, null);
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
 
     const creationParams = {
       alias: "alias",
       portalUrl: "portalUrl",
       region: "region",
       browserOpening: "browserOpening",
-    };
+      type: IntegrationType.awsSso,
+    } as any;
     awsIntegrationService.createIntegration(creationParams);
 
     expect(repository.addAwsSsoIntegration).toHaveBeenCalledWith("portalUrl", "alias", "region", "browserOpening");
@@ -288,11 +241,16 @@ describe("AwsSsoIntegrationService", () => {
       deleteSessions: jest.fn(),
     } as any;
 
-    const behaviouralSubjectService = {
-      setSessions: jest.fn(),
-    } as any;
+    const behavioralNotifier = {
+      setSession: () => {},
+      getSessions: () => [],
+      getSessionById: () => ({} as Session),
+      setSessions: () => {},
+      getIntegrations: () => [],
+      setIntegrations: () => {},
+    };
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, behavioralNotifier, null, null, null, null);
 
-    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null, behaviouralSubjectService);
     awsIntegrationService.logout = jest.fn();
 
     const integrationId = "integrationId";

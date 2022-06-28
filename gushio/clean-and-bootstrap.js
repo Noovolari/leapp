@@ -1,7 +1,7 @@
 module.exports = {
   cli: {
     name: 'setup-package',
-    description: 'Setup Leapp project package',
+    description: 'Clean and bootstrap every package, builds the core',
     version: '0.1',
     arguments: [
       {name: '[packages...]'},
@@ -15,7 +15,6 @@ module.exports = {
     const packageNames = args[0]
 
     try {
-
       for (const packageName of packageNames) {
         console.log(`cleaning ${packageName}...`)
 
@@ -33,17 +32,9 @@ module.exports = {
         if (result.code !== 0) {
           throw new Error(result.stderr)
         }
-      }
 
-      console.log('\n\n')
-      console.log('installing dependencies ...')
-      // install npm dependencies
-      shellJs.cd(path.join(__dirname, '..'))
-      let result = shellJs.exec(`lerna bootstrap`)
-      if (result.code !== 0) {
-        throw new Error(result.stderr)
+        await gushio.run(path.join(__dirname, './bootstrap.js'), [packageName])
       }
-
     } catch (e) {
       e.message = e.message.red
       throw e

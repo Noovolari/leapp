@@ -363,8 +363,8 @@ export class CreateDialogComponent implements OnInit {
           const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
             sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
-            accessKey: this.form.value.accessKey.trim(),
-            secretKey: this.form.value.secretKey.trim(),
+            accessKey: this.form.value.accessKey.replace(/\s/g, ""),
+            secretKey: this.form.value.secretKey.replace(/\s/g, ""),
             mfaDevice: this.form.value.mfaDevice.trim(),
             profileId: this.selectedProfile.value,
           };

@@ -111,7 +111,11 @@ export class AzureIntegrationService implements IIntegrationService {
 
   async syncSessions(integrationId: string): Promise<any> {
     const integration = this.getIntegration(integrationId);
-    await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
+    try {
+      await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
+    } catch (err) {
+      throw new LoggedException("An error occured during Azure login", this, LogLevel.error, true);
+    }
     const azureProfile = await this.azurePersistenceService.loadProfile();
     await this.moveSecretsToKeychain(integration, azureProfile);
     await this.setOnline(integration, true);

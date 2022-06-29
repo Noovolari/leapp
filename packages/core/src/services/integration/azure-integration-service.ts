@@ -114,7 +114,8 @@ export class AzureIntegrationService implements IIntegrationService {
     try {
       await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
     } catch (err) {
-      throw new LoggedException("An error occured during Azure login", this, LogLevel.error, true);
+      if (JSON.parse(JSON.stringify(err)).killed && JSON.parse(JSON.stringify(err)).code === null)
+        throw new LoggedException(`Timeout error during Azure login with integration: ${integration.alias}`, this, LogLevel.error, true);
     }
     const azureProfile = await this.azurePersistenceService.loadProfile();
     await this.moveSecretsToKeychain(integration, azureProfile);

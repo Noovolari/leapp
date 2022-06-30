@@ -7,7 +7,9 @@ class LeappCli < Formula
   url "${tarballUrl}"
   sha256 "${tarballSha256}"
 
-  depends_on "node@16"
+  depends_on "node"
+  depends_on "libsecret"
+  depends_on "python" => :build
 
   def install
     system "npm", "install", *Language::Node.std_npm_install_args(libexec).reject { |a| a == "--build-from-source" }

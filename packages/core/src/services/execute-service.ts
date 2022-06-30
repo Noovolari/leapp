@@ -60,10 +60,18 @@ export class ExecuteService {
 
     if (this.nativeService.process.platform === "darwin") {
       const terminalType = macOsTerminalType ?? this.repository.getWorkspace().macOsTerminal;
+      const path = this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination;
       if (terminalType === constants.macOsTerminal) {
         return this.execute(
           `osascript -e 'if application "Terminal" is running then\n
-                    \tdisplay alert "Leapp SSM" message "To run an SSM session, please close all terminal instances"\n
+                    \ttell application "Terminal"\n
+                    \t\tdo script "source ${path}"\n
+                    \t\tdelay 0.5\n
+                    \t\tactivate\n
+                    \t\tdo script "clear" in window 1\n
+                    \t\tdelay 0.5\n
+                    \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
+                    \tend tell\n
                     else\n
                     \ttell application "Terminal"\n
                     \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
@@ -75,16 +83,25 @@ export class ExecuteService {
       } else {
         return this.execute(
           `osascript -e 'if application "iTerm" is running then\n
-                     \tdisplay alert "Leapp SSM" message "To run an SSM session, please close all iTerm instances"\n
-                     else\n
-                     \ttell application "iTerm"\n
-                     \t\treopen\n
-                     \t\tdelay 1\n
-                     \t\ttell current session of current window\n
-                     \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
-                     \t\tend tell\n
-                     \tend tell\n
-                     end if'`,
+                    \ttell application "iTerm"\n
+                    \t\tset newWindow to (create window with default profile)\n
+                    \t\ttell current session of newWindow\n
+                    \t\t\twrite text "source ${path}"\n
+                    \t\t\tdelay 0.5\n
+                    \t\t\twrite text "clear"\n
+                    \t\t\tdelay 0.5\n
+                    \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+                    \t\tend tell\n
+                    \tend tell\n
+                    else\n
+                    \ttell application "iTerm"\n
+                    \t\treopen\n
+                    \t\tdelay 1\n
+                    \t\ttell current session of current window\n
+                    \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+                    \t\tend tell\n
+                    \tend tell\n
+                    end if'`,
           Object.assign(newEnv, env)
         );
       }

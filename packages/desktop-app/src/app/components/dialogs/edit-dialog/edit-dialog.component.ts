@@ -325,8 +325,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       case SessionType.azure:
         (this.selectedSession as AzureSession).region = this.selectedLocation;
         (this.selectedSession as AzureSession).sessionName = this.form.value.name;
-        (this.selectedSession as AzureSession).subscriptionId = this.form.value.subscriptionId;
-        (this.selectedSession as AzureSession).tenantId = this.form.value.tenantId;
+        (this.selectedSession as AzureSession).subscriptionId = this.form.value.subscriptionId.trim();
+        (this.selectedSession as AzureSession).tenantId = this.form.value.tenantId.trim();
         break;
     }
   }

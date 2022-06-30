@@ -386,8 +386,8 @@ export class CreateDialogComponent implements OnInit {
           const azureSessionRequest: AzureSessionRequest = {
             region: this.selectedLocation,
             sessionName: this.form.value.name,
-            subscriptionId: this.form.value.subscriptionId,
-            tenantId: this.form.value.tenantId,
+            subscriptionId: this.form.value.subscriptionId.trim(),
+            tenantId: this.form.value.tenantId.trim(),
           };
           this.azureService.create(azureSessionRequest);
           break;

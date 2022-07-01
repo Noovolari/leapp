@@ -45,7 +45,10 @@ describe("CommandBarComponent", () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    (component as any).subscription = {
+    (component as any).subscription0 = {
+      unsubscribe: () => {},
+    };
+    (component as any).subscription1 = {
       unsubscribe: () => {},
     };
     (component as any).subscription2 = {

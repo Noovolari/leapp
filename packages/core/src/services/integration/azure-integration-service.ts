@@ -114,7 +114,16 @@ export class AzureIntegrationService implements IIntegrationService {
     try {
       await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
     } catch (err) {
-      if (JSON.parse(JSON.stringify(err)).killed && JSON.parse(JSON.stringify(err)).code === null)
+      const errorObject = JSON.parse(JSON.stringify(err));
+      if (
+        errorObject.code === 1 &&
+        !errorObject.killed &&
+        errorObject.signal === null &&
+        errorObject.stdout.indexOf("ERROR: No subscriptions found for") !== -1
+      ) {
+        throw new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.error, true);
+      }
+      if (errorObject.code === null && errorObject.killed)
         throw new LoggedException(`Timeout error during Azure login with integration: ${integration.alias}`, this, LogLevel.error, true);
     }
     const azureProfile = await this.azurePersistenceService.loadProfile();

@@ -23,24 +23,18 @@ $ brew install leapp
 
 ## Install Leapp CLI
 
-You can install Leapp CLI from [npm](https://www.npmjs.com/package/@noovolari/leapp-cli), installing it as a global package. 
-
-```console
-$ npm install -g @noovolari/leapp-cli
-```
-
-On macOS, you can install Leapp CLI through a Homebrew Formula:
+You can install Leapp CLI through a Homebrew Formula:
 
 ```console
 $ brew install Noovolari/brew/leapp-cli
 ```
 
-OR
+In Linux it may happen that the command ```leapp``` is not recognized. In that case we suggest to run the following command:
 
 ```console
-$ brew tap Noovolari/brew && brew install leapp-cli
+$ brew link leapp-cli
 ```
-
+ 
 All the available commands are listed in the [Leapp CLI section of the documentation](../../cli).
 
 !!! warning

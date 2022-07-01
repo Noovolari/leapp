@@ -225,12 +225,20 @@ export class AwsSsoIntegrationService {
 
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region);
+    const waitFor = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
 
     const promiseArray: Promise<SsoRoleSession[]>[] = [];
+    let counter = 0;
 
-    accounts.forEach((account) => {
+    for (const account of accounts) {
+      counter++;
+      // eslint-disable-next-line eqeqeq
+      if (counter % 25 == 0) {
+        await waitFor(5000);
+      }
+
       promiseArray.push(this.getSessionsFromAccount(integrationId, account, accessToken, region));
-    });
+    }
 
     return new Promise((resolve, _) => {
       Promise.all(promiseArray).then((sessionMatrix: SsoRoleSession[][]) => {

@@ -1,11 +1,14 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.108",
+  "version": "0.1.110",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
   },
   "description": "Leapp's core module",
+  "dependencies": {
+    "core-pro": "file:../../../leapp-pro-frontend/core-pro"
+  },
   "peerDependencies": {
     "@babel/plugin-proposal-decorators": "^7.16.5",
     "@types/aws-sdk": "^2.7.0",

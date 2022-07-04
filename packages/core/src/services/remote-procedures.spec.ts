@@ -92,7 +92,7 @@ describe("RemoteProcedures", () => {
       getWorkspace: jest.fn(() => new Workspace()),
       listAwsSsoIntegrations: () => integrations,
     } as any;
-    const behaviouralSubjectService = { setSessions: jest.fn() } as any;
+    const behaviouralSubjectService = { setSessions: jest.fn(), setIntegrations: jest.fn() } as any;
     (server as any).repository = repository;
     (server as any).behaviouralSubjectService = behaviouralSubjectService;
     server.startServer();

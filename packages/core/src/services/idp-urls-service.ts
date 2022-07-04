@@ -62,6 +62,15 @@ export class IdpUrlsService {
       : dependantSessions;
   }
 
+  mergeIdpUrl(url: string): IdpUrl {
+    const actualIdpUrl = this.repository.getIdpUrls().find((idpUrl) => idpUrl.url === url);
+    if (actualIdpUrl) {
+      return actualIdpUrl;
+    } else {
+      return this.createIdpUrl(url);
+    }
+  }
+
   private getNewId() {
     return uuid.v4();
   }

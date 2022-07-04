@@ -20,6 +20,9 @@ import { AwsSessionService } from "./session/aws/aws-session-service";
 import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-service";
 import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
 import { LoggedException, LogLevel } from "./log-service";
+import { AwsIamRoleFederatedService } from "./session/aws/aws-iam-role-federated-service";
+import { AwsIamFederatedLocalSessionDto } from "../models/web-dto/aws-iam-federated-local-session-dto";
+import { IdpUrlsService } from "./idp-urls-service";
 
 export class WebSyncService {
   private readonly encryptionProvider: EncryptionProvider;
@@ -31,7 +34,8 @@ export class WebSyncService {
     private readonly sessionFactory: SessionFactory,
     private readonly namedProfilesService: NamedProfilesService,
     private readonly sessionManagementService: SessionManagementService,
-    private readonly awsSsoIntegrationService: AwsSsoIntegrationService
+    private readonly awsSsoIntegrationService: AwsSsoIntegrationService,
+    private readonly idpUrlService: IdpUrlsService
   ) {
     const apiEndpoint = "http://localhost:3000";
     const httpClient: HttpClientInterface = {
@@ -99,6 +103,20 @@ export class WebSyncService {
         profileId,
         parentSessionId,
         roleSessionName: localSessionDto.roleSessionName,
+        sessionId: localSessionDto.sessionId,
+      });
+    } else if (localSecret.secretType === SecretType.awsIamRoleFederatedSession) {
+      const localSessionDto = localSecret as AwsIamFederatedLocalSessionDto;
+      const sessionService = (await this.sessionFactory.getSessionService(SessionType.awsIamRoleFederated)) as AwsIamRoleFederatedService;
+      const profileId = await this.setupAwsSession(sessionService, localSessionDto.sessionId, localSessionDto.profileName);
+      const idpUrlId = this.idpUrlService.mergeIdpUrl(localSessionDto.samlUrl).id;
+      await sessionService.create({
+        sessionName: localSessionDto.sessionName,
+        region: localSessionDto.region,
+        roleArn: localSessionDto.roleArn,
+        profileId,
+        idpUrl: idpUrlId,
+        idpArn: localSessionDto.idpArn,
         sessionId: localSessionDto.sessionId,
       });
     }

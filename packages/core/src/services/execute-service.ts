@@ -66,10 +66,10 @@ export class ExecuteService {
           `osascript -e 'if application "Terminal" is running then\n
                     \ttell application "Terminal"\n
                     \t\tdo script "source ${path}"\n
-                    \t\tdelay 0.5\n
+                    \t\tdelay 3.5\n
                     \t\tactivate\n
                     \t\tdo script "clear" in window 1\n
-                    \t\tdelay 0.5\n
+                    \t\tdelay 2.5\n
                     \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
                     \tend tell\n
                     else\n
@@ -87,9 +87,9 @@ export class ExecuteService {
                     \t\tset newWindow to (create window with default profile)\n
                     \t\ttell current session of newWindow\n
                     \t\t\twrite text "source ${path}"\n
-                    \t\t\tdelay 0.5\n
+                    \t\t\tdelay 3.5\n
                     \t\t\twrite text "clear"\n
-                    \t\t\tdelay 0.5\n
+                    \t\t\tdelay 2.5\n
                     \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
                     \t\tend tell\n
                     \tend tell\n

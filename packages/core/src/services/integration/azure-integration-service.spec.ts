@@ -351,6 +351,69 @@ describe("AzureIntegrationService", () => {
     expect((service as any).notifyIntegrationChanges).toHaveBeenCalled();
   });
 
+  test("syncSessions, deleteDependentSessions method is called once if 'ERROR: No subscriptions found for' was catched in the 'az login' command stdout", async () => {
+    const executeService = {
+      execute: jest.fn(() => {
+        const azLoginError = {
+          code: 1,
+          killed: false,
+          signal: null,
+          stdout: "ERROR: No subscriptions found for",
+        };
+        return Promise.reject(azLoginError);
+      }),
+    } as any;
+
+    const integrationAlias = "fake-alias";
+
+    const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
+    (service as any).getIntegration = jest.fn(() => ({
+      alias: integrationAlias,
+      tenantId: "fake-tenant-id",
+    }));
+    (service as any).deleteDependentSessions = jest.fn();
+
+    try {
+      await service.syncSessions("fake-integration-id");
+    } catch (err) {
+      expect(err instanceof LoggedException).toBeTruthy();
+      expect(err.message).toEqual(`No Azure Subscriptions found for integration: ${integrationAlias}`);
+      expect(err.level).toEqual(LogLevel.error);
+      expect(err.display).toBeTruthy();
+    }
+
+    expect((service as any).deleteDependentSessions).toHaveBeenCalledTimes(1);
+  });
+
+  test("syncSessions, timeout error is raised if 'az login' command raised error with code === null and killed === true", async () => {
+    const executeService = {
+      execute: jest.fn(() => {
+        const azLoginError = {
+          code: null,
+          killed: true,
+        };
+        return Promise.reject(azLoginError);
+      }),
+    } as any;
+
+    const integrationAlias = "fake-alias";
+
+    const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
+    (service as any).getIntegration = jest.fn(() => ({
+      alias: integrationAlias,
+      tenantId: "fake-tenant-id",
+    }));
+
+    try {
+      await service.syncSessions("fake-integration-id");
+    } catch (err) {
+      expect(err instanceof LoggedException).toBeTruthy();
+      expect(err.message).toEqual(`Timeout error during Azure login with integration: ${integrationAlias}`);
+      expect(err.level).toEqual(LogLevel.error);
+      expect(err.display).toBeTruthy();
+    }
+  });
+
   test("setOnline, is online, forcedState", async () => {
     const repository = { updateAzureIntegration: jest.fn() } as any;
     const azurePersistenceService = { loadMsalCache: jest.fn(), loadProfile: jest.fn() } as any;

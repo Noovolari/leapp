@@ -1,8 +1,9 @@
+import { describe, test, expect } from "@jest/globals";
 import { SessionType } from "../session-type";
 import { AwsIamRoleFederatedSession } from "./aws-iam-role-federated-session";
 
 describe("AWS IAM Role Federated Session Model", () => {
-  it("should create", () => {
+  test("should create", () => {
     const sessionName = "fake-federated-session";
     const region = "fake-region";
     const idpUrlId = "fake-idp-url-id";

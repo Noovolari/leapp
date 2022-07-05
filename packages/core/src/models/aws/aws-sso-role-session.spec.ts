@@ -1,7 +1,8 @@
+import { describe, test, expect } from "@jest/globals";
 import { AwsSsoRoleSession } from "./aws-sso-role-session";
 
 describe("AWS SSO Role Session", () => {
-  it("should create", () => {
+  test("should create", () => {
     const awsSsoRoleSessionWithEmail = new AwsSsoRoleSession(
       "fake-session-name-1",
       "fake-region-1",

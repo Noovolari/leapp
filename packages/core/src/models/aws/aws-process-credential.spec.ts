@@ -1,7 +1,8 @@
+import { describe, test, expect } from "@jest/globals";
 import { AwsProcessCredentials } from "./aws-process-credential";
 
 describe("AWS Process Credential", () => {
-  it("should create", () => {
+  test("should create", () => {
     const awsProcessCredentials = new AwsProcessCredentials(
       1,
       "fake-access-key-id",

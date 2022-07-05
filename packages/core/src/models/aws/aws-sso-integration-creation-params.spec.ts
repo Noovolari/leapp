@@ -1,7 +1,8 @@
+import { describe, test, expect } from "@jest/globals";
 import { AwsSsoIntegrationCreationParams } from "./aws-sso-integration-creation-params";
 
 describe("AWS SSO Integration Creation Params", () => {
-  it("should create", () => {
+  test("should create", () => {
     const awsSsoIntegrationParams: AwsSsoIntegrationCreationParams = {
       portalUrl: "fake-portal-url",
       region: "fake-region",

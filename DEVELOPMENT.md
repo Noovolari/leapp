@@ -3,7 +3,7 @@ If you want to start a code contribution to Leapp, whether it is a bug fix or a 
 
 # Project Structure
 
-Leapp project is structured as a monorepo architecture with [Lerna](https://github.com/lerna/lerna).
+Leapp project is structured as a monorepo architecture.
 
 | package       | folder         |
 |---------------|----------------|

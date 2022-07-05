@@ -25,13 +25,6 @@ import { AwsSsoIntegrationCreationParams } from "../../models/aws/aws-sso-integr
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
-/*
-const asyncFilter = async (arr, predicate) => {
-  const results = await Promise.all(arr.map(predicate));
-  return arr.filter((_v, index) => results[index]);
-};
- */
-
 export interface SsoSessionsDiff {
   sessionsToDelete: AwsSsoRoleSession[];
   sessionsToAdd: SsoRoleSession[];
@@ -435,8 +428,8 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   private getProtocol(aliasedUrl: string): string {
     let protocol = aliasedUrl.split("://")[0];
-    if (protocol.indexOf("http") === -1) {
-      protocol = "https";
+    if (protocol.indexOf("https") === -1) {
+      protocol = "http";
     }
     return protocol;
   }

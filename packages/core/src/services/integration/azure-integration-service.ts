@@ -124,8 +124,10 @@ export class AzureIntegrationService implements IIntegrationService {
         await this.deleteDependentSessions(integrationId);
         throw new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.error, true);
       }
-      if (errorObject.code === null && errorObject.killed)
+      if (errorObject.code === null && errorObject.killed) {
         throw new LoggedException(`Timeout error during Azure login with integration: ${integration.alias}`, this, LogLevel.error, true);
+      }
+      throw new LoggedException(err.toString(), this, LogLevel.error, false);
     }
     const azureProfile = await this.azurePersistenceService.loadProfile();
     await this.moveSecretsToKeychain(integration, azureProfile);
@@ -161,7 +163,7 @@ export class AzureIntegrationService implements IIntegrationService {
           azureSession.subscriptionId === request.subscriptionId &&
           azureSession.region === request.region
       );
-      const isSessionToDelete = !creationRequest;
+      const isSessionToDelete = creationRequest === undefined;
       if (isSessionToDelete) {
         await this.azureSessionService.delete(azureSession.sessionId);
       } else {

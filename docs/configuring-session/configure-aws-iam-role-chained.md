@@ -23,3 +23,6 @@ Role chaining occurs when you use a role to assume a second role through the AWS
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-chained.mp4" type="video/mp4"> </video>
 
+!!! info
+
+    Azure session is no more available for direct creation. Instead you can create a new [Azure Integration](../../configuring-integration/configuring-azure-integration.md).

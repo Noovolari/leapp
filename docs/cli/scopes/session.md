@@ -22,10 +22,10 @@ Add a new session
 
 ```console
 USAGE
-  $ leapp session add [--providerType aws|azure] [--accessKey <value>] [--idpArn <value>] [--idpUrl <value>]
+  $ leapp session add [--providerType aws] [--accessKey <value>] [--idpArn <value>] [--idpUrl <value>]
     [--mfaDevice <value>] [--sessionName <value>] [--parentSessionId <value>] [--profileId <value>] [--region <value>]
     [--roleArn <value>] [--roleSessionName <value>] [--secretKey <value>] [--subscriptionId <value>] [--tenantId
-    <value>] [--sessionType awsIamRoleFederated|awsIamUser|awsIamRoleChained|azure]
+    <value>] [--sessionType awsIamRoleFederated|awsIamUser|awsIamRoleChained]
 
 FLAGS
   --accessKey=<value>        AWS Access Key ID of the IAM User
@@ -35,18 +35,16 @@ FLAGS
   --parentSessionId=<value>  For AWS IAM Role Chained is the session Id of the session that will assume the chained
                              role. Retrieve it using $leapp session list -x
   --profileId=<value>        an AWS named profile ID in Leapp
-  --providerType=<option>    Identify the provider for your sessions. Valid types are [aws, azure]
-                             <options: aws|azure>
-  --region=<value>           Session Region for session in Leapp, use it for both AWS Region and Azure Location
+  --providerType=<option>    Identify the provider for your sessions. Valid types are [aws]
+                             <options: aws>
+  --region=<value>           Session Region for session in Leapp, use it for AWS Region 
   --roleArn=<value>          AWS IAM Federated Role Arn value, obtain it from your AWS Account
   --roleSessionName=<value>  Optional Alias for the Assumed Role Session name
   --secretKey=<value>        AWS Secret Access Key of the IAM User
   --sessionName=<value>      Session Alias to identify the session in Leapp
-  --sessionType=<option>     Identify the session type for both AWS and Azure. Valid types are [awsIamRoleFederated,
-                             awsIamUser, awsIamRoleChained, azure]
-                             <options: awsIamRoleFederated|awsIamUser|awsIamRoleChained|azure>
-  --subscriptionId=<value>   The Azure session Subscriptin Id
-  --tenantId=<value>         The Azure session Tenant Id
+  --sessionType=<option>     Identify the session type. Valid types are [awsIamRoleFederated,
+                             awsIamUser, awsIamRoleChained]
+                             <options: awsIamRoleFederated|awsIamUser|awsIamRoleChained>
 
 DESCRIPTION
   Add a new session
@@ -54,9 +52,7 @@ DESCRIPTION
 EXAMPLES
   $leapp session add
 
-  $leapp session add --providerType [aws, azure] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser, azure] --region [AWSREGION, AZURELOCATION] --sessionName NAME ...[combination of flags relative to the session]
-
-  $leapp session add --providerType azure --sessionType azure --sessionName NAME --region AZURELOCATION --tenantID TENANTID --subscriptionId SUBSCRIPTIONID
+  $leapp session add --providerType [aws] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser] --region [AWSREGION] --sessionName NAME ...[combination of flags relative to the session]
 
   $leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN
 
@@ -95,7 +91,7 @@ USAGE
   $ leapp session change-region [--sessionId <value>] [--region <value>]
 
 FLAGS
-  --region=<value>     Session Region for session in Leapp, use it for both AWS Region and Azure Location
+  --region=<value>     Session Region for session in Leapp, use it for AWS Region
   --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
@@ -113,16 +109,15 @@ Provides info about the current active session for a selected profile (if no pro
 
 ```console
 USAGE
-  $ leapp session current [-i] [-p <value>] [-r aws|azure] [-f <value>]
+  $ leapp session current [-i] [-p <value>] [-r aws] [-f <value>]
 
 FLAGS
   -f, --format=<value>     allows formatting data to show
                            - aws -> id alias, accountNumber, roleArn
-                           - azure -> id tenantId, subscriptionId
   -i, --inline
   -p, --profile=<value>    [default: default] aws named profile of which gets info
   -r, --provider=<option>  filters sessions by the cloud provider service
-                           <options: aws|azure>
+                           <options: aws>
 
 DESCRIPTION
   Provides info about the current active session for a selected profile (if no profile is provided it uses default
@@ -264,7 +259,7 @@ USAGE
   $ leapp session start-ssm-session [--sessionId <value>] [--region <value>] [--ssmInstanceId <value>]
 
 FLAGS
-  --region=<value>         Session Region for session in Leapp, use it for both AWS Region and Azure Location
+  --region=<value>         Session Region for session in Leapp, use it for AWS Region
   --sessionId=<value>      Session Id to identify the session in Leapp, recover it with $leapp session list -x
   --ssmInstanceId=<value>  Instance ID for EC2 instance we want to access with SSM
 

@@ -21,3 +21,7 @@ An IAM User in AWS consists of a name and a set of long-term credentials. Leapp 
 ## Video Tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-user.mp4" type="video/mp4"> </video>
+
+!!! info
+
+    Azure session is no more available for direct creation. Instead you can create a new [Azure Integration](../../configuring-integration/configuring-azure-integration.md).

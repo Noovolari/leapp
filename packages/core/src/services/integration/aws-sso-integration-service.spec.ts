@@ -3,6 +3,8 @@ import { AwsSsoIntegrationService } from "./aws-sso-integration-service";
 import { IntegrationType } from "../../models/integration-type";
 import { Session } from "../../models/session";
 import { SSO } from "aws-sdk";
+import { SessionType } from "../../models/session-type";
+import { ListAccountRolesRequest } from "aws-sdk/clients/sso";
 
 describe("AwsSsoIntegrationService", () => {
   test("validateAlias - empty alias", () => {
@@ -360,37 +362,45 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("findOldSession", () => {
-    /*
-    *     for (let i = 0; i < this.repository.getSessions().length; i++) {
-      const sess = this.repository.getSessions()[i];
-
-      if (sess.type === SessionType.awsSsoRole) {
-        if (
-          (sess as AwsSsoRoleSession).email === accountInfo.emailAddress &&
-          (sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`
-        ) {
-          return { region: (sess as AwsSsoRoleSession).region, profileId: (sess as AwsSsoRoleSession).profileId };
-        }
-      }
-    }
-
-    return undefined;
-    * */
     const sessions = [
-      { sessionId: 1, awsSsoConfigurationId: "2" },
-      { sessionId: 2, awsSsoConfigurationId: "2" },
-      { sessionId: 3, awsSsoConfigurationId: "1" },
+      {
+        sessionId: 1,
+        awsSsoConfigurationId: "2",
+        type: SessionType.awsSsoRole,
+        email: "test2@gmail.com",
+        roleArn: `arn:aws:iam::accountId2/roleName2`,
+        region: "1",
+        profileId: "1",
+      },
+      {
+        sessionId: 2,
+        awsSsoConfigurationId: "2",
+        type: SessionType.awsSsoRole,
+        email: "test@gmail.com",
+        roleArn: `arn:aws:iam::testAccountId/roleTest`,
+        region: "2",
+        profileId: "2",
+      },
+      {
+        sessionId: 3,
+        awsSsoConfigurationId: "1",
+        type: SessionType.awsSsoRole,
+        email: "test3@gmail.com",
+        roleArn: `arn:aws:iam::accountId3/roleName3`,
+        region: "3",
+        profileId: "3",
+      },
     ];
 
     const accountInfo: SSO.AccountInfo = {
-      accountId: "testAccountid",
+      accountId: "testAccountId",
       accountName: "testAccountName",
       emailAddress: "test@gmail.com",
     };
 
     const accountRole: SSO.RoleInfo = {
-      roleName: "",
-      accountId: "",
+      roleName: "roleTest",
+      accountId: "testAccountId",
     };
 
     const repository = {
@@ -402,7 +412,42 @@ describe("AwsSsoIntegrationService", () => {
     } as any;
 
     const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
-    expect((awsIntegrationService as any).findOldSession(accountInfo, accountRole));
+    expect((awsIntegrationService as any).findOldSession(accountInfo, accountRole)).toStrictEqual({ region: "2", profileId: "2" });
+    expect((awsIntegrationService as any).findOldSession(accountInfo, { roleName: "notTobeFoundRole", accountId: "notToBeFoundId" })).toBeUndefined();
+  });
+
+  test("recursiveListRoles", () => {
+    const listAccountRolesRequest: ListAccountRolesRequest = { accessToken: "", accountId: "" };
+
+    let i = 0;
+    const response = {
+      roleList: [{ roleId: 1, roleName: "a" }],
+      nextToken: null,
+    };
+
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    (awsIntegrationService as any).ssoPortal = {
+      listAccountRoles: () => ({
+        promise: () => {
+          response.nextToken = i === 0 ? "1234abcd" : null;
+          console.log(i, response);
+          i++;
+          return Promise.resolve(response);
+        },
+      }),
+    };
+    const spy = jest.spyOn((awsIntegrationService as any).ssoPortal, "listAccountRoles");
+
+    const promiseCallback = jest.fn(() => {});
+
+    (awsIntegrationService as any).recursiveListRoles([], listAccountRolesRequest, promiseCallback);
+
+    expect(i).toBe(1);
+    expect(spy).toHaveBeenCalledWith(listAccountRolesRequest);
+    /*expect(promiseCallback).toHaveBeenCalledWith([
+      { roleId: 1, roleName: "a" },
+      { roleId: 1, roleName: "a" },
+    ]);*/
   });
 
   test("logout", () => {});

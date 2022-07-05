@@ -8,7 +8,7 @@ import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service"
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
-import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { AppNativeService } from "./app-native.service";
 import { AppMfaCodePromptService } from "./app-mfa-code-prompt.service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
@@ -25,7 +25,7 @@ import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
 import { WindowService } from "./window.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
@@ -36,6 +36,9 @@ import { SessionManagementService } from "@noovolari/leapp-core/services/session
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { AppNativeLoggerService } from "./app-native-logger-service";
 import { MessageToasterService } from "./message-toaster.service";
+import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
+import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
+import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 
 @Injectable({
   providedIn: "root",
@@ -55,14 +58,15 @@ export class AppProviderService {
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private awsCoreServiceInstance: AwsCoreService;
-  private azureServiceInstance: AzureService;
+  private azureServiceInstance: AzureSessionService;
+  private azureIntegrationServiceInstance: AzureIntegrationService;
   private authenticationServiceInstance: AwsSamlAssertionExtractionService;
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
   private keyChainServiceInstance: KeychainService;
-  private loggingServiceInstance: LogService;
+  private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
   private rotationServiceInstance: RotationService;
@@ -76,8 +80,10 @@ export class AppProviderService {
   private segmentServiceInstance: SegmentService;
   private sessionManagementServiceInstance: SessionManagementService;
   private workspaceServiceInstance: WorkspaceService;
+  private azurePersistenceServiceInstance: AzurePersistenceService;
+  private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
 
-  constructor(private electronService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
+  constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -175,13 +181,12 @@ export class AppProviderService {
     if (!this.awsSsoIntegrationServiceInstance) {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
         this.repository,
-        this.awsSsoOidcService,
-        this.awsSsoRoleService,
         this.keyChainService,
         this.behaviouralSubjectService,
-        this.electronService,
+        this.appNativeService,
         this.sessionFactory,
-        this.behaviouralSubjectService
+        this.awsSsoOidcService,
+        this.awsSsoRoleService
       );
     }
     return this.awsSsoIntegrationServiceInstance;
@@ -195,7 +200,7 @@ export class AppProviderService {
         this.fileService,
         this.keyChainService,
         this.awsCoreService,
-        this.electronService,
+        this.appNativeService,
         this.awsSsoOidcService
       );
     }
@@ -211,23 +216,48 @@ export class AppProviderService {
 
   public get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.electronService, this.logService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.appNativeService, this.logService);
     }
     return this.awsCoreServiceInstance;
   }
 
-  public get azureService(): AzureService {
+  public get azureSessionService(): AzureSessionService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(
+      this.azureServiceInstance = new AzureSessionService(
         this.behaviouralSubjectService,
         this.repository,
         this.fileService,
         this.executeService,
-        constants.azureAccessTokens
+        constants.azureMsalCacheFile,
+        this.appNativeService,
+        this.azurePersistenceService,
+        this.logService
       );
     }
 
     return this.azureServiceInstance;
+  }
+
+  public get azureIntegrationService(): AzureIntegrationService {
+    if (!this.azureIntegrationServiceInstance) {
+      this.azureIntegrationServiceInstance = new AzureIntegrationService(
+        this.repository,
+        this.behaviouralSubjectService,
+        this.appNativeService,
+        this.sessionFactory,
+        this.executeService,
+        this.azureSessionService,
+        this.azurePersistenceService
+      );
+    }
+    return this.azureIntegrationServiceInstance;
+  }
+
+  public get azurePersistenceService(): AzurePersistenceService {
+    if (!this.azurePersistenceServiceInstance) {
+      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.appNativeService, this.keyChainService);
+    }
+    return this.azurePersistenceServiceInstance;
   }
 
   public get authenticationService(): AwsSamlAssertionExtractionService {
@@ -244,7 +274,7 @@ export class AppProviderService {
         this.awsIamRoleFederatedService,
         this.awsIamRoleChainedService,
         this.awsSsoRoleService,
-        this.azureService
+        this.azureSessionService
       );
     }
     return this.sessionFactoryInstance;
@@ -270,30 +300,30 @@ export class AppProviderService {
 
   public get fileService(): FileService {
     if (!this.fileServiceInstance) {
-      this.fileServiceInstance = new FileService(this.electronService);
+      this.fileServiceInstance = new FileService(this.appNativeService);
     }
     return this.fileServiceInstance;
   }
 
   public get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.electronService, this.fileService);
+      this.repositoryInstance = new Repository(this.appNativeService, this.fileService);
     }
     return this.repositoryInstance;
   }
 
   public get keyChainService(): KeychainService {
     if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.electronService);
+      this.keyChainServiceInstance = new KeychainService(this.appNativeService);
     }
     return this.keyChainServiceInstance;
   }
 
   public get logService(): LogService {
-    if (!this.loggingServiceInstance) {
-      this.loggingServiceInstance = new LogService(new AppNativeLoggerService(this.electronService, this.messageToaster));
+    if (!this.logServiceInstance) {
+      this.logServiceInstance = new LogService(new AppNativeLoggerService(this.appNativeService, this.messageToaster));
     }
-    return this.loggingServiceInstance;
+    return this.logServiceInstance;
   }
 
   public get timerService(): TimerService {
@@ -305,7 +335,7 @@ export class AppProviderService {
 
   public get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.electronService, this.repository, this.logService);
+      this.executeServiceInstance = new ExecuteService(this.appNativeService, this.repository, this.logService);
     }
     return this.executeServiceInstance;
   }
@@ -332,7 +362,7 @@ export class AppProviderService {
 
   public get azureCoreService(): AzureCoreService {
     if (!this.azureCoreServiceInstance) {
-      this.azureCoreServiceInstance = new AzureCoreService();
+      this.azureCoreServiceInstance = new AzureCoreService(this.sessionManagementService, this.azureSessionService);
     }
     return this.azureCoreServiceInstance;
   }
@@ -340,7 +370,7 @@ export class AppProviderService {
   public get remoteProceduresServer(): RemoteProceduresServer {
     if (!this.remoteProceduresServerInstance) {
       this.remoteProceduresServerInstance = new RemoteProceduresServer(
-        this.electronService,
+        this.appNativeService,
         this.verificationWindowService,
         this.awsAuthenticationService,
         this.mfaCodePrompter,
@@ -350,5 +380,16 @@ export class AppProviderService {
       );
     }
     return this.remoteProceduresServerInstance;
+  }
+
+  public get integrationIsOnlineStateRefreshService(): IntegrationIsOnlineStateRefreshService {
+    if (!this.integrationIsOnlineStateRefreshServiceInstance) {
+      this.integrationIsOnlineStateRefreshServiceInstance = new IntegrationIsOnlineStateRefreshService(
+        this.awsSsoIntegrationService,
+        this.azureIntegrationService,
+        this.behaviouralSubjectService
+      );
+    }
+    return this.integrationIsOnlineStateRefreshServiceInstance;
   }
 }

@@ -1,6 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { integrationId } from "../../flags";
 
 export default class LogoutIntegration extends LeappCommand {
@@ -42,7 +42,7 @@ export default class LogoutIntegration extends LeappCommand {
   }
 
   async selectIntegration(): Promise<AwsSsoIntegration> {
-    const onlineIntegrations = this.cliProviderService.awsSsoIntegrationService.getOnlineIntegrations();
+    const onlineIntegrations = await this.cliProviderService.awsSsoIntegrationService.getOnlineIntegrations();
     if (onlineIntegrations.length === 0) {
       throw new Error("no online integrations available");
     }

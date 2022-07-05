@@ -27,7 +27,7 @@ export class OptionsService {
     return workspace.proxyConfiguration;
   }
 
-  updateProxyConfiguration(value: { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string }) {
+  updateProxyConfiguration(value: { proxyProtocol: string; proxyUrl?: string; proxyPort: string; username?: string; password?: string }): void {
     const workspace = this.workspaceService.getWorkspace();
     workspace.proxyConfiguration = value;
     this.workspaceService.persistWorkspace(workspace);

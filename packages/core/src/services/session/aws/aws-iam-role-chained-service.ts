@@ -3,7 +3,7 @@ import { AssumeRoleResponse } from "aws-sdk/clients/sts";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsIamRoleChainedSession } from "../../../models/aws-iam-role-chained-session";
+import { AwsIamRoleChainedSession } from "../../../models/aws/aws-iam-role-chained-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { AwsCoreService } from "../../aws-core-service";
@@ -14,7 +14,6 @@ import { AwsIamUserService } from "./aws-iam-user-service";
 import { AwsParentSessionFactory } from "./aws-parent-session.factory";
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
-import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 import { constants } from "../../../models/constants";
 
 export class AwsIamRoleChainedService extends AwsSessionService {
@@ -170,7 +169,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     const currentSession: Session = sessions[index];
 
     if (credentials !== undefined) {
-      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+      currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 
     sessions[index] = currentSession;

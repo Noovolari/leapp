@@ -1,17 +1,20 @@
 import { serialize } from "class-transformer";
 import { Workspace } from "../models/workspace";
-import { AwsIamRoleFederatedSession } from "../models/aws-iam-role-federated-session";
-import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session";
-import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
-import { AzureSession } from "../models/azure-session";
+import { AwsIamRoleFederatedSession } from "../models/aws/aws-iam-role-federated-session";
+import { AwsIamRoleChainedSession } from "../models/aws/aws-iam-role-chained-session";
+import { AwsSsoRoleSession } from "../models/aws/aws-sso-role-session";
 import { FileService } from "./file-service";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { KeychainService } from "./keychain-service";
 import { constants } from "../models/constants";
-import { AwsIamUserSession } from "../models/aws-iam-user-session";
+import { AwsIamUserSession } from "../models/aws/aws-iam-user-session";
 import * as uuid from "uuid";
 import { SessionType } from "../models/session-type";
 import { Repository } from "./repository";
+import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
+import { Session } from "../models/session";
+import { AzureSession } from "../models/azure/azure-session";
+import { AzureIntegration } from "../models/azure/azure-integration";
 
 export class RetroCompatibilityService {
   constructor(
@@ -77,16 +80,17 @@ export class RetroCompatibilityService {
     workspace._sessions.push(ssoSession);
   }
 
-  private static createNewAzureSession(session: any, workspace: any) {
+  /*private static createNewAzureSession(session: any, workspace: any) {
     const azureSession = new AzureSession(
       session.account.accountName,
       session.account.region,
       session.account.subscriptionId,
-      session.account.tenantId
+      session.account.tenantId,
+      null
     );
     azureSession.sessionId = session.id;
     workspace._sessions.push(azureSession);
-  }
+  }*/
 
   private static createNewAwsFederatedOrIamRoleChainedSessionNew(session: any, workspace: any) {
     if (!(session as AwsIamRoleChainedSession).parentSessionId) {
@@ -130,15 +134,97 @@ export class RetroCompatibilityService {
     workspace._sessions.push(ssoSession);
   }
 
-  private static createNewAzureSessionNew(session: any, workspace: any) {
+  /*private static createNewAzureSessionNew(session: any, workspace: any) {
     const azureSession = new AzureSession(
       (session as AzureSession).sessionName,
       (session as AzureSession).region,
       (session as AzureSession).subscriptionId,
-      (session as AzureSession).tenantId
+      (session as AzureSession).tenantId,
+      null
     );
     azureSession.sessionId = session.sessionId;
     workspace._sessions.push(azureSession);
+  }*/
+
+  async applyWorkspaceMigrations(): Promise<void> {
+    /*if (this.isRetroPatchNecessary()) {
+      await this.adaptOldWorkspaceFile();
+    }
+
+    if (this.isIntegrationPatchNecessary()) {
+      await this.adaptIntegrationPatch();
+    }
+
+    if (this.fileService.existsSync(this.fileService.homeDir() + "/" + constants.lockFileDestination)) {
+      const workspace = this.parseWorkspaceFile();
+      const leappCorePackageJson = JSON.parse(this.fileService.readFileSync("../core/package.json"));
+
+      this.migration1(workspace, leappCorePackageJson["version"]);
+    }*/
+  }
+
+  migration1(workspace: any, leappCorePackageJsonVersion: string): void {
+    const isTheFirstMigration = workspace._lastMigrationVersion === undefined && leappCorePackageJsonVersion === "0.1.111";
+
+    if (isTheFirstMigration) {
+      workspace._lastMigrationVersion = "0.1.111";
+      const awsSsoIntegrations = workspace._awsSsoIntegrations;
+
+      const newAwsSsoIntegrations: AwsSsoIntegration[] = [];
+
+      if (awsSsoIntegrations && awsSsoIntegrations.length > 0) {
+        for (let i = 0; i < awsSsoIntegrations.length; i++) {
+          let newAwsSsoIntegration: AwsSsoIntegration;
+
+          if (awsSsoIntegrations[i].isOnline === undefined) {
+            newAwsSsoIntegration = new AwsSsoIntegration(
+              awsSsoIntegrations[i].id,
+              awsSsoIntegrations[i].alias,
+              awsSsoIntegrations[i].portalUrl,
+              awsSsoIntegrations[i].region,
+              awsSsoIntegrations[i].browserOpening,
+              awsSsoIntegrations[i].accessTokenExpiration
+            );
+            newAwsSsoIntegration.isOnline = false;
+          } else {
+            newAwsSsoIntegration = awsSsoIntegrations[i];
+          }
+
+          newAwsSsoIntegrations.push(newAwsSsoIntegration);
+        }
+      }
+
+      workspace._awsSsoIntegrations = newAwsSsoIntegrations;
+
+      // Remove old Azure sessions and transform in appropriate integrations
+      // 0. Be sure to have a proper array of Azure integrations in the workspace
+      workspace._azureIntegrations = workspace._azureIntegrations || [];
+      // 1. Get all Azure Sessions
+      const azureSessions = workspace._sessions.filter((sess: Session) => sess.type === SessionType.azure);
+      // 2. Keep only NON Azure sessions
+      workspace._sessions = workspace._sessions.filter((sess: Session) => sess.type !== SessionType.azure);
+      // 3. Prepare a list of possible integrations
+      const defaultLocation = workspace.defaultLocation;
+      const possibleNewIntegrations: AzureIntegration[] = [];
+      azureSessions.forEach((sess: AzureSession) => {
+        if (possibleNewIntegrations.map((ai) => ai.tenantId).indexOf(sess.tenantId) < 0) {
+          // A new integration for Azure is found: add it to the list
+          possibleNewIntegrations.push(
+            new AzureIntegration(uuid.v4(), `AzureIntgr-${possibleNewIntegrations.length + 1}`, sess.tenantId, defaultLocation)
+          );
+        }
+      });
+      // 4. Add the new integrations to the current Azure Integrations array
+      workspace._azureIntegrations = workspace._azureIntegrations.concat(possibleNewIntegrations);
+
+      // Persists all the changes
+      this.persists(workspace);
+      this.repository.reloadWorkspace();
+
+      const updatedAwsSsoIntegrations = this.repository.listAwsSsoIntegrations();
+      const updatedAzureIntegrations = this.repository.listAzureIntegrations();
+      this.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
+    }
   }
 
   isRetroPatchNecessary(): boolean {
@@ -174,6 +260,7 @@ export class RetroCompatibilityService {
       _idpUrls: [],
       _profiles: [{ id: uuid.v4(), name: constants.defaultAwsProfileName }],
       _awsSsoIntegrations: [],
+      _azureIntegrations: [],
       _proxyConfiguration: {
         proxyProtocol: "https",
         proxyUrl: undefined,
@@ -198,7 +285,7 @@ export class RetroCompatibilityService {
       RetroCompatibilityService.adaptProxyConfig(oldWorkspace, workspace);
       RetroCompatibilityService.adaptGeneralProperties(oldWorkspace, workspace);
       await this.adaptAwsSsoConfig(oldWorkspace, workspace);
-      await this.adaptSessions(oldWorkspace, workspace);
+      //await this.adaptSessions(oldWorkspace, workspace);
       // Persist adapted workspace data
       this.persistsTemp(workspace);
       // Apply sessions to behaviour subject
@@ -243,7 +330,7 @@ export class RetroCompatibilityService {
     );
   }
 
-  private async adaptSessions(oldWorkspace: any, workspace: any): Promise<void> {
+  /*private async adaptSessions(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace.workspaces[0].sessions;
 
     // Loop through sessions and generate data
@@ -284,9 +371,9 @@ export class RetroCompatibilityService {
           break;
       }
     }
-  }
+  }*/
 
-  private async adaptNewSessions(oldWorkspace: any, workspace: any): Promise<void> {
+  /*private async adaptNewSessions(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace._sessions;
 
     // Loop through sessions and generate data
@@ -312,7 +399,7 @@ export class RetroCompatibilityService {
           break;
       }
     }
-  }
+  }*/
 
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace.workspaces[0].sessions;
@@ -392,21 +479,23 @@ export class RetroCompatibilityService {
     workspace.proxyConfiguration = oldWorkspace._proxyConfiguration;
     workspace.defaultRegion = oldWorkspace._defaultRegion;
     workspace.defaultLocation = oldWorkspace._defaultLocation;
-    await this.adaptNewSessions(oldWorkspace, workspace);
+    //await this.adaptNewSessions(oldWorkspace, workspace);
 
     // Get AWS SSO Configuration from both intermediate and old configs
     const awsSsoConfiguration = oldWorkspace._awsSsoConfiguration || oldWorkspace.awsSsoConfiguration;
 
     if (workspace.sessions.filter((sess) => sess.type === SessionType.awsSsoRole.toString()).length > 0) {
       if (workspace.awsSsoIntegrations.length === 0) {
-        workspace.awsSsoIntegrations.push({
-          id: uuid.v4(),
-          alias: "Aws Single Sign-On",
-          region: awsSsoConfiguration.region,
-          portalUrl: awsSsoConfiguration.portalUrl,
-          accessTokenExpiration: awsSsoConfiguration.expirationTime,
-          browserOpening: constants.inApp,
-        });
+        workspace.awsSsoIntegrations.push(
+          new AwsSsoIntegration(
+            uuid.v4(),
+            "Aws Single Sign-On",
+            awsSsoConfiguration.portalUrl,
+            awsSsoConfiguration.region,
+            constants.inApp,
+            awsSsoConfiguration.expirationTime
+          )
+        );
 
         try {
           const accessToken = await this.keyChainService.getSecret(constants.appName, `aws-sso-access-token`);

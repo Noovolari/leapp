@@ -11,7 +11,7 @@ import { AppProviderService } from "../../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
 import { OptionsService } from "../../../services/options.service";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 

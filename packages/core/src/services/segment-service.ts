@@ -8,7 +8,7 @@ export class SegmentService {
     return this.repository.getSegments();
   }
 
-  setSegments(segments: Segment[]) {
+  setSegments(segments: Segment[]): void {
     this.repository.setSegments(segments);
   }
 

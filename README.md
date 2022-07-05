@@ -77,6 +77,7 @@ We want to thank you all!
 A special thanks to our individual sponsors!
 
 [<img hspace="5" src="https://avatars.githubusercontent.com/u/1392040?v=4" width="90" height="90" alt="@Gowiem">](https://github.com/Gowiem)
+[<img hspace="5" src="https://avatars.githubusercontent.com/u/6387224?v=4" width="90" height="90" alt="@dharada1">](https://github.com/dharada1)
 
 # Documentation
 

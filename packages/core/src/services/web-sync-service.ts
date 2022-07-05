@@ -3,26 +3,28 @@ import axios, { AxiosRequestConfig } from "axios";
 import { SessionFactory } from "./session-factory";
 import { SessionType } from "../models/session-type";
 import { NamedProfilesService } from "./named-profiles-service";
+import { SessionManagementService } from "./session-management-service";
+import { AwsSsoIntegrationService } from "./integration/aws-sso-integration-service";
+import { AwsIamUserSession } from "../models/aws/aws-iam-user-session";
+import { AwsSessionService } from "./session/aws/aws-session-service";
+import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-service";
+import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
+import { LoggedException, LogLevel } from "./log-service";
+import { AwsIamRoleFederatedService } from "./session/aws/aws-iam-role-federated-service";
+import { IdpUrlsService } from "./idp-urls-service";
+import { AzureIntegrationService } from "./integration/azure-integration-service";
 import { LocalSecretDto } from "core-pro/web-dto/local-secret-dto";
 import { AwsIamUserLocalSessionDto } from "core-pro/web-dto/aws-iam-user-local-session-dto";
-import { SessionManagementService } from "./session-management-service";
 import { EncryptionProvider } from "core-pro/encryption/encryption.provider";
 import { VaultProvider } from "core-pro/vault/vault-provider";
 import { UserProvider } from "core-pro/user/user.provider";
 import { HttpClientInterface } from "core-pro/http/HttpClientInterface";
 import { User } from "core-pro/user/user";
 import { SecretType } from "core-pro/web-dto/secret-type";
+import { AwsIamFederatedLocalSessionDto } from "core-pro/web-dto/aws-iam-federated-local-session-dto";
 import { AwsSsoLocalIntegrationDto } from "core-pro/web-dto/aws-sso-local-integration-dto";
-import { AwsSsoIntegrationService } from "./aws-sso-integration-service";
-import { AwsIamUserSession } from "../models/aws-iam-user-session";
 import { AwsIamRoleChainedLocalSessionDto } from "core-pro/web-dto/aws-iam-role-chained-local-session-dto";
-import { AwsSessionService } from "./session/aws/aws-session-service";
-import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-service";
-import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
-import { LoggedException, LogLevel } from "./log-service";
-import { AwsIamRoleFederatedService } from "./session/aws/aws-iam-role-federated-service";
-import { AwsIamFederatedLocalSessionDto } from "../models/web-dto/aws-iam-federated-local-session-dto";
-import { IdpUrlsService } from "./idp-urls-service";
+import { AzureLocalIntegrationDto } from "core-pro/web-dto/azure-local-integration-dto";
 
 export class WebSyncService {
   private readonly encryptionProvider: EncryptionProvider;
@@ -35,6 +37,7 @@ export class WebSyncService {
     private readonly namedProfilesService: NamedProfilesService,
     private readonly sessionManagementService: SessionManagementService,
     private readonly awsSsoIntegrationService: AwsSsoIntegrationService,
+    private readonly azureIntegrationService: AzureIntegrationService,
     private readonly idpUrlService: IdpUrlsService
   ) {
     const apiEndpoint = "http://localhost:3000";
@@ -63,18 +66,37 @@ export class WebSyncService {
     return localSecretDtos;
   }
 
-  async syncIntegrationSecret(localIntegrationDto: AwsSsoLocalIntegrationDto): Promise<void> {
-    const localIntegration = this.awsSsoIntegrationService.getIntegration(localIntegrationDto.id);
-    if (localIntegration) {
-      await this.awsSsoIntegrationService.deleteIntegration(localIntegration.id);
+  async syncIntegrationSecret(localIntegrationDto: LocalSecretDto): Promise<void> {
+    if (localIntegrationDto.secretType === SecretType.awsSsoIntegration) {
+      const dto = localIntegrationDto as AwsSsoLocalIntegrationDto;
+      const awsSsoIntegration = this.awsSsoIntegrationService.getIntegration(dto.id);
+      if (awsSsoIntegration) {
+        await this.awsSsoIntegrationService.deleteIntegration(awsSsoIntegration.id);
+      }
+      await this.awsSsoIntegrationService.createIntegration(
+        {
+          alias: dto.alias,
+          portalUrl: dto.portalUrl,
+          region: dto.region,
+          browserOpening: dto.browserOpening,
+        },
+        dto.id
+      );
+    } else if (localIntegrationDto.secretType === SecretType.azureIntegration) {
+      const dto = localIntegrationDto as AzureLocalIntegrationDto;
+      const azureIntegration = this.azureIntegrationService.getIntegration(dto.id);
+      if (azureIntegration) {
+        await this.azureIntegrationService.deleteIntegration(azureIntegration.id);
+      }
+      await this.azureIntegrationService.createIntegration(
+        {
+          alias: dto.alias,
+          tenantId: dto.tenantId,
+          region: dto.region,
+        },
+        dto.id
+      );
     }
-    await this.awsSsoIntegrationService.createIntegration({
-      alias: localIntegrationDto.alias,
-      portalUrl: localIntegrationDto.portalUrl,
-      region: localIntegrationDto.region,
-      browserOpening: localIntegrationDto.browserOpening,
-      integrationId: localIntegrationDto.id,
-    });
   }
 
   async syncSessionsSecret(localSecret: LocalSecretDto): Promise<void> {

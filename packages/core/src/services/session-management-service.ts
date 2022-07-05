@@ -1,6 +1,6 @@
 import { Session } from "../models/session";
 import { Repository } from "./repository";
-import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "../models/aws/aws-sso-role-session";
 
 export class SessionManagementService {
   constructor(private repository: Repository) {}

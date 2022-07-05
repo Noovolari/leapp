@@ -3,7 +3,7 @@ import { Repository } from "./repository";
 import * as uuid from "uuid";
 import { Session } from "../models/session";
 import { IdpUrl } from "../models/idp-url";
-import { AwsIamRoleFederatedSession } from "../models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "../models/aws/aws-iam-role-federated-session";
 
 export class IdpUrlsService {
   constructor(private sessionFactory: SessionFactory, private repository: Repository) {}

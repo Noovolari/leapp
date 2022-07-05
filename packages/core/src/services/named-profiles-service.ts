@@ -1,6 +1,6 @@
 import * as uuid from "uuid";
 import { constants } from "../models/constants";
-import { AwsNamedProfile } from "../models/aws-named-profile";
+import { AwsNamedProfile } from "../models/aws/aws-named-profile";
 import { Repository } from "./repository";
 import { Session } from "../models/session";
 import { SessionFactory } from "./session-factory";

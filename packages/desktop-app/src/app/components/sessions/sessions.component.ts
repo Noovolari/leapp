@@ -20,10 +20,10 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
 import { AppProviderService } from "../../services/app-provider.service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
-import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
-import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws-sso-role-session";
-import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws-iam-role-chained-session";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
+import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
 
 export const optionBarIds = {};
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);

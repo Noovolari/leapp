@@ -2,7 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.12.1](https://github.com/Noovolari/leapp/compare/v0.12.0...v0.12.1) (2022-05-25)
+## [0.12.2](https://github.com/Noovolari/leapp/compare/v0.12.1...v0.12.2) (2022-05-30)
+
+### Bug Fixes
+
+* updated Leapp Desktop App's Windows code signing certificate [#277](https://github.com/Noovolari/leapp/issues/277)
+
+### [0.12.1](https://github.com/Noovolari/leapp/compare/v0.12.0...v0.12.1) (2022-05-25)
 
 ### Features
 

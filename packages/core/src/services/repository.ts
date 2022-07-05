@@ -1,8 +1,8 @@
 import { deserialize, serialize } from "class-transformer";
 import { INativeService } from "../interfaces/i-native-service";
-import { AwsIamRoleChainedSession } from "../models/aws-iam-role-chained-session";
-import { AwsNamedProfile } from "../models/aws-named-profile";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
+import { AwsIamRoleChainedSession } from "../models/aws/aws-iam-role-chained-session";
+import { AwsNamedProfile } from "../models/aws/aws-named-profile";
+import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 import { constants } from "../models/constants";
 import Segment from "../models/segment";
 import { Session } from "../models/session";
@@ -14,6 +14,7 @@ import { IdpUrl } from "../models/idp-url";
 import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
+import { AzureIntegration } from "../models/azure/azure-integration";
 
 export class Repository {
   // Private singleton workspace
@@ -273,18 +274,19 @@ export class Repository {
 
   addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string, integrationId?: string): void {
     const workspace = this.getWorkspace();
-    workspace.awsSsoIntegrations.push({
-      id: integrationId ?? uuid.v4(),
-      alias,
-      portalUrl,
-      region,
-      accessTokenExpiration: undefined,
-      browserOpening,
-    });
+    workspace.awsSsoIntegrations.push(new AwsSsoIntegration(integrationId ?? uuid.v4(), alias, portalUrl, region, browserOpening, undefined));
     this.persistWorkspace(workspace);
   }
 
-  updateAwsSsoIntegration(id: string, alias: string, region: string, portalUrl: string, browserOpening: string, expirationTime?: string): void {
+  updateAwsSsoIntegration(
+    id: string,
+    alias: string,
+    region: string,
+    portalUrl: string,
+    browserOpening: string,
+    isOnline: boolean,
+    expirationTime?: string
+  ): void {
     const workspace = this.getWorkspace();
     const index = workspace.awsSsoIntegrations.findIndex((sso) => sso.id === id);
     if (index > -1) {
@@ -292,6 +294,7 @@ export class Repository {
       workspace.awsSsoIntegrations[index].region = region;
       workspace.awsSsoIntegrations[index].portalUrl = portalUrl;
       workspace.awsSsoIntegrations[index].browserOpening = browserOpening;
+      workspace.awsSsoIntegrations[index].isOnline = isOnline;
       if (expirationTime) {
         workspace.awsSsoIntegrations[index].accessTokenExpiration = expirationTime;
       }
@@ -315,6 +318,43 @@ export class Repository {
       workspace.awsSsoIntegrations.splice(index, 1);
       this.persistWorkspace(workspace);
     }
+  }
+
+  addAzureIntegration(alias: string, tenantId: string, region: string, integrationId?: string): void {
+    const workspace = this.getWorkspace();
+    workspace.azureIntegrations.push(new AzureIntegration(integrationId ?? uuid.v4(), alias, tenantId, region));
+    this.persistWorkspace(workspace);
+  }
+
+  updateAzureIntegration(id: string, alias: string, tenantId: string, region: string, isOnline: boolean, tokenExpiration?: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.azureIntegrations.findIndex((integration) => integration.id === id);
+    if (index > -1) {
+      workspace.azureIntegrations[index].alias = alias;
+      workspace.azureIntegrations[index].tenantId = tenantId;
+      workspace.azureIntegrations[index].isOnline = isOnline;
+      workspace.azureIntegrations[index].region = region;
+      workspace.azureIntegrations[index].tokenExpiration = tokenExpiration;
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  deleteAzureIntegration(id: string): void {
+    const workspace = this.getWorkspace();
+    const index = workspace.azureIntegrations.findIndex((azureIntegration) => azureIntegration.id === id);
+    if (index > -1) {
+      workspace.azureIntegrations.splice(index, 1);
+      this.persistWorkspace(workspace);
+    }
+  }
+
+  getAzureIntegration(id: string | number): AzureIntegration {
+    return this.getWorkspace().azureIntegrations.filter((azureIntegration) => azureIntegration.id === id)[0];
+  }
+
+  listAzureIntegrations(): AzureIntegration[] {
+    const workspace = this.getWorkspace();
+    return workspace.azureIntegrations;
   }
 
   // PROXY CONFIGURATION

@@ -62,7 +62,7 @@ const spyElectronService = jasmine.createSpyObj("ElectronService", [], {
   app: { getVersion: () => "1.0.0" },
 });
 
-const spyLoggingService = jasmine.createSpyObj("LoggingService", ["logger"]);
+const spyLoggingService = jasmine.createSpyObj("LogService", ["logger"]);
 spyLoggingService.logger.and.returnValue(true);
 
 const spyMessageToasterService = jasmine.createSpyObj("MessageToasterService", ["toast"]);

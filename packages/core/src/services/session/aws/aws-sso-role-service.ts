@@ -2,7 +2,7 @@ import SSO from "aws-sdk/clients/sso";
 import { BrowserWindowClosing } from "../../../interfaces/i-browser-window-closing";
 import { INativeService } from "../../../interfaces/i-native-service";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsSsoRoleSession } from "../../../models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "../../../models/aws/aws-sso-role-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
@@ -16,7 +16,6 @@ import { IAwsIntegrationDelegate } from "../../../interfaces/i-aws-integration-d
 import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
-import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -204,7 +203,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const currentSession: Session = sessions[index];
 
     if (credentials !== undefined) {
-      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+      currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 
     sessions[index] = currentSession;

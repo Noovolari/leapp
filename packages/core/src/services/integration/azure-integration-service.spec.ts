@@ -2,6 +2,7 @@ import { describe, expect, jest, test } from "@jest/globals";
 import { AzureIntegrationService } from "./azure-integration-service";
 import { SessionType } from "../../models/session-type";
 import { SessionStatus } from "../../models/session-status";
+import { LoggedException, LogLevel } from "../log-service";
 
 describe("AzureIntegrationService", () => {
   test("checkCliVersion, cli installed with version 2.30", async () => {
@@ -109,6 +110,73 @@ describe("AzureIntegrationService", () => {
 
     const integrations = service.getIntegrations();
     expect(integrations).toBe("integrations");
+  });
+
+  test("syncSessions, if error in execute service with code 1 and stdoutput identifying integration we catch a specific error", async () => {
+    const executeService = {
+      execute: jest.fn().mockRejectedValue({
+        code: 1,
+        killed: false,
+        signal: null,
+        stdout: "ERROR: No subscriptions found for X",
+      }),
+    } as any;
+
+    const azurePersistenceService = {} as any;
+    const repository = { getSessions: () => [] } as any;
+    const azureSessionService = {} as any;
+
+    const service = new AzureIntegrationService(repository, null, null, null, executeService, azureSessionService, azurePersistenceService);
+    const integrationId = "integrationId";
+    const integration = { tenantId: "tenantId", region: "region", alias: "alias" } as any;
+    service.getIntegration = jest.fn(() => integration);
+
+    await expect(service.syncSessions(integrationId)).rejects.toThrow(
+      new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.error, true)
+    );
+  });
+
+  test("syncSessions, if error in execute service with killed true we catch a specific error", async () => {
+    const executeService = {
+      execute: jest.fn().mockRejectedValue({
+        code: null,
+        killed: true,
+      }),
+    } as any;
+
+    const azurePersistenceService = {} as any;
+    const repository = { getSessions: () => [] } as any;
+    const azureSessionService = {} as any;
+
+    const service = new AzureIntegrationService(repository, null, null, null, executeService, azureSessionService, azurePersistenceService);
+    const integrationId = "integrationId";
+    const integration = { tenantId: "tenantId", region: "region", alias: "alias" } as any;
+    service.getIntegration = jest.fn(() => integration);
+
+    await expect(service.syncSessions(integrationId)).rejects.toThrow(
+      new LoggedException(`Timeout error during Azure login with integration: ${integration.alias}`, this, LogLevel.error, true)
+    );
+  });
+
+  test("syncSessions, if generic error in execute service we catch a generic error", async () => {
+    const executeService = {
+      execute: jest.fn().mockRejectedValue({
+        code: 12,
+      }),
+    } as any;
+
+    const azurePersistenceService = {} as any;
+    const repository = { getSessions: () => [] } as any;
+    const azureSessionService = {} as any;
+
+    const service = new AzureIntegrationService(repository, null, null, null, executeService, azureSessionService, azurePersistenceService);
+    const integrationId = "integrationId";
+    const integration = { tenantId: "tenantId", region: "region", alias: "alias" } as any;
+    service.getIntegration = jest.fn(() => integration);
+
+    await expect(service.syncSessions(integrationId)).rejects.toThrow(
+      new LoggedException(JSON.parse(JSON.stringify({ code: "12" })).toString(), this, LogLevel.error, false)
+    );
   });
 
   test("syncSessions, no available azure local sessions, with another azure integration's session active", async () => {

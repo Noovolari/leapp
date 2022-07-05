@@ -2,6 +2,7 @@ import { jest, describe, test, expect } from "@jest/globals";
 import { AwsSsoIntegrationService } from "./aws-sso-integration-service";
 import { IntegrationType } from "../../models/integration-type";
 import { Session } from "../../models/session";
+import { SSO } from "aws-sdk";
 
 describe("AwsSsoIntegrationService", () => {
   test("validateAlias - empty alias", () => {
@@ -259,4 +260,150 @@ describe("AwsSsoIntegrationService", () => {
     expect(awsIntegrationService.logout).toHaveBeenCalledWith(integrationId);
     expect(repository.deleteAwsSsoIntegration).toHaveBeenCalledWith(integrationId);
   });
+
+  test("updateIntegration", () => {
+    const repository = {
+      getAwsSsoIntegration: jest.fn(() => ({ isOnline: true })),
+      updateAwsSsoIntegration: jest.fn(),
+    } as any;
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
+
+    const updateParams = {
+      alias: "alias",
+      portalUrl: "portalUrl",
+      region: "region",
+      browserOpening: "browserOpening",
+      type: IntegrationType.awsSso,
+    } as any;
+    awsIntegrationService.updateIntegration("1234", updateParams);
+
+    expect(repository.getAwsSsoIntegration).toHaveBeenCalledWith("1234");
+    expect(repository.updateAwsSsoIntegration).toHaveBeenCalledWith("1234", "alias", "region", "portalUrl", "browserOpening", true);
+  });
+
+  test("getIntegration", () => {
+    const repository = {
+      getAwsSsoIntegration: jest.fn(),
+    } as any;
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
+    awsIntegrationService.getIntegration("1234");
+
+    expect(repository.getAwsSsoIntegration).toHaveBeenCalledWith("1234");
+  });
+
+  test("getOnlineIntegrations", () => {
+    const repository = {
+      listAwsSsoIntegrations: jest.fn(() => [
+        { id: 1, isOnline: true },
+        { id: 2, isOnline: true },
+        { id: 3, isOnline: false },
+      ]),
+    } as any;
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
+    const result = awsIntegrationService.getOnlineIntegrations();
+
+    expect(repository.listAwsSsoIntegrations).toHaveBeenCalled();
+    expect(result.length).toBe(2);
+    expect(result.map((r) => r.id)).toStrictEqual([1, 2]);
+  });
+
+  test("getOfflineIntegrations", () => {
+    const repository = {
+      listAwsSsoIntegrations: jest.fn(() => [
+        { id: 1, isOnline: true },
+        { id: 2, isOnline: true },
+        { id: 3, isOnline: false },
+      ]),
+    } as any;
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
+    const result = awsIntegrationService.getOfflineIntegrations();
+
+    expect(repository.listAwsSsoIntegrations).toHaveBeenCalled();
+    expect(result.length).toBe(1);
+    expect(result.map((r) => r.id)).toStrictEqual([3]);
+  });
+
+  test("getProtocol", () => {
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    expect((awsIntegrationService as any).getProtocol("https://www.google.test.com")).toBe("https");
+    expect((awsIntegrationService as any).getProtocol("http://www.google.test.com")).toBe("http");
+  });
+
+  test("deleteDependentSessions", () => {
+    const sessions = [
+      { sessionId: 1, awsSsoConfigurationId: "2" },
+      { sessionId: 2, awsSsoConfigurationId: "2" },
+      { sessionId: 3, awsSsoConfigurationId: "1" },
+    ];
+
+    const repository = {
+      getSessions: jest.fn(() => sessions),
+      deleteSession: jest.fn((id) => {
+        const session = sessions.find((s) => s.sessionId === id);
+        sessions.splice(sessions.indexOf(session), 1);
+      }),
+    } as any;
+
+    const behaviourNotifier = {
+      setSessions: jest.fn(),
+    } as any;
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, behaviourNotifier, null, null, null, null);
+    (awsIntegrationService as any).deleteDependentSessions("2");
+    expect(sessions.length).toBe(1);
+    expect(sessions[0].sessionId).toBe(3);
+    expect(behaviourNotifier.setSessions).toHaveBeenCalledWith([{ sessionId: 3, awsSsoConfigurationId: "1" }]);
+  });
+
+  test("findOldSession", () => {
+    /*
+    *     for (let i = 0; i < this.repository.getSessions().length; i++) {
+      const sess = this.repository.getSessions()[i];
+
+      if (sess.type === SessionType.awsSsoRole) {
+        if (
+          (sess as AwsSsoRoleSession).email === accountInfo.emailAddress &&
+          (sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`
+        ) {
+          return { region: (sess as AwsSsoRoleSession).region, profileId: (sess as AwsSsoRoleSession).profileId };
+        }
+      }
+    }
+
+    return undefined;
+    * */
+    const sessions = [
+      { sessionId: 1, awsSsoConfigurationId: "2" },
+      { sessionId: 2, awsSsoConfigurationId: "2" },
+      { sessionId: 3, awsSsoConfigurationId: "1" },
+    ];
+
+    const accountInfo: SSO.AccountInfo = {
+      accountId: "testAccountid",
+      accountName: "testAccountName",
+      emailAddress: "test@gmail.com",
+    };
+
+    const accountRole: SSO.RoleInfo = {
+      roleName: "",
+      accountId: "",
+    };
+
+    const repository = {
+      getSessions: jest.fn(() => sessions),
+      deleteSession: jest.fn((id) => {
+        const session = sessions.find((s) => s.sessionId === id);
+        sessions.splice(sessions.indexOf(session), 1);
+      }),
+    } as any;
+
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
+    expect((awsIntegrationService as any).findOldSession(accountInfo, accountRole));
+  });
+
+  test("logout", () => {});
 });

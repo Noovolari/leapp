@@ -65,4 +65,3 @@ jobs:
           cd packages/desktop-app
           TAG_VERSION=v123.123.123
           TAG_VERSION=${TAG_VERSION:1}
-          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive

@@ -6,7 +6,7 @@ on:
       - azure-msal-spike
 
 env:
-  S3_BUCKET: s3://noovolari-leapp-website-distribution
+  S3_BUCKET: s3://noovolari-leapp-website-distribution-test
   WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
@@ -65,3 +65,4 @@ jobs:
           cd packages/desktop-app
           TAG_VERSION=v123.123.123
           TAG_VERSION=${TAG_VERSION:1}
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive

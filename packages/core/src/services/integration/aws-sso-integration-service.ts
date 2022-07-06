@@ -245,7 +245,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   async deleteIntegration(integrationId: string): Promise<void> {
     await this.logout(integrationId);
     this.repository.deleteAwsSsoIntegration(integrationId);
-    this.deleteDependentSessions(integrationId);
+    await this.deleteDependentSessions(integrationId);
   }
 
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
@@ -418,12 +418,12 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return undefined;
   }
 
-  private deleteDependentSessions(configurationId: string) {
+  private async deleteDependentSessions(configurationId: string): Promise<void> {
     const ssoSessions = this.repository.getSessions().filter((session) => (session as any).awsSsoConfigurationId === configurationId);
     for (const session of ssoSessions) {
-      this.repository.deleteSession(session.sessionId);
+      const sessionService = this.sessionFactory.getSessionService(session.type);
+      await sessionService.delete(session.sessionId);
     }
-    this.behaviouralNotifier.setSessions([...this.repository.getSessions()]);
   }
 
   private getProtocol(aliasedUrl: string): string {

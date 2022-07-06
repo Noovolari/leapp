@@ -335,30 +335,33 @@ describe("AwsSsoIntegrationService", () => {
     expect((awsIntegrationService as any).getProtocol("http://www.google.test.com")).toBe("http");
   });
 
-  test("deleteDependentSessions", () => {
+  test("deleteDependentSessions", async () => {
     const sessions = [
-      { sessionId: 1, awsSsoConfigurationId: "2" },
-      { sessionId: 2, awsSsoConfigurationId: "2" },
-      { sessionId: 3, awsSsoConfigurationId: "1" },
+      { sessionId: "1", awsSsoConfigurationId: "sso2", type: SessionType.awsSsoRole },
+      { sessionId: "2", awsSsoConfigurationId: "sso2", type: SessionType.awsSsoRole },
+      { sessionId: "3", awsSsoConfigurationId: "sso1", type: SessionType.awsSsoRole },
     ];
 
     const repository = {
       getSessions: jest.fn(() => sessions),
-      deleteSession: jest.fn((id) => {
-        const session = sessions.find((s) => s.sessionId === id);
-        sessions.splice(sessions.indexOf(session), 1);
-      }),
     } as any;
 
-    const behaviourNotifier = {
-      setSessions: jest.fn(),
+    const sessionService = {
+      delete: jest.fn(async () => {}),
+    };
+
+    const sessionFactory = {
+      getSessionService: jest.fn(() => sessionService),
     } as any;
 
-    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, behaviourNotifier, null, null, null, null);
-    (awsIntegrationService as any).deleteDependentSessions("2");
-    expect(sessions.length).toBe(1);
-    expect(sessions[0].sessionId).toBe(3);
-    expect(behaviourNotifier.setSessions).toHaveBeenCalledWith([{ sessionId: 3, awsSsoConfigurationId: "1" }]);
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, sessionFactory, null, null);
+    await (awsIntegrationService as any).deleteDependentSessions("sso2");
+    expect(repository.getSessions).toHaveBeenCalled();
+    expect(sessionFactory.getSessionService).toHaveBeenCalledTimes(2);
+    expect(sessionFactory.getSessionService).toHaveBeenCalledWith(SessionType.awsSsoRole);
+    expect(sessionService.delete).toHaveBeenCalledTimes(2);
+    expect(sessionService.delete).toHaveBeenNthCalledWith(1, "1");
+    expect(sessionService.delete).toHaveBeenNthCalledWith(2, "2");
   });
 
   test("findOldSession", () => {

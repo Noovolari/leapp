@@ -30,5 +30,5 @@ and have logged into your *Azure Portal*,
 ![](../../images/screens/newuxui/azure-tenant.png?style=center-img "Add Azure Integration Screen")
 ## Video Tutorial
 
-<video width="100%" muted autoplay loop> <source src="../../videos/newuxui/azure.mp4" type="video/mp4"> </video>
+<video width="100%" muted autoplay loop> <source src="../../videos/newuxui/azure-integration.mp4" type="video/mp4"> </video>
 

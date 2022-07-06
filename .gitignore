@@ -52,6 +52,7 @@ Thumbs.db
 
 # Windows certificate
 packages/desktop-app/windows.pfx
+packages/desktop-app/windows_sign_certificate.pfx
 
 start.sh
 buildAll.sh

@@ -47,4 +47,7 @@ export const constants = {
   // Credential Process
   credentialFile: "credential-file-method",
   credentialProcess: "credential-process-method",
+
+  // Contains Env for SSM on macOS
+  ssmSourceFileDestination: ".Leapp/ssm-env",
 };

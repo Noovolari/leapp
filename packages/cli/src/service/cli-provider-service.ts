@@ -363,7 +363,7 @@ export class CliProviderService {
 
   get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.logService, this.executeService);
+      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService, this.cliNativeService, this.fileService);
     }
     return this.ssmServiceInstance;
   }

@@ -22,6 +22,7 @@
     "build-prod": "gushio gushio/target-build.js 'configuration production'",
     "run-local": "electron --enable-accelerated-mjpeg-decode --enable-accelerated-video --ignore-gpu-blacklist --enable-native-gpu-memory-buffers --enable-gpu-rasterization --ignore-gpu-blacklist .",
     "build-and-run-dev": "gushio gushio/target-build-and-run.js aot",
+    "rebuild-core-and-run-dev": "cd ../core && npm run build && cd ../desktop-app && npm run build-and-run-dev",
     "release-mac": "gushio gushio/target-release.js 'configuration production' mac",
     "release-linux": "gushio gushio/target-release.js 'configuration production' linux",
     "release-win": "gushio gushio/target-release.js \"configuration production\" win",

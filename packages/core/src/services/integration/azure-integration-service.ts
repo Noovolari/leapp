@@ -122,7 +122,7 @@ export class AzureIntegrationService implements IIntegrationService {
         errorObject.stdout.indexOf("ERROR: No subscriptions found for") !== -1
       ) {
         await this.deleteDependentSessions(integrationId);
-        throw new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.error, true);
+        throw new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.warn, true);
       }
       if (errorObject.code === null && errorObject.killed) {
         throw new LoggedException(`Timeout error during Azure login with integration: ${integration.alias}`, this, LogLevel.error, true);

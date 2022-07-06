@@ -282,7 +282,7 @@ export class AppProviderService {
 
   public get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.logService, this.executeService, this.electronService, this.fileService);
+      this.ssmServiceInstance = new SsmService(this.logService, this.executeService, this.appNativeService, this.fileService);
     }
     return this.ssmServiceInstance;
   }

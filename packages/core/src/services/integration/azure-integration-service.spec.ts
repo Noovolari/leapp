@@ -132,7 +132,7 @@ describe("AzureIntegrationService", () => {
     service.getIntegration = jest.fn(() => integration);
 
     await expect(service.syncSessions(integrationId)).rejects.toThrow(
-      new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.error, true)
+      new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.warn, true)
     );
   });
 
@@ -378,7 +378,7 @@ describe("AzureIntegrationService", () => {
     } catch (err) {
       expect(err instanceof LoggedException).toBeTruthy();
       expect(err.message).toEqual(`No Azure Subscriptions found for integration: ${integrationAlias}`);
-      expect(err.level).toEqual(LogLevel.error);
+      expect(err.level).toEqual(LogLevel.warn);
       expect(err.display).toBeTruthy();
     }
 

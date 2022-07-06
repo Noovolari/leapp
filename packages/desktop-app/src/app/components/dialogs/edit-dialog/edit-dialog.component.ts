@@ -294,15 +294,15 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         (this.selectedSession as AwsIamRoleFederatedSession).roleArn = this.form.value.roleArn.trim();
         break;
       case SessionType.awsIamUser:
-        this.selectedSession.sessionName = this.form.controls["name"].value;
+        this.selectedSession.sessionName = this.form.controls["name"].value.trim();
         this.selectedSession.region = this.selectedRegion;
-        this.selectedSession.mfaDevice = this.form.controls["mfaDevice"].value;
+        this.selectedSession.mfaDevice = this.form.controls["mfaDevice"].value.trim();
         // eslint-disable-next-line max-len
         this.keychainService
           .saveSecret(
             constants.appName,
             `${this.selectedSession.sessionId}-iam-user-aws-session-access-key-id`,
-            this.form.controls["accessKey"].value
+            this.form.controls["accessKey"].value.replace(/\s/g, "")
           )
           .then((_) => {});
         // eslint-disable-next-line max-len
@@ -310,7 +310,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
           .saveSecret(
             constants.appName,
             `${this.selectedSession.sessionId}-iam-user-aws-session-secret-access-key`,
-            this.form.controls["secretKey"].value
+            this.form.controls["secretKey"].value.replace(/\s/g, "")
           )
           .then((_) => {});
         break;
@@ -324,8 +324,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       /*case SessionType.azure:
         (this.selectedSession as AzureSession).region = this.selectedLocation;
         (this.selectedSession as AzureSession).sessionName = this.form.value.name;
-        (this.selectedSession as AzureSession).subscriptionId = this.form.value.subscriptionId;
-        (this.selectedSession as AzureSession).tenantId = this.form.value.tenantId;
+        (this.selectedSession as AzureSession).subscriptionId = this.form.value.subscriptionId.trim();
+        (this.selectedSession as AzureSession).tenantId = this.form.value.tenantId.trim();
         break;*/
     }
   }

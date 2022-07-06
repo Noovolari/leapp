@@ -362,8 +362,8 @@ export class CreateDialogComponent implements OnInit {
           const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
             sessionName: this.form.value.name.trim(),
             region: this.selectedRegion,
-            accessKey: this.form.value.accessKey.trim(),
-            secretKey: this.form.value.secretKey.trim(),
+            accessKey: this.form.value.accessKey.replace(/\s/g, ""),
+            secretKey: this.form.value.secretKey.replace(/\s/g, ""),
             mfaDevice: this.form.value.mfaDevice.trim(),
             profileId: this.selectedProfile.value,
           };
@@ -385,8 +385,8 @@ export class CreateDialogComponent implements OnInit {
             azureIntegrationId: uuid.v4(),
             region: this.selectedLocation,
             sessionName: this.form.value.name,
-            subscriptionId: this.form.value.subscriptionId,
-            tenantId: this.form.value.tenantId,
+            subscriptionId: this.form.value.subscriptionId.trim(),
+            tenantId: this.form.value.tenantId.trim(),
           };
           this.azureSessionService.create(azureSessionRequest);
           break;*/

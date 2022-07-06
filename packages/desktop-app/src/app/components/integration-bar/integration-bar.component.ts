@@ -1,5 +1,5 @@
 import { Component, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
-import { globalFilteredSessions } from "../command-bar/command-bar.component";
+import { globalFilterGroup } from "../command-bar/command-bar.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
@@ -14,14 +14,12 @@ import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
-import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
 import { WindowService } from "../../services/window.service";
 import { sidebarHighlight } from "../side-bar/side-bar.component";
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { OptionsService } from "../../services/options.service";
 import { Integration } from "@noovolari/leapp-core/models/integration";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
-import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { AzureIntegration } from "@noovolari/leapp-core/models/azure/azure-integration";
 
 export interface SelectedIntegration {
@@ -203,11 +201,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     const selectedIndex = this.selectedIntegrations.findIndex((s) => s.id === configuration.id);
     this.selectedIntegrations[selectedIndex].selected = true;
     document.querySelector(".sessions").classList.remove("option-bar-opened");
-    globalFilteredSessions.next(
-      this.behaviouralSubjectService.sessions.filter(
-        (s) => (s as AwsSsoRoleSession).awsSsoConfigurationId === configuration.id || (s as AzureSession).azureIntegrationId === configuration.id
-      )
-    );
+
+    const currentFilterGroup = globalFilterGroup.value;
+    currentFilterGroup.pinnedFilter = false;
+    currentFilterGroup.integrationFilter = [{ name: configuration.id, value: true }];
+    globalFilterGroup.next(currentFilterGroup);
   }
 
   async logout(integrationId: string): Promise<void> {

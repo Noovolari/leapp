@@ -18,6 +18,7 @@ import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -32,6 +33,7 @@ export interface IGlobalColumns {
   namedProfile: boolean;
   region: boolean;
 }
+
 export const globalColumns = new BehaviorSubject<IGlobalColumns>(null);
 
 @Component({
@@ -50,13 +52,11 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     providerFilter: new FormControl([]),
     profileFilter: new FormControl([]),
     regionFilter: new FormControl([]),
-    integrationFilter: new FormControl([]),
     typeFilter: new FormControl([]),
   });
 
   providers: { show: boolean; id: string; name: string; value: boolean }[];
   profiles: { show: boolean; id: string; name: string; value: boolean }[];
-  integrations: { show: boolean; id: string; name: string; value: boolean }[];
   types: { show: boolean; id: SessionType; category: string; name: string; value: boolean }[];
   regions: { show: boolean; name: string; value: boolean }[];
 
@@ -65,7 +65,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   eConstants = constants;
 
-  private subscription;
+  private subscription0;
+  private subscription1;
   private subscription2;
   private subscription3;
   private subscription4;
@@ -105,9 +106,14 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   ngOnInit(): void {
-    this.subscription = this.filterForm.valueChanges.subscribe((values: GlobalFilters) => {
-      globalFilterGroup.next(values);
+    this.subscription0 = globalFilterGroup.subscribe((values: GlobalFilters) => {
       this.applyFiltersToSessions(values, this.behaviouralSubjectService.sessions);
+    });
+
+    this.subscription1 = this.filterForm.valueChanges.subscribe((values: GlobalFilters) => {
+      values.pinnedFilter = globalFilterGroup.value ? globalFilterGroup.value.pinnedFilter : false;
+      values.integrationFilter = globalFilterGroup.value ? globalFilterGroup.value.integrationFilter : [];
+      globalFilterGroup.next(values);
     });
 
     this.subscription2 = globalHasFilter.subscribe((value) => {
@@ -122,14 +128,19 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       this.filterForm.get("providerFilter").setValue(this.providers);
       this.filterForm.get("profileFilter").setValue(this.profiles);
       this.filterForm.get("regionFilter").setValue(this.regions);
-      this.filterForm.get("integrationFilter").setValue(this.integrations);
       this.filterForm.get("typeFilter").setValue(this.types);
+
+      const globalFilters = globalFilterGroup.value;
+      globalFilters.pinnedFilter = false;
+      globalFilters.integrationFilter = [];
+      globalFilterGroup.next(globalFilters);
     });
 
     this.subscription4 = this.behaviouralSubjectService.sessions$.subscribe((sessions) => {
       const actualFilterValues: GlobalFilters = {
         dateFilter: this.filterForm.get("dateFilter").value,
-        integrationFilter: this.filterForm.get("integrationFilter").value,
+        pinnedFilter: globalFilterGroup.value ? globalFilterGroup.value.pinnedFilter : false,
+        integrationFilter: globalFilterGroup.value ? globalFilterGroup.value.integrationFilter : [],
         profileFilter: this.filterForm.get("profileFilter").value,
         providerFilter: this.filterForm.get("providerFilter").value,
         regionFilter: this.filterForm.get("regionFilter").value,
@@ -145,7 +156,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         const values = segment.filterGroup;
         globalFilterGroup.next(values);
         this.updateFilterForm(values);
-        this.applyFiltersToSessions(values, this.behaviouralSubjectService.sessions);
       }
     });
 
@@ -155,7 +165,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
+    this.subscription0.unsubscribe();
+    this.subscription1.unsubscribe();
     this.subscription2.unsubscribe();
     this.subscription3.unsubscribe();
     this.subscription4.unsubscribe();
@@ -216,7 +227,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       this.filterForm.get("providerFilter").value.length > 0 ||
       this.filterForm.get("profileFilter").value.length > 0 ||
       this.filterForm.get("regionFilter").value.length > 0 ||
-      this.filterForm.get("integrationFilter").value.length > 0 ||
       this.filterForm.get("typeFilter").value.length > 0
     );
   }
@@ -236,8 +246,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  windowMaximizeAction() {
+  windowMaximizeAction(): void {
     if (!this.compactMode) {
       if (this.windowService.getCurrentWindow().isMaximized()) {
         this.windowService.getCurrentWindow().restore();
@@ -247,7 +256,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
-  private applyFiltersToSessions(values: GlobalFilters, sessions: Session[]) {
+  private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {
     let filteredSessions = sessions;
     const searchText = this.filterForm.get("searchFilter").value;
     if (searchText !== "") {
@@ -318,18 +327,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       });
     }
 
-    if (this.filterForm.get("integrationFilter").value.filter((v) => v.value).length > 0) {
-      filteredSessions = filteredSessions.filter((session) => {
-        let test = false;
-        this.integrations.forEach((integration) => {
-          if (integration.value) {
-            test ||= session.type === SessionType.awsSsoRole && (session as AwsSsoRoleSession).awsSsoConfigurationId.indexOf(integration.id) > -1;
-          }
-        });
-        return test;
-      });
-    }
-
     if (this.filterForm.get("typeFilter").value.filter((v) => v.value).length > 0) {
       filteredSessions = filteredSessions.filter((session) => {
         let test = false;
@@ -353,6 +350,19 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       }
     });
 
+    // Filtering using globalFilters
+    if (globalFilters && globalFilters.pinnedFilter) {
+      filteredSessions = filteredSessions.filter((s: Session) => this.optionsService.pinned.includes(s.sessionId));
+    }
+
+    if (globalFilters && globalFilters.integrationFilter.length > 0) {
+      const allowedIntegrationIds = globalFilters.integrationFilter.filter((filter) => filter.value).map((filter) => filter.name);
+      filteredSessions = filteredSessions.filter((session) => {
+        const sessionIntegrationId = (session as AwsSsoRoleSession).awsSsoConfigurationId || (session as AzureSession).azureIntegrationId;
+        return allowedIntegrationIds.includes(sessionIntegrationId);
+      });
+    }
+
     return globalFilteredSessions.next(filteredSessions);
   }
 
@@ -366,7 +376,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.filterForm.get("providerFilter").setValue(values.providerFilter);
     this.filterForm.get("profileFilter").setValue(values.profileFilter);
     this.filterForm.get("regionFilter").setValue(values.regionFilter);
-    this.filterForm.get("integrationFilter").setValue(values.integrationFilter);
     this.filterForm.get("typeFilter").setValue(values.typeFilter);
 
     if (values.providerFilter.length > 0) {
@@ -401,8 +410,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       { show: true, id: "azure", name: "Microsoft Azure", value: false },
     ];
 
-    this.integrations = [];
-
     this.types = [
       // eslint-disable-next-line max-len
       { show: true, id: SessionType.awsIamRoleFederated, category: "Amazon AWS", name: "IAM Role Federated", value: false },
@@ -417,27 +424,5 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       .map((element) => ({ name: element.name, id: element.id, value: false, show: true }));
 
     this.regions = this.leappCoreService.awsCoreService.getRegions().map((element) => ({ name: element.region, value: false, show: true }));
-  }
-
-  private saveTemporarySegmentAndApply() {
-    if (!this.filterExtended) {
-      this.currentSegment = JSON.parse(
-        JSON.stringify({
-          name: "temp",
-          filterGroup: {
-            dateFilter: this.filterForm.get("dateFilter").value,
-            integrationFilter: this.filterForm.get("integrationFilter").value,
-            profileFilter: this.filterForm.get("profileFilter").value,
-            providerFilter: this.filterForm.get("providerFilter").value,
-            regionFilter: this.filterForm.get("regionFilter").value,
-            searchFilter: this.filterForm.get("searchFilter").value,
-            typeFilter: this.filterForm.get("typeFilter").value,
-          },
-        })
-      );
-      globalResetFilter.next(true);
-    } else {
-      globalSegmentFilter.next(this.currentSegment);
-    }
   }
 }

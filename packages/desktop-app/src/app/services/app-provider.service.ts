@@ -353,8 +353,7 @@ export class AppProviderService {
         this.fileService,
         this.keyChainService,
         this.repository,
-        this.behaviouralSubjectService,
-        constants.appName
+        this.behaviouralSubjectService
       );
     }
     return this.retroCompatibilityServiceInstance;

@@ -320,7 +320,7 @@ export class CliProviderService {
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
       this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
-        this.repository, this.behaviouralSubjectService, constants.appName);
+        this.repository, this.behaviouralSubjectService);
     }
     return this.retroCompatibilityServiceInstance;
   }

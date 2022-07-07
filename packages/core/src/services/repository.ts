@@ -52,6 +52,7 @@ export class Repository {
     if (!this.fileService.existsSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)) {
       this.fileService.newDir(this.nativeService.os.homedir() + "/.Leapp", { recursive: true });
       this._workspace = new Workspace();
+      this._workspace.setNewWorkspaceVersion();
       this.persistWorkspace(this._workspace);
     }
   }

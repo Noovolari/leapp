@@ -204,7 +204,7 @@ export class RetroCompatibilityService {
       return;
     }
 
-    workspace._workspaceVersion = "0.1.114";
+    workspace._workspaceVersion = "1";
     const awsSsoIntegrations = workspace._awsSsoIntegrations;
     const newAwsSsoIntegrations: AwsSsoIntegration[] = [];
     if (awsSsoIntegrations && awsSsoIntegrations.length > 0) {

@@ -67,7 +67,7 @@ export class Workspace {
   }
 
   setNewWorkspaceVersion(): void {
-    this._workspaceVersion = require("../../package.json").version;
+    this._workspaceVersion = "1";
   }
 
   addIpUrl(idpUrl: IdpUrl): void {

@@ -1,0 +1,21 @@
+{
+  "name": "plugin-system",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@vendia/serverless-express": "^4.9.0",
+    "tsoa": "3.5.1"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.101"
+  },
+  "scripts": {
+    "generate:swagger": "./node_modules/tsoa/dist/cli.js swagger",
+    "generate:routes": "./node_modules/tsoa/dist/cli.js routes"
+  },
+  "dependencies": {
+    "@tsoa/runtime": "3.5.0",
+    "body-parser": "^1.20.0",
+    "express": "^4.18.1",
+    "readline-sync": "^1.4.10"
+  }
+}

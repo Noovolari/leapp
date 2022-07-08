@@ -82,7 +82,9 @@
     "clean": "gushio gushio/target-clean.js",
     "build": "gushio gushio/target-build.js",
     "test": "jest --coverage",
-    "release": "gushio gushio/target-release.js"
+    "release": "gushio gushio/target-release.js",
+    "pre-deploy:backend": "npm run build && src/plugin-system/backend/prepare-layer.sh",
+    "deploy:dev": "export ENVIRONMENT_NAME=dev && npm run build && cd ./src/plugin-system/backend && ./prepare-layer.sh && cd ../infrastructure && ./../../../node_modules/aws-cdk/bin/cdk deploy '*' -- --require-approval never"
   },
   "repository": {
     "type": "git",

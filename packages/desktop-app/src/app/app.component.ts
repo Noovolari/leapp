@@ -88,6 +88,9 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    await this.appProviderService.pluginManagerService.loadFromPluginDir();
+
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
     // We get the right moment to set an hook to app close

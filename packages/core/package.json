@@ -91,5 +91,9 @@
   "bugs": {
     "url": "https://github.com/Noovolari/leapp/issues"
   },
-  "homepage": "https://github.com/Noovolari/leapp"
+  "homepage": "https://github.com/Noovolari/leapp",
+  "dependencies": {
+    "folder-hash": "^4.0.2",
+    "require-module": "^0.1.0"
+  }
 }

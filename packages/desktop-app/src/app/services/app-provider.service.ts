@@ -39,6 +39,7 @@ import { MessageToasterService } from "./message-toaster.service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
 
 @Injectable({
   providedIn: "root",
@@ -83,7 +84,16 @@ export class AppProviderService {
   private azurePersistenceServiceInstance: AzurePersistenceService;
   private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
 
+  private pluginManagerServiceInstance: PluginManagerService;
+
   constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
+
+  public get pluginManagerService(): PluginManagerService {
+    if (!this.pluginManagerServiceInstance) {
+      this.pluginManagerServiceInstance = new PluginManagerService(this.appNativeService, this.logService);
+    }
+    return this.pluginManagerServiceInstance;
+  }
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {

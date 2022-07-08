@@ -36,6 +36,9 @@ export class AppNativeService implements INativeService {
   nodeIpc: any;
   process: any;
   msalEncryptionService: IMsalEncryptionService;
+  hashElement: any;
+  requireModule: any;
+  crypto: any;
 
   constructor() {
     if (this.isElectron) {
@@ -70,6 +73,9 @@ export class AppNativeService implements INativeService {
       this.nodeIpc = window.require("node-ipc");
       this.process = (window as any).process;
       this.msalEncryptionService = window.require("@noovolari/dpapi-addon");
+      this.requireModule = window.require("require-module");
+      this.hashElement = window.require("folder-hash");
+      this.crypto = window.require("crypto");
     }
   }
 

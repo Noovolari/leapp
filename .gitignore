@@ -45,7 +45,7 @@ release/
 **/yarn-error.log
 **/testem.log
 **/typings
-++/generated
+**/generated
 **/layer
 **/dist
 

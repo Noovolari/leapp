@@ -102,6 +102,11 @@ export class InfrastructureStack extends NestedStack {
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: path.join("app.handler"),
       layers: [layer],
+      environment: {
+        RDS_ARN: this.database.clusterArn,
+        RDS_SECRET_ARN: this.databaseSecret.secretArn,
+        RDS_DATABASE: 'postgres'
+      },
       code: lambda.Code.fromAsset(path.join(__dirname, "..", "..", "..", "..", "dist", "plugin-system", "backend")),
     });
   }

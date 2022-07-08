@@ -5,7 +5,7 @@ import * as fs from "fs";
 import serverlessExpress from "@vendia/serverless-express";
 import { RegisterRoutes } from "./generated/routes";
 import express from "express";
-import { ResponseDto } from "./dto/response.dto";
+import { ResponseDto } from "./core/response.dto";
 import { HTTPStatusCodeEnum } from "./enum/http-status-code.enum";
 
 const port = 3100;

@@ -6,13 +6,19 @@
     "tsoa": "3.5.1"
   },
   "devDependencies": {
-    "@types/aws-lambda": "^8.10.101"
+    "@types/aws-lambda": "^8.10.101",
+    "pg": "~8.3.0",
+    "sequelize": "~6.21.2",
+    "sequelize-cli": "~6.2.0"
   },
   "scripts": {
     "generate:swagger": "./node_modules/tsoa/dist/cli.js swagger",
-    "generate:routes": "./node_modules/tsoa/dist/cli.js routes"
+    "generate:routes": "./node_modules/tsoa/dist/cli.js routes",
+    "migrate-db-dev": "NODE_ENV=dev ./node_modules/sequelize-cli/lib/sequelize db:migrate",
+    "undo-db-dev": "NODE_ENV=dev ./node_modules/sequelize-cli/lib/sequelize db:migrate:undo:all"
   },
   "dependencies": {
+    "@aws-sdk/client-rds-data": "^3.121.0",
     "@tsoa/runtime": "3.5.0",
     "body-parser": "^1.20.0",
     "express": "^4.18.1",

@@ -167,6 +167,8 @@ describe("RetroCompatibilityService", () => {
 
       (service as any).migration1();
 
+      expect(persistedWorkspace._workspaceVersion).toBe(1);
+
       expect(persistedWorkspace._awsSsoIntegrations.length).toBe(1);
       const migratedIntegration = persistedWorkspace._awsSsoIntegrations[0];
       expect(migratedIntegration).toMatchObject(fakeOldIntegration);

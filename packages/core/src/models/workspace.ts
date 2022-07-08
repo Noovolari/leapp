@@ -39,7 +39,7 @@ export class Workspace {
 
   private _credentialMethod: string;
 
-  private _workspaceVersion: string;
+  private _workspaceVersion: number;
 
   constructor() {
     this._pinned = [];
@@ -67,7 +67,7 @@ export class Workspace {
   }
 
   setNewWorkspaceVersion(): void {
-    this._workspaceVersion = "1";
+    this._workspaceVersion = 1;
   }
 
   addIpUrl(idpUrl: IdpUrl): void {

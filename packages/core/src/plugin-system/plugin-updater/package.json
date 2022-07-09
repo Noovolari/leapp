@@ -1,16 +1,6 @@
 {
   "name": "plugin-system",
   "version": "0.0.1",
-  "peerDependencies": {
-    "@vendia/serverless-express": "^4.9.0",
-    "tsoa": "3.5.1"
-  },
-  "scripts": {
-    "generate:swagger": "./node_modules/tsoa/dist/cli.js swagger",
-    "generate:routes": "./node_modules/tsoa/dist/cli.js routes",
-    "migrate-db-dev": "NODE_ENV=dev ./node_modules/sequelize-cli/lib/sequelize db:migrate",
-    "undo-db-dev": "NODE_ENV=dev ./node_modules/sequelize-cli/lib/sequelize db:migrate:undo:all"
-  },
   "dependencies": {
     "@aws-sdk/client-rds-data": "^3.121.0",
     "@aws-sdk/client-sqs": "^3.121.0",

@@ -13,6 +13,8 @@ export class PluginConverter {
       status: model.status.name,
       uri: model.uri,
       description: model.description,
+      hash: model.hash,
+      signature: model.signature,
       icon: "ICONA", // TODO
       image: "IMAGE" // TODO
     }

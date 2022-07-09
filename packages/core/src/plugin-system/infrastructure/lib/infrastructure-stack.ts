@@ -36,6 +36,7 @@ export class InfrastructureStack extends NestedStack {
   private readonly envName: string;
   private backendLambdaFunction: lambda.Function;
   private updaterLambdaFunction: lambda.Function;
+  private signatureUpdaterLambdaFunction: lambda.Function;
   private restApi: RestApi;
   private databaseSecret: DatabaseSecret;
   private readonly vpc: IVpc;
@@ -57,9 +58,11 @@ export class InfrastructureStack extends NestedStack {
     this.createBackendLambdaFunction();
     this.createApiGateway();
     this.createUpdaterLambdaFunction();
+    this.createSignatureUpdaterLambdaFunction();
 
     this.database.grantDataApiAccess(this.backendLambdaFunction);
     this.database.grantDataApiAccess(this.updaterLambdaFunction);
+    this.database.grantDataApiAccess(this.signatureUpdaterLambdaFunction);
   }
 
   private static addMethodsToResource(resource: IResource, methods: string[]) {
@@ -152,6 +155,29 @@ export class InfrastructureStack extends NestedStack {
     });
   }
 
+  createSignatureUpdaterLambdaFunction() {
+    const layer = this.createLambdaLayer(
+      "LeappPluginSignatureUpdaterLayer",
+      `${this.envName}-leapp-plugin-signature-updater-layer`,
+      path.join(__dirname, "..", "..", "signature-updater", "layer", "nodejs.zip"),
+      path.join(__dirname, "..", "..", "signature-updater", "package.json")
+    );
+
+    this.signatureUpdaterLambdaFunction = new lambda.Function(this, "LeappSignatureUpdaterFunction", {
+      functionName: `${this.envName}-leapp-signature-updater-function`,
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: path.join("app.handler"),
+      layers: [layer],
+      environment: {
+        RDS_ARN: this.database.clusterArn,
+        RDS_SECRET_ARN: this.databaseSecret.secretArn,
+        RDS_DATABASE: 'postgres'
+      },
+      timeout: Duration.seconds(30),
+      code: lambda.Code.fromAsset(path.join(__dirname, "..", "..", "..", "..", "dist", "plugin-system", "signature-updater")),
+    });
+  }
+
   private createLambdaLayer(id: string, layerName: string, codePath: string, fileToHash?: string) {
     let assetOptions: AssetOptions | undefined;
     if (fileToHash) {
@@ -234,7 +260,7 @@ export class InfrastructureStack extends NestedStack {
       ),
       vpc: this.vpc,
       scaling: {
-        autoPause: Duration.minutes(10),
+        autoPause: Duration.minutes(0),
         minCapacity: AuroraCapacityUnit.ACU_2,
         maxCapacity: AuroraCapacityUnit.ACU_2,
       },

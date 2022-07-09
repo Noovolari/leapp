@@ -88,10 +88,14 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
+    this.appNativeService.fixPath();
+
     this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
     await this.appProviderService.pluginManagerService.loadFromPluginDir();
 
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
+
+    // await this.installPlugin("leapp://leapp-helloworld");
 
     // We get the right moment to set an hook to app close
     const ipcRenderer = this.appNativeService.ipcRenderer;
@@ -111,7 +115,8 @@ export class AppComponent implements OnInit {
     }
 
     // Prevent Dev Tool to show on production mode
-    this.windowService.blockDevToolInProductionMode();
+    this.windowService.getCurrentWindow().webContents.openDevTools();
+    //this.windowService.blockDevToolInProductionMode();
 
     // Create folders and files if missing
     this.updaterService.createFoldersIfMissing();
@@ -242,6 +247,11 @@ export class AppComponent implements OnInit {
         this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
         this.appProviderService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
       }
+    });
+
+    ipc.on("PLUGIN_URL", (_, url) => {
+      // dialog.showErrorBox('Welcome Back', `You arrived from: ${url}`)
+      this.appService.installPlugin(url);
     });
   }
 

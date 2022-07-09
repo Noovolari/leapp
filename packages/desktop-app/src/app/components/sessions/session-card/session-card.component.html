@@ -120,6 +120,16 @@
     </button>
   </ng-container>
 
+  <ng-container *ngIf="appProviderService.pluginManagerService.plugins.length > 0">
+    <div class="divider"></div>
+    <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.plugins">
+      <button mat-menu-item (click)="applyPluginAction($event, plugin);">
+        <i class="moon-Puzzle"></i>
+        <span>&nbsp;{{plugin.name}}</span>
+      </button>
+    </ng-container>
+  </ng-container>
+
 </mat-menu>
 
 <mat-menu #change>

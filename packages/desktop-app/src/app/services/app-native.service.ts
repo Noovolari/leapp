@@ -39,6 +39,7 @@ export class AppNativeService implements INativeService {
   hashElement: any;
   requireModule: any;
   crypto: any;
+  fixPath: any;
 
   constructor() {
     if (this.isElectron) {
@@ -76,6 +77,7 @@ export class AppNativeService implements INativeService {
       this.requireModule = window.require("require-module");
       this.hashElement = window.require("folder-hash");
       this.crypto = window.require("crypto");
+      this.fixPath = window.require("fix-path");
     }
   }
 

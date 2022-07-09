@@ -24,4 +24,5 @@ export interface INativeService {
   hashElement: any;
   requireModule: any;
   crypto: any;
+  fixPath: any;
 }

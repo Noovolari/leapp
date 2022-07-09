@@ -217,6 +217,24 @@
       </div>
     </mat-tab>
 
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-Puzzle"></i>
+        <span class="mat-tab-label-text">Plugins</span>
+      </ng-template>
+      <div class="no-padding no-margin panel">
+        <h2>Download Plugin manually</h2>
+
+        <div class="form-group">
+          <div class="form-field form-control-input-button max-width">
+            <input formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Add here a leapp://<package> valid uri">
+            <button class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
+          </div>
+        </div>
+
+      </div>
+    </mat-tab>
+
   </mat-tab-group>
 
   <button type="button" (click)="saveOptions();" [disabled]="!form.valid" class="margin-fix">Done</button>

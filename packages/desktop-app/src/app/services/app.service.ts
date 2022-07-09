@@ -22,26 +22,26 @@ export class AppService {
   private logService: LogService;
 
   constructor(
-    private electronService: AppNativeService,
+    private appNativeService: AppNativeService,
     private windowService: WindowService,
     private modalService: BsModalService,
-    leappCoreService: AppProviderService
+    private appProviderService: AppProviderService
   ) {
     this.triggers = [];
 
-    this.logService = leappCoreService.logService;
+    this.logService = appProviderService.logService;
 
     // Global Configure logger
-    if (this.electronService.log) {
+    if (this.appNativeService.log) {
       const logPaths = {
-        [constants.mac]: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
-        [constants.linux]: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
-        [constants.windows]: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
+        [constants.mac]: `${this.appNativeService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
+        [constants.linux]: `${this.appNativeService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
+        [constants.windows]: `${this.appNativeService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
       };
 
-      this.electronService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
-      this.electronService.log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}";
-      this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
+      this.appNativeService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
+      this.appNativeService.log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}";
+      this.appNativeService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
   }
 
@@ -50,23 +50,23 @@ export class AppService {
    * Return the app object from node
    */
   getApp(): any {
-    return this.electronService.app;
+    return this.appNativeService.app;
   }
 
   // TODO: get directly from AppNativeService
   getMenu(): any {
-    return this.electronService.menu;
+    return this.appNativeService.menu;
   }
 
   isDarkMode(): boolean {
-    return this.electronService.nativeTheme.shouldUseDarkColors;
+    return this.appNativeService.nativeTheme.shouldUseDarkColors;
   }
 
   /**
    * Return the dialog native object
    */
   getDialog(): any {
-    return this.electronService.dialog;
+    return this.appNativeService.dialog;
   }
 
   /**
@@ -78,7 +78,7 @@ export class AppService {
       darwin: constants.mac,
       win32: constants.windows,
     };
-    const os = this.electronService.os.platform();
+    const os = this.appNativeService.os.platform();
     return hrNames[os];
   }
 
@@ -86,25 +86,25 @@ export class AppService {
    * Quit the app
    */
   quit(): void {
-    this.electronService.app.exit(0);
+    this.appNativeService.app.exit(0);
   }
 
   /**
    * Restart the app
    */
   restart(): void {
-    this.electronService.app.relaunch();
-    this.electronService.app.exit(0);
+    this.appNativeService.app.relaunch();
+    this.appNativeService.app.exit(0);
   }
 
   async logout(): Promise<void> {
     try {
       // Clear all extra data
-      const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
-      this.electronService.rimraf.sync(getAppPath + "/Partitions/leapp*");
+      const getAppPath = this.appNativeService.path.join(this.appNativeService.app.getPath("appData"), constants.appName);
+      this.appNativeService.rimraf.sync(getAppPath + "/Partitions/leapp*");
 
       // Cleaning Library Electron Cache
-      await this.electronService.session.defaultSession.clearStorageData();
+      await this.appNativeService.session.defaultSession.clearStorageData();
 
       // Clean localStorage
       localStorage.clear();
@@ -126,7 +126,7 @@ export class AppService {
    * @returns the semver object
    */
   semVer(): any {
-    return this.electronService.semver;
+    return this.appNativeService.semver;
   }
 
   /**
@@ -171,7 +171,7 @@ export class AppService {
   setFilteringForEc2Calls(): void {
     // Modify the user agent for all requests to the following urls.
     const filter = { urls: ["https://*.amazonaws.com/"] };
-    this.electronService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    this.appNativeService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
       details.requestHeaders["Origin"] = "http://localhost:4200";
       callback({ cancel: false, requestHeaders: details.requestHeaders });
     });
@@ -184,7 +184,7 @@ export class AppService {
    * @returns return a new browser window
    */
   newInvisibleWindow(url: string): void {
-    const win = new this.electronService.browserWindow({ width: 1, height: 1, show: false });
+    const win = new this.appNativeService.browserWindow({ width: 1, height: 1, show: false });
     win.loadURL(url);
     return win;
   }
@@ -230,5 +230,39 @@ export class AppService {
       t.closeMenu();
     });
     this.triggers = [];
+  }
+
+  async installPlugin(url: string): Promise<void> {
+    const packageName = url.replace("leapp://", "");
+    const pluginDir = this.appNativeService.os.homedir() + "/.Leapp/plugins";
+
+    this.appProviderService.logService.log(
+      new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true)
+    );
+
+    console.log(pluginDir, packageName);
+    const version = await this.appProviderService.executeService.execute(`npm show ${packageName} version`);
+    console.log(version);
+    const packageComplete = `${packageName}-${version.trim()}.tgz`;
+
+    await this.appProviderService.executeService.execute(
+      `cd ${pluginDir} && /usr/bin/curl --silent --remote-name "https://registry.npmjs.org/${packageName}/-/${packageComplete}"`
+    );
+    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/rm -rf "${packageName}"`);
+    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/mkdir "${packageName}"`);
+    await this.appProviderService.executeService.execute(
+      `cd ${pluginDir} && /usr/bin/tar xzf "${packageComplete}" --strip-components 1 -C "${packageName}"`
+    );
+    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/rm "${packageComplete}"`);
+    await this.appProviderService.executeService.execute(`cd ${pluginDir}/${packageName} && npm install`);
+
+    this.appProviderService.logService.log(new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
+
+    this.reloadPlugins();
+  }
+
+  async reloadPlugins(): Promise<void> {
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    await this.appProviderService.pluginManagerService.loadFromPluginDir();
   }
 }

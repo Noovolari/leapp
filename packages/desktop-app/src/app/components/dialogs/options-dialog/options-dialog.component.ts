@@ -67,6 +67,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     terminalSelect: new FormControl(""),
     colorThemeSelect: new FormControl(""),
     credentialMethodSelect: new FormControl(""),
+    pluginDeepLink: new FormControl(""),
   });
 
   selectedCredentialMethod: string;
@@ -420,6 +421,14 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         const sessionService = this.appProviderService.sessionFactory.getSessionService(activeSessions[i].type);
         await sessionService.stop(activeSessions[i].sessionId);
         await sessionService.start(activeSessions[i].sessionId);
+      }
+    }
+  }
+
+  installPlugin(): void {
+    if (this.form.controls.pluginDeepLink.value) {
+      if (this.form.controls.pluginDeepLink.value.indexOf("leapp://") > -1) {
+        this.appService.installPlugin(this.form.controls.pluginDeepLink.value);
       }
     }
   }

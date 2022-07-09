@@ -1,0 +1,52 @@
+{
+  "test": {
+    "host": "localhost",
+    "username": "postgres",
+    "password": "example",
+    "database": "test",
+    "dialect": "postgresql",
+    "port": 5436,
+    "log": true
+  },
+  "local": {
+    "host": "localhost",
+    "username": "postgres",
+    "password": "example",
+    "database": "postgres",
+    "dialect": "postgresql",
+    "port": 5435,
+    "log": true
+  },
+  "dev": {
+    "host": "leapp-plugin-system-cluster.cluster-cydep8e4ull9.eu-west-1.rds.amazonaws.com",
+    "username": "master",
+    "password": "5IOyWSSyPB687Xr5=JWVq.c1,Wud8O",
+    "database": "postgres",
+    "dialect": "postgresql",
+    "log": true
+  },
+  "stage": {
+    "host": "xxx",
+    "username": "xxx",
+    "password": "xxx",
+    "database": "xxx",
+    "dialect": "postgresql",
+    "log": false
+  },
+  "demo": {
+    "host": "xxx",
+    "username": "xxx",
+    "password": "xxx",
+    "database": "xxx",
+    "dialect": "postgresql",
+    "log": false
+  },
+  "prod": {
+    "host": "xxx",
+    "username": "xxx",
+    "password": "xxx",
+    "database": "xxx",
+    "dialect": "postgresql",
+    "log": false
+  }
+}

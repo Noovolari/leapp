@@ -11,6 +11,9 @@ import {AuroraCapacityUnit, Credentials, DatabaseClusterEngine, DatabaseSecret, 
 import {HostedRotation} from "aws-cdk-lib/aws-secretsmanager";
 import {IVpc, SecurityGroup, Vpc} from "aws-cdk-lib/aws-ec2";
 import {environment} from "../environments/environment";
+import {Rule, Schedule} from "aws-cdk-lib/aws-events";
+import * as targets from "aws-cdk-lib/aws-events-targets";
+import {Queue} from "aws-cdk-lib/aws-sqs";
 
 class PermissionAspect implements IAspect {
   visit(construct: IConstruct) {
@@ -31,7 +34,8 @@ interface InfrastructureStackProps extends NestedStackProps {
 
 export class InfrastructureStack extends NestedStack {
   private readonly envName: string;
-  private lambdaFunction: lambda.Function;
+  private backendLambdaFunction: lambda.Function;
+  private updaterLambdaFunction: lambda.Function;
   private restApi: RestApi;
   private databaseSecret: DatabaseSecret;
   private readonly vpc: IVpc;
@@ -50,10 +54,12 @@ export class InfrastructureStack extends NestedStack {
     });
 
     this.createRDSDatabase();
-    this.createLambdaFunction();
+    this.createBackendLambdaFunction();
     this.createApiGateway();
+    this.createUpdaterLambdaFunction();
 
-    this.database.grantDataApiAccess(this.lambdaFunction);
+    this.database.grantDataApiAccess(this.backendLambdaFunction);
+    this.database.grantDataApiAccess(this.updaterLambdaFunction);
   }
 
   private static addMethodsToResource(resource: IResource, methods: string[]) {
@@ -77,27 +83,27 @@ export class InfrastructureStack extends NestedStack {
         stageName: "api",
       },
       proxy: false,
-      handler: this.lambdaFunction,
+      handler: this.backendLambdaFunction,
     });
 
     this.createApiResources();
 
     Aspects.of(this.restApi).add(new PermissionAspect());
-    this.lambdaFunction.addPermission("ApiPermissions", {
+    this.backendLambdaFunction.addPermission("ApiPermissions", {
       action: "lambda:InvokeFunction",
       principal: new ServicePrincipal("apigateway.amazonaws.com"),
       sourceArn: this.restApi.arnForExecuteApi(),
     });
   }
 
-  createLambdaFunction() {
+  createBackendLambdaFunction() {
     const layer = this.createLambdaLayer(
       "LeappPluginLayer",
       `${this.envName}-leapp-plugin-system-layer`,
       path.join(__dirname, "..", "..", "backend", "layer", "nodejs.zip"),
-      path.join(__dirname, "..", "..", "..", "..", "package.json")
+      path.join(__dirname, "..", "..", "backend", "package.json")
     );
-    this.lambdaFunction = new lambda.Function(this, "LeappPluginSystemFunction", {
+    this.backendLambdaFunction = new lambda.Function(this, "LeappPluginSystemFunction", {
       functionName: `${this.envName}-leapp-plugin-system-function`,
       runtime: lambda.Runtime.NODEJS_14_X,
       handler: path.join("app.handler"),
@@ -107,7 +113,42 @@ export class InfrastructureStack extends NestedStack {
         RDS_SECRET_ARN: this.databaseSecret.secretArn,
         RDS_DATABASE: 'postgres'
       },
+      timeout: Duration.seconds(10),
       code: lambda.Code.fromAsset(path.join(__dirname, "..", "..", "..", "..", "dist", "plugin-system", "backend")),
+    });
+  }
+
+  createUpdaterLambdaFunction() {
+    const layer = this.createLambdaLayer(
+      "LeappPluginUpdaterLayer",
+      `${this.envName}-leapp-plugin-updater-layer`,
+      path.join(__dirname, "..", "..", "plugin-updater", "layer", "nodejs.zip"),
+      path.join(__dirname, "..", "..", "plugin-updater", "package.json")
+    );
+
+    this.updaterLambdaFunction = new lambda.Function(this, "LeappPluginUpdaterFunction", {
+      functionName: `${this.envName}-leapp-plugin-updater-function`,
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: path.join("app.handler"),
+      layers: [layer],
+      environment: {
+        RDS_ARN: this.database.clusterArn,
+        RDS_SECRET_ARN: this.databaseSecret.secretArn,
+        RDS_DATABASE: 'postgres',
+        QUEUE_URL: "https://sqs.eu-west-1.amazonaws.com/198460698501/sign-queue"
+      },
+      timeout: Duration.seconds(30),
+      code: lambda.Code.fromAsset(path.join(__dirname, "..", "..", "..", "..", "dist", "plugin-system", "plugin-updater")),
+    });
+
+    Queue.fromQueueArn(this, "UpdaterQueue", "arn:aws:sqs:eu-west-1:198460698501:sign-queue").grantSendMessages(this.updaterLambdaFunction);
+
+    new Rule(this, "UpdateRule", {
+      ruleName: `dev-plugin-system-update`,
+      description: `dev-plugin-system-update`,
+      schedule: Schedule.rate(Duration.days(1)),
+      targets: [new targets.LambdaFunction(this.updaterLambdaFunction)],
+      enabled: true,
     });
   }
 

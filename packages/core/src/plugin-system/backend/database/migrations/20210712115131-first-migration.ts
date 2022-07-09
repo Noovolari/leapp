@@ -15,17 +15,13 @@ module.exports = {
       name: {
         field: 'name',
         type: Sequelize.DataTypes.TEXT,
-        allowNull: false
-      },
-      surname: {
-        field: 'surname',
-        type: Sequelize.DataTypes.TEXT,
-        allowNull: false
+        allowNull: false,
+        unique: true
       },
       email: {
         field: 'email',
         type: Sequelize.DataTypes.TEXT,
-        allowNull: false
+        allowNull: true
       }
     });
 

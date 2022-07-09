@@ -1,5 +1,3 @@
-import {StatusDto} from "./status.dto";
-
 export interface PluginDto {
   id: string;
   title: string;
@@ -10,8 +8,8 @@ export interface PluginDto {
   signature?: string;
   hash?: string;
   status: string;
-  icon: "ICONA", // TODO
-  image: "IMAGE" // TODO
+  icon: string;
+  image: string;
   pubdate: string;
   updatedate: string;
 }

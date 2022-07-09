@@ -18,7 +18,7 @@ export class PluginService extends Service {
 
   public async listPlugin(queryParam?: string): Promise<PluginModel[]> {
     const pluginListRds: PluginRdsModel[] = (await this.dataApiConnector.executeStatement(
-      `SELECT p.*, a.id a_id, a.name AS a_name, a.surname AS a_surname, a.email AS a_email, s.id AS s_id, s.name AS s_name FROM plugin AS p
+      `SELECT p.*, a.id a_id, a.name AS a_name, a.email AS a_email, s.id AS s_id, s.name AS s_name FROM plugin AS p
             JOIN author a ON p.author_id = a.id
             JOIN status s ON p.status_id = s.id
             WHERE p::text ILIKE :queryParam
@@ -33,7 +33,7 @@ export class PluginService extends Service {
 
   public async getPlugin(pluginName: string): Promise<PluginModel> {
     const pluginRds: PluginRdsModel = (await this.dataApiConnector.executeStatement(
-      `SELECT p.*, a.id a_id, a.name AS a_name, a.surname AS a_surname, a.email AS a_email, s.id AS s_id, s.name AS s_name FROM plugin AS p
+      `SELECT p.*, a.id a_id, a.name AS a_name, a.email AS a_email, s.id AS s_id, s.name AS s_name FROM plugin AS p
             JOIN author a ON p.author_id = a.id
             JOIN status s ON p.status_id = s.id
             WHERE p.plugin_name = :name`,

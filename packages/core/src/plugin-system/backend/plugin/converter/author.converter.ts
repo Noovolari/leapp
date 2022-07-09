@@ -7,7 +7,6 @@ export class AuthorConverter {
     return {
       id: dto.id,
       name: dto.name,
-      surname: dto.surname,
       email: dto.email
     }
   }
@@ -16,7 +15,6 @@ export class AuthorConverter {
     return {
       id: dto.id,
       name: dto.name,
-      surname: dto.surname,
       email: dto.email
     }
   }
@@ -25,7 +23,6 @@ export class AuthorConverter {
     return {
       id: model.id,
       name: model.name,
-      surname: model.surname,
       email: model.email
     }
   }

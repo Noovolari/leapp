@@ -1,15 +1,12 @@
-import {AuthorModel} from "./author.model";
 import {StatusModel} from "./status.model";
+import {AuthorModel} from "./author.model";
 
 export interface PluginModel {
   pluginName: string;
   author: AuthorModel;
   description: string;
-  tags?: string;
-  uri: string;
+  uri?: string;
   signature?: string;
   hash?: string;
-  status: StatusModel;
-  createdAt: string;
-  updatedAt: string;
+  status?: StatusModel
 }

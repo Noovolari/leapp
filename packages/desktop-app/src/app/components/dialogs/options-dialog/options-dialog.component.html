@@ -230,6 +230,23 @@
             <input formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Add here a leapp://<package> valid uri">
             <button class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
           </div>
+
+          <div class="form-group scrollable max-height-230">
+            <h4> Plugins from Hub</h4>
+            <table class="table">
+              <tbody>
+              <ng-container *ngFor="let plugin of pluginList">
+                <tr>
+                  <td>{{plugin.title}}</td>
+                  <td>{{plugin.author}}</td>
+                  <td>
+                    <button class="icon-button inline" type="button" (click)="installPluginFromList('leapp://' + plugin.id);"><i class="moon-Add"></i></button>
+                  </td>
+                </tr>
+              </ng-container>
+              </tbody>
+            </table>
+          </div>
         </div>
 
       </div>

@@ -1,0 +1,45 @@
+{
+  "name": "require-module",
+  "version": "0.1.0",
+  "description": "Requires a module found relative to given root or working directory.",
+  "main": "index.js",
+  "scripts": {
+    "test-main": "tap test/*.js",
+    "test-0.8": "nave use 0.8 npm run test-main",
+    "test-0.10": "nave use 0.10 npm run test-main",
+    "test-all": "npm run test-main && npm run test-0.8 && npm run test-0.10",
+    "test": "if [ -e $TRAVIS ]; then npm run test-all; else npm run test-main; fi"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thlorenz/require-module.git"
+  },
+  "homepage": "https://github.com/thlorenz/require-module",
+  "dependencies": {
+    "resolve": "~0.6.1"
+  },
+  "devDependencies": {
+    "nave": "~0.4.3",
+    "tap": "~0.4.3"
+  },
+  "keywords": [
+    "require",
+    "resolve",
+    "relative",
+    "working",
+    "directory",
+    "module"
+  ],
+  "author": {
+    "name": "Thorsten Lorenz",
+    "email": "thlorenz@gmx.de",
+    "url": "http://thlorenz.com"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/thlorenz/require-module/blob/master/LICENSE"
+  },
+  "engine": {
+    "node": ">=0.6"
+  }
+}

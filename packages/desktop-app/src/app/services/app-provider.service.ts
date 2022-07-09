@@ -40,6 +40,7 @@ import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-pe
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
+import { PluginCoreService } from "@noovolari/leapp-core/plugin-system/plugin-core-service";
 
 @Injectable({
   providedIn: "root",
@@ -85,6 +86,7 @@ export class AppProviderService {
   private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
 
   private pluginManagerServiceInstance: PluginManagerService;
+  private pluginCoreServiceInstance: PluginCoreService;
 
   constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
 
@@ -93,6 +95,19 @@ export class AppProviderService {
       this.pluginManagerServiceInstance = new PluginManagerService(this.appNativeService, this.logService);
     }
     return this.pluginManagerServiceInstance;
+  }
+
+  public get pluginCoreService(): PluginCoreService {
+    if (!this.pluginCoreServiceInstance) {
+      this.pluginCoreServiceInstance = new PluginCoreService(
+        this.executeService,
+        this.appNativeService,
+        this.repository,
+        this.awsCoreService,
+        this.azureCoreService
+      );
+    }
+    return this.pluginCoreServiceInstance;
   }
 
   public get workspaceService(): WorkspaceService {

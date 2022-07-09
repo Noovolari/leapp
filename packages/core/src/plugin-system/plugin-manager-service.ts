@@ -9,7 +9,7 @@ export class PluginManagerService {
   private _hashElement;
   private _pluginDir = "plugins";
 
-  constructor(private nativeService: INativeService, private logService: LogService) {
+  constructor(private nativeService: INativeService, private logService: LogService, private http: any) {
     this._plugins = [];
     this._requireModule = nativeService.requireModule;
     this._hashElement = nativeService.hashElement.hashElement;
@@ -30,9 +30,10 @@ export class PluginManagerService {
   }
 
   async loadFromPluginDir(): Promise<void> {
+    this._plugins = [];
     const options = {
       folders: { include: ["*.*"] },
-      files: { exclude: ["signature", ".DS_Store"] },
+      files: { exclude: ["signature", ".DS_Store", "package-lock.json"] },
     };
 
     const pluginFilePaths = this.nativeService.fs.readdirSync(this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir);
@@ -57,21 +58,27 @@ export class PluginManagerService {
             console.log(hash);
             if (
               // Required files
-              this.nativeService.fs.existsSync(pluginFilePath + "/signature") &&
               this.nativeService.fs.existsSync(pluginFilePath + "/package.json") &&
               this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")
             ) {
               // Verify signature to enable plugin
-              const signature = this.nativeService.fs.readFileSync(pluginFilePath + "/signature");
+              const data = await this.http.get(constants.pluginPortalUrl + `/${pluginFilePaths[i]}`, { responseType: "json" }).toPromise();
+              if (data.status !== "active") {
+                this.logService.log(new LoggedEntry("Plugin not in active state: " + pluginFilePaths[i], this, LogLevel.warn, true));
+                continue;
+              }
               packageJson = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
-              const verifyMessage = packageJson + hash;
-              const signatureVerified = this.rsaVerifySignatureFromBase64(constants.publicKey, verifyMessage, signature);
+              const verifyMessage = packageJson + hash.hash;
+              console.log("verifyMessage: ", verifyMessage);
+              console.log("data: ", data);
+              const signatureVerified = this.rsaVerifySignatureFromBase64(constants.publicKey, verifyMessage, data.signature);
               console.log(signatureVerified);
 
-              // if (!signatureVerified) {
-              //  this.logService.log(new LoggedEntry("Signature not verified for plugin: " + pluginFilePaths[i], this, LogLevel.warn, true));
-              //  continue;
-              // }
+              if (!signatureVerified) {
+                this.logService.log(new LoggedEntry("Signature not verified for plugin: " + pluginFilePaths[i], this, LogLevel.warn, true));
+                this.nativeService.rimraf(pluginFilePath, () => {});
+                continue;
+              }
             } else {
               console.log(`folder ${pluginFilePath} is not a plugin folder, ignoring...`);
               this.logService.log(new LoggedEntry(`folder ${pluginFilePath} is not a plugin folder, ignoring...`, this, LogLevel.info, false));

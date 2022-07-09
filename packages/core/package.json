@@ -99,6 +99,7 @@
   "homepage": "https://github.com/Noovolari/leapp",
   "dependencies": {
     "folder-hash": "^4.0.2",
-    "require-module": "^0.1.0"
+    "require-module": "^0.1.0",
+    "tsoa": "^4.1.0"
   }
 }

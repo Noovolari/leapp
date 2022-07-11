@@ -1,9 +1,7 @@
 import { expect, describe, test, jest } from "@jest/globals";
 import { AzurePersistenceService, DataProtectionScope } from "./azure-persistence-service";
-import * as os from "os";
 import * as fs from "fs";
 import * as zlib from "zlib";
-import * as process from "process";
 import * as path from "path";
 import { constants } from "../models/constants";
 
@@ -83,11 +81,20 @@ describe("MsalPersistenceService", () => {
     "}";
 
   const customTestPath = "test.file";
+  const os = { homedir: () => "" };
 
   test("load normally", async () => {
     fs.writeFileSync(customTestPath, mockedMsal);
 
-    const iNativeService: any = { os, fs, process, path };
+    const process = { platform: "win32" };
+    const msalEncryptionService = {
+      unprotectData: jest.fn((data, optionalEntropy, scope) => {
+        expect(optionalEntropy).toBe(null);
+        expect(scope).toBe(DataProtectionScope.currentUser);
+        return data.toString();
+      }),
+    };
+    const iNativeService: any = { os, fs, process, path, msalEncryptionService };
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
 
     (service as any).getMsalCacheLocation = () => customTestPath;
@@ -96,6 +103,7 @@ describe("MsalPersistenceService", () => {
 
     expect(parsedData).not.toBeNull();
     expect(parsedData.AccessToken["mocked-2"].secret).toBe("LZqJh_3rhnsCvqLNyZHOb5TH1x5v302XuwMg27w2nSQv_3Agx_5655Vk---feCdMjjAQrXug");
+    expect(msalEncryptionService.unprotectData).toHaveBeenCalled();
 
     fs.unlinkSync(customTestPath);
   });
@@ -113,7 +121,7 @@ describe("MsalPersistenceService", () => {
 
     const myfs = {
       readFileSync: jest.fn((p: string) => {
-        expect(p.indexOf(".azure/msal_token_cache.bin")).toBeGreaterThan(-1);
+        expect(p).toBe(".azure/msal_token_cache.bin");
         return compressedFile;
       }),
     };
@@ -138,7 +146,7 @@ describe("MsalPersistenceService", () => {
 
     const myfs = {
       readFileSync: jest.fn((p: string) => {
-        expect(p.indexOf(".azure/msal_token_cache.json")).toBeGreaterThan(-1);
+        expect(p).toBe(".azure/msal_token_cache.json");
         return mockedMsal;
       }),
     };
@@ -166,17 +174,27 @@ describe("MsalPersistenceService", () => {
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
     await service.loadMsalCache();
 
-    expect(mockedFs.readFileSync).toHaveBeenCalledWith(path.join(os.homedir(), `.azure/msal_token_cache.bin`));
+    expect(mockedFs.readFileSync).toHaveBeenCalledWith(`.azure/msal_token_cache.bin`);
   });
 
-  test("save", async () => {
+  test("saveMsalCache", async () => {
     fs.writeFileSync(customTestPath, mockedMsal);
 
+    const process = { platform: "win32" };
+    const msalEncryptionService = {
+      unprotectData: jest.fn((data) => data.toString()),
+      protectData: jest.fn((data, optionalEntropy, scope) => {
+        expect(optionalEntropy).toBe(null);
+        expect(scope).toBe(DataProtectionScope.currentUser);
+        return data;
+      }),
+    };
     const iNativeService: any = {
       os,
       fs,
       process,
       path,
+      msalEncryptionService,
     };
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
     (service as any).getMsalCacheLocation = () => customTestPath;
@@ -198,7 +216,6 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os: { homedir: jest.fn(() => "a/") },
       fs: mockedFs,
-      process,
       path: { join: jest.fn((_s1: string, _s2: string) => path.join(_s1, _s2)) },
     };
     const service = new AzurePersistenceService(iNativeService, null);
@@ -230,7 +247,6 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os: { homedir: jest.fn(() => "a/") },
       fs: mockedFs,
-      process,
       path: { join: jest.fn((_s1: string, _s2: string) => path.join(_s1, _s2)) },
     };
     const service = new AzurePersistenceService(iNativeService, null);
@@ -277,7 +293,6 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os,
       fs,
-      process,
       path,
     };
 

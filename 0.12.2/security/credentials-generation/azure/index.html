@@ -16,7 +16,7 @@
         
       
       <link rel="icon" href="../../../images/icon.ico">
-      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.7+insiders-4.18.2">
+      <meta name="generator" content="mkdocs-1.3.0, mkdocs-material-8.3.9+insiders-4.20.1">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../../../assets/stylesheets/main.8ae2a6bc.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.19db47b7.min.css">
       
         
         <link rel="stylesheet" href="../../../assets/stylesheets/palette.cbb835fc.min.css">
@@ -874,8 +874,6 @@
       
         
       
-        
-      
     
     
     <li class="md-nav__item md-nav__item--nested">
@@ -959,25 +957,6 @@
 
               
             
-              
-                
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../../configuring-session/configure-azure-tenant/" class="md-nav__link">
-        
-  
-  <span class="md-ellipsis">
-    Configure Azure Tenant
-  </span>
-
-      </a>
-    </li>
-  
-
-              
-            
           </ul>
         </nav>
       
@@ -993,6 +972,8 @@
   
     
     
+      
+        
       
         
       
@@ -1033,6 +1014,25 @@
   
   <span class="md-ellipsis">
     Configure AWS Single Sign-On integration
+  </span>
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../configuring-integration/configure-azure-integration/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Configure Azure integration
   </span>
 
       </a>
@@ -1320,6 +1320,15 @@
   
     <nav class="md-nav" aria-label="Azure credentials generation">
       <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#access-strategy-login-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Access strategy - login integration
+    </span>
+  </a>
+  
+</li>
         
           <li class="md-nav__item">
   <a href="#access-strategy-start-session" class="md-nav__link">
@@ -1755,6 +1764,15 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
+  <a href="#access-strategy-login-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Access strategy - login integration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#access-strategy-start-session" class="md-nav__link">
     <span class="md-ellipsis">
       Access strategy - start session
@@ -1807,28 +1825,77 @@
   <h1>Azure</h1>
 
 <h2 id="azure-credentials-generation">Azure credentials generation</h2>
-<p>Azure generates a set of access and refresh tokens that are put inside accessTokens.json inside .azure directory. 
+<p>Azure generates a set of access and refresh tokens that are put inside <strong>msal_token_cache.json</strong> inside <strong>.azure</strong> directory. 
 Following is the procedure used to generate a set of credentials.</p>
-<h3 id="access-strategy-start-session">Access strategy - start session</h3>
-<p>if accessTokens.json is not present Leapp runs <code>az login —tenant &lt;tenant_id&gt; 2&gt;&amp;1</code>, otherwise accessTokens.json file 
-is parsed and Leapp extracts the access tokens array.</p>
-<p>if access token - corresponding to the specific tenant - exists, we extract it or else we run <code>az login</code>.</p>
-<p>if access token is expired we run <code>az account get-access-token --subscription &lt;subscription-id&gt;</code>.</p>
-<p>Finally <code>az account set —subscription &lt;subscription-id&gt; 2&gt;&amp;1</code> and <code>az configure —default location &lt;region(location)&gt;</code> are run.</p>
-<p>Refresh token is deleted from the accessTokens.json file</p>
-<h3 id="access-strategy-rotate-session">Access strategy - rotate session</h3>
-<ul>
-<li>same as start session</li>
-</ul>
-<h3 id="access-strategy-stop-session">Access strategy - stop session</h3>
-<p>We run <code>az account clear</code>, and we set session's status to INACTIVE.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>Leapp enhances security by forcingly refresh access token every 20 minutes and by removing refresh token from the file.</p>
+<p>In Windows OS the msal_token_cache is persisted on an encrypted file with <a href="https://docs.microsoft.com/en-us/previous-versions/ms995355(v%3Dmsdn.10)"><strong>dpapi</strong></a> API.<br>
+<a href="https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli">Starting from release 2.30</a> of Azure CLI, credentials are no more persisted in the original accessToken.json</p>
+</div>
+<p>Azure Users profile info is saved in the <strong>azureProfile.json</strong> file inside the <strong>.azure</strong> directory.</p>
+<h3 id="access-strategy-login-integration">Access strategy - login integration</h3>
+<p>Before accessing Azure sessions you now have to <a href="../../../configuring-integration/configure-azure-integration/">create</a> an Azure integration.
+After that, these are the steps required to login and then retrieve Azure sessions.</p>
+<ol>
+<li><em>msal_token_cache</em> and <em>azureProfile.json</em> files are cleaned for security reason.</li>
+<li>We execute <code>az login --tenantId &lt;TENANTID&gt;</code>. We do this to obtain the updated user profile and the refresh token (associated to this integration).</li>
+<li>We extract all the Azure subscriptions associated with the integration and for each one we map a Leapp Azure session.</li>
+<li>We extract the <em>refresh token</em>, <em>account</em>, and <em>profile</em> information from <em>msal_token_cache and azureProfile.json</em> and persist them in the <a href="../../system-vault/">System's vault</a>.</li>
+<li>We also remove the previous information from the original files, to increase security and avoid external tampering.</li>
+</ol>
+<h3 id="access-strategy-start-session">Access strategy - start session</h3>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>In the current version of Leapp we can only start one Azure session at a time.</p>
+</div>
+<p>For each subscription retrieved upon login to a specific integration, we define a new Leapp Azure Session.
+To start an Azure session we follow these steps.</p>
+<ol>
+<li>Recover <em>refresh token</em>, <em>account</em>, and <em>profile</em> information from the Vault and we use them alongside sessionId (Subscription id) in the start operation.</li>
+<li><em>azureProfile.json</em> is only filled with profile information from the current subscription.</li>
+<li>We write the <em>account information</em> and the <em>refresh token</em> back in the <em>msal_token_cache</em></li>
+<li>We execute <code>az account get-access-token --subscriptionId &lt;SUBSCRIPTIONID&gt;</code>, to retrieve the <strong>access token</strong> and the <strong>id token</strong> of the subscription.</li>
+<li>The previous command also write <em>access</em> and <em>id token</em> back to the <em>msal_token_cache file</em>.</li>
+<li>We update the <em>expiration time</em> of the session to the current datetime.</li>
+<li>We update the <em>refresh token</em> in the Vault with the new information.</li>
+<li>We remove the <em>refresh token</em> from the <em>msal_token_cache</em>.</li>
+<li>We finally start the session.</li>
+</ol>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<ul>
+<li>The <strong>refresh token</strong> is a long term credential that potentially lasts for <strong>90 days</strong>. The <strong>access token</strong> is a short term credential and last for <strong>70 minutes</strong>. <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens">Source</a></li>
+</ul>
+</div>
+<h3 id="access-strategy-rotate-session">Access strategy - rotate session</h3>
+<p>To rotate the session's credentials we do the following steps:</p>
+<ol>
+<li>We obtain the <strong>expiration time</strong> from the session we are rotating.</li>
+<li>We check with the <em>current date</em> to see if the session validity will expire in the next <strong>20 minutes</strong>.</li>
+<li>If <strong>no</strong>, no other checks are necessary you can still use the current credentials.</li>
+<li>
+<p>If <strong>yes</strong>, we do the following operations:</p>
+<ul>
+<li>Remove <em>access token</em> from <strong>msal_token_cache</strong>.</li>
+<li>Recover <em>refresh token</em> from System's Vault.</li>
+<li>Insert the <em>refresh token</em> back into the <em>msal_token_cache</em> file.</li>
+<li>We redo the last 4 steps (6-9) from the <em>start operation</em>.</li>
+</ul>
+</li>
+</ol>
+<h3 id="access-strategy-stop-session">Access strategy - stop session</h3>
+<p>To stop the session (because we only have one active at a time) we do the following steps:</p>
+<ol>
+<li>We run <code>az logout</code>, and we set session's status to INACTIVE. This operation cleans both <em>msal_token_cache</em> and <em>azureProfile.json</em> files.</li>
+</ol>
+<div class="admonition info">
+<p class="admonition-title">Info</p>
+<p>Leapp enhances security by forcingly refresh access token every 20 minutes and by removing refresh token from the msal_token_cache.</p>
 </div>
 
-  
 
+
+  
 
 
 
@@ -1964,7 +2031,7 @@ is parsed and Leapp extracts the access tokens array.</p>
     <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.instant", "navigation.indexes", "navigation.top", "content.code.annotate"], "search": "../../../assets/javascripts/workers/search.720157f5.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.config.lang": "en", "search.config.pipeline": "stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../../assets/javascripts/bundle.2131bdac.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.5e3df397.min.js"></script>
       
     
   </body>

@@ -121,7 +121,7 @@ describe("MsalPersistenceService", () => {
 
     const myfs = {
       readFileSync: jest.fn((p: string) => {
-        expect(p).toBe(".azure/msal_token_cache.bin");
+        expect(p).toMatch(/\.azure[/\\]msal_token_cache\.bin/);
         return compressedFile;
       }),
     };
@@ -146,7 +146,7 @@ describe("MsalPersistenceService", () => {
 
     const myfs = {
       readFileSync: jest.fn((p: string) => {
-        expect(p).toBe(".azure/msal_token_cache.json");
+        expect(p).toMatch(/\.azure[/\\]msal_token_cache\.json/);
         return mockedMsal;
       }),
     };
@@ -166,7 +166,9 @@ describe("MsalPersistenceService", () => {
     };
     msalEncryptionService.protectData();
     const mockedFs = {
-      readFileSync: jest.fn(() => {}),
+      readFileSync: jest.fn((p) => {
+        expect(p).toMatch(/\.azure[/\\]msal_token_cache\.bin/);
+      }),
     };
 
     const iNativeService: any = { os, fs: mockedFs, process: { platform: "win32" }, path, msalEncryptionService };
@@ -174,7 +176,7 @@ describe("MsalPersistenceService", () => {
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
     await service.loadMsalCache();
 
-    expect(mockedFs.readFileSync).toHaveBeenCalledWith(`.azure/msal_token_cache.bin`);
+    expect(mockedFs.readFileSync).toHaveBeenCalled();
   });
 
   test("saveMsalCache", async () => {
@@ -238,7 +240,7 @@ describe("MsalPersistenceService", () => {
     let resultData;
     const mockedFs = {
       writeFileSync: jest.fn((location, data) => {
-        expect(location).toStrictEqual("a/.azure/azureProfile.json");
+        expect(location).toMatch(/a[/\\]\.azure[/\\]azureProfile\.json/);
         expect(data).toStrictEqual(JSON.stringify(mockedProfile, null, 4));
         resultData = data;
       }),
@@ -247,7 +249,13 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os: { homedir: jest.fn(() => "a/") },
       fs: mockedFs,
-      path: { join: jest.fn((_s1: string, _s2: string) => path.join(_s1, _s2)) },
+      path: {
+        join: jest.fn((_s1: string, _s2: string) => {
+          expect(_s1).toMatch(/a[/\\]/);
+          expect(_s2).toMatch(/\.azure[/\\]azureProfile\.json/);
+          return path.join(_s1, _s2);
+        }),
+      },
     };
     const service = new AzurePersistenceService(iNativeService, null);
     const load = (service as any).getProfileLocation;
@@ -256,7 +264,7 @@ describe("MsalPersistenceService", () => {
       load.apply(service);
 
       expect(iNativeService.os.homedir).toHaveBeenCalled();
-      expect(iNativeService.path.join).toHaveBeenCalledWith("a/", ".azure/azureProfile.json");
+      expect(iNativeService.path.join).toHaveBeenCalled();
       return path.join(iNativeService.os.homedir(), ".azure/azureProfile.json");
     });
 

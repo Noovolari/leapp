@@ -22,4 +22,4 @@ Integrations have four main actions available: **Create**, **Delete**, **Sync**,
 | AWS SSO     | :white_check_mark: |
 | Okta        | Coming Soon |
 | OneLogin    | Coming Soon |
-| AzureAD     | Coming Soon |
+| AzureAD     | :white_check_mark: |

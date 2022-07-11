@@ -110,7 +110,8 @@ export class AppProviderService {
         this.appNativeService,
         this.repository,
         this.awsCoreService,
-        this.azureCoreService
+        this.azureCoreService,
+        this.sessionFactory
       );
     }
     return this.pluginCoreServiceInstance;

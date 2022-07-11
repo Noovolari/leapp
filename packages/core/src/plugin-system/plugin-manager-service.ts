@@ -1,7 +1,6 @@
 import { IPlugin } from "./interfaces/IPlugin";
 import { INativeService } from "../interfaces/i-native-service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "../services/log-service";
-import { constants } from "../models/constants";
 
 export class PluginManagerService {
   private _plugins: IPlugin[];
@@ -61,24 +60,25 @@ export class PluginManagerService {
               this.nativeService.fs.existsSync(pluginFilePath + "/package.json") &&
               this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")
             ) {
+              packageJson = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
               // Verify signature to enable plugin
-              const data = await this.http.get(constants.pluginPortalUrl + `/${pluginFilePaths[i]}`, { responseType: "json" }).toPromise();
+              /*const data = await this.http.get(constants.pluginPortalUrl + `/${pluginFilePaths[i]}`, { responseType: "json" }).toPromise();
               if (data.status !== "active") {
                 this.logService.log(new LoggedEntry("Plugin not in active state: " + pluginFilePaths[i], this, LogLevel.warn, true));
                 continue;
               }
-              packageJson = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
+
               const verifyMessage = packageJson + hash.hash;
               console.log("verifyMessage: ", verifyMessage);
               console.log("data: ", data);
               const signatureVerified = this.rsaVerifySignatureFromBase64(constants.publicKey, verifyMessage, data.signature);
-              console.log(signatureVerified);
+              console.log(signatureVerified);*/
 
-              if (!signatureVerified) {
+              /*if (!signatureVerified) {
                 this.logService.log(new LoggedEntry("Signature not verified for plugin: " + pluginFilePaths[i], this, LogLevel.warn, true));
                 this.nativeService.rimraf(pluginFilePath, () => {});
                 continue;
-              }
+              }*/
             } else {
               console.log(`folder ${pluginFilePath} is not a plugin folder, ignoring...`);
               this.logService.log(new LoggedEntry(`folder ${pluginFilePath} is not a plugin folder, ignoring...`, this, LogLevel.info, false));
@@ -100,7 +100,7 @@ export class PluginManagerService {
             this._plugins.push(plugin);
           }
         } catch (error) {
-          console.log("error loading plugin: " + error);
+          console.log("error loading plugin: " + error.toString());
           this.logService.log(new LoggedException(`error loading plugin: ${JSON.stringify(error)}`, this, LogLevel.error, false));
         }
       }

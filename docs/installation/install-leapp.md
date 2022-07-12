@@ -10,7 +10,7 @@ You can install Leapp by downloading the pre-built binaries for your OS on the w
 
 ### macOS (Homebrew) & Linux (Linuxbrew)
 
-Leapp can also be installed on **macOS** or **Linux** via [Homebrew Cask](https://brew.sh/) with:
+Leapp can also be installed on **macOS** or **Linux** via [Homebrew Cask](https://brew.sh/){: target='_blank'} with:
 
 ```console
 $ brew install leapp
@@ -18,7 +18,7 @@ $ brew install leapp
 
 !!! info
 
-    In addition, Leapp can also be installed with Linuxbrew on Windows via [WSL](https://docs.microsoft.com/en-us/windows/wsl/about)
+    In addition, Leapp can also be installed with Linuxbrew on Windows via [WSL](https://docs.microsoft.com/en-us/windows/wsl/about){: target='_blank'}
 
 ## Install Leapp CLI
 
@@ -43,7 +43,7 @@ On macOS with ARM64 chip you can use the Homebrew Formula:
 $ brew install Noovolari/brew/leapp-cli-darwin-arm64
 ```
 
-All the available commands are listed in the [Leapp CLI section of the documentation](../../cli).
+All the available commands are listed in the [Leapp CLI section of the documentation](../../cli/).
 
 !!! warning
 

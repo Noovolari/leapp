@@ -17,8 +17,6 @@ import {
   roleArn,
   roleSessionName,
   secretKey,
-  subscriptionId,
-  tenantId,
   sessionType,
 } from "../../flags";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
@@ -57,8 +55,8 @@ export default class AddSession extends LeappCommand {
     roleArn,
     roleSessionName,
     secretKey,
-    subscriptionId,
-    tenantId,
+    //subscriptionId,
+    //tenantId,
     sessionType,
   };
 

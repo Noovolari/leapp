@@ -1829,18 +1829,18 @@
 Following is the procedure used to generate a set of credentials.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-<p>In Windows OS the msal_token_cache is persisted on an encrypted file with <a href="https://docs.microsoft.com/en-us/previous-versions/ms995355(v%3Dmsdn.10)"><strong>dpapi</strong></a> API.<br>
-<a href="https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli">Starting from release 2.30</a> of Azure CLI, credentials are no more persisted in the original accessToken.json</p>
+<p>In Windows OS the msal_token_cache is persisted on an encrypted file with <a href="https://docs.microsoft.com/en-us/previous-versions/ms995355(v%3Dmsdn.10)" target="_blank"><strong>dpapi</strong></a> API.<br>
+<a href="https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli" target="_blank">Starting from release 2.30</a> of Azure CLI, credentials are no more persisted in the original accessToken.json</p>
 </div>
 <p>Azure Users profile info is saved in the <strong>azureProfile.json</strong> file inside the <strong>.azure</strong> directory.</p>
 <h3 id="access-strategy-login-integration">Access strategy - login integration</h3>
-<p>Before accessing Azure sessions you now have to <a href="../../../configuring-integration/configure-azure-integration/">create</a> an Azure integration.
+<p>Before accessing Azure sessions you now have to <a href="../../../configuring-integration/configure-azure-integration/" target="_blank">create</a> an Azure integration.
 After that, these are the steps required to login and then retrieve Azure sessions.</p>
 <ol>
 <li><em>msal_token_cache</em> and <em>azureProfile.json</em> files are cleaned for security reason.</li>
 <li>We execute <code>az login --tenantId &lt;TENANTID&gt;</code>. We do this to obtain the updated user profile and the refresh token (associated to this integration).</li>
 <li>We extract all the Azure subscriptions associated with the integration and for each one we map a Leapp Azure session.</li>
-<li>We extract the <em>refresh token</em>, <em>account</em>, and <em>profile</em> information from <em>msal_token_cache and azureProfile.json</em> and persist them in the <a href="../../system-vault/">System's vault</a>.</li>
+<li>We extract the <em>refresh token</em>, <em>account</em>, and <em>profile</em> information from <em>msal_token_cache and azureProfile.json</em> and persist them in the <a href="../../system-vault/" target="_blank">System's vault</a>.</li>
 <li>We also remove the previous information from the original files, to increase security and avoid external tampering.</li>
 </ol>
 <h3 id="access-strategy-start-session">Access strategy - start session</h3>
@@ -1864,7 +1864,7 @@ To start an Azure session we follow these steps.</p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <ul>
-<li>The <strong>refresh token</strong> is a long term credential that potentially lasts for <strong>90 days</strong>. The <strong>access token</strong> is a short term credential and last for <strong>70 minutes</strong>. <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens">Source</a></li>
+<li>The <strong>refresh token</strong> is a long term credential that potentially lasts for <strong>90 days</strong>. The <strong>access token</strong> is a short term credential and last for <strong>70 minutes</strong>. <a href="https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens" target="_blank">Source</a></li>
 </ul>
 </div>
 <h3 id="access-strategy-rotate-session">Access strategy - rotate session</h3>

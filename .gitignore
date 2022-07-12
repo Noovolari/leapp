@@ -60,6 +60,9 @@ buildAll.sh
 site/
 temp/
 
+#Pyenv
+.python-version
+
 packages/core/node_modules
 packages/core/dist
 

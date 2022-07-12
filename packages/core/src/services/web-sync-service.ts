@@ -55,7 +55,9 @@ export class WebSyncService {
     this.currentUser = await this.userProvider.signIn(email, password);
     const rsaKeys = await this.getRSAKeys(this.currentUser);
     const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
-    const integrationDtos = localSecretDtos.filter((secret) => secret.secretType === SecretType.awsSsoIntegration);
+    const integrationDtos = localSecretDtos.filter(
+      (secret) => secret.secretType === SecretType.awsSsoIntegration || secret.secretType === SecretType.azureIntegration
+    );
     for (const integrationDto of integrationDtos) {
       await this.syncIntegrationSecret(integrationDto as AwsSsoLocalIntegrationDto);
     }

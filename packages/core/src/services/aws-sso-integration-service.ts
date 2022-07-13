@@ -21,6 +21,7 @@ import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
 import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
 import { SessionFactory } from "./session-factory";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
+import { ThrottledService } from "./throttled-service";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -38,6 +39,7 @@ export interface SsoSessionsDiff {
 
 export class AwsSsoIntegrationService {
   private ssoPortal: SSO;
+  private listAccountRolesCall: ThrottledService;
 
   constructor(
     private repository: Repository,
@@ -296,6 +298,7 @@ export class AwsSsoIntegrationService {
   private setupSsoPortalClient(region: string): void {
     if (!this.ssoPortal) {
       this.ssoPortal = new SSO({ region });
+      this.listAccountRolesCall = new ThrottledService((...params) => this.ssoPortal.listAccountRoles(...params), 20); // TODO: into constants
     }
   }
 
@@ -367,19 +370,16 @@ export class AwsSsoIntegrationService {
   }
 
   private recursiveListRoles(accountRoles: RoleInfo[], listAccountRolesRequest: ListAccountRolesRequest, promiseCallback: any) {
-    this.ssoPortal
-      .listAccountRoles(listAccountRolesRequest)
-      .promise()
-      .then((response) => {
-        accountRoles.push(...response.roleList);
+    this.listAccountRolesCall.callWithThrottle(listAccountRolesRequest).then((response) => {
+      accountRoles.push(...response.roleList);
 
-        if (response.nextToken !== null) {
-          listAccountRolesRequest.nextToken = response.nextToken;
-          this.recursiveListRoles(accountRoles, listAccountRolesRequest, promiseCallback);
-        } else {
-          promiseCallback(accountRoles);
-        }
-      });
+      if (response.nextToken !== null) {
+        listAccountRolesRequest.nextToken = response.nextToken;
+        this.recursiveListRoles(accountRoles, listAccountRolesRequest, promiseCallback);
+      } else {
+        promiseCallback(accountRoles);
+      }
+    });
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {

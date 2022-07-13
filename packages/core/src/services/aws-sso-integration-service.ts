@@ -21,7 +21,7 @@ import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
 import { AwsSsoIntegrationTokenInfo } from "../models/aws-sso-integration-token-info";
 import { SessionFactory } from "./session-factory";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
-import { ThrottledService } from "./throttled-service";
+import { ThrottleService } from "./throttle-service";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -39,7 +39,7 @@ export interface SsoSessionsDiff {
 
 export class AwsSsoIntegrationService {
   private ssoPortal: SSO;
-  private listAccountRolesCall: ThrottledService;
+  private listAccountRolesCall: ThrottleService;
 
   constructor(
     private repository: Repository,
@@ -227,26 +227,8 @@ export class AwsSsoIntegrationService {
 
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     const accounts: AccountInfo[] = await this.listAccounts(accessToken, region);
-    const waitFor = (delay) => new Promise((resolve) => setTimeout(resolve, delay));
-
-    const promiseArray: Promise<SsoRoleSession[]>[] = [];
-    let counter = 0;
-
-    for (const account of accounts) {
-      counter++;
-      // eslint-disable-next-line eqeqeq
-      if (counter % 25 == 0) {
-        await waitFor(5000);
-      }
-
-      promiseArray.push(this.getSessionsFromAccount(integrationId, account, accessToken, region));
-    }
-
-    return new Promise((resolve, _) => {
-      Promise.all(promiseArray).then((sessionMatrix: SsoRoleSession[][]) => {
-        resolve(sessionMatrix.flat());
-      });
-    });
+    const promiseArray = accounts.map((account) => this.getSessionsFromAccount(integrationId, account, accessToken, region));
+    return (await Promise.all(promiseArray)).flat();
   }
 
   private async configureAwsSso(
@@ -298,7 +280,7 @@ export class AwsSsoIntegrationService {
   private setupSsoPortalClient(region: string): void {
     if (!this.ssoPortal) {
       this.ssoPortal = new SSO({ region });
-      this.listAccountRolesCall = new ThrottledService((...params) => this.ssoPortal.listAccountRoles(...params), 20); // TODO: into constants
+      this.listAccountRolesCall = new ThrottleService((...params) => this.ssoPortal.listAccountRoles(...params).promise(), 20); // TODO: into constants
     }
   }
 

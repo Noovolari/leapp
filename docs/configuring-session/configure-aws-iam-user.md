@@ -4,7 +4,7 @@ An IAM User in AWS consists of a name and a set of long-term credentials. Leapp 
 
 !!! Info
   
-    If you want to know how Leapp generates and refresh short-term credentials refer to the [credentials generation](../../security/credentials-generation/aws/) section in the documentation.
+    If you want to know how Leapp generates and refresh short-term credentials refer to the [credentials generation](../../security/credentials-generation/aws/){: target='_blank'} section in the documentation.
 
 ## Fields
 
@@ -21,3 +21,7 @@ An IAM User in AWS consists of a name and a set of long-term credentials. Leapp 
 ## Video Tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-user.mp4" type="video/mp4"> </video>
+
+!!! info
+
+    Azure sessions are not available anymore for direct creation. Instead you can create a new [Azure Integration](../configuring-integration/configure-azure-integration.md).

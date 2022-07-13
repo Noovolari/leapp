@@ -2,7 +2,7 @@ import { describe, expect, jest, test } from "@jest/globals";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import CurrentSession from "./current";
-import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 
 const awsProvider = "aws";
 const azureProvider = "azure";
@@ -275,7 +275,7 @@ describe("CurrentSession", () => {
   test("getSessionData - azure", async () => {
     const cliProviderService: any = {
       sessionFactory: {
-        getSessionService: jest.fn(() => new AzureService(null, null, null, null, null)),
+        getSessionService: jest.fn(() => new AzureSessionService(null, null, null, null, null, null, null, null)),
       },
     };
     const session = {

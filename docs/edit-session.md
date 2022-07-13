@@ -39,12 +39,6 @@ Below are the configuration options for every type of session:
 - SAML 2.0 Url: Federated URL needed for authentication to AWS
 - Identity Provider: the identity provider ARN that you have setup on AWS
 
-### Azure
-- Session Alias: the session name can be changed as a session is identified by a hidden id
-- Subscription ID: this value is the unique ID of the Subscription in the Azure Panel
-- Tenant ID: this value is the unique ID of the Tenant in the Azure Panel
-- Location: where you land first once logged in
-
 After modifying all the parameters, a user can test their validity with *test credential generation*:
 
 ![](../images/testconnection.png)

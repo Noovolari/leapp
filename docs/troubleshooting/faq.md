@@ -9,7 +9,7 @@ The open-source software don't transfer, persist, or share anything with other s
 
 **We can't and don't want to see any of your access data.**
 
-We need to store your data online to enable some features (syncing, managing other users, etc.) but we implement a [Zero-Knowledge](../../security/zero-knowledge) encryption system that prevents even ourselves to access your data.
+We need to store your data online to enable some features (syncing, managing other users, etc.) but we implement a [Zero-Knowledge](../../security/zero-knowledge/){: target='_blank'} encryption system that prevents even ourselves to access your data.
 
 ## I don't feel secure using a built-in window for authentication, can't you use the default browser?
 

@@ -32,3 +32,7 @@ We currently only support SAML 2.0 federation.
 ## Video tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-federated.mp4" type="video/mp4"> </video>
+
+!!! info
+
+    Azure sessions are not available anymore for direct creation. Instead you can create a new [Azure Integration](../configuring-integration/configure-azure-integration.md).

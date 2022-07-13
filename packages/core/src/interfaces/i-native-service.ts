@@ -1,4 +1,5 @@
 import * as ipc from "node-ipc";
+import { IMsalEncryptionService } from "./i-msal-encryption-service";
 
 export interface INativeService {
   url: any;
@@ -19,4 +20,5 @@ export interface INativeService {
   httpsProxyAgent: any;
   process: any;
   nodeIpc: typeof ipc;
+  msalEncryptionService: IMsalEncryptionService;
 }

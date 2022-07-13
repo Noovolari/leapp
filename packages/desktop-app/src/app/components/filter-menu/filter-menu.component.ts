@@ -48,7 +48,6 @@ export class FilterMenuComponent implements OnInit {
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,max-len
   updateValue(event: any, data: { id?: string; category?: string; name: string; value: boolean; show?: boolean }[], form: FormGroup) {
-    console.log(data);
     data = data.map((o) => ({ id: o.id, name: o.name, value: o.value, category: o.category }));
     form.get(this.control).setValue(data);
   }

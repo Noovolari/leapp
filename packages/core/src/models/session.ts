@@ -5,18 +5,15 @@ import { constants } from "./constants";
 
 export class Session {
   sessionId: string;
-  sessionName: string;
   status: SessionStatus;
   startDateTime?: string;
-  region: string;
   type: SessionType;
+  sessionTokenExpiration: string;
 
-  constructor(sessionName: string, region: string) {
+  constructor(public sessionName: string, public region: string) {
     this.sessionId = uuid.v4();
-    this.sessionName = sessionName;
     this.status = SessionStatus.inactive;
     this.startDateTime = undefined;
-    this.region = region;
   }
 
   expired(): boolean {

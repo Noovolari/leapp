@@ -1,6 +1,6 @@
 import { LeappBaseError } from "../../../errors/leapp-base-error";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsProcessCredentials } from "../../../models/aws-process-credential";
+import { AwsProcessCredentials } from "../../../models/aws/aws-process-credential";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { SessionStatus } from "../../../models/session-status";
@@ -40,7 +40,7 @@ export abstract class AwsSessionService extends SessionService {
       } else {
         await this.applyConfigProfileCommand(sessionId);
       }
-      this.sessionActivate(sessionId);
+      this.sessionActivated(sessionId);
     } catch (error) {
       this.sessionError(sessionId, error);
     }
@@ -53,7 +53,7 @@ export abstract class AwsSessionService extends SessionService {
         this.sessionLoading(sessionId);
         const credentialsInfo = await this.generateCredentials(sessionId);
         await this.applyCredentials(sessionId, credentialsInfo);
-        this.sessionRotated(sessionId);
+        this.sessionActivated(sessionId);
       }
     } catch (error) {
       this.sessionError(sessionId, error);
@@ -102,7 +102,7 @@ export abstract class AwsSessionService extends SessionService {
         token.aws_access_key_id,
         token.aws_secret_access_key,
         token.aws_session_token,
-        (session as any).sessionTokenExpiration
+        session.sessionTokenExpiration
       );
     } else {
       throw new Error("only AWS sessions are supported");

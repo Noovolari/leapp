@@ -1,12 +1,13 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.110",
+  "version": "0.1.114",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
   },
   "description": "Leapp's core module",
   "peerDependencies": {
+    "@azure/msal-node": "^1.9.0",
     "@babel/plugin-proposal-decorators": "^7.16.5",
     "@types/aws-sdk": "^2.7.0",
     "@types/node": "^16.9.4",
@@ -32,10 +33,10 @@
     "ini": "~2.0.0",
     "is-url": "^1.2.4",
     "jwt-decode": "~3.1.2",
-    "keytar": "7.7.0",
+    "keytar": "7.9.0",
     "ms": "^2.1.3",
-    "node-log-rotate": "~0.1.5",
     "node-ipc": "9.2.1",
+    "node-log-rotate": "~0.1.5",
     "node-machine-id": "~1.1.12",
     "reflect-metadata": "^0.1.13",
     "rimraf": "~3.0.2",
@@ -77,10 +78,10 @@
     "access": "public"
   },
   "scripts": {
-    "setup": "gushio ../../gushio/setup-package.js core",
+    "setup": "gushio ../../gushio/clean-and-bootstrap.js core",
     "clean": "gushio gushio/target-clean.js",
     "build": "gushio gushio/target-build.js",
-    "test": "jest",
+    "test": "jest --coverage",
     "release": "gushio gushio/target-release.js"
   },
   "repository": {

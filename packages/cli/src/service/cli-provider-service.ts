@@ -6,7 +6,7 @@ import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service"
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
-import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
 import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
 import { AwsParentSessionFactory } from "@noovolari/leapp-core/services/session/aws/aws-parent-session.factory";
@@ -24,7 +24,7 @@ import { RemoteProceduresClient } from "@noovolari/leapp-core/services/remote-pr
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import CliInquirer from "inquirer";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { CliOpenWebConsoleService } from "./cli-open-web-console-service";
@@ -40,6 +40,7 @@ import { SessionManagementService } from "@noovolari/leapp-core/services/session
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
+import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -56,7 +57,7 @@ export class CliProviderService {
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
   private awsSsoRoleServiceInstance: AwsSsoRoleService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
-  private azureServiceInstance: AzureService;
+  private azureServiceInstance: AzureSessionService;
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
@@ -80,6 +81,7 @@ export class CliProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private segmentServiceInstance: SegmentService;
   private workspaceServiceInstance: WorkspaceService;
+  private azurePersistenceServiceInstance: AzurePersistenceService;
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -197,10 +199,25 @@ export class CliProviderService {
     return this.awsSsoOidcServiceInstance;
   }
 
-  get azureService(): AzureService {
+  public get azurePersistenceService(): AzurePersistenceService {
+    if (!this.azurePersistenceServiceInstance) {
+      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.cliNativeService, this.keyChainService);
+    }
+    return this.azurePersistenceServiceInstance;
+  }
+
+  get azureSessionService(): AzureSessionService {
     if (!this.azureServiceInstance) {
-      this.azureServiceInstance = new AzureService(this.behaviouralSubjectService, this.repository, this.fileService, this.executeService,
-        constants.azureAccessTokens);
+      this.azureServiceInstance = new AzureSessionService(
+        this.behaviouralSubjectService,
+        this.repository,
+        this.fileService,
+        this.executeService,
+        constants.azureMsalCacheFile,
+        this.cliNativeService,
+        this.azurePersistenceService,
+        this.logService
+      );
     }
     return this.azureServiceInstance;
   }
@@ -208,7 +225,7 @@ export class CliProviderService {
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
-        this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureService);
+        this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureSessionService);
     }
     return this.sessionFactoryInstance;
   }
@@ -258,8 +275,9 @@ export class CliProviderService {
 
   get awsSsoIntegrationService(): AwsSsoIntegrationService {
     if (!this.awsSsoIntegrationServiceInstance) {
-      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.awsSsoOidcService,
-        this.awsSsoRoleService, this.keyChainService, this.behaviouralSubjectService, this.cliNativeService, this.sessionFactory, this.behaviouralSubjectService);
+      this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(this.repository, this.keyChainService,
+        this.behaviouralSubjectService, this.cliNativeService,
+        this.sessionFactory, this.awsSsoOidcService, this.awsSsoRoleService);
     }
     return this.awsSsoIntegrationServiceInstance;
   }
@@ -271,7 +289,7 @@ export class CliProviderService {
     return this.keyChainServiceInstance;
   }
 
-  get loggingService(): LogService {
+  get logService(): LogService {
     if (!this.logServiceInstance) {
       this.logServiceInstance = new LogService(new CliNativeLoggerService());
     }
@@ -287,7 +305,7 @@ export class CliProviderService {
 
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
-      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository, this.loggingService);
+      this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository, this.logService);
     }
     return this.executeServiceInstance;
   }
@@ -302,7 +320,7 @@ export class CliProviderService {
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
       this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
-        this.repository, this.behaviouralSubjectService, constants.appName);
+        this.repository, this.behaviouralSubjectService);
     }
     return this.retroCompatibilityServiceInstance;
   }
@@ -317,14 +335,14 @@ export class CliProviderService {
 
   get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService, this.loggingService);
+      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService, this.logService);
     }
     return this.awsCoreServiceInstance;
   }
 
   get azureCoreService(): AzureCoreService {
     if (!this.azureCoreServiceInstance) {
-      this.azureCoreServiceInstance = new AzureCoreService();
+      this.azureCoreServiceInstance = new AzureCoreService(this.sessionManagementService, this.azureSessionService);
     }
     return this.azureCoreServiceInstance;
   }
@@ -338,14 +356,14 @@ export class CliProviderService {
 
   get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.loggingService, fetch);
+      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.logService, fetch);
     }
     return this.webConsoleServiceInstance;
   }
 
   get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.loggingService, this.executeService);
+      this.ssmServiceInstance = new SsmService(this.logService, this.executeService, this.cliNativeService, this.fileService);
     }
     return this.ssmServiceInstance;
   }

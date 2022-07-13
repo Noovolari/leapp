@@ -1,5 +1,4 @@
-import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
-import { AzureSession } from "@noovolari/leapp-core/models/azure-session";
+import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { Flags } from "@oclif/core";
@@ -7,7 +6,8 @@ import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { AzureService } from "@noovolari/leapp-core/services/session/azure/azure-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 
 const awsProvider = "aws";
 const azureProvider = "azure";
@@ -107,7 +107,7 @@ export default class CurrentSession extends LeappCommand {
         accountNumber: await sessionService.getAccountNumberFromCallerIdentity(session),
         roleArn: session.type === SessionType.awsIamUser ? "none" : (session as any).roleArn,
       };
-    } else if (sessionService instanceof AzureService) {
+    } else if (sessionService instanceof AzureSessionService) {
       const azureSession = session as AzureSession;
       return {
         id: azureSession.sessionId,

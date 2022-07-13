@@ -11,10 +11,10 @@ export const constants = {
   timeout: 10000,
   credentialsDestination: ".aws/credentials",
   defaultRegion: "us-east-1",
+  maxSsoTps: 20, // Transaction per second for AWS SSO endpoint
 
   //Azure
-  azureAccessTokens: ".azure/accessTokens.json",
-  azureProfile: ".azure/azureProfile.json",
+  azureMsalCacheFile: ".azure/msal_token_cache.json",
   defaultLocation: "eastus",
   defaultAwsProfileName: "default",
   defaultAzureProfileName: "default-azure",
@@ -48,4 +48,7 @@ export const constants = {
   // Credential Process
   credentialFile: "credential-file-method",
   credentialProcess: "credential-process-method",
+
+  // Contains Env for SSM on macOS
+  ssmSourceFileDestination: ".Leapp/ssm-env",
 };

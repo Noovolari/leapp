@@ -1,5 +1,5 @@
 import { Session } from "../models/session";
-import { AwsSsoIntegration } from "../models/aws-sso-integration";
+import { Integration } from "../models/integration";
 
 export interface IBehaviouralNotifier {
   getSessions(): Session[];
@@ -8,7 +8,7 @@ export interface IBehaviouralNotifier {
 
   setSessions(sessions: Session[]): void;
 
-  getIntegrations(): AwsSsoIntegration[];
+  getIntegrations(): Integration[];
 
-  setIntegrations(integrations: AwsSsoIntegration[]): void;
+  setIntegrations(integrations: Integration[]): void;
 }

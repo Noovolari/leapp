@@ -1,7 +1,11 @@
 import { AzureLocation } from "./azure-location";
+import { SessionManagementService } from "./session-management-service";
+import { SessionType } from "../models/session-type";
+import { Session } from "../models/session";
+import { AzureSessionService } from "./session/azure/azure-session-service";
 
 export class AzureCoreService {
-  constructor() {}
+  constructor(private sessionManagementService: SessionManagementService, private azureSessionService: AzureSessionService) {}
 
   getLocations(): AzureLocation[] {
     return [
@@ -68,5 +72,12 @@ export class AzureCoreService {
       new AzureLocation("uaecentral"),
       new AzureLocation("brazilsoutheast"),
     ];
+  }
+
+  async stopAllSessionsOnQuit(): Promise<void> {
+    const azureSessions = this.sessionManagementService.getSessions().filter((session: Session) => session.type === SessionType.azure);
+    for (const s of azureSessions) {
+      await this.azureSessionService.stop(s.sessionId);
+    }
   }
 }

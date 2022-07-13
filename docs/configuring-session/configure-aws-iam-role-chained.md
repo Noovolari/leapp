@@ -5,7 +5,7 @@ A role does not have standard long-term credentials such as a password or access
 Role chaining occurs when you use a role to assume a second role through the AWS CLI or API, even in other accounts.
 
 !!! Info
-    Refer to [this guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_saml.html) to delegate access across AWS accounts using IAM Roles chaining.
+    Refer to [this guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_saml.html){: target='_blank'} to delegate access across AWS accounts using IAM Roles chaining.
 
 ## Fields
 
@@ -23,3 +23,6 @@ Role chaining occurs when you use a role to assume a second role through the AWS
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-chained.mp4" type="video/mp4"> </video>
 
+!!! info
+
+    Azure sessions are not available anymore for direct creation. Instead you can create a new [Azure Integration](../configuring-integration/configure-azure-integration.md){: target='_blank'}.

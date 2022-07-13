@@ -34,6 +34,7 @@ describe("SessionComponent", () => {
     fixture = TestBed.createComponent(SessionsComponent);
     component = fixture.componentInstance;
     component.eGlobalFilterGroup = {
+      pinnedFilter: false,
       dateFilter: false,
       integrationFilter: [],
       profileFilter: [],

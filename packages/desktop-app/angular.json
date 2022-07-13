@@ -42,7 +42,7 @@
             "sourceMap": true,
             "optimization": false,
             "namedChunks": true,
-            "allowedCommonJsDependencies": ["stream", "assert", "fs"]
+            "allowedCommonJsDependencies": ["stream", "assert", "fs", "@noovolari/leapp-core"]
           },
           "configurations": {
             "staging": {

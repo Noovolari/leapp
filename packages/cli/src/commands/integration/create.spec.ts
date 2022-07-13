@@ -1,6 +1,6 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import CreateSsoIntegration from "./create";
-import { AwsSsoIntegrationService, IntegrationCreationParams } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService, IntegrationCreationParams } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { CliProviderService } from "../../service/cli-provider-service";

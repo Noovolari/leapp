@@ -16,7 +16,7 @@ This option is used to select the terminal in which to open an SSM session.
 
 !!! Info
 
-    This setting is currently only available on MacOS. If you want to contribute and add a new terminal for a specific OS, please refer to the [contributing guide](https://github.com/Noovolari/leapp/blob/master/CONTRIBUTING.md)
+    This setting is currently only available on MacOS. If you want to contribute and add a new terminal for a specific OS, please refer to the [contributing guide](https://github.com/Noovolari/leapp/blob/master/CONTRIBUTING.md){: target='_blank'}
 
 ## Color Theme
 

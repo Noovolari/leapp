@@ -12,8 +12,10 @@ Then follow the links below.
 [Configure an AWS IAM Role Federated](configuring-session/configure-aws-iam-role-federated.md)
 [Configure an AWS IAM Role Chained](configuring-session/configure-aws-iam-role-chained.md)
 
-### Azure
-[Configure an Azure Tenant](configuring-session/configure-azure-tenant.md)
-
 ## Integrations
+
+### AWS SSO
 [Configure AWS SSO](configuring-integration/configure-aws-single-sign-on-integration.md)
+
+### Azure AD
+[Configure an Azure Tenant](configuring-integration/configure-azure-integration.md)

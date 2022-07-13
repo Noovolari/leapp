@@ -30,6 +30,8 @@ describe("ThrottledService", () => {
 
     const service = new ThrottleService((p1, p2) => endpointFn(p1, p2), tps);
 
+    const startTime = new Date().getTime();
+
     const callPromises = [];
     for (let i = 0; i < totalCalls; i++) {
       callPromises.push(service.callWithThrottle(1, i));
@@ -37,6 +39,8 @@ describe("ThrottledService", () => {
 
     await Promise.allSettled(callPromises);
 
+    const elapsedTime = new Date().getTime() - startTime;
+    expect(elapsedTime).toBeGreaterThanOrEqual(((totalCalls - 1) / tps) * 1000);
     expect(endpointFn).toHaveBeenCalledTimes(totalCalls);
   });
 });

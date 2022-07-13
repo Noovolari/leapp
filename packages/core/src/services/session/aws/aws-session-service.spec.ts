@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { AwsProcessCredentials } from "../../../models/aws-process-credential";
+import { AwsProcessCredentials } from "../../../models/aws/aws-process-credential";
 import { SessionType } from "../../../models/session-type";
 import { AwsSessionService } from "./aws-session-service";
 import { CredentialsInfo } from "../../../models/credentials-info";
@@ -86,7 +86,7 @@ describe("AwsSessionService", () => {
     const isThereAnotherPendingSessionWithSameNameProfile = jest.fn((_: string) => false);
     const stopAllWithSameNameProfile = jest.fn((_: string): void => {});
     const sessionLoading = jest.fn((_: string): void => {});
-    const sessionActivate = jest.fn((_: string): void => {});
+    const sessionActivated = jest.fn((_: string): void => {});
     const generateCredentials = jest.fn((_: string): Promise<CredentialsInfo> => Promise.resolve(credentialsInfo));
     const applyCredentials = jest.fn((_: string, __: CredentialsInfo): void => {});
     const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
@@ -94,14 +94,14 @@ describe("AwsSessionService", () => {
     (awsSessionService as any).stopAllWithSameNameProfile = stopAllWithSameNameProfile;
     (awsSessionService as any).generateCredentials = generateCredentials;
     (awsSessionService as any).sessionLoading = sessionLoading;
-    (awsSessionService as any).sessionActivate = sessionActivate;
+    (awsSessionService as any).sessionActivated = sessionActivated;
     (awsSessionService as any).applyCredentials = applyCredentials;
     await awsSessionService.start("sessionId");
 
     expect(isThereAnotherPendingSessionWithSameNameProfile).toHaveBeenCalledWith("sessionId");
     expect(stopAllWithSameNameProfile).toHaveBeenCalledWith("sessionId");
     expect(sessionLoading).toHaveBeenCalledWith("sessionId");
-    expect(sessionActivate).toHaveBeenCalledWith("sessionId");
+    expect(sessionActivated).toHaveBeenCalledWith("sessionId");
     expect(generateCredentials).toHaveBeenCalledWith("sessionId");
     expect(applyCredentials).toHaveBeenCalledWith("sessionId", credentialsInfo);
   });
@@ -116,18 +116,18 @@ describe("AwsSessionService", () => {
     const sessionNotifier = {} as any;
     const credentialsInfo = {} as any;
     const sessionLoading = jest.fn((_: string): void => {});
-    const sessionRotated = jest.fn((_: string): void => {});
+    const sessionActivated = jest.fn((_: string): void => {});
     const generateCredentials = jest.fn((_: string): Promise<CredentialsInfo> => Promise.resolve(credentialsInfo));
     const applyCredentials = jest.fn((_: string, __: CredentialsInfo): void => {});
     const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
     (awsSessionService as any).generateCredentials = generateCredentials;
     (awsSessionService as any).sessionLoading = sessionLoading;
-    (awsSessionService as any).sessionRotated = sessionRotated;
+    (awsSessionService as any).sessionActivated = sessionActivated;
     (awsSessionService as any).applyCredentials = applyCredentials;
     await awsSessionService.rotate("sessionId");
 
     expect(sessionLoading).toHaveBeenCalledWith("sessionId");
-    expect(sessionRotated).toHaveBeenCalledWith("sessionId");
+    expect(sessionActivated).toHaveBeenCalledWith("sessionId");
     expect(generateCredentials).toHaveBeenCalledWith("sessionId");
     expect(applyCredentials).toHaveBeenCalledWith("sessionId", credentialsInfo);
   });

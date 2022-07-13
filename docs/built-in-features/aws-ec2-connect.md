@@ -2,7 +2,7 @@ You can directly connect to an AWS EC2 instance from Leapp through AWS System Ma
 
 !!! Info
 
-    To setup SSM follow [this](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-getting-started.html) guide.
+    To setup SSM follow [this](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-getting-started.html){: target='_blank'} guide.
 
 ![](../../images/screens/newuxui/aws-ssm.png?style=center-img)
 

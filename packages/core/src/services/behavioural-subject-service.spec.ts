@@ -9,7 +9,7 @@ import { IntegrationType } from "../models/integration-type";
 import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 import { AzureIntegration } from "../models/azure/azure-integration";
 
-describe("WorkspaceService", () => {
+describe("BehaviouralSubjectService", () => {
   let repositoryMock: Repository;
   let mockedSession1: Session;
   let mockedSession2: Session;
@@ -168,4 +168,8 @@ describe("WorkspaceService", () => {
   test("getIntegrationsById() - retrieve a integrations given its id", () => {
     expect(behaviouralSubjectService.getIntegrationById("3")).toStrictEqual(mockedIntegration3);
   });
+
+  test("setSessions", () => {});
+
+  test("setIntegrations", () => {});
 });

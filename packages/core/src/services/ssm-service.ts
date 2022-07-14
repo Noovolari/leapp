@@ -93,9 +93,10 @@ export class SsmService {
           this.nativeService.rimraf(this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
       })
       .catch((err) => {
-        if (this.nativeService.process.platform === "darwin")
+        if (this.nativeService.process.platform === "darwin") {
           this.nativeService.rimraf(this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
-        throw new LoggedException(err.message, this, LogLevel.error);
+        }
+        this.logService.log(new LoggedException(err.message, this, LogLevel.error, true));
       });
   }
 

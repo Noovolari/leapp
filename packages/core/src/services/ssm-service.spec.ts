@@ -1,9 +1,11 @@
-import { beforeEach, describe, test, expect, jest } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { SsmService } from "./ssm-service";
 import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
 import { INativeService } from "../interfaces/i-native-service";
-import { LoggedEntry, LogLevel } from "./log-service";
+import { LoggedEntry } from "./log-service";
+import { LoggedException, LogLevel } from "../../dist/services/log-service";
+import { constants } from "../models/constants";
 
 jest.mock("../models/session");
 
@@ -183,14 +185,19 @@ describe("SsmService", () => {
     }, 100);
   });
 
-  /*test("startSession - openTerminal throws an error and on macOS the env file is removed", async () => {
+  test("startSession - openTerminal throws an error and on macOS the env file is removed", () => {
     const mockedHomeDir = "/Users/mock";
     const fileService = {
       writeFileSync: jest.fn(() => {}),
     } as any;
     const executeService2 = {
       getQuote: () => {},
-      openTerminal: jest.fn((_: string, _1?: any): Promise<string> => Promise.reject(new Error("Open Terminal Error"))),
+      openTerminal: jest.fn(
+        (_1: any, _2: any, _3: any) =>
+          new Promise((res, rej) => {
+            rej({ message: "Error" });
+          })
+      ),
     } as any;
     const nativeService2 = {
       process: {
@@ -208,15 +215,21 @@ describe("SsmService", () => {
     const instanceId = "mocked-id";
     const region = "eu-west-1";
 
-    try {
-      await ssmService.startSession(credentialInfo, instanceId, region);
-    } catch (err) {
-      expect(err instanceof LoggedException).toBeTruthy();
-      expect(err.level).toEqual(LogLevel.error);
-    }
-  }); */
+    ssmService.startSession(credentialInfo, instanceId, region);
+    setTimeout(() => {
+      expect(nativeService2.rimraf).toHaveBeenCalledWith(nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
+      expect(logService.log).toHaveBeenCalledWith(new LoggedException("Error: Error", this, LogLevel.error, true));
 
-  test("requestSsmInstances", async () => {
+      nativeService2.process.platform = "not-darwin";
+      ssmService = new SsmService(logService, executeService2, nativeService2, fileService);
+      ssmService.startSession(credentialInfo, instanceId, region);
+      setTimeout(() => {
+        expect(logService.log).toHaveBeenCalledWith(new LoggedException("Error: Error", this, LogLevel.error, true));
+      }, 100);
+    }, 100);
+  });
+
+  test("requestSsmInstances, plus error checking", async () => {
     ssmService.aws = {
       config: {
         update: jest.fn((_: any) => {}),
@@ -268,13 +281,130 @@ describe("SsmService", () => {
         PingStatus: "Online",
       },
     ]);
+
+    (ssmService as any).ssmClient = {
+      describeInstanceInformation: jest.fn(() => ({
+        promise: () =>
+          Promise.resolve({
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            InstanceInformationList: [
+              {
+                fakeInstanceId: "fake-id-1",
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                PingStatus: "Offline",
+              },
+              {
+                fakeInstanceId: "fake-id-2",
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                PingStatus: "Offline",
+              },
+            ],
+          }),
+      })),
+    };
+    await expect(async () => {
+      await (ssmService as any).requestSsmInstances(credentialInfo, instanceId, region);
+    }).rejects.toThrow(new Error("No instances are accessible by this Role."));
+
+    (ssmService as any).ssmClient = {
+      describeInstanceInformation: jest.fn(() => ({
+        promise: () => Promise.resolve({}),
+      })),
+    };
+    await expect(async () => {
+      await (ssmService as any).requestSsmInstances(credentialInfo, instanceId, region);
+    }).rejects.toThrow(new Error("No instances are accessible by this Role."));
   });
 
-  test("requestSsmInstances - no usable instances", async () => {});
+  test("applyEc2MetadataInformation", async () => {
+    const mockedInstances = [
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      { id: 1, Name: "fake-instance-ip-address" },
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      { id: 2, Name: "found-id" },
+    ];
+    let reservations = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Reservations: [
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          Instances: [
+            {
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              InstanceId: "found-id",
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              Tags: [{ Key: "Name", Value: "Mocked Name" }],
+            },
+          ],
+        },
+      ],
+    };
+    let ec2Client = {
+      describeInstances: jest.fn(() => ({ promise: jest.fn((_params) => Promise.resolve(reservations)) })),
+    };
 
-  test("requestSsmInstances - throws an error", async () => {});
+    const logService: any = {
+      log: jest.fn(),
+    };
 
-  test("applyEc2MetadataInformation", async () => {});
+    ssmService = new SsmService(logService, executeService, nativeService, null);
+    (ssmService as any).ec2Client = ec2Client;
+    let result = await (ssmService as any).applyEc2MetadataInformation(mockedInstances);
+    expect(result).toStrictEqual(mockedInstances);
 
-  test("applyEc2MetadataInformation - throws an error", async () => {});
+    reservations = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Reservations: [
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          Instances: [
+            {
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              InstanceId: "not-found-id",
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              Tags: [{ Key: "Name", Value: "Mocked Name" }],
+            },
+          ],
+        },
+      ],
+    };
+    ec2Client = {
+      describeInstances: jest.fn(() => ({ promise: jest.fn((_params) => Promise.resolve(reservations)) })),
+    };
+    (ssmService as any).ec2Client = ec2Client;
+    result = await (ssmService as any).applyEc2MetadataInformation(mockedInstances);
+    expect(result).toStrictEqual(mockedInstances);
+
+    reservations = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Reservations: [
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        {
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          Instances: [
+            {
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              InstanceId: "found-id",
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              Tags: [{ Key: "Not-Name", Value: "Not Mocked Name" }],
+            },
+          ],
+        },
+      ],
+    };
+    ec2Client = {
+      describeInstances: jest.fn(() => ({ promise: jest.fn((_params) => Promise.resolve(reservations)) })),
+    };
+    (ssmService as any).ec2Client = ec2Client;
+    result = await (ssmService as any).applyEc2MetadataInformation(mockedInstances);
+    expect(result).toStrictEqual(mockedInstances);
+
+    ec2Client.describeInstances = jest.fn(() => ({ promise: jest.fn((_params) => Promise.reject({ message: "Error" })) }));
+
+    expect(async () => {
+      await (ssmService as any).applyEc2MetadataInformation(mockedInstances);
+    }).rejects.toThrow(new LoggedException("Error", this, LogLevel.warn));
+  });
 });

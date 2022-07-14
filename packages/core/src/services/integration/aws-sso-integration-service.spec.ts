@@ -429,17 +429,15 @@ describe("AwsSsoIntegrationService", () => {
     };
 
     const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
-    (awsIntegrationService as any).ssoPortal = {
-      listAccountRoles: () => ({
-        promise: () => {
-          response.nextToken = i === 0 ? "1234abcd" : null;
-          console.log(i, response);
-          i++;
-          return Promise.resolve(response);
-        },
-      }),
+    (awsIntegrationService as any).listAccountRolesCall = {
+      callWithThrottle: () => {
+        response.nextToken = i === 0 ? "1234abcd" : null;
+        console.log(i, response);
+        i++;
+        return Promise.resolve(response);
+      },
     };
-    const spy = jest.spyOn((awsIntegrationService as any).ssoPortal, "listAccountRoles");
+    const spy = jest.spyOn((awsIntegrationService as any).listAccountRolesCall, "callWithThrottle");
 
     const promiseCallback = jest.fn(() => {});
 

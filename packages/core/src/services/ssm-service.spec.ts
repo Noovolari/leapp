@@ -3,6 +3,7 @@ import { SsmService } from "./ssm-service";
 import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
 import { INativeService } from "../interfaces/i-native-service";
+import { LoggedEntry, LogLevel } from "./log-service";
 
 jest.mock("../models/session");
 
@@ -181,4 +182,99 @@ describe("SsmService", () => {
       done();
     }, 100);
   });
+
+  /*test("startSession - openTerminal throws an error and on macOS the env file is removed", async () => {
+    const mockedHomeDir = "/Users/mock";
+    const fileService = {
+      writeFileSync: jest.fn(() => {}),
+    } as any;
+    const executeService2 = {
+      getQuote: () => {},
+      openTerminal: jest.fn((_: string, _1?: any): Promise<string> => Promise.reject(new Error("Open Terminal Error"))),
+    } as any;
+    const nativeService2 = {
+      process: {
+        platform: "darwin",
+      },
+      os: {
+        homedir: () => mockedHomeDir,
+      },
+      rimraf: () => {},
+    } as any;
+    const logService: any = {
+      log: jest.fn(),
+    };
+    ssmService = new SsmService(logService, executeService2, nativeService2, fileService);
+    const instanceId = "mocked-id";
+    const region = "eu-west-1";
+
+    try {
+      await ssmService.startSession(credentialInfo, instanceId, region);
+    } catch (err) {
+      expect(err instanceof LoggedException).toBeTruthy();
+      expect(err.level).toEqual(LogLevel.error);
+    }
+  }); */
+
+  test("requestSsmInstances", async () => {
+    ssmService.aws = {
+      config: {
+        update: jest.fn((_: any) => {}),
+      },
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      SSM: jest.fn(() => {}),
+    } as any;
+    const logService: any = {
+      log: jest.fn(),
+    };
+
+    ssmService = new SsmService(logService, executeService, nativeService, null);
+    const instanceId = "mocked-id";
+    const region = "eu-west-1";
+
+    (ssmService as any).ssmClient = {
+      describeInstanceInformation: jest.fn(() => ({
+        promise: () =>
+          Promise.resolve({
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            InstanceInformationList: [
+              {
+                fakeInstanceId: "fake-id-1",
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                PingStatus: "Offline",
+              },
+              {
+                fakeInstanceId: "fake-id-2",
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                PingStatus: "Online",
+              },
+            ],
+          }),
+      })),
+    };
+
+    jest.spyOn(ssmService as any, "requestSsmInstances");
+    const result = await (ssmService as any).requestSsmInstances(credentialInfo, instanceId, region);
+    expect(logService.log).toHaveBeenCalledWith(new LoggedEntry("Obtained smm info from aws for SSM", ssmService, LogLevel.info));
+
+    expect(result).toStrictEqual([
+      {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        ComputerName: undefined,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Name: undefined,
+        fakeInstanceId: "fake-id-2",
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        PingStatus: "Online",
+      },
+    ]);
+  });
+
+  test("requestSsmInstances - no usable instances", async () => {});
+
+  test("requestSsmInstances - throws an error", async () => {});
+
+  test("applyEc2MetadataInformation", async () => {});
+
+  test("applyEc2MetadataInformation - throws an error", async () => {});
 });

@@ -15,10 +15,16 @@ export class WebConsoleService {
   ): Promise<void> {
     const isUSGovCloud = sessionRegion.startsWith("us-gov-");
 
-    const federationUrl = !isUSGovCloud ? "https://signin.aws.amazon.com/federation" : "https://signin.amazonaws-us-gov.com/federation";
-    const consoleHomeURL = !isUSGovCloud
-      ? `https://${sessionRegion}.console.aws.amazon.com/console/home?region=${sessionRegion}`
-      : `https://console.amazonaws-us-gov.com/console/home?region=${sessionRegion}`;
+    let federationUrl;
+    let consoleHomeURL;
+
+    if (!isUSGovCloud) {
+      federationUrl = "https://signin.aws.amazon.com/federation";
+      consoleHomeURL = `https://${sessionRegion}.console.aws.amazon.com/console/home?region=${sessionRegion}`;
+    } else {
+      federationUrl = "https://signin.amazonaws-us-gov.com/federation";
+      consoleHomeURL = `https://console.amazonaws-us-gov.com/console/home?region=${sessionRegion}`;
+    }
 
     if (sessionRegion.startsWith("cn-")) {
       throw new Error("Unsupported Region");

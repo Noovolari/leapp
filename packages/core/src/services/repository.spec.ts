@@ -73,6 +73,21 @@ describe("Repository", () => {
     expect(workspace).toBe((repository as any)._workspace);
   });
 
+  test("reloadWorkspace", () => {
+    const homeDir = "homeDir";
+    mockedNativeService.os.homedir = () => homeDir;
+    mockedFileService.readFileSync = jest.fn(() => "fileContent");
+    mockedFileService.decryptText = jest.fn(() => '{"test":"json"}');
+    repository.reloadWorkspace();
+
+    expect(mockedFileService.readFileSync).toHaveBeenCalledWith(`${homeDir}/.Leapp/Leapp-lock.json`);
+    expect(mockedFileService.decryptText).toHaveBeenCalledWith("fileContent");
+    const actualWorkspace = (repository as any)._workspace;
+
+    expect(actualWorkspace).toBeInstanceOf(Workspace);
+    expect(actualWorkspace.test).toEqual("json");
+  });
+
   test("createWorkspace() - create a new workspace", () => {
     repository.persistWorkspace = jest.fn();
     repository.createWorkspace();
@@ -80,14 +95,22 @@ describe("Repository", () => {
     expect(repository.persistWorkspace).toHaveBeenCalledWith((repository as any)._workspace);
   });
 
-  test("getWorkspace() - to be the same as the getter property and the private variable", () => {
-    repository.persistWorkspace = jest.fn();
-    repository.createWorkspace();
+  test("getWorkspace() - workspace not set", () => {
+    (repository as any).reloadWorkspace = jest.fn();
+    (repository as any)._workspace = undefined;
 
-    expect(repository.workspace).not.toBe(null);
-    expect(repository.persistWorkspace).toHaveBeenCalledWith((repository as any)._workspace);
-    expect(repository.getWorkspace()).toBe(repository.workspace);
-    expect(repository.getWorkspace()).toBe((repository as any)._workspace);
+    const actualWorkspace = repository.getWorkspace();
+    expect(actualWorkspace).toBe(undefined);
+    expect((repository as any).reloadWorkspace).toHaveBeenCalled();
+  });
+
+  test("getWorkspace() - workspace already set", () => {
+    const fakeWorkspace = {};
+    (repository as any)._workspace = fakeWorkspace;
+
+    const actualWorkspace = repository.getWorkspace();
+    expect(actualWorkspace).toEqual(fakeWorkspace);
+    expect(repository.getWorkspace()).toBe(actualWorkspace);
   });
 
   test("persistWorkspace() - to save the new status of a workspace", () => {
@@ -126,6 +149,18 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     expect(repository.getSessionById("123456789")).toStrictEqual(mockedSession);
+  });
+
+  test("getSessionById() - session ID doesn't exist", () => {
+    const workspace = new Workspace();
+    workspace.sessions = [mockedSession];
+
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(() => repository.getSessionById("notExistingId")).toThrowError("session with id notExistingId not found.");
   });
 
   test("addSession() - add a new session to the array of sessions", () => {
@@ -467,11 +502,21 @@ describe("Repository", () => {
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
 
-    expect(workspace.profiles.length).toBeGreaterThan(0);
     expect(workspace.profiles.length).toBe(1);
 
     const defaultProfile = workspace.profiles[0];
     expect(repository.getDefaultProfileId()).toStrictEqual(defaultProfile.id);
+  });
+
+  test("getDefaultProfileId() - no default named profile found", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.profiles = [];
+    expect(() => repository.getDefaultProfileId()).toThrow("no default named profile found.");
   });
 
   test("addProfile() - add a new profile to the workspace", () => {

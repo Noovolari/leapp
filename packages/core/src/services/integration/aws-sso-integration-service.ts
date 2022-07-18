@@ -201,16 +201,13 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       const loginResponse = await this.login(integrationId, region, portalUrl);
       const integration: AwsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId);
 
-      // const d = new Date();
-      // d.setMinutes(d.getMinutes() + 1);
-
       await this.configureAwsSso(
         integrationId,
         integration.alias,
         region,
         loginResponse.portalUrlUnrolled,
         integration.browserOpening,
-        loginResponse.expirationTime.toISOString(), // d.toISOString(),
+        loginResponse.expirationTime.toISOString(),
         loginResponse.accessToken
       );
 
@@ -234,15 +231,14 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   async getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId: string): Promise<AwsSsoIntegrationTokenInfo> {
     const accessToken = await this.keyChainService.getSecret(constants.appName, `aws-sso-integration-access-token-${awsSsoIntegrationId}`);
-    const expiration = this.repository.getAwsSsoIntegration(awsSsoIntegrationId)
-      ? new Date(this.repository.getAwsSsoIntegration(awsSsoIntegrationId).accessTokenExpiration).getTime()
-      : undefined;
+    const awsSsoIntegration = this.repository.getAwsSsoIntegration(awsSsoIntegrationId);
+    const expiration = awsSsoIntegration ? new Date(awsSsoIntegration.accessTokenExpiration).getTime() : undefined;
     return { accessToken, expiration };
   }
 
   async isAwsSsoAccessTokenExpired(awsSsoIntegrationId: string): Promise<boolean> {
     const awsSsoAccessTokenInfo = await this.getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId);
-    return !awsSsoAccessTokenInfo.expiration || awsSsoAccessTokenInfo.expiration < Date.now();
+    return !awsSsoAccessTokenInfo.expiration || awsSsoAccessTokenInfo.expiration < this.getDate().getTime();
   }
 
   async deleteIntegration(integrationId: string): Promise<void> {
@@ -295,14 +291,6 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       region,
       expirationTime: generateSsoTokenResponse.expirationTime,
     };
-  }
-
-  private async removeSsoSessionsFromWorkspace(integrationId: string): Promise<void> {
-    const ssoSessions = this.repository.getAwsSsoIntegrationSessions(integrationId);
-    for (const ssoSession of ssoSessions) {
-      const sessionService = this.sessionFactory.getSessionService(ssoSession.type);
-      await sessionService.delete(ssoSession.sessionId);
-    }
   }
 
   private setupSsoPortalClient(region: string): void {
@@ -384,21 +372,15 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
-    //TODO: use map and filter in order to make this method more readable
-    for (let i = 0; i < this.repository.getSessions().length; i++) {
-      const sess = this.repository.getSessions()[i];
-
-      if (sess.type === SessionType.awsSsoRole) {
-        if (
-          (sess as AwsSsoRoleSession).email === accountInfo.emailAddress &&
-          (sess as AwsSsoRoleSession).roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`
-        ) {
-          return { region: (sess as AwsSsoRoleSession).region, profileId: (sess as AwsSsoRoleSession).profileId };
-        }
-      }
-    }
-
-    return undefined;
+    const oldSession = this.repository
+      .getSessions()
+      .find(
+        (session: AwsSsoRoleSession) =>
+          session.type === SessionType.awsSsoRole &&
+          session.email === accountInfo.emailAddress &&
+          session.roleArn === `arn:aws:iam::${accountInfo.accountId}/${accountRole.roleName}`
+      );
+    return oldSession ? { region: (oldSession as AwsSsoRoleSession).region, profileId: (oldSession as AwsSsoRoleSession).profileId } : undefined;
   }
 
   private async deleteDependentSessions(configurationId: string): Promise<void> {

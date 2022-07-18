@@ -5,7 +5,8 @@ import { SessionType } from "../../../models/session-type";
 import { AwsIamRoleFederatedSessionRequest } from "./aws-iam-role-federated-session-request";
 import * as uuid from "uuid";
 import { SessionStatus } from "../../../models/session-status";
-
+import * as AWS from "aws-sdk";
+import * as AWSMock from "aws-sdk-mock";
 jest.mock("uuid");
 
 describe("AwsIamRoleFederatedService", () => {
@@ -118,6 +119,99 @@ describe("AwsIamRoleFederatedService", () => {
         ["aws_session_token"]: "fake-session-token",
       },
     });
+  });
+
+  test("deApplyCredentials", async () => {
+    const profileId = "fake-profile-id";
+    const session = { sessionId: "fake-sessions-id", profileId };
+    const profileName = "fake-profile-name";
+    const credentialPath = "fake-credential-path";
+    const credentialsFile = { [profileName]: {}, anotherProfileName: {} };
+    const repository = {
+      getSessionById: jest.fn(() => session),
+      getProfileName: jest.fn(() => profileName),
+    } as any;
+    const fileService = {
+      iniParseSync: jest.fn(() => credentialsFile),
+      replaceWriteSync: jest.fn(),
+    } as any;
+    const awsCoreService = {
+      awsCredentialPath: jest.fn(() => credentialPath),
+    } as any;
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, repository, fileService, awsCoreService, null, null);
+    await awsIamRoleFederatedService.deApplyCredentials("fake-session-id");
+    expect(repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
+    expect(repository.getProfileName).toHaveBeenCalledWith(profileId);
+    expect(fileService.iniParseSync).toHaveBeenCalledWith(credentialPath);
+    expect(credentialsFile).toStrictEqual({ anotherProfileName: {} });
+    expect(credentialsFile).not.toContain({ [profileName]: {} });
+    expect(fileService.replaceWriteSync).toHaveBeenCalledWith(credentialPath, credentialsFile);
+  });
+
+  test("generateCredentialsProxy", () => {
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, null, null, null, null, null);
+    awsIamRoleFederatedService.generateCredentials = jest.fn();
+    awsIamRoleFederatedService.generateCredentialsProxy("fake-session-id");
+    expect(awsIamRoleFederatedService.generateCredentials).toHaveBeenCalledWith("fake-session-id");
+  });
+
+  test("generateCredentials - success", async () => {
+    AWSMock.setSDKInstance(AWS);
+    AWSMock.mock("STS", "assumeRoleWithSAML", () => {
+      console.log("STS", "assumeRoleWithSAML", "mock called");
+    });
+    const idpUrl = "fake-idp-url";
+    const idpUrlId = "fake-idp-url-id";
+    const samlResponse = `aaaa`;
+    const session = {
+      sessionId: "fake-sessions-id",
+      idpUrlId,
+      idpArn: "arn:aws:iam::111111111111:saml-provider/FakeProvider",
+      roleArn: "arn:aws:iam::111111111111:role/FakeRole",
+    };
+    const profileName = "fake-profile-name";
+    const repository = {
+      getSessionById: jest.fn(() => session),
+      getProfileName: jest.fn(() => profileName),
+      getIdpUrl: jest.fn(() => idpUrl),
+    } as any;
+    const needToAuthenticate = true;
+    const awsAuthenticationService = {
+      needAuthentication: jest.fn(async () => needToAuthenticate),
+      awsSignIn: jest.fn(async () => samlResponse),
+    } as any;
+    const options = "fake-options";
+    const awsCoreService = {
+      stsOptions: jest.fn(() => options),
+    } as any;
+
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, repository, null, awsCoreService, awsAuthenticationService, null);
+    (awsIamRoleFederatedService as any).samlRoleSessionDuration = 1111;
+    await awsIamRoleFederatedService.generateCredentials("fake-session-id");
+    expect(repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
+    expect(repository.getIdpUrl).toHaveBeenCalledWith(idpUrlId);
+    await expect(awsAuthenticationService.needAuthentication).toHaveBeenCalledWith(idpUrl);
+    expect(awsAuthenticationService.awsSignIn).toHaveBeenCalledWith(idpUrl, needToAuthenticate);
+    expect(awsCoreService.stsOptions).toHaveBeenCalledWith(session);
+    //await expect(AWS.STS.assumeRoleWithSAML).toHaveBeenCalled;
+
+    //AWSMock.restore("STS");
+  });
+
+  test("validateCredentials - verify credentials validity", async () => {
+    const session = {
+      sessionId: "1",
+      type: SessionType.awsIamRoleFederated,
+      roleArn: "abcdefghijklmnopqrstuvwxyz/12345",
+    } as any;
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, null, null, null, null, null);
+    jest.spyOn(awsIamRoleFederatedService, "generateCredentials").mockImplementation(() => Promise.resolve({} as any));
+    let result = await awsIamRoleFederatedService.validateCredentials(session.sessionId);
+    expect(result).toBeTruthy();
+
+    jest.spyOn(awsIamRoleFederatedService, "generateCredentials").mockImplementation(() => Promise.reject({} as any));
+    result = await awsIamRoleFederatedService.validateCredentials(session.sessionId);
+    expect(result).not.toBeTruthy();
   });
 
   test("saveSessionTokenExpirationInTheSession - add token info in the session", () => {

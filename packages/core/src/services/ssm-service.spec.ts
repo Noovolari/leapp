@@ -4,8 +4,7 @@ import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
 import { INativeService } from "../interfaces/i-native-service";
 import { LoggedEntry } from "./log-service";
-import { LoggedException, LogLevel } from "../../dist/services/log-service";
-import { constants } from "../models/constants";
+import { LoggedException, LogLevel, LogService } from "../../dist/services/log-service";
 
 jest.mock("../models/session");
 
@@ -128,11 +127,11 @@ describe("SsmService", () => {
     const region = "eu-west-1";
     const instanceId = "mocked-id";
     const quote = "";
-    const logService: any = {
-      log: jest.fn(),
-    };
+    const logger = { log: jest.fn() };
+    const logService = new LogService(logger as any);
+    jest.spyOn(logService, "log");
 
-    ssmService = new SsmService(logService, executeService, nativeService, null);
+    ssmService = new SsmService(logService as any, executeService, nativeService, null);
 
     ssmService.startSession(credentialInfo, instanceId, region);
 
@@ -207,19 +206,16 @@ describe("SsmService", () => {
     }, 100);
   });
 
-  test("startSession - openTerminal throws an error and on macOS the env file is removed", () => {
+  test("startSession - openTerminal throws an error and on macOS the env file is removed", (done) => {
+    jest.useFakeTimers();
+
     const mockedHomeDir = "/Users/mock";
     const fileService = {
       writeFileSync: jest.fn(() => {}),
     } as any;
     const executeService2 = {
       getQuote: () => {},
-      openTerminal: jest.fn(
-        (_1: any, _2: any, _3: any) =>
-          new Promise((res, rej) => {
-            rej({ message: "Error" });
-          })
-      ),
+      openTerminal: jest.fn((_1: any, _2: any, _3: any) => ({ ["then"]: jest.fn(() => ({ ["catch"]: (clb) => clb({ message: "error" }) })) })),
     } as any;
     const nativeService2 = {
       process: {
@@ -230,34 +226,34 @@ describe("SsmService", () => {
       },
       rimraf: jest.fn(() => {}),
     } as any;
-    const logService: any = {
-      log: jest.fn(),
-    };
-    ssmService = new SsmService(logService, executeService2, nativeService2, fileService);
+    const logger = { log: jest.fn(), show: jest.fn() };
+    const logService = new LogService(logger as any);
+    jest.spyOn(logService, "log");
+    ssmService = new SsmService(logService as any, executeService2, nativeService2, fileService);
     const instanceId = "mocked-id";
     const region = "eu-west-1";
 
     ssmService.startSession(credentialInfo, instanceId, region);
     setTimeout(() => {
-      expect(nativeService2.rimraf).toHaveBeenCalledWith(nativeService2.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
-      expect(logService.log).toHaveBeenCalledWith(new LoggedException("Error: Error", this, LogLevel.error, true));
-    }, 200);
+      expect(nativeService2.rimraf).toHaveBeenCalled();
+      expect(logService.log).toHaveBeenCalledWith(new LoggedException("error", this, LogLevel.error, true));
+      const nativeService3 = {
+        process: {
+          platform: "not-darwin",
+        },
+        os: {
+          homedir: () => mockedHomeDir,
+        },
+        rimraf: jest.fn(),
+      } as any;
+      const ssmService2 = new SsmService(logService as any, executeService2, nativeService3, fileService);
+      ssmService2.startSession(credentialInfo, instanceId, region);
 
-    const nativeService3 = {
-      process: {
-        platform: "not-darwin",
-      },
-      os: {
-        homedir: () => mockedHomeDir,
-      },
-      rimraf: jest.fn(),
-    } as any;
-    const ssmService2 = new SsmService(logService, executeService2, nativeService3, fileService);
-    ssmService2.startSession(credentialInfo, instanceId, region);
-    setTimeout(() => {
-      expect(logService.log).toHaveBeenCalledWith(new LoggedException("Error: Error", this, LogLevel.error, true));
+      expect(logService.log).toHaveBeenCalledWith(new LoggedException("error", this, LogLevel.error, true));
       expect(nativeService3.rimraf).not.toHaveBeenCalled();
+      done();
     }, 200);
+    jest.runAllTimers();
   });
 
   test("requestSsmInstances, plus error checking", async () => {
@@ -478,5 +474,30 @@ describe("SsmService", () => {
 
     const result2 = await (ssmService as any).applyEc2MetadataInformation([]);
     expect(result2).toStrictEqual([]);
+  });
+
+  test("log service completion - must be done here because it seems that for jest --coverage the file is tied here...", () => {
+    const logger = { log: jest.fn(), show: jest.fn() };
+    let logService = new LogService(logger as any);
+
+    logService.log(new LoggedEntry("message", this, LogLevel.info, false));
+    expect(logger.log).toHaveBeenCalled();
+
+    logService = new LogService(logger as any);
+    logService.log(new LoggedEntry("message", this, LogLevel.warn, false));
+    expect(logger.log).toHaveBeenCalled();
+
+    logService = new LogService(logger as any);
+    logService.log(new LoggedEntry("message", this, LogLevel.success, false));
+    expect(logger.log).toHaveBeenCalled();
+
+    logService = new LogService(logger as any);
+    logService.log(new LoggedException("message", this, LogLevel.error, false));
+    expect(logger.log).toHaveBeenCalled();
+
+    logService = new LogService(logger as any);
+    logService.log(new LoggedEntry("message", this, LogLevel.success, true));
+    expect(logger.log).toHaveBeenCalled();
+    expect(logger.show).toHaveBeenCalled();
   });
 });

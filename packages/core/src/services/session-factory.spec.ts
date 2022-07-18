@@ -23,6 +23,7 @@ describe("sessionFactory", () => {
     expect((sessionFactory.getSessionService(SessionType.awsIamRoleChained) as any).name).toEqual("IamRoleChained");
     expect((sessionFactory.getSessionService(SessionType.awsSsoRole) as any).name).toEqual("SsoRole");
     expect((sessionFactory.getSessionService(SessionType.azure) as any).name).toEqual("Azure");
+    expect((sessionFactory.getSessionService(SessionType.anytype) as any).name).toEqual("Azure");
   });
 
   test("createSession", async () => {

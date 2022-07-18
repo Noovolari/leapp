@@ -9,7 +9,7 @@ import { IntegrationType } from "../models/integration-type";
 import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 import { AzureIntegration } from "../models/azure/azure-integration";
 
-describe("BehaviouralSubjectService", () => {
+describe("WorkspaceService", () => {
   let repositoryMock: Repository;
   let mockedSession1: Session;
   let mockedSession2: Session;
@@ -169,7 +169,19 @@ describe("BehaviouralSubjectService", () => {
     expect(behaviouralSubjectService.getIntegrationById("3")).toStrictEqual(mockedIntegration3);
   });
 
-  test("setSessions", () => {});
+  test("setSessions", () => {
+    jest.spyOn(behaviouralSubjectService.sessions$, "next");
+    const sessions = [{ id: 1 }, { id: 2 }, { id: 3 }] as unknown as Session[];
+    behaviouralSubjectService.setSessions(sessions);
+    expect(behaviouralSubjectService.sessions).toEqual(sessions);
+    expect(behaviouralSubjectService.sessions$.next).toHaveBeenCalledWith(sessions);
+  });
 
-  test("setIntegrations", () => {});
+  test("setIntegrations", () => {
+    jest.spyOn(behaviouralSubjectService.integrations$, "next");
+    const integrations = [{ id: 1 }, { id: 2 }, { id: 3 }] as unknown as Integration[];
+    behaviouralSubjectService.setIntegrations(integrations);
+    expect(behaviouralSubjectService.integrations).toEqual(integrations);
+    expect(behaviouralSubjectService.integrations$.next).toHaveBeenCalledWith(integrations);
+  });
 });

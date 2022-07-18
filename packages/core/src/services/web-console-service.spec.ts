@@ -21,8 +21,7 @@ describe("WebConsoleService", () => {
     return new WebConsoleService(shellService, logService, fetch);
   };
 
-  test("openWebConsole - throws error if session's region starts with us-gov- or cn-", async () => {
-    const mockedSessionRegion = "us-gov-";
+  test("openWebConsole - throws error if session's region starts with cn-", async () => {
     const mockedSessionDuration = 3200;
 
     const credentialsInfo: CredentialsInfo = {
@@ -37,6 +36,7 @@ describe("WebConsoleService", () => {
     };
 
     const webConsoleService: WebConsoleService = getService();
+    const mockedSessionRegion = "cn-";
     try {
       await webConsoleService.openWebConsole(credentialsInfo, mockedSessionRegion, mockedSessionDuration);
     } catch (e) {
@@ -45,7 +45,7 @@ describe("WebConsoleService", () => {
   });
 
   test("openWebConsole - generates a valid aws url to log", async () => {
-    const mockedSessionRegion = "eu-west-1";
+    let mockedSessionRegion = "eu-west-1";
     const mockedSessionDuration = 3200;
 
     const credentialsInfo: CredentialsInfo = {
@@ -59,13 +59,21 @@ describe("WebConsoleService", () => {
       },
     };
 
-    const federationUrl = "https://signin.aws.amazon.com/federation";
-    const consoleHomeURL = `https://${mockedSessionRegion}.console.aws.amazon.com/console/home?region=${mockedSessionRegion}`;
     const signinToken = credentialsInfo.sessionToken.aws_session_token;
-    const truthUrl = `${federationUrl}?Action=login&Issuer=Leapp&Destination=${consoleHomeURL}&SigninToken=${signinToken}`;
+    let federationUrl = "https://signin.aws.amazon.com/federation";
+    let consoleHomeURL = `https://${mockedSessionRegion}.console.aws.amazon.com/console/home?region=${mockedSessionRegion}`;
+    let truthUrl = `${federationUrl}?Action=login&Issuer=Leapp&Destination=${consoleHomeURL}&SigninToken=${signinToken}`;
 
     const webConsoleService: WebConsoleService = getService();
     await webConsoleService.openWebConsole(credentialsInfo, mockedSessionRegion, mockedSessionDuration);
+    expect((webConsoleService as any).shellService.openExternalUrl).toHaveBeenCalledWith(truthUrl);
+
+    mockedSessionRegion = "us-gov-";
+    federationUrl = "https://signin.amazonaws-us-gov.com/federation";
+    consoleHomeURL = `https://console.amazonaws-us-gov.com/console/home?region=${mockedSessionRegion}`;
+    truthUrl = `${federationUrl}?Action=login&Issuer=Leapp&Destination=${consoleHomeURL}&SigninToken=${signinToken}`;
+    await webConsoleService.openWebConsole(credentialsInfo, mockedSessionRegion);
+    expect((webConsoleService as any).shellService.openExternalUrl).toHaveBeenCalled();
     expect((webConsoleService as any).shellService.openExternalUrl).toHaveBeenCalledWith(truthUrl);
   });
 });

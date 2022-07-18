@@ -11,6 +11,7 @@ import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import { AzureIntegration } from "./azure/azure-integration";
 
 export class Workspace {
+  /* istanbul ignore next */
   @Type(() => Session)
   private _sessions: Session[];
 

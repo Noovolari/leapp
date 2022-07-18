@@ -5,9 +5,9 @@ import { SessionType } from "../../../models/session-type";
 import { AwsIamRoleFederatedSessionRequest } from "./aws-iam-role-federated-session-request";
 import * as uuid from "uuid";
 import { SessionStatus } from "../../../models/session-status";
-import * as AWS from "aws-sdk";
-import * as AWSMock from "aws-sdk-mock";
+import { LoggedException, LogLevel } from "../../log-service";
 jest.mock("uuid");
+jest.mock("aws-sdk");
 
 describe("AwsIamRoleFederatedService", () => {
   beforeEach(() => {});
@@ -155,11 +155,24 @@ describe("AwsIamRoleFederatedService", () => {
     expect(awsIamRoleFederatedService.generateCredentials).toHaveBeenCalledWith("fake-session-id");
   });
 
+  test("generateCredentials - fail", async () => {
+    const session = {};
+    const repository = {
+      getSessionById: jest.fn(() => session),
+      getIdpUrl: jest.fn(() => {
+        throw new Error();
+      }),
+    } as any;
+
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, repository, null, null, null, null);
+    try {
+      await awsIamRoleFederatedService.generateCredentials("fake-session-id");
+    } catch (error) {
+      expect(error).toStrictEqual(new LoggedException(error.message, this, LogLevel.warn));
+    }
+  });
+
   test("generateCredentials - success", async () => {
-    AWSMock.setSDKInstance(AWS);
-    AWSMock.mock("STS", "assumeRoleWithSAML", () => {
-      console.log("STS", "assumeRoleWithSAML", "mock called");
-    });
     const idpUrl = "fake-idp-url";
     const idpUrlId = "fake-idp-url-id";
     const samlResponse = `aaaa`;
@@ -171,6 +184,7 @@ describe("AwsIamRoleFederatedService", () => {
     };
     const profileName = "fake-profile-name";
     const repository = {
+      getSessions: jest.fn(),
       getSessionById: jest.fn(() => session),
       getProfileName: jest.fn(() => profileName),
       getIdpUrl: jest.fn(() => idpUrl),
@@ -185,17 +199,38 @@ describe("AwsIamRoleFederatedService", () => {
       stsOptions: jest.fn(() => options),
     } as any;
 
+    const assumeRoleWithSamlResponse = {
+      ["Credentials"]: {
+        ["AccessKeyId"]: "1",
+        ["SecretAccessKey"]: "2",
+        ["SessionToken"]: "3",
+      },
+    };
+
+    let stsMock;
     const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, repository, null, awsCoreService, awsAuthenticationService, null);
     (awsIamRoleFederatedService as any).samlRoleSessionDuration = 1111;
+    (awsIamRoleFederatedService as any).assumeRoleWithSAML = jest.fn((_sts, _params) => {
+      stsMock = _sts;
+      return assumeRoleWithSamlResponse;
+    });
+    (awsIamRoleFederatedService as any).saveSessionTokenExpirationInTheSession = jest.fn();
     await awsIamRoleFederatedService.generateCredentials("fake-session-id");
     expect(repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
     expect(repository.getIdpUrl).toHaveBeenCalledWith(idpUrlId);
     await expect(awsAuthenticationService.needAuthentication).toHaveBeenCalledWith(idpUrl);
     expect(awsAuthenticationService.awsSignIn).toHaveBeenCalledWith(idpUrl, needToAuthenticate);
     expect(awsCoreService.stsOptions).toHaveBeenCalledWith(session);
-    //await expect(AWS.STS.assumeRoleWithSAML).toHaveBeenCalled;
-
-    //AWSMock.restore("STS");
+    expect((awsIamRoleFederatedService as any).assumeRoleWithSAML).toHaveBeenCalledWith(stsMock, {
+      ["PrincipalArn"]: (session as AwsIamRoleFederatedSession).idpArn,
+      ["RoleArn"]: (session as AwsIamRoleFederatedSession).roleArn,
+      ["SAMLAssertion"]: samlResponse,
+      ["DurationSeconds"]: 1111,
+    });
+    expect((awsIamRoleFederatedService as any).saveSessionTokenExpirationInTheSession).toHaveBeenCalledWith(
+      session,
+      assumeRoleWithSamlResponse.Credentials
+    );
   });
 
   test("validateCredentials - verify credentials validity", async () => {
@@ -256,5 +291,52 @@ describe("AwsIamRoleFederatedService", () => {
     expect(sessionToModify.sessionTokenExpiration).toBe("");
     expect(repository.updateSessions).toHaveBeenCalledWith([{ sessionId: "1" }, sessionToModify]);
     expect(sessionNotifier.setSessions).toHaveBeenCalledWith([{ sessionId: "1" }, sessionToModify]);
+  });
+
+  test("assumeRoleWithSAML- success", async () => {
+    const sts = {
+      assumeRoleWithSAML: jest.fn(() => ({
+        promise: jest.fn(() => Promise.resolve("saml-response")),
+      })),
+    } as any;
+    const params = {
+      ["SAMLAssertion"]: "",
+      ["PrincipalArn"]: "",
+      ["DurationSeconds"]: 1,
+      ["RoleArn"]: "",
+    };
+
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, null, null, null, null, null);
+    jest.spyOn(awsIamRoleFederatedService as any, "assumeRoleWithSAML");
+
+    await (awsIamRoleFederatedService as any).assumeRoleWithSAML(sts, params);
+    expect((awsIamRoleFederatedService as any).assumeRoleWithSAML).toHaveBeenCalledWith(sts, params);
+  });
+
+  test("assumeRoleWithSAML- fail", async () => {
+    const sts = {
+      assumeRoleWithSAML: jest.fn(() => ({
+        promise: jest.fn(() => Promise.reject({ message: "error" })),
+      })),
+    } as any;
+    const params = {
+      ["SAMLAssertion"]: "",
+      ["PrincipalArn"]: "",
+      ["DurationSeconds"]: 1,
+      ["RoleArn"]: "",
+    };
+
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, null, null, null, null, null);
+    jest.spyOn(awsIamRoleFederatedService as any, "removeSecrets");
+    jest.spyOn(awsIamRoleFederatedService as any, "assumeRoleWithSAML");
+
+    awsIamRoleFederatedService.removeSecrets("");
+    expect(awsIamRoleFederatedService.removeSecrets).toHaveBeenCalled();
+
+    try {
+      await (awsIamRoleFederatedService as any).assumeRoleWithSAML(sts, params);
+    } catch (error) {
+      expect(error).toStrictEqual(new LoggedException("error", this, LogLevel.warn));
+    }
   });
 });

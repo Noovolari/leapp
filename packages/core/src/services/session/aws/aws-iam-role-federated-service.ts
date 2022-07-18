@@ -12,6 +12,7 @@ import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
 import { LoggedException, LogLevel } from "../../log-service";
+import { STS } from "aws-sdk";
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
@@ -104,12 +105,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     };
 
     // Invoke assumeRoleWithSAML
-    let assumeRoleWithSamlResponse: Aws.STS.AssumeRoleWithSAMLResponse;
-    try {
-      assumeRoleWithSamlResponse = await sts.assumeRoleWithSAML(params).promise();
-    } catch (err) {
-      throw new LoggedException(err.message, this, LogLevel.warn);
-    }
+    const assumeRoleWithSamlResponse = await this.assumeRoleWithSAML(sts, params);
 
     // Save session token expiration
     this.saveSessionTokenExpirationInTheSession(session, assumeRoleWithSamlResponse.Credentials);
@@ -139,6 +135,17 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   removeSecrets(_: string): void {}
+
+  private async assumeRoleWithSAML(
+    sts: STS,
+    params: { ["SAMLAssertion"]: string; ["PrincipalArn"]: string; ["DurationSeconds"]: number; ["RoleArn"]: string }
+  ): Promise<STS.Types.AssumeRoleWithSAMLResponse> {
+    try {
+      return await sts.assumeRoleWithSAML(params).promise();
+    } catch (err) {
+      throw new LoggedException(err.message, this, LogLevel.warn);
+    }
+  }
 
   private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
     const sessions = this.repository.getSessions();

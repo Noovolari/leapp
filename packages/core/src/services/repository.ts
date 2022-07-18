@@ -112,39 +112,27 @@ export class Repository {
   }
 
   listPending(): Session[] {
-    const workspace = this.getWorkspace();
-    return workspace.sessions && workspace.sessions.length > 0
-      ? workspace.sessions.filter((session) => session.status === SessionStatus.pending)
-      : [];
+    return this.getSessionsOrDefault().filter((session) => session.status === SessionStatus.pending);
   }
 
   listActive(): Session[] {
-    const workspace = this.getWorkspace();
-    return workspace.sessions && workspace.sessions.length > 0 ? workspace.sessions.filter((session) => session.status === SessionStatus.active) : [];
+    return this.getSessionsOrDefault().filter((session) => session.status === SessionStatus.active);
   }
 
   listActiveAndPending(): Session[] {
-    const workspace = this.getWorkspace();
-    return workspace.sessions && workspace.sessions.length > 0
-      ? workspace.sessions.filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending)
-      : [];
+    return this.getSessionsOrDefault().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
   }
 
   listAwsSsoRoles(): Session[] {
-    const workspace = this.getWorkspace();
-    return workspace.sessions && workspace.sessions.length > 0 ? workspace.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
+    return this.getSessionsOrDefault().filter((session) => session.type === SessionType.awsSsoRole);
   }
 
   listAssumable(): Session[] {
-    return this.getWorkspace().sessions.length > 0 ? this.getWorkspace().sessions.filter((session) => session.type !== SessionType.azure) : [];
+    return this.getSessionsOrDefault().filter((session) => session.type !== SessionType.azure);
   }
 
   listIamRoleChained(parentSession?: Session): Session[] {
-    const workspace = this.getWorkspace();
-    let childSession =
-      workspace.sessions && workspace.sessions.length > 0
-        ? workspace.sessions.filter((session) => session.type === SessionType.awsIamRoleChained)
-        : [];
+    let childSession = this.getSessionsOrDefault().filter((session) => session.type === SessionType.awsIamRoleChained);
     if (parentSession) {
       childSession = childSession.filter((session) => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId);
     }
@@ -432,5 +420,11 @@ export class Repository {
   getColorTheme(): string {
     const workspace = this.getWorkspace();
     return workspace.colorTheme;
+  }
+
+  private getSessionsOrDefault(): Session[] {
+    const workspace = this.getWorkspace();
+    if (workspace.sessions) return workspace.sessions;
+    else return [];
   }
 }

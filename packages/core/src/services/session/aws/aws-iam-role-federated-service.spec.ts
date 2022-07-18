@@ -1,9 +1,11 @@
-import { jest, describe, test, expect, beforeEach } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { AwsIamRoleFederatedSession } from "../../../models/aws/aws-iam-role-federated-session";
 import { AwsIamRoleFederatedService } from "./aws-iam-role-federated-service";
 import { SessionType } from "../../../models/session-type";
 import { AwsIamRoleFederatedSessionRequest } from "./aws-iam-role-federated-session-request";
 import * as uuid from "uuid";
+import { SessionStatus } from "../../../models/session-status";
+
 jest.mock("uuid");
 
 describe("AwsIamRoleFederatedService", () => {
@@ -116,5 +118,49 @@ describe("AwsIamRoleFederatedService", () => {
         ["aws_session_token"]: "fake-session-token",
       },
     });
+  });
+
+  test("saveSessionTokenExpirationInTheSession - add token info in the session", () => {
+    const sessionToModify: AwsIamRoleFederatedSession = {
+      startDateTime: new Date().toISOString(),
+      idpArn: "fake-idp-arn",
+      idpUrlId: "fake-idp-url",
+      profileId: "fake-profile-id",
+      roleArn: "fake-role-arn",
+      sessionId: "2",
+      sessionTokenExpiration: "",
+      status: SessionStatus.inactive,
+      type: SessionType.awsIamRoleFederated,
+      sessionName: "sessionName",
+      region: "eu-west-1",
+      expired: (): boolean => false,
+    };
+
+    const fakeCredentials = {
+      ["Expiration"]: new Date(),
+    };
+
+    const repository = {
+      updateSessions: jest.fn(),
+      getSessions: jest.fn(() => [{ sessionId: "1" }, sessionToModify]),
+    } as any;
+
+    const sessionNotifier = {
+      setSessions: jest.fn(),
+    } as any;
+
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(sessionNotifier, repository, null, null, null, null);
+    (awsIamRoleFederatedService as any).saveSessionTokenExpirationInTheSession(sessionToModify, fakeCredentials);
+    expect(repository.getSessions).toHaveBeenCalled();
+    expect(sessionToModify.sessionTokenExpiration).toBe(fakeCredentials.Expiration.toISOString());
+    expect(repository.updateSessions).toHaveBeenCalledWith([{ sessionId: "1" }, sessionToModify]);
+    expect(sessionNotifier.setSessions).toHaveBeenCalledWith([{ sessionId: "1" }, sessionToModify]);
+
+    sessionToModify.sessionTokenExpiration = "";
+    (awsIamRoleFederatedService as any).saveSessionTokenExpirationInTheSession(sessionToModify, undefined);
+    expect(repository.getSessions).toHaveBeenCalled();
+    expect(sessionToModify.sessionTokenExpiration).toBe("");
+    expect(repository.updateSessions).toHaveBeenCalledWith([{ sessionId: "1" }, sessionToModify]);
+    expect(sessionNotifier.setSessions).toHaveBeenCalledWith([{ sessionId: "1" }, sessionToModify]);
   });
 });

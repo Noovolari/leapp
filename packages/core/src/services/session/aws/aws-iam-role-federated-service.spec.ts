@@ -82,4 +82,39 @@ describe("AwsIamRoleFederatedService", () => {
     expect(repository.getSessions).toHaveBeenCalled();
     expect(sessionNotifier.setSessions).toHaveBeenCalledWith("fake-sessions");
   });
+
+  test("applyCredentials", async () => {
+    const profileId = "fake-profile-id";
+    const session = { sessionId: "fake-sessions-id", profileId };
+    const profileName = "fake-profile-name";
+    const repository = {
+      getSessionById: jest.fn(() => session),
+      getProfileName: jest.fn(() => profileName),
+    } as any;
+    const fileService = {
+      iniWriteSync: jest.fn(),
+    } as any;
+    const credentialPath = "fake-credential-path";
+    const awsCoreService = {
+      awsCredentialPath: jest.fn(() => credentialPath),
+    } as any;
+    const awsIamRoleFederatedService = new AwsIamRoleFederatedService(null, repository, fileService, awsCoreService, null, null);
+    const credentialsInfo = {
+      sessionToken: {
+        ["aws_access_key_id"]: "fake-access-key-id",
+        ["aws_secret_access_key"]: "fake-secret-access-key",
+        ["aws_session_token"]: "fake-session-token",
+      },
+    };
+    await awsIamRoleFederatedService.applyCredentials("fake-session-id", credentialsInfo);
+    expect(repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
+    expect(repository.getProfileName).toHaveBeenCalledWith(profileId);
+    expect(fileService.iniWriteSync).toHaveBeenCalledWith(credentialPath, {
+      [profileName]: {
+        ["aws_access_key_id"]: "fake-access-key-id",
+        ["aws_secret_access_key"]: "fake-secret-access-key",
+        ["aws_session_token"]: "fake-session-token",
+      },
+    });
+  });
 });

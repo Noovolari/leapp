@@ -228,7 +228,7 @@ describe("SsmService", () => {
       os: {
         homedir: () => mockedHomeDir,
       },
-      rimraf: () => {},
+      rimraf: jest.fn(() => {}),
     } as any;
     const logService: any = {
       log: jest.fn(),
@@ -239,9 +239,9 @@ describe("SsmService", () => {
 
     ssmService.startSession(credentialInfo, instanceId, region);
     setTimeout(() => {
-      expect(nativeService2.rimraf).toHaveBeenCalledWith(nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
+      expect(nativeService2.rimraf).toHaveBeenCalledWith(nativeService2.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
       expect(logService.log).toHaveBeenCalledWith(new LoggedException("Error: Error", this, LogLevel.error, true));
-    }, 100);
+    }, 200);
 
     const nativeService3 = {
       process: {
@@ -257,7 +257,7 @@ describe("SsmService", () => {
     setTimeout(() => {
       expect(logService.log).toHaveBeenCalledWith(new LoggedException("Error: Error", this, LogLevel.error, true));
       expect(nativeService3.rimraf).not.toHaveBeenCalled();
-    }, 100);
+    }, 200);
   });
 
   test("requestSsmInstances, plus error checking", async () => {

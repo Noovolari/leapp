@@ -209,6 +209,36 @@ describe("MsalPersistenceService", () => {
     fs.unlinkSync(customTestPath);
   });
 
+  test("saveMsalCache - 2", async () => {
+    fs.writeFileSync(customTestPath, mockedMsal);
+
+    const process = { platform: "darwin" };
+    const msalEncryptionService = {
+      unprotectData: jest.fn((data) => data.toString()),
+      protectData: jest.fn((data, optionalEntropy, scope) => {
+        expect(optionalEntropy).toBe(null);
+        expect(scope).toBe(DataProtectionScope.currentUser);
+        return data;
+      }),
+    };
+    const iNativeService: any = {
+      os,
+      fs,
+      process,
+      path,
+      msalEncryptionService,
+    };
+    const service = new AzurePersistenceService(iNativeService, keyChainService as any);
+    (service as any).getMsalCacheLocation = () => customTestPath;
+    const parsedData = await service.loadMsalCache();
+    parsedData["RefreshToken"] = {};
+    await service.saveMsalCache(parsedData);
+    const newParsedData = await service.loadMsalCache();
+    expect(newParsedData).toEqual(parsedData);
+
+    fs.unlinkSync(customTestPath);
+  });
+
   test("load profile", async () => {
     const mockedProfile = '{ "profile": "mockedProfile" }';
     const mockedFs = {

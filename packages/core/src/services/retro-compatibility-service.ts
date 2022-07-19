@@ -40,7 +40,8 @@ export class RetroCompatibilityService {
     return workspaceParsed.defaultWorkspace === "default";
   }
 
-  private async adaptOldWorkspaceFile(): Promise<Workspace> {
+  private async adaptOldWorkspaceFile(): Promise<void> {
+    /*
     // We need to adapt Sessions, IdpUrls, AwsSso Config, Proxy Config
     const workspace: any = {
       _sessions: [],
@@ -77,15 +78,15 @@ export class RetroCompatibilityService {
       workspace._defaultRegion = oldWorkspace.workspaces[0].defaultRegion;
       workspace._defaultLocation = oldWorkspace.workspaces[0].defaultLocation;
 
-      await this.adaptAwsSsoConfig(oldWorkspace, workspace);
-      //await this.adaptSessions(oldWorkspace, workspace);
+      // await this.adaptAwsSsoConfig(oldWorkspace, workspace);
+      // await this.adaptSessions(oldWorkspace, workspace);
       // Persist adapted workspace data
       this.persistsTemp(workspace);
       // Apply sessions to behaviour subject
       this.behaviouralSubjectService.sessions = workspace._sessions;
-    }
+    }*/
   }
-
+  /*
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace.workspaces[0].sessions;
     // check if we have at least one SSO sessions
@@ -107,6 +108,7 @@ export class RetroCompatibilityService {
         } catch (err) {
           // we need all or nothing, otherwise it means that configuration is incomplete so its better
           // to force the user to redo the process on the new fresh workspace
+          console.log(err);
         }
 
         workspace.awsSsoConfiguration = {
@@ -119,7 +121,7 @@ export class RetroCompatibilityService {
       }
     }
   }
-
+  */
   private isIntegrationPatchNecessary(): boolean {
     const workspaceParsed = this.getWorkspace();
     // check for new integration array if present or not
@@ -179,7 +181,9 @@ export class RetroCompatibilityService {
             `aws-sso-integration-access-token-${workspace.awsSsoIntegrations[0].id}`,
             accessToken
           );
-        } catch (_) {}
+        } catch (_) {
+          console.log("no need to save access token");
+        }
       }
 
       for (let i = 0; i < workspace.sessions.length; i++) {

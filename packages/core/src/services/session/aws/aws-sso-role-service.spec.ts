@@ -6,6 +6,7 @@ import { IAwsIntegrationDelegate } from "../../../interfaces/i-aws-integration-d
 import * as uuid from "uuid";
 import { AwsSsoRoleSessionRequest } from "./aws-sso-role-session-request";
 import { AwsSessionService } from "./aws-session-service";
+import * as AWS from "aws-sdk";
 jest.mock("uuid");
 
 describe("AwsSsoRoleService", () => {
@@ -39,18 +40,18 @@ describe("AwsSsoRoleService", () => {
   });
 
   test("catchClosingBrowserWindow", async () => {
-    const sessions = [{ sessionId: "1" }, { sessionId: "2" }, { sessionId: "3" }];
+    const sessions = [{ sessionId: "session-1" }, { sessionId: "session-2" }, { sessionId: "session-3" }];
     const repository = {
       listAwsSsoRoles: jest.fn(() => sessions),
     } as any;
-    const awsSsoRoleService = new AwsSsoRoleService(null, repository, null, null, null, null, {
-      appendListener: jest.fn(() => ({
-        then: () => Promise.resolve(""),
-      })),
-    } as any);
-    awsSsoRoleService.stop = jest.fn();
-    //await awsSsoRoleService.catchClosingBrowserWindow();
-    //expect(repository.listAwsSsoRoles).toHaveBeenCalled();
+    const awsSsoRoleService = new AwsSsoRoleService(null, repository, null, null, null, null, { appendListener: jest.fn(() => {}) } as any);
+    (awsSsoRoleService.stop as any) = jest.fn(() => Promise.resolve(""));
+    await awsSsoRoleService.catchClosingBrowserWindow();
+    expect(repository.listAwsSsoRoles).toHaveBeenCalled();
+    expect(awsSsoRoleService.stop).toHaveBeenCalledTimes(sessions.length);
+    expect(awsSsoRoleService.stop).toHaveBeenNthCalledWith(1, sessions[0].sessionId);
+    expect(awsSsoRoleService.stop).toHaveBeenNthCalledWith(2, sessions[1].sessionId);
+    expect(awsSsoRoleService.stop).toHaveBeenNthCalledWith(3, sessions[2].sessionId);
   });
 
   test("create - with session notifier", async () => {
@@ -108,6 +109,142 @@ describe("AwsSsoRoleService", () => {
     expect(sessionNotifier.setSessions).not.toHaveBeenCalled();
   });
 
+  test("applyCredentials", async () => {
+    const credentialInfo = {
+      sessionToken: {
+        ["aws_access_key_id"]: "fake-access-key-id",
+        ["aws_secret_access_key"]: "fake-secret-access-key",
+        ["aws_session_token"]: "fake-session-token",
+      },
+    };
+    const profileId = "fake-profile-id";
+    const session = { profileName: "fake-profile-name", region: "fake-region", profileId };
+    const profileName = "fake-profile";
+    const credentialPath = "fake-credential-path";
+    const repository = {
+      getSessionById: jest.fn(() => session),
+      getProfileName: jest.fn(() => profileName),
+    } as any;
+    const fileService = {
+      iniWriteSync: jest.fn(),
+    } as any;
+    const awsCore = {
+      awsCredentialPath: jest.fn(() => credentialPath),
+    } as any;
+    const awsSsoRoleService = new AwsSsoRoleService(null, repository, fileService, null, awsCore, null, { appendListener: jest.fn(() => {}) } as any);
+    await awsSsoRoleService.applyCredentials("fake-session-id", credentialInfo);
+    expect(repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
+    expect(repository.getProfileName).toHaveBeenCalledWith(profileId);
+    expect(awsCore.awsCredentialPath).toHaveBeenCalled();
+    const expectedCredentialObject = {
+      [profileName]: {
+        ["aws_access_key_id"]: credentialInfo.sessionToken.aws_access_key_id,
+        ["aws_secret_access_key"]: credentialInfo.sessionToken.aws_secret_access_key,
+        ["aws_session_token"]: credentialInfo.sessionToken.aws_session_token,
+        region: session.region,
+      },
+    };
+    expect(fileService.iniWriteSync).toHaveBeenCalledWith(credentialPath, expectedCredentialObject);
+  });
+
+  test("deApplyCredentials", async () => {
+    const profileName = "fake-profile";
+    const credentialFile = {
+      [profileName]: {
+        fakeKey: "fake-value",
+      },
+      anotherNameProfile: {
+        fakeKey: "fake-value",
+      },
+    };
+    const profileId = "fake-profile-id";
+    const session = { profileName: "fake-profile-name", region: "fake-region", profileId };
+    const credentialPath = "fake-credential-path";
+    const repository = {
+      getSessionById: jest.fn(() => session),
+      getProfileName: jest.fn(() => profileName),
+    } as any;
+    const fileService = {
+      iniParseSync: jest.fn(async () => credentialFile),
+      replaceWriteSync: jest.fn(),
+    } as any;
+    const awsCore = {
+      awsCredentialPath: jest.fn(() => credentialPath),
+    } as any;
+    const awsSsoRoleService = new AwsSsoRoleService(null, repository, fileService, null, awsCore, null, { appendListener: jest.fn(() => {}) } as any);
+    await awsSsoRoleService.deApplyCredentials("fake-session-id");
+    expect(repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
+    expect(repository.getProfileName).toHaveBeenCalledWith(profileId);
+    expect(awsCore.awsCredentialPath).toHaveBeenCalled();
+    const expectedCredentialFile = {
+      anotherNameProfile: {
+        fakeKey: "fake-value",
+      },
+    };
+    expect(fileService.iniParseSync).toHaveBeenCalledWith(credentialPath);
+    expect(fileService.replaceWriteSync).toHaveBeenCalledWith(credentialPath, expectedCredentialFile);
+  });
+
+  test("generateCredentialsProxy", async () => {
+    const awsSsoRoleService = new AwsSsoRoleService(null, null, null, null, null, null, { appendListener: jest.fn(() => {}) } as any);
+    jest.spyOn(awsSsoRoleService, "generateCredentials").mockImplementation(jest.fn());
+    await awsSsoRoleService.generateCredentialsProxy("fake-session-id");
+    expect(awsSsoRoleService.generateCredentials).toHaveBeenCalledWith("fake-session-id");
+  });
+
+  test("generateCredentials", async () => {
+    jest.useFakeTimers("modern");
+    jest.setSystemTime(new Date());
+    const credentials = {
+      roleCredentials: {
+        accessKeyId: "fake-access-key-id",
+        secretAccessKey: "fake-secret-access-key",
+        sessionToken: "fake-session-token",
+        expiration: new Date(),
+      },
+    };
+    const roleArn = "fake-role-arn";
+    const awsSsoConfigurationId = "fake-aws-configuration-id";
+    const session = { profileName: "fake-profile-name", roleArn, awsSsoConfigurationId };
+    const awsSsoConfiguration = {
+      region: "fake-region",
+      portalUrl: "fake-portal-url",
+    };
+    const repository = {
+      getSessionById: jest.fn(() => session),
+      getAwsSsoIntegration: jest.fn(() => awsSsoConfiguration),
+    } as any;
+    const accessToken = "fake-access-token";
+    const awsSsoRoleService = new AwsSsoRoleService(null, repository, null, null, null, null, { appendListener: jest.fn(() => {}) } as any);
+    (awsSsoRoleService as any).awsIntegrationDelegate = {};
+    (awsSsoRoleService as any).awsIntegrationDelegate.getAccessToken = jest.fn(async () => accessToken);
+    (awsSsoRoleService as any).awsIntegrationDelegate.getRoleCredentials = jest.fn(async () => credentials);
+    (awsSsoRoleService as any).saveSessionTokenExpirationInTheSession = jest.fn();
+    jest.spyOn(AwsSsoRoleService, "sessionTokenFromGetSessionTokenResponse").mockImplementation(jest.fn());
+    await awsSsoRoleService.generateCredentials("fake-session-id");
+
+    expect(repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
+    expect(repository.getAwsSsoIntegration).toHaveBeenCalledWith(session.awsSsoConfigurationId);
+    expect((awsSsoRoleService as any).awsIntegrationDelegate.getAccessToken).toHaveBeenCalledWith(
+      session.awsSsoConfigurationId,
+      awsSsoConfiguration.region,
+      awsSsoConfiguration.portalUrl
+    );
+    expect((awsSsoRoleService as any).awsIntegrationDelegate.getRoleCredentials).toHaveBeenCalledWith(
+      accessToken,
+      awsSsoConfiguration.region,
+      session.roleArn
+    );
+    const expectedAwsCredential: AWS.STS.Credentials = {
+      ["AccessKeyId"]: credentials.roleCredentials.accessKeyId,
+      ["Expiration"]: new Date(credentials.roleCredentials.expiration),
+      ["SecretAccessKey"]: credentials.roleCredentials.secretAccessKey,
+      ["SessionToken"]: credentials.roleCredentials.sessionToken,
+    };
+    expect((awsSsoRoleService as any).saveSessionTokenExpirationInTheSession).toHaveBeenCalledWith(session, expectedAwsCredential);
+    expect(AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse).toHaveBeenCalledWith(credentials);
+  });
+
   test("getAccountNumberFromCallerIdentity", async () => {
     const session = {
       type: SessionType.awsSsoRole,
@@ -149,5 +286,37 @@ describe("AwsSsoRoleService", () => {
     jest.spyOn(awsSsoRoleService, "generateCredentials").mockImplementation(() => Promise.reject({} as any));
     result = await awsSsoRoleService.validateCredentials(session.sessionId);
     expect(result).not.toBeTruthy();
+  });
+
+  test("saveSessionTokenExpirationInTheSession - credentials not undefined", () => {
+    const session: any = { id: "fake-session-id", sessionTokenExpiration: undefined };
+    const sessions = [{ id: "wrong-session-id" }, session];
+    const repository = {
+      getSessions: jest.fn(() => sessions),
+      updateSessions: jest.fn(),
+    } as any;
+    const sessionNotifier = {
+      setSessions: jest.fn(),
+    } as any;
+    const fakeCredentials = {
+      ["Expiration"]: new Date(),
+    };
+    const awsSsoRoleService = new AwsSsoRoleService(sessionNotifier, repository, null, null, null, null, { appendListener: () => {} } as any);
+    (awsSsoRoleService as any).saveSessionTokenExpirationInTheSession(session, fakeCredentials);
+    expect(repository.getSessions).toHaveBeenCalled();
+    expect(session.sessionTokenExpiration).toBe(fakeCredentials.Expiration.toISOString());
+    expect(repository.updateSessions).toHaveBeenCalledWith([{ id: "wrong-session-id" }, session]);
+    expect(sessionNotifier.setSessions).toHaveBeenCalledWith([{ id: "wrong-session-id" }, session]);
+
+    session.sessionTokenExpiration = "";
+    (awsSsoRoleService as any).saveSessionTokenExpirationInTheSession(session, undefined);
+    expect(repository.getSessions).toHaveBeenCalled();
+    expect(session.sessionTokenExpiration).toBe("");
+    expect(repository.updateSessions).toHaveBeenCalledWith([{ id: "wrong-session-id" }, session]);
+    expect(sessionNotifier.setSessions).toHaveBeenCalledWith([{ id: "wrong-session-id" }, session]);
+
+    jest.spyOn(awsSsoRoleService as any, "removeSecrets");
+    awsSsoRoleService.removeSecrets("");
+    expect(awsSsoRoleService.removeSecrets).toHaveBeenCalled();
   });
 });

@@ -6,6 +6,7 @@ import { SSO } from "aws-sdk";
 import { SessionType } from "../../models/session-type";
 import { ListAccountRolesRequest } from "aws-sdk/clients/sso";
 import { constants } from "../../models/constants";
+import { ThrottleService } from "../throttle-service";
 
 describe("AwsSsoIntegrationService", () => {
   afterEach(() => {
@@ -382,7 +383,114 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("login", async () => {
-    // TODO
+    const portalUrl = "fake-portal-url";
+    const resolvedPortalUrl = "fake-resolved-portal-url";
+
+    const requestMock = { end: jest.fn() };
+    const httpClient = {
+      request: jest.fn((actualPortalUrl, responseFn: any) => {
+        expect(actualPortalUrl).toBe(portalUrl);
+        responseFn({ responseUrl: resolvedPortalUrl });
+        return requestMock;
+      }),
+    };
+    const nativeService = {
+      followRedirects: { https: httpClient },
+    } as any;
+
+    const generateSsoTokenResponse = { accessToken: "fake-access-token", expirationTime: "fake-expiration-time" };
+    const awsSsoOidcService = {
+      login: jest.fn(async () => generateSsoTokenResponse),
+    } as any;
+
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, nativeService, null, awsSsoOidcService, null) as any;
+    awsIntegrationService.getProtocol = jest.fn(() => "https");
+
+    const integrationId = "fake-integration-id";
+    const region = "fake-region";
+    const loginResponse = await awsIntegrationService.login(integrationId, region, portalUrl);
+    expect(loginResponse).toEqual({
+      portalUrlUnrolled: resolvedPortalUrl,
+      accessToken: generateSsoTokenResponse.accessToken,
+      region,
+      expirationTime: generateSsoTokenResponse.expirationTime,
+    });
+
+    expect(awsIntegrationService.getProtocol).toHaveBeenCalledWith(portalUrl);
+    expect(requestMock.end).toHaveBeenCalled();
+    expect(awsSsoOidcService.login).toHaveBeenCalledWith(integrationId, region, resolvedPortalUrl);
+  });
+
+  test("setupSsoPortalClient, sso portal not set up", () => {
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
+
+    const fakeRegion = "fake-region";
+    awsIntegrationService.setupSsoPortalClient(fakeRegion);
+
+    expect(awsIntegrationService.ssoPortal.config.region).toBe(fakeRegion);
+    expect(awsIntegrationService.listAccountRolesCall).toBeInstanceOf(ThrottleService);
+    expect(awsIntegrationService.listAccountRolesCall.minDelay).toBe(50);
+
+    const callParams = ["fake-param1", "fake-param2"];
+    const callPromise = "fake-call-promise";
+    awsIntegrationService.ssoPortal = {
+      ["listAccountRoles"]: (...params) => {
+        expect(params).toEqual(callParams);
+        return { promise: () => callPromise };
+      },
+    };
+    const actualCallPromise = awsIntegrationService.listAccountRolesCall.call(...callParams);
+    expect(actualCallPromise).toBe(callPromise);
+  });
+
+  test("listAccounts", async () => {
+    const accessToken = "fake-access-token";
+    const accounts = ["fake-account-1"];
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
+    awsIntegrationService.recursiveListAccounts = async (accountList, listAccountsRequest, resolve: any) => {
+      expect(accountList).toEqual([]);
+      expect(listAccountsRequest).toEqual({ accessToken, maxResults: 30 });
+      resolve(accounts);
+    };
+
+    const actualAccounts = await awsIntegrationService.listAccounts(accessToken);
+    expect(actualAccounts).toEqual(accounts);
+  });
+
+  test("recursiveListAccounts", (done) => {
+    const accountList = [];
+    const nextToken = "fake-next-token";
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
+
+    let callNumber = 1;
+    const listAccountsFn = jest.fn(() => ({
+      promise: () => {
+        if (callNumber++ === 1) {
+          return Promise.resolve({ accountList: ["fake-first-account"], nextToken });
+        } else {
+          return Promise.resolve({ accountList: ["fake-last-account"], nextToken: null });
+        }
+      },
+    }));
+    awsIntegrationService.ssoPortal = { listAccounts: listAccountsFn };
+
+    const promiseCallback = () => {
+      expect(accountList).toEqual(["fake-first-account", "fake-last-account"]);
+      expect(listAccountsFn).toHaveBeenCalledTimes(2);
+      expect(listAccountsFn).toHaveBeenLastCalledWith({ fake: "request", nextToken });
+      done();
+    };
+    awsIntegrationService.recursiveListAccounts(accountList, { fake: "request" }, promiseCallback);
+  });
+
+  test("setupSsoPortalClient, sso portal already set up", () => {
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
+    awsIntegrationService.ssoPortal = "fake-sso-portal";
+
+    awsIntegrationService.setupSsoPortalClient("fake-region");
+
+    expect(awsIntegrationService.listAccountRolesCall).toBeUndefined();
+    expect(awsIntegrationService.ssoPortal).toBe("fake-sso-portal");
   });
 
   test("createIntegration", () => {
@@ -655,6 +763,67 @@ describe("AwsSsoIntegrationService", () => {
     const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null);
     expect((awsIntegrationService as any).findOldSession(accountInfo, accountRole)).toStrictEqual({ region: "2", profileId: "2" });
     expect((awsIntegrationService as any).findOldSession(accountInfo, { roleName: "notTobeFoundRole", accountId: "notToBeFoundId" })).toBeUndefined();
+  });
+
+  test("getSessionsFromAccount", async () => {
+    const repository = {
+      getDefaultRegion: () => "fake-default-region",
+      getDefaultProfileId: () => "fake-default-profile-id",
+    } as any;
+    const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null) as any;
+
+    let findOldSessionCallNumber = 1;
+    awsIntegrationService.findOldSession = jest.fn(() => {
+      if (findOldSessionCallNumber++ === 1) {
+        return undefined;
+      } else {
+        return { region: "fake-region", profileId: "fake-profile-id" };
+      }
+    });
+
+    const accountRole1 = { roleName: "fake-role-name-1" };
+    const accountRole2 = { roleName: "fake-role-name-2" };
+
+    awsIntegrationService.recursiveListRoles = async (accountRoles, listAccountRolesRequest, resolve: any) => {
+      expect(accountRoles).toEqual([]);
+      expect(listAccountRolesRequest).toEqual({
+        accessToken: "fake-access-token",
+        accountId: "fake-account-id",
+        maxResults: 30,
+      });
+      accountRoles.push(accountRole1, accountRole2);
+      resolve();
+    };
+
+    const accountInfo = {
+      emailAddress: "fake-email-address",
+      accountId: "fake-account-id",
+      accountName: "fake-account-name",
+    };
+    const integrationId = "fake-integration-id";
+    const actualSessions = await awsIntegrationService.getSessionsFromAccount(integrationId, accountInfo, "fake-access-token");
+    expect(actualSessions).toEqual([
+      {
+        awsSsoConfigurationId: integrationId,
+        email: accountInfo.emailAddress,
+        profileId: "fake-default-profile-id",
+        region: "fake-default-region",
+        roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole1.roleName}`,
+        sessionName: accountInfo.accountName,
+      },
+      {
+        awsSsoConfigurationId: integrationId,
+        email: accountInfo.emailAddress,
+        profileId: "fake-profile-id",
+        region: "fake-region",
+        roleArn: `arn:aws:iam::${accountInfo.accountId}/${accountRole2.roleName}`,
+        sessionName: accountInfo.accountName,
+      },
+    ]);
+
+    expect(awsIntegrationService.findOldSession).toHaveBeenCalledTimes(2);
+    expect(awsIntegrationService.findOldSession).toHaveBeenNthCalledWith(1, accountInfo, accountRole1);
+    expect(awsIntegrationService.findOldSession).toHaveBeenNthCalledWith(2, accountInfo, accountRole2);
   });
 
   test("recursiveListRoles", () => {

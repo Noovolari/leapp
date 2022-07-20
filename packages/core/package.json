@@ -82,14 +82,9 @@
   "scripts": {
     "setup": "gushio ../../gushio/clean-and-bootstrap.js core",
     "clean": "gushio gushio/target-clean.js",
-    "prebuild": "cd ./src/plugin-system/backend && npm run generate:swagger && npm run generate:routes",
     "build": "gushio gushio/target-build.js",
     "test": "jest --coverage",
-    "release": "gushio gushio/target-release.js",
-    "pre-deploy:backend": "src/plugin-system/backend/prepare-layer.sh",
-    "pre-deploy:plugin-updater": "src/plugin-system/plugin-updater/prepare-layer.sh",
-    "pre-deploy:signature-updater": "src/plugin-system/signature-updater/prepare-layer.sh",
-    "deploy:dev": "export ENVIRONMENT_NAME=dev && npm run build && npm run pre-deploy:backend && npm run pre-deploy:plugin-updater && npm run pre-deploy:signature-updater && cd ./src/plugin-system/infrastructure && ./../../../node_modules/aws-cdk/bin/cdk deploy '*' -- --require-approval never"
+    "release": "gushio gushio/target-release.js"
   },
   "repository": {
     "type": "git",

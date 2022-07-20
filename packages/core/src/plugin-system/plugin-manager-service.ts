@@ -1,6 +1,7 @@
-import { IPlugin } from "./interfaces/IPlugin";
+import { IPlugin } from "./interfaces/i-plugin";
 import { INativeService } from "../interfaces/i-native-service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "../services/log-service";
+import { constants } from "../models/constants";
 
 export class PluginManagerService {
   private _plugins: IPlugin[];
@@ -48,48 +49,20 @@ export class PluginManagerService {
         console.log("Creating a hash over the current folder");
 
         let hash;
-        let packageJson;
-        try {
-          // Hashing file and directory
-          hash = await this._hashElement(pluginFilePath, options);
-          if (hash.children) {
-            // If it has children then it is a directory
-            console.log(hash);
-            if (
-              // Required files
-              this.nativeService.fs.existsSync(pluginFilePath + "/package.json") &&
-              this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")
-            ) {
-              packageJson = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
-              // Verify signature to enable plugin
-              /*const data = await this.http.get(constants.pluginPortalUrl + `/${pluginFilePaths[i]}`, { responseType: "json" }).toPromise();
-              if (data.status !== "active") {
-                this.logService.log(new LoggedEntry("Plugin not in active state: " + pluginFilePaths[i], this, LogLevel.warn, true));
-                continue;
-              }
+        let isPluginValid = true;
+        let packageJson = null;
 
-              const verifyMessage = packageJson + hash.hash;
-              console.log("verifyMessage: ", verifyMessage);
-              console.log("data: ", data);
-              const signatureVerified = this.rsaVerifySignatureFromBase64(constants.publicKey, verifyMessage, data.signature);
-              console.log(signatureVerified);*/
+        // VALIDATION PROCESS
+        const result = await this.validatePlugin(hash, pluginFilePath, options, packageJson, pluginFilePaths, i, isPluginValid);
+        packageJson = result.packageJson;
+        isPluginValid = result.isPluginValid;
 
-              /*if (!signatureVerified) {
-                this.logService.log(new LoggedEntry("Signature not verified for plugin: " + pluginFilePaths[i], this, LogLevel.warn, true));
-                this.nativeService.rimraf(pluginFilePath, () => {});
-                continue;
-              }*/
-            } else {
-              console.log(`folder ${pluginFilePath} is not a plugin folder, ignoring...`);
-              this.logService.log(new LoggedEntry(`folder ${pluginFilePath} is not a plugin folder, ignoring...`, this, LogLevel.info, false));
-              continue;
-            }
-          }
-        } catch (error) {
-          console.error("hashing failed or verification failed:", error);
-          this.logService.log(new LoggedException(`hashing failed or verification failed: ${error.toString()}`, this, LogLevel.warn, false));
+        // CHECK VALIDATION
+        if (!isPluginValid && !constants.skipPluginValidation) {
+          continue;
         }
 
+        // LOAD
         try {
           if (this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")) {
             const pluginModule = this._requireModule(pluginFilePath + "/plugin.js");
@@ -181,6 +154,59 @@ export class PluginManagerService {
       passphrase: "DkgCF3wYa6N@urrtUxNLaE#e8*woRm6Ld$k&qBJg8P7LEEVJ3s*nXdQKDC8*NEZ0",
     });
     return signature.toString("Base64");
+  }
+
+  private async validatePlugin(
+    hash,
+    pluginFilePath,
+    options: { folders: { include: string[] }; files: { exclude: string[] } },
+    packageJson,
+    pluginFilePaths,
+    i: number,
+    isPluginValid: boolean
+  ) {
+    try {
+      // Hashing file and directory
+      hash = await this._hashElement(pluginFilePath, options);
+      if (hash.children) {
+        // If it has children then it is a directory
+        console.log(hash);
+        if (
+          // Required files
+          this.nativeService.fs.existsSync(pluginFilePath + "/package.json") &&
+          this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")
+        ) {
+          packageJson = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
+          // Verify signature to enable plugin
+          const data = await this.http.get(constants.pluginPortalUrl + `/${pluginFilePaths[i]}`, { responseType: "json" }).toPromise();
+          if (data.status !== "active") {
+            this.logService.log(new LoggedEntry("Plugin not in active state: " + pluginFilePaths[i], this, LogLevel.warn, true));
+            this.nativeService.rimraf(pluginFilePath, () => {});
+            isPluginValid = false;
+          }
+
+          const verifyMessage = packageJson + hash.hash;
+          console.log("verifyMessage: ", verifyMessage);
+          console.log("data: ", data);
+          const signatureVerified = this.rsaVerifySignatureFromBase64(constants.publicKey, verifyMessage, data.signature);
+          console.log(signatureVerified);
+
+          if (!signatureVerified) {
+            this.logService.log(new LoggedEntry("Signature not verified for plugin: " + pluginFilePaths[i], this, LogLevel.warn, true));
+            this.nativeService.rimraf(pluginFilePath, () => {});
+            isPluginValid = false;
+          }
+        } else {
+          console.log(`folder ${pluginFilePath} is not a plugin folder, ignoring...`);
+          this.logService.log(new LoggedEntry(`folder ${pluginFilePath} is not a plugin folder, ignoring...`, this, LogLevel.info, false));
+          isPluginValid = false;
+        }
+      }
+    } catch (error) {
+      console.error("hashing failed or verification failed:", error);
+      this.logService.log(new LoggedException(`hashing failed or verification failed: ${error.toString()}`, this, LogLevel.warn, false));
+    }
+    return { packageJson, isPluginValid };
   }
 
   private rsaVerifySignatureFromBase64(publicKey, message, signatureBase64): boolean {

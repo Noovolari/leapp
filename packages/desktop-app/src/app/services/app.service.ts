@@ -232,6 +232,8 @@ export class AppService {
     this.triggers = [];
   }
 
+  // TODO: make platform independent
+  // TODO: remove preemptly package-lock before running npm install
   async installPlugin(url: string): Promise<void> {
     const packageName = url.replace("leapp://", "");
     const pluginDir = this.appNativeService.os.homedir() + "/.Leapp/plugins";

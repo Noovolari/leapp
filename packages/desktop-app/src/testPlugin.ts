@@ -8,7 +8,7 @@ export class HelloWorldPlugin implements IPlugin {
   description = "hello world plugin";
   name = "Hello World";
   supportedOS = ["macOS", "windows", "linux"];
-  tags = ["leapp", "hello world"];
+  tags = ["leapp-plugin", "hello world"];
   templateStructure;
   url: string;
 

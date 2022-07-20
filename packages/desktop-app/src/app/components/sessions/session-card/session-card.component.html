@@ -121,6 +121,7 @@
   </ng-container>
 
   <ng-container *ngIf="appProviderService.pluginManagerService.plugins.length > 0">
+    <!-- TODO if for supported session and OS -->
     <div class="divider"></div>
     <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.plugins">
       <button mat-menu-item (click)="applyPluginAction($event, plugin);">

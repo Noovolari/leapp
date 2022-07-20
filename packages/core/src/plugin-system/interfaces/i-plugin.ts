@@ -1,4 +1,5 @@
 import { Session } from "../../models/session";
+import { SessionType } from "../../models/session-type";
 import { PluginCoreService } from "../plugin-core-service";
 
 export enum TemplateFormObject {
@@ -35,6 +36,7 @@ export interface IPlugin {
   url: string;
   tags: string[];
   supportedOS: string[];
+  supportedSessions?: SessionType[];
   active: boolean;
 
   templateStructure: {

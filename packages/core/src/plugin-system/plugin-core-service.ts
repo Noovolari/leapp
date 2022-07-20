@@ -3,7 +3,7 @@ import { ExecuteService } from "../services/execute-service";
 import { AzureCoreService } from "../services/azure-core-service";
 import { INativeService } from "../interfaces/i-native-service";
 import { Repository } from "../services/repository";
-import { TemplateOutputObject } from "./interfaces/IPlugin";
+import { TemplateOutputObject } from "./interfaces/i-plugin";
 import { SessionFactory } from "../services/session-factory";
 
 export class PluginCoreService {

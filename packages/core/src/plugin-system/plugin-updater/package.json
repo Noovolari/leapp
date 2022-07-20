@@ -1,9 +1,0 @@
-{
-  "name": "plugin-system",
-  "version": "0.0.1",
-  "dependencies": {
-    "@aws-sdk/client-rds-data": "^3.121.0",
-    "@aws-sdk/client-sqs": "^3.121.0",
-    "axios": "^0.27.2"
-  }
-}

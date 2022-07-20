@@ -53,6 +53,46 @@ describe("RetroCompatibilityService", () => {
       expect((service as any).adaptIntegrationPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
     });
+
+    test("should try migrations, retropatch not necessary", async () => {
+      const fileService = {
+        existsSync: () => true,
+        homeDir: () => "",
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      (service as any).isRetroPatchNecessary = () => false;
+      (service as any).adaptOldWorkspaceFile = jest.fn();
+      (service as any).isIntegrationPatchNecessary = () => true;
+      (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).migration1 = jest.fn();
+
+      await service.applyWorkspaceMigrations();
+
+      expect((service as any).adaptOldWorkspaceFile).not.toHaveBeenCalled();
+      expect((service as any).adaptIntegrationPatch).toHaveBeenCalled();
+      expect((service as any).migration1).toHaveBeenCalled();
+    });
+
+    test("should try migrations, integrationpatch not necessary", async () => {
+      const fileService = {
+        existsSync: () => true,
+        homeDir: () => "",
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      (service as any).isRetroPatchNecessary = () => true;
+      (service as any).adaptOldWorkspaceFile = jest.fn();
+      (service as any).isIntegrationPatchNecessary = () => false;
+      (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).migration1 = jest.fn();
+
+      await service.applyWorkspaceMigrations();
+
+      expect((service as any).adaptOldWorkspaceFile).toHaveBeenCalled();
+      expect((service as any).adaptIntegrationPatch).not.toHaveBeenCalled();
+      expect((service as any).migration1).toHaveBeenCalled();
+    });
   });
 
   describe("isRetroPatchNecessary", () => {
@@ -141,12 +181,22 @@ describe("RetroCompatibilityService", () => {
         accessTokenExpiration: "fakeAccessTokenExpiration",
       } as any;
 
+      const fakeOldIntegrationWithIsOnline = {
+        id: "fakeId2",
+        alias: "fakeAlias2",
+        portalUrl: "fakePortalUrl2",
+        region: "fakeRegion2",
+        browserOpening: "fakeBrowserOpening2",
+        accessTokenExpiration: "fakeAccessTokenExpiration2",
+        isOnline: true,
+      } as any;
+
       const fileService = {
         homeDir: () => "",
         decryptText: (text: string) => text,
         readFileSync: (_: string) =>
           JSON.stringify({
-            _awsSsoIntegrations: [fakeOldIntegration],
+            _awsSsoIntegrations: [fakeOldIntegration, fakeOldIntegrationWithIsOnline],
             _sessions: [
               { type: "notAzure" },
               { type: SessionType.azure, tenantId: "fakeTenant1" },
@@ -174,7 +224,7 @@ describe("RetroCompatibilityService", () => {
 
       expect(persistedWorkspace._workspaceVersion).toBe(1);
 
-      expect(persistedWorkspace._awsSsoIntegrations.length).toBe(1);
+      expect(persistedWorkspace._awsSsoIntegrations.length).toBe(2);
       const migratedIntegration = persistedWorkspace._awsSsoIntegrations[0];
       expect(migratedIntegration).toMatchObject(fakeOldIntegration);
       expect(migratedIntegration.isOnline).toBe(false);
@@ -198,6 +248,49 @@ describe("RetroCompatibilityService", () => {
         tenantId: "fakeTenant2",
         type: IntegrationType.azure,
       });
+
+      expect(repository.reloadWorkspace).toHaveBeenCalled();
+      expect(behaviouralSubjectService.setIntegrations).toHaveBeenCalledWith(["ssoIntegration", "azureIntegration"]);
+    });
+
+    test("should migrate but no integrations available", () => {
+      let persistedWorkspace: any;
+
+      const fileService = {
+        homeDir: () => "",
+        decryptText: (text: string) => text,
+        readFileSync: (_: string) =>
+          JSON.stringify({
+            _awsSsoIntegrations: [],
+            _sessions: [
+              { type: "notAzure" },
+              { type: SessionType.azure, tenantId: "fakeTenant1" },
+              { type: SessionType.azure, tenantId: "fakeTenant2" },
+              { type: SessionType.azure, tenantId: "fakeTenant2" },
+            ],
+            defaultLocation: "fakeLocation",
+          }),
+      } as any;
+
+      const repository = {
+        reloadWorkspace: jest.fn(),
+        listAwsSsoIntegrations: () => ["ssoIntegration"],
+        listAzureIntegrations: () => ["azureIntegration"],
+      } as any;
+
+      const behaviouralSubjectService = {
+        setIntegrations: jest.fn(),
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, repository, behaviouralSubjectService);
+      (service as any).persists = jest.fn((workspace) => (persistedWorkspace = workspace));
+
+      (service as any).migration1();
+
+      expect(persistedWorkspace._workspaceVersion).toBe(1);
+
+      expect(persistedWorkspace._sessions.length).toBe(1);
+      expect(persistedWorkspace._sessions[0]).toEqual({ type: "notAzure" });
 
       expect(repository.reloadWorkspace).toHaveBeenCalled();
       expect(behaviouralSubjectService.setIntegrations).toHaveBeenCalledWith(["ssoIntegration", "azureIntegration"]);
@@ -270,6 +363,13 @@ describe("RetroCompatibilityService", () => {
     expect(workspace.sessions[0]["awsSsoConfigurationId"]).toBe("fake-uuid");
     expect(keyChainService.saveSecret).toHaveBeenCalledWith(constants.appName, "aws-sso-integration-access-token-fake-uuid", "mocked-access-token");
     expect(keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, `aws-sso-access-token`);
+
+    workspace.awsSsoIntegrations.push(
+      new AwsSsoIntegration(uuid.v4(), "Aws Single Sign-On", "portalUrl", "region", constants.inApp, "expirationTime")
+    );
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    expect(keyChainService.saveSecret).toHaveBeenCalledTimes(1);
+    expect(keyChainService.getSecret).toHaveBeenCalledTimes(1);
   });
 
   test("adaptIntegrations - throws an error", async () => {

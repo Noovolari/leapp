@@ -39,7 +39,8 @@
     "clean-and-bootstrap": "npm install && gushio gushio/clean-and-bootstrap.js core cli desktop-app",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "release": "gushio gushio/release.js"
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"

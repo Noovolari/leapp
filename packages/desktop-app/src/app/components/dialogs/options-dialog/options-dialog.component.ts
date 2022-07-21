@@ -15,7 +15,7 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { HttpClient } from "@angular/common/http";
-import { IHubPluginObject } from "@noovolari/leapp-core/plugin-system/interfaces/i-hub-plugin-object";
+import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
 
 @Component({
   selector: "app-options-dialog",
@@ -54,7 +54,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   colorTheme: string;
   selectedColorTheme: string;
 
-  pluginList: IHubPluginObject[];
+  pluginList: IPlugin[];
 
   form = new FormGroup({
     idpUrl: new FormControl(""),
@@ -126,7 +126,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
     this.appService.validateAllFormFields(this.form);
 
-    this.listPlugin();
+    this.pluginList = this.appProviderService.pluginManagerService.plugins;
   }
 
   ngAfterViewInit(): void {
@@ -432,26 +432,22 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async listPlugin(): Promise<void> {
-    const pluginPortalUrl = constants.pluginPortalUrl;
-    const response = await this.http.get(pluginPortalUrl, { responseType: "json" }).toPromise();
-    console.log(response);
-    this.pluginList = JSON.parse(JSON.stringify(response));
+  async refreshPluginList(): Promise<void> {
+    await this.appProviderService.pluginManagerService.loadFromPluginDir();
+    this.pluginList = this.appProviderService.pluginManagerService.plugins;
   }
 
-  installPlugin(): void {
+  async installPlugin(): Promise<void> {
     if (this.form.controls.pluginDeepLink.value) {
       if (this.form.controls.pluginDeepLink.value.indexOf("leapp://") > -1) {
-        this.appService.installPlugin(this.form.controls.pluginDeepLink.value);
+        await this.appService.installPlugin(this.form.controls.pluginDeepLink.value);
+        await this.refreshPluginList();
       }
     }
   }
 
-  installPluginFromList(url: string): void {
-    if (url) {
-      if (url.indexOf("leapp://") > -1) {
-        this.appService.installPlugin(url);
-      }
-    }
+  // TODO: persist the activation state
+  togglePluginActivation(plugin: IPlugin): void {
+    plugin.active = !plugin.active;
   }
 }

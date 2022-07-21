@@ -30,6 +30,7 @@ export class PluginManagerService {
   }
 
   async loadFromPluginDir(): Promise<void> {
+    // TODO: check mandatory fields in package.json (name, author, tags, etc.)
     this._plugins = [];
     const options = {
       folders: { include: ["*.*"] },

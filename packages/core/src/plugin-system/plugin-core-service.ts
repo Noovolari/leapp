@@ -5,9 +5,11 @@ import { INativeService } from "../interfaces/i-native-service";
 import { Repository } from "../services/repository";
 import { TemplateOutputObject } from "./interfaces/i-plugin";
 import { SessionFactory } from "../services/session-factory";
+import { OperatingSystem } from "../models/operating-system";
 
 export class PluginCoreService {
   outputType = TemplateOutputObject;
+  operatingSystem = OperatingSystem;
 
   constructor(
     public executeService: ExecuteService,

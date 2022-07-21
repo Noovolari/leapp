@@ -9,6 +9,7 @@ import Folder from "./folder";
 import Segment from "./segment";
 import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import { AzureIntegration } from "./azure/azure-integration";
+import PluginStatus from "./plugin-status";
 
 export class Workspace {
   @Type(() => Session)
@@ -22,6 +23,8 @@ export class Workspace {
   private _macOsTerminal: string;
   private _idpUrls: IdpUrl[];
   private _profiles: AwsNamedProfile[];
+
+  private _pluginsStatus: PluginStatus[];
 
   private _pinned: string[];
   private _folders: Folder[];
@@ -51,6 +54,7 @@ export class Workspace {
     this._macOsTerminal = constants.macOsTerminal;
     this._idpUrls = [];
     this._profiles = [{ id: uuid.v4(), name: constants.defaultAwsProfileName }];
+    this._pluginsStatus = [];
 
     this._awsSsoIntegrations = [];
     this._azureIntegrations = [];

@@ -18,9 +18,6 @@ export const constants = {
   defaultAwsProfileName: "default",
   defaultAzureProfileName: "default-azure",
 
-  mac: "mac",
-  linux: "linux",
-  windows: "windows",
   inApp: "In-app",
   inBrowser: "In-browser",
   forcedCloseBrowserWindow: "ForceCloseBrowserWindow",

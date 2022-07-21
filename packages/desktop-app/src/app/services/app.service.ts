@@ -6,8 +6,9 @@ import { AppProviderService } from "./app-provider.service";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { WindowService } from "./window.service";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { constants } from "@noovolari/leapp-core/models/constants";
 import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Injectable({
   providedIn: "root",
@@ -34,9 +35,9 @@ export class AppService {
     // Global Configure logger
     if (this.appNativeService.log) {
       const logPaths = {
-        [constants.mac]: `${this.appNativeService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
-        [constants.linux]: `${this.appNativeService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
-        [constants.windows]: `${this.appNativeService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
+        [OperatingSystem.mac]: `${this.appNativeService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
+        [OperatingSystem.linux]: `${this.appNativeService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
+        [OperatingSystem.windows]: `${this.appNativeService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
       };
 
       this.appNativeService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
@@ -72,11 +73,11 @@ export class AppService {
   /**
    * Return the type of OS in human-readable form
    */
-  detectOs(): string {
+  detectOs(): OperatingSystem {
     const hrNames = {
-      linux: constants.linux,
-      darwin: constants.mac,
-      win32: constants.windows,
+      linux: OperatingSystem.linux,
+      darwin: OperatingSystem.mac,
+      win32: OperatingSystem.windows,
     };
     const os = this.appNativeService.os.platform();
     return hrNames[os];

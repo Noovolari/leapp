@@ -10,6 +10,7 @@ import { AppService } from "./app.service";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { DomSanitizer } from "@angular/platform-browser";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 
 @Injectable({ providedIn: "root" })
 export class AppAwsAuthenticationService implements IAwsSamlAuthenticationService {
@@ -132,7 +133,7 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
       this.leappCoreService.logService.log(
         new LoggedEntry("Leapp has an error re-creating your configuration file and cache.", this, LogLevel.error, false, err.stack)
       );
-      if (this.appService.detectOs() === constants.windows) {
+      if (this.appService.detectOs() === OperatingSystem.windows) {
         this.leappCoreService.logService.log(
           new LoggedEntry(
             "Leapp needs Admin permissions to do this: please restart the application as an Administrator and retry.",

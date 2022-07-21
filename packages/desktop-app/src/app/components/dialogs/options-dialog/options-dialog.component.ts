@@ -435,7 +435,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   async refreshPluginList(): Promise<void> {
-    await this.appProviderService.pluginManagerService.loadFromPluginDir();
+    await this.appService.reloadPlugins();
     this.pluginList = this.appProviderService.pluginManagerService.plugins;
   }
 

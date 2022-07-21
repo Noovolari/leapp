@@ -122,3 +122,10 @@
   position: relative;
   top: 3px;
 }
+
+.pull-right {
+  float: right;
+  &:hover {
+    cursor: pointer;
+  }
+}

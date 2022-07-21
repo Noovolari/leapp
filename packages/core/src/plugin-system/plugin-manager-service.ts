@@ -40,7 +40,6 @@ export class PluginManagerService {
     };
 
     const pluginFilePaths = this.nativeService.fs.readdirSync(this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir);
-    console.log(pluginFilePaths);
 
     for (let i = 0; i < pluginFilePaths.length; i++) {
       let pluginFilePath = pluginFilePaths[i];
@@ -59,6 +58,8 @@ export class PluginManagerService {
         const isSignatureInvalid = !isPluginValid && !constants.skipPluginValidation;
         if (!metadata || isSignatureInvalid) {
           // TODO: log and notify user with a warning!
+          this.logService.log(new LoggedEntry("Signature not verified for plugin: " + pluginFilePaths[i], this, LogLevel.warn, true));
+          this.nativeService.rimraf(pluginFilePath, () => {});
           continue;
         }
 
@@ -66,11 +67,14 @@ export class PluginManagerService {
         try {
           if (this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")) {
             const pluginModule = this._requireModule(pluginFilePath + "/plugin.js");
-            console.log(pluginModule);
             this.logService.log(new LoggedEntry(`loading plugin: ${JSON.stringify(pluginModule)}`, this, LogLevel.info, false));
 
-            const plugin = new pluginModule[JSON.parse(packageJson).entryClass]() as any;
+            console.log(packageJson);
+            const plugin = new pluginModule[packageJson.entryClass]() as any;
             plugin.metadata = metadata;
+            if (!this.repository.getPluginStatus(plugin.metadata.uniqueName)) {
+              this.repository.createPluginStatus(plugin.metadata.uniqueName);
+            }
             this._plugins.push(plugin);
           }
         } catch (error) {
@@ -172,8 +176,9 @@ export class PluginManagerService {
       return undefined;
     }
 
+    const pluginStatus = this.repository.getPluginStatus(uniqueName);
     const metadata: IPluginMetadata = {
-      active: this.repository.getPluginStatus(uniqueName).active,
+      active: pluginStatus ? pluginStatus.active : true,
       author,
       description,
       supportedOS,
@@ -220,8 +225,6 @@ export class PluginManagerService {
           console.log(signatureVerified);
 
           if (!signatureVerified) {
-            this.logService.log(new LoggedEntry("Signature not verified for plugin: " + pluginFilePaths[i], this, LogLevel.warn, true));
-            this.nativeService.rimraf(pluginFilePath, () => {});
             isPluginValid = false;
           }
         } else {

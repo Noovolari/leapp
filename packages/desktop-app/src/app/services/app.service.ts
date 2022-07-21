@@ -260,8 +260,6 @@ export class AppService {
     await this.appProviderService.executeService.execute(`cd ${pluginDir}/${packageName} && npm install`);
 
     this.appProviderService.logService.log(new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
-
-    this.reloadPlugins();
   }
 
   async reloadPlugins(): Promise<void> {

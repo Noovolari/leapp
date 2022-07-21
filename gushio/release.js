@@ -76,18 +76,20 @@ async function updatePackageJsonVersion(packageName, version) {
 }
 
 async function releaseCore(version) {
-  console.log("Update Leapp Core's package.json version...");
+  console.log("updating Leapp Core's package.json version...");
   const packageName = "core";
   await updatePackageJsonVersion(packageName, version);
   let result = shellJs.exec("git add .");
   if (result.code !== 0) {
     throw new Error(result.stderr)
   }
+  console.log("creating commit with updated package.json version...");
   result = shellJs.exec(`git commit -m "chore(release): release core v${version}"`);
   if (result.code !== 0) {
     throw new Error(result.stderr)
   }
-  result = shellJs.exec(`git tag -a core-vx.x.x -m "release core v${version}"`);
+  console.log(`creating tag core-v${version}...`);
+  result = shellJs.exec(`git tag -a core-v${version} -m "release core v${version}"`);
   if (result.code !== 0) {
     throw new Error(result.stderr)
   }
@@ -100,18 +102,22 @@ async function releaseCore(version) {
   const wantToPush = await prompt.run();
 
   if(wantToPush) {
-    console.log("Push it to the limit!!!");
+    console.log("pushing commit...");
+    result = shellJs.exec(`git push --follow-tags`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
   }
 }
 
 async function releaseCli(version) {
-  console.log("Update Leapp CLI's package.json version...");
+  console.log("updating Leapp CLI's package.json version...");
   const packageName = "cli";
   await updatePackageJsonVersion(packageName, version);
 }
 
 async function releaseDesktopApp(version) {
-  console.log("Update Leapp Desktop App's package.json version...");
+  console.log("updating Leapp Desktop App's package.json version...");
   const packageName = "desktop-app";
   await updatePackageJsonVersion(packageName, version);
 }

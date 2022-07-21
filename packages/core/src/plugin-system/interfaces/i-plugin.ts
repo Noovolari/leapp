@@ -31,6 +31,7 @@ export interface IPluginOutputObject {
 }
 
 export interface IPluginMetadata {
+  version: string;
   uniqueName: string;
   description: string;
   author: string;

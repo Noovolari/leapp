@@ -245,24 +245,22 @@
           </div>
 
           <div class="form-group scrollable max-height-230">
-            <h4> Installed plugins <i class="fa fa-refresh pull-right" (click)="refreshPluginList()"></i></h4>
-            <table class="table">
+            <h4> Installed plugins <i class="fa fa-refresh pull-right" (click)="refreshPluginList()" matTooltip="Refresh plugin list"></i></h4>
+            <table class="table plugin-table">
               <thead>
                 <th>Name</th>
                 <th>Version</th>
-                <th>&nbsp;</th>
+                <th>Supported OS</th>
                 <th>Enabled</th>
               </thead>
               <tbody>
               <ng-container *ngFor="let plugin of pluginList">
                 <tr>
-                  <td>{{plugin.metadata.uniqueName}}</td>
-                  <td>{{plugin.version}}</td>
-                  <td><i class="fa fa-info-circle" matTooltip="Author: {{plugin.metadata.author}}<br>Description: {{plugin.metadata.description}}<br>Supported OS: {{plugin.metadata.supportedOS.join(',')}}<br>Supported Sessions: {{plugin.metadata.supportedSessions.join(',')}}"></i></td>
+                  <td><i class="fa fa-info-circle" matTooltipClass="allow-cr" [matTooltip]="getPluginExtraInfo(plugin)"></i>&nbsp;{{plugin.metadata.uniqueName}}</td>
+                  <td>{{plugin.metadata.version}}</td>
+                  <td [innerHTML]="getSupportedOsIcons(plugin)"></td>
                   <td>
-                    <mat-slide-toggle class="inline" color="primary" (toggleChange)="togglePluginActivation(plugin)"
-                                      [checked]="plugin.metadata.active">
-                    </mat-slide-toggle>
+                    <mat-slide-toggle class="inline toggleColoredCorrectly" (toggleChange)="togglePluginActivation(plugin)" [checked]="plugin.metadata.active"></mat-slide-toggle>
                   </td>
                 </tr>
               </ng-container>

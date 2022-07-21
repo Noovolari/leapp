@@ -162,6 +162,7 @@ export class PluginManagerService {
   }
 
   private extractMetadata(packageJson: any): IPluginMetadata {
+    const version = packageJson.version;
     const uniqueName = packageJson.name;
     const author = packageJson.author?.name ? packageJson.author.name : packageJson.author;
     const description = packageJson.description;
@@ -178,6 +179,7 @@ export class PluginManagerService {
 
     const pluginStatus = this.repository.getPluginStatus(uniqueName);
     const metadata: IPluginMetadata = {
+      version,
       active: pluginStatus ? pluginStatus.active : true,
       author,
       description,

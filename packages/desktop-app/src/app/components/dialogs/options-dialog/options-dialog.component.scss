@@ -129,3 +129,31 @@
     cursor: pointer;
   }
 }
+
+.plugin-table {
+  th {
+    height: 42px!important;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 40%;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    text-align: center;
+  }
+
+  th:nth-child(5),
+  td:nth-child(5) {
+    text-align: right;
+  }
+  i.fa-apple, i.fa-windows, i.fa-linux {
+    color: $main-color-light;
+  }
+}
+
+.bw {
+  filter: grayscale(1)!important;
+}

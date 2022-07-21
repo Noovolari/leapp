@@ -106,6 +106,15 @@ html, body {
   .cdk-overlay-container {
     z-index: 1070!important;
   }
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+    background-color: rgba(33, 212, 184, 0.45);
+  }
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+    background-color: #21D4B8;
+  }
+  .allow-cr {
+    white-space: pre-line;
+  }
 }
 
 

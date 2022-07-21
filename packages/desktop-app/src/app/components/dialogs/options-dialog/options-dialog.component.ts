@@ -454,4 +454,18 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     status.active = plugin.metadata.active;
     this.appProviderService.repository.setPluginStatus(plugin.metadata.uniqueName, status);
   }
+
+  getPluginExtraInfo(plugin: IPlugin) {
+    return `Author: ${plugin.metadata.author}
+    Description: ${plugin.metadata.description}
+    Supported Sessions: ${plugin.metadata.supportedSessions.join(",")}`;
+  }
+
+  getSupportedOsIcons(plugin: IPlugin) {
+    const supportedOS = plugin.metadata.supportedOS;
+    const icon1 = `<i class="fa fa-apple ${supportedOS.includes(OperatingSystem.mac) ? "" : "bw"}"></i>`;
+    const icon2 = `<i class="fa fa-windows ${supportedOS.includes(OperatingSystem.windows) ? "" : "bw"}"></i>`;
+    const icon3 = `<i class="fa fa-linux ${supportedOS.includes(OperatingSystem.linux) ? "" : "bw"}"></i>`;
+    return `${icon1}&nbsp;${icon2}&nbsp;${icon3}`;
+  }
 }

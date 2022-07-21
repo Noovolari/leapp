@@ -168,4 +168,20 @@ describe("WorkspaceService", () => {
   test("getIntegrationsById() - retrieve a integrations given its id", () => {
     expect(behaviouralSubjectService.getIntegrationById("3")).toStrictEqual(mockedIntegration3);
   });
+
+  test("setSessions", () => {
+    jest.spyOn(behaviouralSubjectService.sessions$, "next");
+    const sessions = [{ id: 1 }, { id: 2 }, { id: 3 }] as unknown as Session[];
+    behaviouralSubjectService.setSessions(sessions);
+    expect(behaviouralSubjectService.sessions).toEqual(sessions);
+    expect(behaviouralSubjectService.sessions$.next).toHaveBeenCalledWith(sessions);
+  });
+
+  test("setIntegrations", () => {
+    jest.spyOn(behaviouralSubjectService.integrations$, "next");
+    const integrations = [{ id: 1 }, { id: 2 }, { id: 3 }] as unknown as Integration[];
+    behaviouralSubjectService.setIntegrations(integrations);
+    expect(behaviouralSubjectService.integrations).toEqual(integrations);
+    expect(behaviouralSubjectService.integrations$.next).toHaveBeenCalledWith(integrations);
+  });
 });

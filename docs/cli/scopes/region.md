@@ -30,7 +30,7 @@ USAGE
   $ leapp region set-default [--region <value>]
 
 FLAGS
-  --region=<value>  Session Region for session in Leapp, use it for both AWS Region and Azure Location
+  --region=<value>  Session Region for AWS sessions in Leapp
 
 DESCRIPTION
   Change the default region

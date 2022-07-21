@@ -24,8 +24,8 @@ Add a new session
 USAGE
   $ leapp session add [--providerType aws] [--accessKey <value>] [--idpArn <value>] [--idpUrl <value>]
     [--mfaDevice <value>] [--sessionName <value>] [--parentSessionId <value>] [--profileId <value>] [--region <value>]
-    [--roleArn <value>] [--roleSessionName <value>] [--secretKey <value>] [--subscriptionId <value>] [--tenantId
-    <value>] [--sessionType awsIamRoleFederated|awsIamUser|awsIamRoleChained]
+    [--roleArn <value>] [--roleSessionName <value>] [--secretKey <value>] [--sessionType
+    awsIamRoleFederated|awsIamUser|awsIamRoleChained]
 
 FLAGS
   --accessKey=<value>        AWS Access Key ID of the IAM User
@@ -37,13 +37,13 @@ FLAGS
   --profileId=<value>        an AWS named profile ID in Leapp
   --providerType=<option>    Identify the provider for your sessions. Valid types are [aws]
                              <options: aws>
-  --region=<value>           Session Region for session in Leapp, use it for AWS Region 
+  --region=<value>           Session Region for AWS sessions in Leapp
   --roleArn=<value>          AWS IAM Federated Role Arn value, obtain it from your AWS Account
   --roleSessionName=<value>  Optional Alias for the Assumed Role Session name
   --secretKey=<value>        AWS Secret Access Key of the IAM User
   --sessionName=<value>      Session Alias to identify the session in Leapp
-  --sessionType=<option>     Identify the session type. Valid types are [awsIamRoleFederated,
-                             awsIamUser, awsIamRoleChained]
+  --sessionType=<option>     Identify the AWS session type. Valid types are [awsIamRoleFederated, awsIamUser,
+                             awsIamRoleChained]
                              <options: awsIamRoleFederated|awsIamUser|awsIamRoleChained>
 
 DESCRIPTION
@@ -91,7 +91,7 @@ USAGE
   $ leapp session change-region [--sessionId <value>] [--region <value>]
 
 FLAGS
-  --region=<value>     Session Region for session in Leapp, use it for AWS Region
+  --region=<value>     Session Region for AWS sessions in Leapp
   --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
@@ -109,15 +109,16 @@ Provides info about the current active session for a selected profile (if no pro
 
 ```console
 USAGE
-  $ leapp session current [-i] [-p <value>] [-r aws] [-f <value>]
+  $ leapp session current [-i] [-p <value>] [-r aws|azure] [-f <value>]
 
 FLAGS
   -f, --format=<value>     allows formatting data to show
                            - aws -> id alias, accountNumber, roleArn
+                           - azure -> id tenantId, subscriptionId
   -i, --inline
   -p, --profile=<value>    [default: default] aws named profile of which gets info
   -r, --provider=<option>  filters sessions by the cloud provider service
-                           <options: aws>
+                           <options: aws|azure>
 
 DESCRIPTION
   Provides info about the current active session for a selected profile (if no profile is provided it uses default
@@ -259,7 +260,7 @@ USAGE
   $ leapp session start-ssm-session [--sessionId <value>] [--region <value>] [--ssmInstanceId <value>]
 
 FLAGS
-  --region=<value>         Session Region for session in Leapp, use it for AWS Region
+  --region=<value>         Session Region for AWS sessions in Leapp
   --sessionId=<value>      Session Id to identify the session in Leapp, recover it with $leapp session list -x
   --ssmInstanceId=<value>  Instance ID for EC2 instance we want to access with SSM
 

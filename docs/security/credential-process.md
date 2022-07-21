@@ -1,6 +1,6 @@
 ### What is Credential Process?
 
-[Credential Process](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sourcing-external.html) is a configuration option 
+[Credential Process](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sourcing-external.html){: target='_blank'} is a configuration option 
 (in the AWS config file) that instruct the AWS CLI and SDKs to use an external command to generate valid credentials in a specific format. 
 
 It is **a way to generate AWS compatible credentials on the fly**, only when requested by tools that respect the AWS credential chain.
@@ -33,7 +33,7 @@ The **Expiration** field allows the generated credentials to be cached and reuse
 - Ensures your **long-running tasks** to always have valid credentials during their lifecycle.
 - Is **compatible with named-profiles**.
 - Is **a way to make third-party tool compatible with AWS SSO and SAML Federated IAM Principals** even if they don't support them natively.
-- As stated by [this article](https://ben11kehoe.medium.com/never-put-aws-temporary-credentials-in-env-vars-or-credentials-files-theres-a-better-way-25ec45b4d73e) by Ben Kehoe, Credential Process is a good way to avoid cluttering the credential file with temporary credentials.
+- As stated by [this article](https://ben11kehoe.medium.com/never-put-aws-temporary-credentials-in-env-vars-or-credentials-files-theres-a-better-way-25ec45b4d73e){: target='_blank'} by Ben Kehoe, Credential Process is a good way to avoid cluttering the credential file with temporary credentials.
 
 !!! Warning
 

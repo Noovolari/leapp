@@ -6,7 +6,7 @@ After logging in the first time, Leapp will map all your roles and users into Se
 
 !!! Info
 
-    To get started using AWS SSO refer to [this guide](https://docs.aws.amazon.com/singlesignon/latest/userguide/getting-started.html).
+    To get started using AWS SSO refer to [this guide](https://docs.aws.amazon.com/singlesignon/latest/userguide/getting-started.html){: target='_blank'}.
 
 ## Fields
 

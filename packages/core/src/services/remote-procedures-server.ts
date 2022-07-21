@@ -52,9 +52,9 @@ export class RemoteProceduresServer {
       ipc.server.on("message", (data: RpcRequest, ipcSocket: Socket) => {
         const emitFunction = (socket: Socket, event: string, value?: any) => ipc.server.emit(socket, event, value);
 
-        const rpcFunction = this.rpcMethods.get(data.method).bind(this);
+        const rpcFunction = this.rpcMethods.get(data.method);
         if (rpcFunction) {
-          rpcFunction(emitFunction, ipcSocket, data);
+          rpcFunction.call(this, emitFunction, ipcSocket, data);
         } else {
           ipcSocket.destroy();
         }

@@ -40,7 +40,8 @@ export class RetroCompatibilityService {
     return workspaceParsed.defaultWorkspace === "default";
   }
 
-  private async adaptOldWorkspaceFile(): Promise<Workspace> {
+  private async adaptOldWorkspaceFile(): Promise<void> {
+    /*
     // We need to adapt Sessions, IdpUrls, AwsSso Config, Proxy Config
     const workspace: any = {
       _sessions: [],
@@ -77,15 +78,15 @@ export class RetroCompatibilityService {
       workspace._defaultRegion = oldWorkspace.workspaces[0].defaultRegion;
       workspace._defaultLocation = oldWorkspace.workspaces[0].defaultLocation;
 
-      await this.adaptAwsSsoConfig(oldWorkspace, workspace);
-      //await this.adaptSessions(oldWorkspace, workspace);
+      // await this.adaptAwsSsoConfig(oldWorkspace, workspace);
+      // await this.adaptSessions(oldWorkspace, workspace);
       // Persist adapted workspace data
       this.persistsTemp(workspace);
       // Apply sessions to behaviour subject
       this.behaviouralSubjectService.sessions = workspace._sessions;
-    }
+    }*/
   }
-
+  /*
   private async adaptAwsSsoConfig(oldWorkspace: any, workspace: any): Promise<void> {
     const sessions = oldWorkspace.workspaces[0].sessions;
     // check if we have at least one SSO sessions
@@ -107,6 +108,7 @@ export class RetroCompatibilityService {
         } catch (err) {
           // we need all or nothing, otherwise it means that configuration is incomplete so its better
           // to force the user to redo the process on the new fresh workspace
+          console.log(err);
         }
 
         workspace.awsSsoConfiguration = {
@@ -119,7 +121,7 @@ export class RetroCompatibilityService {
       }
     }
   }
-
+  */
   private isIntegrationPatchNecessary(): boolean {
     const workspaceParsed = this.getWorkspace();
     // check for new integration array if present or not
@@ -179,7 +181,9 @@ export class RetroCompatibilityService {
             `aws-sso-integration-access-token-${workspace.awsSsoIntegrations[0].id}`,
             accessToken
           );
-        } catch (_) {}
+        } catch (_) {
+          console.log("no need to save access token");
+        }
       }
 
       for (let i = 0; i < workspace.sessions.length; i++) {
@@ -204,7 +208,7 @@ export class RetroCompatibilityService {
       return;
     }
 
-    workspace._workspaceVersion = "1";
+    workspace._workspaceVersion = 1;
     const awsSsoIntegrations = workspace._awsSsoIntegrations;
     const newAwsSsoIntegrations: AwsSsoIntegration[] = [];
     if (awsSsoIntegrations && awsSsoIntegrations.length > 0) {
@@ -262,216 +266,3 @@ export class RetroCompatibilityService {
     this.fileService.writeFileSync(this.lockFilePath, this.fileService.encryptText(serialize(workspace)));
   }
 }
-
-// private static createNewAwsFederatedOrIamRoleChainedSession(session: any, workspace: any) {
-//   if (!session.account.parent) {
-//     // Federated
-//     const federatedSession = new AwsIamRoleFederatedSession(
-//       session.account.accountName,
-//       session.account.region,
-//       session.account.idpUrl,
-//       session.account.idpArn,
-//       session.account.role.roleArn,
-//       workspace._profiles[0].id
-//     );
-//     federatedSession.sessionId = session.id;
-//
-//     workspace._sessions.push(federatedSession);
-//   } else {
-//     // IamRoleChained
-//     const iamRoleChainedSession = new AwsIamRoleChainedSession(
-//       session.account.accountName,
-//       session.account.region,
-//       session.account.role.roleArn,
-//       workspace.profiles[0].id,
-//       session.account.parent
-//     );
-//     iamRoleChainedSession.sessionId = session.id;
-//
-//     workspace._sessions.push(iamRoleChainedSession);
-//   }
-// }
-
-// private static createNewAwsSingleSignOnSession(session: any, workspace: any) {
-//   const ssoSession = new AwsSsoRoleSession(
-//     session.account.accountName,
-//     session.account.region,
-//     `arn:aws:iam::${session.account.accountNumber}:role/${session.account.role.name}`,
-//     workspace._profiles[0].id,
-//     undefined,
-//     session.account.email
-//   );
-//   ssoSession.sessionId = session.id;
-//   workspace._sessions.push(ssoSession);
-// }
-
-// private static createNewAzureSession(session: any, workspace: any) {
-//   const azureSession = new AzureSession(
-//     session.account.accountName,
-//     session.account.region,
-//     session.account.subscriptionId,
-//     session.account.tenantId,
-//     null
-//   );
-//   azureSession.sessionId = session.id;
-//   workspace._sessions.push(azureSession);
-// }
-
-// private static createNewAwsFederatedOrIamRoleChainedSessionNew(session: any, workspace: any) {
-//   if (!(session as AwsIamRoleChainedSession).parentSessionId) {
-//     // Federated
-//     const federatedSession = new AwsIamRoleFederatedSession(
-//       (session as AwsIamRoleFederatedSession).sessionName,
-//       (session as AwsIamRoleFederatedSession).region,
-//       (session as AwsIamRoleFederatedSession).idpUrlId,
-//       (session as AwsIamRoleFederatedSession).idpArn,
-//       (session as AwsIamRoleFederatedSession).roleArn,
-//       workspace._profiles[0].id
-//     );
-//     federatedSession.sessionId = session.sessionId;
-//
-//     workspace._sessions.push(federatedSession);
-//   } else {
-//     // IamRoleChained
-//     const iamRoleChainedSession = new AwsIamRoleChainedSession(
-//       (session as AwsIamRoleChainedSession).sessionName,
-//       (session as AwsIamRoleChainedSession).region,
-//       (session as AwsIamRoleChainedSession).roleArn,
-//       workspace.profiles[0].id,
-//       (session as AwsIamRoleChainedSession).parentSessionId
-//     );
-//     iamRoleChainedSession.sessionId = session.id;
-//
-//     workspace._sessions.push(iamRoleChainedSession);
-//   }
-// }
-
-// private static createNewAwsSingleSignOnSessionNew(session: any, workspace: any) {
-//   const ssoSession = new AwsSsoRoleSession(
-//     (session as AwsSsoRoleSession).sessionName,
-//     (session as AwsSsoRoleSession).region,
-//     (session as AwsSsoRoleSession).roleArn,
-//     workspace._profiles[0].id,
-//     undefined,
-//     (session as AwsSsoRoleSession).email
-//   );
-//   ssoSession.sessionId = session.sessionId;
-//   workspace._sessions.push(ssoSession);
-// }
-
-// private static createNewAzureSessionNew(session: any, workspace: any) {
-//   const azureSession = new AzureSession(
-//     (session as AzureSession).sessionName,
-//     (session as AzureSession).region,
-//     (session as AzureSession).subscriptionId,
-//     (session as AzureSession).tenantId,
-//     null
-//   );
-//   azureSession.sessionId = session.sessionId;
-//   workspace._sessions.push(azureSession);
-// }
-
-// private async createNewAwsIamUserSession(session: any, workspace: Workspace) {
-//   const iamUserSession = new AwsIamUserSession(
-//     session.account.accountName,
-//     session.account.region,
-//     workspace.profiles[0].id,
-//     session.account.mfaDevice
-//   );
-//   iamUserSession.sessionId = session.id;
-//
-//   const accessKey = await this.keyChainService.getSecret(this.appName, `${session.account.accountName}___${session.account.user}___accessKey`);
-//
-//   const secretKey = await this.keyChainService.getSecret(this.appName, `${session.account.accountName}___${session.account.user}___secretKey`);
-//
-//   await this.keyChainService.saveSecret(this.appName, `${session.id}-iam-user-aws-session-access-key-id`, accessKey);
-//   await this.keyChainService.saveSecret(this.appName, `${session.id}-iam-user-aws-session-secret-access-key`, secretKey);
-//
-//   workspace.sessions.push(iamUserSession);
-// }
-
-// private async createNewAwsIamUserSessionNew(session: any, workspace: any) {
-//   const iamUserSession = new AwsIamUserSession(
-//     (session as AwsIamUserSession).sessionName,
-//     (session as AwsIamUserSession).region,
-//     workspace.profiles[0].id,
-//     (session as AwsIamUserSession).mfaDevice
-//   );
-//
-//   console.log(workspace, workspace.profiles[0].id);
-//
-//   iamUserSession.sessionId = session.sessionId;
-//
-//   workspace.sessions.push(iamUserSession);
-// }
-
-// private async adaptSessions(oldWorkspace: any, workspace: any): Promise<void> {
-//   const sessions = oldWorkspace.workspaces[0].sessions;
-//
-//   // Loop through sessions and generate data
-//   for (let i = 0; i < sessions.length; i++) {
-//     const session = sessions[i];
-//     // Get sessions type
-//     const sessionType = session.account.type;
-//     switch (sessionType) {
-//       case "AWS":
-//         RetroCompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace);
-//         break;
-//       case "aws":
-//         RetroCompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace);
-//         break;
-//       case "AWS_TRUSTER":
-//         RetroCompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace);
-//         break;
-//       case "aws_truster":
-//         RetroCompatibilityService.createNewAwsFederatedOrIamRoleChainedSession(session, workspace);
-//         break;
-//       case "AWS_PLAIN_USER":
-//         await this.createNewAwsIamUserSession(session, workspace);
-//         break;
-//       case "aws_plain_user":
-//         await this.createNewAwsIamUserSession(session, workspace);
-//         break;
-//       case "AWS_SSO":
-//         RetroCompatibilityService.createNewAwsSingleSignOnSession(session, workspace);
-//         break;
-//       case "aws_sso":
-//         RetroCompatibilityService.createNewAwsSingleSignOnSession(session, workspace);
-//         break;
-//       case "AZURE":
-//         RetroCompatibilityService.createNewAzureSession(session, workspace);
-//         break;
-//       case "azure":
-//         RetroCompatibilityService.createNewAzureSession(session, workspace);
-//         break;
-//     }
-//   }
-// }
-
-// private async adaptNewSessions(oldWorkspace: any, workspace: any): Promise<void> {
-//   const sessions = oldWorkspace._sessions;
-//
-//   // Loop through sessions and generate data
-//   for (let i = 0; i < sessions.length; i++) {
-//     const session = sessions[i];
-//     // Get sessions type
-//     const sessionType = session.type;
-//     switch (sessionType) {
-//       case SessionType.awsIamRoleFederated:
-//         RetroCompatibilityService.createNewAwsFederatedOrIamRoleChainedSessionNew(session, workspace);
-//         break;
-//       case SessionType.awsIamRoleChained:
-//         RetroCompatibilityService.createNewAwsFederatedOrIamRoleChainedSessionNew(session, workspace);
-//         break;
-//       case SessionType.awsIamUser:
-//         await this.createNewAwsIamUserSessionNew(session, workspace);
-//         break;
-//       case SessionType.awsSsoRole:
-//         RetroCompatibilityService.createNewAwsSingleSignOnSessionNew(session, workspace);
-//         break;
-//       case SessionType.azure:
-//         RetroCompatibilityService.createNewAzureSessionNew(session, workspace);
-//         break;
-//     }
-//   }
-// }

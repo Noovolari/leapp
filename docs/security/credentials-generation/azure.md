@@ -5,20 +5,20 @@ Following is the procedure used to generate a set of credentials.
 
 !!! info
     
-    In Windows OS the msal_token_cache is persisted on an encrypted file with [**dpapi**](https://docs.microsoft.com/en-us/previous-versions/ms995355(v%3Dmsdn.10)) API.<br>
-    [Starting from release 2.30](https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli) of Azure CLI, credentials are no more persisted in the original accessToken.json
+    In Windows OS the msal_token_cache is persisted on an encrypted file with [**dpapi**](https://docs.microsoft.com/en-us/previous-versions/ms995355(v%3Dmsdn.10)){: target='_blank'} API.<br>
+    [Starting from release 2.30](https://docs.microsoft.com/en-us/cli/azure/msal-based-azure-cli){: target='_blank'} of Azure CLI, credentials are no more persisted in the original accessToken.json
 
 Azure Users profile info is saved in the **azureProfile.json** file inside the **.azure** directory.
 
 ### Access strategy - login integration
 
-Before accessing Azure sessions you now have to [create](../../configuring-integration/configure-azure-integration.md) an Azure integration.
+Before accessing Azure sessions you now have to [create](../../configuring-integration/configure-azure-integration.md){: target='_blank'} an Azure integration.
 After that, these are the steps required to login and then retrieve Azure sessions.
 
 1. *msal_token_cache* and *azureProfile.json* files are cleaned for security reason.
 2. We execute `az login --tenantId <TENANTID>`. We do this to obtain the updated user profile and the refresh token (associated to this integration).
 3. We extract all the Azure subscriptions associated with the integration and for each one we map a Leapp Azure session.
-4. We extract the *refresh token*, *account*, and *profile* information from *msal_token_cache and azureProfile.json* and persist them in the [System's vault](../system-vault.md).
+4. We extract the *refresh token*, *account*, and *profile* information from *msal_token_cache and azureProfile.json* and persist them in the [System's vault](../system-vault.md){: target='_blank'}.
 5. We also remove the previous information from the original files, to increase security and avoid external tampering.
 
 ### Access strategy - start session
@@ -42,7 +42,7 @@ To start an Azure session we follow these steps.
 
 !!! info
 
-    - The **refresh token** is a long term credential that potentially lasts for **90 days**. The **access token** is a short term credential and last for **70 minutes**. [Source](https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens)
+    - The **refresh token** is a long term credential that potentially lasts for **90 days**. The **access token** is a short term credential and last for **70 minutes**. [Source](https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens){: target='_blank'}
 
 ### Access strategy - rotate session
 

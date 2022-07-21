@@ -6,7 +6,7 @@ These subscriptions include Microsoft Azure, Microsoft Intune, or Microsoft 365.
 
 An Azure tenant represents a single organization and can have multiple subscriptions.
 
-Please refer to [this](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-whatis) document for more information.
+Please refer to [this](https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-whatis){: target='_blank'} document for more information.
 
 !!! Warning
 

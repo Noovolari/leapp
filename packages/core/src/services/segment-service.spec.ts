@@ -52,4 +52,25 @@ describe("SegmentService", () => {
     segmentService.removeSegment(segment2);
     expect(segmentService.list()).toStrictEqual([{ name: "segment1", filterGroup: null }]);
   });
+
+  test("setSegments - should add segments to the list of segments", () => {
+    const segment1 = { name: "segment1", filterGroup: null };
+    const segment2 = { name: "segment2", filterGroup: null };
+    const segment3 = { name: "segment3", filterGroup: null };
+
+    const segments = [segment1, segment2, segment3];
+    let workspaceSegments;
+
+    const repositoryMock = new Repository(nativeService as any, fileService);
+    jest.spyOn(repositoryMock, "setSegments").mockImplementation((_segments) => {
+      workspaceSegments = _segments;
+    });
+    jest.spyOn(repositoryMock, "getSegments").mockImplementation(() => workspaceSegments);
+    jest.spyOn(repositoryMock, "getSegment").mockImplementation((name) => workspaceSegments.find((ws) => ws.name === name));
+
+    const segmentService = new SegmentService(repositoryMock);
+    segmentService.setSegments(segments);
+    expect(repositoryMock.setSegments).toHaveBeenCalledWith(segments);
+    expect(segmentService.getSegmentByName("segment2")).toStrictEqual(segment2);
+  });
 });

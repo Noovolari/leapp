@@ -39,7 +39,7 @@ describe("AddSession", () => {
 
     command = getTestCommand(cliProviderService, null, ["--providerType", "fake"]);
     command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Expected --providerType=fake to be one of: aws, azure");
+    await expect(command.run()).rejects.toThrow("Expected --providerType=fake to be one of: aws");
 
     command = getTestCommand(cliProviderService, null, [
       "--providerType",

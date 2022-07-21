@@ -45,6 +45,16 @@ describe("AwsSamlAssertionExtractionService", () => {
     expect(awsSamlResponse).toBe("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
   });
 
+  test("extractAwsSamlResponse - 2", () => {
+    const responseHookDetails = {
+      uploadData: [{ bytes: "SAMLResponse=ABCDEFGHIJKLMNOPQRSTUVWXYZ" }],
+    };
+
+    const service = new AwsSamlAssertionExtractionService();
+    const awsSamlResponse = service.extractAwsSamlResponse(responseHookDetails as any);
+    expect(awsSamlResponse).toBe("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  });
+
   test("extractAwsSamlResponse - error", () => {
     const responseHookDetails = {
       uploadData: [

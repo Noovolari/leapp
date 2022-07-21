@@ -109,7 +109,7 @@ export abstract class AwsSessionService extends SessionService {
     }
   }
 
-  async applyConfigProfileCommand(sessionId: string): Promise<any> {
+  async applyConfigProfileCommand(sessionId: string): Promise<void> {
     try {
       const session = this.repository.getSessionById(sessionId) as any;
       const command = `leapp session generate ${sessionId}`;
@@ -117,12 +117,11 @@ export abstract class AwsSessionService extends SessionService {
       const profile = `profile ${profileName}`;
       const credentialProcess: { [key: string]: any } = {};
       credentialProcess[profile] = {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        credential_process: command,
+        ["credential_process"]: command,
         region: session.region,
       };
 
-      return await this.fileService.iniWriteSync(this.awsCoreService.awsConfigPath(), credentialProcess);
+      await this.fileService.iniWriteSync(this.awsCoreService.awsConfigPath(), credentialProcess);
     } catch (error) {
       this.sessionError(sessionId, error);
     }
@@ -134,7 +133,7 @@ export abstract class AwsSessionService extends SessionService {
     const profile = `profile ${profileName}`;
     const credentialProcess = await this.fileService.iniParseSync(this.awsCoreService.awsConfigPath());
     delete credentialProcess[profile];
-    return await this.fileService.replaceWriteSync(this.awsCoreService.awsConfigPath(), credentialProcess);
+    await this.fileService.replaceWriteSync(this.awsCoreService.awsConfigPath(), credentialProcess);
   }
 
   private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {

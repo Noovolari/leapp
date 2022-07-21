@@ -1,8 +1,8 @@
 This section provides an overview of Leapp's integrations, useful to extend the functionality of Leapp to 3rd party services.
 
-Integrations help manage access and identities on your preferred service of choice and use Leapp on your daily activities by automatically mapping them into [Sessions](../sessions).
+Integrations help manage access and identities on your preferred service of choice and use Leapp on your daily activities by automatically mapping them into [Sessions](../sessions/).
 
-Integrations help manage access and identities on your service of choice while using Leapp during your daily activities. They are automatically mapped into [Sessions](../sessions).
+Integrations help manage access and identities on your service of choice while using Leapp during your daily activities. They are automatically mapped into [Sessions](../sessions/).
 
 ## Actions
 
@@ -22,4 +22,4 @@ Integrations have four main actions available: **Create**, **Delete**, **Sync**,
 | AWS SSO     | :white_check_mark: |
 | Okta        | Coming Soon |
 | OneLogin    | Coming Soon |
-| AzureAD     | Coming Soon |
+| AzureAD     | :white_check_mark: |

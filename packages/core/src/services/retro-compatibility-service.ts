@@ -23,105 +23,12 @@ export class RetroCompatibilityService {
 
   async applyWorkspaceMigrations(): Promise<void> {
     if (this.fileService.existsSync(this.lockFilePath)) {
-      if (this.isRetroPatchNecessary()) {
-        await this.adaptOldWorkspaceFile();
-      }
-      if (this.isIntegrationPatchNecessary()) {
-        await this.adaptIntegrationPatch();
-      }
+      await this.migration0();
       this.migration1();
+      this.migration2();
     }
   }
 
-  private isRetroPatchNecessary(): boolean {
-    const workspaceParsed = this.getWorkspace();
-    // use a never more used property to check if workspace has changed to new version
-    // also check for new integration array if present or not
-    return workspaceParsed.defaultWorkspace === "default";
-  }
-
-  private async adaptOldWorkspaceFile(): Promise<void> {
-    /*
-    // We need to adapt Sessions, IdpUrls, AwsSso Config, Proxy Config
-    const workspace: any = {
-      _sessions: [],
-      _defaultRegion: constants.defaultRegion,
-      _defaultLocation: constants.defaultLocation,
-      _idpUrls: [],
-      _profiles: [{ id: uuid.v4(), name: constants.defaultAwsProfileName }],
-      _awsSsoIntegrations: [],
-      _azureIntegrations: [],
-      _proxyConfiguration: {
-        proxyProtocol: "https",
-        proxyUrl: undefined,
-        proxyPort: "8080",
-        username: undefined,
-        password: undefined,
-      },
-    };
-    const oldWorkspace = this.getWorkspace();
-
-    // if there are no sessions, remove it, is useless, and let Leapp generate a fresh one
-    if (oldWorkspace.workspaces.length === 0 || oldWorkspace.workspaces[0].sessions.length === 0) {
-      // Just persist a fresh workspace data
-      const freshWorkspace = new Workspace();
-      this.persists(freshWorkspace);
-      // Apply sessions to behaviour subject
-      this.behaviouralSubjectService.sessions = freshWorkspace.sessions;
-      return freshWorkspace;
-    } else {
-      // Adapt idp urls
-      workspace._idpUrls = oldWorkspace.workspaces[0].idpUrl;
-      // Adapt proxy config
-      workspace._proxyConfiguration = oldWorkspace.workspaces[0].proxyConfiguration;
-      // Adapt general properties
-      workspace._defaultRegion = oldWorkspace.workspaces[0].defaultRegion;
-      workspace._defaultLocation = oldWorkspace.workspaces[0].defaultLocation;
-
-      // await this.adaptAwsSsoConfig(oldWorkspace, workspace);
-      // await this.adaptSessions(oldWorkspace, workspace);
-      // Persist adapted workspace data
-      this.persistsTemp(workspace);
-      // Apply sessions to behaviour subject
-      this.behaviouralSubjectService.sessions = workspace._sessions;
-    }*/
-  }
-  /*
-  private async adaptAwsSsoConfig(oldWorkspace: any, workspace: any): Promise<void> {
-    const sessions = oldWorkspace.workspaces[0].sessions;
-    // check if we have at least one SSO sessions
-    // otherwise standard generated properties are just fine
-    for (let i = 0; i < sessions.length; i++) {
-      const session = sessions[i];
-      // We have changed the enum type so we must check it manually
-      if (session.account.type === "aws_sso" || session.account.type === "AWS_SSO") {
-        // OK, let's check if we have data saved in the keychain
-        let region;
-        let portalUrl;
-        let expirationTime;
-        let browserOpening;
-        try {
-          region = await this.keyChainService.getSecret(constants.appName, "AWS_SSO_REGION");
-          portalUrl = await this.keyChainService.getSecret(constants.appName, "AWS_SSO_PORTAL_URL");
-          expirationTime = await this.keyChainService.getSecret(constants.appName, "AWS_SSO_EXPIRATION_TIME");
-          browserOpening = constants.inApp.toString();
-        } catch (err) {
-          // we need all or nothing, otherwise it means that configuration is incomplete so its better
-          // to force the user to redo the process on the new fresh workspace
-          console.log(err);
-        }
-
-        workspace.awsSsoConfiguration = {
-          region,
-          portalUrl,
-          expirationTime,
-          browserOpening,
-        };
-        break;
-      }
-    }
-  }
-  */
   private isIntegrationPatchNecessary(): boolean {
     const workspaceParsed = this.getWorkspace();
     // check for new integration array if present or not
@@ -201,14 +108,27 @@ export class RetroCompatibilityService {
     return this.fileService.homeDir() + "/" + constants.lockFileDestination;
   }
 
+  private async migration0() {
+    if (this.isIntegrationPatchNecessary()) {
+      await this.adaptIntegrationPatch();
+    }
+  }
+
+  private checkMigration(workspace: any, previousVersion: number, currentVersion: number): boolean {
+    const isMigrationNeeded = workspace._workspaceVersion === previousVersion;
+    if (!isMigrationNeeded) {
+      return false;
+    }
+    workspace._workspaceVersion = currentVersion;
+    return true;
+  }
+
   private migration1(): void {
     const workspace = this.getWorkspace();
-    const isTheFirstMigration = workspace._workspaceVersion === undefined;
-    if (!isTheFirstMigration) {
+    if (!this.checkMigration(workspace, undefined, 1)) {
       return;
     }
 
-    workspace._workspaceVersion = 1;
     const awsSsoIntegrations = workspace._awsSsoIntegrations;
     const newAwsSsoIntegrations: AwsSsoIntegration[] = [];
     if (awsSsoIntegrations && awsSsoIntegrations.length > 0) {
@@ -253,13 +173,20 @@ export class RetroCompatibilityService {
     this.behaviouralSubjectService.setIntegrations([...updatedAwsSsoIntegrations, ...updatedAzureIntegrations]);
   }
 
+  private migration2(): void {
+    const workspace = this.getWorkspace();
+    if (!this.checkMigration(workspace, 1, 2)) {
+      return;
+    }
+
+    workspace._pluginsStatus = [];
+    this.persists(workspace);
+    this.repository.reloadWorkspace();
+  }
+
   private getWorkspace(): any {
     const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.lockFilePath));
     return JSON.parse(workspaceJSON);
-  }
-
-  private persistsTemp(workspace: any): void {
-    this.fileService.writeFileSync(this.lockFilePath, this.fileService.encryptText(JSON.stringify(workspace)));
   }
 
   private persists(workspace: Workspace): void {

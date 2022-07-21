@@ -49,6 +49,7 @@ export const constants = {
   // Contains Env for SSM on macOS
   ssmSourceFileDestination: ".Leapp/ssm-env",
 
+  npmRequiredPluginKeyword: "leapp-plugin",
   skipPluginValidation: true,
   pluginPortalUrl: "https://vv0r45fadf.execute-api.eu-west-1.amazonaws.com/api/api/v1/plugins",
   // Public Key for signature

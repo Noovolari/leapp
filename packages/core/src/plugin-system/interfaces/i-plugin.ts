@@ -1,6 +1,7 @@
 import { Session } from "../../models/session";
 import { SessionType } from "../../models/session-type";
 import { PluginCoreService } from "../plugin-core-service";
+import { OperatingSystem } from "../../models/operating-system";
 
 export enum TemplateFormObject {
   inputText,
@@ -29,15 +30,19 @@ export interface IPluginOutputObject {
   data: string;
 }
 
-export interface IPlugin {
-  name: string;
+export interface IPluginMetadata {
+  uniqueName: string;
   description: string;
   author: string;
   url: string;
-  tags: string[];
-  supportedOS: string[];
-  supportedSessions?: SessionType[];
+  keywords: string[];
   active: boolean;
+  supportedOS: OperatingSystem[];
+  supportedSessions?: SessionType[];
+}
+
+export interface IPlugin {
+  readonly metadata: IPluginMetadata;
 
   templateStructure: {
     form: IPluginFormObject[];

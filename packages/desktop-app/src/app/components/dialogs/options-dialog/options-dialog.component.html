@@ -30,7 +30,7 @@
         </div>
 
 
-        <ng-container *ngIf="appService.detectOs() === eConstants.mac">
+        <ng-container *ngIf="appService.detectOs() === eOperatingSystem.mac">
           <h2>MacOS Terminal</h2>
 
           <div class="form-container">
@@ -250,11 +250,12 @@
               <tbody>
               <ng-container *ngFor="let plugin of pluginList">
                 <tr>
-                  <td>{{plugin.name}}</td>
-                  <td>{{plugin.author}}</td>
+                  <td>{{plugin.metadata.name}}</td>
+                  <td>{{plugin.metadata.author}}</td>
                   <td>
-                    <button class="icon-button inline" type="button" (click)="togglePluginActivation(plugin);"><i class="moon-Add"></i>
-                    </button>
+                    <mat-slide-toggle class="inline" color="#21B4D8" (toggleChange)="togglePluginActivation(plugin)"
+                                      [checked]="plugin.metadata.active">Active
+                    </mat-slide-toggle>
                   </td>
                 </tr>
               </ng-container>

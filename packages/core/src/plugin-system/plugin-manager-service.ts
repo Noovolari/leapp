@@ -1,7 +1,10 @@
-import { IPlugin } from "./interfaces/i-plugin";
+import { IPlugin, IPluginMetadata } from "./interfaces/i-plugin";
 import { INativeService } from "../interfaces/i-native-service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "../services/log-service";
 import { constants } from "../models/constants";
+import { Repository } from "../services/repository";
+import { SessionType } from "../models/session-type";
+import { OperatingSystem } from "../models/operating-system";
 
 export class PluginManagerService {
   private _plugins: IPlugin[];
@@ -9,7 +12,7 @@ export class PluginManagerService {
   private _hashElement;
   private _pluginDir = "plugins";
 
-  constructor(private nativeService: INativeService, private logService: LogService, private http: any) {
+  constructor(private nativeService: INativeService, private logService: LogService, private repository: Repository, private http: any) {
     this._plugins = [];
     this._requireModule = nativeService.requireModule;
     this._hashElement = nativeService.hashElement.hashElement;
@@ -30,7 +33,6 @@ export class PluginManagerService {
   }
 
   async loadFromPluginDir(): Promise<void> {
-    // TODO: check mandatory fields in package.json (name, author, tags, etc.)
     this._plugins = [];
     const options = {
       folders: { include: ["*.*"] },
@@ -49,17 +51,14 @@ export class PluginManagerService {
         console.log(pluginFilePath);
         console.log("Creating a hash over the current folder");
 
-        let hash;
-        let isPluginValid = true;
-        let packageJson = null;
-
         // VALIDATION PROCESS
-        const result = await this.validatePlugin(hash, pluginFilePath, options, packageJson, pluginFilePaths, i, isPluginValid);
-        packageJson = result.packageJson;
-        isPluginValid = result.isPluginValid;
+        const { packageJson, isPluginValid } = await this.validatePlugin(pluginFilePath, options, pluginFilePaths, i);
+        const metadata = this.extractMetadata(packageJson);
 
         // CHECK VALIDATION
-        if (!isPluginValid && !constants.skipPluginValidation) {
+        const isSignatureInvalid = !isPluginValid && !constants.skipPluginValidation;
+        if (!metadata || isSignatureInvalid) {
+          // TODO: log and notify user with a warning!
           continue;
         }
 
@@ -70,7 +69,8 @@ export class PluginManagerService {
             console.log(pluginModule);
             this.logService.log(new LoggedEntry(`loading plugin: ${JSON.stringify(pluginModule)}`, this, LogLevel.info, false));
 
-            const plugin = new pluginModule[JSON.parse(packageJson).entryClass]();
+            const plugin = new pluginModule[JSON.parse(packageJson).entryClass]() as any;
+            plugin.metadata = metadata;
             this._plugins.push(plugin);
           }
         } catch (error) {
@@ -86,7 +86,7 @@ export class PluginManagerService {
   }
 
   unloadSinglePlugin(name: string): void {
-    this._plugins.splice(this._plugins.map((p) => p.name).indexOf(name), 1);
+    this._plugins.splice(this._plugins.map((p) => p.metadata.uniqueName).indexOf(name), 1);
   }
 
   testRsaSignToBase64(message: string): string {
@@ -157,18 +157,45 @@ export class PluginManagerService {
     return signature.toString("Base64");
   }
 
+  private extractMetadata(packageJson: any): IPluginMetadata {
+    const uniqueName = packageJson.name;
+    const author = packageJson.author?.name ? packageJson.author.name : packageJson.author;
+    const description = packageJson.description;
+    const keywords = packageJson.keywords as string[];
+    const leappPluginConfig = packageJson.leappPlugin;
+    const supportedSessions = leappPluginConfig?.supportedSessions || [SessionType.anytype];
+    const supportedOS = leappPluginConfig?.supportedOS || [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows];
+    const url = leappPluginConfig.url;
+
+    const areKeywordsInvalid = !keywords || keywords.length === 0 || !keywords.includes(constants.npmRequiredPluginKeyword);
+    if (!uniqueName || !author || !description || areKeywordsInvalid || supportedSessions.length === 0 || supportedOS.length === 0) {
+      return undefined;
+    }
+
+    const metadata: IPluginMetadata = {
+      active: this.repository.getPluginStatus(uniqueName).active,
+      author,
+      description,
+      supportedOS,
+      supportedSessions,
+      keywords,
+      uniqueName,
+      url,
+    };
+    return metadata;
+  }
+
   private async validatePlugin(
-    hash,
     pluginFilePath,
     options: { folders: { include: string[] }; files: { exclude: string[] } },
-    packageJson,
     pluginFilePaths,
-    i: number,
-    isPluginValid: boolean
+    i: number
   ) {
+    let isPluginValid = true;
+    let packageJsonContent: string;
     try {
       // Hashing file and directory
-      hash = await this._hashElement(pluginFilePath, options);
+      const hash = await this._hashElement(pluginFilePath, options);
       if (hash.children) {
         // If it has children then it is a directory
         console.log(hash);
@@ -177,7 +204,7 @@ export class PluginManagerService {
           this.nativeService.fs.existsSync(pluginFilePath + "/package.json") &&
           this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")
         ) {
-          packageJson = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
+          packageJsonContent = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
           // Verify signature to enable plugin
           const data = await this.http.get(constants.pluginPortalUrl + `/${pluginFilePaths[i]}`, { responseType: "json" }).toPromise();
           if (data.status !== "active") {
@@ -186,7 +213,7 @@ export class PluginManagerService {
             isPluginValid = false;
           }
 
-          const verifyMessage = packageJson + hash.hash;
+          const verifyMessage = packageJsonContent + hash.hash;
           console.log("verifyMessage: ", verifyMessage);
           console.log("data: ", data);
           const signatureVerified = this.rsaVerifySignatureFromBase64(constants.publicKey, verifyMessage, data.signature);
@@ -207,7 +234,7 @@ export class PluginManagerService {
       console.error("hashing failed or verification failed:", error);
       this.logService.log(new LoggedException(`hashing failed or verification failed: ${error.toString()}`, this, LogLevel.warn, false));
     }
-    return { packageJson, isPluginValid };
+    return { packageJson: JSON.parse(packageJsonContent), isPluginValid };
   }
 
   private rsaVerifySignatureFromBase64(publicKey, message, signatureBase64): boolean {

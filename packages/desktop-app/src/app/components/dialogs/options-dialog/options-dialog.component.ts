@@ -16,6 +16,7 @@ import { SessionService } from "@noovolari/leapp-core/services/session/session-s
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { HttpClient } from "@angular/common/http";
 import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 
 @Component({
   selector: "app-options-dialog",
@@ -31,6 +32,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   tabGroup: MatTabGroup;
 
   eConstants = constants;
+  eOperatingSystem = OperatingSystem;
 
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
@@ -446,8 +448,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     }
   }
 
-  // TODO: persist the activation state
   togglePluginActivation(plugin: IPlugin): void {
-    plugin.active = !plugin.active;
+    plugin.metadata.active = !plugin.metadata.active;
+    const status = this.appProviderService.repository.getPluginStatus(plugin.metadata.uniqueName);
+    status.active = plugin.metadata.active;
+    this.appProviderService.repository.setPluginStatus(plugin.metadata.uniqueName, status);
   }
 }

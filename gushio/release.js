@@ -10,6 +10,8 @@ const releaseFunctions = {
   "desktop-app": releaseDesktopApp
 };
 
+const FgGreen = "\x1b[32m"
+
 module.exports = {
   cli: {
     name: "leapp-release",
@@ -76,14 +78,14 @@ async function updatePackageJsonVersion(packageName, version) {
 }
 
 function releaseCoreRollback(commitId, version) {
-  console.log(`%c removing tag core-v${version}...`, "color: #bada55");
+  console.log(FgGreen, `removing tag core-v${version}...`);
   result = shellJs.exec(`git tag -d core-v${version}`);
   if (result.code !== 0) {
     throw new Error(result.stderr)
   }
 
   if(commitId !== undefined) {
-    console.log("%c reset codebase to previous commit...", "color: #bada55");
+    console.log(FgGreen, "reset codebase to previous commit...");
     result = shellJs.exec(`git reset --hard ${commitId}`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
@@ -95,7 +97,7 @@ async function releaseCore(version) {
   let commitId;
 
   try {
-    console.log("%c updating Leapp Core's package.json version...", "color: #bada55");
+    console.log(FgGreen, "updating Leapp Core's package.json version...");
     const packageName = "core";
     await updatePackageJsonVersion(packageName, version);
     let result = shellJs.exec("git add .");
@@ -103,19 +105,19 @@ async function releaseCore(version) {
       throw new Error(result.stderr)
     }
 
-    console.log("%c retrieving current commit id", "color: #bada55");
+    console.log(FgGreen, "retrieving current commit id");
     commitId = shellJs.exec(`git rev-parse HEAD`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
     }
 
-    console.log("%c creating commit with updated package.json version...", "color: #bada55");
+    console.log(FgGreen, "creating commit with updated package.json version...");
     result = shellJs.exec(`git commit -m "chore(release): release core v${version}"`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
     }
 
-    console.log(`%c creating tag core-v${version}...`, "color: #bada55");
+    console.log(FgGreen, `creating tag core-v${version}...`);
     result = shellJs.exec(`git tag -a core-v${version} -m "release core v${version}"`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
@@ -129,7 +131,7 @@ async function releaseCore(version) {
     const wantToPush = await prompt.run();
 
     if(wantToPush) {
-      console.log("%c pushing commit...", "color: #bada55");
+      console.log(FgGreen, "pushing commit...");
       throw new Error("test");
       result = shellJs.exec(`git push --follow-tags`);
       if (result.code !== 0) {
@@ -144,13 +146,13 @@ async function releaseCore(version) {
 }
 
 async function releaseCli(version) {
-  console.log("%c updating Leapp CLI's package.json version...", "color: #bada55");
+  console.log(FgGreen, "updating Leapp CLI's package.json version...");
   const packageName = "cli";
   await updatePackageJsonVersion(packageName, version);
 }
 
 async function releaseDesktopApp(version) {
-  console.log("%c updating Leapp Desktop App's package.json version...", "color: #bada55");
+  console.log(FgGreen, "updating Leapp Desktop App's package.json version...");
   const packageName = "desktop-app";
   await updatePackageJsonVersion(packageName, version);
 }

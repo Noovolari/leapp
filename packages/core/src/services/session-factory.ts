@@ -37,4 +37,15 @@ export class SessionFactory {
     const sessionService = this.getSessionService(sessionType);
     await sessionService.create(sessionRequest);
   }
+
+  getCompatibleTypes(sessionType: SessionType): SessionType[] {
+    if (sessionType === SessionType.aws) {
+      return [SessionType.awsIamUser, SessionType.awsIamRoleFederated, SessionType.awsIamRoleChained, SessionType.awsSsoRole];
+    } else if (sessionType === SessionType.anytype) {
+      return [SessionType.azure, SessionType.alibaba, ...this.getCompatibleTypes(SessionType.aws)];
+    } else if (this.getCompatibleTypes(SessionType.anytype).includes(sessionType)) {
+      return [sessionType];
+    }
+    return [];
+  }
 }

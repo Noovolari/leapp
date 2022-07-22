@@ -98,7 +98,13 @@ export class AppProviderService {
 
   public get pluginManagerService(): PluginManagerService {
     if (!this.pluginManagerServiceInstance) {
-      this.pluginManagerServiceInstance = new PluginManagerService(this.appNativeService, this.logService, this.repository, this.http);
+      this.pluginManagerServiceInstance = new PluginManagerService(
+        this.appNativeService,
+        this.logService,
+        this.repository,
+        this.sessionFactory,
+        this.http
+      );
     }
     return this.pluginManagerServiceInstance;
   }

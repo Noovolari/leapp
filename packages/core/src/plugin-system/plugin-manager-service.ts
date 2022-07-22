@@ -6,6 +6,7 @@ import { Repository } from "../services/repository";
 import { SessionType } from "../models/session-type";
 import { OperatingSystem } from "../models/operating-system";
 import { Session } from "../models/session";
+import { SessionFactory } from "../services/session-factory";
 
 export class PluginManagerService {
   private _plugins: IPlugin[];
@@ -13,7 +14,13 @@ export class PluginManagerService {
   private _hashElement;
   private _pluginDir = "plugins";
 
-  constructor(private nativeService: INativeService, private logService: LogService, private repository: Repository, private http: any) {
+  constructor(
+    private nativeService: INativeService,
+    private logService: LogService,
+    private repository: Repository,
+    private sessionFactory: SessionFactory,
+    private http: any
+  ) {
     this._plugins = [];
     this._requireModule = nativeService.requireModule;
     this._hashElement = nativeService.hashElement.hashElement;
@@ -40,11 +47,11 @@ export class PluginManagerService {
       files: { exclude: ["signature", ".DS_Store", "package-lock.json"] },
     };
 
-    const pluginFilePaths = this.nativeService.fs.readdirSync(this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir);
+    const pluginFolderNames = this.nativeService.fs.readdirSync(this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir);
 
-    for (let i = 0; i < pluginFilePaths.length; i++) {
-      let pluginFilePath = pluginFilePaths[i];
-      pluginFilePath = this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir + "/" + pluginFilePath;
+    for (let i = 0; i < pluginFolderNames.length; i++) {
+      const pluginName = pluginFolderNames[i];
+      const pluginFilePath = this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir + "/" + pluginName;
 
       const isDir = this.nativeService.fs.existsSync(pluginFilePath) && this.nativeService.fs.lstatSync(pluginFilePath).isDirectory();
       if (isDir) {
@@ -52,14 +59,24 @@ export class PluginManagerService {
         console.log("Creating a hash over the current folder");
 
         // VALIDATION PROCESS
-        const { packageJson, isPluginValid } = await this.validatePlugin(pluginFilePath, options, pluginFilePaths, i);
-        const metadata = this.extractMetadata(packageJson);
+        const { packageJson, isPluginValid } = await this.validatePlugin(pluginFilePath, options, pluginFolderNames, i);
+
+        // HANDLE PACKAGE.JSON ERROR
+        let metadata;
+        try {
+          metadata = this.extractMetadata(packageJson);
+        } catch (errors) {
+          this.logService.log(
+            new LoggedEntry(`Missing or invalid values in plugin ${pluginName} package.json: ${errors.message}`, this, LogLevel.warn, true)
+          );
+          this.nativeService.rimraf(pluginFilePath, () => {});
+          continue;
+        }
 
         // CHECK VALIDATION
         const isSignatureInvalid = !isPluginValid && !constants.skipPluginValidation;
-        if (!metadata || isSignatureInvalid) {
-          // TODO: log and notify user with a warning!
-          this.logService.log(new LoggedEntry("Signature not verified for plugin: " + pluginFilePaths[i], this, LogLevel.warn, true));
+        if (isSignatureInvalid) {
+          this.logService.log(new LoggedEntry(`Signature not verified for plugin: ${pluginFolderNames[i]}`, this, LogLevel.warn, true));
           this.nativeService.rimraf(pluginFilePath, () => {});
           continue;
         }
@@ -175,36 +192,69 @@ export class PluginManagerService {
   }
 
   private extractMetadata(packageJson: any): IPluginMetadata {
+    const errors = [];
     const version = packageJson.version;
+    if (!version) {
+      errors.push("version");
+    }
     const uniqueName = packageJson.name;
+    if (!uniqueName) {
+      errors.push("name");
+    }
     const author = packageJson.author?.name ? packageJson.author.name : packageJson.author;
+    if (!author) {
+      errors.push("author");
+    }
     const description = packageJson.description;
+    if (!description) {
+      errors.push("description");
+    }
     const keywords = packageJson.keywords as string[];
+    if (!keywords || keywords.length === 0) {
+      errors.push("keywords");
+    } else if (!keywords.includes(constants.npmRequiredPluginKeyword)) {
+      errors.push(`${constants.npmRequiredPluginKeyword} keyword`);
+    }
+
     const leappPluginConfig = packageJson.leappPlugin;
-    const supportedSessions = leappPluginConfig?.supportedSessions || [SessionType.anytype];
+    const supportedSessionTypes = leappPluginConfig?.supportedSessions || [SessionType.anytype];
+    if (!supportedSessionTypes.length) {
+      errors.push("supportedSessions");
+    }
+    for (const sessionType of supportedSessionTypes) {
+      if (this.sessionFactory.getCompatibleTypes(sessionType).length === 0) {
+        errors.push(`${sessionType} unsupported session`);
+      }
+    }
+
     const icon = leappPluginConfig?.icon || "fas fa-puzzle-piece";
-    const supportedOS = leappPluginConfig?.supportedOS || [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows];
+    const operatingSystems = [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows];
+    const supportedOS = leappPluginConfig?.supportedOS || operatingSystems;
+    for (const os of supportedOS) {
+      if (!operatingSystems.includes(os)) {
+        errors.push(`unsupported os ${os}`);
+      }
+    }
+
     const url = leappPluginConfig.url;
 
-    const areKeywordsInvalid = !keywords || keywords.length === 0 || !keywords.includes(constants.npmRequiredPluginKeyword);
-    if (!uniqueName || !author || !description || areKeywordsInvalid || supportedSessions.length === 0 || supportedOS.length === 0) {
-      return undefined;
+    if (errors.length) {
+      throw new Error(errors.join(", "));
     }
 
     const pluginStatus = this.repository.getPluginStatus(uniqueName);
-    const metadata: IPluginMetadata = {
+    return {
       version,
       active: pluginStatus ? pluginStatus.active : true,
       author,
       description,
       supportedOS,
-      supportedSessions,
+      supportedSessions: supportedSessionTypes,
       icon,
       keywords,
       uniqueName,
       url,
     };
-    return metadata;
   }
 
   private async validatePlugin(

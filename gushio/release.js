@@ -76,36 +76,63 @@ async function updatePackageJsonVersion(packageName, version) {
 }
 
 async function releaseCore(version) {
-  console.log("updating Leapp Core's package.json version...");
-  const packageName = "core";
-  await updatePackageJsonVersion(packageName, version);
-  let result = shellJs.exec("git add .");
-  if (result.code !== 0) {
-    throw new Error(result.stderr)
-  }
-  console.log("creating commit with updated package.json version...");
-  result = shellJs.exec(`git commit -m "chore(release): release core v${version}"`);
-  if (result.code !== 0) {
-    throw new Error(result.stderr)
-  }
-  console.log(`creating tag core-v${version}...`);
-  result = shellJs.exec(`git tag -a core-v${version} -m "release core v${version}"`);
-  if (result.code !== 0) {
-    throw new Error(result.stderr)
-  }
+  let commitId;
 
-  const prompt = new Confirm({
-    name: 'question',
-    message: 'Want to push?'
-  });
-
-  const wantToPush = await prompt.run();
-
-  if(wantToPush) {
-    console.log("pushing commit...");
-    result = shellJs.exec(`git push --follow-tags`);
+  try {
+    console.log("updating Leapp Core's package.json version...");
+    const packageName = "core";
+    await updatePackageJsonVersion(packageName, version);
+    let result = shellJs.exec("git add .");
     if (result.code !== 0) {
       throw new Error(result.stderr)
+    }
+
+    console.log("retrieving current commit id");
+    commitId = shellJs.exec(`git rev-parse HEAD`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    console.log("creating commit with updated package.json version...");
+    result = shellJs.exec(`git commit -m "chore(release): release core v${version}"`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    console.log(`creating tag core-v${version}...`);
+    result = shellJs.exec(`git tag -a core-v${version} -m "release core v${version}"`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    const prompt = new Confirm({
+      name: 'question',
+      message: 'Want to push?'
+    });
+
+    const wantToPush = await prompt.run();
+
+    if(wantToPush) {
+      console.log("pushing commit...");
+      throw new Error("test");
+      result = shellJs.exec(`git push --follow-tags`);
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
+    }
+  } catch(e) {
+    console.log(`removing tag core-v${version}...`);
+    result = shellJs.exec(`git tag -d core-v${version}`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    if(commitId !== undefined) {
+      console.log(`reset codebase to previous commit...`);
+      result = shellJs.exec(`git reset --hard ${commitId}`);
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
     }
   }
 }

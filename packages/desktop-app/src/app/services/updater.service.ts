@@ -5,8 +5,8 @@ import compareVersions from "compare-versions";
 import { HttpClient } from "@angular/common/http";
 import md from "markdown-it";
 import { AppNativeService } from "./app-native.service";
-import { constants } from "@noovolari/leapp-core/models/constants";
-import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
+import { constants } from "@hesketh-racing/leapp-core/models/constants";
+import { BehaviouralSubjectService } from "@hesketh-racing/leapp-core/services/behavioural-subject-service";
 import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
 

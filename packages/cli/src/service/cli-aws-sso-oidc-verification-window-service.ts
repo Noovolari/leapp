@@ -1,9 +1,9 @@
-import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
+import { IAwsSsoOidcVerificationWindowService } from "@hesketh-racing/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import {
   RegisterClientResponse,
   StartDeviceAuthorizationResponse,
   VerificationResponse,
-} from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+} from "@hesketh-racing/leapp-core/services/session/aws/aws-sso-role-service";
 import puppeteer from "puppeteer";
 
 export class CliAwsSsoOidcVerificationWindowService implements IAwsSsoOidcVerificationWindowService {

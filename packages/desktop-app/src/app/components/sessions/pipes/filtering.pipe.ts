@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Session } from "@noovolari/leapp-core/models/session";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
+import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
 
 @Pipe({
   name: "filtering",

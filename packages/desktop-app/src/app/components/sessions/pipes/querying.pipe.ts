@@ -1,9 +1,9 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Session } from "@noovolari/leapp-core/models/session";
-import { Workspace } from "@noovolari/leapp-core/models/workspace";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
-import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
-import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
+import { Workspace } from "@hesketh-racing/leapp-core/models/workspace";
+import { AwsIamRoleFederatedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-federated-session";
+import { AzureSession } from "@hesketh-racing/leapp-core/models/azure/azure-session";
+import { AwsSsoRoleSession } from "@hesketh-racing/leapp-core/models/aws/aws-sso-role-session";
 
 @Pipe({
   name: "querying",

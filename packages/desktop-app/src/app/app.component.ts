@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
+import { RemoteProceduresServer } from "@hesketh-racing/leapp-core/services/remote-procedures-server";
 import { environment } from "../environments/environment";
 import { AppService } from "./services/app.service";
 import { Router } from "@angular/router";
@@ -8,26 +8,26 @@ import { AppMfaCodePromptService } from "./services/app-mfa-code-prompt.service"
 import { AppAwsAuthenticationService } from "./services/app-aws-authentication.service";
 import { UpdaterService } from "./services/updater.service";
 import compareVersions from "compare-versions";
-import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
-import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
-import { TimerService } from "@noovolari/leapp-core/services/timer-service";
-import { constants } from "@noovolari/leapp-core/models/constants";
-import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
-import { RetroCompatibilityService } from "@noovolari/leapp-core/services/retro-compatibility-service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "@hesketh-racing/leapp-core/services/log-service";
+import { BehaviouralSubjectService } from "@hesketh-racing/leapp-core/services/behavioural-subject-service";
+import { TimerService } from "@hesketh-racing/leapp-core/services/timer-service";
+import { constants } from "@hesketh-racing/leapp-core/models/constants";
+import { FileService } from "@hesketh-racing/leapp-core/services/file-service";
+import { AwsCoreService } from "@hesketh-racing/leapp-core/services/aws-core-service";
+import { RetroCompatibilityService } from "@hesketh-racing/leapp-core/services/retro-compatibility-service";
 import { AppProviderService } from "./services/app-provider.service";
-import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
-import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
+import { SessionFactory } from "@hesketh-racing/leapp-core/services/session-factory";
+import { RotationService } from "@hesketh-racing/leapp-core/services/rotation-service";
 import { AppVerificationWindowService } from "./services/app-verification-window.service";
 import { WindowService } from "./services/window.service";
 import { AppNativeService } from "./services/app-native.service";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
-import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { AwsSsoIntegrationService } from "@hesketh-racing/leapp-core/services/integration/aws-sso-integration-service";
+import { AwsSsoRoleService } from "@hesketh-racing/leapp-core/services/session/aws/aws-sso-role-service";
+import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
 import { OptionsService } from "./services/options.service";
-import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
-import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
-import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
+import { IntegrationIsOnlineStateRefreshService } from "@hesketh-racing/leapp-core/services/integration/integration-is-online-state-refresh-service";
+import { AzureSessionService } from "@hesketh-racing/leapp-core/services/session/azure/azure-session-service";
+import { AzureCoreService } from "@hesketh-racing/leapp-core/services/azure-core-service";
 
 @Component({
   selector: "app-root",

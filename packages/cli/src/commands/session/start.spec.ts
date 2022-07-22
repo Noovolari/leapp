@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import StartSession from "./start";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
 
 describe("StartSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): StartSession => {

@@ -1,6 +1,6 @@
-import { Session } from "@noovolari/leapp-core/models/session";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
 import { FilteringPipe } from "./filtering.pipe";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
 
 let sessions: Session[] = [];
 

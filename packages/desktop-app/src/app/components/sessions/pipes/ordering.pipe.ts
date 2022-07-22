@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Session } from "@noovolari/leapp-core/models/session";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
 
 @Pipe({
   name: "ordering",

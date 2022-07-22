@@ -1,11 +1,11 @@
-import { constants } from "@noovolari/leapp-core/models/constants";
+import { constants } from "@hesketh-racing/leapp-core/models/constants";
 import { Injectable } from "@angular/core";
 import {
   RegisterClientResponse,
   StartDeviceAuthorizationResponse,
   VerificationResponse,
-} from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
-import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
+} from "@hesketh-racing/leapp-core/services/session/aws/aws-sso-role-service";
+import { IAwsSsoOidcVerificationWindowService } from "@hesketh-racing/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { WindowService } from "./window.service";
 
 @Injectable({ providedIn: "root" })

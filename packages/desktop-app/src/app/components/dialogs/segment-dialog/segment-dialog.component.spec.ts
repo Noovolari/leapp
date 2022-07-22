@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { SegmentDialogComponent } from "./segment-dialog.component";
 import { mustInjected } from "../../../../base-injectables";
-import { constants } from "@noovolari/leapp-core/models/constants";
+import { constants } from "@hesketh-racing/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 
 describe("SegmentDialogComponent", () => {

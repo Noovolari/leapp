@@ -1,8 +1,8 @@
-import { AccessMethod } from "@noovolari/leapp-core/models/access-method";
-import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
+import { AccessMethod } from "@hesketh-racing/leapp-core/models/access-method";
+import { CloudProviderType } from "@hesketh-racing/leapp-core/models/cloud-provider-type";
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { IdpUrlAccessMethodField } from "@noovolari/leapp-core/models/idp-url-access-method-field";
+import { IdpUrlAccessMethodField } from "@hesketh-racing/leapp-core/models/idp-url-access-method-field";
 import CreateIdpUrl from "../idp-url/create";
 import {
   providerType,
@@ -19,9 +19,9 @@ import {
   secretKey,
   sessionType,
 } from "../../flags";
-import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { constants } from "@noovolari/leapp-core/models/constants";
-import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
+import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
+import { constants } from "@hesketh-racing/leapp-core/models/constants";
+import { IdpUrl } from "@hesketh-racing/leapp-core/models/idp-url";
 
 export default class AddSession extends LeappCommand {
   static description = "Add a new session";

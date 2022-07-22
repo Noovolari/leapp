@@ -1,5 +1,5 @@
 import { Flags } from "@oclif/core";
-import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
 
 export const force = Flags.boolean({
   description: "force a command without asking for confirmation (-f, --force)", // help description for flag

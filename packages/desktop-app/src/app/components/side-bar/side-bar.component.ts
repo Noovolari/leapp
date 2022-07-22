@@ -9,11 +9,11 @@ import {
 import { BehaviorSubject } from "rxjs";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { ConfirmationDialogComponent } from "../dialogs/confirmation-dialog/confirmation-dialog.component";
-import Segment from "@noovolari/leapp-core/models/segment";
-import Folder from "@noovolari/leapp-core/models/folder";
-import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
+import Segment from "@hesketh-racing/leapp-core/models/segment";
+import Folder from "@hesketh-racing/leapp-core/models/folder";
+import { BehaviouralSubjectService } from "@hesketh-racing/leapp-core/services/behavioural-subject-service";
 import { AppProviderService } from "../../services/app-provider.service";
-import { constants } from "@noovolari/leapp-core/models/constants";
+import { constants } from "@hesketh-racing/leapp-core/models/constants";
 import { integrationHighlight } from "../integration-bar/integration-bar.component";
 import { OptionsService } from "../../services/options.service";
 

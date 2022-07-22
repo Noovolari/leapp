@@ -1,4 +1,4 @@
-import { IMfaCodePrompter } from "@noovolari/leapp-core/interfaces/i-mfa-code-prompter";
+import { IMfaCodePrompter } from "@hesketh-racing/leapp-core/interfaces/i-mfa-code-prompter";
 import CliInquirer from "inquirer";
 
 export class LocalCliMfaCodePromptService implements IMfaCodePrompter {

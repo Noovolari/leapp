@@ -1,15 +1,15 @@
 import { Injectable, SecurityContext } from "@angular/core";
-import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
-import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
+import { IAwsSamlAuthenticationService } from "@hesketh-racing/leapp-core/interfaces/i-aws-saml-authentication-service";
+import { CloudProviderType } from "@hesketh-racing/leapp-core/models/cloud-provider-type";
 import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
-import { constants } from "@noovolari/leapp-core/models/constants";
+import { AwsIamRoleFederatedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-federated-session";
+import { constants } from "@hesketh-racing/leapp-core/models/constants";
 import { AppNativeService } from "./app-native.service";
 import { AppService } from "./app.service";
-import { Session } from "@noovolari/leapp-core/models/session";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
 import { DomSanitizer } from "@angular/platform-browser";
-import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { LoggedEntry, LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
 
 @Injectable({ providedIn: "root" })
 export class AppAwsAuthenticationService implements IAwsSamlAuthenticationService {

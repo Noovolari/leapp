@@ -3,7 +3,7 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { AppComponent } from "./app.component";
 import { mustInjected } from "../base-injectables";
 import { AppProviderService } from "./services/app-provider.service";
-import { Workspace } from "@noovolari/leapp-core/models/workspace";
+import { Workspace } from "@hesketh-racing/leapp-core/models/workspace";
 
 describe("AppComponent", () => {
   beforeEach(waitForAsync(() => {

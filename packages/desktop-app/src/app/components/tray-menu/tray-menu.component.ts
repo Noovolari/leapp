@@ -3,20 +3,20 @@ import { AppService } from "../../services/app.service";
 import { environment } from "../../../environments/environment";
 import { UpdaterService } from "../../services/updater.service";
 import { AppProviderService } from "../../services/app-provider.service";
-import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
-import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
-import { Session } from "@noovolari/leapp-core/models/session";
-import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
-import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
+import { BehaviouralSubjectService } from "@hesketh-racing/leapp-core/services/behavioural-subject-service";
+import { SessionFactory } from "@hesketh-racing/leapp-core/services/session-factory";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
+import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
+import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
+import { AwsIamRoleFederatedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-federated-session";
+import { AwsIamRoleChainedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-chained-session";
 import { WindowService } from "../../services/window.service";
-import { constants } from "@noovolari/leapp-core/models/constants";
-import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
+import { constants } from "@hesketh-racing/leapp-core/models/constants";
+import { AwsCoreService } from "@hesketh-racing/leapp-core/services/aws-core-service";
 import { AppNativeService } from "../../services/app-native.service";
-import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
+import { LeappBaseError } from "@hesketh-racing/leapp-core/errors/leapp-base-error";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
-import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
+import { LoggedEntry, LoggedException, LogLevel, LogService } from "@hesketh-racing/leapp-core/services/log-service";
 
 @Component({
   selector: "app-tray-menu",

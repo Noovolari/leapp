@@ -1,8 +1,8 @@
 import ListSessions from "./list";
 import { CliUx } from "@oclif/core";
 import { describe, expect, jest, test } from "@jest/globals";
-import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws/aws-iam-user-session";
-import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { AwsIamUserSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-user-session";
+import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
 
 describe("ListSessions", () => {
   const getTestCommand = (cliProviderService: any = null): ListSessions => {

@@ -1,10 +1,10 @@
 import { Injectable } from "@angular/core";
 import { AppService } from "./app.service";
-import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
-import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
+import { CredentialsInfo } from "@hesketh-racing/leapp-core/models/credentials-info";
+import { ExecuteService } from "@hesketh-racing/leapp-core/services/execute-service";
 import { AppProviderService } from "./app-provider.service";
-import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
-import { LogService } from "@noovolari/leapp-core/services/log-service";
+import { SsmService } from "@hesketh-racing/leapp-core/services/ssm-service";
+import { LogService } from "@hesketh-racing/leapp-core/services/log-service";
 
 @Injectable({
   providedIn: "root",

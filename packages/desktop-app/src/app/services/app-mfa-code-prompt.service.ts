@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { InputDialogComponent } from "../components/dialogs/input-dialog/input-dialog.component";
 import { AppNativeService } from "./app-native.service";
-import { IMfaCodePrompter } from "@noovolari/leapp-core/interfaces/i-mfa-code-prompter";
+import { IMfaCodePrompter } from "@hesketh-racing/leapp-core/interfaces/i-mfa-code-prompter";
 
 @Injectable({
   providedIn: "root",

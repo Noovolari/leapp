@@ -3,9 +3,9 @@ import { AppNativeService } from "./app-native.service";
 import { environment } from "../../environments/environment";
 import { ConfirmationDialogComponent } from "../components/dialogs/confirmation-dialog/confirmation-dialog.component";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { IOpenExternalUrlService } from "@noovolari/leapp-core/interfaces/i-open-external-url-service";
+import { IOpenExternalUrlService } from "@hesketh-racing/leapp-core/interfaces/i-open-external-url-service";
 import { AppProviderService } from "./app-provider.service";
-import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { LoggedEntry, LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
 
 @Injectable({
   providedIn: "root",

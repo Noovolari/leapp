@@ -1,7 +1,7 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { Session } from "@noovolari/leapp-core/models/session";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
+import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
 import { sessionId } from "../../flags";
 
 export default class StartSession extends LeappCommand {

@@ -1,7 +1,7 @@
-import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
+import { AwsSessionService } from "@hesketh-racing/leapp-core/services/session/aws/aws-session-service";
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { Session } from "@noovolari/leapp-core/models/session";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
 import { profileId, sessionId } from "../../flags";
 
 export default class ChangeSessionProfile extends LeappCommand {

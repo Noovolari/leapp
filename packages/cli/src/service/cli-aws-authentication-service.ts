@@ -1,8 +1,8 @@
 import puppeteer from "puppeteer";
-import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
-import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
-import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
-import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { IAwsSamlAuthenticationService } from "@hesketh-racing/leapp-core/interfaces/i-aws-saml-authentication-service";
+import { AwsSamlAssertionExtractionService } from "@hesketh-racing/leapp-core/services/aws-saml-assertion-extraction-service";
+import { CloudProviderType } from "@hesketh-racing/leapp-core/models/cloud-provider-type";
+import { LoggedException, LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
 
 export class CliAwsSamlAuthenticationService implements IAwsSamlAuthenticationService {
   private browser: puppeteer.Browser;

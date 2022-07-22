@@ -1,7 +1,7 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
-import { Session } from "@noovolari/leapp-core/models/session";
+import { AwsNamedProfile } from "@hesketh-racing/leapp-core/models/aws/aws-named-profile";
+import { Session } from "@hesketh-racing/leapp-core/models/session";
 import { profileId, force } from "../../flags";
 
 export default class DeleteNamedProfile extends LeappCommand {

@@ -1,5 +1,5 @@
 import { jest, describe, test, expect } from "@jest/globals";
-import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
+import { AwsIamUserService } from "@hesketh-racing/leapp-core/services/session/aws/aws-iam-user-service";
 import ChangeSessionProfile from "./change-profile";
 
 describe("ChangeProfile", () => {

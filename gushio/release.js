@@ -106,7 +106,7 @@ async function releaseCore(version) {
       throw new Error(result.stderr)
     }
 
-    console.log(FgGreen, "retrieving current commit id");
+    console.log(FgGreen, "retrieving current commit id...");
     commitId = shellJs.exec(`git rev-parse HEAD`);
     if (result.code !== 0) {
       throw new Error(result.stderr)

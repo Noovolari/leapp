@@ -75,6 +75,22 @@ async function updatePackageJsonVersion(packageName, version) {
   await writePackageJsonFunction(path, packageName, packageJson);
 }
 
+function releaseCoreRollback(commitId, version) {
+  console.log(`removing tag core-v${version}...`);
+  result = shellJs.exec(`git tag -d core-v${version}`);
+  if (result.code !== 0) {
+    throw new Error(result.stderr)
+  }
+
+  if(commitId !== undefined) {
+    console.log(`reset codebase to previous commit...`);
+    result = shellJs.exec(`git reset --hard ${commitId}`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+  }
+}
+
 async function releaseCore(version) {
   let commitId;
 
@@ -119,21 +135,11 @@ async function releaseCore(version) {
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
+    } else {
+      releaseCoreRollback(commitId, version);
     }
   } catch(e) {
-    console.log(`removing tag core-v${version}...`);
-    result = shellJs.exec(`git tag -d core-v${version}`);
-    if (result.code !== 0) {
-      throw new Error(result.stderr)
-    }
-
-    if(commitId !== undefined) {
-      console.log(`reset codebase to previous commit...`);
-      result = shellJs.exec(`git reset --hard ${commitId}`);
-      if (result.code !== 0) {
-        throw new Error(result.stderr)
-      }
-    }
+    releaseCoreRollback(commitId, version);
   }
 }
 

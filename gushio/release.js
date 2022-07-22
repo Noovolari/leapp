@@ -123,7 +123,7 @@ async function releaseCore(version) {
 
     const prompt = new Confirm({
       name: 'question',
-      message: 'Want to push?'
+      message: 'Want to push? (yes: y/Y/t/T, no: n/N/f/F)'
     });
 
     const wantToPush = await prompt.run();

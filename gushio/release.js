@@ -213,7 +213,7 @@ async function releaseCli(version) {
     }
 
     console.log(FgGreen, "creating commit with updated package.json version...");
-    result = shellJs.exec(`git commit -m "chore(release): release core v${version}"`);
+    result = shellJs.exec(`git commit -m "chore(release): release cli v${version}"`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
     }

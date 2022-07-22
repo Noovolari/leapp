@@ -76,14 +76,14 @@ async function updatePackageJsonVersion(packageName, version) {
 }
 
 function releaseCoreRollback(commitId, version) {
-  console.log(`removing tag core-v${version}...`);
+  console.log(`%c removing tag core-v${version}...`, "color: #bada55");
   result = shellJs.exec(`git tag -d core-v${version}`);
   if (result.code !== 0) {
     throw new Error(result.stderr)
   }
 
   if(commitId !== undefined) {
-    console.log(`reset codebase to previous commit...`);
+    console.log("%c reset codebase to previous commit...", "color: #bada55");
     result = shellJs.exec(`git reset --hard ${commitId}`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
@@ -95,7 +95,7 @@ async function releaseCore(version) {
   let commitId;
 
   try {
-    console.log("updating Leapp Core's package.json version...");
+    console.log("%c updating Leapp Core's package.json version...", "color: #bada55");
     const packageName = "core";
     await updatePackageJsonVersion(packageName, version);
     let result = shellJs.exec("git add .");
@@ -103,19 +103,19 @@ async function releaseCore(version) {
       throw new Error(result.stderr)
     }
 
-    console.log("retrieving current commit id");
+    console.log("%c retrieving current commit id", "color: #bada55");
     commitId = shellJs.exec(`git rev-parse HEAD`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
     }
 
-    console.log("creating commit with updated package.json version...");
+    console.log("%c creating commit with updated package.json version...", "color: #bada55");
     result = shellJs.exec(`git commit -m "chore(release): release core v${version}"`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
     }
 
-    console.log(`creating tag core-v${version}...`);
+    console.log(`%c creating tag core-v${version}...`, "color: #bada55");
     result = shellJs.exec(`git tag -a core-v${version} -m "release core v${version}"`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
@@ -129,7 +129,7 @@ async function releaseCore(version) {
     const wantToPush = await prompt.run();
 
     if(wantToPush) {
-      console.log("pushing commit...");
+      console.log("%c pushing commit...", "color: #bada55");
       throw new Error("test");
       result = shellJs.exec(`git push --follow-tags`);
       if (result.code !== 0) {
@@ -144,13 +144,13 @@ async function releaseCore(version) {
 }
 
 async function releaseCli(version) {
-  console.log("updating Leapp CLI's package.json version...");
+  console.log("%c updating Leapp CLI's package.json version...", "color: #bada55");
   const packageName = "cli";
   await updatePackageJsonVersion(packageName, version);
 }
 
 async function releaseDesktopApp(version) {
-  console.log("updating Leapp Desktop App's package.json version...");
+  console.log("%c updating Leapp Desktop App's package.json version...", "color: #bada55");
   const packageName = "desktop-app";
   await updatePackageJsonVersion(packageName, version);
 }

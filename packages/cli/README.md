@@ -25,7 +25,7 @@ $ npm install -g @hesketh-racing/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@hesketh-racing/leapp-cli/0.1.16 darwin-x64 node-v16.14.0
+@hesketh-racing/leapp-cli/0.1.20 darwin-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND

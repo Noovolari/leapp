@@ -11,7 +11,7 @@ const releaseFunctions = {
 };
 
 const FgGreen = "\x1b[32m"
-shell.config.silent = true;
+shellJs.config.silent = true;
 
 module.exports = {
   cli: {

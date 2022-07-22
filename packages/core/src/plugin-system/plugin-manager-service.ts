@@ -5,6 +5,7 @@ import { constants } from "../models/constants";
 import { Repository } from "../services/repository";
 import { SessionType } from "../models/session-type";
 import { OperatingSystem } from "../models/operating-system";
+import { Session } from "../models/session";
 
 export class PluginManagerService {
   private _plugins: IPlugin[];
@@ -159,6 +160,15 @@ export class PluginManagerService {
       passphrase: "DkgCF3wYa6N@urrtUxNLaE#e8*woRm6Ld$k&qBJg8P7LEEVJ3s*nXdQKDC8*NEZ0",
     });
     return signature.toString("Base64");
+  }
+
+  availablePlugins(os: OperatingSystem, session: Session): IPlugin[] {
+    return this._plugins.filter(
+      (plugin) =>
+        plugin.metadata.active &&
+        plugin.metadata.supportedOS.includes(os) &&
+        (plugin.metadata.supportedSessions.includes(session.type) || plugin.metadata.supportedSessions.includes(SessionType.anytype))
+    );
   }
 
   private extractMetadata(packageJson: any): IPluginMetadata {

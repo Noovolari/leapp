@@ -441,10 +441,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   async installPlugin(): Promise<void> {
     if (this.form.controls.pluginDeepLink.value) {
-      if (this.form.controls.pluginDeepLink.value.indexOf("leapp://") > -1) {
-        await this.appService.installPlugin(this.form.controls.pluginDeepLink.value);
-        await this.refreshPluginList();
-      }
+      await this.appService.installPlugin(this.form.controls.pluginDeepLink.value);
+      await this.refreshPluginList();
     }
   }
 

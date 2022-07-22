@@ -80,7 +80,7 @@ async function updatePackageJsonVersion(packageName, version) {
 
 function releaseCoreRollback(commitId, version) {
   console.log(FgGreen, `removing tag core-v${version}...`);
-  result = shellJs.exec(`git tag -d core-v${version}`);
+  let result = shellJs.exec(`git tag -d core-v${version}`);
   if (result.code !== 0) {
     if (result.stderr.indexOf("not found") === -1) {
       throw new Error(result.stderr)
@@ -135,7 +135,6 @@ async function releaseCore(version) {
 
     if(wantToPush) {
       console.log(FgGreen, "pushing commit...");
-      //throw new Error("test");
       result = shellJs.exec(`git push --follow-tags`);
       if (result.code !== 0) {
         throw new Error(result.stderr)
@@ -151,10 +150,90 @@ async function releaseCore(version) {
   }
 }
 
+function releaseCliRollback(commitId, version) {
+  console.log(FgGreen, `removing tag cli-v${version}...`);
+  let result = shellJs.exec(`git tag -d cli-v${version}`);
+  if (result.code !== 0) {
+    if (result.stderr.indexOf("not found") === -1) {
+      throw new Error(result.stderr)
+    }
+  }
+
+  if(commitId !== undefined) {
+    console.log(FgGreen, "reset codebase to previous commit...");
+    result = shellJs.exec(`git reset --hard ${commitId}`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+  }
+}
+
 async function releaseCli(version) {
-  console.log(FgGreen, "updating Leapp CLI's package.json version...");
-  const packageName = "cli";
-  await updatePackageJsonVersion(packageName, version);
+  let commitId;
+
+  try {
+    console.log(FgGreen, "updating Leapp CLI's package.json version...");
+    const packageName = "cli";
+    await updatePackageJsonVersion(packageName, version);
+
+    console.log(FgGreen, "running Leapp CLI prepack script...");
+    shellJs.cd(path.join(__dirname, "packages", "cli"))
+    let result = shellJs.exec("npm run prepack");
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    console.log(FgGreen, "running Leapp CLI prepare-docs script...");
+    result = shellJs.exec("npm run prepare-docs");
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    result = shellJs.exec("git add .");
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    console.log(FgGreen, "retrieving current commit id...");
+    commitId = shellJs.exec(`git rev-parse HEAD`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    console.log(FgGreen, "creating commit with updated package.json version...");
+    result = shellJs.exec(`git commit -m "chore(release): release core v${version}"`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    console.log(FgGreen, `creating tag cli-v${version}...`);
+    result = shellJs.exec(`git tag -a cli-v${version} -m "release cli v${version}"`);
+    if (result.code !== 0) {
+      throw new Error(result.stderr)
+    }
+
+    const prompt = new Confirm({
+      name: 'question',
+      message: 'Want to push? (yes: y/Y/t/T, no: n/N/f/F)'
+    });
+
+    const wantToPush = await prompt.run();
+
+    if(wantToPush) {
+      console.log(FgGreen, "pushing commit...");
+      result = shellJs.exec(`git push --follow-tags`);
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
+
+      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/cli-ci-cd-test.yml")
+    } else {
+      releaseCliRollback(commitId, version);
+    }
+  } catch(e) {
+    releaseCliRollback(commitId, version);
+    throw e;
+  }
 }
 
 async function releaseDesktopApp(version) {

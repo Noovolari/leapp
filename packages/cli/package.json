@@ -1,5 +1,5 @@
 {
-  "name": "@noovolari/leapp-cli",
+  "name": "@hesketh-racing/leapp-cli",
   "description": "Leapp's Command Line Interface\n\nIt relies on Leapp Core, which encapsulates the domain logic.\n\nFor more information about the project visit the [site](www.leapp.cloud).",
   "version": "0.1.15",
   "author": {
@@ -130,7 +130,7 @@
     "access": "public"
   },
   "scripts": {
-    "prepare docs": "gushio gushio/replace-header-cli-index-doc.js",
+    "prepare-docs": "gushio gushio/replace-header-cli-index-doc.js",
     "clean": "gushio gushio/target-clean.js",
     "test": "jest",
     "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme --multi --dir scopes",

@@ -177,7 +177,7 @@ async function releaseCli(version) {
     await updatePackageJsonVersion(packageName, version);
 
     console.log(FgGreen, "running Leapp CLI prepack script...");
-    shellJs.cd(path.join(__dirname, "packages", "cli"))
+    shellJs.cd(path.join(__dirname, "..", "packages", "cli"))
     let result = shellJs.exec("npm run prepack");
     if (result.code !== 0) {
       throw new Error(result.stderr)

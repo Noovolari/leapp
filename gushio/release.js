@@ -82,7 +82,9 @@ function releaseCoreRollback(commitId, version) {
   console.log(FgGreen, `removing tag core-v${version}...`);
   result = shellJs.exec(`git tag -d core-v${version}`);
   if (result.code !== 0) {
-    throw new Error(result.stderr)
+    if (result.stderr.indexOf("not found") === -1) {
+      throw new Error(result.stderr)
+    }
   }
 
   if(commitId !== undefined) {

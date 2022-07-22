@@ -83,7 +83,6 @@
     "setup": "gushio ../../gushio/clean-and-bootstrap.js core",
     "clean": "gushio gushio/target-clean.js",
     "build": "gushio gushio/target-build.js",
-    "build": "gushio gushio/target-build.js",
     "test": "jest --coverage",
     "release": "gushio gushio/target-release.js"
   },

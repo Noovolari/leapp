@@ -3,7 +3,7 @@ name: Leapp CLI CI/CD test
 on:
   push:
     branches:
-      - 'master'
+      - 'LEAP-635-finalize-release-pipeline-automate-fix'
 
   workflow_dispatch:
 

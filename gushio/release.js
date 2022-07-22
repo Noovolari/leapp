@@ -140,6 +140,18 @@ async function releaseCore(version) {
         throw new Error(result.stderr)
       }
 
+      console.log(FgGreen, "run set-pro-environment...");
+      result = shellJs.exec("run set-pro-environment");
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
+
+      console.log(FgGreen, "npm run clean-and-bootstrap...");
+      result = shellJs.exec("npm run clean-and-bootstrap");
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
+
       console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/core-ci-cd-test.yml")
     } else {
       releaseCoreRollback(commitId, version);

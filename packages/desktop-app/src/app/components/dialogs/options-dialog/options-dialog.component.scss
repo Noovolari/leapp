@@ -95,6 +95,10 @@
   max-height: 230px;
 }
 
+.max-height-320 {
+  max-height: 320px;
+}
+
 @keyframes fadein {
   from {
     opacity:0;
@@ -135,6 +139,7 @@
 .plugin-table {
   th {
     height: 42px!important;
+    z-index: 2;
   }
 
   th:nth-child(1),
@@ -164,4 +169,9 @@
   margin: 0 0 0 15px;
   padding: 0;
   background-color: unset!important;
+}
+
+.centered-column {
+  display: inline-block;
+  padding-bottom: 10px;
 }

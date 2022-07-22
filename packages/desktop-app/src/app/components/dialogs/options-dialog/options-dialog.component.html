@@ -244,17 +244,18 @@
             <button [disabled]="fetchingPlugins" class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
           </div>
 
-          <div class="form-group scrollable max-height-230">
-            <h4> Installed plugins
-              <button class="borderless-button pull-right" (click)="openPluginFolder()"><i class="fas fa-folder-open" matTooltip="Open plugin folder"></i></button>
-              <button [disabled]="fetchingPlugins" class="borderless-button pull-right"(click)="refreshPluginList()"><i class="fa fa-refresh" matTooltip="Refresh plugin list"></i></button>
-            </h4>
+          <h4> Installed plugins
+            <button class="borderless-button pull-right" (click)="openPluginFolder()"><i class="fas fa-folder-open" matTooltip="Open plugin folder"></i></button>
+            <button [disabled]="fetchingPlugins" class="borderless-button pull-right"(click)="refreshPluginList()"><i class="fa fa-refresh" matTooltip="Refresh plugin list"></i></button>
+          </h4>
+
+          <div class="form-group scrollable max-height-320 tableFixHead">
             <table class="table plugin-table">
               <thead>
-                <th>Name</th>
-                <th>Version</th>
-                <th>Supported OS</th>
-                <th>Enabled</th>
+                <th><span class="centered-column">Name</span></th>
+                <th><span class="centered-column">Version</span></th>
+                <th><span class="centered-column">Supported OS</span></th>
+                <th><span class="centered-column">Enabled</span></th>
               </thead>
               <tbody>
               <ng-container *ngFor="let plugin of pluginList">

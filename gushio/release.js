@@ -135,11 +135,13 @@ async function releaseCore(version) {
 
     if(wantToPush) {
       console.log(FgGreen, "pushing commit...");
-      throw new Error("test");
+      //throw new Error("test");
       result = shellJs.exec(`git push --follow-tags`);
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
+
+      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/core-ci-cd-test.yml")
     } else {
       releaseCoreRollback(commitId, version);
     }

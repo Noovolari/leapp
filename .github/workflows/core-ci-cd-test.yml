@@ -1,4 +1,4 @@
-name: Leapp Core CI/CD
+name: Leapp Core CI/CD test
 
 on:
   push:

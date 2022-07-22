@@ -38,6 +38,7 @@ export interface IPluginMetadata {
   url: string;
   keywords: string[];
   active: boolean;
+  icon: string;
   supportedOS: OperatingSystem[];
   supportedSessions?: SessionType[];
 }

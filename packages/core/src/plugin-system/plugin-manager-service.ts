@@ -167,7 +167,10 @@ export class PluginManagerService {
       (plugin) =>
         plugin.metadata.active &&
         plugin.metadata.supportedOS.includes(os) &&
-        (plugin.metadata.supportedSessions.includes(session.type) || plugin.metadata.supportedSessions.includes(SessionType.anytype))
+        (plugin.metadata.supportedSessions.includes(session.type) ||
+          plugin.metadata.supportedSessions.includes(SessionType.anytype) ||
+          //TODO: when writing tests, fix when AWS and Azure session types are specified together
+          session.type.toString().indexOf(plugin.metadata.supportedSessions.join("")) > -1)
     );
   }
 
@@ -179,6 +182,7 @@ export class PluginManagerService {
     const keywords = packageJson.keywords as string[];
     const leappPluginConfig = packageJson.leappPlugin;
     const supportedSessions = leappPluginConfig?.supportedSessions || [SessionType.anytype];
+    const icon = leappPluginConfig?.icon || "fas fa-puzzle-piece";
     const supportedOS = leappPluginConfig?.supportedOS || [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows];
     const url = leappPluginConfig.url;
 
@@ -195,6 +199,7 @@ export class PluginManagerService {
       description,
       supportedOS,
       supportedSessions,
+      icon,
       keywords,
       uniqueName,
       url,

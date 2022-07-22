@@ -157,8 +157,8 @@
   <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session)">
     <ng-container>
       <button mat-menu-item (click)="applyPluginAction($event, plugin);">
-        <i class="moon-Puzzle"></i>
-        <span>&nbsp;{{plugin.name}}</span>
+        <i class="{{plugin.metadata.icon}}"></i>
+        <span>&nbsp;&nbsp;{{plugin.name}}</span>
       </button>
     </ng-container>
   </ng-container>

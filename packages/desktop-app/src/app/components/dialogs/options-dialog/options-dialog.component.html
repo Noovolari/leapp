@@ -241,11 +241,14 @@
         <div class="form-group">
           <div class="form-field form-control-input-button max-width">
             <input formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Insert an npm package name">
-            <button class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
+            <button [disabled]="fetchingPlugins" class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
           </div>
 
           <div class="form-group scrollable max-height-230">
-            <h4> Installed plugins <i class="fa fa-refresh pull-right" (click)="refreshPluginList()" matTooltip="Refresh plugin list"></i></h4>
+            <h4> Installed plugins
+              <button class="borderless-button pull-right" (click)="openPluginFolder()"><i class="fas fa-folder-open" matTooltip="Open plugin folder"></i></button>
+              <button [disabled]="fetchingPlugins" class="borderless-button pull-right"(click)="refreshPluginList()"><i class="fa fa-refresh" matTooltip="Refresh plugin list"></i></button>
+            </h4>
             <table class="table plugin-table">
               <thead>
                 <th>Name</th>

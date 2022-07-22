@@ -124,6 +124,8 @@
 }
 
 .pull-right {
+  display: inline-block;
+  margin-left: 10px;
   float: right;
   &:hover {
     cursor: pointer;
@@ -156,4 +158,10 @@
 
 .bw {
   filter: grayscale(1)!important;
+}
+
+.borderless-button {
+  margin: 0 0 0 15px;
+  padding: 0;
+  background-color: unset!important;
 }

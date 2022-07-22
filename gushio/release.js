@@ -145,6 +145,7 @@ async function releaseCore(version) {
     }
   } catch(e) {
     releaseCoreRollback(commitId, version);
+    throw e;
   }
 }
 

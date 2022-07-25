@@ -120,7 +120,7 @@
       "icon": "src/assets/images/Leapp.ico",
       "legalTrademarks": "beSharp",
       "publisherName": "beSharp",
-      "requestedExecutionLevel": "highestAvailable",
+      "requestedExecutionLevel": "asInvoker",
       "verifyUpdateCodeSignature": false,
       "certificateFile": "windows_sign_certificate.pfx"
     }

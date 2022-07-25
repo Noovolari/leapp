@@ -72,7 +72,6 @@ async function setProEnvironment() {
   }
 }
 
-
 async function checkVersion(wantedVersion, currentVersion) {
   const semver = (await gushio.import('semver')).default
   if(!semver.gt(wantedVersion, currentVersion)) {

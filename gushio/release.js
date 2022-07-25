@@ -58,7 +58,6 @@ module.exports = {
 }
 
 async function setProEnvironment() {
-
   const shellJs = await gushio.import('shelljs')
   console.log(FgGreen, "npm run set-pro-environment...");
   result = shellJs.exec("npm run set-pro-environment");

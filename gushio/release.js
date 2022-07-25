@@ -32,18 +32,18 @@ module.exports = {
       let version = await console.input(
         {
           type: 'input',
-          name: 'version',
+          name: 'number',
           message: 'Specify the version (example: 0.1.0):'
         },
       );
       const regex = /^([0-9]+)\.([0-9]+)\.([0-9]+)/g;
-      const found = version.version.match(regex);
+      const found = version.number.match(regex);
       if(!found) {
-        throw new Error(`version ${version.version} is not a valid SemVer version.`);
+        throw new Error(`version ${version.number} is not a valid SemVer version.`);
       }
 
       const releaseFunction = releaseFunctions[target];
-      await releaseFunction(version.version);
+      await releaseFunction(version.number);
     } catch(e) {
       e.message = e.message.red;
       throw e;
@@ -62,11 +62,7 @@ function checkVersion(wantedVersion, currentVersion) {
   const currentMinor = currentVersionComponents[1];
   const currentPatch = currentVersionComponents[2];
 
-  if(wantedMajor < currentMajor) {
-    throw new Error(`the wanted version (${wantedVersion}) could not be less than the current one (${currentVersion})`);
-  } else if(wantedMinor < currentMinor) {
-    throw new Error(`the wanted version (${wantedVersion}) could not be less than the current one (${currentVersion})`);
-  } else if(wantedPatch < currentPatch) {
+  if(wantedMajor < currentMajor || wantedMinor < currentMinor || wantedPatch < currentPatch ) {
     throw new Error(`the wanted version (${wantedVersion}) could not be less than the current one (${currentVersion})`);
   }
 }
@@ -139,6 +135,8 @@ async function releaseCore(version) {
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
+      //The pipeline starts now. The following commands are to ensure that
+      //we set the pro environment and bootstrap it before releasing the CLI/DA
 
       console.log(FgGreen, "run set-pro-environment...");
       result = shellJs.exec("run set-pro-environment");
@@ -252,4 +250,5 @@ async function releaseDesktopApp(version) {
   console.log(FgGreen, "updating Leapp Desktop App's package.json version...");
   const packageName = "desktop-app";
   await updatePackageJsonVersion(packageName, version);
+
 }

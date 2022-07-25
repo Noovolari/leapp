@@ -114,6 +114,8 @@ async function releaseCore(version) {
   let commitId;
 
   try {
+    shellJs.cd(path.join(__dirname, ".."))
+
     console.log(FgGreen, "updating Leapp Core package.json version...");
     const packageName = "core";
     await updatePackageJsonVersion(packageName, version);
@@ -192,6 +194,8 @@ async function releaseCli(version) {
   let commitId;
 
   try {
+    shellJs.cd(path.join(__dirname, ".."))
+
     await setProEnvironment();
     console.log(FgGreen, "updating Leapp CLI package.json version...");
     const packageName = "cli";
@@ -209,6 +213,8 @@ async function releaseCli(version) {
     if (result.code !== 0) {
       throw new Error(result.stderr)
     }
+
+    shellJs.cd(path.join(__dirname, ".."))
 
     result = shellJs.exec("git add .");
     if (result.code !== 0) {

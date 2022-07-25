@@ -99,13 +99,13 @@ jobs:
           cd packages/cli
           echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm run release-npm
-      - name: Release Homebrew
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          GIT_PUSH_TOKEN: ${{ secrets.GIT_PUSH_TOKEN }}
-        run: |
-          git config --global user.name "Noovolari Bot"
-          git config --global user.email "info@noovolari.com"
-          cd packages/cli
-          npm run release-homebrew
+   #   - name: Release Homebrew
+   #     env:
+   #       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+   #       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+   #       GIT_PUSH_TOKEN: ${{ secrets.GIT_PUSH_TOKEN }}
+   #     run: |
+   #       git config --global user.name "Noovolari Bot"
+   #       git config --global user.email "info@noovolari.com"
+   #       cd packages/cli
+   #       npm run release-homebrew

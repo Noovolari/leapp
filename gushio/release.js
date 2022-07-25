@@ -16,7 +16,7 @@ shellJs.config.silent = true;
 module.exports = {
   cli: {
     name: "leapp-release",
-    description: "This CLI allows you to guide you through Core, CLI, and Desktop App releases.",
+    description: "This CLI guides you through the release of Leapp Core, CLI, and Desktop App.",
     version: "0.1.0",
   },
   run: async () => {
@@ -62,8 +62,10 @@ function checkVersion(wantedVersion, currentVersion) {
   const currentMinor = currentVersionComponents[1];
   const currentPatch = currentVersionComponents[2];
 
-  if(wantedMajor < currentMajor || wantedMinor < currentMinor || wantedPatch < currentPatch ) {
-    throw new Error(`the wanted version (${wantedVersion}) could not be less than the current one (${currentVersion})`);
+  if(wantedMajor < currentMajor || wantedMinor < currentMinor || wantedPatch < currentPatch ||
+    (wantedMajor === currentMajor && wantedMinor === currentMinor && wantedPatch === currentPatch)
+  ) {
+    throw new Error(`the wanted version (${wantedVersion}) could not be less than or equal to the current one (${currentVersion})`);
   }
 }
 
@@ -96,7 +98,7 @@ async function releaseCore(version) {
   let commitId;
 
   try {
-    console.log(FgGreen, "updating Leapp Core's package.json version...");
+    console.log(FgGreen, "updating Leapp Core package.json version...");
     const packageName = "core";
     await updatePackageJsonVersion(packageName, version);
     let result = shellJs.exec("git add .");
@@ -124,7 +126,7 @@ async function releaseCore(version) {
 
     const prompt = new Confirm({
       name: 'question',
-      message: 'Want to push? (yes: y/Y/t/T, no: n/N/f/F)'
+      message: 'Proceed and push? (yes: y/Y/t/T, no: n/N/f/F)'
     });
 
     const wantToPush = await prompt.run();
@@ -138,8 +140,8 @@ async function releaseCore(version) {
       //The pipeline starts now. The following commands are to ensure that
       //we set the pro environment and bootstrap it before releasing the CLI/DA
 
-      console.log(FgGreen, "run set-pro-environment...");
-      result = shellJs.exec("run set-pro-environment");
+      console.log(FgGreen, "npm run set-pro-environment...");
+      result = shellJs.exec("npm run set-pro-environment");
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
@@ -182,7 +184,7 @@ async function releaseCli(version) {
   let commitId;
 
   try {
-    console.log(FgGreen, "updating Leapp CLI's package.json version...");
+    console.log(FgGreen, "updating Leapp CLI package.json version...");
     const packageName = "cli";
     await updatePackageJsonVersion(packageName, version);
 
@@ -224,7 +226,7 @@ async function releaseCli(version) {
 
     const prompt = new Confirm({
       name: 'question',
-      message: 'Want to push? (yes: y/Y/t/T, no: n/N/f/F)'
+      message: 'Proceed and push? (yes: y/Y/t/T, no: n/N/f/F)'
     });
 
     const wantToPush = await prompt.run();
@@ -247,7 +249,7 @@ async function releaseCli(version) {
 }
 
 async function releaseDesktopApp(version) {
-  console.log(FgGreen, "updating Leapp Desktop App's package.json version...");
+  console.log(FgGreen, "updating Leapp Desktop App package.json version...");
   const packageName = "desktop-app";
   await updatePackageJsonVersion(packageName, version);
 

@@ -1,19 +1,11 @@
-const path = require('path');
-const shellJs = require('shelljs');
-const { Confirm, Select } = require("enquirer");
-const readPackageJsonFunction = require('./read-package-json-func');
-const writePackageJsonFunction = require('./write-package-json-func');
-
-const releaseFunctions = {
-  "core": releaseCore,
-  "cli": releaseCli,
-  "desktop-app": releaseDesktopApp
-};
-
 const FgGreen = "\x1b[32m"
-shellJs.config.silent = true;
 
 module.exports = {
+  deps: [
+    { name: 'enquirer', version: '2.3.6' },
+    { name: 'shelljs', version: '0.8.5' },
+    { name: 'semver', version: '7.3.7' },
+  ],
   cli: {
     name: "leapp-release",
     description: "This CLI guides you through the release of Leapp Core, CLI, and Desktop App.",
@@ -21,19 +13,32 @@ module.exports = {
   },
   run: async () => {
     try {
+      const readPackageJsonFunction = require('./read-package-json-func');
+      const path = await gushio.import('path')
+      const shellJs = await gushio.import('shelljs')
+      const { Select } = (await gushio.import('enquirer')).default
+      shellJs.config.silent = true;
+
+      const releaseFunctions = {
+        "core": releaseCore,
+        "cli": releaseCli,
+        "desktop-app": releaseDesktopApp
+      };
       let target;
       const prompt = new Select({
         name: "target",
-        message: "What are you going to deploy?",
+        message: "What do you want to deploy?",
         choices: ["core", "cli", "desktop-app"]
       });
       target = await prompt.run();
+      const packageJson = await readPackageJsonFunction(path, target);
+      const currentVersion = packageJson["version"];
 
       let version = await console.input(
         {
           type: 'input',
           name: 'number',
-          message: 'Specify the version (example: 0.1.0):'
+          message: `Specify the version (current ver: ${currentVersion}):`
         },
       );
       const regex = /^([0-9]+)\.([0-9]+)\.([0-9]+)/g;
@@ -41,6 +46,7 @@ module.exports = {
       if(!found) {
         throw new Error(`version ${version.number} is not a valid SemVer version.`);
       }
+      await checkVersion(version.number, currentVersion);
 
       const releaseFunction = releaseFunctions[target];
       await releaseFunction(version.number);
@@ -51,32 +57,39 @@ module.exports = {
   },
 }
 
-function checkVersion(wantedVersion, currentVersion) {
-  const wantedVersionComponents = wantedVersion.split(".");
-  const wantedMajor = wantedVersionComponents[0];
-  const wantedMinor = wantedVersionComponents[1];
-  const wantedPatch = wantedVersionComponents[2];
+async function setProEnvironment() {
+  const shellJs = await gushio.import('shelljs')
+  console.log(FgGreen, "npm run set-pro-environment...");
+  result = shellJs.exec("npm run set-pro-environment");
+  if (result.code !== 0) {
+    throw new Error(result.stderr)
+  }
 
-  const currentVersionComponents = currentVersion.split(".");
-  const currentMajor = currentVersionComponents[0];
-  const currentMinor = currentVersionComponents[1];
-  const currentPatch = currentVersionComponents[2];
+  console.log(FgGreen, "npm run clean-and-bootstrap...");
+  result = shellJs.exec("npm run clean-and-bootstrap");
+  if (result.code !== 0) {
+    throw new Error(result.stderr)
+  }
+}
 
-  if(wantedMajor < currentMajor || wantedMinor < currentMinor || wantedPatch < currentPatch ||
-    (wantedMajor === currentMajor && wantedMinor === currentMinor && wantedPatch === currentPatch)
-  ) {
-    throw new Error(`the wanted version (${wantedVersion}) could not be less than or equal to the current one (${currentVersion})`);
+async function checkVersion(wantedVersion, currentVersion) {
+  const semver = (await gushio.import('semver')).default
+  if(!semver.gt(wantedVersion, currentVersion)) {
+    throw new Error(`the wanted version (${wantedVersion}) cannot be less than or equal to the current one (${currentVersion})`);
   }
 }
 
 async function updatePackageJsonVersion(packageName, version) {
+  const readPackageJsonFunction = require('./read-package-json-func');
+  const writePackageJsonFunction = require('./write-package-json-func');
+  const path = await gushio.import('path')
   const packageJson = await readPackageJsonFunction(path, packageName);
-  checkVersion(version, packageJson["version"]);
   packageJson["version"] = version;
   await writePackageJsonFunction(path, packageName, packageJson);
 }
 
-function releaseCoreRollback(commitId, version) {
+async function releaseCoreRollback(commitId, version) {
+  const shellJs = await gushio.import('shelljs')
   console.log(FgGreen, `removing tag core-v${version}...`);
   let result = shellJs.exec(`git tag -d core-v${version}`);
   if (result.code !== 0) {
@@ -87,7 +100,8 @@ function releaseCoreRollback(commitId, version) {
 
   if(commitId !== undefined) {
     console.log(FgGreen, "reset codebase to previous commit...");
-    result = shellJs.exec(`git reset --hard ${commitId}`);
+    //TODO restore
+    //result = shellJs.exec(`git reset --hard ${commitId}`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
     }
@@ -95,6 +109,8 @@ function releaseCoreRollback(commitId, version) {
 }
 
 async function releaseCore(version) {
+  const { Confirm } = (await gushio.import('enquirer')).default
+  const shellJs = await gushio.import('shelljs')
   let commitId;
 
   try {
@@ -140,18 +156,6 @@ async function releaseCore(version) {
       //The pipeline starts now. The following commands are to ensure that
       //we set the pro environment and bootstrap it before releasing the CLI/DA
 
-      console.log(FgGreen, "npm run set-pro-environment...");
-      result = shellJs.exec("npm run set-pro-environment");
-      if (result.code !== 0) {
-        throw new Error(result.stderr)
-      }
-
-      console.log(FgGreen, "npm run clean-and-bootstrap...");
-      result = shellJs.exec("npm run clean-and-bootstrap");
-      if (result.code !== 0) {
-        throw new Error(result.stderr)
-      }
-
       console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/core-ci-cd-test.yml")
     } else {
       releaseCoreRollback(commitId, version);
@@ -162,7 +166,8 @@ async function releaseCore(version) {
   }
 }
 
-function releaseCliRollback(commitId, version) {
+async function releaseCliRollback(commitId, version) {
+  const shellJs = await gushio.import('shelljs')
   console.log(FgGreen, `removing tag cli-v${version}...`);
   let result = shellJs.exec(`git tag -d cli-v${version}`);
   if (result.code !== 0) {
@@ -181,9 +186,13 @@ function releaseCliRollback(commitId, version) {
 }
 
 async function releaseCli(version) {
+  const path = await gushio.import('path')
+  const { Confirm } = (await gushio.import('enquirer')).default
+  const shellJs = await gushio.import('shelljs')
   let commitId;
 
   try {
+    await setProEnvironment();
     console.log(FgGreen, "updating Leapp CLI package.json version...");
     const packageName = "cli";
     await updatePackageJsonVersion(packageName, version);

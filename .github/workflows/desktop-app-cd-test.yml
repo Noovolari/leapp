@@ -118,6 +118,8 @@ jobs:
     runs-on: macos-latest
     needs: [ tag-validation ]
     if: needs.tag-validation.outputs.validator == 1
+    env:
+      APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -128,8 +130,6 @@ jobs:
         with:
           timeout_minutes: 13
           max_attempts: 5
-        env:
-          APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
         command: cd packages/desktop-app && KEY_CHAIN=build.keychain && CERTIFICATE_P12=certificate.p12 && CERTIFICATE_APPLICATION_P12=certificate-application.p12 && echo "Recreate the certificate from the secure environment variable" && echo "security create-keychain" && echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12 && echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12 && security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN && echo "security list-keychains" && security list-keychains -s login.keychain build.keychain && echo "security default-keychain" && security default-keychain -s $KEY_CHAIN && echo "security unlock-keychain" && security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN && echo "security import" && security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign; && security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign; && echo "security find-identity" && security find-identity -v && echo "security set-key-partition-list" && security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN && rm -fr *.p12 && npm install && npm run set-target-x64 && npm run release-mac
 
       - name: Cleanup Build macOS desktop app

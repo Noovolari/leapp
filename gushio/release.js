@@ -243,6 +243,7 @@ async function releaseDesktopApp(version) {
   const path = await gushio.import('path')
   const { Confirm } = (await gushio.import('enquirer')).default
   const shellJs = await gushio.import('shelljs')
+  const deleteFunction = require('./delete-func')
   let commitId;
 
   try {
@@ -250,7 +251,8 @@ async function releaseDesktopApp(version) {
 
     await setProEnvironment();
 
-    shellJs.cd(path.join(__dirname, "..", "packages", "desktop-app"))
+    const desktopAppPath = ["..", "packages", "desktop-app"];
+    shellJs.cd(path.join(__dirname, ...desktopAppPath))
 
     console.log(FgGreen, "updating Leapp Desktop App package.json version...");
     let result = shellJs.exec(`npm run release -- --release-as ${version}`)
@@ -266,6 +268,9 @@ async function releaseDesktopApp(version) {
         validate: (input) => input === "continue" || "You have to enter continue. Try again"
       },
     );
+
+    await deleteFunction(path, ...desktopAppPath, "CHANGELOG.md")
+
 
     shellJs.cd(path.join(__dirname, ".."))
 

@@ -10,6 +10,7 @@ env:
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
   DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
   WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
 
@@ -122,7 +123,7 @@ jobs:
         with:
           ref: 'LEAP-635-finalize-release-pipeline-automate-fix'
 
-      - name: Build macOS desktop app
+      - name: Prepare macOS desktop app build
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
         run: |
@@ -151,7 +152,16 @@ jobs:
           rm -fr *.p12
           npm install
           npm run set-target-x64
-          npm run release-mac
+
+      - name: Build macOS desktop app
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: npm run release-mac
+
+      - name: Cleanup Build macOS desktop app
+        run: |
           rm -Rf ./release/mac
           rm -Rf ./release/mac-unpacked
           rm -Rf ./release/.cache
@@ -201,6 +211,16 @@ jobs:
           rm -fr *.p12
           npm install
           npm run set-target-arm64
+
+      - name: Build macOS desktop app
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 10
+          max_attempts: 5
+          command: npm run release-mac
+
+      - name: Cleanup Build macOS desktop app
+        run: |
           npm run release-mac
           rm -Rf ./release/mac
           rm -Rf ./release/mac-unpacked

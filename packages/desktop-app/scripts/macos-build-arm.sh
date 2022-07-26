@@ -1,4 +1,4 @@
-#!bin/bash
+#!/usr/bin/env bash
 
 KEY_CHAIN=build.keychain
 CERTIFICATE_P12=certificate.p12

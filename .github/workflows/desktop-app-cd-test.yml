@@ -130,7 +130,7 @@ jobs:
         with:
           timeout_minutes: 16
           max_attempts: 5
-          command: cd packages/desktop-app && chmod +x scripts/macos-build-x64.sh && ./scripts/macos-build-x64
+          command: cd packages/desktop-app && chmod +x scripts/macos-build-x64.sh && ./scripts/macos-build-x64.sh
 
   build-macos-arm:
     runs-on: macos-latest
@@ -148,4 +148,4 @@ jobs:
         with:
           timeout_minutes: 16
           max_attempts: 5
-          command: cd packages/desktop-app && chmod +x scripts/macos-build-arm.sh && ./scripts/macos-build-arm
+          command: cd packages/desktop-app && chmod +x scripts/macos-build-arm.sh && ./scripts/macos-build-arm.sh

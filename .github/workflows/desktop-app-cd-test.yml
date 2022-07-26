@@ -128,23 +128,9 @@ jobs:
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
         with:
-          timeout_minutes: 13
+          timeout_minutes: 16
           max_attempts: 5
           command: cd packages/desktop-app && ./scripts/macos-build
-
-      - name: Cleanup Build macOS desktop app
-        run: |
-          cd packages/desktop-app
-          rm -Rf ./release/mac
-          rm -Rf ./release/mac-unpacked
-          rm -Rf ./release/.cache
-          rm -Rf ./release/builder-debug.yml
-          rm -Rf ./release/builder-effective-config.yaml
-          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
-          TAG_VERSION=${TAG_VERSION:1}
-          rm "./release/Leapp-$TAG_VERSION-mac.zip"
-          rm "./release/Leapp-$TAG_VERSION-mac.zip.blockmap"
-          zip "./release/Leapp-$TAG_VERSION-mac.zip" "./release/Leapp-$TAG_VERSION.dmg"
 
   build-macos-arm:
     runs-on: macos-latest

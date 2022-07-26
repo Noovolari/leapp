@@ -152,6 +152,9 @@ jobs:
           rm -fr *.p12
           npm install
           npm run set-target-x64
+          echo "::set-env name=KEY_CHAIN::$KEY_CHAIN"
+          echo "::set-env name=CERTIFICATE_P12::$CERTIFICATE_P12"
+          echo "::set-env name=CERTIFICATE_APPLICATION_P12::$CERTIFICATE_APPLICATION_P12"
 
       - name: Build macOS desktop app
         uses: nick-fields/retry@v2

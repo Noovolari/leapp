@@ -217,7 +217,7 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 5
-          command: npm run release-mac
+          command: cd packages/desktop-app && npm run release-mac
 
       - name: Cleanup Build macOS desktop app
         run: |

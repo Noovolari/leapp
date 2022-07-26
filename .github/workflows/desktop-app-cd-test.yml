@@ -124,9 +124,13 @@ jobs:
           ref: 'LEAP-635-finalize-release-pipeline-automate-fix'
 
       - name: Prepare macOS desktop app build
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 15
+          max_attempts: 5
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
-        run: |
+        command: |
           cd packages/desktop-app
           KEY_CHAIN=build.keychain
           CERTIFICATE_P12=certificate.p12
@@ -152,16 +156,7 @@ jobs:
           rm -fr *.p12
           npm install
           npm run set-target-x64
-          echo "KEY_CHAIN=$KEY_CHAIN" >> $GITHUB_ENV
-          echo "CERTIFICATE_P12=$CERTIFICATE_P12" >> $GITHUB_ENV
-          echo "CERTIFICATE_APPLICATION_P12=$CERTIFICATE_APPLICATION_P12" >> $GITHUB_ENV
-
-      - name: Build macOS desktop app
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 13
-          max_attempts: 5
-          command: cd packages/desktop-app && echo $KEY_CHAIN && echo $APPLE_NOTARISATION_PASSWORD && echo $CERTIFICATE_P12 && npm run release-mac
+          npm run release-mac
 
       - name: Cleanup Build macOS desktop app
         run: |

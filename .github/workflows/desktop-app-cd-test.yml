@@ -158,7 +158,7 @@ jobs:
         with:
           timeout_minutes: 13
           max_attempts: 5
-          command: cd packages/desktop-app && npm run release-mac
+          command: cd packages/desktop-app && echo $KEY_CHAIN && echo $APPLE_NOTARISATION_PASSWORD && echo $CERTIFICATE_P12 && npm run release-mac
 
       - name: Cleanup Build macOS desktop app
         run: |

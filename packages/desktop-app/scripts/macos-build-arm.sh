@@ -35,4 +35,5 @@ TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
 TAG_VERSION=${TAG_VERSION:1}
 rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
 rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
-zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.
+zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.dmg"
+

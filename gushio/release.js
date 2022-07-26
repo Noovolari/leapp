@@ -1,4 +1,5 @@
 const FgGreen = "\x1b[32m"
+const FgRed = "\x1b[31m"
 
 module.exports = {
   deps: [
@@ -83,13 +84,13 @@ async function updatePackageJsonVersion(packageName, version) {
 
 async function rollbackProject(commitId, version, package) {
   const shellJs = await gushio.import('shelljs')
+  console.log(FgRed, `rolling back project ${package}`)
+
   package = package === "desktop-app" ? "" : `${package}-`
   console.log(FgGreen, `removing tag ${package}v${version}...`);
   let result = shellJs.exec(`git tag -d ${package}v${version}`);
   if (result.code !== 0) {
-    if (result.stderr.indexOf("not found") === -1) {
-      throw new Error(result.stderr)
-    }
+    console.log(FgRed, result.stderr)
   }
 
   if(commitId !== undefined) {
@@ -97,7 +98,7 @@ async function rollbackProject(commitId, version, package) {
     //TODO restore
     //result = shellJs.exec(`git reset --hard ${commitId}`);
     if (result.code !== 0) {
-      throw new Error(result.stderr)
+      console.log(FgRed, result.stderr)
     }
   }
 }
@@ -291,7 +292,7 @@ async function releaseDesktopApp(version) {
     }
 
     console.log(FgGreen, `creating tag v${version}...`);
-    result = shellJs.exec(`git tag -a v${version} -m "release desktop app v${version}`);
+    result = shellJs.exec(`git tag -a v${version} -m "release desktop app v${version}"`);
     if (result.code !== 0) {
       throw new Error(result.stderr)
     }

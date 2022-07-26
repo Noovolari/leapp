@@ -130,7 +130,7 @@ jobs:
           max_attempts: 5
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
-        command: |
+        run: |
           cd packages/desktop-app
           KEY_CHAIN=build.keychain
           CERTIFICATE_P12=certificate.p12

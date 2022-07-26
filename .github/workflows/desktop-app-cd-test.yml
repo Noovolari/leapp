@@ -130,7 +130,21 @@ jobs:
         with:
           timeout_minutes: 16
           max_attempts: 5
-          command: cd packages/desktop-app && chmod +x scripts/macos-build-x64.sh && ./scripts/macos-build-x64.sh
+          command: cd packages/desktop-app && chmod +x scripts/macos-build.sh && ./scripts/macos-build.sh set-target-x64
+
+      - name: Clean build
+        run: |
+          cd packages/desktop-app
+          rm -Rf ./release/mac
+          rm -Rf ./release/mac-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          rm "./release/Leapp-$TAG_VERSION-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-mac.zip.blockmap"
+          zip "./release/Leapp-$TAG_VERSION-mac.zip" "./release/Leapp-$TAG_VERSION.dmg"
 
   build-macos-arm:
     runs-on: macos-latest
@@ -148,4 +162,19 @@ jobs:
         with:
           timeout_minutes: 16
           max_attempts: 5
-          command: cd packages/desktop-app && chmod +x scripts/macos-build-arm.sh && ./scripts/macos-build-arm.sh
+          command: cd packages/desktop-app && chmod +x scripts/macos-build.sh && ./scripts/macos-build.sh set-target-arm64
+
+      - name: Clean build
+        run: |
+          cd packages/desktop-app
+          rm -Rf ./release/mac
+          rm -Rf ./release/mac-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+          rm -Rf ./release/mac-arm64
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
+          zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.dmg"

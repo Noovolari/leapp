@@ -158,10 +158,11 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 3
-          command: npm run release-mac
+          command: cd packages/desktop-app && npm run release-mac
 
       - name: Cleanup Build macOS desktop app
         run: |
+          cd packages/desktop-app
           rm -Rf ./release/mac
           rm -Rf ./release/mac-unpacked
           rm -Rf ./release/.cache
@@ -221,6 +222,7 @@ jobs:
 
       - name: Cleanup Build macOS desktop app
         run: |
+          cd packages/desktop-app
           npm run release-mac
           rm -Rf ./release/mac
           rm -Rf ./release/mac-unpacked

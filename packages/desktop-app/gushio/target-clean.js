@@ -10,10 +10,10 @@ module.exports = {
 
     try {
       console.log('Performing cleanup... ')
-      await deleteFunction(path, '../electron/dist')
-      await deleteFunction(path, '../dist')
-      await deleteFunction(path, '../coverage')
-      await deleteFunction(path, '../.angular')
+      await deleteFunction(path, "..", "electron", "dist")
+      await deleteFunction(path, "..", "dist")
+      await deleteFunction(path, "..", "coverage")
+      await deleteFunction(path, "..", ".angular")
       console.log('Cleanup completed successfully')
     } catch (e) {
       e.message = e.message.red

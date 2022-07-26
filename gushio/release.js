@@ -3,7 +3,6 @@ const FgGreen = "\x1b[32m"
 module.exports = {
   deps: [
     { name: 'enquirer', version: '2.3.6' },
-    { name: 'shelljs', version: '0.8.5' },
     { name: 'semver', version: '7.3.7' },
   ],
   cli: {

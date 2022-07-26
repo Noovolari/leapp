@@ -20,11 +20,11 @@ module.exports = {
 
         // remove "node-modules" directory
         console.log(`removing ${packageName} node_modules...`)
-        await deleteFunction(path, `../packages/${packageName}/node_modules`)
+        await deleteFunction(path, "..", "packages", packageName, "node_modules")
 
         // remove "package-lock.json" file
         console.log(`removing ${packageName} package-lock.json...`)
-        await deleteFunction(path, `../packages/${packageName}/package-lock.json`)
+        await deleteFunction(path, "..", "packages", packageName, "package-lock.json")
 
         // clean additional directories (dist, ...)
         shellJs.cd(path.join(__dirname, '../packages', packageName))

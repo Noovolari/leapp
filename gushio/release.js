@@ -249,6 +249,8 @@ async function releaseDesktopApp(version) {
 
     await setProEnvironment();
 
+    shellJs.cd(path.join(__dirname, "..", "packages", "desktop-app"))
+
     console.log(FgGreen, "updating Leapp Desktop App package.json version...");
     let result = shellJs.exec(`npm run release -- --release-as ${version}`)
     if (result.code !== 0) {

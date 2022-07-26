@@ -62,14 +62,13 @@ export class PluginManagerService {
         const { packageJson, isPluginValid } = await this.validatePlugin(pluginFilePath, options, pluginFolderNames, i);
 
         // HANDLE PACKAGE.JSON ERROR
-        let metadata;
+        let metadata: IPluginMetadata;
         try {
           metadata = this.extractMetadata(packageJson);
         } catch (errors) {
           this.logService.log(
-            new LoggedEntry(`Missing or invalid values in plugin ${pluginName} package.json: ${errors.message}`, this, LogLevel.warn, true)
+            new LoggedEntry(`missing or invalid values in plugin ${pluginName} package.json: ${errors.message}`, this, LogLevel.warn, true)
           );
-          this.nativeService.rimraf(pluginFilePath, () => {});
           continue;
         }
 
@@ -87,8 +86,7 @@ export class PluginManagerService {
             const pluginModule = this._requireModule(pluginFilePath + "/plugin.js");
             this.logService.log(new LoggedEntry(`loading plugin: ${JSON.stringify(pluginModule)}`, this, LogLevel.info, false));
 
-            console.log(packageJson);
-            const plugin = new pluginModule[packageJson.entryClass]() as any;
+            const plugin = new pluginModule[metadata.entryClass]() as any;
             plugin.metadata = metadata;
             if (!this.repository.getPluginStatus(plugin.metadata.uniqueName)) {
               this.repository.createPluginStatus(plugin.metadata.uniqueName);
@@ -155,6 +153,7 @@ export class PluginManagerService {
     if (!description) {
       errors.push("description");
     }
+
     const keywords = packageJson.keywords as string[];
     if (!keywords || keywords.length === 0) {
       errors.push("keywords");
@@ -163,22 +162,33 @@ export class PluginManagerService {
     }
 
     const leappPluginConfig = packageJson.leappPlugin;
+    if (!leappPluginConfig) {
+      errors.push("leappPlugin");
+    }
+
     const supportedSessionTypes = leappPluginConfig?.supportedSessions || [SessionType.anytype];
     if (!supportedSessionTypes.length) {
-      errors.push("supportedSessions");
+      errors.push("leappPlugin.supportedSessions");
     }
     for (const sessionType of supportedSessionTypes) {
       if (this.sessionFactory.getCompatibleTypes(sessionType).length === 0) {
-        errors.push(`${sessionType} unsupported session`);
+        errors.push(`leappPlugin.supportedSessions: ${sessionType} is unsupported`);
       }
+    }
+    const entryClass = leappPluginConfig?.entryClass;
+    if (leappPluginConfig && !entryClass) {
+      errors.push("leappPlugin.entryClass");
     }
 
     const icon = leappPluginConfig?.icon || "fas fa-puzzle-piece";
     const operatingSystems = [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows];
     const supportedOS = leappPluginConfig?.supportedOS || operatingSystems;
+    if (!supportedOS.length) {
+      errors.push("leappPlugin.supportedOS");
+    }
     for (const os of supportedOS) {
       if (!operatingSystems.includes(os)) {
-        errors.push(`unsupported os ${os}`);
+        errors.push(`leappPlugin.supportedOS: ${os} is unsupported`);
       }
     }
 
@@ -197,6 +207,7 @@ export class PluginManagerService {
       supportedOS,
       supportedSessions: supportedSessionTypes,
       icon,
+      entryClass,
       keywords,
       uniqueName,
       url,
@@ -208,7 +219,7 @@ export class PluginManagerService {
     options: { folders: { include: string[] }; files: { exclude: string[] } },
     pluginFilePaths,
     i: number
-  ) {
+  ): Promise<{ packageJson: string; isPluginValid: boolean }> {
     let isPluginValid = true;
     let packageJsonContent: string;
     try {

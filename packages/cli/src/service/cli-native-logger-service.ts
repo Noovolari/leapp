@@ -1,5 +1,5 @@
-import { ILogger } from "@hesketh-racing/leapp-core/interfaces/i-logger";
-import { LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
+import { ILogger } from "@noovolari/leapp-core/interfaces/i-logger";
+import { LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 export class CliNativeLoggerService implements ILogger {
   constructor() {}

@@ -14,16 +14,16 @@ import {
 import { ColumnDialogComponent } from "../dialogs/column-dialog/column-dialog.component";
 import { BehaviorSubject } from "rxjs";
 import { SessionCardComponent } from "./session-card/session-card.component";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
-import { GlobalFilters } from "@hesketh-racing/leapp-core/models/segment";
-import { BehaviouralSubjectService } from "@hesketh-racing/leapp-core/services/behavioural-subject-service";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { GlobalFilters } from "@noovolari/leapp-core/models/segment";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { AppProviderService } from "../../services/app-provider.service";
-import { AwsCoreService } from "@hesketh-racing/leapp-core/services/aws-core-service";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
-import { AwsIamRoleFederatedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-federated-session";
-import { AzureSession } from "@hesketh-racing/leapp-core/models/azure/azure-session";
-import { AwsSsoRoleSession } from "@hesketh-racing/leapp-core/models/aws/aws-sso-role-session";
-import { AwsIamRoleChainedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-chained-session";
+import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
+import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
 
 export const optionBarIds = {};
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);

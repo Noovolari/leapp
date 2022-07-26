@@ -6,19 +6,19 @@ import { SegmentDialogComponent } from "../dialogs/segment-dialog/segment-dialog
 import { FormControl, FormGroup } from "@angular/forms";
 import { BehaviorSubject } from "rxjs";
 import { globalOrderingFilter } from "../sessions/sessions.component";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
-import Segment, { GlobalFilters } from "@hesketh-racing/leapp-core/models/segment";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
-import { BehaviouralSubjectService } from "@hesketh-racing/leapp-core/services/behavioural-subject-service";
+import { Session } from "@noovolari/leapp-core/models/session";
+import Segment, { GlobalFilters } from "@noovolari/leapp-core/models/segment";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { syncAllEvent } from "../integration-bar/integration-bar.component";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AppNativeService } from "../../services/app-native.service";
 import { AppService } from "../../services/app.service";
-import { AwsSsoRoleSession } from "@hesketh-racing/leapp-core/models/aws/aws-sso-role-session";
-import { constants } from "@hesketh-racing/leapp-core/models/constants";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
+import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
-import { AzureSession } from "@hesketh-racing/leapp-core/models/azure/azure-session";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);

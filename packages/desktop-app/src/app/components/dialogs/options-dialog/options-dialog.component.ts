@@ -3,17 +3,17 @@ import { FormControl, FormGroup } from "@angular/forms";
 import { AppService } from "../../../services/app.service";
 import { Router } from "@angular/router";
 import { MatTabGroup } from "@angular/material/tabs";
-import { constants } from "@hesketh-racing/leapp-core/models/constants";
-import { LoggedEntry, LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
 import { OptionsService } from "../../../services/options.service";
-import { AwsIamRoleFederatedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-federated-session";
-import { SessionService } from "@hesketh-racing/leapp-core/services/session/session-service";
-import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
+import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 @Component({
   selector: "app-options-dialog",

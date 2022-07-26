@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import Folder from "@hesketh-racing/leapp-core/models/folder";
+import Folder from "@noovolari/leapp-core/models/folder";
 import { AppProviderService } from "./app-provider.service";
-import { WorkspaceService } from "@hesketh-racing/leapp-core/services/workspace-service";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { Session } from "@noovolari/leapp-core/models/session";
 
 @Injectable({ providedIn: "root" })
 export class OptionsService {

@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import * as Keytar from "keytar";
-import { INativeService } from "@hesketh-racing/leapp-core/interfaces/i-native-service";
-import { IMsalEncryptionService } from "@hesketh-racing/leapp-core/interfaces/i-msal-encryption-service";
+import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
+import { IMsalEncryptionService } from "@noovolari/leapp-core/interfaces/i-msal-encryption-service";
 
 @Injectable({ providedIn: "root" })
 export class AppNativeService implements INativeService {

@@ -1,4 +1,4 @@
-import { IOpenExternalUrlService } from "@hesketh-racing/leapp-core/interfaces/i-open-external-url-service";
+import { IOpenExternalUrlService } from "@noovolari/leapp-core/interfaces/i-open-external-url-service";
 import open from "open";
 
 export class CliOpenWebConsoleService implements IOpenExternalUrlService {

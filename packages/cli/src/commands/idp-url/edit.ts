@@ -1,6 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { IdpUrl } from "@hesketh-racing/leapp-core/models/idp-url";
+import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
 import { idpUrl, idpUrlId } from "../../flags";
 
 export default class EditIdpUrl extends LeappCommand {

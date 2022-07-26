@@ -1,6 +1,6 @@
 import { ErrorHandler, Injectable, Injector } from "@angular/core";
 import { AppProviderService } from "../app-provider.service";
-import { LoggedException, LoggedEntry, LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
+import { LoggedException, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Injectable({
   providedIn: "root",

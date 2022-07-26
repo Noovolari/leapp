@@ -3,7 +3,7 @@ import { NgSelectComponent } from "@ng-select/ng-select";
 import { FormGroup } from "@angular/forms";
 import { DomSanitizer } from "@angular/platform-browser";
 import { AppProviderService } from "../../services/app-provider.service";
-import { LoggedEntry, LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Component({
   selector: "app-leapp-select",

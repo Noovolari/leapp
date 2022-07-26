@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import DeleteSession from "./delete";
-import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("DeleteSession", () => {

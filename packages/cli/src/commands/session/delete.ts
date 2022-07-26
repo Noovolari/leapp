@@ -1,4 +1,4 @@
-import { Session } from "@hesketh-racing/leapp-core/models/session";
+import { Session } from "@noovolari/leapp-core/models/session";
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { force, sessionId } from "../../flags";

@@ -3,8 +3,8 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { CommandBarComponent } from "./command-bar.component";
 import { mustInjected } from "../../../base-injectables";
 import { AppProviderService } from "../../services/app-provider.service";
-import { constants } from "@hesketh-racing/leapp-core/models/constants";
-import { Workspace } from "@hesketh-racing/leapp-core/models/workspace";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { Workspace } from "@noovolari/leapp-core/models/workspace";
 import { OptionsService } from "../../services/options.service";
 
 describe("CommandBarComponent", () => {

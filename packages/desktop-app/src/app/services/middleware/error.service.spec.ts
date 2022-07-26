@@ -5,7 +5,7 @@ import { ToastrModule } from "ngx-toastr";
 import { ErrorHandler } from "@angular/core";
 import { AppModule } from "../../app.module";
 import { AppProviderService } from "../app-provider.service";
-import { LoggedException, LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
+import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 describe("ErrorService", () => {
   let spyLogService;

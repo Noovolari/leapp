@@ -2,7 +2,7 @@ import { jest, describe, expect, test } from "@jest/globals";
 import { CliAwsSamlAuthenticationService } from "./cli-aws-saml-authentication-service";
 import { of } from "rxjs";
 import { Page, HTTPRequest } from "puppeteer";
-import { CloudProviderType } from "@hesketh-racing/leapp-core/models/cloud-provider-type";
+import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import * as process from "process";
 
 class PageStub {

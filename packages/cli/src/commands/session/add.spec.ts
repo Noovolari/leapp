@@ -1,10 +1,10 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { CloudProviderType } from "@hesketh-racing/leapp-core/models/cloud-provider-type";
+import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import AddSession from "./add";
-import { IdpUrlAccessMethodField } from "@hesketh-racing/leapp-core/models/idp-url-access-method-field";
-import { AccessMethodFieldType } from "@hesketh-racing/leapp-core/models/access-method-field-type";
+import { IdpUrlAccessMethodField } from "@noovolari/leapp-core/models/idp-url-access-method-field";
+import { AccessMethodFieldType } from "@noovolari/leapp-core/models/access-method-field-type";
 import { CliProviderService } from "../../service/cli-provider-service";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("AddSession", () => {
   const getTestCommand = (cliProviderService: any = null, createIdpUrlCommand: any = null, argv = []): AddSession => {

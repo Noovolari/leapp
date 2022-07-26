@@ -1,9 +1,9 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import StartSsmSession from "./start-ssm-session";
-import { AwsSessionService } from "@hesketh-racing/leapp-core/services/session/aws/aws-session-service";
-import { constants } from "@hesketh-racing/leapp-core/models/constants";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
 import { CliProviderService } from "../../service/cli-provider-service";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("StartSsmSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): StartSsmSession => {

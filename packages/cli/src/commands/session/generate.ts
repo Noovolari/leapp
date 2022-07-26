@@ -1,8 +1,8 @@
-import { AwsSessionService } from "@hesketh-racing/leapp-core/services/session/aws/aws-session-service";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
-import { SessionService } from "@hesketh-racing/leapp-core/services/session/session-service";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 
 export default class GenerateSession extends LeappCommand {
   static description = "Generate STS temporary credentials for the given AWS session id";

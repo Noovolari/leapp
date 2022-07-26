@@ -1,9 +1,9 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
-import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
-import { AwsSessionService } from "@hesketh-racing/leapp-core/services/session/aws/aws-session-service";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { sessionId } from "../../flags";
 
 export default class OpenWebConsole extends LeappCommand {

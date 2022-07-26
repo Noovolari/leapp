@@ -3,9 +3,9 @@ import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { CreateDialogComponent } from "./create-dialog.component";
 import { mustInjected } from "../../../../base-injectables";
 import { RouterTestingModule } from "@angular/router/testing";
-import { constants } from "@hesketh-racing/leapp-core/models/constants";
+import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
-import { Workspace } from "@hesketh-racing/leapp-core/models/workspace";
+import { Workspace } from "@noovolari/leapp-core/models/workspace";
 
 describe("CreateDialogComponent", () => {
   let component: CreateDialogComponent;

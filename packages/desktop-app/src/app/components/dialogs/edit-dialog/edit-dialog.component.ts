@@ -2,24 +2,24 @@ import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from "
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AppService } from "../../../services/app.service";
 import { ActivatedRoute, Router } from "@angular/router";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
-import { Workspace } from "@hesketh-racing/leapp-core/models/workspace";
-import { BehaviouralSubjectService } from "@hesketh-racing/leapp-core/services/behavioural-subject-service";
-import { KeychainService } from "@hesketh-racing/leapp-core/services/keychain-service";
-import { constants } from "@hesketh-racing/leapp-core/models/constants";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { Workspace } from "@noovolari/leapp-core/models/workspace";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
+import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
-import { SessionService } from "@hesketh-racing/leapp-core/services/session/session-service";
+import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import * as uuid from "uuid";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
-import { AzureLocation } from "@hesketh-racing/leapp-core/services/azure-location";
-import { AwsIamRoleChainedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-chained-session";
-import { AwsIamRoleFederatedSession } from "@hesketh-racing/leapp-core/models/aws/aws-iam-role-federated-session";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { AzureLocation } from "@noovolari/leapp-core/services/azure-location";
+import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { LeappSelectComponent } from "../../leapp-select/leapp-select.component";
-import { LeappParseError } from "@hesketh-racing/leapp-core/errors/leapp-parse-error";
+import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
-import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "../../../services/options.service";
 
 @Component({

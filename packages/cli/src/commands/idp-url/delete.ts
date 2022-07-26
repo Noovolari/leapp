@@ -1,7 +1,7 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
-import { IdpUrl } from "@hesketh-racing/leapp-core/models/idp-url";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
 import { idpUrlId, force } from "../../flags";
 
 export default class DeleteIdpUrl extends LeappCommand {

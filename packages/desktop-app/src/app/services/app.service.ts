@@ -6,8 +6,8 @@ import { AppProviderService } from "./app-provider.service";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { WindowService } from "./window.service";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { constants } from "@hesketh-racing/leapp-core/models/constants";
-import { LogService, LoggedEntry, LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 @Injectable({
   providedIn: "root",

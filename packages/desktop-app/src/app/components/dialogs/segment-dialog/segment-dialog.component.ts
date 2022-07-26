@@ -4,7 +4,7 @@ import { FormControl, FormGroup } from "@angular/forms";
 import { globalFilterGroup } from "../../command-bar/command-bar.component";
 import { NgSelectComponent } from "@ng-select/ng-select";
 import { segmentFilter } from "../../side-bar/side-bar.component";
-import Segment from "@hesketh-racing/leapp-core/models/segment";
+import Segment from "@noovolari/leapp-core/models/segment";
 import { AppProviderService } from "../../../services/app-provider.service";
 
 @Component({

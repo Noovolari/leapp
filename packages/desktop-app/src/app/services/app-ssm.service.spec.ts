@@ -4,7 +4,7 @@ import { AppSsmService } from "./app-ssm.service";
 import { mustInjected } from "../../base-injectables";
 import { AppProviderService } from "./app-provider.service";
 import SpyObj = jasmine.SpyObj;
-import { CredentialsInfo } from "@hesketh-racing/leapp-core/models/credentials-info";
+import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
 import { AppService } from "./app.service";
 
 describe("SsmService", () => {

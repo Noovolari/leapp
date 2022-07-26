@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
-import { ILogger } from "@hesketh-racing/leapp-core/interfaces/i-logger";
+import { ILogger } from "@noovolari/leapp-core/interfaces/i-logger";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { AppNativeService } from "./app-native.service";
-import { LogLevel } from "@hesketh-racing/leapp-core/services/log-service";
+import { LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 const toastLevelMap = {
   [LogLevel.success]: ToastLevel.success,

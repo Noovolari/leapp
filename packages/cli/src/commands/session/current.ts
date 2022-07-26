@@ -1,13 +1,13 @@
-import { AwsNamedProfile } from "@hesketh-racing/leapp-core/models/aws/aws-named-profile";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
-import { AwsSessionService } from "@hesketh-racing/leapp-core/services/session/aws/aws-session-service";
+import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { Flags } from "@oclif/core";
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
-import { constants } from "@hesketh-racing/leapp-core/models/constants";
-import { AzureSessionService } from "@hesketh-racing/leapp-core/services/session/azure/azure-session-service";
-import { AzureSession } from "@hesketh-racing/leapp-core/models/azure/azure-session";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 
 const awsProvider = "aws";
 const azureProvider = "azure";

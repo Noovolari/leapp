@@ -1,6 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsNamedProfile } from "@hesketh-racing/leapp-core/models/aws/aws-named-profile";
+import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
 import { profileId, profileName } from "../../flags";
 
 export default class EditNamedProfile extends LeappCommand {

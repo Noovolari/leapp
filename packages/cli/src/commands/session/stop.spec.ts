@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import StopSession from "./stop";
-import { SessionStatus } from "@hesketh-racing/leapp-core/models/session-status";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 describe("StopSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): StopSession => {

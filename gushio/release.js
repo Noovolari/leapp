@@ -95,8 +95,7 @@ async function rollbackProject(commitId, version, package) {
 
   if(commitId !== undefined) {
     console.log(FgGreen, "reset codebase to previous commit...");
-    //TODO restore
-    //result = shellJs.exec(`git reset --hard ${commitId}`);
+    result = shellJs.exec(`git reset --hard ${commitId}`);
     if (result.code !== 0) {
       console.log(FgRed, result.stderr)
     }

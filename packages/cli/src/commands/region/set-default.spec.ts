@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import ChangeDefaultRegion from "./set-default";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { CliProviderService } from "../../service/cli-provider-service";
 
 describe("ChangeDefaultRegion", () => {

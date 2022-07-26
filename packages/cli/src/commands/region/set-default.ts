@@ -1,6 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { SessionType } from "@hesketh-racing/leapp-core/models/session-type";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { region } from "../../flags";
 
 export default class ChangeDefaultRegion extends LeappCommand {

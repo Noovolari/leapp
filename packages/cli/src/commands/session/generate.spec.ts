@@ -1,6 +1,6 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { Session } from "@hesketh-racing/leapp-core/models/session";
-import { AwsSessionService } from "@hesketh-racing/leapp-core/services/session/aws/aws-session-service";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import GenerateSession from "./generate";
 
 describe("GenerateSession", () => {

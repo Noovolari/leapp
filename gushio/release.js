@@ -25,6 +25,7 @@ module.exports = {
         "desktop-app": releaseDesktopApp
       };
       let target;
+      console.log(FgGreen, `Welcome to leapp-release script`)
       const prompt = new Select({
         name: "target",
         message: "What do you want to deploy?",
@@ -84,7 +85,7 @@ async function updatePackageJsonVersion(packageName, version) {
 
 async function rollbackProject(commitId, version, package) {
   const shellJs = await gushio.import('shelljs')
-  console.log(FgRed, `rolling back project ${package}`)
+  console.log(FgRed, `rolling back project ${package}...`)
 
   package = package === "desktop-app" ? "" : `${package}-`
   console.log(FgGreen, `removing tag ${package}v${version}...`);
@@ -152,7 +153,7 @@ async function releaseCore(version) {
       //The pipeline starts now. The following commands are to ensure that
       //we set the pro environment and bootstrap it before releasing the CLI/DA
 
-      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/core-ci-cd-test.yml")
+      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/core-ci-cd.yml")
     } else {
       await rollbackProject(commitId, version, "core");
     }
@@ -228,7 +229,7 @@ async function releaseCli(version) {
         throw new Error(result.stderr)
       }
 
-      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/cli-ci-cd-test.yml")
+      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/cli-ci-cd.yml")
     } else {
       await rollbackProject(commitId, version, "cli");
     }
@@ -263,7 +264,7 @@ async function releaseDesktopApp(version) {
       {
         type: 'input',
         name: 'continue',
-        message: `Waiting for CHANGELOG.md to be modified... When it's ready, type continue`,
+        message: `Waiting for CHANGELOG.md to be modified... When the file is ready, type continue`,
         validate: (input) => input === "continue" || "You have to enter continue. Try again"
       },
     );
@@ -315,7 +316,7 @@ async function releaseDesktopApp(version) {
         throw new Error(result.stderr)
       }
 
-      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/desktop-app-cd-test.yml")
+      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/desktop-app-cd.yml")
     } else {
       await rollbackProject(commitId, version, "desktop-app");
     }

@@ -40,7 +40,7 @@
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install",
-    "release": "gushio gushio/release.js"
+    "leapp-release": "gushio gushio/release.js"
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"

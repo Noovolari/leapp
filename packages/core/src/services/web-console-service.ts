@@ -8,11 +8,11 @@ export class WebConsoleService {
 
   constructor(private shellService: IOpenExternalUrlService, private logService: LogService, private fetch: any) {}
 
-  async openWebConsole(
+  async getWebConsoleUrl(
     credentialsInfo: CredentialsInfo,
     sessionRegion: string,
     sessionDuration: number = this.sessionDurationInHours * this.secondsInAHour
-  ): Promise<void> {
+  ): Promise<string> {
     const isUSGovCloud = sessionRegion.startsWith("us-gov-");
 
     let federationUrl;
@@ -47,6 +47,15 @@ export class WebConsoleService {
 
     const loginURL = `${federationUrl}?Action=login&Issuer=Leapp&Destination=${consoleHomeURL}&SigninToken=${(response as any).SigninToken}`;
 
+    return loginURL;
+  }
+
+  async openWebConsole(
+    credentialsInfo: CredentialsInfo,
+    sessionRegion: string,
+    sessionDuration: number = this.sessionDurationInHours * this.secondsInAHour
+  ): Promise<void> {
+    const loginURL = await this.getWebConsoleUrl(credentialsInfo, sessionRegion, sessionDuration);
     this.shellService.openExternalUrl(loginURL);
   }
 }

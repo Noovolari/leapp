@@ -128,10 +128,7 @@ export class PluginManagerService {
       (plugin) =>
         plugin.metadata.active &&
         plugin.metadata.supportedOS.includes(os) &&
-        (plugin.metadata.supportedSessions.includes(session.type) ||
-          plugin.metadata.supportedSessions.includes(SessionType.anytype) ||
-          //TODO: when writing tests, fix when AWS and Azure session types are specified together
-          session.type.toString().indexOf(plugin.metadata.supportedSessions.join("")) > -1)
+        plugin.metadata.supportedSessions.some((supportedSession) => this.sessionFactory.getCompatibleTypes(supportedSession).includes(session.type))
     );
   }
 
@@ -167,9 +164,6 @@ export class PluginManagerService {
     }
 
     const supportedSessionTypes = leappPluginConfig?.supportedSessions || [SessionType.anytype];
-    if (!supportedSessionTypes.length) {
-      errors.push("leappPlugin.supportedSessions");
-    }
     for (const sessionType of supportedSessionTypes) {
       if (this.sessionFactory.getCompatibleTypes(sessionType).length === 0) {
         errors.push(`leappPlugin.supportedSessions: ${sessionType} is unsupported`);
@@ -183,16 +177,13 @@ export class PluginManagerService {
     const icon = leappPluginConfig?.icon || "fas fa-puzzle-piece";
     const operatingSystems = [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows];
     const supportedOS = leappPluginConfig?.supportedOS || operatingSystems;
-    if (!supportedOS.length) {
-      errors.push("leappPlugin.supportedOS");
-    }
     for (const os of supportedOS) {
       if (!operatingSystems.includes(os)) {
         errors.push(`leappPlugin.supportedOS: ${os} is unsupported`);
       }
     }
 
-    const url = leappPluginConfig.url;
+    const url = leappPluginConfig?.url;
 
     if (errors.length) {
       throw new Error(errors.join(", "));

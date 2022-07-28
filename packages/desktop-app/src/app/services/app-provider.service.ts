@@ -103,7 +103,8 @@ export class AppProviderService {
         this.logService,
         this.repository,
         this.sessionFactory,
-        this.http
+        this.http,
+        this.executeService
       );
     }
     return this.pluginManagerServiceInstance;

@@ -21,6 +21,11 @@ export class CliNativeService implements INativeService {
   process: any;
   nodeIpc: any;
   msalEncryptionService: IMsalEncryptionService;
+  requireModule: any;
+  hashElement: any;
+  crypto: any;
+  fixPath: any;
+  tar: any;
 
   constructor() {
     this.fs = require("fs-extra");
@@ -41,5 +46,10 @@ export class CliNativeService implements INativeService {
     this.followRedirects = require("follow-redirects");
     this.httpProxyAgent = require("http-proxy-agent");
     this.httpsProxyAgent = require("https-proxy-agent");
+    this.requireModule = require("require-module");
+    this.hashElement = require("folder-hash");
+    this.crypto = require("crypto");
+    this.fixPath = require("fix-path");
+    this.tar = require("tar");
   }
 }

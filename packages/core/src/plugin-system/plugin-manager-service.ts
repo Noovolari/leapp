@@ -77,7 +77,7 @@ export class PluginManagerService {
         const isSignatureInvalid = !isPluginValid && !this.skipPluginValidation();
         if (isSignatureInvalid) {
           this.logService.log(new LoggedEntry(`Signature not verified for plugin: ${pluginDirContent[i]}`, this, LogLevel.warn, true));
-          this.nativeService.rimraf(pluginFilePath, () => {});
+          await this.nativeService.fs.remove(pluginFilePath);
           continue;
         }
 
@@ -134,6 +134,35 @@ export class PluginManagerService {
         plugin.metadata.supportedOS.includes(os) &&
         plugin.metadata.supportedSessions.some((supportedSession) => this.sessionFactory.getCompatibleTypes(supportedSession).includes(session.type))
     );
+  }
+
+  async installPlugin(url: string) {
+    const packageName = url.replace("leapp://", "");
+    const pluginsDir = this.nativeService.os.homedir() + "/.Leapp/plugins";
+
+    this.logService.log(new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true));
+
+    const npmMetadata = await this.http.get(`https://registry.npmjs.org/${packageName}`, { responseType: "json" }).toPromise();
+    const version = npmMetadata["dist-tags"].latest;
+    const tarballUrl = npmMetadata.versions[version].dist.tarball;
+    const tarballPathComponents = tarballUrl.split("/");
+    const tarballFileName = tarballPathComponents[tarballPathComponents.length - 1];
+    const tarballBuffer = await this.http.get(tarballUrl, { responseType: "arraybuffer" }).toPromise();
+    const tarballFilePath = this.nativeService.path.join(pluginsDir, tarballFileName);
+    this.nativeService.fs.writeFileSync(tarballFilePath, Buffer.from(tarballBuffer));
+
+    const pluginDir = this.nativeService.path.join(pluginsDir, packageName);
+    await this.nativeService.fs.remove(pluginDir);
+    await this.nativeService.fs.ensureDir(pluginDir);
+
+    await this.nativeService.tar.x({
+      file: tarballFilePath,
+      strip: 1,
+      ["C"]: pluginDir,
+    });
+
+    await this.nativeService.fs.remove(tarballFilePath);
+    this.logService.log(new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
   }
 
   private extractMetadata(packageJson: any): IPluginMetadata {
@@ -243,7 +272,7 @@ export class PluginManagerService {
         console.log(signatureVerified);
 
         if (!signatureVerified) {
-          return { packageJson: undefined, isPluginValid: false };
+          return { packageJson: JSON.parse(packageJsonContent), isPluginValid: false };
         }
       } else {
         console.log(`folder ${pluginFilePath} is not a plugin folder, ignoring...`);
@@ -264,29 +293,6 @@ export class PluginManagerService {
     verifier.update(message);
     verifier.end();
     return verifier.verify(publicKey, signature);
-  }
-
-  private async installPlugin(url: string) {
-    const packageName = url.replace("leapp://", "");
-    const pluginDir = this.nativeService.os.homedir() + "/.Leapp/plugins";
-
-    this.logService.log(new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true));
-
-    console.log(pluginDir, packageName);
-    const version = await this.executeService.execute(`npm show ${packageName} version`);
-    console.log(version);
-    const packageComplete = `${packageName}-${version.trim()}.tgz`;
-
-    await this.executeService.execute(
-      `cd ${pluginDir} && /usr/bin/curl --silent --remote-name "https://registry.npmjs.org/${packageName}/-/${packageComplete}"`
-    );
-    await this.executeService.execute(`cd ${pluginDir} && /bin/rm -rf "${packageName}"`);
-    await this.executeService.execute(`cd ${pluginDir} && /bin/mkdir "${packageName}"`);
-    await this.executeService.execute(`cd ${pluginDir} && /usr/bin/tar xzf "${packageComplete}" --strip-components 1 -C "${packageName}"`);
-    await this.executeService.execute(`cd ${pluginDir} && /bin/rm "${packageComplete}"`);
-    await this.executeService.execute(`cd ${pluginDir}/${packageName} && npm install`);
-
-    this.logService.log(new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
   }
 
   private skipPluginValidation() {

@@ -74,9 +74,11 @@ describe("PluginManagerService", () => {
     };
     const plugins = [plugin1, plugin2];
     const packagesJsons = [packageJson1, packageJson2];
+
     class PluginClass {
       constructor() {}
     }
+
     const nativeService = {
       requireModule: jest.fn(() => ({ entryClass: PluginClass })),
       hashElement: { hashElement: null },
@@ -183,11 +185,11 @@ describe("PluginManagerService", () => {
         lstatSync: () => ({
           isDirectory: () => true,
         }),
+        remove: jest.fn(async () => {}),
       },
       os: {
         homedir: () => homedir,
       },
-      rimraf: jest.fn(),
     } as any;
     const logService = {
       log: jest.fn(),
@@ -200,7 +202,7 @@ describe("PluginManagerService", () => {
 
     await pluginManager.loadFromPluginDir();
     expect(logService.log).toHaveBeenCalledWith(new LoggedEntry(`Signature not verified for plugin: plugin-1`, this, LogLevel.warn, true));
-    expect(nativeService.rimraf).toHaveBeenCalledWith(path, expect.anything());
+    expect(nativeService.fs.remove).toHaveBeenCalledWith(path);
   });
 
   test("loadFromPluginDir, invalid plugin code", async () => {
@@ -532,7 +534,7 @@ describe("PluginManagerService", () => {
       })),
     };
     const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
-    expect(result).toStrictEqual({ packageJson: undefined, isPluginValid: false });
+    expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: false });
   });
 
   test("validatePlugin, hashing or verification failed", async () => {

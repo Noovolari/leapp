@@ -25,4 +25,5 @@ export interface INativeService {
   requireModule: any;
   crypto: any;
   fixPath: any;
+  tar: any;
 }

@@ -10,6 +10,7 @@ Sessions management
 * [`leapp session delete`](#leapp-session-delete)
 * [`leapp session generate SESSIONID`](#leapp-session-generate-sessionid)
 * [`leapp session get-id`](#leapp-session-get-id)
+* [`leapp session get-web-console-url`](#leapp-session-get-web-console-url)
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session open-web-console`](#leapp-session-open-web-console)
 * [`leapp session start`](#leapp-session-start)
@@ -182,6 +183,26 @@ DESCRIPTION
 
 EXAMPLES
   $leapp session get-id
+```
+
+# `leapp session get-web-console-url`
+
+Get an AWS Web Console Url
+
+```console
+USAGE
+  $ leapp session get-web-console-url [--sessionId <value>]
+
+FLAGS
+  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
+
+DESCRIPTION
+  Get an AWS Web Console Url
+
+EXAMPLES
+  $leapp session get-web-console-url
+
+  $leapp session get-web-console-url --sessionId SESSIONID
 ```
 
 # `leapp session list`

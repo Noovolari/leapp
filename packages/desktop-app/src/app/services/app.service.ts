@@ -236,30 +236,7 @@ export class AppService {
   // TODO: make platform independent
   // TODO: remove preemptly package-lock before running npm install
   async installPlugin(url: string): Promise<void> {
-    const packageName = url.replace("leapp://", "");
-    const pluginDir = this.appNativeService.os.homedir() + "/.Leapp/plugins";
-
-    this.appProviderService.logService.log(
-      new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true)
-    );
-
-    console.log(pluginDir, packageName);
-    const version = await this.appProviderService.executeService.execute(`npm show ${packageName} version`);
-    console.log(version);
-    const packageComplete = `${packageName}-${version.trim()}.tgz`;
-
-    await this.appProviderService.executeService.execute(
-      `cd ${pluginDir} && /usr/bin/curl --silent --remote-name "https://registry.npmjs.org/${packageName}/-/${packageComplete}"`
-    );
-    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/rm -rf "${packageName}"`);
-    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/mkdir "${packageName}"`);
-    await this.appProviderService.executeService.execute(
-      `cd ${pluginDir} && /usr/bin/tar xzf "${packageComplete}" --strip-components 1 -C "${packageName}"`
-    );
-    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/rm "${packageComplete}"`);
-    await this.appProviderService.executeService.execute(`cd ${pluginDir}/${packageName} && npm install`);
-
-    this.appProviderService.logService.log(new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
+    await this.appProviderService.pluginManagerService.installPlugin(url);
   }
 
   async reloadPlugins(): Promise<void> {

@@ -7,6 +7,7 @@ import { SessionType } from "../models/session-type";
 import { OperatingSystem } from "../models/operating-system";
 import { Session } from "../models/session";
 import { SessionFactory } from "../services/session-factory";
+import { ExecuteService } from "../services/execute-service";
 
 export class PluginManagerService {
   private _plugins: IPlugin[];
@@ -19,7 +20,8 @@ export class PluginManagerService {
     private logService: LogService,
     private repository: Repository,
     private sessionFactory: SessionFactory,
-    private http: any
+    private http: any,
+    private executeService: ExecuteService
   ) {
     this._plugins = [];
     this._requireModule = nativeService.requireModule;
@@ -262,6 +264,29 @@ export class PluginManagerService {
     verifier.update(message);
     verifier.end();
     return verifier.verify(publicKey, signature);
+  }
+
+  private async installPlugin(url: string) {
+    const packageName = url.replace("leapp://", "");
+    const pluginDir = this.nativeService.os.homedir() + "/.Leapp/plugins";
+
+    this.logService.log(new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true));
+
+    console.log(pluginDir, packageName);
+    const version = await this.executeService.execute(`npm show ${packageName} version`);
+    console.log(version);
+    const packageComplete = `${packageName}-${version.trim()}.tgz`;
+
+    await this.executeService.execute(
+      `cd ${pluginDir} && /usr/bin/curl --silent --remote-name "https://registry.npmjs.org/${packageName}/-/${packageComplete}"`
+    );
+    await this.executeService.execute(`cd ${pluginDir} && /bin/rm -rf "${packageName}"`);
+    await this.executeService.execute(`cd ${pluginDir} && /bin/mkdir "${packageName}"`);
+    await this.executeService.execute(`cd ${pluginDir} && /usr/bin/tar xzf "${packageComplete}" --strip-components 1 -C "${packageName}"`);
+    await this.executeService.execute(`cd ${pluginDir} && /bin/rm "${packageComplete}"`);
+    await this.executeService.execute(`cd ${pluginDir}/${packageName} && npm install`);
+
+    this.logService.log(new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
   }
 
   private skipPluginValidation() {

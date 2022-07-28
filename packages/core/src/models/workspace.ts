@@ -191,11 +191,11 @@ export class Workspace {
     this._credentialMethod = credentialMethod;
   }
 
-  get pluginStatus(): PluginStatus[] {
+  get pluginsStatus(): PluginStatus[] {
     return this._pluginsStatus;
   }
 
-  set pluginStatus(newPlugins: PluginStatus[]) {
+  set pluginsStatus(newPlugins: PluginStatus[]) {
     this._pluginsStatus = newPlugins;
   }
 }

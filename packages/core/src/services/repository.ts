@@ -141,17 +141,15 @@ export class Repository {
   }
 
   createPluginStatus(pluginId: string): void {
-    this._workspace.pluginStatus.push({ id: pluginId, active: true });
+    this._workspace.pluginsStatus.push({ id: pluginId, active: true });
   }
 
   getPluginStatus(pluginId: string): PluginStatus {
-    return this._workspace.pluginStatus.find((pluginStatus) => pluginStatus.id === pluginId);
+    return this._workspace.pluginsStatus.find((pluginStatus) => pluginStatus.id === pluginId);
   }
 
   setPluginStatus(pluginId: string, newStatus: PluginStatus): void {
-    console.log("setting plugin status..................");
-    console.log(this._workspace.pluginStatus.map((pluginStatus) => (pluginStatus.id === pluginId ? newStatus : pluginStatus)));
-    this._workspace.pluginStatus = this._workspace.pluginStatus.map((pluginStatus) => (pluginStatus.id === pluginId ? newStatus : pluginStatus));
+    this._workspace.pluginsStatus = this._workspace.pluginsStatus.map((pluginStatus) => (pluginStatus.id === pluginId ? newStatus : pluginStatus));
   }
 
   // REGION AND LOCATION

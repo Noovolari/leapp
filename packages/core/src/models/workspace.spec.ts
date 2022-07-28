@@ -227,4 +227,16 @@ describe("Workspace Model", () => {
     workspace.credentialMethod = mock;
     expect(mock).toStrictEqual((workspace as any)._credentialMethod);
   });
+
+  test("pluginStatus", () => {
+    const workspace = new Workspace();
+    expect(workspace.pluginsStatus).toStrictEqual([]);
+  });
+
+  test("set pluginStatus", () => {
+    const workspace = new Workspace();
+    const mock = "plugin-status" as any;
+    workspace.pluginsStatus = mock;
+    expect(mock).toStrictEqual((workspace as any)._pluginsStatus);
+  });
 });

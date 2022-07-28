@@ -30,7 +30,7 @@ export class WebConsoleService {
       throw new Error("Unsupported Region");
     }
 
-    this.logService.log(new LoggedEntry("Starting opening Web Console", this, LogLevel.info));
+    this.logService.log(new LoggedEntry("Getting Web Console Url", this, LogLevel.info));
 
     const sessionStringJSON = {
       sessionId: credentialsInfo.sessionToken.aws_access_key_id,
@@ -56,6 +56,7 @@ export class WebConsoleService {
     sessionDuration: number = this.sessionDurationInHours * this.secondsInAHour
   ): Promise<void> {
     const loginURL = await this.getWebConsoleUrl(credentialsInfo, sessionRegion, sessionDuration);
+    this.logService.log(new LoggedEntry("Opening Web Console in browser", this, LogLevel.info));
     this.shellService.openExternalUrl(loginURL);
   }
 }

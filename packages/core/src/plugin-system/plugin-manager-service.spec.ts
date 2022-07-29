@@ -379,6 +379,73 @@ describe("PluginManagerService", () => {
     expect(result4).toStrictEqual([]);
   });
 
+  test("installPlugin", async () => {
+    const logService = {
+      log: jest.fn(),
+    } as any;
+    const homedir = "homedir";
+    const packageName = "leapp-fake-plugin";
+    const tarballFilePath = "tarball-file-path";
+    const fakePluginDir = "fake-plugin-dir";
+    const tarballFileName = packageName + ".tgz";
+
+    const nativeService = {
+      requireModule: null,
+      hashElement: { hashElement: null },
+      os: {
+        homedir: jest.fn(() => homedir),
+      },
+      path: {
+        join: jest.fn((_, param2) => (param2 === packageName ? fakePluginDir : tarballFilePath)),
+      },
+      fs: {
+        writeFileSync: jest.fn(),
+        remove: jest.fn(),
+        ensureDir: jest.fn(),
+      },
+      tar: {
+        x: jest.fn(),
+      },
+    } as any;
+    const npmMetadata = {
+      ["dist-tags"]: {
+        latest: "1.0.0",
+      },
+      versions: {
+        ["1.0.0"]: {
+          dist: {
+            tarball: `https://fake-url/${packageName}.tgz`,
+          },
+        },
+      },
+    };
+    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null);
+    (pluginManager as any).http = {
+      get: jest.fn((param1, param2: any) => ({
+        toPromise: async () => (param2.responseType === "json" ? npmMetadata : new ArrayBuffer(10)),
+      })),
+    };
+    await pluginManager.installPlugin(`leapp://${packageName}`);
+    expect(nativeService.os.homedir).toHaveBeenCalled();
+    expect(logService.log).toHaveBeenNthCalledWith(
+      1,
+      new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true)
+    );
+    expect((pluginManager as any).http.get).toHaveBeenNthCalledWith(1, `https://registry.npmjs.org/${packageName}`, { responseType: "json" });
+    expect((pluginManager as any).http.get).toHaveBeenNthCalledWith(2, npmMetadata.versions[npmMetadata["dist-tags"].latest].dist.tarball, {
+      responseType: "arraybuffer",
+    });
+    const pluginsDir = homedir + "/.Leapp/plugins";
+    expect(nativeService.path.join).toHaveBeenNthCalledWith(1, pluginsDir, tarballFileName);
+    expect(nativeService.fs.writeFileSync).toHaveBeenCalledWith(tarballFilePath, Buffer.from(new ArrayBuffer(10)));
+    expect(nativeService.path.join).toHaveBeenNthCalledWith(2, pluginsDir, packageName);
+    expect(nativeService.fs.remove).toHaveBeenNthCalledWith(1, fakePluginDir);
+    expect(nativeService.fs.ensureDir).toHaveBeenCalledWith(fakePluginDir);
+    expect(nativeService.tar.x).toHaveBeenCalledWith({ file: tarballFilePath, strip: 1, ["C"]: fakePluginDir });
+    expect(nativeService.fs.remove).toHaveBeenNthCalledWith(2, tarballFilePath);
+    expect(logService.log).toHaveBeenNthCalledWith(2, new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
+  });
+
   test("extractMetadata, success", () => {
     const sessionFactory = {
       getCompatibleTypes: jest.fn(() => ["any"]),

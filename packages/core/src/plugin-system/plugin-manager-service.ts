@@ -136,7 +136,7 @@ export class PluginManagerService {
     );
   }
 
-  async installPlugin(url: string) {
+  async installPlugin(url: string): Promise<void> {
     const packageName = url.replace("leapp://", "");
     const pluginsDir = this.nativeService.os.homedir() + "/.Leapp/plugins";
 

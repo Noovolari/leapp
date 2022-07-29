@@ -85,7 +85,7 @@ export class PluginManagerService {
         try {
           if (this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")) {
             const pluginModule = this._requireModule(pluginFilePath + "/plugin.js");
-            this.logService.log(new LoggedEntry(`loading plugin: ${JSON.stringify(pluginModule)}`, this, LogLevel.info, false));
+            this.logService.log(new LoggedEntry(`loading ${pluginName} plugin`, this, LogLevel.info, false));
 
             const plugin = new pluginModule[metadata.entryClass]() as IPlugin;
             (plugin as any).metadata = metadata;

@@ -136,10 +136,9 @@ describe("PluginManagerService", () => {
       expect(repository.createPluginStatus).toHaveBeenCalledWith(plugins[i].metadata.uniqueName);
       expect((pluginManager as any)._plugins[i]).toBeInstanceOf(PluginClass);
       expect((pluginManager as any)._plugins[i].metadata).toStrictEqual(plugins[i].metadata);
+      expect(logService.log).toHaveBeenCalledWith(new LoggedEntry(`loading ${plugins[i].metadata.uniqueName} plugin`, this, LogLevel.info, false));
+      expect(bootstrapMock).toHaveBeenCalledWith(pluginEnvironment);
     }
-    expect(bootstrapMock).toHaveBeenCalledTimes(2);
-    expect(bootstrapMock).toHaveBeenCalledWith(pluginEnvironment);
-    expect(logService.log).not.toHaveBeenCalled();
   });
 
   test("loadFromPluginDir, extractMetadata throws an exception", async () => {

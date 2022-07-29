@@ -153,12 +153,11 @@
 </mat-menu>
 
 <mat-menu #pluginList>
-  <!-- TODO if for supported session and OS -->
   <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session)">
     <ng-container>
       <button mat-menu-item (click)="applyPluginAction($event, plugin);">
         <i class="{{plugin.metadata.icon}}"></i>
-        <span>&nbsp;&nbsp;{{plugin.name}}</span>
+        <span>&nbsp;&nbsp;{{plugin.metadata.uniqueName}}</span>
       </button>
     </ng-container>
   </ng-container>

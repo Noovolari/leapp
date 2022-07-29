@@ -18,7 +18,7 @@ describe("PluginManagerService", () => {
       hashElement: { hashElement: null },
     } as any;
     const expectedValue = ["fake-plugin"];
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     (pluginManager as any)._plugins = expectedValue;
     const result = pluginManager.plugins;
     expect(result).toStrictEqual(expectedValue);
@@ -36,7 +36,7 @@ describe("PluginManagerService", () => {
         homedir: jest.fn(() => "homedir"),
       },
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     (pluginManager as any)._pluginDir = "plugin-dir";
     pluginManager.verifyAndGeneratePluginFolderIfMissing();
     expect(nativeService.os.homedir).toHaveBeenCalled();
@@ -74,9 +74,12 @@ describe("PluginManagerService", () => {
     };
     const plugins = [plugin1, plugin2];
     const packagesJsons = [packageJson1, packageJson2];
+    const bootstrapMock = jest.fn(async () => {});
 
     class PluginClass {
-      constructor() {}
+      constructor() {
+        (this as any).bootstrap = bootstrapMock;
+      }
     }
 
     const nativeService = {
@@ -107,7 +110,9 @@ describe("PluginManagerService", () => {
       getPluginStatus: jest.fn(() => false),
       createPluginStatus: jest.fn(),
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, logService, repository, null, null, null);
+    const pluginEnvironment = "fake-plugin-environment" as any;
+
+    const pluginManager = new PluginManagerService(nativeService, logService, repository, null, null, null, pluginEnvironment);
     (pluginManager as any)._pluginDir = "plugin-dir";
     (pluginManager as any).validatePlugin = jest.fn((_p1, _p2, pluginName) => ({
       packageJson: packagesJsons.find((packageJson) => packageJson.name === pluginName),
@@ -132,6 +137,9 @@ describe("PluginManagerService", () => {
       expect((pluginManager as any)._plugins[i]).toBeInstanceOf(PluginClass);
       expect((pluginManager as any)._plugins[i].metadata).toStrictEqual(plugins[i].metadata);
     }
+    expect(bootstrapMock).toHaveBeenCalledTimes(2);
+    expect(bootstrapMock).toHaveBeenCalledWith(pluginEnvironment);
+    expect(logService.log).not.toHaveBeenCalled();
   });
 
   test("loadFromPluginDir, extractMetadata throws an exception", async () => {
@@ -157,7 +165,7 @@ describe("PluginManagerService", () => {
     const logService = {
       log: jest.fn(),
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null, null);
     (pluginManager as any)._pluginDir = "plugin-dir";
     (pluginManager as any).validatePlugin = () => ({ packageJson: packageJson1, isPluginValid: true });
     (pluginManager as any).extractMetadata = () => {
@@ -194,7 +202,7 @@ describe("PluginManagerService", () => {
     const logService = {
       log: jest.fn(),
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null, null);
     (pluginManager as any)._pluginDir = "plugin-dir";
     (pluginManager as any).validatePlugin = () => ({ packageJson: packageJson1, isPluginValid: false });
     (pluginManager as any).extractMetadata = () => {};
@@ -233,14 +241,14 @@ describe("PluginManagerService", () => {
     const logService = {
       log: jest.fn(),
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null, null);
     (pluginManager as any)._pluginDir = "plugin-dir";
     (pluginManager as any).validatePlugin = () => ({ packageJson: packageJson1, isPluginValid: false });
     (pluginManager as any).extractMetadata = () => {};
     (pluginManager as any).skipPluginValidation = () => true;
 
     await pluginManager.loadFromPluginDir();
-    expect(logService.log).toHaveBeenCalledWith(new LoggedEntry(`error loading plugin: error`, this, LogLevel.error, false));
+    expect(logService.log).toHaveBeenCalledWith(new LoggedEntry(`error loading plugin plugin-1: error`, this, LogLevel.error, false));
   });
 
   test("unloadAllPlugins", () => {
@@ -264,7 +272,7 @@ describe("PluginManagerService", () => {
       requireModule: null,
       hashElement: { hashElement: null },
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     (pluginManager as any)._plugins = [plugin1, plugin2];
     pluginManager.unloadAllPlugins();
     expect((pluginManager as any)._plugins).toStrictEqual([]);
@@ -291,7 +299,7 @@ describe("PluginManagerService", () => {
         supportedSessions: [SessionType.azure, SessionType.anytype],
       },
     };
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     (pluginManager as any)._plugins = [plugin1, plugin2];
     pluginManager.unloadSinglePlugin("plugin-1");
     expect((pluginManager as any)._plugins).toStrictEqual([plugin2]);
@@ -311,7 +319,7 @@ describe("PluginManagerService", () => {
       requireModule: null,
       hashElement: { hashElement: null },
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     const result = pluginManager.testRsaSignToBase64("fake-message");
     expect(nativeService.crypto.createSign).toHaveBeenCalledWith("sha256");
     expect(result).toStrictEqual("fake-signature");
@@ -324,7 +332,7 @@ describe("PluginManagerService", () => {
       requireModule: null,
       hashElement: { hashElement: null },
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, null, null, sessionFactory, null, null) as any;
+    const pluginManager = new PluginManagerService(nativeService, null, null, sessionFactory, null, null, null) as any;
     const plugin1 = {
       metadata: {
         uniqueName: "plugin-1",
@@ -419,7 +427,7 @@ describe("PluginManagerService", () => {
         },
       },
     };
-    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null, null);
     (pluginManager as any).http = {
       get: jest.fn((param1, param2: any) => ({
         toPromise: async () => (param2.responseType === "json" ? npmMetadata : new ArrayBuffer(10)),
@@ -468,7 +476,7 @@ describe("PluginManagerService", () => {
         entryClass: "test",
       },
     };
-    const service = new PluginManagerService(nativeService, null, repository, sessionFactory, null, null) as any;
+    const service = new PluginManagerService(nativeService, null, repository, sessionFactory, null, null, null) as any;
     const result = service.extractMetadata(packageJson);
     expect(sessionFactory.getCompatibleTypes).toHaveBeenCalledWith(SessionType.awsIamUser);
     expect(repository.getPluginStatus).toHaveBeenCalledWith(packageJson.name);
@@ -495,7 +503,7 @@ describe("PluginManagerService", () => {
         existsSync: jest.fn(),
       },
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     const result = await (pluginManager as any).validatePlugin(null, null, null);
     expect(result).toStrictEqual({ packageJson: undefined, isPluginValid: false });
   });
@@ -512,7 +520,7 @@ describe("PluginManagerService", () => {
         readFileSync: jest.fn(() => packageJsonContent),
       },
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     (pluginManager as any).rsaVerifySignatureFromBase64 = jest.fn(() => true);
     (pluginManager as any).http = {
       get: jest.fn(() => ({
@@ -549,7 +557,7 @@ describe("PluginManagerService", () => {
     const logService = {
       log: jest.fn(),
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null, null);
     (pluginManager as any).http = {
       get: jest.fn(() => ({
         toPromise: async () => ({ status: "inactive", signature: "fake-signature" }),
@@ -557,7 +565,7 @@ describe("PluginManagerService", () => {
     };
     const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
     expect(logService.log).toHaveBeenCalledWith(new LoggedEntry("Plugin not in active state: " + "plugin-1", this, LogLevel.warn, true));
-    expect(result).toStrictEqual({ packageJson: undefined, isPluginValid: false });
+    expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: false });
   });
 
   test("validatePlugin, not a plugin folder", async () => {
@@ -573,7 +581,7 @@ describe("PluginManagerService", () => {
     const logService = {
       log: jest.fn(),
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null, null);
     const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
     expect(logService.log).toHaveBeenCalledWith(
       new LoggedEntry(`folder ${pluginFilePath} is not a plugin folder, ignoring...`, this, LogLevel.info, false)
@@ -593,7 +601,7 @@ describe("PluginManagerService", () => {
         readFileSync: () => packageJsonContent,
       },
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     (pluginManager as any).rsaVerifySignatureFromBase64 = jest.fn(() => false);
     (pluginManager as any).http = {
       get: jest.fn(() => ({
@@ -619,7 +627,7 @@ describe("PluginManagerService", () => {
     const logService = {
       log: jest.fn(),
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, logService, null, null, null, null, null);
     const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
     expect(logService.log).toHaveBeenCalledWith(new LoggedEntry(`hashing failed or verification failed: ${error}`, this, LogLevel.warn, false));
     expect(result).toStrictEqual({ packageJson: undefined, isPluginValid: false });
@@ -633,7 +641,7 @@ describe("PluginManagerService", () => {
       requireModule: null,
       hashElement: { hashElement: null },
     } as any;
-    const service = new PluginManagerService(nativeService, null, null, sessionFactory, null, null) as any;
+    const service = new PluginManagerService(nativeService, null, null, sessionFactory, null, null, null) as any;
 
     const packageJson1 = {};
     let expectedMissingValues = ["version", "name", "author", "description", "keywords", "leappPlugin"];
@@ -677,7 +685,7 @@ describe("PluginManagerService", () => {
       },
     };
     const expectedErrors = ["leappPlugin.supportedSessions: wrong-session is unsupported", "leappPlugin.supportedOS: wrong-os is unsupported"];
-    const service = new PluginManagerService(nativeService, null, null, sessionFactory, null, null) as any;
+    const service = new PluginManagerService(nativeService, null, null, sessionFactory, null, null, null) as any;
     expect(() => service.extractMetadata(packageJson)).toThrowError(expectedErrors.join(", "));
   });
 
@@ -694,7 +702,7 @@ describe("PluginManagerService", () => {
       },
     } as any;
     (PluginManagerService as any).base64Decoding = jest.fn(() => "fake-signature");
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     const result = (pluginManager as any).rsaVerifySignatureFromBase64();
     expect(result).toBeTruthy();
     expect(nativeService.crypto.createVerify).toHaveBeenCalledWith("sha256");
@@ -705,7 +713,7 @@ describe("PluginManagerService", () => {
       requireModule: null,
       hashElement: { hashElement: null },
     } as any;
-    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null);
+    const pluginManager = new PluginManagerService(nativeService, null, null, null, null, null, null);
     const result = (pluginManager as any).skipPluginValidation();
     expect(result).toBeTruthy();
   });

@@ -8,6 +8,7 @@ import { OperatingSystem } from "../models/operating-system";
 import { Session } from "../models/session";
 import { SessionFactory } from "../services/session-factory";
 import { ExecuteService } from "../services/execute-service";
+import { PluginEnvironment } from "./plugin-environment";
 
 export class PluginManagerService {
   private _plugins: IPlugin[];
@@ -21,7 +22,8 @@ export class PluginManagerService {
     private repository: Repository,
     private sessionFactory: SessionFactory,
     private http: any,
-    private executeService: ExecuteService
+    private executeService: ExecuteService,
+    private pluginEnvironment: PluginEnvironment
   ) {
     this._plugins = [];
     this._requireModule = nativeService.requireModule;
@@ -50,9 +52,7 @@ export class PluginManagerService {
     };
 
     const pluginDirContent = this.nativeService.fs.readdirSync(this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir);
-
-    for (let i = 0; i < pluginDirContent.length; i++) {
-      const pluginName = pluginDirContent[i];
+    for (const pluginName of pluginDirContent) {
       const pluginFilePath = this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir + "/" + pluginName;
       const isDir = this.nativeService.fs.existsSync(pluginFilePath) && this.nativeService.fs.lstatSync(pluginFilePath).isDirectory();
       if (isDir) {
@@ -76,7 +76,7 @@ export class PluginManagerService {
         // CHECK VALIDATION
         const isSignatureInvalid = !isPluginValid && !this.skipPluginValidation();
         if (isSignatureInvalid) {
-          this.logService.log(new LoggedEntry(`Signature not verified for plugin: ${pluginDirContent[i]}`, this, LogLevel.warn, true));
+          this.logService.log(new LoggedEntry(`Signature not verified for plugin: ${pluginName}`, this, LogLevel.warn, true));
           await this.nativeService.fs.remove(pluginFilePath);
           continue;
         }
@@ -87,16 +87,18 @@ export class PluginManagerService {
             const pluginModule = this._requireModule(pluginFilePath + "/plugin.js");
             this.logService.log(new LoggedEntry(`loading plugin: ${JSON.stringify(pluginModule)}`, this, LogLevel.info, false));
 
-            const plugin = new pluginModule[metadata.entryClass]() as any;
-            plugin.metadata = metadata;
+            const plugin = new pluginModule[metadata.entryClass]() as IPlugin;
+            (plugin as any).metadata = metadata;
             if (!this.repository.getPluginStatus(plugin.metadata.uniqueName)) {
               this.repository.createPluginStatus(plugin.metadata.uniqueName);
             }
             this._plugins.push(plugin);
+            if (plugin.metadata.active) {
+              await plugin.bootstrap(this.pluginEnvironment);
+            }
           }
         } catch (error) {
-          console.log("error loading plugin: " + error.toString());
-          this.logService.log(new LoggedException(`error loading plugin: ${error.message}`, this, LogLevel.error, false));
+          this.logService.log(new LoggedException(`error loading plugin ${pluginName}: ${error.message}`, this, LogLevel.error, true));
         }
       }
     }
@@ -243,12 +245,12 @@ export class PluginManagerService {
     options: { folders: { include: string[] }; files: { exclude: string[] } },
     pluginName: string
   ): Promise<{ packageJson: string; isPluginValid: boolean }> {
-    let packageJsonContent: string;
+    let packageJson: string;
     try {
       // Hashing file and directory
       const hash = await this._hashElement(pluginFilePath, options);
       if (!hash.children) {
-        return { packageJson: undefined, isPluginValid: false };
+        return { packageJson, isPluginValid: false };
       }
       // If it has children then it is a directory
       console.log(hash);
@@ -257,12 +259,13 @@ export class PluginManagerService {
         this.nativeService.fs.existsSync(pluginFilePath + "/package.json") &&
         this.nativeService.fs.existsSync(pluginFilePath + "/plugin.js")
       ) {
-        packageJsonContent = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
+        const packageJsonContent = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
+        packageJson = JSON.parse(packageJsonContent);
         // Verify signature to enable plugin
         const data = await this.http.get(constants.pluginPortalUrl + `/${pluginName}`, { responseType: "json" }).toPromise();
         if (data.status !== "active") {
           this.logService.log(new LoggedEntry("Plugin not in active state: " + pluginName, this, LogLevel.warn, true));
-          return { packageJson: undefined, isPluginValid: false };
+          return { packageJson, isPluginValid: false };
         }
 
         const verifyMessage = packageJsonContent + hash.hash;
@@ -272,19 +275,19 @@ export class PluginManagerService {
         console.log(signatureVerified);
 
         if (!signatureVerified) {
-          return { packageJson: JSON.parse(packageJsonContent), isPluginValid: false };
+          return { packageJson, isPluginValid: false };
         }
       } else {
         console.log(`folder ${pluginFilePath} is not a plugin folder, ignoring...`);
         this.logService.log(new LoggedEntry(`folder ${pluginFilePath} is not a plugin folder, ignoring...`, this, LogLevel.info, false));
-        return { packageJson: undefined, isPluginValid: false };
+        return { packageJson, isPluginValid: false };
       }
     } catch (error) {
       console.error("hashing failed or verification failed:", error);
       this.logService.log(new LoggedException(`hashing failed or verification failed: ${error.message}`, this, LogLevel.warn, false));
-      return { packageJson: undefined, isPluginValid: false };
+      return { packageJson, isPluginValid: false };
     }
-    return { packageJson: JSON.parse(packageJsonContent), isPluginValid: true };
+    return { packageJson, isPluginValid: true };
   }
 
   private rsaVerifySignatureFromBase64(publicKey, message, signatureBase64): boolean {

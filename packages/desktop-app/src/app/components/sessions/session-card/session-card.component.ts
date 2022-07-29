@@ -32,7 +32,7 @@ import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
 import { OptionsService } from "../../../services/options.service";
-import { IPlugin, TemplateOutputObject } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
+import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -144,14 +144,13 @@ export class SessionCardComponent implements OnInit {
     this.selectedProfile = this.getProfileId(this.session);
   }
 
-  applyPluginAction($event: MouseEvent, plugin: IPlugin): void {
-    plugin.boostrap(this.session, this.appProviderService.pluginCoreService);
-    plugin.applyAction();
-    if (plugin.templateStructure.output) {
+  async applyPluginAction($event: MouseEvent, plugin: IPlugin): Promise<void> {
+    await plugin.applySessionAction(this.session);
+    /*if (plugin.templateStructure.output) {
       if (plugin.templateStructure.output.type === TemplateOutputObject.message) {
         this.appProviderService.logService.log(new LoggedEntry(plugin[plugin.templateStructure.output.data](), this, LogLevel.info, true));
       }
-    }
+    }*/
   }
 
   /**

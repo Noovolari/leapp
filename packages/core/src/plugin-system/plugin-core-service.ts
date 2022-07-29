@@ -3,16 +3,20 @@ import { ExecuteService } from "../services/execute-service";
 import { AzureCoreService } from "../services/azure-core-service";
 import { INativeService } from "../interfaces/i-native-service";
 import { Repository } from "../services/repository";
-import { TemplateOutputObject } from "./interfaces/IPlugin";
+import { TemplateOutputObject } from "./interfaces/i-plugin";
+import { SessionFactory } from "../services/session-factory";
+import { OperatingSystem } from "../models/operating-system";
 
 export class PluginCoreService {
   outputType = TemplateOutputObject;
+  operatingSystem = OperatingSystem;
 
   constructor(
-    private executeService: ExecuteService,
-    private nativeService: INativeService,
-    private repositoryService: Repository,
-    private awsCoreService: AwsCoreService,
-    private azureCoreService: AzureCoreService
+    public executeService: ExecuteService,
+    public nativeService: INativeService,
+    public repositoryService: Repository,
+    public awsCoreService: AwsCoreService,
+    public azureCoreService: AzureCoreService,
+    public sessionFactory: SessionFactory
   ) {}
 }

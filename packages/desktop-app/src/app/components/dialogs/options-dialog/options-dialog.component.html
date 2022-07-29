@@ -1,4 +1,3 @@
-
 <form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
 
   <mat-tab-group [animationDuration]="'0ms'" #tabs>
@@ -16,27 +15,31 @@
           <div class="form-group">
             <div class="form-field">
               <label>AWS Region</label>
-              <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions" [(ngModel)]="selectedRegion" [appendTo]="'body'"></ng-select>
+              <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions"
+                         [(ngModel)]="selectedRegion" [appendTo]="'body'"></ng-select>
             </div>
           </div>
 
           <div class="form-group">
             <div class="form-field">
               <label>Azure Location</label>
-              <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [clearable]="false" [items]="locations" [(ngModel)]="selectedLocation" [appendTo]="'body'"></ng-select>
+              <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [clearable]="false" [items]="locations"
+                         [(ngModel)]="selectedLocation" [appendTo]="'body'"></ng-select>
             </div>
           </div>
         </div>
 
 
-        <ng-container *ngIf="appService.detectOs() === eConstants.mac">
+        <ng-container *ngIf="appService.detectOs() === eOperatingSystem.mac">
           <h2>MacOS Terminal</h2>
 
           <div class="form-container">
             <div class="form-group">
               <div class="form-field">
                 <label>Terminal</label>
-                <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal" [appendTo]="'body'"></ng-select>
+                <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false"
+                           [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal"
+                           [appendTo]="'body'"></ng-select>
               </div>
             </div>
           </div>
@@ -66,7 +69,8 @@
           <div class="form-container">
             <div class="form-group">
               <div class="form-field">
-                <label><i class="moon-Help fix-top" matTooltip="Note: when switching method a backup of your credentials and config files will be created and the original files cleaned."></i>&nbsp;Method</label>
+                <label><i class="moon-Help fix-top"
+                          matTooltip="Note: when switching method a backup of your credentials and config files will be created and the original files cleaned."></i>&nbsp;Method</label>
                 <ng-select formControlName="credentialMethodSelect"
                            bindLabel="credentialMethod"
                            bindValue="credentialMethod"
@@ -91,33 +95,35 @@
 
           <div class="form-group">
             <div class="form-field">
-              <ng-select formControlName="proxyProtocol" [items]="['HTTP', 'HTTPS']" [(ngModel)]="proxyProtocol" [appendTo]="'body'" class="proxy-length-1"></ng-select>
+              <ng-select formControlName="proxyProtocol" [items]="['HTTP', 'HTTPS']" [(ngModel)]="proxyProtocol" [appendTo]="'body'"
+                         class="proxy-length-1"></ng-select>
 
               <span class="proxy-length-2">://</span>
 
-              <input formControlName="proxyUrl" type="text" class="form-control proxy-length-3" placeholder="Enter Proxy Url" [value]="proxyUrl" >
+              <input formControlName="proxyUrl" type="text" class="form-control proxy-length-3" placeholder="Enter Proxy Url" [value]="proxyUrl">
 
               <span class="proxy-length-4">:</span>
 
-              <input formControlName="proxyPort" type="text" class="form-control proxy-length-5" placeholder="Enter Proxy Port" [value]="proxyPort" >
+              <input formControlName="proxyPort" type="text" class="form-control proxy-length-5" placeholder="Enter Proxy Port" [value]="proxyPort">
             </div>
           </div>
 
           <div class="form-group">
             <div class="form-field">
-              <mat-checkbox formControlName="showAuthCheckbox" [(ngModel)]="showProxyAuthentication"></mat-checkbox> Use authentication
+              <mat-checkbox formControlName="showAuthCheckbox" [(ngModel)]="showProxyAuthentication"></mat-checkbox>
+              Use authentication
             </div>
           </div>
 
           <div class="form-group" *ngIf="showProxyAuthentication">
             <div class="form-field">
               <label>Username</label>
-              <input formControlName="proxyUsername" type="text" class="form-control" placeholder="Proxy Username" [value]="proxyUsername" >
+              <input formControlName="proxyUsername" type="text" class="form-control" placeholder="Proxy Username" [value]="proxyUsername">
             </div>
 
             <div class="form-field">
               <label>Password</label>
-              <input formControlName="proxyPassword" type="password" class="form-control" placeholder="Proxy Password" [value]="proxyPassword" >
+              <input formControlName="proxyPassword" type="password" class="form-control" placeholder="Proxy Password" [value]="proxyPassword">
             </div>
           </div>
         </div>
@@ -138,8 +144,11 @@
 
           <div class="form-group">
             <div class="form-field form-control-input-button max-width">
-              <input formControlName="idpUrl" type="text" class="form-control max-width" placeholder="Add SAML 2.0 IdP URL" (keydown.enter)="$event.preventDefault(); manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);" [value]="idpUrlValue ? idpUrlValue.url : ''" >
-              <button type="button" (click)="manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"><i class="{{editingIdpUrl ? 'moon-Edit' : 'moon-Add'}}"></i></button>
+              <input formControlName="idpUrl" type="text" class="form-control max-width" placeholder="Add SAML 2.0 IdP URL"
+                     (keydown.enter)="$event.preventDefault(); manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"
+                     [value]="idpUrlValue ? idpUrlValue.url : ''">
+              <button type="button" (click)="manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"><i
+                class="{{editingIdpUrl ? 'moon-Edit' : 'moon-Add'}}"></i></button>
             </div>
           </div>
 
@@ -173,8 +182,11 @@
 
         <div class="form-group">
           <div class="form-field form-control-input-button max-width">
-            <input formControlName="awsProfile" type="text" class="form-control max-width" placeholder="Add a new Named Profile" (keydown.enter)="$event.preventDefault(); manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);" [value]="awsProfileValue ? awsProfileValue.name : ''" >
-            <button class="button" type="button" (click)="manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);"><i class="{{editingAwsProfile ? 'moon-Edit' : 'moon-Add'}}"></i></button>
+            <input formControlName="awsProfile" type="text" class="form-control max-width" placeholder="Add a new Named Profile"
+                   (keydown.enter)="$event.preventDefault(); manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);"
+                   [value]="awsProfileValue ? awsProfileValue.name : ''">
+            <button class="button" type="button" (click)="manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);"><i
+              class="{{editingAwsProfile ? 'moon-Edit' : 'moon-Add'}}"></i></button>
           </div>
         </div>
 
@@ -187,7 +199,8 @@
                 <td>
                   <ng-container *ngIf="profile.name !== 'default'">
                     <button class="icon-button inline" type="button" (click)="editAwsProfile(profile.id);"><i class="moon-Edit"></i></button>
-                    <button class="icon-button inline" type="button" (click)="deleteAwsProfile(profile.id);"><i class="moon-Delete size-up"></i></button>
+                    <button class="icon-button inline" type="button" (click)="deleteAwsProfile(profile.id);"><i class="moon-Delete size-up"></i>
+                    </button>
                   </ng-container>
                 </td>
               </tr>
@@ -227,20 +240,31 @@
 
         <div class="form-group">
           <div class="form-field form-control-input-button max-width">
-            <input formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Add here a leapp://<package> valid uri">
-            <button class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
+            <input formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Insert an npm package name">
+            <button [disabled]="fetchingPlugins" class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
           </div>
 
-          <div class="form-group scrollable max-height-230">
-            <h4> Plugins from Hub</h4>
-            <table class="table">
+          <h4> Installed plugins
+            <button class="borderless-button pull-right" (click)="openPluginFolder()"><i class="fas fa-folder-open" matTooltip="Open plugin folder"></i></button>
+            <button [disabled]="fetchingPlugins" class="borderless-button pull-right"(click)="refreshPluginList()"><i class="fa fa-refresh" matTooltip="Refresh plugin list"></i></button>
+          </h4>
+
+          <div class="form-group scrollable max-height-320 tableFixHead">
+            <table class="table plugin-table">
+              <thead>
+                <th><span class="centered-column">Name</span></th>
+                <th><span class="centered-column">Version</span></th>
+                <th><span class="centered-column">Supported OS</span></th>
+                <th><span class="centered-column">Enabled</span></th>
+              </thead>
               <tbody>
               <ng-container *ngFor="let plugin of pluginList">
                 <tr>
-                  <td>{{plugin.title}}</td>
-                  <td>{{plugin.author}}</td>
+                  <td><i class="fa fa-info-circle" matTooltipClass="allow-cr" [matTooltip]="getPluginExtraInfo(plugin)"></i>&nbsp;{{plugin.metadata.uniqueName}}</td>
+                  <td>{{plugin.metadata.version}}</td>
+                  <td [innerHTML]="getSupportedOsIcons(plugin)"></td>
                   <td>
-                    <button class="icon-button inline" type="button" (click)="installPluginFromList('leapp://' + plugin.id);"><i class="moon-Add"></i></button>
+                    <mat-slide-toggle class="inline toggleColoredCorrectly" (toggleChange)="togglePluginActivation(plugin)" [checked]="plugin.metadata.active"></mat-slide-toggle>
                   </td>
                 </tr>
               </ng-container>

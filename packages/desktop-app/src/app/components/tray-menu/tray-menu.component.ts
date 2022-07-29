@@ -11,12 +11,12 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
 import { WindowService } from "../../services/window.service";
-import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { AppNativeService } from "../../services/app-native.service";
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 
 @Component({
   selector: "app-tray-menu",
@@ -162,12 +162,12 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     this.appService.getMenu().setApplicationMenu(this.appService.getMenu().buildFromTemplate(template));
     // check for dark mode
     let normalIcon = "LeappTemplate";
-    if (this.appService.detectOs() === constants.linux) {
+    if (this.appService.detectOs() === OperatingSystem.linux) {
       normalIcon = "LeappMini";
     }
     if (!this.currentTray) {
       this.currentTray = new this.electronService.tray(__dirname + `/assets/images/${normalIcon}.png`);
-      if (this.appService.detectOs() !== constants.windows && this.appService.detectOs() !== constants.linux) {
+      if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
         this.appService.getApp().dock.setBadge("");
       }
     }
@@ -184,7 +184,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     ]);
 
     const contextMenu = this.appService.getMenu().buildFromTemplate(this.voices);
-    if (this.appService.detectOs() !== constants.windows && this.appService.detectOs() !== constants.linux) {
+    if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
       this.currentTray.setToolTip("Leapp");
     }
     this.currentTray.setContextMenu(contextMenu);

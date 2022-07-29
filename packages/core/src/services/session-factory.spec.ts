@@ -1,4 +1,4 @@
-import { jest, describe, test, expect } from "@jest/globals";
+import { describe, expect, jest, test } from "@jest/globals";
 import { SessionType } from "../models/session-type";
 import { SessionFactory } from "./session-factory";
 import { CreateSessionRequest } from "./session/create-session-request";
@@ -23,6 +23,7 @@ describe("sessionFactory", () => {
     expect((sessionFactory.getSessionService(SessionType.awsIamRoleChained) as any).name).toEqual("IamRoleChained");
     expect((sessionFactory.getSessionService(SessionType.awsSsoRole) as any).name).toEqual("SsoRole");
     expect((sessionFactory.getSessionService(SessionType.azure) as any).name).toEqual("Azure");
+    expect((sessionFactory.getSessionService(SessionType.anytype) as any).name).toEqual("Azure");
   });
 
   test("createSession", async () => {
@@ -36,5 +37,29 @@ describe("sessionFactory", () => {
 
     await sessionFactory.createSession(SessionType.azure, createSessionRequest);
     expect(fakeSessionService.create).toHaveBeenCalledWith(createSessionRequest);
+  });
+
+  test("getCompatibleTypes", async () => {
+    const sessionFactory = new SessionFactory(null, null, null, null, null);
+    expect(sessionFactory.getCompatibleTypes(SessionType.anytype)).toEqual([
+      SessionType.azure,
+      SessionType.alibaba,
+      SessionType.awsIamUser,
+      SessionType.awsIamRoleFederated,
+      SessionType.awsIamRoleChained,
+      SessionType.awsSsoRole,
+    ]);
+
+    expect(sessionFactory.getCompatibleTypes(SessionType.aws)).toEqual([
+      SessionType.awsIamUser,
+      SessionType.awsIamRoleFederated,
+      SessionType.awsIamRoleChained,
+      SessionType.awsSsoRole,
+    ]);
+
+    expect(sessionFactory.getCompatibleTypes(SessionType.azure)).toEqual([SessionType.azure]);
+    expect(sessionFactory.getCompatibleTypes(SessionType.awsIamRoleFederated)).toEqual([SessionType.awsIamRoleFederated]);
+
+    expect(sessionFactory.getCompatibleTypes("wrong-type" as any)).toEqual([]);
   });
 });

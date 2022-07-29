@@ -1,0 +1,471 @@
+{
+  "version": "20.0.0",
+  "artifacts": {
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "InfrastructureStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "InfrastructureStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "InfrastructureStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "InfrastructureStack.template.json",
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/89888d3ba7ca9237b6180147326b858c76cbe350b92ebb5319e788fe6d1522c7.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "InfrastructureStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "InfrastructureStack.assets"
+      ],
+      "metadata": {
+        "/InfrastructureStack/InfrastructureStack/VPC": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "fromVpcAttributes: 'availabilityZones' is a list token: the imported VPC will not work with constructs that require a list of subnets at synthesis time. Use 'Vpc.fromLookup()' or 'Fn.importListValue' instead.",
+            "trace": [
+              "Annotations.addMessage (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:1213)",
+              "Annotations.addWarning (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:600)",
+              "new ImportedVpc (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:23725)",
+              "Function.fromVpcAttributes (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:11429)",
+              "new InfrastructureStack (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/lib/infrastructure-stack.ts:52:20)",
+              "new LeappPluginSystemInfrastructure (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/bin/infrastructure.ts:23:5)",
+              "Object.<anonymous> (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/bin/infrastructure.ts:30:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1099:14)",
+              "Module.m._compile (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/index.ts:1597:23)",
+              "Module._extensions..js (node:internal/modules/cjs/loader:1153:10)",
+              "Object.require.extensions.<computed> [as .ts] (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/index.ts:1600:12)",
+              "Module.load (node:internal/modules/cjs/loader:975:32)",
+              "Function.Module._load (node:internal/modules/cjs/loader:822:12)",
+              "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)",
+              "phase4 (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:579:12)",
+              "bootstrap (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:85:10)",
+              "main (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:54:10)",
+              "Object.<anonymous> (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:729:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1099:14)",
+              "Object.Module._extensions..js (node:internal/modules/cjs/loader:1153:10)",
+              "Module.load (node:internal/modules/cjs/loader:975:32)",
+              "Function.Module._load (node:internal/modules/cjs/loader:822:12)",
+              "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)",
+              "node:internal/main/run_main_module:17:47"
+            ]
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/VPC/PrivateSubnet1": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "No routeTableId was provided to the subnet 'subnet-0effa5262519e2005'. Attempting to read its .routeTable.routeTableId will return null/undefined. (More info: https://github.com/aws/aws-cdk/pull/3171)",
+            "trace": [
+              "Annotations.addMessage (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:1213)",
+              "Annotations.addWarning (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:600)",
+              "new ImportedSubnet (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:27471)",
+              "Function.fromSubnetAttributes (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:18231)",
+              "/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/util.js:1:1826",
+              "Array.map (<anonymous>)",
+              "ImportSubnetGroup.import (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/util.js:1:1746)",
+              "new ImportedVpc (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:24704)",
+              "Function.fromVpcAttributes (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:11429)",
+              "new InfrastructureStack (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/lib/infrastructure-stack.ts:52:20)",
+              "new LeappPluginSystemInfrastructure (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/bin/infrastructure.ts:23:5)",
+              "Object.<anonymous> (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/bin/infrastructure.ts:30:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1099:14)",
+              "Module.m._compile (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/index.ts:1597:23)",
+              "Module._extensions..js (node:internal/modules/cjs/loader:1153:10)",
+              "Object.require.extensions.<computed> [as .ts] (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/index.ts:1600:12)",
+              "Module.load (node:internal/modules/cjs/loader:975:32)",
+              "Function.Module._load (node:internal/modules/cjs/loader:822:12)",
+              "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)",
+              "phase4 (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:579:12)",
+              "bootstrap (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:85:10)",
+              "main (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:54:10)",
+              "Object.<anonymous> (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:729:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1099:14)",
+              "Object.Module._extensions..js (node:internal/modules/cjs/loader:1153:10)",
+              "Module.load (node:internal/modules/cjs/loader:975:32)",
+              "Function.Module._load (node:internal/modules/cjs/loader:822:12)",
+              "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)",
+              "node:internal/main/run_main_module:17:47"
+            ]
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/VPC/undefinedSubnet2": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "No routeTableId was provided to the subnet 'subnet-023a47cf8214d6756'. Attempting to read its .routeTable.routeTableId will return null/undefined. (More info: https://github.com/aws/aws-cdk/pull/3171)",
+            "trace": [
+              "Annotations.addMessage (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:1213)",
+              "Annotations.addWarning (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:600)",
+              "new ImportedSubnet (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:27471)",
+              "Function.fromSubnetAttributes (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:18231)",
+              "/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/util.js:1:1826",
+              "Array.map (<anonymous>)",
+              "ImportSubnetGroup.import (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/util.js:1:1746)",
+              "new ImportedVpc (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:24704)",
+              "Function.fromVpcAttributes (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:11429)",
+              "new InfrastructureStack (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/lib/infrastructure-stack.ts:52:20)",
+              "new LeappPluginSystemInfrastructure (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/bin/infrastructure.ts:23:5)",
+              "Object.<anonymous> (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/bin/infrastructure.ts:30:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1099:14)",
+              "Module.m._compile (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/index.ts:1597:23)",
+              "Module._extensions..js (node:internal/modules/cjs/loader:1153:10)",
+              "Object.require.extensions.<computed> [as .ts] (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/index.ts:1600:12)",
+              "Module.load (node:internal/modules/cjs/loader:975:32)",
+              "Function.Module._load (node:internal/modules/cjs/loader:822:12)",
+              "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)",
+              "phase4 (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:579:12)",
+              "bootstrap (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:85:10)",
+              "main (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:54:10)",
+              "Object.<anonymous> (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:729:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1099:14)",
+              "Object.Module._extensions..js (node:internal/modules/cjs/loader:1153:10)",
+              "Module.load (node:internal/modules/cjs/loader:975:32)",
+              "Function.Module._load (node:internal/modules/cjs/loader:822:12)",
+              "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)",
+              "node:internal/main/run_main_module:17:47"
+            ]
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/VPC/undefinedSubnet3": [
+          {
+            "type": "aws:cdk:warning",
+            "data": "No routeTableId was provided to the subnet 'subnet-065d79422735f8eda'. Attempting to read its .routeTable.routeTableId will return null/undefined. (More info: https://github.com/aws/aws-cdk/pull/3171)",
+            "trace": [
+              "Annotations.addMessage (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:1213)",
+              "Annotations.addWarning (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/core/lib/annotations.js:1:600)",
+              "new ImportedSubnet (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:27471)",
+              "Function.fromSubnetAttributes (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:18231)",
+              "/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/util.js:1:1826",
+              "Array.map (<anonymous>)",
+              "ImportSubnetGroup.import (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/util.js:1:1746)",
+              "new ImportedVpc (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:24704)",
+              "Function.fromVpcAttributes (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/aws-cdk-lib/aws-ec2/lib/vpc.js:1:11429)",
+              "new InfrastructureStack (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/lib/infrastructure-stack.ts:52:20)",
+              "new LeappPluginSystemInfrastructure (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/bin/infrastructure.ts:23:5)",
+              "Object.<anonymous> (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/bin/infrastructure.ts:30:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1099:14)",
+              "Module.m._compile (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/index.ts:1597:23)",
+              "Module._extensions..js (node:internal/modules/cjs/loader:1153:10)",
+              "Object.require.extensions.<computed> [as .ts] (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/index.ts:1600:12)",
+              "Module.load (node:internal/modules/cjs/loader:975:32)",
+              "Function.Module._load (node:internal/modules/cjs/loader:822:12)",
+              "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)",
+              "phase4 (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:579:12)",
+              "bootstrap (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:85:10)",
+              "main (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:54:10)",
+              "Object.<anonymous> (/home/daniele/dev/beSharp/Internal/leapp/packages/core/src/plugin-system/infrastructure/node_modules/ts-node/src/bin.ts:729:3)",
+              "Module._compile (node:internal/modules/cjs/loader:1099:14)",
+              "Object.Module._extensions..js (node:internal/modules/cjs/loader:1153:10)",
+              "Module.load (node:internal/modules/cjs/loader:975:32)",
+              "Function.Module._load (node:internal/modules/cjs/loader:822:12)",
+              "Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:77:12)",
+              "node:internal/main/run_main_module:17:47"
+            ]
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/DatabaseSecret/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DatabaseSecret86DBB7B3"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/DatabaseSecret/DatabaseSecretRotationSchedule/SecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DatabaseSecretDatabaseSecretRotationScheduleSecurityGroup67C42F29"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/DatabaseSecret/DatabaseSecretRotationSchedule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DatabaseSecretDatabaseSecretRotationSchedule23080F45"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/DatabaseSecret/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DatabaseSecretPolicy20C1BC95"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/DatabaseSecret/Attachment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DatabaseSecretAttachment9A63A3D4"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/DatabaseSecurityGroup/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "DatabaseSecurityGroup7319C0F6"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RDSCluster/Subnets/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RDSClusterSubnets80ABBE08"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RDSCluster/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RDSCluster423DF6F1"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginLayer77551666"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginSystemFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginSystemFunctionServiceRole94D9E5B9"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginSystemFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginSystemFunctionServiceRoleDefaultPolicyE86C15B1"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginSystemFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginSystemFunctionE6D10594"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginSystemFunction/ApiPermissions": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginSystemFunctionApiPermissionsE51AEBD9"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApi0C43BF4B"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/CloudWatchRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiCloudWatchRoleE3ED6605"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Account": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiAccount7C83CF5A"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiDeployment180EC503eb39f087212f51d8c9bdbbddd8e17ce8"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/DeploymentStage.api/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiDeploymentStageapi14DA8585"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiEndpoint0551178A"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Default/api/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiapiC55947A1"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Default/api/v1/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiapiv1B3578DAE"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Default/api/v1/plugins/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiapiv1pluginsA8695F04"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Default/api/v1/plugins/get/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiapiv1pluginsget5276E417"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Default/api/v1/plugins/post/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiapiv1pluginspostE867B99A"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Default/api/v1/plugins/{pluginId}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiapiv1pluginspluginIdD99106D3"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Default/api/v1/plugins/{pluginId}/get/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiapiv1pluginspluginIdget12F0C377"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/RestApi/Default/api/v1/plugins/{pluginId}/put/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RestApiapiv1pluginspluginIdputFED004FF"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginUpdaterLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginUpdaterLayer4B6A6321"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginUpdaterFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginUpdaterFunctionServiceRoleFBFD1563"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginUpdaterFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginUpdaterFunctionServiceRoleDefaultPolicyD4DD496A"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginUpdaterFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginUpdaterFunction888D3D22"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/UpdateRule/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UpdateRule5163DF91"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/UpdateRule/AllowEventRuleInfrastructureStackLeappPluginUpdaterFunction8FCACFF1": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UpdateRuleAllowEventRuleInfrastructureStackLeappPluginUpdaterFunction8FCACFF1BA7A5950"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginSignatureUpdaterLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginSignatureUpdaterLayerB4BAFD8C"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappSignatureUpdaterFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappSignatureUpdaterFunctionServiceRole7EFB31FD"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappSignatureUpdaterFunction/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappSignatureUpdaterFunctionServiceRoleDefaultPolicy73AD3C34"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappSignatureUpdaterFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappSignatureUpdaterFunctionEC6BB048"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappPluginSignerStarterLayer/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappPluginSignerStarterLayer9D5A60FF"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappSignerStarterFunction/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappSignerStarterFunctionServiceRole39E4000C"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/LeappSignerStarterFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LeappSignerStarterFunction91F1E2D4"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/InfrastructureStack/InfrastructureStack.NestedStack/InfrastructureStack.NestedStackResource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "InfrastructureStackNestedStackInfrastructureStackNestedStackResource547B17FB"
+          }
+        ],
+        "/InfrastructureStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/InfrastructureStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/InfrastructureStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/InfrastructureStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "InfrastructureStack"
+    }
+  }
+}

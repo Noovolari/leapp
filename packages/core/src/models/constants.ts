@@ -11,6 +11,7 @@ export const constants = {
   timeout: 10000,
   credentialsDestination: ".aws/credentials",
   defaultRegion: "us-east-1",
+  maxSsoTps: 20, // Transaction per second for AWS SSO endpoint
 
   //Azure
   azureMsalCacheFile: ".azure/msal_token_cache.json",
@@ -18,9 +19,6 @@ export const constants = {
   defaultAwsProfileName: "default",
   defaultAzureProfileName: "default-azure",
 
-  mac: "mac",
-  linux: "linux",
-  windows: "windows",
   inApp: "In-app",
   inBrowser: "In-browser",
   forcedCloseBrowserWindow: "ForceCloseBrowserWindow",
@@ -51,6 +49,8 @@ export const constants = {
   // Contains Env for SSM on macOS
   ssmSourceFileDestination: ".Leapp/ssm-env",
 
+  npmRequiredPluginKeyword: "leapp-plugin",
+  skipPluginValidation: true,
   pluginPortalUrl: "https://vv0r45fadf.execute-api.eu-west-1.amazonaws.com/api/api/v1/plugins",
   // Public Key for signature
   // TODO: move it to the leapp site in future

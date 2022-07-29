@@ -41,6 +41,7 @@ import { AzureIntegrationService } from "@noovolari/leapp-core/services/integrat
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
 import { PluginCoreService } from "@noovolari/leapp-core/plugin-system/plugin-core-service";
+import { HttpClient } from "@angular/common/http";
 
 @Injectable({
   providedIn: "root",
@@ -88,11 +89,23 @@ export class AppProviderService {
   private pluginManagerServiceInstance: PluginManagerService;
   private pluginCoreServiceInstance: PluginCoreService;
 
-  constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
+  constructor(
+    private appNativeService: AppNativeService,
+    private messageToaster: MessageToasterService,
+    private ngZone: NgZone,
+    private http: HttpClient
+  ) {}
 
   public get pluginManagerService(): PluginManagerService {
     if (!this.pluginManagerServiceInstance) {
-      this.pluginManagerServiceInstance = new PluginManagerService(this.appNativeService, this.logService);
+      this.pluginManagerServiceInstance = new PluginManagerService(
+        this.appNativeService,
+        this.logService,
+        this.repository,
+        this.sessionFactory,
+        this.http,
+        this.executeService
+      );
     }
     return this.pluginManagerServiceInstance;
   }
@@ -104,7 +117,8 @@ export class AppProviderService {
         this.appNativeService,
         this.repository,
         this.awsCoreService,
-        this.azureCoreService
+        this.azureCoreService,
+        this.sessionFactory
       );
     }
     return this.pluginCoreServiceInstance;

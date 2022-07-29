@@ -6,8 +6,9 @@ import { AppProviderService } from "./app-provider.service";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { WindowService } from "./window.service";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { constants } from "@noovolari/leapp-core/models/constants";
 import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Injectable({
   providedIn: "root",
@@ -34,9 +35,9 @@ export class AppService {
     // Global Configure logger
     if (this.appNativeService.log) {
       const logPaths = {
-        [constants.mac]: `${this.appNativeService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
-        [constants.linux]: `${this.appNativeService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
-        [constants.windows]: `${this.appNativeService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
+        [OperatingSystem.mac]: `${this.appNativeService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
+        [OperatingSystem.linux]: `${this.appNativeService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
+        [OperatingSystem.windows]: `${this.appNativeService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
       };
 
       this.appNativeService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
@@ -72,11 +73,11 @@ export class AppService {
   /**
    * Return the type of OS in human-readable form
    */
-  detectOs(): string {
+  detectOs(): OperatingSystem {
     const hrNames = {
-      linux: constants.linux,
-      darwin: constants.mac,
-      win32: constants.windows,
+      linux: OperatingSystem.linux,
+      darwin: OperatingSystem.mac,
+      win32: OperatingSystem.windows,
     };
     const os = this.appNativeService.os.platform();
     return hrNames[os];
@@ -232,33 +233,10 @@ export class AppService {
     this.triggers = [];
   }
 
+  // TODO: make platform independent
+  // TODO: remove preemptly package-lock before running npm install
   async installPlugin(url: string): Promise<void> {
-    const packageName = url.replace("leapp://", "");
-    const pluginDir = this.appNativeService.os.homedir() + "/.Leapp/plugins";
-
-    this.appProviderService.logService.log(
-      new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true)
-    );
-
-    console.log(pluginDir, packageName);
-    const version = await this.appProviderService.executeService.execute(`npm show ${packageName} version`);
-    console.log(version);
-    const packageComplete = `${packageName}-${version.trim()}.tgz`;
-
-    await this.appProviderService.executeService.execute(
-      `cd ${pluginDir} && /usr/bin/curl --silent --remote-name "https://registry.npmjs.org/${packageName}/-/${packageComplete}"`
-    );
-    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/rm -rf "${packageName}"`);
-    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/mkdir "${packageName}"`);
-    await this.appProviderService.executeService.execute(
-      `cd ${pluginDir} && /usr/bin/tar xzf "${packageComplete}" --strip-components 1 -C "${packageName}"`
-    );
-    await this.appProviderService.executeService.execute(`cd ${pluginDir} && /bin/rm "${packageComplete}"`);
-    await this.appProviderService.executeService.execute(`cd ${pluginDir}/${packageName} && npm install`);
-
-    this.appProviderService.logService.log(new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
-
-    this.reloadPlugins();
+    await this.appProviderService.pluginManagerService.installPlugin(url);
   }
 
   async reloadPlugins(): Promise<void> {

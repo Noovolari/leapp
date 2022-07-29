@@ -89,4 +89,154 @@ describe("Workspace Model", () => {
       },
     ]);
   });
+
+  test("setNewWorkspaceVersion", () => {
+    const workspace = new Workspace();
+    workspace.setNewWorkspaceVersion();
+    expect((workspace as any)._workspaceVersion).toBe(1);
+  });
+
+  test("get Sessions", () => {
+    const workspace = new Workspace();
+    expect(workspace.sessions).toBe((workspace as any)._sessions);
+  });
+
+  test("set Sessions", () => {
+    const workspace = new Workspace();
+    const session = { sessionId: 1 } as any;
+    workspace.sessions = [session];
+    expect([session]).toStrictEqual((workspace as any)._sessions);
+  });
+
+  test("proxyConfiguration", () => {
+    const workspace = new Workspace();
+    expect(workspace.proxyConfiguration).toStrictEqual((workspace as any)._proxyConfiguration);
+  });
+
+  test("set proxyConfiguration", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.proxyConfiguration = mock;
+    expect(mock).toStrictEqual((workspace as any)._proxyConfiguration);
+  });
+
+  test("defaultRegion", () => {
+    const workspace = new Workspace();
+    expect(workspace.defaultRegion).toStrictEqual((workspace as any)._defaultRegion);
+  });
+
+  test("set defaultRegion", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.defaultRegion = mock;
+    expect(mock).toStrictEqual((workspace as any)._defaultRegion);
+  });
+
+  test("defaultLocation", () => {
+    const workspace = new Workspace();
+    expect(workspace.defaultLocation).toStrictEqual((workspace as any)._defaultLocation);
+  });
+
+  test("set defaultLocation", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.defaultLocation = mock;
+    expect(mock).toStrictEqual((workspace as any)._defaultLocation);
+  });
+
+  test("awsSsoIntegrations", () => {
+    const workspace = new Workspace();
+    expect(workspace.awsSsoIntegrations).toStrictEqual((workspace as any)._awsSsoIntegrations);
+  });
+
+  test("set awsSsoIntegrations", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.awsSsoIntegrations = mock;
+    expect(mock).toStrictEqual((workspace as any)._awsSsoIntegrations);
+  });
+
+  test("azureIntegrations", () => {
+    const workspace = new Workspace();
+    expect(workspace.azureIntegrations).toStrictEqual((workspace as any)._azureIntegrations);
+  });
+
+  test("set azureIntegrations", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.azureIntegrations = mock;
+    expect(mock).toStrictEqual((workspace as any)._azureIntegrations);
+  });
+
+  test("pinned", () => {
+    const workspace = new Workspace();
+    expect(workspace.pinned).toStrictEqual((workspace as any)._pinned);
+  });
+
+  test("set pinned", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.pinned = mock;
+    expect(mock).toStrictEqual((workspace as any)._pinned);
+  });
+
+  test("folders", () => {
+    const workspace = new Workspace();
+    expect(workspace.folders).toStrictEqual((workspace as any)._folders);
+  });
+
+  test("set folders", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.folders = mock;
+    expect(mock).toStrictEqual((workspace as any)._folders);
+  });
+
+  test("segments", () => {
+    const workspace = new Workspace();
+    expect(workspace.segments).toStrictEqual((workspace as any)._segments);
+  });
+
+  test("set segments", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.segments = mock;
+    expect(mock).toStrictEqual((workspace as any)._segments);
+  });
+
+  test("colorTheme", () => {
+    const workspace = new Workspace();
+    expect(workspace.colorTheme).toStrictEqual((workspace as any)._colorTheme);
+  });
+
+  test("set colorTheme", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.colorTheme = mock;
+    expect(mock).toStrictEqual((workspace as any)._colorTheme);
+  });
+
+  test("credentialMethod", () => {
+    const workspace = new Workspace();
+    expect(workspace.credentialMethod).toStrictEqual((workspace as any)._credentialMethod);
+  });
+
+  test("set credentialMethod", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.credentialMethod = mock;
+    expect(mock).toStrictEqual((workspace as any)._credentialMethod);
+  });
+
+  test("pluginStatus", () => {
+    const workspace = new Workspace();
+    expect(workspace.pluginsStatus).toStrictEqual([]);
+  });
+
+  test("set pluginStatus", () => {
+    const workspace = new Workspace();
+    const mock = "plugin-status" as any;
+    workspace.pluginsStatus = mock;
+    expect(mock).toStrictEqual((workspace as any)._pluginsStatus);
+  });
 });

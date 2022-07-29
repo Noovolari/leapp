@@ -35,4 +35,4 @@ We currently only support SAML 2.0 federation.
 
 !!! info
 
-    Azure session is no more available for direct creation. Instead you can create a new [Azure Integration](../../configuring-integration/configuring-azure-integration.md).
+    Azure sessions are not available anymore for direct creation. Instead you can create a new [Azure Integration](../configuring-integration/configure-azure-integration.md).

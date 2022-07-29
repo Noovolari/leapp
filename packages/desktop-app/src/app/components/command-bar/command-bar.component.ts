@@ -19,6 +19,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -197,7 +198,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.windowService.getCurrentWindow().unmaximize();
     this.windowService.getCurrentWindow().restore();
 
-    if (this.appService.detectOs() === constants.mac && this.windowService.getCurrentWindow().isFullScreen()) {
+    if (this.appService.detectOs() === OperatingSystem.mac && this.windowService.getCurrentWindow().isFullScreen()) {
       this.windowService.getCurrentWindow().setFullScreen(false);
       this.windowService.getCurrentWindow().setMaximizable(false);
     }

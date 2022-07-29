@@ -14,8 +14,9 @@ import { OptionsService } from "../../../services/options.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { HttpClient } from "@angular/common/http";
-import { IHubPluginObject } from "@noovolari/leapp-core/plugin-system/interfaces/i-hub-plugin-object";
+import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { AppNativeService } from "../../../services/app-native.service";
 
 @Component({
   selector: "app-options-dialog",
@@ -31,6 +32,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   tabGroup: MatTabGroup;
 
   eConstants = constants;
+  eOperatingSystem = OperatingSystem;
 
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
@@ -54,7 +56,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   colorTheme: string;
   selectedColorTheme: string;
 
-  pluginList: IHubPluginObject[];
+  pluginList: IPlugin[];
+  fetchingPlugins: boolean;
 
   form = new FormGroup({
     idpUrl: new FormControl(""),
@@ -83,11 +86,11 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     public appProviderService: AppProviderService,
     public appService: AppService,
     private optionsService: OptionsService,
+    private appNativeService: AppNativeService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,
     private modalService: BsModalService,
-    private router: Router,
-    private http: HttpClient
+    private router: Router
   ) {
     this.selectedTerminal = this.optionsService.macOsTerminal || constants.macOsTerminal;
 
@@ -98,6 +101,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.fetchingPlugins = false;
     this.idpUrlValue = "";
     this.proxyProtocol = this.optionsService.proxyConfiguration.proxyProtocol;
     this.proxyUrl = this.optionsService.proxyConfiguration.proxyUrl;
@@ -126,7 +130,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
     this.appService.validateAllFormFields(this.form);
 
-    this.listPlugin();
+    this.pluginList = this.appProviderService.pluginManagerService.plugins;
   }
 
   ngAfterViewInit(): void {
@@ -432,26 +436,45 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async listPlugin(): Promise<void> {
-    const pluginPortalUrl = constants.pluginPortalUrl;
-    const response = await this.http.get(pluginPortalUrl, { responseType: "json" }).toPromise();
-    console.log(response);
-    this.pluginList = JSON.parse(JSON.stringify(response));
+  async refreshPluginList(): Promise<void> {
+    this.fetchingPlugins = true;
+    await this.appService.reloadPlugins();
+    this.pluginList = this.appProviderService.pluginManagerService.plugins;
+    this.fetchingPlugins = false;
   }
 
-  installPlugin(): void {
+  async installPlugin(): Promise<void> {
+    this.fetchingPlugins = true;
     if (this.form.controls.pluginDeepLink.value) {
-      if (this.form.controls.pluginDeepLink.value.indexOf("leapp://") > -1) {
-        this.appService.installPlugin(this.form.controls.pluginDeepLink.value);
-      }
+      await this.appService.installPlugin(this.form.controls.pluginDeepLink.value);
+      await this.refreshPluginList();
     }
+    this.fetchingPlugins = false;
   }
 
-  installPluginFromList(url: string): void {
-    if (url) {
-      if (url.indexOf("leapp://") > -1) {
-        this.appService.installPlugin(url);
-      }
-    }
+  togglePluginActivation(plugin: IPlugin): void {
+    plugin.metadata.active = !plugin.metadata.active;
+    const status = this.appProviderService.repository.getPluginStatus(plugin.metadata.uniqueName);
+    status.active = plugin.metadata.active;
+    this.appProviderService.repository.setPluginStatus(plugin.metadata.uniqueName, status);
+  }
+
+  getPluginExtraInfo(plugin: IPlugin): string {
+    return `Author: ${plugin.metadata.author}
+    Description: ${plugin.metadata.description}
+    Supported Sessions: ${plugin.metadata.supportedSessions.join(",")}`;
+  }
+
+  getSupportedOsIcons(plugin: IPlugin): string {
+    const supportedOS = plugin.metadata.supportedOS;
+    const icon1 = `<i class="fa fa-apple ${supportedOS.includes(OperatingSystem.mac) ? "" : "bw"}"></i>`;
+    const icon2 = `<i class="fa fa-windows ${supportedOS.includes(OperatingSystem.windows) ? "" : "bw"}"></i>`;
+    const icon3 = `<i class="fa fa-linux ${supportedOS.includes(OperatingSystem.linux) ? "" : "bw"}"></i>`;
+    return `${icon1}&nbsp;${icon2}&nbsp;${icon3}`;
+  }
+
+  openPluginFolder(): void {
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    this.appNativeService.shell.showItemInFolder(this.appNativeService.path.join(this.appNativeService.os.homedir(), ".Leapp", "plugins"));
   }
 }

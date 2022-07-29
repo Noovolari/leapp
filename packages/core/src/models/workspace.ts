@@ -9,8 +9,10 @@ import Folder from "./folder";
 import Segment from "./segment";
 import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import { AzureIntegration } from "./azure/azure-integration";
+import PluginStatus from "./plugin-status";
 
 export class Workspace {
+  /* istanbul ignore next */
   @Type(() => Session)
   private _sessions: Session[];
 
@@ -22,6 +24,8 @@ export class Workspace {
   private _macOsTerminal: string;
   private _idpUrls: IdpUrl[];
   private _profiles: AwsNamedProfile[];
+
+  private _pluginsStatus: PluginStatus[];
 
   private _pinned: string[];
   private _folders: Folder[];
@@ -39,7 +43,7 @@ export class Workspace {
 
   private _credentialMethod: string;
 
-  private _workspaceVersion: string;
+  private _workspaceVersion: number;
 
   constructor() {
     this._pinned = [];
@@ -51,6 +55,7 @@ export class Workspace {
     this._macOsTerminal = constants.macOsTerminal;
     this._idpUrls = [];
     this._profiles = [{ id: uuid.v4(), name: constants.defaultAwsProfileName }];
+    this._pluginsStatus = [];
 
     this._awsSsoIntegrations = [];
     this._azureIntegrations = [];
@@ -67,7 +72,7 @@ export class Workspace {
   }
 
   setNewWorkspaceVersion(): void {
-    this._workspaceVersion = "1";
+    this._workspaceVersion = 1;
   }
 
   addIpUrl(idpUrl: IdpUrl): void {
@@ -184,5 +189,13 @@ export class Workspace {
 
   set credentialMethod(credentialMethod: string) {
     this._credentialMethod = credentialMethod;
+  }
+
+  get pluginsStatus(): PluginStatus[] {
+    return this._pluginsStatus;
+  }
+
+  set pluginsStatus(newPlugins: PluginStatus[]) {
+    this._pluginsStatus = newPlugins;
   }
 }

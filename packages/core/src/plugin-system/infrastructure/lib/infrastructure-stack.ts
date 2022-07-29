@@ -37,6 +37,7 @@ export class InfrastructureStack extends NestedStack {
   private backendLambdaFunction: lambda.Function;
   private updaterLambdaFunction: lambda.Function;
   private signatureUpdaterLambdaFunction: lambda.Function;
+  private signerStarterLambdaFunction: lambda.Function;
   private restApi: RestApi;
   private databaseSecret: DatabaseSecret;
   private readonly vpc: IVpc;
@@ -59,6 +60,7 @@ export class InfrastructureStack extends NestedStack {
     this.createApiGateway();
     this.createUpdaterLambdaFunction();
     this.createSignatureUpdaterLambdaFunction();
+    this.createSignerStarterLambdaFunction();
 
     this.database.grantDataApiAccess(this.backendLambdaFunction);
     this.database.grantDataApiAccess(this.updaterLambdaFunction);
@@ -175,6 +177,29 @@ export class InfrastructureStack extends NestedStack {
       },
       timeout: Duration.seconds(30),
       code: lambda.Code.fromAsset(path.join(__dirname, "..", "..", "..", "..", "dist", "plugin-system", "signature-updater")),
+    });
+  }
+
+  createSignerStarterLambdaFunction() {
+    const layer = this.createLambdaLayer(
+      "LeappPluginSignerStarterLayer",
+      `${this.envName}-leapp-plugin-signer-starter-layer`,
+      path.join(__dirname, "..", "..", "signer-starter", "layer", "nodejs.zip"),
+      path.join(__dirname, "..", "..", "signer-starter", "package.json")
+    );
+
+    this.signerStarterLambdaFunction = new lambda.Function(this, "LeappSignerStarterFunction", {
+      functionName: `${this.envName}-leapp-signer-starter-function`,
+      runtime: lambda.Runtime.NODEJS_14_X,
+      handler: path.join("app.handler"),
+      layers: [layer],
+      environment: {
+        RDS_ARN: this.database.clusterArn,
+        RDS_SECRET_ARN: this.databaseSecret.secretArn,
+        RDS_DATABASE: 'postgres'
+      },
+      timeout: Duration.seconds(30),
+      code: lambda.Code.fromAsset(path.join(__dirname, "..", "..", "..", "..", "dist", "plugin-system", "signer-starter")),
     });
   }
 

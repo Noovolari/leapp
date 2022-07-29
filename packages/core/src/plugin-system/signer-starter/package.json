@@ -1,0 +1,7 @@
+{
+  "name": "plugin-system",
+  "version": "0.0.1",
+  "dependencies": {
+    "@aws-sdk/client-ecs": "^3.121.0"
+  }
+}

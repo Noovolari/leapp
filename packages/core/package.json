@@ -89,7 +89,8 @@
     "pre-deploy:backend": "src/plugin-system/backend/prepare-layer.sh",
     "pre-deploy:plugin-updater": "src/plugin-system/plugin-updater/prepare-layer.sh",
     "pre-deploy:signature-updater": "src/plugin-system/signature-updater/prepare-layer.sh",
-    "deploy:dev": "export ENVIRONMENT_NAME=dev && npm run build && npm run pre-deploy:backend && npm run pre-deploy:plugin-updater && npm run pre-deploy:signature-updater && cd ./src/plugin-system/infrastructure && ./../../../node_modules/aws-cdk/bin/cdk deploy '*' -- --require-approval never"
+    "pre-deploy:signer-starter": "src/plugin-system/signer-starter/prepare-layer.sh",
+    "deploy:dev": "export ENVIRONMENT_NAME=dev && npm run build && npm run pre-deploy:backend && npm run pre-deploy:plugin-updater && npm run pre-deploy:signature-updater && npm run pre-deploy:signer-starter && cd ./src/plugin-system/infrastructure && ./../../../node_modules/aws-cdk/bin/cdk deploy '*' -- --require-approval never"
   },
   "repository": {
     "type": "git",

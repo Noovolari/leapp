@@ -436,19 +436,20 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     }
   }
 
-  async refreshPluginList(): Promise<void> {
-    this.fetchingPlugins = true;
-    await this.appService.reloadPlugins();
-    this.pluginList = this.appProviderService.pluginManagerService.plugins;
-    this.fetchingPlugins = false;
-  }
-
   async installPlugin(): Promise<void> {
     this.fetchingPlugins = true;
     if (this.form.controls.pluginDeepLink.value) {
-      await this.appService.installPlugin(this.form.controls.pluginDeepLink.value);
+      await this.appProviderService.pluginManagerService.installPlugin(this.form.controls.pluginDeepLink.value);
       await this.refreshPluginList();
     }
+    this.fetchingPlugins = false;
+  }
+
+  async refreshPluginList(): Promise<void> {
+    this.fetchingPlugins = true;
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    await this.appProviderService.pluginManagerService.loadFromPluginDir();
+    this.pluginList = this.appProviderService.pluginManagerService.plugins;
     this.fetchingPlugins = false;
   }
 

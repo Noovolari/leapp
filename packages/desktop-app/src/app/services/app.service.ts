@@ -232,15 +232,4 @@ export class AppService {
     });
     this.triggers = [];
   }
-
-  // TODO: make platform independent
-  // TODO: remove preemptly package-lock before running npm install
-  async installPlugin(url: string): Promise<void> {
-    await this.appProviderService.pluginManagerService.installPlugin(url);
-  }
-
-  async reloadPlugins(): Promise<void> {
-    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
-    await this.appProviderService.pluginManagerService.loadFromPluginDir();
-  }
 }

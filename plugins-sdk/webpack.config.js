@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
-  entry: './testPlugin.ts',
+  entry: './web-console-plugin.ts',
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'plugin.js',

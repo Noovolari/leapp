@@ -23,6 +23,7 @@ import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-serv
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
@@ -231,6 +232,10 @@ export class SessionCardComponent implements OnInit {
 
   /**
    * Copy credentials in the clipboard
+   *
+   * @param session - source session for copied information
+   * @param type - information type to copy
+   * @param event - to remove propagation bubbles
    */
   async copyCredentials(session: Session, type: number, event: Event): Promise<void> {
     event.preventDefault();
@@ -239,24 +244,48 @@ export class SessionCardComponent implements OnInit {
 
     try {
       if (this.appProviderService.workspaceService.workspaceExists()) {
-        const texts = {
-          // eslint-disable-next-line max-len
-          1: (session as AwsIamRoleFederatedSession).roleArn
-            ? `${(session as AwsIamRoleFederatedSession).roleArn.split("/")[0].substring(13, 25)}`
-            : "",
-          2: (session as AwsIamRoleFederatedSession).roleArn ? `${(session as AwsIamRoleFederatedSession).roleArn}` : "",
-        };
+        let text: string;
 
-        let text = texts[type];
-
-        // Special conditions for IAM Users
-        if (session.type === SessionType.awsIamUser) {
-          // Get Account from Caller Identity
-          text = await (this.sessionService as AwsIamUserService).getAccountNumberFromCallerIdentity(session);
+        // Information types:
+        // 1 - Account number
+        // 2 - Role ARN (if session has assumed a role)
+        // 3 - Region and session credentials exported as environment variables
+        switch (type) {
+          case 1: {
+            if (session.type === SessionType.awsIamUser) {
+              text = await (this.sessionService as AwsIamUserService).getAccountNumberFromCallerIdentity(session);
+            } else {
+              text = await (this.sessionService as AwsIamRoleFederatedService).getAccountNumberFromCallerIdentity(
+                session as AwsIamRoleFederatedSession
+              );
+            }
+            break;
+          }
+          case 2: {
+            text = (session as AwsIamRoleFederatedSession).roleArn;
+            if (!text) {
+              throw new LoggedException("Unable to get Role ARN", this, LogLevel.error, false);
+            }
+            break;
+          }
+          case 3: {
+            const sessionCredentialsToken = (await (this.sessionService as AwsSessionService).generateCredentials(session.sessionId)).sessionToken;
+            /* eslint-disable no-useless-escape */
+            text = `export AWS_REGION=\"${session.region}\"\n`;
+            text += `export AWS_ACCESS_KEY_ID=\"${sessionCredentialsToken.aws_access_key_id}\"\n`;
+            text += `export AWS_SECRET_ACCESS_KEY=\"${sessionCredentialsToken.aws_secret_access_key}\"\n`;
+            text += `export AWS_SESSION_TOKEN=\"${sessionCredentialsToken.aws_session_token}\"\n`;
+            /* eslint-enable no-useless-escape */
+            break;
+          }
         }
 
-        this.appService.copyToClipboard(text);
-        this.messageToasterService.toast("Your information have been successfully copied!", ToastLevel.success, "Information copied!");
+        if (text) {
+          this.appService.copyToClipboard(text);
+          this.messageToasterService.toast("Your information have been successfully copied!", ToastLevel.success, "Information copied!");
+        } else {
+          throw new LoggedException("Nothing copied", this, LogLevel.error, false);
+        }
       }
     } catch (err) {
       this.messageToasterService.toast(err, ToastLevel.warn);

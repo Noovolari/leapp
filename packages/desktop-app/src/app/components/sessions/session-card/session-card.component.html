@@ -142,6 +142,10 @@
     <i class="fab fa-aws"></i>&nbsp;
     <span>Role ARN</span>
   </button>
+  <button mat-menu-item (click)="copyCredentials(session, 3, $event);">
+    <i class="fab fa-aws"></i>&nbsp;
+    <span>AWS session as environment variables</span>
+  </button>
 </mat-menu>
 
 <ng-container *ngIf="eOptionIds[session.sessionId]">

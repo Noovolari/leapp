@@ -7,7 +7,6 @@ import { SessionType } from "../models/session-type";
 import { OperatingSystem } from "../models/operating-system";
 import { Session } from "../models/session";
 import { SessionFactory } from "../services/session-factory";
-import { ExecuteService } from "../services/execute-service";
 import { PluginEnvironment } from "./plugin-environment";
 
 export class PluginManagerService {
@@ -17,13 +16,12 @@ export class PluginManagerService {
   private _pluginDir = "plugins";
 
   constructor(
+    public pluginEnvironment: PluginEnvironment,
     private nativeService: INativeService,
     private logService: LogService,
     private repository: Repository,
     private sessionFactory: SessionFactory,
-    private http: any,
-    private executeService: ExecuteService,
-    private pluginEnvironment: PluginEnvironment
+    private http: any
   ) {
     this._plugins = [];
     this._requireModule = nativeService.requireModule;
@@ -36,6 +34,10 @@ export class PluginManagerService {
 
   get plugins(): IPlugin[] {
     return this._plugins;
+  }
+
+  getPluginByName(name: string): IPlugin {
+    return this._plugins.find((plugin) => plugin.metadata.uniqueName === name);
   }
 
   verifyAndGeneratePluginFolderIfMissing(): void {

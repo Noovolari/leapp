@@ -7,7 +7,7 @@ import { MatMenuTrigger } from "@angular/material/menu";
 import { WindowService } from "./window.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
-import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { OperatingSystem, osMap } from "@noovolari/leapp-core/models/operating-system";
 import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Injectable({
@@ -74,13 +74,8 @@ export class AppService {
    * Return the type of OS in human-readable form
    */
   detectOs(): OperatingSystem {
-    const hrNames = {
-      linux: OperatingSystem.linux,
-      darwin: OperatingSystem.mac,
-      win32: OperatingSystem.windows,
-    };
     const os = this.appNativeService.os.platform();
-    return hrNames[os];
+    return osMap[os];
   }
 
   /**

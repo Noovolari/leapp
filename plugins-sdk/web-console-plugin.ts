@@ -23,7 +23,6 @@ export class WebConsolePlugin {
       session.sessionId
     );
     const sessionDuration = 3200;
-    const fetch = window.fetch.bind(window);
 
     const isUSGovCloud = sessionRegion.startsWith("us-gov-");
 

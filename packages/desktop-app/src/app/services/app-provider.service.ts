@@ -97,13 +97,12 @@ export class AppProviderService {
   public get pluginManagerService(): PluginManagerService {
     if (!this.pluginManagerServiceInstance) {
       this.pluginManagerServiceInstance = new PluginManagerService(
+        new PluginEnvironment(EnvironmentType.desktopApp, this),
         this.appNativeService,
         this.logService,
         this.repository,
         this.sessionFactory,
-        this.http,
-        this.executeService,
-        new PluginEnvironment(EnvironmentType.desktopApp, this)
+        this.http
       );
     }
     return this.pluginManagerServiceInstance;

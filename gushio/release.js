@@ -105,6 +105,7 @@ async function rollbackProject(commitId, version, package) {
 
 async function releaseCore(version) {
   const { Confirm } = (await gushio.import('enquirer')).default
+  const path = await gushio.import('path')
   const shellJs = await gushio.import('shelljs')
   let commitId;
 

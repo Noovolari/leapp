@@ -24,14 +24,23 @@ export default class CreateSsoIntegration extends LeappCommand {
     super(argv, config);
   }
 
+  private static areFlagsNotDefined(flags: any): boolean {
+    return (
+      flags.integrationAlias === undefined &&
+      flags.integrationRegion === undefined &&
+      flags.integrationPortalUrl === undefined &&
+      flags.integrationMethod === undefined
+    );
+  }
+
   async run(): Promise<void> {
     try {
       let creationParams: AwsSsoIntegration;
       const { flags } = await this.parse(CreateSsoIntegration);
-      if (this.checkFlags(flags)) {
-        creationParams = this.validateAndAssignFlags(flags);
-      } else {
+      if (CreateSsoIntegration.areFlagsNotDefined(flags)) {
         creationParams = await this.askConfigurationParameters();
+      } else {
+        creationParams = this.validateAndAssignFlags(flags);
       }
       await this.createIntegration(creationParams);
     } catch (error: any) {
@@ -81,16 +90,15 @@ export default class CreateSsoIntegration extends LeappCommand {
     this.log("aws sso integration created");
   }
 
-  private checkFlags(flags: any): boolean {
-    return (
-      flags.integrationAlias !== undefined &&
-      flags.integrationRegion !== undefined &&
-      flags.integrationPortalUrl !== undefined &&
-      flags.integrationMethod !== undefined
-    );
-  }
-
   private validateAndAssignFlags(flags: any): AwsSsoIntegration {
+    if (
+      flags.integrationAlias === undefined ||
+      flags.integrationPortalUrl === undefined ||
+      flags.integrationRegion === undefined ||
+      flags.integrationMethod === undefined
+    ) {
+      throw new Error("flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must be specified");
+    }
     if (flags.integrationAlias === "") {
       throw new Error("Alias must not be empty");
     }

@@ -86,7 +86,7 @@
 
   <div class="divider"></div>
 
-  <ng-container *ngIf="(session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained || session.type === eSessionType.awsSsoRole)">
+  <ng-container *ngIf="(session.type === eSessionType.awsIamUser || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained || session.type === eSessionType.awsSsoRole)">
     <button mat-menu-item [matMenuTriggerFor]="copy">
       <i class="moon-Copy"></i>
       <span>&nbsp;&nbsp;Copy</span>
@@ -138,7 +138,7 @@
     <i class="fab fa-aws"></i>&nbsp;
     <span>Account Number</span>
   </button>
-  <button mat-menu-item (click)="copyCredentials(session, 2, $event);">
+  <button mat-menu-item (click)="copyCredentials(session, 2, $event);" *ngIf="session.type !== eSessionType.awsIamUser">
     <i class="fab fa-aws"></i>&nbsp;
     <span>Role ARN</span>
   </button>

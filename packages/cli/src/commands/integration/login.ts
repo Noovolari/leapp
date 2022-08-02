@@ -21,6 +21,9 @@ export default class LoginIntegration extends LeappCommand {
       const { flags } = await this.parse(LoginIntegration);
       if (flags.integrationId && flags.integrationId !== "") {
         const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        if (!selectedIntegration) {
+          throw new Error("integrationId is not associated to an existing integration");
+        }
         await this.login(selectedIntegration);
       } else {
         const selectedIntegration = await this.selectIntegration();

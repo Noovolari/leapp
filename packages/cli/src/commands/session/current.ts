@@ -13,7 +13,8 @@ const awsProvider = "aws";
 const azureProvider = "azure";
 
 export default class CurrentSession extends LeappCommand {
-  static description = "Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)";
+  static description =
+    "Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile default)";
   static examples = ['$leapp session current --format "alias accountNumber" --inline --provider aws'];
   static flags = {
     inline: Flags.boolean({

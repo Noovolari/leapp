@@ -97,7 +97,7 @@ export default class CreateSsoIntegration extends LeappCommand {
       flags.integrationRegion === undefined ||
       flags.integrationMethod === undefined
     ) {
-      throw new Error("flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must be specified");
+      throw new Error("flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must all be specified");
     }
     if (flags.integrationAlias === "") {
       throw new Error("Alias must not be empty");

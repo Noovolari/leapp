@@ -21,6 +21,9 @@ export default class LogoutIntegration extends LeappCommand {
       const { flags } = await this.parse(LogoutIntegration);
       if (flags.integrationId && flags.integrationId !== "") {
         const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        if (!selectedIntegration) {
+          throw new Error("integrationId is not associated to an existing integration");
+        }
         await this.logout(selectedIntegration);
       } else {
         const selectedIntegration = await this.selectIntegration();

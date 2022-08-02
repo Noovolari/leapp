@@ -105,7 +105,7 @@ EXAMPLES
 
 ## `leapp session current`
 
-Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)
+Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile default)
 
 ```
 USAGE
@@ -121,8 +121,8 @@ FLAGS
                            <options: aws|azure>
 
 DESCRIPTION
-  Provides info about the current active session for a selected profile (if no profile is provided it uses default
-  profile)
+  Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile
+  default)
 
 EXAMPLES
   $leapp session current --format "alias accountNumber" --inline --provider aws

@@ -7,6 +7,6 @@ module.exports = {
     "!node_modules/"
   ],
   moduleNameMapper: {
-    "^@noovolari/leapp-core/(.*)$": "@noovolari/leapp-core/dist/$1"
+    "^@noovolari/leapp-core/(.*)$": "@noovolari/leapp-core/dist/$1",
   }
 }

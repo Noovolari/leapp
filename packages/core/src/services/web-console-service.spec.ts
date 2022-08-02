@@ -12,13 +12,14 @@ describe("WebConsoleService", () => {
       log: jest.fn(),
     };
 
-    const fetch: any = () => ({
-      json: () => ({
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        SigninToken: "mocked-aws_session_token",
+    const nativeService = {
+      fetch: () => ({
+        json: () => ({
+          ["SigninToken"]: "mocked-aws_session_token",
+        }),
       }),
-    });
-    return new WebConsoleService(shellService, logService, fetch);
+    };
+    return new WebConsoleService(shellService, logService, nativeService);
   };
 
   test("openWebConsole - throws error if session's region starts with cn-", async () => {

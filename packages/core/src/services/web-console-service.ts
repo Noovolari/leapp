@@ -1,12 +1,13 @@
 import { IOpenExternalUrlService } from "../interfaces/i-open-external-url-service";
 import { CredentialsInfo } from "../models/credentials-info";
 import { LoggedEntry, LogLevel, LogService } from "./log-service";
+import { INativeService } from "../interfaces/i-native-service";
 
 export class WebConsoleService {
   private secondsInAHour = 3200;
   private sessionDurationInHours = 1;
 
-  constructor(private shellService: IOpenExternalUrlService, private logService: LogService, private fetch: any) {}
+  constructor(private shellService: IOpenExternalUrlService, private logService: LogService, private nativeService: INativeService) {}
 
   async openWebConsole(
     credentialsInfo: CredentialsInfo,
@@ -42,11 +43,10 @@ export class WebConsoleService {
       JSON.stringify(sessionStringJSON)
     )}`;
 
-    const res = await this.fetch(`${federationUrl}${queryParametersSigninToken}`);
+    const res = await this.nativeService.fetch(`${federationUrl}${queryParametersSigninToken}`);
     const response = await res.json();
 
     const loginURL = `${federationUrl}?Action=login&Issuer=Leapp&Destination=${consoleHomeURL}&SigninToken=${(response as any).SigninToken}`;
-
     this.shellService.openExternalUrl(loginURL);
   }
 }

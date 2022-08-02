@@ -145,7 +145,7 @@ export class AppProviderService {
 
   public get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.logService, window.fetch.bind(window));
+      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.logService, this.appNativeService);
     }
     return this.webConsoleServiceInstance;
   }

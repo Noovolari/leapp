@@ -1,15 +1,28 @@
 {
-  "name": "leapp-plugin-test",
+  "name": "leapp-web-console-plugin",
+  "author": "Noovolari",
   "version": "1.0.0",
-  "description": "",
+  "description": "open the AWS web console for the specified session",
+  "keywords": [
+    "leapp-plugin",
+    "s3",
+    "list buckets"
+  ],
+  "leappPlugin": {
+    "entryClass": "WebConsolePlugin",
+    "supportedOS": [
+      "mac"
+    ],
+    "supportedSessions": [
+      "aws"
+    ]
+  },
   "scripts": {
     "build": "webpack --config webpack.config.js"
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
-    "tar": "^6.1.11",
-    "@noovolari/leapp-core": "0.1.115"
+    "@noovolari/leapp-core": "file:../packages/core"
   },
   "devDependencies": {
     "path-browserify": "^1.0.1",

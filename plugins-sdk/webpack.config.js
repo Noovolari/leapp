@@ -4,7 +4,7 @@ module.exports = {
   mode: 'development',
   entry: './web-console-plugin.ts',
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname),
     filename: 'plugin.js',
     library: {
       type: 'commonjs2',

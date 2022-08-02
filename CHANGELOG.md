@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.13.1](https://github.com/Noovolari/leapp/compare/v0.13.0...v0.13.1) (2022-07-14)
+## [0.13.2](https://github.com/Noovolari/leapp/compare/v0.13.1...v0.13.2) (2022-08-02)
+
+### Bug Fixes
+* changed TPS limit introduced in the solution for AWS SSO TooManyRequest error [#281](https://github.com/Noovolari/leapp/issues/281) [#308](https://github.com/Noovolari/leapp/issues/308)
+
+### [0.13.1](https://github.com/Noovolari/leapp/compare/v0.13.0...v0.13.1) (2022-07-14)
 
 ### Bug Fixes
 * added solution that solves AWS SSO TooManyRequest error [#281](https://github.com/Noovolari/leapp/issues/281) [#297](https://github.com/Noovolari/leapp/pull/297)

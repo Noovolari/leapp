@@ -429,7 +429,7 @@ describe("AwsSsoIntegrationService", () => {
 
     expect(awsIntegrationService.ssoPortal.config.region).toBe(fakeRegion);
     expect(awsIntegrationService.listAccountRolesCall).toBeInstanceOf(ThrottleService);
-    expect(awsIntegrationService.listAccountRolesCall.minDelay).toBe(50);
+    expect(awsIntegrationService.listAccountRolesCall.minDelay).toBe(100);
 
     const callParams = ["fake-param1", "fake-param2"];
     const callPromise = "fake-call-promise";

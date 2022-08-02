@@ -1,6 +1,6 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import CreateSsoIntegration from "./create";
-import { AwsSsoIntegrationService, IntegrationCreationParams } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { CliProviderService } from "../../service/cli-provider-service";
@@ -36,31 +36,27 @@ describe("CreateSsoIntegration", () => {
       })
     );
 
-    const mock2 = jest.fn((_: IntegrationCreationParams) => Promise.resolve());
+    const mock2 = jest.fn((_: any) => Promise.resolve());
 
     command1.createIntegration = mock2;
-    command1.askConfigurationParameters = mock1;
+    (command1 as any).askConfigurationParameters = mock1;
     command2.createIntegration = mock2;
-    command2.askConfigurationParameters = mock1;
+    (command2 as any).askConfigurationParameters = mock1;
     command3.createIntegration = mock2;
-    command3.askConfigurationParameters = mock1;
+    (command3 as any).askConfigurationParameters = mock1;
     command4.createIntegration = mock2;
-    command4.askConfigurationParameters = mock1;
+    (command4 as any).askConfigurationParameters = mock1;
 
-    const spy1 = jest.spyOn(command1 as any, "checkFlags");
-    const spy2 = jest.spyOn(command2 as any, "checkFlags");
-    const spy3 = jest.spyOn(command3 as any, "checkFlags");
-    const spy4 = jest.spyOn(command4 as any, "checkFlags");
-
-    await command1.run();
-    await command2.run();
-    await command3.run();
+    await expect(command1.run()).rejects.toThrowError(
+      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must be specified"
+    );
+    await expect(command2.run()).rejects.toThrowError(
+      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must be specified"
+    );
+    await expect(command3.run()).rejects.toThrowError(
+      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must be specified"
+    );
     await expect(command4.run()).rejects.toThrowError("Alias must not be empty");
-
-    expect(spy1).toHaveReturnedWith(false);
-    expect(spy2).toHaveReturnedWith(false);
-    expect(spy3).toHaveReturnedWith(false);
-    expect(spy4).toHaveReturnedWith(true);
 
     const command5 = getTestCommand(new CliProviderService(), [
       "--integrationAlias",
@@ -124,7 +120,7 @@ describe("CreateSsoIntegration", () => {
       "--integrationMethod",
       "In-app",
     ]);
-    const mock3 = jest.fn((_: IntegrationCreationParams) => Promise.resolve());
+    const mock3 = jest.fn((_: any) => Promise.resolve());
     command9.createIntegration = mock3;
     await command9.run();
     expect(mock3).toHaveBeenCalledWith({
@@ -251,7 +247,7 @@ describe("CreateSsoIntegration", () => {
 
     const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
-    const creationParam: IntegrationCreationParams = {
+    const creationParam: any = {
       alias: "alias",
       portalUrl: "portalUrl",
       region: "region",

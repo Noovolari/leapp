@@ -24,10 +24,21 @@ export default class StartSsmSession extends LeappCommand {
     super(argv, config);
   }
 
+  private static areFlagsNotDefined(flags: any): boolean {
+    return flags.sessionId === undefined && flags.region === undefined && flags.ssmInstanceId === undefined;
+  }
+
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(StartSsmSession);
-      if (this.validateFlags(flags)) {
+      if (StartSsmSession.areFlagsNotDefined(flags)) {
+        const selectedSession = await this.selectSession();
+        const credentials = await this.generateCredentials(selectedSession);
+        const selectedRegion = await this.selectRegion(selectedSession);
+        const selectedSsmInstanceId = await this.selectSsmInstance(credentials, selectedRegion);
+        await this.startSsmSession(credentials, selectedSsmInstanceId, selectedRegion);
+      } else {
+        this.validateFlags(flags);
         const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(`${flags.sessionId}`);
         if (!selectedSession) {
           throw new Error("No session found with id " + flags.sessionId);
@@ -39,12 +50,6 @@ export default class StartSsmSession extends LeappCommand {
           throw new Error("No region found with name " + flags.region);
         }
         await this.startSsmSession(credentials, `${flags.ssmInstanceId}`, `${flags.region}`);
-      } else {
-        const selectedSession = await this.selectSession();
-        const credentials = await this.generateCredentials(selectedSession);
-        const selectedRegion = await this.selectRegion(selectedSession);
-        const selectedSsmInstanceId = await this.selectSsmInstance(credentials, selectedRegion);
-        await this.startSsmSession(credentials, selectedSsmInstanceId, selectedRegion);
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
@@ -114,7 +119,26 @@ export default class StartSsmSession extends LeappCommand {
   }
 
   private validateFlags(flags: any) {
-    return flags.sessionId && flags.sessionId !== "" && flags.ssmInstanceId && flags.ssmInstanceId !== "" && flags.region && flags.region !== "";
+    if (!flags.sessionId || !flags.ssmInstanceId || !flags.region) {
+      throw new Error("flags --sessionId, --ssmInstanceId and --region must be specified");
+    }
+    if (flags.sessionId === "") {
+      throw new Error("Session ID must not be empty");
+    }
+    if (flags.ssmInstanceId === "") {
+      throw new Error("SSM Instance ID must not be empty");
+    }
+    if (flags.region === "") {
+      throw new Error("Region must not be empty");
+    }
+    if (
+      this.cliProviderService.awsCoreService
+        .getRegions()
+        .map((r: { region: any }) => r.region)
+        .indexOf(flags.region) < 0
+    ) {
+      throw new Error("Provided region is not a valid AWS region");
+    }
   }
 
   private availableRegions(selectedSession: Session) {

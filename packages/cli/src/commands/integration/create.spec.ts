@@ -48,13 +48,13 @@ describe("CreateSsoIntegration", () => {
     (command4 as any).askConfigurationParameters = mock1;
 
     await expect(command1.run()).rejects.toThrowError(
-      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must be specified"
+      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must all be specified"
     );
     await expect(command2.run()).rejects.toThrowError(
-      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must be specified"
+      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must all be specified"
     );
     await expect(command3.run()).rejects.toThrowError(
-      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must be specified"
+      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must all be specified"
     );
     await expect(command4.run()).rejects.toThrowError("Alias must not be empty");
 

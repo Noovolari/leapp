@@ -58,11 +58,11 @@ describe("ChangeRegion", () => {
 
     command = getTestCommand(cliProviderService, ["--region", "profileXX", "--sessionId", "Session1"]);
     command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Region not found with name profileXX");
+    await expect(command.run()).rejects.toThrow("No region with name profileXX found");
 
     command = getTestCommand(cliProviderService, ["--region", "eu-west-1", "--sessionId", "sessionXX"]);
     command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Session not found with id sessionXX");
+    await expect(command.run()).rejects.toThrow("No session with id sessionXX found");
 
     command = getTestCommand(cliProviderService, ["--region", "eu-west-1", "--sessionId", "Session1"]);
     command.log = jest.fn();

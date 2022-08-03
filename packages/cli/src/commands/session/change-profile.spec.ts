@@ -57,11 +57,11 @@ describe("ChangeProfile", () => {
 
     command = getTestCommand(cliProviderService, ["--profileId", "profileXX", "--sessionId", "Session1"]);
     command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Profile not found with id profileXX");
+    await expect(command.run()).rejects.toThrow("No profile with id profileXX found");
 
     command = getTestCommand(cliProviderService, ["--profileId", "profile3", "--sessionId", "sessionXX"]);
     command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Session not found with id sessionXX");
+    await expect(command.run()).rejects.toThrow("No session with id sessionXX found");
 
     command = getTestCommand(cliProviderService, ["--profileId", "profile3", "--sessionId", "Session1"]);
     command.log = jest.fn();

@@ -13,18 +13,25 @@ describe("CreateSsoIntegration", () => {
   };
 
   test("Flags - Validation and Existance", async () => {
-    const command1 = getTestCommand(new CliProviderService(), ["--integrationAlias", ""]);
-    const command2 = getTestCommand(new CliProviderService(), ["--integrationAlias", "", "--integrationPortalUrl", ""]);
-    const command3 = getTestCommand(new CliProviderService(), ["--integrationAlias", "", "--integrationPortalUrl", "", "--integrationRegion", ""]);
+    const command1 = getTestCommand(new CliProviderService(), ["--integrationAlias", "test"]);
+    const command2 = getTestCommand(new CliProviderService(), ["--integrationAlias", "test", "--integrationPortalUrl", "test"]);
+    const command3 = getTestCommand(new CliProviderService(), [
+      "--integrationAlias",
+      "test",
+      "--integrationPortalUrl",
+      "test",
+      "--integrationRegion",
+      "test",
+    ]);
     const command4 = getTestCommand(new CliProviderService(), [
       "--integrationAlias",
       "",
       "--integrationPortalUrl",
-      "",
+      "test",
       "--integrationRegion",
-      "",
+      "test",
       "--integrationMethod",
-      "",
+      "test",
     ]);
 
     const mock1 = jest.fn(() =>
@@ -47,15 +54,9 @@ describe("CreateSsoIntegration", () => {
     command4.createIntegration = mock2;
     (command4 as any).askConfigurationParameters = mock1;
 
-    await expect(command1.run()).rejects.toThrowError(
-      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must all be specified"
-    );
-    await expect(command2.run()).rejects.toThrowError(
-      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must all be specified"
-    );
-    await expect(command3.run()).rejects.toThrowError(
-      "flags --integrationAlias, --integrationPortalUrl, --integrationRegion and --integrationMethod must all be specified"
-    );
+    await expect(command1.run()).rejects.toThrowError("missing values for flags: --integrationPortalUrl, --integrationRegion, --integrationMethod");
+    await expect(command2.run()).rejects.toThrowError("missing values for flags: --integrationRegion, --integrationMethod");
+    await expect(command3.run()).rejects.toThrowError("missing values for flags: --integrationMethod");
     await expect(command4.run()).rejects.toThrowError("Alias must not be empty");
 
     const command5 = getTestCommand(new CliProviderService(), [

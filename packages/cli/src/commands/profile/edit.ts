@@ -17,14 +17,10 @@ export default class EditNamedProfile extends LeappCommand {
     super(argv, config);
   }
 
-  private static areFlagsNotDefined(flags: any): boolean {
-    return flags.profileId === undefined && flags.profileName === undefined;
-  }
-
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(EditNamedProfile);
-      if (EditNamedProfile.areFlagsNotDefined(flags)) {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         const selectedNamedProfile = await this.selectNamedProfile();
         const newProfileName = await this.getProfileName();
         await this.editNamedProfile(selectedNamedProfile.id, newProfileName);

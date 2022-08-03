@@ -18,14 +18,10 @@ export default class ChangeSessionProfile extends LeappCommand {
     super(argv, config);
   }
 
-  private static areFlagsNotDefined(flags: any): boolean {
-    return flags.profileId === undefined && flags.sessionId === undefined;
-  }
-
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(ChangeSessionProfile);
-      if (ChangeSessionProfile.areFlagsNotDefined(flags)) {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         const selectedSession = await this.selectSession();
         const selectedProfile = await this.selectProfile(selectedSession);
         await this.changeSessionProfile(selectedSession, selectedProfile);

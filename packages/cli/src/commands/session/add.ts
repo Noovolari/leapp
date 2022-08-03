@@ -64,28 +64,10 @@ export default class AddSession extends LeappCommand {
     super(argv, config);
   }
 
-  private static areFlagsNotDefined(flags: any): boolean {
-    return (
-      flags.providerType === undefined &&
-      flags.sessionType === undefined &&
-      flags.accessKey === undefined &&
-      flags.idpArn === undefined &&
-      flags.idpUrl === undefined &&
-      flags.mfaDevice === undefined &&
-      flags.sessionName === undefined &&
-      flags.parentSessionId === undefined &&
-      flags.profileId === undefined &&
-      flags.region === undefined &&
-      flags.roleArn === undefined &&
-      flags.roleSessionName === undefined &&
-      flags.secretKey === undefined
-    );
-  }
-
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(AddSession);
-      if (AddSession.areFlagsNotDefined(flags)) {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         // const selectedCloudProvider = await this.chooseCloudProvider();
         const selectedCloudProvider = CloudProviderType.aws;
         const selectedAccessMethod = await this.chooseAccessMethod(selectedCloudProvider);

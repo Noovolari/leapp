@@ -7,6 +7,19 @@ export abstract class LeappCommand extends Command {
     super(argv, config);
   }
 
+  protected static areFlagsNotDefined(flags: any, instance: any): boolean {
+    let enableInteractiveMode = true;
+    Object.keys(flags).forEach((key) => {
+      if (Object.keys(instance.constructor.flags).includes(key)) {
+        //if the command contains at least a flag, do not switch to interactive mode
+        if (flags[key] !== undefined) {
+          enableInteractiveMode = false;
+        }
+      }
+    });
+    return enableInteractiveMode;
+  }
+
   async init(): Promise<void> {
     this.cliProviderService.awsSsoRoleService.setAwsIntegrationDelegate(this.cliProviderService.awsSsoIntegrationService);
     const isDesktopAppRunning = await this.cliProviderService.remoteProceduresClient.isDesktopAppRunning();

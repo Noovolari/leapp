@@ -24,20 +24,11 @@ export default class CreateSsoIntegration extends LeappCommand {
     super(argv, config);
   }
 
-  private static areFlagsNotDefined(flags: any): boolean {
-    return (
-      flags.integrationAlias === undefined &&
-      flags.integrationRegion === undefined &&
-      flags.integrationPortalUrl === undefined &&
-      flags.integrationMethod === undefined
-    );
-  }
-
   async run(): Promise<void> {
     try {
       let creationParams: AwsSsoIntegration;
       const { flags } = await this.parse(CreateSsoIntegration);
-      if (CreateSsoIntegration.areFlagsNotDefined(flags)) {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         creationParams = await this.askConfigurationParameters();
       } else {
         creationParams = this.validateAndAssignFlags(flags);

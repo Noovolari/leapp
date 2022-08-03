@@ -24,14 +24,10 @@ export default class StartSsmSession extends LeappCommand {
     super(argv, config);
   }
 
-  private static areFlagsNotDefined(flags: any): boolean {
-    return flags.sessionId === undefined && flags.region === undefined && flags.ssmInstanceId === undefined;
-  }
-
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(StartSsmSession);
-      if (StartSsmSession.areFlagsNotDefined(flags)) {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         const selectedSession = await this.selectSession();
         const credentials = await this.generateCredentials(selectedSession);
         const selectedRegion = await this.selectRegion(selectedSession);

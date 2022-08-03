@@ -17,14 +17,10 @@ export default class EditIdpUrl extends LeappCommand {
     super(argv, config);
   }
 
-  static areFlagsNotDefined(flags: any): boolean {
-    return flags.idpUrlId === undefined && flags.idpUrl === undefined;
-  }
-
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(EditIdpUrl);
-      if (EditIdpUrl.areFlagsNotDefined(flags)) {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         const selectedIdpUrl = await this.selectIdpUrl();
         const newIdpUrl = await this.getNewIdpUrl();
         await this.editIdpUrl(selectedIdpUrl.id, newIdpUrl);

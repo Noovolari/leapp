@@ -17,14 +17,10 @@ export default class ChangeSessionRegion extends LeappCommand {
     super(argv, config);
   }
 
-  private static areFlagsNotDefined(flags: any): boolean {
-    return flags.sessionId === undefined && flags.region === undefined;
-  }
-
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(ChangeSessionRegion);
-      if (ChangeSessionRegion.areFlagsNotDefined(flags)) {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         const selectedSession = await this.selectSession();
         const selectedRegion = await this.selectRegion(selectedSession);
         await this.changeSessionRegion(selectedSession, selectedRegion);

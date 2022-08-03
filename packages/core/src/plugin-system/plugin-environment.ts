@@ -4,5 +4,6 @@ export enum EnvironmentType {
 }
 
 export class PluginEnvironment {
+  // TODO: providerService should have a common interface
   constructor(public environmentType: EnvironmentType, public providerService: any) {}
 }

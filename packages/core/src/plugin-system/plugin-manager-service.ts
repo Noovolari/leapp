@@ -58,9 +58,6 @@ export class PluginManagerService {
       const pluginFilePath = this.nativeService.os.homedir() + "/.Leapp/" + this._pluginDir + "/" + pluginName;
       const isDir = this.nativeService.fs.existsSync(pluginFilePath) && this.nativeService.fs.lstatSync(pluginFilePath).isDirectory();
       if (isDir) {
-        console.log(pluginFilePath);
-        console.log("Creating a hash over the current folder");
-
         // VALIDATION PROCESS
         const { packageJson, isPluginValid } = await this.validatePlugin(pluginFilePath, options, pluginName);
 
@@ -255,7 +252,6 @@ export class PluginManagerService {
         return { packageJson, isPluginValid: false };
       }
       // If it has children then it is a directory
-      console.log(hash);
       if (
         // Required files
         this.nativeService.fs.existsSync(pluginFilePath + "/package.json") &&
@@ -271,21 +267,16 @@ export class PluginManagerService {
         }
 
         const verifyMessage = packageJsonContent + hash.hash;
-        console.log("verifyMessage: ", verifyMessage);
-        console.log("data: ", data);
         const signatureVerified = this.rsaVerifySignatureFromBase64(constants.publicKey, verifyMessage, data.signature);
-        console.log(signatureVerified);
 
         if (!signatureVerified) {
           return { packageJson, isPluginValid: false };
         }
       } else {
-        console.log(`folder ${pluginFilePath} is not a plugin folder, ignoring...`);
         this.logService.log(new LoggedEntry(`folder ${pluginFilePath} is not a plugin folder, ignoring...`, this, LogLevel.info, false));
         return { packageJson, isPluginValid: false };
       }
     } catch (error) {
-      console.error("hashing failed or verification failed:", error);
       this.logService.log(new LoggedException(`hashing failed or verification failed: ${error.message}`, this, LogLevel.warn, false));
       return { packageJson, isPluginValid: false };
     }

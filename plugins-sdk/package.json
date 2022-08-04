@@ -20,6 +20,9 @@
   "scripts": {
     "build": "webpack --config webpack.config.js"
   },
+  "files": [
+    "plugin.js"
+  ],
   "license": "ISC",
   "dependencies": {
     "@noovolari/leapp-core": "file:../packages/core"

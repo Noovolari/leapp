@@ -136,7 +136,7 @@
   "scripts": {
     "prepare docs": "gushio gushio/replace-header-cli-index-doc.js",
     "clean": "gushio gushio/target-clean.js",
-    "test": "jest",
+    "test": "jest --coverage",
     "prepack": "gushio gushio/target-build.js && oclif manifest && oclif readme --multi --dir scopes",
     "release-homebrew": "gushio gushio/target-brew-release.js",
     "release-npm": "gushio gushio/target-npm-release.js"

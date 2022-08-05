@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import RunPlugin from "./run-plugin";
+import RunPlugin from "../../plugin-system/run-plugin";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 
 describe("RunPlugin", () => {

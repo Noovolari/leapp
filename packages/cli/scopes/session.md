@@ -12,7 +12,6 @@ Sessions management
 * [`leapp session get-id`](#leapp-session-get-id)
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session open-web-console`](#leapp-session-open-web-console)
-* [`leapp session run-plugin`](#leapp-session-run-plugin)
 * [`leapp session start`](#leapp-session-start)
 * [`leapp session start-ssm-session`](#leapp-session-start-ssm-session)
 * [`leapp session stop`](#leapp-session-stop)
@@ -230,27 +229,6 @@ EXAMPLES
   $leapp session open-web-console
 
   $leapp session open-web-console --sessionId SESSIONID
-```
-
-## `leapp session run-plugin`
-
-Run a Leapp Plugin
-
-```
-USAGE
-  $ leapp session run-plugin [--sessionId <value>] [--pluginName <value>]
-
-FLAGS
-  --pluginName=<value>  Unique name of a Leapp Plugin
-  --sessionId=<value>   Session Id to identify the session in Leapp, recover it with $leapp session list -x
-
-DESCRIPTION
-  Run a Leapp Plugin
-
-EXAMPLES
-  $leapp session run-plugin
-
-  $leapp session run-plugin --sessionName SESSIONAME --pluginName PLUGINNAME
 ```
 
 ## `leapp session start`

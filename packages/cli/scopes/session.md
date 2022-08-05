@@ -217,9 +217,10 @@ Open an AWS Web Console
 
 ```
 USAGE
-  $ leapp session open-web-console [--sessionId <value>]
+  $ leapp session open-web-console [--sessionId <value>] [-p]
 
 FLAGS
+  -p, --print          Print an AWS Web Console login URL in the terminal instead of opening the web browser
   --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
@@ -228,7 +229,7 @@ DESCRIPTION
 EXAMPLES
   $leapp session open-web-console
 
-  $leapp session open-web-console --sessionId SESSIONID
+  $leapp session open-web-console --sessionId SESSIONID [--print, -p]
 ```
 
 ## `leapp session start`

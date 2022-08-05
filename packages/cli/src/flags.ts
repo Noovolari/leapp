@@ -134,3 +134,9 @@ export const pluginName = Flags.string({
   description: "Unique name of a Leapp Plugin",
   hidden: false,
 });
+export const print = Flags.boolean({
+  description: "Print an AWS Web Console login URL in the terminal instead of opening the web browser",
+  hidden: false,
+  default: false,
+  char: "p",
+});

@@ -142,6 +142,10 @@
     <i class="fab fa-aws"></i>&nbsp;
     <span>Role ARN</span>
   </button>
+  <button mat-menu-item (click)="copyAwsWebConsoleUrl($event);">
+    <i class="fab fa-aws"></i>&nbsp;
+    <span>Web Console URL</span>
+  </button>
 </mat-menu>
 
 <ng-container *ngIf="eOptionIds[session.sessionId]">

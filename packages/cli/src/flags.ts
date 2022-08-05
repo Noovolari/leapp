@@ -130,3 +130,9 @@ export const ssmInstanceId = Flags.string({
   description: "Instance ID for EC2 instance we want to access with SSM",
   hidden: false,
 });
+export const print = Flags.boolean({
+  description: "Print an AWS Web Console login URL in the terminal instead of opening the web browser",
+  hidden: false,
+  default: false,
+  char: "p",
+});

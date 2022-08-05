@@ -58,7 +58,6 @@ describe("OpenWebConsole", () => {
     command.log = jest.fn();
     await command.run();
 
-    expect(command.log).toHaveBeenCalledWith("opened AWS Web Console for this session");
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
     expect(sessionService.generateCredentials).toHaveBeenCalledWith("sessionId");
 
@@ -97,12 +96,37 @@ describe("OpenWebConsole", () => {
     const command = getTestCommand(cliProviderService);
     command.log = jest.fn();
 
-    await command.openWebConsole(session);
-    expect(command.log).toHaveBeenCalledWith("opened AWS Web Console for this session");
+    await command.openWebConsole(session, []);
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("sessionType");
     expect(sessionService.generateCredentials).toHaveBeenCalledWith("sessionId");
 
     expect(webConsoleService.openWebConsole).toHaveBeenCalledWith(credentialInfo, "eu-west-1");
+  });
+
+  test("openWebConsole - print flag", async () => {
+    const sessionService: any = {
+      generateCredentials: async () => credentialInfo,
+    };
+    const sessionFactory: any = {
+      getSessionService: () => sessionService,
+    };
+
+    const webConsoleService: any = {
+      getWebConsoleUrl: jest.fn(async () => "fake-web-console-url"),
+    };
+
+    const cliProviderService: any = {
+      sessionFactory,
+      webConsoleService,
+    };
+
+    const session: any = { sessionId: "sessionId", type: "sessionType", region: "eu-west-1" };
+    const command = getTestCommand(cliProviderService);
+    command.log = jest.fn();
+
+    await command.openWebConsole(session, { print: true });
+    expect(webConsoleService.getWebConsoleUrl).toHaveBeenCalledWith(credentialInfo, session.region);
+    expect(command.log).toHaveBeenCalledWith("fake-web-console-url");
   });
 
   test("selectSession", async () => {
@@ -168,5 +192,17 @@ describe("OpenWebConsole", () => {
     } catch (err) {
       expect(err.toString()).toBe("Error: no sessions available");
     }
+  });
+
+  test("run - interactive mode", async () => {
+    const cliProviderService: any = {};
+
+    const command = getTestCommand(cliProviderService, []) as any;
+    command.openWebConsole = jest.fn();
+    command.selectSession = jest.fn(async () => "selected-session");
+
+    await command.run();
+    expect(command.selectSession).toHaveBeenCalled();
+    expect(command.openWebConsole).toHaveBeenCalledWith("selected-session", { print: false });
   });
 });

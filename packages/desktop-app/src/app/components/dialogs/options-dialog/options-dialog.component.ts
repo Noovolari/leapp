@@ -14,6 +14,9 @@ import { OptionsService } from "../../../services/options.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { AppNativeService } from "../../../services/app-native.service";
 
 @Component({
   selector: "app-options-dialog",
@@ -29,6 +32,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   tabGroup: MatTabGroup;
 
   eConstants = constants;
+  eOperatingSystem = OperatingSystem;
 
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
@@ -52,6 +56,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   colorTheme: string;
   selectedColorTheme: string;
 
+  pluginList: IPlugin[];
+  fetchingPlugins: boolean;
+
   form = new FormGroup({
     idpUrl: new FormControl(""),
     awsProfile: new FormControl(""),
@@ -67,6 +74,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     terminalSelect: new FormControl(""),
     colorThemeSelect: new FormControl(""),
     credentialMethodSelect: new FormControl(""),
+    pluginDeepLink: new FormControl(""),
   });
 
   selectedCredentialMethod: string;
@@ -78,6 +86,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     public appProviderService: AppProviderService,
     public appService: AppService,
     private optionsService: OptionsService,
+    private appNativeService: AppNativeService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,
     private modalService: BsModalService,
@@ -92,6 +101,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.fetchingPlugins = false;
     this.idpUrlValue = "";
     this.proxyProtocol = this.optionsService.proxyConfiguration.proxyProtocol;
     this.proxyUrl = this.optionsService.proxyConfiguration.proxyUrl;
@@ -119,6 +129,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.selectedLocation = this.optionsService.defaultLocation || constants.defaultLocation;
 
     this.appService.validateAllFormFields(this.form);
+
+    this.pluginList = this.appProviderService.pluginManagerService.plugins;
   }
 
   ngAfterViewInit(): void {
@@ -422,5 +434,48 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         await sessionService.start(activeSessions[i].sessionId);
       }
     }
+  }
+
+  async installPlugin(): Promise<void> {
+    this.fetchingPlugins = true;
+    if (this.form.controls.pluginDeepLink.value) {
+      await this.appProviderService.pluginManagerService.installPlugin(this.form.controls.pluginDeepLink.value);
+      await this.refreshPluginList();
+    }
+    this.fetchingPlugins = false;
+  }
+
+  async refreshPluginList(): Promise<void> {
+    this.fetchingPlugins = true;
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    await this.appProviderService.pluginManagerService.loadFromPluginDir();
+    this.pluginList = this.appProviderService.pluginManagerService.plugins;
+    this.fetchingPlugins = false;
+  }
+
+  togglePluginActivation(plugin: IPlugin): void {
+    plugin.metadata.active = !plugin.metadata.active;
+    const status = this.appProviderService.repository.getPluginStatus(plugin.metadata.uniqueName);
+    status.active = plugin.metadata.active;
+    this.appProviderService.repository.setPluginStatus(plugin.metadata.uniqueName, status);
+  }
+
+  getPluginExtraInfo(plugin: IPlugin): string {
+    return `Author: ${plugin.metadata.author}
+    Description: ${plugin.metadata.description}
+    Supported Sessions: ${plugin.metadata.supportedSessions.join(",")}`;
+  }
+
+  getSupportedOsIcons(plugin: IPlugin): string {
+    const supportedOS = plugin.metadata.supportedOS;
+    const icon1 = `<i class="fa fa-apple ${supportedOS.includes(OperatingSystem.mac) ? "" : "bw"}"></i>`;
+    const icon2 = `<i class="fa fa-windows ${supportedOS.includes(OperatingSystem.windows) ? "" : "bw"}"></i>`;
+    const icon3 = `<i class="fa fa-linux ${supportedOS.includes(OperatingSystem.linux) ? "" : "bw"}"></i>`;
+    return `${icon1}&nbsp;${icon2}&nbsp;${icon3}`;
+  }
+
+  openPluginFolder(): void {
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    this.appNativeService.shell.showItemInFolder(this.appNativeService.path.join(this.appNativeService.os.homedir(), ".Leapp", "plugins"));
   }
 }

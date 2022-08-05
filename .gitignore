@@ -45,6 +45,9 @@ release/
 **/yarn-error.log
 **/testem.log
 **/typings
+**/generated
+**/layer
+**/dist
 
 # System Files
 .DS_Store

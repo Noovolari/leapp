@@ -29,7 +29,6 @@ import CliInquirer from "inquirer";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { CliOpenWebConsoleService } from "./cli-open-web-console-service";
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
-import fetch from "node-fetch";
 import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { CliRpcAwsSsoOidcVerificationWindowService } from "./cli-rpc-aws-sso-oidc-verification-window-service";
@@ -41,6 +40,9 @@ import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
+import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-system/plugin-environment";
+import axios from "axios";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -82,6 +84,26 @@ export class CliProviderService {
   private segmentServiceInstance: SegmentService;
   private workspaceServiceInstance: WorkspaceService;
   private azurePersistenceServiceInstance: AzurePersistenceService;
+  private pluginManagerServiceInstance: PluginManagerService;
+  private httpClient: any = {
+    get: (url: string) =>  ({
+      toPromise: async () => (await axios.get(url)).data
+    }),
+  };
+
+  public get pluginManagerService(): PluginManagerService {
+    if (!this.pluginManagerServiceInstance) {
+      this.pluginManagerServiceInstance = new PluginManagerService(
+        new PluginEnvironment(EnvironmentType.cli, this),
+        this.cliNativeService,
+        this.logService,
+        this.repository,
+        this.sessionFactory,
+        this.httpClient
+      );
+    }
+    return this.pluginManagerServiceInstance;
+  }
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -356,7 +378,7 @@ export class CliProviderService {
 
   get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.logService, fetch);
+      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.logService, this.cliNativeService);
     }
     return this.webConsoleServiceInstance;
   }

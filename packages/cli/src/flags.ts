@@ -130,3 +130,7 @@ export const ssmInstanceId = Flags.string({
   description: "Instance ID for EC2 instance we want to access with SSM",
   hidden: false,
 });
+export const pluginName = Flags.string({
+  description: "Unique name of a Leapp Plugin",
+  hidden: false,
+});

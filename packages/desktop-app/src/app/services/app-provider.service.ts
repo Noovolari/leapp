@@ -39,6 +39,9 @@ import { MessageToasterService } from "./message-toaster.service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
+import { HttpClient } from "@angular/common/http";
+import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-system/plugin-environment";
 
 @Injectable({
   providedIn: "root",
@@ -82,8 +85,28 @@ export class AppProviderService {
   private workspaceServiceInstance: WorkspaceService;
   private azurePersistenceServiceInstance: AzurePersistenceService;
   private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
+  private pluginManagerServiceInstance: PluginManagerService;
 
-  constructor(private appNativeService: AppNativeService, private messageToaster: MessageToasterService, private ngZone: NgZone) {}
+  constructor(
+    private appNativeService: AppNativeService,
+    private messageToaster: MessageToasterService,
+    private ngZone: NgZone,
+    private http: HttpClient
+  ) {}
+
+  public get pluginManagerService(): PluginManagerService {
+    if (!this.pluginManagerServiceInstance) {
+      this.pluginManagerServiceInstance = new PluginManagerService(
+        new PluginEnvironment(EnvironmentType.desktopApp, this),
+        this.appNativeService,
+        this.logService,
+        this.repository,
+        this.sessionFactory,
+        this.http
+      );
+    }
+    return this.pluginManagerServiceInstance;
+  }
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -122,7 +145,7 @@ export class AppProviderService {
 
   public get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.logService, window.fetch.bind(window));
+      this.webConsoleServiceInstance = new WebConsoleService(this.windowService, this.logService, this.appNativeService);
     }
     return this.webConsoleServiceInstance;
   }

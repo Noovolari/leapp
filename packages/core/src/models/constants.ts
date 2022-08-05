@@ -19,9 +19,6 @@ export const constants = {
   defaultAwsProfileName: "default",
   defaultAzureProfileName: "default-azure",
 
-  mac: "mac",
-  linux: "linux",
-  windows: "windows",
   inApp: "In-app",
   inBrowser: "In-browser",
   forcedCloseBrowserWindow: "ForceCloseBrowserWindow",
@@ -51,4 +48,25 @@ export const constants = {
 
   // Contains Env for SSM on macOS
   ssmSourceFileDestination: ".Leapp/ssm-env",
+
+  npmRequiredPluginKeyword: "leapp-plugin",
+  skipPluginValidation: true,
+  pluginPortalUrl: "https://vv0r45fadf.execute-api.eu-west-1.amazonaws.com/api/api/v1/plugins",
+  // Public Key for signature
+  // TODO: move it to the leapp site in future
+  publicKey:
+    "-----BEGIN PUBLIC KEY-----\n" +
+    "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAqti1Z2PXLzKgkAgm9sMH\n" +
+    "kW1HMZM2cWK49nc9MqF3/QF3bLkwtlveaaDl0ZwuPT25iAVdWTUPVGLh+4oBRENR\n" +
+    "sk3YUDptt90cRyzcTCPzsa4bWDOmIwPEUZFpIsdTEfs69UH0rHcFZOIbGjr+xGsn\n" +
+    "2YXV5/exQJ5sdcwKeNS1MfYDCqqz9+teC2vHl6s7Vy0xQQO98tWHkE99iS6m8dvK\n" +
+    "x2hqGuQb2J/lp7Rt1eCfUwFqvDFNnXk4LAHo2et9NInc+UIjn4ovLy/xb73HO6bQ\n" +
+    "ELVQ5oGUvkxo8uWhHEWt+On1xvH8Cc284yRW8kcrM1XwZgWdglQXlctbMaec8DQS\n" +
+    "94CMzctnsTtoCJonV+T1pEzZki3me/MaP7ZFxPITiWoDz1k+DwTLFoDW1aI7Aflj\n" +
+    "HQWBxFXrf5jL4oHRLVXhdikW9IeAvnFwe0T15QYOhl/U+85ljcKuWMnwqW9uVWmO\n" +
+    "atRbgEVaINwFsiCyNJeV7AbSNAWXIFQa4vF7OUq727uonN9aJC6R/CWy62FltFh4\n" +
+    "1D4ql66z0crg9LBNmhEJnZJlSfoVQNjrWiY7RPrGRAHl/bCRxdP8h6IoFK7a9YyO\n" +
+    "yP6Ekgn8yeDmON1JoX0E0Tdm6dfXVY5v2K8KaT2/XtsqRlwCCU+pXRsQwJfQcknZ\n" +
+    "aNqnY3aBtCwmaesTlrc5bR8CAwEAAQ==\n" +
+    "-----END PUBLIC KEY-----",
 };

@@ -44,5 +44,8 @@
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"
+  },
+  "dependencies": {
+    "tsoa": "^4.1.0"
   }
 }

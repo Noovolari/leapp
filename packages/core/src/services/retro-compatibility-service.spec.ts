@@ -42,16 +42,16 @@ describe("RetroCompatibilityService", () => {
 
       service = new RetroCompatibilityService(fileService, null, null, null);
       (service as any).isRetroPatchNecessary = () => true;
-      (service as any).adaptOldWorkspaceFile = jest.fn();
       (service as any).isIntegrationPatchNecessary = () => true;
       (service as any).adaptIntegrationPatch = jest.fn();
       (service as any).migration1 = jest.fn();
+      (service as any).migration2 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
-      expect((service as any).adaptOldWorkspaceFile).toHaveBeenCalled();
       expect((service as any).adaptIntegrationPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
+      expect((service as any).migration2).toHaveBeenCalled();
     });
 
     test("should try migrations, retropatch not necessary", async () => {
@@ -62,16 +62,16 @@ describe("RetroCompatibilityService", () => {
 
       service = new RetroCompatibilityService(fileService, null, null, null);
       (service as any).isRetroPatchNecessary = () => false;
-      (service as any).adaptOldWorkspaceFile = jest.fn();
-      (service as any).isIntegrationPatchNecessary = () => true;
       (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).isIntegrationPatchNecessary = () => true;
       (service as any).migration1 = jest.fn();
+      (service as any).migration2 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
-      expect((service as any).adaptOldWorkspaceFile).not.toHaveBeenCalled();
       expect((service as any).adaptIntegrationPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
+      expect((service as any).migration2).toHaveBeenCalled();
     });
 
     test("should try migrations, integrationpatch not necessary", async () => {
@@ -82,40 +82,16 @@ describe("RetroCompatibilityService", () => {
 
       service = new RetroCompatibilityService(fileService, null, null, null);
       (service as any).isRetroPatchNecessary = () => true;
-      (service as any).adaptOldWorkspaceFile = jest.fn();
       (service as any).isIntegrationPatchNecessary = () => false;
       (service as any).adaptIntegrationPatch = jest.fn();
       (service as any).migration1 = jest.fn();
+      (service as any).migration2 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
-      expect((service as any).adaptOldWorkspaceFile).toHaveBeenCalled();
       expect((service as any).adaptIntegrationPatch).not.toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
-    });
-  });
-
-  describe("isRetroPatchNecessary", () => {
-    test("should return true if a specific key is present in the file", () => {
-      const fileService = {
-        homeDir: () => "",
-        decryptText: (text: string) => text,
-        readFileSync: (_: string) => JSON.stringify({ defaultWorkspace: "default" }),
-      } as any;
-
-      service = new RetroCompatibilityService(fileService, null, null, null);
-      expect((service as any).isRetroPatchNecessary()).toEqual(true);
-    });
-
-    test("should return false if key is not there", () => {
-      const fileService = {
-        homeDir: () => "",
-        decryptText: (text: string) => text,
-        readFileSync: (_: string) => JSON.stringify({}),
-      } as any;
-
-      service = new RetroCompatibilityService(fileService, null, null, null);
-      expect((service as any).isRetroPatchNecessary()).toEqual(false);
+      expect((service as any).migration2).toHaveBeenCalled();
     });
   });
 
@@ -297,6 +273,48 @@ describe("RetroCompatibilityService", () => {
     });
   });
 
+  describe("migration2", () => {
+    test("should not migrate if _workspaceVersion is not 1", () => {
+      const persistedWorkspace: any = {};
+      const repository = {
+        reloadWorkspace: jest.fn(),
+      } as any;
+
+      service = new RetroCompatibilityService(null, null, repository, null);
+      (service as any).getWorkspace = jest.fn(() => persistedWorkspace);
+      (service as any).checkMigration = jest.fn(() => false);
+      (service as any).persists = jest.fn();
+
+      (service as any).migration2();
+
+      expect((service as any).getWorkspace).toHaveBeenCalled();
+      expect((service as any).checkMigration).toHaveBeenCalledWith(persistedWorkspace, 1, 2);
+      expect(persistedWorkspace._pluginsStatus).toBeUndefined();
+      expect(repository.reloadWorkspace).not.toHaveBeenCalled();
+      expect((service as any).persists).not.toHaveBeenCalled();
+    });
+
+    test("should migrate", () => {
+      let persistedWorkspace: any = {};
+
+      const repository = {
+        reloadWorkspace: jest.fn(),
+      } as any;
+
+      service = new RetroCompatibilityService(null, null, repository, null);
+      (service as any).getWorkspace = jest.fn(() => persistedWorkspace);
+      (service as any).checkMigration = jest.fn(() => true);
+      (service as any).persists = jest.fn((workspace) => (persistedWorkspace = workspace));
+
+      (service as any).migration2();
+
+      expect((service as any).getWorkspace).toHaveBeenCalled();
+      expect((service as any).checkMigration).toHaveBeenCalledWith(persistedWorkspace, 1, 2);
+      expect(persistedWorkspace._pluginsStatus).toStrictEqual([]);
+      expect(repository.reloadWorkspace).toHaveBeenCalled();
+    });
+  });
+
   test("adaptIntegrations", async () => {
     jest.spyOn(uuid, "v4").mockImplementation(() => "fake-uuid");
     const oldWOrkspace = {
@@ -466,22 +484,6 @@ describe("RetroCompatibilityService", () => {
     expect((retrocompatibilityService as any).adaptIntegrations).toHaveBeenCalledWith(workspace, new Workspace());
     expect(behaviouralSubjectService.sessions).toStrictEqual(new Workspace().sessions);
     expect(repository.workspace).toStrictEqual(new Workspace());
-  });
-
-  test("persistsTemp", () => {
-    const workspace = {
-      fakeKey: "fakeValue",
-    };
-    const fileService = {
-      writeFileSync: jest.fn(),
-      homeDir: jest.fn(() => "/home"),
-      encryptText: jest.fn((_workspace) => JSON.stringify(_workspace)),
-    } as any;
-    const retrocompatibilityService = new RetroCompatibilityService(fileService, null, null, null);
-    (retrocompatibilityService as any).persistsTemp(workspace);
-    jest.spyOn(retrocompatibilityService as any, "lockFilePath", "get");
-    expect((retrocompatibilityService as any).lockFilePath).toBe("/home/.Leapp/Leapp-lock.json");
-    expect(fileService.writeFileSync).toHaveBeenCalledWith("/home/.Leapp/Leapp-lock.json", '"{\\"fakeKey\\":\\"fakeValue\\"}"');
   });
 
   test("persists", () => {

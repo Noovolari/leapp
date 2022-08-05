@@ -28,6 +28,7 @@ import { OptionsService } from "./services/options.service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
 
 @Component({
   selector: "app-root",
@@ -49,6 +50,7 @@ export class AppComponent implements OnInit {
   private integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService;
   private azureSessionService: AzureSessionService;
   private azureCoreService: AzureCoreService;
+  private pluginManagerService: PluginManagerService;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -82,13 +84,21 @@ export class AppComponent implements OnInit {
     this.integrationIsOnlineStateRefreshService = appProviderService.integrationIsOnlineStateRefreshService;
     this.azureSessionService = appProviderService.azureSessionService;
     this.azureCoreService = appProviderService.azureCoreService;
+    this.pluginManagerService = appProviderService.pluginManagerService;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
   }
 
   async ngOnInit(): Promise<void> {
+    this.appNativeService.fixPath();
+
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    await this.appProviderService.pluginManagerService.loadFromPluginDir();
+
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
+
+    // await this.installPlugin("leapp://leapp-helloworld");
 
     // We get the right moment to set an hook to app close
     const ipcRenderer = this.appNativeService.ipcRenderer;
@@ -108,7 +118,8 @@ export class AppComponent implements OnInit {
     }
 
     // Prevent Dev Tool to show on production mode
-    this.windowService.blockDevToolInProductionMode();
+    this.windowService.getCurrentWindow().webContents.openDevTools();
+    //this.windowService.blockDevToolInProductionMode();
 
     // Create folders and files if missing
     this.updaterService.createFoldersIfMissing();
@@ -239,6 +250,10 @@ export class AppComponent implements OnInit {
         this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
         this.appProviderService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
       }
+    });
+
+    ipc.on("PLUGIN_URL", (_, url) => {
+      this.pluginManagerService.installPlugin(url);
     });
   }
 

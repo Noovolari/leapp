@@ -95,6 +95,10 @@
   max-height: 230px;
 }
 
+.max-height-320 {
+  max-height: 320px;
+}
+
 @keyframes fadein {
   from {
     opacity:0;
@@ -121,4 +125,53 @@
 .fix-top {
   position: relative;
   top: 3px;
+}
+
+.pull-right {
+  display: inline-block;
+  margin-left: 10px;
+  float: right;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.plugin-table {
+  th {
+    height: 42px!important;
+    z-index: 2;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 40%;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    text-align: center;
+  }
+
+  th:nth-child(5),
+  td:nth-child(5) {
+    text-align: right;
+  }
+  i.fa-apple, i.fa-windows, i.fa-linux {
+    color: #52A8DC;
+  }
+}
+
+.bw {
+  filter: grayscale(1)!important;
+}
+
+.borderless-button {
+  margin: 0 0 0 15px;
+  padding: 0;
+  background-color: unset!important;
+}
+
+.centered-column {
+  display: inline-block;
+  padding-bottom: 10px;
 }

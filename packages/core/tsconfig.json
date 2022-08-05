@@ -38,6 +38,7 @@
     "./dist/**",
     "./gushio/**",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/cdk.out/**/*"
   ]
 }

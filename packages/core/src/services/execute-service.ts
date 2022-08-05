@@ -33,10 +33,12 @@ export class ExecuteService {
       }
 
       if (this.nativeService.process.platform === "darwin") {
-        if (command.indexOf("osascript") === -1) {
-          command = "/usr/local/bin/" + command;
-        } else {
+        if (command.indexOf("osascript") !== -1) {
           command = "/usr/bin/" + command;
+        } else if (command.indexOf("cd") !== -1) {
+          command = "" + command;
+        } else {
+          command = "/usr/local/bin/" + command;
         }
       }
       exec(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {

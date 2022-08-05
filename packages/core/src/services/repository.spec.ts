@@ -1254,4 +1254,28 @@ describe("Repository", () => {
     repository.updateColorTheme(constants.darkTheme);
     expect(repository.getColorTheme()).toBe(constants.darkTheme);
   });
+
+  test("createPluginStatus() - creates a new pluginStatus", () => {
+    (repository as any)._workspace = {
+      pluginsStatus: [],
+    };
+    repository.createPluginStatus("pluginId");
+    expect((repository as any)._workspace.pluginsStatus).toStrictEqual([{ id: "pluginId", active: true }]);
+  });
+
+  test("getPluginStatus() - get the pluginStatus from a pluginId", () => {
+    (repository as any)._workspace = {
+      pluginsStatus: [{ id: "id1" }, { id: "id2" }],
+    };
+    const result = repository.getPluginStatus("id1");
+    expect(result).toStrictEqual({ id: "id1" });
+  });
+
+  test("setPluginStatus() - set the newStatus of a pluginStatus from a pluginId", () => {
+    (repository as any)._workspace = {
+      pluginsStatus: [{ id: "id1" }, { id: "id2" }],
+    };
+    repository.setPluginStatus("id1", "new-status");
+    expect((repository as any)._workspace.pluginsStatus).toStrictEqual(["new-status", { id: "id2" }]);
+  });
 });

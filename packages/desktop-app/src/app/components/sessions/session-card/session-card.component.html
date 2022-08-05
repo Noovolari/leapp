@@ -120,6 +120,14 @@
     </button>
   </ng-container>
 
+  <ng-container *ngIf="appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session).length > 0">
+    <div class="divider"></div>
+    <button mat-menu-item [matMenuTriggerFor]="pluginList">
+      <i class="moon-Puzzle"></i>
+      <span>&nbsp;&nbsp;Plugins</span>
+    </button>
+  </ng-container>
+
 </mat-menu>
 
 <mat-menu #change>
@@ -142,6 +150,17 @@
     <i class="fab fa-aws"></i>&nbsp;
     <span>Role ARN</span>
   </button>
+</mat-menu>
+
+<mat-menu #pluginList>
+  <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session)">
+    <ng-container>
+      <button mat-menu-item (click)="applyPluginAction($event, plugin);">
+        <i class="{{plugin.metadata.icon}}"></i>
+        <span>&nbsp;&nbsp;{{plugin.metadata.uniqueName}}</span>
+      </button>
+    </ng-container>
+  </ng-container>
 </mat-menu>
 
 <ng-container *ngIf="eOptionIds[session.sessionId]">

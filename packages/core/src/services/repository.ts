@@ -15,6 +15,7 @@ import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
 import { AzureIntegration } from "../models/azure/azure-integration";
+import PluginStatus from "../models/plugin-status";
 
 export class Repository {
   // Private singleton workspace
@@ -137,6 +138,18 @@ export class Repository {
       childSession = childSession.filter((session) => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId);
     }
     return childSession;
+  }
+
+  createPluginStatus(pluginId: string): void {
+    this._workspace.pluginsStatus.push({ id: pluginId, active: true });
+  }
+
+  getPluginStatus(pluginId: string): PluginStatus {
+    return this._workspace.pluginsStatus.find((pluginStatus) => pluginStatus.id === pluginId);
+  }
+
+  setPluginStatus(pluginId: string, newStatus: PluginStatus): void {
+    this._workspace.pluginsStatus = this._workspace.pluginsStatus.map((pluginStatus) => (pluginStatus.id === pluginId ? newStatus : pluginStatus));
   }
 
   // REGION AND LOCATION

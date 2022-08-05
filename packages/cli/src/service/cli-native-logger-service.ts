@@ -6,7 +6,7 @@ export class CliNativeLoggerService implements ILogger {
 
   log(message: string, level: LogLevel): void {
     if (level === LogLevel.info || level === LogLevel.success) {
-      global.console.info(message);
+      //global.console.info(message);
     } else if (level === LogLevel.warn) {
       global.console.warn(message);
     } else {

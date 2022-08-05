@@ -256,7 +256,7 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-        this.messageToasterService.toast("Your information have been successfully copied!", ToastLevel.success, "Information copied!");
+        this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
       }
     } catch (err) {
       this.messageToasterService.toast(err, ToastLevel.warn);
@@ -278,7 +278,7 @@ export class SessionCardComponent implements OnInit {
       const loginURL = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion);
 
       this.appService.copyToClipboard(loginURL);
-      this.messageToasterService.toast("Your information have been successfully copied!", ToastLevel.success, "Information copied!");
+      this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
     } catch (err) {
       this.messageToasterService.toast(err, ToastLevel.warn);
       this.loggingService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));

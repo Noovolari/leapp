@@ -63,7 +63,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     { label: "Azure", value: IntegrationType.azure },
   ];
   selectedIntegration: string;
-  defaultLocation: string;
 
   form = new FormGroup({
     alias: new FormControl("", [Validators.required]),
@@ -106,7 +105,6 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.setValues();
     this.selectedIntegration = this.integrations[0].value; // default on AWS
-    this.defaultLocation = this.appProviderService.repository.getDefaultLocation();
 
     this.subscription = this.behaviouralSubjectService.integrations$.subscribe(() => {
       this.refreshLists();
@@ -443,5 +441,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   getIntegrationLabel(): string {
     return this.integrations.find((i) => i.value === this.selectedIntegration).label;
+  }
+
+  get defaultLocation(): string {
+    return this.appProviderService.repository.getDefaultLocation();
   }
 }

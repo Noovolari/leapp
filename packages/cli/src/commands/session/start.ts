@@ -23,7 +23,7 @@ export default class StartSession extends LeappCommand {
       if (flags.sessionId && flags.sessionId !== "") {
         const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId);
         if (!selectedSession) {
-          throw new Error("No session found with id " + flags.sessionId);
+          throw new Error("No session with id " + flags.sessionId + " found");
         }
         await this.startSession(selectedSession);
       } else {

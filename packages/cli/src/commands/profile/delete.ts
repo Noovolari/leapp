@@ -79,6 +79,9 @@ export default class DeleteNamedProfile extends LeappCommand {
 
   async deleteNamedProfile(id: string): Promise<void> {
     try {
+      if (!this.cliProviderService.namedProfilesService.getProfileName(id)) {
+        throw new Error("profileId is not associated to an existing profile");
+      }
       await this.cliProviderService.namedProfilesService.deleteNamedProfile(id);
       this.log("profile deleted");
     } finally {

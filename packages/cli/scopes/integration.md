@@ -10,11 +10,11 @@ Leapp Integrations management
 * [`leapp integration logout`](#leapp-integration-logout)
 * [`leapp integration sync`](#leapp-integration-sync)
 
-# `leapp integration create`
+## `leapp integration create`
 
 Create a new AWS SSO integration
 
-```console
+```
 USAGE
   $ leapp integration create [--integrationAlias <value>] [--integrationPortalUrl <value>] [--integrationRegion <value>]
     [--integrationMethod <value>]
@@ -35,11 +35,11 @@ EXAMPLES
   $leapp integration create --integrationAlias ALIAS --integrationPortalUrl URL --integrationRegion REGION --integrationMethod [In-app, In-browser]
 ```
 
-# `leapp integration delete`
+## `leapp integration delete`
 
 Delete an integration
 
-```console
+```
 USAGE
   $ leapp integration delete [--integrationId <value>]
 
@@ -55,11 +55,11 @@ EXAMPLES
   $leapp integration delete --integrationId ID
 ```
 
-# `leapp integration list`
+## `leapp integration list`
 
 Show integrations list
 
-```console
+```
 USAGE
   $ leapp integration list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
     [--csv | --no-truncate]] [--no-header | ]
@@ -82,11 +82,11 @@ EXAMPLES
   $leapp integration list
 ```
 
-# `leapp integration login`
+## `leapp integration login`
 
 Login to synchronize integration sessions
 
-```console
+```
 USAGE
   $ leapp integration login [--integrationId <value>]
 
@@ -102,11 +102,11 @@ EXAMPLES
   $leapp integration login --integrationId ID
 ```
 
-# `leapp integration logout`
+## `leapp integration logout`
 
 Logout from integration
 
-```console
+```
 USAGE
   $ leapp integration logout [--integrationId <value>]
 
@@ -122,11 +122,11 @@ EXAMPLES
   $leapp integration logout --integrationId ID
 ```
 
-# `leapp integration sync`
+## `leapp integration sync`
 
 Synchronize integration sessions
 
-```console
+```
 USAGE
   $ leapp integration sync [--integrationId <value>]
 

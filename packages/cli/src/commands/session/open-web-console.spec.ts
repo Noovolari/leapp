@@ -50,9 +50,10 @@ describe("OpenWebConsole", () => {
     command.log = jest.fn();
     await expect(command.run()).rejects.toThrow("Flag --sessionId expects a value");
 
-    command = getTestCommand(cliProviderService, ["--sessionId", "sjklhnjkl"]);
+    const mockedSessionId = "mocked-session-id";
+    command = getTestCommand(cliProviderService, ["--sessionId", mockedSessionId]);
     command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("No session found with id sjklhnjkl");
+    await expect(command.run()).rejects.toThrow("No session with id " + mockedSessionId + " found");
 
     command = getTestCommand(cliProviderService, ["--sessionId", "sessionId"]);
     command.log = jest.fn();

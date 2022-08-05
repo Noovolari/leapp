@@ -17,19 +17,16 @@ export default class EditIdpUrl extends LeappCommand {
     super(argv, config);
   }
 
-  static areFlagsDefined(flags: any): boolean {
-    return flags.idpUrlId !== undefined && flags.idpUrl !== undefined;
-  }
-
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(EditIdpUrl);
-      if (EditIdpUrl.areFlagsDefined(flags) && this.validateMyFlags(flags)) {
-        await this.editIdpUrl(flags.idpUrlId, flags.idpUrl);
-      } else {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         const selectedIdpUrl = await this.selectIdpUrl();
         const newIdpUrl = await this.getNewIdpUrl();
         await this.editIdpUrl(selectedIdpUrl.id, newIdpUrl);
+      } else {
+        this.validateMyFlags(flags);
+        await this.editIdpUrl(flags.idpUrlId, flags.idpUrl);
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
@@ -71,12 +68,14 @@ export default class EditIdpUrl extends LeappCommand {
   }
 
   validateMyFlags(flags: any): boolean {
+    if (flags.idpUrl === undefined || flags.idpUrlId === undefined) {
+      throw new Error("flags --idpUrlId and --idpUrl must all be specified");
+    }
     if (flags.idpUrlId === "") {
       throw new Error("IdP URL ID can't be empty");
     }
-
     if (!this.cliProviderService.idpUrlsService.getIdpUrl(flags.idpUrlId)) {
-      throw new Error("IdP URL not found");
+      throw new Error("IdP URL ID not found");
     }
     if (flags.idpUrl === "") {
       throw new Error("IdP URL can't be empty");

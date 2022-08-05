@@ -21,20 +21,22 @@ export default class ChangeSessionProfile extends LeappCommand {
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(ChangeSessionProfile);
-      if (flags.profileId && flags.profileId !== "" && flags.sessionId && flags.sessionId !== "") {
-        const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId);
-        const selectedProfile = this.cliProviderService.namedProfilesService.getNamedProfiles().find((p) => p.id === flags.profileId);
-        if (!selectedSession) {
-          throw new Error("Session not found with id " + flags.sessionId);
-        }
-        if (!selectedProfile) {
-          throw new Error("Profile not found with id " + flags.profileId);
-        }
-        await this.changeSessionProfile(selectedSession, flags.profileId);
-      } else {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         const selectedSession = await this.selectSession();
         const selectedProfile = await this.selectProfile(selectedSession);
         await this.changeSessionProfile(selectedSession, selectedProfile);
+      } else {
+        if (this.validateFlags(flags)) {
+          const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId || "");
+          const selectedProfile = this.cliProviderService.namedProfilesService.getNamedProfiles().find((p) => p.id === flags.profileId);
+          if (!selectedSession) {
+            throw new Error("No session with id " + flags.sessionId + " found");
+          }
+          if (!selectedProfile) {
+            throw new Error("No profile with id " + flags.profileId + " found");
+          }
+          await this.changeSessionProfile(selectedSession, flags.profileId || "");
+        }
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
@@ -85,5 +87,18 @@ export default class ChangeSessionProfile extends LeappCommand {
     } finally {
       await this.cliProviderService.remoteProceduresClient.refreshSessions();
     }
+  }
+
+  private validateFlags(flags: any): boolean {
+    if (flags.sessionId === undefined || flags.profileId === undefined) {
+      throw new Error("flags --profileId and --sessionId must all be specified");
+    }
+    if (flags.sessionId === "") {
+      throw new Error("Session Id must not be empty");
+    }
+    if (flags.profileId === "") {
+      throw new Error("Profile Id must not be empty");
+    }
+    return true;
   }
 }

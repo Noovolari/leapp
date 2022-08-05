@@ -266,8 +266,29 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-        this.messageToasterService.toast("Your information have been successfully copied!", ToastLevel.success, "Information copied!");
+        this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
       }
+    } catch (err) {
+      this.messageToasterService.toast(err, ToastLevel.warn);
+      this.loggingService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));
+    }
+  }
+
+  /**
+   * Copy AWS Web Console URL in the clipboard
+   */
+  async copyAwsWebConsoleUrl(event: MouseEvent): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
+    this.trigger.closeMenu();
+
+    try {
+      const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
+      const sessionRegion = this.session.region;
+      const loginURL = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion);
+
+      this.appService.copyToClipboard(loginURL);
+      this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
     } catch (err) {
       this.messageToasterService.toast(err, ToastLevel.warn);
       this.loggingService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));

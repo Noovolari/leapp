@@ -13,6 +13,6 @@ export class LocalCliMfaCodePromptService implements IMfaCodePrompter {
           type: "input",
         },
       ])
-      .then((mfaResponse) => callback(mfaResponse.mfaCode));
+      .then((mfaResponse: any) => callback(mfaResponse.mfaCode));
   }
 }

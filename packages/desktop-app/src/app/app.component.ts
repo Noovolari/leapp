@@ -93,8 +93,10 @@ export class AppComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     this.appNativeService.fixPath();
 
-    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
-    await this.appProviderService.pluginManagerService.loadFromPluginDir();
+    if (!constants.disablePluginSystem) {
+      this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+      await this.appProviderService.pluginManagerService.loadFromPluginDir();
+    }
 
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
@@ -252,9 +254,11 @@ export class AppComponent implements OnInit {
       }
     });
 
-    ipc.on("PLUGIN_URL", (_, url) => {
-      this.pluginManagerService.installPlugin(url);
-    });
+    if (!constants.disablePluginSystem) {
+      ipc.on("PLUGIN_URL", (_, url) => {
+        this.pluginManagerService.installPlugin(url);
+      });
+    }
   }
 
   private setInitialColorSchema() {

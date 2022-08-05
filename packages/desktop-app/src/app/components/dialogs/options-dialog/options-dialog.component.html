@@ -230,7 +230,7 @@
       </div>
     </mat-tab>
 
-    <mat-tab>
+    <mat-tab *ngIf=!eConstants.disablePluginSystem>
       <ng-template mat-tab-label>
         <i class="mat-tab-icon moon-Puzzle"></i>
         <span class="mat-tab-label-text">Plugins</span>

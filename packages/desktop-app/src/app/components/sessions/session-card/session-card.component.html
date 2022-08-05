@@ -120,12 +120,12 @@
     </button>
   </ng-container>
 
-  <ng-container *ngIf="appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session).length > 0">
+  <ng-container *ngIf="!eConstants.disablePluginSystem && appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session).length > 0">
     <div class="divider"></div>
-    <button mat-menu-item [matMenuTriggerFor]="pluginList">
+    <!--<button mat-menu-item [matMenuTriggerFor]="pluginList">
       <i class="moon-Puzzle"></i>
       <span>&nbsp;&nbsp;Plugins</span>
-    </button>
+    </button>----->
   </ng-container>
 
 </mat-menu>
@@ -152,7 +152,7 @@
   </button>
 </mat-menu>
 
-<mat-menu #pluginList>
+<mat-menu #pluginList *ngIf="!eConstants.disablePluginSystem">
   <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session)">
     <ng-container>
       <button mat-menu-item (click)="applyPluginAction($event, plugin);">

@@ -1,10 +1,11 @@
-import { LeappCommand } from "../../leapp-command";
+import { LeappCommand } from "../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { sessionId, pluginName } from "../../flags";
+import { sessionId, pluginName } from "../flags";
 import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { OperatingSystem, osMap } from "@noovolari/leapp-core/models/operating-system";
 
+// TODO: move again to the commands folder when plugin system is activated
 export default class RunPlugin extends LeappCommand {
   static description = "Run a Leapp Plugin";
 

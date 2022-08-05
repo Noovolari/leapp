@@ -42,6 +42,7 @@ export default class StartSession extends LeappCommand {
       process.exit(0);
     });
     try {
+      this.unsupportedAzureSession(session);
       await sessionService.start(session.sessionId);
       this.log("session started");
     } finally {

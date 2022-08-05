@@ -72,6 +72,7 @@ export default class ChangeSessionRegion extends LeappCommand {
 
   async changeSessionRegion(session: Session, newRegion: string): Promise<void> {
     try {
+      this.unsupportedAzureSession(session);
       await this.cliProviderService.regionsService.changeRegion(session, newRegion);
       this.log("session region changed");
     } finally {

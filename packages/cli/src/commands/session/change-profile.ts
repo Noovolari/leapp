@@ -28,6 +28,7 @@ export default class ChangeSessionProfile extends LeappCommand {
       } else {
         if (this.validateFlags(flags)) {
           const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId || "");
+          this.unsupportedAzureSession(selectedSession);
           const selectedProfile = this.cliProviderService.namedProfilesService.getNamedProfiles().find((p) => p.id === flags.profileId);
           if (!selectedSession) {
             throw new Error("No session with id " + flags.sessionId + " found");

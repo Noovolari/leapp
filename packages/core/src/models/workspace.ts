@@ -42,6 +42,7 @@ export class Workspace {
   };
 
   private _credentialMethod: string;
+  private _samlRoleSessionDuration: number;
 
   private _workspaceVersion: number;
 
@@ -69,6 +70,7 @@ export class Workspace {
     };
 
     this._credentialMethod = constants.credentialFile;
+    this._samlRoleSessionDuration = constants.samlRoleSessionDuration;
   }
 
   setNewWorkspaceVersion(): void {
@@ -197,5 +199,13 @@ export class Workspace {
 
   set pluginsStatus(newPlugins: PluginStatus[]) {
     this._pluginsStatus = newPlugins;
+  }
+
+  get samlRoleSessionDuration(): number {
+    return this._samlRoleSessionDuration;
+  }
+
+  set samlRoleSessionDuration(duration: number) {
+    this._samlRoleSessionDuration = duration;
   }
 }

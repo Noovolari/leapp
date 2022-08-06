@@ -74,10 +74,12 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     terminalSelect: new FormControl(""),
     colorThemeSelect: new FormControl(""),
     credentialMethodSelect: new FormControl(""),
+    sessionDuration: new FormControl(""),
     pluginDeepLink: new FormControl(""),
   });
 
   selectedCredentialMethod: string;
+  webConsoleSessionDuration: number;
 
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: SessionService;
@@ -108,6 +110,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.proxyPort = this.optionsService.proxyConfiguration.proxyPort;
     this.proxyUsername = this.optionsService.proxyConfiguration.username || "";
     this.proxyPassword = this.optionsService.proxyConfiguration.password || "";
+    this.webConsoleSessionDuration = this.optionsService.samlRoleSessionDuration || constants.samlRoleSessionDuration;
 
     this.form.controls["idpUrl"].setValue(this.idpUrlValue);
     this.form.controls["proxyUrl"].setValue(this.proxyUrl);
@@ -115,6 +118,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.form.controls["proxyPort"].setValue(this.proxyPort);
     this.form.controls["proxyUsername"].setValue(this.proxyUsername);
     this.form.controls["proxyPassword"].setValue(this.proxyPassword);
+    this.form.controls["sessionDuration"].setValue(this.webConsoleSessionDuration);
 
     const isProxyUrl = this.optionsService.proxyConfiguration.proxyUrl && this.optionsService.proxyConfiguration.proxyUrl !== "undefined";
     this.proxyUrl = isProxyUrl ? this.optionsService.proxyConfiguration.proxyUrl : "";
@@ -168,6 +172,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       this.optionsService.defaultRegion = this.selectedRegion;
       this.optionsService.defaultLocation = this.selectedLocation;
       this.optionsService.macOsTerminal = this.selectedTerminal;
+      this.optionsService.samlRoleSessionDuration = this.form.controls["sessionDuration"].value;
 
       if (this.checkIfNeedDialogBox()) {
         // eslint-disable-next-line max-len

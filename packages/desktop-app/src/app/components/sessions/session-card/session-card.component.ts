@@ -285,7 +285,8 @@ export class SessionCardComponent implements OnInit {
     try {
       const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
       const sessionRegion = this.session.region;
-      const loginURL = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion);
+      const sessionDuration = this.appProviderService.workspaceService.getWorkspace().samlRoleSessionDuration;
+      const loginURL = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion, sessionDuration);
 
       this.appService.copyToClipboard(loginURL);
       this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
@@ -573,7 +574,8 @@ export class SessionCardComponent implements OnInit {
     this.trigger.closeMenu();
     const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
     const sessionRegion = this.session.region;
-    await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion);
+    const sessionDuration = this.appProviderService.workspaceService.getWorkspace().samlRoleSessionDuration;
+    await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion, sessionDuration);
   }
 
   createAChainedSessionFromSelectedOne(): void {

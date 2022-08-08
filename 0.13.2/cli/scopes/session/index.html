@@ -1742,7 +1742,7 @@
 
 <span class="gp">  $</span>leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN
 
-<span class="gp">  $</span>leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionUId ID <span class="o">(</span>--roleSessionName ROLESESSIONNAME<span class="o">)</span>
+<span class="gp">  $</span>leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionId ID <span class="o">(</span>--roleSessionName ROLESESSIONNAME<span class="o">)</span>
 
 <span class="gp">  $</span>leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY <span class="o">(</span>--mfaDevice MFADEVICEARN<span class="o">)</span>
 </code></pre></div>
@@ -1781,7 +1781,7 @@
 <span class="gp">  $</span>leapp session change-region --sessionId SESSIONID --region REGION
 </code></pre></div>
 <h1 id="leapp-session-current"><code>leapp session current</code></h1>
-<p>Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)</p>
+<p>Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile default)</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp session current <span class="o">[</span>-i<span class="o">]</span> <span class="o">[</span>-p &lt;value&gt;<span class="o">]</span> <span class="o">[</span>-r aws<span class="p">|</span>azure<span class="o">]</span> <span class="o">[</span>-f &lt;value&gt;<span class="o">]</span>
 
@@ -1795,8 +1795,8 @@
 <span class="go">                           &lt;options: aws|azure&gt;</span>
 
 <span class="go">DESCRIPTION</span>
-<span class="go">  Provides info about the current active session for a selected profile (if no profile is provided it uses default</span>
-<span class="go">  profile)</span>
+<span class="go">  Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile</span>
+<span class="go">  default)</span>
 
 <span class="go">EXAMPLES</span>
 <span class="gp">  $</span>leapp session current --format <span class="s2">&quot;alias accountNumber&quot;</span> --inline --provider aws
@@ -1871,9 +1871,10 @@
 <h1 id="leapp-session-open-web-console"><code>leapp session open-web-console</code></h1>
 <p>Open an AWS Web Console</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
-<span class="gp">  $ </span>leapp session open-web-console <span class="o">[</span>--sessionId &lt;value&gt;<span class="o">]</span>
+<span class="gp">  $ </span>leapp session open-web-console <span class="o">[</span>--sessionId &lt;value&gt;<span class="o">]</span> <span class="o">[</span>-p<span class="o">]</span>
 
 <span class="go">FLAGS</span>
+<span class="go">  -p, --print          Print an AWS Web Console login URL in the terminal instead of opening the web browser</span>
 <span class="go">  --sessionId=&lt;value&gt;  Session Id to identify the session in Leapp, recover it with $leapp session list -x</span>
 
 <span class="go">DESCRIPTION</span>
@@ -1882,7 +1883,7 @@
 <span class="go">EXAMPLES</span>
 <span class="gp">  $</span>leapp session open-web-console
 
-<span class="gp">  $</span>leapp session open-web-console --sessionId SESSIONID
+<span class="gp">  $</span>leapp session open-web-console --sessionId SESSIONID <span class="o">[</span>--print, -p<span class="o">]</span>
 </code></pre></div>
 <h1 id="leapp-session-start"><code>leapp session start</code></h1>
 <p>Start a session</p>

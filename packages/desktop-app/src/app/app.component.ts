@@ -100,8 +100,6 @@ export class AppComponent implements OnInit {
 
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
-    // await this.installPlugin("leapp://leapp-helloworld");
-
     // We get the right moment to set an hook to app close
     const ipcRenderer = this.appNativeService.ipcRenderer;
     ipcRenderer.on("app-close", () => {
@@ -120,8 +118,8 @@ export class AppComponent implements OnInit {
     }
 
     // Prevent Dev Tool to show on production mode
-    this.windowService.getCurrentWindow().webContents.openDevTools();
-    //this.windowService.blockDevToolInProductionMode();
+    //this.windowService.getCurrentWindow().webContents.openDevTools();
+    this.windowService.blockDevToolInProductionMode();
 
     // Create folders and files if missing
     this.updaterService.createFoldersIfMissing();

@@ -56,7 +56,7 @@ EXAMPLES
 
   $leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN
 
-  $leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionUId ID (--roleSessionName ROLESESSIONNAME)
+  $leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionId ID (--roleSessionName ROLESESSIONNAME)
 
   $leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY (--mfaDevice MFADEVICEARN)
 ```
@@ -105,7 +105,7 @@ EXAMPLES
 
 # `leapp session current`
 
-Provides info about the current active session for a selected profile (if no profile is provided it uses default profile)
+Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile default)
 
 ```console
 USAGE
@@ -121,8 +121,8 @@ FLAGS
                            <options: aws|azure>
 
 DESCRIPTION
-  Provides info about the current active session for a selected profile (if no profile is provided it uses default
-  profile)
+  Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile
+  default)
 
 EXAMPLES
   $leapp session current --format "alias accountNumber" --inline --provider aws
@@ -217,9 +217,10 @@ Open an AWS Web Console
 
 ```console
 USAGE
-  $ leapp session open-web-console [--sessionId <value>]
+  $ leapp session open-web-console [--sessionId <value>] [-p]
 
 FLAGS
+  -p, --print          Print an AWS Web Console login URL in the terminal instead of opening the web browser
   --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
@@ -228,7 +229,7 @@ DESCRIPTION
 EXAMPLES
   $leapp session open-web-console
 
-  $leapp session open-web-console --sessionId SESSIONID
+  $leapp session open-web-console --sessionId SESSIONID [--print, -p]
 ```
 
 # `leapp session start`

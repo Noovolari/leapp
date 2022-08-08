@@ -2,7 +2,26 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.13.2](https://github.com/Noovolari/leapp/compare/v0.13.1...v0.13.2) (2022-08-02)
+### [0.13.4](https://github.com/Noovolari/leapp/compare/v0.13.3...v0.13.4) (2022-08-08)
+
+### Bug Fixes
+
+* fixed dev tools opening on app start
+
+### [0.13.3](https://github.com/Noovolari/leapp/compare/v0.13.2...v0.13.3) (2022-08-08)
+
+### Features
+
+* added feature to copy web-console URL [#296](https://github.com/Noovolari/leapp/issues/296) PR: [#306](https://github.com/Noovolari/leapp/pull/306)
+
+### Bug Fixes
+
+* fixed a bug that entered in CLI interactive mode when running with flags and prevented some commands to work properly [#301](https://github.com/Noovolari/leapp/issues/301) [#259](https://github.com/Noovolari/leapp/issues/259)
+* fixed permissions required for running Leapp on Windows. Now it will run with the same permissions as the user using Leapp PR: [#307](https://github.com/Noovolari/leapp/pull/307)
+
+A special **“thank you”** to **Sami Oksanen** ([@c-sami](https://github.com/c-sami)), who made 3 PRs this week!
+
+### [0.13.2](https://github.com/Noovolari/leapp/compare/v0.13.1...v0.13.2) (2022-08-02)
 
 ### Bug Fixes
 * changed TPS limit introduced in the solution for AWS SSO TooManyRequest error [#281](https://github.com/Noovolari/leapp/issues/281) [#308](https://github.com/Noovolari/leapp/issues/308)

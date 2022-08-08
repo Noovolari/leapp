@@ -8,11 +8,11 @@ SAML 2.0 Identity providers URL management
 * [`leapp idp-url edit`](#leapp-idp-url-edit)
 * [`leapp idp-url list`](#leapp-idp-url-list)
 
-## `leapp idp-url create`
+# `leapp idp-url create`
 
 Create a new identity provider URL
 
-```
+```console
 USAGE
   $ leapp idp-url create [--idpUrl <value>]
 
@@ -28,11 +28,11 @@ EXAMPLES
   $leapp idp-url create --idpUrl ADDRESS
 ```
 
-## `leapp idp-url delete`
+# `leapp idp-url delete`
 
 Delete an identity provider URL
 
-```
+```console
 USAGE
   $ leapp idp-url delete [--idpUrlId <value>] [-f]
 
@@ -51,11 +51,11 @@ EXAMPLES
   $leapp idp-url delete --idpUrlId ID [--force, -f]
 ```
 
-## `leapp idp-url edit`
+# `leapp idp-url edit`
 
 Edit an identity provider URL
 
-```
+```console
 USAGE
   $ leapp idp-url edit [--idpUrlId <value>] [--idpUrl <value>]
 
@@ -72,11 +72,11 @@ EXAMPLES
   $leapp idp-url edit --idpUrlId ID --idpUrl ADDRESS
 ```
 
-## `leapp idp-url list`
+# `leapp idp-url list`
 
 Show identity providers list
 
-```
+```console
 USAGE
   $ leapp idp-url list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
     [--csv | --no-truncate]] [--no-header | ]

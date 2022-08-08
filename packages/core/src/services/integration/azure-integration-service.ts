@@ -112,6 +112,7 @@ export class AzureIntegrationService implements IIntegrationService {
   async syncSessions(integrationId: string): Promise<any> {
     const integration = this.getIntegration(integrationId);
     try {
+      // TODO: remove/clean msal_token_cache!!!
       await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
     } catch (err) {
       const errorObject = JSON.parse(JSON.stringify(err));
@@ -122,6 +123,7 @@ export class AzureIntegrationService implements IIntegrationService {
         errorObject.stdout.indexOf("ERROR: No subscriptions found for") !== -1
       ) {
         await this.deleteDependentSessions(integrationId);
+        // TODO: remove/clean msal_token_cache!!!
         throw new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.warn, true);
       }
       if (errorObject.code === null && errorObject.killed) {

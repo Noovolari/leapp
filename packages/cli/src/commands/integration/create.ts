@@ -1,13 +1,13 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { constants } from "@noovolari/leapp-core/models/constants";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { integrationAlias, integrationMethod, integrationPortalUrl, integrationRegion } from "../../flags";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
+import { IntegrationMethod } from "@noovolari/leapp-core/models/integration-method";
+import { IntegrationParams } from "@noovolari/leapp-core/models/integration-params";
+import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 
 export default class CreateSsoIntegration extends LeappCommand {
-  static description = "Create a new AWS SSO integration";
+  static description = "Create a new integration";
   static examples = [
     "$leapp integration create",
     "$leapp integration create --integrationAlias ALIAS --integrationPortalUrl URL --integrationRegion REGION --integrationMethod [In-app, In-browser]",
@@ -26,59 +26,58 @@ export default class CreateSsoIntegration extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      let creationParams: AwsSsoIntegration;
+      let creationParams: IntegrationParams;
+      let integrationType: IntegrationType;
       const { flags } = await this.parse(CreateSsoIntegration);
       if (LeappCommand.areFlagsNotDefined(flags, this)) {
-        creationParams = await this.askConfigurationParameters();
+        const method = await this.chooseIntegrationMethod();
+        integrationType = method.integrationType;
+        creationParams = await this.askConfigurationParameters(method);
       } else {
+        // TODO: add proper flags!
+        integrationType = IntegrationType.awsSso;
         creationParams = this.validateAndAssignFlags(flags);
       }
-      await this.createIntegration(creationParams);
+      await this.createIntegration(integrationType, creationParams);
     } catch (error: any) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
   }
 
-  async askConfigurationParameters(): Promise<AwsSsoIntegration> {
-    const creationParams = { browserOpening: constants.inBrowser } as AwsSsoIntegration;
-    const aliasAnswer: any = await this.cliProviderService.inquirer.prompt([
+  async chooseIntegrationMethod(): Promise<IntegrationMethod> {
+    const integrationMethods = this.cliProviderService.cloudProviderService.creatableIntegrationMethods();
+    const accessMethodAnswer: any = await this.cliProviderService.inquirer.prompt([
       {
-        name: "selectedAlias",
-        message: "Insert an alias",
-        validate: AwsSsoIntegrationService.validateAlias,
-        type: "input",
-      },
-    ]);
-    creationParams.alias = aliasAnswer.selectedAlias;
-
-    const portalUrlAnswer: any = await this.cliProviderService.inquirer.prompt([
-      {
-        name: "selectedPortalUrl",
-        message: "Insert a portal URL",
-        validate: AwsSsoIntegrationService.validatePortalUrl,
-        type: "input",
-      },
-    ]);
-    creationParams.portalUrl = portalUrlAnswer.selectedPortalUrl;
-
-    const awsRegions = this.cliProviderService.cloudProviderService.availableRegions(SessionType.aws);
-    const regionAnswer = await this.cliProviderService.inquirer.prompt([
-      {
-        name: "selectedRegion",
-        message: "Select a region",
+        name: "selectedMethod",
+        message: "select an integration method",
         type: "list",
-        choices: awsRegions.map((region: { fieldName: any; fieldValue: any }) => ({ name: region.fieldName, value: region.fieldValue })),
+        choices: integrationMethods.map((method: any) => ({ name: method.alias, value: method })),
       },
     ]);
-    creationParams.region = regionAnswer.selectedRegion;
-
-    return creationParams;
+    return accessMethodAnswer.selectedMethod;
   }
 
-  async createIntegration(creationParams: AwsSsoIntegration): Promise<void> {
-    await this.cliProviderService.awsSsoIntegrationService.createIntegration(creationParams);
+  async askConfigurationParameters(chosenIntegrationMethod: IntegrationMethod): Promise<IntegrationParams> {
+    const integrationParams = {} as any;
+    for (const field of chosenIntegrationMethod.integrationMethodFields) {
+      const fieldAnswer: any = await this.cliProviderService.inquirer.prompt([
+        {
+          name: field.creationRequestField,
+          message: field.message,
+          type: field.type,
+          choices: field.choices?.map((choice: any) => ({ name: choice.fieldName, value: choice.fieldValue })),
+          validate: field.fieldValidator,
+        },
+      ]);
+      integrationParams[field.creationRequestField] = fieldAnswer[field.creationRequestField];
+    }
+    return integrationParams;
+  }
+
+  async createIntegration(integrationType: IntegrationType, integrationParams: IntegrationParams): Promise<void> {
+    await this.cliProviderService.integrationFactory.create(integrationType, integrationParams);
     await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
-    this.log("aws sso integration created");
+    this.log("integration created");
   }
 
   private validateAndAssignFlags(flags: any): AwsSsoIntegration {

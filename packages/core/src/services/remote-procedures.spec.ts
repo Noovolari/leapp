@@ -302,4 +302,23 @@ describe("RemoteProcedures", () => {
       await expect(client.refreshIntegrations()).rejects.toEqual("unexpected error");
     });
   });
+
+  test("msalProtectData", async () => {
+    nativeService.msalEncryptionService = {
+      protectData: jest.fn(() => Uint8Array.from([7, 8, 9])),
+    };
+
+    startServer();
+
+    await retry(async () => {
+      expect(await client.msalProtectData(Uint8Array.from([1, 2, 3]), Uint8Array.from([4, 5, 6]), "fake-scope")).toStrictEqual(
+        Uint8Array.from([7, 8, 9])
+      );
+      expect(nativeService.msalEncryptionService.protectData).toHaveBeenCalledWith(
+        Uint8Array.from([1, 2, 3]),
+        Uint8Array.from([4, 5, 6]),
+        "fake-scope"
+      );
+    });
+  });
 });

@@ -1,7 +1,7 @@
 import { RegisterClientResponse, StartDeviceAuthorizationResponse, VerificationResponse } from "./session/aws/aws-sso-role-service";
 import { constants } from "../models/constants";
 import { INativeService } from "../interfaces/i-native-service";
-import { RpcRequest, RpcResponse } from "./remote-procedures-server";
+import { RpcRequest, RpcResponse, arrayToString, stringToArray } from "./remote-procedures-server";
 
 const connectionError = "unable to connect with desktop app";
 
@@ -69,6 +69,36 @@ export class RemoteProceduresClient {
     return this.remoteProcedureCall(
       { method: "refreshIntegrations", params: {} },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      (_, reject) => reject(connectionError)
+    );
+  }
+
+  async msalProtectData(dataToEncrypt: Uint8Array, optionalEntropy: Uint8Array, scope: string): Promise<Uint8Array> {
+    return this.remoteProcedureCall(
+      {
+        method: "msalProtectData",
+        params: {
+          dataToEncrypt: arrayToString(dataToEncrypt),
+          optionalEntropy: arrayToString(optionalEntropy),
+          scope,
+        },
+      },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(stringToArray(data.result))),
+      (_, reject) => reject(connectionError)
+    );
+  }
+
+  async msalUnprotectData(encryptedData: Uint8Array, optionalEntropy: Uint8Array, scope: string): Promise<Uint8Array> {
+    return this.remoteProcedureCall(
+      {
+        method: "msalUnprotectData",
+        params: {
+          encryptedData: arrayToString(encryptedData),
+          optionalEntropy: arrayToString(optionalEntropy),
+          scope,
+        },
+      },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(stringToArray(data.result))),
       (_, reject) => reject(connectionError)
     );
   }

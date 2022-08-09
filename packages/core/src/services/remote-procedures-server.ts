@@ -8,6 +8,9 @@ import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IMfaCodePrompter } from "../interfaces/i-mfa-code-prompter";
 import { IntegrationFactory } from "./integration-factory";
 
+export const arrayToString = (uint8array: Uint8Array) => JSON.stringify([...uint8array.values()]);
+export const stringToArray = (serializedArray: string) => Uint8Array.from(JSON.parse(serializedArray));
+
 export interface RpcResponse {
   result?: any;
   error?: any;
@@ -44,6 +47,8 @@ export class RemoteProceduresServer {
       ["openVerificationWindow", this.openVerificationWindow],
       ["refreshIntegrations", this.refreshIntegrations],
       ["refreshSessions", this.refreshSessions],
+      ["msalProtectData", this.msalProtectData],
+      ["msalUnprotectData", this.msalUnprotectData],
     ]);
   }
 
@@ -132,6 +137,32 @@ export class RemoteProceduresServer {
         this.behaviouralSubjectService.setSessions(this.repository.getSessions());
       });
       emitFunction(socket, "message", {});
+    } catch (error) {
+      emitFunction(socket, "message", { error: error.message });
+    }
+  }
+
+  private msalProtectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
+    try {
+      const protectedData = this.nativeService.msalEncryptionService.protectData(
+        stringToArray(data.params.dataToEncrypt),
+        stringToArray(data.params.optionalEntropy),
+        data.params.scope
+      );
+      emitFunction(socket, "message", { result: arrayToString(protectedData) });
+    } catch (error) {
+      emitFunction(socket, "message", { error: error.message });
+    }
+  }
+
+  private msalUnprotectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
+    try {
+      const protectedData = this.nativeService.msalEncryptionService.unprotectData(
+        stringToArray(data.params.encryptedData),
+        stringToArray(data.params.optionalEntropy),
+        data.params.scope
+      );
+      emitFunction(socket, "message", { result: arrayToString(protectedData) });
     } catch (error) {
       emitFunction(socket, "message", { error: error.message });
     }

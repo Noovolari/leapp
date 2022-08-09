@@ -276,9 +276,11 @@ describe("RemoteProcedures", () => {
       reloadWorkspace: jest.fn(),
       getWorkspace: jest.fn(() => new Workspace()),
       listAwsSsoIntegrations: () => integrations,
+      listAzureIntegrations: () => integrations,
     } as any;
     const behaviouralSubjectService = { setSessions: jest.fn(), setIntegrations: jest.fn() } as any;
     startServer();
+    (server as any).integrationFactory = { getIntegrations: jest.fn(() => [...integrations, ...integrations]) };
     (server as any).repository = repository;
     (server as any).behaviouralSubjectService = behaviouralSubjectService;
 

@@ -53,6 +53,6 @@ export class CliNativeService implements INativeService {
     this.fixPath = require("fix-path");
     this.tar = require("tar");
     this.fetch = require("node-fetch");
-    this.msalEncryptionService = null as any; // TODO: implement with RPC
+    this.msalEncryptionService = null as any;
   }
 }

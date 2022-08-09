@@ -5,6 +5,7 @@ import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-inte
 import { IntegrationMethod } from "@noovolari/leapp-core/models/integration-method";
 import { IntegrationParams } from "@noovolari/leapp-core/models/integration-params";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 export default class CreateSsoIntegration extends LeappCommand {
   static description = "Create a new integration";
@@ -70,6 +71,9 @@ export default class CreateSsoIntegration extends LeappCommand {
         },
       ]);
       integrationParams[field.creationRequestField] = fieldAnswer[field.creationRequestField];
+    }
+    if (chosenIntegrationMethod.integrationType === IntegrationType.awsSso) {
+      integrationParams.browserOpening = constants.inBrowser;
     }
     return integrationParams;
   }

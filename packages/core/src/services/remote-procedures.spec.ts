@@ -42,12 +42,12 @@ describe("RemoteProcedures", () => {
   });
 
   const startServer = () => {
-    server = new RemoteProceduresServer(nativeService as any, null, null, null, null, null, (f) => f(), testId);
+    server = new RemoteProceduresServer(nativeService as any, null, null, null, null, null, null, (f) => f(), testId);
     server.startServer();
   };
 
   test("server default id", async () => {
-    const server2 = new RemoteProceduresServer(null, null, null, null, null, null, null);
+    const server2 = new RemoteProceduresServer(null, null, null, null, null, null, null, null);
     expect((server2 as any).serverId).toBe(constants.ipcServerId);
   });
 

@@ -343,18 +343,15 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       const tenantId = this.form.get("tenantId").value;
 
       let integrationParams: IntegrationParams;
-      let type: IntegrationType;
-
       if (this.modifying > 0) {
-        type = this.form.get("integrationType").value;
         integrationParams =
-          type === IntegrationType.awsSso
+          this.selectedIntegration === IntegrationType.awsSso
             ? ({ alias, browserOpening, portalUrl, region } as IntegrationParams)
             : ({ alias, tenantId } as IntegrationParams);
       }
       if (this.modifying === 1) {
-        await this.appProviderService.integrationFactory.create(type, integrationParams);
-      } else if (this.modifying === 2 && this.selectedConfiguration.portalUrl !== "") {
+        await this.appProviderService.integrationFactory.create(this.selectedIntegration as any, integrationParams);
+      } else if (this.modifying === 2) {
         await this.appProviderService.integrationFactory.update(this.selectedConfiguration.id, integrationParams);
       }
 

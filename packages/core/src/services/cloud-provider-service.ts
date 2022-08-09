@@ -14,6 +14,7 @@ import { IdpUrlAccessMethodField } from "../models/idp-url-access-method-field";
 import { IntegrationMethod } from "../models/integration-method";
 import { IntegrationType } from "../models/integration-type";
 import { AwsSsoIntegrationService } from "./integration/aws-sso-integration-service";
+import { AzureIntegrationService } from "./integration/azure-integration-service";
 
 export const createNewIdpUrlFieldChoice = "CreateNewIdpUrlFieldChoice";
 
@@ -37,22 +38,21 @@ export class CloudProviderService {
   creatableIntegrationMethods(): IntegrationMethod[] {
     const awsRegionChoices = this.getAwsRegionChoices();
     return [
-      new IntegrationMethod(
-        IntegrationType.awsSso,
-        "AWS Single Sign-On",
-        [
-          new AccessMethodField("alias", "Insert integration alias", AccessMethodFieldType.input, undefined, AwsSsoIntegrationService.validateAlias),
-          new AccessMethodField(
-            "portalUrl",
-            "Insert the portal url",
-            AccessMethodFieldType.input,
-            undefined,
-            AwsSsoIntegrationService.validatePortalUrl
-          ),
-          new AccessMethodField("region", "Select region", AccessMethodFieldType.list, awsRegionChoices),
-        ]
-        // TODO: add Azure method
-      ),
+      new IntegrationMethod(IntegrationType.awsSso, "AWS Single Sign-On", [
+        new AccessMethodField("alias", "Insert integration alias", AccessMethodFieldType.input, undefined, AwsSsoIntegrationService.validateAlias),
+        new AccessMethodField(
+          "portalUrl",
+          "Insert the portal url",
+          AccessMethodFieldType.input,
+          undefined,
+          AwsSsoIntegrationService.validatePortalUrl
+        ),
+        new AccessMethodField("region", "Select region", AccessMethodFieldType.list, awsRegionChoices),
+      ]),
+      new IntegrationMethod(IntegrationType.azure, "Azure", [
+        new AccessMethodField("alias", "Insert integration alias", AccessMethodFieldType.input, undefined, AzureIntegrationService.validateAlias),
+        new AccessMethodField("tenantId", "Insert the tenant id", AccessMethodFieldType.input, undefined, AzureIntegrationService.validateTenantId),
+      ]),
     ];
   }
 

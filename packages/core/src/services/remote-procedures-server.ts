@@ -6,6 +6,7 @@ import { IAwsSamlAuthenticationService } from "../interfaces/i-aws-saml-authenti
 import { Repository } from "./repository";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IMfaCodePrompter } from "../interfaces/i-mfa-code-prompter";
+import { IntegrationFactory } from "./integration-factory";
 
 export interface RpcResponse {
   result?: any;
@@ -28,6 +29,7 @@ export class RemoteProceduresServer {
     private nativeService: INativeService,
     private verificationWindowService: IAwsSsoOidcVerificationWindowService,
     private awsAuthenticationService: IAwsSamlAuthenticationService,
+    private integrationFactory: IntegrationFactory,
     private mfaCodePrompter: IMfaCodePrompter,
     private repository: Repository,
     private behaviouralSubjectService: BehaviouralSubjectService,
@@ -113,8 +115,9 @@ export class RemoteProceduresServer {
       this.uiSafeFn(() => {
         const workspace = this.repository.getWorkspace();
         workspace.awsSsoIntegrations = this.repository.listAwsSsoIntegrations();
+        workspace.azureIntegrations = this.repository.listAzureIntegrations();
         this.repository.persistWorkspace(workspace);
-        this.behaviouralSubjectService.setIntegrations(this.repository.listAwsSsoIntegrations());
+        this.behaviouralSubjectService.setIntegrations(this.integrationFactory.getIntegrations());
       });
       emitFunction(socket, "message", {});
     } catch (error) {

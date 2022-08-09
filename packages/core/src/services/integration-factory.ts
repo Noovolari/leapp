@@ -62,6 +62,12 @@ export class IntegrationFactory {
     return integrationService.remainingHours(integration);
   }
 
+  async setOnline(integration: Integration): Promise<void> {
+    const integrationType = this.getIntegrationById(integration.id)?.type;
+    const integrationService = this.getIntegrationService(integrationType);
+    await integrationService.setOnline(integration);
+  }
+
   getIntegrations(): Integration[] {
     return [...this.awsSsoIntegrationService.getIntegrations(), ...this.azureIntegrationService.getIntegrations()];
   }

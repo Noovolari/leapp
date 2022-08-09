@@ -404,6 +404,7 @@ export class AppProviderService {
         this.appNativeService,
         this.verificationWindowService,
         this.awsAuthenticationService,
+        this.integrationFactory,
         this.mfaCodePrompter,
         this.repository,
         this.behaviouralSubjectService,
@@ -416,8 +417,7 @@ export class AppProviderService {
   public get integrationIsOnlineStateRefreshService(): IntegrationIsOnlineStateRefreshService {
     if (!this.integrationIsOnlineStateRefreshServiceInstance) {
       this.integrationIsOnlineStateRefreshServiceInstance = new IntegrationIsOnlineStateRefreshService(
-        this.awsSsoIntegrationService,
-        this.azureIntegrationService,
+        this.integrationFactory,
         this.behaviouralSubjectService
       );
     }

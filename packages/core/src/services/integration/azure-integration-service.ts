@@ -26,6 +26,14 @@ export class AzureIntegrationService implements IIntegrationService {
     public azurePersistenceService: AzurePersistenceService
   ) {}
 
+  static validateAlias(alias: string): boolean | string {
+    return alias.trim() !== "" ? true : "Empty alias";
+  }
+
+  static validateTenantId(tenantId: string): boolean | string {
+    return tenantId.trim() !== "" ? true : "Empty tenant id";
+  }
+
   async checkCliVersion(): Promise<void> {
     let output;
     try {

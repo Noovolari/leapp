@@ -17,14 +17,16 @@ Create a new integration
 ```
 USAGE
   $ leapp integration create [--integrationAlias <value>] [--integrationPortalUrl <value>] [--integrationRegion <value>]
-    [--integrationMethod <value>]
+    [--integrationType AWS-SSO|AZURE] [--integrationTenantId <value>] [--integrationLocation <value>]
 
 FLAGS
   --integrationAlias=<value>      alias that identifies an integration
-  --integrationMethod=<value>     value is either In-app or In-browser, identifies the preferred method to authenticate
-                                  against portal URL
+  --integrationLocation=<value>   Location of an Azure Integration
   --integrationPortalUrl=<value>  url that identifies the integration portal where you authenticate
   --integrationRegion=<value>     an AWS valid region code for the integration
+  --integrationTenantId=<value>   Tenant ID of an Azure Integration
+  --integrationType=<option>      Identify the type of your integration. Valid types are [AWS-SSO, AZURE]
+                                  <options: AWS-SSO|AZURE>
 
 DESCRIPTION
   Create a new integration
@@ -32,7 +34,9 @@ DESCRIPTION
 EXAMPLES
   $leapp integration create
 
-  $leapp integration create --integrationAlias ALIAS --integrationPortalUrl URL --integrationRegion REGION --integrationMethod [In-app, In-browser]
+  $leapp integration create --integrationType AWS-SSO --integrationAlias ALIAS --integrationPortalUrl URL --integrationRegion REGION
+
+  $leapp integration create --integrationType AZURE --integrationAlias ALIAS --integrationTenantId TENANT --integrationLocation LOCATION
 ```
 
 ## `leapp integration delete`

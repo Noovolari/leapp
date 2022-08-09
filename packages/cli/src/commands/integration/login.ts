@@ -38,8 +38,8 @@ export default class LoginIntegration extends LeappCommand {
     this.log("waiting for browser authorization using your AWS sign-in...");
     try {
       const sessionsDiff = await this.cliProviderService.awsSsoIntegrationService.syncSessions(integration.id);
-      this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
-      this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
+      this.log(`${sessionsDiff.sessionsAdded} sessions added`);
+      this.log(`${sessionsDiff.sessionsDeleted} sessions removed`);
     } finally {
       await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
       await this.cliProviderService.remoteProceduresClient.refreshSessions();

@@ -40,7 +40,7 @@ export class AzurePersistenceService {
     const location = this.getMsalCacheLocation(isWin);
     const data = this.iNativeService.fs.readFileSync(location);
     const finalData = isWin
-      ? this.iNativeService.msalEncryptionService.unprotectData(data, null, DataProtectionScope.currentUser).toString()
+      ? (await this.iNativeService.msalEncryptionService.unprotectData(data, null, DataProtectionScope.currentUser)).toString()
       : data.toString();
     return JSON.parse(finalData.trim());
   }
@@ -50,7 +50,7 @@ export class AzurePersistenceService {
     const isWin = this.iNativeService.process.platform === "win32";
     const location = this.getMsalCacheLocation(isWin);
     const finalData = isWin
-      ? this.iNativeService.msalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.currentUser)
+      ? await this.iNativeService.msalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.currentUser)
       : data;
     this.iNativeService.fs.writeFileSync(location, finalData);
   }

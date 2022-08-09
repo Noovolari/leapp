@@ -205,7 +205,8 @@ describe("AzureIntegrationService", () => {
     const integration = { tenantId: "tenantId", region: "region" } as any;
     service.getIntegration = jest.fn(() => integration);
 
-    await service.syncSessions(integrationId);
+    const syncResult = await service.syncSessions(integrationId);
+    expect(syncResult).toEqual({ sessionsAdded: 1, sessionsDeleted: 0 });
 
     expect(azureSessionService.stop).toHaveBeenCalledWith("anotherSessionId");
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
@@ -251,7 +252,8 @@ describe("AzureIntegrationService", () => {
     const integration = { tenantId: "tenantId", region: "region" } as any;
     service.getIntegration = jest.fn(() => integration);
 
-    await service.syncSessions(integrationId);
+    const syncResult = await service.syncSessions(integrationId);
+    expect(syncResult).toEqual({ sessionsAdded: 0, sessionsDeleted: 0 });
 
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
     expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");
@@ -291,7 +293,8 @@ describe("AzureIntegrationService", () => {
     const integration = { tenantId: "tenantId", region: "region" } as any;
     service.getIntegration = jest.fn(() => integration);
 
-    await service.syncSessions(integrationId);
+    const syncResult = await service.syncSessions(integrationId);
+    expect(syncResult).toEqual({ sessionsAdded: 0, sessionsDeleted: 0 });
 
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
     expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");
@@ -334,7 +337,8 @@ describe("AzureIntegrationService", () => {
     const integration = { tenantId: "tenantId", region: "region" } as any;
     service.getIntegration = jest.fn(() => integration);
 
-    await service.syncSessions(integrationId);
+    const syncResult = await service.syncSessions(integrationId);
+    expect(syncResult).toEqual({ sessionsAdded: 1, sessionsDeleted: 1 });
 
     expect(service.getIntegration).toHaveBeenCalledWith(integrationId);
     expect(executeService.execute).toHaveBeenCalledWith("az login --tenant tenantId 2>&1");

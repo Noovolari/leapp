@@ -142,9 +142,9 @@ export class RemoteProceduresServer {
     }
   }
 
-  private msalProtectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
+  private async msalProtectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
     try {
-      const protectedData = this.nativeService.msalEncryptionService.protectData(
+      const protectedData = await this.nativeService.msalEncryptionService.protectData(
         stringToArray(data.params.dataToEncrypt),
         stringToArray(data.params.optionalEntropy),
         data.params.scope
@@ -155,9 +155,9 @@ export class RemoteProceduresServer {
     }
   }
 
-  private msalUnprotectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
+  private async msalUnprotectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
     try {
-      const protectedData = this.nativeService.msalEncryptionService.unprotectData(
+      const protectedData = await this.nativeService.msalEncryptionService.unprotectData(
         stringToArray(data.params.encryptedData),
         stringToArray(data.params.optionalEntropy),
         data.params.scope

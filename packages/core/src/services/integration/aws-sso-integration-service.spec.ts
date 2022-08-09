@@ -196,7 +196,7 @@ describe("AwsSsoIntegrationService", () => {
 
     const syncedSessions = await awsSsoIntegrationService.syncSessions(integrationId);
 
-    expect(syncedSessions).toEqual(sessionDiff);
+    expect(syncedSessions).toEqual({ sessionsAdded: 1, sessionsDeleted: 1 });
     expect(loginAndGetSessionsDiff).toHaveBeenCalledWith(integrationId);
     expect(awsSsoRoleService.create).toHaveBeenCalledWith({
       awsSsoConfigurationId: "integrationId",

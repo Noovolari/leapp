@@ -44,10 +44,10 @@ export class IntegrationFactory {
     await integrationService.deleteIntegration(integrationId);
   }
 
-  async syncSessions(integrationId: string): Promise<void> {
+  async syncSessions(integrationId: string): Promise<any> {
     const integrationType = this.getIntegrationById(integrationId)?.type;
     const integrationService = this.getIntegrationService(integrationType);
-    await integrationService.syncSessions(integrationId);
+    return await integrationService.syncSessions(integrationId);
   }
 
   async logout(integrationId: string): Promise<void> {

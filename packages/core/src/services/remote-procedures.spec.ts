@@ -307,7 +307,7 @@ describe("RemoteProcedures", () => {
 
   test("msalProtectData", async () => {
     nativeService.msalEncryptionService = {
-      protectData: jest.fn(() => Uint8Array.from([7, 8, 9])),
+      protectData: jest.fn(async () => Uint8Array.from([7, 8, 9])),
     };
 
     startServer();
@@ -326,7 +326,7 @@ describe("RemoteProcedures", () => {
 
   test("msalUnprotectData", async () => {
     nativeService.msalEncryptionService = {
-      unprotectData: jest.fn(() => Uint8Array.from([7, 8, 9])),
+      unprotectData: jest.fn(async () => Uint8Array.from([7, 8, 9])),
     };
 
     startServer();

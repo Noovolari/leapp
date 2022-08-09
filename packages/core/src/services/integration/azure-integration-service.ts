@@ -164,6 +164,7 @@ export class AzureIntegrationService implements IIntegrationService {
       await this.azureSessionService.stop(azureSession.sessionId);
     }
 
+    let sessionsToDelete = 0;
     const integrationSessions = azureSessions.filter((session) => session.azureIntegrationId === integrationId);
     for (const azureSession of integrationSessions) {
       const creationRequest = sessionCreationRequests.find(
@@ -175,6 +176,7 @@ export class AzureIntegrationService implements IIntegrationService {
       );
       const isSessionToDelete = creationRequest === undefined;
       if (isSessionToDelete) {
+        sessionsToDelete++;
         await this.azureSessionService.delete(azureSession.sessionId);
       } else {
         if (azureSession.status !== SessionStatus.inactive) {
@@ -187,6 +189,8 @@ export class AzureIntegrationService implements IIntegrationService {
     for (const creationRequest of sessionCreationRequests) {
       await this.azureSessionService.create(creationRequest);
     }
+
+    return { sessionsAdded: sessionCreationRequests.length, sessionsDeleted: sessionsToDelete };
   }
 
   private notifyIntegrationChanges() {

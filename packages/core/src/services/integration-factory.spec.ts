@@ -5,7 +5,6 @@ import { AwsSsoIntegrationService } from "./integration/aws-sso-integration-serv
 import { AzureIntegrationService } from "./integration/azure-integration-service";
 
 describe("IntegrationFactory", () => {
-  // eslint-disable-next-line no-unused-vars
   let factory;
   let awsSsoIntegrationService;
   let azureIntegrationService;
@@ -89,18 +88,19 @@ describe("IntegrationFactory", () => {
 
   test("syncSessions", async () => {
     const fakeIntegrationService = {
-      syncSessions: jest.fn(async () => {}),
+      syncSessions: jest.fn(async () => "fake-sync-output"),
     } as any;
 
     (factory as any).azureIntegrationService = azureIntegrationService;
     factory.getIntegrationById = jest.fn(() => ({ type: IntegrationType.awsSso }));
     factory.getIntegrationService = jest.fn(() => fakeIntegrationService);
 
-    await factory.syncSessions("fake-id");
+    const syncOutput = await factory.syncSessions("fake-id");
     expect(factory.getIntegrationById).toHaveBeenCalledWith("fake-id");
     expect(factory.getIntegrationById).toHaveReturnedWith({ type: IntegrationType.awsSso });
     expect(factory.getIntegrationService).toHaveBeenCalledWith(IntegrationType.awsSso);
     expect(fakeIntegrationService.syncSessions).toHaveBeenCalledWith("fake-id");
+    expect(syncOutput).toBe("fake-sync-output");
   });
 
   test("logout", async () => {

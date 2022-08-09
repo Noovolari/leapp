@@ -161,6 +161,11 @@ export class CliProviderService {
   public get remoteProceduresClient(): RemoteProceduresClient {
     if (!this.remoteProceduresClientInstance) {
       this.remoteProceduresClientInstance = new RemoteProceduresClient(this.cliNativeService);
+      const client = this.remoteProceduresClientInstance;
+      this.cliNativeService.msalEncryptionService = {
+        unprotectData: client.msalUnprotectData.bind(client),
+        protectData: client.msalProtectData.bind(client),
+      }
     }
     return this.remoteProceduresClientInstance;
   }

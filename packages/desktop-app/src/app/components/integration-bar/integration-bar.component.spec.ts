@@ -6,6 +6,7 @@ import { mustInjected } from "../../../base-injectables";
 import { RouterTestingModule } from "@angular/router/testing";
 import { AppProviderService } from "../../services/app-provider.service";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
+import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 
 describe("IntegrationBarComponent", () => {
   let component: IntegrationBarComponent;
@@ -26,6 +27,11 @@ describe("IntegrationBarComponent", () => {
       setIntegrations: (_awsSsoIntegrations: AwsSsoIntegration[]) => void {},
       getIntegrations: () => [],
     });
+
+    const spyIntegrationFactory = jasmine.createSpyObj("IntegrationFactory", {
+      getIntegrations: () => [],
+    });
+
     const spyLeappCoreService = jasmine.createSpyObj("AppProviderService", [], {
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => ["mocked-region-1", "mocked-region-2"] },
@@ -33,6 +39,7 @@ describe("IntegrationBarComponent", () => {
       behaviouralSubjectService: spyBehaviouralSubjectService,
       awsSsoIntegrationService: { getIntegrations: () => [] },
       azureIntegrationService: { getIntegrations: () => [] },
+      integrationFactory: spyIntegrationFactory,
     });
 
     TestBed.configureTestingModule({
@@ -41,7 +48,12 @@ describe("IntegrationBarComponent", () => {
       providers: [
         { provide: MAT_SNACK_BAR_DATA, useValue: {} },
         { provide: MatSnackBarRef, useValue: {} },
-      ].concat(mustInjected().concat([{ provide: AppProviderService, useValue: spyLeappCoreService }])),
+      ].concat(
+        mustInjected().concat([
+          { provide: IntegrationFactory, useValue: spyIntegrationFactory },
+          { provide: AppProviderService, useValue: spyLeappCoreService },
+        ])
+      ),
     }).compileComponents();
   }));
 

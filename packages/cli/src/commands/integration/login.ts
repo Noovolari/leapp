@@ -24,6 +24,9 @@ export default class LoginIntegration extends LeappCommand {
         if (!selectedIntegration) {
           throw new Error(`integrationId "${flags.integrationId}" is not associated to an existing integration`);
         }
+        if (selectedIntegration.isOnline) {
+          throw new Error("integration is already online");
+        }
         await this.login(selectedIntegration);
       } else {
         const selectedIntegration = await this.selectIntegration();

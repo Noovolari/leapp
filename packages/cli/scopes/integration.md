@@ -108,7 +108,7 @@ EXAMPLES
 
 ## `leapp integration logout`
 
-Logout from integration
+Logout from an integration
 
 ```
 USAGE
@@ -118,7 +118,7 @@ FLAGS
   --integrationId=<value>  the Integration Id used to identify the integration inside Leapp
 
 DESCRIPTION
-  Logout from integration
+  Logout from an integration
 
 EXAMPLES
   $leapp integration logout

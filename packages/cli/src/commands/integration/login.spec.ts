@@ -162,4 +162,10 @@ describe("LoginIntegration", () => {
     const command = getTestCommand(cliProviderService, ["--integrationId", "invalidId"]);
     await expect(command.run()).rejects.toThrow('integrationId "invalidId" is not associated to an existing integration');
   });
+
+  test("run - integration already online", async () => {
+    const cliProviderService = { integrationFactory: { getIntegrationById: () => ({ isOnline: true }) } };
+    const command = getTestCommand(cliProviderService, ["--integrationId", "already-online-id"]);
+    await expect(command.run()).rejects.toThrow("integration is already online");
+  });
 });

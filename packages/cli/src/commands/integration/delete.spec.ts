@@ -27,8 +27,8 @@ describe("DeleteIntegration", () => {
     expect(command.selectIntegration).toHaveBeenCalled();
 
     const cliProviderService = {
-      awsSsoIntegrationService: {
-        getIntegration: jest.fn((id: string) => {
+      integrationFactory: {
+        getIntegrationById: jest.fn((id: string) => {
           if (id === "validId") {
             return mockIntegration;
           } else return null;
@@ -46,7 +46,7 @@ describe("DeleteIntegration", () => {
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
+      integrationFactory: {
         getIntegrations: jest.fn(() => [integration]),
       },
       inquirer: {
@@ -67,13 +67,13 @@ describe("DeleteIntegration", () => {
     const command = getTestCommand(cliProviderService);
     const selectedIntegration = await command.selectIntegration();
 
-    expect(cliProviderService.awsSsoIntegrationService.getIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.integrationFactory.getIntegrations).toHaveBeenCalled();
     expect(selectedIntegration).toBe(integration);
   });
 
   test("selectIntegration, no integrations", async () => {
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
+      integrationFactory: {
         getIntegrations: jest.fn(() => []),
       },
     };
@@ -84,8 +84,8 @@ describe("DeleteIntegration", () => {
 
   test("delete", async () => {
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
-        deleteIntegration: jest.fn(),
+      integrationFactory: {
+        delete: jest.fn(),
       },
       remoteProceduresClient: {
         refreshIntegrations: jest.fn(),
@@ -99,7 +99,7 @@ describe("DeleteIntegration", () => {
     const integration = { id: "integration1" } as any;
     await command.delete(integration);
 
-    expect(cliProviderService.awsSsoIntegrationService.deleteIntegration).toHaveBeenCalledWith(integration.id);
+    expect(cliProviderService.integrationFactory.delete).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenLastCalledWith("integration deleted");
     expect(cliProviderService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
     expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();

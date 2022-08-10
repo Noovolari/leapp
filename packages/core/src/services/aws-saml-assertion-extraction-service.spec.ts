@@ -25,6 +25,12 @@ describe("AwsSamlAssertionExtractionService", () => {
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://login.microsoftonline.com")).toBe(false);
 
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml")).toBe(false);
+
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://tenant-name.us.auth0.com/samlp/client-id")).toBe(true);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://tenant-name.us.auth0.com")).toBe(false);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://tenant-name.us.auth0.com/samlp/")).toBe(false);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://.auth0.com/samlp/")).toBe(false);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://auth0.com/samlp/")).toBe(false);
   });
 
   test("isSamlAssertionUrl", () => {

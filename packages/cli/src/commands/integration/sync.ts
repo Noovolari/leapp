@@ -22,7 +22,7 @@ export default class SyncIntegration extends LeappCommand {
       if (flags.integrationId && flags.integrationId !== "") {
         const selectedIntegration = this.cliProviderService.integrationFactory.getIntegrationById(flags.integrationId);
         if (!selectedIntegration) {
-          throw new Error("integrationId is not associated to an existing integration");
+          throw new Error(`integrationId "${flags.integrationId}" is not associated to an existing integration`);
         }
         await this.sync(selectedIntegration);
       } else {
@@ -45,8 +45,8 @@ export default class SyncIntegration extends LeappCommand {
   }
 
   async selectIntegration(): Promise<Integration> {
-    const onlineIntegrations = await this.cliProviderService.integrationFactory.getIntegrations();
-    if (onlineIntegrations.length === 0) {
+    const integrations = await this.cliProviderService.integrationFactory.getIntegrations();
+    if (integrations.length === 0) {
       throw new Error("no integrations available");
     }
 
@@ -55,7 +55,7 @@ export default class SyncIntegration extends LeappCommand {
         name: "selectedIntegration",
         message: "select an integration",
         type: "list",
-        choices: onlineIntegrations.map((integration: any) => ({ name: integration.alias, value: integration })),
+        choices: integrations.map((integration: any) => ({ name: integration.alias, value: integration })),
       },
     ]);
     return answer.selectedIntegration;

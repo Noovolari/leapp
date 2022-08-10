@@ -324,6 +324,20 @@ describe("RemoteProcedures", () => {
     });
   });
 
+  test("msalProtectData, server throwing", async () => {
+    nativeService.msalEncryptionService = {
+      protectData: async () => {
+        throw new Error("unexpected error");
+      },
+    };
+
+    startServer();
+
+    await retry(async () => {
+      await expect(client.msalProtectData(Uint8Array.from([]), Uint8Array.from([]), "")).rejects.toEqual("unexpected error");
+    });
+  });
+
   test("msalUnprotectData", async () => {
     nativeService.msalEncryptionService = {
       unprotectData: jest.fn(async () => Uint8Array.from([7, 8, 9])),
@@ -340,6 +354,20 @@ describe("RemoteProcedures", () => {
         Uint8Array.from([4, 5, 6]),
         "fake-scope"
       );
+    });
+  });
+
+  test("msalUnprotectData, server throwing", async () => {
+    nativeService.msalEncryptionService = {
+      unprotectData: async () => {
+        throw new Error("unexpected error");
+      },
+    };
+
+    startServer();
+
+    await retry(async () => {
+      await expect(client.msalUnprotectData(Uint8Array.from([]), Uint8Array.from([]), "")).rejects.toEqual("unexpected error");
     });
   });
 });

@@ -4,6 +4,8 @@ import { CloudProviderType } from "../models/cloud-provider-type";
 import { SessionType } from "../models/session-type";
 import { CloudProviderService } from "./cloud-provider-service";
 import { IdpUrlAccessMethodField } from "../models/idp-url-access-method-field";
+import { AwsSsoIntegrationService } from "./integration/aws-sso-integration-service";
+import { AzureIntegrationService } from "./integration/azure-integration-service";
 
 describe("CloudProviderService", () => {
   test("availableCloudProviders", () => {
@@ -269,6 +271,57 @@ describe("CloudProviderService", () => {
         label: "Azure",
         sessionType: "azure",
         creatable: true,
+      },
+    ]);
+  });
+
+  test("creatableIntegrationMethods", () => {
+    const service = new CloudProviderService(null, null, null, null, null) as any;
+    service.getAwsRegionChoices = () => "aws-region-choices";
+
+    const methods = service.creatableIntegrationMethods();
+    expect(methods).toEqual([
+      {
+        alias: "AWS Single Sign-On",
+        integrationMethodFields: [
+          {
+            creationRequestField: "alias",
+            fieldValidator: AwsSsoIntegrationService.validateAlias,
+            message: "Insert integration alias",
+            type: "input",
+          },
+          {
+            creationRequestField: "portalUrl",
+            fieldValidator: AwsSsoIntegrationService.validatePortalUrl,
+            message: "Insert the portal url",
+            type: "input",
+          },
+          {
+            choices: "aws-region-choices",
+            creationRequestField: "region",
+            message: "Select region",
+            type: "list",
+          },
+        ],
+        integrationType: "AWS-SSO",
+      },
+      {
+        alias: "Azure",
+        integrationMethodFields: [
+          {
+            creationRequestField: "alias",
+            fieldValidator: AzureIntegrationService.validateAlias,
+            message: "Insert integration alias",
+            type: "input",
+          },
+          {
+            creationRequestField: "tenantId",
+            fieldValidator: AzureIntegrationService.validateTenantId,
+            message: "Insert the tenant id",
+            type: "input",
+          },
+        ],
+        integrationType: "AZURE",
       },
     ]);
   });

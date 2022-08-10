@@ -5,6 +5,48 @@ import { SessionStatus } from "../../models/session-status";
 import { LoggedException, LogLevel } from "../log-service";
 
 describe("AzureIntegrationService", () => {
+  test("validateAlias - empty alias", () => {
+    const aliasParam = "";
+    const actualValidationResult = AzureIntegrationService.validateAlias(aliasParam);
+
+    expect(actualValidationResult).toBe("Empty alias");
+  });
+
+  test("validateAlias - only spaces alias", () => {
+    const aliasParam = "      ";
+    const actualValidationResult = AzureIntegrationService.validateAlias(aliasParam);
+
+    expect(actualValidationResult).toBe("Empty alias");
+  });
+
+  test("validateAlias - valid alias", () => {
+    const aliasParam = "alias";
+    const actualValidationResult = AzureIntegrationService.validateAlias(aliasParam);
+
+    expect(actualValidationResult).toBe(true);
+  });
+
+  test("validateTenantId - empty alias", () => {
+    const tenantIdParam = "";
+    const actualValidationResult = AzureIntegrationService.validateTenantId(tenantIdParam);
+
+    expect(actualValidationResult).toBe("Empty tenant id");
+  });
+
+  test("validateTenantId - only spaces alias", () => {
+    const tenantIdParam = "      ";
+    const actualValidationResult = AzureIntegrationService.validateTenantId(tenantIdParam);
+
+    expect(actualValidationResult).toBe("Empty tenant id");
+  });
+
+  test("validateTenantId - valid alias", () => {
+    const tenantIdParam = "alias";
+    const actualValidationResult = AzureIntegrationService.validateTenantId(tenantIdParam);
+
+    expect(actualValidationResult).toBe(true);
+  });
+
   test("checkCliVersion, cli installed with version 2.30", async () => {
     const expectedCliOutput = `azure-cli                         2.30.0 *\n\ncore                              2.36.0 *\ntelemetry                          1.0.6\n\nDependencies:\nmsal                              1.17.0\nazure-mgmt-resource               20.0.0\n\nPython location '/usr/local/Cellar/azure-cli/2.36.0/libexec/bin/python'\nExtensions directory '/Users/marcovanetti/.azure/cliextensions'\n\nPython (Darwin) 3.10.4 (main, Apr 26 2022, 19:42:59) [Clang 13.1.6 (clang-1316.0.21.2)]\n\nLegal docs and information: aka.ms/AzureCliLegal\n\n\nYou have 2 updates available. Consider updating your CLI installation with 'az upgrade'\n\nPlease let us know how we are doing: https://aka.ms/azureclihats\nand let us know if you're interested in trying out our newest features: https://aka.ms/CLIUXstudy\n`;
     const executeService = {

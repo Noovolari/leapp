@@ -32,7 +32,7 @@ export abstract class LeappCommand extends Command {
 
   unsupportedAzureSession(session: Session): void {
     if (session && session.type === SessionType.azure) {
-      throw new Error("Azure sessions currently not supported by Leapp CLI");
+      throw new Error("Azure sessions not supported for this command");
     }
   }
 }

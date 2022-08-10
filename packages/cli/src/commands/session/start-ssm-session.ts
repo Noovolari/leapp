@@ -39,6 +39,7 @@ export default class StartSsmSession extends LeappCommand {
         if (!selectedSession) {
           throw new Error("No session found with id " + flags.sessionId);
         }
+        this.unsupportedAzureSession(selectedSession);
         const credentials = await this.generateCredentials(selectedSession);
         const aRegions = this.availableRegions(selectedSession);
         const selectedRegion = aRegions.find((r) => r.fieldName === flags.region);

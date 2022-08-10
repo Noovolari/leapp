@@ -22,7 +22,7 @@ export default class DeleteIntegration extends LeappCommand {
       if (flags.integrationId && flags.integrationId !== "") {
         const selectedIntegration = this.cliProviderService.integrationFactory.getIntegrationById(flags.integrationId);
         if (!selectedIntegration) {
-          throw new Error("integrationId is not associated to an existing integration");
+          throw new Error(`integrationId "${flags.integrationId}" is not associated to an existing integration`);
         }
         await this.delete(selectedIntegration);
       } else {

@@ -141,4 +141,10 @@ describe("DeleteIntegration", () => {
   test("run - delete throws undefined object", async () => {
     await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
   });
+
+  test("run - integration not found", async () => {
+    const cliProviderService = { integrationFactory: { getIntegrationById: () => null } };
+    const command = getTestCommand(cliProviderService, ["--integrationId", "invalidId"]);
+    await expect(command.run()).rejects.toThrow('integrationId "invalidId" is not associated to an existing integration');
+  });
 });

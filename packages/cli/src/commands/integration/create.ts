@@ -2,8 +2,9 @@ import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { AwsSsoIntegrationService, IntegrationCreationParams } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { integrationAlias, integrationMethod, integrationPortalUrl, integrationRegion } from "../../flags";
+import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 
 export default class CreateSsoIntegration extends LeappCommand {
   static description = "Create a new AWS SSO integration";
@@ -25,12 +26,12 @@ export default class CreateSsoIntegration extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      let creationParams: IntegrationCreationParams;
+      let creationParams: AwsSsoIntegration;
       const { flags } = await this.parse(CreateSsoIntegration);
-      if (this.checkFlags(flags)) {
-        creationParams = this.validateAndAssignFlags(flags);
-      } else {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         creationParams = await this.askConfigurationParameters();
+      } else {
+        creationParams = this.validateAndAssignFlags(flags);
       }
       await this.createIntegration(creationParams);
     } catch (error: any) {
@@ -38,8 +39,8 @@ export default class CreateSsoIntegration extends LeappCommand {
     }
   }
 
-  async askConfigurationParameters(): Promise<IntegrationCreationParams> {
-    const creationParams = { browserOpening: constants.inBrowser } as IntegrationCreationParams;
+  async askConfigurationParameters(): Promise<AwsSsoIntegration> {
+    const creationParams = { browserOpening: constants.inBrowser } as AwsSsoIntegration;
     const aliasAnswer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedAlias",
@@ -66,7 +67,7 @@ export default class CreateSsoIntegration extends LeappCommand {
         name: "selectedRegion",
         message: "Select a region",
         type: "list",
-        choices: awsRegions.map((region) => ({ name: region.fieldName, value: region.fieldValue })),
+        choices: awsRegions.map((region: { fieldName: any; fieldValue: any }) => ({ name: region.fieldName, value: region.fieldValue })),
       },
     ]);
     creationParams.region = regionAnswer.selectedRegion;
@@ -74,22 +75,30 @@ export default class CreateSsoIntegration extends LeappCommand {
     return creationParams;
   }
 
-  async createIntegration(creationParams: IntegrationCreationParams): Promise<void> {
+  async createIntegration(creationParams: AwsSsoIntegration): Promise<void> {
     await this.cliProviderService.awsSsoIntegrationService.createIntegration(creationParams);
     await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
     this.log("aws sso integration created");
   }
 
-  private checkFlags(flags: any): boolean {
-    return (
-      flags.integrationAlias !== undefined &&
-      flags.integrationRegion !== undefined &&
-      flags.integrationPortalUrl !== undefined &&
-      flags.integrationMethod !== undefined
-    );
-  }
-
-  private validateAndAssignFlags(flags: any): IntegrationCreationParams {
+  private validateAndAssignFlags(flags: any): AwsSsoIntegration {
+    if (
+      flags.integrationAlias === undefined ||
+      flags.integrationPortalUrl === undefined ||
+      flags.integrationRegion === undefined ||
+      flags.integrationMethod === undefined
+    ) {
+      throw new Error(
+        `missing values for flags: ${[
+          flags.integrationAlias ? "" : "--integrationAlias",
+          flags.integrationPortalUrl ? "" : "--integrationPortalUrl",
+          flags.integrationRegion ? "" : "--integrationRegion",
+          flags.integrationMethod ? "" : "--integrationMethod",
+        ]
+          .filter((el) => el !== "")
+          .join(", ")}`
+      );
+    }
     if (flags.integrationAlias === "") {
       throw new Error("Alias must not be empty");
     }
@@ -105,7 +114,7 @@ export default class CreateSsoIntegration extends LeappCommand {
     if (
       this.cliProviderService.awsCoreService
         .getRegions()
-        .map((r) => r.region)
+        .map((r: { region: any }) => r.region)
         .indexOf(flags.integrationRegion) < 0
     ) {
       throw new Error("Provided region is not a valid AWS region");
@@ -119,6 +128,6 @@ export default class CreateSsoIntegration extends LeappCommand {
       alias: flags.integrationAlias,
       browserOpening: flags.integrationMethod,
       region: flags.integrationRegion,
-    };
+    } as AwsSsoIntegration;
   }
 }

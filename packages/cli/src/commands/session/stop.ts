@@ -38,6 +38,7 @@ export default class StopSession extends LeappCommand {
   async stopSession(session: Session): Promise<void> {
     try {
       const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
+      this.unsupportedAzureSession(session);
       await sessionService.stop(session.sessionId);
       this.log("session stopped");
     } finally {

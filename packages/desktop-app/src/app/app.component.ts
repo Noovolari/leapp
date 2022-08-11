@@ -21,10 +21,14 @@ import { RotationService } from "@noovolari/leapp-core/services/rotation-service
 import { AppVerificationWindowService } from "./services/app-verification-window.service";
 import { WindowService } from "./services/window.service";
 import { AppNativeService } from "./services/app-native.service";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/aws-sso-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "./services/options.service";
+import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
+import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
+import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
 
 @Component({
   selector: "app-root",
@@ -43,6 +47,10 @@ export class AppComponent implements OnInit {
   private awsSsoIntegrationService: AwsSsoIntegrationService;
   private awsSsoRoleService: AwsSsoRoleService;
   private remoteProceduresServer: RemoteProceduresServer;
+  private integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService;
+  private azureSessionService: AzureSessionService;
+  private azureCoreService: AzureCoreService;
+  private pluginManagerService: PluginManagerService;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -55,7 +63,7 @@ export class AppComponent implements OnInit {
     private optionsService: OptionsService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private electronService: AppNativeService
+    private appNativeService: AppNativeService
   ) {
     appProviderService.mfaCodePrompter = mfaCodePrompter;
     appProviderService.awsAuthenticationService = awsAuthenticationService;
@@ -73,16 +81,27 @@ export class AppComponent implements OnInit {
     this.awsSsoIntegrationService = appProviderService.awsSsoIntegrationService;
     this.awsSsoRoleService = appProviderService.awsSsoRoleService;
     this.remoteProceduresServer = appProviderService.remoteProceduresServer;
+    this.integrationIsOnlineStateRefreshService = appProviderService.integrationIsOnlineStateRefreshService;
+    this.azureSessionService = appProviderService.azureSessionService;
+    this.azureCoreService = appProviderService.azureCoreService;
+    this.pluginManagerService = appProviderService.pluginManagerService;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
   }
 
   async ngOnInit(): Promise<void> {
+    this.appNativeService.fixPath();
+
+    if (!constants.disablePluginSystem) {
+      this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+      await this.appProviderService.pluginManagerService.loadFromPluginDir();
+    }
+
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
     // We get the right moment to set an hook to app close
-    const ipcRenderer = this.electronService.ipcRenderer;
+    const ipcRenderer = this.appNativeService.ipcRenderer;
     ipcRenderer.on("app-close", () => {
       this.loggingService.log(new LoggedEntry("Preparing for closing instruction...", this, LogLevel.info));
       this.beforeCloseInstructions();
@@ -99,6 +118,7 @@ export class AppComponent implements OnInit {
     }
 
     // Prevent Dev Tool to show on production mode
+    //this.windowService.getCurrentWindow().webContents.openDevTools();
     this.windowService.blockDevToolInProductionMode();
 
     // Create folders and files if missing
@@ -106,13 +126,7 @@ export class AppComponent implements OnInit {
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
-    if (this.retroCompatibilityService.isRetroPatchNecessary()) {
-      await this.retroCompatibilityService.adaptOldWorkspaceFile();
-    }
-
-    if (this.retroCompatibilityService.isIntegrationPatchNecessary()) {
-      await this.retroCompatibilityService.adaptIntegrationPatch();
-    }
+    await this.retroCompatibilityService.applyWorkspaceMigrations();
 
     // Check the existence of a pre-Leapp credential file and make a backup
     this.showCredentialBackupMessageIfNeeded();
@@ -126,14 +140,14 @@ export class AppComponent implements OnInit {
     }
 
     // Start Global Timer
-    this.timerService.start(this.rotationService.rotate.bind(this.rotationService));
+    this.timerService.start(() => this.timerFunction(this.rotationService, this.integrationIsOnlineStateRefreshService));
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
-    this.router.navigate(["/dashboard"]);
+    await this.router.navigate(["/dashboard"]);
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
   }
@@ -142,10 +156,15 @@ export class AppComponent implements OnInit {
     this.appService.closeAllMenuTriggers();
   }
 
+  private timerFunction(rotationService: RotationService, integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService): void {
+    rotationService.rotate();
+    integrationIsOnlineStateRefreshService.refreshIsOnlineState();
+  }
+
   /**
    * This is an hook on the closing app to remove credential file and force stop using them
    */
-  private beforeCloseInstructions() {
+  private async beforeCloseInstructions() {
     // Check if we are here
     this.loggingService.log(new LoggedEntry("Closing app with cleaning process...", this, LogLevel.info));
 
@@ -161,6 +180,7 @@ export class AppComponent implements OnInit {
     // We need the Try/Catch as we have a the possibility to call the method without sessions
     try {
       // Clean the config file
+      await this.azureCoreService.stopAllSessionsOnQuit();
       this.awsCoreService.cleanCredentialFile();
     } catch (err) {
       this.loggingService.log(new LoggedException("No sessions to stop, skipping...", this, LogLevel.error, true, err.stack));
@@ -221,7 +241,7 @@ export class AppComponent implements OnInit {
       this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion());
     }
 
-    const ipc = this.electronService.ipcRenderer;
+    const ipc = this.appNativeService.ipcRenderer;
     ipc.on("UPDATE_AVAILABLE", async (_, info) => {
       const releaseNote = await this.updaterService.getReleaseNote();
       this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
@@ -231,6 +251,12 @@ export class AppComponent implements OnInit {
         this.appProviderService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
       }
     });
+
+    if (!constants.disablePluginSystem) {
+      ipc.on("PLUGIN_URL", (_, url) => {
+        this.pluginManagerService.installPlugin(url);
+      });
+    }
   }
 
   private setInitialColorSchema() {

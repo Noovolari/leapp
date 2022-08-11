@@ -7,11 +7,11 @@ import { RouterTestingModule } from "@angular/router/testing";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { Workspace } from "@noovolari/leapp-core/models/workspace";
 import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
-import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
+import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
 import Segment from "@noovolari/leapp-core/models/segment";
 import { Session } from "@noovolari/leapp-core/models/session";
 import Folder from "@noovolari/leapp-core/models/folder";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { constants } from "@noovolari/leapp-core/models/constants";
 
 describe("SessionCardComponent", () => {
@@ -95,12 +95,13 @@ describe("SessionCardComponent", () => {
     component = fixture.componentInstance;
     component.globalColumns = { namedProfile: false, provider: false, region: false, role: false };
     component.session = {
-      region: "",
       sessionId: "",
-      sessionName: "",
       status: undefined,
-      expired: (): boolean => false,
       type: SessionType.awsSsoRole,
+      sessionTokenExpiration: undefined,
+      sessionName: "",
+      region: "",
+      expired: (): boolean => false,
     };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore

@@ -12,7 +12,6 @@ export class RemoteProceduresClient {
     return this.remoteProcedureCall(
       { method: "isDesktopAppRunning", params: {} },
       (data, resolve, _) => resolve(data.result),
-      () => null,
       (resolve, _) => resolve(false)
     );
   }
@@ -21,7 +20,6 @@ export class RemoteProceduresClient {
     return this.remoteProcedureCall(
       { method: "needAuthentication", params: { idpUrl } },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
-      () => null,
       (_, reject) => reject(connectionError)
     );
   }
@@ -30,16 +28,14 @@ export class RemoteProceduresClient {
     return this.remoteProcedureCall(
       { method: "needMFA", params: { sessionName } },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
-      () => null,
       (_, reject) => reject(connectionError)
     );
   }
 
-  async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<any> {
+  async awsSignIn(idpUrl: string, needToAuthenticate: boolean): Promise<string> {
     return this.remoteProcedureCall(
       { method: "awsSignIn", params: { idpUrl, needToAuthenticate } },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
-      () => null,
       (_, reject) => reject(connectionError)
     );
   }
@@ -56,8 +52,8 @@ export class RemoteProceduresClient {
         params: { registerClientResponse, startDeviceAuthorizationResponse, windowModality },
       },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
-      (data, _, __) => (data.callbackId === "onWindowClose" ? onWindowClose() : null),
-      (_, reject) => reject(connectionError)
+      (_, reject) => reject(connectionError),
+      (data, _, __) => (data.callbackId === "onWindowClose" ? onWindowClose() : null)
     );
   }
 
@@ -65,7 +61,6 @@ export class RemoteProceduresClient {
     return this.remoteProcedureCall(
       { method: "refreshSessions", params: {} },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
-      () => null,
       (_, reject) => reject(connectionError)
     );
   }
@@ -74,7 +69,6 @@ export class RemoteProceduresClient {
     return this.remoteProcedureCall(
       { method: "refreshIntegrations", params: {} },
       (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
-      () => null,
       (_, reject) => reject(connectionError)
     );
   }
@@ -82,8 +76,8 @@ export class RemoteProceduresClient {
   async remoteProcedureCall(
     rpcRequest: RpcRequest,
     onReturn: (data: RpcResponse, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
-    onCallback: (data: RpcResponse, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
-    onDisconnect: (resolve: (value: unknown) => void, reject: (reason?: any) => void) => void
+    onDisconnect: (resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,
+    onCallback?: (data: RpcResponse, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void
   ): Promise<any> {
     const ipc = this.nativeService.nodeIpc;
     ipc.config.id = "leapp_cli";
@@ -100,7 +94,7 @@ export class RemoteProceduresClient {
           onDisconnect(resolve, reject);
         });
         desktopAppServer.on("message", (data: RpcResponse) => {
-          if (data.callbackId) {
+          if (data.callbackId && onCallback) {
             onCallback(data, resolve, reject);
           } else {
             onReturn(data, resolve, reject);

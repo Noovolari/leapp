@@ -2,7 +2,54 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.12.2](https://github.com/Noovolari/leapp/compare/v0.12.1...v0.12.2) (2022-05-30)
+### [0.13.4](https://github.com/Noovolari/leapp/compare/v0.13.3...v0.13.4) (2022-08-08)
+
+### Bug Fixes
+
+* fixed dev tools opening on app start
+
+### [0.13.3](https://github.com/Noovolari/leapp/compare/v0.13.2...v0.13.3) (2022-08-08)
+
+### Features
+
+* added feature to copy web-console URL [#296](https://github.com/Noovolari/leapp/issues/296) PR: [#306](https://github.com/Noovolari/leapp/pull/306)
+
+### Bug Fixes
+
+* fixed a bug that entered in CLI interactive mode when running with flags and prevented some commands to work properly [#301](https://github.com/Noovolari/leapp/issues/301) [#259](https://github.com/Noovolari/leapp/issues/259)
+* fixed permissions required for running Leapp on Windows. Now it will run with the same permissions as the user using Leapp PR: [#307](https://github.com/Noovolari/leapp/pull/307)
+
+A special **“thank you”** to **Sami Oksanen** ([@c-sami](https://github.com/c-sami)), who made 3 PRs this week!
+
+### [0.13.2](https://github.com/Noovolari/leapp/compare/v0.13.1...v0.13.2) (2022-08-02)
+
+### Bug Fixes
+* changed TPS limit introduced in the solution for AWS SSO TooManyRequest error [#281](https://github.com/Noovolari/leapp/issues/281) [#308](https://github.com/Noovolari/leapp/issues/308)
+
+### [0.13.1](https://github.com/Noovolari/leapp/compare/v0.13.0...v0.13.1) (2022-07-14)
+
+### Bug Fixes
+* added solution that solves AWS SSO TooManyRequest error [#281](https://github.com/Noovolari/leapp/issues/281) [#297](https://github.com/Noovolari/leapp/pull/297)
+* increased Leapp Core tests coverage
+
+Thank you! A huge shout out to the community members who contributed to this release of Leapp!
+
+@peteawood #281 #297
+
+### [0.13.0](https://github.com/Noovolari/leapp/compare/v0.12.2...v0.13.0) (2022-07-12)
+
+### Features
+
+* added support for Azure Integration: now it is possible to sync, start, rotate, edit, stop, and delete all Azure Sessions associated to Azure Tenant Subscriptions
+* added support for Brew on Linux: Linux and darwin-x64 rely on npm tarball, while darwin-arm64 rely on a custom installer [#251](https://github.com/Noovolari/leapp/issues/251) [#250](https://github.com/Noovolari/leapp/issues/250)
+
+### Bug Fixes
+* fixed tray menu Session list: now it is possible to see more than 10 Leapp Sessions
+* automatically strip AWS keys' white spaces [#289](https://github.com/Noovolari/leapp/issues/289)
+* added ap-southeast-3 region [#291](https://github.com/Noovolari/leapp/pull/291) [@nitrocode](https://github.com/nitrocode)
+* fixed filtering not saving after integration selection
+
+### [0.12.2](https://github.com/Noovolari/leapp/compare/v0.12.1...v0.12.2) (2022-05-30)
 
 ### Bug Fixes
 
@@ -22,7 +69,7 @@ All notable changes to this project will be documented in this file. See [standa
 * fixed selected but not applied filters behavior
 * dependabot security issues
 * fixed docs param typo [#268](https://github.com/Noovolari/leapp/pull/268) [@RafPe](https://github.com/RafPe)
-* removed error message shown when AWS SSM plugin is not 
+* removed error message shown when AWS SSM plugin is not
 * now it is possible to logout from AWS SSO Integrations without deleting sessions [#209](https://github.com/Noovolari/leapp/issues/209)
 
 ### [0.12.0](https://github.com/Noovolari/leapp/compare/v0.11.1...v0.12.0) (2022-04-28)
@@ -34,7 +81,7 @@ All notable changes to this project will be documented in this file. See [standa
 * added support to credential_process in ~/.aws/config file
 * Leapp CLI now [supports scripting using flags](https://docs.leapp.cloud/latest/cli/) for each available command [#259](https://github.com/Noovolari/leapp/issues/259)
 
-## [0.11.1](https://github.com/Noovolari/leapp/compare/v0.11.0...v0.11.1) (2022-04-21)
+### [0.11.1](https://github.com/Noovolari/leapp/compare/v0.11.0...v0.11.1) (2022-04-21)
 
 ### Bug Fixes
 

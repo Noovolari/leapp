@@ -15,7 +15,7 @@ const toastLevelMap = {
 export class AppNativeLoggerService implements ILogger {
   constructor(private nativeService: AppNativeService, private messageToasterService: MessageToasterService) {}
 
-  log(message: string, level: LogLevel) {
+  log(message: string, level: LogLevel): void {
     switch (level) {
       case LogLevel.info:
         this.nativeService.log.info(message);
@@ -32,7 +32,7 @@ export class AppNativeLoggerService implements ILogger {
     }
   }
 
-  show(message: string, level: LogLevel) {
+  show(message: string, level: LogLevel): void {
     this.messageToasterService.toast(message, toastLevelMap[level]);
   }
 }

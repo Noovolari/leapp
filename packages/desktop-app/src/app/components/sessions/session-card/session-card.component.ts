@@ -22,7 +22,7 @@ import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service"
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
@@ -32,6 +32,7 @@ import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
 import { OptionsService } from "../../../services/options.service";
+import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -110,7 +111,7 @@ export class SessionCardComponent implements OnInit {
     private windowService: WindowService,
     private electronService: AppNativeService,
     private messageToasterService: MessageToasterService,
-    private appProviderService: AppProviderService,
+    public appProviderService: AppProviderService,
     private awsAuthenticationService: AppAwsAuthenticationService,
     public optionService: OptionsService
   ) {
@@ -141,6 +142,15 @@ export class SessionCardComponent implements OnInit {
     // Pre-selected Region and Profile
     this.selectedDefaultRegion = this.session.region;
     this.selectedProfile = this.getProfileId(this.session);
+  }
+
+  async applyPluginAction($event: MouseEvent, plugin: IPlugin): Promise<void> {
+    await plugin.applySessionAction(this.session);
+    /*if (plugin.templateStructure.output) {
+      if (plugin.templateStructure.output.type === TemplateOutputObject.message) {
+        this.appProviderService.logService.log(new LoggedEntry(plugin[plugin.templateStructure.output.data](), this, LogLevel.info, true));
+      }
+    }*/
   }
 
   /**
@@ -256,8 +266,29 @@ export class SessionCardComponent implements OnInit {
         }
 
         this.appService.copyToClipboard(text);
-        this.messageToasterService.toast("Your information have been successfully copied!", ToastLevel.success, "Information copied!");
+        this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
       }
+    } catch (err) {
+      this.messageToasterService.toast(err, ToastLevel.warn);
+      this.loggingService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));
+    }
+  }
+
+  /**
+   * Copy AWS Web Console URL in the clipboard
+   */
+  async copyAwsWebConsoleUrl(event: MouseEvent): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
+    this.trigger.closeMenu();
+
+    try {
+      const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
+      const sessionRegion = this.session.region;
+      const loginURL = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion);
+
+      this.appService.copyToClipboard(loginURL);
+      this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
     } catch (err) {
       this.messageToasterService.toast(err, ToastLevel.warn);
       this.loggingService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));

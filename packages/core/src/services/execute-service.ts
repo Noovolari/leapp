@@ -17,9 +17,14 @@ export class ExecuteService {
    *
    * @param command - the command to launch
    * @param env - environment
+   * @param disableOutputLog - to disable logging of outputs
    * @returns an {Promise<string>} stdout or stderr
    */
-  execute(command: string, env?: any): Promise<string> {
+  execute(command: string, env?: any, maskOutputLog?: boolean): Promise<string> {
+    // TODO: in case of error, adding stdout and stderr is just a retro-compatible
+    //  solution, not the ideal one; we could extract an Info interface and return it
+    //  both in reject and resolve cases. This will be a breaking change but
+    //  provides all the information needed.
     return new Promise((resolve, reject) => {
       let exec = this.nativeService.exec;
       if (command.startsWith("sudo")) {
@@ -28,17 +33,26 @@ export class ExecuteService {
       }
 
       if (this.nativeService.process.platform === "darwin") {
-        if (command.indexOf("osascript") === -1) {
-          command = "/usr/local/bin/" + command;
-        } else {
+        if (command.indexOf("osascript") !== -1) {
           command = "/usr/bin/" + command;
+        } else if (command.indexOf("cd") !== -1) {
+          command = "" + command;
+        } else {
+          command = "/usr/local/bin/" + command;
         }
       }
-
       exec(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {
-        const output = { error: err, stdout, stderr };
-        this.logService.log(new LoggedEntry("execute from Leapp: " + JSON.stringify(output), this, LogLevel.info, false));
+        const info = { command, stdout, stderr, error: err };
+        if (info.error && info.error.cmd) {
+          delete info.error.cmd;
+        }
+        if (maskOutputLog) {
+          Object.assign(info, { stdout: "****", stderr: "****" });
+        }
+        this.logService.log(new LoggedEntry("execute from Leapp\ninfo:" + JSON.stringify(info, undefined, 4), this, LogLevel.info, false));
         if (err) {
+          err.stdout = stdout;
+          err.stderr = stderr;
           reject(err);
         } else {
           resolve(stdout ? stdout : stderr);
@@ -56,30 +70,59 @@ export class ExecuteService {
    * @returns an {Promise<string>} stdout or stderr
    */
   openTerminal(command: string, env?: any, macOsTerminalType?: string): Promise<string> {
+    const newEnv = Object.assign({}, this.nativeService.process.env);
+
     if (this.nativeService.process.platform === "darwin") {
       const terminalType = macOsTerminalType ?? this.repository.getWorkspace().macOsTerminal;
+      const path = this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination;
       if (terminalType === constants.macOsTerminal) {
         return this.execute(
-          `osascript -e "tell app \\"Terminal\\"
-                              activate (do script \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\")
-                              end tell"`,
-          Object.assign(this.nativeService.process.env, env)
+          `osascript -e 'if application "Terminal" is running then\n
+                    \ttell application "Terminal"\n
+                    \t\tdo script "source ${path}"\n
+                    \t\tdelay 3.5\n
+                    \t\tactivate\n
+                    \t\tdo script "clear" in window 1\n
+                    \t\tdelay 2.5\n
+                    \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
+                    \tend tell\n
+                    else\n
+                    \ttell application "Terminal"\n
+                    \t\tdo script "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID" in window 1\n
+                    \t\tactivate\n
+                    \tend tell\n
+                    end if'`,
+          Object.assign(newEnv, env)
         );
       } else {
         return this.execute(
-          `osascript -e "tell app \\"iTerm\\"
-                              set newWindow to (create window with default profile)
-                              tell current session of newWindow
-                                write text \\"${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID\\"
-                              end tell
-                            end tell"`,
-          Object.assign(this.nativeService.process.env, env)
+          `osascript -e 'if application "iTerm" is running then\n
+                    \ttell application "iTerm"\n
+                    \t\tset newWindow to (create window with default profile)\n
+                    \t\ttell current session of newWindow\n
+                    \t\t\twrite text "source ${path}"\n
+                    \t\t\tdelay 3.5\n
+                    \t\t\twrite text "clear"\n
+                    \t\t\tdelay 2.5\n
+                    \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+                    \t\tend tell\n
+                    \tend tell\n
+                    else\n
+                    \ttell application "iTerm"\n
+                    \t\treopen\n
+                    \t\tdelay 1\n
+                    \t\ttell current session of current window\n
+                    \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+                    \t\tend tell\n
+                    \tend tell\n
+                    end if'`,
+          Object.assign(newEnv, env)
         );
       }
     } else if (this.nativeService.process.platform === "win32") {
       return this.execute(`start cmd /k ${command}`, env);
     } else {
-      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(this.nativeService.process.env, env));
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(newEnv, env));
     }
   }
 }

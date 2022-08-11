@@ -1,6 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { integrationId } from "../../flags";
 
 export default class LoginIntegration extends LeappCommand {
@@ -21,6 +21,9 @@ export default class LoginIntegration extends LeappCommand {
       const { flags } = await this.parse(LoginIntegration);
       if (flags.integrationId && flags.integrationId !== "") {
         const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        if (!selectedIntegration) {
+          throw new Error("integrationId is not associated to an existing integration");
+        }
         await this.login(selectedIntegration);
       } else {
         const selectedIntegration = await this.selectIntegration();

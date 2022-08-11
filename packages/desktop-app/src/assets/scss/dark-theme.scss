@@ -494,4 +494,8 @@ body.dark-theme {
     position: relative!important;
     top: -1px;
   }
+
+  .plugin-table thead th {
+    background-color: $dark-modal-background!important;
+  }
 }

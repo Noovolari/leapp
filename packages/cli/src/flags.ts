@@ -68,24 +68,24 @@ export const sessionName = Flags.string({
 });
 
 export const region = Flags.string({
-  description: "Session Region for session in Leapp, use it for both AWS Region and Azure Location",
+  description: "Session Region for AWS sessions in Leapp",
   hidden: false,
 });
 
 export const providerType = Flags.string({
-  description: "Identify the provider for your sessions. Valid types are [aws, azure]",
+  description: "Identify the provider for your sessions. Valid types are [aws]",
   hidden: false,
-  options: [SessionType.aws.toString(), SessionType.azure.toString()],
+  options: [SessionType.aws.toString() /*, SessionType.azure.toString()*/],
 });
 
 export const sessionType = Flags.string({
-  description: "Identify the session type for both AWS and Azure. Valid types are [awsIamRoleFederated, awsIamUser, awsIamRoleChained, azure]",
+  description: "Identify the AWS session type. Valid types are [awsIamRoleFederated, awsIamUser, awsIamRoleChained]",
   hidden: false,
   options: [
     SessionType.awsIamRoleFederated.toString(),
     SessionType.awsIamUser.toString(),
     SessionType.awsIamRoleChained.toString(),
-    SessionType.azure.toString(),
+    /*SessionType.azure.toString(),*/
   ],
 });
 
@@ -110,14 +110,14 @@ export const roleSessionName = Flags.string({
   description: "Optional Alias for the Assumed Role Session name",
   hidden: false,
 });
-export const tenantId = Flags.string({
+/*export const tenantId = Flags.string({
   description: "The Azure session Tenant Id",
   hidden: false,
 });
 export const subscriptionId = Flags.string({
-  description: "The Azure session Subscriptin Id",
+  description: "The Azure session Subscription Id",
   hidden: false,
-});
+});*/
 export const accessKey = Flags.string({
   description: "AWS Access Key ID of the IAM User",
   hidden: false,
@@ -129,4 +129,14 @@ export const secretKey = Flags.string({
 export const ssmInstanceId = Flags.string({
   description: "Instance ID for EC2 instance we want to access with SSM",
   hidden: false,
+});
+export const pluginName = Flags.string({
+  description: "Unique name of a Leapp Plugin",
+  hidden: false,
+});
+export const print = Flags.boolean({
+  description: "Print an AWS Web Console login URL in the terminal instead of opening the web browser",
+  hidden: false,
+  default: false,
+  char: "p",
 });

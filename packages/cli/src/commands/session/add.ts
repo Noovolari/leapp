@@ -17,8 +17,6 @@ import {
   roleArn,
   roleSessionName,
   secretKey,
-  subscriptionId,
-  tenantId,
   sessionType,
 } from "../../flags";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
@@ -27,12 +25,20 @@ import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
 
 export default class AddSession extends LeappCommand {
   static description = "Add a new session";
-  static examples = [
+  /* static examples = [
     "$leapp session add",
     "$leapp session add --providerType [aws, azure] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser, azure] --region [AWSREGION, AZURELOCATION] --sessionName NAME ...[combination of flags relative to the session]",
     "$leapp session add --providerType azure --sessionType azure --sessionName NAME --region AZURELOCATION --tenantID TENANTID --subscriptionId SUBSCRIPTIONID",
     "$leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN",
-    "$leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionUId ID (--roleSessionName ROLESESSIONNAME)",
+    "$leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionId ID (--roleSessionName ROLESESSIONNAME)",
+    "$leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY (--mfaDevice MFADEVICEARN)",
+  ]; */
+
+  static examples = [
+    "$leapp session add",
+    "$leapp session add --providerType [aws] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser] --region [AWSREGION] --sessionName NAME ...[combination of flags relative to the session]",
+    "$leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN",
+    "$leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionId ID (--roleSessionName ROLESESSIONNAME)",
     "$leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY (--mfaDevice MFADEVICEARN)",
   ];
 
@@ -49,8 +55,8 @@ export default class AddSession extends LeappCommand {
     roleArn,
     roleSessionName,
     secretKey,
-    subscriptionId,
-    tenantId,
+    //subscriptionId,
+    //tenantId,
     sessionType,
   };
 
@@ -61,16 +67,19 @@ export default class AddSession extends LeappCommand {
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(AddSession);
-      if (this.verifyFlags(flags)) {
-        const selectedCloudProvider = this.extractProviderFromFlags(flags);
-        const selectedAccessMethod = this.extractAccessMethodFromFlags(flags, selectedCloudProvider);
-        const selectedParams = await this.extractCorrectParamsFromFlags(flags, selectedAccessMethod);
-        await this.createSession(selectedAccessMethod, selectedParams);
-      } else {
-        const selectedCloudProvider = await this.chooseCloudProvider();
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
+        // const selectedCloudProvider = await this.chooseCloudProvider();
+        const selectedCloudProvider = CloudProviderType.aws;
         const selectedAccessMethod = await this.chooseAccessMethod(selectedCloudProvider);
         const selectedParams = await this.chooseAccessMethodParams(selectedAccessMethod);
         await this.createSession(selectedAccessMethod, selectedParams);
+      } else {
+        if (this.verifyFlags(flags)) {
+          const selectedCloudProvider = this.extractProviderFromFlags(flags);
+          const selectedAccessMethod = this.extractAccessMethodFromFlags(flags, selectedCloudProvider);
+          const selectedParams = await this.extractCorrectParamsFromFlags(flags, selectedAccessMethod);
+          await this.createSession(selectedAccessMethod, selectedParams);
+        }
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
@@ -134,7 +143,8 @@ export default class AddSession extends LeappCommand {
 
   private extractProviderFromFlags(flags: any): string {
     if (flags.providerType && flags.providerType !== "") {
-      if (flags.providerType.indexOf(SessionType.aws.toString()) < 0 && flags.providerType.indexOf(SessionType.azure.toString()) < 0) {
+      // if (flags.providerType.indexOf(SessionType.aws.toString()) < 0 && flags.providerType.indexOf(SessionType.azure.toString()) < 0) {
+      if (flags.providerType.indexOf(SessionType.aws.toString()) < 0) {
         throw new Error("Provider Type is not valid");
       } else {
         return flags.providerType;
@@ -145,6 +155,63 @@ export default class AddSession extends LeappCommand {
   }
 
   private verifyFlags(flags: any) {
+    if (flags.providerType === undefined || flags.sessionType === undefined) {
+      throw new Error("flags --providerType and --sessionType must always be specified");
+    }
+    switch (flags.sessionType) {
+      case SessionType.awsIamRoleFederated:
+        if (
+          flags.sessionName === undefined ||
+          flags.region === undefined ||
+          flags.idpArn === undefined ||
+          flags.idpUrl === undefined ||
+          flags.roleArn === undefined
+        ) {
+          throw new Error(
+            `missing values for flags: ${[
+              flags.sessionName ? "" : "--sessionName",
+              flags.region ? "" : "--region",
+              flags.idpArn ? "" : "--idpArn",
+              flags.idpUrl ? "" : "--idpUrl",
+              flags.roleArn ? "" : "--roleArn",
+            ]
+              .filter((el) => el !== "")
+              .join(", ")}`
+          );
+        }
+        break;
+      case SessionType.awsIamUser:
+        if (flags.sessionName === undefined || flags.region === undefined || flags.accessKey === undefined || flags.secretKey === undefined) {
+          throw new Error(
+            `missing values for flags: ${[
+              flags.sessionName ? "" : "--sessionName",
+              flags.region ? "" : "--region",
+              flags.accessKey ? "" : "--accessKey",
+              flags.secretKey ? "" : "--secretKey",
+            ]
+              .filter((el) => el !== "")
+              .join(", ")}`
+          );
+        }
+        break;
+      case SessionType.awsIamRoleChained:
+        if (flags.sessionName === undefined || flags.region === undefined || flags.roleArn === undefined || flags.parentSessionId === undefined) {
+          throw new Error(
+            `missing values for flags: ${[
+              flags.sessionName ? "" : "--sessionName",
+              flags.region ? "" : "--region",
+              flags.roleArn ? "" : "--roleArn",
+              flags.parentSessionId ? "" : "--parentSessionId",
+            ]
+              .filter((el) => el !== "")
+              .join(", ")}`
+          );
+        }
+        break;
+      default:
+        throw new Error("invalid session type value. Valid values are: awsIamRoleFederated, awsIamRoleChained, awsIamUser");
+    }
+
     const firstStep =
       flags.providerType &&
       flags.providerType !== "" &&
@@ -157,11 +224,11 @@ export default class AddSession extends LeappCommand {
 
     const secondStep =
       // AZURE
-      (flags.providerType === SessionType.azure.toString() &&
+      /*(flags.providerType === SessionType.azure.toString() &&
         flags.tenantId &&
         flags.tenantId !== "" &&
         flags.subscriptionId &&
-        flags.subscriptionId !== "") ||
+        flags.subscriptionId !== "") ||*/
       // AWS IAM ROLE CHAINED
       (flags.providerType === SessionType.aws.toString() &&
         flags.sessionType === SessionType.awsIamRoleChained.toString() &&
@@ -186,12 +253,12 @@ export default class AddSession extends LeappCommand {
         flags.accessKey &&
         flags.accessKey !== "");
     // Special condition
-    if (
+    /* if (
       (firstStep && flags.sessionType.indexOf(SessionType.aws.toString()) > -1 && flags.providerType === SessionType.azure.toString()) ||
       (flags.sessionType === SessionType.azure.toString() && flags.providerType === SessionType.aws.toString())
     ) {
       throw new Error("Session Type and Provider Type are not valid together");
-    }
+    } */
 
     return firstStep && secondStep;
   }
@@ -254,7 +321,7 @@ export default class AddSession extends LeappCommand {
     ) {
       throw new Error(`AWS Region not valid`);
     }
-    if (
+    /* if (
       field.creationRequestField === "region" &&
       flags.providerType === SessionType.azure.toString() &&
       !this.cliProviderService.azureCoreService
@@ -263,7 +330,7 @@ export default class AddSession extends LeappCommand {
         .includes(fieldAnswerValue)
     ) {
       throw new Error(`Azure location not valid`);
-    }
+    } */
   }
 
   private setDefaultParameterValues(fieldAnswerValue: any, field: any) {
@@ -310,7 +377,8 @@ export default class AddSession extends LeappCommand {
     }
     if (
       found &&
-      (found.type === SessionType.awsIamRoleChained || found.type === SessionType.azure) &&
+      // (found.type === SessionType.awsIamRoleChained || found.type === SessionType.azure) &&
+      found.type === SessionType.awsIamRoleChained &&
       field.creationRequestField === "parentSessionId"
     ) {
       throw new Error(`Invalid Parent: cannot chain from ${found.type.toString()}`);

@@ -1,6 +1,6 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws-named-profile";
+import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { profileId, force } from "../../flags";
 
@@ -79,6 +79,9 @@ export default class DeleteNamedProfile extends LeappCommand {
 
   async deleteNamedProfile(id: string): Promise<void> {
     try {
+      if (!this.cliProviderService.namedProfilesService.getProfileName(id)) {
+        throw new Error("profileId is not associated to an existing profile");
+      }
       await this.cliProviderService.namedProfilesService.deleteNamedProfile(id);
       this.log("profile deleted");
     } finally {

@@ -1,7 +1,7 @@
 import * as path from "path";
 import { environment } from "../src/environments/environment";
 
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = require("electron");
 const electronLocalshortcut = require('electron-localshortcut');
 const { autoUpdater } = require("electron-updater");
 
@@ -14,6 +14,8 @@ remote.initialize();
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
 app.disableHardwareAcceleration();
+app.setAsDefaultProtocolClient('leapp');
+
 
 // Main Window configuration: set here the options to make it works with your app
 // Electron is the application wrapper so NOT log is prompted when we build an
@@ -30,7 +32,7 @@ const windowDefaultConfig = {
       devTools: !environment.production,
       contextIsolation: false,
       enableRemoteModule: true,
-      nodeIntegration: true,
+      nodeIntegration: true
     },
   },
 };
@@ -140,12 +142,20 @@ const generateMainWindow = () => {
     });
 
     app.on("browser-window-focus", () => {
-      electronLocalshortcut.register(win, ['CommandOrControl+R','CommandOrControl+Shift+R', 'F5'], () => {});
+      electronLocalshortcut.register(win, ['CommandOrControl+R', 'CommandOrControl+Shift+R', 'F5'], () => {});
     });
 
     app.on("browser-window-blur", () => {
       electronLocalshortcut.unregisterAll(win);
     });
+
+
+
+
+
+    app.on('open-url', (event, url) => {
+      win.webContents.send("PLUGIN_URL", url);
+    })
 
     remote.enable(win.webContents);
   };

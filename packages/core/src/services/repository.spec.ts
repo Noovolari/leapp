@@ -1,4 +1,4 @@
-import { beforeEach, describe, test, jest, expect } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { Repository } from "./repository";
 import { FileService } from "./file-service";
 import { Workspace } from "../models/workspace";
@@ -6,7 +6,7 @@ import { constants } from "../models/constants";
 import { Session } from "../models/session";
 import { SessionType } from "../models/session-type";
 import { SessionStatus } from "../models/session-status";
-import { AwsSsoRoleSession } from "../models/aws-sso-role-session";
+import { AwsSsoRoleSession } from "../models/aws/aws-sso-role-session";
 import { LoggedException } from "./log-service";
 
 describe("Repository", () => {
@@ -51,6 +51,7 @@ describe("Repository", () => {
     (repository as any)._workspace = mockedWorkspace;
 
     mockedSession = {
+      sessionTokenExpiration: "",
       region: "eu-west-1",
       sessionId: "123456789",
       sessionName: "mock-session",
@@ -72,6 +73,21 @@ describe("Repository", () => {
     expect(workspace).toBe((repository as any)._workspace);
   });
 
+  test("reloadWorkspace", () => {
+    const homeDir = "homeDir";
+    mockedNativeService.os.homedir = () => homeDir;
+    mockedFileService.readFileSync = jest.fn(() => "fileContent");
+    mockedFileService.decryptText = jest.fn(() => '{"test":"json"}');
+    repository.reloadWorkspace();
+
+    expect(mockedFileService.readFileSync).toHaveBeenCalledWith(`${homeDir}/.Leapp/Leapp-lock.json`);
+    expect(mockedFileService.decryptText).toHaveBeenCalledWith("fileContent");
+    const actualWorkspace = (repository as any)._workspace;
+
+    expect(actualWorkspace).toBeInstanceOf(Workspace);
+    expect(actualWorkspace.test).toEqual("json");
+  });
+
   test("createWorkspace() - create a new workspace", () => {
     repository.persistWorkspace = jest.fn();
     repository.createWorkspace();
@@ -79,14 +95,29 @@ describe("Repository", () => {
     expect(repository.persistWorkspace).toHaveBeenCalledWith((repository as any)._workspace);
   });
 
-  test("getWorkspace() - to be the same as the getter property and the private variable", () => {
+  test("createWorkspace() - directory exists", () => {
+    mockedFileService.existsSync = () => true;
     repository.persistWorkspace = jest.fn();
     repository.createWorkspace();
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
+  });
 
-    expect(repository.workspace).not.toBe(null);
-    expect(repository.persistWorkspace).toHaveBeenCalledWith((repository as any)._workspace);
-    expect(repository.getWorkspace()).toBe(repository.workspace);
-    expect(repository.getWorkspace()).toBe((repository as any)._workspace);
+  test("getWorkspace() - workspace not set", () => {
+    (repository as any).reloadWorkspace = jest.fn();
+    (repository as any)._workspace = undefined;
+
+    const actualWorkspace = repository.getWorkspace();
+    expect(actualWorkspace).toBe(undefined);
+    expect((repository as any).reloadWorkspace).toHaveBeenCalled();
+  });
+
+  test("getWorkspace() - workspace already set", () => {
+    const fakeWorkspace = {};
+    (repository as any)._workspace = fakeWorkspace;
+
+    const actualWorkspace = repository.getWorkspace();
+    expect(actualWorkspace).toEqual(fakeWorkspace);
+    expect(repository.getWorkspace()).toBe(actualWorkspace);
   });
 
   test("persistWorkspace() - to save the new status of a workspace", () => {
@@ -127,6 +158,18 @@ describe("Repository", () => {
     expect(repository.getSessionById("123456789")).toStrictEqual(mockedSession);
   });
 
+  test("getSessionById() - session ID doesn't exist", () => {
+    const workspace = new Workspace();
+    workspace.sessions = [mockedSession];
+
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(() => repository.getSessionById("notExistingId")).toThrowError("session with id notExistingId not found.");
+  });
+
   test("addSession() - add a new session to the array of sessions", () => {
     const workspace = new Workspace();
     workspace.sessions = [mockedSession];
@@ -137,6 +180,7 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     const mockedSession2: Session = {
+      sessionTokenExpiration: "",
       region: "eu-west-2",
       sessionId: "987654321",
       sessionName: "mocked-2",
@@ -151,7 +195,8 @@ describe("Repository", () => {
 
   test("updateSession() - updates a specific session", () => {
     const workspace = new Workspace();
-    workspace.sessions = [mockedSession];
+    const mockedSession3 = { sessionId: "fake-id" };
+    workspace.sessions = [mockedSession, mockedSession3 as any];
 
     mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
 
@@ -159,6 +204,7 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     const mockedSession2: Session = {
+      sessionTokenExpiration: "",
       region: "eu-west-2",
       sessionId: "123456789",
       sessionName: "mocked-2",
@@ -170,7 +216,7 @@ describe("Repository", () => {
 
     expect(repository.getSessionById("123456789")).not.toBe(mockedSession);
     expect(repository.getSessionById("123456789")).toBe(mockedSession2);
-    expect(repository.getSessions()).toStrictEqual([mockedSession2]);
+    expect(repository.getSessions()).toStrictEqual([mockedSession2, mockedSession3]);
   });
 
   test("updateSessions() - bulk updates all sessions at once", () => {
@@ -183,6 +229,7 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     const mockedSession2: Session = {
+      sessionTokenExpiration: "",
       region: "eu-west-2",
       sessionId: "123456789",
       sessionName: "mocked-2",
@@ -207,6 +254,14 @@ describe("Repository", () => {
     repository.deleteSession("123456789");
     expect(repository.getSessions()).not.toStrictEqual([mockedSession]);
     expect(repository.getSessions()).toStrictEqual([]);
+  });
+
+  test("deleteSession() - no session found", () => {
+    const workspace = { sessions: [{ sessionId: "fake-session-id-1" }, { sessionId: "fake-session-id-2" }] };
+    repository.persistWorkspace = jest.fn();
+    repository.getWorkspace = () => workspace;
+    repository.deleteSession("wrong-id");
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
   });
 
   test("listPending() - list sessions in pending state", () => {
@@ -245,6 +300,29 @@ describe("Repository", () => {
     expect(repository.listActive()).toStrictEqual([]);
   });
 
+  test("listActiveAndPending() - with pending and active sessions ", () => {
+    const session1 = { id: 1, status: SessionStatus.active };
+    const session2 = { id: 2, status: SessionStatus.pending };
+    const workspace = { sessions: [session1, session2, { id: 3, status: SessionStatus.inactive }] };
+    repository.getWorkspace = () => workspace;
+    const result = repository.listActiveAndPending();
+    expect(result).toStrictEqual([session1, session2]);
+  });
+
+  test("listActiveAndPending() - without sessions key", () => {
+    const workspace = {};
+    repository.getWorkspace = () => workspace;
+    const result = repository.listActiveAndPending();
+    expect(result).toStrictEqual([]);
+  });
+
+  test("listActiveAndPending() - without sessions length equal to 0", () => {
+    const workspace = { session: [] };
+    repository.getWorkspace = () => workspace;
+    const result = repository.listActiveAndPending();
+    expect(result).toStrictEqual([]);
+  });
+
   test("listAwsSsoRoles() - list sessions of type AwsSsoRole", () => {
     mockedSession.type = SessionType.awsSsoRole;
     const workspace = new Workspace();
@@ -281,22 +359,37 @@ describe("Repository", () => {
     expect(repository.listAssumable()).toStrictEqual([]);
   });
 
-  test("listIamRoleChained() - list sessions of type AwsIamRoleChained", () => {
-    mockedSession.type = SessionType.awsIamRoleChained;
-    const workspace = new Workspace();
-    workspace.sessions = [mockedSession];
+  test("listIamRoleChained() - list sessions of type AwsIamRoleChained without parentSession argument", () => {
+    const session1 = { id: 1, type: SessionType.awsIamRoleChained };
+    const session2 = { id: 2, type: SessionType.awsIamRoleFederated };
+    const workspace = { sessions: [session1, session2] };
+    repository.getWorkspace = () => workspace;
+    const result = repository.listIamRoleChained();
+    expect(result).toStrictEqual([session1]);
+  });
 
-    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+  test("listIamRoleChained() - list sessions of type AwsIamRoleChained without sessions key", () => {
+    const workspace = {};
+    repository.getWorkspace = () => workspace;
+    const result = repository.listIamRoleChained();
+    expect(result).toStrictEqual([]);
+  });
 
-    repository.workspace = workspace;
-    repository.persistWorkspace(workspace);
+  test("listIamRoleChained() - list sessions of type AwsIamRoleChained with session length equal to 0", () => {
+    const workspace = { sessions: [] };
+    repository.getWorkspace = () => workspace;
+    const result = repository.listIamRoleChained();
+    expect(result).toStrictEqual([]);
+  });
 
-    expect(repository.listIamRoleChained()).toStrictEqual([mockedSession]);
-
-    mockedSession.type = SessionType.azure;
-    workspace.sessions = [mockedSession];
-
-    expect(repository.listIamRoleChained()).toStrictEqual([]);
+  test("listIamRoleChained() - list sessions of type AwsIamRoleChained with parentSession argument", () => {
+    const session1 = { id: 1, type: SessionType.awsIamRoleChained, parentSessionId: "fake-id" };
+    const session2 = { id: 2, type: SessionType.awsIamRoleChained, parentSessionId: "wrong-fake-id" };
+    const parentSession = { sessionId: "fake-id" };
+    const workspace = { sessions: [session1, session2] };
+    repository.getWorkspace = () => workspace;
+    const result = repository.listIamRoleChained(parentSession);
+    expect(result).toStrictEqual([session1]);
   });
 
   test("getDefaultRegion() - default rigion property from workspace", () => {
@@ -388,6 +481,14 @@ describe("Repository", () => {
     expect(repository.getIdpUrl("1234")).toStrictEqual("mocked-url-2");
   });
 
+  test("updateIdpUrl() - idpUrl not found", () => {
+    const workspace = { idpUrls: [{ id: "fake-idpurl" }] };
+    repository.getWorkspace = () => workspace;
+    repository.persistWorkspace = jest.fn();
+    repository.updateIdpUrl("wrong-idpurl");
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
+  });
+
   test("removeIdpUrl() - update a IdpUrl", () => {
     const workspace = new Workspace();
     mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
@@ -429,19 +530,6 @@ describe("Repository", () => {
     expect(repository.getProfileName("1234")).toStrictEqual("mocked-url");
   });
 
-  test("getProfileName() - get a profile's name", () => {
-    const workspace = new Workspace();
-    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
-
-    repository.workspace = workspace;
-
-    const mockedProfile = { id: "1234", name: "mocked-url" };
-    workspace.profiles.push(mockedProfile);
-
-    repository.persistWorkspace(workspace);
-    expect(repository.getProfileName("1234")).toStrictEqual("mocked-url");
-  });
-
   test("doesProfileExists() - check if a profile is in the workspace", () => {
     const workspace = new Workspace();
     mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
@@ -463,11 +551,21 @@ describe("Repository", () => {
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
 
-    expect(workspace.profiles.length).toBeGreaterThan(0);
     expect(workspace.profiles.length).toBe(1);
 
     const defaultProfile = workspace.profiles[0];
     expect(repository.getDefaultProfileId()).toStrictEqual(defaultProfile.id);
+  });
+
+  test("getDefaultProfileId() - no default named profile found", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.profiles = [];
+    expect(() => repository.getDefaultProfileId()).toThrow("no default named profile found.");
   });
 
   test("addProfile() - add a new profile to the workspace", () => {
@@ -504,6 +602,14 @@ describe("Repository", () => {
 
     expect(repository.getProfiles().length).toStrictEqual(2);
     expect(repository.getProfileName("2345")).toBe("test2");
+  });
+
+  test("updateProfile() - profile not found", () => {
+    const workspace = { profiles: [{ id: "fake-profile-id" }] };
+    repository.getWorkspace = () => workspace;
+    repository.persistWorkspace = jest.fn();
+    repository.updateProfile("wrong-profile-id");
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
   });
 
   test("deleteProfile() - delete a profile in the workspace", () => {
@@ -554,7 +660,11 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     workspace.awsSsoIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
     ];
     repository.workspace = workspace;
@@ -586,6 +696,7 @@ describe("Repository", () => {
         type: SessionType.awsSsoRole,
         status: SessionStatus.inactive,
         region: "eu-west-1",
+        sessionTokenExpiration: "",
         expired: () => false,
       },
       {
@@ -594,12 +705,17 @@ describe("Repository", () => {
         type: SessionType.awsSsoRole,
         status: SessionStatus.inactive,
         region: "eu-west-1",
+        sessionTokenExpiration: "",
         expired: () => false,
       },
     ];
 
     workspace.awsSsoIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
     ];
     repository.workspace = workspace;
@@ -616,7 +732,11 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     workspace.awsSsoIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
     ];
     repository.workspace = workspace;
@@ -638,7 +758,11 @@ describe("Repository", () => {
     repository.persistWorkspace(workspace);
 
     workspace.awsSsoIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "1234", alias: "1", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       { id: "4567", alias: "2", region: "a", accessTokenExpiration: "", browserOpening: "", portalUrl: "" },
     ];
     repository.workspace = workspace;
@@ -655,6 +779,35 @@ describe("Repository", () => {
     expect(repository.listAwsSsoIntegrations()[0].browserOpening).toBe("in-app");
   });
 
+  test("updateAwsSsoIntegration() - no integrations found", () => {
+    repository.persistWorkspace = jest.fn();
+    const id = "fake-sso-id";
+    const workspace = { awsSsoIntegrations: [{ id: "wrong-id" }] };
+    repository.getWorkspace = () => workspace;
+    repository.updateAwsSsoIntegration(id, null, null, null, null);
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
+  });
+
+  test("updateAwsSsoIntegration() - with expirationTime argument", () => {
+    repository.persistWorkspace = jest.fn();
+    const id = "fake-sso-id";
+    const integration = { id };
+    const accessTokenExpiration = "fake-expiration-time-value";
+    const workspace = { awsSsoIntegrations: [integration] };
+    repository.getWorkspace = () => workspace;
+    repository.updateAwsSsoIntegration(id, "fake-alias", "fake-region", "fake-portal-url", "fake-browser-opening", true, accessTokenExpiration);
+    expect(integration).toEqual({
+      id,
+      alias: "fake-alias",
+      region: "fake-region",
+      portalUrl: "fake-portal-url",
+      browserOpening: "fake-browser-opening",
+      isOnline: true,
+      accessTokenExpiration,
+    });
+    expect(repository.persistWorkspace).toHaveBeenCalled();
+  });
+
   test("unsetAwsSsoIntegrationExpiration() - put accessTokenExpiration to undefined", () => {
     const workspace = new Workspace();
     mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
@@ -662,6 +815,8 @@ describe("Repository", () => {
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     workspace.awsSsoIntegrations = [{ id: "1234", alias: "1", region: "a", accessTokenExpiration: "1000", browserOpening: "", portalUrl: "" }];
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
@@ -674,6 +829,14 @@ describe("Repository", () => {
     expect(repository.listAwsSsoIntegrations()[0].accessTokenExpiration).toBe(undefined);
   });
 
+  test("unsetAwsSsoIntegrationExpiration() - integration not found", () => {
+    const workspace = { awsSsoIntegrations: [{ id: "fake-integration-id" }] };
+    repository.getWorkspace = () => workspace;
+    repository.persistWorkspace = jest.fn();
+    repository.unsetAwsSsoIntegrationExpiration("wrong-integration-id");
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
+  });
+
   test("deleteAwsSsoIntegration() - remove an integration from the workspace", () => {
     const workspace = new Workspace();
     mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
@@ -681,6 +844,8 @@ describe("Repository", () => {
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     workspace.awsSsoIntegrations = [{ id: "1234", alias: "1", region: "a", accessTokenExpiration: "1000", browserOpening: "", portalUrl: "" }];
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
@@ -691,6 +856,148 @@ describe("Repository", () => {
 
     expect(repository.listAwsSsoIntegrations().length).toBe(0);
     expect(repository.listAwsSsoIntegrations()[0]).toBe(undefined);
+  });
+
+  test("deleteAwsSsoIntegration() - integration not found", () => {
+    const workspace = { awsSsoIntegrations: [{ id: "fake-integration-id" }] };
+    repository.getWorkspace = () => workspace;
+    repository.persistWorkspace = jest.fn();
+    repository.deleteAwsSsoIntegration("wrong-integration-id");
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
+  });
+
+  test("listAzureIntegrations() - get all the azure integrations we have in the workspace", () => {
+    const workspace = new Workspace();
+    workspace.azureIntegrations = [];
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(0);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.azureIntegrations = [{}, {}];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(2);
+  });
+
+  test("getAzureIntegration() - get a specific integration given the id", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.azureIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "1234", alias: "1", tenantId: "1" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "4567", alias: "2", tenantId: "2" },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.getAzureIntegration("1234").tenantId).toBe("1");
+    expect(repository.getAzureIntegration("4567").tenantId).toBe("2");
+    expect(repository.getAzureIntegration("8910")).toBe(undefined);
+  });
+
+  test("addAzureIntegration() - add a specific integration to the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.azureIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "1234", alias: "1", tenantId: "1" },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "4567", alias: "2", tenantId: "2" },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(2);
+
+    repository.addAzureIntegration("alias", "1234", "region-1");
+
+    expect(repository.listAzureIntegrations().length).toBe(3);
+    expect(repository.listAzureIntegrations()[2].alias).toBe("alias");
+    expect(repository.listAzureIntegrations()[2].tenantId).toBe("1234");
+  });
+
+  test("updateAzureIntegration() - update a specific integration in the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    workspace.azureIntegrations = [
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "1234", alias: "1", tenantId: "1", isOnline: false },
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      { id: "4567", alias: "2", tenantId: "2", isOnline: false },
+    ];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(2);
+
+    repository.updateAzureIntegration("1234", "alias", "ti1", "fake", true);
+
+    expect(repository.listAzureIntegrations().length).toBe(2);
+    expect(repository.listAzureIntegrations()[0].alias).toBe("alias");
+    expect(repository.listAzureIntegrations()[0].tenantId).toBe("ti1");
+    expect(repository.listAzureIntegrations()[0].isOnline).toBe(true);
+  });
+
+  test("updateAzureIntegration() - integration not found", () => {
+    const workspace = { azureIntegrations: [{ id: "fake-integration-id" }] };
+    repository.getWorkspace = () => workspace;
+    repository.persistWorkspace = jest.fn();
+    repository.updateAzureIntegration("wrong-integration-id");
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
+  });
+
+  test("deleteAzureIntegration() - remove an integration from the workspace", () => {
+    const workspace = new Workspace();
+    mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
+
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    workspace.azureIntegrations = [{ id: "1234", alias: "1", tenantId: "1111", isOnline: false }];
+    repository.workspace = workspace;
+    repository.persistWorkspace(workspace);
+
+    expect(repository.listAzureIntegrations().length).toBe(1);
+
+    repository.deleteAzureIntegration("1234");
+
+    expect(repository.listAzureIntegrations().length).toBe(0);
+    expect(repository.listAzureIntegrations()[0]).toBe(undefined);
+  });
+
+  test("deleteAzureIntegration() - integration not found", () => {
+    const workspace = { azureIntegrations: [{ id: "fake-integration-id" }] };
+    repository.getWorkspace = () => workspace;
+    repository.persistWorkspace = jest.fn();
+    repository.deleteAzureIntegration("wrong-integration-id");
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
   });
 
   test("getProxyConfiguration() - get the proxy config object from the workspace", () => {
@@ -855,6 +1162,14 @@ describe("Repository", () => {
     expect(repository.getSegments().length).toBe(2);
   });
 
+  test("removeSegment() - segment not found", () => {
+    const workspace = { segments: [{ name: "fake-segment-name" }] };
+    repository.getWorkspace = () => workspace;
+    repository.persistWorkspace = jest.fn();
+    repository.removeSegment("wrong-segment-name");
+    expect(repository.persistWorkspace).not.toHaveBeenCalled();
+  });
+
   test("getFolders() - get the folders object from the workspace", () => {
     const workspace = new Workspace();
     mockedFileService.encryptText = jest.fn(() => JSON.stringify(workspace));
@@ -938,5 +1253,29 @@ describe("Repository", () => {
 
     repository.updateColorTheme(constants.darkTheme);
     expect(repository.getColorTheme()).toBe(constants.darkTheme);
+  });
+
+  test("createPluginStatus() - creates a new pluginStatus", () => {
+    (repository as any)._workspace = {
+      pluginsStatus: [],
+    };
+    repository.createPluginStatus("pluginId");
+    expect((repository as any)._workspace.pluginsStatus).toStrictEqual([{ id: "pluginId", active: true }]);
+  });
+
+  test("getPluginStatus() - get the pluginStatus from a pluginId", () => {
+    (repository as any)._workspace = {
+      pluginsStatus: [{ id: "id1" }, { id: "id2" }],
+    };
+    const result = repository.getPluginStatus("id1");
+    expect(result).toStrictEqual({ id: "id1" });
+  });
+
+  test("setPluginStatus() - set the newStatus of a pluginStatus from a pluginId", () => {
+    (repository as any)._workspace = {
+      pluginsStatus: [{ id: "id1" }, { id: "id2" }],
+    };
+    repository.setPluginStatus("id1", "new-status");
+    expect((repository as any)._workspace.pluginsStatus).toStrictEqual(["new-status", { id: "id2" }]);
   });
 });

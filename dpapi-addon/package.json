@@ -1,0 +1,23 @@
+{
+  "name": "@noovolari/dpapi-addon",
+  "version": "0.1.2",
+  "author": {
+    "name": "Noovolari",
+    "email": "info@noovolari.com"
+  },
+  "description": "Leapp dpapi addon.",
+  "main": "dpapi-addon/Dpapi.js",
+  "homepage": "https://github.com/Noovolari/leapp",
+  "scripts": {
+  },
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "nan": "^2.13.2"
+  },
+  "devDependencies": {
+    "electron-rebuild": "3.2.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

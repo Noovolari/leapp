@@ -2,7 +2,7 @@
 
 <form [formGroup]="form" class="edit-form form center-vertical text-left">
 
-  <h4><img src="./assets/images/{{getIconForProvider(provider)}}" alt="" title="" class="title-img" /> {{form.controls['name'].value}}</h4>
+  <h4><img src="./assets/images/{{getIconForProvider(accountType)}}" alt="" title="" class="title-img" /> {{form.controls['name'].value}}</h4>
   <br>
 
   <!-- =============================== -->
@@ -136,6 +136,7 @@
   <!-- ================================================================= -->
   <!-- ==                  azure SESSION PROPERTIES                   == -->
   <!-- ================================================================= -->
+  <!--
   <ng-container *ngIf="accountType === eSessionType.azure">
     <div class="form-group">
       <div class="form-field">
@@ -156,6 +157,7 @@
       </div>
     </div>
   </ng-container>
+  -->
   <div class="form-group">
     <div class="form-field text-right">
       <a (click)="tryProperties();" class="check-validity btn-link" *ngIf="accountType">Test credential generation</a>

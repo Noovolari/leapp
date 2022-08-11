@@ -3,13 +3,14 @@ import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import { AppProviderService } from "./app-provider.service";
 import { WindowService } from "./window.service";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppNativeService } from "./app-native.service";
 import { AppService } from "./app.service";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { DomSanitizer } from "@angular/platform-browser";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 
 @Injectable({ providedIn: "root" })
 export class AppAwsAuthenticationService implements IAwsSamlAuthenticationService {
@@ -103,34 +104,36 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
   async logoutFromFederatedSession(session: Session, callback?: any): Promise<void> {
     try {
       // Clear all extra data
-      const url = this.leappCoreService.idpUrlService.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId);
-      const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, url);
+      const url = this.leappCoreService.idpUrlService.getIdpUrl((session as AwsIamRoleFederatedSession).idpUrlId)?.url;
+      const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, url ? url : "");
 
       const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
-      this.electronService.rimraf.sync(getAppPath + `/Partitions/leapp-${btoa(sanitizedField)}`);
 
-      if (session) {
-        const sessionService = this.leappCoreService.sessionFactory.getSessionService(session.type);
-        await sessionService.stop(session.sessionId);
-        if (callback) {
-          callback();
+      this.electronService.rimraf(getAppPath + `/Partitions/leapp-${btoa(sanitizedField)}`, async () => {
+        if (session) {
+          const sessionService = this.leappCoreService.sessionFactory.getSessionService(session.type);
+          await sessionService.stop(session.sessionId);
+          if (callback) {
+            callback();
+          }
         }
-      }
 
-      this.leappCoreService.logService.log(
-        new LoggedEntry("Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.", this, LogLevel.info, true)
-      );
+        this.leappCoreService.logService.log(
+          new LoggedEntry("Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.", this, LogLevel.info, true)
+        );
 
-      // Restart
-      setTimeout(() => {
-        // a bit of timeout to make everything reset as expected and give time to read message
-        this.appService.restart();
-      }, 3000);
+        // Restart
+        setTimeout(() => {
+          // a bit of timeout to make everything reset as expected and give time to read message
+          this.appService.restart();
+        }, 3000);
+      });
+      this.electronService.session.defaultSession.clearStorageData([], (_data) => {});
     } catch (err) {
       this.leappCoreService.logService.log(
         new LoggedEntry("Leapp has an error re-creating your configuration file and cache.", this, LogLevel.error, false, err.stack)
       );
-      if (this.appService.detectOs() === constants.windows) {
+      if (this.appService.detectOs() === OperatingSystem.windows) {
         this.leappCoreService.logService.log(
           new LoggedEntry(
             "Leapp needs Admin permissions to do this: please restart the application as an Administrator and retry.",

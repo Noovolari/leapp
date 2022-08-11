@@ -4,15 +4,16 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
-import { sessionId } from "../../flags";
+import { sessionId, print } from "../../flags";
 
 export default class OpenWebConsole extends LeappCommand {
   static description = "Open an AWS Web Console";
 
-  static examples = [`$leapp session open-web-console`, `$leapp session open-web-console --sessionId SESSIONID`];
+  static examples = [`$leapp session open-web-console`, `$leapp session open-web-console --sessionId SESSIONID [--print, -p]`];
 
   static flags = {
     sessionId,
+    print,
   };
 
   constructor(argv: string[], config: Config) {
@@ -25,28 +26,27 @@ export default class OpenWebConsole extends LeappCommand {
       if (flags.sessionId && flags.sessionId !== "") {
         const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId);
         if (!selectedSession) {
-          throw new Error("No session found with id " + flags.sessionId);
+          throw new Error("No session with id " + flags.sessionId + " found");
         }
-        await this.openWebConsole(selectedSession);
+        await this.openWebConsole(selectedSession, flags);
       } else {
         const selectedSession = await this.selectSession();
-        await this.openWebConsole(selectedSession);
+        await this.openWebConsole(selectedSession, flags);
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
   }
 
-  async openWebConsole(session: Session): Promise<void> {
+  async openWebConsole(session: Session, flags: any): Promise<void> {
     const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type) as AwsSessionService;
     const credentials = await sessionService.generateCredentials(session.sessionId);
-    try {
+    if (flags.print) {
+      const loginUrl = await this.cliProviderService.webConsoleService.getWebConsoleUrl(credentials, session.region);
+      this.log(loginUrl);
+    } else {
       await this.cliProviderService.webConsoleService.openWebConsole(credentials, session.region);
-    } catch (e) {
-      console.log(e);
-      throw e;
     }
-    this.log("opened AWS Web Console for this session");
   }
 
   private async selectSession(): Promise<Session> {

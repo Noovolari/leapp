@@ -1,5 +1,6 @@
 import { ILogger } from "../interfaces/i-logger";
 
+/* istanbul ignore next */
 export enum LogLevel {
   success,
   info,

@@ -23,7 +23,7 @@ export default class StartSession extends LeappCommand {
       if (flags.sessionId && flags.sessionId !== "") {
         const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(flags.sessionId);
         if (!selectedSession) {
-          throw new Error("No session found with id " + flags.sessionId);
+          throw new Error("No session with id " + flags.sessionId + " found");
         }
         await this.startSession(selectedSession);
       } else {
@@ -42,6 +42,7 @@ export default class StartSession extends LeappCommand {
       process.exit(0);
     });
     try {
+      this.unsupportedAzureSession(session);
       await sessionService.start(session.sessionId);
       this.log("session started");
     } finally {

@@ -1,7 +1,7 @@
 import * as Aws from "aws-sdk";
 import { IAwsSamlAuthenticationService } from "../../../interfaces/i-aws-saml-authentication-service";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
-import { AwsIamRoleFederatedSession } from "../../../models/aws-iam-role-federated-session";
+import { AwsIamRoleFederatedSession } from "../../../models/aws/aws-iam-role-federated-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
@@ -11,8 +11,8 @@ import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
-import { AwsIamUserSession } from "../../../models/aws-iam-user-session";
 import { LoggedException, LogLevel } from "../../log-service";
+import { STS } from "aws-sdk";
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
@@ -29,12 +29,9 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   static sessionTokenFromGetSessionTokenResponse(assumeRoleResponse: Aws.STS.AssumeRoleWithSAMLResponse): { sessionToken: any } {
     return {
       sessionToken: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        aws_access_key_id: assumeRoleResponse.Credentials.AccessKeyId.trim(),
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        aws_secret_access_key: assumeRoleResponse.Credentials.SecretAccessKey.trim(),
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        aws_session_token: assumeRoleResponse.Credentials.SessionToken.trim(),
+        ["aws_access_key_id"]: assumeRoleResponse.Credentials.AccessKeyId.trim(),
+        ["aws_secret_access_key"]: assumeRoleResponse.Credentials.SecretAccessKey.trim(),
+        ["aws_session_token"]: assumeRoleResponse.Credentials.SessionToken.trim(),
       },
     };
   }
@@ -58,12 +55,9 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     const profileName = this.repository.getProfileName((session as AwsIamRoleFederatedSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      aws_session_token: credentialsInfo.sessionToken.aws_session_token,
+      ["aws_access_key_id"]: credentialsInfo.sessionToken.aws_access_key_id,
+      ["aws_secret_access_key"]: credentialsInfo.sessionToken.aws_secret_access_key,
+      ["aws_session_token"]: credentialsInfo.sessionToken.aws_session_token,
       region: session.region,
     };
     return await this.fileService.iniWriteSync(this.awsCoreService.awsCredentialPath(), credentialObject);
@@ -94,40 +88,24 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       needToAuthenticate = await this.awsAuthenticationService.needAuthentication(idpUrl);
     } catch (err) {
       throw new LoggedException(err.message, this, LogLevel.warn);
-    } finally {
-      // await this.awsAuthenticationService.closeAuthenticationWindow();
     }
 
     // AwsSignIn: retrieve the response hook
-    let samlResponse;
-    try {
-      samlResponse = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
-    } finally {
-      // await this.awsAuthenticationService.closeAuthenticationWindow();
-    }
+    const samlResponse = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
 
     // Setup STS to generate the credentials
     const sts = new Aws.STS(this.awsCoreService.stsOptions(session));
 
     // Params for the calls
     const params = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      PrincipalArn: (session as AwsIamRoleFederatedSession).idpArn,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      RoleArn: (session as AwsIamRoleFederatedSession).roleArn,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      SAMLAssertion: samlResponse,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      DurationSeconds: this.samlRoleSessionDuration,
+      ["PrincipalArn"]: (session as AwsIamRoleFederatedSession).idpArn,
+      ["RoleArn"]: (session as AwsIamRoleFederatedSession).roleArn,
+      ["SAMLAssertion"]: samlResponse,
+      ["DurationSeconds"]: this.samlRoleSessionDuration,
     };
 
     // Invoke assumeRoleWithSAML
-    let assumeRoleWithSamlResponse: Aws.STS.AssumeRoleWithSAMLResponse;
-    try {
-      assumeRoleWithSamlResponse = await sts.assumeRoleWithSAML(params).promise();
-    } catch (err) {
-      throw new LoggedException(err.message, this, LogLevel.warn);
-    }
+    const assumeRoleWithSamlResponse = await this.assumeRoleWithSAML(sts, params);
 
     // Save session token expiration
     this.saveSessionTokenExpirationInTheSession(session, assumeRoleWithSamlResponse.Credentials);
@@ -158,13 +136,24 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
 
   removeSecrets(_: string): void {}
 
+  private async assumeRoleWithSAML(
+    sts: STS,
+    params: { ["SAMLAssertion"]: string; ["PrincipalArn"]: string; ["DurationSeconds"]: number; ["RoleArn"]: string }
+  ): Promise<STS.Types.AssumeRoleWithSAMLResponse> {
+    try {
+      return await sts.assumeRoleWithSAML(params).promise();
+    } catch (err) {
+      throw new LoggedException(err.message, this, LogLevel.warn);
+    }
+  }
+
   private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
     const sessions = this.repository.getSessions();
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];
 
     if (credentials !== undefined) {
-      (currentSession as AwsIamUserSession).sessionTokenExpiration = credentials.Expiration.toISOString();
+      currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 
     sessions[index] = currentSession;

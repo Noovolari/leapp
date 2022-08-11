@@ -28,19 +28,24 @@
     "eslint-plugin-prettier": "^4.0.0",
     "gushio": "~0.7.0",
     "husky": "^7.0.0",
-    "lerna": "^4.0.0",
     "lint-staged": "12.3.5",
     "prettier": "^2.5.1",
     "typescript": "4.5.5"
   },
   "scripts": {
-    "setup": "npm install && gushio gushio/setup-package.js core cli desktop-app",
-    "bootstrap": "npm install && lerna bootstrap",
+    "set-pro-environment": "npm install && gushio gushio/set-pro-environment.js",
+    "set-dev-environment": "npm install && gushio gushio/set-dev-environment.js",
+    "bootstrap": "npm install && gushio gushio/bootstrap.js core cli desktop-app",
+    "clean-and-bootstrap": "npm install && gushio gushio/clean-and-bootstrap.js core cli desktop-app",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "leapp-release": "gushio gushio/release.js"
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"
+  },
+  "dependencies": {
+    "tsoa": "^4.1.0"
   }
 }

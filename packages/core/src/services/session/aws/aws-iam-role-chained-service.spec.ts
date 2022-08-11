@@ -1,7 +1,11 @@
 import { describe, test, expect, beforeEach, jest } from "@jest/globals";
-import { AwsIamRoleChainedSession } from "../../../models/aws-iam-role-chained-session";
+import { AwsIamRoleChainedSession } from "../../../models/aws/aws-iam-role-chained-session";
 import { AwsIamRoleChainedService } from "./aws-iam-role-chained-service";
 import { SessionType } from "../../../models/session-type";
+import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
+import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
+import { constants } from "../../../models/constants";
+import * as AWS from "aws-sdk";
 
 describe("AwsIamRoleChainedService", () => {
   let sessionNotifier;
@@ -141,6 +145,13 @@ describe("AwsIamRoleChainedService", () => {
     expect(fileService.replaceWriteSync).toHaveBeenCalledWith("aws-path", {});
   });
 
+  test("generateCredentialsProxy", async () => {
+    const awsIamRoleChainedService = new AwsIamRoleChainedService(null, null, null, null, null, null);
+    jest.spyOn(awsIamRoleChainedService, "generateCredentials").mockImplementation(jest.fn());
+    await awsIamRoleChainedService.generateCredentialsProxy("fake-session-id");
+    expect(awsIamRoleChainedService.generateCredentials).toHaveBeenCalledWith("fake-session-id");
+  });
+
   test("generateCredentials - generate a credential set", async () => {
     const awsIamRoleChainedService = new AwsIamRoleChainedService(
       sessionNotifier,
@@ -158,6 +169,65 @@ describe("AwsIamRoleChainedService", () => {
     expect(repository.getSessionById).toHaveBeenCalledWith("sessionP");
 
     expect(generateSessionToken).toHaveBeenCalled();
+  });
+
+  test("generateCredentials - RoleSessionName undefined", async () => {
+    const session2 = { sessionId: "fake-session-id", roleArn: "arn" };
+    const repository2 = {
+      getSessionById: () => session2,
+    } as any;
+    const awsIamRoleChainedService = new AwsIamRoleChainedService(
+      sessionNotifier,
+      repository2,
+      awsCoreService,
+      fileService,
+      null,
+      parentSessionServiceFactory
+    );
+    (awsIamRoleChainedService as any).generateSessionToken = jest.fn();
+    await awsIamRoleChainedService.generateCredentials("fake-session-id");
+    const sts = new AWS.STS();
+    (sts as any)._clientId = 2;
+    expect((awsIamRoleChainedService as any).generateSessionToken.mock.calls[0][2]).toEqual({
+      ["RoleSessionName"]: constants.roleSessionName,
+      ["RoleArn"]: session2.roleArn,
+    });
+  });
+
+  test("generateCredentials - throws an error", async () => {
+    const sessionId = "fake-session-id";
+    const session2 = { sessionName: "fake-session-name", parentSessionId: "throw-exeption" };
+    const repository2 = {
+      getSessionById: jest.fn((_sessionId) => {
+        if (_sessionId === "throw-exeption") {
+          throw new Error("Error");
+        } else {
+          return session2;
+        }
+      }),
+    } as any;
+    const awsIamRoleChainedService = new AwsIamRoleChainedService(null, repository2, null, null, null, null);
+    try {
+      await awsIamRoleChainedService.generateCredentials(sessionId);
+    } catch (err) {
+      expect(err).toEqual(new LeappNotFoundError(this, `Parent Account Session  not found for Chained Account ${session2.sessionName}`));
+    }
+  });
+
+  test("validateCredentials", async () => {
+    const session2 = {
+      sessionId: "1",
+      type: SessionType.awsIamRoleChained,
+      roleArn: "abcdefghijklmnopqrstuvwxyz/12345",
+    } as any;
+    const awsIamRoleChainedService = new AwsIamRoleChainedService(null, null, null, null, null, null);
+    jest.spyOn(awsIamRoleChainedService, "generateCredentials").mockImplementation(() => Promise.resolve({} as any));
+    let result = await awsIamRoleChainedService.validateCredentials(session2.sessionId);
+    expect(result).toBeTruthy();
+
+    jest.spyOn(awsIamRoleChainedService, "generateCredentials").mockImplementation(() => Promise.reject({} as any));
+    result = await awsIamRoleChainedService.validateCredentials(session2.sessionId);
+    expect(result).not.toBeTruthy();
   });
 
   test("removeSecret - exists", () => {
@@ -213,7 +283,21 @@ describe("AwsIamRoleChainedService", () => {
     expect(stsMock.assumeRole).toHaveBeenCalled();
   });
 
-  test("saveSessionTokenExpirationInTheSession - save a new token expiration in a specified session", async () => {
+  test("generateSessionToken - throws error", async () => {
+    const sts = {
+      assumeRole: () => {
+        throw new Error({ message: "Error" } as any);
+      },
+    };
+    const awsIamRoleChainedService = new AwsIamRoleChainedService(null, null, null, null, null, null);
+    try {
+      await (awsIamRoleChainedService as any).generateSessionToken("fake-session", sts, "fake-params");
+    } catch (err) {
+      expect(err).toStrictEqual(new LeappAwsStsError(this, err.message));
+    }
+  });
+
+  test("saveSessionTokenExpirationInTheSession - save a new token expiration in a specified session, with and without credentials", async () => {
     const awsIamRoleChainedService = new AwsIamRoleChainedService(
       sessionNotifier,
       repository,
@@ -223,12 +307,18 @@ describe("AwsIamRoleChainedService", () => {
       parentSessionServiceFactory
     );
 
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    await (awsIamRoleChainedService as any).saveSessionTokenExpirationInTheSession(session, { Expiration: new Date() });
+    await (awsIamRoleChainedService as any).saveSessionTokenExpirationInTheSession(session, undefined);
+    expect(session.sessionTokenExpiration).toBe(undefined);
+
+    await (awsIamRoleChainedService as any).saveSessionTokenExpirationInTheSession(session, { ["Expiration"]: new Date() });
 
     expect(session.sessionTokenExpiration).not.toBe(undefined);
     expect(repository.getSessions).toHaveBeenCalled();
     expect(repository.updateSessions).toHaveBeenCalledWith([session]);
     expect(sessionNotifier.setSessions).toHaveBeenCalledWith([session]);
+
+    jest.spyOn(awsIamRoleChainedService as any, "removeSecrets");
+    awsIamRoleChainedService.removeSecrets("");
+    expect(awsIamRoleChainedService.removeSecrets).toHaveBeenCalled();
   });
 });

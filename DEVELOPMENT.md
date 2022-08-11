@@ -3,7 +3,7 @@ If you want to start a code contribution to Leapp, whether it is a bug fix or a 
 
 # Project Structure
 
-Leapp project is structured as a monorepo architecture with [Lerna](https://github.com/lerna/lerna).
+Leapp project is structured as a monorepo architecture.
 
 | package       | folder         |
 |---------------|----------------|
@@ -59,7 +59,7 @@ If it is the first time you fork a repository from the GitHub console, please re
 
 [This](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/syncing-a-fork) guide explains you how to keep your local branch up-to-date with the upstream one.
 
-## Install dependencies
+## Install dependencies and build packages
 
 At a first glance, you can see that Leapp consists of a monorepo structure that contains **Leapp Core**, **Leapp Desktop App**,
 and **Leapp CLI**.
@@ -72,36 +72,58 @@ Inside the project root folder, run
 nvm use
 ```
 
-to set the Node.js version to the one specified in the _.nvmrc_; then, from the root folder, run
+to set the Node.js version to the one specified in the _.nvmrc_. 
+
+Before setting up Core, CLI, and Desktop App packages, run the following command from the root folder:
 
 ```bash
-npm run setup
+npm install
 ```
 
-The _setup_ script:
- * installs _node_modules_ dependencies specified in the root package.json
- * for each package
-   * cleans all _node_modules_ directories and _package-lock.json_ files
-   * runs the *clean* script (removing other dev temporary directories)
-   * installs _node_modules_ dependencies
+which installs _node_modules_ dependencies specified in the root package.json.
 
-A _setup_ script is also available for every package, with a scope limited to the single package.
+From the root folder, run
 
-Setup script and other scripts in Leapp are powered by [Gushio](https://github.com/Forge-Srl/gushio).
+```bash
+npm run set-dev-environment
+```
+
+This command is necessary to make both Desktop App and CLI depend on the local Core package, 
+not the one published on npm. This saves a lot of time when new features need to be 
+implemented in the Core package.
+
+At this point, run the following command to setup the entire project:
+
+```bash
+npm run clean-and-bootstrap
+```
+
+This _clean-and-bootstrap_ script takes as input one or more of the following packages: _core_, _cli_, or _desktop-app_.
+
+For each of the packages, it:
+* removes the _node_modules_ directory;
+* removes the package-lock.json file;
+* invokes ```npm run clean``` command that cleans additional directories in the specific package;
+* invokes _bootstrap.js_ script passing the package name as input.
+
+The _bootstrap.js_ script does two things:
+* runs ```npm install``` for the given input package;
+* if the input package is the Core, it runs ```npm run build```.
+
+_clean-and-bootstrap_ script, _bootstrap_ script, and other ones are powered by [Gushio](https://github.com/Forge-Srl/gushio).
 
 > Gushio* is built on top of battle-tested libraries like commander and shelljs and allows you to write a multiplatform shell script in a single JavaScript file without having to worry about package.json and dependencies installation.
 
-To build Leapp Core there is a script called _build_ available in _packages/core/package.json_.
-
-```bash
-npm run build
-```
+Once the entire solution is set up and the Core is built, you can focus on building the clients,
+i.e. the CLI and the Desktop App.
 
 To build Leapp CLI a script called _prepack_ in _packages/cli/package.json_ can be called.
 
 ```bash
 npm run prepack
 ```
+
+To test the CLI locally, execute the _packages/cli/bin/run_ script.
 
 To build and run Leapp Desktop App in the development environment, there is a specific script - called _build-and-run-dev_ -
 available in Leapp Desktop App's _package.json_.
@@ -129,8 +151,6 @@ To install the AWS SSM agent locally, follow [this](https://docs.leapp.cloud/lat
 ## Azure CLI
 
 [Here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli) you can find the official installation guide.
-
-
 
 ## Core
 

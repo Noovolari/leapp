@@ -10,7 +10,10 @@
 
     <div class="strategy-list">
       <button type="button" class="providers" (click)="setProvider(eSessionType.awsIamRoleFederated);"><img src="./assets/images/aws{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" width="36" alt=""> Amazon AWS</button>
+
+      <!-- Removed because now Azure sessions are automatically retrieved from integration
       <button type="button" class="providers" (click)="setProvider(eSessionType.azure);"><img src="./assets/images/azure-logo.svg" width="36" alt=""> Microsoft Azure</button>
+      -->
 
       <button type="button" class="providers disabled" (click)="false; //setProvider(eSessionType.google);"><img src="./assets/images/google.png" width="36" alt=""> Google Cloud</button>
       <button type="button" class="providers disabled" (click)="false; //setProvider(eSessionType.alibaba);"><img src="./assets/images/alibaba.png" width="36" alt=""> Alibaba Cloud</button>

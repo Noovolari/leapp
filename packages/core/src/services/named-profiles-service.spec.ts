@@ -2,8 +2,9 @@ import { expect, describe, test, jest } from "@jest/globals";
 import { NamedProfilesService } from "./named-profiles-service";
 import { SessionStatus } from "../models/session-status";
 import { constants } from "../models/constants";
-import { AwsNamedProfile } from "../models/aws-named-profile";
+import { AwsNamedProfile } from "../models/aws/aws-named-profile";
 import { AwsSessionService } from "./session/aws/aws-session-service";
+import { LoggedException, LogLevel } from "./log-service";
 
 describe("NamedProfilesService", () => {
   test("getNamedProfiles", () => {
@@ -281,5 +282,53 @@ describe("NamedProfilesService", () => {
     const existentNewProfileName = namedProfileService.validateNewProfileName("profile");
 
     expect(existentNewProfileName).toBe("Profile already exists");
+  });
+
+  test("getProfileName", () => {
+    const profiles = [
+      { id: "1", name: "10" },
+      { id: "2", name: "20" },
+      { id: "3", name: "30" },
+    ];
+    const repository = {
+      getProfileName: jest.fn((_id) => {
+        const name = profiles.find((p) => p.id === _id)?.name;
+        if (name) {
+          return name;
+        } else {
+          throw new LoggedException(`named profile with id ${_id} not found.`, this, LogLevel.warn);
+        }
+      }),
+    } as any;
+    const namedProfileService = new NamedProfilesService(null, repository, null);
+    expect(namedProfileService.getProfileName("1")).toBe("10");
+    expect(namedProfileService.getProfileName("2")).toBe("20");
+    expect(namedProfileService.getProfileName("3")).toBe("30");
+    expect(() => namedProfileService.getProfileName("4")).toThrow(new LoggedException(`named profile with id 4 not found.`, this, LogLevel.warn));
+    expect(repository.getProfileName).toHaveBeenCalled();
+  });
+
+  test("getDefaultProfileId", () => {
+    const profiles = [
+      { id: "1", name: "10" },
+      { id: "2", name: "default" },
+      { id: "3", name: "30" },
+    ];
+    const repository = {
+      getDefaultProfileId: jest.fn(() => {
+        const name = profiles.find((p) => p.name === "default")?.id;
+        if (name) {
+          return name;
+        } else {
+          throw new LoggedException(`no default named profile found.`, this, LogLevel.warn);
+        }
+      }),
+    } as any;
+    const namedProfileService = new NamedProfilesService(null, repository, null);
+    expect(namedProfileService.getDefaultProfileId()).toBe("2");
+
+    profiles.splice(1, 1);
+    expect(() => namedProfileService.getDefaultProfileId()).toThrow(new LoggedException(`no default named profile found.`, this, LogLevel.warn));
+    expect(repository.getDefaultProfileId).toHaveBeenCalled();
   });
 });

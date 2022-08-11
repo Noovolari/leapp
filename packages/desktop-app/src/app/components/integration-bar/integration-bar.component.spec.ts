@@ -5,7 +5,7 @@ import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from "@angular/material/snack-bar"
 import { mustInjected } from "../../../base-injectables";
 import { RouterTestingModule } from "@angular/router/testing";
 import { AppProviderService } from "../../services/app-provider.service";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws-sso-integration";
+import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 
 describe("IntegrationBarComponent", () => {
   let component: IntegrationBarComponent;
@@ -17,6 +17,8 @@ describe("IntegrationBarComponent", () => {
       getSessions: [],
       getSegments: [],
       listAwsSsoIntegrations: [],
+      listAzureIntegrations: [],
+      getDefaultLocation: () => "defaultLocation",
     });
     const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       integrations: [],
@@ -24,12 +26,13 @@ describe("IntegrationBarComponent", () => {
       setIntegrations: (_awsSsoIntegrations: AwsSsoIntegration[]) => void {},
       getIntegrations: () => [],
     });
-    const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
+    const spyLeappCoreService = jasmine.createSpyObj("AppProviderService", [], {
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => ["mocked-region-1", "mocked-region-2"] },
       awsSsoOidcService: { listeners: [] },
       behaviouralSubjectService: spyBehaviouralSubjectService,
       awsSsoIntegrationService: { getIntegrations: () => [] },
+      azureIntegrationService: { getIntegrations: () => [] },
     });
 
     TestBed.configureTestingModule({

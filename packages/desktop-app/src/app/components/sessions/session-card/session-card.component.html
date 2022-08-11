@@ -63,17 +63,19 @@
     </button>
   </ng-container>
 
-  <div class="divider"></div>
+  <div class="divider" *ngIf="session.type !== eSessionType.azure"></div>
 
-  <button mat-menu-item [matMenuTriggerFor]="change">
+  <button mat-menu-item [matMenuTriggerFor]="change" *ngIf="session.type !== eSessionType.azure">
     <i class="moon-Star"></i>
     <span>&nbsp;&nbsp;Change</span>
   </button>
 
-  <button mat-menu-item (click)="ssmModalOpen($event);">
-    <i class="moon-Server"></i>&nbsp;
-    <span>View SSM Sessions</span>
-  </button>
+  <ng-container *ngIf="session.type !== eSessionType.azure">
+    <button mat-menu-item (click)="ssmModalOpen($event);">
+      <i class="moon-Server"></i>&nbsp;
+      <span>View SSM Sessions</span>
+    </button>
+  </ng-container>
 
   <ng-container *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained">
     <button mat-menu-item (click)="openAwsWebConsole($event);">
@@ -92,7 +94,7 @@
     <div class="divider"></div>
   </ng-container>
 
-  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type !== eSessionType.awsSsoRole">
+  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type !== eSessionType.awsSsoRole && session.type !== eSessionType.azure">
     <i class="moon-Edit"></i>&nbsp;
     <span>Edit Session</span>
   </button>
@@ -111,11 +113,19 @@
     </button>
   </ng-container>
 
-  <ng-container *ngIf="session.type !== eSessionType.awsSsoRole">
+  <ng-container *ngIf="session.type !== eSessionType.awsSsoRole && session.type !== eSessionType.azure">
     <button mat-menu-item (click)="deleteSession(session, $event);">
       <i class="moon-Delete"></i>&nbsp;
       <span>Delete Session</span>
     </button>
+  </ng-container>
+
+  <ng-container *ngIf="!eConstants.disablePluginSystem && appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session).length > 0">
+    <div class="divider"></div>
+    <!--<button mat-menu-item [matMenuTriggerFor]="pluginList">
+      <i class="moon-Puzzle"></i>
+      <span>&nbsp;&nbsp;Plugins</span>
+    </button>----->
   </ng-container>
 
 </mat-menu>
@@ -140,6 +150,21 @@
     <i class="fab fa-aws"></i>&nbsp;
     <span>Role ARN</span>
   </button>
+  <button mat-menu-item (click)="copyAwsWebConsoleUrl($event);">
+    <i class="fab fa-aws"></i>&nbsp;
+    <span>Web Console URL</span>
+  </button>
+</mat-menu>
+
+<mat-menu #pluginList *ngIf="!eConstants.disablePluginSystem">
+  <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session)">
+    <ng-container>
+      <button mat-menu-item (click)="applyPluginAction($event, plugin);">
+        <i class="{{plugin.metadata.icon}}"></i>
+        <span>&nbsp;&nbsp;{{plugin.metadata.uniqueName}}</span>
+      </button>
+    </ng-container>
+  </ng-container>
 </mat-menu>
 
 <ng-container *ngIf="eOptionIds[session.sessionId]">
@@ -156,7 +181,7 @@
             <i class="moon-Open-Web-Console"></i>
           </a>
         </ng-container>
-        <a class="icon-button" (click)="changeRegionModalOpen($event);" matTooltip="Change Region"><i class="moon-Region"></i></a>
+        <a class="icon-button" *ngIf="session.type !== eSessionType.azure" (click)="changeRegionModalOpen($event);" matTooltip="Change Region"><i class="moon-Region"></i></a>
         <a class="icon-button" *ngIf="session.type !== eSessionType.azure" (click)="changeProfileModalOpen($event);" matTooltip="Change Named Profile"><i class="moon-User"></i></a>
         <a class="icon-button" (click)="ssmModalOpen($event);" *ngIf="session.type !== eSessionType.azure" matTooltip="View SSM sessions"><i class="moon-Server"></i></a>
         <a class="icon-button" *ngIf="session.type === eSessionType.awsIamUser || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained" (click)="editSession(session, $event);" matTooltip="Edit Session"><i class="moon-Edit"></i></a>
@@ -166,7 +191,7 @@
       <div class="opt-bar-middle-right-buttons">
         <a class="icon-button" (click)="pinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) === -1" matTooltip="Pin Session"><i class="moon-Pin"></i></a>
         <a class="icon-button" (click)="unpinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1" matTooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
-        <ng-container *ngIf="session.type !== eSessionType.awsSsoRole">
+        <ng-container *ngIf="session.type !== eSessionType.awsSsoRole && session.type !== eSessionType.azure">
         <a class="icon-button" (click)="deleteSession(session, $event);" matTooltip="Delete Session"><i class="moon-Delete"></i></a>
         </ng-container>
       </div>

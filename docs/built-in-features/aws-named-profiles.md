@@ -1,10 +1,10 @@
-With Leapp you can group and activate more than one credential set at a time through [Named Profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
+With Leapp you can group and activate more than one credential set at a time through [Named Profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html){: target='_blank'}.
 
 ## Named Profiles
 
 Named Profiles are used by AWS to maintain more than one set of active credentials for you to use with AWS-CLI, SDK, or other third-party tools. Named profiles are stored in *~/.aws/credentials* file in the **ini** file format.
 
-Named Profiles have a default profile which is the one you get from [aws configure](https://docs.aws.amazon.com/cli/latest/reference/configure/) command.
+Named Profiles have a default profile which is the one you get from [aws configure](https://docs.aws.amazon.com/cli/latest/reference/configure/){: target='_blank'} command.
 
 ## Create a new Named Profile
 

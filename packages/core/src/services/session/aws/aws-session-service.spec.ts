@@ -1,5 +1,5 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { AwsProcessCredentials } from "../../../models/aws-process-credential";
+import { AwsProcessCredentials } from "../../../models/aws/aws-process-credential";
 import { SessionType } from "../../../models/session-type";
 import { AwsSessionService } from "./aws-session-service";
 import { CredentialsInfo } from "../../../models/credentials-info";
@@ -76,9 +76,6 @@ describe("AwsSessionService", () => {
 
   test("start - will start your session", async () => {
     const repository = {
-      listIamRoleChained: jest.fn(() => ["session1", "session2"]),
-      getSessionById: jest.fn(() => "session1"),
-      getSessions: jest.fn(() => []),
       getWorkspace: jest.fn(() => ({ credentialMethod: constants.credentialFile })),
     } as any;
     const sessionNotifier = {} as any;
@@ -86,7 +83,7 @@ describe("AwsSessionService", () => {
     const isThereAnotherPendingSessionWithSameNameProfile = jest.fn((_: string) => false);
     const stopAllWithSameNameProfile = jest.fn((_: string): void => {});
     const sessionLoading = jest.fn((_: string): void => {});
-    const sessionActivate = jest.fn((_: string): void => {});
+    const sessionActivated = jest.fn((_: string): void => {});
     const generateCredentials = jest.fn((_: string): Promise<CredentialsInfo> => Promise.resolve(credentialsInfo));
     const applyCredentials = jest.fn((_: string, __: CredentialsInfo): void => {});
     const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
@@ -94,16 +91,30 @@ describe("AwsSessionService", () => {
     (awsSessionService as any).stopAllWithSameNameProfile = stopAllWithSameNameProfile;
     (awsSessionService as any).generateCredentials = generateCredentials;
     (awsSessionService as any).sessionLoading = sessionLoading;
-    (awsSessionService as any).sessionActivate = sessionActivate;
+    (awsSessionService as any).sessionActivated = sessionActivated;
     (awsSessionService as any).applyCredentials = applyCredentials;
     await awsSessionService.start("sessionId");
 
     expect(isThereAnotherPendingSessionWithSameNameProfile).toHaveBeenCalledWith("sessionId");
     expect(stopAllWithSameNameProfile).toHaveBeenCalledWith("sessionId");
     expect(sessionLoading).toHaveBeenCalledWith("sessionId");
-    expect(sessionActivate).toHaveBeenCalledWith("sessionId");
+    expect(sessionActivated).toHaveBeenCalledWith("sessionId");
     expect(generateCredentials).toHaveBeenCalledWith("sessionId");
     expect(applyCredentials).toHaveBeenCalledWith("sessionId", credentialsInfo);
+  });
+
+  test("start - using credentialProcess", async () => {
+    const repository = {
+      getWorkspace: () => ({ credentialMethod: constants.credentialProcess }),
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository);
+    awsSessionService.isThereAnotherPendingSessionWithSameNamedProfile = () => false;
+    awsSessionService.stopAllWithSameNameProfile = async () => {};
+    awsSessionService.sessionLoading = () => {};
+    awsSessionService.sessionActivated = () => {};
+    awsSessionService.applyConfigProfileCommand = jest.fn(async () => {});
+    await awsSessionService.start("fake-session-id");
+    expect(await awsSessionService.applyConfigProfileCommand).toHaveBeenCalledWith("fake-session-id");
   });
 
   test("rotate - apply rotation by generating a new set of credentials", async () => {
@@ -116,20 +127,49 @@ describe("AwsSessionService", () => {
     const sessionNotifier = {} as any;
     const credentialsInfo = {} as any;
     const sessionLoading = jest.fn((_: string): void => {});
-    const sessionRotated = jest.fn((_: string): void => {});
+    const sessionActivated = jest.fn((_: string): void => {});
     const generateCredentials = jest.fn((_: string): Promise<CredentialsInfo> => Promise.resolve(credentialsInfo));
     const applyCredentials = jest.fn((_: string, __: CredentialsInfo): void => {});
     const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
     (awsSessionService as any).generateCredentials = generateCredentials;
     (awsSessionService as any).sessionLoading = sessionLoading;
-    (awsSessionService as any).sessionRotated = sessionRotated;
+    (awsSessionService as any).sessionActivated = sessionActivated;
     (awsSessionService as any).applyCredentials = applyCredentials;
     await awsSessionService.rotate("sessionId");
 
     expect(sessionLoading).toHaveBeenCalledWith("sessionId");
-    expect(sessionRotated).toHaveBeenCalledWith("sessionId");
+    expect(sessionActivated).toHaveBeenCalledWith("sessionId");
     expect(generateCredentials).toHaveBeenCalledWith("sessionId");
     expect(applyCredentials).toHaveBeenCalledWith("sessionId", credentialsInfo);
+  });
+
+  test("rotate - in credential process mode, rotation is not used", async () => {
+    const repository = {
+      getWorkspace: jest.fn(() => ({ credentialMethod: constants.credentialProcess })),
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository);
+    awsSessionService.sessionLoading = jest.fn();
+    awsSessionService.applyCredentials = jest.fn();
+    awsSessionService.sessionActivated = jest.fn();
+    await awsSessionService.rotate("fake-session-id");
+    expect(awsSessionService.sessionLoading).not.toHaveBeenCalled();
+    expect(awsSessionService.applyCredentials).not.toHaveBeenCalled();
+    expect(awsSessionService.sessionActivated).not.toHaveBeenCalled();
+  });
+
+  test("rotate - throw and catch error", async () => {
+    const repository = {
+      getWorkspace: jest.fn(() => ({ credentialMethod: constants.credentialFile })),
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository);
+    awsSessionService.applyCredentials = () => {};
+    awsSessionService.sessionActivated = () => {};
+    awsSessionService.sessionLoading = () => {
+      throw new Error("Error");
+    };
+    awsSessionService.sessionError = jest.fn();
+    await awsSessionService.rotate("fake-session-id");
+    expect(awsSessionService.sessionError).toHaveBeenCalled();
   });
 
   test("stop - stop an active session", async () => {
@@ -149,6 +189,33 @@ describe("AwsSessionService", () => {
 
     expect(sessionDeactivated).toHaveBeenCalledWith("sessionId");
     expect(deApplyCredentials).toHaveBeenCalledWith("sessionId");
+  });
+
+  test("stop - credential process method", async () => {
+    const repository = {
+      getWorkspace: jest.fn(() => ({ credentialMethod: constants.credentialProcess })),
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository);
+    awsSessionService.deApplyConfigProfileCommand = jest.fn();
+    awsSessionService.sessionDeactivated = jest.fn();
+    await awsSessionService.stop("fake-session-id");
+    expect(awsSessionService.deApplyConfigProfileCommand).toHaveBeenCalledWith("fake-session-id");
+    expect(awsSessionService.sessionDeactivated).toHaveBeenCalledWith("fake-session-id");
+  });
+
+  test("stop - throw and catch error", async () => {
+    const repository = {
+      getWorkspace: jest.fn(() => ({ credentialMethod: constants.credentialFile })),
+    } as any;
+    const expectedError = new Error("Error");
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository);
+    awsSessionService.deApplyCredentials = () => {};
+    awsSessionService.sessionDeactivated = () => {
+      throw expectedError;
+    };
+    awsSessionService.sessionError = jest.fn();
+    await awsSessionService.stop("fake-session-id");
+    expect(awsSessionService.sessionError).toHaveBeenCalledWith("fake-session-id", expectedError);
   });
 
   test("delete - delete an active session", async () => {
@@ -180,6 +247,38 @@ describe("AwsSessionService", () => {
     expect(getDependantSessions).toHaveBeenCalledWith("sessionId");
     expect(stop).toHaveBeenCalledWith("sessionId");
     expect(stop).toHaveBeenCalledWith("1d");
+  });
+
+  test("delete - throw and catch error", async () => {
+    const expectedError = new Error("Error");
+    const repository = {
+      getSessionById: () => ({
+        status: SessionStatus.inactive,
+      }),
+      deleteSession: () => {
+        throw expectedError;
+      },
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository);
+    awsSessionService.getDependantSessions = () => [];
+    awsSessionService.sessionError = jest.fn();
+    await awsSessionService.delete("fake-session-id");
+    expect(awsSessionService.sessionError).toHaveBeenCalledWith("fake-session-id", expectedError);
+  });
+
+  test("delete - no dependante active sessions to be stop", async () => {
+    const repository = {
+      getSessionById: () => ({
+        status: SessionStatus.active,
+      }),
+      deleteSession: () => {},
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository);
+    awsSessionService.stop = jest.fn();
+    awsSessionService.getDependantSessions = () => [{ sessionId: "fake-id", status: SessionStatus.inactive }];
+    awsSessionService.sessionError = jest.fn();
+    await awsSessionService.delete("fake-session-id");
+    expect(awsSessionService.stop).not.toHaveBeenCalledWith("fake-id");
   });
 
   test("generateProcessCredentials - success", async () => {
@@ -225,6 +324,65 @@ describe("AwsSessionService", () => {
     awsSessionService.repository = repository;
 
     await expect(awsSessionService.generateProcessCredentials("sessionId")).rejects.toThrow(new Error("only AWS sessions are supported"));
+  });
+
+  test("applyConfigProfileCommand - success", async () => {
+    const repository = {
+      getSessionById: () => ({ profileId: "fake-profile-id", region: "fake-region" }),
+      getProfileName: () => "fake",
+    } as any;
+    const credentialProcess = { ["profile fake"]: { ["credential_process"]: "leapp session generate fake-session-id", region: "fake-region" } };
+    const fileService = {
+      iniWriteSync: jest.fn(async () => {}),
+    } as any;
+    const fakeConfigPath = "fake-config-path";
+    const awsCoreService = {
+      awsConfigPath: () => fakeConfigPath,
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository, awsCoreService, fileService);
+    await awsSessionService.applyConfigProfileCommand("fake-session-id");
+    expect(fileService.iniWriteSync).toHaveBeenCalledWith(fakeConfigPath, credentialProcess);
+  });
+
+  test("applyConfigProfileCommand - throw and catch error", async () => {
+    const expectedError = new Error("Error");
+    const repository = {
+      getSessionById: () => ({ profileId: "fake-profile-id" }),
+      getProfileName: () => {},
+    } as any;
+    const fileService = {
+      iniWriteSync: () => {
+        throw expectedError;
+      },
+    } as any;
+    const awsCoreService = {
+      awsConfigPath: () => {},
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository, awsCoreService, fileService);
+    awsSessionService.sessionError = jest.fn();
+    await awsSessionService.applyConfigProfileCommand("fake-session-id");
+    expect(awsSessionService.sessionError).toHaveBeenCalledWith("fake-session-id", expectedError);
+  });
+
+  test("deApplyConfigProfileCommand - success", async () => {
+    const repository = {
+      getSessionById: () => ({ profileId: "fake-profile-id" }),
+      getProfileName: () => "fake",
+    } as any;
+    const credentialProcess = { ["profile fake"]: "fake-value" };
+    const fileService = {
+      iniParseSync: jest.fn(async () => credentialProcess),
+      replaceWriteSync: jest.fn(),
+    } as any;
+    const fakeConfigPath = "fake-config-path";
+    const awsCoreService = {
+      awsConfigPath: () => fakeConfigPath,
+    } as any;
+    const awsSessionService: any = new (AwsSessionService as any)(null, repository, awsCoreService, fileService);
+    await awsSessionService.deApplyConfigProfileCommand("fake-session-id");
+    expect(fileService.iniParseSync).toHaveBeenCalledWith(fakeConfigPath);
+    expect(fileService.replaceWriteSync).toHaveBeenCalledWith(fakeConfigPath, credentialProcess);
+    expect(credentialProcess["profile fake"]).toBeUndefined();
   });
 
   test("isThereAnotherPendingSessionWithSameNamedProfile - true if another session with the same name profile is pending", () => {

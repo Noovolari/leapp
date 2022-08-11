@@ -1,13 +1,21 @@
 import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "./log-service";
+import { constants } from "../models/constants";
+import { INativeService } from "../interfaces/i-native-service";
+import { FileService } from "./file-service";
 
 export class SsmService {
   aws;
   ssmClient;
   ec2Client;
 
-  constructor(private logService: LogService, private executeService: ExecuteService) {
+  constructor(
+    private logService: LogService,
+    private executeService: ExecuteService,
+    private nativeService: INativeService,
+    private fileService: FileService
+  ) {
     this.aws = require("aws-sdk");
   }
 
@@ -70,12 +78,26 @@ export class SsmService {
       AWS_SESSION_TOKEN: credentials.sessionToken.aws_session_token,
     };
 
-    this.executeService.openTerminal(`aws ssm start-session --region ${region} --target ${quote}${instanceId}${quote}`, env, macOsTerminalType).then(
-      () => {},
-      (err) => {
-        throw new LoggedException(err.message, this, LogLevel.error);
-      }
-    );
+    if (this.nativeService.process.platform === "darwin") {
+      // Creates the ssm-set-env file for the openTerminal
+      const exportedEnvVars = `export AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN} &&
+          export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY} &&
+          export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}`;
+      this.fileService.writeFileSync(this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, exportedEnvVars);
+    }
+
+    this.executeService
+      .openTerminal(`aws ssm start-session --region ${region} --target ${quote}${instanceId}${quote}`, env, macOsTerminalType)
+      .then(() => {
+        if (this.nativeService.process.platform === "darwin")
+          this.nativeService.rimraf(this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
+      })
+      .catch((err) => {
+        if (this.nativeService.process.platform === "darwin") {
+          this.nativeService.rimraf(this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
+        }
+        this.logService.log(new LoggedException(err.message, this, LogLevel.error, true));
+      });
   }
 
   /**

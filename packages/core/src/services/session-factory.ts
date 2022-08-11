@@ -3,7 +3,7 @@ import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-ser
 import { AwsIamRoleFederatedService } from "./session/aws/aws-iam-role-federated-service";
 import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
 import { AwsSsoRoleService } from "./session/aws/aws-sso-role-service";
-import { AzureService } from "./session/azure/azure-service";
+import { AzureSessionService } from "./session/azure/azure-session-service";
 import { CreateSessionRequest } from "./session/create-session-request";
 import { SessionService } from "./session/session-service";
 
@@ -13,7 +13,7 @@ export class SessionFactory {
     private readonly awsIamRoleFederatedService: AwsIamRoleFederatedService,
     private readonly awsIamRoleChainedService: AwsIamRoleChainedService,
     private readonly awsSsoRoleService: AwsSsoRoleService,
-    private readonly azureService: AzureService
+    private readonly azureSessionService: AzureSessionService
   ) {}
 
   getSessionService(sessionType: SessionType): SessionService {
@@ -27,14 +27,25 @@ export class SessionFactory {
       case SessionType.awsSsoRole:
         return this.awsSsoRoleService;
       case SessionType.azure:
-        return this.azureService;
+        return this.azureSessionService;
       case SessionType.anytype:
-        return this.azureService as SessionService;
+        return this.azureSessionService as SessionService;
     }
   }
 
   async createSession(sessionType: SessionType, sessionRequest: CreateSessionRequest): Promise<void> {
     const sessionService = this.getSessionService(sessionType);
     await sessionService.create(sessionRequest);
+  }
+
+  getCompatibleTypes(sessionType: SessionType): SessionType[] {
+    if (sessionType === SessionType.aws) {
+      return [SessionType.awsIamUser, SessionType.awsIamRoleFederated, SessionType.awsIamRoleChained, SessionType.awsSsoRole];
+    } else if (sessionType === SessionType.anytype) {
+      return [SessionType.azure, SessionType.alibaba, ...this.getCompatibleTypes(SessionType.aws)];
+    } else if (this.getCompatibleTypes(SessionType.anytype).includes(sessionType)) {
+      return [sessionType];
+    }
+    return [];
   }
 }

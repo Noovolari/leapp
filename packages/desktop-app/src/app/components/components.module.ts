@@ -27,6 +27,7 @@ import { CreateDialogComponent } from "./dialogs/create-dialog/create-dialog.com
 import { EditDialogComponent } from "./dialogs/edit-dialog/edit-dialog.component";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatListModule } from "@angular/material/list";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { FilterMenuComponent } from "./filter-menu/filter-menu.component";
@@ -76,6 +77,7 @@ import { CredentialProcessDialogComponent } from "./dialogs/credential-process-d
     MatButtonModule,
     MatMenuModule,
     MatListModule,
+    MatSlideToggleModule,
     MatExpansionModule,
     MatButtonToggleModule,
     MatTooltipModule,

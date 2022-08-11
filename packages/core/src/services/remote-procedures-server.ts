@@ -8,8 +8,14 @@ import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IMfaCodePrompter } from "../interfaces/i-mfa-code-prompter";
 import { IntegrationFactory } from "./integration-factory";
 
-export const arrayToString = (uint8array: Uint8Array) => JSON.stringify([...uint8array.values()]);
-export const stringToArray = (serializedArray: string) => Uint8Array.from(JSON.parse(serializedArray));
+export const uInt8ArrayToArray = (uint8array: Uint8Array): Array<number> => {
+  if (uint8array === null || uint8array === undefined) return null;
+  return [...uint8array.values()];
+};
+export const arrayToUInt8Array = (serializedArray: Array<number>): Buffer => {
+  if (!serializedArray) return null;
+  return Buffer.from(serializedArray);
+};
 
 export interface RpcResponse {
   result?: any;
@@ -145,11 +151,11 @@ export class RemoteProceduresServer {
   private async msalProtectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
     try {
       const protectedData = await this.nativeService.msalEncryptionService.protectData(
-        stringToArray(data.params.dataToEncrypt),
-        stringToArray(data.params.optionalEntropy),
+        arrayToUInt8Array(data.params.dataToEncrypt),
+        arrayToUInt8Array(data.params.optionalEntropy),
         data.params.scope
       );
-      emitFunction(socket, "message", { result: arrayToString(protectedData) });
+      emitFunction(socket, "message", { result: uInt8ArrayToArray(protectedData) });
     } catch (error) {
       emitFunction(socket, "message", { error: error.message });
     }
@@ -158,11 +164,11 @@ export class RemoteProceduresServer {
   private async msalUnprotectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
     try {
       const protectedData = await this.nativeService.msalEncryptionService.unprotectData(
-        stringToArray(data.params.encryptedData),
-        stringToArray(data.params.optionalEntropy),
+        arrayToUInt8Array(data.params.encryptedData),
+        arrayToUInt8Array(data.params.optionalEntropy),
         data.params.scope
       );
-      emitFunction(socket, "message", { result: arrayToString(protectedData) });
+      emitFunction(socket, "message", { result: uInt8ArrayToArray(protectedData) });
     } catch (error) {
       emitFunction(socket, "message", { error: error.message });
     }

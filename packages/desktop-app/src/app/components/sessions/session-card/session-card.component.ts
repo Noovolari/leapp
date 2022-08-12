@@ -145,7 +145,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   async applyPluginAction($event: MouseEvent, plugin: IPlugin): Promise<void> {
-    await plugin.applySessionAction(this.session);
+    await plugin.run(this.session);
     /*if (plugin.templateStructure.output) {
       if (plugin.templateStructure.output.type === TemplateOutputObject.message) {
         this.appProviderService.logService.log(new LoggedEntry(plugin[plugin.templateStructure.output.data](), this, LogLevel.info, true));

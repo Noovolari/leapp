@@ -86,15 +86,12 @@ export class PluginManagerService {
             const pluginModule = this._requireModule(pluginFilePath + "/plugin.js");
             this.logService.log(new LoggedEntry(`loading ${pluginName} plugin`, this, LogLevel.info, false));
 
-            const plugin = new pluginModule[metadata.entryClass]() as IPlugin;
+            const plugin = new pluginModule[metadata.entryClass](this.pluginEnvironment, this.sessionFactory) as IPlugin;
             (plugin as any).metadata = metadata;
             if (!this.repository.getPluginStatus(plugin.metadata.uniqueName)) {
               this.repository.createPluginStatus(plugin.metadata.uniqueName);
             }
             this._plugins.push(plugin);
-            if (plugin.metadata.active) {
-              await plugin.bootstrap(this.pluginEnvironment);
-            }
           }
         } catch (error) {
           this.logService.log(new LoggedException(`error loading plugin ${pluginName}: ${error.message}`, this, LogLevel.error, true));

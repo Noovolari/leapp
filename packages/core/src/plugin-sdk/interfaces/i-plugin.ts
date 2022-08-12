@@ -37,13 +37,13 @@ export interface IPluginMetadata {
   url: string;
   keywords: string[];
   active: boolean;
-  entryClass: string;
   icon: string;
   supportedOS: OperatingSystem[];
   supportedSessions?: SessionType[];
 }
 
 export interface IPlugin {
+  readonly pluginType: string;
   readonly metadata: IPluginMetadata;
   run: (session: Session) => Promise<void>;
 }

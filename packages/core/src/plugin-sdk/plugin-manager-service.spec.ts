@@ -20,7 +20,7 @@ describe("PluginManagerService", () => {
     const expectedValue = ["fake-plugin"];
     const pluginManager = new PluginManagerService(null, nativeService, null, null, null, null);
     (pluginManager as any)._plugins = expectedValue;
-    const result = pluginManager.plugins;
+    const result = pluginManager.pluginContainers;
     expect(result).toStrictEqual(expectedValue);
   });
 

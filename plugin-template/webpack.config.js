@@ -1,8 +1,8 @@
 const path = require('path');
 
 module.exports = {
-  mode: 'development',
-  entry: './web-console-plugin.ts',
+  mode: 'none',
+  entry: './plugin-index.ts',
   output: {
     path: path.resolve(__dirname),
     filename: 'plugin.js',

@@ -839,7 +839,6 @@ describe("AwsSsoIntegrationService", () => {
     (awsIntegrationService as any).listAccountRolesCall = {
       callWithThrottle: () => {
         response.nextToken = i === 0 ? "1234abcd" : null;
-        console.log(i, response);
         i++;
         return Promise.resolve(response);
       },

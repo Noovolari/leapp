@@ -1,10 +1,10 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import RunPlugin from "../../plugin-system/run-plugin";
+import RunAwsCredentialPlugin from "./run-aws-credential-plugin";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 
-describe("RunPlugin", () => {
-  const getTestCommand = (cliProviderService: any = null, argv = []): RunPlugin => {
-    const command = new RunPlugin(argv, {} as any);
+describe("RunAwsCredentialPlugin", () => {
+  const getTestCommand = (cliProviderService: any = null, argv = []): RunAwsCredentialPlugin => {
+    const command = new RunAwsCredentialPlugin(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

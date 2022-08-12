@@ -9,7 +9,6 @@
     "list buckets"
   ],
   "leappPlugin": {
-    "entryClass": "WebConsolePlugin",
     "supportedOS": [
       "mac"
     ],

@@ -3,8 +3,16 @@ import { PluginLogLevel } from "@noovolari/leapp-core/plugin-sdk/plugin-environm
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 
 export class WebConsolePlugin extends AwsCredentialsPlugin {
+  get actionName(): string {
+    return "Open web console";
+  }
+
+  get actionIcon(): string {
+    return "fa fa-globe";
+  }
+
   async applySessionAction(session: Session, credentials: any): Promise<void> {
-    this.pluginEnvironment.log("Opening web console for session: " + session.sessionName, PluginLogLevel.info);
+    this.pluginEnvironment.log("Opening web console for session: " + session.sessionName, PluginLogLevel.info, true);
 
     const sessionRegion = session.region;
     const sessionDuration = 3200;
@@ -24,7 +32,7 @@ export class WebConsolePlugin extends AwsCredentialsPlugin {
       throw new Error("Unsupported Region");
     }
 
-    this.pluginEnvironment.log("Starting opening Web Console", PluginLogLevel.info);
+    this.pluginEnvironment.log("Starting opening Web Console", PluginLogLevel.info, true);
 
     const sessionStringJSON = {
       sessionId: credentials.sessionToken.aws_access_key_id,

@@ -149,7 +149,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return { sessionsToDelete, sessionsToAdd };
   }
 
-  async syncSessions(integrationId: string): Promise<SsoSessionsDiff> {
+  async syncSessions(integrationId: string): Promise<any> {
     const sessionsDiff = await this.loginAndGetSessionsDiff(integrationId);
 
     for (const ssoRoleSession of sessionsDiff.sessionsToAdd) {
@@ -162,7 +162,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       await sessionService.delete(ssoSession.sessionId);
     }
 
-    return sessionsDiff;
+    return { sessionsDeleted: sessionsDiff.sessionsToDelete.length, sessionsAdded: sessionsDiff.sessionsToAdd.length };
   }
 
   async logout(integrationId: string): Promise<void> {

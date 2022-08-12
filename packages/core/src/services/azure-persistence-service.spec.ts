@@ -88,7 +88,7 @@ describe("MsalPersistenceService", () => {
 
     const process = { platform: "win32" };
     const msalEncryptionService = {
-      unprotectData: jest.fn((data, optionalEntropy, scope) => {
+      unprotectData: jest.fn(async (data, optionalEntropy, scope) => {
         expect(optionalEntropy).toBe(null);
         expect(scope).toBe(DataProtectionScope.currentUser);
         return data.toString();
@@ -114,10 +114,10 @@ describe("MsalPersistenceService", () => {
     const decompressedFile = zlib.inflateRawSync(compressedFileBuffer).toString("utf8");
 
     const msalEncryptionService = {
-      protectData: jest.fn(() => fs.writeFileSync(customTestPath, compressedFile)),
-      unprotectData: jest.fn(() => decompressedFile),
+      protectData: jest.fn(async () => fs.writeFileSync(customTestPath, compressedFile)),
+      unprotectData: jest.fn(async () => decompressedFile),
     };
-    msalEncryptionService.protectData();
+    await msalEncryptionService.protectData();
 
     const myfs = {
       readFileSync: jest.fn((p: string) => {
@@ -139,10 +139,10 @@ describe("MsalPersistenceService", () => {
 
   test("load - mimic other system", async () => {
     const msalEncryptionService = {
-      protectData: jest.fn(() => {}),
-      unprotectData: jest.fn(() => {}),
+      protectData: jest.fn(async () => {}),
+      unprotectData: jest.fn(async () => {}),
     };
-    msalEncryptionService.protectData();
+    await msalEncryptionService.protectData();
 
     const myfs = {
       readFileSync: jest.fn((p: string) => {
@@ -161,10 +161,10 @@ describe("MsalPersistenceService", () => {
 
   test("load - mimic windows - check extension", async () => {
     const msalEncryptionService = {
-      protectData: jest.fn(() => {}),
-      unprotectData: jest.fn(() => "{}"),
+      protectData: jest.fn(async () => {}),
+      unprotectData: jest.fn(async () => "{}"),
     };
-    msalEncryptionService.protectData();
+    await msalEncryptionService.protectData();
     const mockedFs = {
       readFileSync: jest.fn((p) => {
         expect(p).toMatch(/\.azure[/\\]msal_token_cache\.bin/);

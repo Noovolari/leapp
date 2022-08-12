@@ -39,6 +39,7 @@ export default class OpenWebConsole extends LeappCommand {
   }
 
   async openWebConsole(session: Session, flags: any): Promise<void> {
+    this.unsupportedAzureSession(session);
     const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type) as AwsSessionService;
     const credentials = await sessionService.generateCredentials(session.sessionId);
     if (flags.print) {

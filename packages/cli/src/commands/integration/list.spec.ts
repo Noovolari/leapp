@@ -1,6 +1,7 @@
 import ListIntegrations from "./list";
 import { CliUx } from "@oclif/core";
 import { describe, expect, jest, test } from "@jest/globals";
+import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 
 describe("ListIntegrations", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ListIntegrations => {
@@ -45,19 +46,28 @@ describe("ListIntegrations", () => {
   test("showIntegrations", async () => {
     const integrations = [
       {
-        alias: "integrationName",
+        id: "integration1",
+        type: IntegrationType.awsSso,
+        alias: "ssoIntegrationName",
         portalUrl: "portalUrl",
         region: "region",
-        accessTokenExpiration: "expiration",
-        id: "integrationId",
+        accessTokenExpiration: "expiration1",
         isOnline: true,
+      },
+      {
+        id: "integration2",
+        type: IntegrationType.azure,
+        alias: "azureIntegrationName",
+        tenantId: "tenantId",
+        location: "location",
+        accessTokenExpiration: "expiration2",
+        isOnline: false,
       },
     ];
     const cliProviderService = {
-      awsSsoIntegrationService: {
+      integrationFactory: {
         getIntegrations: () => integrations,
-        isOnline: jest.fn(() => true),
-        remainingHours: jest.fn(() => "remainingHours"),
+        getRemainingHours: jest.fn(() => "remainingHours"),
       },
     };
 
@@ -68,24 +78,35 @@ describe("ListIntegrations", () => {
 
     const expectedData = [
       {
-        integrationId: "integrationId",
-        integrationName: "integrationName",
-        portalUrl: "portalUrl",
+        integrationId: "integration1",
+        integrationType: IntegrationType.awsSso,
+        integrationName: "ssoIntegrationName",
+        urlOrTenant: "portalUrl",
         region: "region",
         status: "Online",
         expirationInHours: "Expiring remainingHours",
       },
+      {
+        integrationId: "integration2",
+        integrationType: IntegrationType.azure,
+        integrationName: "azureIntegrationName",
+        urlOrTenant: "tenantId",
+        region: "location",
+        status: "Offline",
+        expirationInHours: "-",
+      },
     ];
 
     expect(tableSpy.mock.calls[0][0]).toEqual(expectedData);
-
-    expect(cliProviderService.awsSsoIntegrationService.remainingHours).toHaveBeenCalledWith(integrations[0]);
+    expect(cliProviderService.integrationFactory.getRemainingHours).toHaveBeenCalledWith(integrations[0]);
+    expect(cliProviderService.integrationFactory.getRemainingHours).toHaveBeenCalledTimes(1);
 
     const expectedColumns = {
       integrationId: { header: "ID", extended: true },
+      integrationType: { header: "Type" },
       integrationName: { header: "Integration Name" },
-      portalUrl: { header: "Portal URL" },
-      region: { header: "Region" },
+      urlOrTenant: { header: "AWS Portal URL/Azure Tenant ID" },
+      region: { header: "Region/Location" },
       status: { header: "Status" },
       expirationInHours: { header: "Expiration" },
     };

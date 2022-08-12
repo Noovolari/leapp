@@ -47,7 +47,7 @@ describe("LeappCommand", () => {
     const mockedSession = { type: SessionType.azure };
     const leappCommand = new (LeappCommand as any)(null, null, null);
     leappCommand.error = jest.fn();
-    expect(() => leappCommand.unsupportedAzureSession(mockedSession)).toThrow(new Error("Azure sessions currently not supported by Leapp CLI"));
+    expect(() => leappCommand.unsupportedAzureSession(mockedSession)).toThrow(new Error("Azure sessions not supported for this command"));
   });
 
   test("unsupportedAzureSession - anything else then an azure session should not throw an error", async () => {

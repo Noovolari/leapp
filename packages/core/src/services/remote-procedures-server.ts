@@ -6,6 +6,16 @@ import { IAwsSamlAuthenticationService } from "../interfaces/i-aws-saml-authenti
 import { Repository } from "./repository";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IMfaCodePrompter } from "../interfaces/i-mfa-code-prompter";
+import { IntegrationFactory } from "./integration-factory";
+
+export const uInt8ArrayToArray = (uint8array: Uint8Array): Array<number> => {
+  if (uint8array === null || uint8array === undefined) return null;
+  return [...uint8array.values()];
+};
+export const arrayToUInt8Array = (serializedArray: Array<number>): Buffer => {
+  if (!serializedArray) return null;
+  return Buffer.from(serializedArray);
+};
 
 export interface RpcResponse {
   result?: any;
@@ -28,6 +38,7 @@ export class RemoteProceduresServer {
     private nativeService: INativeService,
     private verificationWindowService: IAwsSsoOidcVerificationWindowService,
     private awsAuthenticationService: IAwsSamlAuthenticationService,
+    private integrationFactory: IntegrationFactory,
     private mfaCodePrompter: IMfaCodePrompter,
     private repository: Repository,
     private behaviouralSubjectService: BehaviouralSubjectService,
@@ -42,6 +53,8 @@ export class RemoteProceduresServer {
       ["openVerificationWindow", this.openVerificationWindow],
       ["refreshIntegrations", this.refreshIntegrations],
       ["refreshSessions", this.refreshSessions],
+      ["msalProtectData", this.msalProtectData],
+      ["msalUnprotectData", this.msalUnprotectData],
     ]);
   }
 
@@ -113,8 +126,9 @@ export class RemoteProceduresServer {
       this.uiSafeFn(() => {
         const workspace = this.repository.getWorkspace();
         workspace.awsSsoIntegrations = this.repository.listAwsSsoIntegrations();
+        workspace.azureIntegrations = this.repository.listAzureIntegrations();
         this.repository.persistWorkspace(workspace);
-        this.behaviouralSubjectService.setIntegrations(this.repository.listAwsSsoIntegrations());
+        this.behaviouralSubjectService.setIntegrations(this.integrationFactory.getIntegrations());
       });
       emitFunction(socket, "message", {});
     } catch (error) {
@@ -129,6 +143,32 @@ export class RemoteProceduresServer {
         this.behaviouralSubjectService.setSessions(this.repository.getSessions());
       });
       emitFunction(socket, "message", {});
+    } catch (error) {
+      emitFunction(socket, "message", { error: error.message });
+    }
+  }
+
+  private async msalProtectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
+    try {
+      const protectedData = await this.nativeService.msalEncryptionService.protectData(
+        arrayToUInt8Array(data.params.dataToEncrypt),
+        arrayToUInt8Array(data.params.optionalEntropy),
+        data.params.scope
+      );
+      emitFunction(socket, "message", { result: uInt8ArrayToArray(protectedData) });
+    } catch (error) {
+      emitFunction(socket, "message", { error: error.message });
+    }
+  }
+
+  private async msalUnprotectData(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
+    try {
+      const protectedData = await this.nativeService.msalEncryptionService.unprotectData(
+        arrayToUInt8Array(data.params.encryptedData),
+        arrayToUInt8Array(data.params.optionalEntropy),
+        data.params.scope
+      );
+      emitFunction(socket, "message", { result: uInt8ArrayToArray(protectedData) });
     } catch (error) {
       emitFunction(socket, "message", { error: error.message });
     }

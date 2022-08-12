@@ -32,7 +32,7 @@ import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
 import { OptionsService } from "../../../services/options.service";
-import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
+import { IPlugin } from "@noovolari/leapp-core/plugin-sdk/interfaces/i-plugin";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector

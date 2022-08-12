@@ -14,7 +14,7 @@ import { OptionsService } from "../../../services/options.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
+import { IPlugin } from "@noovolari/leapp-core/plugin-sdk/interfaces/i-plugin";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { AppNativeService } from "../../../services/app-native.service";
 

@@ -1,7 +1,7 @@
 import { LeappCommand } from "../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { sessionId, pluginName } from "../flags";
-import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
+import { IPlugin } from "@noovolari/leapp-core/plugin-sdk/interfaces/i-plugin";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { OperatingSystem, osMap } from "@noovolari/leapp-core/models/operating-system";
 

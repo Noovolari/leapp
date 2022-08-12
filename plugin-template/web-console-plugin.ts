@@ -1,15 +1,8 @@
 import { Session } from "@noovolari/leapp-core/models/session";
-import { PluginEnvironment, PluginLogLevel } from "@noovolari/leapp-core/plugin-system/plugin-environment";
-import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
-import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-system/aws-credentials-plugin";
-import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
+import { PluginLogLevel } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
+import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 
 export class WebConsolePlugin extends AwsCredentialsPlugin {
-
-  constructor(pluginEnvironment: PluginEnvironment, sessionFactory: SessionFactory) {
-    super(pluginEnvironment, sessionFactory);
-  }
-
   async applySessionAction(session: Session, credentials: any): Promise<void> {
     this.pluginEnvironment.log("Opening web console for session: " + session.sessionName, PluginLogLevel.info);
 

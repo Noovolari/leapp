@@ -9,7 +9,7 @@ export abstract class AwsCredentialsPlugin implements IPlugin {
   protected pluginEnvironment: PluginEnvironment;
   private sessionFactory: SessionFactory;
 
-  protected constructor(pluginEnvironment: PluginEnvironment, sessionFactory: SessionFactory) {
+  constructor(pluginEnvironment: PluginEnvironment, sessionFactory: SessionFactory) {
     this.pluginEnvironment = pluginEnvironment;
     this.sessionFactory = sessionFactory;
   }

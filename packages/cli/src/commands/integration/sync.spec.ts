@@ -27,8 +27,8 @@ describe("SyncIntegration", () => {
     expect(command.selectIntegration).toHaveBeenCalled();
 
     const cliProviderService = {
-      awsSsoIntegrationService: {
-        getIntegration: jest.fn((id: string) => {
+      integrationFactory: {
+        getIntegrationById: jest.fn((id: string) => {
           if (id === "validId") {
             return mockIntegration;
           } else return null;
@@ -43,11 +43,17 @@ describe("SyncIntegration", () => {
     expect(command.sync).toHaveBeenCalledWith(mockIntegration);
   });
 
+  test("Flags - integration not found", async () => {
+    const cliProviderService = { integrationFactory: { getIntegrationById: () => null } };
+    const command = getTestCommand(cliProviderService, ["--integrationId", "invalidId"]);
+    await expect(command.run()).rejects.toThrow('integrationId "invalidId" is not associated to an existing integration');
+  });
+
   test("selectIntegration", async () => {
     const integration = { alias: "integration1" };
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
-        getOnlineIntegrations: jest.fn(() => [integration]),
+      integrationFactory: {
+        getIntegrations: jest.fn(() => [integration]),
       },
       inquirer: {
         prompt: async (params: any) => {
@@ -67,25 +73,25 @@ describe("SyncIntegration", () => {
     const command = getTestCommand(cliProviderService);
     const selectedIntegration = await command.selectIntegration();
 
-    expect(cliProviderService.awsSsoIntegrationService.getOnlineIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.integrationFactory.getIntegrations).toHaveBeenCalled();
     expect(selectedIntegration).toBe(integration);
   });
 
   test("selectIntegration, no integrations", async () => {
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
-        getOnlineIntegrations: jest.fn(() => []),
+      integrationFactory: {
+        getIntegrations: () => [],
       },
     };
 
     const command = getTestCommand(cliProviderService);
-    await expect(command.selectIntegration()).rejects.toThrow(new Error("no online integrations available"));
+    await expect(command.selectIntegration()).rejects.toThrow(new Error("no integrations available"));
   });
 
   test("sync", async () => {
-    const sessionsDiff = { sessionsToAdd: ["session1", "session2"], sessionsToDelete: ["session3"] };
+    const sessionsDiff = { sessionsAdded: 2, sessionsDeleted: 1 };
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
+      integrationFactory: {
         syncSessions: jest.fn(async () => sessionsDiff),
       },
       remoteProceduresClient: {
@@ -99,9 +105,9 @@ describe("SyncIntegration", () => {
     const integration = { id: "id1" } as any;
     await command.sync(integration);
 
-    expect(cliProviderService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(integration.id);
-    expect(command.log).toHaveBeenNthCalledWith(1, `${sessionsDiff.sessionsToAdd.length} sessions added`);
-    expect(command.log).toHaveBeenNthCalledWith(2, `${sessionsDiff.sessionsToDelete.length} sessions removed`);
+    expect(cliProviderService.integrationFactory.syncSessions).toHaveBeenCalledWith(integration.id);
+    expect(command.log).toHaveBeenNthCalledWith(1, `${sessionsDiff.sessionsAdded} sessions added`);
+    expect(command.log).toHaveBeenNthCalledWith(2, `${sessionsDiff.sessionsDeleted} sessions removed`);
     expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 

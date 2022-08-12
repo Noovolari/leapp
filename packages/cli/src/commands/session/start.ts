@@ -36,13 +36,15 @@ export default class StartSession extends LeappCommand {
   }
 
   async startSession(session: Session): Promise<void> {
+    if (session.status === SessionStatus.active) {
+      throw new Error("session already started");
+    }
     const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
     process.on("SIGINT", () => {
       sessionService.sessionDeactivated(session.sessionId);
       process.exit(0);
     });
     try {
-      this.unsupportedAzureSession(session);
       await sessionService.start(session.sessionId);
       this.log("session started");
     } finally {

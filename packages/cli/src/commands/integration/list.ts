@@ -25,25 +25,27 @@ export default class ListIntegrations extends LeappCommand {
   async showIntegrations(): Promise<void> {
     const { flags } = await this.parse(ListIntegrations);
     const data: Record<string, unknown>[] = [];
-    const integrations = this.cliProviderService.awsSsoIntegrationService.getIntegrations();
+    const integrations = this.cliProviderService.integrationFactory.getIntegrations();
 
     for (const integration of integrations) {
       const isOnline = integration.isOnline;
       data.push({
         integrationId: integration.id,
+        integrationType: integration.type,
         integrationName: integration.alias,
-        portalUrl: integration.portalUrl,
-        region: integration.region,
+        urlOrTenant: (integration as any).portalUrl ?? (integration as any).tenantId,
+        region: (integration as any).region ?? (integration as any).location,
         status: isOnline ? "Online" : "Offline",
-        expirationInHours: isOnline ? `Expiring ${this.cliProviderService.awsSsoIntegrationService.remainingHours(integration)}` : "-",
+        expirationInHours: isOnline ? `Expiring ${this.cliProviderService.integrationFactory.getRemainingHours(integration)}` : "-",
       } as Record<string, unknown>);
     }
 
     const columns = {
       integrationId: { header: "ID", extended: true },
+      integrationType: { header: "Type" },
       integrationName: { header: "Integration Name" },
-      portalUrl: { header: "Portal URL" },
-      region: { header: "Region" },
+      urlOrTenant: { header: "AWS Portal URL/Azure Tenant ID" },
+      region: { header: "Region/Location" },
       status: { header: "Status" },
       expirationInHours: { header: "Expiration" },
     };

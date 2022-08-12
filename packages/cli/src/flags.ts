@@ -1,5 +1,6 @@
 import { Flags } from "@oclif/core";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 
 export const force = Flags.boolean({
   description: "force a command without asking for confirmation (-f, --force)", // help description for flag
@@ -37,11 +38,6 @@ export const integrationPortalUrl = Flags.string({
 
 export const integrationRegion = Flags.string({
   description: "an AWS valid region code for the integration",
-  hidden: false,
-});
-
-export const integrationMethod = Flags.string({
-  description: "value is either In-app or In-browser, identifies the preferred method to authenticate against portal URL",
   hidden: false,
 });
 
@@ -139,4 +135,20 @@ export const print = Flags.boolean({
   hidden: false,
   default: false,
   char: "p",
+});
+
+export const integrationType = Flags.string({
+  description: `Identify the type of your integration. Valid types are [${IntegrationType.awsSso}, ${IntegrationType.azure}]`,
+  hidden: false,
+  options: [IntegrationType.awsSso, IntegrationType.azure],
+});
+
+export const integrationTenantId = Flags.string({
+  description: "Tenant ID of an Azure Integration",
+  hidden: false,
+});
+
+export const integrationLocation = Flags.string({
+  description: "Location of an Azure Integration",
+  hidden: false,
 });

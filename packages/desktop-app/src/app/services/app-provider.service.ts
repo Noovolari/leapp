@@ -42,6 +42,7 @@ import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/se
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
 import { HttpClient } from "@angular/common/http";
 import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-system/plugin-environment";
+import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 
 @Injectable({
   providedIn: "root",
@@ -65,6 +66,7 @@ export class AppProviderService {
   private azureIntegrationServiceInstance: AzureIntegrationService;
   private authenticationServiceInstance: AwsSamlAssertionExtractionService;
   private sessionFactoryInstance: SessionFactory;
+  private integrationFactoryInstance: IntegrationFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
@@ -303,6 +305,13 @@ export class AppProviderService {
     return this.sessionFactoryInstance;
   }
 
+  public get integrationFactory(): IntegrationFactory {
+    if (!this.integrationFactoryInstance) {
+      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
+    }
+    return this.integrationFactoryInstance;
+  }
+
   public get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
       this.ssmServiceInstance = new SsmService(this.logService, this.executeService, this.appNativeService, this.fileService);
@@ -395,6 +404,7 @@ export class AppProviderService {
         this.appNativeService,
         this.verificationWindowService,
         this.awsAuthenticationService,
+        this.integrationFactory,
         this.mfaCodePrompter,
         this.repository,
         this.behaviouralSubjectService,
@@ -407,8 +417,7 @@ export class AppProviderService {
   public get integrationIsOnlineStateRefreshService(): IntegrationIsOnlineStateRefreshService {
     if (!this.integrationIsOnlineStateRefreshServiceInstance) {
       this.integrationIsOnlineStateRefreshServiceInstance = new IntegrationIsOnlineStateRefreshService(
-        this.awsSsoIntegrationService,
-        this.azureIntegrationService,
+        this.integrationFactory,
         this.behaviouralSubjectService
       );
     }

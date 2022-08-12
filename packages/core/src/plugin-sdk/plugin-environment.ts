@@ -1,20 +1,18 @@
 import { LoggedEntry, LogLevel } from "../services/log-service";
 import { INativeService } from "../interfaces/i-native-service";
 import { IOpenExternalUrlService } from "../interfaces/i-open-external-url-service";
+import { AwsSessionService } from "../services/session/aws/aws-session-service";
+import { Session } from "../models/session";
+import { CredentialsInfo } from "../models/credentials-info";
+import { IPluginEnvironment } from "./interfaces/i-plugin-environment";
+import { PluginLogLevel } from "./plugin-log-level";
 
 export enum EnvironmentType {
   desktopApp = "desktop-app",
   cli = "cli",
 }
 
-export enum PluginLogLevel {
-  success,
-  info,
-  warn,
-  error,
-}
-
-export class PluginEnvironment {
+export class PluginEnvironment implements IPluginEnvironment {
   private nativeService: INativeService;
   private openExternalUrlService: IOpenExternalUrlService;
 
@@ -38,5 +36,10 @@ export class PluginEnvironment {
 
   openExternalUrl(loginUrl: string): void {
     this.openExternalUrlService.openExternalUrl(loginUrl);
+  }
+
+  private async generateCredentials(session: Session): Promise<CredentialsInfo> {
+    const sessionService = this.providerService.sessionFactory.getSessionService(session.type) as unknown as AwsSessionService;
+    return await sessionService.generateCredentials(session.sessionId);
   }
 }

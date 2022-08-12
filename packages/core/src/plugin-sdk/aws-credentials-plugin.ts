@@ -1,23 +1,18 @@
 import { IPlugin, IPluginMetadata } from "./interfaces/i-plugin";
 import { Session } from "../models/session";
-import { PluginEnvironment } from "./plugin-environment";
-import { SessionFactory } from "../services/session-factory";
-import { AwsSessionService } from "../services/session/aws/aws-session-service";
+import { IPluginEnvironment } from "./interfaces/i-plugin-environment";
 
 export abstract class AwsCredentialsPlugin implements IPlugin {
   readonly pluginType = AwsCredentialsPlugin.name;
   readonly metadata: IPluginMetadata;
-  protected pluginEnvironment: PluginEnvironment;
-  private sessionFactory: SessionFactory;
+  protected pluginEnvironment: IPluginEnvironment;
 
-  constructor(pluginEnvironment: PluginEnvironment, sessionFactory: SessionFactory) {
+  constructor(pluginEnvironment: IPluginEnvironment) {
     this.pluginEnvironment = pluginEnvironment;
-    this.sessionFactory = sessionFactory;
   }
 
   async run(session: Session): Promise<void> {
-    const sessionService = this.sessionFactory.getSessionService(session.type) as unknown as AwsSessionService;
-    const credentials = await sessionService.generateCredentials(session.sessionId);
+    const credentials = await (this.pluginEnvironment as any).generateCredentials(session);
     await this.applySessionAction(session, credentials);
   }
 

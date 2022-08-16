@@ -139,7 +139,7 @@ export class PluginManagerService {
   }
 
   availableAwsCredentialsPlugins(os: OperatingSystem, session: Session): AwsCredentialsPlugin[] {
-    return this._pluginContainers
+    const list = this._pluginContainers
       .filter(
         (plugin) =>
           plugin.metadata.active &&
@@ -151,6 +151,7 @@ export class PluginManagerService {
       .flatMap((pluginContainer) =>
         pluginContainer.pluginInstances.filter((plugin) => plugin.pluginType === AwsCredentialsPlugin.name)
       ) as AwsCredentialsPlugin[];
+    return list;
   }
 
   async installPlugin(url: string): Promise<void> {

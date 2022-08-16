@@ -1,7 +1,7 @@
 import { SessionManagementService } from "./session-management-service";
-import { jest } from "@jest/globals";
+import { jest, describe, test, expect } from "@jest/globals";
 import { Session } from "../models/session";
-import { SessionType } from "../../dist/models/session-type";
+import { SessionType } from "../models/session-type";
 
 describe("SessionManagementService", () => {
   test("getSessions - return a list of sessions from repository", () => {

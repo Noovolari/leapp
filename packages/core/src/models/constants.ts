@@ -51,7 +51,7 @@ export const constants = {
 
   npmRequiredPluginKeyword: "leapp-plugin",
   skipPluginValidation: true,
-  disablePluginSystem: true,
+  disablePluginSystem: false,
   pluginPortalUrl: "https://vv0r45fadf.execute-api.eu-west-1.amazonaws.com/api/api/v1/plugins",
   // Public Key for signature
   // TODO: move it to the leapp site in future

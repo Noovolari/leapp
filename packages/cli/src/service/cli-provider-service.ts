@@ -40,10 +40,8 @@ import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
-import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
-import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-system/plugin-environment";
-import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
-import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
+import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
 import axios from "axios";
 
 /* eslint-disable */
@@ -62,9 +60,7 @@ export class CliProviderService {
   private awsSsoRoleServiceInstance: AwsSsoRoleService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private azureServiceInstance: AzureSessionService;
-  private azureIntegrationServiceInstance: AzureIntegrationService;
   private sessionFactoryInstance: SessionFactory;
-  private integrationFactoryInstance: IntegrationFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
@@ -90,7 +86,7 @@ export class CliProviderService {
   private azurePersistenceServiceInstance: AzurePersistenceService;
   private pluginManagerServiceInstance: PluginManagerService;
   private httpClient: any = {
-    get: (url: string) => ({
+    get: (url: string) =>  ({
       toPromise: async () => (await axios.get(url)).data
     }),
   };
@@ -161,11 +157,6 @@ export class CliProviderService {
   public get remoteProceduresClient(): RemoteProceduresClient {
     if (!this.remoteProceduresClientInstance) {
       this.remoteProceduresClientInstance = new RemoteProceduresClient(this.cliNativeService);
-      const client = this.remoteProceduresClientInstance;
-      this.cliNativeService.msalEncryptionService = {
-        unprotectData: client.msalUnprotectData.bind(client),
-        protectData: client.msalProtectData.bind(client),
-      }
     }
     return this.remoteProceduresClientInstance;
   }
@@ -253,34 +244,12 @@ export class CliProviderService {
     return this.azureServiceInstance;
   }
 
-  public get azureIntegrationService(): AzureIntegrationService {
-    if (!this.azureIntegrationServiceInstance) {
-      this.azureIntegrationServiceInstance = new AzureIntegrationService(
-        this.repository,
-        this.behaviouralSubjectService,
-        this.cliNativeService,
-        this.sessionFactory,
-        this.executeService,
-        this.azureSessionService,
-        this.azurePersistenceService
-      );
-    }
-    return this.azureIntegrationServiceInstance;
-  }
-
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
         this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureSessionService);
     }
     return this.sessionFactoryInstance;
-  }
-
-  public get integrationFactory(): IntegrationFactory {
-    if (!this.integrationFactoryInstance) {
-      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
-    }
-    return this.integrationFactoryInstance;
   }
 
   get awsParentSessionFactory(): AwsParentSessionFactory {

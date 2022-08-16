@@ -595,6 +595,72 @@ describe("PluginManagerService", () => {
   });
   */
 
+  test("validatePlugin, verify signature correctly", async () => {
+    const pluginFilePath = "fake-filepath";
+    const options = "fake-options";
+    const packageJsonContent = '{ "test": true }';
+    const nativeService = {
+      requireModule: null,
+      hashElement: { hashElement: () => ({ children: true, hash: "fake-hash" }) },
+      fs: {
+        existsSync: () => true,
+        readFileSync: () => packageJsonContent,
+      },
+      rimraf: jest.fn(),
+    } as any;
+    const logService = {
+      log: jest.fn(),
+    } as any;
+    const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
+    (pluginManager as any).http = {
+      get: jest.fn(() => ({
+        toPromise: async () => ({ status: "active", signature: "fake-signature" }),
+      })),
+    };
+    (pluginManager as any).skipPluginValidation = () => false;
+    (pluginManager as any).rsaVerifySignatureFromBase64 = jest.fn(() => true);
+    const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
+    expect((pluginManager as any).rsaVerifySignatureFromBase64).toHaveBeenCalledWith(
+      constants.publicKey,
+      packageJsonContent + "fake-hash",
+      "fake-signature"
+    );
+    expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: true });
+  });
+
+  test("validatePlugin, verify signature fails", async () => {
+    const pluginFilePath = "fake-filepath";
+    const options = "fake-options";
+    const packageJsonContent = '{ "test": true }';
+    const nativeService = {
+      requireModule: null,
+      hashElement: { hashElement: () => ({ children: true, hash: "fake-hash" }) },
+      fs: {
+        existsSync: () => true,
+        readFileSync: () => packageJsonContent,
+      },
+      rimraf: jest.fn(),
+    } as any;
+    const logService = {
+      log: jest.fn(),
+    } as any;
+    const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
+    (pluginManager as any).http = {
+      get: jest.fn(() => ({
+        toPromise: async () => ({ status: "active", signature: "fake-signature" }),
+      })),
+    };
+    (pluginManager as any).skipPluginValidation = () => false;
+    (pluginManager as any).rsaVerifySignatureFromBase64 = jest.fn(() => false);
+    const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
+    expect((pluginManager as any).rsaVerifySignatureFromBase64).toHaveBeenCalledWith(
+      constants.publicKey,
+      packageJsonContent + "fake-hash",
+      "fake-signature"
+    );
+    expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: false });
+  });
+
   test("validatePlugin, no active plugin found", async () => {
     const pluginFilePath = "fake-filepath";
     const options = "fake-options";

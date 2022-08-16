@@ -307,20 +307,16 @@ describe("RemoteProcedures", () => {
 
   test("msalProtectData", async () => {
     nativeService.msalEncryptionService = {
-      protectData: jest.fn(async () => Uint8Array.from([7, 8, 9])),
+      protectData: jest.fn(async () => Buffer.from([7, 8, 9])),
     };
 
     startServer();
 
     await retry(async () => {
       expect(await client.msalProtectData(Uint8Array.from([1, 2, 3]), Uint8Array.from([4, 5, 6]), "fake-scope")).toStrictEqual(
-        Uint8Array.from([7, 8, 9])
+        Buffer.from([7, 8, 9])
       );
-      expect(nativeService.msalEncryptionService.protectData).toHaveBeenCalledWith(
-        Uint8Array.from([1, 2, 3]),
-        Uint8Array.from([4, 5, 6]),
-        "fake-scope"
-      );
+      expect(nativeService.msalEncryptionService.protectData).toHaveBeenCalledWith(Buffer.from([1, 2, 3]), Buffer.from([4, 5, 6]), "fake-scope");
     });
   });
 
@@ -340,20 +336,14 @@ describe("RemoteProcedures", () => {
 
   test("msalUnprotectData", async () => {
     nativeService.msalEncryptionService = {
-      unprotectData: jest.fn(async () => Uint8Array.from([7, 8, 9])),
+      unprotectData: jest.fn(async () => Buffer.from([7, 8, 9])),
     };
 
     startServer();
 
     await retry(async () => {
-      expect(await client.msalUnprotectData(Uint8Array.from([1, 2, 3]), Uint8Array.from([4, 5, 6]), "fake-scope")).toStrictEqual(
-        Uint8Array.from([7, 8, 9])
-      );
-      expect(nativeService.msalEncryptionService.unprotectData).toHaveBeenCalledWith(
-        Uint8Array.from([1, 2, 3]),
-        Uint8Array.from([4, 5, 6]),
-        "fake-scope"
-      );
+      expect(await client.msalUnprotectData(Uint8Array.from([1, 2, 3]), Uint8Array.from([4, 5, 6]), "fake-scope")).toStrictEqual([7, 8, 9]);
+      expect(nativeService.msalEncryptionService.unprotectData).toHaveBeenCalledWith(Buffer.from([1, 2, 3]), Buffer.from([4, 5, 6]), "fake-scope");
     });
   });
 

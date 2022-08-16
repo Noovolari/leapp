@@ -42,6 +42,7 @@ import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/se
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { HttpClient } from "@angular/common/http";
 import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
+import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 
 @Injectable({
   providedIn: "root",
@@ -86,6 +87,7 @@ export class AppProviderService {
   private azurePersistenceServiceInstance: AzurePersistenceService;
   private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
   private pluginManagerServiceInstance: PluginManagerService;
+  private integrationFactoryInstance: IntegrationFactory;
 
   constructor(
     private appNativeService: AppNativeService,
@@ -389,12 +391,20 @@ export class AppProviderService {
     return this.azureCoreServiceInstance;
   }
 
+  public get integrationFactory(): IntegrationFactory {
+    if (!this.integrationFactoryInstance) {
+      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
+    }
+    return this.integrationFactoryInstance;
+  }
+
   public get remoteProceduresServer(): RemoteProceduresServer {
     if (!this.remoteProceduresServerInstance) {
       this.remoteProceduresServerInstance = new RemoteProceduresServer(
         this.appNativeService,
         this.verificationWindowService,
         this.awsAuthenticationService,
+        this.integrationFactory,
         this.mfaCodePrompter,
         this.repository,
         this.behaviouralSubjectService,
@@ -407,8 +417,7 @@ export class AppProviderService {
   public get integrationIsOnlineStateRefreshService(): IntegrationIsOnlineStateRefreshService {
     if (!this.integrationIsOnlineStateRefreshServiceInstance) {
       this.integrationIsOnlineStateRefreshServiceInstance = new IntegrationIsOnlineStateRefreshService(
-        this.awsSsoIntegrationService,
-        this.azureIntegrationService,
+        this.integrationFactory,
         this.behaviouralSubjectService
       );
     }

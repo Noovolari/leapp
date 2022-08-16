@@ -1,6 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import RunAwsCredentialPlugin from "./run-aws-credential-plugin";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("RunAwsCredentialPlugin", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): RunAwsCredentialPlugin => {
@@ -11,6 +12,7 @@ describe("RunAwsCredentialPlugin", () => {
 
   test("run with flags", async () => {
     const cliProviderService = {
+      os: { platform: jest.fn(() => OperatingSystem.mac) },
       sessionManagementService: { getSessionById: jest.fn(() => "selected-session") },
       pluginManagerService: { getPluginByName: jest.fn(() => "selected-plugin") },
     };
@@ -27,6 +29,7 @@ describe("RunAwsCredentialPlugin", () => {
 
   test("run with flags, session not found", async () => {
     const cliProviderService = {
+      os: { platform: jest.fn(() => OperatingSystem.mac) },
       sessionManagementService: { getSessionById: () => {} },
     };
     const argv = ["--sessionId", "fake-session-id", "--pluginName", "fake-plugin-name"];
@@ -38,6 +41,7 @@ describe("RunAwsCredentialPlugin", () => {
 
   test("run with flags, plugin not found", async () => {
     const cliProviderService = {
+      os: { platform: jest.fn(() => OperatingSystem.mac) },
       sessionManagementService: { getSessionById: () => "selected-session" },
       pluginManagerService: { getPluginByName: () => {} },
     };
@@ -89,11 +93,14 @@ describe("RunAwsCredentialPlugin", () => {
   });
 
   test("runPlugin", async () => {
-    const cliProviderService = { pluginManagerService: { pluginEnvironment: "fake-plugin-environment" } };
+    const cliProviderService = {
+      os: { platform: jest.fn(() => OperatingSystem.mac) },
+      pluginManagerService: { pluginEnvironment: "fake-plugin-environment" },
+    };
     const command = getTestCommand(cliProviderService, []);
     (command as any).log = jest.fn();
 
-    const plugin = { bootstrap: jest.fn(), applySessionAction: jest.fn() } as any;
+    const plugin = { bootstrap: jest.fn(), applySessionAction: jest.fn(), run: jest.fn() } as any;
     await command.runPlugin("fake-session" as any, plugin);
 
     expect(plugin.bootstrap).toHaveBeenCalledWith("fake-plugin-environment");
@@ -102,8 +109,13 @@ describe("RunAwsCredentialPlugin", () => {
   });
 
   test("selectSession", async () => {
-    const sessions = [{ sessionName: "session1" }, { sessionName: "session2" }];
+    const sessions = [
+      { sessionName: "session1", type: SessionType.awsIamRoleFederated },
+      { sessionName: "session2", type: SessionType.awsIamRoleFederated },
+    ];
     const cliProviderService = {
+      os: { platform: jest.fn(() => OperatingSystem.mac) },
+      sessionFactory: { getCompatibleTypes: jest.fn(() => [SessionType.awsIamRoleFederated]) },
       sessionManagementService: { getSessions: jest.fn(() => sessions) },
       inquirer: {
         prompt: jest.fn(async (questions: any) => {
@@ -130,17 +142,21 @@ describe("RunAwsCredentialPlugin", () => {
   });
 
   test("selectSession, no sessions found", async () => {
-    const cliProviderService = { sessionManagementService: { getSessions: () => [] } };
+    const cliProviderService = { sessionManagementService: { getSessions: () => [] }, sessionFactory: { getCompatibleTypes: jest.fn(() => []) } };
     const command = getTestCommand(cliProviderService, []) as any;
     await expect(command.selectSession()).rejects.toThrow("no sessions available");
   });
 
   test("selectPlugin", async () => {
-    const plugins = [{ metadata: { uniqueName: "plugin1" } }, { metadata: { uniqueName: "plugin2" } }];
+    const plugins = [
+      { actionName: "plugin1", metadata: { uniqueName: "plugin1" } },
+      { actionName: "plugin2", metadata: { uniqueName: "plugin2" } },
+    ];
     const cliProviderService = {
+      os: { platform: jest.fn(() => OperatingSystem.mac) },
       pluginManagerService: {
         loadFromPluginDir: jest.fn(async () => {}),
-        availablePlugins: jest.fn(() => plugins),
+        availableAwsCredentialsPlugins: jest.fn(() => plugins),
       },
       inquirer: {
         prompt: jest.fn(async (questions: any) => {
@@ -163,13 +179,13 @@ describe("RunAwsCredentialPlugin", () => {
     expect(selectedPlugin).toBe("selected-plugin");
 
     expect(cliProviderService.pluginManagerService.loadFromPluginDir).toHaveBeenCalled();
-    expect(cliProviderService.pluginManagerService.availablePlugins).toHaveBeenCalledWith("os", "selected-session");
+    expect(cliProviderService.pluginManagerService.availableAwsCredentialsPlugins).toHaveBeenCalledWith("os", "selected-session");
     expect(cliProviderService.inquirer.prompt).toHaveBeenCalled();
   });
 
   test("selectPlugin, no plugin found", async () => {
-    const cliProviderService = { pluginManagerService: { loadFromPluginDir: () => {}, availablePlugins: () => [] } };
+    const cliProviderService = { pluginManagerService: { loadFromPluginDir: () => {}, availableAwsCredentialsPlugins: () => [] } };
     const command = getTestCommand(cliProviderService, []) as any;
-    await expect(command.selectPlugin()).rejects.toThrow("no plugins available for selected session on this operating system");
+    await expect(command.selectPlugin()).rejects.toThrow("no AWS credential plugins available for selected session on this operating system");
   });
 });

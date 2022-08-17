@@ -245,8 +245,8 @@
           </div>
 
           <h4> Installed plugins
-            <button class="borderless-button pull-right" (click)="openPluginFolder()"><i class="fas fa-folder-open" matTooltip="Open plugin folder"></i></button>
-            <button [disabled]="fetchingPlugins" class="borderless-button pull-right"(click)="refreshPluginList()"><i class="fa fa-refresh" matTooltip="Refresh plugin list"></i></button>
+            <button class="borderless-button pull-right" (click)="openPluginFolder()"><i class="fas fa-folder-open blackery" matTooltip="Open plugin folder"></i></button>
+            <button [disabled]="fetchingPlugins" class="borderless-button pull-right"(click)="refreshPluginList()"><i class="fa fa-refresh blackery" matTooltip="Refresh plugin list"></i></button>
           </h4>
 
           <div class="form-group scrollable max-height-320 tableFixHead">
@@ -260,7 +260,7 @@
               <tbody>
               <ng-container *ngFor="let plugin of pluginList">
                 <tr>
-                  <td><i class="fa fa-info-circle" matTooltipClass="allow-cr" [matTooltip]="getPluginExtraInfo(plugin)"></i>&nbsp;{{plugin.metadata.uniqueName}}</td>
+                  <td><i class="fa fa-info-circle blackery" matTooltipClass="allow-cr" [matTooltip]="getPluginExtraInfo(plugin)"></i>&nbsp;{{plugin.metadata.uniqueName}}</td>
                   <td>{{plugin.metadata.version}}</td>
                   <td [innerHTML]="getSupportedOsIcons(plugin)"></td>
                   <td>

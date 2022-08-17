@@ -179,3 +179,10 @@ img[src$="even-smaller-img"] {
   display:block;
   margin: 0 auto;
 }
+
+.centered-button {
+  display: block!important;
+  margin: 0 auto;
+  width: 40%;
+  text-align: center;
+}

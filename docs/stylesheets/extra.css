@@ -167,3 +167,15 @@ header {
   background-color: #4DA7DE!important;
   border: none !important;
 }
+
+img[src$="smaller-img"] {
+  width:70%;
+  display:block;
+  margin: 0 auto;
+}
+
+img[src$="even-smaller-img"] {
+  width:50%;
+  display:block;
+  margin: 0 auto;
+}

@@ -2,7 +2,7 @@ site_name: Leapp - Docs
 site_url: https://docs.leapp.cloud/
 repo_url: https://github.com/Noovolari/leapp
 site_description: 'Leapp is a tool for developers to manage, secure, and access the cloud. Manage AWS and Azure credentials centrally'
-copyright: '© 2021 Noovolari, All rights reserved. | Powered by beSharp'
+copyright: '© 2022 Noovolari, All rights reserved. | Powered by beSharp'
 
 nav:
   - 'Get Started':
@@ -46,6 +46,9 @@ nav:
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
       - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'
       - 'Opening AWS Web Console': 'built-in-features/opening-web-console.md'
+      - 'Plugin System':
+          - 'Documentation': 'built-in-features/plugin-system-documentation.md'
+          - 'Install and use Plugins': 'built-in-features/plugin-system-usage.md'
   - 'General Options': 'built-in-features/general-options.md'
   - 'Roadmap': https://roadmap.leapp.cloud/tabs/4-in-progress
   - Contributing:

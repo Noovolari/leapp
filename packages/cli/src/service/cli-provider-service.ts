@@ -42,6 +42,8 @@ import { CliNativeLoggerService } from "./cli-native-logger-service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
+import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
+import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 import axios from "axios";
 
 /* eslint-disable */
@@ -85,11 +87,36 @@ export class CliProviderService {
   private workspaceServiceInstance: WorkspaceService;
   private azurePersistenceServiceInstance: AzurePersistenceService;
   private pluginManagerServiceInstance: PluginManagerService;
+  private integrationFactoryInstance: IntegrationFactory;
+  private azureIntegrationServiceInstance: AzureIntegrationService;
+
   private httpClient: any = {
     get: (url: string) =>  ({
       toPromise: async () => (await axios.get(url)).data
     }),
   };
+
+  public get azureIntegrationService(): AzureIntegrationService {
+    if (!this.azureIntegrationServiceInstance) {
+      this.azureIntegrationServiceInstance = new AzureIntegrationService(
+        this.repository,
+        this.behaviouralSubjectService,
+        this.cliNativeService,
+        this.sessionFactory,
+        this.executeService,
+        this.azureSessionService,
+        this.azurePersistenceService
+      );
+    }
+    return this.azureIntegrationServiceInstance;
+  }
+
+  public get integrationFactory(): IntegrationFactory {
+    if (!this.integrationFactoryInstance) {
+      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
+    }
+    return this.integrationFactoryInstance;
+  }
 
   public get pluginManagerService(): PluginManagerService {
     if (!this.pluginManagerServiceInstance) {

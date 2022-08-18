@@ -139,19 +139,19 @@ export class PluginManagerService {
   }
 
   availableAwsCredentialsPlugins(os: OperatingSystem, session: Session): AwsCredentialsPlugin[] {
-    const list = this._pluginContainers
-      .filter(
-        (plugin) =>
-          plugin.metadata.active &&
-          plugin.metadata.supportedOS.includes(os) &&
-          plugin.metadata.supportedSessions.some((supportedSession) =>
-            this.sessionFactory.getCompatibleTypes(supportedSession).includes(session.type)
-          )
-      )
-      .flatMap((pluginContainer) =>
-        pluginContainer.pluginInstances.filter((plugin) => plugin.pluginType === AwsCredentialsPlugin.name)
-      ) as AwsCredentialsPlugin[];
-    return list;
+    const list = this._pluginContainers.filter((plugin) => {
+      const active = this.repository.getPluginStatus(plugin.metadata.uniqueName).active;
+      const supportedOS = plugin.metadata.supportedOS.includes(os);
+      const supportedSome = plugin.metadata.supportedSessions.some((supportedSession) =>
+        this.sessionFactory.getCompatibleTypes(supportedSession).includes(session.type)
+      );
+      return active && supportedOS && supportedSome;
+    });
+    let arrayToReturn = [];
+    list.forEach((pluginContainer) => {
+      arrayToReturn = arrayToReturn.concat(pluginContainer.pluginInstances.filter((plugin) => plugin.pluginType === AwsCredentialsPlugin.name));
+    });
+    return arrayToReturn;
   }
 
   async installPlugin(url: string): Promise<void> {

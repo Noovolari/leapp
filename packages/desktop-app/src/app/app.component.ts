@@ -91,11 +91,14 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.appNativeService.fixPath();
+    // this.appNativeService.fixPath();
 
     if (!constants.disablePluginSystem) {
       this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
       await this.appProviderService.pluginManagerService.loadFromPluginDir();
+      this.loggingService.log(
+        new LoggedEntry(`Loaded plugins...\n\n${this.appProviderService.pluginManagerService.pluginContainers}`, this, LogLevel.info)
+      );
     }
 
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);

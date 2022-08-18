@@ -10,9 +10,15 @@ Leapp's Command Line Interface.
 
 <!-- usage -->
 ```sh-session
-
-npm install -g @noovolari/leapp-cli
-
+$ npm install -g @noovolari/leapp-cli
+$ leapp COMMAND
+running command...
+$ leapp (--version)
+@noovolari/leapp-cli/0.1.18 darwin-x64 node-v16.14.0
+$ leapp --help [COMMAND]
+USAGE
+  $ leapp COMMAND
+...
 ```
 <!-- usagestop -->
 

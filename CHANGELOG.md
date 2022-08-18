@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.0](https://github.com/Noovolari/leapp/compare/v0.13.4...v0.14.0) (2022-08-18)
+
+### Features
+
+* added new plugin system: users have the ability to download, install, and create custom plugins for Leapp
+* added [plugin template](https://github.com/Noovolari/leapp-plugin-template) as a starting point to develop your own plugin
+
+Learn more about Leapp plugins in our in-depth [documentation](https://docs.leapp.cloud/latest/plugins/plugins-introduction/)
+
 ### [0.13.4](https://github.com/Noovolari/leapp/compare/v0.13.3...v0.13.4) (2022-08-08)
 
 ### Bug Fixes

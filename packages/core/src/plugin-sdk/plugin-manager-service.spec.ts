@@ -345,7 +345,10 @@ describe("PluginManagerService", () => {
       requireModule: null,
       hashElement: { hashElement: null },
     } as any;
-    const pluginManager = new PluginManagerService(null, nativeService, null, null, sessionFactory, null) as any;
+    const repository = {
+      getPluginStatus: () => ({ active: true }),
+    } as any;
+    const pluginManager = new PluginManagerService(null, nativeService, null, repository, sessionFactory, null) as any;
     const plugin1 = {
       pluginType: AwsCredentialsPlugin.name,
       metadata: {

@@ -20,7 +20,7 @@ Go to Options by clicking the top right gear icon then click the Plugins tab. Cl
 
 Here, manually create a folder with the same name as your plugin package.json name property and move your `package.json` and bundled `plugin.js` files inside this folder.
 
-Alternatively, you can simply move your entire plugin folder cloned from the [example template](/plugins/plugins-development/#starting-template).
+Alternatively, you can simply move your entire plugin folder cloned from the [example template](https://github.com/Noovolari/leapp-plugin-template).
 
 Lastly, from the Leapp Plugins tab in the Option menu, click on the refresh icon to reload all plugins.
 

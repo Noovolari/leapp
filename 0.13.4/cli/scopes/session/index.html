@@ -1792,6 +1792,7 @@
 <li><a href="#leapp-session-get-id"><code>leapp session get-id</code></a></li>
 <li><a href="#leapp-session-list"><code>leapp session list</code></a></li>
 <li><a href="#leapp-session-open-web-console"><code>leapp session open-web-console</code></a></li>
+<li><a href="#leapp-session-run-aws-credential-plugin"><code>leapp session run-aws-credential-plugin</code></a></li>
 <li><a href="#leapp-session-start"><code>leapp session start</code></a></li>
 <li><a href="#leapp-session-start-ssm-session"><code>leapp session start-ssm-session</code></a></li>
 <li><a href="#leapp-session-stop"><code>leapp session stop</code></a></li>
@@ -1975,6 +1976,23 @@
 <span class="gp">  $</span>leapp session open-web-console
 
 <span class="gp">  $</span>leapp session open-web-console --sessionId SESSIONID <span class="o">[</span>--print, -p<span class="o">]</span>
+</code></pre></div>
+<h1 id="leapp-session-run-aws-credential-plugin"><code>leapp session run-aws-credential-plugin</code></h1>
+<p>Run a Leapp Plugin</p>
+<div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
+<span class="gp">  $ </span>leapp session run-aws-credential-plugin <span class="o">[</span>--sessionId &lt;value&gt;<span class="o">]</span> <span class="o">[</span>--pluginName &lt;value&gt;<span class="o">]</span>
+
+<span class="go">FLAGS</span>
+<span class="go">  --pluginName=&lt;value&gt;  Unique name of a Leapp Plugin</span>
+<span class="go">  --sessionId=&lt;value&gt;   Session Id to identify the session in Leapp, recover it with $leapp session list -x</span>
+
+<span class="go">DESCRIPTION</span>
+<span class="go">  Run a Leapp Plugin</span>
+
+<span class="go">EXAMPLES</span>
+<span class="gp">  $</span>leapp session run-plugin
+
+<span class="gp">  $</span>leapp session run-plugin --sessionName SESSIONAME --pluginName PLUGINNAME
 </code></pre></div>
 <h1 id="leapp-session-start"><code>leapp session start</code></h1>
 <p>Start a session</p>

@@ -1791,25 +1791,29 @@
 <li><a href="#leapp-integration-sync"><code>leapp integration sync</code></a></li>
 </ul>
 <h1 id="leapp-integration-create"><code>leapp integration create</code></h1>
-<p>Create a new AWS SSO integration</p>
+<p>Create a new integration</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp integration create <span class="o">[</span>--integrationAlias &lt;value&gt;<span class="o">]</span> <span class="o">[</span>--integrationPortalUrl &lt;value&gt;<span class="o">]</span> <span class="o">[</span>--integrationRegion &lt;value&gt;<span class="o">]</span>
-<span class="go">    [--integrationMethod &lt;value&gt;]</span>
+<span class="go">    [--integrationType AWS-SSO|AZURE] [--integrationTenantId &lt;value&gt;] [--integrationLocation &lt;value&gt;]</span>
 
 <span class="go">FLAGS</span>
 <span class="go">  --integrationAlias=&lt;value&gt;      alias that identifies an integration</span>
-<span class="go">  --integrationMethod=&lt;value&gt;     value is either In-app or In-browser, identifies the preferred method to authenticate</span>
-<span class="go">                                  against portal URL</span>
+<span class="go">  --integrationLocation=&lt;value&gt;   Location of an Azure Integration</span>
 <span class="go">  --integrationPortalUrl=&lt;value&gt;  url that identifies the integration portal where you authenticate</span>
 <span class="go">  --integrationRegion=&lt;value&gt;     an AWS valid region code for the integration</span>
+<span class="go">  --integrationTenantId=&lt;value&gt;   Tenant ID of an Azure Integration</span>
+<span class="go">  --integrationType=&lt;option&gt;      Identify the type of your integration. Valid types are [AWS-SSO, AZURE]</span>
+<span class="go">                                  &lt;options: AWS-SSO|AZURE&gt;</span>
 
 <span class="go">DESCRIPTION</span>
-<span class="go">  Create a new AWS SSO integration</span>
+<span class="go">  Create a new integration</span>
 
 <span class="go">EXAMPLES</span>
 <span class="gp">  $</span>leapp integration create
 
-<span class="gp">  $</span>leapp integration create --integrationAlias ALIAS --integrationPortalUrl URL --integrationRegion REGION --integrationMethod <span class="o">[</span>In-app, In-browser<span class="o">]</span>
+<span class="gp">  $</span>leapp integration create --integrationType AWS-SSO --integrationAlias ALIAS --integrationPortalUrl URL --integrationRegion REGION
+
+<span class="gp">  $</span>leapp integration create --integrationType AZURE --integrationAlias ALIAS --integrationTenantId TENANT --integrationLocation LOCATION
 </code></pre></div>
 <h1 id="leapp-integration-delete"><code>leapp integration delete</code></h1>
 <p>Delete an integration</p>
@@ -1867,7 +1871,7 @@
 <span class="gp">  $</span>leapp integration login --integrationId ID
 </code></pre></div>
 <h1 id="leapp-integration-logout"><code>leapp integration logout</code></h1>
-<p>Logout from integration</p>
+<p>Logout from an integration</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp integration <span class="nb">logout</span> <span class="o">[</span>--integrationId &lt;value&gt;<span class="o">]</span>
 
@@ -1875,7 +1879,7 @@
 <span class="go">  --integrationId=&lt;value&gt;  the Integration Id used to identify the integration inside Leapp</span>
 
 <span class="go">DESCRIPTION</span>
-<span class="go">  Logout from integration</span>
+<span class="go">  Logout from an integration</span>
 
 <span class="go">EXAMPLES</span>
 <span class="gp">  $</span>leapp integration <span class="nb">logout</span>

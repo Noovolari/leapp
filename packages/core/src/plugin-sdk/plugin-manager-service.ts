@@ -161,6 +161,9 @@ export class PluginManagerService {
     this.logService.log(new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true));
 
     const npmMetadata = await this.http.get(`https://registry.npmjs.org/${packageName}`, { responseType: "json" }).toPromise();
+    if (!npmMetadata["keywords"] || !npmMetadata["keywords"].includes("leapp-plugin")) {
+      throw new LoggedException(`${npmMetadata["name"]} is not a Leapp plugin`, this, LogLevel.error, true);
+    }
     const version = npmMetadata["dist-tags"].latest;
     const tarballUrl = npmMetadata.versions[version].dist.tarball;
     const tarballPathComponents = tarballUrl.split("/");

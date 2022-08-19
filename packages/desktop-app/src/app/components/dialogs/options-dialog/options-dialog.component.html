@@ -1,4 +1,4 @@
-<form [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
+<form spellcheck="false" [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
 
   <mat-tab-group [animationDuration]="'0ms'" #tabs>
 
@@ -240,13 +240,14 @@
 
         <div class="form-group">
           <div class="form-field form-control-input-button max-width">
-            <input formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Insert an npm package name">
+            <input formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Insert an npm package name"
+                   (keydown.enter)="$event.preventDefault(); installPlugin();">
             <button [disabled]="fetchingPlugins" class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
           </div>
 
           <h4> Installed plugins
-            <button class="borderless-button pull-right" (click)="openPluginFolder()"><i class="fas fa-folder-open blackery" matTooltip="Open plugin folder"></i></button>
-            <button [disabled]="fetchingPlugins" class="borderless-button pull-right"(click)="refreshPluginList()"><i class="fa fa-refresh blackery" matTooltip="Refresh plugin list"></i></button>
+            <button class="borderless-button pull-right" (click)="$event.preventDefault(); openPluginFolder()"><i class="fas fa-folder-open blackery" matTooltip="Open plugin folder"></i></button>
+            <button [disabled]="fetchingPlugins" class="borderless-button pull-right"(click)="$event.preventDefault(); refreshPluginList(true)"><i class="fa fa-refresh blackery" matTooltip="Refresh plugin list"></i></button>
           </h4>
 
           <div class="form-group scrollable max-height-320 tableFixHead">

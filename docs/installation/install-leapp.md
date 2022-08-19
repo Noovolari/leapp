@@ -8,9 +8,9 @@ You can install Leapp by downloading the pre-built binaries for your OS on the w
 
 **Unzip** the package and **double-click the executable** to install.
 
-### macOS (Homebrew) & Linux (Linuxbrew)
+### macOS (Homebrew)
 
-Leapp can also be installed on **macOS** or **Linux** via [Homebrew Cask](https://brew.sh/){: target='_blank'} with:
+Leapp can also be installed on **macOS** via [Homebrew Cask](https://brew.sh/){: target='_blank'} with:
 
 ```console
 brew install leapp

@@ -16,7 +16,7 @@ module.exports = {
       "\n" +
       "!!! warning\n" +
       "\n" +
-      "    Leapp CLI will works only with the Desktop App is installed and running.\n" +
+      "    Leapp CLI works only if the Desktop App is installed and running.\n" +
       "    Note that version >= v0.11.0 of the Desktop App is required.\n" +
       "    Check the [installation guide](../installation/install-leapp/){: target='_blank'} to install the Desktop App.\n" +
       "\n" +

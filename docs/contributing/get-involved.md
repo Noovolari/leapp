@@ -6,4 +6,4 @@ Read our [contribution guide](https://github.com/Noovolari/leapp/blob/master/CON
 
 You can chat with us in our community, so join us, or feel free to contact us via the [website](https://www.leapp.cloud/contacts){: target='_blank'}!
 
-[Join our Community :fontawesome-brands-slack:](https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q){ .md-button .md-button--primary }
+[Join our Community :fontawesome-brands-slack:](https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q){ .md-button .md-button--primary .centered-button }

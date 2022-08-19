@@ -171,7 +171,7 @@ header {
 img[src$="smaller-img"] {
   width:70%;
   display:block;
-  margin: 0 auto;
+  margin: 0 auto 30px;
 }
 
 img[src$="even-smaller-img"] {

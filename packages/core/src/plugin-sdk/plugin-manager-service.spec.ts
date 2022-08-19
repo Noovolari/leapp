@@ -483,6 +483,7 @@ describe("PluginManagerService", () => {
           },
         },
       },
+      keywords: ["leapp-plugin"],
     };
     const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
     (pluginManager as any).http = {

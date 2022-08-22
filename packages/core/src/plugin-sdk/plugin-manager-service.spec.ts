@@ -4,7 +4,7 @@ import { constants } from "../models/constants";
 import { OperatingSystem } from "../models/operating-system";
 import { SessionType } from "../models/session-type";
 import { SessionFactory } from "../services/session-factory";
-import { LoggedEntry, LogLevel } from "../services/log-service";
+import { LoggedEntry, LoggedException, LogLevel } from "../services/log-service";
 import { AwsCredentialsPlugin } from "./aws-credentials-plugin";
 
 describe("PluginManagerService", () => {
@@ -510,6 +510,44 @@ describe("PluginManagerService", () => {
     expect(nativeService.tar.x).toHaveBeenCalledWith({ file: tarballFilePath, strip: 1, ["C"]: fakePluginDir });
     expect(nativeService.fs.remove).toHaveBeenNthCalledWith(2, tarballFilePath);
     expect(logService.log).toHaveBeenNthCalledWith(2, new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
+  });
+
+  test("installPlugin, no leapp-plugin keyword", async () => {
+    const logService = {
+      log: () => {},
+    } as any;
+    const homedir = "homedir";
+    const packageName = "not-a-leapp-plugin";
+    const nativeService = {
+      requireModule: null,
+      hashElement: { hashElement: null },
+      os: {
+        homedir: () => homedir,
+      },
+    } as any;
+    const npmMetadata = {
+      name: packageName,
+      ["dist-tags"]: {
+        latest: "1.0.0",
+      },
+      versions: {
+        ["1.0.0"]: {
+          dist: {
+            tarball: `https://fake-url/${packageName}.tgz`,
+          },
+        },
+      },
+      keywords: ["random-keyword"],
+    };
+    const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
+    (pluginManager as any).http = {
+      get: jest.fn((param1, param2: any) => ({
+        toPromise: async () => (param2.responseType === "json" ? npmMetadata : ""),
+      })),
+    };
+    await expect(pluginManager.installPlugin(`leapp://${packageName}`)).rejects.toEqual(
+      new LoggedException(`${npmMetadata["name"]} is not a Leapp plugin`, this, LogLevel.error, true)
+    );
   });
 
   test("extractMetadata, success", () => {

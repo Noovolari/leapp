@@ -99,7 +99,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     private mfaPrompter: AppMfaCodePromptService
   ) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
-    this.keychainService = this.leappCoreService.keyChainService;
+    this.keychainService = this.leappCoreService.keychainService;
   }
 
   ngOnInit(): void {

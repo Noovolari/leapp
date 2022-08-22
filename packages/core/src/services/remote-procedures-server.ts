@@ -7,6 +7,7 @@ import { Repository } from "./repository";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IMfaCodePrompter } from "../interfaces/i-mfa-code-prompter";
 import { IntegrationFactory } from "./integration-factory";
+import { IKeychainService } from "../interfaces/i-keychain-service";
 
 export const uInt8ArrayToArray = (uint8array: Uint8Array): Array<number> => {
   if (uint8array === null || uint8array === undefined) return null;
@@ -35,6 +36,7 @@ export class RemoteProceduresServer {
   private rpcMethods: Map<string, RemoteProcedureFunctions>;
 
   constructor(
+    private keychainService: IKeychainService,
     private nativeService: INativeService,
     private verificationWindowService: IAwsSsoOidcVerificationWindowService,
     private awsAuthenticationService: IAwsSamlAuthenticationService,
@@ -55,6 +57,9 @@ export class RemoteProceduresServer {
       ["refreshSessions", this.refreshSessions],
       ["msalProtectData", this.msalProtectData],
       ["msalUnprotectData", this.msalUnprotectData],
+      ["keychainSaveSecret", this.keychainSaveSecret],
+      ["keychainGetSecret", this.keychainGetSecret],
+      ["keychainDeleteSecret", this.keychainDeleteSecret],
     ]);
   }
 
@@ -169,6 +174,33 @@ export class RemoteProceduresServer {
         data.params.scope
       );
       emitFunction(socket, "message", { result: uInt8ArrayToArray(protectedData) });
+    } catch (error) {
+      emitFunction(socket, "message", { error: error.message });
+    }
+  }
+
+  private async keychainSaveSecret(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
+    try {
+      await this.keychainService.saveSecret(data.params.service, data.params.account, data.params.password);
+      emitFunction(socket, "message", {});
+    } catch (error) {
+      emitFunction(socket, "message", { error: error.message });
+    }
+  }
+
+  private async keychainGetSecret(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
+    try {
+      const result = await this.keychainService.getSecret(data.params.service, data.params.account);
+      emitFunction(socket, "message", { result });
+    } catch (error) {
+      emitFunction(socket, "message", { error: error.message });
+    }
+  }
+
+  private async keychainDeleteSecret(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): Promise<void> {
+    try {
+      const result = await this.keychainService.deleteSecret(data.params.service, data.params.account);
+      emitFunction(socket, "message", { result });
     } catch (error) {
       emitFunction(socket, "message", { error: error.message });
     }

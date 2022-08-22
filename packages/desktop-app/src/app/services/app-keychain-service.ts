@@ -33,6 +33,6 @@ export class AppKeychainService implements IKeychainService {
    * @param account - unique identifier
    */
   async deleteSecret(service: string, account: string): Promise<boolean> {
-    return await this.nativeService.keytar.deleteSecret(service, account);
+    return await this.nativeService.keytar.deletePassword(service, account);
   }
 }

@@ -118,7 +118,7 @@ export class SessionCardComponent implements OnInit {
     this.loggingService = appProviderService.logService;
     this.sessionFactory = appProviderService.sessionFactory;
     this.fileService = appProviderService.fileService;
-    this.keychainService = appProviderService.keyChainService;
+    this.keychainService = appProviderService.keychainService;
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.awsCoreService = appProviderService.awsCoreService;
     this.azureCoreService = appProviderService.azureCoreService;

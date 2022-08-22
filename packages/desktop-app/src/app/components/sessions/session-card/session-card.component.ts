@@ -15,7 +15,6 @@ import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/l
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { AppSsmService } from "../../../services/app-ssm.service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
@@ -33,6 +32,7 @@ import { AppAwsAuthenticationService } from "../../../services/app-aws-authentic
 import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
 import { OptionsService } from "../../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -96,7 +96,7 @@ export class SessionCardComponent implements OnInit {
   private loggingService: LogService;
   private sessionFactory: SessionFactory;
   private fileService: FileService;
-  private keychainService: KeychainService;
+  private keychainService: IKeychainService;
   private behaviouralSubjectService: BehaviouralSubjectService;
   private sessionService: SessionService;
   private awsCoreService: AwsCoreService;

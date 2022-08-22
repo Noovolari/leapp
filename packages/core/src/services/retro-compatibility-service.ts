@@ -3,7 +3,6 @@ import { Workspace } from "../models/workspace";
 import { AwsSsoRoleSession } from "../models/aws/aws-sso-role-session";
 import { FileService } from "./file-service";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
-import { KeychainService } from "./keychain-service";
 import { constants } from "../models/constants";
 import * as uuid from "uuid";
 import { SessionType } from "../models/session-type";
@@ -12,11 +11,12 @@ import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 import { Session } from "../models/session";
 import { AzureSession } from "../models/azure/azure-session";
 import { AzureIntegration } from "../models/azure/azure-integration";
+import { IKeychainService } from "../interfaces/i-keychain-service";
 
 export class RetroCompatibilityService {
   constructor(
     private fileService: FileService,
-    private keyChainService: KeychainService,
+    private keyChainService: IKeychainService,
     private repository: Repository,
     private behaviouralSubjectService: BehaviouralSubjectService
   ) {}

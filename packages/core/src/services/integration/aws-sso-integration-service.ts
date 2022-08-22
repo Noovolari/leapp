@@ -4,7 +4,6 @@ import { AwsSsoIntegration } from "../../models/aws/aws-sso-integration";
 import { formatDistance } from "date-fns";
 import { INativeService } from "../../interfaces/i-native-service";
 import { AwsSsoOidcService } from "../aws-sso-oidc.service";
-import { KeychainService } from "../keychain-service";
 import { constants } from "../../models/constants";
 import SSO, {
   AccountInfo,
@@ -24,6 +23,7 @@ import { SessionFactory } from "../session-factory";
 import { IIntegrationService } from "../../interfaces/i-integration-service";
 import { AwsSsoIntegrationCreationParams } from "../../models/aws/aws-sso-integration-creation-params";
 import { ThrottleService } from "../throttle-service";
+import { IKeychainService } from "../../interfaces/i-keychain-service";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -38,7 +38,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   constructor(
     public repository: Repository,
-    public keyChainService: KeychainService,
+    public keyChainService: IKeychainService,
     public behaviouralNotifier: IBehaviouralNotifier,
     public nativeService: INativeService,
     public sessionFactory: SessionFactory,
@@ -186,7 +186,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       this.ssoPortal = null;
 
       // Delete access token and remove sso integration info from workspace
-      await this.keyChainService.deletePassword(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
+      await this.keyChainService.deleteSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
       this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
     }
 

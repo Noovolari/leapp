@@ -3,7 +3,6 @@ import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/service
 import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
@@ -43,6 +42,8 @@ import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-ma
 import { HttpClient } from "@angular/common/http";
 import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
+import { AppKeychainService } from "./app-keychain-service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 
 @Injectable({
   providedIn: "root",
@@ -69,7 +70,7 @@ export class AppProviderService {
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
-  private keyChainServiceInstance: KeychainService;
+  private keyChainServiceInstance: IKeychainService;
   private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
@@ -337,9 +338,9 @@ export class AppProviderService {
     return this.repositoryInstance;
   }
 
-  public get keyChainService(): KeychainService {
+  public get keyChainService(): IKeychainService {
     if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.appNativeService);
+      this.keyChainServiceInstance = new AppKeychainService(this.appNativeService);
     }
     return this.keyChainServiceInstance;
   }

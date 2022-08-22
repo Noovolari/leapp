@@ -91,7 +91,7 @@ export class CliProviderService {
   private azureIntegrationServiceInstance: AzureIntegrationService;
 
   private httpClient: any = {
-    get: (url: string) =>  ({
+    get: (url: string) => ({
       toPromise: async () => (await axios.get(url)).data
     }),
   };
@@ -184,6 +184,11 @@ export class CliProviderService {
   public get remoteProceduresClient(): RemoteProceduresClient {
     if (!this.remoteProceduresClientInstance) {
       this.remoteProceduresClientInstance = new RemoteProceduresClient(this.cliNativeService);
+      const client = this.remoteProceduresClientInstance;
+      this.cliNativeService.msalEncryptionService = {
+        unprotectData: client.msalUnprotectData.bind(client),
+        protectData: client.msalProtectData.bind(client),
+      }
     }
     return this.remoteProceduresClientInstance;
   }

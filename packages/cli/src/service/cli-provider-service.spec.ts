@@ -26,4 +26,17 @@ describe("CliProviderService", () => {
       }
     }
   });
+
+  test("remoteProceduresClient", async () => {
+    const cliProviderService = new CliProviderService();
+    const cliNativeService = cliProviderService.cliNativeService;
+    expect(cliNativeService.msalEncryptionService).toBeNull();
+
+    const remoteProceduresClient = cliProviderService.remoteProceduresClient;
+    expect(remoteProceduresClient).not.toBeFalsy();
+
+    expect(cliNativeService.msalEncryptionService).not.toBeFalsy();
+    expect(cliNativeService.msalEncryptionService.protectData).not.toBeFalsy();
+    expect(cliNativeService.msalEncryptionService.unprotectData).not.toBeFalsy();
+  });
 });

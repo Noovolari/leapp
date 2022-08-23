@@ -6,7 +6,6 @@ import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-crede
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { LeappCommand } from "../../leapp-command";
 
-// TODO: move again to the commands folder when plugin system is activated
 export default class RunAwsCredentialPlugin extends LeappCommand {
   static description = "Run a Leapp Plugin";
 

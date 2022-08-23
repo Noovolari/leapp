@@ -31,8 +31,8 @@ export class ExecuteService {
       const commandTokens = command.split(" ");
       const commandBin = commandTokens[0];
       const commandParams = commandTokens.slice(1).join(" ");
-      const whichResult = await this.exec(this.nativeService.exec, `which ${commandBin}`);
-      if (!whichResult.includes("built-in command") && !whichResult.includes("not found")) {
+      const whichResult = (await this.exec(this.nativeService.exec, `which ${commandBin}`)).trim();
+      if (!whichResult.includes("built-in command")) {
         command = whichResult + (commandParams ? " " + commandParams : "");
       }
     }

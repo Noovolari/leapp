@@ -15,8 +15,8 @@
 
 ::ng-deep {
   .add-error-link-cursor {
-    cursor: pointer!important;
     div .link {
+      cursor: pointer!important;
       text-decoration: underline;
       color: #ffffff;
       transition: all 0.3s ease;

@@ -43,6 +43,7 @@ import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-ma
 import { HttpClient } from "@angular/common/http";
 import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
+import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 
 @Injectable({
   providedIn: "root",
@@ -69,6 +70,7 @@ export class AppProviderService {
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
+  private workspaceConsistencyServiceInstance: WorkspaceConsistencyService;
   private keyChainServiceInstance: KeychainService;
   private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
@@ -330,9 +332,16 @@ export class AppProviderService {
     return this.fileServiceInstance;
   }
 
+  public get workspaceConsistencyService(): WorkspaceConsistencyService {
+    if (!this.workspaceConsistencyServiceInstance) {
+      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.appNativeService, this.logService);
+    }
+    return this.workspaceConsistencyServiceInstance;
+  }
+
   public get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.appNativeService, this.fileService);
+      this.repositoryInstance = new Repository(this.appNativeService, this.fileService, this.workspaceConsistencyService);
     }
     return this.repositoryInstance;
   }

@@ -45,6 +45,7 @@ import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 import axios from "axios";
+import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -65,6 +66,7 @@ export class CliProviderService {
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
+  private workspaceConsistencyServiceInstance: WorkspaceConsistencyService;
   private repositoryInstance: Repository;
   private regionsServiceInstance: RegionsService;
   private namedProfilesServiceInstance: NamedProfilesService;
@@ -294,9 +296,16 @@ export class CliProviderService {
     return this.fileServiceInstance;
   }
 
+  public get workspaceConsistencyService(): WorkspaceConsistencyService {
+    if (!this.workspaceConsistencyServiceInstance) {
+      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.cliNativeServiceInstance, this.logService);
+    }
+    return this.workspaceConsistencyServiceInstance;
+  }
+
   get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService);
+      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService, this.workspaceConsistencyService);
     }
     return this.repositoryInstance;
   }

@@ -1,3 +1,7 @@
+!!! Warning
+
+    If your Leapp Desktop App is warning you that you're missing the **AWS Session Manager Plugin**, please install it following this official [guide](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager-working-with-install-plugin.html){: target='_blank'}.
+
 You can directly connect to an AWS EC2 instance from Leapp through AWS System Manager (AWS SSM).
 
 !!! Info

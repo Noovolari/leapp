@@ -17,6 +17,7 @@ import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { LeappLinkError } from "@noovolari/leapp-core/errors/leapp-link-error";
 
 @Component({
   selector: "app-tray-menu",
@@ -218,17 +219,25 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   private getMetadata() {
     const printError = (error) => {
-      this.loggingService.log(new LoggedException(error.toString(), this, LogLevel.error, true, error.stack));
+      this.loggingService.log(new LoggedException(error.toString(), this, LogLevel.error, false, error.stack));
       if ((error as LeappBaseError).severity === LogLevel.error) {
-        this.messageToasterService.toast(error.toString(), ToastLevel.error, "");
+        if ((error as LeappLinkError).link === undefined || (error as LeappLinkError).link === null) {
+          this.messageToasterService.toast(error.toString(), ToastLevel.error, "");
+        } else {
+          this.messageToasterService.toast(error.toString(), ToastLevel.error, "", (error as LeappLinkError).link);
+        }
       }
     };
 
     this.getAwsCliVersion()
       .then(() => {
-        this.getSessionManagerPluginVersion().then(() => {
-          this.setIssueBody();
-        });
+        this.getSessionManagerPluginVersion()
+          .then(() => {
+            this.setIssueBody();
+          })
+          .catch((error) => {
+            printError(error);
+          });
       })
       .catch((error) => {
         printError(error);
@@ -256,11 +265,10 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         const sessionManagerPluginVersion = await this.appProviderService.executeService.execute("session-manager-plugin --version");
         this.awsSsmPluginVersion = sessionManagerPluginVersion.replace(/(\r\n|\n|\r)/gm, "");
       } catch (error) {
-        throw new LeappBaseError(
-          "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed.",
+        throw new LeappLinkError(
+          "https://docs.leapp.cloud/latest/built-in-features/aws-ec2-connect/",
           this,
-          LogLevel.warn,
-          "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed."
+          "An error occurred getting AWS Session Manager Plugin version. Please <span class='link'>click this message</span> to install it."
         );
       }
     }

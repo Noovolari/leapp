@@ -13,6 +13,21 @@
   align-items: center;
 }
 
+::ng-deep {
+  .add-error-link-cursor {
+    cursor: pointer!important;
+    div .link {
+      text-decoration: underline;
+      color: #ffffff;
+      transition: all 0.3s ease;
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+
 .icon {
   width: 8%;
   height: 100%;

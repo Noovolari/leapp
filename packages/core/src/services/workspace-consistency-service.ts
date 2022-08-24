@@ -43,7 +43,46 @@ export class WorkspaceConsistencyService {
     return workspace;
   }
 
-  private checkConsistency(_: Workspace) {}
+  private checkConsistency(workspace: Workspace) {
+    const sessionIds = new Set(workspace.sessions.map((session) => session.sessionId));
+    if (sessionIds.size !== workspace.sessions.length) {
+      throw new Error("Sessions with duplicated ids");
+    }
+    const awsSsoIntegrationIds = new Set(workspace.awsSsoIntegrations.map((integration) => integration.id));
+    if (awsSsoIntegrationIds.size !== workspace.awsSsoIntegrations.length) {
+      throw new Error("AWS SSO integrations with duplicated ids");
+    }
+    const azureIntegrationIds = new Set(workspace.azureIntegrations.map((integration) => integration.id));
+    if (azureIntegrationIds.size !== workspace.azureIntegrations.length) {
+      throw new Error("Azure integrations with duplicated ids");
+    }
+    const awsProfileIds = new Set(workspace.profiles.map((profile) => profile.id));
+    if (awsProfileIds.size !== workspace.profiles.length) {
+      throw new Error("AWS named profiles with duplicated ids");
+    }
+    const idpUrlIds = new Set(workspace.idpUrls.map((idpUrl) => idpUrl.id));
+    if (idpUrlIds.size !== workspace.idpUrls.length) {
+      throw new Error("AWS IdP URLs with duplicated ids");
+    }
+
+    for (const session of workspace.sessions as any[]) {
+      if (session.profileId && !awsProfileIds.has(session.profileId)) {
+        throw new Error(`Session ${session.sessionName} has an invalid profileId`);
+      }
+      if (session.idpUrlId && !idpUrlIds.has(session.idpUrlId)) {
+        throw new Error(`Session ${session.sessionName} has an invalid idpUrlId`);
+      }
+      if (session.awsSsoConfigurationId && !awsSsoIntegrationIds.has(session.awsSsoConfigurationId)) {
+        throw new Error(`Session ${session.sessionName} has an invalid awsSsoConfigurationId`);
+      }
+      if (session.azureIntegrationId && !azureIntegrationIds.has(session.azureIntegrationId)) {
+        throw new Error(`Session ${session.sessionName} has an invalid azureIntegrationId`);
+      }
+      if (session.parentSessionId && !sessionIds.has(session.parentSessionId)) {
+        throw new Error(`Session ${session.sessionName} has an invalid parentSessionId`);
+      }
+    }
+  }
 
   private saveBackup(workspace: Workspace) {
     this.fileService.writeFileSync(this.fileLockBackupPath, this.fileService.encryptText(serialize(workspace)));

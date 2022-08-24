@@ -1,6 +1,8 @@
 import { expect, beforeEach, jest, describe, test } from "@jest/globals";
 import { WorkspaceConsistencyService } from "./workspace-consistency-service";
 import { LoggedEntry, LogLevel } from "./log-service";
+import { Workspace } from "../models/workspace";
+import { deserialize, serialize } from "class-transformer";
 
 describe("WorkspaceConsistencyService", () => {
   let fileService;
@@ -102,4 +104,44 @@ describe("WorkspaceConsistencyService", () => {
     expect(fileService.existsSync).toHaveBeenCalledWith("backup/path");
     expect(service.cleanWorkspace).toHaveBeenCalled();
   });
+
+  test("createNewWorkspace", () => {
+    const result = service.createNewWorkspace();
+    expect(result).toBeInstanceOf(Workspace);
+    expect((result as any)._workspaceVersion).not.toBe(undefined);
+  });
+
+  test("checkConsistency", () => {});
+
+  test("saveBackup", () => {
+    const mockedWorkspace = new Workspace();
+    mockedWorkspace.sessions = [{ name: "testName" } as any];
+    const fileLockBackupPathSpy = jest.spyOn(service, "fileLockBackupPath", "get").mockImplementation(() => "backup/path");
+    fileService.encryptText = jest.fn(() => "encryptedText");
+    fileService.writeFileSync = jest.fn();
+
+    service.saveBackup(mockedWorkspace);
+
+    expect(fileService.encryptText).toHaveBeenCalledWith(serialize(mockedWorkspace));
+    expect(fileLockBackupPathSpy).toHaveBeenCalled();
+    expect(fileService.writeFileSync).toHaveBeenCalledWith("backup/path", "encryptedText");
+  });
+
+  test("loadWorkspace", () => {
+    const decryptedWorkspace = serialize(new Workspace());
+    const fileLockPathSpy = jest.spyOn(service, "fileLockPath", "get").mockImplementation(() => "actual/path");
+    fileService.decryptText = jest.fn(() => decryptedWorkspace);
+    fileService.readFileSync = jest.fn(() => "content");
+
+    const resultWorkspace = service.loadWorkspace();
+
+    expect(fileLockPathSpy).toHaveBeenCalled();
+    expect(fileService.readFileSync).toHaveBeenCalledWith("actual/path");
+    expect(fileService.decryptText).toHaveBeenCalledWith("content");
+    expect(resultWorkspace).toStrictEqual(deserialize(Workspace, decryptedWorkspace));
+  });
+
+  test("restoreBackup", () => {});
+
+  test("cleanWorkspace", () => {});
 });

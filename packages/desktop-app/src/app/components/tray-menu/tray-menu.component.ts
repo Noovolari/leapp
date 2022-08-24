@@ -189,6 +189,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
     this.currentTray.setContextMenu(contextMenu);
   }
+
   /**
    * Remove session and credential file before exiting program
    */
@@ -240,12 +241,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       try {
         this.awsCliVersion = await this.appProviderService.executeService.execute("aws --version");
       } catch (error) {
-        throw new LeappBaseError(
-          "An error occurred getting AWS CLI version. Please check if it is installed.",
-          this,
-          LogLevel.error,
-          "An error occurred getting AWS CLI version. Please check if it is installed."
-        );
+        throw new LeappBaseError("AWS CLI", this, LogLevel.error, "An error occurred getting AWS CLI version. Please check if it is installed.");
       }
     }
   }
@@ -257,7 +253,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         this.awsSsmPluginVersion = sessionManagerPluginVersion.replace(/(\r\n|\n|\r)/gm, "");
       } catch (error) {
         throw new LeappBaseError(
-          "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed.",
+          "AWS Session Manager",
           this,
           LogLevel.warn,
           "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed."

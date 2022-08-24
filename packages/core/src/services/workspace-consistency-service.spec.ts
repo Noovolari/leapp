@@ -111,7 +111,56 @@ describe("WorkspaceConsistencyService", () => {
     expect((result as any)._workspaceVersion).not.toBe(undefined);
   });
 
-  test("checkConsistency", () => {});
+  test("checkConsistency, success", () => {
+    const workspace = new Workspace();
+    workspace.awsSsoIntegrations = [{ id: "aws-sso-integration-id" } as any];
+    workspace.azureIntegrations = [{ id: "azure-integration-id" } as any];
+    workspace.profiles = [{ id: "profile-id" } as any];
+    workspace.idpUrls = [{ id: "idpurl-id" } as any];
+    workspace.sessions.push(
+      { sessionId: "id-1", profileId: "profile-id" } as any,
+      { sessionId: "id-2", idpUrlId: "idpurl-id" } as any,
+      { sessionId: "id-3", awsSsoConfigurationId: "aws-sso-integration-id" } as any,
+      { sessionId: "id-4", azureIntegrationId: "azure-integration-id" } as any,
+      { sessionId: "id-5", parentSessionId: "id-1" } as any
+    );
+    service.checkConsistency(workspace);
+  });
+
+  test("checkConsistency, duplicated ids", () => {
+    const assertions = [
+      { arrayFieldName: "sessions", idFieldName: "sessionId", expectError: "Sessions with duplicated ids" },
+      { arrayFieldName: "awsSsoIntegrations", idFieldName: "id", expectError: "AWS SSO integrations with duplicated ids" },
+      { arrayFieldName: "azureIntegrations", idFieldName: "id", expectError: "Azure integrations with duplicated ids" },
+      { arrayFieldName: "profiles", idFieldName: "id", expectError: "AWS named profiles with duplicated ids" },
+      { arrayFieldName: "idpUrls", idFieldName: "id", expectError: "AWS IdP URLs with duplicated ids" },
+    ];
+    for (const assertion of assertions) {
+      const workspace = new Workspace();
+      workspace[assertion.arrayFieldName].push({ [assertion.idFieldName]: "id" }, { [assertion.idFieldName]: "id" });
+      expect(() => service.checkConsistency(workspace)).toThrow(assertion.expectError);
+    }
+  });
+
+  test("checkConsistency, invalid/missing ids", () => {
+    const sessionName = "fake-session-name";
+    const assertions = [
+      { sessionFieldName: "profileId", expectError: `Session ${sessionName} has an invalid profileId` },
+      { sessionFieldName: "idpUrlId", expectError: `Session ${sessionName} has an invalid idpUrlId` },
+      { sessionFieldName: "awsSsoConfigurationId", expectError: `Session ${sessionName} has an invalid awsSsoConfigurationId` },
+      { sessionFieldName: "azureIntegrationId", expectError: `Session ${sessionName} has an invalid azureIntegrationId` },
+      { sessionFieldName: "parentSessionId", expectError: `Session ${sessionName} has an invalid parentSessionId` },
+    ];
+    for (const assertion of assertions) {
+      console.log(assertion.sessionFieldName);
+      const workspace = new Workspace();
+      workspace.sessions.push(
+        { sessionId: "session-1" } as any,
+        { sessionId: "session-2", sessionName, [assertion.sessionFieldName]: "invalid-id" } as any
+      );
+      expect(() => service.checkConsistency(workspace)).toThrow(assertion.expectError);
+    }
+  });
 
   test("saveBackup", () => {
     const mockedWorkspace = new Workspace();
@@ -141,7 +190,54 @@ describe("WorkspaceConsistencyService", () => {
     expect(resultWorkspace).toStrictEqual(deserialize(Workspace, decryptedWorkspace));
   });
 
-  test("restoreBackup", () => {});
+  test("restoreBackup", () => {
+    const workspace = deserialize(Workspace, serialize(new Workspace()));
+    workspace.defaultRegion = "fake-region";
+    const serializedWorkspace = serialize(workspace);
 
-  test("cleanWorkspace", () => {});
+    fileService.readFileSync = jest.fn(() => "backup-content");
+    fileService.writeFileSync = jest.fn();
+    fileService.decryptText = jest.fn(() => serializedWorkspace);
+    logService.log = jest.fn();
+    service.checkConsistency = jest.fn();
+    const fileLockBackupPath = jest.spyOn(service, "fileLockBackupPath", "get").mockImplementation(() => "backup/path");
+    const fileLockPath = jest.spyOn(service, "fileLockPath", "get").mockImplementation(() => "actual/path");
+
+    const resultWorkspace = service.restoreBackup();
+
+    expect(fileLockBackupPath).toHaveBeenCalled();
+    expect(fileService.readFileSync).toHaveBeenCalledWith("backup/path");
+    expect(fileLockPath).toHaveBeenCalled();
+    expect(fileService.writeFileSync).toHaveBeenCalledWith("actual/path", "backup-content");
+    expect(fileService.decryptText).toHaveBeenCalledWith("backup-content");
+    expect(service.checkConsistency).toHaveBeenCalledWith(workspace);
+    expect(logService.log).toHaveBeenCalledWith(
+      new LoggedEntry("Leapp-lock.json was corrupted and has been restored from the latest backup.", service, LogLevel.error, true)
+    );
+    expect(resultWorkspace).toStrictEqual(workspace);
+  });
+
+  test("cleanWorkspace", () => {
+    const newWorkspace = new Workspace();
+    fileService.writeFileSync = jest.fn();
+    fileService.encryptText = jest.fn(() => "encrypted-workspace");
+    logService.log = jest.fn();
+    service.createNewWorkspace = jest.fn(() => newWorkspace);
+    const fileLockBackupPath = jest.spyOn(service, "fileLockBackupPath", "get").mockImplementation(() => "backup/path");
+    const fileLockPath = jest.spyOn(service, "fileLockPath", "get").mockImplementation(() => "actual/path");
+
+    const resultWorkspace = service.cleanWorkspace();
+
+    expect(service.createNewWorkspace).toHaveBeenCalled();
+    expect(fileLockBackupPath).toHaveBeenCalled();
+    expect(fileLockPath).toHaveBeenCalled();
+    expect(fileService.encryptText).toHaveBeenCalledWith(serialize(newWorkspace));
+    expect(fileService.writeFileSync).toHaveBeenCalledTimes(2);
+    expect(fileService.writeFileSync).toHaveBeenNthCalledWith(1, "actual/path", "encrypted-workspace");
+    expect(fileService.writeFileSync).toHaveBeenNthCalledWith(2, "backup/path", "encrypted-workspace");
+    expect(logService.log).toHaveBeenCalledWith(
+      new LoggedEntry("Leapp failed to restore the latest Leapp-lock.json backup. Leapp-lock.json was reinitialized.", service, LogLevel.error, true)
+    );
+    expect(resultWorkspace).toBe(newWorkspace);
+  });
 });

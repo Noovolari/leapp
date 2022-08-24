@@ -8,11 +8,11 @@ import { deserialize, serialize } from "class-transformer";
 export class WorkspaceConsistencyService {
   constructor(private fileService: FileService, private nativeService: INativeService, private logService: LogService) {}
 
-  get fileLockPath(): string {
+  private get fileLockPath(): string {
     return this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
   }
 
-  get fileLockBackupPath(): string {
+  private get fileLockBackupPath(): string {
     return this.nativeService.os.homedir() + "/" + constants.lockFileBackupPath;
   }
 

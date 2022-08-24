@@ -268,7 +268,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         throw new LeappLinkError(
           "https://docs.leapp.cloud/latest/built-in-features/aws-ec2-connect/",
           this,
-          "An error occurred getting AWS Session Manager Plugin version. <span class='link'>Follow the instructions on the docs</span> to solve the issue."
+          "An error occurred getting AWS Session Manager Plugin version. <span class='link'>Click here to follow the instructions on the docs</span> and solve the issue."
         );
       }
     }

@@ -25,7 +25,7 @@ export class SnackbarComponent implements OnInit {
     });
   }
 
-  processEventualLink() {
+  processOptionalLink(): void {
     if (this.data.link) {
       this.appProviderService.windowService.openExternalUrl(this.data.link);
     }

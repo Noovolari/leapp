@@ -1,4 +1,4 @@
-<div class="holder">
+<div class="holder {{this.data.link ? 'add-error-link-cursor' : ''}}">
   <div class="icon float">
     <i *ngIf="data.className === 'toast-success'" class="fal fa-check-circle"></i>
     <i *ngIf="data.className === 'toast-info'" class="fal fa-info-circle"></i>
@@ -6,7 +6,7 @@
     <i *ngIf="data.className === 'toast-error'" class="fal fa-exclamation-circle"></i>
   </div>
 
-  <div [innerHTML]="data.html" class="large float"></div>
+  <div [innerHTML]="data.html" class="large float" (click)="processOptionalLink();"></div>
 
   <a (click)="close($event);" class="small float" *ngIf="data.className === 'toast-error'"><i class="moon-Close"></i></a>
   <div class="clear"></div>

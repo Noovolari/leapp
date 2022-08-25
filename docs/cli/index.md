@@ -2,7 +2,7 @@ Leapp's Command Line Interface.
 
 !!! warning
 
-    Leapp CLI will works only with the Desktop App is installed and running.
+    Leapp CLI works only if the Desktop App is installed and running.
     Note that version >= v0.11.0 of the Desktop App is required.
     Check the [installation guide](../installation/install-leapp/){: target='_blank'} to install the Desktop App.
 
@@ -14,7 +14,7 @@ $ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@noovolari/leapp-cli/0.1.18 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli/0.1.19 darwin-x64 node-v16.15.1
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND

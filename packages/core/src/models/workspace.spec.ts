@@ -1,4 +1,4 @@
-import { describe, test, expect } from "@jest/globals";
+import { jest, describe, test, expect } from "@jest/globals";
 import { Workspace } from "./workspace";
 import { IdpUrl } from "./idp-url";
 import { constants } from "./constants";
@@ -93,7 +93,7 @@ describe("Workspace Model", () => {
   test("setNewWorkspaceVersion", () => {
     const workspace = new Workspace();
     workspace.setNewWorkspaceVersion();
-    expect((workspace as any)._workspaceVersion).toBe(1);
+    expect((workspace as any)._workspaceVersion).toBe(2);
   });
 
   test("get Sessions", () => {

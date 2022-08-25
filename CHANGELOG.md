@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.3](https://github.com/Noovolari/leapp/compare/v0.14.2...v0.14.3) (2022-08-25)
+
+### Bug Fixes
+
+* removed AWS error message for AWS CLI on macOS ([a638052](https://github.com/Noovolari/leapp/commit/a638052735917761b8317e77c96592018cf49807))
+
 ### [0.14.2](https://github.com/Noovolari/leapp/compare/v0.14.1...v0.14.2) (2022-08-25)
 
 ### Features

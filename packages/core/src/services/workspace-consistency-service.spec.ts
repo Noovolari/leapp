@@ -3,6 +3,8 @@ import { WorkspaceConsistencyService } from "./workspace-consistency-service";
 import { LoggedEntry, LogLevel } from "./log-service";
 import { Workspace } from "../models/workspace";
 import { deserialize, serialize } from "class-transformer";
+import * as uuid from "uuid";
+import { IntegrationType } from "../models/integration-type";
 
 describe("WorkspaceConsistencyService", () => {
   let fileService;
@@ -113,6 +115,8 @@ describe("WorkspaceConsistencyService", () => {
 
   test("checkConsistency, success", () => {
     const workspace = new Workspace();
+    service.save = jest.fn();
+
     workspace.awsSsoIntegrations = [{ id: "aws-sso-integration-id" } as any];
     workspace.azureIntegrations = [{ id: "azure-integration-id" } as any];
     workspace.profiles = [{ id: "profile-id" } as any];
@@ -125,6 +129,7 @@ describe("WorkspaceConsistencyService", () => {
       { sessionId: "id-5", parentSessionId: "id-1" } as any
     );
     service.checkConsistency(workspace);
+    expect(service.save).toHaveBeenCalledWith(workspace);
   });
 
   test("checkConsistency, duplicated ids", () => {
@@ -162,6 +167,19 @@ describe("WorkspaceConsistencyService", () => {
     }
   });
 
+  test("checkConsistency, missing integration types", () => {
+    const workspace = new Workspace();
+    service.save = jest.fn();
+
+    const assertion = { arrayFieldName: "awsSsoIntegrations", idFieldName: "id" };
+    workspace[assertion.arrayFieldName].push({ [assertion.idFieldName]: uuid.v4() }, { [assertion.idFieldName]: uuid.v4() });
+    service.checkConsistency(workspace);
+
+    expect(workspace.awsSsoIntegrations[0].type).toBe(IntegrationType.awsSso);
+    expect(workspace.awsSsoIntegrations[1].type).toBe(IntegrationType.awsSso);
+    expect(service.save).toHaveBeenCalledWith(workspace);
+  });
+
   test("saveBackup", () => {
     const mockedWorkspace = new Workspace();
     mockedWorkspace.sessions = [{ name: "testName" } as any];
@@ -174,6 +192,20 @@ describe("WorkspaceConsistencyService", () => {
     expect(fileService.encryptText).toHaveBeenCalledWith(serialize(mockedWorkspace));
     expect(fileLockBackupPathSpy).toHaveBeenCalled();
     expect(fileService.writeFileSync).toHaveBeenCalledWith("backup/path", "encryptedText");
+  });
+
+  test("save", () => {
+    const mockedWorkspace = new Workspace();
+    mockedWorkspace.sessions = [{ name: "testName" } as any];
+    const fileLockPathSpy = jest.spyOn(service, "fileLockPath", "get").mockImplementation(() => "user/path");
+    fileService.encryptText = jest.fn(() => "encryptedText");
+    fileService.writeFileSync = jest.fn();
+
+    service.save(mockedWorkspace);
+
+    expect(fileService.encryptText).toHaveBeenCalledWith(serialize(mockedWorkspace));
+    expect(fileLockPathSpy).toHaveBeenCalled();
+    expect(fileService.writeFileSync).toHaveBeenCalledWith("user/path", "encryptedText");
   });
 
   test("loadWorkspace", () => {

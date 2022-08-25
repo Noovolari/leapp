@@ -4,6 +4,7 @@ import { LoggedEntry, LogLevel, LogService } from "./log-service";
 import { Workspace } from "../models/workspace";
 import { constants } from "../models/constants";
 import { deserialize, serialize } from "class-transformer";
+import { IntegrationType } from "../models/integration-type";
 
 export class WorkspaceConsistencyService {
   constructor(private fileService: FileService, private nativeService: INativeService, private logService: LogService) {}
@@ -82,10 +83,21 @@ export class WorkspaceConsistencyService {
         throw new Error(`Session ${session.sessionName} has an invalid parentSessionId`);
       }
     }
+
+    for (let i = 0; i < workspace.awsSsoIntegrations.length; i++) {
+      if (!workspace.awsSsoIntegrations[i].type) {
+        workspace.awsSsoIntegrations[i].type = IntegrationType.awsSso;
+      }
+    }
+    this.save(workspace);
   }
 
   private saveBackup(workspace: Workspace) {
     this.fileService.writeFileSync(this.fileLockBackupPath, this.fileService.encryptText(serialize(workspace)));
+  }
+
+  private save(workspace: Workspace) {
+    this.fileService.writeFileSync(this.fileLockPath, this.fileService.encryptText(serialize(workspace)));
   }
 
   private loadWorkspace(): Workspace {

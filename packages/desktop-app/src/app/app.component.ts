@@ -91,16 +91,6 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    // this.appNativeService.fixPath();
-
-    if (!constants.disablePluginSystem) {
-      this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
-      await this.appProviderService.pluginManagerService.loadFromPluginDir();
-      this.loggingService.log(
-        new LoggedEntry(`Loaded plugins...\n\n${this.appProviderService.pluginManagerService.pluginContainers}`, this, LogLevel.info)
-      );
-    }
-
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
     // We get the right moment to set an hook to app close
@@ -147,6 +137,14 @@ export class AppComponent implements OnInit {
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
+
+    if (!constants.disablePluginSystem) {
+      this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+      await this.appProviderService.pluginManagerService.loadFromPluginDir();
+      this.loggingService.log(
+        new LoggedEntry(`Loaded plugins...\n\n${this.appProviderService.pluginManagerService.pluginContainers}`, this, LogLevel.info)
+      );
+    }
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit

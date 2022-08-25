@@ -27,6 +27,7 @@ export class RetroCompatibilityService {
       await this.migration0();
       this.migration1();
       this.migration2();
+      // When adding new migrations remember to increase constants.workspaceLastVersion
     }
   }
 

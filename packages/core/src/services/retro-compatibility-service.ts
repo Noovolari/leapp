@@ -55,7 +55,7 @@ export class RetroCompatibilityService {
     const azureIntegrations = [];
 
     for (const integration of integrations) {
-      if (integration.type === "awsSso") {
+      if (integration.type === "awsSso" || !integration.type) {
         integration.type = IntegrationType.awsSso;
         awsIntegrations.push(integration);
       } else if (integration.type === "azure") {

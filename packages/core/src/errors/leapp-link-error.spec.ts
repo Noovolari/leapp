@@ -10,7 +10,7 @@ describe("LeappLinkError", () => {
     expect(error).toBeInstanceOf(LeappLinkError);
     expect(error).toBeInstanceOf(LeappBaseError);
     expect(error.message).toBe("link error");
-    expect(error.name).toBe("Leapp Link Error");
+    expect(error.name).toBe("Error");
     expect(error.severity).toBe(LogLevel.error);
     expect(error.context).toBe(this);
   });

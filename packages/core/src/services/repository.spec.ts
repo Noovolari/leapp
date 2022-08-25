@@ -15,6 +15,7 @@ describe("Repository", () => {
   let mockedFileService;
   let repository;
   let mockedSession: Session;
+  let workspaceConsistencyService: any;
 
   beforeEach(() => {
     mockedWorkspace = new Workspace();
@@ -40,6 +41,10 @@ describe("Repository", () => {
       url: jest.fn(),
     };
 
+    workspaceConsistencyService = {
+      createNewWorkspace: () => mockedWorkspace,
+    };
+
     mockedFileService = new FileService(mockedNativeService);
     mockedFileService.readFileSync = jest.fn();
     mockedFileService.writeFileSync = jest.fn(() => {});
@@ -47,8 +52,7 @@ describe("Repository", () => {
     mockedFileService.existsSync = jest.fn(() => false);
     mockedFileService.newDir = jest.fn();
 
-    repository = new Repository(mockedNativeService, mockedFileService);
-    (repository as any)._workspace = mockedWorkspace;
+    repository = new Repository(mockedNativeService, mockedFileService, workspaceConsistencyService);
 
     mockedSession = {
       sessionTokenExpiration: "",
@@ -74,24 +78,20 @@ describe("Repository", () => {
   });
 
   test("reloadWorkspace", () => {
-    const homeDir = "homeDir";
-    mockedNativeService.os.homedir = () => homeDir;
-    mockedFileService.readFileSync = jest.fn(() => "fileContent");
-    mockedFileService.decryptText = jest.fn(() => '{"test":"json"}');
+    workspaceConsistencyService.getWorkspace = jest.fn(() => mockedWorkspace);
     repository.reloadWorkspace();
 
-    expect(mockedFileService.readFileSync).toHaveBeenCalledWith(`${homeDir}/.Leapp/Leapp-lock.json`);
-    expect(mockedFileService.decryptText).toHaveBeenCalledWith("fileContent");
+    expect(workspaceConsistencyService.getWorkspace).toHaveBeenCalled();
     const actualWorkspace = (repository as any)._workspace;
-
-    expect(actualWorkspace).toBeInstanceOf(Workspace);
-    expect(actualWorkspace.test).toEqual("json");
+    expect(actualWorkspace).toBe(mockedWorkspace);
   });
 
   test("createWorkspace() - create a new workspace", () => {
+    workspaceConsistencyService.createNewWorkspace = jest.fn(() => mockedWorkspace);
     repository.persistWorkspace = jest.fn();
     repository.createWorkspace();
     expect(repository.workspace).not.toBe(null);
+    expect(workspaceConsistencyService.createNewWorkspace).toHaveBeenCalled();
     expect(repository.persistWorkspace).toHaveBeenCalledWith((repository as any)._workspace);
   });
 

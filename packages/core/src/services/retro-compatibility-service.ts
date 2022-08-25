@@ -12,6 +12,7 @@ import { Session } from "../models/session";
 import { AzureSession } from "../models/azure/azure-session";
 import { AzureIntegration } from "../models/azure/azure-integration";
 import { IKeychainService } from "../interfaces/i-keychain-service";
+import { IntegrationType } from "../models/integration-type";
 
 export class RetroCompatibilityService {
   constructor(
@@ -21,11 +22,17 @@ export class RetroCompatibilityService {
     private behaviouralSubjectService: BehaviouralSubjectService
   ) {}
 
+  /* TODO: refactor and call this method only inside WorkspaceConsistencyService's getWorkspace: in this way
+      we don't need to use fileService and behaviouralSubjectService anymore because the conversion is
+      done BEFORE workspace is read and returned to the rest of the app and so it can be done "in memory"
+      without persistence and without notifying anything!
+   */
   async applyWorkspaceMigrations(): Promise<void> {
     if (this.fileService.existsSync(this.lockFilePath)) {
       await this.migration0();
       this.migration1();
       this.migration2();
+      // When adding new migrations remember to increase constants.workspaceLastVersion
     }
   }
 
@@ -36,6 +43,33 @@ export class RetroCompatibilityService {
       !workspaceParsed._awsSsoIntegrations ||
       (workspaceParsed._awsSsoIntegrations.length === 0 && workspaceParsed._sessions.filter((s) => s.type === "awsSsoRole").length > 0)
     );
+  }
+
+  private async integrationTypeEnumPatch(): Promise<void> {
+    const workspace = this.getWorkspace();
+    const integrations = [
+      ...(workspace._awsSsoIntegrations ? workspace._awsSsoIntegrations : []),
+      ...(workspace._azureIntegrations ? workspace._azureIntegrations : []),
+    ];
+    const awsIntegrations = [];
+    const azureIntegrations = [];
+
+    for (const integration of integrations) {
+      if (integration.type === "awsSso") {
+        integration.type = IntegrationType.awsSso;
+        awsIntegrations.push(integration);
+      } else if (integration.type === "azure") {
+        integration.type = IntegrationType.azure;
+        azureIntegrations.push(integration);
+      } else if (integration.type === IntegrationType.awsSso) {
+        awsIntegrations.push(integration);
+      } else if (integration.type === IntegrationType.azure) {
+        azureIntegrations.push(integration);
+      }
+    }
+    workspace._awsSsoIntegrations = awsIntegrations;
+    workspace._azureIntegrations = azureIntegrations;
+    this.reloadIntegrations(workspace);
   }
 
   private async adaptIntegrationPatch(): Promise<Workspace> {
@@ -112,6 +146,7 @@ export class RetroCompatibilityService {
     if (this.isIntegrationPatchNecessary()) {
       await this.adaptIntegrationPatch();
     }
+    await this.integrationTypeEnumPatch();
   }
 
   private checkMigration(workspace: any, previousVersion: number, currentVersion: number): boolean {
@@ -166,6 +201,10 @@ export class RetroCompatibilityService {
       }
     });
     workspace._azureIntegrations = workspace._azureIntegrations.concat(possibleNewIntegrations);
+    this.reloadIntegrations(workspace);
+  }
+
+  private reloadIntegrations(workspace) {
     this.persists(workspace);
     this.repository.reloadWorkspace();
     const updatedAwsSsoIntegrations = this.repository.listAwsSsoIntegrations();

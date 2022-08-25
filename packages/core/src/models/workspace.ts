@@ -72,7 +72,7 @@ export class Workspace {
   }
 
   setNewWorkspaceVersion(): void {
-    this._workspaceVersion = 2;
+    this._workspaceVersion = constants.workspaceLastVersion;
   }
 
   addIpUrl(idpUrl: IdpUrl): void {

@@ -44,6 +44,7 @@ import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 import { AppKeychainService } from "./app-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
+import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 
 @Injectable({
   providedIn: "root",
@@ -71,6 +72,7 @@ export class AppProviderService {
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
   private keychainServiceInstance: IKeychainService;
+  private workspaceConsistencyServiceInstance: WorkspaceConsistencyService;
   private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
@@ -331,9 +333,16 @@ export class AppProviderService {
     return this.fileServiceInstance;
   }
 
+  public get workspaceConsistencyService(): WorkspaceConsistencyService {
+    if (!this.workspaceConsistencyServiceInstance) {
+      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.appNativeService, this.logService);
+    }
+    return this.workspaceConsistencyServiceInstance;
+  }
+
   public get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.appNativeService, this.fileService);
+      this.repositoryInstance = new Repository(this.appNativeService, this.fileService, this.workspaceConsistencyService);
     }
     return this.repositoryInstance;
   }

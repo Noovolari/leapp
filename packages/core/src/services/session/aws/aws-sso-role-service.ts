@@ -6,7 +6,6 @@ import { AwsSsoRoleSession } from "../../../models/aws/aws-sso-role-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
-import { KeychainService } from "../../keychain-service";
 import { Repository } from "../../repository";
 
 import { AwsSessionService } from "./aws-session-service";
@@ -16,6 +15,7 @@ import { IAwsIntegrationDelegate } from "../../../interfaces/i-aws-integration-d
 import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
+import { IKeychainService } from "../../../interfaces/i-keychain-service";
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -67,7 +67,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     protected sessionNotifier: IBehaviouralNotifier,
     protected repository: Repository,
     fileService: FileService,
-    private keyChainService: KeychainService,
+    private keyChainService: IKeychainService,
     awsCoreService: AwsCoreService,
     private nativeService: INativeService,
     private awsSsoOidcService: AwsSsoOidcService

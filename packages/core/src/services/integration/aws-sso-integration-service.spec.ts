@@ -213,7 +213,7 @@ describe("AwsSsoIntegrationService", () => {
       listAwsSsoIntegrations: () => ["aws-integration-1"],
       listAzureIntegrations: () => ["azure-integration-1"],
     } as any;
-    const keyChainService = { deletePassword: jest.fn(async () => {}) } as any;
+    const keyChainService = { deleteSecret: jest.fn(async () => {}) } as any;
     const behaviouralNotifier = { setIntegrations: jest.fn() } as any;
 
     const awsIntegrationService = new AwsSsoIntegrationService(repository, keyChainService, behaviouralNotifier, null, null, null, null) as any;
@@ -235,7 +235,7 @@ describe("AwsSsoIntegrationService", () => {
     expect(awsIntegrationService.setupSsoPortalClient).toHaveBeenCalledWith(awsSsoIntegration.region);
     expect(logoutFnMock).toHaveBeenCalledWith({ accessToken: savedAccessToken });
     expect(logoutPromise).toHaveBeenCalled();
-    expect(keyChainService.deletePassword).toHaveBeenCalledWith(constants.appName, fakeIntegrationAccessToken);
+    expect(keyChainService.deleteSecret).toHaveBeenCalledWith(constants.appName, fakeIntegrationAccessToken);
     expect(awsIntegrationService.getIntegrationAccessTokenKey).toHaveBeenCalledWith(fakeIntegrationId);
     expect(repository.unsetAwsSsoIntegrationExpiration).toHaveBeenCalledWith(fakeIntegrationId);
     expect(awsIntegrationService.setOnline).toHaveBeenCalledWith(awsSsoIntegration, false);

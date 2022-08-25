@@ -1,7 +1,6 @@
 import { CloudProviderService } from "@noovolari/leapp-core/services/cloud-provider-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
@@ -44,6 +43,8 @@ import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-ma
 import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
+import { CliRpcKeychainService } from "./cli-rpc-keychain-service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import axios from "axios";
 
 /* eslint-disable */
@@ -70,7 +71,7 @@ export class CliProviderService {
   private namedProfilesServiceInstance: NamedProfilesService;
   private idpUrlsServiceInstance: IdpUrlsService;
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
-  private keyChainServiceInstance: KeychainService;
+  private keyChainServiceInstance: IKeychainService;
   private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
@@ -91,7 +92,7 @@ export class CliProviderService {
   private azureIntegrationServiceInstance: AzureIntegrationService;
 
   private httpClient: any = {
-    get: (url: string) =>  ({
+    get: (url: string) => ({
       toPromise: async () => (await axios.get(url)).data
     }),
   };
@@ -184,6 +185,11 @@ export class CliProviderService {
   public get remoteProceduresClient(): RemoteProceduresClient {
     if (!this.remoteProceduresClientInstance) {
       this.remoteProceduresClientInstance = new RemoteProceduresClient(this.cliNativeService);
+      const client = this.remoteProceduresClientInstance;
+      this.cliNativeService.msalEncryptionService = {
+        unprotectData: client.msalUnprotectData.bind(client),
+        protectData: client.msalProtectData.bind(client),
+      }
     }
     return this.remoteProceduresClientInstance;
   }
@@ -331,9 +337,9 @@ export class CliProviderService {
     return this.awsSsoIntegrationServiceInstance;
   }
 
-  get keyChainService(): KeychainService {
+  get keyChainService(): IKeychainService {
     if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.cliNativeService);
+      this.keyChainServiceInstance = new CliRpcKeychainService(this.remoteProceduresClient);
     }
     return this.keyChainServiceInstance;
   }

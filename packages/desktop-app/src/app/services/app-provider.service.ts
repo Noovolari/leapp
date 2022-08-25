@@ -3,7 +3,6 @@ import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/service
 import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
@@ -43,6 +42,8 @@ import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-ma
 import { HttpClient } from "@angular/common/http";
 import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
+import { AppKeychainService } from "./app-keychain-service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 
 @Injectable({
   providedIn: "root",
@@ -69,7 +70,7 @@ export class AppProviderService {
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
-  private keyChainServiceInstance: KeychainService;
+  private keychainServiceInstance: IKeychainService;
   private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
@@ -166,7 +167,7 @@ export class AppProviderService {
         this.repository,
         this.mfaCodePrompter,
         this.mfaCodePrompter,
-        this.keyChainService,
+        this.keychainService,
         this.fileService,
         this.awsCoreService
       );
@@ -206,7 +207,7 @@ export class AppProviderService {
     if (!this.awsSsoIntegrationServiceInstance) {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
         this.repository,
-        this.keyChainService,
+        this.keychainService,
         this.behaviouralSubjectService,
         this.appNativeService,
         this.sessionFactory,
@@ -223,7 +224,7 @@ export class AppProviderService {
         this.behaviouralSubjectService,
         this.repository,
         this.fileService,
-        this.keyChainService,
+        this.keychainService,
         this.awsCoreService,
         this.appNativeService,
         this.awsSsoOidcService
@@ -280,7 +281,7 @@ export class AppProviderService {
 
   public get azurePersistenceService(): AzurePersistenceService {
     if (!this.azurePersistenceServiceInstance) {
-      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.appNativeService, this.keyChainService);
+      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.appNativeService, this.keychainService);
     }
     return this.azurePersistenceServiceInstance;
   }
@@ -337,11 +338,11 @@ export class AppProviderService {
     return this.repositoryInstance;
   }
 
-  public get keyChainService(): KeychainService {
-    if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.appNativeService);
+  public get keychainService(): IKeychainService {
+    if (!this.keychainServiceInstance) {
+      this.keychainServiceInstance = new AppKeychainService(this.appNativeService);
     }
-    return this.keyChainServiceInstance;
+    return this.keychainServiceInstance;
   }
 
   public get logService(): LogService {
@@ -376,7 +377,7 @@ export class AppProviderService {
     if (!this.retroCompatibilityServiceInstance) {
       this.retroCompatibilityServiceInstance = new RetroCompatibilityService(
         this.fileService,
-        this.keyChainService,
+        this.keychainService,
         this.repository,
         this.behaviouralSubjectService
       );
@@ -401,6 +402,7 @@ export class AppProviderService {
   public get remoteProceduresServer(): RemoteProceduresServer {
     if (!this.remoteProceduresServerInstance) {
       this.remoteProceduresServerInstance = new RemoteProceduresServer(
+        this.keychainService,
         this.appNativeService,
         this.verificationWindowService,
         this.awsAuthenticationService,

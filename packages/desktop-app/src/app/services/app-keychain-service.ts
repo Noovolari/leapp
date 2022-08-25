@@ -1,7 +1,7 @@
-import { INativeService } from "../interfaces/i-native-service";
-import { IKeychainService } from "../interfaces/i-keychain-service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
+import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
 
-export class KeychainService implements IKeychainService {
+export class AppKeychainService implements IKeychainService {
   constructor(private nativeService: INativeService) {}
 
   /**
@@ -33,6 +33,6 @@ export class KeychainService implements IKeychainService {
    * @param account - unique identifier
    */
   async deleteSecret(service: string, account: string): Promise<boolean> {
-    return await this.nativeService.keytar.deleteSecret(service, account);
+    return await this.nativeService.keytar.deletePassword(service, account);
   }
 }

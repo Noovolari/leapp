@@ -12,6 +12,7 @@ import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 import { Session } from "../models/session";
 import { AzureSession } from "../models/azure/azure-session";
 import { AzureIntegration } from "../models/azure/azure-integration";
+import { IntegrationType } from "../models/integration-type";
 
 export class RetroCompatibilityService {
   constructor(
@@ -36,6 +37,24 @@ export class RetroCompatibilityService {
       !workspaceParsed._awsSsoIntegrations ||
       (workspaceParsed._awsSsoIntegrations.length === 0 && workspaceParsed._sessions.filter((s) => s.type === "awsSsoRole").length > 0)
     );
+  }
+
+  private async integrationTypeEnumPatch(): Promise<void> {
+    const workspace = this.getWorkspace();
+    const integrations = [
+      ...(workspace._awsSsoIntegrations ? workspace._awsSsoIntegrations : []),
+      ...(workspace._azureIntegrations ? workspace._azureIntegrations : []),
+    ];
+
+    for (const integration of integrations) {
+      if (integration.type === "awsSso") {
+        integration.type = IntegrationType.awsSso;
+      }
+      if (integration.type === "azure") {
+        integration.type = IntegrationType.azure;
+      }
+    }
+    this.reloadIntegrations(workspace);
   }
 
   private async adaptIntegrationPatch(): Promise<Workspace> {
@@ -112,6 +131,7 @@ export class RetroCompatibilityService {
     if (this.isIntegrationPatchNecessary()) {
       await this.adaptIntegrationPatch();
     }
+    await this.integrationTypeEnumPatch();
   }
 
   private checkMigration(workspace: any, previousVersion: number, currentVersion: number): boolean {
@@ -166,6 +186,10 @@ export class RetroCompatibilityService {
       }
     });
     workspace._azureIntegrations = workspace._azureIntegrations.concat(possibleNewIntegrations);
+    this.reloadIntegrations(workspace);
+  }
+
+  private reloadIntegrations(workspace) {
     this.persists(workspace);
     this.repository.reloadWorkspace();
     const updatedAwsSsoIntegrations = this.repository.listAwsSsoIntegrations();

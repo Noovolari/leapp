@@ -46,15 +46,24 @@ export class RetroCompatibilityService {
       ...(workspace._awsSsoIntegrations ? workspace._awsSsoIntegrations : []),
       ...(workspace._azureIntegrations ? workspace._azureIntegrations : []),
     ];
+    const awsIntegrations = [];
+    const azureIntegrations = [];
 
     for (const integration of integrations) {
       if (integration.type === "awsSso") {
         integration.type = IntegrationType.awsSso;
-      }
-      if (integration.type === "azure") {
+        awsIntegrations.push(integration);
+      } else if (integration.type === "azure") {
         integration.type = IntegrationType.azure;
+        azureIntegrations.push(integration);
+      } else if (integration.type === IntegrationType.awsSso) {
+        awsIntegrations.push(integration);
+      } else if (integration.type === IntegrationType.azure) {
+        azureIntegrations.push(integration);
       }
     }
+    workspace._awsSsoIntegrations = awsIntegrations;
+    workspace._azureIntegrations = azureIntegrations;
     this.reloadIntegrations(workspace);
   }
 

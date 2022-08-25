@@ -1932,8 +1932,16 @@
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <ul>
-<li><strong>Leapp-lock.json</strong> is used to store your actual configuration and is <strong>encrypted</strong>.</li>
-<li><strong>.latest</strong> contains the latest version of your Leapp application. In case the file is removed accidentally or intentionally it will be created again when the app is restarted.</li>
+<li><strong>Leapp-lock.json</strong> stores the Leapp configuration and is <strong>encrypted</strong>.<ul>
+<li>On startup, if Leapp-lock.json is not found, Leapp will create an empty version of it.</li>
+</ul>
+</li>
+<li><strong>Leapp-lock.backup.bin</strong> stores a backup of Leapp-lock.json and is updated on startup if Leapp-lock.json is considered valid.<ul>
+<li>On startup, if Leapp-lock.json is corrupted, Leapp-lock.backup.bin will be used to restore it.</li>
+<li>If both files are corrupted, a new empty configuration will be created.</li>
+</ul>
+</li>
+<li><strong>.latest</strong> contains the latest version number of Leapp. If missing, it will be created again on startup.</li>
 </ul>
 </div>
 <h3 id="credentials-file">Credentials file</h3>

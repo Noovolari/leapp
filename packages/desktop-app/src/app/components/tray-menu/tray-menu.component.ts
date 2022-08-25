@@ -249,8 +249,8 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     if (!this.awsCliVersion) {
       try {
         this.awsCliVersion = await this.appProviderService.executeService.execute("aws --version");
-      } catch (error) {
-        throw new LeappBaseError("AWS CLI", this, LogLevel.error, "An error occurred getting AWS CLI version. Please check if it is installed.");
+      } catch (_) {
+        // throw new LeappBaseError("AWS CLI", this, LogLevel.error, "An error occurred getting AWS CLI version. Please check if it is installed.");
       }
     }
   }

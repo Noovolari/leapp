@@ -2,13 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [0.14.3](https://github.com/Noovolari/leapp/compare/v0.14.2...v0.14.3) (2022-08-25)
-
-### Bug Fixes
-
-* removed AWS error message for AWS CLI on macOS ([a638052](https://github.com/Noovolari/leapp/commit/a638052735917761b8317e77c96592018cf49807))
-
-### [0.14.2](https://github.com/Noovolari/leapp/compare/v0.14.1...v0.14.2) (2022-08-25)
+### [0.14.2](https://github.com/Noovolari/leapp/compare/v0.14.1...v0.14.2) (2022-08-26)
 
 ### Features
 
@@ -19,7 +13,7 @@ All notable changes to this project will be documented in this file. See [standa
 * fixed constant keychain password prompt on macOS when using Leapp Desktop App/CLI [#317](https://github.com/Noovolari/leapp/issues/317) [#318](https://github.com/Noovolari/leapp/issues/318)
 * added a mechanism to backup and restore corrupted Leapp-lock.json files [#282](https://github.com/Noovolari/leapp/issues/282) [#302](https://github.com/Noovolari/leapp/issues/302)
 * added an error message with an additional link to download the Session Manager Plugin if the user doesn't have it installed on the computer [#245](https://github.com/Noovolari/leapp/issues/245)
-* Leapp now obtains the path in which AWS CLI is installed, allowing the user to install it with alternative methods (e.g. Homebrew) [#257](https://github.com/Noovolari/leapp/issues/257)
+* added an error message with an additional link to troubleshoot problems if the AWS CLI was installed with alternative methods (e.g. Homebrew) [#257](https://github.com/Noovolari/leapp/issues/257)
 * fixed minor issues when using the Leapp option menu to download a Leapp plugin from npm
 
 ### [0.14.1](https://github.com/Noovolari/leapp/compare/v0.14.0...v0.14.1) (2022-08-18)

@@ -137,6 +137,17 @@ export class AwsIamRoleChainedService extends AwsSessionService {
 
   removeSecrets(_: string): void {}
 
+  async getCloneRequest(session: AwsIamRoleChainedSession): Promise<AwsIamRoleChainedSessionRequest> {
+    return {
+      profileId: session.profileId,
+      region: session.region,
+      sessionName: session.sessionName,
+      roleArn: session.roleArn,
+      parentSessionId: session.parentSessionId,
+      roleSessionName: session.roleSessionName,
+    };
+  }
+
   async getAccountNumberFromCallerIdentity(session: AwsIamRoleChainedSession): Promise<string> {
     if (session.type === SessionType.awsIamRoleChained) {
       return `${session.roleArn.split("/")[0].substring(13, 25)}`;

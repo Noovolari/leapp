@@ -136,6 +136,17 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
 
   removeSecrets(_: string): void {}
 
+  async getCloneRequest(session: AwsIamRoleFederatedSession): Promise<AwsIamRoleFederatedSessionRequest> {
+    return {
+      profileId: session.profileId,
+      region: session.region,
+      sessionName: session.sessionName,
+      roleArn: session.roleArn,
+      idpArn: session.idpArn,
+      idpUrl: session.idpUrlId,
+    };
+  }
+
   private async assumeRoleWithSAML(
     sts: STS,
     params: { ["SAMLAssertion"]: string; ["PrincipalArn"]: string; ["DurationSeconds"]: number; ["RoleArn"]: string }

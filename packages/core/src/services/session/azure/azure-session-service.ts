@@ -155,6 +155,10 @@ export class AzureSessionService extends SessionService {
     return false;
   }
 
+  async getCloneRequest(session: AzureSession): Promise<AzureSessionRequest> {
+    throw new LoggedException(`Clone is not supported for sessionType ${session.type}`, this, LogLevel.error, false);
+  }
+
   private async restoreSecretsFromKeychain(integrationId: string): Promise<void> {
     let msalTokenCache: JsonCache;
     try {

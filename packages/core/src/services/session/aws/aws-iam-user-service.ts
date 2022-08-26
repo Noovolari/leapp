@@ -215,6 +215,18 @@ export class AwsIamUserService extends AwsSessionService {
       });
   }
 
+  async getCloneRequest(session: AwsIamUserSession): Promise<AwsIamUserSessionRequest> {
+    const accessKey = await this.getAccessKeyFromKeychain(session.sessionId);
+    const secretKey = await this.getSecretKeyFromKeychain(session.sessionId);
+    return {
+      profileId: session.profileId,
+      region: session.region,
+      sessionName: session.sessionName,
+      accessKey,
+      secretKey,
+    };
+  }
+
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private generateSessionTokenCallingMfaModal(
     session: Session,

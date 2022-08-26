@@ -1783,6 +1783,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#aws-cli-or-az-cli-is-installed-but-leapp-cant-find-it-what-can-i-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      AWS CLI (or AZ CLI) is installed but Leapp can't find it, what can I do?
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1877,6 +1886,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#aws-cli-or-az-cli-is-installed-but-leapp-cant-find-it-what-can-i-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      AWS CLI (or AZ CLI) is installed but Leapp can't find it, what can I do?
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1912,6 +1930,11 @@
 <p>Head to the <a href="../app-data/">Application data section</a>.</p>
 <h2 id="ssm-terminal-is-opening-but-no-session-is-starting-what-can-i-do">SSM terminal is opening but no session is starting, what can I do?</h2>
 <p>Just close the terminal and relaunch the SSM command.</p>
+<h2 id="aws-cli-or-az-cli-is-installed-but-leapp-cant-find-it-what-can-i-do">AWS CLI (or AZ CLI) is installed but Leapp can't find it, what can I do?</h2>
+<p>Leapp on macOS works in sandbox mode, so some terminal commands must be symlinked in order to work on some installations.
+Just make a symlink pointing to <code>/usr/local/bin/aws</code> or, for AZ CLI, <code>/usr/local/bin/az</code>. To create
+symlinks on macOS, use this command <code>ln -s /any/file/on/the/disk linked-file</code>. The command is called <strong>ln</strong>. If used with the 
+option <strong>-s</strong> it will create a symbolic link in the current directory.</p>
 
 
 

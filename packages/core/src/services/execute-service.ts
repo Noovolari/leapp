@@ -28,12 +28,12 @@ export class ExecuteService {
     }
 
     if (this.nativeService.process.platform === "darwin") {
-      const commandTokens = command.split(" ");
-      const commandBin = commandTokens[0];
-      const commandParams = commandTokens.slice(1).join(" ");
-      const whichResult = (await this.exec(this.nativeService.exec, `which ${commandBin}`)).trim();
-      if (!whichResult.includes("built-in command")) {
-        command = whichResult + (commandParams ? " " + commandParams : "");
+      if (command.indexOf("osascript") !== -1) {
+        command = "/usr/bin/" + command;
+      } else if (command.indexOf("cd") !== -1) {
+        command = "" + command;
+      } else {
+        command = "/usr/local/bin/" + command;
       }
     }
     return await this.exec(exec, command, env, maskOutputLog);

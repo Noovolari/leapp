@@ -172,7 +172,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         this.appService.getApp().dock.setBadge("");
       }
     }
-    if (this.updaterService.getSavedVersionComparison() && this.updaterService.isReady()) {
+    if (this.updaterService.isReady() && this.updaterService.isUpdateNeeded()) {
       this.voices.push({ type: "separator" });
       this.voices.push({ label: "Check for Updates...", type: "normal", click: () => this.updaterService.updateDialog() });
       this.appService.getApp().dock.setBadge("·");

@@ -3,7 +3,7 @@ import { AzureSessionService } from "./azure-session-service";
 import { SessionType } from "../../../models/session-type";
 import { AzureSession } from "../../../models/azure/azure-session";
 import { SessionStatus } from "../../../models/session-status";
-import { LoggedEntry, LogLevel } from "../../log-service";
+import { LoggedEntry, LoggedException, LogLevel } from "../../log-service";
 import { AzureSecrets, AzureSubscription } from "../../azure-persistence-service";
 import { AzureIntegration } from "../../../models/azure/azure-integration";
 import { JsonCache } from "@azure/msal-node";
@@ -41,6 +41,21 @@ describe("AzureSessionService", () => {
     await azureSessionService.create(sessionParams);
     expect(repository.addSession).toHaveBeenCalled();
     expect(sessionNotifier.setSessions).toHaveBeenCalledWith(["session1"]);
+  });
+
+  test("update", async () => {
+    const sessionNotifier = { setSessions: jest.fn() } as any;
+    const azureSessionService = new AzureSessionService(sessionNotifier, null, null, null, null, null, null, null);
+    await expect(async () => azureSessionService.update(null, null)).rejects.toThrow(
+      new LoggedException(`Update is not supported for Azure Session Type`, this, LogLevel.error, false)
+    );
+  });
+
+  test("getCloneRequest", () => {
+    const azureSessionService = new AzureSessionService(null, null, null, null, null, null, null, null);
+    expect(() => azureSessionService.getCloneRequest({ type: SessionType.azure } as any)).rejects.toThrow(
+      new LoggedException(`Clone is not supported for sessionType ${SessionType.azure}`, this, LogLevel.error, false)
+    );
   });
 
   test("rotate, token still valid", async () => {

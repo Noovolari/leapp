@@ -51,12 +51,14 @@ export class PluginEnvironment implements IPluginEnvironment {
     return sessionService.create(createSessionData);
   }
 
-  updateSession(createSessionRequest: SessionData, sessionId: string): Promise<void> {
-    return Promise.resolve(`${createSessionRequest} ${sessionId}` as any);
+  updateSession(updateSessionRequest: SessionData, sessionId: string): Promise<void> {
+    const session = this.providerService.repository.getSessionById(sessionId);
+    const sessionService = this.providerService.sessionFactory.getSessionService(session.type);
+    return sessionService.update(sessionId, updateSessionRequest);
   }
 
-  openTerminal(command: string, env?: any): Promise<void> {
-    return Promise.resolve(`${command} ${env}` as any);
+  async openTerminal(command: string, env?: any): Promise<void> {
+    this.providerService.executeService.openTerminal(command, env);
   }
 
   private async generateCredentials(session: Session): Promise<CredentialsInfo> {

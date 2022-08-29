@@ -53,10 +53,6 @@ export class UpdaterService {
     return this.electronService.fs.readFileSync(this.electronService.os.homedir() + `/.Leapp/.latest.json`).toString();
   }
 
-  getSavedVersionComparison(): boolean {
-    return compareVersions(this.getSavedAppVersion(), this.getCurrentAppVersion()) > 0;
-  }
-
   setUpdateInfo(version: string, releaseName: string, releaseDate: string, releaseNotes: string): void {
     this.version = version;
     this.releaseName = releaseName;

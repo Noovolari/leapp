@@ -15,7 +15,6 @@ import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/l
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { AppSsmService } from "../../../services/app-ssm.service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
@@ -32,7 +31,8 @@ import { AppNativeService } from "../../../services/app-native.service";
 import { AppAwsAuthenticationService } from "../../../services/app-aws-authentication.service";
 import { CreateDialogComponent } from "../../dialogs/create-dialog/create-dialog.component";
 import { OptionsService } from "../../../services/options.service";
-import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
+import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -96,7 +96,7 @@ export class SessionCardComponent implements OnInit {
   private loggingService: LogService;
   private sessionFactory: SessionFactory;
   private fileService: FileService;
-  private keychainService: KeychainService;
+  private keychainService: IKeychainService;
   private behaviouralSubjectService: BehaviouralSubjectService;
   private sessionService: SessionService;
   private awsCoreService: AwsCoreService;
@@ -118,7 +118,7 @@ export class SessionCardComponent implements OnInit {
     this.loggingService = appProviderService.logService;
     this.sessionFactory = appProviderService.sessionFactory;
     this.fileService = appProviderService.fileService;
-    this.keychainService = appProviderService.keyChainService;
+    this.keychainService = appProviderService.keychainService;
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.awsCoreService = appProviderService.awsCoreService;
     this.azureCoreService = appProviderService.azureCoreService;
@@ -144,8 +144,8 @@ export class SessionCardComponent implements OnInit {
     this.selectedProfile = this.getProfileId(this.session);
   }
 
-  async applyPluginAction($event: MouseEvent, plugin: IPlugin): Promise<void> {
-    await plugin.applySessionAction(this.session);
+  async applyPluginAction($event: MouseEvent, plugin: AwsCredentialsPlugin): Promise<void> {
+    await plugin.run(this.session);
     /*if (plugin.templateStructure.output) {
       if (plugin.templateStructure.output.type === TemplateOutputObject.message) {
         this.appProviderService.logService.log(new LoggedEntry(plugin[plugin.templateStructure.output.data](), this, LogLevel.info, true));

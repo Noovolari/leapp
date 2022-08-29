@@ -28,7 +28,7 @@ import { OptionsService } from "./services/options.service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
-import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 
 @Component({
   selector: "app-root",
@@ -91,13 +91,6 @@ export class AppComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.appNativeService.fixPath();
-
-    if (!constants.disablePluginSystem) {
-      this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
-      await this.appProviderService.pluginManagerService.loadFromPluginDir();
-    }
-
     this.awsSsoRoleService.setAwsIntegrationDelegate(this.awsSsoIntegrationService);
 
     // We get the right moment to set an hook to app close
@@ -118,7 +111,7 @@ export class AppComponent implements OnInit {
     }
 
     // Prevent Dev Tool to show on production mode
-    //this.windowService.getCurrentWindow().webContents.openDevTools();
+    // this.windowService.getCurrentWindow().webContents.openDevTools();
     this.windowService.blockDevToolInProductionMode();
 
     // Create folders and files if missing
@@ -144,6 +137,14 @@ export class AppComponent implements OnInit {
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
+
+    if (!constants.disablePluginSystem) {
+      this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+      await this.appProviderService.pluginManagerService.loadFromPluginDir();
+      this.loggingService.log(
+        new LoggedEntry(`Loaded plugins...\n\n${this.appProviderService.pluginManagerService.pluginContainers}`, this, LogLevel.info)
+      );
+    }
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit

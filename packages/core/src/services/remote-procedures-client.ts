@@ -103,6 +103,39 @@ export class RemoteProceduresClient {
     );
   }
 
+  async keychainSaveSecret(service: string, account: string, password: string): Promise<void> {
+    return this.remoteProcedureCall(
+      {
+        method: "keychainSaveSecret",
+        params: { service, account, password },
+      },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      (_, reject) => reject(connectionError)
+    );
+  }
+
+  async keychainGetSecret(service: string, account: string): Promise<string | null> {
+    return this.remoteProcedureCall(
+      {
+        method: "keychainGetSecret",
+        params: { service, account },
+      },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      (_, reject) => reject(connectionError)
+    );
+  }
+
+  async keychainDeleteSecret(service: string, account: string): Promise<boolean> {
+    return this.remoteProcedureCall(
+      {
+        method: "keychainDeleteSecret",
+        params: { service, account },
+      },
+      (data, resolve, reject) => (data.error ? reject(data.error) : resolve(data.result)),
+      (_, reject) => reject(connectionError)
+    );
+  }
+
   async remoteProcedureCall(
     rpcRequest: RpcRequest,
     onReturn: (data: RpcResponse, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void,

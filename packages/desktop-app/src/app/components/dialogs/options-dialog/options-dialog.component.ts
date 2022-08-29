@@ -14,9 +14,9 @@ import { OptionsService } from "../../../services/options.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { IPlugin } from "@noovolari/leapp-core/plugin-system/interfaces/i-plugin";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { AppNativeService } from "../../../services/app-native.service";
+import { PluginContainer } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 
 @Component({
   selector: "app-options-dialog",
@@ -56,7 +56,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   colorTheme: string;
   selectedColorTheme: string;
 
-  pluginList: IPlugin[];
+  pluginList: PluginContainer[];
   fetchingPlugins: boolean;
 
   form = new FormGroup({
@@ -134,7 +134,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
     this.appService.validateAllFormFields(this.form);
 
-    this.pluginList = this.appProviderService.pluginManagerService.plugins;
+    this.pluginList = this.appProviderService.pluginManagerService.pluginContainers;
   }
 
   ngAfterViewInit(): void {
@@ -444,34 +444,41 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   async installPlugin(): Promise<void> {
     this.fetchingPlugins = true;
     if (this.form.controls.pluginDeepLink.value) {
-      await this.appProviderService.pluginManagerService.installPlugin(this.form.controls.pluginDeepLink.value);
-      await this.refreshPluginList();
+      try {
+        await this.appProviderService.pluginManagerService.installPlugin(this.form.controls.pluginDeepLink.value);
+        await this.refreshPluginList();
+      } catch (error) {
+        this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
+      }
     }
     this.fetchingPlugins = false;
   }
 
-  async refreshPluginList(): Promise<void> {
+  async refreshPluginList(isRefreshingFromAction?: boolean): Promise<void> {
     this.fetchingPlugins = true;
     this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
     await this.appProviderService.pluginManagerService.loadFromPluginDir();
-    this.pluginList = this.appProviderService.pluginManagerService.plugins;
+    this.pluginList = this.appProviderService.pluginManagerService.pluginContainers;
+    if (isRefreshingFromAction) {
+      this.appProviderService.logService.log(new LoggedEntry("Plugins refreshed", this, LogLevel.info, true));
+    }
     this.fetchingPlugins = false;
   }
 
-  togglePluginActivation(plugin: IPlugin): void {
+  togglePluginActivation(plugin: PluginContainer): void {
     plugin.metadata.active = !plugin.metadata.active;
     const status = this.appProviderService.repository.getPluginStatus(plugin.metadata.uniqueName);
     status.active = plugin.metadata.active;
     this.appProviderService.repository.setPluginStatus(plugin.metadata.uniqueName, status);
   }
 
-  getPluginExtraInfo(plugin: IPlugin): string {
+  getPluginExtraInfo(plugin: PluginContainer): string {
     return `Author: ${plugin.metadata.author}
     Description: ${plugin.metadata.description}
     Supported Sessions: ${plugin.metadata.supportedSessions.join(",")}`;
   }
 
-  getSupportedOsIcons(plugin: IPlugin): string {
+  getSupportedOsIcons(plugin: PluginContainer): string {
     const supportedOS = plugin.metadata.supportedOS;
     const icon1 = `<i class="fa fa-apple ${supportedOS.includes(OperatingSystem.mac) ? "" : "bw"}"></i>`;
     const icon2 = `<i class="fa fa-windows ${supportedOS.includes(OperatingSystem.windows) ? "" : "bw"}"></i>`;

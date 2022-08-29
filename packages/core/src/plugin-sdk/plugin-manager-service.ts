@@ -8,9 +8,18 @@ import { OperatingSystem } from "../models/operating-system";
 import { Session } from "../models/session";
 import { SessionFactory } from "../services/session-factory";
 import { PluginEnvironment } from "./plugin-environment";
+import { AwsCredentialsPlugin } from "./aws-credentials-plugin";
+
+export class PluginContainer {
+  public pluginInstances: IPlugin[];
+
+  constructor(public metadata: IPluginMetadata) {
+    this.pluginInstances = [];
+  }
+}
 
 export class PluginManagerService {
-  private _plugins: IPlugin[];
+  private _pluginContainers: PluginContainer[];
   private _requireModule;
   private _hashElement;
   private _pluginDir = "plugins";
@@ -23,7 +32,7 @@ export class PluginManagerService {
     private sessionFactory: SessionFactory,
     private http: any
   ) {
-    this._plugins = [];
+    this._pluginContainers = [];
     this._requireModule = nativeService.requireModule;
     this._hashElement = nativeService.hashElement.hashElement;
   }
@@ -32,12 +41,12 @@ export class PluginManagerService {
     return Buffer.from(input, "base64");
   }
 
-  get plugins(): IPlugin[] {
-    return this._plugins;
+  get pluginContainers(): PluginContainer[] {
+    return this._pluginContainers;
   }
 
-  getPluginByName(name: string): IPlugin {
-    return this._plugins.find((plugin) => plugin.metadata.uniqueName === name);
+  getPluginByName(name: string): PluginContainer {
+    return this._pluginContainers.find((plugin) => plugin.metadata.uniqueName === name);
   }
 
   verifyAndGeneratePluginFolderIfMissing(): void {
@@ -47,7 +56,7 @@ export class PluginManagerService {
   }
 
   async loadFromPluginDir(): Promise<void> {
-    this._plugins = [];
+    this._pluginContainers = [];
     const options = {
       folders: { include: ["*.*"] },
       files: { exclude: ["signature", ".DS_Store", "package-lock.json"] },
@@ -73,8 +82,7 @@ export class PluginManagerService {
         }
 
         // CHECK VALIDATION
-        const isSignatureInvalid = !isPluginValid && !this.skipPluginValidation();
-        if (isSignatureInvalid) {
+        if (!isPluginValid) {
           this.logService.log(new LoggedEntry(`Signature not verified for plugin: ${pluginName}`, this, LogLevel.warn, true));
           await this.nativeService.fs.remove(pluginFilePath);
           continue;
@@ -86,14 +94,16 @@ export class PluginManagerService {
             const pluginModule = this._requireModule(pluginFilePath + "/plugin.js");
             this.logService.log(new LoggedEntry(`loading ${pluginName} plugin`, this, LogLevel.info, false));
 
-            const plugin = new pluginModule[metadata.entryClass]() as IPlugin;
-            (plugin as any).metadata = metadata;
-            if (!this.repository.getPluginStatus(plugin.metadata.uniqueName)) {
-              this.repository.createPluginStatus(plugin.metadata.uniqueName);
+            const pluginContainer = new PluginContainer(metadata);
+            const pluginClasses = Object.values(pluginModule) as any[];
+            for (const pluginClass of pluginClasses) {
+              const pluginInstance = new pluginClass(this.pluginEnvironment, this.sessionFactory) as IPlugin;
+              (pluginInstance as any).metadata = metadata;
+              pluginContainer.pluginInstances.push(pluginInstance);
             }
-            this._plugins.push(plugin);
-            if (plugin.metadata.active) {
-              await plugin.bootstrap(this.pluginEnvironment);
+            this._pluginContainers.push(pluginContainer);
+            if (!this.repository.getPluginStatus(metadata.uniqueName)) {
+              this.repository.createPluginStatus(metadata.uniqueName);
             }
           }
         } catch (error) {
@@ -104,13 +114,13 @@ export class PluginManagerService {
   }
 
   unloadAllPlugins(): void {
-    this._plugins = [];
+    this._pluginContainers = [];
   }
 
   unloadSinglePlugin(name: string): void {
-    const pluginIndex = this._plugins.map((p) => p.metadata.uniqueName).indexOf(name);
+    const pluginIndex = this._pluginContainers.map((p) => p.metadata.uniqueName).indexOf(name);
     if (pluginIndex > -1) {
-      this._plugins.splice(pluginIndex, 1);
+      this._pluginContainers.splice(pluginIndex, 1);
     }
   }
 
@@ -128,13 +138,20 @@ export class PluginManagerService {
     return signature.toString("Base64");
   }
 
-  availablePlugins(os: OperatingSystem, session: Session): IPlugin[] {
-    return this._plugins.filter(
-      (plugin) =>
-        plugin.metadata.active &&
-        plugin.metadata.supportedOS.includes(os) &&
-        plugin.metadata.supportedSessions.some((supportedSession) => this.sessionFactory.getCompatibleTypes(supportedSession).includes(session.type))
-    );
+  availableAwsCredentialsPlugins(os: OperatingSystem, session: Session): AwsCredentialsPlugin[] {
+    const list = this._pluginContainers.filter((plugin) => {
+      const active = this.repository.getPluginStatus(plugin.metadata.uniqueName).active;
+      const supportedOS = plugin.metadata.supportedOS.includes(os);
+      const supportedSome = plugin.metadata.supportedSessions.some((supportedSession) =>
+        this.sessionFactory.getCompatibleTypes(supportedSession).includes(session.type)
+      );
+      return active && supportedOS && supportedSome;
+    });
+    let arrayToReturn = [];
+    list.forEach((pluginContainer) => {
+      arrayToReturn = arrayToReturn.concat(pluginContainer.pluginInstances.filter((plugin) => plugin.pluginType === AwsCredentialsPlugin.name));
+    });
+    return arrayToReturn;
   }
 
   async installPlugin(url: string): Promise<void> {
@@ -144,6 +161,9 @@ export class PluginManagerService {
     this.logService.log(new LoggedEntry(`We are ready to install Plugin ${packageName}, please wait...`, this, LogLevel.info, true));
 
     const npmMetadata = await this.http.get(`https://registry.npmjs.org/${packageName}`, { responseType: "json" }).toPromise();
+    if (!npmMetadata["keywords"] || !npmMetadata["keywords"].includes("leapp-plugin")) {
+      throw new LoggedException(`${npmMetadata["name"]} is not a Leapp plugin`, this, LogLevel.error, true);
+    }
     const version = npmMetadata["dist-tags"].latest;
     const tarballUrl = npmMetadata.versions[version].dist.tarball;
     const tarballPathComponents = tarballUrl.split("/");
@@ -203,11 +223,6 @@ export class PluginManagerService {
         errors.push(`leappPlugin.supportedSessions: ${sessionType} is unsupported`);
       }
     }
-    const entryClass = leappPluginConfig?.entryClass;
-    if (leappPluginConfig && !entryClass) {
-      errors.push("leappPlugin.entryClass");
-    }
-
     const icon = leappPluginConfig?.icon || "fas fa-puzzle-piece";
     const operatingSystems = [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows];
     const supportedOS = leappPluginConfig?.supportedOS || operatingSystems;
@@ -232,7 +247,6 @@ export class PluginManagerService {
       supportedOS,
       supportedSessions: supportedSessionTypes,
       icon,
-      entryClass,
       keywords,
       uniqueName,
       url,
@@ -259,6 +273,10 @@ export class PluginManagerService {
       ) {
         const packageJsonContent = this.nativeService.fs.readFileSync(pluginFilePath + "/package.json");
         packageJson = JSON.parse(packageJsonContent);
+        if (this.skipPluginValidation()) {
+          return { packageJson, isPluginValid: true };
+        }
+
         // Verify signature to enable plugin
         const data = await this.http.get(constants.pluginPortalUrl + `/${pluginName}`, { responseType: "json" }).toPromise();
         if (data.status !== "active") {

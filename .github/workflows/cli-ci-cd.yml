@@ -63,7 +63,7 @@ jobs:
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
 
       - name: If valid tag set
-        if: steps.validatocr.outputs.VALID_TAG == 1
+        if: steps.validator.outputs.VALID_TAG == 1
         run: |
           echo "Valid Tag - Releasing..."
 

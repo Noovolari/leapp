@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.2](https://github.com/Noovolari/leapp/compare/v0.14.1...v0.14.2) (2022-08-26)
+
+### Features
+
+* added support to Auth0 as SAML IdP. Thanks to [@maintux](https://github.com/maintux) for the [Pull Request #321](https://github.com/Noovolari/leapp/pull/321)!
+
+### Bug Fixes
+
+* fixed constant keychain password prompt on macOS when using Leapp Desktop App/CLI [#317](https://github.com/Noovolari/leapp/issues/317) [#318](https://github.com/Noovolari/leapp/issues/318)
+* added a mechanism to backup and restore corrupted Leapp-lock.json files [#282](https://github.com/Noovolari/leapp/issues/282) [#302](https://github.com/Noovolari/leapp/issues/302)
+* added an error message with an additional link to download the Session Manager Plugin if the user doesn't have it installed on the computer [#245](https://github.com/Noovolari/leapp/issues/245)
+* added an error message with an additional link to troubleshoot problems if the AWS CLI was installed with alternative methods (e.g. Homebrew) [#257](https://github.com/Noovolari/leapp/issues/257)
+* fixed minor issues when using the Leapp option menu to download a Leapp plugin from npm
+
+### [0.14.1](https://github.com/Noovolari/leapp/compare/v0.14.0...v0.14.1) (2022-08-18)
+
+### Bug Fixes
+
+* fixed compiler option to allow desktop-app to read base class from plugins
+
+### [0.14.0](https://github.com/Noovolari/leapp/compare/v0.13.4...v0.14.0) (2022-08-18)
+
+### Features
+
+* added new plugin system: users have the ability to download, install, and create custom plugins for Leapp
+* added [plugin template](https://github.com/Noovolari/leapp-plugin-template) as a starting point to develop your own plugin
+
+Learn more about Leapp plugins in our in-depth [documentation](https://docs.leapp.cloud/latest/plugins/plugins-introduction/)
+
 ### [0.13.4](https://github.com/Noovolari/leapp/compare/v0.13.3...v0.13.4) (2022-08-08)
 
 ### Bug Fixes

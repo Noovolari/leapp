@@ -1,10 +1,11 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import { PluginManagerService } from "./plugin-manager-service";
+import { PluginContainer, PluginManagerService } from "./plugin-manager-service";
 import { constants } from "../models/constants";
 import { OperatingSystem } from "../models/operating-system";
 import { SessionType } from "../models/session-type";
 import { SessionFactory } from "../services/session-factory";
-import { LoggedEntry, LogLevel } from "../services/log-service";
+import { LoggedEntry, LoggedException, LogLevel } from "../services/log-service";
+import { AwsCredentialsPlugin } from "./aws-credentials-plugin";
 
 describe("PluginManagerService", () => {
   test("base64Decoding", () => {
@@ -12,15 +13,15 @@ describe("PluginManagerService", () => {
     expect(result).toBeInstanceOf(Buffer);
   });
 
-  test("get plugins", () => {
+  test("pluginContainers", () => {
     const nativeService = {
       requireModule: null,
       hashElement: { hashElement: null },
     } as any;
     const expectedValue = ["fake-plugin"];
     const pluginManager = new PluginManagerService(null, nativeService, null, null, null, null);
-    (pluginManager as any)._plugins = expectedValue;
-    const result = pluginManager.plugins;
+    (pluginManager as any)._pluginContainers = expectedValue;
+    const result = pluginManager.pluginContainers;
     expect(result).toStrictEqual(expectedValue);
   });
 
@@ -31,7 +32,7 @@ describe("PluginManagerService", () => {
     } as any;
     const plugins = [{ metadata: { uniqueName: "plugin-1" } }, { metadata: { uniqueName: "plugin-2" } }];
     const pluginManager = new PluginManagerService(null, nativeService, null, null, null, null);
-    (pluginManager as any)._plugins = plugins;
+    (pluginManager as any)._pluginContainers = plugins;
     const result = pluginManager.getPluginByName("plugin-2");
     expect(result).toStrictEqual({ metadata: { uniqueName: "plugin-2" } });
   });
@@ -72,30 +73,25 @@ describe("PluginManagerService", () => {
     };
     const plugin1 = {
       metadata: {
-        entryClass: "entryClass",
         uniqueName: "plugin-1",
         active: true,
       },
     };
     const plugin2 = {
       metadata: {
-        entryClass: "entryClass",
         uniqueName: "plugin-2",
         active: true,
       },
     };
     const plugins = [plugin1, plugin2];
     const packagesJsons = [packageJson1, packageJson2];
-    const bootstrapMock = jest.fn(async () => {});
 
-    class PluginClass {
-      constructor() {
-        (this as any).bootstrap = bootstrapMock;
-      }
-    }
+    class PluginAction1 {}
+
+    class PluginAction2 {}
 
     const nativeService = {
-      requireModule: jest.fn(() => ({ entryClass: PluginClass })),
+      requireModule: jest.fn(() => ({ action1: PluginAction1, action2: PluginAction2 })),
       hashElement: { hashElement: null },
       fs: {
         readdirSync: jest.fn(() => pluginDirContent),
@@ -146,10 +142,16 @@ describe("PluginManagerService", () => {
       expect(nativeService.fs.existsSync).toHaveBeenCalledWith(pluginFilePath + "/plugin.js");
       expect(repository.getPluginStatus).toHaveBeenCalledWith(plugins[i].metadata.uniqueName);
       expect(repository.createPluginStatus).toHaveBeenCalledWith(plugins[i].metadata.uniqueName);
-      expect((pluginManager as any)._plugins[i]).toBeInstanceOf(PluginClass);
-      expect((pluginManager as any)._plugins[i].metadata).toStrictEqual(plugins[i].metadata);
+      const pluginContainer = (pluginManager as any)._pluginContainers[i] as PluginContainer;
+      expect(pluginContainer).toBeInstanceOf(PluginContainer);
+      expect(pluginContainer.metadata).toStrictEqual(plugins[i].metadata);
+      expect(pluginContainer).toBeInstanceOf(PluginContainer);
+      expect(pluginContainer.pluginInstances.length).toBe(2);
+      expect(pluginContainer.pluginInstances[0]).toBeInstanceOf(PluginAction1);
+      expect(pluginContainer.pluginInstances[0].metadata).toStrictEqual(plugins[i].metadata);
+      expect(pluginContainer.pluginInstances[1]).toBeInstanceOf(PluginAction2);
+      expect(pluginContainer.pluginInstances[1].metadata).toStrictEqual(plugins[i].metadata);
       expect(logService.log).toHaveBeenCalledWith(new LoggedEntry(`loading ${plugins[i].metadata.uniqueName} plugin`, this, LogLevel.info, false));
-      expect(bootstrapMock).toHaveBeenCalledWith(pluginEnvironment);
     }
   });
 
@@ -254,7 +256,7 @@ describe("PluginManagerService", () => {
     } as any;
     const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
     (pluginManager as any)._pluginDir = "plugin-dir";
-    (pluginManager as any).validatePlugin = () => ({ packageJson: packageJson1, isPluginValid: false });
+    (pluginManager as any).validatePlugin = () => ({ packageJson: packageJson1, isPluginValid: true });
     (pluginManager as any).extractMetadata = () => {};
     (pluginManager as any).skipPluginValidation = () => true;
 
@@ -284,9 +286,9 @@ describe("PluginManagerService", () => {
       hashElement: { hashElement: null },
     } as any;
     const pluginManager = new PluginManagerService(null, nativeService, null, null, null, null);
-    (pluginManager as any)._plugins = [plugin1, plugin2];
+    (pluginManager as any)._pluginContainers = [plugin1, plugin2];
     pluginManager.unloadAllPlugins();
-    expect((pluginManager as any)._plugins).toStrictEqual([]);
+    expect((pluginManager as any)._pluginContainers).toStrictEqual([]);
   });
 
   test("unloadSinglePlugin", () => {
@@ -311,11 +313,11 @@ describe("PluginManagerService", () => {
       },
     };
     const pluginManager = new PluginManagerService(null, nativeService, null, null, null, null);
-    (pluginManager as any)._plugins = [plugin1, plugin2];
+    (pluginManager as any)._pluginContainers = [plugin1, plugin2];
     pluginManager.unloadSinglePlugin("plugin-1");
-    expect((pluginManager as any)._plugins).toStrictEqual([plugin2]);
+    expect((pluginManager as any)._pluginContainers).toStrictEqual([plugin2]);
     pluginManager.unloadSinglePlugin("wrong-plugin");
-    expect((pluginManager as any)._plugins).toStrictEqual([plugin2]);
+    expect((pluginManager as any)._pluginContainers).toStrictEqual([plugin2]);
   });
 
   test("testRsaSignToBase64", () => {
@@ -336,15 +338,19 @@ describe("PluginManagerService", () => {
     expect(result).toStrictEqual("fake-signature");
   });
 
-  test("availablePlugins", () => {
+  test("availableAwsCredentialsPlugins", () => {
     const sessionFactory = new SessionFactory(null, null, null, null, null);
     jest.spyOn(sessionFactory, "getCompatibleTypes");
     const nativeService = {
       requireModule: null,
       hashElement: { hashElement: null },
     } as any;
-    const pluginManager = new PluginManagerService(null, nativeService, null, null, sessionFactory, null) as any;
+    const repository = {
+      getPluginStatus: () => ({ active: true }),
+    } as any;
+    const pluginManager = new PluginManagerService(null, nativeService, null, repository, sessionFactory, null) as any;
     const plugin1 = {
+      pluginType: AwsCredentialsPlugin.name,
       metadata: {
         uniqueName: "plugin-1",
         active: true,
@@ -353,6 +359,7 @@ describe("PluginManagerService", () => {
       },
     };
     const plugin2 = {
+      pluginType: AwsCredentialsPlugin.name,
       metadata: {
         uniqueName: "plugin-2",
         active: true,
@@ -361,6 +368,7 @@ describe("PluginManagerService", () => {
       },
     };
     const plugin3 = {
+      pluginType: AwsCredentialsPlugin.name,
       metadata: {
         uniqueName: "plugin-3",
         active: true,
@@ -369,6 +377,7 @@ describe("PluginManagerService", () => {
       },
     };
     const plugin4 = {
+      pluginType: AwsCredentialsPlugin.name,
       metadata: {
         uniqueName: "plugin-4",
         active: false,
@@ -377,7 +386,44 @@ describe("PluginManagerService", () => {
       },
     };
 
-    (pluginManager as any)._plugins = [plugin1, plugin2, plugin3, plugin4];
+    (pluginManager as any)._pluginContainers = [
+      {
+        metadata: {
+          uniqueName: "plugin-1",
+          active: true,
+          supportedOS: [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows],
+          supportedSessions: [SessionType.awsIamUser],
+        },
+        pluginInstances: [plugin1],
+      },
+      {
+        metadata: {
+          uniqueName: "plugin-2",
+          active: true,
+          supportedOS: [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows],
+          supportedSessions: [SessionType.awsIamRoleFederated],
+        },
+        pluginInstances: [plugin2],
+      },
+      {
+        metadata: {
+          uniqueName: "plugin-3",
+          active: true,
+          supportedOS: [OperatingSystem.linux],
+          supportedSessions: [SessionType.anytype],
+        },
+        pluginInstances: [plugin3],
+      },
+      {
+        metadata: {
+          uniqueName: "plugin-4",
+          active: true,
+          supportedOS: [OperatingSystem.linux],
+          supportedSessions: [SessionType.aws],
+        },
+        pluginInstances: [plugin4],
+      },
+    ];
     const iamSession = {
       type: SessionType.awsIamUser,
     } as any;
@@ -387,14 +433,14 @@ describe("PluginManagerService", () => {
     const azureSession = {
       type: SessionType.azure,
     } as any;
-    const result1 = pluginManager.availablePlugins(OperatingSystem.mac, iamSession);
+    const result1 = pluginManager.availableAwsCredentialsPlugins(OperatingSystem.mac, iamSession);
     expect(sessionFactory.getCompatibleTypes).toHaveBeenCalled();
     expect(result1).toStrictEqual([plugin1]);
-    const result2 = pluginManager.availablePlugins(OperatingSystem.windows, federatedSession);
+    const result2 = pluginManager.availableAwsCredentialsPlugins(OperatingSystem.windows, federatedSession);
     expect(result2).toStrictEqual([plugin2]);
-    const result3 = pluginManager.availablePlugins(OperatingSystem.linux, federatedSession);
-    expect(result3).toStrictEqual([plugin1, plugin3]);
-    const result4 = pluginManager.availablePlugins(OperatingSystem.windows, azureSession);
+    const result3 = pluginManager.availableAwsCredentialsPlugins(OperatingSystem.linux, federatedSession);
+    expect(result3).toStrictEqual([plugin2, plugin3, plugin4]);
+    const result4 = pluginManager.availableAwsCredentialsPlugins(OperatingSystem.windows, azureSession);
     expect(result4).toStrictEqual([]);
   });
 
@@ -437,6 +483,7 @@ describe("PluginManagerService", () => {
           },
         },
       },
+      keywords: ["leapp-plugin"],
     };
     const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
     (pluginManager as any).http = {
@@ -465,6 +512,44 @@ describe("PluginManagerService", () => {
     expect(logService.log).toHaveBeenNthCalledWith(2, new LoggedEntry(`Plugin ${packageName} installed correctly.`, this, LogLevel.info, true));
   });
 
+  test("installPlugin, no leapp-plugin keyword", async () => {
+    const logService = {
+      log: () => {},
+    } as any;
+    const homedir = "homedir";
+    const packageName = "not-a-leapp-plugin";
+    const nativeService = {
+      requireModule: null,
+      hashElement: { hashElement: null },
+      os: {
+        homedir: () => homedir,
+      },
+    } as any;
+    const npmMetadata = {
+      name: packageName,
+      ["dist-tags"]: {
+        latest: "1.0.0",
+      },
+      versions: {
+        ["1.0.0"]: {
+          dist: {
+            tarball: `https://fake-url/${packageName}.tgz`,
+          },
+        },
+      },
+      keywords: ["random-keyword"],
+    };
+    const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
+    (pluginManager as any).http = {
+      get: jest.fn((param1, param2: any) => ({
+        toPromise: async () => (param2.responseType === "json" ? npmMetadata : ""),
+      })),
+    };
+    await expect(pluginManager.installPlugin(`leapp://${packageName}`)).rejects.toEqual(
+      new LoggedException(`${npmMetadata["name"]} is not a Leapp plugin`, this, LogLevel.error, true)
+    );
+  });
+
   test("extractMetadata, success", () => {
     const sessionFactory = {
       getCompatibleTypes: jest.fn(() => ["any"]),
@@ -484,7 +569,6 @@ describe("PluginManagerService", () => {
       keywords: ["test-keyword", constants.npmRequiredPluginKeyword],
       leappPlugin: {
         supportedSessions: [SessionType.awsIamUser],
-        entryClass: "test",
       },
     };
     const service = new PluginManagerService(null, nativeService, null, repository, sessionFactory, null) as any;
@@ -499,7 +583,6 @@ describe("PluginManagerService", () => {
       supportedOS: [OperatingSystem.mac, OperatingSystem.linux, OperatingSystem.windows],
       supportedSessions: [SessionType.awsIamUser],
       icon: "fas fa-puzzle-piece",
-      entryClass: packageJson.leappPlugin.entryClass,
       keywords: packageJson.keywords,
       uniqueName: packageJson.name,
       url: undefined,
@@ -519,6 +602,7 @@ describe("PluginManagerService", () => {
     expect(result).toStrictEqual({ packageJson: undefined, isPluginValid: false });
   });
 
+  /*
   test("validatePlugin, success and active plugin found", async () => {
     const pluginFilePath = "fake-filepath";
     const options = "fake-options";
@@ -543,13 +627,80 @@ describe("PluginManagerService", () => {
     expect(nativeService.fs.existsSync).toHaveBeenNthCalledWith(1, pluginFilePath + "/package.json");
     expect(nativeService.fs.existsSync).toHaveBeenNthCalledWith(2, pluginFilePath + "/plugin.js");
     expect(nativeService.fs.readFileSync).toHaveBeenCalledWith(pluginFilePath + "/package.json");
-    expect((pluginManager as any).http.get).toHaveBeenCalledWith(constants.pluginPortalUrl + "/plugin-1", { responseType: "json" });
+    // expect((pluginManager as any).http.get).toHaveBeenCalledWith(constants.pluginPortalUrl + "/plugin-1", { responseType: "json" });
     expect((pluginManager as any).rsaVerifySignatureFromBase64).toHaveBeenCalledWith(
       constants.publicKey,
       packageJsonContent + "fake-hash",
       "fake-signature"
     );
     expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: true });
+  });
+  */
+
+  test("validatePlugin, verify signature correctly", async () => {
+    const pluginFilePath = "fake-filepath";
+    const options = "fake-options";
+    const packageJsonContent = '{ "test": true }';
+    const nativeService = {
+      requireModule: null,
+      hashElement: { hashElement: () => ({ children: true, hash: "fake-hash" }) },
+      fs: {
+        existsSync: () => true,
+        readFileSync: () => packageJsonContent,
+      },
+      rimraf: jest.fn(),
+    } as any;
+    const logService = {
+      log: jest.fn(),
+    } as any;
+    const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
+    (pluginManager as any).http = {
+      get: jest.fn(() => ({
+        toPromise: async () => ({ status: "active", signature: "fake-signature" }),
+      })),
+    };
+    (pluginManager as any).skipPluginValidation = () => false;
+    (pluginManager as any).rsaVerifySignatureFromBase64 = jest.fn(() => true);
+    const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
+    expect((pluginManager as any).rsaVerifySignatureFromBase64).toHaveBeenCalledWith(
+      constants.publicKey,
+      packageJsonContent + "fake-hash",
+      "fake-signature"
+    );
+    expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: true });
+  });
+
+  test("validatePlugin, verify signature fails", async () => {
+    const pluginFilePath = "fake-filepath";
+    const options = "fake-options";
+    const packageJsonContent = '{ "test": true }';
+    const nativeService = {
+      requireModule: null,
+      hashElement: { hashElement: () => ({ children: true, hash: "fake-hash" }) },
+      fs: {
+        existsSync: () => true,
+        readFileSync: () => packageJsonContent,
+      },
+      rimraf: jest.fn(),
+    } as any;
+    const logService = {
+      log: jest.fn(),
+    } as any;
+    const pluginManager = new PluginManagerService(null, nativeService, logService, null, null, null);
+    (pluginManager as any).http = {
+      get: jest.fn(() => ({
+        toPromise: async () => ({ status: "active", signature: "fake-signature" }),
+      })),
+    };
+    (pluginManager as any).skipPluginValidation = () => false;
+    (pluginManager as any).rsaVerifySignatureFromBase64 = jest.fn(() => false);
+    const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
+    expect((pluginManager as any).rsaVerifySignatureFromBase64).toHaveBeenCalledWith(
+      constants.publicKey,
+      packageJsonContent + "fake-hash",
+      "fake-signature"
+    );
+    expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: false });
   });
 
   test("validatePlugin, no active plugin found", async () => {
@@ -574,7 +725,9 @@ describe("PluginManagerService", () => {
         toPromise: async () => ({ status: "inactive", signature: "fake-signature" }),
       })),
     };
+    (pluginManager as any).skipPluginValidation = jest.fn(() => false);
     const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
+    expect((pluginManager as any).skipPluginValidation).toHaveBeenCalled();
     expect(logService.log).toHaveBeenCalledWith(new LoggedEntry("Plugin not in active state: " + "plugin-1", this, LogLevel.warn, true));
     expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: false });
   });
@@ -620,7 +773,7 @@ describe("PluginManagerService", () => {
       })),
     };
     const result = await (pluginManager as any).validatePlugin(pluginFilePath, options, "plugin-1");
-    expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: false });
+    expect(result).toStrictEqual({ packageJson: JSON.parse(packageJsonContent), isPluginValid: true });
   });
 
   test("validatePlugin, hashing or verification failed", async () => {
@@ -664,15 +817,12 @@ describe("PluginManagerService", () => {
       description: "test description",
       leappPlugin: {},
     };
-    expectedMissingValues = expectedMissingValues.filter((value) => value === "keywords" || value === "author");
-    expectedMissingValues.push("leappPlugin.entryClass");
+    expectedMissingValues = ["author", "keywords"];
     expect(() => service.extractMetadata(packageJson2)).toThrowError(expectedMissingValues.join(", "));
 
     packageJson2["keywords"] = ["test-keyword"];
     packageJson2["author"] = "author";
-    packageJson2["leappPlugin"]["entryClass"] = "entryClass";
-    expectedMissingValues = [constants.npmRequiredPluginKeyword];
-    expect(() => service.extractMetadata(packageJson2)).toThrowError(expectedMissingValues[0]);
+    expect(() => service.extractMetadata(packageJson2)).toThrowError(constants.npmRequiredPluginKeyword);
   });
 
   test("extractMetadata, throws an error about wrong/unspported session or operanting system", () => {

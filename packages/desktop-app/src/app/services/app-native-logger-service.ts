@@ -4,15 +4,15 @@ import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { AppNativeService } from "./app-native.service";
 import { LogLevel } from "@noovolari/leapp-core/services/log-service";
 
-const toastLevelMap = {
-  [LogLevel.success]: ToastLevel.success,
-  [LogLevel.info]: ToastLevel.info,
-  [LogLevel.warn]: ToastLevel.warn,
-  [LogLevel.error]: ToastLevel.error,
-};
-
 @Injectable({ providedIn: "root" })
 export class AppNativeLoggerService implements ILogger {
+  toastLevelMap = {
+    [LogLevel.success]: ToastLevel.success,
+    [LogLevel.info]: ToastLevel.info,
+    [LogLevel.warn]: ToastLevel.warn,
+    [LogLevel.error]: ToastLevel.error,
+  };
+
   constructor(private nativeService: AppNativeService, private messageToasterService: MessageToasterService) {}
 
   log(message: string, level: LogLevel): void {
@@ -33,6 +33,6 @@ export class AppNativeLoggerService implements ILogger {
   }
 
   show(message: string, level: LogLevel): void {
-    this.messageToasterService.toast(message, toastLevelMap[level]);
+    this.messageToasterService.toast(message, this.toastLevelMap[level]);
   }
 }

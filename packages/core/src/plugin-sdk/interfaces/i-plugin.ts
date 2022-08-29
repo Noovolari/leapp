@@ -1,6 +1,5 @@
 import { Session } from "../../models/session";
 import { SessionType } from "../../models/session-type";
-import { PluginEnvironment } from "../plugin-environment";
 import { OperatingSystem } from "../../models/operating-system";
 
 export enum TemplateFormObject {
@@ -38,20 +37,13 @@ export interface IPluginMetadata {
   url: string;
   keywords: string[];
   active: boolean;
-  entryClass: string;
   icon: string;
   supportedOS: OperatingSystem[];
   supportedSessions?: SessionType[];
 }
 
 export interface IPlugin {
+  readonly pluginType: string;
   readonly metadata: IPluginMetadata;
-
-  // templateStructure: {
-  //   form: IPluginFormObject[];
-  //   output: IPluginOutputObject;
-  // };
-
-  bootstrap: (pluginEnvironment: PluginEnvironment) => Promise<void>;
-  applySessionAction: (session: Session) => Promise<void>;
+  run: (session: Session) => Promise<void>;
 }

@@ -1,4 +1,4 @@
-import { deserialize, serialize } from "class-transformer";
+import { serialize } from "class-transformer";
 import { INativeService } from "../interfaces/i-native-service";
 import { AwsIamRoleChainedSession } from "../models/aws/aws-iam-role-chained-session";
 import { AwsNamedProfile } from "../models/aws/aws-named-profile";
@@ -16,12 +16,17 @@ import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
 import { AzureIntegration } from "../models/azure/azure-integration";
 import PluginStatus from "../models/plugin-status";
+import { WorkspaceConsistencyService } from "./workspace-consistency-service";
 
 export class Repository {
   // Private singleton workspace
   private _workspace: Workspace;
 
-  constructor(private nativeService: INativeService, private fileService: FileService) {
+  constructor(
+    private nativeService: INativeService,
+    private fileService: FileService,
+    private workspaceConsistencyService: WorkspaceConsistencyService
+  ) {
     this.createWorkspace();
   }
 
@@ -36,10 +41,7 @@ export class Repository {
   }
 
   reloadWorkspace(): void {
-    const workspaceJSON = this.fileService.decryptText(
-      this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
-    );
-    this._workspace = deserialize(Workspace, workspaceJSON);
+    this._workspace = this.workspaceConsistencyService.getWorkspace();
   }
 
   getWorkspace(): Workspace {
@@ -52,8 +54,7 @@ export class Repository {
   createWorkspace(): void {
     if (!this.fileService.existsSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)) {
       this.fileService.newDir(this.nativeService.os.homedir() + "/.Leapp", { recursive: true });
-      this._workspace = new Workspace();
-      this._workspace.setNewWorkspaceVersion();
+      this._workspace = this.workspaceConsistencyService.createNewWorkspace();
       this.persistWorkspace(this._workspace);
     }
   }

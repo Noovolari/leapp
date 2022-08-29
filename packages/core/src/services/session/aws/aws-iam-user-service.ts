@@ -9,11 +9,11 @@ import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
-import { KeychainService } from "../../keychain-service";
 import { Repository } from "../../repository";
 import { AwsIamUserSessionRequest } from "./aws-iam-user-session-request";
 import { AwsSessionService } from "./aws-session-service";
 import { LoggedException, LogLevel } from "../../log-service";
+import { IKeychainService } from "../../../interfaces/i-keychain-service";
 
 export interface GenerateSessionTokenCallingMfaParams {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -32,7 +32,7 @@ export class AwsIamUserService extends AwsSessionService {
     repository: Repository,
     private localMfaCodePrompter: IMfaCodePrompter,
     private remoteMfaCodePrompter: IMfaCodePrompter,
-    private keychainService: KeychainService,
+    private keychainService: IKeychainService,
     fileService: FileService,
     awsCoreService: AwsCoreService
   ) {
@@ -247,15 +247,15 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   private async removeAccessKeyFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
+    await this.keychainService.deleteSecret(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
   }
 
   private async removeSecretKeyFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
+    await this.keychainService.deleteSecret(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
   }
 
   private async removeSessionTokenFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-token`);
+    await this.keychainService.deleteSecret(constants.appName, `${sessionId}-iam-user-aws-session-token`);
   }
 
   private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {

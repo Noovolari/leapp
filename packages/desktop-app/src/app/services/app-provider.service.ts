@@ -3,7 +3,6 @@ import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/service
 import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
@@ -39,10 +38,13 @@ import { MessageToasterService } from "./message-toaster.service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
-import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { HttpClient } from "@angular/common/http";
-import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-system/plugin-environment";
+import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
+import { AppKeychainService } from "./app-keychain-service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
+import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 
 @Injectable({
   providedIn: "root",
@@ -66,11 +68,11 @@ export class AppProviderService {
   private azureIntegrationServiceInstance: AzureIntegrationService;
   private authenticationServiceInstance: AwsSamlAssertionExtractionService;
   private sessionFactoryInstance: SessionFactory;
-  private integrationFactoryInstance: IntegrationFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
-  private keyChainServiceInstance: KeychainService;
+  private keychainServiceInstance: IKeychainService;
+  private workspaceConsistencyServiceInstance: WorkspaceConsistencyService;
   private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
@@ -88,6 +90,7 @@ export class AppProviderService {
   private azurePersistenceServiceInstance: AzurePersistenceService;
   private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
   private pluginManagerServiceInstance: PluginManagerService;
+  private integrationFactoryInstance: IntegrationFactory;
 
   constructor(
     private appNativeService: AppNativeService,
@@ -166,7 +169,7 @@ export class AppProviderService {
         this.repository,
         this.mfaCodePrompter,
         this.mfaCodePrompter,
-        this.keyChainService,
+        this.keychainService,
         this.fileService,
         this.awsCoreService
       );
@@ -206,7 +209,7 @@ export class AppProviderService {
     if (!this.awsSsoIntegrationServiceInstance) {
       this.awsSsoIntegrationServiceInstance = new AwsSsoIntegrationService(
         this.repository,
-        this.keyChainService,
+        this.keychainService,
         this.behaviouralSubjectService,
         this.appNativeService,
         this.sessionFactory,
@@ -223,7 +226,7 @@ export class AppProviderService {
         this.behaviouralSubjectService,
         this.repository,
         this.fileService,
-        this.keyChainService,
+        this.keychainService,
         this.awsCoreService,
         this.appNativeService,
         this.awsSsoOidcService
@@ -280,7 +283,7 @@ export class AppProviderService {
 
   public get azurePersistenceService(): AzurePersistenceService {
     if (!this.azurePersistenceServiceInstance) {
-      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.appNativeService, this.keyChainService);
+      this.azurePersistenceServiceInstance = new AzurePersistenceService(this.appNativeService, this.keychainService);
     }
     return this.azurePersistenceServiceInstance;
   }
@@ -303,13 +306,6 @@ export class AppProviderService {
       );
     }
     return this.sessionFactoryInstance;
-  }
-
-  public get integrationFactory(): IntegrationFactory {
-    if (!this.integrationFactoryInstance) {
-      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
-    }
-    return this.integrationFactoryInstance;
   }
 
   public get ssmService(): SsmService {
@@ -337,18 +333,25 @@ export class AppProviderService {
     return this.fileServiceInstance;
   }
 
+  public get workspaceConsistencyService(): WorkspaceConsistencyService {
+    if (!this.workspaceConsistencyServiceInstance) {
+      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.appNativeService, this.logService);
+    }
+    return this.workspaceConsistencyServiceInstance;
+  }
+
   public get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.appNativeService, this.fileService);
+      this.repositoryInstance = new Repository(this.appNativeService, this.fileService, this.workspaceConsistencyService);
     }
     return this.repositoryInstance;
   }
 
-  public get keyChainService(): KeychainService {
-    if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.appNativeService);
+  public get keychainService(): IKeychainService {
+    if (!this.keychainServiceInstance) {
+      this.keychainServiceInstance = new AppKeychainService(this.appNativeService);
     }
-    return this.keyChainServiceInstance;
+    return this.keychainServiceInstance;
   }
 
   public get logService(): LogService {
@@ -383,7 +386,7 @@ export class AppProviderService {
     if (!this.retroCompatibilityServiceInstance) {
       this.retroCompatibilityServiceInstance = new RetroCompatibilityService(
         this.fileService,
-        this.keyChainService,
+        this.keychainService,
         this.repository,
         this.behaviouralSubjectService
       );
@@ -398,9 +401,17 @@ export class AppProviderService {
     return this.azureCoreServiceInstance;
   }
 
+  public get integrationFactory(): IntegrationFactory {
+    if (!this.integrationFactoryInstance) {
+      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
+    }
+    return this.integrationFactoryInstance;
+  }
+
   public get remoteProceduresServer(): RemoteProceduresServer {
     if (!this.remoteProceduresServerInstance) {
       this.remoteProceduresServerInstance = new RemoteProceduresServer(
+        this.keychainService,
         this.appNativeService,
         this.verificationWindowService,
         this.awsAuthenticationService,

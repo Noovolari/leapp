@@ -311,6 +311,18 @@ body.dark-theme {
     .ng-dropdown-panel-items {
       background-color: $dark-select-component!important;
     }
+    .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+      background-color: rgba(82, 168, 220, 0.45)!important;
+    }
+    .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+      background-color: #52A8DC!important;
+    }
+  }
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
+    background-color: rgba(82, 168, 220, 0.45)!important;
+  }
+  .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
+    background-color: #52A8DC!important;
   }
 
   .toggled-filter {
@@ -497,5 +509,13 @@ body.dark-theme {
 
   .plugin-table thead th {
     background-color: $dark-modal-background!important;
+  }
+
+  .blackery {
+    color: $dark-main-text-color !important;
+  }
+
+  i.fa-apple, i.fa-windows, i.fa-linux {
+    color: #52A8DC!important;
   }
 }

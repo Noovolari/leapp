@@ -5,7 +5,6 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { Workspace } from "@noovolari/leapp-core/models/workspace";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
@@ -21,6 +20,7 @@ import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error"
 import { AppMfaCodePromptService } from "../../../services/app-mfa-code-prompt.service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "../../../services/options.service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 
 @Component({
   selector: "app-edit-dialog",
@@ -85,7 +85,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   public selectedLocation;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
-  private keychainService: KeychainService;
+  private keychainService: IKeychainService;
   private sessionService: SessionService;
 
   constructor(
@@ -99,7 +99,7 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     private mfaPrompter: AppMfaCodePromptService
   ) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
-    this.keychainService = this.leappCoreService.keyChainService;
+    this.keychainService = this.leappCoreService.keychainService;
   }
 
   ngOnInit(): void {

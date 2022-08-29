@@ -1,5 +1,6 @@
 import { Component, Inject, NgZone, OnInit } from "@angular/core";
 import { MAT_SNACK_BAR_DATA, MatSnackBar } from "@angular/material/snack-bar";
+import { AppProviderService } from "../../services/app-provider.service";
 
 @Component({
   selector: "app-snackbar",
@@ -8,7 +9,12 @@ import { MAT_SNACK_BAR_DATA, MatSnackBar } from "@angular/material/snack-bar";
 })
 export class SnackbarComponent implements OnInit {
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  constructor(@Inject(MAT_SNACK_BAR_DATA) public data: any, private snackBar: MatSnackBar, private ngZone: NgZone) {}
+  constructor(
+    @Inject(AppProviderService) private appProviderService: AppProviderService,
+    @Inject(MAT_SNACK_BAR_DATA) public data: any,
+    private snackBar: MatSnackBar,
+    private ngZone: NgZone
+  ) {}
 
   ngOnInit(): void {}
 
@@ -17,5 +23,11 @@ export class SnackbarComponent implements OnInit {
       event.preventDefault();
       this.snackBar.dismiss();
     });
+  }
+
+  processOptionalLink(): void {
+    if (this.data.link) {
+      this.appProviderService.windowService.openExternalUrl(this.data.link);
+    }
   }
 }

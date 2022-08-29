@@ -8,6 +8,6 @@ Leapp will open your default browser with the Region and the Role already prepar
 
 > **note:** to use this feature correctly, remember to logout from any web console already opened in the browser.
 
-![](../../images/built-in-features/opening-screen.png)
+![](../../images/built-in-features/opening-screen.png?style=smaller-img)
 
 > **note:** the feature currently is available for IAM Role Federated Sessions, Single Sign-On Sessions, and IAM Role Chained Sessions.

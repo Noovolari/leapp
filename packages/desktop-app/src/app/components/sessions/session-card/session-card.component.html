@@ -1,21 +1,32 @@
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-1">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+    class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-1">
   <div class="session-name-td">
-    <img class="provider-icon" src="assets/images/{{getSessionTypeIcon(session.type)}}{{optionService.colorTheme === eConstants.darkTheme || (optionService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="" title="" />
+    <img class="provider-icon"
+         src="assets/images/{{getSessionTypeIcon(session.type)}}{{optionService.colorTheme === eConstants.darkTheme || (optionService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png"
+         alt="" title=""/>
     &nbsp;
-    <i class="moon-Hover-{{session.status !== eSessionStatus.active && session.status !== eSessionStatus.pending ? 'Start' : 'Stop'}} moon-hover-session hover-item {{session.type === eSessionType.azure ? 'hover-azure' : ''}}" (click)="session.status === eSessionStatus.active || session.status === eSessionStatus.pending ? stopSession() : startSession()"></i>
+    <i
+      class="moon-Hover-{{session.status !== eSessionStatus.active && session.status !== eSessionStatus.pending ? 'Start' : 'Stop'}} moon-hover-session hover-item {{session.type === eSessionType.azure ? 'hover-azure' : ''}}"
+      (click)="session.status === eSessionStatus.active || session.status === eSessionStatus.pending ? stopSession() : startSession()"></i>
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session.sessionName}}</span>
     <i class="moon-Pin" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1"></i>
   </div>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-2" *ngIf="globalColumns.role">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+    class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-2"
+    *ngIf="globalColumns.role">
   <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
     <ng-container *ngIf="session.type !== eSessionType.awsIamUser && session.type !== eSessionType.azure">{{ session | detail }}</ng-container>
   </span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-3" *ngIf="globalColumns.provider">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+    class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-3"
+    *ngIf="globalColumns.provider">
   <span class="badge badge-rounded badge-{{getSessionProviderClass(session.type)}}">{{getSessionProviderLabel(session.type)}}</span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-4" *ngIf="globalColumns.namedProfile">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+    class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-4"
+    *ngIf="globalColumns.namedProfile">
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
       <ng-container *ngIf="session.type !== eSessionType.azure">
       {{getProfileName(getProfileId(session))}}
@@ -23,15 +34,18 @@
       </ng-container>
     </span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-5" *ngIf="!compactMode && globalColumns.region">
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+    class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-5"
+    *ngIf="!compactMode && globalColumns.region">
   <span class="badge badge-region badge-{{session.status === eSessionStatus.active ? 'black' : 'gray'}}">{{session.region}}</span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)" class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-6">
-  <i class="status-item fas fa-circle {{session.status === eSessionStatus.active ? 'active' : 'offline'}}" *ngIf="session.status !== eSessionStatus.pending"></i>
+<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+    class="{{eOptionIds[session.sessionId] ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-6">
+  <i class="status-item fas fa-circle {{session.status === eSessionStatus.active ? 'active' : 'offline'}}"
+     *ngIf="session.status !== eSessionStatus.pending"></i>
   <i class="status-item far fa-spinner-third fa-spin" *ngIf="session.status === eSessionStatus.pending"></i>
   <i class="hover-item moon-More" (click)="openContextMenu($event, session);"></i>
 </td>
-
 
 
 <div [matMenuTriggerFor]="menu" [style.position]="'absolute'" [style.left.px]="menuX"></div>
@@ -44,7 +58,9 @@
   </button>
 
   <button mat-menu-item (click)="stopSession();" *ngIf="session.status === eSessionStatus.active || session.status === eSessionStatus.pending">
-    <img class="moon-stop-outline" src="assets/images/stop-circle-light{{optionService.colorTheme === eConstants.darkTheme || (optionService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" alt="stop-circle">
+    <img class="moon-stop-outline"
+         src="assets/images/stop-circle-light{{optionService.colorTheme === eConstants.darkTheme || (optionService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png"
+         alt="stop-circle">
     <span style="margin-left: 7px;">Stop Session</span>
   </button>
 
@@ -77,7 +93,8 @@
     </button>
   </ng-container>
 
-  <ng-container *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained">
+  <ng-container
+    *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained">
     <button mat-menu-item (click)="openAwsWebConsole($event);">
       <i class="moon-Open-Web-Console"></i>
       <span>&nbsp;&nbsp;Open Web Console</span>
@@ -86,7 +103,8 @@
 
   <div class="divider"></div>
 
-  <ng-container *ngIf="(session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained || session.type === eSessionType.awsSsoRole)">
+  <ng-container
+    *ngIf="(session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained || session.type === eSessionType.awsSsoRole)">
     <button mat-menu-item [matMenuTriggerFor]="copy">
       <i class="moon-Copy"></i>
       <span>&nbsp;&nbsp;Copy</span>
@@ -94,7 +112,8 @@
     <div class="divider"></div>
   </ng-container>
 
-  <button mat-menu-item (click)="editSession(session, $event);" *ngIf="session.type !== eSessionType.awsSsoRole && session.type !== eSessionType.azure">
+  <button mat-menu-item (click)="editSession(session, $event);"
+          *ngIf="session.type !== eSessionType.awsSsoRole && session.type !== eSessionType.azure">
     <i class="moon-Edit"></i>&nbsp;
     <span>Edit Session</span>
   </button>
@@ -120,12 +139,13 @@
     </button>
   </ng-container>
 
-  <ng-container *ngIf="!eConstants.disablePluginSystem && appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session).length > 0">
+  <ng-container
+    *ngIf="!eConstants.disablePluginSystem && appProviderService.pluginManagerService.availableAwsCredentialsPlugins(appService.detectOs(), session).length > 0">
     <div class="divider"></div>
-    <!--<button mat-menu-item [matMenuTriggerFor]="pluginList">
+    <button mat-menu-item [matMenuTriggerFor]="pluginList">
       <i class="moon-Puzzle"></i>
       <span>&nbsp;&nbsp;Plugins</span>
-    </button>----->
+    </button>
   </ng-container>
 
 </mat-menu>
@@ -135,7 +155,8 @@
     <i class="moon-Region"></i>&nbsp;
     <span>Region</span>
   </button>
-  <button mat-menu-item (click)="changeProfileModalOpen($event);" *ngIf="(session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained || session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamUser)">
+  <button mat-menu-item (click)="changeProfileModalOpen($event);"
+          *ngIf="(session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained || session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamUser)">
     <i class="moon-User"></i>&nbsp;
     <span>Named Profile</span>
   </button>
@@ -156,12 +177,12 @@
   </button>
 </mat-menu>
 
-<mat-menu #pluginList *ngIf="!eConstants.disablePluginSystem">
-  <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.availablePlugins(appService.detectOs(), session)">
+<mat-menu #pluginList>
+  <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.availableAwsCredentialsPlugins(appService.detectOs(), session)">
     <ng-container>
       <button mat-menu-item (click)="applyPluginAction($event, plugin);">
-        <i class="{{plugin.metadata.icon}}"></i>
-        <span>&nbsp;&nbsp;{{plugin.metadata.uniqueName}}</span>
+        <i class="{{plugin.actionIcon}}"></i>
+        <span>&nbsp;&nbsp;{{plugin.actionName}}</span>
       </button>
     </ng-container>
   </ng-container>
@@ -170,29 +191,43 @@
 <ng-container *ngIf="eOptionIds[session.sessionId]">
   <div class="option-bar" [ngClass]="session.type.toLowerCase() + '-opt-bar'">
     <div class="opt-bar-session-button">
-      <a class="icon-button start-session" (click)="startSession();" *ngIf="session.status === eSessionStatus.inactive"><i class="moon-Play-filled"><div class="dark-theme-filling"></div></i><span>{{compactMode ? '' : '&nbsp;Start Session'}}</span></a>
-      <a class="icon-button stop-session" (click)="stopSession();" *ngIf="session.status === eSessionStatus.active || session.status === eSessionStatus.pending"><i class="moon-Stop"><div class="dark-theme-filling"></div></i><span>{{compactMode ? '' : '&nbsp;Stop Session'}}</span></a>
+      <a class="icon-button start-session" (click)="startSession();" *ngIf="session.status === eSessionStatus.inactive"><i class="moon-Play-filled">
+        <div class="dark-theme-filling"></div>
+      </i><span>{{compactMode ? '' : '&nbsp;Start Session'}}</span></a>
+      <a class="icon-button stop-session" (click)="stopSession();"
+         *ngIf="session.status === eSessionStatus.active || session.status === eSessionStatus.pending"><i class="moon-Stop">
+        <div class="dark-theme-filling"></div>
+      </i><span>{{compactMode ? '' : '&nbsp;Stop Session'}}</span></a>
     </div>
-    <div [ngClass]="(session.type === eSessionType.awsIamUser && session.status !== eSessionStatus.active) ? 'iam-session-selected' : ''" class="opt-bar-middle-section">
+    <div [ngClass]="(session.type === eSessionType.awsIamUser && session.status !== eSessionStatus.active) ? 'iam-session-selected' : ''"
+         class="opt-bar-middle-section">
       <div class="opt-bar-middle-left-buttons">
 
-        <ng-container *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained">
+        <ng-container
+          *ngIf="session.type === eSessionType.awsSsoRole || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained">
           <a class="icon-button open-web-console" (click)="openAwsWebConsole($event);" matTooltip="Open Web Console">
             <i class="moon-Open-Web-Console"></i>
           </a>
         </ng-container>
-        <a class="icon-button" *ngIf="session.type !== eSessionType.azure" (click)="changeRegionModalOpen($event);" matTooltip="Change Region"><i class="moon-Region"></i></a>
-        <a class="icon-button" *ngIf="session.type !== eSessionType.azure" (click)="changeProfileModalOpen($event);" matTooltip="Change Named Profile"><i class="moon-User"></i></a>
-        <a class="icon-button" (click)="ssmModalOpen($event);" *ngIf="session.type !== eSessionType.azure" matTooltip="View SSM sessions"><i class="moon-Server"></i></a>
-        <a class="icon-button" *ngIf="session.type === eSessionType.awsIamUser || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained" (click)="editSession(session, $event);" matTooltip="Edit Session"><i class="moon-Edit"></i></a>
+        <a class="icon-button" *ngIf="session.type !== eSessionType.azure" (click)="changeRegionModalOpen($event);" matTooltip="Change Region"><i
+          class="moon-Region"></i></a>
+        <a class="icon-button" *ngIf="session.type !== eSessionType.azure" (click)="changeProfileModalOpen($event);"
+           matTooltip="Change Named Profile"><i class="moon-User"></i></a>
+        <a class="icon-button" (click)="ssmModalOpen($event);" *ngIf="session.type !== eSessionType.azure" matTooltip="View SSM sessions"><i
+          class="moon-Server"></i></a>
+        <a class="icon-button"
+           *ngIf="session.type === eSessionType.awsIamUser || session.type === eSessionType.awsIamRoleFederated || session.type === eSessionType.awsIamRoleChained"
+           (click)="editSession(session, $event);" matTooltip="Edit Session"><i class="moon-Edit"></i></a>
       </div>
       <span class="separator"></span>
 
       <div class="opt-bar-middle-right-buttons">
-        <a class="icon-button" (click)="pinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) === -1" matTooltip="Pin Session"><i class="moon-Pin"></i></a>
-        <a class="icon-button" (click)="unpinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1" matTooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
+        <a class="icon-button" (click)="pinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) === -1"
+           matTooltip="Pin Session"><i class="moon-Pin"></i></a>
+        <a class="icon-button" (click)="unpinSession(session, $event);" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1"
+           matTooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
         <ng-container *ngIf="session.type !== eSessionType.awsSsoRole && session.type !== eSessionType.azure">
-        <a class="icon-button" (click)="deleteSession(session, $event);" matTooltip="Delete Session"><i class="moon-Delete"></i></a>
+          <a class="icon-button" (click)="deleteSession(session, $event);" matTooltip="Delete Session"><i class="moon-Delete"></i></a>
         </ng-container>
       </div>
     </div>
@@ -214,7 +249,8 @@
         <div class="form-field">
           <div class="form-group">
             <label>Select a Region</label>
-            <ng-select bindLabel="region" bindValue="region" [items]="awsRegions" [(ngModel)]="selectedSsmRegion" placeholder="Select a Region for finding instances" (change)="changeSsmRegion($event, session);"></ng-select>
+            <ng-select bindLabel="region" bindValue="region" [items]="awsRegions" [(ngModel)]="selectedSsmRegion"
+                       placeholder="Select a Region for finding instances" (change)="changeSsmRegion($event, session);"></ng-select>
           </div>
         </div>
       </div>
@@ -227,7 +263,7 @@
             <div class="form-field">
               <div class="form-group">
                 <label>Select an Instance</label>
-                <input class="form-control" type="text" placeholder="searchFilter by..." (keyup)="searchSSMInstance($event)" />
+                <input class="form-control" type="text" placeholder="searchFilter by..." (keyup)="searchSSMInstance($event)"/>
               </div>
             </div>
           </div>
@@ -272,7 +308,9 @@
       </div>
     </div>
     <br>
-    <button (click)="changeRegion()" [disabled]="!selectedDefaultRegion" [ngClass]="(!selectedDefaultRegion) ? 'btn-control mat-button-disabled': 'btn-control'">Select</button>
+    <button (click)="changeRegion()" [disabled]="!selectedDefaultRegion"
+            [ngClass]="(!selectedDefaultRegion) ? 'btn-control mat-button-disabled': 'btn-control'">Select
+    </button>
     <a (click)="goBack()">Cancel</a>
 
   </div>
@@ -308,7 +346,9 @@
       </form>
     </div>
     <br>
-    <button type="button" (click)="changeProfile();" [disabled]="!selectedProfile" [ngClass]="(!selectedProfile) ? 'btn-control mat-button-disabled': 'btn-control'">Save Profile</button>
+    <button type="button" (click)="changeProfile();" [disabled]="!selectedProfile"
+            [ngClass]="(!selectedProfile) ? 'btn-control mat-button-disabled': 'btn-control'">Save Profile
+    </button>
     <a (click)="goBack();">Cancel</a>
   </div>
 </ng-template>

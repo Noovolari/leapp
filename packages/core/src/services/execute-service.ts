@@ -17,48 +17,31 @@ export class ExecuteService {
    *
    * @param command - the command to launch
    * @param env - environment
-   * @param disableOutputLog - to disable logging of outputs
+   * @param maskOutputLog - to mask logging of secret outputs
    * @returns an {Promise<string>} stdout or stderr
    */
-  execute(command: string, env?: any, maskOutputLog?: boolean): Promise<string> {
-    // TODO: in case of error, adding stdout and stderr is just a retro-compatible
-    //  solution, not the ideal one; we could extract an Info interface and return it
-    //  both in reject and resolve cases. This will be a breaking change but
-    //  provides all the information needed.
-    return new Promise((resolve, reject) => {
-      let exec = this.nativeService.exec;
-      if (command.startsWith("sudo")) {
-        exec = this.nativeService.sudo.exec;
-        command = command.substring(5, command.length);
+  async execute(command: string, env?: any, maskOutputLog?: boolean): Promise<string> {
+    let exec = this.nativeService.exec;
+    if (command.startsWith("sudo")) {
+      exec = this.nativeService.sudo.exec;
+      command = command.substring(5, command.length);
+    }
+    // NOTE: Electron works in sandbox mode when built.
+    // Unfortunately this comes with some problems with executing OS commands.
+    // This code just uses absolute path for the commands Leapp uses to interact with both AWS and AZ command line tools.
+    // If this part is modified for some reason,
+    // PLEASE TEST BUILD APPLICATION BEFORE RELEASING
+    if (this.nativeService.process.platform === "darwin") {
+      if (command.indexOf("osascript") !== -1) {
+        command = "/usr/bin/" + command;
+      } else if (command.indexOf("cd") !== -1) {
+        command = "" + command;
+      } else {
+        command = "/usr/local/bin/" + command;
       }
-
-      if (this.nativeService.process.platform === "darwin") {
-        if (command.indexOf("osascript") !== -1) {
-          command = "/usr/bin/" + command;
-        } else if (command.indexOf("cd") !== -1) {
-          command = "" + command;
-        } else {
-          command = "/usr/local/bin/" + command;
-        }
-      }
-      exec(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {
-        const info = { command, stdout, stderr, error: err };
-        if (info.error && info.error.cmd) {
-          delete info.error.cmd;
-        }
-        if (maskOutputLog) {
-          Object.assign(info, { stdout: "****", stderr: "****" });
-        }
-        this.logService.log(new LoggedEntry("execute from Leapp\ninfo:" + JSON.stringify(info, undefined, 4), this, LogLevel.info, false));
-        if (err) {
-          err.stdout = stdout;
-          err.stderr = stderr;
-          reject(err);
-        } else {
-          resolve(stdout ? stdout : stderr);
-        }
-      });
-    });
+    }
+    // ========================================================
+    return await this.exec(exec, command, env, maskOutputLog);
   }
 
   /**
@@ -124,5 +107,31 @@ export class ExecuteService {
     } else {
       return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, Object.assign(newEnv, env));
     }
+  }
+
+  private async exec(execFn: any, command: string, env: any = undefined, maskOutputLog: boolean = false): Promise<string> {
+    // TODO: in case of error, adding stdout and stderr is just a retro-compatible
+    //  solution, not the ideal one; we could extract an Info interface and return it
+    //  both in reject and resolve cases. This will be a breaking change but
+    //  provides all the information needed.
+    return new Promise((resolve, reject) => {
+      execFn(command, { env, name: "Leapp", timeout: 60000 }, (err, stdout, stderr) => {
+        const info = { command, stdout, stderr, error: err };
+        if (info.error && info.error.cmd) {
+          delete info.error.cmd;
+        }
+        if (maskOutputLog) {
+          Object.assign(info, { stdout: "****", stderr: "****" });
+        }
+        this.logService.log(new LoggedEntry("execute from Leapp\ninfo:" + JSON.stringify(info, undefined, 4), this, LogLevel.info, false));
+        if (err) {
+          err.stdout = stdout;
+          err.stderr = stderr;
+          reject(err);
+        } else {
+          resolve(stdout ? stdout : stderr);
+        }
+      });
+    });
   }
 }

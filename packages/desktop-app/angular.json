@@ -36,12 +36,13 @@
               "src/styles.scss"
             ],
             "scripts": [],
-            "vendorChunk": true,
-            "extractLicenses": false,
-            "buildOptimizer": false,
-            "sourceMap": true,
             "optimization": false,
-            "namedChunks": true,
+            "outputHashing": "all",
+            "sourceMap": true,
+            "namedChunks": false,
+            "extractLicenses": true,
+            "vendorChunk": false,
+
             "allowedCommonJsDependencies": ["stream", "assert", "fs", "@noovolari/leapp-core"]
           },
           "configurations": {
@@ -52,7 +53,7 @@
                   "with": "src/environments/environment.stag.ts"
                 }
               ],
-              "optimization": true,
+              "optimization": false,
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
@@ -62,7 +63,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "6mb",
-                  "maximumError": "10mb"
+                  "maximumError": "20mb"
                 }
               ]
             },
@@ -73,7 +74,7 @@
                   "with": "src/environments/environment.prod.ts"
                 }
               ],
-              "optimization": true,
+              "optimization": false,
               "outputHashing": "all",
               "sourceMap": false,
               "namedChunks": false,
@@ -83,7 +84,7 @@
                 {
                   "type": "initial",
                   "maximumWarning": "6mb",
-                  "maximumError": "10mb"
+                  "maximumError": "20mb"
                 }
               ]
             }

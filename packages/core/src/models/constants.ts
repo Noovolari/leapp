@@ -2,7 +2,9 @@ export const constants = {
   //General
   appName: "Leapp",
   lockFileDestination: ".Leapp/Leapp-lock.json",
+  lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",
+  workspaceLastVersion: 2,
 
   //Aws
   samlRoleSessionDuration: 3600, // 1h
@@ -51,7 +53,7 @@ export const constants = {
 
   npmRequiredPluginKeyword: "leapp-plugin",
   skipPluginValidation: true,
-  disablePluginSystem: true,
+  disablePluginSystem: false,
   pluginPortalUrl: "https://vv0r45fadf.execute-api.eu-west-1.amazonaws.com/api/api/v1/plugins",
   // Public Key for signature
   // TODO: move it to the leapp site in future

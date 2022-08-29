@@ -6,6 +6,7 @@ import { Workspace } from "../models/workspace";
 import * as uuid from "uuid";
 import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
 import { constants } from "../models/constants";
+
 jest.mock("uuid");
 
 describe("RetroCompatibilityService", () => {
@@ -23,6 +24,7 @@ describe("RetroCompatibilityService", () => {
       (service as any).adaptOldWorkspaceFile = jest.fn();
       (service as any).isIntegrationPatchNecessary = jest.fn();
       (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).integrationTypeEnumPatch = jest.fn();
       (service as any).migration1 = jest.fn();
 
       await service.applyWorkspaceMigrations();
@@ -31,6 +33,7 @@ describe("RetroCompatibilityService", () => {
       expect((service as any).adaptOldWorkspaceFile).not.toHaveBeenCalled();
       expect((service as any).isIntegrationPatchNecessary).not.toHaveBeenCalled();
       expect((service as any).adaptIntegrationPatch).not.toHaveBeenCalled();
+      expect((service as any).integrationTypeEnumPatch).not.toHaveBeenCalled();
       expect((service as any).migration1).not.toHaveBeenCalled();
     });
 
@@ -44,12 +47,14 @@ describe("RetroCompatibilityService", () => {
       (service as any).isRetroPatchNecessary = () => true;
       (service as any).isIntegrationPatchNecessary = () => true;
       (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).integrationTypeEnumPatch = jest.fn();
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
       expect((service as any).adaptIntegrationPatch).toHaveBeenCalled();
+      expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
     });
@@ -64,12 +69,14 @@ describe("RetroCompatibilityService", () => {
       (service as any).isRetroPatchNecessary = () => false;
       (service as any).adaptIntegrationPatch = jest.fn();
       (service as any).isIntegrationPatchNecessary = () => true;
+      (service as any).integrationTypeEnumPatch = jest.fn();
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
       expect((service as any).adaptIntegrationPatch).toHaveBeenCalled();
+      expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
     });
@@ -84,12 +91,14 @@ describe("RetroCompatibilityService", () => {
       (service as any).isRetroPatchNecessary = () => true;
       (service as any).isIntegrationPatchNecessary = () => false;
       (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).integrationTypeEnumPatch = jest.fn();
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
       expect((service as any).adaptIntegrationPatch).not.toHaveBeenCalled();
+      expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
     });
@@ -128,6 +137,50 @@ describe("RetroCompatibilityService", () => {
       service = new RetroCompatibilityService(fileService, null, null, null);
       expect((service as any).isIntegrationPatchNecessary()).toEqual(false);
     });
+  });
+
+  test("integrationTypeEnumPatch, non empty case", async () => {
+    const retroService = new RetroCompatibilityService(null, null, null, null) as any;
+    const workspace = {
+      ["_awsSsoIntegrations"]: [{ type: "awsSso" }, { type: IntegrationType.awsSso }],
+      ["_azureIntegrations"]: [{ type: "azure" }, { type: IntegrationType.azure }],
+    };
+    retroService.getWorkspace = () => workspace;
+    retroService.reloadIntegrations = jest.fn();
+    await retroService.integrationTypeEnumPatch();
+
+    expect(workspace._awsSsoIntegrations[0].type === IntegrationType.awsSso);
+    expect(workspace._awsSsoIntegrations[1].type === IntegrationType.awsSso);
+
+    expect(workspace._azureIntegrations[0].type === IntegrationType.azure);
+    expect(workspace._azureIntegrations[1].type === IntegrationType.azure);
+
+    expect(retroService.reloadIntegrations).toHaveBeenCalledWith(workspace);
+  });
+
+  test("integrationTypeEnumPatch, empty case", async () => {
+    const retroService = new RetroCompatibilityService(null, null, null, null) as any;
+    const workspace = {
+      ["_awsSsoIntegrations"]: [],
+      ["_azureIntegrations"]: [],
+    };
+    retroService.getWorkspace = () => workspace;
+    retroService.reloadIntegrations = jest.fn();
+    await retroService.integrationTypeEnumPatch();
+
+    expect(workspace._awsSsoIntegrations.length).toBe(0);
+    expect(workspace._azureIntegrations.length).toBe(0);
+    expect(retroService.reloadIntegrations).toHaveBeenCalledWith(workspace);
+  });
+
+  test("integrationTypeEnumPatch, missing integration keys", async () => {
+    const retroService = new RetroCompatibilityService(null, null, null, null) as any;
+    const workspace = {};
+    retroService.getWorkspace = () => workspace;
+    retroService.reloadIntegrations = jest.fn();
+    await retroService.integrationTypeEnumPatch();
+
+    expect(retroService.reloadIntegrations).toHaveBeenCalledWith(workspace);
   });
 
   describe("migration1", () => {

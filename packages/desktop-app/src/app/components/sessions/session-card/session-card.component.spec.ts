@@ -34,6 +34,7 @@ describe("SessionCardComponent", () => {
       awsCoreService: { getRegions: () => [] },
       azureCoreService: { getLocations: () => [] },
       sessionFactory: { getSessionService: () => {} },
+      pluginManagerService: { availableAwsCredentialsPlugins: () => [] },
     });
 
     TestBed.configureTestingModule({

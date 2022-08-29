@@ -1,7 +1,6 @@
 import { CloudProviderService } from "@noovolari/leapp-core/services/cloud-provider-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
@@ -40,11 +39,14 @@ import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
-import { PluginManagerService } from "@noovolari/leapp-core/plugin-system/plugin-manager-service";
-import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-system/plugin-environment";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
+import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
+import { CliRpcKeychainService } from "./cli-rpc-keychain-service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import axios from "axios";
+import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -62,17 +64,16 @@ export class CliProviderService {
   private awsSsoRoleServiceInstance: AwsSsoRoleService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private azureServiceInstance: AzureSessionService;
-  private azureIntegrationServiceInstance: AzureIntegrationService;
   private sessionFactoryInstance: SessionFactory;
-  private integrationFactoryInstance: IntegrationFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
+  private workspaceConsistencyServiceInstance: WorkspaceConsistencyService;
   private repositoryInstance: Repository;
   private regionsServiceInstance: RegionsService;
   private namedProfilesServiceInstance: NamedProfilesService;
   private idpUrlsServiceInstance: IdpUrlsService;
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
-  private keyChainServiceInstance: KeychainService;
+  private keyChainServiceInstance: IKeychainService;
   private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
@@ -89,11 +90,36 @@ export class CliProviderService {
   private workspaceServiceInstance: WorkspaceService;
   private azurePersistenceServiceInstance: AzurePersistenceService;
   private pluginManagerServiceInstance: PluginManagerService;
+  private integrationFactoryInstance: IntegrationFactory;
+  private azureIntegrationServiceInstance: AzureIntegrationService;
+
   private httpClient: any = {
     get: (url: string) => ({
       toPromise: async () => (await axios.get(url)).data
     }),
   };
+
+  public get azureIntegrationService(): AzureIntegrationService {
+    if (!this.azureIntegrationServiceInstance) {
+      this.azureIntegrationServiceInstance = new AzureIntegrationService(
+        this.repository,
+        this.behaviouralSubjectService,
+        this.cliNativeService,
+        this.sessionFactory,
+        this.executeService,
+        this.azureSessionService,
+        this.azurePersistenceService
+      );
+    }
+    return this.azureIntegrationServiceInstance;
+  }
+
+  public get integrationFactory(): IntegrationFactory {
+    if (!this.integrationFactoryInstance) {
+      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
+    }
+    return this.integrationFactoryInstance;
+  }
 
   public get pluginManagerService(): PluginManagerService {
     if (!this.pluginManagerServiceInstance) {
@@ -253,34 +279,12 @@ export class CliProviderService {
     return this.azureServiceInstance;
   }
 
-  public get azureIntegrationService(): AzureIntegrationService {
-    if (!this.azureIntegrationServiceInstance) {
-      this.azureIntegrationServiceInstance = new AzureIntegrationService(
-        this.repository,
-        this.behaviouralSubjectService,
-        this.cliNativeService,
-        this.sessionFactory,
-        this.executeService,
-        this.azureSessionService,
-        this.azurePersistenceService
-      );
-    }
-    return this.azureIntegrationServiceInstance;
-  }
-
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
         this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureSessionService);
     }
     return this.sessionFactoryInstance;
-  }
-
-  public get integrationFactory(): IntegrationFactory {
-    if (!this.integrationFactoryInstance) {
-      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
-    }
-    return this.integrationFactoryInstance;
   }
 
   get awsParentSessionFactory(): AwsParentSessionFactory {
@@ -298,9 +302,16 @@ export class CliProviderService {
     return this.fileServiceInstance;
   }
 
+  public get workspaceConsistencyService(): WorkspaceConsistencyService {
+    if (!this.workspaceConsistencyServiceInstance) {
+      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.cliNativeServiceInstance, this.logService);
+    }
+    return this.workspaceConsistencyServiceInstance;
+  }
+
   get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService);
+      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService, this.workspaceConsistencyService);
     }
     return this.repositoryInstance;
   }
@@ -335,9 +346,9 @@ export class CliProviderService {
     return this.awsSsoIntegrationServiceInstance;
   }
 
-  get keyChainService(): KeychainService {
+  get keyChainService(): IKeychainService {
     if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.cliNativeService);
+      this.keyChainServiceInstance = new CliRpcKeychainService(this.remoteProceduresClient);
     }
     return this.keyChainServiceInstance;
   }

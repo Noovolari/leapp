@@ -7,7 +7,7 @@ import { constants } from "../models/constants";
 
 describe("MsalPersistenceService", () => {
   const keyChainService = {
-    deletePassword: jest.fn(async () => Promise.resolve(true)),
+    deleteSecret: jest.fn(async () => Promise.resolve(true)),
     getSecret: jest.fn(async () => Promise.resolve("")),
     saveSecret: jest.fn(async () => {}),
   };
@@ -305,7 +305,7 @@ describe("MsalPersistenceService", () => {
   test("getAzureSecrets", async () => {
     const intId = "fake-integration-id";
     const mockedKeyChain = {
-      deletePassword: jest.fn(async () => Promise.resolve(true)),
+      deleteSecret: jest.fn(async () => Promise.resolve(true)),
       getSecret: jest.fn(async (_, str: string): Promise<string> => {
         let value;
         if (str.indexOf(`azure-integration-profile-${intId}`) > -1) {
@@ -367,20 +367,20 @@ describe("MsalPersistenceService", () => {
 
   test("deleteAzureSecrets", async () => {
     const kcService = {
-      deletePassword: jest.fn(),
+      deleteSecret: jest.fn(),
     } as any;
 
     const service = new AzurePersistenceService(null, kcService);
     await service.deleteAzureSecrets("fakeIntegrationId");
 
-    expect(kcService.deletePassword).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeIntegrationId");
-    expect(kcService.deletePassword).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeIntegrationId");
-    expect(kcService.deletePassword).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeIntegrationId");
+    expect(kcService.deleteSecret).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeIntegrationId");
+    expect(kcService.deleteSecret).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeIntegrationId");
+    expect(kcService.deleteSecret).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeIntegrationId");
   });
 
-  test("deleteAzureSecrets, deletePassword throws an exception", async () => {
+  test("deleteAzureSecrets, deleteSecret throws an exception", async () => {
     const kcService = {
-      deletePassword: jest.fn(async () => {
+      deleteSecret: jest.fn(async () => {
         throw new Error("Error message");
       }),
     } as any;

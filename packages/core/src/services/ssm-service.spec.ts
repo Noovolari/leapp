@@ -4,7 +4,7 @@ import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
 import { INativeService } from "../interfaces/i-native-service";
 import { LoggedEntry } from "./log-service";
-import { LoggedException, LogLevel, LogService } from "../../dist/services/log-service";
+import { LoggedException, LogLevel, LogService } from "./log-service";
 
 jest.mock("../models/session");
 

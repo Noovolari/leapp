@@ -45,12 +45,8 @@ export class PluginEnvironment implements IPluginEnvironment {
   }
 
   async cloneSession(session: Session): Promise<string> {
-    console.log("SESSION:");
-    console.log(session);
     const sessionService = this.providerService.sessionFactory.getSessionService(session.type);
     const createSessionData = await sessionService.getCloneRequest(session);
-    console.log("CREATE SESSION DATA");
-    console.log(createSessionData);
     return await sessionService.create(createSessionData);
   }
 

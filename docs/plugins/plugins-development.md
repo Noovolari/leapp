@@ -36,6 +36,44 @@ Currently available methods:
   | -------------------------- | --------- | --------|
   | url   | string     | a valid HTTP URL to open in the default browser |
 
+###createSession
+- **`createSession`**`(createSessionData: SessionData): Promise<string>`
+
+  Creates a new Leapp Session based on given SessionData
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | createSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | an object containing Leapp Session metadata 
+
+###cloneSession
+- **`cloneSession`**`(session: Session): Promise<string>`
+
+  Creates a clone of the given Leapp Session
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | an object that represents a specific Leapp Session
+
+###updateSession
+- **`updateSession`**`(updateSessionData: SessionData, session: Session): Promise<void>`
+
+  Allows to edit the given Leapp Session with the specified SessionData
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | updateSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | an object containing Leapp Session metadata
+  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | an object that represents a specific Leapp Session
+
+###openTerminal
+- **`openTerminal`**`(command: string, env?: any): Promise<void>`
+
+  Executes the given command in a new terminal window
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | command | string | a string representation of the command to execute
+  | env | any | an object containing key-value pairs corresponding to environment variables to set
+
 ---
 
 ###Example: display a toast message in Leapp

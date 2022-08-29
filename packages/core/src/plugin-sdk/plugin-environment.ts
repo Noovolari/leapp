@@ -39,20 +39,24 @@ export class PluginEnvironment implements IPluginEnvironment {
     this.openExternalUrlService.openExternalUrl(loginUrl);
   }
 
-  createSession(createSessionData: SessionData): Promise<string> {
+  async createSession(createSessionData: SessionData): Promise<string> {
     const sessionService = this.providerService.sessionFactory.getSessionService(createSessionData.sessionType);
-    return sessionService.create(createSessionData.getCreationRequest());
+    return await sessionService.create(createSessionData.getCreationRequest());
   }
 
-  cloneSession(session: Session): Promise<string> {
+  async cloneSession(session: Session): Promise<string> {
+    console.log("SESSION:");
+    console.log(session);
     const sessionService = this.providerService.sessionFactory.getSessionService(session.type);
-    const createSessionData = sessionService.getCloneRequest(session);
-    return sessionService.create(createSessionData);
+    const createSessionData = await sessionService.getCloneRequest(session);
+    console.log("CREATE SESSION DATA");
+    console.log(createSessionData);
+    return await sessionService.create(createSessionData);
   }
 
-  updateSession(updateSessionData: SessionData, session: Session): Promise<void> {
+  async updateSession(updateSessionData: SessionData, session: Session): Promise<void> {
     const sessionService = this.providerService.sessionFactory.getSessionService(session.type);
-    return sessionService.update(session.sessionId, updateSessionData.getCreationRequest());
+    return await sessionService.update(session.sessionId, updateSessionData.getCreationRequest());
   }
 
   async openTerminal(command: string, env?: any): Promise<void> {

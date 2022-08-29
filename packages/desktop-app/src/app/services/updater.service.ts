@@ -35,7 +35,12 @@ export class UpdaterService {
   }
 
   isUpdateNeeded(): boolean {
-    const currentSavedVersion = this.getSavedAppVersion();
+    let currentSavedVersion;
+    try {
+      currentSavedVersion = this.getSavedAppVersion();
+    } catch (_) {
+      currentSavedVersion = this.version;
+    }
     const updateVersion = this.version;
     return compareVersions(updateVersion, currentSavedVersion) > 0;
   }

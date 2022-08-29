@@ -17,6 +17,7 @@ import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
 import { IKeychainService } from "../../../interfaces/i-keychain-service";
 import { LoggedException, LogLevel } from "../../log-service";
+import { CreateSessionRequest } from "../create-session-request";
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -112,6 +113,10 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
 
     this.repository.addSession(session);
     this.sessionNotifier?.setSessions(this.repository.getSessions());
+  }
+
+  update(_: string, __: CreateSessionRequest): Promise<void> {
+    throw new LoggedException(`Update is not supported for AWS SSO Role Session Type`, this, LogLevel.error, false);
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {

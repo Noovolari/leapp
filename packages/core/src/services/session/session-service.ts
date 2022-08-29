@@ -64,7 +64,7 @@ export abstract class SessionService {
 
   abstract create(sessionRequest: CreateSessionRequest): Promise<void>;
 
-  //abstract update(sessionId: string, updateRequest: CreateSessionRequest): Promise<void>;
+  abstract update(sessionId: string, updateRequest: CreateSessionRequest): Promise<void>;
 
   abstract start(sessionId: string): Promise<void>;
 

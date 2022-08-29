@@ -50,6 +50,20 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
+  async update(sessionId: string, updateRequest: AwsIamRoleFederatedSessionRequest): Promise<void> {
+    const session = this.repository.getSessionById(sessionId) as AwsIamRoleFederatedSession;
+    if (session) {
+      session.sessionName = updateRequest.sessionName;
+      session.region = updateRequest.region;
+      session.roleArn = updateRequest.roleArn;
+      session.idpUrlId = updateRequest.idpUrl;
+      session.idpArn = updateRequest.idpArn;
+      session.profileId = updateRequest.profileId;
+      this.repository.updateSession(sessionId, session);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
+    }
+  }
+
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsIamRoleFederatedSession).profileId);

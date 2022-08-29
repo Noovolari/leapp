@@ -13,6 +13,7 @@ import { AzurePersistenceService } from "../../azure-persistence-service";
 import { SessionStatus } from "../../../models/session-status";
 import { constants } from "../../../models/constants";
 import { SessionType } from "../../../models/session-type";
+import { CreateSessionRequest } from "../create-session-request";
 
 // TODO: refactor by calling AzureIntegrationService instead of Repository
 export class AzureSessionService extends SessionService {
@@ -157,6 +158,10 @@ export class AzureSessionService extends SessionService {
 
   async getCloneRequest(session: AzureSession): Promise<AzureSessionRequest> {
     throw new LoggedException(`Clone is not supported for sessionType ${session.type}`, this, LogLevel.error, false);
+  }
+
+  update(_: string, __: CreateSessionRequest): Promise<void> {
+    throw new LoggedException(`Update is not supported for Azure Session Type`, this, LogLevel.error, false);
   }
 
   private async restoreSecretsFromKeychain(integrationId: string): Promise<void> {

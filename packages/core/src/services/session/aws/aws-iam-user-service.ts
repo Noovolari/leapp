@@ -77,6 +77,31 @@ export class AwsIamUserService extends AwsSessionService {
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
+  async update(sessionId: string, updateRequest: AwsIamUserSessionRequest): Promise<void> {
+    const session = this.repository.getSessionById(sessionId) as AwsIamUserSession;
+    if (session) {
+      session.sessionName = updateRequest.sessionName;
+      session.region = updateRequest.region;
+      session.mfaDevice = updateRequest.mfaDevice;
+      session.profileId = updateRequest.profileId;
+
+      if (updateRequest.accessKey) {
+        await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, updateRequest.accessKey);
+      }
+
+      if (updateRequest.secretKey) {
+        await this.keychainService.saveSecret(
+          constants.appName,
+          `${session.sessionId}-iam-user-aws-session-secret-access-key`,
+          updateRequest.secretKey
+        );
+      }
+
+      this.repository.updateSession(sessionId, session);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
+    }
+  }
+
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsIamUserSession).profileId);

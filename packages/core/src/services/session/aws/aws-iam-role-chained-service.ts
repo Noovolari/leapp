@@ -117,6 +117,8 @@ export class AwsIamRoleChainedService extends AwsSessionService {
       RoleSessionName: roleSessionName ? roleSessionName : constants.roleSessionName,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       RoleArn: (session as AwsIamRoleChainedSession).roleArn,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      DurationSeconds: this.repository.workspace.samlRoleSessionDuration,
     };
 
     // Generate Session token

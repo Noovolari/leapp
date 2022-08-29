@@ -2,6 +2,7 @@ import { beforeEach, describe, test, jest, expect } from "@jest/globals";
 import { EnvironmentType, PluginEnvironment } from "./plugin-environment";
 import { LoggedEntry, LogLevel } from "../services/log-service";
 import { SessionType } from "../models/session-type";
+import { AwsIamUserService } from "../services/session/aws/aws-iam-user-service";
 
 describe("PluginEnvironment", () => {
   let pluginEnvironment;
@@ -9,6 +10,14 @@ describe("PluginEnvironment", () => {
   beforeEach(() => {
     providerService = {} as any;
     pluginEnvironment = new PluginEnvironment(EnvironmentType.desktopApp, providerService);
+  });
+
+  test("PluginEnvironment, using cliNativeService as the providerService in the constructor", () => {
+    providerService.cliNativeService = { fakeMethod1: () => {} };
+    providerService.cliOpenWebConsoleService = { fakeMethod2: () => {} };
+    pluginEnvironment = new PluginEnvironment(EnvironmentType.cli, providerService);
+    expect(pluginEnvironment.nativeService).toBe(providerService.cliNativeService);
+    expect(pluginEnvironment.openExternalUrlService).toBe(providerService.cliOpenWebConsoleService);
   });
 
   test("log", () => {
@@ -29,9 +38,49 @@ describe("PluginEnvironment", () => {
     expect(pluginEnvironment.openExternalUrlService.openExternalUrl).toHaveBeenCalledWith("fake url");
   });
 
-  test("createSession", async () => {});
-  test("cloneSession", async () => {});
-  test("updateSession", async () => {});
+  test("createSession", async () => {
+    const createSessionData = {
+      sessionType: SessionType.awsIamUser,
+      getCreationRequest: jest.fn(() => "fake-request"),
+    } as any;
+    const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
+    awsIamUserService.create = jest.fn();
+    providerService.sessionFactory = { getSessionService: jest.fn(() => awsIamUserService) };
+
+    pluginEnvironment.createSession(createSessionData);
+    expect(providerService.sessionFactory.getSessionService).toHaveBeenCalledWith(SessionType.awsIamUser);
+    expect(createSessionData.getCreationRequest).toHaveBeenCalled();
+    expect(awsIamUserService.create).toHaveBeenCalledWith("fake-request");
+  });
+
+  test("cloneSession", async () => {
+    const session = { sessionType: SessionType.awsIamUser };
+    const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
+    const fakeCreateSessionData = "fake-create-session-data";
+    awsIamUserService.getCloneRequest = jest.fn(() => fakeCreateSessionData as any);
+    awsIamUserService.create = jest.fn();
+    providerService.repository = { getSession: jest.fn(() => session) };
+    providerService.sessionFactory = { getSessionService: jest.fn(() => awsIamUserService) };
+
+    pluginEnvironment.cloneSession("fake-session-id");
+    expect(providerService.repository.getSession).toHaveBeenCalledWith("fake-session-id");
+    expect(providerService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.sessionType);
+    expect(awsIamUserService.getCloneRequest).toHaveBeenCalledWith(session);
+    expect(awsIamUserService.create).toHaveBeenCalledWith(fakeCreateSessionData);
+  });
+
+  test("updateSession", async () => {
+    const session = { type: SessionType.awsIamUser };
+    const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
+    awsIamUserService.update = jest.fn();
+    providerService.repository = { getSessionById: jest.fn(() => session) };
+    providerService.sessionFactory = { getSessionService: jest.fn(() => awsIamUserService) };
+
+    pluginEnvironment.updateSession("fake-update-request-data", "fake-session-id");
+    expect(providerService.repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
+    expect(providerService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
+    expect(awsIamUserService.update).toHaveBeenCalledWith("fake-session-id", "fake-update-request-data");
+  });
 
   test("openTerminal", async () => {
     providerService.executeService = { openTerminal: jest.fn() };

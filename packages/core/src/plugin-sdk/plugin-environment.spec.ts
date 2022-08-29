@@ -54,7 +54,7 @@ describe("PluginEnvironment", () => {
   });
 
   test("cloneSession", async () => {
-    const session = { sessionType: SessionType.awsIamUser };
+    const session = { type: SessionType.awsIamUser };
     const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
     const fakeCreateSessionData = "fake-create-session-data";
     awsIamUserService.getCloneRequest = jest.fn(() => fakeCreateSessionData as any);
@@ -62,24 +62,24 @@ describe("PluginEnvironment", () => {
     providerService.repository = { getSession: jest.fn(() => session) };
     providerService.sessionFactory = { getSessionService: jest.fn(() => awsIamUserService) };
 
-    pluginEnvironment.cloneSession("fake-session-id");
-    expect(providerService.repository.getSession).toHaveBeenCalledWith("fake-session-id");
-    expect(providerService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.sessionType);
+    pluginEnvironment.cloneSession(session);
+    expect(providerService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(awsIamUserService.getCloneRequest).toHaveBeenCalledWith(session);
     expect(awsIamUserService.create).toHaveBeenCalledWith(fakeCreateSessionData);
   });
 
   test("updateSession", async () => {
-    const session = { type: SessionType.awsIamUser };
+    const fakeCreationRequest = "fake-creation-request";
+    const session = { type: SessionType.awsIamUser, sessionId: "fake-session-id" };
     const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
     awsIamUserService.update = jest.fn();
     providerService.repository = { getSessionById: jest.fn(() => session) };
     providerService.sessionFactory = { getSessionService: jest.fn(() => awsIamUserService) };
+    const updateRequestData = { getCreationRequest: jest.fn(() => fakeCreationRequest) };
 
-    pluginEnvironment.updateSession("fake-update-request-data", "fake-session-id");
-    expect(providerService.repository.getSessionById).toHaveBeenCalledWith("fake-session-id");
+    pluginEnvironment.updateSession(updateRequestData, session);
     expect(providerService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
-    expect(awsIamUserService.update).toHaveBeenCalledWith("fake-session-id", "fake-update-request-data");
+    expect(awsIamUserService.update).toHaveBeenCalledWith(session.sessionId, fakeCreationRequest);
   });
 
   test("openTerminal", async () => {

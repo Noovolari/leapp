@@ -1,5 +1,6 @@
 import { PluginLogLevel } from "../plugin-log-level";
 import { SessionData } from "./session-data";
+import { Session } from "../../models/session";
 
 export interface IPluginEnvironment {
   log(message: string, level: PluginLogLevel, display: boolean): void;
@@ -10,9 +11,9 @@ export interface IPluginEnvironment {
 
   createSession(createSessionRequest: SessionData): Promise<string>;
 
-  cloneSession(sessionId: string): Promise<string>;
+  cloneSession(session: Session): Promise<string>;
 
-  updateSession(createSessionRequest: SessionData, sessionId: string): Promise<void>;
+  updateSession(createSessionRequest: SessionData, session: Session): Promise<void>;
 
   openTerminal(command: string, env?: any): Promise<void>;
 }

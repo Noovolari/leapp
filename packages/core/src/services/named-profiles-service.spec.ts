@@ -45,6 +45,18 @@ describe("NamedProfilesService", () => {
     );
   });
 
+  test("getProfileIdByName, success", () => {
+    const namedProfileService = new NamedProfilesService(null, null, null);
+    const namedProfiles = [
+      { name: "fake-profile-name", id: "1" },
+      { name: "another-named-profile", id: "2" },
+    ];
+    namedProfileService.getNamedProfiles = jest.fn(() => namedProfiles);
+    const result = namedProfileService.getProfileIdByName("fake-profile-name");
+    expect(namedProfileService.getNamedProfiles).toHaveBeenCalled();
+    expect(result).toEqual("1");
+  });
+
   test("getSessionsWithNamedProfile", () => {
     const repository = {
       getSessions: () => [{ profileId: "1" }, { profileId: "2" }],

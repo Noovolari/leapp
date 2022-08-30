@@ -16,4 +16,6 @@ export interface IPluginEnvironment {
   updateSession(createSessionRequest: SessionData, session: Session): Promise<void>;
 
   openTerminal(command: string, env?: any): Promise<void>;
+
+  getProfileIdByName(profileName: string): Promise<string>;
 }

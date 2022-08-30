@@ -36,6 +36,29 @@ describe("IdpUrlsService", () => {
     expect(result).toEqual(null);
   });
 
+  test("getIdpUrlIdByUrl, success", () => {
+    const idpUrlService = new IdpUrlsService(null, null);
+    const idpUrls = [
+      { url: "fake-idp-url", id: "1" },
+      { url: "another-idp-url", id: "2" },
+    ];
+    idpUrlService.getIdpUrls = jest.fn(() => idpUrls);
+    const result = idpUrlService.getIdpUrlIdByUrl("fake-idp-url");
+    expect(idpUrlService.getIdpUrls).toHaveBeenCalled();
+    expect(result).toEqual("1");
+  });
+
+  test("getIdpUrlIdByUrl, returns undefined", () => {
+    const idpUrlService = new IdpUrlsService(null, null);
+    const idpUrls = [
+      { url: "fake-idp-url", id: "1" },
+      { url: "another-idp-url", id: "2" },
+    ];
+    idpUrlService.getIdpUrls = () => idpUrls;
+    const result = idpUrlService.getIdpUrlIdByUrl("wrong-idp-url");
+    expect(result).toBeUndefined();
+  });
+
   test("createIdpUrl", () => {
     const repository = {
       addIdpUrl: jest.fn(),

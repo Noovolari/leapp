@@ -57,6 +57,14 @@ describe("NamedProfilesService", () => {
     expect(result).toEqual("1");
   });
 
+  test("getProfileIdByName, returns undefined", () => {
+    const namedProfileService = new NamedProfilesService(null, null, null);
+    const namedProfiles = [{ name: "another-named-profile", id: "2" }];
+    namedProfileService.getNamedProfiles = () => namedProfiles;
+    const result = namedProfileService.getProfileIdByName("wrong-profile-name");
+    expect(result).toBeUndefined();
+  });
+
   test("getSessionsWithNamedProfile", () => {
     const repository = {
       getSessions: () => [{ profileId: "1" }, { profileId: "2" }],

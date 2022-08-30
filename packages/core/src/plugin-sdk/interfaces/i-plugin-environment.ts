@@ -18,4 +18,6 @@ export interface IPluginEnvironment {
   openTerminal(command: string, env?: any): Promise<void>;
 
   getProfileIdByName(profileName: string): string;
+
+  getIdpUrlIdByUrl(idpUrl: string): string;
 }

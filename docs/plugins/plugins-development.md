@@ -67,7 +67,7 @@ Currently available methods:
 ###openTerminal
 - **`openTerminal`**`(command: string, env?: any): Promise<void>`
 
-  Executes the given command in a new terminal window. The terminal window base path is set to the home directory.
+  Executes the given command in a new terminal window. The terminal window base path is set to the home directory
 
   | argument | type | description |
   | --- | --- | --- |
@@ -82,6 +82,15 @@ Currently available methods:
   | argument | type | description |
   | --- | --- | --- |
   | profileName | string | a valid named profile
+
+###getIdpUrlIdByUrl
+- **`getIdpUrlIdByUrl`**`(url: string): string`
+
+  Returns the id of an IdP URL from its url. Can be used when creating/editing a session since SessionData requires the id of an IdP URL
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | url | string | a string representation of an IdP URL
 
 ---
 

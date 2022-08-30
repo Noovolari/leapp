@@ -63,6 +63,10 @@ export class PluginEnvironment implements IPluginEnvironment {
     return this.providerService.namedProfileService.getProfileIdByName(profileName);
   }
 
+  getIdpUrlIdByUrl(url: string): string {
+    return this.providerService.idpUrlService.getIdpUrlIdByUrl(url);
+  }
+
   private async generateCredentials(session: Session): Promise<CredentialsInfo> {
     const sessionService = this.providerService.sessionFactory.getSessionService(session.type) as unknown as AwsSessionService;
     return await sessionService.generateCredentials(session.sessionId);

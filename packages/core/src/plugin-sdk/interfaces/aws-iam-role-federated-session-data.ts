@@ -5,7 +5,7 @@ import { AwsIamRoleFederatedSessionRequest } from "../../services/session/aws/aw
 export class AwsIamRoleFederatedSessionData extends SessionData {
   constructor(
     public idpArn: string,
-    public idpUrl: string,
+    public idpUrlId: string,
     public profileId: string,
     public region: string,
     public roleArn: string,
@@ -20,7 +20,7 @@ export class AwsIamRoleFederatedSessionData extends SessionData {
       region: this.region,
       sessionName: this.sessionName,
       roleArn: this.roleArn,
-      idpUrl: this.idpUrl,
+      idpUrl: this.idpUrlId,
       idpArn: this.idpArn,
     };
   }

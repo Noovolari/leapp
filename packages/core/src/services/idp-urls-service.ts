@@ -19,6 +19,16 @@ export class IdpUrlsService {
     } else return null;
   }
 
+  /**
+   * Get the AWS named profile ID from the unique name
+   *
+   * @param url
+   * @return id the IdP URL id if the given URL if the idpUrl exists, otherwise undefined
+   */
+  getIdpUrlIdByUrl(url: string): string {
+    return this.getIdpUrls().find((idpUrl) => idpUrl.url === url)?.id;
+  }
+
   createIdpUrl(idpUrl: string): IdpUrl {
     const newIdpUrl = new IdpUrl(this.getNewId(), idpUrl.trim());
     this.repository.addIdpUrl(newIdpUrl);

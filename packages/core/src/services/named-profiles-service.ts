@@ -32,7 +32,7 @@ export class NamedProfilesService {
    * Get the AWS named profile ID from the unique name
    *
    * @param profileName
-   * @return id the profile id, otherwise undefined
+   * @return id the profile id if the named profile exists, otherwise undefined
    */
   getProfileIdByName(profileName: string): string {
     return this.getNamedProfiles().find((profile) => profile.name === profileName)?.id;

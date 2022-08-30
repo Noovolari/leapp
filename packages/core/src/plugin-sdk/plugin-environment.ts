@@ -59,8 +59,8 @@ export class PluginEnvironment implements IPluginEnvironment {
     this.providerService.executeService.openTerminal(command, env);
   }
 
-  async getProfileIdByName(profileName: string): Promise<string> {
-    return await this.providerService.namedProfileService.getProfileIdByName(profileName);
+  getProfileIdByName(profileName: string): string {
+    return this.providerService.namedProfileService.getProfileIdByName(profileName);
   }
 
   private async generateCredentials(session: Session): Promise<CredentialsInfo> {

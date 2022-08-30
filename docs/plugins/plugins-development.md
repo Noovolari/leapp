@@ -67,12 +67,21 @@ Currently available methods:
 ###openTerminal
 - **`openTerminal`**`(command: string, env?: any): Promise<void>`
 
-  Executes the given command in a new terminal window
+  Executes the given command in a new terminal window. The terminal window base path is set to the home directory.
 
   | argument | type | description |
   | --- | --- | --- |
   | command | string | a string representation of the command to execute
   | env | any | an object containing key-value pairs corresponding to environment variables to set
+
+###getProfileIdByName
+- **`getProfileIdByName`**`(profileName: string): string`
+
+  Returns the id of a named profile from its name. Can be used when creating/editing a session since SessionData requires the id of a named profile
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | profileName | string | a valid named profile
 
 ---
 

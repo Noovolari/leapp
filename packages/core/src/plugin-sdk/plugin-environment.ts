@@ -7,6 +7,7 @@ import { CredentialsInfo } from "../models/credentials-info";
 import { IPluginEnvironment } from "./interfaces/i-plugin-environment";
 import { PluginLogLevel } from "./plugin-log-level";
 import { SessionData } from "./interfaces/session-data";
+import { constants } from "../models/constants";
 
 export enum EnvironmentType {
   desktopApp = "desktop-app",
@@ -39,6 +40,33 @@ export class PluginEnvironment implements IPluginEnvironment {
     this.openExternalUrlService.openExternalUrl(loginUrl);
   }
 
+  getProfileIdByName(profileName: string): string {
+    return this.providerService.namedProfileService.getProfileIdByName(profileName);
+  }
+
+  getIdpUrlIdByUrl(url: string): string {
+    return this.providerService.idpUrlService.getIdpUrlIdByUrl(url);
+  }
+
+  async openTerminal(command: string, env?: any): Promise<void> {
+    let exportedEnvVars = "";
+    for (const [key, value] of Object.entries(env)) {
+      exportedEnvVars = exportedEnvVars.concat(`export ${key}=${value};\n`);
+    }
+    this.providerService.fileService.writeFileSync(this.nativeService.os.homedir() + "/" + constants.pluginEnvFileDestination, exportedEnvVars);
+    this.providerService.executeService
+      .openTerminalFromPlugin(command, env)
+      .then(() => {
+        if (this.nativeService.process.platform === "darwin")
+          this.nativeService.rimraf(this.nativeService.os.homedir() + "/" + constants.pluginEnvFileDestination, {}, () => {});
+      })
+      .catch((_) => {
+        if (this.nativeService.process.platform === "darwin") {
+          this.nativeService.rimraf(this.nativeService.os.homedir() + "/" + constants.pluginEnvFileDestination, {}, () => {});
+        }
+      });
+  }
+
   async createSession(createSessionData: SessionData): Promise<string> {
     const sessionService = this.providerService.sessionFactory.getSessionService(createSessionData.sessionType);
     return await sessionService.create(createSessionData.getCreationRequest());
@@ -53,18 +81,6 @@ export class PluginEnvironment implements IPluginEnvironment {
   async updateSession(updateSessionData: SessionData, session: Session): Promise<void> {
     const sessionService = this.providerService.sessionFactory.getSessionService(session.type);
     return await sessionService.update(session.sessionId, updateSessionData.getCreationRequest());
-  }
-
-  async openTerminal(command: string, env?: any): Promise<void> {
-    this.providerService.executeService.openTerminal(command, env);
-  }
-
-  getProfileIdByName(profileName: string): string {
-    return this.providerService.namedProfileService.getProfileIdByName(profileName);
-  }
-
-  getIdpUrlIdByUrl(url: string): string {
-    return this.providerService.idpUrlService.getIdpUrlIdByUrl(url);
   }
 
   private async generateCredentials(session: Session): Promise<CredentialsInfo> {

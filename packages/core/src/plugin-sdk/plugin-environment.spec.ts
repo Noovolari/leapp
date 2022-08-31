@@ -1,8 +1,9 @@
-import { beforeEach, describe, test, jest, expect } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { EnvironmentType, PluginEnvironment } from "./plugin-environment";
 import { LoggedEntry, LogLevel } from "../services/log-service";
 import { SessionType } from "../models/session-type";
 import { AwsIamUserService } from "../services/session/aws/aws-iam-user-service";
+import { constants } from "../models/constants";
 
 describe("PluginEnvironment", () => {
   let pluginEnvironment;
@@ -62,7 +63,7 @@ describe("PluginEnvironment", () => {
     providerService.repository = { getSession: jest.fn(() => session) };
     providerService.sessionFactory = { getSessionService: jest.fn(() => awsIamUserService) };
 
-    pluginEnvironment.cloneSession(session);
+    await pluginEnvironment.cloneSession(session);
     expect(providerService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(awsIamUserService.getCloneRequest).toHaveBeenCalledWith(session);
     expect(awsIamUserService.create).toHaveBeenCalledWith(fakeCreateSessionData);
@@ -77,15 +78,37 @@ describe("PluginEnvironment", () => {
     providerService.sessionFactory = { getSessionService: jest.fn(() => awsIamUserService) };
     const updateRequestData = { getCreationRequest: jest.fn(() => fakeCreationRequest) };
 
-    pluginEnvironment.updateSession(updateRequestData, session);
+    await pluginEnvironment.updateSession(updateRequestData, session);
     expect(providerService.sessionFactory.getSessionService).toHaveBeenCalledWith(session.type);
     expect(awsIamUserService.update).toHaveBeenCalledWith(session.sessionId, fakeCreationRequest);
   });
 
   test("openTerminal", async () => {
-    providerService.executeService = { openTerminal: jest.fn() };
-    await pluginEnvironment.openTerminal("fake command", { ciao: "ciao" });
-    expect(providerService.executeService.openTerminal).toHaveBeenCalledWith("fake command", { ciao: "ciao" });
+    const homedir = "homedir";
+    pluginEnvironment.nativeService = {
+      os: {
+        homedir: jest.fn(() => homedir),
+      },
+      process: {
+        platform: "darwin",
+      },
+      rimraf: jest.fn(),
+    } as any;
+    providerService.executeService = {
+      openTerminalFromPlugin: jest.fn(async () => {}),
+    };
+    providerService.fileService = { writeFileSync: jest.fn() };
+    await pluginEnvironment.openTerminal("fake-command arg1 arg2", { testEnv: "test", anotherEnvVar: `"test 2"` });
+    expect(providerService.executeService.openTerminalFromPlugin).toHaveBeenCalledWith("fake-command arg1 arg2", {
+      testEnv: "test",
+      anotherEnvVar: `"test 2"`,
+    });
+    expect(pluginEnvironment.nativeService.os.homedir).toHaveBeenCalled();
+    expect(providerService.fileService.writeFileSync).toHaveBeenCalledWith(
+      homedir + "/" + constants.pluginEnvFileDestination,
+      'export testEnv=test;\nexport anotherEnvVar="test 2";\n'
+    );
+    expect(pluginEnvironment.nativeService.rimraf).toHaveBeenCalledWith(homedir + "/" + constants.pluginEnvFileDestination, {}, expect.any(Function));
   });
 
   test("generalCredentials", async () => {

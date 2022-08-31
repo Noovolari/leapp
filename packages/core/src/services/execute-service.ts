@@ -109,6 +109,34 @@ export class ExecuteService {
     }
   }
 
+  openTerminalFromPlugin(command: string, env?: any): Promise<string> {
+    const defaultEnv = Object.assign({}, this.nativeService.process.env);
+    const executeEnv = Object.assign(defaultEnv, env);
+    const pluginEnvPath = this.nativeService.os.homedir() + "/" + constants.pluginEnvFileDestination;
+    if (this.nativeService.process.platform === "darwin") {
+      return this.execute(
+        `osascript -e 'if application "Terminal" is running then\n
+                    \ttell application "Terminal"\n
+                    \t\tdo script "source ${pluginEnvPath}"\n
+                    \t\tdelay 2.5\n
+                    \t\tactivate\n
+                    \t\tdo script "${command}" in window 1\n
+                    \tend tell\n
+                    else\n
+                    \ttell application "Terminal"\n
+                    \t\tdo script "${command}" in window 1\n
+                    \t\tactivate\n
+                    \tend tell\n
+                    end if'`,
+        executeEnv
+      );
+    } else if (this.nativeService.process.platform === "win32") {
+      return this.execute(`start cmd /k ${command}`, executeEnv);
+    } else {
+      return this.execute(`gnome-terminal -- sh -c "${command}; bash"`, executeEnv);
+    }
+  }
+
   private async exec(execFn: any, command: string, env: any = undefined, maskOutputLog: boolean = false): Promise<string> {
     // TODO: in case of error, adding stdout and stderr is just a retro-compatible
     //  solution, not the ideal one; we could extract an Info interface and return it

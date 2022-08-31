@@ -67,17 +67,21 @@ Currently available methods:
 ###openTerminal
 - **`openTerminal`**`(command: string, env?: any): Promise<void>`
 
-  Executes the given command in a new terminal window. The terminal window base path is set to the home directory
+  Executes the given command in a new terminal window. 
+
+  The terminal window base path is set to the home directory
 
   | argument | type | description |
   | --- | --- | --- |
   | command | string | a string representation of the command to execute
-  | env | any | an object containing key-value pairs corresponding to environment variables to set
+  | env | any | an optional object containing key-value pairs corresponding to environment variables to set in the terminal
 
 ###getProfileIdByName
 - **`getProfileIdByName`**`(profileName: string): string`
 
-  Returns the id of a named profile from its name. Can be used when creating/editing a session since SessionData requires the id of a named profile
+  Returns the id of a named profile from its name if it exists, otherwise undefined. 
+  
+  Can be used when creating/editing a session since SessionData requires the id of a named profile
 
   | argument | type | description |
   | --- | --- | --- |
@@ -86,7 +90,9 @@ Currently available methods:
 ###getIdpUrlIdByUrl
 - **`getIdpUrlIdByUrl`**`(url: string): string`
 
-  Returns the id of an IdP URL from its url. Can be used when creating/editing a session since SessionData requires the id of an IdP URL
+  Returns the id of an IdP URL from its url if it exists, otherwise undefined. 
+
+  Can be used when creating/editing Federated Sessions since SessionData requires the id of an IdP URL
 
   | argument | type | description |
   | --- | --- | --- |

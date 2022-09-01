@@ -16,7 +16,7 @@
         
       
       <link rel="icon" href="../../images/icon.ico">
-      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.1+insiders-4.22.0">
+      <meta name="generator" content="mkdocs-1.3.1, mkdocs-material-8.4.2+insiders-4.22.0">
     
     
       
@@ -56,7 +56,7 @@
   
 
 
-  <script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-FB1NX90MYZ"),document.addEventListener("DOMContentLoaded",function(){if(document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document.forms.feedback){var e,a=document.forms.feedback;for(e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}"undefined"!=typeof location$&&location$.subscribe(function(e){n("config","G-FB1NX90MYZ",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-FB1NX90MYZ",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+  <script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-FB1NX90MYZ"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-FB1NX90MYZ",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-FB1NX90MYZ",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
 
   
     <script>var consent;"undefined"==typeof __md_analytics||(consent=__md_get("__consent"))&&consent.analytics&&__md_analytics()</script>
@@ -1831,12 +1831,12 @@
 <p>The tenant is automatically created when your organization signs up for a Microsoft cloud service subscription.</p>
 <p>These subscriptions include Microsoft Azure, Microsoft Intune, or Microsoft 365. </p>
 <p>An Azure tenant represents a single organization and can have multiple subscriptions.</p>
-<p>Please refer to <a href="https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-whatis" target="_blank">this</a> document for more information.</p>
+<p>Please refer to <a href="https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-how-to-find-tenant" target="_blank">How to find your Azure Active Directory tenant ID</a> and other <a href="https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-whatis" target="_blank">Azure AD documentation</a> for more information.</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>For azure-cli users with version &lt; 2.30.0: Leapp no more support this version of the CLI. Please update to a newer version.</p>
 </div>
-<p>To create a new Azure Integration go to the left sidebar of Leapp Desktop and click on the "+" icon.
+<p>To create a new Azure Integration go to the left sidebar of Leapp Desktop and click on the "+" icon. 
 A new modal will be presented with the following option to compile. After submitting the new Integration 
 and have logged into your <em>Azure Portal</em>, 
 <em>Subscriptions</em> will be automatically retrieved and mapped into Leapp Azure Sessions.</p>
@@ -1859,7 +1859,7 @@ and have logged into your <em>Azure Portal</em>,
 </tr>
 <tr>
 <td><code>TENANT ID</code></td>
-<td>A <strong>tenant ID</strong> identifies a tenant. You can have multiple clients on a given tenant database.</td>
+<td>A <a href="https://docs.microsoft.com/en-us/azure/active-directory/fundamentals/active-directory-how-to-find-tenant" target="_blank"><strong>tenant ID</strong></a> identifies a tenant. You can have multiple clients on a given tenant database.</td>
 </tr>
 <tr>
 <td><code>LOCATION</code></td>

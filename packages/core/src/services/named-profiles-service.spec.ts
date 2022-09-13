@@ -57,12 +57,15 @@ describe("NamedProfilesService", () => {
     expect(result).toEqual("1");
   });
 
-  test("getProfileIdByName, returns undefined", () => {
+  test("getProfileIdByName, creates a new profile", () => {
+    const newId = "newId";
     const namedProfileService = new NamedProfilesService(null, null, null);
+    (namedProfileService as any).createNamedProfile = jest.fn(() => ({ id: newId }));
     const namedProfiles = [{ name: "another-named-profile", id: "2" }];
     namedProfileService.getNamedProfiles = () => namedProfiles;
-    const result = namedProfileService.getProfileIdByName("wrong-profile-name");
-    expect(result).toBeUndefined();
+    const result = namedProfileService.getProfileIdByName("new-profile-name");
+    expect(namedProfileService.createNamedProfile).toHaveBeenCalledWith("new-profile-name");
+    expect(result).toEqual(newId);
   });
 
   test("getSessionsWithNamedProfile", () => {

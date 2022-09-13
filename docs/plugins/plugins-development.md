@@ -61,8 +61,8 @@ Currently available methods:
 
   | argument | type | description |
   | --- | --- | --- |
-  | updateSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | an object containing Leapp Session metadata
-  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | an object that represents a specific Leapp Session
+  | updateSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | an object containing the new Leapp Session metadata
+  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | an object that represents the Leapp Session to be updated
 
 ###openTerminal
 - **`openTerminal`**`(command: string, env?: any): Promise<void>`
@@ -79,7 +79,7 @@ Currently available methods:
 ###getProfileIdByName
 - **`getProfileIdByName`**`(profileName: string): string`
 
-  Returns the id of a named profile from its name if it exists, otherwise undefined. 
+  Returns the id of a named profile from its name if it exists, otherwise creates a new profile and returns its id. 
   
   Can be used when creating/editing a session since SessionData requires the id of a named profile
 
@@ -90,7 +90,7 @@ Currently available methods:
 ###getIdpUrlIdByUrl
 - **`getIdpUrlIdByUrl`**`(url: string): string`
 
-  Returns the id of an IdP URL from its url if it exists, otherwise undefined. 
+  Returns the id of an IdP URL from its url if it exists, otherwise creates a new IdP URL and returns its id. 
 
   Can be used when creating/editing Federated Sessions since SessionData requires the id of an IdP URL
 
@@ -117,6 +117,24 @@ const response = await res.json();
 
 ```typescript
 this.pluginEnvironment.openExternalUrl("https://leapp.cloud");
+```
+
+###Example: edit the selected session
+
+```typescript
+async applySessionAction(session: Session, credentials: any): Promise<void> {
+    const profileId = this.pluginEnvironment.getProfileIdByName("default");
+    const idpUrlId = this.pluginEnvironment.getIdpUrlIdByUrl("put a valid url for an IdP here");
+    this
+    .pluginEnvironment.updateSession(new AwsIamRoleFederatedSessionData(
+        "arn:aws:iam::000000000000:saml-provider/test", 
+        idpUrlId, 
+        profileId, 
+        "us-east-1", 
+        "arn:aws:iam::000000000000:role/test", 
+        "New Name Session"
+    ), session);
+}
 ```
 
 ---

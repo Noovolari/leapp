@@ -64,6 +64,8 @@ export abstract class SessionService {
 
   abstract create(sessionRequest: CreateSessionRequest): Promise<void>;
 
+  abstract update(sessionId: string, updateRequest: CreateSessionRequest): Promise<void>;
+
   abstract start(sessionId: string): Promise<void>;
 
   abstract rotate(sessionId: string): Promise<void>;
@@ -75,4 +77,6 @@ export abstract class SessionService {
   abstract getDependantSessions(sessionId: string): Session[];
 
   abstract validateCredentials(sessionId: string): Promise<boolean>;
+
+  abstract getCloneRequest(session: Session): Promise<CreateSessionRequest>;
 }

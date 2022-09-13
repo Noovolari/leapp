@@ -55,6 +55,20 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
+  async update(sessionId: string, updateRequest: AwsIamRoleChainedSessionRequest): Promise<void> {
+    const session = this.repository.getSessionById(sessionId) as AwsIamRoleChainedSession;
+    if (session) {
+      session.sessionName = updateRequest.sessionName;
+      session.region = updateRequest.region;
+      session.roleArn = updateRequest.roleArn;
+      session.roleSessionName = updateRequest.roleSessionName;
+      session.parentSessionId = updateRequest.parentSessionId;
+      session.profileId = updateRequest.profileId;
+      this.repository.updateSession(sessionId, session);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
+    }
+  }
+
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsIamRoleChainedSession).profileId);
@@ -136,6 +150,17 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   }
 
   removeSecrets(_: string): void {}
+
+  async getCloneRequest(session: AwsIamRoleChainedSession): Promise<AwsIamRoleChainedSessionRequest> {
+    return {
+      profileId: session.profileId,
+      region: session.region,
+      sessionName: session.sessionName,
+      roleArn: session.roleArn,
+      parentSessionId: session.parentSessionId,
+      roleSessionName: session.roleSessionName,
+    };
+  }
 
   async getAccountNumberFromCallerIdentity(session: AwsIamRoleChainedSession): Promise<string> {
     if (session.type === SessionType.awsIamRoleChained) {

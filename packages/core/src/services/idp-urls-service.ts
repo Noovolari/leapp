@@ -19,6 +19,20 @@ export class IdpUrlsService {
     } else return null;
   }
 
+  /**
+   * Get or create the AWS IdPUrl ID from the unique name
+   *
+   * @param url
+   * @return id the IdP URL id if the given URL if the idpUrl exists, otherwise creates a new IdPUrl and returns its id
+   */
+  getIdpUrlIdByUrl(url: string): string {
+    const idpUrlId = this.getIdpUrls().find((idpUrl) => idpUrl.url === url)?.id;
+    if (!idpUrlId) {
+      return this.createIdpUrl(url).id;
+    }
+    return idpUrlId;
+  }
+
   createIdpUrl(idpUrl: string): IdpUrl {
     const newIdpUrl = new IdpUrl(this.getNewId(), idpUrl.trim());
     this.repository.addIdpUrl(newIdpUrl);

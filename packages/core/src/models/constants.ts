@@ -50,6 +50,7 @@ export const constants = {
 
   // Contains Env for SSM on macOS
   ssmSourceFileDestination: ".Leapp/ssm-env",
+  pluginEnvFileDestination: ".Leapp/plugin-env",
 
   npmRequiredPluginKeyword: "leapp-plugin",
   skipPluginValidation: true,

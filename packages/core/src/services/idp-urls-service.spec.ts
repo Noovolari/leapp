@@ -36,6 +36,32 @@ describe("IdpUrlsService", () => {
     expect(result).toEqual(null);
   });
 
+  test("getIdpUrlIdByUrl, success", () => {
+    const idpUrlService = new IdpUrlsService(null, null);
+    const idpUrls = [
+      { url: "fake-idp-url", id: "1" },
+      { url: "another-idp-url", id: "2" },
+    ];
+    idpUrlService.getIdpUrls = jest.fn(() => idpUrls);
+    const result = idpUrlService.getIdpUrlIdByUrl("fake-idp-url");
+    expect(idpUrlService.getIdpUrls).toHaveBeenCalled();
+    expect(result).toEqual("1");
+  });
+
+  test("getIdpUrlIdByUrl, creates a new idpUrl", () => {
+    const newId = "new-id";
+    const idpUrlService = new IdpUrlsService(null, null);
+    (idpUrlService as any).createIdpUrl = jest.fn(() => ({ id: newId }));
+    const idpUrls = [
+      { url: "fake-idp-url", id: "1" },
+      { url: "another-idp-url", id: "2" },
+    ];
+    idpUrlService.getIdpUrls = () => idpUrls;
+    const result = idpUrlService.getIdpUrlIdByUrl("new-idp-url");
+    expect(idpUrlService.createIdpUrl).toHaveBeenCalledWith("new-idp-url");
+    expect(result).toEqual(newId);
+  });
+
   test("createIdpUrl", () => {
     const repository = {
       addIdpUrl: jest.fn(),

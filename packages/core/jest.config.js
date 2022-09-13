@@ -5,4 +5,10 @@ module.exports = {
     "**/**/*.spec.ts",
     "log-service.spec.ts"
   ],
+  collectCoverageFrom: [
+    "**/*.ts",
+    "!**/node_modules/**",
+    "!**/vendor/**",
+    "!**/dist/**"
+  ]
 };

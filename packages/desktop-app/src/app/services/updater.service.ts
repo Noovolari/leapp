@@ -35,7 +35,12 @@ export class UpdaterService {
   }
 
   isUpdateNeeded(): boolean {
-    const currentSavedVersion = this.getSavedAppVersion();
+    let currentSavedVersion;
+    try {
+      currentSavedVersion = this.getSavedAppVersion();
+    } catch (_) {
+      currentSavedVersion = this.version;
+    }
     const updateVersion = this.version;
     return compareVersions(updateVersion, currentSavedVersion) > 0;
   }
@@ -46,10 +51,6 @@ export class UpdaterService {
 
   getSavedAppVersion(): string {
     return this.electronService.fs.readFileSync(this.electronService.os.homedir() + `/.Leapp/.latest.json`).toString();
-  }
-
-  getSavedVersionComparison(): boolean {
-    return compareVersions(this.getSavedAppVersion(), this.getCurrentAppVersion()) > 0;
   }
 
   setUpdateInfo(version: string, releaseName: string, releaseDate: string, releaseNotes: string): void {

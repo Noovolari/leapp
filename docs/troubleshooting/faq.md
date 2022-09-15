@@ -30,6 +30,12 @@ Just close the terminal and relaunch the SSM command.
 ## AWS CLI (or AZ CLI) is installed but Leapp can't find it, what can I do?
 
 Leapp on macOS works in sandbox mode, so some terminal commands must be symlinked in order to work on some installations.
-Just make a symlink pointing to `/usr/local/bin/aws` or, for AZ CLI, `/usr/local/bin/az`. To create
+Just make a symlink pointing from `/usr/local/bin/aws` to the actual `aws` binary or, for AZ CLI, `/usr/local/bin/az` to the actual `az` binary. To create
 symlinks on macOS, use this command `ln -s /any/file/on/the/disk linked-file`. The command is called **ln**. If used with the 
 option **-s** it will create a symbolic link in the current directory.
+
+Examples:
+```
+ln -s /path/to/my/aws /usr/local/bin/aws
+ln -s /path/to/my/az /usr/local/bin/az
+```

@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.14.3](https://github.com/Noovolari/leapp/compare/v0.14.2...v0.14.3) (2022-09-15)
+
+### Features
+
+* added a new set of Leapp Plugin APIs to open the terminal and to work with Leapp sessions (create, edit and clone)
+* added a new [Plugin Hub](https://www.leapp.cloud/plugins) to search and install Leapp Plugins directly from the Leapp website
+
+### Bug Fixes
+
+* fixed a problem not allowing Leapp desktop app to start normally on Ubuntu 22.04 LTS [#334](https://github.com/Noovolari/leapp/issues/334)
+
 ### [0.14.2](https://github.com/Noovolari/leapp/compare/v0.14.1...v0.14.2) (2022-08-26)
 
 ### Features

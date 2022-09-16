@@ -1,6 +1,7 @@
 import { describe, test } from "@jest/globals";
 import { Builder, By, until } from "selenium-webdriver";
 import * as path from "path";
+import * as chrome from "selenium-webdriver/chrome";
 import * as os from "os";
 
 describe("Integration test 1", () => {
@@ -39,6 +40,9 @@ describe("Integration test 1", () => {
   // }, 5000000);
 
   beforeEach(async () => {
+    // chrome_options = Options()
+    // chrome_options.add_argument("--headless")
+    // driver = webdriver.Chrome(options=chrome_options)
     driver = await new Builder()
       .usingServer("http://localhost:9515")
       .withCapabilities({
@@ -48,6 +52,7 @@ describe("Integration test 1", () => {
         },
       })
       .forBrowser("chrome")
+      .setChromeOptions(new chrome.Options().headless())
       .build();
   });
 

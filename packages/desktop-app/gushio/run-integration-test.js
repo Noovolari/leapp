@@ -31,8 +31,14 @@ module.exports = {
         result = shellJs.exec(command[currentOS]);
       } else {
         shellJs.exec(command[currentOS][0], {async: true});
-        shellJs.exec(command[currentOS][1]);
-        shellJs.exec(command[currentOS][2]);
+        result = shellJs.exec(command[currentOS][1]);
+        if (result.code !== 0) {
+          throw new Error(result.stderr)
+        }
+        result = shellJs.exec(command[currentOS][2]);
+        if (result.code !== 0) {
+          throw new Error(result.stderr)
+        }
         result = shellJs.exec(command[currentOS][3]);
       }
       if (result.code !== 0) {

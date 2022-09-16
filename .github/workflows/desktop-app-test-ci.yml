@@ -20,8 +20,7 @@ jobs:
           command: |
             npm run bootstrap
             npm run set-dev-environment
-            cd packages/desktop-app
-            npm run integration-test
+            npm run --prefix packages/desktop-app integration-test
 
   integration-test-win:
     runs-on: windows-latest
@@ -37,6 +36,7 @@ jobs:
             npm run bootstrap
             npm run set-dev-environment
             cd packages/desktop-app
+            ls -la
             npm run integration-test
 
   integration-test-linux:

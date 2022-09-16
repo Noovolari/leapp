@@ -33,15 +33,18 @@ module.exports = {
         shellJs.exec(command[currentOS][0], {async: true});
         result = shellJs.exec(command[currentOS][1]);
         if (result.code !== 0) {
+          console.log("ERR 1");
           throw new Error(result.stderr)
         }
         result = shellJs.exec(command[currentOS][2]);
         if (result.code !== 0) {
+          console.log("ERR 2");
           throw new Error(result.stderr)
         }
         result = shellJs.exec(command[currentOS][3]);
       }
       if (result.code !== 0) {
+        console.log("ERR TEST");
         throw new Error(result.stderr)
       }
     } catch (e) {

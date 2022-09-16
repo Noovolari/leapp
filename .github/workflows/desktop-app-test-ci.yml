@@ -6,50 +6,21 @@ on:
       - LEAP-680-spike-integration-tests
 
 jobs:
-  integration-test-macos:
-    runs-on: macos-latest
+  build:
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
 
-      - name: Test macOS desktop app
-        uses: nick-fields/retry@v2
+      - name: Setup Project
+        run: |
+          npm run bootstrap
+          npm run set-dev-environment
+          cd packages/desktop-app
+
+      - name: Run headless test
+        uses: GabrielBB/xvfb-action@v1
         with:
-          timeout_minutes: 20
-          max_attempts: 5
-          command: |
-            npm run bootstrap
-            npm run set-dev-environment
-            cd packages/desktop-app
-            npm run integration-test
-
-  integration-test-win:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Test Windows desktop app
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 20
-          max_attempts: 5
-          command: |
-            npm run bootstrap
-            npm run set-dev-environment
-            cd packages/desktop-app
-            npm run integration-test
-
-  integration-test-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Test Windows desktop app
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 20
-          max_attempts: 5
-          command: |
-            npm run bootstrap
-            npm run set-dev-environment
-            cd packages/desktop-app
-            npm run integration-test
+          run: npm run integration-test

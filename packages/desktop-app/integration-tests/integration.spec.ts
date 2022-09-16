@@ -1,7 +1,6 @@
 import { describe, test } from "@jest/globals";
 import { Builder, By, until } from "selenium-webdriver";
 import * as path from "path";
-import * as chrome from "selenium-webdriver/chrome";
 import * as os from "os";
 
 describe("Integration test 1", () => {
@@ -52,7 +51,6 @@ describe("Integration test 1", () => {
         },
       })
       .forBrowser("chrome")
-      .setChromeOptions(new chrome.Options().headless())
       .build();
   });
 

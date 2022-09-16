@@ -1,8 +1,18 @@
 import { describe, test } from "@jest/globals";
 import { Builder, By, until } from "selenium-webdriver";
+import * as path from "path";
+import * as os from "os";
 
 describe("Integration test 1", () => {
   let driver;
+  const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
+  const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
+  const winPath = path.resolve(".", "node_modules\\electron\\dist\\electron.exe");
+  const electronBinaryPath = {
+    darwin: macPath,
+    linux: linuxPath,
+    win32: winPath,
+  };
 
   // beforeAll(async () => {
   //   await new Promise<void>((resolve, reject) => {
@@ -33,8 +43,8 @@ describe("Integration test 1", () => {
       .usingServer("http://localhost:9515")
       .withCapabilities({
         "goog:chromeOptions": {
-          binary: "/Users/marcovanetti/Repos/leapp/packages/desktop-app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron",
-          args: ["app=/Users/marcovanetti/Repos/leapp/packages/desktop-app"],
+          binary: electronBinaryPath[os.platform()],
+          args: [`app=${path.resolve(".")}`],
         },
       })
       .forBrowser("chrome")

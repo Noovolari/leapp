@@ -1,0 +1,53 @@
+name: Leapp Desktop App Test CI
+
+on:
+  push:
+    branches:
+      - LEAP-680-spike-integration-tests
+
+jobs:
+  integration-test-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Test macOS desktop app
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 20
+          max_attempts: 5
+          command: |
+            cd packages/desktop-app
+            npm run integration-test
+
+  integration-test-win:
+    strategy:
+      matrix:
+        os: [ windows-2022 ]
+        node_version: [ 16 ]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Test Windows desktop app
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 20
+          max_attempts: 5
+          command: |
+            cd packages/desktop-app
+            npm run integration-test
+
+  integration-test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Test Windows desktop app
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 20
+          max_attempts: 5
+          command: |
+            cd packages/desktop-app
+            npm run integration-test

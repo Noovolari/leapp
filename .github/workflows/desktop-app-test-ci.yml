@@ -17,15 +17,13 @@ jobs:
           timeout_minutes: 20
           max_attempts: 5
           command: |
+            npm run bootstrap
+            npm run set-dev-environment
             cd packages/desktop-app
             npm run integration-test
 
   integration-test-win:
-    strategy:
-      matrix:
-        os: [ windows-2022 ]
-        node_version: [ 16 ]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
 
@@ -35,6 +33,8 @@ jobs:
           timeout_minutes: 20
           max_attempts: 5
           command: |
+            npm run bootstrap
+            npm run set-dev-environment
             cd packages/desktop-app
             npm run integration-test
 
@@ -49,5 +49,7 @@ jobs:
           timeout_minutes: 20
           max_attempts: 5
           command: |
+            npm run bootstrap
+            npm run set-dev-environment
             cd packages/desktop-app
             npm run integration-test

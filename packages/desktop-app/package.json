@@ -218,6 +218,7 @@
     "@angular/cli": "^13.2.2",
     "@angular/compiler-cli": "^13.2.2",
     "@angular/language-service": "^13.2.2",
+    "@babel/plugin-proposal-decorators": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
     "@biesbjerg/ngx-translate-extract": "^7.0.4",

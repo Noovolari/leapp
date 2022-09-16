@@ -17,7 +17,7 @@ module.exports = {
       const rootPath = path.join(__dirname, "..");
       const currentOS = os.platform();
       const macCommand = `${rootPath}/node_modules/.bin/chromedriver & npx jest && pkill chromedriver`;
-      const winCommand = `start /min ${rootPath}\\node_modules\\.bin\\chromedriver.cmd && npx jest && taskkill /f /im chromedriver.exe`;
+      const winCommand = [`${rootPath}\\node_modules\\.bin\\chromedriver.cmd`, `timeout 2>nul`, `npx jest`, `taskkill /f /im chromedriver.exe`];
       const linCommand = `${rootPath}/node_modules/.bin/chromedriver & npx jest && pkill chromedriver`;
 
       const command = {
@@ -26,7 +26,15 @@ module.exports = {
         linux: linCommand,
       };
 
-      let result = shellJs.exec(command[currentOS]);
+      let result;
+      if(currentOS !== "win32") {
+        result = shellJs.exec(command[currentOS]);
+      } else {
+        shellJs.exec(command[currentOS][0], {async: true});
+        shellJs.exec(command[currentOS][1]);
+        shellJs.exec(command[currentOS][2]);
+        result = shellJs.exec(command[currentOS][3]);
+      }
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }

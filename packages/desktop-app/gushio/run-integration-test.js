@@ -48,10 +48,9 @@ module.exports = {
   }
 }
 
-async function pause (timeout) {
-  return new Promise((resolve, _) => {
-    setTimeout( () => {
-      resolve();
-    }, timeout)
-  })
-}
+const pause = async (timeout) =>
+  new Promise((resolve, _) => {
+    setTimeout(() => {
+      resolve(true);
+    }, timeout);
+  });

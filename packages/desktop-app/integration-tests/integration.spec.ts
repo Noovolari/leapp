@@ -1,9 +1,10 @@
-import { describe, test, expect, jest } from "@jest/globals";
+import { describe, test, expect } from "@jest/globals";
 import { Builder, By, until } from "selenium-webdriver";
 import * as path from "path";
 import * as os from "os";
 
 describe("Integration test 1", () => {
+  const testTimeout = 60000;
   let driver;
   const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
   const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
@@ -15,7 +16,6 @@ describe("Integration test 1", () => {
   };
 
   beforeEach(async () => {
-    jest.setTimeout(60000);
     driver = await new Builder()
       .usingServer("http://localhost:9515")
       .withCapabilities({
@@ -26,24 +26,32 @@ describe("Integration test 1", () => {
       })
       .forBrowser("chrome")
       .build();
-  });
+  }, testTimeout);
 
   afterEach(async () => {
     await driver.quit();
-  });
+  }, testTimeout);
 
-  test("my integration test 1", async () => {
+  const clickOnAddSessionButton = async () => {
     const addSessionButton = await driver.wait(until.elementLocated(By.css('button[mattooltip="Add a new Session"]')), 10000);
     await addSessionButton.click();
+  };
 
-    const strategyButtonSelector = By.css(".strategy-list button");
-    await driver.wait(until.elementLocated(strategyButtonSelector));
-    const strategyButtons = await driver.findElements(strategyButtonSelector);
-    expect(strategyButtons.length).toBe(3);
+  test(
+    "my integration test 1",
+    async () => {
+      await clickOnAddSessionButton();
 
-    const buttons = await Promise.all(strategyButtons.map((button) => (async () => ({ button, text: await button.getText() }))()));
-    const awsButton = buttons.find((button) => button.text.includes("AWS")).button;
+      const strategyButtonSelector = By.css(".strategy-list button");
+      await driver.wait(until.elementLocated(strategyButtonSelector));
+      const strategyButtons = await driver.findElements(strategyButtonSelector);
+      expect(strategyButtons.length).toBe(3);
 
-    await awsButton.click();
-  });
+      const buttons = await Promise.all(strategyButtons.map((button) => (async () => ({ button, text: await button.getText() }))()));
+      const awsButton = buttons.find((button) => button.text.includes("AWS")).button;
+
+      await awsButton.click();
+    },
+    testTimeout
+  );
 });

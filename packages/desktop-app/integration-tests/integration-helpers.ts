@@ -54,6 +54,7 @@ export const pause = (timeout: number): Promise<boolean> =>
 
 export const waitUntilDisplayed = (selector: string, expectDisplayToBe: boolean, driver: ThenableWebDriver): Promise<boolean> =>
   new Promise((resolve, _) => {
+    console.log("in wait until displayed...");
     const timeoutId = setTimeout(() => {
       // Resolve in case of unexpected errors that would make the method run endlessly
       clearTimeout(timeoutId);
@@ -64,6 +65,7 @@ export const waitUntilDisplayed = (selector: string, expectDisplayToBe: boolean,
       if (expectDisplayToBe === false) {
         // Resolve when the element is not present in the page anymore throwing a not such element exception
         try {
+          console.log("executing set interval callback...");
           await driver.findElement(By.css(selector));
         } catch (err) {
           clearInterval(intervalId);

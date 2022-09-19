@@ -13,6 +13,12 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Test macOS desktop app
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: |
+            packages/desktop-app/package-lock.json
+            packages/core/package-lock.json
         run: |
           npm run bootstrap
           npm run set-dev-environment
@@ -24,6 +30,12 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Test Windows desktop app
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: |
+            packages/desktop-app/package-lock.json
+            packages/core/package-lock.json
         run: |
           npm run bootstrap
           npm run set-dev-environment
@@ -35,6 +47,12 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Setup Project
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: |
+            packages/desktop-app/package-lock.json
+            packages/core/package-lock.json
         run: |
           npm run bootstrap
           npm run set-dev-environment

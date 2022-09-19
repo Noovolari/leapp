@@ -1,68 +1,32 @@
 import { describe, test, expect } from "@jest/globals";
-import { Builder, By, until, WebElement } from "selenium-webdriver";
-import * as path from "path";
-import * as os from "os";
+import { By, until } from "selenium-webdriver";
+import {
+  clickOnAddSessionButton,
+  clickOnStrategyButton,
+  generateDriver,
+  pause,
+  selectElementByCss,
+  selectElementWithInnerText,
+  waitUntilDisplayed,
+} from "./integration-helpers";
+import { env } from "./.env";
 
 describe("Integration test 1", () => {
   const testTimeout = 60000;
   let driver;
-  const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
-  const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
-  const winPath = path.resolve(".", "node_modules\\electron\\dist\\electron.exe");
-  const electronBinaryPath = {
-    darwin: macPath,
-    linux: linuxPath,
-    win32: winPath,
-  };
-
-  const pause = (timeout) =>
-    new Promise((resolve, _) => {
-      setTimeout(() => {
-        resolve(true);
-      }, timeout);
-    });
 
   beforeEach(async () => {
-    driver = await new Builder()
-      .usingServer("http://localhost:9515")
-      .withCapabilities({
-        "goog:chromeOptions": {
-          binary: electronBinaryPath[os.platform()],
-          args: [`app=${path.resolve(".")}`],
-        },
-      })
-      .forBrowser("chrome")
-      .build();
+    driver = await generateDriver();
   }, testTimeout);
 
   afterEach(async () => {
     await driver.quit();
   }, testTimeout);
 
-  const selectElementByCss = async (selector: string): Promise<WebElement> => await driver.wait(until.elementLocated(By.css(selector)), 10000);
-
-  const clickOnAddSessionButton = async () => {
-    const addSessionButton = await selectElementByCss('button[mattooltip="Add a new Session"]');
-    await addSessionButton.click();
-  };
-
-  const selectElementWithInnerText = async (text: string, selector: By) => {
-    const elements = await driver.findElements(selector);
-    const element = await Promise.all(elements.map((el) => (async () => ({ el, text: await el.getText() }))()));
-    return element.find((el) => el.text.includes(text)).el;
-  };
-
-  const clickOnStrategyButton = async (strategy: string) => {
-    const strategyButtonSelector = By.css(".strategy-list button");
-    await driver.wait(until.elementLocated(strategyButtonSelector));
-    const awsButton = await selectElementWithInnerText(strategy, strategyButtonSelector);
-    await awsButton.click();
-  };
-
   test(
     "my integration test 1",
     async () => {
-      await clickOnAddSessionButton();
+      await clickOnAddSessionButton(driver);
 
       const strategyButtonSelector = By.css(".strategy-list button");
       await driver.wait(until.elementLocated(strategyButtonSelector));
@@ -80,34 +44,36 @@ describe("Integration test 1", () => {
   test(
     "create session",
     async () => {
-      await clickOnAddSessionButton();
-      await clickOnStrategyButton("AWS");
-      const sessionTypeOption = await selectElementByCss('ng-select[placeholder="Select Session Strategy"]');
+      await clickOnAddSessionButton(driver);
+      await clickOnStrategyButton("AWS", driver);
+      const sessionTypeOption = await selectElementByCss('ng-select[placeholder="Select Session Strategy"]', driver);
       await sessionTypeOption.click();
 
-      const selectedSessionType = await selectElementWithInnerText("AWS IAM User", By.css("div span.ng-option-label"));
+      const selectedSessionType = await selectElementWithInnerText("AWS IAM User", By.css("div span.ng-option-label"), driver);
       await selectedSessionType.click();
 
-      const sessionAlias = await selectElementByCss('input[placeholder="Session Alias *"]');
+      const sessionAlias = await selectElementByCss('input[placeholder="Session Alias *"]', driver);
       await sessionAlias.sendKeys("selenium-session");
 
-      const sessionAccessKey = await selectElementByCss('input[placeholder="Access Key ID *"]');
-      await sessionAccessKey.sendKeys("a");
+      const sessionAccessKey = await selectElementByCss('input[placeholder="Access Key ID *"]', driver);
+      await sessionAccessKey.sendKeys(env.awsIamUserTest.accessKeyId);
 
-      const sessionSecretAccessKey = await selectElementByCss('input[placeholder="Secret Access Key *"]');
-      await sessionSecretAccessKey.sendKeys("a");
+      const sessionSecretAccessKey = await selectElementByCss('input[placeholder="Secret Access Key *"]', driver);
+      await sessionSecretAccessKey.sendKeys(env.awsIamUserTest.secretAccessKey);
 
-      const createButton = await selectElementWithInnerText("Create Session", By.css("button"));
+      const createButton = await selectElementWithInnerText("Create Session", By.css("button"), driver);
       await createButton.click();
 
-      const seleniumSession = await selectElementWithInnerText("selenium-session", By.css("td div.session-name-td"));
+      const seleniumSession = await selectElementWithInnerText("selenium-session", By.css("td div.session-name-td"), driver);
       await seleniumSession.click();
 
-      const playButton = await selectElementByCss("a.start-session");
+      const playButton = await selectElementByCss("a.start-session", driver);
 
-      await pause(2000);
+      await waitUntilDisplayed("div.holder", false, driver);
 
       await playButton.click();
+
+      await pause(5000);
     },
     testTimeout
   );

@@ -84,3 +84,6 @@ lerna-debug.log
 .run
 
 packages/dpapi-addon/build
+
+# Ignore local environment secrets
+packages/desktop-app/integration-tests/.env.ts

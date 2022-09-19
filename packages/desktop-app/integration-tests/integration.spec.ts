@@ -48,13 +48,18 @@ describe("Integration test 1", () => {
   test(
     "create session",
     async () => {
-      console.log("in create session...");
+      console.log("before clickOnAddSessionButton...");
       await clickOnAddSessionButton(driver);
+      console.log("before clickOnStrategyButton...");
       await clickOnStrategyButton("AWS", driver);
+      console.log("before selectElementByCss...");
       const sessionTypeOption = await selectElementByCss('ng-select[placeholder="Select Session Strategy"]', driver);
+      console.log("before click...");
       await sessionTypeOption.click();
 
+      console.log("before selectElementWithInnerText...");
       const selectedSessionType = await selectElementWithInnerText("AWS IAM User", By.css("div span.ng-option-label"), driver);
+      console.log("before click 2...");
       await selectedSessionType.click();
 
       console.log("about to create a session...");

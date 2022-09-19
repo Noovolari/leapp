@@ -15,20 +15,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Dependency caching
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: |
-            packages/desktop-app/package-lock.json
-            packages/core/package-lock.json
-
       - name: Test macOS desktop app
         run: |
           npm run bootstrap
           npm run set-dev-environment
-          echo ${{ env.INTEGRATION_TEST_ENVIRONMENT }}
           npx gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js '${{ env.INTEGRATION_TEST_ENVIRONMENT }}'
           npm run --prefix packages/desktop-app integration-test
 
@@ -36,15 +26,6 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Dependency caching
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: |
-            packages/desktop-app/package-lock.json
-            packages/core/package-lock.json
 
       - name: Test Windows desktop app
         run: |
@@ -57,15 +38,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-
-      - name: Dependency caching
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-          cache: 'npm'
-          cache-dependency-path: |
-            packages/desktop-app/package-lock.json
-            packages/core/package-lock.json
 
       - name: Setup Project
         run: |

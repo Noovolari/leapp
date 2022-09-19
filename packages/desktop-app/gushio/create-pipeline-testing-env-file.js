@@ -16,14 +16,16 @@ module.exports = {
 
     try {
       let result;
-      const jsonText = `export const env = {\n\t"awsIamUserTest": {\n\t\t"accessKeyId": "${envJson.awsIamUserTest.accessKeyId}",\n\t\t"secretAccessKey": "${envJson.awsIamUserTest.secretAccessKey}"\n\t}\n};\n`;
       if(currentOS !== "win32") {
+        const jsonText = `export const env = {\n\t"awsIamUserTest": {\n\t\t"accessKeyId": "${envJson.awsIamUserTest.accessKeyId}",\n\t\t"secretAccessKey": "${envJson.awsIamUserTest.secretAccessKey}"\n\t}\n};\n`;
         result = shellJs.exec(`printf '${jsonText}' > ${integrationTestsPath}/.env.ts`);
         if (result.code !== 0) {
           throw new Error(result.stderr)
         }
       } else {
-        result = shellJs.exec(`echo "${jsonText}" > ${integrationTestsPath}/.env.ts`);
+        const jsonText = `export const env = {◙    \"awsIamUserTest\": {◙        \"accessKeyId\": \"${envJson.awsIamUserTest.accessKeyId}\",◙        \"secretAccessKey\": \"${envJson.awsIamUserTest.secretAccessKey}\"◙    }◙};`;
+        console.log(`echo "${jsonText}" > "${integrationTestsPath}\\.env.ts"`);
+        result = shellJs.exec(`echo ${jsonText} > "${integrationTestsPath}\\.env.ts"`);
         if (result.code !== 0) {
           throw new Error(result.stderr)
         }

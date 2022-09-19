@@ -12,8 +12,8 @@ const electronBinaryPath = {
   win32: winPath,
 };
 
-export const generateDriver = async (): Promise<ThenableWebDriver> =>
-  new Builder()
+export const generateDriver = async (): Promise<any> =>
+  await new Builder()
     .usingServer(serverHost)
     .withCapabilities({
       "goog:chromeOptions": {

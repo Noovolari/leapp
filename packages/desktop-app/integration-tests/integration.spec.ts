@@ -1,4 +1,4 @@
-import { describe, test, expect } from "@jest/globals";
+import { describe, test, expect, jest } from "@jest/globals";
 import { Builder, By, until } from "selenium-webdriver";
 import * as path from "path";
 import * as os from "os";
@@ -15,6 +15,7 @@ describe("Integration test 1", () => {
   };
 
   beforeEach(async () => {
+    jest.setTimeout(60000);
     driver = await new Builder()
       .usingServer("http://localhost:9515")
       .withCapabilities({
@@ -44,5 +45,5 @@ describe("Integration test 1", () => {
     const awsButton = buttons.find((button) => button.text.includes("AWS")).button;
 
     await awsButton.click();
-  }, 500000);
+  });
 });

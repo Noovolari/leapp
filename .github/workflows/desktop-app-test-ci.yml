@@ -25,7 +25,7 @@ jobs:
         run: |
           npm run bootstrap
           npm run set-dev-environment
-          gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js ${{ secrets.INTEGRATION_TEST_ENVIRONMENT }}
+          npx gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js ${{ secrets.INTEGRATION_TEST_ENVIRONMENT }}
           npm run --prefix packages/desktop-app integration-test
 
   integration-test-win:
@@ -46,7 +46,7 @@ jobs:
         run: |
           npm run bootstrap
           npm run set-dev-environment
-          gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js ${{ secrets.INTEGRATION_TEST_ENVIRONMENT }}
+          npx gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js ${{ secrets.INTEGRATION_TEST_ENVIRONMENT }}
           npm run --prefix packages/desktop-app integration-test
 
   integration-test-linux:
@@ -67,7 +67,7 @@ jobs:
         run: |
           npm run bootstrap
           npm run set-dev-environment
-          gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js ${{ secrets.INTEGRATION_TEST_ENVIRONMENT }}
+          npx gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js ${{ secrets.INTEGRATION_TEST_ENVIRONMENT }}
 
       - name: Test Linux Headless desktop app
         uses: GabrielBB/xvfb-action@v1

@@ -1,5 +1,5 @@
-import { describe, test, expect } from "@jest/globals";
-import { By, until } from "selenium-webdriver";
+import { describe, test } from "@jest/globals";
+import { By } from "selenium-webdriver";
 import {
   clickOnAddSessionButton,
   clickOnStrategyButton,
@@ -24,7 +24,7 @@ describe("Integration test 1", () => {
     await driver.quit();
   }, testTimeout);
 
-  test(
+  /*test(
     "my integration test 1",
     async () => {
       console.log("in integration test 1...");
@@ -43,7 +43,7 @@ describe("Integration test 1", () => {
       await awsButton.click();
     },
     testTimeout
-  );
+  );*/
 
   test(
     "create session",

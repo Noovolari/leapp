@@ -31,20 +31,27 @@ module.exports = {
         result = shellJs.exec(command[currentOS]);
       } else {
         shellJs.exec(command[currentOS][0], {async: true});
+        await pause(2000);
         result = shellJs.exec(command[currentOS][1]);
         if (result.code !== 0) {
-          console.log("ERR 1");
           throw new Error(result.stderr)
         }
         result = shellJs.exec(command[currentOS][2]);
       }
       if (result.code !== 0) {
-        console.log("ERR TEST");
         throw new Error(result.stderr)
       }
     } catch (e) {
       e.message = e.message.red
       throw e
     }
-  },
+  }
+}
+
+async function pause (timeout) {
+  return new Promise((resolve, _) => {
+    setTimeout( () => {
+      resolve();
+    }, timeout)
+  })
 }

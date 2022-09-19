@@ -13,14 +13,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Test macOS desktop app
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 20
-          max_attempts: 5
-          command: |
-            npm run bootstrap
-            npm run set-dev-environment
-            npm run --prefix packages/desktop-app integration-test
+        run: |
+          npm run bootstrap
+          npm run set-dev-environment
+          npm run --prefix packages/desktop-app integration-test
 
   integration-test-win:
     runs-on: windows-latest
@@ -28,16 +24,10 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Test Windows desktop app
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 20
-          max_attempts: 5
-          command: |
-            npm run bootstrap
-            npm run set-dev-environment
-            cd packages/desktop-app
-            ls -la
-            npm run integration-test
+        run: |
+          npm run bootstrap
+          npm run set-dev-environment
+          npm run --prefix packages/desktop-app integration-test
 
   integration-test-linux:
     runs-on: ubuntu-latest

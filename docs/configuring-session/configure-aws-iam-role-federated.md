@@ -16,6 +16,7 @@ We currently only support SAML 2.0 federation.
 | `OKTA`                     | :white_check_mark:                   | :x:                                 |
 | `ONELOGIN`                 | :white_check_mark:                   | :x:                                 |
 | `AZURE AD`                 | :white_check_mark:                   | :white_check_mark:                  |
+| `AUTH0`                    | :white_check_mark:                   | :x:                                 |
 
 ## Fields
 

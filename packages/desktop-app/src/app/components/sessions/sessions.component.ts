@@ -24,8 +24,15 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
+import { SessionSelectionState } from "@noovolari/leapp-core/models/session-selection-state";
+import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
+import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { OptionsService } from "../../services/options.service";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
+import { EditDialogComponent } from "../dialogs/edit-dialog/edit-dialog.component";
 
-export const optionBarIds = {};
+export const optionBarIds = {}; // TODO: remove
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);
 
 export interface ArrowSettings {
@@ -46,6 +53,9 @@ export class SessionsComponent implements OnInit, OnDestroy {
   eCompactMode: boolean;
   eGlobalFilterGroup: GlobalFilters;
   eGlobalColumns: IGlobalColumns;
+  eSessionType = SessionType;
+  eSessionStatus = SessionStatus;
+  eOptionIds = optionBarIds;
 
   // Data for the select
   modalAccounts = [];
@@ -61,10 +71,14 @@ export class SessionsComponent implements OnInit, OnDestroy {
   // For column ordering
   columnSettings: ArrowSettings[];
 
+  selectedSession?: Session;
+
   private subscriptions = [];
   private awsCoreService: AwsCoreService;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
+  private sessionFactory: SessionFactory;
+  private logService: LogService;
 
   constructor(
     private ref: ChangeDetectorRef,
@@ -73,10 +87,13 @@ export class SessionsComponent implements OnInit, OnDestroy {
     private httpClient: HttpClient,
     private modalService: BsModalService,
     private appService: AppService,
-    private leappCoreService: AppProviderService
+    private appProviderService: AppProviderService,
+    public optionService: OptionsService
   ) {
-    this.behaviouralSubjectService = this.leappCoreService.behaviouralSubjectService;
-    this.awsCoreService = this.leappCoreService.awsCoreService;
+    this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
+    this.awsCoreService = this.appProviderService.awsCoreService;
+    this.sessionFactory = appProviderService.sessionFactory;
+    this.logService = appProviderService.logService;
 
     this.columnSettings = Array.from(Array(5)).map((): ArrowSettings => ({ activeArrow: false, orderStyle: false }));
     const subscription = globalHasFilter.subscribe((value) => {
@@ -94,13 +111,15 @@ export class SessionsComponent implements OnInit, OnDestroy {
     const subscription5 = globalColumns.subscribe((value) => {
       this.eGlobalColumns = value;
     });
+    const subscription6 = this.behaviouralSubjectService.sessionSelections$.subscribe((sessionSelections: SessionSelectionState[]) => {
+      if (sessionSelections.length > 0) {
+        this.selectedSession = this.eGlobalFilteredSessions.find((session) => session.sessionId === sessionSelections[0].sessionId);
+      } else {
+        this.selectedSession = undefined;
+      }
+    });
 
-    this.subscriptions.push(subscription);
-    this.subscriptions.push(subscription2);
-    this.subscriptions.push(subscription3);
-    this.subscriptions.push(subscription4);
-    this.subscriptions.push(subscription5);
-
+    this.subscriptions.push(subscription, subscription2, subscription3, subscription4, subscription5, subscription6);
     globalOrderingFilter.next(JSON.parse(JSON.stringify(this.behaviouralSubjectService.sessions)));
   }
 
@@ -298,6 +317,48 @@ export class SessionsComponent implements OnInit, OnDestroy {
     }
   }
 
+  get selectedSessionService() {
+    return this.sessionFactory.getSessionService(this.selectedSession.type);
+  }
+
+  async startSession(): Promise<void> {
+    this.logSessionData(this.selectedSession, "Starting Session");
+    await this.selectedSessionService.start(this.selectedSession.sessionId);
+    this.behaviouralSubjectService.unselectSessions();
+  }
+
+  async stopSession(): Promise<void> {
+    this.logSessionData(this.selectedSession, `Stopped Session`);
+    await this.selectedSessionService.stop(this.selectedSession.sessionId);
+    this.behaviouralSubjectService.unselectSessions();
+  }
+
+  async openAwsWebConsole(): Promise<void> {
+    const credentials = await (this.selectedSessionService as AwsSessionService).generateCredentials(this.selectedSession.sessionId);
+    const sessionRegion = this.selectedSession.region;
+    await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion);
+  }
+
+  async changeRegionModalOpen(): Promise<void> {}
+
+  async changeProfileModalOpen(): Promise<void> {}
+
+  async ssmModalOpen(): Promise<void> {}
+
+  async editCurrentSession(): Promise<void> {
+    this.modalService.show(EditDialogComponent, {
+      animated: false,
+      class: "edit-modal",
+      initialState: { selectedSessionId: this.selectedSession.sessionId },
+    });
+  }
+
+  async pinSession(): Promise<void> {}
+
+  async unpinSession(): Promise<void> {}
+
+  async deleteSession(): Promise<void> {}
+
   private resetArrowsExcept(c): void {
     this.columnSettings.forEach((column, index) => {
       if (index !== c) {
@@ -305,5 +366,17 @@ export class SessionsComponent implements OnInit, OnDestroy {
         column.activeArrow = false;
       }
     });
+  }
+
+  private logSessionData(session: Session, message: string): void {
+    this.logService.log(
+      new LoggedEntry(
+        message,
+        this,
+        LogLevel.info,
+        false,
+        JSON.stringify({ timestamp: new Date().toISOString(), id: session.sessionId, account: session.sessionName, type: session.type }, null, 3)
+      )
+    );
   }
 }

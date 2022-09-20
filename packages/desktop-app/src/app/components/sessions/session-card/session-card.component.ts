@@ -168,6 +168,7 @@ export class SessionCardComponent implements OnInit {
     this.clearOptionIds();
     optionBarIds[session.sessionId] = true;
     document.querySelector(".sessions").classList.add("option-bar-opened");
+    this.behaviouralSubjectService.selectSession(session.sessionId);
   }
 
   /**
@@ -561,6 +562,7 @@ export class SessionCardComponent implements OnInit {
       optionBarIds[prop] = false;
     }
     document.querySelector(".sessions").classList.remove("option-bar-opened");
+    this.behaviouralSubjectService.unselectSessions();
   }
 
   addNewUUID(): string {

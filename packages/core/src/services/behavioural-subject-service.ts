@@ -3,14 +3,17 @@ import { Repository } from "./repository";
 import { Session } from "../models/session";
 import { IBehaviouralNotifier } from "../interfaces/i-behavioural-notifier";
 import { Integration } from "../models/integration";
+import { SessionSelectionState } from "../models/session-selection-state";
 
 export class BehaviouralSubjectService implements IBehaviouralNotifier {
   readonly sessions$: BehaviorSubject<Session[]>;
   readonly integrations$: BehaviorSubject<Integration[]>;
+  readonly sessionSelections$: BehaviorSubject<SessionSelectionState[]>;
 
   constructor(private repository: Repository) {
-    this.sessions$ = new BehaviorSubject<Session[]>([]);
-    this.integrations$ = new BehaviorSubject<Integration[]>([]);
+    this.sessions$ = new BehaviorSubject([]);
+    this.integrations$ = new BehaviorSubject([]);
+    this.sessionSelections$ = new BehaviorSubject([]);
     this.sessions = this.repository.getSessions();
     this.integrations = [...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()];
   }
@@ -23,6 +26,8 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
   // assigning a value to this.sessions will push it onto the observable
   // and down to all of its subscribers (ex: this.sessions = [])
   set sessions(sessions: Session[]) {
+    const sessionIds = new Set(sessions.map((session) => session.sessionId));
+    this.sessionSelections = this.sessionSelections.filter((sessionSelection) => sessionIds.has(sessionSelection.sessionId));
     this.sessions$.next(sessions);
   }
 
@@ -56,5 +61,22 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
 
   setIntegrations(integrations: Integration[]): void {
     this.integrations = integrations;
+  }
+
+  get sessionSelections(): SessionSelectionState[] {
+    return this.sessionSelections$.getValue();
+  }
+
+  set sessionSelections(sessionSelections: SessionSelectionState[]) {
+    this.sessionSelections$.next(sessionSelections);
+  }
+
+  selectSession(sessionId: string) {
+    const sessionSelections = [new SessionSelectionState(sessionId, true)];
+    this.sessionSelections = sessionSelections;
+  }
+
+  unselectSessions() {
+    this.sessionSelections = [];
   }
 }

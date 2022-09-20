@@ -13,67 +13,6 @@
 
 a { color: $text-color; }
 
-.option-bar {
-  cursor: initial;
-  padding: $standard-padding $standard-padding $standard-padding 0;
-  position: fixed;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: $white-text-color;
-  height: $commandbar-height;
-  bottom: 0;
-  left: $menubar-width;
-  right: 0;
-  z-index: 1;
-  @include box-shadow(3px -1px 5px -3px $text-color);
-  a {
-    display: inline-flex;
-    margin: 0 10px;
-    i { color: $medium-dark; }
-    &:hover {
-      i {
-        color: #3c3c3c;
-        opacity: 1;
-      }
-    }
-  }
-  .separator {
-    display: inline-flex;
-    width: 1px;
-    height: 24px;
-    background: $silver-50;
-    margin: 0 17px;
-    position: relative;
-    top: 4px;
-  }
-}
-
-.stop-session i {
-  color: $bright-red!important;
-}
-.start-session i {
-  color: $main-color-light!important;
-}
-
-.start-session, .stop-session {
-  display: inline-flex;
-  text-decoration: none;
-  font-weight: 500;
-  font-size: 15px;
-  min-width: 143px!important;
-  color: $text-color;
-  i {
-    font-size: 30px!important;
-    margin-right: 15px;
-  }
-}
-
-.opt-bar-session-button {
-  position: relative;
-  top: 2px;
-}
-
 .session-name {
   position: relative;
   left: -1px;
@@ -120,13 +59,6 @@ td:nth-child(1) {
       top: 3px;
     }
   }
-
-  .compact .option-bar {
-    left: 0;
-    .start-session {
-      width: 50px!important;
-    }
-  }
 }
 
 .select-region-form,
@@ -138,10 +70,6 @@ td:nth-child(1) {
     display: inline-block;
     margin-left: 10px;
   }
-}
-
-a.ng-star-inserted {
-  display: none;
 }
 
 span.badge-region {
@@ -269,40 +197,6 @@ td:nth-child(4) {
   padding-left: 5px!important;
 }
 
-.opt-bar-middle-section {
-  position: relative;
-  left: -43px;
-  &.moon-Server {
-  }
-}
-
-.icon-button.start-session,
-.icon-button.stop-session {
-  position: relative!important;
-  left: 7px!important;
-}
-
-.opt-bar-middle-left-buttons {
-  display: inline-block;
-  a .moon-Region {
-    position: relative;
-    left: -6px;
-  }
-  a .moon-User {
-    position: relative;
-    left: -3px;
-  }
-}
-
-.opt-bar-middle-right-buttons {
-  display: inline-block;
-  margin-left: -5px;
-  a .moon-Delete {
-    position: relative;
-    left: 2px;
-  }
-}
-
 .ssm-ul {
   padding: 20px;
   .ssm-card {
@@ -318,26 +212,4 @@ img.moon-stop-outline {
   width:23px;
   margin-left: -2px;
   margin-bottom: 2px;
-}
-
-.open-web-console {
-  position: relative;
-  right: 10px;
-}
-
-.azure-opt-bar .opt-bar-middle-section {
-  position: relative;
-  left: 37px;
-}
-
-.awsiamrolefederated-opt-bar .opt-bar-middle-section,
-.awsiamrolechained-opt-bar .opt-bar-middle-section {
-  position: relative;
-  left: -43px;
-}
-
-.awsiamuser-opt-bar .opt-bar-middle-section,
-.awsssorole-opt-bar .opt-bar-middle-section {
-  position: relative;
-  left: -23px!important;
 }

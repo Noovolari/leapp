@@ -24,13 +24,6 @@ a {
   color: $text-color;
 }
 
-.session-name {
-  position: relative;
-  left: -1px;
-  color: $silver-dark;
-  font-size: 13px;
-}
-
 ::ng-deep {
   td.selected,
   tr:hover td:not(.selected) {

@@ -267,3 +267,10 @@ tr .hover-item {
 .azure-opt-bar .separator {
   visibility: hidden;
 }
+
+.session-name {
+  position: relative;
+  left: -1px;
+  color: $silver-dark;
+  font-size: 13px;
+}

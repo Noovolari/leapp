@@ -120,31 +120,9 @@ describe("Integration test 1", () => {
 
       await awsButton.click();
 
-      expect(true).toBe(true);
-    },
-    testTimeout
-  );
-});
+      const closeButton = await selectElementByCss(".close-modal", driver);
+      await closeButton.click();
 
-describe("Integration test 2", () => {
-  const testTimeout = 60000;
-  let driver;
-
-  beforeEach(async () => {
-    console.log("in before each...");
-    driver = await generateDriver();
-    console.log("created succesfully");
-  }, testTimeout);
-
-  afterEach(async () => {
-    console.log("in after each...");
-    await driver.quit();
-    console.log("quit succesfully");
-  }, testTimeout);
-
-  test(
-    "create session",
-    async () => {
       console.log("in integration test 2...");
       console.log(driver);
 

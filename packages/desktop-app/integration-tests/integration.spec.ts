@@ -94,11 +94,13 @@ describe("Integration test 1", () => {
   beforeEach(async () => {
     console.log("in before each...");
     driver = await generateDriver();
+    console.log("created succesfully");
   }, testTimeout);
 
   afterEach(async () => {
     console.log("in after each...");
     await driver.quit();
+    console.log("quit succesfully");
   }, testTimeout);
 
   test(

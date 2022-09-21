@@ -124,6 +124,8 @@ describe("Integration test 1", () => {
   test(
     "create session",
     async () => {
+      console.log("waiting 20 seconds...");
+      await pause(20000);
       console.log("before clickOnAddSessionButton...");
       await clickOnAddSessionButton(driver);
       console.log("before clickOnStrategyButton...");

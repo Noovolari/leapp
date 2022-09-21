@@ -7,9 +7,10 @@ module.exports = {
   },
   run: async (args) => {
     const [env_secret] = args;
-    const envJson = JSON.parse(env_secret);
+    const jsYaml = require("js-yaml");
+    const envJson = jsYaml.load(env_secret);
     const path = require("path");
-    const shellJs = require('shelljs');
+    const shellJs = require("shelljs");
     const os = require('os');
     const currentOS = os.platform();
     const integrationTestsPath = path.join(__dirname, "..", "integration-tests");

@@ -15,7 +15,7 @@ const electronBinaryPath = {
 };
 
 export const generateDriver = async (): Promise<any> =>
-  await new Builder()
+  new Builder()
     .usingServer(serverHost)
     .withCapabilities({
       "goog:chromeOptions": {
@@ -26,8 +26,10 @@ export const generateDriver = async (): Promise<any> =>
     .forBrowser("chrome")
     .build();
 
-export const selectElementByCss = async (selector: string, driver: ThenableWebDriver): Promise<WebElement> =>
-  await driver.wait(until.elementLocated(By.css(selector)), 10000);
+export const selectElementByCss = async (selector: string, driver: ThenableWebDriver): Promise<WebElement> => {
+  console.log("waiting 60 seconds - driver wait");
+  return driver.wait(until.elementLocated(By.css(selector)), 60000);
+};
 
 export const clickOnAddSessionButton = async (driver: ThenableWebDriver): Promise<void> => {
   console.log("1");
@@ -45,7 +47,7 @@ export const selectElementWithInnerText = async (text: string, selector: By, dri
 
 export const clickOnStrategyButton = async (strategy: string, driver: ThenableWebDriver): Promise<void> => {
   const strategyButtonSelector = By.css(".strategy-list button");
-  await driver.wait(until.elementLocated(strategyButtonSelector));
+  await driver.wait(until.elementLocated(strategyButtonSelector), 20000);
   const awsButton = await selectElementWithInnerText(strategy, strategyButtonSelector, driver);
   await awsButton.click();
 };
@@ -104,6 +106,7 @@ describe("Integration test 1", () => {
     "my integration test 1",
     async () => {
       console.log("in integration test 1...");
+      console.log(driver);
       await clickOnAddSessionButton(driver);
 
       const strategyButtonSelector = By.css(".strategy-list button");
@@ -124,8 +127,8 @@ describe("Integration test 1", () => {
   test(
     "create session",
     async () => {
-      console.log("waiting 20 seconds...");
-      await pause(20000);
+      console.log("waiting 8 seconds...");
+      await pause(8000);
       console.log("before clickOnAddSessionButton...");
       await clickOnAddSessionButton(driver);
       console.log("before clickOnStrategyButton...");

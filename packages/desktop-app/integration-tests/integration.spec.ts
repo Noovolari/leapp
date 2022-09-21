@@ -4,7 +4,7 @@ import path from "path";
 import os from "os";
 import { env } from "./.env";
 
-// const serverHost = "http://localhost:9515";
+const serverHost = "http://localhost:9515";
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
 const winPath = path.resolve(".", "node_modules\\electron\\dist\\electron.exe");
@@ -16,7 +16,7 @@ const electronBinaryPath = {
 
 export const generateDriver = async (): Promise<any> =>
   new Builder()
-    .usingServer("http://localhost:951" + (Math.floor(Math.random() * 5) + 1))
+    .usingServer(serverHost)
     .withCapabilities({
       "goog:chromeOptions": {
         binary: electronBinaryPath[os.platform()],
@@ -124,6 +124,23 @@ describe("Integration test 1", () => {
     },
     testTimeout
   );
+});
+
+describe("Integration test 2", () => {
+  const testTimeout = 60000;
+  let driver;
+
+  beforeEach(async () => {
+    console.log("in before each...");
+    driver = await generateDriver();
+    console.log("created succesfully");
+  }, testTimeout);
+
+  afterEach(async () => {
+    console.log("in after each...");
+    await driver.quit();
+    console.log("quit succesfully");
+  }, testTimeout);
 
   test(
     "create session",

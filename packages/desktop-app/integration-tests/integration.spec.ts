@@ -20,7 +20,7 @@ export const generateDriver = async (): Promise<any> =>
     .withCapabilities({
       "goog:chromeOptions": {
         binary: electronBinaryPath[os.platform()],
-        args: [`app=${path.resolve(".")}`],
+        args: [`app=${path.resolve(".")}`, `--headless`],
       },
     })
     .forBrowser("chrome")
@@ -32,11 +32,8 @@ export const selectElementByCss = async (selector: string, driver: ThenableWebDr
 };
 
 export const clickOnAddSessionButton = async (driver: ThenableWebDriver): Promise<void> => {
-  console.log("1");
   const addSessionButton = await selectElementByCss('button[mattooltip="Add a new Session"]', driver);
-  console.log("2");
   await addSessionButton.click();
-  console.log("3");
 };
 
 export const selectElementWithInnerText = async (text: string, selector: By, driver: ThenableWebDriver): Promise<WebElement> => {

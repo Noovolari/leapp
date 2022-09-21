@@ -30,8 +30,11 @@ export const selectElementByCss = async (selector: string, driver: ThenableWebDr
   await driver.wait(until.elementLocated(By.css(selector)), 10000);
 
 export const clickOnAddSessionButton = async (driver: ThenableWebDriver): Promise<void> => {
+  console.log("1");
   const addSessionButton = await selectElementByCss('button[mattooltip="Add a new Session"]', driver);
+  console.log("2");
   await addSessionButton.click();
+  console.log("3");
 };
 
 export const selectElementWithInnerText = async (text: string, selector: By, driver: ThenableWebDriver): Promise<WebElement> => {

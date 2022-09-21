@@ -4,7 +4,7 @@ import path from "path";
 import os from "os";
 import { env } from "./.env";
 
-const serverHost = "http://localhost:9515";
+// const serverHost = "http://localhost:9515";
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
 const winPath = path.resolve(".", "node_modules\\electron\\dist\\electron.exe");
@@ -16,11 +16,11 @@ const electronBinaryPath = {
 
 export const generateDriver = async (): Promise<any> =>
   new Builder()
-    .usingServer(serverHost)
+    .usingServer("http://localhost:951" + (Math.floor(Math.random() * 5) + 1))
     .withCapabilities({
       "goog:chromeOptions": {
         binary: electronBinaryPath[os.platform()],
-        args: [`app=${path.resolve(".")}`, `--headless`, `--disable-gpu`],
+        args: [`app=${path.resolve(".")}`],
       },
     })
     .forBrowser("chrome")
@@ -119,6 +119,8 @@ describe("Integration test 1", () => {
       const awsButton = buttons.find((button) => button.text.includes("AWS")).button;
 
       await awsButton.click();
+
+      expect(true).toBe(true);
     },
     testTimeout
   );
@@ -170,7 +172,7 @@ describe("Integration test 1", () => {
 
       await playButton.click();
 
-      await pause(2000);
+      expect(true).toBe(true);
     },
     testTimeout
   );

@@ -39,6 +39,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { CredentialProcessDialogComponent } from "./dialogs/credential-process-dialog/credential-process-dialog.component";
 import { ChangeRegionDialogComponent } from "./dialogs/change-region-dialog/change-region-dialog.component";
 import { ChangeNamedProfileDialogComponent } from "./dialogs/change-named-profile-dialog/change-named-profile-dialog.component";
+import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-dialog.component";
 
 @NgModule({
   declarations: [
@@ -65,6 +66,7 @@ import { ChangeNamedProfileDialogComponent } from "./dialogs/change-named-profil
     CredentialProcessDialogComponent,
     ChangeRegionDialogComponent,
     ChangeNamedProfileDialogComponent,
+    SsmModalDialogComponent,
   ],
   imports: [
     CommonModule,

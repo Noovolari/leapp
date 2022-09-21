@@ -2,16 +2,27 @@
 @import "../../../../assets/scss/mixins/palette";
 @import "../../../../assets/scss/global";
 
-.status-item, .hover-item { font-size: 12px; }
-.hover-item { display: none; cursor: pointer; }
+.status-item, .hover-item {
+  font-size: 12px;
+}
+
+.hover-item {
+  display: none;
+  cursor: pointer;
+}
 
 .active {
   background-color: $active-card;
   color: $text-color;
 }
-.offline { color: $silver-25!important; }
 
-a { color: $text-color; }
+.offline {
+  color: $silver-25 !important;
+}
+
+a {
+  color: $text-color;
+}
 
 .session-name {
   position: relative;
@@ -39,11 +50,16 @@ a { color: $text-color; }
 td:nth-child(1) {
   font-size: 15px;
   color: $text-color;
-  img { width: 30px; }
+
+  img {
+    width: 30px;
+  }
 }
 
 ::ng-deep {
-  .compact th { z-index: 1; }
+  .compact th {
+    z-index: 1;
+  }
 
   .compact th,
   .compact td:nth-child(1),
@@ -87,11 +103,11 @@ span.badge-region.badge-black {
 }
 
 i.active {
-  background-color: unset!important;
+  background-color: unset !important;
 }
 
 i.fas.active {
-  color: $success-session!important;
+  color: $success-session !important;
 }
 
 i.fa-circle.status-item {
@@ -103,6 +119,7 @@ i.fa-spin.status-item {
   font-size: 13px;
   margin-left: 30px;
 }
+
 i.hover-item {
   font-size: 20px;
   padding-left: 40%;
@@ -110,11 +127,12 @@ i.hover-item {
 }
 
 td.active {
-  font-weight: normal!important;
+  font-weight: normal !important;
 }
 
 td:nth-child(1) {
-  padding-left: 20px!important;
+  padding-left: 20px !important;
+
   .strong {
     -webkit-text-stroke-width: 0.5px;
     letter-spacing: -0.022em;
@@ -125,26 +143,31 @@ td:nth-child(2),
 td:nth-child(4) {
   font-size: 13px;
   font-weight: normal;
+
   .strong {
-    font-weight: normal!important;
+    font-weight: normal !important;
   }
 }
 
 ::ng-deep {
   .table td {
-    padding: 0!important;
+    padding: 0 !important;
   }
+
   .compact {
     td {
-      padding: 0 0 0 0!important;
+      padding: 0 0 0 0 !important;
     }
+
     td:nth-child(1) {
-      padding: 0 0 0 20px!important;
+      padding: 0 0 0 20px !important;
     }
+
     td:nth-child(2),
     td:nth-child(4) {
-      font-size: 13px!important;
-      font-weight: normal!important;
+      font-size: 13px !important;
+      font-weight: normal !important;
+
       .strong {
         font-weight: normal !important;
       }
@@ -167,49 +190,65 @@ td:nth-child(4) {
   .compact td:nth-child(1) span {
     width: 110px;
   }
+
   .compact td:nth-child(2) span {
     width: 100px;
   }
+
   .compact td:nth-child(3) {
-    width: 115px!important;
+    width: 115px !important;
+
     span {
-      width: unset!important;
+      width: unset !important;
     }
   }
+
   .compact td:nth-child(4) {
-    width: 80px!important;
+    width: 80px !important;
+
     span {
-      width: unset!important;
+      width: unset !important;
     }
   }
+
   .compact td:nth-child(5) {
-    width: 50px!important;
+    width: 50px !important;
   }
 }
 
 .iam-session-selected {
   position: relative;
-  left: -65px!important;
+  left: -65px !important;
 }
 
 .session-name-td i.moon-Pin,
 .session-name-td i.moon-Pin-filled {
-  padding-left: 5px!important;
+  padding-left: 5px !important;
 }
 
 .ssm-ul {
   padding: 20px;
+
   .ssm-card {
     height: 40px;
+
     button {
-      padding: 5px 10px!important;
+      padding: 5px 10px !important;
       float: right;
     }
   }
 }
 
 img.moon-stop-outline {
-  width:23px;
+  width: 23px;
   margin-left: -2px;
   margin-bottom: 2px;
+}
+
+td.selected .moon-Copy {
+  color: $white-text-color !important;
+}
+
+i.moon-Copy {
+  color: transparent;
 }

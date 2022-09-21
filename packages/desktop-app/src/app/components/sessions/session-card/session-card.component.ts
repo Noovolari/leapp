@@ -167,7 +167,6 @@ export class SessionCardComponent implements OnInit {
   openOptionBar(session: Session): void {
     this.clearOptionIds();
     optionBarIds[session.sessionId] = true;
-    document.querySelector(".sessions").classList.add("option-bar-opened");
     this.behaviouralSubjectService.selectSession(session.sessionId);
   }
 
@@ -432,7 +431,6 @@ export class SessionCardComponent implements OnInit {
     this.ssmLoading = false;
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   searchSSMInstance(event): void {
     if (event.target.value !== "") {
       this.instances = this.duplicateInstances.filter(
@@ -561,7 +559,6 @@ export class SessionCardComponent implements OnInit {
     for (const prop of Object.getOwnPropertyNames(optionBarIds)) {
       optionBarIds[prop] = false;
     }
-    document.querySelector(".sessions").classList.remove("option-bar-opened");
     this.behaviouralSubjectService.unselectSessions();
   }
 

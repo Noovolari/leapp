@@ -24,7 +24,7 @@ $form-button-padding: 10px 20px;
 $toggle-button-padding: 3px 8px;
 $padding-form-control: 5px 10px;
 $font-size-form-control: 16px;
-$form-control-height: 40px!important;
+$form-control-height: 40px !important;
 
 $icon-button-size: 25px;
 $icon-button-width: 20px;
@@ -40,13 +40,16 @@ $compact-fixed-width: 560px;
   -webkit-user-select: none;
   user-select: none;
 }
+
 input, button, textarea, :focus {
   outline: none; // You should add some other style for :focus to help UX/a11y
 }
 
 
 html, body {
-  height: 100%; letter-spacing: -.5px;
+  height: 100%;
+  letter-spacing: -.5px;
+
   .stop-showing-on-loaded-app {
     display: none;
   }
@@ -56,23 +59,28 @@ html, body {
   .mat-elevation-z4 {
     box-shadow: none;
   }
+
   .mat-menu-panel {
     box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%);
     border-radius: $border-radius;
   }
+
   .ng-dropdown-footer {
-    border-top: none!important;
+    border-top: none !important;
   }
+
   .mat-menu-item i {
     font-size: 20px;
     position: relative;
     top: 2px;
   }
+
   .mat-menu-item:hover:not([disabled]),
   .mat-menu-item.cdk-program-focused:not([disabled]),
   .mat-menu-item.cdk-keyboard-focused:not([disabled]),
   .mat-menu-item-highlighted:not([disabled]) {
     background: $white-text-color;
+
     &::after {
       content: '';
       position: absolute;
@@ -81,37 +89,45 @@ html, body {
       left: 10px;
       right: 10px;
       border-radius: 5px;
-      background: rgba(0,0,0,.04);
+      background: rgba(0, 0, 0, .04);
       cursor: pointer;
     }
   }
+
   .mat-tab-body-wrapper {
     padding: 0 19px;
     min-height: 386px;
   }
+
   .modal-content {
     .ng-dropdown-panel .ng-dropdown-panel-items {
       max-height: 120px;
     }
   }
+
   .mat-tab-group {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
   .context-menu-drop-class {
-    display: none!important;
+    display: none !important;
   }
+
   .cdk-overlay-container {
-    z-index: 1070!important;
+    z-index: 1070 !important;
   }
+
   .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
     background-color: rgba(58, 57, 57, 0.45);
   }
+
   .mat-slide-toggle.mat-checked .mat-slide-toggle-thumb {
     background-color: $dark-main-background;
   }
+
   .allow-cr {
     white-space: pre-line;
   }
@@ -128,7 +144,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img  {
+img {
   -webkit-user-select: none;
   -webkit-user-drag: none;
   -webkit-app-region: no-drag;
@@ -138,20 +154,17 @@ img  {
   color: $silver-75;
 }
 
-:focus
-{
+:focus {
   outline: none !important;
   box-shadow: none;
 }
 
-::-webkit-scrollbar-track
-{
+::-webkit-scrollbar-track {
   border-radius: 10px;
   background-color: $silver-25;
 }
 
-::-webkit-scrollbar
-{
+::-webkit-scrollbar {
   width: 6px;
   height: 0;
   background-color: $white-text-color;
@@ -161,26 +174,45 @@ img  {
   background-color: $white-text-color;
 }
 
-::-webkit-scrollbar-thumb
-{
+::-webkit-scrollbar-thumb {
   border-radius: 10px;
   background-color: $silver-dark;
 }
-::-webkit-scrollbar-thumb:horizontal
-{
+
+::-webkit-scrollbar-thumb:horizontal {
   background-color: transparent;
 }
 
-a { text-decoration: none; cursor: pointer; color: $silver-dark; * { cursor: pointer; }}
-.btn-link { text-decoration: underline; color: $silver-dark; }
+a {
+  text-decoration: none;
+  cursor: pointer;
+  color: $silver-dark;
 
-hr { margin: 5px 0 0 0; display: block; height: 1px; border-top: 1px solid $silver-50; }
+  * {
+    cursor: pointer;
+  }
+}
+
+.btn-link {
+  text-decoration: underline;
+  color: $silver-dark;
+}
+
+hr {
+  margin: 5px 0 0 0;
+  display: block;
+  height: 1px;
+  border-top: 1px solid $silver-50;
+}
+
 h5 {
   font-size: 14px;
   color: $silver-dark;
 }
 
-.clear { clear: both; }
+.clear {
+  clear: both;
+}
 
 small.text-error {
   display: block;
@@ -188,21 +220,42 @@ small.text-error {
   color: $danger-color;
 }
 
-.line-start { margin-right: auto; }
-.line-end { margin-left: auto; }
+.line-start {
+  margin-right: auto;
+}
 
-.string { font-weight: bold; }
+.line-end {
+  margin-left: auto;
+}
+
+.string {
+  font-weight: bold;
+}
 
 .scrollable {
   overflow-y: auto;
 }
 
-.hidden { visibility: hidden; display: inline-block; margin: 0; padding: 0; width: 0; height: 0; }
-.not-displayed { display: none; }
+.hidden {
+  visibility: hidden;
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  width: 0;
+  height: 0;
+}
 
-.inline { display: inline-block; }
+.not-displayed {
+  display: none;
+}
 
-.max-width { width: 100%!important; }
+.inline {
+  display: inline-block;
+}
+
+.max-width {
+  width: 100% !important;
+}
 
 .divider {
   width: auto;
@@ -213,20 +266,20 @@ small.text-error {
 }
 
 .icon-button {
-  border: none!important;
-  outline: none!important;
-  background: none!important;
+  border: none !important;
+  outline: none !important;
+  background: none !important;
 
   display: flex;
   align-content: center;
   align-items: center;
 
-  min-width: $icon-button-width!important;
-  min-height: $icon-button-height!important;
-  width: $icon-button-width!important;
-  height: $icon-button-height!important;
+  min-width: $icon-button-width !important;
+  min-height: $icon-button-height !important;
+  width: $icon-button-width !important;
+  height: $icon-button-height !important;
 
-  padding: 0!important;
+  padding: 0 !important;
 
   transition: opacity 0.3s ease;
   cursor: pointer;
@@ -254,15 +307,52 @@ small.text-error {
   border-radius: 0;
   color: $white-text-color;
 
-  &.badge-rounded { height: 20px; border-radius: 12px; text-transform: none; font-size: 10px; }
-  &.badge-gray { background: $silver-50; color: $text-color; }
-  &.badge-black { background: $text-color!important; color: $white-text-color; }
-  &.badge-blue { background: $dark-sky-blue; color: $white-text-color; }
-  &.badge-orange { background: $aws; color: $white-text-color; }
-  &.badge-red { background: $danger-color; color: $white-text-color; }
-  &.badge-green { background: $success-color; color: $white-text-color; }
-  &.badge-purple { background: $primary-color; color: $white-text-color; }
-  &.badge-azure { background: $main-color-light; color: $white-text-color; }
+  &.badge-rounded {
+    height: 20px;
+    border-radius: 12px;
+    text-transform: none;
+    font-size: 10px;
+  }
+
+  &.badge-gray {
+    background: $silver-50;
+    color: $text-color;
+  }
+
+  &.badge-black {
+    background: $text-color !important;
+    color: $white-text-color;
+  }
+
+  &.badge-blue {
+    background: $dark-sky-blue;
+    color: $white-text-color;
+  }
+
+  &.badge-orange {
+    background: $aws;
+    color: $white-text-color;
+  }
+
+  &.badge-red {
+    background: $danger-color;
+    color: $white-text-color;
+  }
+
+  &.badge-green {
+    background: $success-color;
+    color: $white-text-color;
+  }
+
+  &.badge-purple {
+    background: $primary-color;
+    color: $white-text-color;
+  }
+
+  &.badge-azure {
+    background: $main-color-light;
+    color: $white-text-color;
+  }
 }
 
 .table {
@@ -270,7 +360,7 @@ small.text-error {
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
-  border: none!important;
+  border: none !important;
   user-select: none;
   cursor: pointer;
 
@@ -300,15 +390,18 @@ small.text-error {
 }
 
 /* TABS Style */
-.tabs{ position: relative; margin: 0; }
+.tabs {
+  position: relative;
+  margin: 0;
+}
 
 .tabs .tab {
   cursor: pointer;
   padding: 10px 20px;
-  margin:0 2px -1px;
-  background:#fff;
-  display:inline-block;
-  color:#909f9d;
+  margin: 0 2px -1px;
+  background: #fff;
+  display: inline-block;
+  color: #909f9d;
   border-radius: 5px 5px 0 0;
   border: none;
 }
@@ -327,18 +420,18 @@ small.text-error {
 .mat-tab-label {
   min-width: 25px !important;
   background-color: #ffffff;
-  text-align: center!important;
+  text-align: center !important;
   font-weight: normal;
   text-transform: capitalize;
   color: $text-color;
-  height: auto!important;
-  padding: initial!important;
+  height: auto !important;
+  padding: initial !important;
 }
 
 /* Styles for the active tab label */
 .mat-tab-label.mat-tab-label-active {
   min-width: 25px !important;
-  text-align: center!important;
+  text-align: center !important;
   font-weight: normal;
   text-transform: capitalize;
   color: $black;
@@ -356,15 +449,15 @@ small.text-error {
 }
 
 .mat-tab-label, .mat-tab-label-content {
-  display: inline-flex!important;
-  flex-direction: column!important;
+  display: inline-flex !important;
+  flex-direction: column !important;
   text-align: center;
   padding: 5px 10px;
   margin: 5px;
 }
 
 .mat-tab-icon, .mat-tab-label-text {
-  display: block!important;
+  display: block !important;
   text-align: center;
   font-size: 25px;
 }
@@ -374,13 +467,13 @@ small.text-error {
 }
 
 .mat-ripple-element {
-  display: none!important;
+  display: none !important;
 }
 
 .mat-list-base .mat-subheader {
-  font-size: 14px!important;
+  font-size: 14px !important;
   color: $table-text;
-  font: unset!important;
+  font: unset !important;
 }
 
 .mat-list-base .mat-subheader:first-child {
@@ -394,14 +487,15 @@ small.text-error {
 .mat-list-base .mat-list-item.mat-list-item-with-avatar,
 .mat-list-base .mat-list-option.mat-list-item-with-avatar {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-  height: 35px!important;
+  height: 35px !important;
   font-size: 14px;
 
   &:hover {
     background: $white-two;
     border-radius: 6px;
-    margin-left: 10px!important;
-    width: 218px!important;
+    margin-left: 10px !important;
+    width: 218px !important;
+
     .mat-list-item-content .mat-list-text {
       margin-left: -10px;
     }
@@ -409,34 +503,40 @@ small.text-error {
 }
 
 .mat-expansion-panel-header {
-  padding: 0 24px 0 10px!important;
+  padding: 0 24px 0 10px !important;
   border-radius: 0;
-  height: 48px!important;
+  height: 48px !important;
 }
+
 .mat-accordion .mat-expansion-panel:last-of-type {
-  border-bottom-right-radius: 0!important;
-  border-bottom-left-radius: 0!important;
+  border-bottom-right-radius: 0 !important;
+  border-bottom-left-radius: 0 !important;
 }
+
 .mat-accordion .mat-expansion-panel:first-of-type {
-  border-top-right-radius: 0!important;
-  border-top-left-radius: 0!important;
+  border-top-right-radius: 0 !important;
+  border-top-left-radius: 0 !important;
 }
+
 .mat-expansion-panel:not([class*=mat-elevation-z]) {
-  box-shadow: none!important;
+  box-shadow: none !important;
 }
+
 .mat-subheader {
   display: flex;
   box-sizing: border-box;
-  padding: 12px 16px!important;
-  align-items: flex-end!important;
+  padding: 12px 16px !important;
+  align-items: flex-end !important;
 }
 
 .mat-expansion-panel-body {
   margin: 0 -24px;
 }
+
 .mat-content {
   justify-content: space-between;
 }
+
 .mat-expansion-panel-header-description {
   display: flex;
   margin-right: 10px;
@@ -447,17 +547,18 @@ small.text-error {
 .selected-integration {
   background-color: $silver-25;
   border-radius: 6px;
-  margin-left: 10px!important;
-  width: 218px!important;
+  margin-left: 10px !important;
+  width: 218px !important;
   transition: all 0.2s ease;
 
   .mat-list-item-content {
-    padding: 0 6px!important;
+    padding: 0 6px !important;
 
     .status {
       left: 19px;
     }
   }
+
   &:hover {
     .mat-list-item-content {
       left: 1px;
@@ -466,8 +567,9 @@ small.text-error {
         left: 20px;
       }
     }
+
     .mat-line {
-      padding: 0 9px!important;
+      padding: 0 9px !important;
     }
   }
 }
@@ -475,31 +577,60 @@ small.text-error {
 ::ng-deep {
   .app-windows-detected {
     .compact {
-      .left { width: 92px!important; }
-      .right { width: calc(100% - 92px) !important; }
-      .search-bar { width: 200px !important; }
+      .left {
+        width: 92px !important;
+      }
+
+      .right {
+        width: calc(100% - 92px) !important;
+      }
+
+      .search-bar {
+        width: 200px !important;
+      }
     }
   }
 }
 
-.compact { .left { width: $left-compacted-sidebar!important; border-bottom: 1px solid $silver-75; } }
-.compact { .right { width: calc(100% - #{$left-compacted-sidebar})!important; } }
+.compact {
+  .left {
+    width: $left-compacted-sidebar !important;
+    border-bottom: 1px solid $silver-75;
+  }
+}
+
+.compact {
+  .right {
+    width: calc(100% - #{$left-compacted-sidebar}) !important;
+  }
+}
+
 .compact {
   .filtering {
-    display: none!important;
+    display: none !important;
   }
+
   .search-bar {
-    width: 270px!important;
+    width: 270px !important;
   }
 
 
   .extended {
     .tag-filters {
       margin-left: -$left-compacted-sidebar;
-      padding: 10px!important;
+      padding: 10px !important;
     }
-    .left-shadow { top: 8px; left: 10px; }
-    .right-shadow { top: 8px; right: 74px; }
+
+    .left-shadow {
+      top: 8px;
+      left: 10px;
+    }
+
+    .right-shadow {
+      top: 8px;
+      right: 74px;
+    }
+
     .tag-filters-area {
       width: calc(100% - 64px);
     }
@@ -519,6 +650,7 @@ small.text-error {
 
   &:hover {
     opacity: 0.6;
+    text-decoration: none !important;
   }
 }
 
@@ -549,7 +681,7 @@ i.fal.fa-plus-circle {
 }
 
 .filter-button {
-  border-radius: $filter-border-radius!important;
+  border-radius: $filter-border-radius !important;
 }
 
 
@@ -563,7 +695,9 @@ button, a, input, i {
   -webkit-app-region: no-drag;
 }
 
-.window-buttons, .windows-menu { display: none; }
+.window-buttons, .windows-menu {
+  display: none;
+}
 
 ::ng-deep {
   .app-windows-detected {
@@ -578,6 +712,7 @@ button, a, input, i {
       left: 15px;
       top: 18px;
     }
+
     .window-buttons {
       -webkit-user-drag: none;
       -webkit-app-region: no-drag;
@@ -614,13 +749,19 @@ button, a, input, i {
           opacity: 1;
         }
       }
+
       .maximize.disabled:hover {
-        background: transparent!important;
+        background: transparent !important;
       }
+
       .quit:hover {
         background: #FD0007;
         color: $white-text-color;
-        img { filter: invert(1); opacity: 1; }
+
+        img {
+          filter: invert(1);
+          opacity: 1;
+        }
       }
     }
 
@@ -642,6 +783,7 @@ button, a, input, i {
           margin-right: 200px;
           margin-left: auto;
         }
+
         .main-bar {
           padding: 10px 38px 9px 20px;
         }
@@ -651,12 +793,12 @@ button, a, input, i {
 }
 
 ::ng-deep {
-.mat-tooltip {
+  .mat-tooltip {
     font-size: 10px;
     background-color: $text-black;
   }
 
-.dark-theme .mat-tooltip {
+  .dark-theme .mat-tooltip {
     font-size: 10px;
     background-color: $dark-tooltip-color;
   }
@@ -664,10 +806,12 @@ button, a, input, i {
 
 .modal + .modal {
   background: rgba(41, 32, 68, 0.5);
+
   &:after {
     content: '';
     top: 0;
-    left: 0; right: 0;
+    left: 0;
+    right: 0;
     position: fixed;
     height: 50px;
     background: rgba(41, 32, 68, 0.5);
@@ -685,16 +829,17 @@ button, a, input, i {
 }
 
 .app-windows-detected .command-bar:not(.compact) .top-right-option-button {
-  position: relative!important;
-  left: 10px!important;
+  position: relative !important;
+  left: 10px !important;
 }
 
 ::ng-deep {
   .ng-select .ng-arrow-wrapper:hover .ng-arrow {
     border-color: #666;
   }
+
   .mat-menu-panel {
-    min-height: initial!important;
+    min-height: initial !important;
   }
 }
 
@@ -704,8 +849,8 @@ tr:hover img.provider-icon {
 
 tr:hover .moon-hover-session {
   position: relative;
-  padding-top: 0!important;
-  padding-left: 14px!important;
+  padding-top: 0 !important;
+  padding-left: 14px !important;
   margin-top: -1px;
   right: 16px;
   top: 3px;
@@ -723,12 +868,12 @@ body:not(.dark-theme) td.table-column-1.selected .session-name-td span {
 
 body:not(.dark-theme) tr:hover td.table-column-1.selected .session-name-td span {
   position: relative;
-  top: 0!important;
+  top: 0 !important;
 }
 
 body:not(.dark-theme) tr:hover td.table-column-1.selected .session-name-td .hover-azure ~ span {
   position: relative;
-  top: -1px!important;
+  top: -1px !important;
 }
 
 .compact tr:hover i.hover-azure ~ span {

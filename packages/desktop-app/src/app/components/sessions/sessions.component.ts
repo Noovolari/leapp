@@ -33,6 +33,9 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { EditDialogComponent } from "../dialogs/edit-dialog/edit-dialog.component";
 import { ChangeRegionDialogComponent } from "../dialogs/change-region-dialog/change-region-dialog.component";
 import { ChangeNamedProfileDialogComponent } from "../dialogs/change-named-profile-dialog/change-named-profile-dialog.component";
+import { WindowService } from "../../services/window.service";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { SsmModalDialogComponent } from "../dialogs/ssm-modal-dialog/ssm-modal-dialog.component";
 
 export const optionBarIds = {}; // TODO: remove
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);
@@ -57,16 +60,6 @@ export class SessionsComponent implements OnInit, OnDestroy {
   eGlobalColumns: IGlobalColumns;
   eSessionType = SessionType;
   eSessionStatus = SessionStatus;
-  eOptionIds = optionBarIds;
-
-  // Data for the select
-  modalAccounts = [];
-  currentSelectedColor;
-  currentSelectedAccountNumber;
-
-  // Ssm instances
-  ssmloading = true;
-  ssmRegions = [];
 
   showOnly = "ALL";
 
@@ -90,6 +83,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     private modalService: BsModalService,
     private appService: AppService,
     private appProviderService: AppProviderService,
+    private windowService: WindowService,
     public optionService: OptionsService
   ) {
     this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
@@ -114,10 +108,13 @@ export class SessionsComponent implements OnInit, OnDestroy {
       this.eGlobalColumns = value;
     });
     const subscription6 = this.behaviouralSubjectService.sessionSelections$.subscribe((sessionSelections: SessionSelectionState[]) => {
+      const sessionsCssClasses = document.querySelector(".sessions")?.classList;
       if (sessionSelections.length > 0) {
         this.selectedSession = this.eGlobalFilteredSessions.find((session) => session.sessionId === sessionSelections[0].sessionId);
+        sessionsCssClasses?.add("option-bar-opened");
       } else {
         this.selectedSession = undefined;
+        sessionsCssClasses?.remove("option-bar-opened");
       }
     });
 
@@ -125,10 +122,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     globalOrderingFilter.next(JSON.parse(JSON.stringify(this.behaviouralSubjectService.sessions)));
   }
 
-  ngOnInit(): void {
-    // Set regions for ssm
-    this.ssmRegions = this.awsCoreService.getRegions();
-  }
+  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription) => {
@@ -357,7 +351,13 @@ export class SessionsComponent implements OnInit, OnDestroy {
     });
   }
 
-  async ssmModalOpen(): Promise<void> {}
+  async ssmModalOpen(): Promise<void> {
+    this.modalService.show(SsmModalDialogComponent, {
+      animated: false,
+      class: "edit-modal",
+      initialState: { session: this.selectedSession },
+    });
+  }
 
   async editCurrentSession(): Promise<void> {
     this.modalService.show(EditDialogComponent, {
@@ -367,11 +367,51 @@ export class SessionsComponent implements OnInit, OnDestroy {
     });
   }
 
-  async pinSession(): Promise<void> {}
+  async pinSession(): Promise<void> {
+    this.optionService.pinSession(this.selectedSession);
+  }
 
-  async unpinSession(): Promise<void> {}
+  async unpinSession(): Promise<void> {
+    this.optionService.unpinSession(this.selectedSession);
+  }
 
-  async deleteSession(): Promise<void> {}
+  async deleteSession(): Promise<void> {
+    const dialogMessage = this.generateDeleteDialogMessage();
+    this.windowService.confirmDialog(
+      dialogMessage,
+      (status) => {
+        if (status === constants.confirmed) {
+          this.logSessionData(this.selectedSession, "Session Deleted");
+          this.selectedSessionService.delete(this.selectedSession.sessionId).then(() => {});
+          this.behaviouralSubjectService.unselectSessions();
+        }
+      },
+      "Delete Session",
+      "Cancel"
+    );
+  }
+
+  private generateDeleteDialogMessage(): string {
+    const session = this.selectedSession;
+    let dependentSessions = [];
+    if (session.type !== SessionType.azure) {
+      dependentSessions = this.selectedSessionService.getDependantSessions(session.sessionId);
+    }
+
+    let dependendSessionsHtml = "";
+    dependentSessions.forEach((sess) => {
+      dependendSessionsHtml += `<li><div class="removed-sessions"><b>${sess.sessionName}</b></div></li>`;
+    });
+    if (dependendSessionsHtml !== "") {
+      return (
+        "This session has dependent sessions: <br><ul>" +
+        dependendSessionsHtml +
+        "</ul><br>Removing the session will also remove the dependent sessions associated with it. Do you want to proceed?"
+      );
+    } else {
+      return `Do you really want to delete the session '${session.sessionName}'?`;
+    }
+  }
 
   private resetArrowsExcept(c): void {
     this.columnSettings.forEach((column, index) => {

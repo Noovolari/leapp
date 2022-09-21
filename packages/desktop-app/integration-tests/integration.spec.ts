@@ -85,6 +85,12 @@ export const waitUntilDisplayed = (selector: string, expectDisplayToBe: boolean,
     }, 500);
   });
 
+const takeScreenshot = async (driver: ThenableWebDriver) => {
+  await pause(20000);
+  const screenshot = await driver.takeScreenshot();
+  console.log(screenshot);
+};
+
 describe("Integration test 1", () => {
   const testTimeout = 60000;
   let driver;
@@ -106,6 +112,7 @@ describe("Integration test 1", () => {
     async () => {
       console.log("in integration test 1...");
       console.log(driver);
+      await takeScreenshot(driver);
       await clickOnAddSessionButton(driver);
 
       const strategyButtonSelector = By.css(".strategy-list button");
@@ -171,4 +178,8 @@ describe("Integration test 1", () => {
     },
     testTimeout
   );
+
+  test("screenshot test", async () => {
+    await takeScreenshot(driver);
+  });
 });

@@ -16,7 +16,7 @@ module.exports = {
 
       const rootPath = path.join(__dirname, "..");
       const currentOS = os.platform();
-      const macCommand = `${rootPath}/node_modules/.bin/chromedriver & npx jest --runInBand && pkill chromedriver`;
+      const macCommand = `${rootPath}/node_modules/.bin/chromedriver & npx jest --runInBand`;
       const winCommand = [`${rootPath}\\node_modules\\.bin\\chromedriver.cmd`, `npx jest --runInBand`, `taskkill /f /im chromedriver.exe`];
       const linCommand = `${rootPath}/node_modules/.bin/chromedriver & npx jest --runInBand && pkill chromedriver`;
 

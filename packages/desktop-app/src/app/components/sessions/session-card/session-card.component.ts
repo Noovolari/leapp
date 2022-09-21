@@ -343,7 +343,7 @@ export class SessionCardComponent implements OnInit {
   }
 
   /**
-   * Set the region for ssm init and launch the mopethod form the server to find instances
+   * Set the region for ssm init and launch the method form the server to find instances
    *
    * @param event - the change select event
    * @param session - The sessions in which the aws region need to change

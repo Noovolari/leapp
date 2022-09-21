@@ -1,0 +1,12 @@
+@import "../../../../assets/scss/mixins/utility";
+@import "../../../../assets/scss/mixins/palette";
+@import "../../../../assets/scss/global";
+
+.named-profile-form {
+  margin-top: 20px;
+
+  a {
+    display: inline-block;
+    margin-left: 10px;
+  }
+}

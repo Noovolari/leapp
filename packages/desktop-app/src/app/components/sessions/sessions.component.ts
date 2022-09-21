@@ -31,6 +31,8 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "../../services/options.service";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { EditDialogComponent } from "../dialogs/edit-dialog/edit-dialog.component";
+import { ChangeRegionDialogComponent } from "../dialogs/change-region-dialog/change-region-dialog.component";
+import { ChangeNamedProfileDialogComponent } from "../dialogs/change-named-profile-dialog/change-named-profile-dialog.component";
 
 export const optionBarIds = {}; // TODO: remove
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);
@@ -339,9 +341,21 @@ export class SessionsComponent implements OnInit, OnDestroy {
     await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion);
   }
 
-  async changeRegionModalOpen(): Promise<void> {}
+  async changeRegionModalOpen(): Promise<void> {
+    this.modalService.show(ChangeRegionDialogComponent, {
+      animated: false,
+      class: "ssm-modal",
+      initialState: { session: this.selectedSession },
+    });
+  }
 
-  async changeProfileModalOpen(): Promise<void> {}
+  async changeProfileModalOpen(): Promise<void> {
+    this.modalService.show(ChangeNamedProfileDialogComponent, {
+      animated: false,
+      class: "ssm-modal",
+      initialState: { session: this.selectedSession },
+    });
+  }
 
   async ssmModalOpen(): Promise<void> {}
 

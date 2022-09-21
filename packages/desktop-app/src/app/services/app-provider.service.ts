@@ -45,6 +45,7 @@ import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-f
 import { AppKeychainService } from "./app-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
+import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
 
 @Injectable({
   providedIn: "root",
@@ -71,6 +72,7 @@ export class AppProviderService {
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
   private repositoryInstance: Repository;
+  private regionsServiceInstance: RegionsService;
   private keychainServiceInstance: IKeychainService;
   private workspaceConsistencyServiceInstance: WorkspaceConsistencyService;
   private logServiceInstance: LogService;
@@ -345,6 +347,13 @@ export class AppProviderService {
       this.repositoryInstance = new Repository(this.appNativeService, this.fileService, this.workspaceConsistencyService);
     }
     return this.repositoryInstance;
+  }
+
+  get regionsService(): RegionsService {
+    if (!this.regionsServiceInstance) {
+      this.regionsServiceInstance = new RegionsService(this.sessionFactory, this.repository, this.behaviouralSubjectService);
+    }
+    return this.regionsServiceInstance;
   }
 
   public get keychainService(): IKeychainService {

@@ -9,13 +9,7 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { OptionsService } from "../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
-import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
-import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
-import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
-import { LoggedEntry, LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
-import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
-import { CreateDialogComponent } from "../dialogs/create-dialog/create-dialog.component";
-import { BsModalService } from "ngx-bootstrap/modal";
+import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
 
 @Component({
   selector: "app-contextual-menu",
@@ -37,8 +31,7 @@ export class ContextualMenuComponent implements OnInit {
     public appService: AppService,
     public optionsService: OptionsService,
     public appProviderService: AppProviderService,
-    private messageToasterService: MessageToasterService,
-    private modalService: BsModalService
+    private selectedSessionActionsService: SelectedSessionActionsService
   ) {}
 
   ngOnInit(): void {
@@ -61,130 +54,65 @@ export class ContextualMenuComponent implements OnInit {
     });
   }
 
-  get selectedSessionService() {
-    return this.appProviderService.sessionFactory.getSessionService(this.selectedSession.type);
+  async startSession(): Promise<void> {
+    await this.selectedSessionActionsService.startSession(this.selectedSession);
   }
 
-  startSession() {}
-
-  stopSession() {}
+  async stopSession(): Promise<void> {}
 
   logoutFromFederatedSession(): void {
-    this.appProviderService.awsAuthenticationService.logoutFromFederatedSession(this.selectedSession, () => {
-      this.logSessionData(this.selectedSession, `Stopped Session`);
-      this.appProviderService.behaviouralSubjectService.unselectSessions();
-    });
+    this.selectedSessionActionsService.logoutFromFederatedSession(this.selectedSession);
   }
 
   createAChainedSessionFromSelectedOne(): void {
-    const aliasConstructed = `ChainedFrom${this.selectedSession.sessionName}`;
-    const regionConstructed = this.selectedSession.region;
-    const assumerSessionIdConstructed = this.selectedSession.sessionId;
-    const assumerSessionNameConstructed = this.selectedSession.sessionName;
-    const sessionName = this.selectedSession.sessionName.replace(/ /g, "-");
-    const assumerSessionTagConstructed = `chained-from-${sessionName}`;
-
-    const initialState = {
-      shortcutAlias: aliasConstructed,
-      shortcutRegion: regionConstructed,
-      shortcutSessionId: assumerSessionIdConstructed,
-      shortcutSessionName: assumerSessionNameConstructed,
-      shortcutSessionTag: assumerSessionTagConstructed,
-      shortcut: true,
-    };
-
-    this.modalService.show(CreateDialogComponent, {
-      animated: false,
-      class: "create-modal",
-      backdrop: "static",
-      keyboard: false,
-      initialState,
-    });
+    this.selectedSessionActionsService.createAChainedSessionFromSelectedOne(this.selectedSession);
   }
 
-  ssmModalOpen(_$event: MouseEvent) {}
+  async ssmModalOpen(): Promise<void> {
+    await this.selectedSessionActionsService.ssmModalOpen(this.selectedSession);
+  }
 
-  openAwsWebConsole(_$event: MouseEvent) {}
+  async openAwsWebConsole(): Promise<void> {
+    await this.selectedSessionActionsService.openAwsWebConsole(this.selectedSession);
+  }
 
-  editSession(_$event: MouseEvent) {}
+  async editSession(): Promise<void> {
+    await this.selectedSessionActionsService.editCurrentSession(this.selectedSession);
+  }
 
-  pinSession(_$event: MouseEvent) {}
+  async pinSession(): Promise<void> {
+    await this.selectedSessionActionsService.pinSession(this.selectedSession);
+  }
 
-  unpinSession(_$event: MouseEvent) {}
+  async unpinSession(): Promise<void> {
+    await this.selectedSessionActionsService.unpinSession(this.selectedSession);
+  }
 
-  deleteSession(_$event: MouseEvent) {}
+  async deleteSession(): Promise<void> {
+    await this.selectedSessionActionsService.deleteSession(this.selectedSession);
+  }
 
-  changeRegionModalOpen(_$event: MouseEvent) {}
+  async changeRegionModalOpen(): Promise<void> {
+    await this.selectedSessionActionsService.changeRegionModalOpen(this.selectedSession);
+  }
 
-  changeProfileModalOpen(_$event: MouseEvent) {}
+  async changeProfileModalOpen(): Promise<void> {
+    await this.selectedSessionActionsService.changeProfileModalOpen(this.selectedSession);
+  }
 
   async copyCredentials(type: number, event: Event): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
-    this.appProviderService.behaviouralSubjectService.unselectSessions();
-
-    try {
-      if (this.appProviderService.workspaceService.workspaceExists()) {
-        const roleArn = (this.selectedSession as AwsIamRoleFederatedSession).roleArn;
-        const texts = {
-          // eslint-disable-next-line max-len
-          1: roleArn ? `${roleArn.split("/")[0].substring(13, 25)}` : "",
-          2: roleArn ? `${roleArn}` : "",
-        };
-
-        let text = texts[type];
-
-        // Special conditions for IAM Users
-        if (this.selectedSession.type === SessionType.awsIamUser) {
-          // Get Account from Caller Identity
-          text = await (this.selectedSessionService as AwsIamUserService).getAccountNumberFromCallerIdentity(this.selectedSession);
-        }
-
-        this.appService.copyToClipboard(text);
-        this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
-      }
-    } catch (err) {
-      this.messageToasterService.toast(err, ToastLevel.warn);
-      this.appProviderService.logService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));
-    }
+    await this.selectedSessionActionsService.copyCredentials(this.selectedSession, type);
   }
 
   async copyAwsWebConsoleUrl(event: MouseEvent): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
-    this.appProviderService.behaviouralSubjectService.unselectSessions();
-
-    try {
-      const credentials = await (this.selectedSessionService as AwsSessionService).generateCredentials(this.selectedSession.sessionId);
-      const sessionRegion = this.selectedSession.region;
-      const loginURL = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion);
-
-      this.appService.copyToClipboard(loginURL);
-      this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");
-    } catch (err) {
-      this.messageToasterService.toast(err, ToastLevel.warn);
-      this.appProviderService.logService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));
-    }
+    await this.selectedSessionActionsService.copyAwsWebConsoleUrl(this.selectedSession);
   }
 
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {
     await plugin.run(this.selectedSession);
-    /*if (plugin.templateStructure.output) {
-      if (plugin.templateStructure.output.type === TemplateOutputObject.message) {
-        this.appProviderService.logService.log(new LoggedEntry(plugin[plugin.templateStructure.output.data](), this, LogLevel.info, true));
-      }
-    }*/
-  }
-
-  private logSessionData(session: Session, message: string): void {
-    this.appProviderService.logService.log(
-      new LoggedEntry(
-        message,
-        this,
-        LogLevel.info,
-        false,
-        JSON.stringify({ timestamp: new Date().toISOString(), id: session.sessionId, account: session.sessionName, type: session.type }, null, 3)
-      )
-    );
   }
 }

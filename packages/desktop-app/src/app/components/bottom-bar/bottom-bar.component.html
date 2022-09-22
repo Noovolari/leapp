@@ -32,10 +32,8 @@
       <span class="separator"></span>
 
       <div class="opt-bar-middle-right-buttons">
-        <a class="icon-button" (click)="pinSession();" *ngIf="optionService.pinned.indexOf(selectedSession.sessionId) === -1"
-           matTooltip="Pin Session"><i class="moon-Pin"></i></a>
-        <a class="icon-button" (click)="unpinSession();" *ngIf="optionService.pinned.indexOf(selectedSession.sessionId) !== -1"
-           matTooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
+        <a class="icon-button" (click)="pinSession();" *ngIf="!isPinned" matTooltip="Pin Session"><i class="moon-Pin"></i></a>
+        <a class="icon-button" (click)="unpinSession();" *ngIf="isPinned" matTooltip="Unpin Session"><i class="moon-Pin-filled"></i></a>
         <ng-container *ngIf="selectedSession.type !== eSessionType.awsSsoRole && selectedSession.type !== eSessionType.azure">
           <a class="icon-button" (click)="deleteSession();" matTooltip="Delete Session"><i class="moon-Delete"></i></a>
         </ng-container>

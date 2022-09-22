@@ -38,7 +38,7 @@
     </button>
 
     <ng-container *ngIf="selectedSession.type !== eSessionType.azure">
-      <button mat-menu-item (click)="ssmModalOpen($event);">
+      <button mat-menu-item (click)="ssmModalOpen();">
         <i class="moon-Server"></i>&nbsp;
         <span>View SSM Sessions</span>
       </button>
@@ -46,7 +46,7 @@
 
     <ng-container
       *ngIf="selectedSession.type === eSessionType.awsSsoRole || selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained">
-      <button mat-menu-item (click)="openAwsWebConsole($event);">
+      <button mat-menu-item (click)="openAwsWebConsole();">
         <i class="moon-Open-Web-Console"></i>
         <span>&nbsp;&nbsp;Open Web Console</span>
       </button>
@@ -63,28 +63,28 @@
       <div class="divider"></div>
     </ng-container>
 
-    <button mat-menu-item (click)="editSession( $event);"
+    <button mat-menu-item (click)="editSession();"
             *ngIf="selectedSession.type !== eSessionType.awsSsoRole && selectedSession.type !== eSessionType.azure">
       <i class="moon-Edit"></i>&nbsp;
       <span>Edit Session</span>
     </button>
 
     <ng-container *ngIf="optionsService.pinned.indexOf(selectedSession.sessionId) === -1">
-      <button mat-menu-item (click)="pinSession( $event);">
+      <button mat-menu-item (click)="pinSession();">
         <i class="moon-Pin"></i>&nbsp;
         <span>Pin Session</span>
       </button>
     </ng-container>
 
     <ng-container *ngIf="optionsService.pinned.indexOf(selectedSession.sessionId) !== -1">
-      <button mat-menu-item (click)="unpinSession( $event);">
+      <button mat-menu-item (click)="unpinSession();">
         <i class="moon-Pin"></i>&nbsp;
         <span>Unpin Session</span>
       </button>
     </ng-container>
 
     <ng-container *ngIf="selectedSession.type !== eSessionType.awsSsoRole && selectedSession.type !== eSessionType.azure">
-      <button mat-menu-item (click)="deleteSession( $event);">
+      <button mat-menu-item (click)="deleteSession();">
         <i class="moon-Delete"></i>&nbsp;
         <span>Delete Session</span>
       </button>
@@ -102,11 +102,11 @@
   </mat-menu>
 
   <mat-menu #change>
-    <button mat-menu-item (click)="changeRegionModalOpen($event);">
+    <button mat-menu-item (click)="changeRegionModalOpen();">
       <i class="moon-Region"></i>&nbsp;
       <span>Region</span>
     </button>
-    <button mat-menu-item (click)="changeProfileModalOpen($event);"
+    <button mat-menu-item (click)="changeProfileModalOpen();"
             *ngIf="(selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained || selectedSession.type === eSessionType.awsSsoRole || selectedSession.type === eSessionType.awsIamUser)">
       <i class="moon-User"></i>&nbsp;
       <span>Named Profile</span>

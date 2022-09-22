@@ -29,8 +29,8 @@
     *ngIf="globalColumns.namedProfile">
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
       <ng-container *ngIf="session.type !== eSessionType.azure">
-      {{getProfileName(getProfileId(session))}}
-        <a (click)="copyProfile(getProfileName(getProfileId(session)))" matTooltip="Copy Profile Name"><i class="moon-Copy"></i></a>
+      {{profileName}}
+        <a (click)="copyProfile(profileName)" matTooltip="Copy Profile Name"><i class="moon-Copy"></i></a>
       </ng-container>
     </span>
 </td>

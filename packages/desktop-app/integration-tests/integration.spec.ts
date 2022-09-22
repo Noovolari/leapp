@@ -120,8 +120,6 @@ describe("Integration test 1", () => {
       const awsButton = buttons.find((button) => button.text.includes("AWS")).button;
 
       await awsButton.click();
-
-      expect(true).toBe(true);
     },
     testTimeout
   );
@@ -172,8 +170,6 @@ describe("Integration test 1", () => {
       await waitUntilDisplayed("div.holder", false, driver);
 
       await playButton.click();
-
-      expect(true).toBe(true);
     },
     testTimeout
   );

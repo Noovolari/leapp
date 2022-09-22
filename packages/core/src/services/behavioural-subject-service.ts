@@ -72,7 +72,12 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
   }
 
   selectSession(sessionId: string) {
-    const sessionSelections = [new SessionSelectionState(sessionId, true)];
+    const sessionSelections = [new SessionSelectionState(sessionId, true, null, null, false)];
+    this.sessionSelections = sessionSelections;
+  }
+
+  openContextualMenu(sessionId: string, menuX: number, menuY: number) {
+    const sessionSelections = [new SessionSelectionState(sessionId, true, menuX, menuY, true)];
     this.sessionSelections = sessionSelections;
   }
 

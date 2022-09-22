@@ -40,6 +40,8 @@ import { CredentialProcessDialogComponent } from "./dialogs/credential-process-d
 import { ChangeRegionDialogComponent } from "./dialogs/change-region-dialog/change-region-dialog.component";
 import { ChangeNamedProfileDialogComponent } from "./dialogs/change-named-profile-dialog/change-named-profile-dialog.component";
 import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-dialog.component";
+import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
+import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
 
 @NgModule({
   declarations: [
@@ -67,6 +69,8 @@ import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-di
     ChangeRegionDialogComponent,
     ChangeNamedProfileDialogComponent,
     SsmModalDialogComponent,
+    ContextualMenuComponent,
+    BottomBarComponent,
   ],
   imports: [
     CommonModule,

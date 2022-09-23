@@ -42,6 +42,7 @@ import { ChangeNamedProfileDialogComponent } from "./dialogs/change-named-profil
 import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-dialog.component";
 import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
 import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
+import { ScrollingModule } from "@angular/cdk/scrolling";
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
     MatExpansionModule,
     MatButtonToggleModule,
     MatTooltipModule,
+    ScrollingModule,
   ],
   exports: [ConfirmationDialogComponent, InputDialogComponent, CommandBarComponent, SideBarComponent, SessionsComponent],
 })

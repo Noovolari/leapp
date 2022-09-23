@@ -37,16 +37,12 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   async create(request: AwsIamRoleFederatedSessionRequest): Promise<void> {
-    const session = new AwsIamRoleFederatedSession(
-      request.sessionName,
-      request.region,
-      request.idpUrl,
-      request.idpArn,
-      request.roleArn,
-      request.profileId
-    );
-
-    this.repository.addSession(session);
+    // TODO: remove before flight
+    for (let i = 0; i < 200; i++) {
+      const sessionName = `${request.sessionName} ${i}`;
+      const session = new AwsIamRoleFederatedSession(sessionName, request.region, request.idpUrl, request.idpArn, request.roleArn, request.profileId);
+      this.repository.addSession(session);
+    }
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 

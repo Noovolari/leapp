@@ -1,5 +1,5 @@
 <ng-container *ngIf="selectedSession">
-  <div [matMenuTriggerFor]="menu" [style.position]="'absolute'" [style.left.px]="menuX" [style.top.px]="menuY"></div>
+  <div [matMenuTriggerFor]="menu" [style.position]="'fixed'" [style.left.px]="menuX" [style.top.px]="menuY"></div>
   <mat-menu #menu [hasBackdrop]="false" role="menu">
     <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
 
@@ -114,15 +114,15 @@
   </mat-menu>
 
   <mat-menu #copy>
-    <button mat-menu-item (click)="copyCredentials( 1, $event);">
+    <button mat-menu-item (click)="copyCredentials(1);">
       <i class="fab fa-aws"></i>&nbsp;
       <span>Account Number</span>
     </button>
-    <button mat-menu-item (click)="copyCredentials( 2, $event);">
+    <button mat-menu-item (click)="copyCredentials(2);">
       <i class="fab fa-aws"></i>&nbsp;
       <span>Role ARN</span>
     </button>
-    <button mat-menu-item (click)="copyAwsWebConsoleUrl($event);">
+    <button mat-menu-item (click)="copyAwsWebConsoleUrl();">
       <i class="fab fa-aws"></i>&nbsp;
       <span>Web Console URL</span>
     </button>

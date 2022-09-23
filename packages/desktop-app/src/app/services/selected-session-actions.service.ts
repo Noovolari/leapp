@@ -19,6 +19,7 @@ import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { CreateDialogComponent } from "../components/dialogs/create-dialog/create-dialog.component";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
+import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 
 @Injectable({
   providedIn: "root",
@@ -46,21 +47,23 @@ export class SelectedSessionActionsService {
   }
 
   async startSession(session: Session): Promise<void> {
+    this.behaviouralSubjectService.unselectSessions();
     this.logSessionData(session, "Starting Session");
     await this.getSelectedSessionService(session).start(session.sessionId);
     document.querySelector(".table thead tr").scrollIntoView();
   }
 
   async stopSession(session: Session): Promise<void> {
+    this.behaviouralSubjectService.unselectSessions();
     this.logSessionData(session, `Stopped Session`);
     await this.getSelectedSessionService(session).stop(session.sessionId);
   }
 
   async openAwsWebConsole(session: Session): Promise<void> {
+    this.behaviouralSubjectService.unselectSessions();
     const credentials = await (this.getSelectedSessionService(session) as AwsSessionService).generateCredentials(session.sessionId);
     const sessionRegion = session.region;
     await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion);
-    this.behaviouralSubjectService.unselectSessions();
   }
 
   async changeRegionModalOpen(session: Session): Promise<void> {
@@ -100,6 +103,7 @@ export class SelectedSessionActionsService {
   }
 
   async deleteSession(session: Session): Promise<void> {
+    this.behaviouralSubjectService.unselectSessions();
     const dialogMessage = this.generateDeleteDialogMessage(session);
     this.windowService.confirmDialog(
       dialogMessage,
@@ -109,7 +113,6 @@ export class SelectedSessionActionsService {
           this.getSelectedSessionService(session)
             .delete(session.sessionId)
             .then(() => {});
-          this.behaviouralSubjectService.unselectSessions();
         }
       },
       "Delete Session",
@@ -132,19 +135,20 @@ export class SelectedSessionActionsService {
   }
 
   copyProfile(profileName: string): void {
+    this.behaviouralSubjectService.unselectSessions();
     this.appService.copyToClipboard(profileName);
     this.messageToasterService.toast("Profile name copied!", ToastLevel.success, "Information copied!");
-    this.behaviouralSubjectService.unselectSessions();
   }
 
   logoutFromFederatedSession(session: Session): void {
+    this.behaviouralSubjectService.unselectSessions();
     this.appProviderService.awsAuthenticationService.logoutFromFederatedSession(session, () => {
       this.logSessionData(session, `Stopped Session`);
-      this.appProviderService.behaviouralSubjectService.unselectSessions();
     });
   }
 
   createAChainedSessionFromSelectedOne(session: Session): void {
+    this.behaviouralSubjectService.unselectSessions();
     const aliasConstructed = `ChainedFrom${session.sessionName}`;
     const regionConstructed = session.region;
     const assumerSessionIdConstructed = session.sessionId;
@@ -168,7 +172,6 @@ export class SelectedSessionActionsService {
       keyboard: false,
       initialState,
     });
-    this.behaviouralSubjectService.unselectSessions();
   }
 
   async copyCredentials(session: Session, type: number): Promise<void> {
@@ -214,6 +217,11 @@ export class SelectedSessionActionsService {
       this.messageToasterService.toast(err, ToastLevel.warn);
       this.appProviderService.logService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));
     }
+  }
+
+  async applyPluginAction(session: Session, plugin: AwsCredentialsPlugin): Promise<void> {
+    this.behaviouralSubjectService.unselectSessions();
+    await plugin.run(session);
   }
 
   private generateDeleteDialogMessage(session: Session): string {

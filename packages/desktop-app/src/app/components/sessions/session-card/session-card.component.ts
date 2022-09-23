@@ -135,6 +135,10 @@ export class SessionCardComponent implements OnInit {
   }
 
   openContextMenu(event: any, session: Session): void {
-    this.behaviouralSubjectService.openContextualMenu(session.sessionId, event.layerX - 10, event.layerY - 10);
+    event.preventDefault();
+    event.stopPropagation();
+    const menuX = event.pageX;
+    const menuY = event.pageY;
+    this.behaviouralSubjectService.openContextualMenu(session.sessionId, menuX - 10, menuY - 10);
   }
 }

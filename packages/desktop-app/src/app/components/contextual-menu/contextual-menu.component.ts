@@ -58,7 +58,9 @@ export class ContextualMenuComponent implements OnInit {
     await this.selectedSessionActionsService.startSession(this.selectedSession);
   }
 
-  async stopSession(): Promise<void> {}
+  async stopSession(): Promise<void> {
+    await this.selectedSessionActionsService.stopSession(this.selectedSession);
+  }
 
   logoutFromFederatedSession(): void {
     this.selectedSessionActionsService.logoutFromFederatedSession(this.selectedSession);
@@ -100,19 +102,15 @@ export class ContextualMenuComponent implements OnInit {
     await this.selectedSessionActionsService.changeProfileModalOpen(this.selectedSession);
   }
 
-  async copyCredentials(type: number, event: Event): Promise<void> {
-    event.preventDefault();
-    event.stopPropagation();
+  async copyCredentials(type: number): Promise<void> {
     await this.selectedSessionActionsService.copyCredentials(this.selectedSession, type);
   }
 
-  async copyAwsWebConsoleUrl(event: MouseEvent): Promise<void> {
-    event.preventDefault();
-    event.stopPropagation();
+  async copyAwsWebConsoleUrl(): Promise<void> {
     await this.selectedSessionActionsService.copyAwsWebConsoleUrl(this.selectedSession);
   }
 
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {
-    await plugin.run(this.selectedSession);
+    await this.selectedSessionActionsService.applyPluginAction(this.selectedSession, plugin);
   }
 }

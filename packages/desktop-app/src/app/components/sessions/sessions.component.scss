@@ -52,7 +52,7 @@ th {
 i.moon-Table {
   color: $silver-dark;
   font-size: 23px;
-  padding-left: 27px;
+  padding-left: 22px;
   position: relative;
   top: 4px;
 }
@@ -63,16 +63,13 @@ span.vertical-rule {
   height: 22px !important;
 }
 
-th:nth-child(1) {
-  padding-left: 22px !important;
-}
 
 .compact th a span.vertical-rule {
   margin-block: -1px !important;
 }
 
 .compact i.moon-Table {
-  padding-left: 22px;
+  padding-left: 8px;
 }
 
 i.moon-Dropdown,
@@ -102,12 +99,60 @@ i.moon-Caret-down {
   }
 }
 
-tr .status-item {
-  display: inline-block;
+tr.compact {
+  th:nth-child(2) {
+    width: 114px;
+  }
+
+  th:nth-child(3) {
+    width: 115px;
+  }
+
+  th:nth-child(4) {
+    width: 80px;
+  }
+
+  th:nth-child(6) {
+    width: 50px;
+  }
 }
 
-tr .hover-item {
-  display: none;
+tr {
+  &.status-item {
+    display: inline-block;
+  }
+
+  &.hover-item {
+    display: none;
+  }
+
+  th.hidden-column {
+    display: none;
+  }
+
+  th:nth-child(1) {
+    padding-left: 22px !important;
+  }
+
+  th:nth-child(2) {
+    width: 14%;
+  }
+
+  th:nth-child(3) {
+    width: 14%;
+  }
+
+  th:nth-child(4) {
+    width: 14%;
+  }
+
+  th:nth-child(5) {
+    width: 14%;
+  }
+
+  th:nth-child(6) {
+    width: 7%;
+  }
 }
 
 ::ng-deep {
@@ -124,56 +169,6 @@ tr .hover-item {
     .hover-item {
       display: inline-block !important;
     }
-  }
-
-  .compact .option-bar {
-    left: 0;
-
-    .start-session {
-      width: 50px !important;
-    }
-  }
-}
-
-.option-bar {
-  cursor: initial;
-  padding: $standard-padding $standard-padding $standard-padding 0;
-  position: fixed;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: $white-text-color;
-  height: $commandbar-height;
-  bottom: 0;
-  left: $menubar-width;
-  right: 0;
-  z-index: 1;
-  @include box-shadow(3px -1px 5px -3px $text-color);
-
-  a {
-    display: inline-flex;
-    margin: 0 10px;
-
-    i {
-      color: $medium-dark;
-    }
-
-    &:hover {
-      i {
-        color: #3c3c3c;
-        opacity: 1;
-      }
-    }
-  }
-
-  .separator {
-    display: inline-flex;
-    width: 1px;
-    height: 24px;
-    background: $silver-50;
-    margin: 0 17px;
-    position: relative;
-    top: 4px;
   }
 }
 
@@ -273,4 +268,11 @@ tr .hover-item {
   left: -1px;
   color: $silver-dark;
   font-size: 13px;
+}
+
+table.table-header {
+  position: sticky;
+  top: 0;
+  margin: 0;
+  z-index: 1;
 }

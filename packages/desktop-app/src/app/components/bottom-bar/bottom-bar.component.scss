@@ -125,13 +125,13 @@ tr .hover-item {
       display: inline-block !important;
     }
   }
+}
 
-  .compact .option-bar {
-    left: 0;
+.compact.option-bar {
+  left: 0;
 
-    .start-session {
-      width: 50px !important;
-    }
+  .start-session {
+    width: 50px !important;
   }
 }
 

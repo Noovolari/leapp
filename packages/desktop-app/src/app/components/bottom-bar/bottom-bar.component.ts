@@ -13,7 +13,9 @@ export class BottomBarComponent implements OnInit {
   @Input()
   selectedSession: Session;
 
-  public eCompactMode: boolean;
+  @Input()
+  compact: boolean;
+
   public eSessionType = SessionType;
   public eSessionStatus = SessionStatus;
 

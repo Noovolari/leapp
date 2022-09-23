@@ -13,20 +13,20 @@
   </div>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
-    class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-2"
-    *ngIf="globalColumns.role">
+    class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
+           {{globalColumns.role ? '' : 'hidden-column'}} table-column-2">
   <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
     <ng-container *ngIf="session.type !== eSessionType.awsIamUser && session.type !== eSessionType.azure">{{ session | detail }}</ng-container>
   </span>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
-    class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-3"
-    *ngIf="globalColumns.provider">
+    class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
+           {{globalColumns.provider ? '' : 'hidden-column'}} table-column-3">
   <span class="badge badge-rounded badge-{{getSessionProviderClass(session.type)}}">{{getSessionProviderLabel(session.type)}}</span>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
-    class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-4"
-    *ngIf="globalColumns.namedProfile">
+    class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-4
+           {{globalColumns.namedProfile ? '' : 'hidden-column'}}">
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
       <ng-container *ngIf="session.type !== eSessionType.azure">
       {{profileName}}
@@ -35,8 +35,8 @@
     </span>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
-    class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-5"
-    *ngIf="!compactMode && globalColumns.region">
+    class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
+           {{!compactMode && globalColumns.region ? '' : 'hidden-column'}} table-column-5">
   <span class="badge badge-region badge-{{session.status === eSessionStatus.active ? 'black' : 'gray'}}">{{session.region}}</span>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"

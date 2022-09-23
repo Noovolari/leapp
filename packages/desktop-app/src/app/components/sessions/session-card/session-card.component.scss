@@ -63,7 +63,6 @@ td:nth-child(1) {
       overflow: hidden;
       white-space: nowrap;
       display: inline-block;
-      /*width: 96px;*/
       position: relative;
       top: 3px;
     }
@@ -189,23 +188,59 @@ td:nth-child(4) {
   }
 
   .compact td:nth-child(3) {
-    width: 115px !important;
-
     span {
       width: unset !important;
     }
   }
 
   .compact td:nth-child(4) {
-    width: 80px !important;
-
     span {
       width: unset !important;
     }
   }
 
-  .compact td:nth-child(5) {
-    width: 50px !important;
+  tr.compact td {
+    &:nth-child(2) {
+      width: 114px;
+    }
+
+    &:nth-child(3) {
+      width: 115px;
+    }
+
+    &:nth-child(4) {
+      width: 80px;
+    }
+
+    &:nth-child(6) {
+      width: 50px;
+    }
+  }
+
+  tr td {
+    &:nth-child(2) {
+      width: 14%;
+    }
+
+    &:nth-child(3) {
+      width: 14%;
+    }
+
+    &:nth-child(4) {
+      width: 14%;
+    }
+
+    &:nth-child(5) {
+      width: 14%;
+    }
+
+    &:nth-child(6) {
+      width: 7%;
+    }
+  }
+
+  tr td.hidden-column {
+    display: none;
   }
 }
 

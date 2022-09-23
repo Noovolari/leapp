@@ -1,16 +1,18 @@
 <ng-container *ngIf="selectedSession">
-  <div class="option-bar" [ngClass]="selectedSession.type.toLowerCase() + '-opt-bar'">
+  <div class="option-bar {{compact ? 'compact': ''}}" [ngClass]="selectedSession.type.toLowerCase() + '-opt-bar'">
     <div class="opt-bar-session-button">
-      <a class="icon-button start-session" (click)="startSession();" *ngIf="selectedSession.status === eSessionStatus.inactive"><i class="moon-Play-filled">
+      <a class="icon-button start-session" (click)="startSession();" *ngIf="selectedSession.status === eSessionStatus.inactive"><i
+        class="moon-Play-filled">
         <div class="dark-theme-filling"></div>
-      </i><span>{{eCompactMode ? '' : '&nbsp;Start Session'}}</span></a>
+      </i><span>{{compact ? '' : '&nbsp;Start Session'}}</span></a>
       <a class="icon-button stop-session" (click)="stopSession();"
          *ngIf="selectedSession.status === eSessionStatus.active || selectedSession.status === eSessionStatus.pending"><i class="moon-Stop">
         <div class="dark-theme-filling"></div>
-      </i><span>{{eCompactMode ? '' : '&nbsp;Stop Session'}}</span></a>
+      </i><span>{{compact ? '' : '&nbsp;Stop Session'}}</span></a>
     </div>
-    <div [ngClass]="(selectedSession.type === eSessionType.awsIamUser && selectedSession.status !== eSessionStatus.active) ? 'iam-session-selected' : ''"
-         class="opt-bar-middle-section">
+    <div
+      [ngClass]="(selectedSession.type === eSessionType.awsIamUser && selectedSession.status !== eSessionStatus.active) ? 'iam-session-selected' : ''"
+      class="opt-bar-middle-section">
       <div class="opt-bar-middle-left-buttons">
 
         <ng-container

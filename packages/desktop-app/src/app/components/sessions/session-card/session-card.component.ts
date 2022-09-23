@@ -114,18 +114,11 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  private get profileId(): string {
-    if (this.session.type !== SessionType.azure) {
-      return (this.session as any).profileId;
-    } else {
-      return undefined;
-    }
-  }
-
   get profileName(): string {
+    const profileId = this.session.type !== SessionType.azure ? (this.session as any).profileId : undefined;
     let profileName = constants.defaultAwsProfileName;
     try {
-      profileName = this.appProviderService.namedProfileService.getProfileName(this.profileId);
+      profileName = this.appProviderService.namedProfileService.getProfileName(profileId);
     } catch (e) {}
     return profileName;
   }

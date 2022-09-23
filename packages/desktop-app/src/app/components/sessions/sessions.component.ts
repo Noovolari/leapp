@@ -23,8 +23,8 @@ import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-i
 import { SessionSelectionState } from "@noovolari/leapp-core/models/session-selection-state";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "../../services/options.service";
+import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws/aws-iam-user-session";
 
-export const optionBarIds = {}; // TODO: remove
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);
 
 export interface ArrowSettings {
@@ -131,6 +131,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // TODO: verify this sorting!
   orderSessionsByRole(orderStyle: boolean): void {
     this.resetArrowsExcept(1);
     if (!orderStyle) {
@@ -199,28 +200,12 @@ export class SessionsComponent implements OnInit, OnDestroy {
     if (!orderStyle) {
       this.columnSettings[3].activeArrow = true;
       globalOrderingFilter.next(
-        JSON.parse(
-          JSON.stringify(
-            this.eGlobalFilteredSessions.sort((a, b) =>
-              this.sessionCard
-                .getProfileName(this.sessionCard.getProfileId(a))
-                .localeCompare(this.sessionCard.getProfileName(this.sessionCard.getProfileId(b)))
-            )
-          )
-        )
+        JSON.parse(JSON.stringify(this.eGlobalFilteredSessions.sort((a, b) => this.getProfileName(a).localeCompare(this.getProfileName(b)))))
       );
       this.columnSettings[3].orderStyle = !this.columnSettings[3].orderStyle;
     } else if (this.columnSettings[3].activeArrow) {
       globalOrderingFilter.next(
-        JSON.parse(
-          JSON.stringify(
-            this.eGlobalFilteredSessions.sort((a, b) =>
-              this.sessionCard
-                .getProfileName(this.sessionCard.getProfileId(b))
-                .localeCompare(this.sessionCard.getProfileName(this.sessionCard.getProfileId(a)))
-            )
-          )
-        )
+        JSON.parse(JSON.stringify(this.eGlobalFilteredSessions.sort((a, b) => this.getProfileName(b).localeCompare(this.getProfileName(a)))))
       );
       this.columnSettings[3].activeArrow = false;
     } else {
@@ -281,6 +266,13 @@ export class SessionsComponent implements OnInit, OnDestroy {
       default:
         return "";
     }
+  }
+
+  private getProfileName(session: Session): string {
+    try {
+      return this.appProviderService.namedProfileService.getProfileName((session as AwsIamUserSession).profileId);
+    } catch (e) {}
+    return "";
   }
 
   private resetArrowsExcept(c): void {

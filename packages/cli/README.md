@@ -42,5 +42,6 @@ USAGE
 * [`leapp profile`](scopes/profile.md) - Leapp AWS Multi-profile management
 * [`leapp region`](scopes/region.md) - Leapp regions management
 * [`leapp session`](scopes/session.md) - Sessions management
+* [`leapp version`](scopes/version.md) - Displays the Cli and Core versions
 
 <!-- commandsstop -->

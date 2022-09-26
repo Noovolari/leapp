@@ -19,7 +19,7 @@
           class="{{!eCompactMode && eGlobalColumns.region ? '' : 'hidden-column'}}"><span>Region</span><i
         [ngClass]="[columnSettings[4].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[4].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[4].orderStyle && !columnSettings[4].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i>
       </th>
-      <th><a (click)="openFilterColumn();"><span class="vertical-rule"></span><i class="moon-Table"></i></a></th>
+      <th><a (click)="openFilterColumn();"><i class="moon-Table"></i></a></th>
     </tr>
     </thead>
   </table>

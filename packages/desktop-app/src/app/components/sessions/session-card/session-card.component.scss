@@ -62,9 +62,6 @@ td:nth-child(1) {
       text-overflow: ellipsis;
       overflow: hidden;
       white-space: nowrap;
-      display: inline-block;
-      position: relative;
-      top: 3px;
     }
   }
 }
@@ -112,10 +109,16 @@ i.fa-spin.status-item {
   margin-left: 30px;
 }
 
-i.hover-item {
+.compact i.moon-More {
+  padding-left: 10px;
+}
+
+
+i.moon-More {
   font-size: 20px;
-  padding-left: 40%;
+  padding-left: 41%;
   padding-top: 6px;
+  width: 10px;
 }
 
 td.active {
@@ -124,6 +127,7 @@ td.active {
 
 td:nth-child(1) {
   padding-left: 20px !important;
+  padding-right: 10px !important;
 
   .strong {
     -webkit-text-stroke-width: 0.5px;
@@ -141,6 +145,17 @@ td:nth-child(4) {
   }
 }
 
+td:nth-child(2),
+td:nth-child(4) {
+  span {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    display: inline-block;
+    width: 90%;
+  }
+}
+
 ::ng-deep {
   .table td {
     padding: 0 !important;
@@ -152,7 +167,7 @@ td:nth-child(4) {
     }
 
     td:nth-child(1) {
-      padding: 0 0 0 20px !important;
+      padding: 0 10px 0 20px !important;
     }
 
     td:nth-child(2),
@@ -188,12 +203,6 @@ td:nth-child(4) {
   }
 
   .compact td:nth-child(3) {
-    span {
-      width: unset !important;
-    }
-  }
-
-  .compact td:nth-child(4) {
     span {
       width: unset !important;
     }
@@ -249,9 +258,22 @@ td:nth-child(4) {
   left: -65px !important;
 }
 
-.session-name-td i.moon-Pin,
-.session-name-td i.moon-Pin-filled {
-  padding-left: 5px !important;
+.session-name-td {
+  height: inherit;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  span {
+    max-height: 44px;
+    margin-left: 5px;
+  }
+
+  i.moon-Pin,
+  i.moon-Pin-filled {
+    padding-left: 5px !important;
+  }
 }
 
 .ssm-ul {
@@ -279,4 +301,14 @@ td.selected .moon-Copy {
 
 i.moon-Copy {
   color: transparent;
+}
+
+::ng-deep {
+  .compact .span-limiter {
+    max-width: 80px !important;
+  }
+}
+
+.span-limiter {
+  max-width: 125px;
 }

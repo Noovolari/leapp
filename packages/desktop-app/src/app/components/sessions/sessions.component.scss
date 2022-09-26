@@ -52,7 +52,6 @@ th {
 i.moon-Table {
   color: $silver-dark;
   font-size: 23px;
-  padding-left: 22px;
   position: relative;
   top: 4px;
 }
@@ -152,6 +151,7 @@ tr {
 
   th:nth-child(6) {
     width: 7%;
+    text-align: center;
   }
 }
 

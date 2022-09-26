@@ -196,7 +196,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     const selectedIndex = this.selectedIntegrations.findIndex((s) => s.id === configuration.id);
     this.selectedIntegrations[selectedIndex].selected = true;
-    document.querySelector(".sessions").classList.remove("option-bar-opened");
+    this.behaviouralSubjectService.unselectSessions();
 
     const currentFilterGroup = globalFilterGroup.value;
     currentFilterGroup.pinnedFilter = false;

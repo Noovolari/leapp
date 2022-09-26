@@ -1,7 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
-import { ActivatedRoute, Router } from "@angular/router";
-import { AppService } from "../../services/app.service";
-import { HttpClient } from "@angular/common/http";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { BsModalService } from "ngx-bootstrap/modal";
 import {
   compactMode,
@@ -18,14 +15,16 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { GlobalFilters } from "@noovolari/leapp-core/models/segment";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { AppProviderService } from "../../services/app-provider.service";
-import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
+import { SessionSelectionState } from "@noovolari/leapp-core/models/session-selection-state";
+import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { OptionsService } from "../../services/options.service";
+import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws/aws-iam-user-session";
 
-export const optionBarIds = {};
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);
 
 export interface ArrowSettings {
@@ -46,38 +45,22 @@ export class SessionsComponent implements OnInit, OnDestroy {
   eCompactMode: boolean;
   eGlobalFilterGroup: GlobalFilters;
   eGlobalColumns: IGlobalColumns;
-
-  // Data for the select
-  modalAccounts = [];
-  currentSelectedColor;
-  currentSelectedAccountNumber;
-
-  // Ssm instances
-  ssmloading = true;
-  ssmRegions = [];
+  eSessionType = SessionType;
+  eSessionStatus = SessionStatus;
 
   showOnly = "ALL";
 
   // For column ordering
   columnSettings: ArrowSettings[];
 
+  selectedSession?: Session;
+
   private subscriptions = [];
-  private awsCoreService: AwsCoreService;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
 
-  constructor(
-    private ref: ChangeDetectorRef,
-    private router: Router,
-    private route: ActivatedRoute,
-    private httpClient: HttpClient,
-    private modalService: BsModalService,
-    private appService: AppService,
-    private leappCoreService: AppProviderService
-  ) {
-    this.behaviouralSubjectService = this.leappCoreService.behaviouralSubjectService;
-    this.awsCoreService = this.leappCoreService.awsCoreService;
-
+  constructor(private modalService: BsModalService, private appProviderService: AppProviderService, public optionService: OptionsService) {
+    this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
     this.columnSettings = Array.from(Array(5)).map((): ArrowSettings => ({ activeArrow: false, orderStyle: false }));
     const subscription = globalHasFilter.subscribe((value) => {
       this.eGlobalFilterExtended = value;
@@ -94,20 +77,22 @@ export class SessionsComponent implements OnInit, OnDestroy {
     const subscription5 = globalColumns.subscribe((value) => {
       this.eGlobalColumns = value;
     });
+    const subscription6 = this.behaviouralSubjectService.sessionSelections$.subscribe((sessionSelections: SessionSelectionState[]) => {
+      const sessionsCssClasses = document.querySelector(".sessions")?.classList;
+      if (sessionSelections.length > 0) {
+        this.selectedSession = this.eGlobalFilteredSessions.find((session) => session.sessionId === sessionSelections[0].sessionId);
+        sessionsCssClasses?.add("option-bar-opened");
+      } else {
+        this.selectedSession = undefined;
+        sessionsCssClasses?.remove("option-bar-opened");
+      }
+    });
 
-    this.subscriptions.push(subscription);
-    this.subscriptions.push(subscription2);
-    this.subscriptions.push(subscription3);
-    this.subscriptions.push(subscription4);
-    this.subscriptions.push(subscription5);
-
+    this.subscriptions.push(subscription, subscription2, subscription3, subscription4, subscription5, subscription6);
     globalOrderingFilter.next(JSON.parse(JSON.stringify(this.behaviouralSubjectService.sessions)));
   }
 
-  ngOnInit(): void {
-    // Set regions for ssm
-    this.ssmRegions = this.awsCoreService.getRegions();
-  }
+  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription) => {
@@ -146,6 +131,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // TODO: verify this sorting!
   orderSessionsByRole(orderStyle: boolean): void {
     this.resetArrowsExcept(1);
     if (!orderStyle) {
@@ -214,28 +200,12 @@ export class SessionsComponent implements OnInit, OnDestroy {
     if (!orderStyle) {
       this.columnSettings[3].activeArrow = true;
       globalOrderingFilter.next(
-        JSON.parse(
-          JSON.stringify(
-            this.eGlobalFilteredSessions.sort((a, b) =>
-              this.sessionCard
-                .getProfileName(this.sessionCard.getProfileId(a))
-                .localeCompare(this.sessionCard.getProfileName(this.sessionCard.getProfileId(b)))
-            )
-          )
-        )
+        JSON.parse(JSON.stringify(this.eGlobalFilteredSessions.sort((a, b) => this.getProfileName(a).localeCompare(this.getProfileName(b)))))
       );
       this.columnSettings[3].orderStyle = !this.columnSettings[3].orderStyle;
     } else if (this.columnSettings[3].activeArrow) {
       globalOrderingFilter.next(
-        JSON.parse(
-          JSON.stringify(
-            this.eGlobalFilteredSessions.sort((a, b) =>
-              this.sessionCard
-                .getProfileName(this.sessionCard.getProfileId(b))
-                .localeCompare(this.sessionCard.getProfileName(this.sessionCard.getProfileId(a)))
-            )
-          )
-        )
+        JSON.parse(JSON.stringify(this.eGlobalFilteredSessions.sort((a, b) => this.getProfileName(b).localeCompare(this.getProfileName(a)))))
       );
       this.columnSettings[3].activeArrow = false;
     } else {
@@ -296,6 +266,13 @@ export class SessionsComponent implements OnInit, OnDestroy {
       default:
         return "";
     }
+  }
+
+  private getProfileName(session: Session): string {
+    try {
+      return this.appProviderService.namedProfileService.getProfileName((session as AwsIamUserSession).profileId);
+    } catch (e) {}
+    return "";
   }
 
   private resetArrowsExcept(c): void {

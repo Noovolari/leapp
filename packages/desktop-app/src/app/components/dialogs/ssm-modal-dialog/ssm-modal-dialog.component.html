@@ -1,0 +1,45 @@
+<a class="close-modal" (click)="closeModal();"><i class="moon-Close"></i></a>
+<h4>{{session.sessionName}}</h4>
+<h5>{{session | detail }}</h5>
+
+<div class="ssm-tray-form">
+
+  <div class="form-container">
+    <div class="form-group">
+      <div class="form-field">
+        <div class="form-group">
+          <label>Select a Region</label>
+          <ng-select bindLabel="region" bindValue="region" [items]="awsRegions" [(ngModel)]="selectedSsmRegion"
+                     placeholder="Select a Region for finding instances" (change)="changeSsmRegion();"></ng-select>
+        </div>
+      </div>
+    </div>
+
+    <div class="loader" *ngIf="ssmLoading"><i class="fa fa-spinner fa-spin"></i></div>
+
+    <div class="list-of-ssm" *ngIf="!ssmLoading">
+      <ng-container *ngIf="!ssmLoading && !askingSsmRegion">
+        <div class="form-group">
+          <div class="form-field">
+            <div class="form-group">
+              <label>Select an Instance</label>
+              <input class="form-control" type="text" placeholder="searchFilter by..." (keyup)="searchSSMInstance($event)"/>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+      <ul class="ssm-ul" *ngIf="instances.length > 0">
+        <li *ngFor="let instance of instances" class="ssm-card">
+          <div>
+            <span><b>{{instance.Name.length >= 24 ? instance.Name.substr(0, 21) + '...' : instance.Name}}</b> - {{instance.IPAddress}}</span>
+            <button class="btn-control btn-sm" (click)="startSsmSession(instance.InstanceId)">
+              <i class="fa fa-spinner fa-spin" *ngIf="instance.loading"></i>
+              <span *ngIf="!instance.loading">Connect</span>
+            </button>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

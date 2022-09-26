@@ -1,0 +1,28 @@
+<a class="close-modal" (click)="closeModal();"><i class="moon-Close"></i></a>
+<h4>{{session.sessionName}}</h4>
+<h5>{{session | detail }}</h5>
+
+<div class="select-region-form">
+  <div class="form-container">
+    <div class="form-group">
+      <div class="form-field">
+        <div class="form-group">
+          <label>Select a Region</label>
+          <ng-select
+            [clearable]="false"
+            bindLabel="{{session.type === eSessionType.azure ? 'location' : 'region'}}"
+            bindValue="{{session.type === eSessionType.azure ? 'location' : 'region'}}"
+            [items]="regionOrLocations"
+            [addTag]="false"
+            [(ngModel)]="selectedRegion" placeholder="{{placeholder}}"></ng-select>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br>
+  <button (click)="changeRegion()" [disabled]="!selectedRegion"
+          [ngClass]="(!selectedRegion) ? 'btn-control mat-button-disabled': 'btn-control'">Select
+  </button>
+  <a (click)="closeModal()">Cancel</a>
+
+</div>

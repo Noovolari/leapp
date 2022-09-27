@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.14.3",
+  "version": "0.14.3-nightly.202209271453-nightly.202209271455",
   "private": true,
   "author": {
     "name": "Noovolari",
@@ -29,7 +29,7 @@
     "release-all": "gushio gushio/target-release.js 'configuration production' all",
     "set-target-arm64": "gushio gushio/set-target-arch.js arm64",
     "set-target-x64": "gushio gushio/set-target-arch.js x64",
-    "nightly": "gushio gushio/target-nightly.js"
+    "nightly": "gushio gushio/target-nightly.js mac"
   },
   "build": {
     "publish": [
@@ -143,7 +143,7 @@
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
     "@noovolari/dpapi-addon": "0.1.2",
-    "@noovolari/leapp-core": "file:../core",
+    "@noovolari/leapp-core": "npm:@mush-ko-li/leapp-core-nightly@latest",
     "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",

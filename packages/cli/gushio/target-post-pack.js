@@ -13,7 +13,7 @@ module.exports = {
       await deleteFunction(path, "..", "oclif.manifest.json")
       console.log('post-pack actions completed successfully')
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   }

@@ -34,7 +34,7 @@ module.exports = {
       }
       console.log('leapp cli published on npm')
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     } finally {
       await writePackageJsonFunction(path, "cli", originalPackage);

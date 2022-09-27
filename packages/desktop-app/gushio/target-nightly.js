@@ -3,11 +3,11 @@ module.exports = {
     name: 'nightly',
     description: 'Release the leapp Desktop app under the branch Nightly',
     version: '0.1',
+    arguments: [
+      {name: '<platform-version>', choices: ['mac', 'linux', 'win', 'all']},
+    ],
   },
   deps: [],
-  arguments: [
-    {name: '<platform-version>', choices: ['mac', 'linux', 'win', 'all']},
-  ],
   run: async (args) => {
     const path = await gushio.import('path')
     const shellJs = await gushio.import('shelljs')
@@ -31,9 +31,9 @@ module.exports = {
       await writePackageJsonFunction(path, "desktop-app", desktopAppPackage);
       await leappCoreBootstrap("desktop-app", () => `npm:@mush-ko-li/leapp-core-nightly@latest`);
 
-      await gushio.run(path.join(__dirname, './target-release.js'), ["\"configuration production\"", args[0]])
+      await gushio.run(path.join(__dirname, './target-release.js'), ["configuration production", args[0]])
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     } finally {
       await writePackageJsonFunction(path, "desktop-app", originalPackage);

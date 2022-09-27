@@ -19,7 +19,7 @@ module.exports = {
 
       fs.copyFileSync("README.md", "dist/README.md");
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   },

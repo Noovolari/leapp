@@ -15,6 +15,7 @@ env:
   S3_BUCKET: s3://noovolari-leapp-website-distribution
   WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+  NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
 jobs:
   tag-validation:

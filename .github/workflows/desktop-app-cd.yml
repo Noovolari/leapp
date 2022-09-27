@@ -61,17 +61,6 @@ jobs:
           git config --global core.eol lf
 
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-
-      - name: Set pro environment
-        shell: bash
-        run: npm run set-pro-environment
-
-      - name: Bootstrap
-        shell: bash
-        run: npm run bootstrap
 
       - name: Build Win desktop app
         shell: bash

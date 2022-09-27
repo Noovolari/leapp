@@ -1,6 +1,3 @@
-const readPackageJsonFunction = require("../../../gushio/read-package-json-func");
-const writePackageJsonFunction = require("../../../gushio/write-package-json-func");
-const leappCoreBootstrap = require("../../../gushio/leapp-core-bootstrap");
 module.exports = {
   cli: {
     name: 'nightly',
@@ -13,28 +10,22 @@ module.exports = {
     const shellJs = await gushio.import('shelljs')
     const readPackageJsonFunction = require('../../../gushio/read-package-json-func')
     const writePackageJsonFunction = require('../../../gushio/write-package-json-func')
-    const leappCoreBoostrap = require('../../../gushio/leapp-core-bootstrap')
+    const leappCoreBootstrap = require('../../../gushio/leapp-core-bootstrap')
+    const getNightlyVersion = require('../../../gushio/get-nightly-version')
 
     let cliPackage;
     let originalPackage;
 
     try {
-      console.log('reading leapp Cli... ')
-      const jsDate = new Date();
-      const date = jsDate.getFullYear() +
-                   ('0' + (jsDate.getMonth() + 1)).slice(-2) +
-                   ('0' + (jsDate.getDate())).slice(-2) +
-                   ('0' + (jsDate.getHours())).slice(-2) +
-                   ('0' + (jsDate.getMinutes())).slice(-2);
-
+      console.log('Reading leapp Cli package.json... ')
       cliPackage = await readPackageJsonFunction(path, "cli");
       originalPackage = JSON.parse(JSON.stringify(cliPackage));
 
       cliPackage["name"] = `@mush-ko-li/leapp-cli-nightly`;
-      cliPackage["version"] = cliPackage["version"] + `-nightly.${date}`;
+      cliPackage["version"] = cliPackage["version"] + `-nightly.${getNightlyVersion()}`;
 
       await writePackageJsonFunction(path, "cli", cliPackage);
-      await leappCoreBootstrap("cli", (corePackage) => `npm:@mush-ko-li/leapp-core-nightly@latest`);
+      await leappCoreBootstrap("cli", () => `npm:@mush-ko-li/leapp-core-nightly@latest`);
 
       shellJs.cd(path.join(__dirname, '..'))
       const result = shellJs.exec('npm publish')

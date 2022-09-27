@@ -21,11 +21,11 @@ module.exports = {
       cliPackage = await readPackageJsonFunction(path, "cli");
       originalPackage = JSON.parse(JSON.stringify(cliPackage));
 
-      cliPackage["name"] = `@mush-ko-li/leapp-cli-nightly`;
+      cliPackage["name"] = `@noovolari/leapp-cli-nightly`;
       cliPackage["version"] = cliPackage["version"] + `-nightly.${getNightlyVersion()}`;
 
       await writePackageJsonFunction(path, "cli", cliPackage);
-      await leappCoreBootstrap("cli", () => `npm:@mush-ko-li/leapp-core-nightly@latest`);
+      await leappCoreBootstrap("cli", () => `npm:@noovolari/leapp-core-nightly@latest`);
 
       shellJs.cd(path.join(__dirname, '..'))
       const result = shellJs.exec('npm publish')

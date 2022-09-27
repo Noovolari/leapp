@@ -21,11 +21,11 @@ For more information about the project visit the [site](www.leapp.cloud).
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g @mush-ko-li/leapp-cli-nightly
+$ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@mush-ko-li/leapp-cli-nightly/0.1.21-nightly.202209261814 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli/0.1.21 darwin-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND

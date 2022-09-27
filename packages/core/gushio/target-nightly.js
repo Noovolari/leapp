@@ -20,7 +20,7 @@ module.exports = {
       corePackage = await readPackageJsonFunction(path, "core");
       originalPackage = JSON.parse(JSON.stringify(corePackage));
 
-      corePackage["name"] = `@mush-ko-li/leapp-core-nightly`;
+      corePackage["name"] = `@noovolari/leapp-core-nightly`;
       corePackage["version"] = corePackage["version"] + `-nightly.${getNightlyVersion()}`;
 
       await writePackageJsonFunction(path, "core", corePackage);

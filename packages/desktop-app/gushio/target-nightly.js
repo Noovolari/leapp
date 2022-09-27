@@ -24,7 +24,7 @@ module.exports = {
       desktopAppPackage = await readPackageJsonFunction(path, "desktop-app");
       originalPackage = JSON.parse(JSON.stringify(desktopAppPackage));
 
-      const nightlyVersion = desktopAppPackage["version"] + `-nightly.${getNightlyVersion()}`;
+      const nightlyVersion = desktopAppPackage["version"] + `-nightly.${getNightlyVersion(true)}`;
       await fs.writeFile(path.join(__dirname, '..', 'nightly-version'), nightlyVersion)
       desktopAppPackage["version"] = nightlyVersion;
 

@@ -42,6 +42,7 @@ jobs:
         run: |
           cd packages/core
 
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm install
           npm run nightly
 
@@ -49,6 +50,7 @@ jobs:
         run: |
           cd packages/cli
 
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm install
           npm run nightly
 

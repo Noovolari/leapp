@@ -26,7 +26,11 @@ module.exports = {
       await writePackageJsonFunction(path, "core", corePackage);
 
       shellJs.cd(path.join(__dirname, '..'))
-      const result = shellJs.exec('npm publish')
+      let result = shellJs.exec('npm run build')
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
+      result = shellJs.exec('npm publish')
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }

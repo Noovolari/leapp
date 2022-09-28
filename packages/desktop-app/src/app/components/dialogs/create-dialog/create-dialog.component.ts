@@ -339,6 +339,11 @@ export class CreateDialogComponent implements OnInit {
     this.selectedIdpUrl = $event.item;
   }
 
+  setAzureProvider(): void {
+    this.closeModal();
+    openIntegrationEvent.next(true);
+  }
+
   /**
    * Save actual session based on Session Type
    *

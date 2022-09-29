@@ -6,7 +6,7 @@
          alt="" title=""/>
     &nbsp;
     <i
-      class="moon-Hover-{{session.status !== eSessionStatus.active && session.status !== eSessionStatus.pending ? 'Start' : 'Stop'}} moon-hover-session hover-item {{session.type === eSessionType.azure ? 'hover-azure' : ''}}"
+      class="moon-Hover-{{session.status !== eSessionStatus.active && session.status !== eSessionStatus.pending ? 'Start' : 'Stop'}} moon-hover-session hover-item"
       (click)="session.status === eSessionStatus.active || session.status === eSessionStatus.pending ? stopSession() : startSession()"></i>
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session.sessionName}}</span>
     <i class="moon-Pin" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1"></i>
@@ -15,9 +15,11 @@
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
            {{globalColumns.role ? '' : 'hidden-column'}} table-column-2">
-  <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
-    <ng-container *ngIf="session.type !== eSessionType.awsIamUser && session.type !== eSessionType.azure">{{ session | detail }}</ng-container>
-  </span>
+  <div class="span-limiter">
+    <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
+      <ng-container *ngIf="session.type !== eSessionType.awsIamUser && session.type !== eSessionType.azure">{{ session | detail }}</ng-container>
+    </span>
+  </div>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
@@ -27,12 +29,14 @@
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-4
            {{globalColumns.namedProfile ? '' : 'hidden-column'}}">
+  <div class="span-limiter">
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
       <ng-container *ngIf="session.type !== eSessionType.azure">
       {{profileName}}
         <a (click)="copyProfile(profileName)" matTooltip="Copy Profile Name"><i class="moon-Copy"></i></a>
       </ng-container>
     </span>
+  </div>
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}

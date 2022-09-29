@@ -7,12 +7,11 @@ module.exports = async function leappCoreBootstrap(packageName, coreVersionSelec
 
   const packageToModify = await readPackageJsonFunction(path, packageName)
   const corePackage = await readPackageJsonFunction(path, 'core')
-  const corePackageName = corePackage['name'];
-  packageToModify['dependencies'][corePackageName] = coreVersionSelector(corePackage)
+  packageToModify['dependencies']["@noovolari/leapp-core"] = coreVersionSelector(corePackage)
   await writePackageJsonFunction(path, packageName, packageToModify)
 
   const packageRelativePath = ["..", "packages", packageName];
-  const npmOrganization = corePackageName.split("/")[0];
+  const npmOrganization = "@noovolari";
   await deleteFunction(path, ...packageRelativePath, "node_modules", npmOrganization)
   await deleteFunction(path, ...packageRelativePath, "package-lock.json")
   shellJs.cd(path.join(__dirname, ...packageRelativePath))

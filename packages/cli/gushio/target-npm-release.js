@@ -21,7 +21,7 @@ module.exports = {
       }
       console.log('leapp-cli published on npm successfully')
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   }

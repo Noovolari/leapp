@@ -15,7 +15,7 @@ module.exports = {
       packageJson['build']['mac']['target'][1]['arch'][0] = args[0];
       fs.writeFileSync(path.join(__dirname, '../package.json'), JSON.stringify(packageJson, null, 2));
     } catch (e) {
-      e.message = e.message.red;
+      e.message = e.stack.red;
       throw e;
     }
   },

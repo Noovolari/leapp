@@ -14,7 +14,7 @@ module.exports = {
         await leappCoreBootstrap(packageName, (corePackage) => corePackage['version']);
       }
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   },

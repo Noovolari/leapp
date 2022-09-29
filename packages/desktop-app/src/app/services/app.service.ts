@@ -209,10 +209,11 @@ export class AppService {
 
   about(): void {
     const version = this.getApp().getVersion();
+    const coreVersion = this.appProviderService.logService.getCoreVersion();
     this.windowService.getCurrentWindow().show();
     this.getDialog().showMessageBox({
       icon: __dirname + `/assets/images/Leapp.png`,
-      message: `Leapp\n` + `Version ${version} (${version})\n` + "© 2022 Noovolari",
+      message: `Leapp\n` + `Version ${version} (Core: ${coreVersion})\n` + "© 2022 Noovolari",
       buttons: ["Ok"],
     });
   }

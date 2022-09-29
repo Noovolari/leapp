@@ -52,7 +52,7 @@ module.exports = {
       const releaseFunction = releaseFunctions[target];
       await releaseFunction(version.number);
     } catch(e) {
-      e.message = e.message.red;
+      e.message = e.stack.red;
       throw e;
     }
   },

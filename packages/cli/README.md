@@ -21,11 +21,11 @@ For more information about the project visit the [site](www.leapp.cloud).
 # Usage
 <!-- usage -->
 ```sh-session
-$ npm install -g @noovolari/leapp-cli
+$ npm install -g @noovolari/leapp-cli-nightly
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@noovolari/leapp-cli/0.1.21 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli-nightly/0.1.21-nightly.202209281004 darwin-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -42,5 +42,6 @@ USAGE
 * [`leapp profile`](scopes/profile.md) - Leapp AWS Multi-profile management
 * [`leapp region`](scopes/region.md) - Leapp regions management
 * [`leapp session`](scopes/session.md) - Sessions management
+* [`leapp version`](scopes/version.md) - Displays the Cli and Core versions
 
 <!-- commandsstop -->

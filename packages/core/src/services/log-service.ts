@@ -32,4 +32,8 @@ export class LogService {
       this.logger.show(loggedEntry.message, loggedEntry.level);
     }
   }
+
+  getCoreVersion(): string {
+    return require("../../package.json").version;
+  }
 }

@@ -1,7 +1,3 @@
-const writePackageJsonFunction = require("../../../gushio/write-package-json-func");
-const path = require("path");
-
-
 module.exports = {
   cli: {
     name: 'build',

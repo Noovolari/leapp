@@ -61,6 +61,9 @@ export abstract class AwsSessionService extends SessionService {
   }
 
   async stop(sessionId: string): Promise<void> {
+    if (this.isInactive(sessionId)) {
+      return;
+    }
     try {
       if (this.repository.getWorkspace().credentialMethod === constants.credentialFile) {
         await this.deApplyCredentials(sessionId);

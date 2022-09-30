@@ -7,12 +7,6 @@ import { CreateSessionRequest } from "./create-session-request";
 export abstract class SessionService {
   protected constructor(protected sessionNotifier: IBehaviouralNotifier, protected repository: Repository) {}
 
-  isInactive(sessionId: string): boolean {
-    const sessions = this.repository.getSessions();
-    const awsSession = sessions.find((session) => session.sessionId === sessionId);
-    return awsSession.status === SessionStatus.inactive;
-  }
-
   sessionDeactivated(sessionId: string): void {
     const sessions = this.repository.getSessions();
     const index = sessions.findIndex((s) => s.sessionId === sessionId);
@@ -27,6 +21,12 @@ export abstract class SessionService {
         this.sessionNotifier?.setSessions([...sessions]);
       }
     }
+  }
+
+  protected isInactive(sessionId: string): boolean {
+    const sessions = this.repository.getSessions();
+    const awsSession = sessions.find((session) => session.sessionId === sessionId);
+    return awsSession.status === SessionStatus.inactive;
   }
 
   protected sessionActivated(sessionId: string, sessionTokenExpiration?: string): void {

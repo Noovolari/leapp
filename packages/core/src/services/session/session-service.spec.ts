@@ -3,6 +3,27 @@ import { SessionService } from "./session-service";
 import { SessionStatus } from "../../models/session-status";
 
 describe("SessionService", () => {
+  test("isInactive", () => {
+    const activeSessionId = "active-session-id";
+    const pendingSessionId = "pending-session-id";
+    const inactiveSessionId = "inactive-session-id";
+    const sessionList = [
+      { sessionId: activeSessionId, status: SessionStatus.active },
+      { sessionId: pendingSessionId, status: SessionStatus.pending },
+      { sessionId: inactiveSessionId, status: SessionStatus.inactive },
+    ];
+    const repository = {
+      getSessions: jest.fn(() => sessionList),
+    } as any;
+    const sessionService: any = new (SessionService as any)(null, repository);
+
+    expect(sessionService.isInactive(activeSessionId)).toBe(false);
+    expect(sessionService.isInactive(pendingSessionId)).toBe(false);
+    expect(sessionService.isInactive(inactiveSessionId)).toBe(true);
+
+    expect(repository.getSessions).toHaveBeenCalledTimes(3);
+  });
+
   test("sessionDeactivated - sessionId found", () => {
     const sessionId = "fake-session-id";
     const sessionList = [{ sessionId }, { sessionId: "another-session-id" }];

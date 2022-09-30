@@ -1,0 +1,57 @@
+const writePackageJsonFunction = require("../../../gushio/write-package-json-func");
+const path = require("path");
+
+
+module.exports = {
+  cli: {
+    name: 'build',
+    description: 'Build distributable leapp desktop app package',
+    version: '0.1',
+    arguments: [
+      {name: '<target>', choices: ['aot', 'configuration staging']},
+      {name: '<platform-version>', choices: ['mac', 'linux', 'win', 'all']},
+    ],
+  },
+  run: async (args) => {
+    const path = require('path')
+    const shellJs = require('shelljs')
+    const readPackageJsonFunction = require("../../../gushio/read-package-json-func");
+    const writePackageJsonFunction = require("../../../gushio/write-package-json-func");
+    const currentPath = shellJs.pwd()
+    let originalPackage;
+
+    try {
+      const packageJson = await readPackageJsonFunction(path, "desktop-app");
+      originalPackage = JSON.parse(JSON.stringify(packageJson));
+      await gushio.run(path.join(__dirname, './target-build.js'), args)
+
+      console.log('Packaging leapp... ')
+      const platformVersion = args[1] === 'mac'
+        ? ''
+        : args[1] === 'win'
+          ? '--win --x64'
+          : args[1] === 'linux'
+            ? '--linux'
+            : '--mac --win --linux'
+
+      shellJs.cd(path.join(__dirname, '..'));
+
+      delete packageJson["build"]["afterSign"];
+      packageJson["build"]["mac"]["forceCodeSigning"] = false;
+      await writePackageJsonFunction(path, "desktop-app", packageJson);
+
+      const result = shellJs.exec(`export CSC_IDENTITY_AUTO_DISCOVERY=false && electron-builder build ${platformVersion}`)
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
+
+      console.log('Package generation completed successfully')
+    } catch (e) {
+      e.message = e.stack.red
+      throw e
+    } finally {
+      await writePackageJsonFunction(path, "desktop-app", originalPackage);
+      shellJs.cd(currentPath)
+    }
+  },
+}

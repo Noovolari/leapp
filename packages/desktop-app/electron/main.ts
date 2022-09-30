@@ -1,11 +1,13 @@
 import * as path from "path";
 import { environment } from "../src/environments/environment";
 
-const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
 const electronLocalshortcut = require('electron-localshortcut');
 const { autoUpdater } = require("electron-updater");
 
 const url = require("url");
+const fs = require("fs");
+const os = require("os");
 const ipc = ipcMain;
 
 const remote = require("@electron/remote/main");
@@ -155,13 +157,10 @@ const generateMainWindow = () => {
       electronLocalshortcut.unregisterAll(win);
     });
 
-
-
-
-
     app.on('open-url', (event, url) => {
+      event.preventDefault();
       win.webContents.send("PLUGIN_URL", url);
-    })
+    });
 
     remote.enable(win.webContents);
   };
@@ -239,6 +238,18 @@ const generateMainWindow = () => {
     createWindow();
     // createTray();
     buildAutoUpdater(win);
+
+  });
+
+  app.on("will-finish-launching", () => {
+    app.on('open-url', (event, url) => {
+      event.preventDefault();
+      try {
+        fs.writeFileSync(path.join(os.homedir(),environment.deeplinkFile), url);
+      } catch(err) {
+        console.log(err);
+      }
+    });
   });
 
   const gotTheLock = app.requestSingleInstanceLock();
@@ -260,7 +271,6 @@ const generateMainWindow = () => {
     app.setAppUserModelId("Leapp");
   }
 };
-
 // =============================== //
 // Start the real application HERE //
 // =============================== //

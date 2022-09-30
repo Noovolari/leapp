@@ -163,6 +163,12 @@ const generateMainWindow = () => {
     });
 
     remote.enable(win.webContents);
+
+    // Protocol handler for win32
+    if (process.platform == 'win32') {
+      // Keep only command line / deep linked arguments
+      win.webContents.send("PLUGIN_URL", process.argv.slice(1));
+    }
   };
 
   const createTrayWindow = () => {
@@ -258,6 +264,13 @@ const generateMainWindow = () => {
     app.quit();
   } else {
     app.on("second-instance", (event, commandLine, workingDirectory) => {
+      if (process.platform == 'win32') {
+        // Keep only command line / deep linked arguments
+        if (win) {
+          // Win32 on app already open
+          win.webContents.send("PLUGIN_URL", process.argv.slice(1));
+        }
+      }
       // Someone tried to run a second instance, we should focus our window.
       if (win) {
         if (win.isMinimized()) {

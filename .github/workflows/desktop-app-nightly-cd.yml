@@ -78,7 +78,7 @@ jobs:
           echo "${{ env.WIN_CERTIFICATE }}" | base64 --decode > $WIN_CERTIFICATE
 
           npm install
-          npm run nightly win
+          npm run nightly-win
           rm -Rf ./release/win-unpacked
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
@@ -115,7 +115,7 @@ jobs:
           cd packages/desktop-app
 
           npm install
-          npm run nightly linux
+          npm run nightly-linux
           rm -Rf ./release/linux-unpacked
           rm -Rf ./release/.cache
           rm -Rf ./release/builder-debug.yml
@@ -175,7 +175,7 @@ jobs:
 
             npm install
             npm run set-target-x64
-            npm run nightly mac
+            npm run nightly
 
       - name: Clean build
         run: |
@@ -244,7 +244,7 @@ jobs:
 
             npm install
             npm run set-target-arm64
-            npm run nightly mac
+            npm run nightly
 
       - name: Clean build
         run: |

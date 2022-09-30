@@ -36,7 +36,13 @@ module.exports = {
       packageJson["build"]["mac"]["forceCodeSigning"] = false;
       await writePackageJsonFunction(path, "desktop-app", packageJson);
 
-      const result = shellJs.exec(`export CSC_IDENTITY_AUTO_DISCOVERY=false && electron-builder build ${platformVersion}`)
+      let command;
+      if (args[1] === 'mac') {
+        command = `export CSC_IDENTITY_AUTO_DISCOVERY=false && electron-builder build ${platformVersion}`;
+      } else {
+        command = `electron-builder build ${platformVersion}`;
+      }
+      const result = shellJs.exec(command);
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }

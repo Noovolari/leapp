@@ -2,7 +2,7 @@ import { describe, test } from "@jest/globals";
 import { Builder, By, ThenableWebDriver, until, WebElement } from "selenium-webdriver";
 import path from "path";
 import os from "os";
-import { env } from "./.env";
+//import { env } from "./.env";
 
 const serverHost = "http://localhost:9515";
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
@@ -112,7 +112,7 @@ describe("Integration test 1", () => {
       const strategyButtonSelector = By.css(".strategy-list button");
       await driver.wait(until.elementLocated(strategyButtonSelector));
       const strategyButtons = await driver.findElements(strategyButtonSelector);
-      expect(strategyButtons.length).toBe(3);
+      expect(strategyButtons.length).toBe(4);
 
       console.log("expect executed correctly...");
 
@@ -150,10 +150,10 @@ describe("Integration test 1", () => {
       await sessionAlias.sendKeys("selenium-session");
 
       const sessionAccessKey = await selectElementByCss('input[placeholder="Access Key ID *"]', driver);
-      await sessionAccessKey.sendKeys(env.awsIamUserTest.accessKeyId);
+      await sessionAccessKey.sendKeys("accessKey"); /*env.awsIamUserTest.accessKeyId*/
 
       const sessionSecretAccessKey = await selectElementByCss('input[placeholder="Secret Access Key *"]', driver);
-      await sessionSecretAccessKey.sendKeys(env.awsIamUserTest.secretAccessKey);
+      await sessionSecretAccessKey.sendKeys("secretKey"); /*env.awsIamUserTest.secretAccessKey*/
 
       console.log("pressing the button...");
 

@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.15.0](https://github.com/Noovolari/leapp/compare/v0.14.3...v0.15.0) (2022-10-03)
+
+### Features
+
+* refactored sessions list introducing recycle of views; in case of many sessions, CPU usage and memory footprint were dramatically reduced. Thanks to [@egauk](https://github.com/egauk) for the [Issue #314](https://github.com/Noovolari/leapp/issues/314)!
+* improved startup performance
+* now it is possible to create a new Azure Integration directly from Session creation dialog
+
 ### [0.14.3](https://github.com/Noovolari/leapp/compare/v0.14.2...v0.14.3) (2022-09-15)
 
 ### Features

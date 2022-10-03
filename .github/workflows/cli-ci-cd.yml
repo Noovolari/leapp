@@ -57,8 +57,6 @@ jobs:
         run: |
           git fetch
           COMMIT_HASH=$(git log --format="%H" -n 1)
-          echo $COMMIT_HASH
-          echo $GITHUB_SHA
           TAG=$(git tag --contains $GITHUB_SHA)
           MATCH=$(echo "$TAG" | grep "^cli-v[0-9]\+\.[0-9]\+\.[0-9]\+$" || true)
           if [[ $MATCH != "" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;

@@ -3,15 +3,25 @@ import { Builder, By, ThenableWebDriver, until, WebElement } from "selenium-webd
 import path from "path";
 import os from "os";
 //import { env } from "./.env";
+import childProcess from "child_process";
 
+const exec = childProcess.exec;
 const serverHost = "http://localhost:9515";
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
 const winPath = path.resolve(".", "node_modules\\electron\\dist\\electron.exe");
-const electronBinaryPath = {
+const electronBinaryPaths = {
   darwin: macPath,
   linux: linuxPath,
   win32: winPath,
+};
+const electronBinaryPath = electronBinaryPaths[os.platform()];
+
+const killElectron = () => {
+  if (os.platform() !== "darwin") {
+    return;
+  }
+  exec(`killall ${path.parse(electronBinaryPath).name}`);
 };
 
 export const generateDriver = async (): Promise<any> =>
@@ -19,7 +29,7 @@ export const generateDriver = async (): Promise<any> =>
     .usingServer(serverHost)
     .withCapabilities({
       "goog:chromeOptions": {
-        binary: electronBinaryPath[os.platform()],
+        binary: electronBinaryPath,
         args: [`app=${path.resolve(".")}`],
       },
     })
@@ -98,7 +108,7 @@ describe("Integration test 1", () => {
 
   afterEach(async () => {
     console.log("in after each...");
-    await driver.close();
+    killElectron();
     await driver.quit();
     console.log("quit succesfully");
   }, testTimeout);

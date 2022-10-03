@@ -5,7 +5,7 @@ import os from "os";
 //import { env } from "./.env";
 import childProcess from "child_process";
 
-const exec = childProcess.exec;
+const exec = childProcess.execSync;
 const serverHost = "http://localhost:9515";
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
@@ -21,6 +21,7 @@ const killElectron = () => {
   if (os.platform() !== "darwin") {
     return;
   }
+  console.log("process name:", path.parse(electronBinaryPath).name);
   exec(`killall ${path.parse(electronBinaryPath).name}`);
 };
 

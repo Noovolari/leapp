@@ -167,6 +167,7 @@ const generateMainWindow = () => {
     // Protocol handler for win32
     if (process.platform == 'win32') {
       // Keep only command line / deep linked arguments
+      console.log(process.argv);
       fs.writeFileSync(path.join(os.homedir(),environment.deeplinkFile), process.argv.slice(1)[0]);
     }
   };
@@ -268,6 +269,7 @@ const generateMainWindow = () => {
         // Keep only command line / deep linked arguments
         if (win) {
           // Win32 on app already open
+          console.log("2 instance", argv);
           win.webContents.send("PLUGIN_URL", argv.slice(1)[0]);
           win.focus();
         }

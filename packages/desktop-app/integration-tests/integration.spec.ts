@@ -98,6 +98,7 @@ describe("Integration test 1", () => {
 
   afterEach(async () => {
     console.log("in after each...");
+    await driver.close();
     await driver.quit();
     console.log("quit succesfully");
   }, testTimeout);

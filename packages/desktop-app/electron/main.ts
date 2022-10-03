@@ -167,7 +167,6 @@ const generateMainWindow = () => {
     // Protocol handler for win32
     if (process.platform !== 'darwin' && process.argv[1]) {
       // Keep only command line / deep linked arguments
-      console.log(process.argv);
       fs.writeFileSync(path.join(os.homedir(),environment.deeplinkFile), process.argv[1].split("leapp://")[1]);
     }
   };
@@ -264,13 +263,16 @@ const generateMainWindow = () => {
   if (!gotTheLock) {
     app.quit();
   } else {
-    app.on("second-instance", (event, argv, workingDirectory) => {
+    app.on("second-instance", (event, argv, _workingDirectory) => {
       if (process.platform == 'win32') {
         // Keep only command line / deep linked arguments
         if (win) {
           // Win32 on app already open
-          console.log("2 instance", argv);
-          win.webContents.send("PLUGIN_URL", argv[argv.length-1].split("leapp://")[1]);
+          if(argv.length > 0) {
+            if(argv[argv.length-1] && argv[argv.length-1]?.split("leapp://")[1]) {
+              win.webContents.send("PLUGIN_URL", argv[argv.length-1]?.split("leapp://")[1]);
+            }
+          }
           win.focus();
         }
       }

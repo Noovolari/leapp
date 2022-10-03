@@ -74,6 +74,7 @@ export class AwsIamUserService extends AwsSessionService {
       .catch((err: any) => console.error(err));
 
     this.repository.addSession(session);
+
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 

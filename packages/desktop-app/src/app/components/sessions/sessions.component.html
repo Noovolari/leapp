@@ -1,5 +1,5 @@
 <ng-container *ngIf="eGlobalFilteredSessions.length > 0">
-  <table class="table table-header">
+  <table class="table">
     <thead>
     <tr class="{{eCompactMode ? 'compact' : ''}}">
       <th (click)="orderSessionsByName(columnSettings[0].orderStyle)"><span>Session</span><i
@@ -23,16 +23,16 @@
     </tr>
     </thead>
   </table>
-  <table class="table table-account-cards">
-    <tbody>
-    <tr class="active {{eCompactMode ? 'compact' : ''}}" app-session-card [globalColumns]="eGlobalColumns" [compactMode]="eCompactMode"
-        [session]="session" [isSelected]="selectedSession?.sessionId === session.sessionId"
-        *ngFor="let session of eGlobalFilteredSessions | filtering:true"></tr>
-    <tr class="{{eCompactMode ? 'compact' : ''}}" app-session-card [globalColumns]="eGlobalColumns" [compactMode]="eCompactMode" [session]="session"
-        [isSelected]="selectedSession?.sessionId === session.sessionId"
-        *ngFor="let session of eGlobalFilteredSessions | filtering:false"></tr>
-    </tbody>
-  </table>
+  <cdk-virtual-scroll-viewport itemSize="56" class="table-virtual-scroll">
+    <table class="table table-account-cards">
+      <tbody>
+      <tr class="{{session.status !== eSessionStatus.inactive ? 'active' : ''}} {{eCompactMode ? 'compact' : ''}}" app-session-card
+          [globalColumns]="eGlobalColumns" [compactMode]="eCompactMode"
+          [session]="session" [isSelected]="selectedSession?.sessionId === session.sessionId"
+          *cdkVirtualFor="let session of orderedSessions"></tr>
+      </tbody>
+    </table>
+  </cdk-virtual-scroll-viewport>
 </ng-container>
 
 <ng-container *ngIf="eGlobalFilteredSessions.length === 0 && eGlobalFilterGroup.searchFilter !== '' && !eGlobalFilterExtended">

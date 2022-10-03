@@ -24,6 +24,7 @@ import { SessionSelectionState } from "@noovolari/leapp-core/models/session-sele
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "../../services/options.service";
 import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws/aws-iam-user-session";
+import { FilteringPipe } from "./pipes/filtering.pipe";
 
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);
 
@@ -56,10 +57,12 @@ export class SessionsComponent implements OnInit, OnDestroy {
   selectedSession?: Session;
 
   private subscriptions = [];
+  private sessionFiltering;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(private modalService: BsModalService, private appProviderService: AppProviderService, public optionService: OptionsService) {
+    this.sessionFiltering = new FilteringPipe();
     this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
     this.columnSettings = Array.from(Array(5)).map((): ArrowSettings => ({ activeArrow: false, orderStyle: false }));
     const subscription = globalHasFilter.subscribe((value) => {
@@ -90,6 +93,13 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
     this.subscriptions.push(subscription, subscription2, subscription3, subscription4, subscription5, subscription6);
     globalOrderingFilter.next(JSON.parse(JSON.stringify(this.behaviouralSubjectService.sessions)));
+  }
+
+  get orderedSessions(): Session[] {
+    return [
+      ...this.sessionFiltering.transform(this.eGlobalFilteredSessions, true),
+      ...this.sessionFiltering.transform(this.eGlobalFilteredSessions, false),
+    ];
   }
 
   ngOnInit(): void {}

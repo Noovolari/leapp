@@ -64,6 +64,10 @@ td:nth-child(1) {
       white-space: nowrap;
     }
   }
+
+  .compact i.moon-More {
+    padding-left: 18px !important;
+  }
 }
 
 .select-region-form,
@@ -106,13 +110,8 @@ i.fa-circle.status-item {
 
 i.fa-spin.status-item {
   font-size: 13px;
-  margin-left: 30px;
+  margin-left: 45%;
 }
-
-.compact i.moon-More {
-  padding-left: 10px;
-}
-
 
 i.moon-More {
   font-size: 20px;

@@ -90,6 +90,19 @@ describe("AzureSessionService", () => {
     expect(azureSessionService.start).toHaveBeenCalled();
   });
 
+  test("stop, session already inactive", async () => {
+    const isInactive = jest.fn(() => true);
+    const sessionLoading = jest.fn();
+
+    const azureSessionService = new AzureSessionService(null, null, null, null, null, null, null, null);
+    (azureSessionService as any).isInactive = isInactive;
+    (azureSessionService as any).sessionLoading = sessionLoading;
+
+    await azureSessionService.stop("sessionId");
+    expect(isInactive).toHaveBeenCalledWith("sessionId");
+    expect(sessionLoading).not.toHaveBeenCalled();
+  });
+
   test("stop, 'az logout' command is executed when profile contains less than 2 subscriptions", async () => {
     const azureSession = new AzureSession("fake-session-name", "fake-region", "fake-subscription-id", "fake-tenant-id", "fake-azure-integration-id");
     azureSession.status = SessionStatus.active;
@@ -132,6 +145,7 @@ describe("AzureSessionService", () => {
       azurePersistenceService,
       logger
     );
+    (azureSessionService as any).isInactive = () => false;
 
     await azureSessionService.stop(azureSession.sessionId);
 
@@ -156,8 +170,9 @@ describe("AzureSessionService", () => {
     } as any;
 
     const azureSessionService = new AzureSessionService(null, repository, null, null, null, null, null, logService);
-
+    (azureSessionService as any).isInactive = () => false;
     (azureSessionService as any).sessionLoading = jest.fn();
+
     await azureSessionService.stop(azureSession.sessionId);
 
     expect(logService.log).toHaveBeenNthCalledWith(1, new LoggedEntry(error.message, this, LogLevel.warn));
@@ -233,6 +248,7 @@ describe("AzureSessionService", () => {
     } as any;
 
     const azureSessionService = new AzureSessionService(null, repository, null, null, null, null, azurePersistenceService, null);
+    (azureSessionService as any).isInactive = () => false;
     (azureSessionService as any).sessionLoading = () => {};
     (azureSessionService as any).sessionDeactivated = () => {};
 
@@ -285,6 +301,7 @@ describe("AzureSessionService", () => {
     } as any;
 
     const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, azurePersistenceService, null);
+    (azureSessionService as any).isInactive = () => false;
     (azureSessionService as any).sessionLoading = () => {};
     (azureSessionService as any).sessionDeactivated = () => {};
 
@@ -329,6 +346,7 @@ describe("AzureSessionService", () => {
     } as any;
 
     const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, azurePersistenceService, null);
+    (azureSessionService as any).isInactive = () => false;
     (azureSessionService as any).sessionLoading = () => {};
 
     const spySessionDeactivated = jest.spyOn(azureSessionService, "sessionDeactivated");

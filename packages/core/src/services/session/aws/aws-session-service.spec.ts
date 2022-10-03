@@ -182,13 +182,24 @@ describe("AwsSessionService", () => {
     const sessionNotifier = {} as any;
     const sessionDeactivated = jest.fn((_: string): void => {});
     const deApplyCredentials = jest.fn((_: string): void => {});
+    const isInactive = jest.fn(() => false);
     const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
     (awsSessionService as any).deApplyCredentials = deApplyCredentials;
     (awsSessionService as any).sessionDeactivated = sessionDeactivated;
+    (awsSessionService as any).isInactive = isInactive;
     await awsSessionService.stop("sessionId");
 
     expect(sessionDeactivated).toHaveBeenCalledWith("sessionId");
     expect(deApplyCredentials).toHaveBeenCalledWith("sessionId");
+    expect(isInactive).toHaveBeenCalledWith("sessionId");
+  });
+
+  test("stop - stop an inactive session", async () => {
+    const isInactive = jest.fn(() => true);
+    const awsSessionService = new (AwsSessionService as any)(null, null);
+    (awsSessionService as any).isInactive = isInactive;
+    await awsSessionService.stop("sessionId");
+    expect(isInactive).toHaveBeenCalledWith("sessionId");
   });
 
   test("stop - credential process method", async () => {
@@ -198,6 +209,7 @@ describe("AwsSessionService", () => {
     const awsSessionService: any = new (AwsSessionService as any)(null, repository);
     awsSessionService.deApplyConfigProfileCommand = jest.fn();
     awsSessionService.sessionDeactivated = jest.fn();
+    awsSessionService.isInactive = () => false;
     await awsSessionService.stop("fake-session-id");
     expect(awsSessionService.deApplyConfigProfileCommand).toHaveBeenCalledWith("fake-session-id");
     expect(awsSessionService.sessionDeactivated).toHaveBeenCalledWith("fake-session-id");
@@ -209,6 +221,7 @@ describe("AwsSessionService", () => {
     } as any;
     const expectedError = new Error("Error");
     const awsSessionService: any = new (AwsSessionService as any)(null, repository);
+    awsSessionService.isInactive = () => false;
     awsSessionService.deApplyCredentials = () => {};
     awsSessionService.sessionDeactivated = () => {
       throw expectedError;

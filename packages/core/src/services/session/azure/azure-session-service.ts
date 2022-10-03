@@ -106,6 +106,9 @@ export class AzureSessionService extends SessionService {
   }
 
   async stop(sessionId: string): Promise<void> {
+    if (this.isInactive(sessionId)) {
+      return;
+    }
     this.sessionLoading(sessionId);
     try {
       const session = this.repository.getSessionById(sessionId) as AzureSession;

@@ -71,7 +71,9 @@ export class AwsIamUserService extends AwsSessionService {
           .saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, request.secretKey)
           .catch((err: any) => console.error(err));
       })
-      .catch((err: any) => console.error(err));
+      .catch((err: any) => {
+        console.error(err);
+      });
 
     this.repository.addSession(session);
 

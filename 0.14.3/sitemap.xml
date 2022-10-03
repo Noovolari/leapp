@@ -81,6 +81,11 @@
          <changefreq>daily</changefreq>
     </url>
     <url>
+         <loc>https://docs.leapp.cloud/0.14.3/cli/scopes/version/</loc>
+         <lastmod>2022-10-03</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
          <loc>https://docs.leapp.cloud/0.14.3/configuring-integration/configure-aws-single-sign-on-integration/</loc>
          <lastmod>2022-10-03</lastmod>
          <changefreq>daily</changefreq>

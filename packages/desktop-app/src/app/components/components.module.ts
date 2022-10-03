@@ -37,6 +37,12 @@ import { LeappSelectComponent } from "./leapp-select/leapp-select.component";
 import { IntegrationBarComponent } from "./integration-bar/integration-bar.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { CredentialProcessDialogComponent } from "./dialogs/credential-process-dialog/credential-process-dialog.component";
+import { ChangeRegionDialogComponent } from "./dialogs/change-region-dialog/change-region-dialog.component";
+import { ChangeNamedProfileDialogComponent } from "./dialogs/change-named-profile-dialog/change-named-profile-dialog.component";
+import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-dialog.component";
+import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
+import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
+import { ScrollingModule } from "@angular/cdk/scrolling";
 
 @NgModule({
   declarations: [
@@ -61,6 +67,11 @@ import { CredentialProcessDialogComponent } from "./dialogs/credential-process-d
     LeappSelectComponent,
     IntegrationBarComponent,
     CredentialProcessDialogComponent,
+    ChangeRegionDialogComponent,
+    ChangeNamedProfileDialogComponent,
+    SsmModalDialogComponent,
+    ContextualMenuComponent,
+    BottomBarComponent,
   ],
   imports: [
     CommonModule,
@@ -81,6 +92,7 @@ import { CredentialProcessDialogComponent } from "./dialogs/credential-process-d
     MatExpansionModule,
     MatButtonToggleModule,
     MatTooltipModule,
+    ScrollingModule,
   ],
   exports: [ConfirmationDialogComponent, InputDialogComponent, CommandBarComponent, SideBarComponent, SessionsComponent],
 })

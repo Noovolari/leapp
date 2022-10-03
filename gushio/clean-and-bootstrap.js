@@ -36,7 +36,7 @@ module.exports = {
         await gushio.run(path.join(__dirname, './bootstrap.js'), [packageName])
       }
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     } finally {
       shellJs.cd(currentPath)

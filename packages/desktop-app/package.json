@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.14.3",
+  "version": "0.15.0",
   "private": true,
   "author": {
     "name": "Noovolari",
@@ -29,7 +29,8 @@
     "release-win": "gushio gushio/target-release.js \"configuration production\" win",
     "release-all": "gushio gushio/target-release.js 'configuration production' all",
     "set-target-arm64": "gushio gushio/set-target-arch.js arm64",
-    "set-target-x64": "gushio gushio/set-target-arch.js x64"
+    "set-target-x64": "gushio gushio/set-target-arch.js x64",
+    "nightly": "gushio gushio/target-nightly.js mac"
   },
   "build": {
     "publish": [
@@ -128,7 +129,7 @@
   },
   "dependencies": {
     "@angular/animations": "^13.2.2",
-    "@angular/cdk": "^13.2.2",
+    "@angular/cdk": "^13.3.9",
     "@angular/common": "^13.2.2",
     "@angular/compiler": "^13.2.2",
     "@angular/core": "^13.2.2",
@@ -143,7 +144,7 @@
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
     "@noovolari/dpapi-addon": "0.1.2",
-    "@noovolari/leapp-core": "0.1.122",
+    "@noovolari/leapp-core": "0.1.123",
     "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",

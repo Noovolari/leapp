@@ -23,6 +23,12 @@ export abstract class SessionService {
     }
   }
 
+  protected isInactive(sessionId: string): boolean {
+    const sessions = this.repository.getSessions();
+    const awsSession = sessions.find((session) => session.sessionId === sessionId);
+    return awsSession.status === SessionStatus.inactive;
+  }
+
   protected sessionActivated(sessionId: string, sessionTokenExpiration?: string): void {
     const sessions = this.repository.getSessions();
     const index = sessions.findIndex((s) => s.sessionId === sessionId);

@@ -18,7 +18,7 @@ module.exports = {
 
       console.log('Build completed successfully')
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   },

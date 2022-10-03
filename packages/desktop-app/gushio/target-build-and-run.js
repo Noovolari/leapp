@@ -22,7 +22,7 @@ module.exports = {
         throw new Error(result.stderr)
       }
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     } finally {
       shellJs.cd(currentPath)

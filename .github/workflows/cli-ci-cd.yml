@@ -49,7 +49,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 1
+          fetch-depth: 10
           ref: master
 
       - name: Check Tag Validity
@@ -57,7 +57,7 @@ jobs:
         run: |
           git fetch
           COMMIT_HASH=$(git log --format="%H" -n 1)
-          TAG=$(git tag --contains $COMMIT_HASH)
+          TAG=$(git tag --contains $GITHUB_SHA)
           MATCH=$(echo "$TAG" | grep "^cli-v[0-9]\+\.[0-9]\+\.[0-9]\+$" || true)
           if [[ $MATCH != "" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"

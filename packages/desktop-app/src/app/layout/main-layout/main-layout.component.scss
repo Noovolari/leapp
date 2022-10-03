@@ -32,7 +32,7 @@
   float: right;
   width: calc(100% - #{$menubar-width});
   height: calc(100vh - #{$commandbar-height});
-  overflow: auto;
+  overflow: hidden;
   &.filtered:not(.option-bar-opened) {
     height: calc(100vh - #{$commandbar-height} - 51px);
   }

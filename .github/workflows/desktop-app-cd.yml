@@ -50,11 +50,7 @@ jobs:
         run: |
           echo "Not a Desktop App Release Tag or Invalid one Found - Exiting..."
   build-win:
-    strategy:
-      matrix:
-        os: [ windows-2022 ]
-        node_version: [ 16 ]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-2022
     needs: [ tag-validation ]
     if: needs.tag-validation.outputs.validator == 1
     steps:
@@ -65,17 +61,6 @@ jobs:
           git config --global core.eol lf
 
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_version }}
-
-      - name: Set pro environment
-        shell: bash
-        run: npm run set-pro-environment
-
-      - name: Bootstrap
-        shell: bash
-        run: npm run bootstrap
 
       - name: Build Win desktop app
         shell: bash

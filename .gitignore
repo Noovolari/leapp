@@ -80,10 +80,9 @@ packages/cli/oclif.manifest.json
 /release/
 
 lerna-debug.log
-
 .run
-
 packages/dpapi-addon/build
+nightly-version
 
 # Ignore local environment secrets
 packages/desktop-app/integration-tests/.env.ts

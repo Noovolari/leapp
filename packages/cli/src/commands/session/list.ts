@@ -33,7 +33,7 @@ export default class ListSessions extends LeappCommand {
     const { flags } = await this.parse(ListSessions);
     const sessionTypeLabelMap = this.cliProviderService.cloudProviderService.getSessionTypeMap();
     const namedProfilesMap = this.cliProviderService.namedProfilesService.getNamedProfilesMap();
-    const data = this.cliProviderService.sessionManagementService.getSessions().map((session) => ({
+    const data = this.cliProviderService.sessionManagementService.getSessions().map((session: any) => ({
       id: session.sessionId,
       sessionName: session.sessionName,
       role: this.getRole(session),

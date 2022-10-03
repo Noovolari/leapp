@@ -19,7 +19,7 @@ module.exports = {
       }
       console.log('leapp-core published on npm')
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   }

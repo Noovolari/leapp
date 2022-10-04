@@ -11,7 +11,11 @@ module.exports = {
     try {
       console.log('Rebuilding app && Executing integration tests...');
       await gushio.run(path.join(__dirname, './target-build.js'), ['aot']);
-      const result = shellJs.exec("npx jest --runInBand");
+      let result = shellJs.exec("npx jest -t \"my integration test 1\" --runInBand");
+      if (result.code !== 0) {
+        throw new Error(result.stderr)
+      }
+      result = shellJs.exec("npx jest -t \"create session\" --runInBand");
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }

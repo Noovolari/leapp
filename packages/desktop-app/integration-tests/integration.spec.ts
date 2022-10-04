@@ -1,18 +1,9 @@
-import { jest, describe, test } from "@jest/globals";
+import { describe, test } from "@jest/globals";
 import path from "path";
 import os from "os";
 import { env } from "./.env";
 import chromedriver from "chromedriver";
-import childProcess from "child_process";
-import { ThenableWebDriver, WebElement } from "selenium-webdriver";
-
-// eslint-disable-next-line @typescript-eslint/naming-convention
-let Builder;
-// eslint-disable-next-line @typescript-eslint/naming-convention
-let By;
-let until;
-
-const execSync = childProcess.execSync;
+import { ThenableWebDriver, WebElement, Builder, By, until } from "selenium-webdriver";
 
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
@@ -23,10 +14,9 @@ const electronBinaryPaths = {
   win32: winPath,
 };
 const electronBinaryPath = electronBinaryPaths[os.platform()];
-let chromeDriverPort = 9515;
 
 export const generateDriver = async (): Promise<any> => {
-  const serverHost = `http://localhost:${chromeDriverPort}`;
+  const serverHost = `http://localhost:9515`;
   return new Builder()
     .usingServer(serverHost)
     .withCapabilities({
@@ -37,18 +27,6 @@ export const generateDriver = async (): Promise<any> => {
     })
     .forBrowser("chrome")
     .build();
-};
-
-const killElectron = () => {
-  if (os.platform() !== "darwin") {
-    return;
-  }
-  console.log("process name:", path.parse(electronBinaryPath).name);
-  try {
-    execSync(`killall ${path.parse(electronBinaryPath).name}`);
-  } catch (error) {
-    console.log(error);
-  }
 };
 
 export const selectElementByCss = async (selector: string, driver: ThenableWebDriver): Promise<WebElement> => {
@@ -121,19 +99,11 @@ describe("Integration test 1", () => {
 
   beforeEach(async () => {
     console.log("in before each...");
-
-    jest.resetModules();
-    const webdriver = await import("selenium-webdriver");
-    Builder = webdriver.Builder;
-    By = webdriver.By;
-    until = webdriver.until;
-
     try {
-      await chromedriver.start([`--port=${chromeDriverPort}`], true);
+      await chromedriver.start(undefined, true);
       console.log("chromedriver started successfully");
       driver = await generateDriver();
       console.log("driver generated successfully");
-      chromeDriverPort++;
       await pause(5000);
     } catch (err) {
       console.error(err);
@@ -146,8 +116,6 @@ describe("Integration test 1", () => {
     console.log("driver quit successfully");
     chromedriver.stop();
     console.log("chromedriver stop successfully");
-    killElectron();
-    console.log("electron killed successfully");
     await pause(5000);
   }, testTimeout);
 

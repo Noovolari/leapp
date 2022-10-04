@@ -1,10 +1,16 @@
-import { describe, test } from "@jest/globals";
-import { Builder, By, ThenableWebDriver, until, WebElement } from "selenium-webdriver";
+import { jest, describe, test } from "@jest/globals";
 import path from "path";
 import os from "os";
 import { env } from "./.env";
 import chromedriver from "chromedriver";
 import childProcess from "child_process";
+import { ThenableWebDriver, WebElement } from "selenium-webdriver";
+
+// eslint-disable-next-line @typescript-eslint/naming-convention
+let Builder;
+// eslint-disable-next-line @typescript-eslint/naming-convention
+let By;
+let until;
 
 const execSync = childProcess.execSync;
 
@@ -38,7 +44,11 @@ const killElectron = () => {
     return;
   }
   console.log("process name:", path.parse(electronBinaryPath).name);
-  execSync(`killall ${path.parse(electronBinaryPath).name}`);
+  try {
+    execSync(`killall ${path.parse(electronBinaryPath).name}`);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const selectElementByCss = async (selector: string, driver: ThenableWebDriver): Promise<WebElement> => {
@@ -103,7 +113,6 @@ export const waitUntilDisplayed = (selector: string, expectDisplayToBe: boolean,
 
 describe("Integration test 1", () => {
   const testTimeout = 60000;
-
   let driver;
 
   beforeAll(async () => {}, testTimeout);
@@ -112,6 +121,13 @@ describe("Integration test 1", () => {
 
   beforeEach(async () => {
     console.log("in before each...");
+
+    jest.resetModules();
+    const webdriver = await import("selenium-webdriver");
+    Builder = webdriver.Builder;
+    By = webdriver.By;
+    until = webdriver.until;
+
     try {
       await chromedriver.start([`--port=${chromeDriverPort}`], true);
       console.log("chromedriver started successfully");

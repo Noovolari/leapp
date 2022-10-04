@@ -102,7 +102,7 @@ describe("Integration test 1", () => {
   beforeEach(async () => {
     console.log("in before each...");
     try {
-      chromedriver.start();
+      await chromedriver.start(undefined, true);
       console.log("chromedriver started successfully");
       driver = await generateDriver();
       console.log("driver generated successfully");

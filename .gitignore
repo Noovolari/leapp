@@ -84,3 +84,7 @@ lerna-debug.log
 .run
 
 packages/dpapi-addon/build
+
+packages/desktop-app/integration-tests/.env.ts
+
+nightly-version

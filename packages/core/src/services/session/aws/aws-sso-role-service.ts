@@ -16,6 +16,8 @@ import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
 import { IKeychainService } from "../../../interfaces/i-keychain-service";
+import { LoggedException, LogLevel } from "../../log-service";
+import { CreateSessionRequest } from "../create-session-request";
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -113,6 +115,10 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
+  update(_: string, __: CreateSessionRequest): Promise<void> {
+    throw new LoggedException(`Update is not supported for AWS SSO Role Session Type`, this, LogLevel.error, false);
+  }
+
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsSsoRoleSession).profileId);
@@ -186,6 +192,10 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   removeSecrets(_: string): void {}
+
+  async getCloneRequest(session: AwsSsoRoleSession): Promise<AwsSsoRoleSessionRequest> {
+    throw new LoggedException(`Clone is not supported for sessionType ${session.type}`, this, LogLevel.error, false);
+  }
 
   private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
     const sessions = this.repository.getSessions();

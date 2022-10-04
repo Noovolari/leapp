@@ -7,6 +7,7 @@ import * as uuid from "uuid";
 import { AwsSsoRoleSessionRequest } from "./aws-sso-role-session-request";
 import { AwsSessionService } from "./aws-session-service";
 import * as AWS from "aws-sdk";
+import { LoggedException, LogLevel } from "../../log-service";
 jest.mock("uuid");
 
 describe("AwsSsoRoleService", () => {
@@ -107,6 +108,24 @@ describe("AwsSsoRoleService", () => {
     } as any);
     await awsSsoRoleService.create(request);
     expect(sessionNotifier.setSessions).not.toHaveBeenCalled();
+  });
+
+  test("update", async () => {
+    const awsSsoRoleService = new AwsSsoRoleService(null, null, null, null, null, null, {
+      appendListener: jest.fn(() => {}),
+    } as any);
+    await expect(async () => awsSsoRoleService.update(null, null)).rejects.toThrow(
+      new LoggedException(`Update is not supported for AWS SSO Role Session Type`, this, LogLevel.error, false)
+    );
+  });
+
+  test("getCloneRequest", () => {
+    const awsSsoRoleService = new AwsSsoRoleService(null, null, null, null, null, null, {
+      appendListener: jest.fn(() => {}),
+    } as any);
+    expect(() => awsSsoRoleService.getCloneRequest({ type: SessionType.awsSsoRole } as any)).rejects.toThrow(
+      new LoggedException(`Clone is not supported for sessionType ${SessionType.awsSsoRole}`, this, LogLevel.error, false)
+    );
   });
 
   test("applyCredentials", async () => {

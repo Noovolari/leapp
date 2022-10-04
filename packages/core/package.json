@@ -1,6 +1,6 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.121",
+  "version": "0.1.123",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
@@ -85,7 +85,8 @@
     "clean": "gushio gushio/target-clean.js",
     "build": "gushio gushio/target-build.js",
     "test": "jest --coverage",
-    "release": "gushio gushio/target-release.js"
+    "release": "gushio gushio/target-release.js",
+    "nightly": "gushio gushio/target-nightly.js"
   },
   "repository": {
     "type": "git",

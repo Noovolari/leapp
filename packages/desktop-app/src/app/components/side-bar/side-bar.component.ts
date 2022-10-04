@@ -93,7 +93,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
     const selectedIndex = this.selectedS.findIndex((s) => s.name === segment.name);
     this.selectedS[selectedIndex].selected = true;
-    document.querySelector(".sessions").classList.remove("option-bar-opened");
+    this.behaviouralSubjectService.unselectSessions();
     sidebarHighlight.next({ showAll: false, showPinned: false, selectedSegment: selectedIndex });
     globalSegmentFilter.next(JSON.parse(JSON.stringify(segment)));
   }

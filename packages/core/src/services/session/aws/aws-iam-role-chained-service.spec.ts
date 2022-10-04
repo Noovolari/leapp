@@ -6,6 +6,7 @@ import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { constants } from "../../../models/constants";
 import * as AWS from "aws-sdk";
+import { AwsIamRoleChainedSessionRequest } from "./aws-iam-role-chained-session-request";
 
 describe("AwsIamRoleChainedService", () => {
   let sessionNotifier;
@@ -28,6 +29,7 @@ describe("AwsIamRoleChainedService", () => {
       profileId: "profileId",
       roleSessionName: "miao",
       parentSessionId: "sessionP",
+      sessionName: "piao",
     } as any;
     parentSession = {
       sessionId: "sessionP",
@@ -97,12 +99,48 @@ describe("AwsIamRoleChainedService", () => {
     generateSessionToken = jest.fn((_: string, __: string, _2: string) => {});
   });
 
+  test("getCloneRequest", async () => {
+    const awsIamRoleChainedService = new AwsIamRoleChainedService(null, null, null, null, null, null);
+    const result = await awsIamRoleChainedService.getCloneRequest(session);
+    const mock = {
+      parentSessionId: "sessionP",
+      sessionName: "piao",
+      profileId: "profileId",
+      region: "eu-west-1",
+      roleArn: "abcdefghijklmnopqrstuvwxyz/12345",
+      roleSessionName: "miao",
+    };
+    expect(result).toStrictEqual(mock);
+  });
+
   test("create - add a new role chained session", async () => {
     const awsIamRoleChainedService = new AwsIamRoleChainedService(sessionNotifier, repository, awsCoreService, null, null, null);
     await awsIamRoleChainedService.create(session);
 
     expect(sessionNotifier.setSessions).toHaveBeenCalled();
     expect(repository.addSession).toHaveBeenCalled();
+  });
+
+  test("update", async () => {
+    const updateRequest = {
+      sessionName: "a",
+      region: "b",
+      roleArn: "c",
+      roleSessionName: "d",
+      parentSessionId: "1",
+      profileId: "2",
+    } as AwsIamRoleChainedSessionRequest;
+    const mockedSession = {};
+    repository = {
+      getSessions: jest.fn(() => [mockedSession]),
+      getSessionById: jest.fn(() => mockedSession),
+      updateSession: jest.fn(),
+    } as any;
+    const awsIamRoleChainedService = new AwsIamRoleChainedService(sessionNotifier, repository, awsCoreService, null, null, null);
+    await awsIamRoleChainedService.update("session1", updateRequest);
+    expect(repository.getSessionById).toHaveBeenCalledWith("session1");
+    expect(repository.updateSession).toHaveBeenCalledWith("session1", updateRequest);
+    expect(sessionNotifier.setSessions).toHaveBeenCalledWith([mockedSession]);
   });
 
   test("applyCredentials - apply a credential set by writing on the ini file", async () => {

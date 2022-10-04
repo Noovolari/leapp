@@ -14,7 +14,7 @@ module.exports = {
       await deleteFunction(path, "..", "coverage")
       console.log('Cleanup completed successfully')
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   }

@@ -86,6 +86,52 @@ describe("AwsIamRoleFederatedService", () => {
     expect(sessionNotifier.setSessions).toHaveBeenCalledWith("fake-sessions");
   });
 
+  test("update", async () => {
+    const updateRequest = {
+      sessionName: "a",
+      region: "b",
+      roleArn: "c",
+      idpUrl: "v",
+      idpArn: "x",
+      profileId: "d",
+    } as AwsIamRoleFederatedSessionRequest;
+    const session = Object.assign({}, updateRequest);
+    (session as any).idpUrlId = updateRequest.idpUrl;
+    delete session.idpUrl;
+    const mockedSession = {};
+    const repository = {
+      getSessions: jest.fn(() => [mockedSession]),
+      getSessionById: jest.fn(() => mockedSession),
+      updateSession: jest.fn(),
+    } as any;
+    const sessionNotifier = {
+      addSession: jest.fn(() => {}),
+      setSessions: jest.fn(() => {}),
+    } as any;
+    const awsIamRoleChainedService = new AwsIamRoleFederatedService(sessionNotifier, repository, null, null, null, null);
+    await awsIamRoleChainedService.update("session1", updateRequest);
+    expect(repository.getSessionById).toHaveBeenCalledWith("session1");
+    expect(repository.updateSession).toHaveBeenCalledWith("session1", session);
+    expect(sessionNotifier.setSessions).toHaveBeenCalledWith([mockedSession]);
+  });
+
+  test("getCloneRequest", async () => {
+    const awsIamRoleChainedService = new AwsIamRoleFederatedService(null, null, null, null, null, null);
+    const mockedSession = {
+      idpArn: "",
+      idpUrlId: "",
+      sessionName: "piao",
+      profileId: "profileId",
+      region: "eu-west-1",
+      roleArn: "abcdefghijklmnopqrstuvwxyz/12345",
+    };
+    const result = await awsIamRoleChainedService.getCloneRequest(mockedSession as any);
+    const clonedMocked = Object.assign({}, mockedSession);
+    clonedMocked["idpUrl"] = mockedSession.idpUrlId;
+    delete clonedMocked.idpUrlId;
+    expect(result).toStrictEqual(clonedMocked);
+  });
+
   test("applyCredentials", async () => {
     const profileId = "fake-profile-id";
     const session = { sessionId: "fake-sessions-id", profileId };

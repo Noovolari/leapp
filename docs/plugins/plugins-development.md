@@ -36,6 +36,68 @@ Currently available methods:
   | -------------------------- | --------- | --------|
   | url   | string     | a valid HTTP URL to open in the default browser |
 
+###createSession
+- **`createSession`**`(createSessionData: SessionData): Promise<string>`
+
+  Creates a new Leapp Session based on given SessionData
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | createSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | an object containing Leapp Session metadata 
+
+###cloneSession
+- **`cloneSession`**`(session: Session): Promise<string>`
+
+  Creates a clone of the given Leapp Session
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | an object that represents a specific Leapp Session
+
+###updateSession
+- **`updateSession`**`(updateSessionData: SessionData, session: Session): Promise<void>`
+
+  Allows to edit the given Leapp Session with the specified SessionData
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | updateSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | an object containing the new Leapp Session metadata
+  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | an object that represents the Leapp Session to be updated
+
+###openTerminal
+- **`openTerminal`**`(command: string, env?: any): Promise<void>`
+
+  Executes the given command in a new terminal window. 
+
+  The terminal window base path is set to the home directory
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | command | string | a string representation of the command to execute
+  | env | any | an optional object containing key-value pairs corresponding to environment variables to set in the terminal
+
+###getProfileIdByName
+- **`getProfileIdByName`**`(profileName: string): string`
+
+  Returns the id of a named profile from its name if it exists, otherwise creates a new profile and returns its id. 
+  
+  Can be used when creating/editing a session since SessionData requires the id of a named profile
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | profileName | string | a valid named profile
+
+###getIdpUrlIdByUrl
+- **`getIdpUrlIdByUrl`**`(url: string): string`
+
+  Returns the id of an IdP URL from its url if it exists, otherwise creates a new IdP URL and returns its id. 
+
+  Can be used when creating/editing Federated Sessions since SessionData requires the id of an IdP URL
+
+  | argument | type | description |
+  | --- | --- | --- |
+  | url | string | a string representation of an IdP URL
+
 ---
 
 ###Example: display a toast message in Leapp
@@ -55,6 +117,24 @@ const response = await res.json();
 
 ```typescript
 this.pluginEnvironment.openExternalUrl("https://leapp.cloud");
+```
+
+###Example: edit the selected session
+
+```typescript
+async applySessionAction(session: Session, credentials: any): Promise<void> {
+    const profileId = this.pluginEnvironment.getProfileIdByName("default");
+    const idpUrlId = this.pluginEnvironment.getIdpUrlIdByUrl("put a valid url for an IdP here");
+    this
+    .pluginEnvironment.updateSession(new AwsIamRoleFederatedSessionData(
+        "arn:aws:iam::000000000000:saml-provider/test", 
+        idpUrlId, 
+        profileId, 
+        "us-east-1", 
+        "arn:aws:iam::000000000000:role/test", 
+        "New Name Session"
+    ), session);
+}
 ```
 
 ---

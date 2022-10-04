@@ -14,6 +14,12 @@ remote.initialize();
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
 app.disableHardwareAcceleration();
+
+if (process.platform === "linux") {
+  app.commandLine.appendSwitch("disable-software-rasterizer");
+  app.commandLine.appendSwitch("in-process-gpu");
+}
+
 app.setAsDefaultProtocolClient('leapp');
 
 

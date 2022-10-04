@@ -45,9 +45,22 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       request.roleArn,
       request.profileId
     );
-
     this.repository.addSession(session);
     this.sessionNotifier?.setSessions(this.repository.getSessions());
+  }
+
+  async update(sessionId: string, updateRequest: AwsIamRoleFederatedSessionRequest): Promise<void> {
+    const session = this.repository.getSessionById(sessionId) as AwsIamRoleFederatedSession;
+    if (session) {
+      session.sessionName = updateRequest.sessionName;
+      session.region = updateRequest.region;
+      session.roleArn = updateRequest.roleArn;
+      session.idpUrlId = updateRequest.idpUrl;
+      session.idpArn = updateRequest.idpArn;
+      session.profileId = updateRequest.profileId;
+      this.repository.updateSession(sessionId, session);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
+    }
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
@@ -135,6 +148,17 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   removeSecrets(_: string): void {}
+
+  async getCloneRequest(session: AwsIamRoleFederatedSession): Promise<AwsIamRoleFederatedSessionRequest> {
+    return {
+      profileId: session.profileId,
+      region: session.region,
+      sessionName: session.sessionName,
+      roleArn: session.roleArn,
+      idpArn: session.idpArn,
+      idpUrl: session.idpUrlId,
+    };
+  }
 
   private async assumeRoleWithSAML(
     sts: STS,

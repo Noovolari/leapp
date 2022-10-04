@@ -28,7 +28,7 @@ export interface SelectedIntegration {
   selected: boolean;
 }
 
-export const openIntegrationEvent = new BehaviorSubject<boolean>(false);
+export const openIntegrationEvent = new BehaviorSubject<boolean | string>(false);
 export const syncAllEvent = new BehaviorSubject<boolean>(false);
 export const integrationHighlight = new BehaviorSubject<number>(-1);
 
@@ -125,7 +125,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     this.subscription2 = openIntegrationEvent.subscribe((value) => {
       if (value) {
-        this.gotoForm(1, this.selectedConfiguration);
+        this.gotoForm(1, this.selectedConfiguration, IntegrationType.azure);
       }
     });
 
@@ -196,7 +196,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
     const selectedIndex = this.selectedIntegrations.findIndex((s) => s.id === configuration.id);
     this.selectedIntegrations[selectedIndex].selected = true;
-    document.querySelector(".sessions").classList.remove("option-bar-opened");
+    this.behaviouralSubjectService.unselectSessions();
 
     const currentFilterGroup = globalFilterGroup.value;
     currentFilterGroup.pinnedFilter = false;
@@ -305,7 +305,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.modalRef?.hide();
   }
 
-  gotoForm(modifying: number, integration: Integration): void {
+  gotoForm(modifying: number, integration: Integration, overrideType?: IntegrationType): void {
     // Change graphical values to show the form
     this.chooseIntegration = false;
     this.modifying = modifying;
@@ -322,7 +322,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       };
     }
 
-    this.selectedIntegration = integration.type || IntegrationType.awsSso;
+    if (overrideType) {
+      this.selectedIntegration = overrideType;
+    } else {
+      this.selectedIntegration = integration.type || IntegrationType.awsSso;
+    }
 
     this.form.get("alias").setValue(this.selectedConfiguration.alias);
     this.form.get("portalUrl").setValue(this.selectedConfiguration.portalUrl);

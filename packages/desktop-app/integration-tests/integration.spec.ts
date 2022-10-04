@@ -4,9 +4,9 @@ import path from "path";
 import os from "os";
 import { env } from "./.env";
 import chromedriver from "chromedriver";
-//import childProcess from "child_process";
+import childProcess from "child_process";
 
-//const execSync = childProcess.execSync;
+const execSync = childProcess.execSync;
 
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
@@ -31,6 +31,14 @@ export const generateDriver = async (): Promise<any> => {
     })
     .forBrowser("chrome")
     .build();
+};
+
+const killElectron = () => {
+  if (os.platform() !== "darwin") {
+    return;
+  }
+  console.log("process name:", path.parse(electronBinaryPath).name);
+  execSync(`killall ${path.parse(electronBinaryPath).name}`);
 };
 
 export const selectElementByCss = async (selector: string, driver: ThenableWebDriver): Promise<WebElement> => {
@@ -109,8 +117,8 @@ describe("Integration test 1", () => {
       console.log("chromedriver started successfully");
       driver = await generateDriver();
       console.log("driver generated successfully");
-      //console.log("TCP status", execSync("lsof -i -n -P | grep TCP | grep chrome").toString());
       chromeDriverPort++;
+      await pause(5000);
     } catch (err) {
       console.error(err);
     }
@@ -121,9 +129,10 @@ describe("Integration test 1", () => {
     await driver.quit();
     console.log("driver quit successfully");
     chromedriver.stop();
-    await pause(5000);
     console.log("chromedriver stop successfully");
-    //console.log("TCP status", execSync("lsof -i -n -P | grep TCP | grep chrome").toString());
+    killElectron();
+    console.log("electron killed successfully");
+    await pause(5000);
   }, testTimeout);
 
   test(

@@ -5,7 +5,8 @@ import os from "os";
 //import { env } from "./.env";
 import childProcess from "child_process";
 
-const exec = childProcess.execSync;
+const exec = childProcess.exec;
+const execSync = childProcess.execSync;
 const serverHost = "http://localhost:9515";
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
@@ -16,14 +17,6 @@ const electronBinaryPaths = {
   win32: winPath,
 };
 const electronBinaryPath = electronBinaryPaths[os.platform()];
-
-const killElectron = () => {
-  if (os.platform() !== "darwin") {
-    return;
-  }
-  console.log("process name:", path.parse(electronBinaryPath).name);
-  exec(`killall ${path.parse(electronBinaryPath).name}`);
-};
 
 export const generateDriver = async (): Promise<any> =>
   new Builder()
@@ -98,27 +91,54 @@ export const waitUntilDisplayed = (selector: string, expectDisplayToBe: boolean,
   });
 
 describe("Integration test 1", () => {
+  const currentOS = os.platform();
+  const rootPath = path.join(__dirname, "..");
   const testTimeout = 60000;
+  const waitForChromeDriverTimeout = 5000;
+
+  const runChromeDriverMacCommand = `${rootPath}/node_modules/.bin/chromedriver`;
+  const runChromeDriverWinCommand = [`${rootPath}\\node_modules\\.bin\\chromedriver.cmd`];
+  const runChromeDriverLinCommand = `${rootPath}/node_modules/.bin/chromedriver`;
+  const runChromeDriverCommand = {
+    darwin: runChromeDriverMacCommand,
+    win32: runChromeDriverWinCommand,
+    linux: runChromeDriverLinCommand,
+  };
+
+  const killChromeDriverMacCommand = `killall chromedriver`;
+  const killChromeDriverWinCommand = [`taskkill /f /im chromedriver.exe`];
+  const killChromeDriverLinCommand = `killall chromedriver`;
+  const killChromeDriverCommand = {
+    darwin: killChromeDriverMacCommand,
+    win32: killChromeDriverWinCommand,
+    linux: killChromeDriverLinCommand,
+  };
+
   let driver;
 
   beforeEach(async () => {
     console.log("in before each...");
-    driver = await generateDriver();
-    console.log("created succesfully");
+    exec(runChromeDriverCommand[currentOS]);
+    await pause(waitForChromeDriverTimeout);
+    try {
+      driver = await generateDriver();
+    } catch (err) {
+      console.error(err);
+    }
+    console.log("created successfully");
   }, testTimeout);
 
   afterEach(async () => {
     console.log("in after each...");
-    killElectron();
     await driver.quit();
-    console.log("quit succesfully");
+    execSync(killChromeDriverCommand[currentOS]);
+    console.log("quit successfully");
   }, testTimeout);
 
   test(
     "my integration test 1",
     async () => {
       console.log("in integration test 1...");
-      console.log(driver);
       await clickOnAddSessionButton(driver);
 
       const strategyButtonSelector = By.css(".strategy-list button");
@@ -140,7 +160,6 @@ describe("Integration test 1", () => {
     "create session",
     async () => {
       console.log("in integration test 2...");
-      console.log(driver);
 
       console.log("before clickOnAddSessionButton...");
       await clickOnAddSessionButton(driver);

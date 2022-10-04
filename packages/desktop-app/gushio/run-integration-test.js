@@ -7,37 +7,11 @@ module.exports = {
   },
   run: async (_) => {
     const path = require('path');
-    const os = require('os');
     const shellJs = require('shelljs');
-
     try {
       console.log('Rebuilding app && Executing integration tests...');
       await gushio.run(path.join(__dirname, './target-build.js'), ['aot']);
-
-      const rootPath = path.join(__dirname, "..");
-      const currentOS = os.platform();
-      const macCommand = `${rootPath}/node_modules/.bin/chromedriver & npx jest --runInBand --detectOpenHandles && pkill chromedriver`;
-      const winCommand = [`${rootPath}\\node_modules\\.bin\\chromedriver.cmd`, `npx jest --runInBand`, `taskkill /f /im chromedriver.exe`];
-      const linCommand = `${rootPath}/node_modules/.bin/chromedriver & npx jest --runInBand && pkill chromedriver`;
-
-      const command = {
-        darwin: macCommand,
-        win32: winCommand,
-        linux: linCommand,
-      };
-
-      let result;
-      if(currentOS !== "win32") {
-        result = shellJs.exec(command[currentOS]);
-      } else {
-        shellJs.exec(command[currentOS][0], {async: true});
-        await pause(2000);
-        result = shellJs.exec(command[currentOS][1]);
-        if (result.code !== 0) {
-          throw new Error(result.stderr)
-        }
-        result = shellJs.exec(command[currentOS][2]);
-      }
+      const result = shellJs.exec("npx jest --runInBand");
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }
@@ -47,10 +21,3 @@ module.exports = {
     }
   }
 }
-
-const pause = async (timeout) =>
-  new Promise((resolve, _) => {
-    setTimeout(() => {
-      resolve(true);
-    }, timeout);
-  });

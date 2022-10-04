@@ -105,11 +105,12 @@ describe("Integration test 1", () => {
   beforeEach(async () => {
     console.log("in before each...");
     try {
-      await chromedriver.start([`--port=${chromeDriverPort++}`], true);
+      await chromedriver.start([`--port=${chromeDriverPort}`], true);
       console.log("chromedriver started successfully");
       driver = await generateDriver();
       console.log("driver generated successfully");
       //console.log("TCP status", execSync("lsof -i -n -P | grep TCP | grep chrome").toString());
+      chromeDriverPort++;
     } catch (err) {
       console.error(err);
     }

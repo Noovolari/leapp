@@ -4,6 +4,9 @@ import path from "path";
 import os from "os";
 import { env } from "./.env";
 import chromedriver from "chromedriver";
+import childProcess from "child_process";
+
+const execSync = childProcess.execSync;
 
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
@@ -106,6 +109,7 @@ describe("Integration test 1", () => {
       console.log("chromedriver started successfully");
       driver = await generateDriver();
       console.log("driver generated successfully");
+      console.log("TCP status", execSync("lsof -i -n -P | grep TCP | grep chrome").toString());
     } catch (err) {
       console.error(err);
     }
@@ -118,6 +122,7 @@ describe("Integration test 1", () => {
     chromedriver.stop();
     await pause(5000);
     console.log("chromedriver stop successfully");
+    console.log("TCP status", execSync("lsof -i -n -P | grep TCP | grep chrome").toString());
   }, testTimeout);
 
   test(

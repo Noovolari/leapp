@@ -2,7 +2,7 @@ import { describe, test } from "@jest/globals";
 import { Builder, By, ThenableWebDriver, until, WebElement } from "selenium-webdriver";
 import path from "path";
 import os from "os";
-//import { env } from "./.env";
+import { env } from "./.env";
 import childProcess from "child_process";
 
 const exec = childProcess.exec;
@@ -97,7 +97,7 @@ describe("Integration test 1", () => {
   const waitForChromeDriverTimeout = 5000;
 
   const runChromeDriverMacCommand = `${rootPath}/node_modules/.bin/chromedriver`;
-  const runChromeDriverWinCommand = [`${rootPath}\\node_modules\\.bin\\chromedriver.cmd`];
+  const runChromeDriverWinCommand = `${rootPath}\\node_modules\\.bin\\chromedriver.cmd`;
   const runChromeDriverLinCommand = `${rootPath}/node_modules/.bin/chromedriver`;
   const runChromeDriverCommand = {
     darwin: runChromeDriverMacCommand,
@@ -106,7 +106,7 @@ describe("Integration test 1", () => {
   };
 
   const killChromeDriverMacCommand = `killall chromedriver`;
-  const killChromeDriverWinCommand = [`taskkill /f /im chromedriver.exe`];
+  const killChromeDriverWinCommand = `taskkill /f /im chromedriver.exe`;
   const killChromeDriverLinCommand = `killall chromedriver`;
   const killChromeDriverCommand = {
     darwin: killChromeDriverMacCommand,
@@ -190,10 +190,10 @@ describe("Integration test 1", () => {
       await sessionAlias.sendKeys("selenium-session");
 
       const sessionAccessKey = await selectElementByCss('input[placeholder="Access Key ID *"]', driver);
-      await sessionAccessKey.sendKeys("accessKey"); /*env.awsIamUserTest.accessKeyId*/
+      await sessionAccessKey.sendKeys(env.awsIamUserTest.accessKeyId);
 
       const sessionSecretAccessKey = await selectElementByCss('input[placeholder="Secret Access Key *"]', driver);
-      await sessionSecretAccessKey.sendKeys("secretKey"); /*env.awsIamUserTest.secretAccessKey*/
+      await sessionSecretAccessKey.sendKeys(env.awsIamUserTest.secretAccessKey);
 
       console.log("pressing the button...");
 

@@ -123,7 +123,13 @@ describe("Integration test 1", () => {
   beforeEach(async () => {
     console.log("in before each...");
     try {
-      exec(runChromeDriverCommand[currentOS]);
+      const process = exec(runChromeDriverCommand[currentOS], (error) => console.log("ERROR", error));
+      process.stdout.on("data", (data) => {
+        console.log("stdout:", data);
+      });
+      process.stderr.on("data", (data) => {
+        console.log("stderr:", data);
+      });
       await pause(waitForChromeDriverTimeout);
       driver = await generateDriver();
     } catch (err) {

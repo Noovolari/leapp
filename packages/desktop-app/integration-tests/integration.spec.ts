@@ -137,8 +137,7 @@ describe("Integration test 1", () => {
 
   afterEach(async () => {
     console.log("in after each...");
-    driver.quit();
-    await pause(2000);
+    await driver.quit();
     console.log("quit successfully");
   }, testTimeout);
 
@@ -167,6 +166,9 @@ describe("Integration test 1", () => {
     "create session",
     async () => {
       console.log("in integration test 2...");
+
+      const screenshot = await driver.takeScreenshot();
+      console.log("screenshot:", screenshot);
 
       console.log("before clickOnAddSessionButton...");
       await clickOnAddSessionButton(driver);

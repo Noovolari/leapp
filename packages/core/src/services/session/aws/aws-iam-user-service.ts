@@ -64,19 +64,9 @@ export class AwsIamUserService extends AwsSessionService {
   async create(request: AwsIamUserSessionRequest): Promise<void> {
     const session = new AwsIamUserSession(request.sessionName, request.region, request.profileId, request.mfaDevice);
 
-    this.keychainService
-      .saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, request.accessKey)
-      .then((_: any) => {
-        this.keychainService
-          .saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, request.secretKey)
-          .catch((err: any) => console.error(err));
-      })
-      .catch((err: any) => {
-        console.error(err);
-      });
-
+    await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, request.accessKey);
+    await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, request.secretKey);
     this.repository.addSession(session);
-
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 

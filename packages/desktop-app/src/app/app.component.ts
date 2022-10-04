@@ -146,6 +146,23 @@ export class AppComponent implements OnInit {
       );
     }
 
+    // Deep link with app closed
+    if (this.fileService.existsSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile))) {
+      try {
+        if (!constants.disablePluginSystem) {
+          const deepLink = this.fileService.readFileSync(
+            this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile)
+          );
+          await this.pluginManagerService.installPlugin(deepLink);
+          await this.pluginManagerService.loadFromPluginDir();
+        }
+      } catch (err) {
+        this.loggingService.log(new LoggedEntry(`Error in install plugin from file: ${err.toString()}`, this, LogLevel.info));
+      } finally {
+        this.appNativeService.fs.removeSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile));
+      }
+    }
+
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     await this.router.navigate(["/dashboard"]);

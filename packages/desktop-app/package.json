@@ -24,14 +24,23 @@
     "build-and-run-dev": "gushio gushio/target-build-and-run.js aot",
     "rebuild-core-and-run-dev": "cd ../core && npm run build && cd ../desktop-app && npm run build-and-run-dev",
     "release-mac": "gushio gushio/target-release.js 'configuration production' mac",
+    "release-mac-dev": "gushio gushio/target-release-dev.js 'configuration staging' mac",
     "release-linux": "gushio gushio/target-release.js 'configuration production' linux",
     "release-win": "gushio gushio/target-release.js \"configuration production\" win",
     "release-all": "gushio gushio/target-release.js 'configuration production' all",
     "set-target-arm64": "gushio gushio/set-target-arch.js arm64",
     "set-target-x64": "gushio gushio/set-target-arch.js x64",
-    "nightly": "gushio gushio/target-nightly.js mac"
+    "nightly": "gushio gushio/target-nightly.js mac",
+    "nightly-win": "gushio gushio/target-nightly.js win",
+    "nightly-linux": "gushio gushio/target-nightly.js linux"
   },
   "build": {
+    "protocols": {
+      "name": "leapp-deep-linking",
+      "schemes": [
+        "leapp"
+      ]
+    },
     "publish": [
       {
         "provider": "github",
@@ -84,11 +93,15 @@
       "description": "Leapp Client is a tool that allows the user to obtain secure, temporary and refreshable credentials to access AWS Services with AWS CLI and tools based on it, with versioning tools that work with AWS CodeCommit service and to easily use AWS SDK from your local environment during your everyday development.",
       "icon": "src/assets/icons/1024x1024.png",
       "desktop": {
-        "Icon": "/usr/share/icons/hicolor/256x256/apps/leapp.png"
+        "Icon": "/usr/share/icons/hicolor/256x256/apps/leapp.png",
+        "exec": "leapp %U"
       },
       "target": [
         "deb",
         "AppImage"
+      ],
+      "mimeTypes": [
+        "x-scheme-handler/leapp"
       ]
     },
     "mac": {
@@ -128,7 +141,7 @@
   },
   "dependencies": {
     "@angular/animations": "^13.2.2",
-    "@angular/cdk": "^13.3.9",
+    "@angular/cdk": "^13.2.2",
     "@angular/common": "^13.2.2",
     "@angular/compiler": "^13.2.2",
     "@angular/core": "^13.2.2",
@@ -143,7 +156,7 @@
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
     "@noovolari/dpapi-addon": "0.1.2",
-    "@noovolari/leapp-core": "0.1.123",
+    "@noovolari/leapp-core": "../core/dist",
     "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",

@@ -31,7 +31,7 @@ module.exports = {
       await writePackageJsonFunction(path, "desktop-app", desktopAppPackage);
       await leappCoreBootstrap("desktop-app", () => `npm:@noovolari/leapp-core-nightly@latest`);
 
-      await gushio.run(path.join(__dirname, './target-release.js'), ["configuration production", args[0]])
+      await gushio.run(path.join(__dirname, './target-release-dev.js'), ["configuration staging", args[0]])
     } catch (e) {
       e.message = e.stack.red
       throw e

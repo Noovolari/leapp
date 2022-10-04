@@ -17,6 +17,7 @@ const electronBinaryPaths = {
   win32: winPath,
 };
 const electronBinaryPath = electronBinaryPaths[os.platform()];
+let stillTesting = false;
 
 export const generateDriver = async (): Promise<any> =>
   new Builder()
@@ -106,7 +107,7 @@ describe("Integration test 1", () => {
   };
 
   const killChromeDriverMacCommand = `killall chromedriver`;
-  const killChromeDriverWinCommand = `taskkill /f /im chromedriver.exe`;
+  const killChromeDriverWinCommand = `taskkill /f /im chromedriver.cmd`;
   const killChromeDriverLinCommand = `killall chromedriver`;
   const killChromeDriverCommand = {
     darwin: killChromeDriverMacCommand,
@@ -121,14 +122,17 @@ describe("Integration test 1", () => {
   afterAll(async () => {}, testTimeout);
 
   beforeEach(async () => {
+    stillTesting = true;
     console.log("in before each...");
     try {
-      const process = exec(runChromeDriverCommand[currentOS], (error) => console.log("ERROR", error));
+      const process = exec(runChromeDriverCommand[currentOS], (error) => {
+        if (stillTesting) console.log("ERROR", error);
+      });
       process.stdout.on("data", (data) => {
-        console.log("stdout:", data);
+        if (stillTesting) console.log("stdout:", data);
       });
       process.stderr.on("data", (data) => {
-        console.log("stderr:", data);
+        if (stillTesting) console.log("stderr:", data);
       });
       await pause(waitForChromeDriverTimeout);
       driver = await generateDriver();
@@ -143,6 +147,7 @@ describe("Integration test 1", () => {
     await driver.quit();
     execSync(killChromeDriverCommand[currentOS]);
     console.log("quit successfully");
+    stillTesting = false;
   }, testTimeout);
 
   test(

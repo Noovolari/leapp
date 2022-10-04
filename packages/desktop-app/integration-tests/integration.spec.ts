@@ -3,11 +3,8 @@ import { Builder, By, ThenableWebDriver, until, WebElement } from "selenium-webd
 import path from "path";
 import os from "os";
 import { env } from "./.env";
-import childProcess from "child_process";
+import chromedriver from "chromedriver";
 
-const exec = childProcess.exec;
-const execSync = childProcess.execSync;
-const serverHost = "http://localhost:9515";
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");
 const winPath = path.resolve(".", "node_modules\\electron\\dist\\electron.exe");
@@ -17,10 +14,11 @@ const electronBinaryPaths = {
   win32: winPath,
 };
 const electronBinaryPath = electronBinaryPaths[os.platform()];
-let stillTesting = false;
+const chromeDriverPort = 9515;
 
-export const generateDriver = async (): Promise<any> =>
-  new Builder()
+export const generateDriver = async (): Promise<any> => {
+  const serverHost = `http://localhost:${chromeDriverPort}`;
+  return new Builder()
     .usingServer(serverHost)
     .withCapabilities({
       "goog:chromeOptions": {
@@ -30,6 +28,7 @@ export const generateDriver = async (): Promise<any> =>
     })
     .forBrowser("chrome")
     .build();
+};
 
 export const selectElementByCss = async (selector: string, driver: ThenableWebDriver): Promise<WebElement> => {
   console.log("waiting 60 seconds - driver wait");
@@ -92,28 +91,7 @@ export const waitUntilDisplayed = (selector: string, expectDisplayToBe: boolean,
   });
 
 describe("Integration test 1", () => {
-  const currentOS = os.platform();
-  const rootPath = path.join(__dirname, "..");
   const testTimeout = 60000;
-  const waitForChromeDriverTimeout = 5000;
-
-  const runChromeDriverMacCommand = `${rootPath}/node_modules/.bin/chromedriver`;
-  const runChromeDriverWinCommand = `${rootPath}\\node_modules\\.bin\\chromedriver.cmd`;
-  const runChromeDriverLinCommand = `${rootPath}/node_modules/.bin/chromedriver`;
-  const runChromeDriverCommand = {
-    darwin: runChromeDriverMacCommand,
-    win32: runChromeDriverWinCommand,
-    linux: runChromeDriverLinCommand,
-  };
-
-  const killChromeDriverMacCommand = `killall chromedriver`;
-  const killChromeDriverWinCommand = `taskkill /f /im chromedriver.cmd`;
-  const killChromeDriverLinCommand = `killall chromedriver`;
-  const killChromeDriverCommand = {
-    darwin: killChromeDriverMacCommand,
-    win32: killChromeDriverWinCommand,
-    linux: killChromeDriverLinCommand,
-  };
 
   let driver;
 
@@ -122,32 +100,23 @@ describe("Integration test 1", () => {
   afterAll(async () => {}, testTimeout);
 
   beforeEach(async () => {
-    stillTesting = true;
     console.log("in before each...");
     try {
-      const process = exec(runChromeDriverCommand[currentOS], (error) => {
-        if (stillTesting) console.log("ERROR", error);
-      });
-      process.stdout.on("data", (data) => {
-        if (stillTesting) console.log("stdout:", data);
-      });
-      process.stderr.on("data", (data) => {
-        if (stillTesting) console.log("stderr:", data);
-      });
-      await pause(waitForChromeDriverTimeout);
+      chromedriver.start();
+      console.log("chromedriver started successfully");
       driver = await generateDriver();
+      console.log("driver generated successfully");
     } catch (err) {
       console.error(err);
     }
-    console.log("created successfully");
   }, testTimeout);
 
   afterEach(async () => {
     console.log("in after each...");
     await driver.quit();
-    execSync(killChromeDriverCommand[currentOS]);
-    console.log("quit successfully");
-    stillTesting = false;
+    console.log("driver quit successfully");
+    chromedriver.stop();
+    console.log("chromedriver stop successfully");
   }, testTimeout);
 
   test(

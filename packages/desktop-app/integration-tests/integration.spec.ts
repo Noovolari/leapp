@@ -116,18 +116,15 @@ describe("Integration test 1", () => {
 
   let driver;
 
-  beforeAll(async () => {
-    exec(runChromeDriverCommand[currentOS]);
-    await pause(waitForChromeDriverTimeout);
-  }, testTimeout);
+  beforeAll(async () => {}, testTimeout);
 
-  afterAll(async () => {
-    execSync(killChromeDriverCommand[currentOS]);
-  }, testTimeout);
+  afterAll(async () => {}, testTimeout);
 
   beforeEach(async () => {
     console.log("in before each...");
     try {
+      exec(runChromeDriverCommand[currentOS]);
+      await pause(waitForChromeDriverTimeout);
       driver = await generateDriver();
     } catch (err) {
       console.error(err);
@@ -138,6 +135,7 @@ describe("Integration test 1", () => {
   afterEach(async () => {
     console.log("in after each...");
     await driver.quit();
+    execSync(killChromeDriverCommand[currentOS]);
     console.log("quit successfully");
   }, testTimeout);
 

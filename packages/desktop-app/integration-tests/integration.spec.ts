@@ -116,6 +116,7 @@ describe("Integration test 1", () => {
     await driver.quit();
     console.log("driver quit successfully");
     chromedriver.stop();
+    await pause(5000);
     console.log("chromedriver stop successfully");
   }, testTimeout);
 

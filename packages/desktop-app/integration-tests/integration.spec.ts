@@ -166,6 +166,7 @@ describe("Integration test 1", () => {
     "create session",
     async () => {
       console.log("in integration test 2...");
+      console.log("DRIVER", driver);
 
       const screenshot = await driver.takeScreenshot();
       console.log("screenshot:", screenshot);

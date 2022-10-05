@@ -9,7 +9,8 @@ env:
   INTEGRATION_TEST_ENVIRONMENT: ${{ secrets.INTEGRATION_TEST_ENVIRONMENT }}
 
 jobs:
-  integration-test-macos-1:
+
+  integration-test-macos:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
@@ -24,20 +25,10 @@ jobs:
       - name: Test 1 macOS desktop app
         run: |
           npm run --prefix packages/desktop-app integration-test-1
-# try to delete leapp.lock
-
-
-  integration-test-macos-2:
-    runs-on: macos-12
-    steps:
-      - uses: actions/checkout@v3
-      - name: Checkout
-        run: |
-          npm run bootstrap
-          npm run set-dev-environment
-          cd packages/desktop-app
-          npm run build-dev
-          npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
+          ls ~/.Leapp/
+          rm ~/.Leapp/Leapp-lock.json
+          rm ~/.Leapp/Leapp-lock.backup.bin
+          ls ~/.Leapp/
 
       - name: Test 2 macOS desktop app
         run: |

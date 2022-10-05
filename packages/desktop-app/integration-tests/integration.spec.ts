@@ -1,9 +1,9 @@
-import { describe, test } from "@jest/globals";
-import path from "path";
-import os from "os";
+import { beforeAll, afterAll, beforeEach, afterEach, expect, describe, test } from "@jest/globals";
 import { env } from "./.env";
 import chromedriver from "chromedriver";
 import { ThenableWebDriver, WebElement, Builder, By, until } from "selenium-webdriver";
+import * as path from "path";
+import * as os from "os";
 
 const linuxPath = path.resolve(".", "node_modules/electron/dist/electron");
 const macPath = path.resolve(".", "node_modules/electron/dist/Electron.app/Contents/MacOS/Electron");

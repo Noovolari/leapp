@@ -25,9 +25,8 @@ jobs:
       - name: Test macOS desktop app
         run: |
           npm run --prefix packages/desktop-app integration-test-1
-          test -f ~/Library/Logs/Leapp/log.electronService.log && echo "leapp log exists."
           rm ~/Library/Logs/Leapp/log.electronService.log
-          test -f ~/Library/Logs/Leapp/log.electronService.log && echo "leapp log exists."
+          rm -rf ~/.Leapp
           npm run --prefix packages/desktop-app integration-test-2
 
 #  integration-test-win:

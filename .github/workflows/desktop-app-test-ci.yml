@@ -26,7 +26,6 @@ jobs:
         run: |
           npm run --prefix packages/desktop-app integration-test-1
 
-      - uses: AutoModality/action-clean@v1
       - uses: actions/checkout@v3
       - name: Bootstrap and build
         run: |

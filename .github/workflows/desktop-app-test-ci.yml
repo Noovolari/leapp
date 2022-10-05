@@ -22,22 +22,21 @@ jobs:
           npm run build-dev
           npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
 
-      - name: Test macOS desktop app
+      - name: Test 1 macOS desktop app
         run: |
           npm run --prefix packages/desktop-app integration-test-1
+          cat ~/electronUserDataPath
+          CHROME_CACHE_PATH=$(cat ~/electronUserDataPath)
+          rm -rf $CHROME_CACHE_PATH
 
-      - uses: actions/checkout@v3
-      - name: Bootstrap and build
-        run: |
-          npm run bootstrap
-          npm run set-dev-environment
-          cd packages/desktop-app
-          npm run build-dev
-          npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
-
-      - name: Test macOS desktop app
+      - name: Test 2 macOS desktop app
         run: |
           npm run --prefix packages/desktop-app integration-test-2
+
+      - name: Print electronUserDataPath
+        if: always()
+        run: |
+          cat ~/electronUserDataPath
 
 #  integration-test-win:
 #    runs-on: windows-latest

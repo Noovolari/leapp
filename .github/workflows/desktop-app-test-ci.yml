@@ -30,9 +30,9 @@ jobs:
 
       - name: Test 1 macOS desktop app
         run: |
-          px -aux > ps-before.txt
+          ps aux > ps-before.txt
           npm run --prefix packages/desktop-app integration-test-1
-          px -aux > ps-after.txt
+          ps aux > ps-after.txt
 
       - name: Screenshot after
         uses: OrbitalOwen/desktop-screenshot-action@0.1

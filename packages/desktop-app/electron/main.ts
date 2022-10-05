@@ -173,10 +173,6 @@ const generateMainWindow = () => {
       // Keep only command line / deep linked arguments
       fs.writeFileSync(path.join(os.homedir(), environment.deeplinkFile), process.argv[1].split("leapp://")[1]);
     }
-
-    // TODO: remove before flight
-    const userDataPath = app.getPath('userData');
-    fs.writeFileSync(path.join(os.homedir(), "electronUserDataPath"), userDataPath);
   };
 
   const createTrayWindow = () => {

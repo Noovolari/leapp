@@ -23,6 +23,7 @@ export const generateDriver = async (): Promise<any> => {
       "goog:chromeOptions": {
         binary: electronBinaryPath,
         args: [`app=${path.resolve(".")}`],
+        detach: true,
       },
     })
     .forBrowser("chrome")

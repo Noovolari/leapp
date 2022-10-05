@@ -155,15 +155,13 @@ const generateMainWindow = () => {
       electronLocalshortcut.unregisterAll(win);
     });
 
-
-
-
-
     app.on('open-url', (event, url) => {
       win.webContents.send("PLUGIN_URL", url);
     })
 
     remote.enable(win.webContents);
+
+    const userDataPath = app.getPath('userData');
   };
 
   const createTrayWindow = () => {

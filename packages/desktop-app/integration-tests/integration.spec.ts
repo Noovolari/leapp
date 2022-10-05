@@ -16,7 +16,7 @@ const electronBinaryPaths = {
 const electronBinaryPath = electronBinaryPaths[os.platform()];
 
 export const generateDriver = async (): Promise<any> => {
-  const serverHost = `http://localhost:9515`;
+  const serverHost = `http://localhost:9515/wd/hub`;
   return new Builder()
     .usingServer(serverHost)
     .withCapabilities({

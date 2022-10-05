@@ -102,6 +102,7 @@ describe("Integration test 1", () => {
     try {
       /*await chromedriver.start(undefined, true);
       console.log("chromedriver started successfully");*/
+      await pause(5000);
       driver = await generateDriver();
       console.log("driver generated successfully");
       await pause(5000);
@@ -116,7 +117,6 @@ describe("Integration test 1", () => {
     console.log("driver quit successfully");
     /*chromedriver.stop();
     console.log("chromedriver stop successfully");*/
-    await pause(5000);
   }, testTimeout);
 
   test(

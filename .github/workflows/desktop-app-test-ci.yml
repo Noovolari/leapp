@@ -23,10 +23,11 @@ jobs:
           npm run build-dev
           npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
 
-      - name: Test macOS desktop app
-        uses: nanasess/setup-chromedriver@v1
+      - uses: nanasess/setup-chromedriver@v1
         with:
           chromedriver-version: '94.0.4606.113'
+
+      - name: Test macOS desktop app
         run: |
           export DISPLAY=:99
           chromedriver --url-base=/wd/hub &

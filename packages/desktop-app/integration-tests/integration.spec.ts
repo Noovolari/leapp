@@ -1,6 +1,6 @@
 import { beforeAll, afterAll, beforeEach, afterEach, expect, describe, test } from "@jest/globals";
 import { env } from "./.env";
-import chromedriver from "chromedriver";
+//import chromedriver from "chromedriver";
 import { ThenableWebDriver, WebElement, Builder, By, until } from "selenium-webdriver";
 import * as path from "path";
 import * as os from "os";
@@ -100,8 +100,8 @@ describe("Integration test 1", () => {
   beforeEach(async () => {
     console.log("in before each...");
     try {
-      await chromedriver.start(undefined, true);
-      console.log("chromedriver started successfully");
+      /*await chromedriver.start(undefined, true);
+      console.log("chromedriver started successfully");*/
       driver = await generateDriver();
       console.log("driver generated successfully");
       await pause(5000);
@@ -114,8 +114,8 @@ describe("Integration test 1", () => {
     console.log("in after each...");
     await driver.quit();
     console.log("driver quit successfully");
-    chromedriver.stop();
-    console.log("chromedriver stop successfully");
+    /*chromedriver.stop();
+    console.log("chromedriver stop successfully");*/
     await pause(5000);
   }, testTimeout);
 

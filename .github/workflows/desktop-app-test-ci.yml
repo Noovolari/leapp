@@ -23,32 +23,15 @@ jobs:
           npm run build-dev
           npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
 
-      - name: Screenshot before
-        uses: OrbitalOwen/desktop-screenshot-action@0.1
+      - name: Test macOS desktop app
+        uses: nanasess/setup-chromedriver@v1
         with:
-          file-name: 'before.jpg'
-
-      - name: Test 1 macOS desktop app
+          chromedriver-version: '94.0.4606.113'
         run: |
-          ps aux > ps-before.txt
+          export DISPLAY=:99
+          chromedriver --url-base=/wd/hub &
+          sudo Xvfb -ac :99 -screen 0 1280x1024x24 > /dev/null 2>&1 & # optional
           npm run --prefix packages/desktop-app integration-test-1
-          ps aux > ps-after.txt
-
-      - name: Screenshot after
-        uses: OrbitalOwen/desktop-screenshot-action@0.1
-        with:
-          file-name: 'after.jpg'
-
-      - name: Save artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: before-and-after
-          path: |
-            *.jpg
-            *.txt
-
-      - name: Test 2 macOS desktop app
-        run: |
           npm run --prefix packages/desktop-app integration-test-2
 
 #  integration-test-win:

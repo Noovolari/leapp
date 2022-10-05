@@ -14,7 +14,8 @@ jobs:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
-      - name: Checkout
+
+      - name: Bootstrap and build
         run: |
           npm run bootstrap
           npm run set-dev-environment
@@ -23,7 +24,7 @@ jobs:
           npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
 
       - name: Screenshot before
-      - uses: OrbitalOwen/desktop-screenshot-action@0.1
+        uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: 'before.jpg'
 
@@ -34,12 +35,12 @@ jobs:
           px -aux > ps-after.txt
 
       - name: Screenshot after
-      - uses: OrbitalOwen/desktop-screenshot-action@0.1
+        uses: OrbitalOwen/desktop-screenshot-action@0.1
         with:
           file-name: 'after.jpg'
 
       - name: Save artifacts
-      - uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3
         with:
           name: before-and-after
           path: |

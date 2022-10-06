@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - LEAP-680-spike-integration-tests
+  workflow_dispatch:
 
 env:
   INTEGRATION_TEST_ENVIRONMENT: ${{ secrets.INTEGRATION_TEST_ENVIRONMENT }}
@@ -14,7 +15,7 @@ jobs:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
-      - name: Bootstrap and build
+      - name: Bootstrap, build, create environment
         run: |
           npm run bootstrap
           npm run set-dev-environment
@@ -22,36 +23,45 @@ jobs:
           npm run build-dev
           npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
 
-      - name: Test macOS desktop app
+      - name: Test 1 macOS desktop app
         run: |
-          npm run --prefix packages/desktop-app integration-test-1
+          cd packages/desktop-app
+          npx jest -t "Integration test 1" --runInBand
           rm ~/Library/Logs/Leapp/log.electronService.log
           rm -rf ~/.Leapp
-          npm run --prefix packages/desktop-app integration-test-2
 
-#  integration-test-win:
-#    runs-on: windows-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#      - name: Test Windows desktop app
-#        run: |
-#          npm run bootstrap
-#          npm run set-dev-environment
-#          npx gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
-#          npm run --prefix packages/desktop-app integration-test
-#
-#  integration-test-linux:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#
-#      - name: Setup Project
-#        run: |
-#          npm run bootstrap
-#          npm run set-dev-environment
-#          npx gushio packages/desktop-app/gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
-#
-#      - name: Test Linux Headless desktop app
-#        uses: GabrielBB/xvfb-action@v1
-#        with:
-#          run: npm run --prefix packages/desktop-app integration-test
+      - name: Test 2 macOS desktop app
+        run: |
+          cd packages/desktop-app
+          npx jest -t "Integration test 2" --runInBand
+
+  integration-test-win:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Test Windows desktop app
+        run: |
+          npm run bootstrap
+          npm run set-dev-environment
+          cd packages/desktop-app
+          npm run build-dev
+          npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
+          npx jest --runInBand
+
+  integration-test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Bootstrap, build, create environment
+        run: |
+          npm run bootstrap
+          npm run set-dev-environment
+          cd packages/desktop-app
+          npm run build-dev
+          npx gushio ./gushio/create-pipeline-testing-env-file.js "${{ env.INTEGRATION_TEST_ENVIRONMENT }}"
+
+      - name: Test Linux Headless desktop app
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: cd packages/desktop-app && npx jest --runInBand

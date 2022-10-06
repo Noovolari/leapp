@@ -15,6 +15,9 @@ jobs:
     runs-on: macos-12
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: LEAP-680-spike-integration-tests
+
       - name: Bootstrap, build, create environment
         run: |
           npm run bootstrap
@@ -39,6 +42,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: LEAP-680-spike-integration-tests
+
       - name: Test Windows desktop app
         run: |
           npm run bootstrap
@@ -52,6 +58,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: LEAP-680-spike-integration-tests
 
       - name: Bootstrap, build, create environment
         run: |

@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, beforeEach, afterEach, expect, describe, test } from "@jest/globals";
+import { beforeEach, afterEach, expect, describe, test } from "@jest/globals";
 import { env } from "./.env";
 import chromedriver from "chromedriver";
 import { ThenableWebDriver, WebElement, Builder, By, until } from "selenium-webdriver";
@@ -94,18 +94,11 @@ describe("Leapp integration tests", () => {
   const testTimeout = 60000;
   let driver;
 
-  beforeAll(async () => {
-    await chromedriver.start(undefined, true);
-  }, testTimeout);
-
-  afterAll(async () => {
-    chromedriver.stop();
-    await pause(5000);
-  }, testTimeout);
-
   beforeEach(async () => {
     try {
-      await pause(5000);
+      await pause(3000);
+      await chromedriver.start(undefined, true);
+      await pause(3000);
       driver = await generateDriver();
     } catch (err) {
       console.error(err);
@@ -114,6 +107,7 @@ describe("Leapp integration tests", () => {
 
   afterEach(async () => {
     await driver.quit();
+    chromedriver.stop();
   }, testTimeout);
 
   test(

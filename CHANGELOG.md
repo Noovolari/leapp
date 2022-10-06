@@ -2,7 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.15.0](https://github.com/Noovolari/leapp/compare/v0.14.3...v0.15.0) (2022-10-03)
+## [0.15.1](https://github.com/Noovolari/leapp/compare/v0.15.0...v0.15.1) (2022-10-06)
+
+### Bug Fixes
+
+* fixed installing Leapp Plugin from the Plugin Hub not completing properly when the app is not running
+* added Leapp Session role name info to CLI start session command [Issue #341](https://github.com/Noovolari/leapp/issues/341) [PR #344](https://github.com/Noovolari/leapp/pull/344). Thanks to [@lordgordon](https://github.com/lordgordon) for reporting the issue and [@andreacavagna01](https://github.com/andreacavagna01) for the PR!
+
+### [0.15.0](https://github.com/Noovolari/leapp/compare/v0.14.3...v0.15.0) (2022-10-03)
 
 ### Features
 

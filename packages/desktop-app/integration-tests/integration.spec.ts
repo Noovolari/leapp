@@ -101,11 +101,12 @@ describe("Leapp integration tests", () => {
 
   afterAll(async () => {
     chromedriver.stop();
-    await pause(1000);
+    await pause(5000);
   }, testTimeout);
 
   beforeEach(async () => {
     try {
+      await pause(5000);
       driver = await generateDriver();
     } catch (err) {
       console.error(err);

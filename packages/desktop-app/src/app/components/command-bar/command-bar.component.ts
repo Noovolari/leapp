@@ -36,6 +36,7 @@ export interface IGlobalColumns {
 }
 
 export const globalColumns = new BehaviorSubject<IGlobalColumns>(null);
+export const globalColumnsCount = new BehaviorSubject<number>(null);
 
 @Component({
   selector: "app-command-bar",

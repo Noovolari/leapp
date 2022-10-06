@@ -194,7 +194,7 @@ td:nth-child(4) {
 
 ::ng-deep {
   .compact td:nth-child(1) span {
-    width: 110px;
+    width: 100%;
   }
 
   .compact td:nth-child(2) span {
@@ -227,11 +227,20 @@ td:nth-child(4) {
 
   tr td {
     &:nth-child(2) {
-      width: 14%;
+      width: 18%;
+      &.active-columns-3 {
+        width: 22%;
+      }
+      &.active-columns-2 {
+        width: 26%;
+      }
+      &.active-columns-1 {
+        width: 32%;
+      }
     }
 
     &:nth-child(3) {
-      width: 14%;
+      width: 13%;
     }
 
     &:nth-child(4) {
@@ -239,7 +248,7 @@ td:nth-child(4) {
     }
 
     &:nth-child(5) {
-      width: 14%;
+      width: 11%;
     }
 
     &:nth-child(6) {
@@ -304,10 +313,10 @@ i.moon-Copy {
 
 ::ng-deep {
   .compact .span-limiter {
-    max-width: 80px !important;
+    max-width: 100% !important;
   }
 }
 
 .span-limiter {
-  max-width: 125px;
+  max-width: 100%;
 }

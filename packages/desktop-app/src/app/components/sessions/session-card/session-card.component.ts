@@ -28,6 +28,9 @@ export class SessionCardComponent implements OnInit {
   globalColumns: IGlobalColumns;
 
   @Input()
+  globalColumnsCount: string;
+
+  @Input()
   isSelected: boolean;
 
   eSessionType = SessionType;

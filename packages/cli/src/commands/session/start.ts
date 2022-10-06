@@ -3,6 +3,11 @@ import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { sessionId } from "../../flags";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
+import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
+import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 
 export default class StartSession extends LeappCommand {
   static description = "Start a session";
@@ -64,9 +69,30 @@ export default class StartSession extends LeappCommand {
         name: "selectedSession",
         message: "select a session",
         type: "list",
-        choices: availableSessions.map((session: any) => ({ name: session.sessionName, value: session })),
+        choices: availableSessions.map((session: Session) => ({
+          name: `${session.sessionName} ${this.secondarySessionInfo(session) ? "- " + this.secondarySessionInfo(session) : ""}`,
+          value: session,
+        })),
       },
     ]);
     return answer.selectedSession;
+  }
+
+  secondarySessionInfo(session: Session): string {
+    switch (session.type) {
+      case SessionType.awsIamRoleFederated:
+        return (session as AwsIamRoleFederatedSession).roleArn.split("role/")[1] || "";
+      case SessionType.awsIamRoleChained:
+        return (session as AwsIamRoleChainedSession).roleArn.split("role/")[1] || "";
+      case SessionType.awsIamUser:
+        return "";
+      case SessionType.awsSsoRole:
+        const splittedRoleArn = (session as AwsSsoRoleSession).roleArn.split("/");
+        splittedRoleArn.splice(0, 1);
+        return splittedRoleArn.join("/");
+      case SessionType.azure:
+        return (session as AzureSession).subscriptionId;
+    }
+    return "ciao";
   }
 }

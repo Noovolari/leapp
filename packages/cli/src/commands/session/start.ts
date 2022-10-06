@@ -93,6 +93,6 @@ export default class StartSession extends LeappCommand {
       case SessionType.azure:
         return (session as AzureSession).subscriptionId;
     }
-    return "ciao";
+    return "";
   }
 }

@@ -87,7 +87,7 @@ describe("StartSession", () => {
     expect(remoteProceduresClient.refreshSessions).toHaveBeenCalled();
   });
 
-  test("selectSession", async () => {
+  test("selectSession without secondarySessionInfo", async () => {
     const cliProviderService: any = {
       sessionManagementService: {
         getSessions: jest.fn(() => [
@@ -102,12 +102,50 @@ describe("StartSession", () => {
     };
 
     const command = getTestCommand(cliProviderService);
+    const fakeRoleName = undefined;
+    command.secondarySessionInfo = jest.fn(() => fakeRoleName);
+
     const selectedSession = await command.selectSession();
     expect(cliProviderService.inquirer.prompt).toHaveBeenCalledWith([
       {
         choices: [
           {
             name: "sessionInactive",
+            value: { sessionName: "sessionInactive", status: SessionStatus.inactive },
+          },
+        ],
+        message: "select a session",
+        name: "selectedSession",
+        type: "list",
+      },
+    ]);
+    expect(selectedSession).toEqual({ name: "sessionInactive", value: "InactiveSession" });
+  });
+
+  test("selectSession with secondarySessionInfo", async () => {
+    const cliProviderService: any = {
+      sessionManagementService: {
+        getSessions: jest.fn(() => [
+          { sessionName: "sessionActive", status: SessionStatus.active },
+          { sessionName: "sessionPending", status: SessionStatus.pending },
+          { sessionName: "sessionInactive", status: SessionStatus.inactive },
+        ]),
+      },
+      inquirer: {
+        prompt: jest.fn(() => ({ selectedSession: { name: "sessionInactive", value: "InactiveSession" } })),
+      },
+    };
+
+    const command = getTestCommand(cliProviderService);
+    const fakeRoleName = "fake-role";
+    command.secondarySessionInfo = jest.fn(() => fakeRoleName);
+
+    const selectedSession = await command.selectSession();
+    expect(cliProviderService.inquirer.prompt).toHaveBeenCalledWith([
+      {
+        choices: [
+          {
+            name: `sessionInactive - ${fakeRoleName}`,
             value: { sessionName: "sessionInactive", status: SessionStatus.inactive },
           },
         ],

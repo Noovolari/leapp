@@ -70,7 +70,7 @@ export default class StartSession extends LeappCommand {
         message: "select a session",
         type: "list",
         choices: availableSessions.map((session: Session) => ({
-          name: `${session.sessionName} ${this.secondarySessionInfo(session) ? "- " + this.secondarySessionInfo(session) : ""}`,
+          name: `${session.sessionName}${this.secondarySessionInfo(session) ? " - " + this.secondarySessionInfo(session) : ""}`,
           value: session,
         })),
       },
@@ -78,7 +78,7 @@ export default class StartSession extends LeappCommand {
     return answer.selectedSession;
   }
 
-  secondarySessionInfo(session: Session): string {
+  secondarySessionInfo(session: Session): string | undefined {
     switch (session.type) {
       case SessionType.awsIamRoleFederated:
         return (session as AwsIamRoleFederatedSession).roleArn.split("role/")[1] || "";
@@ -93,6 +93,6 @@ export default class StartSession extends LeappCommand {
       case SessionType.azure:
         return (session as AzureSession).subscriptionId;
     }
-    return "";
+    return undefined;
   }
 }

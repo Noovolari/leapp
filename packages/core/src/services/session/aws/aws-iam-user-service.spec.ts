@@ -5,11 +5,28 @@ import * as uuid from "uuid";
 import { constants } from "../../../models/constants";
 import { AwsIamUserSession } from "../../../models/aws/aws-iam-user-session";
 import { SessionType } from "../../../models/session-type";
+import { SessionStatus } from "../../../models/session-status";
 
 jest.mock("uuid");
 jest.mock("console");
 
 describe("AwsIamUserService", () => {
+  const mockedDateString = "2022-02-24T10:00:00";
+  const mockedProfileId = "mocked-profile-id";
+  const mockedSessionId = "mocked-id";
+  const mockedSessionName = "mocked-name";
+  const mockedRegion = "mocked-region";
+  const awsIamUserSession: any = {
+    sessionId: mockedSessionId,
+    status: SessionStatus.inactive,
+    startDateTime: undefined,
+    type: SessionType.awsIamUser,
+    sessionTokenExpiration: new Date(mockedDateString).toISOString(),
+    profile: mockedProfileId,
+    sessionName: mockedSessionName,
+    region: mockedRegion,
+  };
+
   test("isTokenExpired, returns true if current time is greater than the token expiration time", () => {
     const tokenExpiration = new Date(1999, 1, 1, 0, 0, 0, 0).toISOString();
     const result = AwsIamUserService.isTokenExpired(tokenExpiration);
@@ -92,5 +109,124 @@ describe("AwsIamUserService", () => {
     );
     expect(repository.addSession).toHaveBeenCalled();
     expect(sessionNotifier.setSessions).toHaveBeenCalledWith("sessions");
+  });
+
+  describe("update", () => {
+    describe("repository.getSessionById", () => {
+      test("has been called once with the expected parameter", async () => {
+        const repository: any = {
+          getSessionById: jest.fn((_sessionId) => undefined),
+        };
+        const service = new AwsIamUserService(null, repository as any, null, null, null, null, null);
+        const awsIamUserSessionRequest: any = {
+          accessKey: "mocked-access-key",
+          secretKey: "mocked-secret-key",
+          region: "mocked-region",
+          profileId: "mocked-profile-id",
+        };
+        await service.update(mockedSessionId, awsIamUserSessionRequest);
+        expect(repository.getSessionById).toHaveBeenCalledWith(mockedSessionId);
+      });
+    });
+
+    describe("keychainService.saveSecret", () => {
+      describe("if accessKey is provided in the awsIamUserSessionRequest", () => {
+        test("is called once with the expected parameters", async () => {
+          const repository: any = {
+            getSessionById: (_sessionId) => awsIamUserSession,
+            updateSession: (_sessionId, _session) => {},
+          };
+          const keychainService: any = {
+            saveSecret: jest.fn((_service, _account, _password) => {}),
+          };
+          const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
+          const awsIamUserSessionRequest: any = {
+            sessionName: "updated-mocked-session-name",
+            accessKey: "mocked-access-key",
+            region: "updated-mocked-region",
+            profileId: "updated-mocked-profile-id",
+          };
+          await service.update(mockedSessionId, awsIamUserSessionRequest);
+          expect(keychainService.saveSecret).toHaveBeenCalledWith(
+            constants.appName,
+            `${mockedSessionId}-iam-user-aws-session-access-key-id`,
+            awsIamUserSessionRequest.accessKey
+          );
+        });
+      });
+
+      describe("if secretKey is provided in the awsIamUserSessionRequest", () => {
+        test("is called once with the expected parameters", async () => {
+          const repository: any = {
+            getSessionById: (_sessionId) => awsIamUserSession,
+            updateSession: (_sessionId, _session) => {},
+          };
+          const keychainService: any = {
+            saveSecret: jest.fn((_service, _account, _password) => {}),
+          };
+          const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
+          const awsIamUserSessionRequest: any = {
+            sessionName: "updated-mocked-session-name",
+            secretKey: "mocked-access-key",
+            region: "updated-mocked-region",
+            profileId: "updated-mocked-profile-id",
+          };
+          await service.update(mockedSessionId, awsIamUserSessionRequest);
+          expect(keychainService.saveSecret).toHaveBeenCalledWith(
+            constants.appName,
+            `${mockedSessionId}-iam-user-aws-session-secret-access-key`,
+            awsIamUserSessionRequest.secretKey
+          );
+        });
+      });
+    });
+
+    describe("repository.updateSession", () => {
+      test("has been called once with the expected parameters", async () => {
+        const repository: any = {
+          getSessionById: (_sessionId) => awsIamUserSession,
+          updateSession: jest.fn((_sessionId, _session) => {}),
+        };
+        const keychainService: any = {
+          saveSecret: (_service, _account, _password) => {},
+        };
+        const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
+        const awsIamUserSessionRequest: any = {
+          sessionName: "updated-mocked-session-name",
+          secretKey: "mocked-access-key",
+          region: "updated-mocked-region",
+          profileId: "updated-mocked-profile-id",
+        };
+
+        await service.update(mockedSessionId, awsIamUserSessionRequest);
+        expect(repository.updateSession).toHaveBeenCalledWith(mockedSessionId, awsIamUserSession);
+      });
+    });
+
+    describe("sessionNotifier.setSessions", () => {
+      test("has been called once with repository.getSessions result", async () => {
+        const repository: any = {
+          getSessionById: (_sessionId) => awsIamUserSession,
+          updateSession: (_sessionId, _session) => {},
+          getSessions: () => [awsIamUserSession],
+        };
+        const keychainService: any = {
+          saveSecret: (_service, _account, _password) => {},
+        };
+        const sessionNotifier: any = {
+          setSessions: jest.fn((_sessions) => {}),
+        };
+        const service = new AwsIamUserService(sessionNotifier, repository as any, null, null, keychainService, null, null);
+        const awsIamUserSessionRequest: any = {
+          sessionName: "updated-mocked-session-name",
+          secretKey: "mocked-access-key",
+          region: "updated-mocked-region",
+          profileId: "updated-mocked-profile-id",
+        };
+
+        await service.update(mockedSessionId, awsIamUserSessionRequest);
+        expect(sessionNotifier.setSessions).toHaveBeenCalledWith(repository.getSessions());
+      });
+    });
   });
 });

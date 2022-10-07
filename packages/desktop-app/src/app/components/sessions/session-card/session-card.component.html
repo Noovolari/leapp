@@ -14,7 +14,7 @@
 </td>
 <td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
-           {{globalColumns.role ? '' : 'hidden-column'}} table-column-2">
+           {{globalColumns.role ? '' : 'hidden-column'}} table-column-2 active-columns-{{globalColumnsCount}}">
   <div class="span-limiter">
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
       <ng-container *ngIf="session.type !== eSessionType.awsIamUser && session.type !== eSessionType.azure">{{ session | detail }}</ng-container>

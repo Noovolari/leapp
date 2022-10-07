@@ -46,8 +46,10 @@ export class SessionsComponent implements OnInit, OnDestroy {
   eCompactMode: boolean;
   eGlobalFilterGroup: GlobalFilters;
   eGlobalColumns: IGlobalColumns;
+  eGlobalColumnsCount: number;
   eSessionType = SessionType;
   eSessionStatus = SessionStatus;
+  columnCount = 0;
 
   showOnly = "ALL";
 
@@ -78,7 +80,14 @@ export class SessionsComponent implements OnInit, OnDestroy {
       this.eGlobalFilterGroup = value;
     });
     const subscription5 = globalColumns.subscribe((value) => {
+      this.columnCount = 0;
       this.eGlobalColumns = value;
+      for (const [_, objValue] of Object.entries(this.eGlobalColumns)) {
+        if (objValue === true) {
+          this.columnCount++;
+        }
+      }
+      this.eGlobalColumnsCount = this.columnCount;
     });
     const subscription6 = this.behaviouralSubjectService.sessionSelections$.subscribe((sessionSelections: SessionSelectionState[]) => {
       const sessionsCssClasses = document.querySelector(".sessions")?.classList;

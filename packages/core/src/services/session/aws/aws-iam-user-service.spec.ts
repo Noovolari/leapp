@@ -1,7 +1,11 @@
 import { describe, test, expect, jest } from "@jest/globals";
 import { AwsIamUserService } from "./aws-iam-user-service";
 import { LoggedException, LogLevel } from "../../log-service";
-//import * as uuid from "uuid";
+import * as uuid from "uuid";
+import { constants } from "../../../models/constants";
+import { AwsIamUserSession } from "../../../models/aws/aws-iam-user-session";
+import { SessionType } from "../../../models/session-type";
+
 jest.mock("uuid");
 jest.mock("console");
 
@@ -47,155 +51,46 @@ describe("AwsIamUserService", () => {
     expect(result["sessionToken"]).toHaveProperty("aws_session_token", "session-token");
   });
 
-  /*
-  test("create, invokes saveSecret with access key id", () => {
-    const keychainService = {
-      saveSecret: jest.fn((_service: string, _account: string, _password: string) => new Promise<void>((_resolve, _reject) => {})),
-      getSecret: (_service: string, _account: string) =>
-        new Promise<string>((resolve, _reject) => {
-          resolve("");
-        }),
-      deleteSecret: (_service: string, _account: string) =>
-        new Promise<boolean>((resolve, _reject) => {
-          resolve(true);
-        }),
-    };
+  test("create", async () => {
+    const keychainService = { saveSecret: jest.fn(async () => {}) };
     const repository = {
-      addSession: (_session: Session) => {},
+      getSessions: () => "sessions",
+      addSession: jest.fn((session: AwsIamUserSession) => {
+        expect(session.sessionId).toBe("test-uuid");
+        expect(session.sessionName).toBe("test-session-name");
+        expect(session.profileId).toBe("test-profile-id");
+        expect(session.mfaDevice).toBe("test-mfa-device");
+        expect(session.region).toBe("test-region");
+        expect(session.type).toBe(SessionType.awsIamUser);
+      }),
     };
-    jest.spyOn(uuid, "v4").mockImplementation(() => "mocked-uuid");
-    const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
-    service.create({
-      sessionName: "mocked-session-name",
-      accessKey: "mocked-access-key-id",
-      secretKey: "mocked-secret-access-key",
-      region: "mocked-region",
-      profileId: "mocked-profile-id",
-      mfaDevice: "mocked-mfa-device",
+    const sessionNotifier = {
+      setSessions: jest.fn(),
+    };
+
+    jest.spyOn(uuid, "v4").mockImplementation(() => "test-uuid");
+    const service = new AwsIamUserService(sessionNotifier as any, repository as any, null, null, keychainService as any, null, null);
+    await service.create({
+      sessionName: "test-session-name",
+      accessKey: "test-access-key",
+      secretKey: "test-secret-key",
+      region: "test-region",
+      profileId: "test-profile-id",
+      mfaDevice: "test-mfa-device",
     });
     expect(keychainService.saveSecret).toHaveBeenNthCalledWith(
       1,
       constants.appName,
-      `mocked-uuid-iam-user-aws-session-access-key-id`,
-      "mocked-access-key-id"
+      "test-uuid-iam-user-aws-session-access-key-id",
+      "test-access-key"
     );
+    expect(keychainService.saveSecret).toHaveBeenNthCalledWith(
+      2,
+      constants.appName,
+      "test-uuid-iam-user-aws-session-secret-access-key",
+      "test-secret-key"
+    );
+    expect(repository.addSession).toHaveBeenCalled();
+    expect(sessionNotifier.setSessions).toHaveBeenCalledWith("sessions");
   });
-
-  test("create, invokes saveSecret with secret access key", async () => {
-    const keychainService = {
-      saveSecret: jest.fn(
-        (_service: string, _account: string, _password: string) =>
-          new Promise<void>((resolve, _reject) => {
-            resolve();
-          })
-      ),
-      getSecret: (_service: string, _account: string) =>
-        new Promise<string>((resolve, _reject) => {
-          resolve("");
-        }),
-      deleteSecret: (_service: string, _account: string) =>
-        new Promise<boolean>((resolve, _reject) => {
-          resolve(true);
-        }),
-    };
-    const repository = {
-      addSession: (_session: Session) => {},
-    };
-    jest.spyOn(uuid, "v4").mockImplementation(() => "mocked-uuid");
-    const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
-    await service.create({
-      sessionName: "mocked-session-name",
-      accessKey: "mocked-access-key-id",
-      secretKey: "mocked-secret-access-key",
-      region: "mocked-region",
-      profileId: "mocked-profile-id",
-      mfaDevice: "mocked-mfa-device",
-    });
-    expect(keychainService.saveSecret).toHaveBeenCalledTimes(2);
-    expect(keychainService.saveSecret.mock.calls).toEqual([
-      [constants.appName, "mocked-uuid-iam-user-aws-session-access-key-id", "mocked-access-key-id"],
-      [constants.appName, `mocked-uuid-iam-user-aws-session-secret-access-key`, "mocked-secret-access-key"],
-    ]);
-  });
-
-  test("create, logs error if first saveSecret invocation throws an error", async () => {
-    const keychainService = {
-      saveSecret: (_service: string, _account: string, _password: string) =>
-        new Promise<void>((_resolve, reject) => {
-          reject(new Error("fake-error"));
-        }),
-      getSecret: (_service: string, _account: string) =>
-        new Promise<string>((resolve, _reject) => {
-          resolve("");
-        }),
-      deleteSecret: (_service: string, _account: string) =>
-        new Promise<boolean>((resolve, _reject) => {
-          resolve(true);
-        }),
-    };
-    const repository = {
-      addSession: (_session: Session) => {},
-    };
-    jest.spyOn(uuid, "v4").mockImplementation(() => "mocked-uuid");
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
-    try {
-      await service.create({
-        sessionName: "mocked-session-name",
-        accessKey: "mocked-access-key-id",
-        secretKey: "mocked-secret-access-key",
-        region: "mocked-region",
-        profileId: "mocked-profile-id",
-        mfaDevice: "mocked-mfa-device",
-      });
-    } catch (err) {
-      expect(console.error).toHaveBeenNthCalledWith(1, "fake-error");
-    }
-  });
-
-  test("create, logs error if seconds saveSecret invocation throws an error", async () => {
-    const keychainService = {
-      saveSecret: jest.fn(),
-      getSecret: (_service: string, _account: string) =>
-        new Promise<string>((resolve, _reject) => {
-          resolve("");
-        }),
-      deleteSecret: (_service: string, _account: string) =>
-        new Promise<boolean>((resolve, _reject) => {
-          resolve(true);
-        }),
-    };
-    const repository = {
-      addSession: (_session: Session) => {},
-    };
-
-    keychainService.saveSecret
-      .mockReturnValueOnce(
-        new Promise<void>((resolve, _reject) => {
-          resolve();
-        })
-      )
-      .mockReturnValueOnce(
-        new Promise<void>((_resolve, reject) => {
-          reject(new Error("fake-error"));
-        })
-      );
-
-    jest.spyOn(uuid, "v4").mockImplementation(() => "mocked-uuid");
-    jest.spyOn(console, "error").mockImplementation(() => {});
-    const service = new AwsIamUserService(null, repository as any, null, null, keychainService as any, null, null);
-    try {
-      await service.create({
-        sessionName: "mocked-session-name",
-        accessKey: "mocked-access-key-id",
-        secretKey: "mocked-secret-access-key",
-        region: "mocked-region",
-        profileId: "mocked-profile-id",
-        mfaDevice: "mocked-mfa-device",
-      });
-    } catch (err) {
-      expect(console.error).toHaveBeenNthCalledWith(1, "fake-error");
-    }
-  });
-  */
 });

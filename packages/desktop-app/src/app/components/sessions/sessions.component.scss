@@ -134,11 +134,20 @@ tr {
   }
 
   th:nth-child(2) {
-    width: 14%;
+    width: 18%;
+    &.active-columns-3 {
+      width: 22%;
+    }
+    &.active-columns-2 {
+      width: 26%;
+    }
+    &.active-columns-1 {
+      width: 32%;
+    }
   }
 
   th:nth-child(3) {
-    width: 14%;
+    width: 13%;
   }
 
   th:nth-child(4) {
@@ -146,7 +155,7 @@ tr {
   }
 
   th:nth-child(5) {
-    width: 14%;
+    width: 11%;
   }
 
   th:nth-child(6) {
@@ -276,4 +285,9 @@ tr {
   bottom: 0;
   left: 0;
   right: 0;
+}
+
+.table-account-cards {
+  width: 100%;
+  table-layout: fixed;
 }

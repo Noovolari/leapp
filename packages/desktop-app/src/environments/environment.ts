@@ -10,6 +10,7 @@ const environment = {
   lockFileDestination: ".Leapp/Leapp-lock.json",
   production: false,
   credentialsDestination: ".aws/credentials",
+  deeplinkFile: ".Leapp/deeplink",
   azureMsalCacheFile: ".azure/msal_token_cache.json",
   defaultRegion: "us-east-1",
   defaultLocation: "eastus",

@@ -1,6 +1,7 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import StartSession from "./start";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("StartSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): StartSession => {
@@ -8,6 +9,104 @@ describe("StartSession", () => {
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
+
+  const mockedDateString = "2022-02-24T10:00:00";
+  const mockedIdpUrlId = "mocked-idp-url-id";
+  const mockedIdpArn = "mocked-idp-arn";
+  const mockedRoleArn = "arn:aws:iam::123123123123:role/test-mfa-role";
+  const mockedAwsSsoRoleArn = "arn:aws:iam::123123123123/DatabaseAdministrator";
+  const mockedProfileId = "mocked-profile-id";
+  const mockedConfigurationId = "mocked-configuration-id";
+  const mockedSubscriptionId = "mocked-subscription-id";
+  const mockedTenantId = "mocked-tenant-id";
+  const mockedAzureIntegrationId = "mocked-azure-integration-id";
+
+  const awsIamRoleFederatedSession: any = {
+    sessionId: "fake-id-1",
+    status: SessionStatus.inactive,
+    startDateTime: undefined,
+    type: SessionType.awsIamRoleFederated,
+    sessionTokenExpiration: new Date(mockedDateString).toISOString(),
+    idpUrlId: mockedIdpUrlId,
+    idpArn: mockedIdpArn,
+    roleArn: mockedRoleArn,
+    profileId: mockedProfileId,
+  };
+
+  const awsIamRoleChainedSession: any = {
+    sessionId: "fake-id-2",
+    status: SessionStatus.inactive,
+    startDateTime: undefined,
+    type: SessionType.awsIamRoleChained,
+    sessionTokenExpiration: new Date(mockedDateString).toISOString(),
+    roleArn: mockedRoleArn,
+    profileId: mockedProfileId,
+    parentSessionId: awsIamRoleFederatedSession.sessionId,
+  };
+
+  const awsIamUserSession: any = {
+    sessionId: "fake-id-3",
+    status: SessionStatus.inactive,
+    startDateTime: undefined,
+    type: SessionType.awsIamUser,
+    sessionTokenExpiration: new Date(mockedDateString).toISOString(),
+    profile: mockedProfileId,
+  };
+
+  const awsSsoRoleSession: any = {
+    sessionId: "fake-id-4",
+    status: SessionStatus.inactive,
+    startDateTime: undefined,
+    type: SessionType.awsSsoRole,
+    sessionTokenExpiration: new Date(mockedDateString).toISOString(),
+    roleArn: mockedAwsSsoRoleArn,
+    profileId: mockedProfileId,
+    awsSsoConfigurationId: mockedConfigurationId,
+  };
+
+  const azureSession: any = {
+    sessionId: "fake-id-5",
+    status: SessionStatus.inactive,
+    startDateTime: undefined,
+    type: SessionType.azure,
+    sessionTokenExpiration: new Date(mockedDateString).toISOString(),
+    subscriptionId: mockedSubscriptionId,
+    tenantId: mockedTenantId,
+    azureIntegrationId: mockedAzureIntegrationId,
+  };
+
+  const noTypeSession: any = {
+    sessionId: "fake-id-6",
+    status: SessionStatus.inactive,
+    startDateTime: undefined,
+    type: undefined,
+    sessionTokenExpiration: new Date(mockedDateString).toISOString(),
+    idpUrlId: mockedIdpUrlId,
+    idpArn: mockedIdpArn,
+    roleArn: mockedRoleArn,
+    profileId: mockedProfileId,
+  };
+
+  test("it throws an error if the given session is active", async () => {
+    const sessionService: any = {
+      start: jest.fn(async () => {}),
+      sessionDeactivated: jest.fn(async () => {}),
+    };
+    const sessionFactory: any = {
+      getSessionService: jest.fn(() => sessionService),
+    };
+    const remoteProceduresClient: any = { refreshSessions: jest.fn() };
+    const session: any = { sessionId: "sessionId", type: "sessionType", status: SessionStatus.active };
+    const cliProviderService: any = {
+      sessionFactory,
+      remoteProceduresClient,
+      sessionManagementService: {
+        getSessionById: jest.fn((id: string) => [session].find((s) => s.sessionId === id)),
+      },
+    };
+    const command = getTestCommand(cliProviderService, ["--sessionId", "sessionId"]);
+    await expect(command.run()).rejects.toThrow("session already started");
+  });
 
   test("Flags - Session Id", async () => {
     const sessionService: any = {
@@ -123,12 +222,14 @@ describe("StartSession", () => {
   });
 
   test("selectSession with secondarySessionInfo", async () => {
+    const inactiveSession: any = { sessionName: "sessionInactive", status: SessionStatus.inactive };
+
     const cliProviderService: any = {
       sessionManagementService: {
         getSessions: jest.fn(() => [
           { sessionName: "sessionActive", status: SessionStatus.active },
           { sessionName: "sessionPending", status: SessionStatus.pending },
-          { sessionName: "sessionInactive", status: SessionStatus.inactive },
+          inactiveSession,
         ]),
       },
       inquirer: {
@@ -155,6 +256,8 @@ describe("StartSession", () => {
       },
     ]);
     expect(selectedSession).toEqual({ name: "sessionInactive", value: "InactiveSession" });
+    expect(command.secondarySessionInfo).toHaveBeenNthCalledWith(1, inactiveSession);
+    expect(command.secondarySessionInfo).toHaveBeenNthCalledWith(2, inactiveSession);
   });
 
   test("selectSession, no session available", async () => {
@@ -186,6 +289,20 @@ describe("StartSession", () => {
     }
     expect(command.startSession).toHaveBeenCalledWith("session");
   };
+
+  test.each([
+    { session: awsIamRoleFederatedSession, expected: "test-mfa-role" },
+    { session: awsIamRoleChainedSession, expected: "test-mfa-role" },
+    { session: awsIamUserSession, expected: "" },
+    { session: awsSsoRoleSession, expected: "DatabaseAdministrator" },
+    { session: azureSession, expected: mockedSubscriptionId },
+    { session: noTypeSession, expected: undefined },
+  ])("test secondarySessionInfo $session.type", ({ session, expected }) => {
+    const cliProviderService: any = {};
+    const command = getTestCommand(cliProviderService);
+    const result = command.secondarySessionInfo(session);
+    expect(result).toBe(expected);
+  });
 
   test("run - all ok", async () => {
     await runCommand(undefined, "");

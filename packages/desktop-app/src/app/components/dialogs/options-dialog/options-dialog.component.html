@@ -213,6 +213,34 @@
 
     <mat-tab>
       <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-Server"></i>
+        <span class="mat-tab-label-text">SSM</span>
+      </ng-template>
+
+      <ng-container>
+        <h2>AWS SSM dialog behaviour</h2>
+        <div class="form-container">
+          <div class="form-group">
+            <div class="form-field">
+              <label>Populate Region</label>
+              <ng-select formControlName="ssmRegionBehaviourSelect"
+                         bindLabel="ssmRegionBehaviour"
+                         bindValue="ssmRegionBehaviour"
+                         [clearable]="false"
+                         [searchable]="false"
+                         [items]="[{ssmRegionBehaviour: eConstants.ssmRegionNo}, {ssmRegionBehaviour: eConstants.ssmRegionDefault}]"
+                         [(ngModel)]="selectedSsmRegionBehaviour"
+                         [appendTo]="'body'">
+              </ng-select>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
         <i class="mat-tab-icon moon-User"></i>
         <span class="mat-tab-label-text">Account</span>
       </ng-template>

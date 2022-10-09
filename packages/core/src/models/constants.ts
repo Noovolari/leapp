@@ -48,6 +48,10 @@ export const constants = {
   credentialFile: "credential-file-method",
   credentialProcess: "credential-process-method",
 
+  // SSM region behavior
+  ssmRegionNo: "No",
+  ssmRegionDefault: "Use default region",
+
   // Contains Env for SSM on macOS
   ssmSourceFileDestination: ".Leapp/ssm-env",
   pluginEnvFileDestination: ".Leapp/plugin-env",

@@ -486,9 +486,97 @@ describe("AwsIamUserService", () => {
 
   describe("validateCredentials", () => {});
 
-  describe("removeSecrets", () => {});
+  describe("removeSecrets", () => {
+    test("It removes all the secrets of a session from the OS keychain if everything is OK", async () => {
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
+      (awsIamUserService as any).removeAccessKeyFromKeychain = jest.fn(() => Promise.resolve(true));
+      (awsIamUserService as any).removeSecretKeyFromKeychain = jest.fn(() => Promise.resolve(true));
+      (awsIamUserService as any).removeSessionTokenFromKeychain = jest.fn(() => Promise.resolve(true));
 
-  describe("getCloneRequest", () => {});
+      await awsIamUserService.removeSecrets("fake-session-id");
+
+      expect((awsIamUserService as any).removeAccessKeyFromKeychain).toHaveBeenCalledWith("fake-session-id");
+      expect((awsIamUserService as any).removeSecretKeyFromKeychain).toHaveBeenCalledWith("fake-session-id");
+      expect((awsIamUserService as any).removeSessionTokenFromKeychain).toHaveBeenCalledWith("fake-session-id");
+    });
+
+    test("KO in remove access key from keychain, throws Error", async () => {
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
+      (awsIamUserService as any).removeAccessKeyFromKeychain = jest.fn(() => Promise.reject(false));
+      (awsIamUserService as any).removeSecretKeyFromKeychain = jest.fn(() => Promise.resolve(true));
+      (awsIamUserService as any).removeSessionTokenFromKeychain = jest.fn(() => Promise.resolve(true));
+
+      try {
+        await awsIamUserService.removeSecrets("fake-session-id");
+      } catch (err) {
+        expect(err).toBe(false);
+      }
+
+      expect((awsIamUserService as any).removeAccessKeyFromKeychain).toHaveBeenCalledWith("fake-session-id");
+      expect((awsIamUserService as any).removeSecretKeyFromKeychain).not.toHaveBeenCalledWith("fake-session-id");
+      expect((awsIamUserService as any).removeSessionTokenFromKeychain).not.toHaveBeenCalledWith("fake-session-id");
+    });
+
+    test("KO in remove secret key from keychain, throws Error", async () => {
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
+      (awsIamUserService as any).removeAccessKeyFromKeychain = jest.fn(() => Promise.resolve(true));
+      (awsIamUserService as any).removeSecretKeyFromKeychain = jest.fn(() => Promise.reject(false));
+      (awsIamUserService as any).removeSessionTokenFromKeychain = jest.fn(() => Promise.resolve(true));
+
+      try {
+        await awsIamUserService.removeSecrets("fake-session-id");
+      } catch (err) {
+        expect(err).toBe(false);
+      }
+
+      expect((awsIamUserService as any).removeAccessKeyFromKeychain).toHaveBeenCalledWith("fake-session-id");
+      expect((awsIamUserService as any).removeSecretKeyFromKeychain).toHaveBeenCalledWith("fake-session-id");
+      expect((awsIamUserService as any).removeSessionTokenFromKeychain).not.toHaveBeenCalledWith("fake-session-id");
+    });
+
+    test("KO in remove session token from keychain, throws Error", async () => {
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
+      (awsIamUserService as any).removeAccessKeyFromKeychain = jest.fn(() => Promise.resolve(true));
+      (awsIamUserService as any).removeSecretKeyFromKeychain = jest.fn(() => Promise.resolve(true));
+      (awsIamUserService as any).removeSessionTokenFromKeychain = jest.fn(() => Promise.reject(false));
+
+      try {
+        await awsIamUserService.removeSecrets("fake-session-id");
+      } catch (err) {
+        expect(err).toBe(false);
+      }
+
+      expect((awsIamUserService as any).removeAccessKeyFromKeychain).toHaveBeenCalledWith("fake-session-id");
+      expect((awsIamUserService as any).removeSecretKeyFromKeychain).toHaveBeenCalledWith("fake-session-id");
+      expect((awsIamUserService as any).removeSessionTokenFromKeychain).toHaveBeenCalledWith("fake-session-id");
+    });
+  });
+
+  describe("getCloneRequest", () => {
+    test("Given a specific session it returns a Request Object", async () => {
+      const mockedSession = {
+        sessionId: "mocked-session-id",
+        sessionName: "mocked-session-name",
+        region: "fake-region",
+        profileId: "mocked-profile-id",
+      };
+
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, null);
+      (awsIamUserService as any).getAccessKeyFromKeychain = jest.fn(() => "fake-access-key");
+      (awsIamUserService as any).getSecretKeyFromKeychain = jest.fn(() => "fake-secret-key");
+      const result = await awsIamUserService.getCloneRequest(mockedSession as any);
+
+      expect(result).toStrictEqual({
+        profileId: mockedSession.profileId,
+        region: mockedSession.region,
+        sessionName: mockedSession.sessionName,
+        accessKey: "fake-access-key",
+        secretKey: "fake-secret-key",
+      });
+      expect((awsIamUserService as any).getAccessKeyFromKeychain).toHaveBeenCalledWith("mocked-session-id");
+      expect((awsIamUserService as any).getSecretKeyFromKeychain).toHaveBeenCalledWith("mocked-session-id");
+    });
+  });
 
   describe("generateSessionTokenCallingMfaModal", () => {
     let mockedSTSInstance;

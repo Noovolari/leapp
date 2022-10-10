@@ -1,4 +1,4 @@
-import { describe, test, expect, jest } from "@jest/globals";
+import { describe, expect, jest, test, beforeAll } from "@jest/globals";
 import { AwsIamUserService } from "./aws-iam-user-service";
 import { LoggedException, LogLevel } from "../../log-service";
 import * as uuid from "uuid";
@@ -6,9 +6,12 @@ import { constants } from "../../../models/constants";
 import { AwsIamUserSession } from "../../../models/aws/aws-iam-user-session";
 import { SessionType } from "../../../models/session-type";
 import { SessionStatus } from "../../../models/session-status";
+import { CredentialsInfo } from "../../../models/credentials-info";
+import * as AWS from "aws-sdk";
 
 jest.mock("uuid");
 jest.mock("console");
+jest.mock("aws-sdk");
 
 describe("AwsIamUserService", () => {
   const mockedDateString = "2022-02-24T10:00:00";
@@ -22,7 +25,7 @@ describe("AwsIamUserService", () => {
     startDateTime: undefined,
     type: SessionType.awsIamUser,
     sessionTokenExpiration: new Date(mockedDateString).toISOString(),
-    profile: mockedProfileId,
+    profileId: mockedProfileId,
     sessionName: mockedSessionName,
     region: mockedRegion,
   };
@@ -167,7 +170,7 @@ describe("AwsIamUserService", () => {
           const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
           const awsIamUserSessionRequest: any = {
             sessionName: "updated-mocked-session-name",
-            secretKey: "mocked-access-key",
+            secretKey: "mocked-secret-key",
             region: "updated-mocked-region",
             profileId: "updated-mocked-profile-id",
           };
@@ -193,7 +196,7 @@ describe("AwsIamUserService", () => {
         const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
         const awsIamUserSessionRequest: any = {
           sessionName: "updated-mocked-session-name",
-          secretKey: "mocked-access-key",
+          secretKey: "mocked-secret-key",
           region: "updated-mocked-region",
           profileId: "updated-mocked-profile-id",
         };
@@ -219,13 +222,262 @@ describe("AwsIamUserService", () => {
         const service = new AwsIamUserService(sessionNotifier, repository as any, null, null, keychainService, null, null);
         const awsIamUserSessionRequest: any = {
           sessionName: "updated-mocked-session-name",
-          secretKey: "mocked-access-key",
+          secretKey: "mocked-secret-key",
           region: "updated-mocked-region",
           profileId: "updated-mocked-profile-id",
         };
 
         await service.update(mockedSessionId, awsIamUserSessionRequest);
         expect(sessionNotifier.setSessions).toHaveBeenCalledWith(repository.getSessions());
+      });
+    });
+  });
+
+  test("applyCredentials", () => {
+    const mockedProfileName = "mocked-profile-name";
+    const mockedAccessKeyId = "mocked-access-key-id";
+    const mockedSecretAccessKey = "mocked-secret-access-key";
+    const mockedAwsSessionToken = "mocked-session-token";
+    const mockedSessionToken: any = {
+      sessionToken: {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_access_key_id: mockedAccessKeyId,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_secret_access_key: mockedSecretAccessKey,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        aws_session_token: mockedAwsSessionToken,
+      },
+    };
+    const mockedCredentialObject = {};
+    mockedCredentialObject[mockedProfileName] = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/naming-convention
+      aws_access_key_id: mockedSessionToken.sessionToken.aws_access_key_id,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      aws_secret_access_key: mockedSessionToken.sessionToken.aws_secret_access_key,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      aws_session_token: mockedSessionToken.sessionToken.aws_session_token,
+      region: awsIamUserSession.region,
+    };
+
+    const repository: any = {
+      getSessionById: jest.fn((_sessionId) => awsIamUserSession),
+      getProfileName: jest.fn((_session) => mockedProfileName),
+    };
+    const fileService: any = {
+      iniWriteSync: jest.fn((_filePath, _content) => {}),
+    };
+    const awsCoreService: any = {
+      awsCredentialPath: jest.fn(() => "mocked-aws-credentials-path"),
+    };
+
+    const service = new AwsIamUserService(null, repository as any, null, null, null, fileService, awsCoreService);
+    service.applyCredentials(awsIamUserSession.sessionId, mockedSessionToken);
+
+    expect(repository.getSessionById).toHaveBeenCalledWith(awsIamUserSession.sessionId);
+    expect(repository.getProfileName).toHaveBeenCalledWith(awsIamUserSession.profileId);
+    expect(fileService.iniWriteSync).toHaveBeenCalledWith(awsCoreService.awsCredentialPath(), mockedCredentialObject);
+  });
+
+  test("deApplyCredentials", async () => {
+    const mockedProfileName = "mocked-profile-name";
+    const initialMockedCredentialsFile = {};
+    const finalMockedCredentialsFile = {};
+    initialMockedCredentialsFile[mockedProfileName] = {};
+
+    const repository: any = {
+      getSessions: jest.fn((_sessionId) => [awsIamUserSession]),
+      getProfileName: jest.fn((_session) => mockedProfileName),
+    };
+    const fileService: any = {
+      iniParseSync: jest.fn((_filePath) => initialMockedCredentialsFile),
+      replaceWriteSync: jest.fn((_filePath, _content) => {}),
+    };
+    const awsCoreService: any = {
+      awsCredentialPath: jest.fn(() => "mocked-aws-credentials-path"),
+    };
+
+    const service = new AwsIamUserService(null, repository as any, null, null, null, fileService, awsCoreService);
+    await service.deApplyCredentials(awsIamUserSession.sessionId);
+
+    expect(repository.getSessions).toHaveBeenCalledTimes(1);
+    expect(repository.getProfileName).toHaveBeenCalledWith(awsIamUserSession.profileId);
+    expect(fileService.iniParseSync).toHaveBeenCalledWith(awsCoreService.awsCredentialPath());
+    expect(fileService.replaceWriteSync).toHaveBeenCalledWith(awsCoreService.awsCredentialPath(), finalMockedCredentialsFile);
+  });
+
+  describe("generateCredentialsProxy", () => {
+    describe("if generateCredentials resolves", () => {
+      test("that generateCredentialsProxy resolves mockedCredentialsInfo", async () => {
+        const mockedAccessKeyId = "mocked-access-key-id";
+        const mockedSecretAccessKey = "mocked-secret-access-key";
+        const mockedAwsSessionToken = "mocked-session-token";
+        const mockedCredentialsInfo: any = {
+          sessionToken: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            aws_access_key_id: mockedAccessKeyId,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            aws_secret_access_key: mockedSecretAccessKey,
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            aws_session_token: mockedAwsSessionToken,
+          },
+        };
+
+        const localMfaCodePrompter: any = {};
+
+        const service = new AwsIamUserService(null, null, localMfaCodePrompter, null, null, null, null);
+        (service as any).generateCredentials = (_sessionId) =>
+          new Promise<CredentialsInfo>((resolve, _reject) => {
+            resolve(mockedCredentialsInfo);
+          });
+
+        await expect(service.generateCredentialsProxy(mockedSessionId)).resolves.toBe(mockedCredentialsInfo);
+        expect((service as any).mfaCodePrompterProxy).toEqual(localMfaCodePrompter);
+      });
+    });
+
+    describe("if generateCredentials rejects", () => {
+      test("that generateCredentialsProxy resolves mockedCredentialsInfo", async () => {
+        const mockedError = new Error("mocked-error");
+        const localMfaCodePrompter: any = {};
+
+        const service = new AwsIamUserService(null, null, localMfaCodePrompter, null, null, null, null);
+        (service as any).generateCredentials = (_sessionId) =>
+          new Promise<CredentialsInfo>((_resolve, reject) => {
+            reject(mockedError);
+          });
+
+        await expect(service.generateCredentialsProxy(mockedSessionId)).rejects.toThrow(mockedError);
+        expect((service as any).mfaCodePrompterProxy).toEqual(localMfaCodePrompter);
+      });
+    });
+  });
+
+  describe("generateCredentials", () => {
+    describe("if session was not found", () => {
+      test("it throws a LoggedException", async () => {
+        const repository: any = {
+          getSessions: jest.fn((_sessionId) => [awsIamUserSession]),
+        };
+        const keychainService: any = {
+          getSecret: jest.fn((_service, _account) => "mocked-secret"),
+        };
+
+        const service = new AwsIamUserService(null, repository, null, null, keychainService, null, null);
+        await expect(service.generateCredentials("another-mocked-session-id")).rejects.toThrow(
+          new LoggedException(`session with id another-mocked-session-id not found.`, service, LogLevel.warn)
+        );
+      });
+    });
+
+    describe("if session.sessionTokenExpiration is not expired", () => {
+      test("it invokes JSON.parse with the sessionToken retrieved by keychainService.getSecret", async () => {
+        const mockedObject = {};
+        const mockedSecret = "mocked-secret";
+
+        awsIamUserSession.sessionTokenExpiration = new Date(3000, 1, 1, 0, 0, 0, 0).toISOString();
+
+        const repository: any = {
+          getSessions: jest.fn((_sessionId) => [awsIamUserSession]),
+        };
+        const keychainService: any = {
+          getSecret: jest.fn((_service, _account) => mockedSecret),
+        };
+
+        JSON.parse = jest.fn().mockImplementationOnce((_text) => mockedObject);
+
+        const service = new AwsIamUserService(null, repository, null, null, keychainService, null, null);
+        const credentials = await service.generateCredentials(mockedSessionId);
+
+        expect(JSON.parse).toHaveBeenCalledWith(mockedSecret);
+        expect(credentials).toBe(mockedObject);
+      });
+
+      describe("if JSON.parse throws an Error", () => {
+        test("it throws a new LoggedException", async () => {
+          const mockedSecret = "mocked-secret";
+          const mockedErrorMessage = "invalid JSON format";
+
+          awsIamUserSession.sessionTokenExpiration = new Date(3000, 1, 1, 0, 0, 0, 0).toISOString();
+
+          const repository: any = {
+            getSessions: jest.fn((_sessionId) => [awsIamUserSession]),
+          };
+          const keychainService: any = {
+            getSecret: jest.fn((_service, _account) => mockedSecret),
+          };
+
+          JSON.parse = jest.fn().mockImplementationOnce((_text) => {
+            throw new Error(mockedErrorMessage);
+          });
+
+          const service = new AwsIamUserService(null, repository, null, null, keychainService, null, null);
+          await expect(service.generateCredentials(mockedSessionId)).rejects.toThrow(new LoggedException(mockedErrorMessage, service, LogLevel.warn));
+        });
+      });
+    });
+
+    describe("if session.sessionTokenExpiration is expired", () => {
+      let repository: any;
+      let awsCoreService: any;
+      let service: AwsIamUserService;
+      const mockedSTSInstance = {};
+
+      beforeAll(() => {
+        awsIamUserSession.sessionTokenExpiration = new Date(1999, 1, 1, 0, 0, 0, 0).toISOString();
+        repository = {
+          getSessions: jest.fn((_sessionId) => [awsIamUserSession]),
+        };
+        awsCoreService = {
+          stsOptions: jest.fn(() => {}),
+        };
+        service = new AwsIamUserService(null, repository, null, null, null, null, awsCoreService);
+        (service as any).getAccessKeyFromKeychain = jest.fn(() => "mocked-access-key-id");
+        (service as any).getSecretKeyFromKeychain = jest.fn(() => "mocked-secret-access-key");
+        (service as any).generateSessionToken = jest.fn(() => ({ sessionToken: {} }));
+        (service as any).generateSessionTokenCallingMfaModal = jest.fn((_session, _sts, _params) => {});
+        jest.spyOn(AWS.config, "update").mockImplementation((_options) => {});
+        (AWS as any).STS.mockImplementation((_options) => mockedSTSInstance);
+      });
+
+      test("AwsIamUserService.getAccessKeyFromKeychain has been called once with given sessionId", async () => {
+        await service.generateCredentials(mockedSessionId);
+        expect((service as any).getAccessKeyFromKeychain).toHaveBeenCalledWith(mockedSessionId);
+      });
+
+      test("AwsIamUserService.getSecretKeyFromKeychain has been called once with given sessionId", async () => {
+        await service.generateCredentials(mockedSessionId);
+        expect((service as any).getSecretKeyFromKeychain).toHaveBeenCalledWith(mockedSessionId);
+      });
+
+      test("AWS.config.update has been called once with awsCoreService.stsOptions result", async () => {
+        await service.generateCredentials(mockedSessionId);
+        expect((AWS as any).config.update).toHaveBeenCalledWith({ accessKeyId: "mocked-access-key-id", secretAccessKey: "mocked-secret-access-key" });
+      });
+
+      describe("if session mfaDevice attribute is set", () => {
+        beforeAll(() => {
+          awsIamUserSession.mfaDevice = "mocked-mfa-device";
+        });
+
+        test("generateSessionTokenCallingMfaModal has been called once with the expected parameters", async () => {
+          await service.generateCredentials(mockedSessionId);
+          expect((service as any).generateSessionTokenCallingMfaModal).toHaveBeenCalledWith(awsIamUserSession, mockedSTSInstance, {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            DurationSeconds: constants.sessionTokenDuration,
+          });
+        });
+      });
+
+      describe("if session mfaDevice attribute is not set", () => {
+        delete awsIamUserSession["mfaDevice"];
+
+        test("generateSessionToken has been called once with the expected parameters", async () => {
+          await service.generateCredentials(mockedSessionId);
+          expect((service as any).generateSessionToken).toHaveBeenCalledWith(awsIamUserSession, mockedSTSInstance, {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            DurationSeconds: constants.sessionTokenDuration,
+          });
+        });
       });
     });
   });

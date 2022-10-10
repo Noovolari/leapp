@@ -1,4 +1,4 @@
-import { describe, expect, jest, test, beforeAll } from "@jest/globals";
+import { describe, expect, jest, test, beforeAll, beforeEach } from "@jest/globals";
 import { AwsIamUserService } from "./aws-iam-user-service";
 import { LoggedException, LogLevel } from "../../log-service";
 import * as uuid from "uuid";
@@ -479,6 +479,245 @@ describe("AwsIamUserService", () => {
           });
         });
       });
+    });
+  });
+
+  describe("getAccountNumberFromCallerIdentity", () => {});
+
+  describe("validateCredentials", () => {});
+
+  describe("removeSecrets", () => {});
+
+  describe("getCloneRequest", () => {});
+
+  describe("generateSessionTokenCallingMfaModal", () => {
+    let mockedSTSInstance;
+    let mockedSessionTokenResponse;
+    let mockedSession;
+    let params;
+
+    beforeEach(() => {
+      mockedSession = {
+        sessionName: "fake-session-name",
+        mfaDevice: "fake-device-id",
+      };
+      mockedSessionTokenResponse = { value: "ok" };
+      mockedSTSInstance = {
+        getSessionToken: jest.fn((_params) => ({ promise: () => Promise.resolve(mockedSessionTokenResponse) })),
+      };
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      params = {};
+    });
+
+    test("It opens a modal and if the modal gives the corerect mfa code and closes itself, it returns a valid session token", async () => {
+      const callbackValue = "43567";
+      const mfaCodePrompterProxy = {
+        promptForMFACode: jest.fn((_params, callback: any) => {
+          callback(callbackValue);
+          return Promise.resolve(mockedSessionTokenResponse);
+        }),
+      };
+      const awsIamUserService = new AwsIamUserService(null, null, mfaCodePrompterProxy, null, null, null, null);
+      (awsIamUserService as any).generateSessionToken = jest.fn();
+
+      expect(params.SerialNumber).toBeUndefined();
+      expect(params.TokenCode).toBeUndefined();
+
+      await (awsIamUserService as any).generateSessionTokenCallingMfaModal(mockedSession, mockedSTSInstance, params);
+
+      expect(mfaCodePrompterProxy.promptForMFACode).toHaveBeenCalled();
+      expect(params.SerialNumber).toStrictEqual("fake-device-id");
+      expect(params.TokenCode).toStrictEqual("43567");
+      expect((awsIamUserService as any).generateSessionToken).toHaveBeenCalledWith(mockedSession, mockedSTSInstance, params);
+    });
+
+    test("It opens a modal and if the modal gives the close signal and closes itself, it rejects with a Logged Exceptions", async () => {
+      const callbackValue = constants.confirmClosed;
+      const mfaCodePrompterProxy = {
+        promptForMFACode: jest.fn((_params, callback: any) => {
+          callback(callbackValue);
+        }),
+      };
+      const awsIamUserService = new AwsIamUserService(null, null, mfaCodePrompterProxy, null, null, null, null);
+
+      expect(params.SerialNumber).toBeUndefined();
+      expect(params.TokenCode).toBeUndefined();
+
+      try {
+        await (awsIamUserService as any).generateSessionTokenCallingMfaModal(mockedSession, mockedSTSInstance, params);
+      } catch (error) {
+        expect(error).toStrictEqual(new LoggedException("Missing Multi Factor Authentication code", this, LogLevel.warn));
+      }
+
+      expect(mfaCodePrompterProxy.promptForMFACode).toHaveBeenCalled();
+      expect(params.SerialNumber).toBeUndefined();
+      expect(params.TokenCode).toBeUndefined();
+    });
+  });
+
+  describe("getAccessKeyFromKeychain", () => {
+    test("If a session id is passed and the secret found, the access key is retrieved by calling get secret from keychain service", async () => {
+      const resultString = "fake-secret";
+      const keychainService = { getSecret: jest.fn(() => Promise.resolve(resultString)) };
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, keychainService as any, null, null);
+      const result = await (awsIamUserService as any).getAccessKeyFromKeychain("fake-session-id");
+      expect(keychainService.getSecret).toHaveBeenCalledWith(constants.appName, `fake-session-id-iam-user-aws-session-access-key-id`);
+      expect(result).toStrictEqual(resultString);
+    });
+  });
+
+  describe("getSecretKeyFromKeychain", () => {
+    test("If a session id is passed and the secret found, the secret key is retrieved by calling get secret from keychain service", async () => {
+      const resultString = "fake-secret";
+      const keychainService = { getSecret: jest.fn(() => Promise.resolve(resultString)) };
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, keychainService as any, null, null);
+      const result = await (awsIamUserService as any).getSecretKeyFromKeychain("fake-session-id");
+      expect(keychainService.getSecret).toHaveBeenCalledWith(constants.appName, `fake-session-id-iam-user-aws-session-secret-access-key`);
+      expect(result).toStrictEqual(resultString);
+    });
+  });
+
+  describe("removeAccessKeyFromKeychain", () => {
+    test("If a session id is passed and the secret found, the access key is removed by calling delete secret from keychain service", async () => {
+      const keychainService = { deleteSecret: jest.fn() };
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, keychainService as any, null, null);
+      await (awsIamUserService as any).removeAccessKeyFromKeychain("fake-session-id");
+      expect(keychainService.deleteSecret).toHaveBeenCalledWith(constants.appName, `fake-session-id-iam-user-aws-session-access-key-id`);
+    });
+  });
+
+  describe("removeSecretKeyFromKeychain", () => {
+    test("If a session id is passed and the secret found, the secret key is removed by calling delete secret from keychain service", async () => {
+      const keychainService = { deleteSecret: jest.fn() };
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, keychainService as any, null, null);
+      await (awsIamUserService as any).removeSecretKeyFromKeychain("fake-session-id");
+      expect(keychainService.deleteSecret).toHaveBeenCalledWith(constants.appName, `fake-session-id-iam-user-aws-session-secret-access-key`);
+    });
+  });
+
+  describe("removeSessionTokenFromKeychain", () => {
+    test("If a session id is passed and the secret found, it is removed by calling delete secret from keychain service", async () => {
+      const keychainService = { deleteSecret: jest.fn() };
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, keychainService as any, null, null);
+      await (awsIamUserService as any).removeSessionTokenFromKeychain("fake-session-id");
+      expect(keychainService.deleteSecret).toHaveBeenCalledWith(constants.appName, `fake-session-id-iam-user-aws-session-token`);
+    });
+  });
+
+  describe("generateSessionToken", () => {
+    let mockedSession;
+    let mockedSTSInstance;
+    let mockedSessionTokenResponse;
+    let mockedSessionToken;
+    let params;
+    let keychainService;
+
+    beforeEach(() => {
+      mockedSession = { sessionId: "mocked-session-id" };
+      mockedSessionTokenResponse = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Credentials: "fake-credentials",
+      };
+      mockedSessionToken = { value: "fake-session-token" };
+      mockedSTSInstance = {
+        getSessionToken: jest.fn((_params) => ({ promise: () => Promise.resolve(mockedSessionTokenResponse) })),
+      };
+      params = { fakeParam: "fakeParam" };
+
+      keychainService = {
+        saveSecret: jest.fn(),
+      };
+      (AWS as any).STS.mockImplementation((_options) => mockedSTSInstance);
+    });
+
+    test("Given a valid session and an STS object, it retrieves the AWS Session Token", async () => {
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, keychainService as any, null, null);
+      (awsIamUserService as any).saveSessionTokenExpirationInTheSession = jest.fn();
+      AwsIamUserService.sessionTokenFromGetSessionTokenResponse = jest.fn(() => mockedSessionToken);
+
+      const resultSessionToken = await (awsIamUserService as any).generateSessionToken(mockedSession, mockedSTSInstance, params);
+      expect(mockedSTSInstance.getSessionToken).toHaveBeenCalledWith(params);
+      expect((awsIamUserService as any).saveSessionTokenExpirationInTheSession).toHaveBeenCalledWith(mockedSession, "fake-credentials");
+      expect(AwsIamUserService.sessionTokenFromGetSessionTokenResponse).toHaveBeenCalledWith(mockedSessionTokenResponse);
+      expect(keychainService.saveSecret).toHaveBeenCalledWith(
+        constants.appName,
+        `mocked-session-id-iam-user-aws-session-token`,
+        '{"value":"fake-session-token"}'
+      );
+      expect(resultSessionToken).toStrictEqual({ value: "fake-session-token" });
+    });
+
+    test("If an error occurs it throws a new Logged Exception", async () => {
+      mockedSTSInstance.getSessionToken = jest.fn(() => {
+        throw new Error("fake-error");
+      });
+
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, keychainService, null, null);
+
+      expect(async () => await (awsIamUserService as any).generateSessionToken(mockedSession, mockedSTSInstance, params)).rejects.toThrow(
+        new LoggedException("fake-error", awsIamUserService, LogLevel.warn)
+      );
+    });
+  });
+
+  describe("saveSessionTokenExpirationInTheSession", () => {
+    let mockedSession;
+    let mockedSession2;
+    let sessions;
+    let credentials;
+    let repository;
+    let sessionNotifier;
+
+    beforeEach(() => {
+      mockedSession = {};
+      mockedSession2 = {};
+      sessions = [mockedSession, mockedSession2];
+      credentials = {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Expiration: {
+          toISOString: jest.fn(() => "fake-expiration-string"),
+        },
+      };
+
+      sessionNotifier = {
+        setSessions: jest.fn(),
+      };
+      repository = {
+        getSessions: jest.fn(() => sessions),
+        updateSessions: jest.fn(),
+      };
+    });
+
+    test("Given a session if credentials are set, it set them and then calls for session update on the UI", () => {
+      const awsIamUserService = new AwsIamUserService(sessionNotifier as any, repository as any, null, null, null, null, null);
+
+      expect(mockedSession.sessionTokenExpiration).toBe(undefined);
+      expect(mockedSession2.sessionTokenExpiration).toBe(undefined);
+
+      (awsIamUserService as any).saveSessionTokenExpirationInTheSession(mockedSession, credentials);
+
+      expect(repository.getSessions).toHaveBeenCalled();
+      expect(mockedSession.sessionTokenExpiration).toBe("fake-expiration-string");
+      expect(mockedSession2.sessionTokenExpiration).toBe(undefined);
+      expect(credentials.Expiration.toISOString).toHaveBeenCalled();
+      expect(repository.updateSessions).toHaveBeenCalledWith(sessions);
+      expect(sessionNotifier.setSessions).toHaveBeenCalledWith([...sessions]);
+    });
+
+    test("Given a session if credentials are not set, the expiration is skipped and then we call for session update on the UI", () => {
+      const awsIamUserService = new AwsIamUserService(sessionNotifier as any, repository as any, null, null, null, null, null);
+
+      expect(mockedSession.sessionTokenExpiration).toBe(undefined);
+      expect(mockedSession2.sessionTokenExpiration).toBe(undefined);
+
+      (awsIamUserService as any).saveSessionTokenExpirationInTheSession(mockedSession);
+
+      expect(repository.getSessions).toHaveBeenCalled();
+      expect(mockedSession.sessionTokenExpiration).toBe(undefined);
+      expect(mockedSession2.sessionTokenExpiration).toBe(undefined);
+      expect(credentials.Expiration.toISOString).not.toHaveBeenCalled();
+      expect(repository.updateSessions).toHaveBeenCalledWith(sessions);
+      expect(sessionNotifier.setSessions).toHaveBeenCalledWith([...sessions]);
     });
   });
 });

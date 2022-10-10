@@ -314,7 +314,7 @@ export class AwsIamUserService extends AwsSessionService {
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];
 
-    if (credentials !== undefined) {
+    if (credentials) {
       currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 

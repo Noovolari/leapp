@@ -529,6 +529,28 @@ describe("AwsIamUserService", () => {
       expect(mockedSTSInstance.getCallerIdentity).toHaveBeenCalledWith({});
     });
 
+    test("Given a session it returns an empty string if no caller identity is found", async () => {
+      mockedSTSInstance = {
+        getCallerIdentity: jest.fn(() =>
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          ({ promise: jest.fn(() => ({})) })
+        ),
+      };
+      const awsIamUserService = new AwsIamUserService(null, null, null, null, null, null, awsCoreService);
+      awsIamUserService.generateCredentials = jest.fn(() => mockedCredentials);
+      const result = await awsIamUserService.getAccountNumberFromCallerIdentity(mockedSession);
+
+      expect(result).toBe("");
+      expect(AWS.config.update).toHaveBeenCalledWith({
+        accessKeyId: "mocked-access-key-id",
+        secretAccessKey: "mocked-secret-access-key",
+        sessionToken: "mocked-session-token",
+      });
+      expect(awsCoreService.stsOptions).toHaveBeenCalledWith(mockedSession);
+      expect(AWS.STS).toHaveBeenCalledWith("mocked-sts-options");
+      expect(mockedSTSInstance.getCallerIdentity).toHaveBeenCalledWith({});
+    });
+
     test("Given a session it throws an error", async () => {
       (AWS as any).STS.mockImplementation((_options) => {
         throw new Error("mocked-error");

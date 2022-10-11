@@ -22,7 +22,7 @@ export class ExtensionWebsocketService {
       this.wsClient.on("message", (data) => {
         console.log("received: %s", data.toString("utf8"));
       });
-      setInterval(() => this.sendMessage("ping"), 5000);
+      //setInterval(() => this.sendMessage("ping"), 5000);
     });
   }
 

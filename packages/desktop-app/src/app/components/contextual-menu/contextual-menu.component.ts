@@ -10,6 +10,8 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { OptionsService } from "../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
+import { ExtensionWebsocketService } from "../../services/extension-websocket.service";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 
 @Component({
   selector: "app-contextual-menu",
@@ -31,7 +33,8 @@ export class ContextualMenuComponent implements OnInit {
     public appService: AppService,
     public optionsService: OptionsService,
     public appProviderService: AppProviderService,
-    private selectedSessionActionsService: SelectedSessionActionsService
+    private selectedSessionActionsService: SelectedSessionActionsService,
+    private extensionWebsocketService: ExtensionWebsocketService
   ) {}
 
   ngOnInit(): void {
@@ -112,5 +115,12 @@ export class ContextualMenuComponent implements OnInit {
 
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {
     await this.selectedSessionActionsService.applyPluginAction(this.selectedSession, plugin);
+  }
+
+  async sendExtensionMessage(): Promise<void> {
+    const sessionService = this.appProviderService.sessionFactory.getSessionService(this.selectedSession.type) as AwsSessionService;
+    const credentialsInfo = await sessionService.generateCredentials(this.selectedSession.sessionId);
+    const url = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentialsInfo, this.selectedSession.region);
+    this.extensionWebsocketService.sendMessage(JSON.stringify({ url }));
   }
 }

@@ -3,7 +3,7 @@ name: Leapp Desktop App Nightly CD
 on:
   push:
     branches:
-      - LEAP-690-leapp-plugin-not-installing-on-app-start
+      - LEAP-707-aws-sso-session-token-not-found-or-invalid
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:

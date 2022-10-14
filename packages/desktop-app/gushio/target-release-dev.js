@@ -38,7 +38,7 @@ module.exports = {
 
       let command;
       if (args[1] === 'mac') {
-        command = `export CSC_IDENTITY_AUTO_DISCOVERY=false && electron-builder build ${platformVersion}`;
+        command = `export CSC_IDENTITY_AUTO_DISCOVERY=true && electron-builder build ${platformVersion}`;
       } else {
         command = `electron-builder build ${platformVersion}`;
       }

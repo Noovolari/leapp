@@ -32,8 +32,8 @@ module.exports = {
 
       shellJs.cd(path.join(__dirname, '..'));
 
-      delete packageJson["build"]["afterSign"];
-      packageJson["build"]["mac"]["forceCodeSigning"] = false;
+      //delete packageJson["build"]["afterSign"];
+      packageJson["build"]["mac"]["forceCodeSigning"] = true;
       await writePackageJsonFunction(path, "desktop-app", packageJson);
 
       let command;

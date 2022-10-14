@@ -89,9 +89,29 @@ export interface IPluginEnvironment {
    */
   updateSession(createSessionRequest: SessionData, session: Session): Promise<void>;
 
+  /**
+   * Execute the given command in the platform-specific terminal; optionally, it is possible to set an env key/value object containing
+   * the env variables to export in the terminal, before the command execution.
+   * The terminal window base path is set to the home directory.
+   *
+   * @param {string} command - the command that I want to execute in the platform-specific terminal
+   * @param {any} env - optional key/value env variables object
+   */
   openTerminal(command: string, env?: any): Promise<void>;
 
+  /**
+   * Return the ID of a NamedProfile from the given name if it exists, otherwise creates a new named profile and returns its ID.
+   * Can be used when creating/editing a session since SessionData requires the ID of a named profile.
+   *
+   * @param {string} profileName - the name of the NamedProfile I want to retrieve
+   */
   getProfileIdByName(profileName: string): string;
 
+  /**
+   * Return the ID of the IdpUrl object from the given URL if it exists, otherwise creates a new IdP URL and returns its ID.
+   * Can be used when creating/editing Federated Sessions since SessionData requires the ID of an IdP URL.
+   *
+   * @param {string} idpUrl - the URL associated with the IdpUrl I want to retrieve
+   */
   getIdpUrlIdByUrl(idpUrl: string): string;
 }

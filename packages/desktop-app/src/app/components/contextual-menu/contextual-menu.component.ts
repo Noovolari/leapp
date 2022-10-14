@@ -121,6 +121,14 @@ export class ContextualMenuComponent implements OnInit {
     const sessionService = this.appProviderService.sessionFactory.getSessionService(this.selectedSession.type) as AwsSessionService;
     const credentialsInfo = await sessionService.generateCredentials(this.selectedSession.sessionId);
     const url = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentialsInfo, this.selectedSession.region);
-    this.extensionWebsocketService.sendMessage(JSON.stringify({ url }));
+    this.extensionWebsocketService.sendMessage(
+      JSON.stringify({
+        url,
+        sessionName: this.selectedSession.sessionName,
+        sessionRole: (this.selectedSession as any).roleArn.split("/")[1],
+        sessionRegion: this.selectedSession.region,
+        sessionType: this.selectedSession.type.toString().startsWith("aws") ? "aws" : this.selectedSession.type.toString(),
+      })
+    );
   }
 }

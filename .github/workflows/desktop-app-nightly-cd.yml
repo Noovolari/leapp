@@ -41,6 +41,8 @@ jobs:
     needs: [ clean-nightly-latest ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: LEAP-707-aws-sso-session-token-not-found-or-invalid
       - name: Build and release core (nightly)
         run: |
           cd packages/core

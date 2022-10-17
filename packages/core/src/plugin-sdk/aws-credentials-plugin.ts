@@ -16,11 +16,24 @@ export abstract class AwsCredentialsPlugin implements IPlugin {
     await this.applySessionAction(session, credentials);
   }
 
+  /**
+   * This method returns the actionName, visible to the end user from the Desktop App contextual menu and from the CLI as a command.
+   */
   abstract get actionName(): string;
 
+  /**
+   * This method retrieves the value of the IPluginMetadata icon field.
+   */
   get actionIcon(): string {
     return this.metadata.icon;
   }
 
+  /**
+   * This method is invoked by the AwsCredentialsPlugin run method; it expects both the Leapp Session metadata and credentials. The latter
+   * are generated in the run method, prior the applySessionAction invocation.
+   *
+   * @param session
+   * @param credentials
+   */
   abstract applySessionAction(session: Session, credentials: any): Promise<void>;
 }

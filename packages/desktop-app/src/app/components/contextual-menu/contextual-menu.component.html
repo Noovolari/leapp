@@ -100,7 +100,7 @@
     </ng-container>
 
     <ng-container>
-      <button mat-menu-item (click)="sendExtensionMessage();">
+      <button [disabled]="browserExtensionfetching ? true : null" [class.disabled]="browserExtensionfetching" mat-menu-item (click)="sendExtensionMessage();">
         <i class="moon-User"></i>&nbsp;
         <span>Open Web Console Extension</span>
       </button>

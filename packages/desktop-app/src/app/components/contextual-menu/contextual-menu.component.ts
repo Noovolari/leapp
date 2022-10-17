@@ -11,7 +11,6 @@ import { OptionsService } from "../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
 import { ExtensionWebsocketService } from "../../services/extension-websocket.service";
-import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 
 @Component({
   selector: "app-contextual-menu",
@@ -28,6 +27,7 @@ export class ContextualMenuComponent implements OnInit {
   public selectedSession: Session;
   public menuX: number;
   public menuY: number;
+  public browserExtensionfetching: boolean;
 
   constructor(
     public appService: AppService,
@@ -54,6 +54,10 @@ export class ContextualMenuComponent implements OnInit {
           this.appService.setMenuTrigger(this.trigger);
         }, 100);
       }
+    });
+
+    this.extensionWebsocketService.fetching$.subscribe((value) => {
+      this.browserExtensionfetching = value;
     });
   }
 
@@ -118,17 +122,6 @@ export class ContextualMenuComponent implements OnInit {
   }
 
   async sendExtensionMessage(): Promise<void> {
-    const sessionService = this.appProviderService.sessionFactory.getSessionService(this.selectedSession.type) as AwsSessionService;
-    const credentialsInfo = await sessionService.generateCredentials(this.selectedSession.sessionId);
-    const url = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentialsInfo, this.selectedSession.region);
-    this.extensionWebsocketService.sendMessage(
-      JSON.stringify({
-        url,
-        sessionName: this.selectedSession.sessionName,
-        sessionRole: (this.selectedSession as any).roleArn.split("/")[1],
-        sessionRegion: this.selectedSession.region,
-        sessionType: this.selectedSession.type.toString().startsWith("aws") ? "aws" : this.selectedSession.type.toString(),
-      })
-    );
+    await this.extensionWebsocketService.openWebConsoleWithExtension(this.selectedSession);
   }
 }

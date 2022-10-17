@@ -1,5 +1,10 @@
 import { Injectable } from "@angular/core";
 import { AppNativeService } from "./app-native.service";
+import { AppProviderService } from "./app-provider.service";
+import { Session } from "@noovolari/leapp-core/models/session";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
+import { BehaviorSubject } from "rxjs";
+import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 
 @Injectable({
   providedIn: "root",
@@ -8,8 +13,27 @@ export class ExtensionWebsocketService {
   public wsServer: any;
   public port: string;
   public wsClient: any;
+  public fetching$: BehaviorSubject<boolean>;
+  private fetchingTimeout: any;
 
-  constructor(private appNativeService: AppNativeService) {}
+  constructor(
+    private appNativeService: AppNativeService,
+    private appProviderService: AppProviderService,
+    private toastService: MessageToasterService
+  ) {
+    this.fetching$ = new BehaviorSubject(false);
+    this.fetching$.subscribe(async (value) => {
+      clearTimeout(this.fetchingTimeout);
+      if (value) {
+        await this.pause();
+        this.sendMessage(JSON.stringify({ type: "get-fetching-state" }));
+        this.fetchingTimeout = setTimeout(() => {
+          this.fetching$.next(false);
+          this.toastService.toast("Error: cannot communicate with the browser extension", ToastLevel.error);
+        }, 4000);
+      }
+    });
+  }
 
   bootstrap(): void {
     const ws = this.appNativeService.ws;
@@ -20,9 +44,11 @@ export class ExtensionWebsocketService {
     this.wsServer.on("connection", (wsClient) => {
       this.wsClient = wsClient;
       this.wsClient.on("message", (data) => {
-        console.log("received: %s", data.toString("utf8"));
+        const parsedData = JSON.parse(data.toString("utf8"));
+        if (parsedData.type === "send-fetching-state") {
+          this.fetching$.next(parsedData.fetching);
+        }
       });
-      //setInterval(() => this.sendMessage("ping"), 5000);
     });
   }
 
@@ -31,6 +57,36 @@ export class ExtensionWebsocketService {
       if (client.readyState === WebSocket.OPEN) {
         client.send(payload);
       }
+    });
+  }
+
+  async openWebConsoleWithExtension(session: Session): Promise<void> {
+    this.appProviderService.behaviouralSubjectService.unselectSessions();
+    const sessionService = this.appProviderService.sessionFactory.getSessionService(session.type) as AwsSessionService;
+    const credentialsInfo = await sessionService.generateCredentials(session.sessionId);
+    const url = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentialsInfo, session.region);
+    this.sendMessage(
+      JSON.stringify({
+        type: "create-new-session",
+        sessionInfo: {
+          url,
+          sessionName: session.sessionName,
+          sessionRole: (session as any).roleArn.split("/")[1],
+          sessionRegion: session.region,
+          sessionType: session.type.toString().startsWith("aws") ? "aws" : session.type.toString(),
+        },
+      })
+    );
+    this.fetching$.next(true);
+    this.toastService.toast("Opening Web Console with the Leapp Extension...", ToastLevel.info);
+  }
+
+  private pause(): Promise<void> {
+    return new Promise((resolve, _) => {
+      const timeout = setTimeout(() => {
+        clearTimeout(timeout);
+        resolve();
+      }, 300);
     });
   }
 }

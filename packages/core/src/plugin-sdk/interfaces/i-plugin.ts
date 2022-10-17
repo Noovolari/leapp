@@ -30,7 +30,7 @@ export interface IPluginOutputObject {
 }
 
 /**
- * This interface represents the metadata associated with the plugin. This information is extracted form the plugin package.json.
+ * This interface represents the metadata associated with the plugin. This information is extracted from the plugin package.json.
  *
  * @property {string} version - the SemVer version of the plugin
  * @property {string} uniqueName - the plugin name

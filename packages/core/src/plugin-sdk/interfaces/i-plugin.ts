@@ -37,7 +37,7 @@ export interface IPluginOutputObject {
  * @property {string} description - the plugin description
  * @property {string} author - the author of the plugin
  * @property {string} url
- * @property {string[]} keywords - npm package keywords. leapp-plugin keyword is required to allow the plugin to be listed in the [plugin hub]{@link }
+ * @property {string[]} keywords - npm package keywords. leapp-plugin keyword is required to allow the plugin to be listed in the {@link https://www.leapp.cloud/plugins|Plugin Hub}
  */
 export interface IPluginMetadata {
   version: string;

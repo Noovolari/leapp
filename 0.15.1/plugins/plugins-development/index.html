@@ -1708,9 +1708,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#example-create-a-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: create a session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#example-edit-the-selected-session" class="md-nav__link">
     <span class="md-ellipsis">
       Example: edit the selected session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-clone-the-selected-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: clone the selected session
     </span>
   </a>
   
@@ -2166,9 +2184,27 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#example-create-a-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: create a session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#example-edit-the-selected-session" class="md-nav__link">
     <span class="md-ellipsis">
       Example: edit the selected session
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#example-clone-the-selected-session" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: clone the selected session
     </span>
   </a>
   
@@ -2380,7 +2416,7 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <tr>
 <td>createSessionData</td>
 <td><a href="https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts">SessionData</a></td>
-<td>an object containing Leapp Session metadata</td>
+<td>the metadata used to create the Leapp Session</td>
 </tr>
 </tbody>
 </table>
@@ -2388,7 +2424,12 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <ul>
 <li><strong><code>cloneSession</code></strong><code>(session: Session): Promise&lt;string&gt;</code></li>
 </ul>
-<p>Creates a clone of the given Leapp Session</p>
+<p>This method allows you to clone the given Leapp Session. This operation is allowed for the following Leapp Session types:</p>
+<ul>
+<li>AwsIamUserSession</li>
+<li>AwsIamRoleFederatedSession</li>
+<li>AwsIamRoleChainedSession</li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -2401,7 +2442,7 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <tr>
 <td>session</td>
 <td><a href="https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts">Session</a></td>
-<td>an object that represents a specific Leapp Session</td>
+<td>the Leapp Session that I want to clone</td>
 </tr>
 </tbody>
 </table>
@@ -2409,7 +2450,12 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <ul>
 <li><strong><code>updateSession</code></strong><code>(updateSessionData: SessionData, session: Session): Promise&lt;void&gt;</code></li>
 </ul>
-<p>Allows to edit the given Leapp Session with the specified SessionData</p>
+<p>This method allows you to update the given session with the given updateSessionData. This operation is allowed for the following Leapp Session types:</p>
+<ul>
+<li>AwsIamUserSession</li>
+<li>AwsIamRoleFederatedSession</li>
+<li>AwsIamRoleChainedSession</li>
+</ul>
 <table>
 <thead>
 <tr>
@@ -2422,12 +2468,12 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <tr>
 <td>updateSessionData</td>
 <td><a href="https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts">SessionData</a></td>
-<td>an object containing the new Leapp Session metadata</td>
+<td>the metadata used to update the given Leapp Session</td>
 </tr>
 <tr>
 <td>session</td>
 <td><a href="https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts">Session</a></td>
-<td>an object that represents the Leapp Session to be updated</td>
+<td>the Leapp Session that I want to update</td>
 </tr>
 </tbody>
 </table>
@@ -2435,8 +2481,8 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <ul>
 <li><strong><code>openTerminal</code></strong><code>(command: string, env?: any): Promise&lt;void&gt;</code></li>
 </ul>
-<p>Executes the given command in a new terminal window. </p>
-<p>The terminal window base path is set to the home directory</p>
+<p>Execute the given command in the platform-specific terminal; optionally, it is possible to set an env key/value object containing the env variables to export in the terminal, before the command execution.</p>
+<p>The terminal window base path is set to the home directory.</p>
 <table>
 <thead>
 <tr>
@@ -2449,12 +2495,12 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <tr>
 <td>command</td>
 <td>string</td>
-<td>a string representation of the command to execute</td>
+<td>the command that I want to execute in the platform-specific terminal</td>
 </tr>
 <tr>
 <td>env</td>
 <td>any</td>
-<td>an optional object containing key-value pairs corresponding to environment variables to set in the terminal</td>
+<td>optional key/value env variables object</td>
 </tr>
 </tbody>
 </table>
@@ -2484,8 +2530,8 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <ul>
 <li><strong><code>getIdpUrlIdByUrl</code></strong><code>(url: string): string</code></li>
 </ul>
-<p>Returns the id of an IdP URL from its url if it exists, otherwise creates a new IdP URL and returns its id. </p>
-<p>Can be used when creating/editing Federated Sessions since SessionData requires the id of an IdP URL</p>
+<p>Return the ID of the IdpUrl object from the given URL if it exists, otherwise creates a new IdP URL and returns its ID.</p>
+<p>Can be used when creating/editing Federated Sessions since SessionData requires the ID of an IdP URL.</p>
 <table>
 <thead>
 <tr>
@@ -2498,7 +2544,7 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <tr>
 <td>url</td>
 <td>string</td>
-<td>a string representation of an IdP URL</td>
+<td>the URL associated with the IdpUrl I want to retrieve</td>
 </tr>
 </tbody>
 </table>
@@ -2513,6 +2559,21 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <h3 id="example-open-an-url-in-the-browser">Example: open an URL in the browser</h3>
 <div class="highlight"><pre><span></span><code><span class="k">this</span><span class="p">.</span><span class="nx">pluginEnvironment</span><span class="p">.</span><span class="nx">openExternalUrl</span><span class="p">(</span><span class="s2">&quot;https://leapp.cloud&quot;</span><span class="p">);</span><span class="w"></span>
 </code></pre></div>
+<h3 id="example-create-a-session">Example: create a session</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="nx">applySessionAction</span><span class="p">(</span><span class="nx">session</span><span class="o">:</span><span class="w"> </span><span class="kt">Session</span><span class="p">,</span><span class="w"> </span><span class="nx">credentials</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="ow">void</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">profileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">pluginEnvironment</span><span class="p">.</span><span class="nx">getProfileIdByName</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">);</span><span class="w"></span>
+<span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">idpUrlId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">pluginEnvironment</span><span class="p">.</span><span class="nx">getIdpUrlIdByUrl</span><span class="p">(</span><span class="s2">&quot;put a valid url for an IdP here&quot;</span><span class="p">);</span><span class="w"></span>
+
+<span class="w">    </span><span class="k">this</span><span class="p">.</span><span class="nx">pluginEnvironment</span><span class="p">.</span><span class="nx">createSession</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nx">AwsIamRoleFederatedSessionData</span><span class="p">(</span><span class="w"></span>
+<span class="w">      </span><span class="s2">&quot;arn:aws:iam::000000000000:saml-provider/test&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nx">idpUrlId</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="nx">profileId</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="s2">&quot;us-east-1&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="s2">&quot;arn:aws:iam::000000000000:role/test&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="s2">&quot;New Name Session&quot;</span><span class="w"></span>
+<span class="w">    </span><span class="p">));</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
 <h3 id="example-edit-the-selected-session">Example: edit the selected session</h3>
 <div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="nx">applySessionAction</span><span class="p">(</span><span class="nx">session</span><span class="o">:</span><span class="w"> </span><span class="kt">Session</span><span class="p">,</span><span class="w"> </span><span class="nx">credentials</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="ow">void</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
 <span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">profileId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">pluginEnvironment</span><span class="p">.</span><span class="nx">getProfileIdByName</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">);</span><span class="w"></span>
@@ -2526,6 +2587,11 @@ The Plugin SDK is part of Leapp Core and contains Base Classes that describe dif
 <span class="w">        </span><span class="s2">&quot;arn:aws:iam::000000000000:role/test&quot;</span><span class="p">,</span><span class="w"> </span>
 <span class="w">        </span><span class="s2">&quot;New Name Session&quot;</span><span class="w"></span>
 <span class="w">    </span><span class="p">),</span><span class="w"> </span><span class="nx">session</span><span class="p">);</span><span class="w"></span>
+<span class="p">}</span><span class="w"></span>
+</code></pre></div>
+<h3 id="example-clone-the-selected-session">Example: clone the selected session</h3>
+<div class="highlight"><pre><span></span><code><span class="k">async</span><span class="w"> </span><span class="nx">applySessionAction</span><span class="p">(</span><span class="nx">session</span><span class="o">:</span><span class="w"> </span><span class="kt">Session</span><span class="p">,</span><span class="w"> </span><span class="nx">credentials</span><span class="o">:</span><span class="w"> </span><span class="kt">any</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="nb">Promise</span><span class="o">&lt;</span><span class="ow">void</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="k">await</span><span class="w"> </span><span class="k">this</span><span class="p">.</span><span class="nx">pluginEnvironment</span><span class="p">.</span><span class="nx">cloneSession</span><span class="p">(</span><span class="nx">session</span><span class="p">);</span><span class="w"></span>
 <span class="p">}</span><span class="w"></span>
 </code></pre></div>
 <hr />

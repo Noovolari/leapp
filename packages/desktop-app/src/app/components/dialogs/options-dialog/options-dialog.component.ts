@@ -59,6 +59,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   pluginList: PluginContainer[];
   fetchingPlugins: boolean;
 
+  selectedSsmRegionBehaviour: string;
+
   form = new FormGroup({
     idpUrl: new FormControl(""),
     awsProfile: new FormControl(""),
@@ -75,6 +77,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     colorThemeSelect: new FormControl(""),
     credentialMethodSelect: new FormControl(""),
     pluginDeepLink: new FormControl(""),
+    ssmRegionBehaviourSelect: new FormControl(""),
   });
 
   selectedCredentialMethod: string;
@@ -98,6 +101,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.selectedColorTheme = this.colorTheme;
 
     this.selectedCredentialMethod = this.optionsService.credentialMethod || constants.credentialFile;
+
+    this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
   }
 
   ngOnInit(): void {
@@ -131,6 +136,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.appService.validateAllFormFields(this.form);
 
     this.pluginList = this.appProviderService.pluginManagerService.pluginContainers;
+
+    this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
   }
 
   ngAfterViewInit(): void {
@@ -168,6 +175,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       this.optionsService.defaultRegion = this.selectedRegion;
       this.optionsService.defaultLocation = this.selectedLocation;
       this.optionsService.macOsTerminal = this.selectedTerminal;
+
+      this.optionsService.ssmRegionBehaviour = this.selectedSsmRegionBehaviour;
 
       if (this.checkIfNeedDialogBox()) {
         // eslint-disable-next-line max-len

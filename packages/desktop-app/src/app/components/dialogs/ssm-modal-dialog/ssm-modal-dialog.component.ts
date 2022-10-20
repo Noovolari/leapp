@@ -7,6 +7,7 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Component({
   selector: "app-ssm-modal-dialog",
@@ -40,6 +41,11 @@ export class SsmModalDialogComponent implements OnInit {
     this.awsRegions = this.appProviderService.awsCoreService.getRegions();
     this.sessionFactory = this.appProviderService.sessionFactory;
     this.ssmService = this.appProviderService.ssmService;
+
+    if (this.appProviderService.repository.getWorkspace().ssmRegionBehaviour === constants.ssmRegionDefault) {
+      this.selectedSsmRegion = this.session.region;
+      this.changeSsmRegion();
+    }
   }
 
   closeModal(): void {

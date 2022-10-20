@@ -170,7 +170,7 @@ describe("AwsIamUserService", () => {
           const service = new AwsIamUserService(null, repository as any, null, null, keychainService, null, null);
           const awsIamUserSessionRequest: any = {
             sessionName: "updated-mocked-session-name",
-            secretKey: "mocked-secret-key",
+            secretKey: "mocked-access-key",
             region: "updated-mocked-region",
             profileId: "updated-mocked-profile-id",
           };

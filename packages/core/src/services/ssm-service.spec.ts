@@ -272,6 +272,7 @@ describe("SsmService", () => {
     const instanceId = "mocked-id";
     const region = "eu-west-1";
 
+    let index = 0;
     (ssmService as any).ssmClient = {
       describeInstanceInformation: jest.fn(() => ({
         promise: () =>
@@ -289,6 +290,8 @@ describe("SsmService", () => {
                 PingStatus: "Online",
               },
             ],
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            NextToken: index++ < 3 ? "fake-next-token" : undefined,
           }),
       })),
     };
@@ -296,18 +299,18 @@ describe("SsmService", () => {
     jest.spyOn(ssmService as any, "requestSsmInstances");
     const result = await (ssmService as any).requestSsmInstances(credentialInfo, instanceId, region);
     expect(logService.log).toHaveBeenCalledWith(new LoggedEntry("Obtained smm info from aws for SSM", ssmService, LogLevel.info));
+    expect((ssmService as any).ssmClient.describeInstanceInformation).toHaveBeenCalledTimes(4);
 
-    expect(result).toStrictEqual([
-      {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        ComputerName: undefined,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        Name: undefined,
-        fakeInstanceId: "fake-id-2",
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        PingStatus: "Online",
-      },
-    ]);
+    const resultObject = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      ComputerName: undefined,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      Name: undefined,
+      fakeInstanceId: "fake-id-2",
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      PingStatus: "Online",
+    };
+    expect(result).toStrictEqual([resultObject, resultObject, resultObject, resultObject]);
 
     (ssmService as any).ssmClient = {
       describeInstanceInformation: jest.fn(() => ({

@@ -6,6 +6,12 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { BehaviorSubject } from "rxjs";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 
+export enum FetchingState {
+  notFetching,
+  fetchingRequested,
+  fetching,
+}
+
 @Injectable({
   providedIn: "root",
 })
@@ -13,7 +19,7 @@ export class ExtensionWebsocketService {
   public wsServer: any;
   public port: string;
   public wsClient: any;
-  public fetching$: BehaviorSubject<boolean>;
+  public fetching$: BehaviorSubject<FetchingState>;
   private fetchingTimeout: any;
 
   constructor(
@@ -21,14 +27,14 @@ export class ExtensionWebsocketService {
     private appProviderService: AppProviderService,
     private toastService: MessageToasterService
   ) {
-    this.fetching$ = new BehaviorSubject(false);
+    this.fetching$ = new BehaviorSubject(FetchingState.notFetching);
     this.fetching$.subscribe(async (value) => {
       clearTimeout(this.fetchingTimeout);
-      if (value) {
+      if (value === FetchingState.fetching) {
         await this.pause();
         this.sendMessage(JSON.stringify({ type: "get-fetching-state" }));
         this.fetchingTimeout = setTimeout(() => {
-          this.fetching$.next(false);
+          this.fetching$.next(FetchingState.notFetching);
           this.toastService.toast("Error: cannot communicate with the browser extension", ToastLevel.error);
         }, 4000);
       }
@@ -46,7 +52,7 @@ export class ExtensionWebsocketService {
       this.wsClient.on("message", (data) => {
         const parsedData = JSON.parse(data.toString("utf8"));
         if (parsedData.type === "send-fetching-state") {
-          this.fetching$.next(parsedData.fetching);
+          this.fetching$.next(parsedData.fetching ? FetchingState.fetching : FetchingState.notFetching);
         }
       });
     });
@@ -61,6 +67,7 @@ export class ExtensionWebsocketService {
   }
 
   async openWebConsoleWithExtension(session: Session): Promise<void> {
+    this.fetching$.next(FetchingState.fetchingRequested);
     this.appProviderService.behaviouralSubjectService.unselectSessions();
     const sessionService = this.appProviderService.sessionFactory.getSessionService(session.type) as AwsSessionService;
     const credentialsInfo = await sessionService.generateCredentials(session.sessionId);
@@ -77,7 +84,7 @@ export class ExtensionWebsocketService {
         },
       })
     );
-    this.fetching$.next(true);
+    this.fetching$.next(FetchingState.fetching);
     this.toastService.toast("Opening Web Console with the Leapp Extension...", ToastLevel.info);
   }
 

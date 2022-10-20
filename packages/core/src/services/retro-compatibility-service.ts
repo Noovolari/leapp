@@ -230,7 +230,7 @@ export class RetroCompatibilityService {
       return;
     }
 
-    workspace._ssmRegionBehaviour = constants.ssmRegionNo;
+    workspace.ssmRegionBehaviour = constants.ssmRegionNo;
     this.persists(workspace);
     this.repository.reloadWorkspace();
   }

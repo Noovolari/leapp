@@ -4,11 +4,11 @@ export const constants = {
   lockFileDestination: ".Leapp/Leapp-lock.json",
   lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",
-  workspaceLastVersion: 2,
+  workspaceLastVersion: 3,
 
   //Aws
   samlRoleSessionDuration: 3600, // 1h
-  sessionDuration: 60, // 1200, // 20 min
+  sessionDuration: 1200, // 20 min
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
   credentialsDestination: ".aws/credentials",

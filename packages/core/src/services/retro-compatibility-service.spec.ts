@@ -50,6 +50,7 @@ describe("RetroCompatibilityService", () => {
       (service as any).integrationTypeEnumPatch = jest.fn();
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
+      (service as any).migration3 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
@@ -57,6 +58,7 @@ describe("RetroCompatibilityService", () => {
       expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
+      expect((service as any).migration3).toHaveBeenCalled();
     });
 
     test("should try migrations, retropatch not necessary", async () => {
@@ -72,6 +74,7 @@ describe("RetroCompatibilityService", () => {
       (service as any).integrationTypeEnumPatch = jest.fn();
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
+      (service as any).migration3 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
@@ -79,6 +82,7 @@ describe("RetroCompatibilityService", () => {
       expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
+      expect((service as any).migration3).toHaveBeenCalled();
     });
 
     test("should try migrations, integrationpatch not necessary", async () => {
@@ -94,6 +98,7 @@ describe("RetroCompatibilityService", () => {
       (service as any).integrationTypeEnumPatch = jest.fn();
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
+      (service as any).migration3 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
@@ -101,6 +106,7 @@ describe("RetroCompatibilityService", () => {
       expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
+      expect((service as any).migration3).toHaveBeenCalled();
     });
   });
 

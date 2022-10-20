@@ -43,38 +43,46 @@ Currently available methods:
 
   | argument | type | description |
   | --- | --- | --- |
-  | createSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | an object containing Leapp Session metadata 
+  | createSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | the metadata used to create the Leapp Session
 
 ###cloneSession
 - **`cloneSession`**`(session: Session): Promise<string>`
 
-  Creates a clone of the given Leapp Session
+  This method allows you to clone the given Leapp Session. This operation is allowed for the following Leapp Session types:
+
+  - AwsIamUserSession
+  - AwsIamRoleFederatedSession
+  - AwsIamRoleChainedSession
 
   | argument | type | description |
   | --- | --- | --- |
-  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | an object that represents a specific Leapp Session
+  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | the Leapp Session that I want to clone
 
 ###updateSession
 - **`updateSession`**`(updateSessionData: SessionData, session: Session): Promise<void>`
 
-  Allows to edit the given Leapp Session with the specified SessionData
+  This method allows you to update the given session with the given updateSessionData. This operation is allowed for the following Leapp Session types:
+
+  - AwsIamUserSession
+  - AwsIamRoleFederatedSession
+  - AwsIamRoleChainedSession
 
   | argument | type | description |
   | --- | --- | --- |
-  | updateSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | an object containing the new Leapp Session metadata
-  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | an object that represents the Leapp Session to be updated
+  | updateSessionData | [SessionData](https://github.com/Noovolari/leapp/blob/master/packages/core/src/plugin-sdk/interfaces/session-data.ts) | the metadata used to update the given Leapp Session
+  | session | [Session](https://github.com/Noovolari/leapp/blob/master/packages/core/src/models/session.ts) | the Leapp Session that I want to update
 
 ###openTerminal
 - **`openTerminal`**`(command: string, env?: any): Promise<void>`
 
-  Executes the given command in a new terminal window. 
+  Execute the given command in the platform-specific terminal; optionally, it is possible to set an env key/value object containing the env variables to export in the terminal, before the command execution.
 
-  The terminal window base path is set to the home directory
+  The terminal window base path is set to the home directory.
 
   | argument | type | description |
   | --- | --- | --- |
-  | command | string | a string representation of the command to execute
-  | env | any | an optional object containing key-value pairs corresponding to environment variables to set in the terminal
+  | command | string | the command that I want to execute in the platform-specific terminal
+  | env | any | optional key/value env variables object
 
 ###getProfileIdByName
 - **`getProfileIdByName`**`(profileName: string): string`
@@ -90,13 +98,13 @@ Currently available methods:
 ###getIdpUrlIdByUrl
 - **`getIdpUrlIdByUrl`**`(url: string): string`
 
-  Returns the id of an IdP URL from its url if it exists, otherwise creates a new IdP URL and returns its id. 
+  Return the ID of the IdpUrl object from the given URL if it exists, otherwise creates a new IdP URL and returns its ID.
 
-  Can be used when creating/editing Federated Sessions since SessionData requires the id of an IdP URL
+  Can be used when creating/editing Federated Sessions since SessionData requires the ID of an IdP URL.
 
   | argument | type | description |
   | --- | --- | --- |
-  | url | string | a string representation of an IdP URL
+  | url | string | the URL associated with the IdpUrl I want to retrieve
 
 ---
 
@@ -119,6 +127,23 @@ const response = await res.json();
 this.pluginEnvironment.openExternalUrl("https://leapp.cloud");
 ```
 
+###Example: create a session
+```typescript
+async applySessionAction(session: Session, credentials: any): Promise<void> {
+    const profileId = this.pluginEnvironment.getProfileIdByName("default");
+    const idpUrlId = this.pluginEnvironment.getIdpUrlIdByUrl("put a valid url for an IdP here");
+  
+    this.pluginEnvironment.createSession(new AwsIamRoleFederatedSessionData(
+      "arn:aws:iam::000000000000:saml-provider/test",
+      idpUrlId,
+      profileId,
+      "us-east-1",
+      "arn:aws:iam::000000000000:role/test",
+      "New Name Session"
+    ));
+}
+```
+
 ###Example: edit the selected session
 
 ```typescript
@@ -134,6 +159,13 @@ async applySessionAction(session: Session, credentials: any): Promise<void> {
         "arn:aws:iam::000000000000:role/test", 
         "New Name Session"
     ), session);
+}
+```
+
+###Example: clone the selected session
+```typescript
+async applySessionAction(session: Session, credentials: any): Promise<void> {
+    await this.pluginEnvironment.cloneSession(session);
 }
 ```
 

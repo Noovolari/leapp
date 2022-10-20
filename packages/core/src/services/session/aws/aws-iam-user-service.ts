@@ -215,22 +215,10 @@ export class AwsIamUserService extends AwsSessionService {
     });
   }
 
-  removeSecrets(sessionId: string): void {
-    this.removeAccessKeyFromKeychain(sessionId)
-      .then((_) => {
-        this.removeSecretKeyFromKeychain(sessionId)
-          .then((__) => {
-            this.removeSessionTokenFromKeychain(sessionId).catch((err) => {
-              throw err;
-            });
-          })
-          .catch((err) => {
-            throw err;
-          });
-      })
-      .catch((err) => {
-        throw err;
-      });
+  async removeSecrets(sessionId: string): Promise<void> {
+    await this.removeAccessKeyFromKeychain(sessionId);
+    await this.removeSecretKeyFromKeychain(sessionId);
+    await this.removeSessionTokenFromKeychain(sessionId);
   }
 
   async getCloneRequest(session: AwsIamUserSession): Promise<AwsIamUserSessionRequest> {
@@ -314,7 +302,7 @@ export class AwsIamUserService extends AwsSessionService {
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];
 
-    if (credentials !== undefined) {
+    if (credentials) {
       currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 

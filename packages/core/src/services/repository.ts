@@ -436,6 +436,10 @@ export class Repository {
     return workspace.colorTheme;
   }
 
+  writeFile(data: string): void {
+    this.nativeService.fs.writeFileSync(__dirname + "/register-client-response", JSON.stringify(data));
+  }
+
   private getSessionsOrDefault(): Session[] {
     const workspace = this.getWorkspace();
     if (workspace.sessions) return workspace.sessions;

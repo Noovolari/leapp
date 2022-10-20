@@ -156,6 +156,7 @@ export class RetroCompatibilityService {
       return false;
     }
     workspace._workspaceVersion = currentVersion;
+    this.persists(workspace);
     return true;
   }
 

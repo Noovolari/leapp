@@ -36,8 +36,7 @@ jobs:
           npm run build
       - name: Test
         run: |
-          cd packages/core
-          npm test
+          npm run make-badges core
       - name: Lint
         run: |
           npm run lint

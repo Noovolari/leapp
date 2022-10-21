@@ -34,8 +34,7 @@ jobs:
           npm run prepack
       - name: Test
         run: |
-          cd packages/cli
-          npm test
+          npm run make-badges cli
       - name: Lint
         run: |
           npm run lint

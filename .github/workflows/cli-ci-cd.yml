@@ -15,7 +15,6 @@ jobs:
         node_version: [ 16 ]
     env:
       SKIP_INTEGRATION_TESTS: "true"
-      S3_BUCKET: s3://noovolari-leapp-website-distribution
     runs-on: ${{ matrix.os }}
     steps:
       - name: Prepare GIT
@@ -33,6 +32,20 @@ jobs:
         run: |
           cd packages/cli
           npm run prepack
+      - name: Test
+        run: |
+          cd packages/cli
+          npm run test
+      - name: Lint
+        run: |
+          npm run lint
+  make_coverage_badges:
+    needs: build_and_test
+    runs-on: ubuntu-latest
+    env:
+      SKIP_INTEGRATION_TESTS: "true"
+      S3_BUCKET: s3://noovolari-leapp-website-distribution
+    steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -47,10 +60,6 @@ jobs:
         run: |
           cd coverage
           aws s3 cp cli-badges.svg "${{ env.S3_BUCKET }}/coverage-badges/"
-      - name: Lint
-        run: |
-          npm run lint
-
   check_for_release:
     needs: build_and_test
     runs-on: ubuntu-latest

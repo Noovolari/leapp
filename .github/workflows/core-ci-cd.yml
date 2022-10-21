@@ -43,7 +43,7 @@ jobs:
           aws-region: eu-west-1
       - name: Test
         run: |
-          npm run make-badges core
+          npm run make-badges-core
       - name: Send badge to S3
         shell: bash
         run: |

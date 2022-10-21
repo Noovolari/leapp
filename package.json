@@ -41,7 +41,8 @@
     "lint:fix": "npm run lint -- --fix",
     "prepare": "husky install",
     "leapp-release": "gushio gushio/release.js",
-    "make-badges": "gushio gushio/make-badges.js core"
+    "make-badges-core": "gushio gushio/make-badges.js core",
+    "make-badges-cli": "gushio gushio/make-badges.js cli"
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"

@@ -12,7 +12,7 @@ module.exports = {
     const currentPath = shellJs.pwd();
     let result;
     try {
-      if(args[0] === 'core' || args[0] == 'all') {
+      if(args[1] === 'core' || args[0] == 'all') {
         // Core badge
         result = shellJs.exec('cd packages/core && npm run test');
         if (result.code !== 0) {
@@ -28,7 +28,7 @@ module.exports = {
         }
       }
 
-      if(args[0] === 'cli' || args[0] == 'all') {
+      if(args[1] === 'cli' || args[0] == 'all') {
         // Cli badge
         result = shellJs.exec('cd packages/cli && npm run test');
         if (result.code !== 0) {

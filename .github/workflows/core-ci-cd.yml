@@ -45,10 +45,10 @@ jobs:
         run: |
           npm run make-badges core
       - name: Send badge to S3
-          shell: bash
-          run: |
-            cd coverage
-            aws s3 cp core-badges.svg "${{ env.S3_BUCKET }}/coverage-badges/"
+        shell: bash
+        run: |
+          cd coverage
+          aws s3 cp core-badges.svg "${{ env.S3_BUCKET }}/coverage-badges/"
       - name: Lint
         run: |
           npm run lint

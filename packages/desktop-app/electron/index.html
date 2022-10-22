@@ -7,34 +7,29 @@
 
   tabGroup.setDefaultTab({
     title: "New Page",
-    src: "https://signin.aws.amazon.com/federation?Action=login&Issuer=Leapp&Destination=https://eu-west-1.console.aws.amazon.com/console/home?region=eu-west-1&SigninToken=tYtGQqQs_cwi86GVAdayVREWCJpRvSJr6gv8tq9Isc"
+    src: "https://signin.aws.amazon.com/federation?Action=login&Issuer=Leapp&Destination=https://eu-west-1.console.aws.amazon.com/console/home?region=eu-west-1&SigninToken=u5Q8An9nWQd2BhsZtkxbZolVN-xYvJvEOzAsl8Td"
   });
 
   let index = 0;
 
   tabGroup.on("tab-added", (tab, tabGroup) => {
-    console.log(tab.webview);
+    tab.on("active", (tab) => {
+      tab.show();
+    });
 
     const tmpWebview = tab.webview.cloneNode(true);
-    console.log(`persist:test${index}`);
     tmpWebview.setAttribute("partition", `persist:test${index}`);
     tmpWebview.setAttribute("class", `view visible`);
     index++;
 
-    console.log(tab.webview.parentElement);
     const views = tab.webview.parentElement;
-    //tab.webview.remove();
     views.removeChild(tab.webview);
+    for (let child of views.children) {
+      child.setAttribute("class", `view`);
+    }
     views.appendChild(tmpWebview);
 
-    console.log(tmpWebview);
+    tab.webview = tmpWebview;
+    tab.activate();
   });
-
-  // Do stuff
-  /*const tab = tabGroup.addTab({
-    title: "electron-tabs on NPM",
-    src: "https://www.npmjs.com/package/electron-tabs",
-    visible: true,
-    active: true,
-  });*/
 </script>

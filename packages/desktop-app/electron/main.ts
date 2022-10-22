@@ -172,10 +172,10 @@ const generateMainWindow = () => {
     // Protocol handler for win32 and linux for deep linking when the app is already launched.
     // The url is passed in the args so we read and write to a temp file before the frontend is
     // launched, this way the frontend can read the temp file and load the plugin
-    if (process.platform !== 'darwin' && process.argv[1] && process.argv[1] !== "--enable-accelerated-mjpeg-decode") {
+    /*if (process.platform !== 'darwin' && process.argv[1] && process.argv[1] !== "--enable-accelerated-mjpeg-decode") {
       // Keep only command line / deep linked arguments
       fs.writeFileSync(path.join(os.homedir(),environment.deeplinkFile), process.argv[1].split("leapp://")[1]);
-    }
+    }*/
   };
 
   const createTrayWindow = () => {

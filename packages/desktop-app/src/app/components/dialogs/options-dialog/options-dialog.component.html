@@ -224,7 +224,7 @@
             <strong>Leapp Pro coming soon</strong>
             <span>Join our community and give us feedback</span>
             <br>
-            <button type="button" class="join-community-button" (click)="openJoinUs()">Join</button>
+            <button type="button" class="join-community-button" (click)="openBrowser('https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA')">Join</button>
           </p>
         </div>
       </div>
@@ -274,6 +274,27 @@
           </div>
         </div>
 
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-Open-Web-Console"></i>
+        <span class="mat-tab-label-text">Extension</span>
+      </ng-template>
+      <div class="no-padding no-margin panel">
+        <div class="hero-unit">
+          <img src="assets/images/in-browser.png" alt="">
+          <p class="extension-info">
+            <strong>Leapp Browser Extension</strong>
+            <span>To install it on Firefox, visit the Extension Store. The extension will also be available very soon on Chrome and other browsers.</span>
+            <br>
+            <span>
+              <button type="button" class="install-firefox-button" (click)="openBrowser('https://addons.mozilla.org/en-GB/firefox/')">Get it on Firefox</button>
+              <button type="button" class="extension-documentation-button" (click)="openBrowser('https://docs.leapp.cloud')">Read Docs</button>
+            </span>
+          </p>
+        </div>
       </div>
     </mat-tab>
 

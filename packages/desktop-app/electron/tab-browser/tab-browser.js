@@ -1,35 +1,33 @@
-<tab-group new-tab-button="true" sortable="true"></tab-group>
-
-<script src="../node_modules/electron-tabs/dist/electron-tabs.js"></script>
-<script>
+var electronTabs = require("electron-tabs");
+(function() {
   // Select tab-group
-  const tabGroup = document.getElementsByTagName("tab-group")[0];
+  var tabGroup = document.getElementById("tabs");
 
   tabGroup.setDefaultTab({
     title: "New Page",
     src: "https://signin.aws.amazon.com/federation?Action=login&Issuer=Leapp&Destination=https://eu-west-1.console.aws.amazon.com/console/home?region=eu-west-1&SigninToken=u5Q8An9nWQd2BhsZtkxbZolVN-xYvJvEOzAsl8Td"
   });
 
-  let index = 0;
+  var index = 0;
 
   tabGroup.on("tab-added", (tab, tabGroup) => {
     tab.on("active", (tab) => {
       tab.show();
     });
 
-    const tmpWebview = tab.webview.cloneNode(true);
+    var tmpWebview = tab.webview.cloneNode(true);
     tmpWebview.setAttribute("partition", `persist:test${index}`);
     tmpWebview.setAttribute("class", `view visible`);
     index++;
 
-    const views = tab.webview.parentElement;
+    var views = tab.webview.parentElement;
     views.removeChild(tab.webview);
-    for (let child of views.children) {
-      child.setAttribute("class", `view`);
+    for (var i = 0; i < views.children.length; i++) {
+      views.children[i].setAttribute("class", `view`);
     }
     views.appendChild(tmpWebview);
 
     tab.webview = tmpWebview;
     tab.activate();
   });
-</script>
+})();

@@ -213,6 +213,22 @@ const generateMainWindow = () => {
     remote.enable(trayWin.webContents);
   };
 
+  const createTabBrowser = () => {
+    const electronTabsBrowserWindowConfig = JSON.parse(JSON.stringify(windowDefaultConfig.browserWindow));
+    electronTabsBrowserWindowConfig.webPreferences.webviewTag = true;
+
+    // Generate the App Window
+    const electronTabsWindow = new BrowserWindow(electronTabsBrowserWindowConfig);
+    electronTabsWindow.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
+    electronTabsWindow.removeMenu(); // Remove Window Menu inside App, to make it compliant with Linux
+    electronTabsWindow.setMenu(null);
+    electronTabsWindow.loadURL(url.format({ pathname: path.join(__dirname, `/../../../electron/tab-browser/tab-browser.html`), protocol: "file:", slashes: true }));
+    electronTabsWindow.center();
+
+    // Set new minimum windows for opened tool. Note: it can also be modified at runtime
+    electronTabsWindow.setMinimumSize(1200, 680);
+  }
+
   const createTray = () => {
     if (!taskbar) {
       taskbar = new Tray(windowDefaultConfig.dir + `/assets/images/LeappTemplate.png`);
@@ -251,20 +267,7 @@ const generateMainWindow = () => {
     createWindow();
     // createTray();
     buildAutoUpdater(win);
-
-    const electronTabsBrowserWindowConfig = JSON.parse(JSON.stringify(windowDefaultConfig.browserWindow));
-    electronTabsBrowserWindowConfig.webPreferences.webviewTag = true;
-
-    // Generate the App Window
-    const electronTabsWindow = new BrowserWindow(electronTabsBrowserWindowConfig);
-    electronTabsWindow.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
-    electronTabsWindow.removeMenu(); // Remove Window Menu inside App, to make it compliant with Linux
-    electronTabsWindow.setMenu(null);
-    electronTabsWindow.loadURL(url.format({ pathname: path.join(__dirname, `/../../../electron/index.html`), protocol: "file:", slashes: true }));
-    electronTabsWindow.center();
-
-    // Set new minimum windows for opened tool. Note: it can also be modified at runtime
-    electronTabsWindow.setMinimumSize(1200, 680);
+    createTabBrowser();
   });
 
   // when the app on macOS is starting for the first time the frontend is not ready so we use 'will-finish-launching'

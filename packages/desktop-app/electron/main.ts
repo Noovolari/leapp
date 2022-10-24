@@ -13,6 +13,8 @@ const ipc = ipcMain;
 const remote = require("@electron/remote/main");
 remote.initialize();
 
+let electronTabsWindow = null;
+
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
 app.disableHardwareAcceleration();
@@ -109,6 +111,13 @@ const generateMainWindow = () => {
       // Open web tools for diagnostics
       win.webContents.once("dom-ready", () => {});
     }
+
+    win.on("focus", () => {
+      if (electronTabsWindow) {
+        electronTabsWindow.minimize();
+      }
+      win.focus();
+    });
 
     win.on("close", (event) => {
       event.preventDefault();
@@ -218,7 +227,7 @@ const generateMainWindow = () => {
     electronTabsBrowserWindowConfig.webPreferences.webviewTag = true;
 
     // Generate the App Window
-    const electronTabsWindow = new BrowserWindow(electronTabsBrowserWindowConfig);
+    electronTabsWindow = new BrowserWindow(electronTabsBrowserWindowConfig);
     electronTabsWindow.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
     electronTabsWindow.removeMenu(); // Remove Window Menu inside App, to make it compliant with Linux
     electronTabsWindow.setMenu(null);
@@ -227,10 +236,26 @@ const generateMainWindow = () => {
 
     // Set new minimum windows for opened tool. Note: it can also be modified at runtime
     electronTabsWindow.setMinimumSize(1200, 680);
-    ipcMain.handle("OPEN_TAB_BROWSER_WITH_URL", (_, data) => {
-      electronTabsWindow.webContents.send("TAB_URL", data);
+    electronTabsWindow.on("close", (event) => {
+      event.preventDefault();
+      electronTabsWindow.minimize();
     });
   }
+
+  const bootstrapTabBrowser = () => {
+    ipcMain.handle("OPEN_TAB_BROWSER_WITH_URL", (_, data) => {
+      if (!electronTabsWindow) {
+        createTabBrowser();
+      } else {
+        electronTabsWindow.restore();
+      }
+      electronTabsWindow.show();
+      electronTabsWindow.focus();
+      const timeoutId = setTimeout(() => {
+        electronTabsWindow.webContents.send("TAB_URL", data);
+      }, 200);
+    });
+  };
 
   const createTray = () => {
     if (!taskbar) {
@@ -270,7 +295,7 @@ const generateMainWindow = () => {
     createWindow();
     // createTray();
     buildAutoUpdater(win);
-    createTabBrowser();
+    bootstrapTabBrowser();
   });
 
   // when the app on macOS is starting for the first time the frontend is not ready so we use 'will-finish-launching'

@@ -10,7 +10,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { OptionsService } from "../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
-import { ExtensionWebsocketService } from "../../services/extension-websocket.service";
+import { ExtensionWebsocketService, FetchingState } from "../../services/extension-websocket.service";
 
 @Component({
   selector: "app-contextual-menu",
@@ -27,7 +27,7 @@ export class ContextualMenuComponent implements OnInit {
   public selectedSession: Session;
   public menuX: number;
   public menuY: number;
-  public browserExtensionfetching: boolean;
+  public openWebConsoleExtensionDisabled: boolean;
 
   constructor(
     public appService: AppService,
@@ -57,7 +57,7 @@ export class ContextualMenuComponent implements OnInit {
     });
 
     this.extensionWebsocketService.fetching$.subscribe((value) => {
-      this.browserExtensionfetching = value;
+      this.openWebConsoleExtensionDisabled = value !== FetchingState.notFetching;
     });
   }
 

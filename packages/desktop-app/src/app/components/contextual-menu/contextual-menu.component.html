@@ -53,6 +53,13 @@
     </ng-container>
 
     <div class="divider"></div>
+    <ng-container *ngIf="selectedSession.type !== eSessionType.awsIamUser && selectedSession.type !== eSessionType.azure">
+      <button mat-menu-item (click)="openWebConsoleInInternalTab();">
+        <i class="fab fa-aws"></i>&nbsp;
+        <span>Open Web Console Internal</span>
+      </button>
+    </ng-container>
+    <div class="divider"></div>
 
     <ng-container
       *ngIf="(selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained || selectedSession.type === eSessionType.awsSsoRole)">
@@ -121,10 +128,6 @@
     <button mat-menu-item (click)="copyCredentials(2);">
       <i class="fab fa-aws"></i>&nbsp;
       <span>Role ARN</span>
-    </button>
-    <button mat-menu-item (click)="copyAwsWebConsoleUrl();">
-      <i class="fab fa-aws"></i>&nbsp;
-      <span>Web Console URL</span>
     </button>
   </mat-menu>
 

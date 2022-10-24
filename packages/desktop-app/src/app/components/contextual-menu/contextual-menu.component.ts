@@ -10,6 +10,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { OptionsService } from "../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
+import { AppNativeService } from "../../services/app-native.service";
 
 @Component({
   selector: "app-contextual-menu",
@@ -31,7 +32,8 @@ export class ContextualMenuComponent implements OnInit {
     public appService: AppService,
     public optionsService: OptionsService,
     public appProviderService: AppProviderService,
-    private selectedSessionActionsService: SelectedSessionActionsService
+    private selectedSessionActionsService: SelectedSessionActionsService,
+    private appNativeService: AppNativeService
   ) {}
 
   ngOnInit(): void {
@@ -108,6 +110,12 @@ export class ContextualMenuComponent implements OnInit {
 
   async copyAwsWebConsoleUrl(): Promise<void> {
     await this.selectedSessionActionsService.copyAwsWebConsoleUrl(this.selectedSession);
+  }
+
+  async openWebConsoleInInternalTab(): Promise<void> {
+    const url = await this.selectedSessionActionsService.getAwsWebConsoleUrl(this.selectedSession);
+    const ipc = this.appNativeService.ipcRenderer;
+    ipc.invoke("OPEN_TAB_BROWSER_WITH_URL", { title: this.selectedSession.sessionName, url });
   }
 
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {

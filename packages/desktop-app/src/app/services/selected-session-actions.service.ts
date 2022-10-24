@@ -219,6 +219,19 @@ export class SelectedSessionActionsService {
     }
   }
 
+  async getAwsWebConsoleUrl(session: Session): Promise<string> {
+    this.appProviderService.behaviouralSubjectService.unselectSessions();
+
+    try {
+      const credentials = await (this.getSelectedSessionService(session) as AwsSessionService).generateCredentials(session.sessionId);
+      const sessionRegion = session.region;
+      return await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion);
+    } catch (err) {
+      this.messageToasterService.toast(err, ToastLevel.warn);
+      this.appProviderService.logService.log(new LoggedException(err, this, LogLevel.error, true, err.stack));
+    }
+  }
+
   async applyPluginAction(session: Session, plugin: AwsCredentialsPlugin): Promise<void> {
     this.behaviouralSubjectService.unselectSessions();
     await plugin.run(session);

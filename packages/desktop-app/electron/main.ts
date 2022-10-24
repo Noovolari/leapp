@@ -227,6 +227,9 @@ const generateMainWindow = () => {
 
     // Set new minimum windows for opened tool. Note: it can also be modified at runtime
     electronTabsWindow.setMinimumSize(1200, 680);
+    ipcMain.handle("OPEN_TAB_BROWSER_WITH_URL", (_, data) => {
+      electronTabsWindow.webContents.send("TAB_URL", data);
+    });
   }
 
   const createTray = () => {

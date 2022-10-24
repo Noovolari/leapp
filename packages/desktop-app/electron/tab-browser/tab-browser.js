@@ -2,13 +2,15 @@ var electronTabs = require("electron-tabs");
 (function() {
   // Select tab-group
   var tabGroup = document.getElementById("tabs");
-
-  tabGroup.setDefaultTab({
-    title: "New Page",
-    src: "https://signin.aws.amazon.com/federation?Action=login&Issuer=Leapp&Destination=https://eu-west-1.console.aws.amazon.com/console/home?region=eu-west-1&SigninToken=u5Q8An9nWQd2BhsZtkxbZolVN-xYvJvEOzAsl8Td"
-  });
-
   var index = 0;
+  var ipc = require("electron").ipcRenderer;
+
+  ipc.on("TAB_URL", (_, data) => {
+    tabGroup.addTab({
+      title: data.title,
+      src: data.url,
+    })
+  });
 
   tabGroup.on("tab-added", (tab, tabGroup) => {
     tab.on("active", (tab) => {

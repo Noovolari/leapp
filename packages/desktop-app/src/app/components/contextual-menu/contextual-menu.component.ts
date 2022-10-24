@@ -115,7 +115,7 @@ export class ContextualMenuComponent implements OnInit {
   async openWebConsoleInInternalTab(): Promise<void> {
     const url = await this.selectedSessionActionsService.getAwsWebConsoleUrl(this.selectedSession);
     const ipc = this.appNativeService.ipcRenderer;
-    ipc.invoke("OPEN_TAB_BROWSER_WITH_URL", { title: this.selectedSession.sessionName, url });
+    ipc.invoke("OPEN_TAB_BROWSER_WITH_URL", { title: this.selectedSession.sessionName, url, sessionId: this.selectedSession.sessionId });
   }
 
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {

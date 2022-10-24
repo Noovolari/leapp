@@ -2,14 +2,15 @@ var electronTabs = require("electron-tabs");
 (function() {
   // Select tab-group
   var tabGroup = document.getElementById("tabs");
-  var index = 0;
   var ipc = require("electron").ipcRenderer;
+  var sessionId = -1;
 
-  ipc.on("TAB_URL", (_, data) => {
+  ipc.on("TAB_URL", (_, data ) => {
     tabGroup.addTab({
       title: data.title,
       src: data.url,
     })
+    sessionId = data.sessionId;
   });
 
   tabGroup.on("tab-added", (tab, tabGroup) => {
@@ -18,9 +19,8 @@ var electronTabs = require("electron-tabs");
     });
 
     var tmpWebview = tab.webview.cloneNode(true);
-    tmpWebview.setAttribute("partition", `persist:test${index}`);
+    tmpWebview.setAttribute("partition", `persist:tab-browser-${sessionId}`);
     tmpWebview.setAttribute("class", `view visible`);
-    index++;
 
     var views = tab.webview.parentElement;
     views.removeChild(tab.webview);

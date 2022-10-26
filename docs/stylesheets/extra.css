@@ -168,6 +168,12 @@ header {
   border: none !important;
 }
 
+.md-disabled-button {
+  color: #c2c2c2 !important;
+  background-color: #646464 !important;
+  cursor: default!important;
+}
+
 img[src$="smaller-img"] {
   width:70%;
   display:block;
@@ -183,6 +189,17 @@ img[src$="even-smaller-img"] {
 .centered-button {
   display: block!important;
   margin: 0 auto;
-  width: 40%;
+  width: 58%;
+  text-align: center;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.installation-button {
+  width: 49%;
   text-align: center;
 }

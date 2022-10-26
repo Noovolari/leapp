@@ -1,7 +1,10 @@
 The Leapp Multi-Console Browser Extension allows you to open **multiple instances of 
 the AWS Web Console in the same browser window** and helps you in managing them.
 
-This extension is available for all major browsers (Firefox, Chrome, Edge, Brave, and all other Chromium-based browsers).
+<div class="button-container">
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/" class="md-button md-button--primary installation-button">Get it on Firefox<i></i></a>
+  <a href="" class="md-button md-disabled-button md-button--primary installation-button">Get it on Chrome (coming soon)</a>
+</div>
 
 ## Install the Extension
 
@@ -9,7 +12,10 @@ This extension is available for all major browsers (Firefox, Chrome, Edge, Brave
 
 You can get the extension on the official Mozilla Addons Store and install it from there:
 
-[Get it on Firefox :fontawesome-solid-download:](https://addons.mozilla.org/en-GB/firefox/){ .md-button .md-button--primary }
+1. Visit the page by clicking the button below
+2. Then Click on Add to Firefox
+
+[Get it on Firefox :fontawesome-solid-download:](https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/){ .md-button .md-button--primary }
 
 ### Chrome, Edge and other Chromium based browsers
 
@@ -27,7 +33,30 @@ The extension can only be installed manually. To do so, follow these instruction
 5. Then click on **Load unpacked** in the top left corner
 6. Finally, Select the folder extracted previously
 
-[Get it on Chrome :fontawesome-solid-download:](https://addons.mozilla.org/en-GB/firefox/){ .md-button .md-button--primary }
+[Get it on Chrome (coming soon) :fontawesome-solid-download:](){ .md-button .md-button--primary .md-disabled-button }
+
+## Uninstall the Extension
+
+### Firefox
+
+1. Visit about:addons
+2. Select Leapp Browser Extension and click on the 3 dots
+3. Click on Remove
+
+### Chrome, Edge and other Chromium based browsers
+
+1. Visit about://extensions
+2. Search for Leapp Browser Extension and click on Remove
+
+### List of Supported Browsers
+
+| Browser                    | Supported
+| -------------------------- | ------------------------------------ 
+| Firefox                    | :white_check_mark:
+| Chrome                     | :white_check_mark:
+| Edge                       | :white_check_mark:
+| Brave                      | :white_check_mark:
+| Safari                     | :x:
 
 ## How to use it
 

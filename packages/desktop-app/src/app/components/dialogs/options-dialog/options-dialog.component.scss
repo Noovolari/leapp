@@ -182,21 +182,21 @@
 
 .extension-info {
   position: relative;
-  bottom: 51px;
+  bottom: 40px;
   strong {
     bottom: 5px;
     position: relative;
   }
 }
 
-.extension-documentation-button {
-  margin-left: 10px;
+.install-firefox-button, .extension-documentation-button, .install-chrome-button {
+  font-size: 14px;
+  padding: 10px 12px;
+  margin: 0 10px 10px 0;
 }
 
-.install-firefox-button, .extension-documentation-button {
-  position: relative;
-  bottom: 10px;
-  font-size: 15px;
+.install-chrome-button {
+  cursor: default!important;
 }
 
 .extension-info span strong {
@@ -205,3 +205,17 @@
   font-size: 16px;
   top: 0;
 }
+
+.description-container {
+  position: relative;
+  top: 16px;
+}
+
+.button-container {
+  position: relative!important;
+  top: 17px!important;
+}
+
+
+
+

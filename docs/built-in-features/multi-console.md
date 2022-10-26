@@ -6,6 +6,16 @@ the AWS Web Console in the same browser window** and helps you in managing them.
   <a href="" class="md-button md-disabled-button md-button--primary installation-button">Get it on Chrome (coming soon)</a>
 </div>
 
+### List of Supported Browsers
+
+| Browser                    | Supported
+| -------------------------- | ------------------------------------ 
+| Firefox                    | :white_check_mark:
+| Chrome                     | Coming soon
+| Edge                       | Coming soon
+| Brave                      | Coming soon
+| Safari                     | :x:
+
 ## Install the Extension
 
 ### Firefox
@@ -47,16 +57,6 @@ The extension can only be installed manually. To do so, follow these instruction
 
 1. Visit about://extensions
 2. Search for Leapp Browser Extension and click on Remove
-
-### List of Supported Browsers
-
-| Browser                    | Supported
-| -------------------------- | ------------------------------------ 
-| Firefox                    | :white_check_mark:
-| Chrome                     | :white_check_mark:
-| Edge                       | :white_check_mark:
-| Brave                      | :white_check_mark:
-| Safari                     | :x:
 
 ## How to use it
 

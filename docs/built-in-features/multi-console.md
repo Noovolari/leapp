@@ -3,7 +3,7 @@ the AWS Web Console in the same browser window** and helps you in managing them.
 
 <div class="button-container">
   <a href="https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/" class="md-button md-button--primary installation-button">Get it on Firefox<i></i></a>
-  <a href="" class="md-button md-disabled-button md-button--primary installation-button">Get it on Chrome (coming soon)</a>
+  <a class="md-button md-disabled-button md-button--primary installation-button">Get it on Chrome (coming soon)</a>
 </div>
 
 ### List of Supported Browsers

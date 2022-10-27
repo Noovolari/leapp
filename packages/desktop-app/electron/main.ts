@@ -289,6 +289,7 @@ const generateMainWindow = () => {
         if (win.isMinimized()) {
           win.restore();
         }
+        win.show();
         win.focus();
       }
     });

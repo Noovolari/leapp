@@ -3,7 +3,7 @@ the AWS Web Console in the same browser window** and helps you in managing them.
 
 <div class="button-container">
   <a href="https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/" class="md-button md-button--primary installation-button">Get it on Firefox<i></i></a>
-  <a class="md-button md-disabled-button md-button--primary installation-button">Get it on Chrome (coming soon)</a>
+  <a href="https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-0.1.2.zip" class="md-button md-button--primary installation-button">Get it on Chrome (coming soon)</a>
 </div>
 
 ### List of Supported Browsers
@@ -11,9 +11,9 @@ the AWS Web Console in the same browser window** and helps you in managing them.
 | Browser                    | Supported
 | -------------------------- | ------------------------------------ 
 | Firefox                    | :white_check_mark:
-| Chrome                     | Coming soon
-| Edge                       | Coming soon
-| Brave                      | Coming soon
+| Chrome                     | :white_check_mark:
+| Edge                       | :white_check_mark:
+| Brave                      | :white_check_mark:
 | Safari                     | :x:
 
 ## Install the Extension
@@ -43,7 +43,7 @@ The extension can only be installed manually. To do so, follow these instruction
 5. Then click on **Load unpacked** in the top left corner
 6. Finally, Select the folder extracted previously
 
-[Get it on Chrome (coming soon) :fontawesome-solid-download:](){ .md-button .md-button--primary .md-disabled-button }
+[Get it on Chrome/Others :fontawesome-solid-download:](https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-0.1.2.zip){ .md-button .md-button--primary }
 
 ## Uninstall the Extension
 
@@ -57,6 +57,18 @@ The extension can only be installed manually. To do so, follow these instruction
 
 1. Visit about://extensions
 2. Search for Leapp Browser Extension and click on Remove
+3. See warning section below
+
+!!! warning
+
+    If you are using the Chrome version and you uninstalled or disabled the extension, you have to manually clear cookies for the AWS Console. To do so,
+    when accessing the login page of the AWS Console, on the left of the address bar, click the lock icon and select "Cookies". 
+    Then, remove all cookies by clicking "Remove" until the cookie list is empty and then click on Done 
+    <div class="button-container" style="background-color:none!important">
+      <img src="../../images/built-in-features/extension-uninstall-1.png?style=even-smaller-img;background-color:none!important" class="installation-button">
+      <img src="../../images/built-in-features/extension-uninstall-2.png?style=even-smaller-img;background-color:none!important" class="installation-button">
+    </div>
+
 
 ## How to use it
 

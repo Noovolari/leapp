@@ -205,6 +205,12 @@
 .description-container {
   position: relative;
   top: 16px;
+  a {
+    color: #52A8DC!important;
+    &:hover {
+      color: #00D9FF!important;
+    }
+  }
 }
 
 .button-container {

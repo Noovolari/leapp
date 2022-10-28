@@ -375,8 +375,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  openJoinUs() {
-    this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA");
+  openBrowser(url: string) {
+    this.windowService.openExternalUrl(url);
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

@@ -29,6 +29,7 @@ import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/se
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
+import { ExtensionWebsocketService } from "./services/extension-websocket.service";
 
 @Component({
   selector: "app-root",
@@ -63,7 +64,8 @@ export class AppComponent implements OnInit {
     private optionsService: OptionsService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private appNativeService: AppNativeService
+    private appNativeService: AppNativeService,
+    private extensionWebsocketService: ExtensionWebsocketService
   ) {
     appProviderService.mfaCodePrompter = mfaCodePrompter;
     appProviderService.awsAuthenticationService = awsAuthenticationService;
@@ -166,6 +168,9 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     await this.router.navigate(["/dashboard"]);
+
+    // Start the websocket server for the Leapp Browser Extension
+    this.extensionWebsocketService.bootstrap();
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
   }

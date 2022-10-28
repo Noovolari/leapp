@@ -11,3 +11,8 @@ img.moon-stop-outline {
   margin-left: -2px;
   margin-bottom: 2px;
 }
+
+.disabled i.moon-User,
+.disabled span {
+  color: $silver-30;
+}

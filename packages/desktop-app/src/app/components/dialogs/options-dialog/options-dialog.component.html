@@ -252,7 +252,7 @@
             <strong>Leapp Pro coming soon</strong>
             <span>Join our community and give us feedback</span>
             <br>
-            <button type="button" class="join-community-button" (click)="openJoinUs()">Join</button>
+            <button type="button" class="join-community-button" (click)="openBrowser('https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA')">Join</button>
           </p>
         </div>
       </div>
@@ -302,6 +302,27 @@
           </div>
         </div>
 
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-Open-Web-Console"></i>
+        <span class="mat-tab-label-text">Multi-Console</span>
+      </ng-template>
+      <div class="no-padding no-margin panel">
+        <div class="hero-unit hero-unit-extension">
+          <img src="assets/images/in-browser.png" alt="">
+          <p class="extension-info">
+            <strong>Multi-Console Browser Extension</strong>
+            <span class="description-container">Navigate multiple AWS consoles on different profiles at once. <a (click)="openBrowser('https://docs.leapp.cloud/latest/built-in-features/multi-console/#install-the-extension')">Read the docs for more info.</a></span>
+            <br>
+            <span class="button-container">
+              <button type="button" class="install-firefox-button" (click)="openBrowser('https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/')">Get for Firefox</button>
+              <button type="button" class="install-chrome-button" (click)="openBrowser('https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-0.1.2.zip')">Get for Chrome/Others</button>
+            </span>
+          </p>
+        </div>
       </div>
     </mat-tab>
 

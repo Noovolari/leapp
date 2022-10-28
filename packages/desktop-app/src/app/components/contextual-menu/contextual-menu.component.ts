@@ -10,6 +10,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { OptionsService } from "../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
+import { ExtensionWebsocketService, FetchingState } from "../../services/extension-websocket.service";
 
 @Component({
   selector: "app-contextual-menu",
@@ -26,12 +27,14 @@ export class ContextualMenuComponent implements OnInit {
   public selectedSession: Session;
   public menuX: number;
   public menuY: number;
+  public openWebConsoleExtensionDisabled: boolean;
 
   constructor(
     public appService: AppService,
     public optionsService: OptionsService,
     public appProviderService: AppProviderService,
-    private selectedSessionActionsService: SelectedSessionActionsService
+    private selectedSessionActionsService: SelectedSessionActionsService,
+    private extensionWebsocketService: ExtensionWebsocketService
   ) {}
 
   ngOnInit(): void {
@@ -51,6 +54,10 @@ export class ContextualMenuComponent implements OnInit {
           this.appService.setMenuTrigger(this.trigger);
         }, 100);
       }
+    });
+
+    this.extensionWebsocketService.fetching$.subscribe((value) => {
+      this.openWebConsoleExtensionDisabled = value !== FetchingState.notFetching;
     });
   }
 
@@ -112,5 +119,9 @@ export class ContextualMenuComponent implements OnInit {
 
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {
     await this.selectedSessionActionsService.applyPluginAction(this.selectedSession, plugin);
+  }
+
+  async sendExtensionMessage(): Promise<void> {
+    await this.extensionWebsocketService.openWebConsoleWithExtension(this.selectedSession);
   }
 }

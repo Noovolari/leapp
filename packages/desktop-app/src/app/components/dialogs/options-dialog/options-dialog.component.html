@@ -287,11 +287,11 @@
           <img src="assets/images/in-browser.png" alt="">
           <p class="extension-info">
             <strong>Multi-Console Browser Extension</strong>
-            <span>Browse multiple AWS Web Consoles at once from your browser of choice using the Leapp Multi-Console Browser Extension. <strong>To install it on Firefox</strong>, visit the Mozilla Extension Store. <strong>To install it on Chrome and other Chromium-based browsers</strong>, read the docs.</span>
+            <span class="description-container">Navigate multiple AWS consoles on different profiles at once. <a (click)="openBrowser('https://docs.leapp.cloud/latest/built-in-features/multi-console/#install-the-extension')">Read the docs for more info.</a></span>
             <br>
-            <span>
-              <button type="button" class="install-firefox-button" (click)="openBrowser('https://addons.mozilla.org/en-GB/firefox/')">Get it on Firefox</button>
-              <button type="button" class="extension-documentation-button" (click)="openBrowser('https://docs.leapp.cloud')">Get it on Chrome</button>
+            <span class="button-container">
+              <button type="button" class="install-firefox-button" (click)="openBrowser('https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/')">Get for Firefox</button>
+              <button type="button" class="install-chrome-button" (click)="openBrowser('https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-0.1.2.zip')">Get for Chrome/Others</button>
             </span>
           </p>
         </div>

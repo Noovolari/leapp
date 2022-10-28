@@ -182,21 +182,17 @@
 
 .extension-info {
   position: relative;
-  bottom: 51px;
+  bottom: 40px;
   strong {
     bottom: 5px;
     position: relative;
   }
 }
 
-.extension-documentation-button {
-  margin-left: 10px;
-}
-
-.install-firefox-button, .extension-documentation-button {
-  position: relative;
-  bottom: 10px;
-  font-size: 15px;
+.install-firefox-button, .extension-documentation-button, .install-chrome-button {
+  font-size: 14px;
+  padding: 10px 12px;
+  margin: 0 10px 10px 0;
 }
 
 .extension-info span strong {
@@ -205,3 +201,23 @@
   font-size: 16px;
   top: 0;
 }
+
+.description-container {
+  position: relative;
+  top: 16px;
+  a {
+    color: #52A8DC!important;
+    &:hover {
+      color: #00D9FF!important;
+    }
+  }
+}
+
+.button-container {
+  position: relative!important;
+  top: 17px!important;
+}
+
+
+
+

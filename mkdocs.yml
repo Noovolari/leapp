@@ -46,7 +46,6 @@ nav:
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
       - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'
       - 'Opening AWS Web Console': 'built-in-features/opening-web-console.md'
-      - 'Multi-Console Browser Extension': 'built-in-features/multi-console.md'
   - 'Plugins':
       - 'Introduction to Plugins': 'plugins/plugins-introduction.md'
       - 'Developer Reference': 'plugins/plugins-development.md'

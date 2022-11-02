@@ -44,6 +44,8 @@ export class Workspace {
   private _credentialMethod: string;
   private _samlRoleSessionDuration: number;
 
+  private _ssmRegionBehaviour: string;
+
   private _workspaceVersion: number;
 
   constructor() {
@@ -71,6 +73,8 @@ export class Workspace {
 
     this._credentialMethod = constants.credentialFile;
     this._samlRoleSessionDuration = constants.samlRoleSessionDuration;
+
+    this._ssmRegionBehaviour = constants.ssmRegionNo;
   }
 
   setNewWorkspaceVersion(): void {
@@ -199,6 +203,14 @@ export class Workspace {
 
   set pluginsStatus(newPlugins: PluginStatus[]) {
     this._pluginsStatus = newPlugins;
+  }
+
+  get ssmRegionBehaviour(): string {
+    return this._ssmRegionBehaviour;
+  }
+
+  set ssmRegionBehaviour(ssmRegionBehaviour: string) {
+    this._ssmRegionBehaviour = ssmRegionBehaviour;
   }
 
   get samlRoleSessionDuration(): number {

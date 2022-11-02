@@ -2,7 +2,29 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.15.1](https://github.com/Noovolari/leapp/compare/v0.15.0...v0.15.1) (2022-10-06)
+### [0.16.0](https://github.com/Noovolari/leapp/compare/v0.15.2...v0.16.0) (2022-11-02)
+
+### Features
+
+* added AWS multi-console support. Now it is possible to open multiple AWS consoles in the same browser window by installing
+  the Leapp browser extension available for Firefox, Chrome, Edge and other Chromium-based browser. To learn more, see the [docs](https://docs.leapp.cloud/0.16.0/built-in-features/multi-console/).
+
+### Bug Fixes
+
+* updated Electron to version 19 to restore U2F support for AWS Single Sign-On
+
+### [0.15.2](https://github.com/Noovolari/leapp/compare/v0.15.1...v0.15.2) (2022-10-21)
+
+### Features
+
+* added a new tab in the options to manage AWS SSM deafult region behaviour. This feature closes GitHub Issues [#292](https://github.com/Noovolari/leapp/issues/292) and [#232](https://github.com/Noovolari/leapp/issues/232). Thanks to [@akymos](https://github.com/akymos) for the PR!
+
+### Bug Fixes
+
+* fixed AWS IAM Identity Center "Session token not found or invalid" issue [#347](https://github.com/Noovolari/leapp/issues/347)
+* increased Leapp Core tests coverage
+
+### [0.15.1](https://github.com/Noovolari/leapp/compare/v0.15.0...v0.15.1) (2022-10-06)
 
 ### Bug Fixes
 

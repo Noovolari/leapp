@@ -175,3 +175,49 @@
   display: inline-block;
   padding-bottom: 10px;
 }
+
+.hero-unit-extension {
+  border: none;
+}
+
+.extension-info {
+  position: relative;
+  bottom: 40px;
+  strong {
+    bottom: 5px;
+    position: relative;
+  }
+}
+
+.install-firefox-button, .extension-documentation-button, .install-chrome-button {
+  font-size: 14px;
+  padding: 10px 12px;
+  margin: 0 10px 10px 0;
+}
+
+.extension-info span strong {
+  font-weight: bold;
+  display: inline;
+  font-size: 16px;
+  top: 0;
+}
+
+.description-container {
+  position: relative;
+  top: 16px;
+  a {
+    color: #52A8DC!important;
+    &:hover {
+      color: #00D9FF!important;
+    }
+  }
+}
+
+.button-container {
+  position: relative!important;
+  top: 17px!important;
+}
+
+
+
+

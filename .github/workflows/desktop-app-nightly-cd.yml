@@ -1,9 +1,6 @@
 name: Leapp Desktop App Nightly CD
 
 on:
-  push:
-    branches:
-      - LEAP-690-leapp-plugin-not-installing-on-app-start
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
@@ -41,6 +38,8 @@ jobs:
     needs: [ clean-nightly-latest ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: master
       - name: Build and release core (nightly)
         run: |
           cd packages/core
@@ -68,6 +67,8 @@ jobs:
           git config --global core.eol lf
 
       - uses: actions/checkout@v3
+        with:
+          ref: master
 
       - name: Build Win desktop app (nightly)
         shell: bash
@@ -109,6 +110,8 @@ jobs:
     needs: [ build-and-release-core-and-cli ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: master
 
       - name: Build Linux desktop app (nightly)
         run: |
@@ -140,6 +143,8 @@ jobs:
     needs: [ build-and-release-core-and-cli ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: master
 
       - name: Build macOS x64 desktop app (nightly)
         uses: nick-fields/retry@v2
@@ -209,6 +214,8 @@ jobs:
     needs: [ build-and-release-core-and-cli, build-macos-x64 ]
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: master
 
       - name: Build macOS arm64 desktop app (nightly)
         uses: nick-fields/retry@v2

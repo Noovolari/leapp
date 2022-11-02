@@ -15,6 +15,7 @@ jobs:
         node_version: [ 16 ]
     env:
       SKIP_INTEGRATION_TESTS: "true"
+      S3_BUCKET: s3://noovolari-leapp-website-distribution
     runs-on: ${{ matrix.os }}
     steps:
       - name: Prepare GIT
@@ -34,10 +35,20 @@ jobs:
         run: |
           cd packages/core
           npm run build
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
       - name: Test
         run: |
-          cd packages/core
-          npm test
+          npm run make-badges-core
+      - name: Send badge to S3
+        shell: bash
+        run: |
+          cd coverage
+          aws s3 cp core-badges.svg "${{ env.S3_BUCKET }}/coverage-badges/"
       - name: Lint
         run: |
           npm run lint
@@ -99,3 +110,4 @@ jobs:
           cd packages/core
           echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
           npm run release
+

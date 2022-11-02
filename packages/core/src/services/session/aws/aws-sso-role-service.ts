@@ -151,8 +151,15 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const portalUrl = awsSsoConfiguration.portalUrl;
     const roleArn = session.roleArn;
 
-    const accessToken = await this.awsIntegrationDelegate.getAccessToken(session.awsSsoConfigurationId, region, portalUrl);
-    const credentials = await this.awsIntegrationDelegate.getRoleCredentials(accessToken, region, roleArn);
+    let accessToken = await this.awsIntegrationDelegate.getAccessToken(session.awsSsoConfigurationId, region, portalUrl);
+    let credentials;
+
+    try {
+      credentials = await this.awsIntegrationDelegate.getRoleCredentials(accessToken, region, roleArn);
+    } catch (err) {
+      accessToken = await this.awsIntegrationDelegate.getAccessToken(session.awsSsoConfigurationId, region, portalUrl, true);
+      credentials = await this.awsIntegrationDelegate.getRoleCredentials(accessToken, region, roleArn);
+    }
 
     const awsCredentials: AWS.STS.Credentials = {
       ["AccessKeyId"]: credentials.roleCredentials.accessKeyId,

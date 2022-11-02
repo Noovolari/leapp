@@ -99,6 +99,13 @@
       </button>
     </ng-container>
 
+    <ng-container>
+      <button [disabled]="openWebConsoleExtensionDisabled ? true : null" [class.disabled]="openWebConsoleExtensionDisabled" mat-menu-item (click)="sendExtensionMessage();">
+        <i class="moon-User"></i>&nbsp;
+        <span>Open Multi-Console Extension</span>
+      </button>
+    </ng-container>
+
   </mat-menu>
 
   <mat-menu #change>

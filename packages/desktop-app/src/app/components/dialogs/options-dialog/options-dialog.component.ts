@@ -59,6 +59,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   pluginList: PluginContainer[];
   fetchingPlugins: boolean;
 
+  selectedSsmRegionBehaviour: string;
+
   form = new FormGroup({
     idpUrl: new FormControl(""),
     awsProfile: new FormControl(""),
@@ -76,6 +78,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     credentialMethodSelect: new FormControl(""),
     sessionDuration: new FormControl(""),
     pluginDeepLink: new FormControl(""),
+    ssmRegionBehaviourSelect: new FormControl(""),
   });
 
   selectedCredentialMethod: string;
@@ -100,6 +103,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.selectedColorTheme = this.colorTheme;
 
     this.selectedCredentialMethod = this.optionsService.credentialMethod || constants.credentialFile;
+
+    this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
   }
 
   ngOnInit(): void {
@@ -135,6 +140,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.appService.validateAllFormFields(this.form);
 
     this.pluginList = this.appProviderService.pluginManagerService.pluginContainers;
+
+    this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
   }
 
   ngAfterViewInit(): void {
@@ -173,6 +180,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       this.optionsService.defaultLocation = this.selectedLocation;
       this.optionsService.macOsTerminal = this.selectedTerminal;
       this.optionsService.samlRoleSessionDuration = this.form.controls["sessionDuration"].value;
+
+      this.optionsService.ssmRegionBehaviour = this.selectedSsmRegionBehaviour;
 
       if (this.checkIfNeedDialogBox()) {
         // eslint-disable-next-line max-len
@@ -371,8 +380,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  openJoinUs() {
-    this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA");
+  openBrowser(url: string) {
+    this.windowService.openExternalUrl(url);
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types

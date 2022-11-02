@@ -4,7 +4,7 @@ export const constants = {
   lockFileDestination: ".Leapp/Leapp-lock.json",
   lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",
-  workspaceLastVersion: 2,
+  workspaceLastVersion: 3,
 
   //Aws
   samlRoleSessionDuration: 3600, // 1h
@@ -47,6 +47,10 @@ export const constants = {
   // Credential Process
   credentialFile: "credential-file-method",
   credentialProcess: "credential-process-method",
+
+  // SSM region behavior
+  ssmRegionNo: "No",
+  ssmRegionDefault: "Use default region",
 
   // Contains Env for SSM on macOS
   ssmSourceFileDestination: ".Leapp/ssm-env",

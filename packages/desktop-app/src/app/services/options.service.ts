@@ -116,6 +116,17 @@ export class OptionsService {
     }
   }
 
+  get ssmRegionBehaviour(): string {
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.ssmRegionBehaviour;
+  }
+
+  set ssmRegionBehaviour(ssmRegionBehaviour: string) {
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.ssmRegionBehaviour = ssmRegionBehaviour;
+    this.workspaceService.persistWorkspace(workspace);
+  }
+
   get samlRoleSessionDuration(): number {
     const workspace = this.workspaceService.getWorkspace();
     return workspace.samlRoleSessionDuration / 60 / 60;

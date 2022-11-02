@@ -9,7 +9,7 @@
   <a href="https://www.leapp.cloud">Website</a> |
   <a href="https://roadmap.leapp.cloud/tabs/4-in-progress">Roadmap</a> |
   <a href="https://medium.com/leapp-cloud">Blog</a> |
-  <a href="https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q">Slack</a> |
+  <a href="https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q">TOPS community</a> |
   <a href="https://docs.leapp.cloud">Documentation</a> |
   <a href="https://docs.leapp.cloud/latest/troubleshooting/app-data/">Troubleshooting</a>
 
@@ -19,6 +19,8 @@
   <a href="https://lgtm.com/projects/g/Noovolari/leapp/context:javascript"><img src="https://img.shields.io/lgtm/grade/javascript/g/Noovolari/leapp.svg?logo=lgtm&logoWidth=18" alt="Javascript"></a>
   <a href="https://github.com/Noovolari/leapp/blob/master/LICENSE"><img alt="License" src="https://img.shields.io/github/license/noovolari/leapp"></a>
   <a href="https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q"><img src="https://img.shields.io/badge/slack-online-green" alt="Slack"></a>
+  <img src="https://d3o59asa8udcq9.cloudfront.net/coverage-badges/core-badges.svg">
+  <img src="https://d3o59asa8udcq9.cloudfront.net/coverage-badges/cli-badges.svg">
 </p>
 
 <p align="center">⚡ Lightning Fast, Safe, Desktop App for Cloud credentials managing and generation</p>

@@ -43,6 +43,7 @@ export class AppNativeService implements INativeService {
   fixPath: any;
   tar: any;
   fetch: any;
+  ws: any;
 
   constructor() {
     if (this.isElectron) {
@@ -83,6 +84,7 @@ export class AppNativeService implements INativeService {
       this.fixPath = window.require("fix-path");
       this.tar = window.require("tar");
       this.fetch = window.fetch.bind(window);
+      this.ws = window.require("ws");
     }
   }
 

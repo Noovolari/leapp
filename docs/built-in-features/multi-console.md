@@ -3,7 +3,7 @@ the AWS Web Console in the same browser window** and helps you in managing them.
 
 <div class="button-container">
   <a href="https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/" class="md-button md-button--primary installation-button">Get it on Firefox<i></i></a>
-  <a href="https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-0.1.2.zip" class="md-button md-button--primary installation-button">Get it on Chrome (coming soon)</a>
+  <a href="https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-0.1.2.zip" class="md-button md-button--primary installation-button">Get it on Chrome</a>
 </div>
 
 ### List of Supported Browsers
@@ -38,7 +38,7 @@ The extension can only be installed manually. To do so, follow these instruction
 
 1. Download the zip archive by clicking on the button below
 2. Unzip the file
-3. Open your browser and navigate to **about://extensions**
+3. Open your browser and navigate to `about://extensions`
 4. Enable **Developer mode** in the top right corner
 5. Then click on **Load unpacked** in the top left corner
 6. Finally, Select the folder extracted previously
@@ -49,13 +49,13 @@ The extension can only be installed manually. To do so, follow these instruction
 
 ### Firefox
 
-1. Visit about:addons
+1. Visit `about:addons`
 2. Select Leapp Browser Extension and click on the 3 dots
 3. Click on Remove
 
 ### Chrome, Edge and other Chromium based browsers
 
-1. Visit about://extensions
+1. Visit `about://extensions`
 2. Search for Leapp Browser Extension and click on Remove
 3. See warning section below
 
@@ -63,7 +63,7 @@ The extension can only be installed manually. To do so, follow these instruction
 
     If you are using the Chrome version and you uninstalled or disabled the extension, you have to manually clear cookies for the AWS Console. To do so,
     when accessing the login page of the AWS Console, on the left of the address bar, click the lock icon and select "Cookies". 
-    Then, remove all cookies by clicking "Remove" until the cookie list is empty and then click on Done 
+    Then, remove all cookies by clicking "Remove" until the cookie list is empty and finally click on Done 
     <div class="button-container" style="background-color:none!important">
       <img src="../../images/built-in-features/extension-uninstall-1.png?style=even-smaller-img;background-color:none!important" class="installation-button">
       <img src="../../images/built-in-features/extension-uninstall-2.png?style=even-smaller-img;background-color:none!important" class="installation-button">
@@ -73,15 +73,16 @@ The extension can only be installed manually. To do so, follow these instruction
 ## How to use it
 
 Once you installed the extension on your browser, go to the Leapp Desktop App and open the contextual menu of a Leapp Session by left-clicking
-on the desired session.
+on it.
 
 ![](../../images/built-in-features/leapp-extension.png?style=even-smaller-img)
 
-Select **Open Multi-Console Extension** in the contextual menu. This will open an isolated session in your browser.
+Select **Open Multi-Console Extension** in the contextual menu. This will open an isolated session in your browser. Be aware that **the browser should be open** to
+use this feature.
 
 !!! warning 
     
-    If any communication error occurs, or you don't have the extension installed/enabled on your browser, an error will be shown.
+    If any communication error occurs, your browser is not open or you don't have the extension installed/enabled on it, an error will be shown.
 
 ![](../../images/built-in-features/extension-communication-error.png?style=even-smaller-img)
 

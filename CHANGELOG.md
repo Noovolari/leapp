@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.16.0](https://github.com/Noovolari/leapp/compare/v0.15.2...v0.16.0) (2022-11-02)
+
+### Features
+
+* added AWS multi-console support. Now it is possible to open multiple AWS consoles in the same browser window by installing
+  the Leapp browser extension available for Firefox, Chrome, Edge and other Chromium-based browser. To learn more, see the [docs](https://docs.leapp.cloud/0.16.0/built-in-features/multi-console/).
+
+### Bug Fixes
+
+* updated Electron to version 19 to restore U2F support for AWS Single Sign-On
+
 ## [0.15.2](https://github.com/Noovolari/leapp/compare/v0.15.1...v0.15.2) (2022-10-21)
 
 ### Features

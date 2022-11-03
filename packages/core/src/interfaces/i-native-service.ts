@@ -16,6 +16,7 @@ export interface INativeService {
   machineId: any;
   keytar: any;
   followRedirects: any;
+  https: any;
   httpProxyAgent: any;
   httpsProxyAgent: any;
   process: any;

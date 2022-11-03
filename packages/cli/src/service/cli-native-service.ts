@@ -16,6 +16,7 @@ export class CliNativeService implements INativeService {
   machineId: any;
   keytar: any;
   followRedirects: any;
+  https: any;
   httpProxyAgent: any;
   httpsProxyAgent: any;
   process: any;
@@ -45,6 +46,7 @@ export class CliNativeService implements INativeService {
     this.machineId = require("node-machine-id").machineIdSync();
     this.keytar = require("keytar");
     this.followRedirects = require("follow-redirects");
+    this.https = require("https");
     this.httpProxyAgent = require("http-proxy-agent");
     this.httpsProxyAgent = require("https-proxy-agent");
     this.requireModule = require("require-module");

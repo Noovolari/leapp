@@ -173,6 +173,8 @@ export class AppComponent implements OnInit {
     this.extensionWebsocketService.bootstrap();
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
+
+    // Start user tracking
   }
 
   closeAllRightClickMenus(): void {

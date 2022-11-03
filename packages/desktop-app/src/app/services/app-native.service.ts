@@ -30,6 +30,7 @@ export class AppNativeService implements INativeService {
   ipcRenderer: any;
   keytar: typeof Keytar;
   followRedirects: any;
+  https: any;
   httpProxyAgent: any;
   httpsProxyAgent: any;
   nativeTheme: any;
@@ -63,6 +64,7 @@ export class AppNativeService implements INativeService {
       this.machineId = window.require("node-machine-id").machineIdSync();
       this.keytar = window.require("keytar");
       this.followRedirects = window.require("follow-redirects");
+      this.https = window.require("https");
       this.httpProxyAgent = window.require("http-proxy-agent");
       this.httpsProxyAgent = window.require("https-proxy-agent");
       this.app = window.require("@electron/remote").app;

@@ -228,10 +228,8 @@ export class TrackingService {
       path: this.nativeService.url.pathName(url),
       method: "POST",
       headers: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        "Content-Type": "application/json",
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        "Content-Length": postData.length,
+        ["Content-Type"]: "application/json",
+        ["Content-Length"]: postData.length,
       },
     };
 

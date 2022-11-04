@@ -30,6 +30,7 @@ import { AzureSessionService } from "@noovolari/leapp-core/services/session/azur
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { ExtensionWebsocketService } from "./services/extension-websocket.service";
+import { TrackingService } from "@noovolari/leapp-core/services/tracking/tracking-service";
 
 @Component({
   selector: "app-root",
@@ -52,6 +53,7 @@ export class AppComponent implements OnInit {
   private azureSessionService: AzureSessionService;
   private azureCoreService: AzureCoreService;
   private pluginManagerService: PluginManagerService;
+  private trackingService: TrackingService;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -87,6 +89,7 @@ export class AppComponent implements OnInit {
     this.azureSessionService = appProviderService.azureSessionService;
     this.azureCoreService = appProviderService.azureCoreService;
     this.pluginManagerService = appProviderService.pluginManagerService;
+    this.trackingService = appProviderService.trackingService;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
@@ -135,7 +138,7 @@ export class AppComponent implements OnInit {
     }
 
     // Start Global Timer
-    this.timerService.start(() => this.timerFunction(this.rotationService, this.integrationIsOnlineStateRefreshService));
+    this.timerService.start(() => this.timerFunction());
 
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
@@ -181,9 +184,10 @@ export class AppComponent implements OnInit {
     this.appService.closeAllMenuTriggers();
   }
 
-  private timerFunction(rotationService: RotationService, integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService): void {
-    rotationService.rotate();
-    integrationIsOnlineStateRefreshService.refreshIsOnlineState();
+  private timerFunction(): void {
+    this.rotationService.rotate();
+    this.integrationIsOnlineStateRefreshService.refreshIsOnlineState();
+    this.trackingService.trackMetrics();
   }
 
   /**
@@ -202,7 +206,7 @@ export class AppComponent implements OnInit {
     });
     this.appProviderService.sessionManagementService.updateSessions(sessions);
 
-    // We need the Try/Catch as we have a the possibility to call the method without sessions
+    // We need the Try/Catch as we have the possibility to call the method without sessions
     try {
       // Clean the config file
       await this.azureCoreService.stopAllSessionsOnQuit();
@@ -212,6 +216,7 @@ export class AppComponent implements OnInit {
     }
 
     // Finally quit
+    this.trackingService.addToTimeClosed();
     this.appService.quit();
   }
 

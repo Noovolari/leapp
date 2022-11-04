@@ -37,7 +37,7 @@ export interface ITrackingMetrics {
 }
 
 export interface ITrackingMetricsMetadata {
-  allowTracking: boolean;
+  allowSendingMetrics: boolean;
   alreadyAsked: boolean;
   leappVersion: string;
 }

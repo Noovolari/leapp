@@ -10,66 +10,29 @@ import { Session } from "../../models/session";
 import { SessionStatus } from "../../models/session-status";
 
 export class TrackingService {
-  private readonly metricsPath!: string;
-  private readonly metricsMetadataPath!: string;
-  private readonly metricsBackendUrl!: string;
   private metricsContent!: ITrackingMetrics;
   private metricsMetadataContent!: ITrackingMetricsMetadata;
+  private lastSendTime: number;
+  private readonly metricsPath: string;
+  private readonly metricsMetadataPath: string;
+  private readonly metricsBackendUrl: string;
 
   constructor(
     private repository: Repository,
     private fileService: FileService,
     private nativeService: INativeService,
-    private logService: LogService
+    private logService: LogService,
+    private leappVersion: string
   ) {
-    this.metricsPath = this.nativeService.path.join(this.nativeService.os.homedir(), constants.metricsPath);
-    this.metricsMetadataPath = this.nativeService.path.join(this.nativeService.os.homedir(), constants.metricsMetadataPath);
-    this.metricsBackendUrl = "www.url.com";
-
-    // Files are typically initialized empty, but we also need to verify if they exist from a previous opening
-    if (this.fileService.existsSync(this.metricsPath)) {
-      this.metricsContent = JSON.parse(this.fileService.readFileSync(this.metricsPath));
-    } else {
-      this.metricsContent = {
-        awsChainedCount: 0,
-        awsChainedTotalRotations: 0,
-        awsChainedTotalTime: 0,
-        awsCount: 0,
-        awsTotalTime: 0,
-        awsFederatedCount: 0,
-        awsFederatedTotalRotations: 0,
-        awsFederatedTotalTime: 0,
-        awsIamUserCount: 0,
-        awsIamUserTotalRotations: 0,
-        awsIamUserTotalTime: 0,
-        awsSsoCount: 0,
-        awsSsoTotalRotations: 0,
-        awsSsoTotalTime: 0,
-        azureCount: 0,
-        azureTotalRotations: 0,
-        azureTotalTime: 0,
-        closedAverageTime: 0,
-        closedTotalTime: 0,
-        id: TrackingService.generateNewId(),
-        lastLogTime: 0,
-        lastOpened: 0,
-        openedAverageTime: 0,
-        openedTotalTime: 0,
-        timesClosed: 1,
-        timesOpened: 0,
-      };
-    }
-    this.metricsContent.lastOpened = new Date().getTime();
-    this.metricsContent.timesOpened += 1;
-
-    if (this.fileService.existsSync(this.metricsMetadataPath)) {
-      this.metricsMetadataContent = JSON.parse(this.fileService.readFileSync(this.metricsMetadataPath));
-    } else {
-      this.metricsMetadataContent = { allowTracking: false, alreadyAsked: false, leappVersion: "" };
-    }
+    const homeDir = this.nativeService.os.homedir();
+    this.metricsPath = this.nativeService.path.join(homeDir, constants.metricsPath);
+    this.metricsMetadataPath = this.nativeService.path.join(homeDir, constants.metricsMetadataPath);
+    this.metricsBackendUrl = "www.url.com"; // TODO: set to the real value
+    this.lastSendTime = 0;
+    this.bootstrap();
   }
 
-  private static generateNewId(): string {
+  private static generateNewMetricId(): string {
     return `${uuid.v4()}#${TrackingService.daySignature()}`;
   }
 
@@ -78,51 +41,34 @@ export class TrackingService {
     return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
   }
 
-  private static isToday(metrics: ITrackingMetrics): boolean {
+  private static isTodayMetrics(metrics: ITrackingMetrics): boolean {
     const id = metrics.id;
     const date = id.split("#")[1];
     const newDate = TrackingService.daySignature();
     return date === newDate;
   }
 
-  bootstrap(): void {
-    if (!this.fileService.existsSync(this.metricsPath)) {
-      this.fileService.writeFileSync(this.metricsPath, JSON.stringify(this.metricsContent, null, 4));
-    }
-    if (!this.fileService.existsSync(this.metricsMetadataPath)) {
-      this.fileService.writeFileSync(this.metricsMetadataPath, JSON.stringify(this.metricsMetadataContent, null, 4));
-    }
-  }
-
-  canTrackMetrics(): boolean {
-    if (this.fileService.existsSync(this.metricsMetadataPath)) {
-      try {
-        this.metricsMetadataContent = JSON.parse(this.fileService.readFileSync(this.metricsMetadataPath));
-        return this.metricsMetadataContent.allowTracking;
-      } catch (error) {
-        this.logService.log(new LoggedException(error.message, this, LogLevel.error, false, error.stackTrace));
-      }
-    }
-  }
-
   trackMetrics(): void {
-    if (this.fileService.existsSync(this.metricsPath)) {
-      try {
-        this.metricsContent = JSON.parse(this.fileService.readFileSync(this.metricsPath));
-        // refresh metrics data
-        this.metricsContent = this.getRefreshedMetricsData(this.metricsContent);
-        // write to local file
-        this.writeLocalContent(this.metricsPath, this.metricsContent);
-      } catch (error) {
-        this.logService.log(new LoggedException(error.message, this, LogLevel.error, false, error.stackTrace));
+    try {
+      // refresh metrics data
+      this.metricsContent = this.getRefreshedMetricsData(this.metricsContent);
+      // write to local file
+      this.persistsMetricsContent();
+      const now = new Date().getTime();
+      const elapsedTime = now - this.lastSendTime;
+      if (this.metricsMetadataContent.allowSendingMetrics && elapsedTime > constants.sendMetricsIntervalInMs) {
+        this.sendLocalMetricsToServer(this.metricsBackendUrl, this.metricsContent);
+        this.lastSendTime = now;
       }
+    } catch (error) {
+      this.logService.log(new LoggedException(error.message, this, LogLevel.error, false, error.stackTrace));
     }
   }
 
   addToTimeClosed(): void {
     this.metricsContent.timesClosed += 1;
     // write to local file
-    this.writeLocalContent(this.metricsPath, this.metricsContent);
+    this.persistsMetricsContent();
   }
 
   addToRotationByType(session: Session): void {
@@ -149,64 +95,132 @@ export class TrackingService {
         break;
     }
     // write to local file
-    this.writeLocalContent(this.metricsPath, this.metricsContent);
+    this.persistsMetricsContent();
   }
 
-  private getRefreshedMetricsData(oldMetricsContent: ITrackingMetrics): ITrackingMetrics {
-    const id = TrackingService.isToday(this.metricsContent) ? this.metricsContent.id : TrackingService.generateNewId();
+  async checkConsensus(askUserConsensus: () => Promise<boolean>): Promise<void> {
+    const versionNotBumped = this.metricsMetadataContent.leappVersion === this.leappVersion;
+    if (this.metricsMetadataContent.alreadyAsked && versionNotBumped) {
+      return;
+    }
+    this.metricsMetadataContent.allowSendingMetrics = await askUserConsensus();
+    this.metricsMetadataContent.alreadyAsked = true;
+    this.metricsMetadataContent.leappVersion = this.leappVersion;
+    this.persistsMetricsMetadataContent();
+  }
 
-    const countByType = (type: SessionType, active?: boolean): number => {
-      const sessions = this.repository.getSessions();
-      return sessions.filter((session) => session.type.toLowerCase().startsWith(type) && (active ? session.status === SessionStatus.active : true))
-        .length;
-    };
+  private bootstrap(): void {
+    // Files are typically initialized empty, but we also need to verify if they exist from a previous opening
+    const now = new Date().getTime();
 
+    if (this.fileService.existsSync(this.metricsPath)) {
+      this.metricsContent = JSON.parse(this.fileService.readFileSync(this.metricsPath));
+    } else {
+      this.metricsContent = {
+        awsChainedCount: 0,
+        awsChainedTotalRotations: 0,
+        awsChainedTotalTime: 0,
+        awsCount: 0,
+        awsTotalTime: 0,
+        awsFederatedCount: 0,
+        awsFederatedTotalRotations: 0,
+        awsFederatedTotalTime: 0,
+        awsIamUserCount: 0,
+        awsIamUserTotalRotations: 0,
+        awsIamUserTotalTime: 0,
+        awsSsoCount: 0,
+        awsSsoTotalRotations: 0,
+        awsSsoTotalTime: 0,
+        azureCount: 0,
+        azureTotalRotations: 0,
+        azureTotalTime: 0,
+        closedAverageTime: 0,
+        closedTotalTime: 0,
+        id: TrackingService.generateNewMetricId(),
+        lastLogTime: now - constants.rotationIntervalInMs,
+        lastOpened: 0,
+        openedAverageTime: 0,
+        openedTotalTime: 0,
+        timesClosed: 1,
+        timesOpened: 0,
+      };
+    }
+    this.metricsContent.lastOpened = now;
+    this.metricsContent.timesOpened += 1;
+    this.persistsMetricsContent();
+
+    if (this.fileService.existsSync(this.metricsMetadataPath)) {
+      this.metricsMetadataContent = JSON.parse(this.fileService.readFileSync(this.metricsMetadataPath));
+    } else {
+      this.metricsMetadataContent = { allowSendingMetrics: false, alreadyAsked: false, leappVersion: this.leappVersion };
+      this.persistsMetricsMetadataContent();
+    }
+  }
+
+  private countSessions(type: SessionType, active: boolean = false): number {
+    const sessions = this.repository.getSessions();
+    return sessions.filter((session) => session.type.startsWith(type) && (active ? session.status === SessionStatus.active : true)).length;
+  }
+
+  private getRefreshedMetricsData(oldMetrics: ITrackingMetrics): ITrackingMetrics {
+    const id = TrackingService.isTodayMetrics(oldMetrics) ? oldMetrics.id : TrackingService.generateNewMetricId();
+
+    const now = new Date().getTime();
     return {
       id,
-      lastLogTime: new Date().getTime(),
-      lastOpened: oldMetricsContent.lastOpened,
+      lastLogTime: now,
+      lastOpened: oldMetrics.lastOpened,
 
-      openedTotalTime: oldMetricsContent.openedTotalTime + constants.timeout,
-      closedTotalTime: oldMetricsContent.closedTotalTime + (new Date().getTime() - oldMetricsContent.lastLogTime - constants.timeout),
+      openedTotalTime: oldMetrics.openedTotalTime + constants.rotationIntervalInMs,
+      closedTotalTime: oldMetrics.closedTotalTime + (now - oldMetrics.lastLogTime - constants.rotationIntervalInMs),
 
-      timesOpened: oldMetricsContent.timesOpened,
-      timesClosed: oldMetricsContent.timesClosed,
+      timesOpened: oldMetrics.timesOpened,
+      timesClosed: oldMetrics.timesClosed,
 
-      openedAverageTime: Math.round(oldMetricsContent.openedTotalTime / oldMetricsContent.timesOpened),
-      closedAverageTime: Math.round(oldMetricsContent.closedTotalTime / oldMetricsContent.timesClosed),
+      openedAverageTime: Math.round(oldMetrics.openedTotalTime / oldMetrics.timesOpened),
+      closedAverageTime: Math.round(oldMetrics.closedTotalTime / oldMetrics.timesClosed),
 
-      awsCount: countByType(SessionType.aws),
-      awsFederatedCount: countByType(SessionType.awsIamRoleFederated),
-      awsChainedCount: countByType(SessionType.awsIamRoleChained),
-      awsIamUserCount: countByType(SessionType.awsIamUser),
-      awsSsoCount: countByType(SessionType.awsSsoRole),
-      azureCount: countByType(SessionType.azure),
+      awsCount: this.countSessions(SessionType.aws),
+      awsFederatedCount: this.countSessions(SessionType.awsIamRoleFederated),
+      awsChainedCount: this.countSessions(SessionType.awsIamRoleChained),
+      awsIamUserCount: this.countSessions(SessionType.awsIamUser),
+      awsSsoCount: this.countSessions(SessionType.awsSsoRole),
+      azureCount: this.countSessions(SessionType.azure),
 
-      awsTotalTime: oldMetricsContent.awsTotalTime + constants.timeout * countByType(SessionType.aws, true),
-      awsFederatedTotalTime: oldMetricsContent.awsFederatedTotalTime + constants.timeout * countByType(SessionType.awsIamRoleFederated, true),
-      awsChainedTotalTime: oldMetricsContent.awsChainedTotalTime + constants.timeout * countByType(SessionType.awsIamRoleChained, true),
-      awsIamUserTotalTime: oldMetricsContent.awsIamUserTotalTime + constants.timeout * countByType(SessionType.awsIamUser, true),
-      awsSsoTotalTime: oldMetricsContent.awsSsoTotalTime + constants.timeout * countByType(SessionType.awsSsoRole, true),
-      azureTotalTime: oldMetricsContent.awsFederatedTotalTime + constants.timeout * countByType(SessionType.azure, true),
+      awsTotalTime: oldMetrics.awsTotalTime + constants.rotationIntervalInMs * this.countSessions(SessionType.aws, true),
+      awsFederatedTotalTime:
+        oldMetrics.awsFederatedTotalTime + constants.rotationIntervalInMs * this.countSessions(SessionType.awsIamRoleFederated, true),
+      awsChainedTotalTime: oldMetrics.awsChainedTotalTime + constants.rotationIntervalInMs * this.countSessions(SessionType.awsIamRoleChained, true),
+      awsIamUserTotalTime: oldMetrics.awsIamUserTotalTime + constants.rotationIntervalInMs * this.countSessions(SessionType.awsIamUser, true),
+      awsSsoTotalTime: oldMetrics.awsSsoTotalTime + constants.rotationIntervalInMs * this.countSessions(SessionType.awsSsoRole, true),
+      azureTotalTime: oldMetrics.azureTotalTime + constants.rotationIntervalInMs * this.countSessions(SessionType.azure, true),
 
-      awsFederatedTotalRotations: oldMetricsContent.awsFederatedTotalRotations,
-      awsChainedTotalRotations: oldMetricsContent.awsChainedTotalRotations,
-      awsIamUserTotalRotations: oldMetricsContent.awsIamUserTotalRotations,
-      awsSsoTotalRotations: oldMetricsContent.awsSsoTotalRotations,
-      azureTotalRotations: oldMetricsContent.azureTotalRotations,
+      awsFederatedTotalRotations: oldMetrics.awsFederatedTotalRotations,
+      awsChainedTotalRotations: oldMetrics.awsChainedTotalRotations,
+      awsIamUserTotalRotations: oldMetrics.awsIamUserTotalRotations,
+      awsSsoTotalRotations: oldMetrics.awsSsoTotalRotations,
+      azureTotalRotations: oldMetrics.azureTotalRotations,
     };
   }
 
-  private writeLocalContent(path: string, content: ITrackingMetrics | ITrackingMetricsMetadata): void {
+  private persistsMetricsContent(): void {
     try {
-      this.fileService.writeFileSync(path, JSON.stringify(content));
+      this.fileService.writeFileSync(this.metricsPath, JSON.stringify(this.metricsContent, null, 4));
+    } catch (error) {
+      this.logService.log(new LoggedException(error.message, this, LogLevel.error, false, error.stackTrace));
+    }
+  }
+
+  private persistsMetricsMetadataContent(): void {
+    try {
+      this.fileService.writeFileSync(this.metricsMetadataPath, JSON.stringify(this.metricsMetadataContent, null, 4));
     } catch (error) {
       this.logService.log(new LoggedException(error.message, this, LogLevel.error, false, error.stackTrace));
     }
   }
 
   private sendLocalMetricsToServer(url: string, content: ITrackingMetrics): void {
-    const postData = JSON.stringify(content);
+    const postData = JSON.stringify(content, null, 4);
 
     const options = {
       hostname: this.nativeService.url.host(url),

@@ -5,6 +5,7 @@ export const constants = {
   lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",
   workspaceLastVersion: 3,
+  rotationIntervalInMs: 10000,
 
   //Aws
   samlRoleSessionDuration: 3600, // 1h
@@ -81,4 +82,5 @@ export const constants = {
   // Tracking
   metricsPath: ".Leapp/metrics.bin",
   metricsMetadataPath: ".Leapp/metrics-metadata.bin",
+  sendMetricsIntervalInMs: 600000, // we send metrics every 10 minutes if allowed by the user
 };

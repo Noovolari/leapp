@@ -3,7 +3,6 @@ import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aw
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { LogService } from "@noovolari/leapp-core/services/log-service";
-import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
@@ -15,7 +14,6 @@ import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
-import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { RemoteCliMfaCodePromptService } from "./remote-cli-mfa-code-prompt-service";
 import { CliNativeService } from "./cli-native-service";
@@ -75,9 +73,7 @@ export class CliProviderService {
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
   private keyChainServiceInstance: IKeychainService;
   private logServiceInstance: LogService;
-  private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
-  private rotationServiceInstance: RotationService;
   private retroCompatibilityServiceInstance: RetroCompatibilityService;
   private cloudProviderServiceInstance: CloudProviderService;
   private awsCoreServiceInstance: AwsCoreService;
@@ -360,25 +356,11 @@ export class CliProviderService {
     return this.logServiceInstance;
   }
 
-  get timerService(): TimerService {
-    if (!this.timerServiceInstance) {
-      this.timerServiceInstance = new TimerService();
-    }
-    return this.timerServiceInstance;
-  }
-
   get executeService(): ExecuteService {
     if (!this.executeServiceInstance) {
       this.executeServiceInstance = new ExecuteService(this.cliNativeService, this.repository, this.logService);
     }
     return this.executeServiceInstance;
-  }
-
-  get rotationService(): RotationService {
-    if (!this.rotationServiceInstance) {
-      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.repository);
-    }
-    return this.rotationServiceInstance;
   }
 
   get retroCompatibilityService(): RetroCompatibilityService {

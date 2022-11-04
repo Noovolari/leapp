@@ -1,8 +1,7 @@
 export class TimerService {
   private timeOutTimer: NodeJS.Timeout;
-  private timeInterval = 10000;
 
-  constructor() {}
+  constructor(private intervalInMs: number) {}
 
   set timer(value: NodeJS.Timeout) {
     this.timeOutTimer = value;
@@ -16,7 +15,7 @@ export class TimerService {
     if (!this.timer) {
       this.timer = setInterval(() => {
         callback();
-      }, this.timeInterval);
+      }, this.intervalInMs);
     }
   }
 }

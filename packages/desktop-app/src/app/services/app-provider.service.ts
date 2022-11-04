@@ -46,6 +46,7 @@ import { AppKeychainService } from "./app-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
+import { TrackingService } from "@noovolari/leapp-core/services/tracking/tracking-service";
 
 @Injectable({
   providedIn: "root",
@@ -93,6 +94,7 @@ export class AppProviderService {
   private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
   private pluginManagerServiceInstance: PluginManagerService;
   private integrationFactoryInstance: IntegrationFactory;
+  private trackingServiceInstance: TrackingService;
 
   constructor(
     private appNativeService: AppNativeService,
@@ -372,7 +374,7 @@ export class AppProviderService {
 
   public get timerService(): TimerService {
     if (!this.timerServiceInstance) {
-      this.timerServiceInstance = new TimerService();
+      this.timerServiceInstance = new TimerService(constants.rotationIntervalInMs);
     }
     return this.timerServiceInstance;
   }
@@ -386,7 +388,7 @@ export class AppProviderService {
 
   public get rotationService(): RotationService {
     if (!this.rotationServiceInstance) {
-      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.repository);
+      this.rotationServiceInstance = new RotationService(this.sessionFactory, this.repository, this.trackingService);
     }
     return this.rotationServiceInstance;
   }
@@ -442,5 +444,18 @@ export class AppProviderService {
       );
     }
     return this.integrationIsOnlineStateRefreshServiceInstance;
+  }
+
+  public get trackingService(): TrackingService {
+    if (!this.trackingServiceInstance) {
+      this.trackingServiceInstance = new TrackingService(
+        this.repository,
+        this.fileService,
+        this.appNativeService,
+        this.logService,
+        this.appNativeService.app.getVersion()
+      );
+    }
+    return this.trackingServiceInstance;
   }
 }

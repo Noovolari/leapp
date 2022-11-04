@@ -22,9 +22,9 @@ import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
 import { SessionSelectionState } from "@noovolari/leapp-core/models/session-selection-state";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
-import { OptionsService } from "../../services/options.service";
 import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws/aws-iam-user-session";
 import { FilteringPipe } from "./pipes/filtering.pipe";
+import { AppNativeService } from "../../services/app-native.service";
 
 export const globalOrderingFilter = new BehaviorSubject<Session[]>([]);
 
@@ -63,7 +63,7 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
   private behaviouralSubjectService: BehaviouralSubjectService;
 
-  constructor(private modalService: BsModalService, private appProviderService: AppProviderService, public optionService: OptionsService) {
+  constructor(private modalService: BsModalService, private appProviderService: AppProviderService, public appNativeService: AppNativeService) {
     this.sessionFiltering = new FilteringPipe();
     this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
     this.columnSettings = Array.from(Array(5)).map((): ArrowSettings => ({ activeArrow: false, orderStyle: false }));
@@ -111,7 +111,26 @@ export class SessionsComponent implements OnInit, OnDestroy {
     ];
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.appProviderService.trackingService.checkConsensus(
+      () =>
+        new Promise((resolve, _reject) => {
+          setTimeout(() => {
+            const options = {
+              message: "Do you want to help the Leapp team by sending anonymous information about application usage?",
+              type: "question",
+              buttons: ["No, thanks", "Yes"],
+              defaultId: 1,
+              cancelId: 0,
+              title: "Privacy consensus",
+            };
+            this.appNativeService.dialog.showMessageBox(options).then((result: any) => {
+              resolve(result.response === 1);
+            });
+          }, 2000);
+        })
+    );
+  }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription) => {

@@ -1,7 +1,9 @@
 export interface ITrackingMetrics {
   id: string;
+  lastLogTime: number;
+
   // we need them for calculate how much time the application is left opened or closed
-  lastOpened: string;
+  lastOpened: number;
   openedTotalTime: number;
   closedTotalTime: number;
 
@@ -20,6 +22,7 @@ export interface ITrackingMetrics {
   awsSsoCount: number;
   azureCount: number;
 
+  awsTotalTime: number;
   awsFederatedTotalTime: number;
   awsChainedTotalTime: number;
   awsIamUserTotalTime: number;

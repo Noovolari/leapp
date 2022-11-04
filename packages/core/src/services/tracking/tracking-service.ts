@@ -15,7 +15,8 @@ export class TrackingService {
   private lastSendTime: number;
   private readonly metricsPath: string;
   private readonly metricsMetadataPath: string;
-  private readonly metricsBackendUrl: string;
+  private readonly metricsBackendHost: string;
+  private readonly metricsBackendPath: string;
 
   constructor(
     private repository: Repository,
@@ -27,7 +28,8 @@ export class TrackingService {
     const homeDir = this.nativeService.os.homedir();
     this.metricsPath = this.nativeService.path.join(homeDir, constants.metricsPath);
     this.metricsMetadataPath = this.nativeService.path.join(homeDir, constants.metricsMetadataPath);
-    this.metricsBackendUrl = "www.url.com"; // TODO: set to the real value
+    this.metricsBackendHost = "0z2f8k0dtd.execute-api.eu-west-1.amazonaws.com";
+    this.metricsBackendPath = "/metrics";
     this.lastSendTime = 0;
     this.bootstrap();
   }
@@ -57,7 +59,7 @@ export class TrackingService {
       const now = new Date().getTime();
       const elapsedTime = now - this.lastSendTime;
       if (this.metricsMetadataContent.allowSendingMetrics && elapsedTime > constants.sendMetricsIntervalInMs) {
-        this.sendLocalMetricsToServer(this.metricsBackendUrl, this.metricsContent);
+        this.sendLocalMetricsToServer(this.metricsBackendHost, this.metricsBackendPath, this.metricsContent);
         this.lastSendTime = now;
       }
     } catch (error) {
@@ -219,13 +221,13 @@ export class TrackingService {
     }
   }
 
-  private sendLocalMetricsToServer(url: string, content: ITrackingMetrics): void {
-    const postData = JSON.stringify(content, null, 4);
+  private sendLocalMetricsToServer(host: string, path: string, content: ITrackingMetrics): void {
+    console.log("trying to send metrics");
 
+    const postData = JSON.stringify(content, null, 4);
     const options = {
-      hostname: this.nativeService.url.host(url),
-      port: 443,
-      path: this.nativeService.url.pathName(url),
+      hostname: host,
+      path,
       method: "POST",
       headers: {
         ["Content-Type"]: "application/json",

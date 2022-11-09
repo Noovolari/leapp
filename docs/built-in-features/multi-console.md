@@ -3,7 +3,7 @@ the AWS Web Console in the same browser window** and helps you in managing them.
 
 <div class="button-container">
   <a href="https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/" class="md-button md-button--primary installation-button">Get it on Firefox<i></i></a>
-  <a href="https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-0.1.2.zip" class="md-button md-button--primary installation-button">Get it on Chrome</a>
+  <a href="https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-latest.zip" class="md-button md-button--primary installation-button">Get it on Chrome</a>
 </div>
 
 ### List of Supported Browsers
@@ -43,7 +43,7 @@ The extension can only be installed manually. To do so, follow these instruction
 5. Then click on **Load unpacked** in the top left corner
 6. Finally, Select the folder extracted previously
 
-[Get it on Chrome/Others :fontawesome-solid-download:](https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-0.1.2.zip){ .md-button .md-button--primary }
+[Get it on Chrome/Others :fontawesome-solid-download:](https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-latest.zip){ .md-button .md-button--primary }
 
 ## Uninstall the Extension
 

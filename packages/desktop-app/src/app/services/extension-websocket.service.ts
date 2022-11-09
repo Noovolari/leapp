@@ -82,6 +82,7 @@ export class ExtensionWebsocketService {
           sessionRegion: session.region,
           sessionType: session.type.toString().startsWith("aws") ? "aws" : session.type.toString(),
         },
+        leappSessionId: session.sessionId,
       })
     );
     this.fetching$.next(FetchingState.fetching);

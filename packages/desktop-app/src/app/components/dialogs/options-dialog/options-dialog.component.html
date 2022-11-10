@@ -323,6 +323,24 @@
             </span>
           </p>
         </div>
+<!--        <div class="open-method-container">-->
+<!--          <h2>Open Web Console - Method</h2>-->
+
+<!--          <div class="form-container">-->
+<!--            <div class="form-group">-->
+<!--              <div class="form-field">-->
+<!--                <label>Method</label>-->
+<!--                <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false"-->
+<!--                           [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal"-->
+<!--                           [appendTo]="'body'"></ng-select>-->
+<!--              </div>-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </div>-->
+        <div class="enable-option">
+          <mat-slide-toggle class="enable-extension-toggle" (toggleChange)="toggleExtension()" [checked]="extensionEnabled">Enable Multi-Console Extension</mat-slide-toggle>
+          <span class="extension-description">Use the Extension as default. Fallback to the Single-Console method if the browser is closed or any error occurs.</span>
+        </div>
       </div>
     </mat-tab>
 

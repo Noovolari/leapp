@@ -27,7 +27,7 @@ export class ContextualMenuComponent implements OnInit {
   public selectedSession: Session;
   public menuX: number;
   public menuY: number;
-  public openWebConsoleExtensionDisabled: boolean;
+  public isWebConsoleFetching: boolean;
 
   constructor(
     public appService: AppService,
@@ -57,7 +57,7 @@ export class ContextualMenuComponent implements OnInit {
     });
 
     this.extensionWebsocketService.fetching$.subscribe((value) => {
-      this.openWebConsoleExtensionDisabled = value !== FetchingState.notFetching;
+      this.isWebConsoleFetching = value !== FetchingState.notFetching;
     });
   }
 
@@ -82,7 +82,6 @@ export class ContextualMenuComponent implements OnInit {
   }
 
   async openAwsWebConsole(): Promise<void> {
-    console.log(this.optionsService.extensionEnabled);
     if (this.optionsService.extensionEnabled) {
       await this.extensionWebsocketService.openWebConsoleWithExtension(this.selectedSession);
     } else {

@@ -82,7 +82,12 @@ export class ContextualMenuComponent implements OnInit {
   }
 
   async openAwsWebConsole(): Promise<void> {
-    await this.selectedSessionActionsService.openAwsWebConsole(this.selectedSession);
+    console.log(this.optionsService.extensionEnabled);
+    if (this.optionsService.extensionEnabled) {
+      await this.extensionWebsocketService.openWebConsoleWithExtension(this.selectedSession);
+    } else {
+      await this.selectedSessionActionsService.openAwsWebConsole(this.selectedSession);
+    }
   }
 
   async editSession(): Promise<void> {
@@ -119,9 +124,5 @@ export class ContextualMenuComponent implements OnInit {
 
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {
     await this.selectedSessionActionsService.applyPluginAction(this.selectedSession, plugin);
-  }
-
-  async sendExtensionMessage(): Promise<void> {
-    await this.extensionWebsocketService.openWebConsoleWithExtension(this.selectedSession);
   }
 }

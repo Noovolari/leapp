@@ -32,6 +32,7 @@ export class Workspace {
   private _segments: Segment[];
 
   private _colorTheme: string;
+  private _extensionEnabled: boolean;
 
   private _proxyConfiguration: {
     proxyProtocol: string;
@@ -58,6 +59,7 @@ export class Workspace {
     this._idpUrls = [];
     this._profiles = [{ id: uuid.v4(), name: constants.defaultAwsProfileName }];
     this._pluginsStatus = [];
+    this._extensionEnabled = false;
 
     this._awsSsoIntegrations = [];
     this._azureIntegrations = [];
@@ -209,5 +211,13 @@ export class Workspace {
 
   set ssmRegionBehaviour(ssmRegionBehaviour: string) {
     this._ssmRegionBehaviour = ssmRegionBehaviour;
+  }
+
+  get extensionEnabled(): boolean {
+    return this._extensionEnabled;
+  }
+
+  set extensionEnabled(extensionEnabled: boolean) {
+    this._extensionEnabled = extensionEnabled;
   }
 }

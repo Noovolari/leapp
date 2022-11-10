@@ -35,7 +35,10 @@ export class ExtensionWebsocketService {
         this.sendMessage(JSON.stringify({ type: "get-fetching-state" }));
         this.fetchingTimeout = setTimeout(() => {
           this.fetching$.next(FetchingState.notFetching);
-          this.toastService.toast("Error: cannot communicate with the browser extension", ToastLevel.error);
+          this.toastService.toast(
+            "Error: cannot communicate with the extension. Be sure to have your browser open and the extension installed.",
+            ToastLevel.error
+          );
         }, 4000);
       }
     });

@@ -33,7 +33,7 @@ export class ExtensionWebsocketService {
     this.fetching$ = new BehaviorSubject(FetchingState.notFetching);
     this.fetching$.subscribe(async (value) => {
       clearTimeout(this.fetchingTimeout);
-      if (value === FetchingState.fetching || value === FetchingState.fetchingRequested) {
+      if (value === FetchingState.fetching) {
         await this.pause();
         this.sendMessage(JSON.stringify({ type: "get-fetching-state" }));
         this.fetchingTimeout = setTimeout(() => {
@@ -72,7 +72,6 @@ export class ExtensionWebsocketService {
   }
 
   sendMessage(payload: any): void {
-    console.log("send message.");
     this.wsServer.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(payload);
@@ -84,7 +83,13 @@ export class ExtensionWebsocketService {
     this.fetching$.next(FetchingState.fetchingRequested);
     this.appProviderService.behaviouralSubjectService.unselectSessions();
     const sessionService = this.appProviderService.sessionFactory.getSessionService(session.type) as AwsSessionService;
-    const credentialsInfo = await sessionService.generateCredentials(session.sessionId);
+    let credentialsInfo;
+    try {
+      credentialsInfo = await sessionService.generateCredentials(session.sessionId);
+    } catch (error) {
+      this.fetching$.next(FetchingState.notFetching);
+      throw error;
+    }
     this.consoleUrl = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentialsInfo, session.region);
     this.sendMessage(
       JSON.stringify({

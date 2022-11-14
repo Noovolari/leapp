@@ -33,7 +33,7 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
       // Generate a new singleton browser window for the check
       let idpWindow = this.windowService.newWindow(sanitizedField, false, "", activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY);
 
-      const timeoutInMs = 60000;
+      const timeoutInMs = 5000;
       const timeout = setTimeout(() => {
         const error = new LeappBaseError("SAML authentication timeout error", this, LogLevel.error, "SAML authentication timeout exceeded");
         reject(error);

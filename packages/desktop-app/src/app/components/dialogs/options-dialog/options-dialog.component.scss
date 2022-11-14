@@ -177,6 +177,7 @@
 }
 
 .hero-unit-extension {
+  top: 34%;
   border: none;
 }
 
@@ -215,9 +216,27 @@
 
 .button-container {
   position: relative!important;
-  top: 17px!important;
+  top: 16px!important;
 }
 
+.enable-option {
+  top: 54%;
+  position: fixed;
+  text-align: right!important;
+  display: inline-block;
+  right: 388px;
+  border-top: 0.5px solid #DADADA !important;
+  width: 37%;
+  padding: 15px;
+  .extension-description {
+    text-align: left;
+    justify-content: left;
+    display: inline-block;
+    margin-top: 5px;
+  }
+}
 
-
-
+.enable-extension-toggle {
+  right: -16px;
+  position: relative;
+}

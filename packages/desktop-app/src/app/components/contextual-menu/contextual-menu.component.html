@@ -46,7 +46,7 @@
 
     <ng-container
       *ngIf="selectedSession.type === eSessionType.awsSsoRole || selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained">
-      <button mat-menu-item (click)="openAwsWebConsole();">
+      <button [disabled]="this.optionsService.extensionEnabled && isWebConsoleFetching ? true : null" [class.disabled]="isWebConsoleFetching" mat-menu-item (click)="openAwsWebConsole();">
         <i class="moon-Open-Web-Console"></i>
         <span>&nbsp;&nbsp;Open Web Console</span>
       </button>
@@ -96,14 +96,6 @@
       <button mat-menu-item [matMenuTriggerFor]="pluginList">
         <i class="moon-Puzzle"></i>
         <span>&nbsp;&nbsp;Plugins</span>
-      </button>
-    </ng-container>
-
-    <ng-container
-      *ngIf="selectedSession.type === eSessionType.awsSsoRole || selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained">
-      <button [disabled]="openWebConsoleExtensionDisabled ? true : null" [class.disabled]="openWebConsoleExtensionDisabled" mat-menu-item (click)="sendExtensionMessage();">
-        <i class="moon-User"></i>&nbsp;
-        <span>Open Multi-Console Extension</span>
       </button>
     </ng-container>
 

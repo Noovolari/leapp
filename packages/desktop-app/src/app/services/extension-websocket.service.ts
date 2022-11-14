@@ -5,6 +5,7 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { BehaviorSubject } from "rxjs";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
+import { WindowService } from "./window.service";
 
 export enum FetchingState {
   notFetching,
@@ -21,11 +22,13 @@ export class ExtensionWebsocketService {
   public wsClient: any;
   public fetching$: BehaviorSubject<FetchingState>;
   private fetchingTimeout: any;
+  private consoleUrl: string;
 
   constructor(
     private appNativeService: AppNativeService,
     private appProviderService: AppProviderService,
-    private toastService: MessageToasterService
+    private toastService: MessageToasterService,
+    private windowService: WindowService
   ) {
     this.fetching$ = new BehaviorSubject(FetchingState.notFetching);
     this.fetching$.subscribe(async (value) => {
@@ -35,7 +38,17 @@ export class ExtensionWebsocketService {
         this.sendMessage(JSON.stringify({ type: "get-fetching-state" }));
         this.fetchingTimeout = setTimeout(() => {
           this.fetching$.next(FetchingState.notFetching);
-          this.toastService.toast("Error: cannot communicate with the browser extension", ToastLevel.error);
+          try {
+            this.windowService.openExternalUrl(this.consoleUrl);
+            this.toastService.toast(
+              "Communication Error. Be sure to have your browser open and the extension installed. Opening it with the standard method...",
+              ToastLevel.warn
+            );
+          } catch (err) {
+            this.toastService.toast("An error occured while opening the web console. Malformed session information", ToastLevel.error);
+          } finally {
+            this.consoleUrl = undefined;
+          }
         }, 4000);
       }
     });
@@ -70,13 +83,19 @@ export class ExtensionWebsocketService {
     this.fetching$.next(FetchingState.fetchingRequested);
     this.appProviderService.behaviouralSubjectService.unselectSessions();
     const sessionService = this.appProviderService.sessionFactory.getSessionService(session.type) as AwsSessionService;
-    const credentialsInfo = await sessionService.generateCredentials(session.sessionId);
-    const url = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentialsInfo, session.region);
+    let credentialsInfo;
+    try {
+      credentialsInfo = await sessionService.generateCredentials(session.sessionId);
+    } catch (error) {
+      this.fetching$.next(FetchingState.notFetching);
+      throw error;
+    }
+    this.consoleUrl = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentialsInfo, session.region);
     this.sendMessage(
       JSON.stringify({
         type: "create-new-session",
         sessionInfo: {
-          url,
+          url: this.consoleUrl,
           sessionName: session.sessionName,
           sessionRole: (session as any).roleArn.split("/")[1],
           sessionRegion: session.region,

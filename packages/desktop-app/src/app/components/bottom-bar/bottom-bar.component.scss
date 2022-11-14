@@ -45,6 +45,11 @@ th {
 
     &:hover {
       opacity: 0.6;
+      &.open-web-console {
+        &.disabled i {
+          opacity: unset !important;
+        }
+      }
     }
   }
 }
@@ -262,6 +267,10 @@ tr .hover-item {
 .open-web-console {
   position: relative;
   right: 10px;
+  &.disabled i {
+    opacity: 0.6 !important;
+    cursor: initial;
+  }
 }
 
 .azure-opt-bar .separator {

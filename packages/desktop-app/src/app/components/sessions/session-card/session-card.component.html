@@ -1,4 +1,4 @@
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+<td (dblclick)="switchCredentials()" (click)="openOptionBar($event, session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-1">
   <div class="session-name-td">
     <img class="provider-icon"
@@ -12,7 +12,7 @@
     <i class="moon-Pin" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1"></i>
   </div>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+<td (dblclick)="switchCredentials()" (click)="openOptionBar($event, session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
            {{globalColumns.role ? '' : 'hidden-column'}} table-column-2 active-columns-{{globalColumnsCount}}">
   <div class="span-limiter">
@@ -21,12 +21,12 @@
     </span>
   </div>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+<td (dblclick)="switchCredentials()" (click)="openOptionBar($event, session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
            {{globalColumns.provider ? '' : 'hidden-column'}} table-column-3">
   <span class="badge badge-rounded badge-{{getSessionProviderClass(session.type)}}">{{getSessionProviderLabel(session.type)}}</span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+<td (dblclick)="switchCredentials()" (click)="openOptionBar($event, session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-4
            {{globalColumns.namedProfile ? '' : 'hidden-column'}}">
   <div class="span-limiter">
@@ -38,12 +38,12 @@
     </span>
   </div>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+<td (dblclick)="switchCredentials()" (click)="openOptionBar($event, session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}}
            {{!compactMode && globalColumns.region ? '' : 'hidden-column'}} table-column-5">
   <span class="badge badge-region badge-{{session.status === eSessionStatus.active ? 'black' : 'gray'}}">{{session.region}}</span>
 </td>
-<td (dblclick)="switchCredentials()" (click)="openOptionBar(session);" (contextmenu)="openContextMenu($event, session)"
+<td (dblclick)="switchCredentials()" (click)="openOptionBar($event, session);" (contextmenu)="openContextMenu($event, session)"
     class="{{isSelected ? 'selected' : (session.status !== eSessionStatus.inactive ? 'active' : '')}} table-column-6">
   <i class="status-item fas fa-circle {{session.status === eSessionStatus.active ? 'active' : 'offline'}}"
      *ngIf="session.status !== eSessionStatus.pending"></i>

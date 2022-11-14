@@ -4,7 +4,7 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
 import { OptionsService } from "../../services/options.service";
-import { ExtensionWebsocketService } from "../../services/extension-websocket.service";
+import { ExtensionWebsocketService, FetchingState } from "../../services/extension-websocket.service";
 
 @Component({
   selector: "app-bottom-bar",
@@ -20,6 +20,7 @@ export class BottomBarComponent implements OnInit {
 
   public eSessionType = SessionType;
   public eSessionStatus = SessionStatus;
+  public isWebConsoleFetching: boolean;
 
   constructor(
     private selectedSessionActionsService: SelectedSessionActionsService,
@@ -27,7 +28,11 @@ export class BottomBarComponent implements OnInit {
     private extensionWebsocketService: ExtensionWebsocketService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.extensionWebsocketService.fetching$.subscribe((value) => {
+      this.isWebConsoleFetching = value !== FetchingState.notFetching;
+    });
+  }
 
   get isPinned(): boolean {
     return this.selectedSessionActionsService.isPinned(this.selectedSession);
@@ -42,7 +47,7 @@ export class BottomBarComponent implements OnInit {
   }
 
   async openAwsWebConsole(): Promise<void> {
-    if (this.optionsService.extensionEnabled) {
+    if (this.optionsService.extensionEnabled && !this.isWebConsoleFetching) {
       await this.extensionWebsocketService.openWebConsoleWithExtension(this.selectedSession);
     } else {
       await this.selectedSessionActionsService.openAwsWebConsole(this.selectedSession);

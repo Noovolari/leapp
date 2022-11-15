@@ -1,8 +1,8 @@
 You can **open the AWS Web Console directly from Leapp**, without having to log in, input your credentials, or select the role to assume.
 
-To do that just *right-click* or *select* the session you want to open in the web console, and click on the <img src="../../images/built-in-features/opening.png" alt="" title=""> icon either in the **context-menu** or 
+To do that just *right-click* or *select* the session you want to open in the web console, and click on the <img src="../../images/built-in-features/opening.png" alt="" title=""> icon either in the **context-menu** or in the **bottom-bar** below.
 
-in the **bottom-bar** below.
+Alternatively, you can Command + left-click on a session (or Control + left-click for Windows/Linux ) to open the web console.
 
 Leapp will open your default browser with the Region and the Role already prepared for you in the account you've selected.
 

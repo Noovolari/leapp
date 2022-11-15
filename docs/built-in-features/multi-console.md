@@ -72,19 +72,18 @@ The extension can only be installed manually. To do so, follow these instruction
 
 ## How to use it
 
-Once you installed the extension on your browser, go to the Leapp Desktop App and open the contextual menu of a Leapp Session by left-clicking
-on it.
+Once you installed the extension on your browser, you need to enable the Multi-Console Extension on the Leapp Desktop App in order to use it.
 
-![](../../images/built-in-features/leapp-extension.png?style=even-smaller-img)
+Click on the top-right cog icon to access the settings, click on the **Multi-Console** tab and then click **Enable Multi-Console Extension**.
 
-Select **Open Multi-Console Extension** in the contextual menu. This will open an isolated session in your browser. Be aware that **the browser should be open** to
-use this feature.
+![](../../images/built-in-features/enable-option.png?style=even-smaller-img)
 
-!!! warning 
+From the contextual menu of a session (accessed by right-clicking on it), simply select **Open Web Console**. 
+
+!!! info 
     
-    If any communication error occurs, your browser is not open or you don't have the extension installed/enabled on it, an error will be shown.
-
-![](../../images/built-in-features/extension-communication-error.png?style=even-smaller-img)
+    If any communication error occurs, your browser is not open or you don't have the extension installed/enabled on it, the web console will be opened in your default
+    browser without using the extension (and will be limited to a single session).
 
 ---
 

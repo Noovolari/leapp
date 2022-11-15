@@ -11,6 +11,7 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { DomSanitizer } from "@angular/platform-browser";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 
 @Injectable({ providedIn: "root" })
 export class AppAwsAuthenticationService implements IAwsSamlAuthenticationService {
@@ -24,7 +25,7 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
 
   async needAuthentication(idpUrl: string): Promise<boolean> {
     const sanitizedField = this.domSanitizer.sanitize(SecurityContext.URL, idpUrl);
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       // Get active window position for extracting new windows coordinate
       const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
       const nearX = 200;
@@ -32,14 +33,22 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
       // Generate a new singleton browser window for the check
       let idpWindow = this.windowService.newWindow(sanitizedField, false, "", activeWindowPosition[0] + nearX, activeWindowPosition[1] + nearY);
 
+      const timeoutInMs = 5000;
+      const timeout = setTimeout(() => {
+        const error = new LeappBaseError("SAML authentication timeout error", this, LogLevel.error, "SAML authentication timeout exceeded");
+        reject(error);
+      }, timeoutInMs);
+
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response
       idpWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
         if (this.leappCoreService.authenticationService.isAuthenticationUrl(CloudProviderType.aws, details.url)) {
+          clearTimeout(timeout);
           idpWindow = null;
           resolve(true);
         }
         if (this.leappCoreService.authenticationService.isSamlAssertionUrl(CloudProviderType.aws, details.url)) {
+          clearTimeout(timeout);
           idpWindow = null;
           resolve(false);
         }

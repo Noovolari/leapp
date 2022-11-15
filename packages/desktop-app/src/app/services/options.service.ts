@@ -127,6 +127,17 @@ export class OptionsService {
     this.workspaceService.persistWorkspace(workspace);
   }
 
+  set extensionEnabled(value: boolean) {
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.extensionEnabled = value;
+    this.workspaceService.persistWorkspace(workspace);
+  }
+
+  get extensionEnabled(): boolean {
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.extensionEnabled;
+  }
+
   get samlRoleSessionDuration(): number {
     const workspace = this.workspaceService.getWorkspace();
     return workspace.samlRoleSessionDuration / 60 / 60;

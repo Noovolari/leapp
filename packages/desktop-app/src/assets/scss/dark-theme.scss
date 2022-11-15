@@ -513,4 +513,12 @@ body.dark-theme {
   i.fa-apple, i.fa-windows, i.fa-linux {
     color: #52A8DC!important;
   }
+
+  .enable-option {
+    border-color: #404040!important;
+  }
+
+  .selected i.fa-circle.active {
+    color: #64D1B9 !important;
+  }
 }

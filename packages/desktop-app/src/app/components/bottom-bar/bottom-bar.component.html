@@ -17,7 +17,7 @@
 
         <ng-container
           *ngIf="selectedSession.type === eSessionType.awsSsoRole || selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained">
-          <a class="icon-button open-web-console" (click)="openAwsWebConsole();" matTooltip="Open Web Console">
+          <a class="icon-button open-web-console" [class.disabled]="isWebConsoleFetching" (click)="openAwsWebConsole();" matTooltip="Open Web Console">
             <i class="moon-Open-Web-Console"></i>
           </a>
         </ng-container>

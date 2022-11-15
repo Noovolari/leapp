@@ -10,6 +10,7 @@ import { SessionService } from "@noovolari/leapp-core/services/session/session-s
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { OptionsService } from "../../../services/options.service";
 import { SelectedSessionActionsService } from "../../../services/selected-session-actions.service";
+import { ExtensionWebsocketService } from "../../../services/extension-websocket.service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -44,7 +45,8 @@ export class SessionCardComponent implements OnInit {
     public appService: AppService,
     public appProviderService: AppProviderService,
     public optionService: OptionsService,
-    private selectedSessionActionService: SelectedSessionActionsService
+    private selectedSessionActionService: SelectedSessionActionsService,
+    private extensionWebSocketService: ExtensionWebsocketService
   ) {
     this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
   }
@@ -65,8 +67,15 @@ export class SessionCardComponent implements OnInit {
     }
   }
 
-  openOptionBar(session: Session): void {
+  async openOptionBar(event: any, session: Session): Promise<void> {
     this.behaviouralSubjectService.selectSession(session.sessionId);
+    if (event.metaKey || event.ctrlKey) {
+      if (this.optionService.extensionEnabled) {
+        await this.extensionWebSocketService.openWebConsoleWithExtension(session);
+      } else {
+        await this.selectedSessionActionService.openAwsWebConsole(session);
+      }
+    }
   }
 
   /**

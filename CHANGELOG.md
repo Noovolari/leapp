@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.16.2](https://github.com/Noovolari/leapp/compare/v0.16.1...v0.16.2) (2022-11-15)
+
+### Features
+
+* merged the open web console methods in a single menu action. Now you can set your favourite method from the Multi-Console tab in the option menu and choose between the
+  standard method or to use the extension (with a fallback to the standard method if any error occurs)
+* added a shortcut to the open web console action. Now you can use Command + left click (or Control + left click on Windows/Linux) to open it with a single click
+
+### Bug Fixes
+
+* fixed a bug with the dark theme showing the active icon of a session with the wrong color if the session is selected
+* introduced a SAML authentication timeout handler to avoid hanging sessions
+
 ### [0.16.1](https://github.com/Noovolari/leapp/compare/v0.16.0...v0.16.1) (2022-11-09)
 
 ### Features

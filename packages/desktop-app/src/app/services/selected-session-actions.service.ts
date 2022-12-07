@@ -63,8 +63,7 @@ export class SelectedSessionActionsService {
     this.behaviouralSubjectService.unselectSessions();
     const credentials = await (this.getSelectedSessionService(session) as AwsSessionService).generateCredentials(session.sessionId);
     const sessionRegion = session.region;
-    const sessionDuration = this.appProviderService.workspaceService.getWorkspace().samlRoleSessionDuration;
-    await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion, sessionDuration);
+    await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion);
   }
 
   async changeRegionModalOpen(session: Session): Promise<void> {
@@ -210,8 +209,7 @@ export class SelectedSessionActionsService {
     try {
       const credentials = await (this.getSelectedSessionService(session) as AwsSessionService).generateCredentials(session.sessionId);
       const sessionRegion = session.region;
-      const sessionDuration = this.appProviderService.workspaceService.getWorkspace().samlRoleSessionDuration;
-      const loginURL = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion, sessionDuration);
+      const loginURL = await this.appProviderService.webConsoleService.getWebConsoleUrl(credentials, sessionRegion);
 
       this.appService.copyToClipboard(loginURL);
       this.messageToasterService.toast("Your information has been successfully copied!", ToastLevel.success, "Information copied!");

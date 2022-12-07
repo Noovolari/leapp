@@ -26,12 +26,5 @@ With this option, you can switch between light and dark theme, or use your syste
 
 ![](images/screens/newuxui/leapp-dark.png?style=center-img)
 
-## Default Webconsole Duration
-
-This option is used to set the default Webconsole session duration in hours.
-
-!!! Info
-
-    The minimum session duration is 1 hour, and can be set to a maximum of 12 hours. [Set session duration](https://docs.aws.amazon.com/singlesignon/latest/userguide/howtosessionduration.html){: target='_blank'}
 
 

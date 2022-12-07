@@ -187,7 +187,7 @@ export class AppProviderService {
         this.fileService,
         this.awsCoreService,
         this.awsAuthenticationService,
-        this.repository.workspace.samlRoleSessionDuration
+        constants.samlRoleSessionDuration
       );
     }
     return this.awsIamRoleFederatedServiceInstance;

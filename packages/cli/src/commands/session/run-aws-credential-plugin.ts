@@ -29,6 +29,7 @@ export default class RunAwsCredentialPlugin extends LeappCommand {
         if (!selectedSession) {
           throw new Error("No session found with id " + flags.sessionId);
         }
+        await this.cliProviderService.pluginManagerService.loadFromPluginDir();
         const selectedPlugin = this.cliProviderService.pluginManagerService
           .availableAwsCredentialsPlugins(os, selectedSession)
           .find((plugin) => plugin.metadata.uniqueName === flags.pluginName);

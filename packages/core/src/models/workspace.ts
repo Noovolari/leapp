@@ -43,6 +43,7 @@ export class Workspace {
   };
 
   private _credentialMethod: string;
+  private _samlRoleSessionDuration: number;
 
   private _ssmRegionBehaviour: string;
 
@@ -73,6 +74,7 @@ export class Workspace {
     };
 
     this._credentialMethod = constants.credentialFile;
+    this._samlRoleSessionDuration = constants.samlRoleSessionDuration;
 
     this._ssmRegionBehaviour = constants.ssmRegionNo;
   }
@@ -219,5 +221,13 @@ export class Workspace {
 
   set extensionEnabled(extensionEnabled: boolean) {
     this._extensionEnabled = extensionEnabled;
+  }
+
+  get samlRoleSessionDuration(): number {
+    return this._samlRoleSessionDuration;
+  }
+
+  set samlRoleSessionDuration(duration: number) {
+    this._samlRoleSessionDuration = duration;
   }
 }

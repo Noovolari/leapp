@@ -239,4 +239,16 @@ describe("Workspace Model", () => {
     workspace.pluginsStatus = mock;
     expect(mock).toStrictEqual((workspace as any)._pluginsStatus);
   });
+
+  test("samlRoleSessionDuration", () => {
+    const workspace = new Workspace();
+    expect(workspace.samlRoleSessionDuration).toStrictEqual((workspace as any)._samlRoleSessionDuration);
+  });
+
+  test("set samlRoleSessionDuration", () => {
+    const workspace = new Workspace();
+    const mock = { mock: "mock" } as any;
+    workspace.samlRoleSessionDuration = mock;
+    expect(mock).toStrictEqual((workspace as any)._samlRoleSessionDuration);
+  });
 });

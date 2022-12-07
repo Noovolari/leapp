@@ -297,7 +297,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   }
 
   private setupSsoPortalClient(region: string): void {
-    if (!this.ssoPortal) {
+    if (!this.ssoPortal || this.ssoPortal.config.region !== region) {
       this.ssoPortal = new SSO({ region });
       this.listAccountRolesCall = new ThrottleService((...params) => this.ssoPortal.listAccountRoles(...params).promise(), constants.maxSsoTps);
     }

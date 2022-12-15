@@ -30,6 +30,7 @@ import { AzureSessionService } from "@noovolari/leapp-core/services/session/azur
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { ExtensionWebsocketService } from "./services/extension-websocket.service";
+import { NotificationsService } from "./services/notifications.service";
 
 @Component({
   selector: "app-root",
@@ -65,7 +66,8 @@ export class AppComponent implements OnInit {
     private updaterService: UpdaterService,
     private windowService: WindowService,
     private appNativeService: AppNativeService,
-    private extensionWebsocketService: ExtensionWebsocketService
+    private extensionWebsocketService: ExtensionWebsocketService,
+    private notificationsService: NotificationsService
   ) {
     appProviderService.mfaCodePrompter = mfaCodePrompter;
     appProviderService.awsAuthenticationService = awsAuthenticationService;
@@ -173,6 +175,8 @@ export class AppComponent implements OnInit {
     this.extensionWebsocketService.bootstrap();
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
+
+    this.notificationsService.startNotificationChecking();
   }
 
   closeAllRightClickMenus(): void {

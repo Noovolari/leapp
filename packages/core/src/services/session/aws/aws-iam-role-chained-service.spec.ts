@@ -49,7 +49,6 @@ describe("AwsIamRoleChainedService", () => {
         region: session.region,
       },
     } as any;
-
     sessionNotifier = {
       addSession: jest.fn(() => {}),
       setSessions: jest.fn(() => {}),
@@ -60,6 +59,9 @@ describe("AwsIamRoleChainedService", () => {
       getSessionById: jest.fn((sessionId: string) => (sessionId === session.sessionId ? session : parentSession)),
       getProfileName: jest.fn(() => "profile1"),
       updateSessions: jest.fn(() => {}),
+      workspace: {
+        samlRoleSessionDuration: constants.samlRoleSessionDuration,
+      },
     };
     fileService = {
       iniWriteSync: jest.fn((_: string, __: any) => {}),
@@ -213,6 +215,9 @@ describe("AwsIamRoleChainedService", () => {
     const session2 = { sessionId: "fake-session-id", roleArn: "arn" };
     const repository2 = {
       getSessionById: () => session2,
+      workspace: {
+        samlRoleSessionDuration: constants.samlRoleSessionDuration,
+      },
     } as any;
     const awsIamRoleChainedService = new AwsIamRoleChainedService(
       sessionNotifier,
@@ -229,6 +234,7 @@ describe("AwsIamRoleChainedService", () => {
     expect((awsIamRoleChainedService as any).generateSessionToken.mock.calls[0][2]).toEqual({
       ["RoleSessionName"]: constants.roleSessionName,
       ["RoleArn"]: session2.roleArn,
+      ["DurationSeconds"]: constants.samlRoleSessionDuration,
     });
   });
 

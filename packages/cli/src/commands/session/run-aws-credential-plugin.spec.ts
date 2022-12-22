@@ -14,7 +14,10 @@ describe("RunAwsCredentialPlugin", () => {
     const cliProviderService = {
       cliNativeService: { os: { platform: jest.fn(() => OperatingSystem.mac) } },
       sessionManagementService: { getSessionById: jest.fn(() => "selected-session") },
-      pluginManagerService: { availableAwsCredentialsPlugins: () => [{ actionName: "", metadata: { uniqueName: "fake-plugin-name" } }] },
+      pluginManagerService: {
+        availableAwsCredentialsPlugins: () => [{ actionName: "", metadata: { uniqueName: "fake-plugin-name" } }],
+        loadFromPluginDir: () => {},
+      },
     };
     const argv = ["--sessionId", "fake-session-id", "--pluginName", "fake-plugin-name"];
     const command = getTestCommand(cliProviderService, argv);
@@ -42,7 +45,7 @@ describe("RunAwsCredentialPlugin", () => {
     const cliProviderService = {
       cliNativeService: { os: { platform: jest.fn(() => OperatingSystem.mac) } },
       sessionManagementService: { getSessionById: () => "selected-session" },
-      pluginManagerService: { getPluginByName: () => {}, availableAwsCredentialsPlugins: () => [] },
+      pluginManagerService: { getPluginByName: () => {}, availableAwsCredentialsPlugins: () => [], loadFromPluginDir: () => {} },
     };
     const argv = ["--sessionId", "fake-session-id", "--pluginName", "fake-plugin-name"];
     const command = getTestCommand(cliProviderService, argv);

@@ -485,12 +485,16 @@ describe("AwsSsoIntegrationService", () => {
 
   test("setupSsoPortalClient, sso portal already set up", () => {
     const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
-    awsIntegrationService.ssoPortal = "fake-sso-portal";
+    awsIntegrationService.ssoPortal = {
+      config: {
+        region: "fake-region",
+      },
+    };
 
     awsIntegrationService.setupSsoPortalClient("fake-region");
 
     expect(awsIntegrationService.listAccountRolesCall).toBeUndefined();
-    expect(awsIntegrationService.ssoPortal).toBe("fake-sso-portal");
+    expect(awsIntegrationService.ssoPortal).toEqual({ config: { region: "fake-region" } });
   });
 
   test("createIntegration", () => {

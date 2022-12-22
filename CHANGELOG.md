@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [0.16.3](https://github.com/Noovolari/leapp/compare/v0.16.2...v0.16.2) (2022-12-22)
+### [0.17.0](https://github.com/Noovolari/leapp/compare/v0.16.2...v0.17.0) (2022-12-22)
 
 ### Features
 * added configurable default webconsole timeout with [#319](https://github.com/Noovolari/leapp/pull/319) PR.

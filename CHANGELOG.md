@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.16.3](https://github.com/Noovolari/leapp/compare/v0.16.2...v0.16.2) (2022-12-22)
+
+### Features
+* added configurable default webconsole timeout with [#319](https://github.com/Noovolari/leapp/pull/319) PR.
+  <br><br>
+  A new option is added in the general options with which the default webconsole
+  timeout can be configured between 1 hour and 12 hours.
+  <br><br>
+  Configurable duration will now also apply to the IAM Role Chained Service
+  and the IAM Role Federated Service.
+
+### Bug Fixes
+
+* fixed [#360](https://github.com/Noovolari/leapp/issues/360) issue with [#361](https://github.com/Noovolari/leapp/pull/361) PR.
+  <br><br>
+  The PR fixes the case when the region for AWS SSO changes
+  and the client isn't aware, leading to the "Session token not found
+  or invalid" error.
+  <br><br>
+  It adds a check to see if the clients' region is different to the
+  integration one and so recreate the client.
+  <br><br>
+  A special thanks to [@rusowyler](https://github.com/rusowyler) for the Pull Request!
+  <br><br>
+* fixed dependencies security issues (gushio and electron-builder are still moderate)
+
 ### [0.16.2](https://github.com/Noovolari/leapp/compare/v0.16.1...v0.16.2) (2022-11-15)
 
 ### Features

@@ -10,8 +10,11 @@ All notable changes to this project will be documented in this file. See [standa
   A new option is added in the general options with which the default webconsole
   timeout can be configured between 1 hour and 12 hours.
   <br><br>
-  Configurable duration will now also apply to the IAM Role Chained Service
-  and the IAM Role Federated Service.
+  Configurable duration will now also apply to the IAM Role Federated Service.
+  <br><br>
+  A special thanks to [@RaviBri](https://github.com/RaviBri) for the contribution!
+  <br><br>
+* updated Multi-Console Browser Extension documentation
 
 ### Bug Fixes
 
@@ -24,8 +27,9 @@ All notable changes to this project will be documented in this file. See [standa
   It adds a check to see if the clients' region is different to the
   integration one and so recreate the client.
   <br><br>
-  A special thanks to [@rusowyler](https://github.com/rusowyler) for the Pull Request!
+  A special thanks to [@rusowyler](https://github.com/rusowyler) for the contribution!
   <br><br>
+* added missing plugins initialization when running a CLI command with flags
 * fixed dependencies security issues (gushio and electron-builder are still moderate)
 
 ### [0.16.2](https://github.com/Noovolari/leapp/compare/v0.16.1...v0.16.2) (2022-11-15)

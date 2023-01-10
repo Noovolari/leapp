@@ -10,7 +10,6 @@ All notable changes to this project will be documented in this file. See [standa
   You can now create an AWS IAM role federated session using Keycloak as an identity provider.
   <br><br>
   A special thanks to [@patlachance](https://github.com/patlachance) for the contribution!
-  <br><br>
 
 ### [0.17.0](https://github.com/Noovolari/leapp/compare/v0.16.2...v0.17.0) (2022-12-23)
 

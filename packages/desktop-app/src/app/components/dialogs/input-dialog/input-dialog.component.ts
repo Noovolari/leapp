@@ -34,7 +34,9 @@ export class InputDialogComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {}
 
   ngAfterViewInit(): void {
-    this.inputField.nativeElement.focus();
+    setTimeout(() => {
+      this.inputField.nativeElement.focus();
+    }, 50);
   }
 
   /**

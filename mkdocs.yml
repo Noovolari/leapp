@@ -64,13 +64,13 @@ theme:
   favicon: images/icon.ico
   name: material
   features:
-    - search.suggest
-    - search.highlight
-    - search.share
     - navigation.instant
     - navigation.indexes
     - navigation.top
     - content.code.annotate
+    - search.suggest
+    - search.highlight
+    - search.share
   font:
     text: Montserrat
   palette:

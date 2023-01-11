@@ -3,7 +3,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latest</loc>
+      <loc>https://docs.leapp.cloud/latest/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -15,7 +15,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestinstallation/requirements/</loc>
+      <loc>https://docs.leapp.cloud/latest/installation/requirements/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -27,7 +27,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestinstallation/install-leapp/</loc>
+      <loc>https://docs.leapp.cloud/latest/installation/install-leapp/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -39,7 +39,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestinstallation/update-leapp/</loc>
+      <loc>https://docs.leapp.cloud/latest/installation/update-leapp/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -51,7 +51,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestsessions/</loc>
+      <loc>https://docs.leapp.cloud/latest/sessions/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -63,7 +63,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestintegrations/</loc>
+      <loc>https://docs.leapp.cloud/latest/integrations/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -75,7 +75,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestcli/</loc>
+      <loc>https://docs.leapp.cloud/latest/cli/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -87,7 +87,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestcli/scopes/help/</loc>
+      <loc>https://docs.leapp.cloud/latest/cli/scopes/help/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -99,7 +99,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestcli/scopes/session/</loc>
+      <loc>https://docs.leapp.cloud/latest/cli/scopes/session/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -111,7 +111,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestcli/scopes/integration/</loc>
+      <loc>https://docs.leapp.cloud/latest/cli/scopes/integration/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -123,7 +123,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestcli/scopes/profile/</loc>
+      <loc>https://docs.leapp.cloud/latest/cli/scopes/profile/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -135,7 +135,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestcli/scopes/region/</loc>
+      <loc>https://docs.leapp.cloud/latest/cli/scopes/region/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -147,7 +147,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestcli/scopes/idp-url/</loc>
+      <loc>https://docs.leapp.cloud/latest/cli/scopes/idp-url/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -159,7 +159,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestconfiguration/</loc>
+      <loc>https://docs.leapp.cloud/latest/configuration/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -171,7 +171,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestconfiguring-session/configure-aws-iam-user/</loc>
+      <loc>https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-user/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -183,7 +183,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestconfiguring-session/configure-aws-iam-role-federated/</loc>
+      <loc>https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-role-federated/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -195,7 +195,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestconfiguring-session/configure-aws-iam-role-chained/</loc>
+      <loc>https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-role-chained/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -207,7 +207,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestconfiguring-integration/configure-aws-single-sign-on-integration/</loc>
+      <loc>https://docs.leapp.cloud/latest/configuring-integration/configure-aws-single-sign-on-integration/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -219,7 +219,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestconfiguring-integration/configure-azure-integration/</loc>
+      <loc>https://docs.leapp.cloud/latest/configuring-integration/configure-azure-integration/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -231,7 +231,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestedit-session/</loc>
+      <loc>https://docs.leapp.cloud/latest/edit-session/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -243,7 +243,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestsecurity/intro/</loc>
+      <loc>https://docs.leapp.cloud/latest/security/intro/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -255,7 +255,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestsecurity/credentials-generation/aws/</loc>
+      <loc>https://docs.leapp.cloud/latest/security/credentials-generation/aws/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -267,7 +267,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestsecurity/credential-process/</loc>
+      <loc>https://docs.leapp.cloud/latest/security/credential-process/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -279,7 +279,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestsecurity/credentials-generation/azure/</loc>
+      <loc>https://docs.leapp.cloud/latest/security/credentials-generation/azure/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -291,7 +291,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestsecurity/system-vault/</loc>
+      <loc>https://docs.leapp.cloud/latest/security/system-vault/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -303,7 +303,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestsecurity/zero-knowledge/</loc>
+      <loc>https://docs.leapp.cloud/latest/security/zero-knowledge/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -315,7 +315,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestbuilt-in-features/aws-ec2-connect/</loc>
+      <loc>https://docs.leapp.cloud/latest/built-in-features/aws-ec2-connect/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -327,7 +327,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestbuilt-in-features/aws-named-profiles/</loc>
+      <loc>https://docs.leapp.cloud/latest/built-in-features/aws-named-profiles/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -339,7 +339,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestbuilt-in-features/opening-web-console/</loc>
+      <loc>https://docs.leapp.cloud/latest/built-in-features/opening-web-console/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -351,7 +351,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestbuilt-in-features/multi-console/</loc>
+      <loc>https://docs.leapp.cloud/latest/built-in-features/multi-console/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -363,7 +363,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestplugins/plugins-introduction/</loc>
+      <loc>https://docs.leapp.cloud/latest/plugins/plugins-introduction/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -375,7 +375,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestplugins/plugins-development/</loc>
+      <loc>https://docs.leapp.cloud/latest/plugins/plugins-development/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -387,7 +387,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestbuilt-in-features/general-options/</loc>
+      <loc>https://docs.leapp.cloud/latest/built-in-features/general-options/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -399,7 +399,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latestcontributing/get-involved/</loc>
+      <loc>https://docs.leapp.cloud/latest/contributing/get-involved/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -411,7 +411,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latesttroubleshooting/app-data/</loc>
+      <loc>https://docs.leapp.cloud/latest/troubleshooting/app-data/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       
@@ -423,7 +423,7 @@
 
   
     <url>
-      <loc>https://docs.leapp.cloud/latesttroubleshooting/faq/</loc>
+      <loc>https://docs.leapp.cloud/latest/troubleshooting/faq/</loc>
       <lastmod>2023-01-11</lastmod>
       <changefreq>daily</changefreq>
       

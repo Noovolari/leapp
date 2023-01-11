@@ -63,6 +63,7 @@ theme:
   titles_only: true
   favicon: images/icon.ico
   name: material
+  custom_dir: 'docs_sitemap/'
   features:
     - navigation.instant
     - navigation.indexes
@@ -127,6 +128,6 @@ plugins:
   - search
   - mkdocs-video
   - img2fig
+  - git-revision-date
   - mike:
-      alias_type: copy
       canonical_version: latest

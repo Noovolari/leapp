@@ -29,6 +29,7 @@ jobs:
       - run: git fetch origin gh-pages --depth=1
       - run: mike deploy --no-redirect --force --push --update-aliases ${{env.PACKAGE_VERSION}} latest
       - run: mike set-default --push latest
+      - run: curl https://www.google.com/ping?sitemap=https://docs.leapp.cloud/latest/sitemap.xml
 
       # - run: mkdocs gh-deploy --force
 env:

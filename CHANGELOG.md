@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.1](https://github.com/Noovolari/leapp/compare/v0.17.0...v0.17.1) (2023-01-10)
+
+### Features
+* added support for Keycloak IdP [#374](https://github.com/Noovolari/leapp/issues/374) 
+  <br><br>
+  You can now create an AWS IAM role federated session using Keycloak as an identity provider.
+  <br><br>
+  A special thanks to [@patlachance](https://github.com/patlachance) for the contribution!
+
 ### [0.17.0](https://github.com/Noovolari/leapp/compare/v0.16.2...v0.17.0) (2022-12-23)
 
 ### Features

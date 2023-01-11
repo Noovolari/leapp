@@ -16,6 +16,7 @@ jobs:
       - run: pip install mkdocs-material
       - run: pip install mkdocs-video
       - run: pip install mkdocs-img2fig-plugin
+      - run: pip install mkdocs-git-revision-date-plugin
       - run: pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
       - run: pip install mike
       - run: |

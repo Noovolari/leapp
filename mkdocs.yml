@@ -140,3 +140,6 @@ plugins:
   - search
   - mkdocs-video
   - img2fig
+  - mike:
+      alias_type: copy
+      canonical_version: latest

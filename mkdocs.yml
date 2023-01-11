@@ -68,6 +68,8 @@ theme:
     - navigation.instant
     - navigation.indexes
     - navigation.top
+    - navigation.footer
+    - content.action.edit
     - content.code.annotate
     - search.suggest
     - search.highlight

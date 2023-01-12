@@ -65,8 +65,8 @@ The extension can only be installed manually. To do so, follow these instruction
     when accessing the login page of the AWS Console, on the left of the address bar, click the lock icon and select "Cookies". 
     Then, remove all cookies by clicking "Remove" until the cookie list is empty and finally click on Done 
     <div class="button-container" style="background-color:none!important">
-      <img src="../../images/built-in-features/extension-uninstall-1.png?style=even-smaller-img;background-color:none!important" class="installation-button">
-      <img src="../../images/built-in-features/extension-uninstall-2.png?style=even-smaller-img;background-color:none!important" class="installation-button">
+      <img alt="uninstall extension step 1" src="../../images/built-in-features/extension-uninstall-1.png?style=even-smaller-img;background-color:none!important" class="installation-button">
+      <img alt="uninstall extension step 2" src="../../images/built-in-features/extension-uninstall-2.png?style=even-smaller-img;background-color:none!important" class="installation-button">
     </div>
 
 
@@ -76,7 +76,7 @@ Once you installed the extension on your browser, you need to enable the Multi-C
 
 Click on the top-right cog icon to access the settings, click on the **Multi-Console** tab and then click **Enable Multi-Console Extension**.
 
-![](../../images/built-in-features/enable-option.png?style=even-smaller-img)
+![enable option](../../images/built-in-features/enable-option.png?style=even-smaller-img)
 
 From the contextual menu of a session (accessed by right-clicking on it), simply select **Open Web Console**. 
 
@@ -91,7 +91,7 @@ By clicking on the Leapp Multi-Console Extension icon in your browser, a list of
 
 This list contains information obtained from Leapp about the session, including **Session Name, Session Role and Session Region**.
 
-![](../../images/built-in-features/leapp-browser-ui.png?style=even-smaller-img)
+![leapp browser ui](../../images/built-in-features/leapp-browser-ui.png?style=even-smaller-img)
 
 In the extension interface, click on a row to select and **focus the tab in which you opened the related AWS Console**, so you can easily navigate among many AWS Consoles
 at the same time.

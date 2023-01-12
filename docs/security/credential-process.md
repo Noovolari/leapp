@@ -45,7 +45,7 @@ The **Expiration** field allows the generated credentials to be cached and reuse
 
     **Requirements**: this credentials' generation method requires that both Leapp desktop app and CLI are installed.
 
-1) Open your Leapp desktop app and go to the settings panel (<img src="../../images/gear.png" width="20"/>).
+1) Open your Leapp desktop app and go to the settings panel (<img src="../../images/gear.png" width="20" alt="option icon" />).
 
 2) In the *general section* change the *AWS Credential Generation* from "credential-file-method" to **"credential-process-method"**.
 
@@ -53,7 +53,7 @@ The **Expiration** field allows the generated credentials to be cached and reuse
 
 ![warning modal](../../images/modalcredentialprocess.png)
 
-4) Now, everytime you click on start (<img src="../../images/startsession.png" width="20" />) an entry will be created in the ~/.aws/config file with the following format:
+4) Now, everytime you click on start (<img src="../../images/startsession.png" width="20" alt="start session icon"/>) an entry will be created in the ~/.aws/config file with the following format:
 
 ```yaml
 [profile PROFILE_NAME]

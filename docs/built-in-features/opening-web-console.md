@@ -1,3 +1,5 @@
+## How to open AWS Console from Leapp
+
 You can **open the AWS Web Console directly from Leapp**, without having to log in, input your credentials, or select the role to assume.
 
 To do that just *right-click* or *select* the session you want to open in the web console, and click on the <img src="../../images/built-in-features/opening.png" alt="" title=""> icon either in the **context-menu** or in the **bottom-bar** below.

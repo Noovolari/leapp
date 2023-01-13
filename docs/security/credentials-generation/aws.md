@@ -31,9 +31,9 @@ Your role session lasts for the specified duration, or until the time specified 
 
 An IAM Chained Role is used to access another AWS account services through a main session with a trust relationship.
 
-[https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#assumeRole-property](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#assumeRole-property)
+[How to use AWS Javascript SDK to Assume a Role](https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#assumeRole-property)
 
-[https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
+[How to generate temporary credentials on AWS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
 
 **If you do not pass DurationSeconds parameter (as in the case of Leapp), the temporary credentials expire in 1 hour.**
 
@@ -49,7 +49,7 @@ The *GetSessionToken* operation must be called by using the **long-term AWS secu
 
 ## AWS SSO Role
 
-[https://aws.amazon.com/premiumsupport/knowledge-center/sso-temporary-credentials/](https://aws.amazon.com/premiumsupport/knowledge-center/sso-temporary-credentials/)
+[How to generate SSO temporary credentials](https://aws.amazon.com/premiumsupport/knowledge-center/sso-temporary-credentials/)
 
 !!! Info
 

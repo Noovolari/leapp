@@ -5,11 +5,11 @@ Display help for leapp.
 
 * [`leapp help [COMMAND]`](#leapp-help-command)
 
-# `leapp help [COMMAND]`
+## `leapp help [COMMAND]`
 
 Display help for leapp.
 
-```console
+```
 USAGE
   $ leapp help [COMMAND] [-n]
 

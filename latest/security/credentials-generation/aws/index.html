@@ -2317,8 +2317,8 @@ However, you can use the optional <em>DurationSeconds</em> parameter to specify 
 </div>
 <h2 id="iam-chained-role">IAM Chained Role</h2>
 <p>An IAM Chained Role is used to access another AWS account services through a main session with a trust relationship.</p>
-<p><a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#assumeRole-property">https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#assumeRole-property</a></p>
-<p><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html">https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html</a></p>
+<p><a href="https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/STS.html#assumeRole-property">How to use AWS Javascript SDK to Assume a Role</a></p>
+<p><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html">How to generate temporary credentials on AWS</a></p>
 <p><strong>If you do not pass DurationSeconds parameter (as in the case of Leapp), the temporary credentials expire in 1 hour.</strong></p>
 <h2 id="iam-user">IAM User</h2>
 <p>The <em>GetSessionToken</em> operation must be called by using the <strong>long-term AWS security credentials</strong> of the AWS IAM user. Credentials that are created by <strong>IAM users are valid for the duration that you specify</strong>. This duration can range from <strong>900 seconds</strong> (15 minutes) up to a <strong>maximum of 129,600 seconds (36 hours)</strong>, with a <strong>default of 43,200 seconds (12 hours)</strong>. Credentials based on <strong>account credentials</strong> can range <strong>from 900 seconds (15 minutes)</strong> up to <strong>3,600 seconds (1 hour)</strong>, with a default of <strong>1 hour</strong>.</p>
@@ -2328,7 +2328,7 @@ However, you can use the optional <em>DurationSeconds</em> parameter to specify 
 <p>These are the only temporary credentials that are stored in the System vault and not rotated, unless expired.</p>
 </div>
 <h2 id="aws-sso-role">AWS SSO Role</h2>
-<p><a href="https://aws.amazon.com/premiumsupport/knowledge-center/sso-temporary-credentials/">https://aws.amazon.com/premiumsupport/knowledge-center/sso-temporary-credentials/</a></p>
+<p><a href="https://aws.amazon.com/premiumsupport/knowledge-center/sso-temporary-credentials/">How to generate SSO temporary credentials</a></p>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
 <p>The access token is valid for 8 hours as noted in the expiresAt timestamp in the JSON file. Expired tokens must be re-authenticated using the get-role-credentials API call.</p>

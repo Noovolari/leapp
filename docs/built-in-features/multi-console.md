@@ -32,7 +32,7 @@ You can get the extension on the official Mozilla Addons Store and install it fr
 !!! info
     
     Because the extension at the moment relies on Manifest V2, we are unable to upload the extension on the official stores. 
-    For more info see [here](https://developer.chrome.com/docs/extensions/mv3/mv2-sunset/)
+    For more info see [Chrome extension documentation](https://developer.chrome.com/docs/extensions/mv3/mv2-sunset/)
 
 The extension can only be installed manually. To do so, follow these instructions:
 

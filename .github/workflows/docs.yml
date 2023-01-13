@@ -40,8 +40,10 @@ jobs:
           git config --global user.name Alessandro Gaggia
           git config --global user.email alex@besharp.it
           git fetch origin gh-pages --depth=1
-          cd packages && cd cli && npm install
-          npm run --prefix packages/cli prepare-docs
+          cd packages/cli
+          npm install
+          npm run prepare-docs
+          cd ../..
           mike deploy --no-redirect --force --push --update-aliases ${{env.PACKAGE_VERSION}} latest
           mike set-default --push latest
 

@@ -26,6 +26,7 @@ module.exports = {
     fs.writeFileSync("index.md", text);
     console.log("...README.md to index.md: corrected and saved");
 
+    /*
     const filenames = fs.readdirSync("scopes");
     console.log("...scopes/");
     filenames.forEach((filename) => {
@@ -35,7 +36,7 @@ module.exports = {
       fs.writeFileSync("scopes/" + filename, fileData);
     });
     console.log("...conversion completed");
-
+   */
     fs.copyFileSync("index.md", "../../docs/cli/index.md");
     console.log('...Successfully moved index.md in docs/cli');
 

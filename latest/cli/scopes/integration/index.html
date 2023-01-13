@@ -767,6 +767,23 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    
+  
+    Integration
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -782,6 +799,91 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration create
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration delete
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration list
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration login
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration logout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -2109,6 +2211,80 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-create" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration create
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration delete
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration list
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration login
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-logout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration logout
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#leapp-integration-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        leapp integration sync
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -2141,7 +2317,7 @@
 <li><a href="#leapp-integration-logout"><code>leapp integration logout</code></a></li>
 <li><a href="#leapp-integration-sync"><code>leapp integration sync</code></a></li>
 </ul>
-<h1 id="leapp-integration-create"><code>leapp integration create</code></h1>
+<h2 id="leapp-integration-create"><code>leapp integration create</code></h2>
 <p>Create a new integration</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp<span class="w"> </span>integration<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>--integrationAlias<span class="w"> </span>&lt;value&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--integrationPortalUrl<span class="w"> </span>&lt;value&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--integrationRegion<span class="w"> </span>&lt;value&gt;<span class="o">]</span>
@@ -2166,7 +2342,7 @@
 
 <span class="gp">  $</span>leapp<span class="w"> </span>integration<span class="w"> </span>create<span class="w"> </span>--integrationType<span class="w"> </span>AZURE<span class="w"> </span>--integrationAlias<span class="w"> </span>ALIAS<span class="w"> </span>--integrationTenantId<span class="w"> </span>TENANT<span class="w"> </span>--integrationLocation<span class="w"> </span>LOCATION
 </code></pre></div>
-<h1 id="leapp-integration-delete"><code>leapp integration delete</code></h1>
+<h2 id="leapp-integration-delete"><code>leapp integration delete</code></h2>
 <p>Delete an integration</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp<span class="w"> </span>integration<span class="w"> </span>delete<span class="w"> </span><span class="o">[</span>--integrationId<span class="w"> </span>&lt;value&gt;<span class="o">]</span>
@@ -2182,7 +2358,7 @@
 
 <span class="gp">  $</span>leapp<span class="w"> </span>integration<span class="w"> </span>delete<span class="w"> </span>--integrationId<span class="w"> </span>ID
 </code></pre></div>
-<h1 id="leapp-integration-list"><code>leapp integration list</code></h1>
+<h2 id="leapp-integration-list"><code>leapp integration list</code></h2>
 <p>Show integrations list</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp<span class="w"> </span>integration<span class="w"> </span>list<span class="w"> </span><span class="o">[</span>--columns<span class="w"> </span>&lt;value&gt;<span class="w"> </span><span class="p">|</span><span class="w"> </span>-x<span class="o">]</span><span class="w"> </span><span class="o">[</span>--sort<span class="w"> </span>&lt;value&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--filter<span class="w"> </span>&lt;value&gt;<span class="o">]</span><span class="w"> </span><span class="o">[</span>--output<span class="w"> </span>csv<span class="p">|</span>json<span class="p">|</span>yaml<span class="w"> </span><span class="p">|</span><span class="w">  </span><span class="p">|</span>
@@ -2205,7 +2381,7 @@
 <span class="go">EXAMPLES</span>
 <span class="gp">  $</span>leapp<span class="w"> </span>integration<span class="w"> </span>list
 </code></pre></div>
-<h1 id="leapp-integration-login"><code>leapp integration login</code></h1>
+<h2 id="leapp-integration-login"><code>leapp integration login</code></h2>
 <p>Login to synchronize integration sessions</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp<span class="w"> </span>integration<span class="w"> </span>login<span class="w"> </span><span class="o">[</span>--integrationId<span class="w"> </span>&lt;value&gt;<span class="o">]</span>
@@ -2221,7 +2397,7 @@
 
 <span class="gp">  $</span>leapp<span class="w"> </span>integration<span class="w"> </span>login<span class="w"> </span>--integrationId<span class="w"> </span>ID
 </code></pre></div>
-<h1 id="leapp-integration-logout"><code>leapp integration logout</code></h1>
+<h2 id="leapp-integration-logout"><code>leapp integration logout</code></h2>
 <p>Logout from an integration</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp<span class="w"> </span>integration<span class="w"> </span><span class="nb">logout</span><span class="w"> </span><span class="o">[</span>--integrationId<span class="w"> </span>&lt;value&gt;<span class="o">]</span>
@@ -2237,7 +2413,7 @@
 
 <span class="gp">  $</span>leapp<span class="w"> </span>integration<span class="w"> </span><span class="nb">logout</span><span class="w"> </span>--integrationId<span class="w"> </span>ID
 </code></pre></div>
-<h1 id="leapp-integration-sync"><code>leapp integration sync</code></h1>
+<h2 id="leapp-integration-sync"><code>leapp integration sync</code></h2>
 <p>Synchronize integration sessions</p>
 <div class="highlight"><pre><span></span><code><span class="go">USAGE</span>
 <span class="gp">  $ </span>leapp<span class="w"> </span>integration<span class="w"> </span>sync<span class="w"> </span><span class="o">[</span>--integrationId<span class="w"> </span>&lt;value&gt;<span class="o">]</span>

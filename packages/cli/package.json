@@ -11,7 +11,7 @@
   },
   "bugs": "https://github.com/Noovolari/leapp/issues",
   "dependencies": {
-    "@azure/msal-node": "^1.9.0",
+    "@azure/msal-node": "^1.14.6",
     "@babel/plugin-proposal-decorators": "^7.16.5",
     "@noovolari/leapp-core": "file:../core",
     "@oclif/core": "1.6.0",

@@ -27,6 +27,7 @@ jobs:
              git config --global user.name Alessandro Gaggia
              git config --global user.email alex@besharp.it
       - run: git fetch origin gh-pages --depth=1
+      - run: npm run prepare-docs
       - run: mike deploy --no-redirect --force --push --update-aliases ${{env.PACKAGE_VERSION}} latest
       - run: mike set-default --push latest
       - run: curl https://www.google.com/ping?sitemap=https://docs.leapp.cloud/latest/sitemap.xml

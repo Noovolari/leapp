@@ -1,4 +1,3 @@
-const fs = require("fs");
 module.exports = {
   cli: {
     name: 'prepare docs',
@@ -26,17 +25,16 @@ module.exports = {
     fs.writeFileSync("index.md", text);
     console.log("...README.md to index.md: corrected and saved");
 
-    /*
     const filenames = fs.readdirSync("scopes");
     console.log("...scopes/");
     filenames.forEach((filename) => {
       console.log("   |...corrected " + filename);
       let fileData = fs.readFileSync("scopes/" + filename, 'utf-8');
-      fileData = fileData.replace(/```\nUSAGE/g, "```console\nUSAGE").replace(/##/g, "#");
+      fileData = fileData.replace(/```\nUSAGE/g, "```console\nUSAGE");
       fs.writeFileSync("scopes/" + filename, fileData);
     });
     console.log("...conversion completed");
-   */
+
     fs.copyFileSync("index.md", "../../docs/cli/index.md");
     console.log('...Successfully moved index.md in docs/cli');
 

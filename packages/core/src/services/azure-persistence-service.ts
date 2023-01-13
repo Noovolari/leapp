@@ -80,13 +80,13 @@ export class AzurePersistenceService {
 
   async deleteAzureSecrets(integrationId: string): Promise<void> {
     try {
-      await this.keychainService.deletePassword(constants.appName, this.getProfileKeychainKey(integrationId));
+      await this.keychainService.deleteSecret(constants.appName, this.getProfileKeychainKey(integrationId));
     } catch (error) {}
     try {
-      await this.keychainService.deletePassword(constants.appName, this.getAccountKeychainKey(integrationId));
+      await this.keychainService.deleteSecret(constants.appName, this.getAccountKeychainKey(integrationId));
     } catch (error) {}
     try {
-      await this.keychainService.deletePassword(constants.appName, this.getRefreshTokenKeychainKey(integrationId));
+      await this.keychainService.deleteSecret(constants.appName, this.getRefreshTokenKeychainKey(integrationId));
     } catch (error) {}
   }
 

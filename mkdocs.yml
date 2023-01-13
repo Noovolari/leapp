@@ -109,9 +109,7 @@ extra:
       make our documentation better.
 
 markdown_extensions:
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.emoji
   - admonition
   - pymdownx.details
   - pymdownx.highlight
@@ -133,3 +131,11 @@ plugins:
   - git-revision-date
   - mike:
       canonical_version: latest
+  - minify:
+      minify_html: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+      cache_safe: true
+      css_files:
+        - stylesheets/extra.css

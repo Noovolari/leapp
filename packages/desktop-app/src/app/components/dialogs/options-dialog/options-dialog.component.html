@@ -29,14 +29,12 @@
           </div>
         </div>
 
-
+        <h2>Generics</h2>
         <ng-container *ngIf="appService.detectOs() === eOperatingSystem.mac">
-          <h2>MacOS Terminal</h2>
-
           <div class="form-container">
             <div class="form-group">
               <div class="form-field">
-                <label>Terminal</label>
+                <label>MacOS Terminal</label>
                 <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false"
                            [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal"
                            [appendTo]="'body'"></ng-select>
@@ -45,11 +43,10 @@
           </div>
         </ng-container>
 
-        <h2>Color Theme</h2>
         <div class="form-container">
           <div class="form-group">
             <div class="form-field">
-              <label>Color</label>
+              <label>Color Theme</label>
               <ng-select formControlName="colorThemeSelect"
                          bindLabel="colorTheme"
                          bindValue="colorTheme"
@@ -65,12 +62,11 @@
         </div>
 
         <ng-container>
-          <h2>AWS Credential Generation</h2>
           <div class="form-container">
             <div class="form-group">
               <div class="form-field">
                 <label><i class="moon-Help fix-top"
-                          matTooltip="Note: when switching method a backup of your credentials and config files will be created and the original files cleaned."></i>&nbsp;Method</label>
+                          matTooltip="Note: when switching method a backup of your credentials and config files will be created and the original files cleaned."></i>&nbsp;AWS Credential Method</label>
                 <ng-select formControlName="credentialMethodSelect"
                            bindLabel="credentialMethod"
                            bindValue="credentialMethod"

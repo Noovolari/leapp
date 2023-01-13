@@ -1,8 +1,8 @@
 import { JsonCache, SerializedRefreshTokenEntity } from "@azure/msal-node";
 import { INativeService } from "../interfaces/i-native-service";
 import { constants } from "../models/constants";
-import { KeychainService } from "./keychain-service";
 import { SerializedAccountEntity } from "@azure/msal-node/dist/cache/serializer/SerializerTypes";
+import { IKeychainService } from "../interfaces/i-keychain-service";
 
 export interface AzureSubscription {
   id: string;
@@ -33,14 +33,14 @@ export interface AzureSecrets {
 }
 
 export class AzurePersistenceService {
-  constructor(private iNativeService: INativeService, private keychainService: KeychainService) {}
+  constructor(private iNativeService: INativeService, private keychainService: IKeychainService) {}
 
   async loadMsalCache(): Promise<JsonCache> {
     const isWin = this.iNativeService.process.platform === "win32";
     const location = this.getMsalCacheLocation(isWin);
     const data = this.iNativeService.fs.readFileSync(location);
     const finalData = isWin
-      ? this.iNativeService.msalEncryptionService.unprotectData(data, null, DataProtectionScope.currentUser).toString()
+      ? (await this.iNativeService.msalEncryptionService.unprotectData(data, null, DataProtectionScope.currentUser)).toString()
       : data.toString();
     return JSON.parse(finalData.trim());
   }
@@ -50,7 +50,7 @@ export class AzurePersistenceService {
     const isWin = this.iNativeService.process.platform === "win32";
     const location = this.getMsalCacheLocation(isWin);
     const finalData = isWin
-      ? this.iNativeService.msalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.currentUser)
+      ? await this.iNativeService.msalEncryptionService.protectData(Buffer.from(data, "utf-8"), null, DataProtectionScope.currentUser)
       : data;
     this.iNativeService.fs.writeFileSync(location, finalData);
   }

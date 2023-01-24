@@ -117,7 +117,7 @@
 
 <span class=go>EXAMPLES</span>
 <span class=gp>  $</span>leapp<span class=w> </span>session<span class=w> </span>get-id
-</code></pre></div> <h2 id=leapp-session-list><code>leapp session list</code></h2> <p>Show sessions list</p> <div class=highlight><pre><span></span><code><span class=go>USAGE</span>
+</code></pre></div> <h2 id=leapp-session-list><code>leapp session list</code></h2> <p>Show sessions list with all properties; filter query is case sensitive</p> <div class=highlight><pre><span></span><code><span class=go>USAGE</span>
 <span class=gp>  $ </span>leapp<span class=w> </span>session<span class=w> </span>list<span class=w> </span><span class=o>[</span>--columns<span class=w> </span>&lt;value&gt;<span class=w> </span><span class=p>|</span><span class=w> </span>-x<span class=o>]</span><span class=w> </span><span class=o>[</span>--sort<span class=w> </span>&lt;value&gt;<span class=o>]</span><span class=w> </span><span class=o>[</span>--filter<span class=w> </span>&lt;value&gt;<span class=o>]</span><span class=w> </span><span class=o>[</span>--output<span class=w> </span>csv<span class=p>|</span>json<span class=p>|</span>yaml<span class=w> </span><span class=p>|</span><span class=w>  </span><span class=p>|</span>
 <span class=go>    [--csv | --no-truncate]] [--no-header | ]</span>
 
@@ -133,10 +133,22 @@
 <span class=go>  --sort=&lt;value&gt;     property to sort by (prepend &#39;-&#39; for descending)</span>
 
 <span class=go>DESCRIPTION</span>
-<span class=go>  Show sessions list</span>
+<span class=go>  Show sessions list with all properties; filter query is case sensitive</span>
 
 <span class=go>EXAMPLES</span>
 <span class=gp>  $</span>leapp<span class=w> </span>session<span class=w> </span>list
+
+<span class=gp>  $</span>leapp<span class=w> </span>session<span class=w> </span>list<span class=w> </span>--filter<span class=o>=</span><span class=s2>&quot;ID=Foo&quot;</span><span class=w> </span>-x
+
+<span class=gp>  $</span>leapp<span class=w> </span>session<span class=w> </span>list<span class=w> </span>--filter<span class=o>=</span><span class=s2>&quot;Session Name=Foo&quot;</span>
+
+<span class=gp>  $</span>leapp<span class=w> </span>session<span class=w> </span>list<span class=w> </span>--filter<span class=o>=</span><span class=s2>&quot;Type=Foo&quot;</span>
+
+<span class=gp>  $</span>leapp<span class=w> </span>session<span class=w> </span>list<span class=w> </span>--filter<span class=o>=</span><span class=s2>&quot;Named Profile=Foo&quot;</span>
+
+<span class=gp>  $</span>leapp<span class=w> </span>session<span class=w> </span>list<span class=w> </span>--filter<span class=o>=</span><span class=s2>&quot;Region/Location=Foo&quot;</span>
+
+<span class=gp>  $</span>leapp<span class=w> </span>session<span class=w> </span>list<span class=w> </span>--filter<span class=o>=</span><span class=s2>&quot;Status=Foo&quot;</span>
 </code></pre></div> <h2 id=leapp-session-open-web-console><code>leapp session open-web-console</code></h2> <p>Open an AWS Web Console</p> <div class=highlight><pre><span></span><code><span class=go>USAGE</span>
 <span class=gp>  $ </span>leapp<span class=w> </span>session<span class=w> </span>open-web-console<span class=w> </span><span class=o>[</span>--sessionId<span class=w> </span>&lt;value&gt;<span class=o>]</span><span class=w> </span><span class=o>[</span>-p<span class=o>]</span>
 

@@ -21,7 +21,7 @@ Sessions management
 
 Add a new session
 
-```
+```console
 USAGE
   $ leapp session add [--providerType aws] [--accessKey <value>] [--idpArn <value>] [--idpUrl <value>]
     [--mfaDevice <value>] [--sessionName <value>] [--parentSessionId <value>] [--profileId <value>] [--region <value>]
@@ -66,7 +66,7 @@ EXAMPLES
 
 Change a session named-profile
 
-```
+```console
 USAGE
   $ leapp session change-profile [--sessionId <value>] [--profileId <value>]
 
@@ -87,7 +87,7 @@ EXAMPLES
 
 Change a session region
 
-```
+```console
 USAGE
   $ leapp session change-region [--sessionId <value>] [--region <value>]
 
@@ -108,7 +108,7 @@ EXAMPLES
 
 Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile default)
 
-```
+```console
 USAGE
   $ leapp session current [-i] [-p <value>] [-r aws|azure] [-f <value>]
 
@@ -133,7 +133,7 @@ EXAMPLES
 
 Delete a session
 
-```
+```console
 USAGE
   $ leapp session delete [--sessionId <value>] [-f]
 
@@ -156,7 +156,7 @@ EXAMPLES
 
 Generate STS temporary credentials for the given AWS session id
 
-```
+```console
 USAGE
   $ leapp session generate [SESSIONID]
 
@@ -174,7 +174,7 @@ EXAMPLES
 
 Get session id
 
-```
+```console
 USAGE
   $ leapp session get-id
 
@@ -187,9 +187,9 @@ EXAMPLES
 
 ## `leapp session list`
 
-Show sessions list
+Show sessions list with all properties; filter query is case sensitive
 
-```
+```console
 USAGE
   $ leapp session list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
     [--csv | --no-truncate]] [--no-header | ]
@@ -206,17 +206,29 @@ FLAGS
   --sort=<value>     property to sort by (prepend '-' for descending)
 
 DESCRIPTION
-  Show sessions list
+  Show sessions list with all properties; filter query is case sensitive
 
 EXAMPLES
   $leapp session list
+
+  $leapp session list --filter="ID=Foo" -x
+
+  $leapp session list --filter="Session Name=Foo"
+
+  $leapp session list --filter="Type=Foo"
+
+  $leapp session list --filter="Named Profile=Foo"
+
+  $leapp session list --filter="Region/Location=Foo"
+
+  $leapp session list --filter="Status=Foo"
 ```
 
 ## `leapp session open-web-console`
 
 Open an AWS Web Console
 
-```
+```console
 USAGE
   $ leapp session open-web-console [--sessionId <value>] [-p]
 
@@ -237,7 +249,7 @@ EXAMPLES
 
 Run a Leapp Plugin
 
-```
+```console
 USAGE
   $ leapp session run-aws-credential-plugin [--sessionId <value>] [--pluginName <value>]
 
@@ -258,7 +270,7 @@ EXAMPLES
 
 Start a session
 
-```
+```console
 USAGE
   $ leapp session start [--sessionId <value>]
 
@@ -278,7 +290,7 @@ EXAMPLES
 
 Start an AWS SSM session
 
-```
+```console
 USAGE
   $ leapp session start-ssm-session [--sessionId <value>] [--region <value>] [--ssmInstanceId <value>]
 
@@ -300,7 +312,7 @@ EXAMPLES
 
 Stop a session
 
-```
+```console
 USAGE
   $ leapp session stop [--sessionId <value>]
 

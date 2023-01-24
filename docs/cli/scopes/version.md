@@ -5,7 +5,7 @@ Displays the Cli and Core versions
 
 * [`leapp version`](#leapp-version)
 
-# `leapp version`
+## `leapp version`
 
 Displays the Cli and Core versions
 

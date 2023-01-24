@@ -17,7 +17,7 @@ Sessions management
 * [`leapp session start-ssm-session`](#leapp-session-start-ssm-session)
 * [`leapp session stop`](#leapp-session-stop)
 
-# `leapp session add`
+## `leapp session add`
 
 Add a new session
 
@@ -62,7 +62,7 @@ EXAMPLES
   $leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY (--mfaDevice MFADEVICEARN)
 ```
 
-# `leapp session change-profile`
+## `leapp session change-profile`
 
 Change a session named-profile
 
@@ -83,7 +83,7 @@ EXAMPLES
   $leapp session change-profile --profileId PROFILEID --sessionId SESSIONID
 ```
 
-# `leapp session change-region`
+## `leapp session change-region`
 
 Change a session region
 
@@ -104,7 +104,7 @@ EXAMPLES
   $leapp session change-region --sessionId SESSIONID --region REGION
 ```
 
-# `leapp session current`
+## `leapp session current`
 
 Provides info about the current active session for a selected profile (if no profile is provided, it uses the profile default)
 
@@ -129,7 +129,7 @@ EXAMPLES
   $leapp session current --format "alias accountNumber" --inline --provider aws
 ```
 
-# `leapp session delete`
+## `leapp session delete`
 
 Delete a session
 
@@ -152,7 +152,7 @@ EXAMPLES
   $leapp session delete --sessionId SESSIONID [--force, -f]
 ```
 
-# `leapp session generate SESSIONID`
+## `leapp session generate SESSIONID`
 
 Generate STS temporary credentials for the given AWS session id
 
@@ -170,7 +170,7 @@ EXAMPLES
   $leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d
 ```
 
-# `leapp session get-id`
+## `leapp session get-id`
 
 Get session id
 
@@ -185,9 +185,9 @@ EXAMPLES
   $leapp session get-id
 ```
 
-# `leapp session list`
+## `leapp session list`
 
-Show sessions list
+Show sessions list with all properties; filter query is case sensitive
 
 ```console
 USAGE
@@ -206,13 +206,25 @@ FLAGS
   --sort=<value>     property to sort by (prepend '-' for descending)
 
 DESCRIPTION
-  Show sessions list
+  Show sessions list with all properties; filter query is case sensitive
 
 EXAMPLES
   $leapp session list
+
+  $leapp session list --filter="ID=Foo" -x
+
+  $leapp session list --filter="Session Name=Foo"
+
+  $leapp session list --filter="Type=Foo"
+
+  $leapp session list --filter="Named Profile=Foo"
+
+  $leapp session list --filter="Region/Location=Foo"
+
+  $leapp session list --filter="Status=Foo"
 ```
 
-# `leapp session open-web-console`
+## `leapp session open-web-console`
 
 Open an AWS Web Console
 
@@ -233,7 +245,7 @@ EXAMPLES
   $leapp session open-web-console --sessionId SESSIONID [--print, -p]
 ```
 
-# `leapp session run-aws-credential-plugin`
+## `leapp session run-aws-credential-plugin`
 
 Run a Leapp Plugin
 
@@ -254,7 +266,7 @@ EXAMPLES
   $leapp session run-plugin --sessionName SESSIONAME --pluginName PLUGINNAME
 ```
 
-# `leapp session start`
+## `leapp session start`
 
 Start a session
 
@@ -274,7 +286,7 @@ EXAMPLES
   $leapp session start --sessionId SESSIONID
 ```
 
-# `leapp session start-ssm-session`
+## `leapp session start-ssm-session`
 
 Start an AWS SSM session
 
@@ -296,7 +308,7 @@ EXAMPLES
   $leapp session start-ssm-session --sessionId SESSIONID --region AWSREGION --ssmInstanceId EC2INSTANCEID
 ```
 
-# `leapp session stop`
+## `leapp session stop`
 
 Stop a session
 

@@ -10,8 +10,16 @@ import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
 
 export default class ListSessions extends LeappCommand {
-  static description = "Show sessions list";
-  static examples = [`$leapp session list`];
+  static description = "Show sessions list with all properties; filter query is case sensitive";
+  static examples = [
+    `$leapp session list`,
+    `$leapp session list --filter="ID=Foo" -x`,
+    `$leapp session list --filter="Session Name=Foo"`,
+    `$leapp session list --filter="Type=Foo"`,
+    `$leapp session list --filter="Named Profile=Foo"`,
+    `$leapp session list --filter="Region/Location=Foo"`,
+    `$leapp session list --filter="Status=Foo"`,
+  ];
 
   static flags = {
     ...CliUx.ux.table.flags(),

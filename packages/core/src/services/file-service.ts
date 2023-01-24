@@ -1,8 +1,6 @@
 import { Subscription } from "rxjs";
 import { INativeService } from "../interfaces/i-native-service";
 
-// TODO: when core will use tsconfig "moduleResolution": "ES2020",
-//  this require still generates warnings compiling the desktop app
 const cryptoJS = require("crypto-js");
 
 export class FileService {

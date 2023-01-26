@@ -296,12 +296,12 @@ The concept of Integration encapsulates the behaviours described below.
 
 **SAML authentication**
 
-When it comes to start an AWS IAM Role Federated Session, Leapp prompts the user with a login page that is specific to the Identity Provider that is
-federated with an AWS Account. During the login phase, if Leapp notices that the login session is still valid, the login page will not be shown.
+For AWS IAM Role Federated Session, Leapp prompts the user with a login page that is specific to the Identity Provider.
+If the Identity token generated is not expired the login page will not be shown.
 
 This behaviour is implemented in the [AwsIamRoleFederatedService.generateCredentials](https://github.com/Noovolari/leapp/blob/9889c32e5a8a91760789455a1faa8c82355d69e1/packages/core/src/services/session/aws/aws-iam-role-federated-service.ts#L91) method.
 
-Firstly, the AwsIamRoleFederatedService.generateCredentials method verifies if the login page needs to be displayed; this check is performed through the
+AwsIamRoleFederatedService.generateCredentials method verifies if the login page needs to be displayed; this check is performed through the
 [AppAwsAuthenticationService.needAuthentication](https://github.com/Noovolari/leapp/blob/a50630e1f617b6332c2beb7e51fcb0cb5daa4332/packages/desktop-app/src/app/services/app-aws-authentication.service.ts#L26) method.
 
 In particular, the needAuthentication method instantiates a headless Electron BrowserWindow that is responsible for loading the

@@ -63,7 +63,7 @@ theme:
   titles_only: true
   favicon: images/icon.ico
   name: material
-  custom_dir: 'docs_sitemap/'
+  custom_dir: 'docs_extra/'
   features:
     - navigation.instant
     - navigation.indexes

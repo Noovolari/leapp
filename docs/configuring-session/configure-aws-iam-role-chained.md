@@ -1,3 +1,24 @@
+---
+title: ""
+description: ""
+pageType: "session"
+structuredData:
+    howTo:
+        title: ""
+        tip1: ""
+        tip2: ""
+        tip3: ""
+        tip4: ""
+social:
+    title: ""
+    description: ""
+    relativeImagePath: ""
+sitemap:
+    video:
+        title: ""
+        content: ""
+---
+
 An IAM role has some similarities to an IAM user. Roles and users are both AWS identities with permissions policies that determine what the identity can and cannot do in AWS. However, instead of being uniquely associated with one person, a role is intended to be assumable by anyone who needs it.
 
 A role does not have standard long-term credentials such as a password or access keys associated with it. Instead, when you assume a role, it provides you with temporary security credentials for your role session.

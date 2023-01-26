@@ -1,3 +1,24 @@
+---
+title: ""
+description: ""
+pageType: "integration"
+structuredData:
+    howTo:
+        title: ""
+        tip1: ""
+        tip2: ""
+        tip3: ""
+        tip4: ""
+social:
+    title: ""
+    description: ""
+    relativeImagePath: ""
+sitemap:
+    video:
+        title: ""
+        content: ""
+---
+
 AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts.
 
 AWS SSO provides a directory that you can use to create users, organize them in groups, and set permissions across those groups; alternatively, you can obtain them from your Microsoft Active Directory or any standards-based identity provider, such as Okta Universal Directory or Azure AD.

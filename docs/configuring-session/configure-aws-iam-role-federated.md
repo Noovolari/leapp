@@ -1,3 +1,24 @@
+---
+title: ""
+description: ""
+pageType: "session"
+structuredData:
+    howTo:
+        title: ""
+        tip1: ""
+        tip2: ""
+        tip3: ""
+        tip4: ""
+social:
+    title: ""
+    description: ""
+    relativeImagePath: ""
+sitemap:
+    video:
+        title: ""
+        content: ""
+---
+
 AWS Identity and Access Management (IAM) supports identity federation for delegated access to the AWS Management Console or AWS APIs. With identity federation, external identities are granted secure access to resources in your AWS accounts through IAM roles.
 
 These external identities can come from your corporate identity provider (such as Microsoft Active Directory or from the AWS Directory Service) or from a web identity provider (such as Amazon Cognito, Login with Amazon, Facebook, Google, or any OpenID Connect-compatible provider).

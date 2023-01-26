@@ -1,3 +1,24 @@
+---
+title: ""
+description: ""
+pageType: "integration"
+structuredData:
+    howTo:
+        title: ""
+        tip1: ""
+        tip2: ""
+        tip3: ""
+        tip4: ""
+social:
+    title: ""
+    description: ""
+    relativeImagePath: ""
+sitemap:
+    video:
+        title: ""
+        content: ""
+---
+
 Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD.
 
 The tenant is automatically created when your organization signs up for a Microsoft cloud service subscription.

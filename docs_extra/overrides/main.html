@@ -7,7 +7,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="{{ page.meta.social.title }}">
 <meta property="og:description" content="{{ page.meta.social.description }}">
-<meta property="og:image" content="{{ page.meta.social.image }}">
+<meta property="og:image" content="{{ config.site_url }}/images/{{ page.meta.social.relativeImagePath }}">
 
 <!-- Twitter Meta Tags -->
 <meta name="twitter:card" content="summary_large_image">
@@ -15,7 +15,7 @@
 <meta property="twitter:url" content="{{ config.site_url }}/{{ page.url }}">
 <meta name="twitter:title" content="{{ page.meta.social.title }}">
 <meta name="twitter:description" content="{{ page.meta.social.description }}">
-<meta name="twitter:image" content="{{ page.meta.social.image }}">
+<meta name="twitter:image" content="{{ config.site_url }}/images/meta/social/{{ page.meta.social.relativeImagePath }}">
 
 <script type="application/ld+json">
   {

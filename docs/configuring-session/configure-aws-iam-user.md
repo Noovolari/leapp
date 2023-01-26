@@ -1,3 +1,23 @@
+---
+title: ""
+description: ""
+pageType: "session"
+structuredData:
+    howTo:
+        title: ""
+        tip1: ""
+        tip2: ""
+        tip3: ""
+        tip4: ""
+social:
+    title: ""
+    description: ""
+    image: ""
+sitemap:
+    video:
+        title: ""
+        content: ""
+---
 An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS.
 
 An IAM User in AWS consists of a name and a set of long-term credentials. Leapp never sets these values in the configuration files, and automatically generates and refreshes a set of short-term credentials.

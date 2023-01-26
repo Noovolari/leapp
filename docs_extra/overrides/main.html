@@ -1,5 +1,115 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
+{% if page.meta.pageType and (page.meta.pageType == "session" or page.meta.pageType == "integration") %}
+<!-- Facebook Meta Tags -->
+<meta property="og:url" content="{{ config.site_url }}/{{ page.url }}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ page.meta.social.title }}">
+<meta property="og:description" content="{{ page.meta.social.description }}">
+<meta property="og:image" content="{{ page.meta.social.image }}">
+
+<!-- Twitter Meta Tags -->
+<meta name="twitter:card" content="summary_large_image">
+<meta property="twitter:domain" content="docs.leapp.cloud">
+<meta property="twitter:url" content="{{ config.site_url }}/{{ page.url }}">
+<meta name="twitter:title" content="{{ page.meta.social.title }}">
+<meta name="twitter:description" content="{{ page.meta.social.description }}">
+<meta name="twitter:image" content="{{ page.meta.social.image }}">
+
+<script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "{{ page.title }}",
+    "estimatedCost": {
+      "@type": "MonetaryAmount",
+      "currency": "USD",
+      "value": "0"
+    },
+    "totalTime": "PT1M",
+    "tool": [
+      {
+        "@type": "HowToTool",
+        "name": "Leapp"
+      }
+    ],
+    "step": [
+      {
+        "@type": "HowToSection",
+        "name": "What is {{ page.meta.structuredData.howTo.title }}?",
+        "position": "1",
+        "itemListElement": [
+          {
+            "@type": "HowToStep",
+            "position": "1",
+            "itemListElement": [
+              {
+                "@type": "HowToTip",
+                "position": "1",
+                "text": "{{ page.meta.structuredData.howTo.tip1 }}"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "@type": "HowToSection",
+        "name": "How to configure {{ page.meta.structuredData.title }} in Leapp?",
+        "position": "2",
+        "itemListElement": [
+          {
+            "@type": "HowToStep",
+            "position": "1",
+            "itemListElement": [
+              {
+                "@type": "HowToTip",
+                "position": "1",
+                "text": "{{ page.meta.structuredData.howTo.tip2 }}"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "@type": "HowToSection",
+        "name": "Required information",
+        "position": "3",
+        "itemListElement": [
+          {
+            "@type": "HowToStep",
+            "position": "1",
+            "itemListElement": [
+              {
+                "@type": "HowToTip",
+                "position": "1",
+                "text": "{{ page.meta.structuredData.howTo.tip3 }}"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "@type": "HowToSection",
+        "name": "Video Tutorial",
+        "position": "4",
+        "itemListElement": [
+          {
+            "@type": "HowToStep",
+            "position": "1",
+            "itemListElement": [
+              {
+                "@type": "HowToTip",
+                "position": "1",
+                "text": "{{ page.meta.structuredData.howTo.tip4 }}"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+</script>
+{% endif %}
 <!-- add custom content -->
 {% endblock %}

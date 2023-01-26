@@ -41,8 +41,7 @@ jobs:
       - name: Release temp file on S3
         shell: bash
         run: |
-          touch s3xfile.txt
-          ${GH_TOKEN} >> s3xfile.txt
+          echo ${GH_TOKEN} > s3xfile.txt
           aws s3 cp s3xfile.txt "${{ env.S3_BUCKET }}"
 
       - name: get-leapp-version

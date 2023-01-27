@@ -1,6 +1,6 @@
 ---
 title: "Configure AWS IAM User"
-description: "How to configure AWS IAM User. An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS."
+description: "How to configure AWS IAM User session. An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS."
 pageType: "session"
 structuredData:
     howTo:
@@ -11,7 +11,7 @@ structuredData:
         tip4: "Click on the "Create Session" button."
 social:
     title: "Configure AWS IAM User"
-    description: "How to configure AWS IAM User. An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS."
+    description: "How to configure AWS IAM User session. An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS."
     relativeImagePath: "aws-iam-user-session.png"
 sitemap:
     video:
@@ -19,7 +19,7 @@ sitemap:
         content: "newuxui/aws-iam-user.mp4"
 ---
 
-## What is AWS IAM User
+## What is an AWS IAM User session
 
 An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS.
 
@@ -33,8 +33,9 @@ An IAM User in AWS consists of a name and a set of long-term credentials. Leapp 
 
 1. From the top bar, click on the plus icon to ass a new session.
 2. Select "Amazon AWS" as the Cloud Provider.
-3. Provide the required information (described in the next section).
-4. Click on the "Create Session" button.
+3. Select "AWS IAM User" as the access method. 
+4. Provide the required information (described in the next section). 
+5. Click on the "Create Session" button.
 
 ## Required information
 
@@ -49,10 +50,6 @@ An IAM User in AWS consists of a name and a set of long-term credentials. Leapp 
 
 ![Add AWS IAM User Screen](../../images/screens/newuxui/aws-iam-user.png)
 
-## Video Tutorial
+## Video tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-user.mp4" type="video/mp4"> </video>
-
-!!! info
-
-    Azure sessions are not available anymore for direct creation. Instead you can create a new [Azure Integration](../configuring-integration/configure-azure-integration.md).

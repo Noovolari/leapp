@@ -1,27 +1,34 @@
 ---
-title: ""
-description: ""
+title: "Configure AWS IAM Role Federated"
+description: "How to configure an AWS IAM Role Federated session. An AWS IAM Role Federated session represents an access type that relies on a federation between an AWS account and an external Identity Provider."
 pageType: "session"
 structuredData:
     howTo:
-        title: ""
-        tip1: ""
-        tip2: ""
-        tip3: ""
-        tip4: ""
+        title: "Configure AWS IAM Role Federated"
+        tip1: "From the top bar, click on the plus icon to ass a new session."
+        tip2: "Select "Amazon AWS" as the Cloud Provider."
+        tip3: "Select "AWS IAM Role Federated" as the access method."
+        tip4: "Provide the required information (described in the next section)."
+        tip5: "Click on the "Create Session" button."
 social:
-    title: ""
-    description: ""
-    relativeImagePath: ""
+    title: "Configure AWS IAM Role Federated"
+    description: "How to configure an AWS IAM Role Federated session. An AWS IAM Role Federated session represents an access type that relies on a federation between an AWS account and an external Identity Provider."
+    relativeImagePath: "aws-iam-role-federated-session.png"
 sitemap:
     video:
-        title: ""
-        content: ""
+        title: "Configure AWS IAM Role Federated"
+        content: "newuxui/aws-iam-federated.mp4"
 ---
 
-AWS Identity and Access Management (IAM) supports identity federation for delegated access to the AWS Management Console or AWS APIs. With identity federation, external identities are granted secure access to resources in your AWS accounts through IAM roles.
+## What is an AWS IAM Role Federated session
 
-These external identities can come from your corporate identity provider (such as Microsoft Active Directory or from the AWS Directory Service) or from a web identity provider (such as Amazon Cognito, Login with Amazon, Facebook, Google, or any OpenID Connect-compatible provider).
+An AWS IAM Role Federated session represents an access type that relies on a federation between an AWS account and an external Identity Provider.  
+
+AWS Identity and Access Management (IAM) supports identity federation for delegated access to the AWS Management Console or AWS APIs. 
+With identity federation, external identities are granted secure access to resources in your AWS accounts through IAM roles.
+
+These external identities can come from your corporate identity provider (such as Microsoft Active Directory or from the AWS Directory Service) 
+or from a web identity provider (such as Amazon Cognito, Login with Amazon, Facebook, Google, or any OpenID Connect-compatible provider).
 
 We currently only support SAML 2.0 federation.
 
@@ -29,7 +36,7 @@ We currently only support SAML 2.0 federation.
     - Refer to [this guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_saml.html) to provision your own federated roles.
     - Refer to [this guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_create_saml.html) to configure and trust your SAML 2.0 Identity Provider.
 
-## Supported SAML Identity Providers
+### Supported SAML Identity Providers
 
 | Identity Provider          | AWS                                  | Azure                               |
 | -------------------------- | ------------------------------------ | ------------------------------------|
@@ -39,7 +46,15 @@ We currently only support SAML 2.0 federation.
 | `AZURE AD`                 | :white_check_mark:                   | :white_check_mark:                  |
 | `AUTH0`                    | :white_check_mark:                   | :x:                                 |
 
-## Fields
+## How to configure an AWS IAM Role Federated in Leapp
+
+1. From the top bar, click on the plus icon to ass a new session.
+2. Select "Amazon AWS" as the Cloud Provider.
+3. Select "AWS IAM Role Federated" as the access method.
+4. Provide the required information (described in the next section).
+5. Click on the "Create Session" button.
+
+## Required information
 
 | Field                      | Description                                                                                                              |
 |----------------------------|--------------------------------------------------------------------------------------------------------------------------|
@@ -51,10 +66,7 @@ We currently only support SAML 2.0 federation.
 | `ROLE ARN`                 | Your IAM Role unique ID. The active Session will refer to this Role.                                     |
 
 ![](../../images/screens/newuxui/aws-iam-role-federated.png?style=center-img "Add AWS IAM Role Federated Screen")
+
 ## Video tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-federated.mp4" type="video/mp4"> </video>
-
-!!! info
-
-    Azure sessions are not available anymore for direct creation. Instead you can create a new [Azure Integration](../configuring-integration/configure-azure-integration.md).

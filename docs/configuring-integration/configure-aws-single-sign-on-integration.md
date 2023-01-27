@@ -39,6 +39,6 @@ After logging in the first time, Leapp will map all your roles and users into Se
 
 ![](../../images/screens/newuxui/aws-sso.png?style=center-img 'Add AWS SSO Screen')
 
-## Video Tutorial
+## Video tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-sso.mp4" type="video/mp4"> </video>

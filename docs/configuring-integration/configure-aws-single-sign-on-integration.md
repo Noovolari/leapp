@@ -1,23 +1,25 @@
 ---
-title: ""
-description: ""
+title: "Configure an AWS Single Sign-On integration"
+description: "AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts."
 pageType: "integration"
 structuredData:
     howTo:
-        title: ""
-        tip1: ""
-        tip2: ""
-        tip3: ""
-        tip4: ""
+        title: "Configure an AWS Single Sign-On integration"
+        tip1: "Click on the _Add integration_ button in the sidebar"
+        tip2: "Select AWS Single Sign-On as _Integration type_"
+        tip3: "Provide the required information (described in the next section)"
+        tip4: "Click on the _Add integration_ button"
 social:
-    title: ""
-    description: ""
-    relativeImagePath: ""
+    title: "Configure an AWS Single Sign-On integration"
+    description: "AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts."
+    relativeImagePath: "aws-single-sign-on-integration.png"
 sitemap:
     video:
-        title: ""
-        content: ""
+        title: "Configure an AWS Single Sign-On integration"
+        content: "newuxui/aws-sso.mp4"
 ---
+
+## What is AWS Single Sign-On
 
 AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts.
 
@@ -29,13 +31,20 @@ After logging in the first time, Leapp will map all your roles and users into Se
 
     To get started using AWS SSO refer to [this guide](https://docs.aws.amazon.com/singlesignon/latest/userguide/getting-started.html){: target='_blank'}.
 
-## Fields
+## How to configure an AWS Single Sign-On integration in Leapp
 
-| Field               | Description                                                                                                                                                    |
-| --------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-|  `INTEGRATION TYPE` | Set as *AWS Single Sign-on*                                                                                                                                    |
-| `AWS SSO URL`       | **The portal URL to begin the authentication flow.** It usually follows this pattern: `d-xxxxxxxxxx.awsapps.com/start`.                                        |
-| `REGION`            | **The region on which AWS SSO is administered and configured.** This is NOT where your generated credentials will be valid, it's only used for the login part. |
+1. "Click on the _Add integration_ button in the sidebar"
+2. "Select AWS Single Sign-On as _Integration type_"
+3. "Provide the required information (described in the next section)"
+4. "Click on the _Add integration_ button"
+
+## Required information
+
+| Field              | Description                                                                                                                                                    |
+| -------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `INTEGRATION TYPE` | Set as *AWS Single Sign-on*                                                                                                                                    |
+| `AWS SSO URL`      | **The portal URL to begin the authentication flow.** It usually follows this pattern: `d-xxxxxxxxxx.awsapps.com/start`.                                        |
+| `REGION`           | **The region on which AWS SSO is administered and configured.** This is NOT where your generated credentials will be valid, it's only used for the login part. |
 
 ![](../../images/screens/newuxui/aws-sso.png?style=center-img 'Add AWS SSO Screen')
 

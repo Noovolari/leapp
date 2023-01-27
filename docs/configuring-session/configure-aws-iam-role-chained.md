@@ -1,23 +1,18 @@
 ---
 title: "Configure AWS IAM Role Chained"
 description: "How to configure an AWS IAM Role Chained session. An AWS IAM Role Chained session represents an AWS role chaining access. Role chaining is the process of assuming a role starting from another IAM role or user."
-pageType: "session"
-structuredData:
-    howTo:
-        title: "Configure AWS IAM Role Chained"
-        tip1: "From the top bar, click on the plus icon to ass a new session."
-        tip2: "Select "Amazon AWS" as the Cloud Provider."
-        tip3: "Select "AWS IAM Role Chained" as the access method."
-        tip4: "Provide the required information (described in the next section)."
-        tip5: "Click on the "Create Session" button."
-social:
-    title: "Configure AWS IAM Role Chained"
-    description: "How to configure an AWS IAM Role Chained session. An AWS IAM Role Chained session represents an AWS role chaining access. Role chaining is the process of assuming a role starting from another IAM role or user."
-    relativeImagePath: "aws-iam-role-chained-session.png"
-sitemap:
-    video:
-        title: "Configure AWS IAM Role Chained"
-        content: "newuxui/aws-iam-chained.mp4"
+page_type: "session"
+structured_data_how_to_title: "Configure AWS IAM Role Chained"
+structured_data_how_to_tip1: "From the top bar, click on the plus icon to ass a new session."
+structured_data_how_to_tip2: "Select Amazon AWS as the Cloud Provider."
+structured_data_how_to_tip3: "Select "AWS IAM Role Chained" as the access method."
+structured_data_how_to_tip4: "Provide the required information (described in the next section)."
+structured_data_how_to_tip5: "Click on the Create Session button."
+social_title: "Configure AWS IAM Role Chained"
+social_description: "How to configure an AWS IAM Role Chained session. An AWS IAM Role Chained session represents an AWS role chaining access. Role chaining is the process of assuming a role starting from another IAM role or user."
+social_relative_image_path: "aws-iam-role-chained-session.png"
+sitemap_video_title: "Configure AWS IAM Role Chained"
+sitemap_video_content: "newuxui/aws-iam-chained.mp4"
 ---
 
 ## What is an AWS IAM Role Chained session

@@ -2,21 +2,16 @@
 title: "Configure an AWS Single Sign-On integration"
 description: "AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts."
 pageType: "integration"
-structuredData:
-    howTo:
-        title: "Configure an AWS Single Sign-On integration"
-        tip1: "Click on the _Add integration_ button in the sidebar"
-        tip2: "Select AWS Single Sign-On as _Integration type_"
-        tip3: "Provide the required information (described in the next section)"
-        tip4: "Click on the _Add integration_ button"
-social:
-    title: "Configure an AWS Single Sign-On integration"
-    description: "AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts."
-    relativeImagePath: "aws-single-sign-on-integration.png"
-sitemap:
-    video:
-        title: "Configure an AWS Single Sign-On integration"
-        content: "newuxui/aws-sso.mp4"
+structured_data_how_to_title: "Configure an AWS Single Sign-On integration"
+structured_data_how_to_tip1: "Click on the _Add integration_ button in the sidebar"
+structured_data_how_to_tip2: "Select AWS Single Sign-On as _Integration type_"
+structured_data_how_to_tip3: "Provide the required information (described in the next section)"
+structured_data_how_to_tip4: "Click on the _Add integration_ button"
+social_title: "Configure an AWS Single Sign-On integration"
+social_description: "AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts."
+social_relative_image_path: "aws-single-sign-on-integration.png"
+sitemap_video_title: "Configure an AWS Single Sign-On integration"
+sitemap_video_content: "newuxui/aws-sso.mp4"
 ---
 
 ## What is AWS Single Sign-On

@@ -1,23 +1,28 @@
 ---
-title: ""
-description: ""
+title: "Configure AWS IAM Role Chained"
+description: "How to configure an AWS IAM Role Chained session. An AWS IAM Role Chained session represents an AWS role chaining access. Role chaining is the process of assuming a role starting from another IAM role or user."
 pageType: "session"
 structuredData:
     howTo:
-        title: ""
-        tip1: ""
-        tip2: ""
-        tip3: ""
-        tip4: ""
+        title: "Configure AWS IAM Role Chained"
+        tip1: "From the top bar, click on the plus icon to ass a new session."
+        tip2: "Select "Amazon AWS" as the Cloud Provider."
+        tip3: "Select "AWS IAM Role Chained" as the access method."
+        tip4: "Provide the required information (described in the next section)."
+        tip5: "Click on the "Create Session" button."
 social:
-    title: ""
-    description: ""
-    relativeImagePath: ""
+    title: "Configure AWS IAM Role Chained"
+    description: "How to configure an AWS IAM Role Chained session. An AWS IAM Role Chained session represents an AWS role chaining access. Role chaining is the process of assuming a role starting from another IAM role or user."
+    relativeImagePath: "aws-iam-role-chained-session.png"
 sitemap:
     video:
-        title: ""
-        content: ""
+        title: "Configure AWS IAM Role Chained"
+        content: "newuxui/aws-iam-chained.mp4"
 ---
+
+## What is an AWS IAM Role Chained session
+
+An AWS IAM Role Chained session represents an AWS role chaining access. Role chaining is the process of assuming a role starting from another IAM role or user.
 
 An IAM role has some similarities to an IAM user. Roles and users are both AWS identities with permissions policies that determine what the identity can and cannot do in AWS. However, instead of being uniquely associated with one person, a role is intended to be assumable by anyone who needs it.
 
@@ -28,7 +33,15 @@ Role chaining occurs when you use a role to assume a second role through the AWS
 !!! Info
     Refer to [this guide](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_create_for-idp_saml.html){: target='_blank'} to delegate access across AWS accounts using IAM Roles chaining.
 
-## Fields
+## How to configure an AWS IAM Role Chained in Leapp
+
+1. From the top bar, click on the plus icon to ass a new session.
+2. Select "Amazon AWS" as the Cloud Provider.
+3. Select "AWS IAM Role Chained" as the access method.
+4. Provide the required information (described in the next section).
+5. Click on the "Create Session" button.
+
+## Required information
 
 | Field               | Description                          |
 |---------------------| ------------------------------------ |
@@ -40,10 +53,7 @@ Role chaining occurs when you use a role to assume a second role through the AWS
 | `ASSUMER SESSION`   | Your session from which this Role will be assumed. The `assume-role` call will be automatically made by Leapp. |
 
 ![](../../images/screens/newuxui/aws-iam-role-chained.png?style=center-img "Add AWS IAM Role Chained Screen")
-## Video Tutorial
+
+## Video tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-iam-chained.mp4" type="video/mp4"> </video>
-
-!!! info
-
-    Azure sessions are not available anymore for direct creation. Instead you can create a new [Azure Integration](../configuring-integration/configure-azure-integration.md){: target='_blank'}.

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
-{% if page and page.meta.page_type and (page.meta.page_type == "session" or page.meta.page_type == "integration") %}
+{% if page and page.meta.page_type and (page.meta.page_type == "session" or page.meta.page_type == "integration" or page.meta.page_type == "built-in") %}
 <!-- Facebook Meta Tags -->
 <meta property="og:url" content="{{ config.site_url }}/{{ page.url }}">
 <meta property="og:type" content="website">

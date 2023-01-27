@@ -1,9 +1,25 @@
+---
+title: "Configure Multi Console"
+description: "How to configure Multi Console. The Leapp Multi-Console Browser Extension allows you to open **multiple instances of the AWS Web Console in the same browser window** and helps you in managing them."
+page_type: "built-in"
+structured_data_how_to_title: "Configure Multi Console"
+structured_data_how_to_tip1: "Install the extension for Chrome-based Browser or Firefox."
+structured_data_how_to_tip2: "Enable the Multi Console in the option panel of Leapp."
+structured_data_how_to_tip3: "Right-click on a session you want to open in the AWS Web Console."
+structured_data_how_to_tip4: "Click on Open Web Console."
+social_title: "Configure Named Profiles"
+social_description: "How to configure Multi Console. The Leapp Multi-Console Browser Extension allows you to open **multiple instances of the AWS Web Console in the same browser window** and helps you in managing them."
+social_relative_image_path: "configure-multi-console.png"
+---
+
+## What is Multi Console
+
 The Leapp Multi-Console Browser Extension allows you to open **multiple instances of 
 the AWS Web Console in the same browser window** and helps you in managing them.
 
 <div class="button-container">
-  <a href="https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/" class="md-button md-button--primary installation-button">Get it on Firefox<i></i></a>
-  <a href="https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-latest.zip" class="md-button md-button--primary installation-button">Get it on Chrome</a>
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/" class="md-button md-button--primary installation-button">Get it on Firefox ⇩<i></i></a>
+  <a href="https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-latest.zip" class="md-button md-button--primary installation-button">Get it on Chrome ⇩</a>
 </div>
 
 ### List of Supported Browsers
@@ -16,18 +32,20 @@ the AWS Web Console in the same browser window** and helps you in managing them.
 | Brave                      | :white_check_mark:
 | Safari                     | :x:
 
-## Install the Extension
+## How to Configure Multi Console in Leapp
 
-### Firefox
+### Install the Extension
+
+#### Firefox
 
 You can get the extension on the official Mozilla Addons Store and install it from there:
 
 1. Visit the page by clicking the button below
 2. Then Click on Add to Firefox
 
-[Get it on Firefox :fontawesome-solid-download:](https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/){ .md-button .md-button--primary }
+[Get it on Firefox ⇩](https://addons.mozilla.org/en-US/firefox/addon/leapp-multi-console-extension/){ .md-button .md-button--primary }
 
-### Chrome, Edge and other Chromium based browsers
+#### Chrome, Edge and other Chromium based browsers
 
 !!! info
     
@@ -43,17 +61,17 @@ The extension can only be installed manually. To do so, follow these instruction
 5. Then click on **Load unpacked** in the top left corner
 6. Finally, Select the folder extracted previously
 
-[Get it on Chrome/Others :fontawesome-solid-download:](https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-latest.zip){ .md-button .md-button--primary }
+[Get it on Chrome/Others ⇩](https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-latest.zip){ .md-button .md-button--primary }
 
-## Uninstall the Extension
+### Uninstall the Extension
 
-### Firefox
+#### Firefox
 
 1. Visit `about:addons`
 2. Select Leapp Browser Extension and click on the 3 dots
 3. Click on Remove
 
-### Chrome, Edge and other Chromium based browsers
+#### Chrome, Edge and other Chromium based browsers
 
 1. Visit `about://extensions`
 2. Search for Leapp Browser Extension and click on Remove
@@ -70,7 +88,7 @@ The extension can only be installed manually. To do so, follow these instruction
     </div>
 
 
-## How to use it
+### How to use it
 
 Once you installed the extension on your browser, you need to enable the Multi-Console Extension on the Leapp Desktop App in order to use it.
 

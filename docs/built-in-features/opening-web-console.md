@@ -1,4 +1,22 @@
-## How to open AWS Console from Leapp
+---
+title: "Configure Open Web Console"
+description: "How to configure Open Web Console. You can **open the AWS Web Console directly from Leapp**, without having to log in, input your credentials, or select the role to assume."
+page_type: "built-in"
+structured_data_how_to_title: "Configure Open Web Console"
+structured_data_how_to_tip1: "Open the General Option menu."
+structured_data_how_to_tip2: "In the Multi-Console tab, check that Multi-Console extension is diabled."
+structured_data_how_to_tip3: "Right-click on a session you want to open in the AWS Web Console."
+structured_data_how_to_tip4: "Click on Open Web Console."
+social_title: "Configure Open Web Console"
+social_description: "How to configure Open Web Console. You can **open the AWS Web Console directly from Leapp**, without having to log in, input your credentials, or select the role to assume."
+social_relative_image_path: "configure-open-web-console.png"
+---
+
+## What is Open Web Console
+
+Open Web Console is a Leapp feature that allows you to open the AWS Web Console of a session that you've created in Leapp. 
+
+## How to Configure Open Web Console in Leapp
 
 You can **open the AWS Web Console directly from Leapp**, without having to log in, input your credentials, or select the role to assume.
 

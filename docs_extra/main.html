@@ -1,21 +1,21 @@
 {% extends "base.html" %}
 
 {% block extrahead %}
-{% if page.meta.pageType and (page.meta.pageType == "session" or page.meta.pageType == "integration") %}
+{% if page and page.meta.page_type and (page.meta.page_type == "session" or page.meta.page_type == "integration") %}
 <!-- Facebook Meta Tags -->
 <meta property="og:url" content="{{ config.site_url }}/{{ page.url }}">
 <meta property="og:type" content="website">
-<meta property="og:title" content="{{ page.meta.social.title }}">
-<meta property="og:description" content="{{ page.meta.social.description }}">
-<meta property="og:image" content="{{ config.site_url }}/images/{{ page.meta.social.relativeImagePath }}">
+<meta property="og:title" content="{{ page.meta.social_title }}">
+<meta property="og:description" content="{{ page.meta.social_description }}">
+<meta property="og:image" content="{{ config.site_url }}/images/{{ page.meta.social_relative_image_path }}">
 
 <!-- Twitter Meta Tags -->
 <meta name="twitter:card" content="summary_large_image">
 <meta property="twitter:domain" content="docs.leapp.cloud">
 <meta property="twitter:url" content="{{ config.site_url }}/{{ page.url }}">
-<meta name="twitter:title" content="{{ page.meta.social.title }}">
-<meta name="twitter:description" content="{{ page.meta.social.description }}">
-<meta name="twitter:image" content="{{ config.site_url }}/images/meta/social/{{ page.meta.social.relativeImagePath }}">
+<meta name="twitter:title" content="{{ page.meta.social_title }}">
+<meta name="twitter:description" content="{{ page.meta.social_description }}">
+<meta name="twitter:image" content="{{ config.site_url }}/images/meta/social/{{ page.meta.social_relative_image_path }}">
 
 <script type="application/ld+json">
   {
@@ -37,7 +37,7 @@
     "step": [
       {
         "@type": "HowToSection",
-        "name": "What is {{ page.meta.structuredData.howTo.title }}?",
+        "name": "What is {{ page.meta.structured_data_how_to_title }}?",
         "position": "1",
         "itemListElement": [
           {
@@ -47,7 +47,7 @@
               {
                 "@type": "HowToTip",
                 "position": "1",
-                "text": "{{ page.meta.structuredData.howTo.tip1 }}"
+                "text": "{{ page.meta.structured_data_how_to_tip1 }}"
               }
             ]
           }
@@ -55,7 +55,7 @@
       },
       {
         "@type": "HowToSection",
-        "name": "How to configure {{ page.meta.structuredData.title }} in Leapp?",
+        "name": "How to configure {{ page.meta.structured_data_title }} in Leapp?",
         "position": "2",
         "itemListElement": [
           {
@@ -65,7 +65,7 @@
               {
                 "@type": "HowToTip",
                 "position": "1",
-                "text": "{{ page.meta.structuredData.howTo.tip2 }}"
+                "text": "{{ page.meta.structured_data_how_to_tip2 }}"
               }
             ]
           }
@@ -83,7 +83,7 @@
               {
                 "@type": "HowToTip",
                 "position": "1",
-                "text": "{{ page.meta.structuredData.howTo.tip3 }}"
+                "text": "{{ page.meta.structured_data_how_to_tip3 }}"
               }
             ]
           }
@@ -101,7 +101,7 @@
               {
                 "@type": "HowToTip",
                 "position": "1",
-                "text": "{{ page.meta.structuredData.howTo.tip4 }}"
+                "text": "{{ page.meta.structured_data_how_to_tip4 }}"
               }
             ]
           }

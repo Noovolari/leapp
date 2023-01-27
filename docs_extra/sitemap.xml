@@ -2,22 +2,22 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
 {% for page in nav.pages %}
   {% if not page.meta.sitemap or (page.meta.sitemap and page.meta.sitemap.exclude != "yes") %}
-    <url>
-      <loc>{{ config.site_url }}/{{ page.url }}</loc>
-      <lastmod>{{ page.meta.revision_date }}</lastmod>
-      <changefreq>daily</changefreq>
-      {% if not page.meta.sitemap or not page.meta.sitemap.priority %}
-      <priority>0.9</priority>
-      {% else %}
-      <priority>{{ page.meta.sitemap.priority }}</priority>
-      {% endif %}
-      {% if page.meta.sitemap and page.meta.sitemap.video.title and page.meta.sitemap.video.content %}
-      <video:video>
-        <video:title>{{ page.meta.sitemap.video.title }}</video:title>
-        <video:content_loc>{{ config.site_url }}/videos/{{ page.meta.sitemap.video.content }}</video:content_loc>
-      </video:video>
-      {% endif %}
-    </url>
+  <url>
+    <loc>{{ config.site_url }}/{{ page.url }}</loc>
+    <lastmod>{{ page.meta.revision_date }}</lastmod>
+    <changefreq>daily</changefreq>
+    {% if not page.meta.sitemap or not page.meta.sitemap.priority %}
+    <priority>0.9</priority>
+    {% else %}
+    <priority>{{ page.meta.sitemap.priority }}</priority>
+    {% endif %}
+    {% if page.meta.sitemap and page.meta.sitemap.video.title and page.meta.sitemap.video.content %}
+    <video:video>
+      <video:title>{{ page.meta.sitemap.video.title }}</video:title>
+      <video:content_loc>{{ config.site_url }}/videos/{{ page.meta.sitemap.video.content }}</video:content_loc>
+    </video:video>
+    {% endif %}
+  </url>
   {% endif %}
 {% endfor %}
 </urlset>

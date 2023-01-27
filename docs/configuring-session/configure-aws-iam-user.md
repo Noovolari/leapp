@@ -1,22 +1,17 @@
 ---
 title: "Configure AWS IAM User"
 description: "How to configure AWS IAM User session. An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS."
-pageType: "session"
-structuredData:
-    howTo:
-        title: "Configure AWS IAM User"
-        tip1: "From the top bar, click on the plus icon to ass a new session."
-        tip2: "Select "Amazon AWS" as the Cloud Provider."
-        tip3: "Provide the required information (described in the next section)."
-        tip4: "Click on the "Create Session" button."
-social:
-    title: "Configure AWS IAM User"
-    description: "How to configure AWS IAM User session. An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS."
-    relativeImagePath: "aws-iam-user-session.png"
-sitemap:
-    video:
-        title: "Configure AWS IAM User"
-        content: "newuxui/aws-iam-user.mp4"
+page_type: "session"
+structured_data_how_to_title: "Configure AWS IAM User"
+structured_data_how_to_tip1: "From the top bar, click on the plus icon to ass a new session."
+structured_data_how_to_tip2: "Select Amazon AWS as the Cloud Provider."
+structured_data_how_to_tip3: "Provide the required information (described in the next section)."
+structured_data_how_to_tip4: "Click on the Create Session button."
+social_title: "Configure AWS IAM User"
+social_description: "How to configure AWS IAM User session. An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS."
+social_relative_image_path: "aws-iam-user-session.png"
+sitemap_video_title: "Configure AWS IAM User"
+sitemap_video_content: "newuxui/aws-iam-user.mp4"
 ---
 
 ## What is an AWS IAM User session

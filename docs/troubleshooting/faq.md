@@ -39,3 +39,15 @@ Examples:
 ln -s /path/to/my/aws /usr/local/bin/aws
 ln -s /path/to/my/az /usr/local/bin/az
 ```
+
+## How can I add support to a new SAML 2.0 Identity Provider?
+
+To add support tu a new SAML 2.0 Identity Provider, you have to perform the following steps:
+
+* create a [Fork](https://github.com/Noovolari/leapp/fork) of the Noovolari/leapp GitHub repository;
+* create a Pull Request and set up your local environment following _[Install dependencies and build packages](https://github.com/Noovolari/leapp/blob/master/DEVELOPMENT.md#development-environment-setup)_ section of the DEVELOPMENT.md;
+* add the Identity Provider-specific authentication URL RegEx filter to the Leapp Core [authenticationUrlRegexes](https://github.com/Noovolari/leapp/blob/beadb073ea99eb71cdf56982851604172bfdba0a/packages/core/src/services/aws-saml-assertion-extraction-service.ts) Map;
+* follow the last part of the _[Install dependencies and build packages](https://github.com/Noovolari/leapp/blob/master/DEVELOPMENT.md#development-environment-setup)_ section of the DEVELOPMENT.md to build the solution for both the CLI and the Desktop App;
+* push your changes to your forked repository and propose to merge them to the main repository. 
+
+If you need more details about the implementation, please check the _How to add a new SAML IdP preset authentication URL_ section of the [DEVELOPMENT.md](https://github.com/Noovolari/leapp/blob/master/DEVELOPMENT.md).

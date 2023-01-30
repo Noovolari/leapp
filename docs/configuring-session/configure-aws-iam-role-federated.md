@@ -33,13 +33,17 @@ We currently only support SAML 2.0 federation.
 
 ### Supported SAML Identity Providers
 
-| Identity Provider          | AWS                                  | Azure                               |
-| -------------------------- | ------------------------------------ | ------------------------------------|
-| `GSUITE`                   | :white_check_mark:                   | :x:                                 |
-| `OKTA`                     | :white_check_mark:                   | :x:                                 |
-| `ONELOGIN`                 | :white_check_mark:                   | :x:                                 |
-| `AZURE AD`                 | :white_check_mark:                   | :white_check_mark:                  |
-| `AUTH0`                    | :white_check_mark:                   | :x:                                 |
+| Identity Provider | AWS                                 | Azure              |
+|-------------------| ----------------------------------- |--------------------|
+| `GSUITE`          | :white_check_mark:                  | :x:                |
+| `OKTA`            | :white_check_mark:                  | :x:                |
+| `ONELOGIN`        | :white_check_mark:                  | :x:                |
+| `AZURE AD`        | :white_check_mark:                  | :white_check_mark: |
+| `AUTH0`           | :white_check_mark:                  | :x:                |
+| `KEYCLOAK`        | :white_check_mark:                  | :x:                |
+
+!!! Info
+    Is your SAML 2.0 Identity Provider not included in the above list? Please, refer to the [FAQ](/troubleshooting/faq/#how-can-i-add-support-to-a-new-saml-20-identity-provider) to add a new one.
 
 ## How to configure an AWS IAM Role Federated in Leapp
 

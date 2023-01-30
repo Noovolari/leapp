@@ -42,6 +42,8 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
       // Our request filter call the generic hook filter passing the idp response type
       // to construct the ideal method to deal with the construction of the response
       idpWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+        console.log("Intercepted HTTP redirect call:", details.url);
+
         if (this.leappCoreService.authenticationService.isAuthenticationUrl(CloudProviderType.aws, details.url)) {
           clearTimeout(timeout);
           idpWindow = null;

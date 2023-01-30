@@ -1,3 +1,26 @@
+---
+title: "Configure an Azure integration"
+description: "Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD."
+pageType: "integration"
+structuredData:
+    howTo:
+        title: "Configure an Azure integration"
+        tip1: "Click on the _Add integration_ button in the sidebar"
+        tip2: "Select Azure as _Integration type_"
+        tip3: "Provide the required information (described in the next section)"
+        tip4: "Click on the _Add integration_ button"
+social:
+    title: "Configure an Azure integration"
+    description: "Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD."
+    relativeImagePath: "azure.png"
+sitemap:
+    video:
+        title: "Configure an Azure integration"
+        content: "newuxui/azure-integration.mp4"
+---
+
+## What is an Azure integration
+
 Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD.
 
 The tenant is automatically created when your organization signs up for a Microsoft cloud service subscription.
@@ -17,7 +40,14 @@ A new modal will be presented with the following option to compile. After submit
 and have logged into your *Azure Portal*, 
 *Subscriptions* will be automatically retrieved and mapped into Leapp Azure Sessions.
 
-## Fields
+## How to configure an Azure integration in Leapp
+
+1. "Click on the _Add integration_ button in the sidebar"
+2. "Select Azure as _Integration type_"
+3. "Provide the required information (described in the next section)"
+4. "Click on the _Add integration_ button"
+
+## Required information
 
 | Field              | Description                                                                                                                                                                                                                                                                                        |
 |--------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -28,7 +58,11 @@ and have logged into your *Azure Portal*,
 
 
 ![](../../images/screens/newuxui/azure-tenant.png?style=center-img "Add Azure Integration Screen")
-## Video Tutorial
+
+## Video tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/azure-integration.mp4" type="video/mp4"> </video>
 
+!!! info
+
+    Azure sessions are not available anymore for direct creation. Instead you can create a new [Azure Integration](../configuring-integration/configure-azure-integration.md).

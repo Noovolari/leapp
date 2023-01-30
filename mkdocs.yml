@@ -65,7 +65,6 @@ theme:
   name: material
   custom_dir: 'docs_extra/'
   features:
-    - navigation.instant
     - navigation.indexes
     - navigation.top
     - navigation.footer

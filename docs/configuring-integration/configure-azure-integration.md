@@ -2,21 +2,16 @@
 title: "Configure an Azure integration"
 description: "Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD."
 pageType: "integration"
-structuredData:
-    howTo:
-        title: "Configure an Azure integration"
-        tip1: "Click on the _Add integration_ button in the sidebar"
-        tip2: "Select Azure as _Integration type_"
-        tip3: "Provide the required information (described in the next section)"
-        tip4: "Click on the _Add integration_ button"
-social:
-    title: "Configure an Azure integration"
-    description: "Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD."
-    relativeImagePath: "azure.png"
-sitemap:
-    video:
-        title: "Configure an Azure integration"
-        content: "newuxui/azure-integration.mp4"
+structured_data_how_to_title: "Configure an Azure integration"
+structured_data_how_to_tip1: "Click on the _Add integration_ button in the sidebar"
+structured_data_how_to_tip2: "Select Azure as _Integration type_"
+structured_data_how_to_tip3: "Provide the required information (described in the next section)"
+structured_data_how_to_tip4: "Click on the _Add integration_ button"
+social_title: "Configure an Azure integration"
+social_description: "Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD."
+social_relative_image_path: "azure.png"
+sitemap_video_title: "Configure an Azure integration"
+sitemap_video_content: "newuxui/azure-integration.mp4"
 ---
 
 ## What is an Azure integration

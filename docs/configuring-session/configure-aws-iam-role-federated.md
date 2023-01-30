@@ -1,23 +1,18 @@
 ---
 title: "Configure AWS IAM Role Federated"
 description: "How to configure an AWS IAM Role Federated session. An AWS IAM Role Federated session represents an access type that relies on a federation between an AWS account and an external Identity Provider."
-pageType: "session"
-structuredData:
-    howTo:
-        title: "Configure AWS IAM Role Federated"
-        tip1: "From the top bar, click on the plus icon to ass a new session."
-        tip2: "Select "Amazon AWS" as the Cloud Provider."
-        tip3: "Select "AWS IAM Role Federated" as the access method."
-        tip4: "Provide the required information (described in the next section)."
-        tip5: "Click on the "Create Session" button."
-social:
-    title: "Configure AWS IAM Role Federated"
-    description: "How to configure an AWS IAM Role Federated session. An AWS IAM Role Federated session represents an access type that relies on a federation between an AWS account and an external Identity Provider."
-    relativeImagePath: "aws-iam-role-federated-session.png"
-sitemap:
-    video:
-        title: "Configure AWS IAM Role Federated"
-        content: "newuxui/aws-iam-federated.mp4"
+page_type: "session"
+structured_data_how_to_title: "Configure AWS IAM Role Federated"
+structured_data_how_to_tip1: "From the top bar, click on the plus icon to ass a new session."
+structured_data_how_to_tip2: "Select Amazon AWS as the Cloud Provider."
+structured_data_how_to_tip3: "Select "AWS IAM Role Federated" as the access method."
+structured_data_how_to_tip4: "Provide the required information (described in the next section)."
+structured_data_how_to_tip5: "Click on the Create Session button."
+social_title: "Configure AWS IAM Role Federated"
+social_description: "How to configure an AWS IAM Role Federated session. An AWS IAM Role Federated session represents an access type that relies on a federation between an AWS account and an external Identity Provider."
+social_relative_image_path: "aws-iam-role-federated-session.png"
+sitemap_video_title: "Configure AWS IAM Role Federated"
+sitemap_video_content: "newuxui/aws-iam-federated.mp4"
 ---
 
 ## What is an AWS IAM Role Federated session

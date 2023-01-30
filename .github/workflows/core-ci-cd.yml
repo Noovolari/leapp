@@ -62,16 +62,19 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 1
           ref: master
 
       - name: Check Tag Validity
         id: validator
         run: |
           git fetch
+          echo GITHUB_SHA: $GITHUB_SHA
           TAG=$(git tag --points-at $GITHUB_SHA)
+          echo TAG: $TAG
           MATCH=$(echo "$TAG" | grep "^core-v[0-9]\+\.[0-9]\+\.[0-9]\+$" || true)
+          echo MATCH: $MATCH
           if [[ $MATCH != "" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
+          echo IS_VALID_TAG: $IS_VALID_TAG
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
 
       - name: If valid tag set

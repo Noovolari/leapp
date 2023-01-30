@@ -10,13 +10,17 @@ We currently only support SAML 2.0 federation.
 
 ## Supported SAML Identity Providers
 
-| Identity Provider          | AWS                                  | Azure                               |
-| -------------------------- | ------------------------------------ | ------------------------------------|
-| `GSUITE`                   | :white_check_mark:                   | :x:                                 |
-| `OKTA`                     | :white_check_mark:                   | :x:                                 |
-| `ONELOGIN`                 | :white_check_mark:                   | :x:                                 |
-| `AZURE AD`                 | :white_check_mark:                   | :white_check_mark:                  |
-| `AUTH0`                    | :white_check_mark:                   | :x:                                 |
+| Identity Provider | AWS                                 | Azure              |
+|-------------------| ----------------------------------- |--------------------|
+| `GSUITE`          | :white_check_mark:                  | :x:                |
+| `OKTA`            | :white_check_mark:                  | :x:                |
+| `ONELOGIN`        | :white_check_mark:                  | :x:                |
+| `AZURE AD`        | :white_check_mark:                  | :white_check_mark: |
+| `AUTH0`           | :white_check_mark:                  | :x:                |
+| `KEYCLOAK`        | :white_check_mark:                  | :x:                |
+
+!!! Info
+    If you want to add support to a new SAML Identity Provider, please refer to the [FAQ](https://docs.leapp.cloud/latest/troubleshooting/faq#how-can-i-add-support-to-a-new-saml-identity-provider).
 
 ## Fields
 

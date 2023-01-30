@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.2](https://github.com/Noovolari/leapp/compare/v0.17.1...v0.17.2) (2023-01-30)
+
+### Features
+* added support for the ap-southeast-4 region [#386](https://github.com/Noovolari/leapp/issues/386)
+* added examples for the Leapp CLI list --filter option. They will be available in docs.leapp.cloud, under the CLI section.
+* updated crypto-js to 4.1.1
+
 ### [0.17.1](https://github.com/Noovolari/leapp/compare/v0.17.0...v0.17.1) (2023-01-10)
 
 ### Features

@@ -69,8 +69,7 @@ jobs:
         id: validator
         run: |
           git fetch
-          COMMIT_HASH=$(git log --format="%H" -n 1)
-          TAG=$(git tag --contains $COMMIT_HASH)
+          TAG=$(git tag --points-at $GITHUB_SHA)
           MATCH=$(echo "$TAG" | grep "^core-v[0-9]\+\.[0-9]\+\.[0-9]\+$" || true)
           if [[ $MATCH != "" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
@@ -90,24 +89,32 @@ jobs:
     runs-on: ubuntu-latest
     if: needs.check_for_release.outputs.to-release == 1
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - name: Bootstrap
-        run: |
-          npm install
-          cd packages/core
-          npm install
-      - name: Build
-        run: |
-          cd packages/core
-          npm run build
-      - name: Release npm
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cd packages/core
-          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-          npm run release
+      - name: Release
+        run: echo Release triggered successfully!
 
+#  release:
+#    needs: check_for_release
+#    runs-on: ubuntu-latest
+#    if: needs.check_for_release.outputs.to-release == 1
+#    steps:
+#      - uses: actions/checkout@v3
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 16
+#      - name: Bootstrap
+#        run: |
+#          npm install
+#          cd packages/core
+#          npm install
+#      - name: Build
+#        run: |
+#          cd packages/core
+#          npm run build
+#      - name: Release npm
+#        env:
+#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+#        run: |
+#          cd packages/core
+#          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+#          npm run release
+#

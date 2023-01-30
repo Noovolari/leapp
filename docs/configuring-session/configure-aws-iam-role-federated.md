@@ -20,7 +20,7 @@ We currently only support SAML 2.0 federation.
 | `KEYCLOAK`        | :white_check_mark:                  | :x:                |
 
 !!! Info
-    If you want to add support to a new SAML Identity Provider, please refer to the [FAQ](https://docs.leapp.cloud/latest/troubleshooting/faq#how-can-i-add-support-to-a-new-saml-identity-provider).
+    Is your SAML 2.0 Identity Provider not included in the above list? Please, refer to the [FAQ](/troubleshooting/faq/#how-can-i-add-support-to-a-new-saml-20-identity-provider) to add a new one.
 
 ## Fields
 

@@ -51,4 +51,4 @@ To add support tu a new SAML 2.0 Identity Provider, you have to perform the foll
 * follow the last part of the '[Install dependencies and build packages](https://github.com/Noovolari/leapp/blob/master/DEVELOPMENT.md#development-environment-setup)' section of the DEVELOPMENT.md to build the solution for both the CLI and the Desktop App;
 * push your changes to your forked repository and propose to merge them to the main repository. 
 
-If you need more details about the implementation, please check [this DEVELOPMENT.md section]().
+If you need more details about the implementation, please check the 'How to add a new SAML IdP preset authentication URL' section of the [DEVELOPMENT.md](https://github.com/Noovolari/leapp/blob/master/DEVELOPMENT.md).

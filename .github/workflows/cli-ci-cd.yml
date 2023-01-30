@@ -80,44 +80,37 @@ jobs:
         if: steps.validator.outputs.VALID_TAG != 1
         run: |
           echo "Invalid Tag - Not releasing"
+
   release:
     needs: check_for_release
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     if: needs.check_for_release.outputs.to-release == 1
     steps:
-      - name: Release
-        run: echo Release triggered successfully!
-
-#  release:
-#    needs: check_for_release
-#    runs-on: macos-latest
-#    if: needs.check_for_release.outputs.to-release == 1
-#    steps:
-#      - uses: actions/checkout@v3
-#      - uses: actions/setup-node@v3
-#        with:
-#          node-version: 16
-#      - name: Bootstrap
-#        run: |
-#          npm run bootstrap
-#      - name: Build CLI
-#        run: |
-#          cd packages/cli
-#          npm run prepack
-#      - name: Release npm
-#        env:
-#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-#        run: |
-#          cd packages/cli
-#          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-#          npm run release-npm
-#      - name: Release Homebrew
-#        env:
-#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#          GIT_PUSH_TOKEN: ${{ secrets.GIT_PUSH_TOKEN }}
-#        run: |
-#          git config --global user.name "Noovolari Bot"
-#          git config --global user.email "info@noovolari.com"
-#          cd packages/cli
-#          npm run release-homebrew
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Bootstrap
+        run: |
+          npm run bootstrap
+      - name: Build CLI
+        run: |
+          cd packages/cli
+          npm run prepack
+      - name: Release npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          cd packages/cli
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+          npm run release-npm
+      - name: Release Homebrew
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          GIT_PUSH_TOKEN: ${{ secrets.GIT_PUSH_TOKEN }}
+        run: |
+          git config --global user.name "Noovolari Bot"
+          git config --global user.email "info@noovolari.com"
+          cd packages/cli
+          npm run release-homebrew

@@ -43,7 +43,7 @@ We currently only support SAML 2.0 federation.
 | `KEYCLOAK`        | :white_check_mark:                  | :x:                |
 
 !!! Info
-    Is your SAML 2.0 Identity Provider not included in the above list? Please, refer to the [FAQ](/troubleshooting/faq/#how-can-i-add-support-to-a-new-saml-20-identity-provider) to add a new one.
+    Is your SAML 2.0 Identity Provider not included in the above list? Please, refer to the [FAQ](/latest/troubleshooting/faq/#how-can-i-add-support-to-a-new-saml-20-identity-provider) to add a new one.
 
 ## How to configure an AWS IAM Role Federated in Leapp
 

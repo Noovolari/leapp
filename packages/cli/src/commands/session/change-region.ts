@@ -20,20 +20,22 @@ export default class ChangeSessionRegion extends LeappCommand {
   async run(): Promise<void> {
     try {
       const { flags } = await this.parse(ChangeSessionRegion);
-      if (this.validateFlags(flags)) {
-        const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(`${flags.sessionId}`);
-        const selectedRegion = this.cliProviderService.awsCoreService.getRegions().find((r) => r.region === flags.region);
-        if (!selectedSession) {
-          throw new Error("Session not found with id " + flags.sessionId);
-        }
-        if (!selectedRegion) {
-          throw new Error("Region not found with name " + flags.region);
-        }
-        await this.changeSessionRegion(selectedSession, `${flags.region}`);
-      } else {
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
         const selectedSession = await this.selectSession();
         const selectedRegion = await this.selectRegion(selectedSession);
         await this.changeSessionRegion(selectedSession, selectedRegion);
+      } else {
+        if (this.validateFlags(flags)) {
+          const selectedSession = this.cliProviderService.sessionManagementService.getSessionById(`${flags.sessionId}`);
+          const selectedRegion = this.cliProviderService.awsCoreService.getRegions().find((r) => r.region === flags.region);
+          if (!selectedSession) {
+            throw new Error("No session with id " + flags.sessionId + " found");
+          }
+          if (!selectedRegion) {
+            throw new Error("No region with name " + flags.region + " found");
+          }
+          await this.changeSessionRegion(selectedSession, `${flags.region}`);
+        }
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
@@ -70,6 +72,7 @@ export default class ChangeSessionRegion extends LeappCommand {
 
   async changeSessionRegion(session: Session, newRegion: string): Promise<void> {
     try {
+      this.unsupportedAzureSession(session);
       await this.cliProviderService.regionsService.changeRegion(session, newRegion);
       this.log("session region changed");
     } finally {
@@ -77,7 +80,16 @@ export default class ChangeSessionRegion extends LeappCommand {
     }
   }
 
-  private validateFlags(flags: any) {
-    return flags.region && flags.sessionId && flags.region !== "" && flags.sessionId !== "";
+  private validateFlags(flags: any): boolean {
+    if (flags.sessionId === undefined || flags.region === undefined) {
+      throw new Error("flags --sessionId and --region must all be specified");
+    }
+    if (flags.sessionId === "") {
+      throw new Error("Session Id must not be empty");
+    }
+    if (flags.region === "") {
+      throw new Error("Region must not be empty");
+    }
+    return true;
   }
 }

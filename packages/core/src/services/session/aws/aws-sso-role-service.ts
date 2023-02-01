@@ -6,7 +6,6 @@ import { AwsSsoRoleSession } from "../../../models/aws/aws-sso-role-session";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
-import { KeychainService } from "../../keychain-service";
 import { Repository } from "../../repository";
 
 import { AwsSessionService } from "./aws-session-service";
@@ -16,6 +15,9 @@ import { IAwsIntegrationDelegate } from "../../../interfaces/i-aws-integration-d
 import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
 import * as AWS from "aws-sdk";
+import { IKeychainService } from "../../../interfaces/i-keychain-service";
+import { LoggedException, LogLevel } from "../../log-service";
+import { CreateSessionRequest } from "../create-session-request";
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -67,7 +69,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     protected sessionNotifier: IBehaviouralNotifier,
     protected repository: Repository,
     fileService: FileService,
-    private keyChainService: KeychainService,
+    private keyChainService: IKeychainService,
     awsCoreService: AwsCoreService,
     private nativeService: INativeService,
     private awsSsoOidcService: AwsSsoOidcService
@@ -79,12 +81,9 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   static sessionTokenFromGetSessionTokenResponse(getRoleCredentialResponse: SSO.GetRoleCredentialsResponse): { sessionToken: any } {
     return {
       sessionToken: {
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        aws_access_key_id: getRoleCredentialResponse.roleCredentials.accessKeyId.trim(),
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        aws_secret_access_key: getRoleCredentialResponse.roleCredentials.secretAccessKey.trim(),
-        // eslint-disable-next-line @typescript-eslint/naming-convention
-        aws_session_token: getRoleCredentialResponse.roleCredentials.sessionToken.trim(),
+        ["aws_access_key_id"]: getRoleCredentialResponse.roleCredentials.accessKeyId.trim(),
+        ["aws_secret_access_key"]: getRoleCredentialResponse.roleCredentials.secretAccessKey.trim(),
+        ["aws_session_token"]: getRoleCredentialResponse.roleCredentials.sessionToken.trim(),
       },
     };
   }
@@ -116,17 +115,18 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }
 
+  update(_: string, __: CreateSessionRequest): Promise<void> {
+    throw new LoggedException(`Update is not supported for AWS SSO Role Session Type`, this, LogLevel.error, false);
+  }
+
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsSsoRoleSession).profileId);
     const credentialObject = {};
     credentialObject[profileName] = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      aws_access_key_id: credentialsInfo.sessionToken.aws_access_key_id,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      aws_secret_access_key: credentialsInfo.sessionToken.aws_secret_access_key,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      aws_session_token: credentialsInfo.sessionToken.aws_session_token,
+      ["aws_access_key_id"]: credentialsInfo.sessionToken.aws_access_key_id,
+      ["aws_secret_access_key"]: credentialsInfo.sessionToken.aws_secret_access_key,
+      ["aws_session_token"]: credentialsInfo.sessionToken.aws_session_token,
       region: session.region,
     };
     return await this.fileService.iniWriteSync(this.awsCoreService.awsCredentialPath(), credentialObject);
@@ -151,18 +151,21 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     const portalUrl = awsSsoConfiguration.portalUrl;
     const roleArn = session.roleArn;
 
-    const accessToken = await this.awsIntegrationDelegate.getAccessToken(session.awsSsoConfigurationId, region, portalUrl);
-    const credentials = await this.awsIntegrationDelegate.getRoleCredentials(accessToken, region, roleArn);
+    let accessToken = await this.awsIntegrationDelegate.getAccessToken(session.awsSsoConfigurationId, region, portalUrl);
+    let credentials;
+
+    try {
+      credentials = await this.awsIntegrationDelegate.getRoleCredentials(accessToken, region, roleArn);
+    } catch (err) {
+      accessToken = await this.awsIntegrationDelegate.getAccessToken(session.awsSsoConfigurationId, region, portalUrl, true);
+      credentials = await this.awsIntegrationDelegate.getRoleCredentials(accessToken, region, roleArn);
+    }
 
     const awsCredentials: AWS.STS.Credentials = {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      AccessKeyId: credentials.roleCredentials.accessKeyId,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      SecretAccessKey: credentials.roleCredentials.secretAccessKey,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      SessionToken: credentials.roleCredentials.sessionToken,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      Expiration: new Date(credentials.roleCredentials.expiration),
+      ["AccessKeyId"]: credentials.roleCredentials.accessKeyId,
+      ["SecretAccessKey"]: credentials.roleCredentials.secretAccessKey,
+      ["SessionToken"]: credentials.roleCredentials.sessionToken,
+      ["Expiration"]: new Date(credentials.roleCredentials.expiration),
     };
 
     // Save session token expiration
@@ -196,6 +199,10 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
   }
 
   removeSecrets(_: string): void {}
+
+  async getCloneRequest(session: AwsSsoRoleSession): Promise<AwsSsoRoleSessionRequest> {
+    throw new LoggedException(`Clone is not supported for sessionType ${session.type}`, this, LogLevel.error, false);
+  }
 
   private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
     const sessions = this.repository.getSessions();

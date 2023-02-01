@@ -25,6 +25,15 @@ describe("AwsSamlAssertionExtractionService", () => {
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://login.microsoftonline.com")).toBe(false);
 
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml")).toBe(false);
+
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://tenant-name.us.auth0.com/samlp/client-id")).toBe(true);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://tenant-name.us.auth0.com")).toBe(false);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://tenant-name.us.auth0.com/samlp/")).toBe(false);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://.auth0.com/samlp/")).toBe(false);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://auth0.com/samlp/")).toBe(false);
+
+    /* Tests for keycloak Identity Providers */
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX/auth/realms/XX/protocol/saml/clients/XX")).toBe(true);
   });
 
   test("isSamlAssertionUrl", () => {
@@ -38,6 +47,16 @@ describe("AwsSamlAssertionExtractionService", () => {
   test("extractAwsSamlResponse", () => {
     const responseHookDetails = {
       uploadData: [{ bytes: "SAMLResponse=ABCDEFGHIJKLMNOPQRSTUVWXYZ&RelayState=abcdefghijklmnopqrstuvwxyz" }],
+    };
+
+    const service = new AwsSamlAssertionExtractionService();
+    const awsSamlResponse = service.extractAwsSamlResponse(responseHookDetails as any);
+    expect(awsSamlResponse).toBe("ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+  });
+
+  test("extractAwsSamlResponse - 2", () => {
+    const responseHookDetails = {
+      uploadData: [{ bytes: "SAMLResponse=ABCDEFGHIJKLMNOPQRSTUVWXYZ" }],
     };
 
     const service = new AwsSamlAssertionExtractionService();

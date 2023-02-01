@@ -1,8 +1,9 @@
+import { describe, test, expect } from "@jest/globals";
 import { AwsIamRoleChainedSession } from "./aws-iam-role-chained-session";
 import { SessionType } from "../session-type";
 
 describe("AWS IAM Role Chained Session Model", () => {
-  it("should create with a role session name", () => {
+  test("should create with a role session name", () => {
     const sessionName = "fake-chained-session";
     const region = "fake-region";
     const roleArn = "fake-role-arn";
@@ -21,7 +22,7 @@ describe("AWS IAM Role Chained Session Model", () => {
     expect(mockedChainedSession.roleSessionName).toEqual(roleSessionName);
   });
 
-  it("should create without a role session name", () => {
+  test("should create without a role session name", () => {
     const mockedChainedSession = new AwsIamRoleChainedSession(null, null, null, null, null);
     expect(mockedChainedSession).toBeInstanceOf(AwsIamRoleChainedSession);
     expect(mockedChainedSession.roleSessionName).toEqual(`assumed-from-leapp`);

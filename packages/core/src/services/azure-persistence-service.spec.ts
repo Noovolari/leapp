@@ -1,15 +1,13 @@
 import { expect, describe, test, jest } from "@jest/globals";
 import { AzurePersistenceService, DataProtectionScope } from "./azure-persistence-service";
-import * as os from "os";
 import * as fs from "fs";
 import * as zlib from "zlib";
-import * as process from "process";
 import * as path from "path";
 import { constants } from "../models/constants";
 
 describe("MsalPersistenceService", () => {
   const keyChainService = {
-    deletePassword: jest.fn(async () => Promise.resolve(true)),
+    deleteSecret: jest.fn(async () => Promise.resolve(true)),
     getSecret: jest.fn(async () => Promise.resolve("")),
     saveSecret: jest.fn(async () => {}),
   };
@@ -83,11 +81,20 @@ describe("MsalPersistenceService", () => {
     "}";
 
   const customTestPath = "test.file";
+  const os = { homedir: () => "" };
 
   test("load normally", async () => {
     fs.writeFileSync(customTestPath, mockedMsal);
 
-    const iNativeService: any = { os, fs, process, path };
+    const process = { platform: "win32" };
+    const msalEncryptionService = {
+      unprotectData: jest.fn(async (data, optionalEntropy, scope) => {
+        expect(optionalEntropy).toBe(null);
+        expect(scope).toBe(DataProtectionScope.currentUser);
+        return data.toString();
+      }),
+    };
+    const iNativeService: any = { os, fs, process, path, msalEncryptionService };
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
 
     (service as any).getMsalCacheLocation = () => customTestPath;
@@ -96,6 +103,7 @@ describe("MsalPersistenceService", () => {
 
     expect(parsedData).not.toBeNull();
     expect(parsedData.AccessToken["mocked-2"].secret).toBe("LZqJh_3rhnsCvqLNyZHOb5TH1x5v302XuwMg27w2nSQv_3Agx_5655Vk---feCdMjjAQrXug");
+    expect(msalEncryptionService.unprotectData).toHaveBeenCalled();
 
     fs.unlinkSync(customTestPath);
   });
@@ -106,14 +114,14 @@ describe("MsalPersistenceService", () => {
     const decompressedFile = zlib.inflateRawSync(compressedFileBuffer).toString("utf8");
 
     const msalEncryptionService = {
-      protectData: jest.fn(() => fs.writeFileSync(customTestPath, compressedFile)),
-      unprotectData: jest.fn(() => decompressedFile),
+      protectData: jest.fn(async () => fs.writeFileSync(customTestPath, compressedFile)),
+      unprotectData: jest.fn(async () => decompressedFile),
     };
-    msalEncryptionService.protectData();
+    await msalEncryptionService.protectData();
 
     const myfs = {
       readFileSync: jest.fn((p: string) => {
-        expect(p.indexOf(".azure/msal_token_cache.bin")).toBeGreaterThan(-1);
+        expect(p).toMatch(/\.azure[/\\]msal_token_cache\.bin/);
         return compressedFile;
       }),
     };
@@ -131,14 +139,14 @@ describe("MsalPersistenceService", () => {
 
   test("load - mimic other system", async () => {
     const msalEncryptionService = {
-      protectData: jest.fn(() => {}),
-      unprotectData: jest.fn(() => {}),
+      protectData: jest.fn(async () => {}),
+      unprotectData: jest.fn(async () => {}),
     };
-    msalEncryptionService.protectData();
+    await msalEncryptionService.protectData();
 
     const myfs = {
       readFileSync: jest.fn((p: string) => {
-        expect(p.indexOf(".azure/msal_token_cache.json")).toBeGreaterThan(-1);
+        expect(p).toMatch(/\.azure[/\\]msal_token_cache\.json/);
         return mockedMsal;
       }),
     };
@@ -153,12 +161,14 @@ describe("MsalPersistenceService", () => {
 
   test("load - mimic windows - check extension", async () => {
     const msalEncryptionService = {
-      protectData: jest.fn(() => {}),
-      unprotectData: jest.fn(() => "{}"),
+      protectData: jest.fn(async () => {}),
+      unprotectData: jest.fn(async () => "{}"),
     };
-    msalEncryptionService.protectData();
+    await msalEncryptionService.protectData();
     const mockedFs = {
-      readFileSync: jest.fn(() => {}),
+      readFileSync: jest.fn((p) => {
+        expect(p).toMatch(/\.azure[/\\]msal_token_cache\.bin/);
+      }),
     };
 
     const iNativeService: any = { os, fs: mockedFs, process: { platform: "win32" }, path, msalEncryptionService };
@@ -166,17 +176,57 @@ describe("MsalPersistenceService", () => {
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
     await service.loadMsalCache();
 
-    expect(mockedFs.readFileSync).toHaveBeenCalledWith(path.join(os.homedir(), `.azure/msal_token_cache.bin`));
+    expect(mockedFs.readFileSync).toHaveBeenCalled();
   });
 
-  test("save", async () => {
+  test("saveMsalCache", async () => {
     fs.writeFileSync(customTestPath, mockedMsal);
 
+    const process = { platform: "win32" };
+    const msalEncryptionService = {
+      unprotectData: jest.fn((data) => data.toString()),
+      protectData: jest.fn((data, optionalEntropy, scope) => {
+        expect(optionalEntropy).toBe(null);
+        expect(scope).toBe(DataProtectionScope.currentUser);
+        return data;
+      }),
+    };
     const iNativeService: any = {
       os,
       fs,
       process,
       path,
+      msalEncryptionService,
+    };
+    const service = new AzurePersistenceService(iNativeService, keyChainService as any);
+    (service as any).getMsalCacheLocation = () => customTestPath;
+    const parsedData = await service.loadMsalCache();
+    parsedData["RefreshToken"] = {};
+    await service.saveMsalCache(parsedData);
+    const newParsedData = await service.loadMsalCache();
+    expect(newParsedData).toEqual(parsedData);
+
+    fs.unlinkSync(customTestPath);
+  });
+
+  test("saveMsalCache - 2", async () => {
+    fs.writeFileSync(customTestPath, mockedMsal);
+
+    const process = { platform: "darwin" };
+    const msalEncryptionService = {
+      unprotectData: jest.fn((data) => data.toString()),
+      protectData: jest.fn((data, optionalEntropy, scope) => {
+        expect(optionalEntropy).toBe(null);
+        expect(scope).toBe(DataProtectionScope.currentUser);
+        return data;
+      }),
+    };
+    const iNativeService: any = {
+      os,
+      fs,
+      process,
+      path,
+      msalEncryptionService,
     };
     const service = new AzurePersistenceService(iNativeService, keyChainService as any);
     (service as any).getMsalCacheLocation = () => customTestPath;
@@ -198,7 +248,6 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os: { homedir: jest.fn(() => "a/") },
       fs: mockedFs,
-      process,
       path: { join: jest.fn((_s1: string, _s2: string) => path.join(_s1, _s2)) },
     };
     const service = new AzurePersistenceService(iNativeService, null);
@@ -221,7 +270,7 @@ describe("MsalPersistenceService", () => {
     let resultData;
     const mockedFs = {
       writeFileSync: jest.fn((location, data) => {
-        expect(location).toStrictEqual("a/.azure/azureProfile.json");
+        expect(location).toMatch(/a[/\\]\.azure[/\\]azureProfile\.json/);
         expect(data).toStrictEqual(JSON.stringify(mockedProfile, null, 4));
         resultData = data;
       }),
@@ -230,8 +279,13 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os: { homedir: jest.fn(() => "a/") },
       fs: mockedFs,
-      process,
-      path: { join: jest.fn((_s1: string, _s2: string) => path.join(_s1, _s2)) },
+      path: {
+        join: jest.fn((_s1: string, _s2: string) => {
+          expect(_s1).toMatch(/a[/\\]/);
+          expect(_s2).toMatch(/\.azure[/\\]azureProfile\.json/);
+          return path.join(_s1, _s2);
+        }),
+      },
     };
     const service = new AzurePersistenceService(iNativeService, null);
     const load = (service as any).getProfileLocation;
@@ -240,7 +294,7 @@ describe("MsalPersistenceService", () => {
       load.apply(service);
 
       expect(iNativeService.os.homedir).toHaveBeenCalled();
-      expect(iNativeService.path.join).toHaveBeenCalledWith("a/", ".azure/azureProfile.json");
+      expect(iNativeService.path.join).toHaveBeenCalled();
       return path.join(iNativeService.os.homedir(), ".azure/azureProfile.json");
     });
 
@@ -251,7 +305,7 @@ describe("MsalPersistenceService", () => {
   test("getAzureSecrets", async () => {
     const intId = "fake-integration-id";
     const mockedKeyChain = {
-      deletePassword: jest.fn(async () => Promise.resolve(true)),
+      deleteSecret: jest.fn(async () => Promise.resolve(true)),
       getSecret: jest.fn(async (_, str: string): Promise<string> => {
         let value;
         if (str.indexOf(`azure-integration-profile-${intId}`) > -1) {
@@ -277,7 +331,6 @@ describe("MsalPersistenceService", () => {
     const iNativeService: any = {
       os,
       fs,
-      process,
       path,
     };
 
@@ -314,20 +367,20 @@ describe("MsalPersistenceService", () => {
 
   test("deleteAzureSecrets", async () => {
     const kcService = {
-      deletePassword: jest.fn(),
+      deleteSecret: jest.fn(),
     } as any;
 
     const service = new AzurePersistenceService(null, kcService);
     await service.deleteAzureSecrets("fakeIntegrationId");
 
-    expect(kcService.deletePassword).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeIntegrationId");
-    expect(kcService.deletePassword).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeIntegrationId");
-    expect(kcService.deletePassword).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeIntegrationId");
+    expect(kcService.deleteSecret).toHaveBeenNthCalledWith(1, constants.appName, "azure-integration-profile-fakeIntegrationId");
+    expect(kcService.deleteSecret).toHaveBeenNthCalledWith(2, constants.appName, "azure-integration-account-fakeIntegrationId");
+    expect(kcService.deleteSecret).toHaveBeenNthCalledWith(3, constants.appName, "azure-integration-refresh-token-fakeIntegrationId");
   });
 
-  test("deleteAzureSecrets, deletePassword throws an exception", async () => {
+  test("deleteAzureSecrets, deleteSecret throws an exception", async () => {
     const kcService = {
-      deletePassword: jest.fn(async () => {
+      deleteSecret: jest.fn(async () => {
         throw new Error("Error message");
       }),
     } as any;

@@ -1,7 +1,6 @@
 import { CloudProviderService } from "@noovolari/leapp-core/services/cloud-provider-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
-import { KeychainService } from "@noovolari/leapp-core/services/keychain-service";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { LogService } from "@noovolari/leapp-core/services/log-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
@@ -25,12 +24,10 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
 import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
-import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 import CliInquirer from "inquirer";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { CliOpenWebConsoleService } from "./cli-open-web-console-service";
 import { WebConsoleService } from "@noovolari/leapp-core/services/web-console-service";
-import fetch from "node-fetch";
 import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { CliRpcAwsSsoOidcVerificationWindowService } from "./cli-rpc-aws-sso-oidc-verification-window-service";
@@ -41,8 +38,15 @@ import { SessionManagementService } from "@noovolari/leapp-core/services/session
 import { SegmentService } from "@noovolari/leapp-core/services/segment-service";
 import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
 import { CliNativeLoggerService } from "./cli-native-logger-service";
-import { WebSyncService } from "@noovolari/leapp-core/services/web-sync-service";
 import { AzurePersistenceService } from "@noovolari/leapp-core/services/azure-persistence-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
+import { EnvironmentType, PluginEnvironment } from "@noovolari/leapp-core/plugin-sdk/plugin-environment";
+import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
+import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
+import { CliRpcKeychainService } from "./cli-rpc-keychain-service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
+import axios from "axios";
+import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -63,13 +67,13 @@ export class CliProviderService {
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
   private fileServiceInstance: FileService;
+  private workspaceConsistencyServiceInstance: WorkspaceConsistencyService;
   private repositoryInstance: Repository;
   private regionsServiceInstance: RegionsService;
   private namedProfilesServiceInstance: NamedProfilesService;
   private idpUrlsServiceInstance: IdpUrlsService;
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
-  private azureIntegrationServiceInstance: AzureIntegrationService;
-  private keyChainServiceInstance: KeychainService;
+  private keyChainServiceInstance: IKeychainService;
   private logServiceInstance: LogService;
   private timerServiceInstance: TimerService;
   private executeServiceInstance: ExecuteService;
@@ -84,8 +88,52 @@ export class CliProviderService {
   private sessionManagementServiceInstance: SessionManagementService;
   private segmentServiceInstance: SegmentService;
   private workspaceServiceInstance: WorkspaceService;
-  private webSyncServiceInstance: WebSyncService;
   private azurePersistenceServiceInstance: AzurePersistenceService;
+  private pluginManagerServiceInstance: PluginManagerService;
+  private integrationFactoryInstance: IntegrationFactory;
+  private azureIntegrationServiceInstance: AzureIntegrationService;
+
+  private httpClient: any = {
+    get: (url: string) => ({
+      toPromise: async () => (await axios.get(url)).data
+    }),
+  };
+
+  public get azureIntegrationService(): AzureIntegrationService {
+    if (!this.azureIntegrationServiceInstance) {
+      this.azureIntegrationServiceInstance = new AzureIntegrationService(
+        this.repository,
+        this.behaviouralSubjectService,
+        this.cliNativeService,
+        this.sessionFactory,
+        this.executeService,
+        this.azureSessionService,
+        this.azurePersistenceService
+      );
+    }
+    return this.azureIntegrationServiceInstance;
+  }
+
+  public get integrationFactory(): IntegrationFactory {
+    if (!this.integrationFactoryInstance) {
+      this.integrationFactoryInstance = new IntegrationFactory(this.awsSsoIntegrationService, this.azureIntegrationService);
+    }
+    return this.integrationFactoryInstance;
+  }
+
+  public get pluginManagerService(): PluginManagerService {
+    if (!this.pluginManagerServiceInstance) {
+      this.pluginManagerServiceInstance = new PluginManagerService(
+        new PluginEnvironment(EnvironmentType.cli, this),
+        this.cliNativeService,
+        this.logService,
+        this.repository,
+        this.sessionFactory,
+        this.httpClient
+      );
+    }
+    return this.pluginManagerServiceInstance;
+  }
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
@@ -139,6 +187,11 @@ export class CliProviderService {
   public get remoteProceduresClient(): RemoteProceduresClient {
     if (!this.remoteProceduresClientInstance) {
       this.remoteProceduresClientInstance = new RemoteProceduresClient(this.cliNativeService);
+      const client = this.remoteProceduresClientInstance;
+      this.cliNativeService.msalEncryptionService = {
+        unprotectData: client.msalUnprotectData.bind(client),
+        protectData: client.msalProtectData.bind(client),
+      }
     }
     return this.remoteProceduresClientInstance;
   }
@@ -249,9 +302,16 @@ export class CliProviderService {
     return this.fileServiceInstance;
   }
 
+  public get workspaceConsistencyService(): WorkspaceConsistencyService {
+    if (!this.workspaceConsistencyServiceInstance) {
+      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.cliNativeServiceInstance, this.logService);
+    }
+    return this.workspaceConsistencyServiceInstance;
+  }
+
   get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService);
+      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService, this.workspaceConsistencyService);
     }
     return this.repositoryInstance;
   }
@@ -286,16 +346,9 @@ export class CliProviderService {
     return this.awsSsoIntegrationServiceInstance;
   }
 
-  get azureIntegrationService(): AzureIntegrationService {
-    if (!this.azureIntegrationServiceInstance) {
-      this.azureIntegrationServiceInstance = new AzureIntegrationService(this.repository, this.behaviouralSubjectService, this.cliNativeService, this.sessionFactory, this.executeService, this.azureSessionService, this.azurePersistenceService);
-    }
-    return this.azureIntegrationServiceInstance;
-  }
-
-  get keyChainService(): KeychainService {
+  get keyChainService(): IKeychainService {
     if (!this.keyChainServiceInstance) {
-      this.keyChainServiceInstance = new KeychainService(this.cliNativeService);
+      this.keyChainServiceInstance = new CliRpcKeychainService(this.remoteProceduresClient);
     }
     return this.keyChainServiceInstance;
   }
@@ -331,7 +384,7 @@ export class CliProviderService {
   get retroCompatibilityService(): RetroCompatibilityService {
     if (!this.retroCompatibilityServiceInstance) {
       this.retroCompatibilityServiceInstance = new RetroCompatibilityService(this.fileService, this.keyChainService,
-        this.repository, this.behaviouralSubjectService, constants.appName);
+        this.repository, this.behaviouralSubjectService);
     }
     return this.retroCompatibilityServiceInstance;
   }
@@ -367,23 +420,16 @@ export class CliProviderService {
 
   get webConsoleService(): WebConsoleService {
     if (!this.webConsoleServiceInstance) {
-      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.logService, fetch);
+      this.webConsoleServiceInstance = new WebConsoleService(this.cliOpenWebConsoleService, this.logService, this.cliNativeService);
     }
     return this.webConsoleServiceInstance;
   }
 
   get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
-      this.ssmServiceInstance = new SsmService(this.logService, this.executeService);
+      this.ssmServiceInstance = new SsmService(this.logService, this.executeService, this.cliNativeService, this.fileService);
     }
     return this.ssmServiceInstance;
-  }
-
-  get webSyncService(): WebSyncService {
-    if (!this.webSyncServiceInstance) {
-      this.webSyncServiceInstance = new WebSyncService(this.sessionFactory, this.namedProfilesService, this.sessionManagementService, this.awsSsoIntegrationService, this.azureIntegrationService, this.idpUrlsService);
-    }
-    return this.webSyncServiceInstance;
   }
 
   get inquirer(): CliInquirer.Inquirer {

@@ -27,6 +27,7 @@ import { CreateDialogComponent } from "./dialogs/create-dialog/create-dialog.com
 import { EditDialogComponent } from "./dialogs/edit-dialog/edit-dialog.component";
 import { MatMenuModule } from "@angular/material/menu";
 import { MatListModule } from "@angular/material/list";
+import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
 import { FilterMenuComponent } from "./filter-menu/filter-menu.component";
@@ -36,6 +37,12 @@ import { LeappSelectComponent } from "./leapp-select/leapp-select.component";
 import { IntegrationBarComponent } from "./integration-bar/integration-bar.component";
 import { MatTooltipModule } from "@angular/material/tooltip";
 import { CredentialProcessDialogComponent } from "./dialogs/credential-process-dialog/credential-process-dialog.component";
+import { ChangeRegionDialogComponent } from "./dialogs/change-region-dialog/change-region-dialog.component";
+import { ChangeNamedProfileDialogComponent } from "./dialogs/change-named-profile-dialog/change-named-profile-dialog.component";
+import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-dialog.component";
+import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
+import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
+import { ScrollingModule } from "@angular/cdk/scrolling";
 
 @NgModule({
   declarations: [
@@ -60,6 +67,11 @@ import { CredentialProcessDialogComponent } from "./dialogs/credential-process-d
     LeappSelectComponent,
     IntegrationBarComponent,
     CredentialProcessDialogComponent,
+    ChangeRegionDialogComponent,
+    ChangeNamedProfileDialogComponent,
+    SsmModalDialogComponent,
+    ContextualMenuComponent,
+    BottomBarComponent,
   ],
   imports: [
     CommonModule,
@@ -76,9 +88,11 @@ import { CredentialProcessDialogComponent } from "./dialogs/credential-process-d
     MatButtonModule,
     MatMenuModule,
     MatListModule,
+    MatSlideToggleModule,
     MatExpansionModule,
     MatButtonToggleModule,
     MatTooltipModule,
+    ScrollingModule,
   ],
   exports: [ConfirmationDialogComponent, InputDialogComponent, CommandBarComponent, SideBarComponent, SessionsComponent],
 })

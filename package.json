@@ -26,7 +26,7 @@
     "eslint-plugin-jsdoc": "latest",
     "eslint-plugin-prefer-arrow": "latest",
     "eslint-plugin-prettier": "^4.0.0",
-    "gushio": "~0.7.0",
+    "gushio": "^0.7.2",
     "husky": "^7.0.0",
     "lint-staged": "12.3.5",
     "prettier": "^2.5.1",
@@ -39,9 +39,16 @@
     "clean-and-bootstrap": "npm install && gushio gushio/clean-and-bootstrap.js core cli desktop-app",
     "lint": "eslint .",
     "lint:fix": "npm run lint -- --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "leapp-release": "gushio gushio/release.js",
+    "make-badges-core": "gushio gushio/make-badges.js core",
+    "make-badges-cli": "gushio gushio/make-badges.js cli"
   },
   "lint-staged": {
     "*.{ts,html}": "eslint --fix"
+  },
+  "dependencies": {
+    "coverage-badges-cli": "^1.0.11",
+    "tsoa": "^4.1.0"
   }
 }

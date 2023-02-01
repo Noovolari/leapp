@@ -63,6 +63,7 @@ export default class DeleteSession extends LeappCommand {
 
   async deleteSession(session: Session): Promise<void> {
     try {
+      this.unsupportedAzureSession(session);
       const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
       await sessionService.delete(session.sessionId);
       this.log("session deleted");

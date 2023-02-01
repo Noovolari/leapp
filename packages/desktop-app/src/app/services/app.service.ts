@@ -6,8 +6,9 @@ import { AppProviderService } from "./app-provider.service";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { WindowService } from "./window.service";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { constants } from "@noovolari/leapp-core/models/constants";
 import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { OperatingSystem, osMap } from "@noovolari/leapp-core/models/operating-system";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Injectable({
   providedIn: "root",
@@ -22,26 +23,26 @@ export class AppService {
   private logService: LogService;
 
   constructor(
-    private electronService: AppNativeService,
+    private appNativeService: AppNativeService,
     private windowService: WindowService,
     private modalService: BsModalService,
-    leappCoreService: AppProviderService
+    private appProviderService: AppProviderService
   ) {
     this.triggers = [];
 
-    this.logService = leappCoreService.logService;
+    this.logService = appProviderService.logService;
 
     // Global Configure logger
-    if (this.electronService.log) {
+    if (this.appNativeService.log) {
       const logPaths = {
-        [constants.mac]: `${this.electronService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
-        [constants.linux]: `${this.electronService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
-        [constants.windows]: `${this.electronService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
+        [OperatingSystem.mac]: `${this.appNativeService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
+        [OperatingSystem.linux]: `${this.appNativeService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
+        [OperatingSystem.windows]: `${this.appNativeService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
       };
 
-      this.electronService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
-      this.electronService.log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}";
-      this.electronService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
+      this.appNativeService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
+      this.appNativeService.log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}";
+      this.appNativeService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
   }
 
@@ -50,61 +51,56 @@ export class AppService {
    * Return the app object from node
    */
   getApp(): any {
-    return this.electronService.app;
+    return this.appNativeService.app;
   }
 
   // TODO: get directly from AppNativeService
   getMenu(): any {
-    return this.electronService.menu;
+    return this.appNativeService.menu;
   }
 
   isDarkMode(): boolean {
-    return this.electronService.nativeTheme.shouldUseDarkColors;
+    return this.appNativeService.nativeTheme.shouldUseDarkColors;
   }
 
   /**
    * Return the dialog native object
    */
   getDialog(): any {
-    return this.electronService.dialog;
+    return this.appNativeService.dialog;
   }
 
   /**
    * Return the type of OS in human-readable form
    */
-  detectOs(): string {
-    const hrNames = {
-      linux: constants.linux,
-      darwin: constants.mac,
-      win32: constants.windows,
-    };
-    const os = this.electronService.os.platform();
-    return hrNames[os];
+  detectOs(): OperatingSystem {
+    const os = this.appNativeService.os.platform();
+    return osMap[os];
   }
 
   /**
    * Quit the app
    */
   quit(): void {
-    this.electronService.app.exit(0);
+    this.appNativeService.app.exit(0);
   }
 
   /**
    * Restart the app
    */
   restart(): void {
-    this.electronService.app.relaunch();
-    this.electronService.app.exit(0);
+    this.appNativeService.app.relaunch();
+    this.appNativeService.app.exit(0);
   }
 
   async logout(): Promise<void> {
     try {
       // Clear all extra data
-      const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
-      this.electronService.rimraf.sync(getAppPath + "/Partitions/leapp*");
+      const getAppPath = this.appNativeService.path.join(this.appNativeService.app.getPath("appData"), constants.appName);
+      this.appNativeService.rimraf.sync(getAppPath + "/Partitions/leapp*");
 
       // Cleaning Library Electron Cache
-      await this.electronService.session.defaultSession.clearStorageData();
+      await this.appNativeService.session.defaultSession.clearStorageData();
 
       // Clean localStorage
       localStorage.clear();
@@ -126,7 +122,7 @@ export class AppService {
    * @returns the semver object
    */
   semVer(): any {
-    return this.electronService.semver;
+    return this.appNativeService.semver;
   }
 
   /**
@@ -171,7 +167,7 @@ export class AppService {
   setFilteringForEc2Calls(): void {
     // Modify the user agent for all requests to the following urls.
     const filter = { urls: ["https://*.amazonaws.com/"] };
-    this.electronService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
+    this.appNativeService.session.defaultSession.webRequest.onBeforeSendHeaders(filter, (details, callback) => {
       details.requestHeaders["Origin"] = "http://localhost:4200";
       callback({ cancel: false, requestHeaders: details.requestHeaders });
     });
@@ -184,7 +180,7 @@ export class AppService {
    * @returns return a new browser window
    */
   newInvisibleWindow(url: string): void {
-    const win = new this.electronService.browserWindow({ width: 1, height: 1, show: false });
+    const win = new this.appNativeService.browserWindow({ width: 1, height: 1, show: false });
     win.loadURL(url);
     return win;
   }
@@ -213,10 +209,11 @@ export class AppService {
 
   about(): void {
     const version = this.getApp().getVersion();
+    const coreVersion = this.appProviderService.logService.getCoreVersion();
     this.windowService.getCurrentWindow().show();
     this.getDialog().showMessageBox({
       icon: __dirname + `/assets/images/Leapp.png`,
-      message: `Leapp\n` + `Version ${version} (${version})\n` + "© 2022 Noovolari",
+      message: `Leapp\n` + `Version ${version} (Core: ${coreVersion})\n` + "© 2022 Noovolari",
       buttons: ["Ok"],
     });
   }

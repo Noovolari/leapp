@@ -11,12 +11,13 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
 import { WindowService } from "../../services/window.service";
-import { constants } from "@noovolari/leapp-core/models/constants";
 import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 import { AppNativeService } from "../../services/app-native.service";
 import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { LeappLinkError } from "@noovolari/leapp-core/errors/leapp-link-error";
 
 @Component({
   selector: "app-tray-menu",
@@ -37,6 +38,10 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   private awsSsmPluginVersion: string;
   private issueBody: string;
 
+  private voices = [];
+  private sessions = [];
+  private moreSessions = [];
+
   constructor(
     private appService: AppService,
     private electronService: AppNativeService,
@@ -51,12 +56,12 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.subscribed = this.behaviouralSubjectService.sessions$.subscribe(() => {
       this.generateMenu();
     });
-    this.generateMenu();
     this.getMetadata();
+    await this.generateMenu();
   }
 
   getProfileId(session: Session): string {
@@ -68,70 +73,19 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   }
 
   async generateMenu(): Promise<void> {
-    let voices = [];
-    const actives = this.appProviderService.sessionManagementService
-      .getSessions()
-      .filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
-    const allSessions = actives.concat(
-      this.appProviderService.sessionManagementService
-        .getSessions()
-        .filter((s) => s.status === SessionStatus.inactive)
-        .filter((_, index) => index < 10 - actives.length)
-    );
+    const sessionSubmenuThreshold = 10;
+    this.voices = [];
+    this.sessions = [];
+    this.moreSessions = [];
 
-    allSessions.forEach((session: Session) => {
-      let icon = "";
-      let label = "";
-      const profile = this.appProviderService.namedProfileService.getNamedProfiles().filter((p) => p.id === this.getProfileId(session))[0];
-      const iconValue = profile && profile.name === "default" ? "home" : "user";
-      switch (session.type) {
-        case SessionType.awsIamUser:
-          // eslint-disable-next-line max-len
-          icon =
-            session.status === SessionStatus.active
-              ? __dirname + `/assets/images/${iconValue}-online.png`
-              : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = "  " + session.sessionName + " - " + "iam user";
-          break;
-        case SessionType.awsIamRoleFederated:
-        case SessionType.awsSsoRole:
-          // eslint-disable-next-line max-len
-          icon =
-            session.status === SessionStatus.active
-              ? __dirname + `/assets/images/${iconValue}-online.png`
-              : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = "  " + session.sessionName + " - " + (session as AwsIamRoleFederatedSession).roleArn.split("/")[1];
-          break;
-        case SessionType.awsIamRoleChained:
-          // eslint-disable-next-line max-len
-          icon =
-            session.status === SessionStatus.active
-              ? __dirname + `/assets/images/${iconValue}-online.png`
-              : __dirname + `/assets/images/${iconValue}-offline.png`;
-          label = "  " + session.sessionName + " - " + (session as AwsIamRoleChainedSession).roleArn.split("/")[1];
-          break;
-        case SessionType.azure:
-          // eslint-disable-next-line max-len
-          icon =
-            session.status === SessionStatus.active
-              ? __dirname + `/assets/images/icon-online-azure.png`
-              : __dirname + `/assets/images/icon-offline.png`;
-          label = "  " + session.sessionName;
-      }
-      voices.push({
-        label,
-        type: "normal",
-        icon,
-        click: async () => {
-          const factorizedSessionService = this.sessionServiceFactory.getSessionService(session.type);
-          if (session.status !== SessionStatus.active) {
-            await factorizedSessionService.start(session.sessionId);
-          } else {
-            await factorizedSessionService.stop(session.sessionId);
-          }
-        },
-      });
-    });
+    const allSessions = this.appProviderService.sessionManagementService.getSessions();
+    const visibleMenuSessions = allSessions.filter((_, index) => index < sessionSubmenuThreshold);
+    visibleMenuSessions.forEach((session: Session) => this.sessions.push(this.createSessionVoice(session)));
+
+    if (allSessions.length > sessionSubmenuThreshold) {
+      const moreMenuSessions = allSessions.filter((_, index) => index >= sessionSubmenuThreshold);
+      moreMenuSessions.forEach((session: Session) => this.moreSessions.push(this.createSessionVoice(session)));
+    }
 
     const extraInfo = [
       { type: "separator" },
@@ -151,7 +105,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
       },
       { type: "separator" },
       {
-        label: "Open documentation",
+        label: "Open Documentation",
         type: "normal",
         click: () => {
           this.windowService.openExternalUrl("https://docs.leapp.cloud/");
@@ -209,27 +163,36 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     this.appService.getMenu().setApplicationMenu(this.appService.getMenu().buildFromTemplate(template));
     // check for dark mode
     let normalIcon = "LeappTemplate";
-    if (this.appService.detectOs() === constants.linux) {
+    if (this.appService.detectOs() === OperatingSystem.linux) {
       normalIcon = "LeappMini";
     }
     if (!this.currentTray) {
       this.currentTray = new this.electronService.tray(__dirname + `/assets/images/${normalIcon}.png`);
-      if (this.appService.detectOs() !== constants.windows && this.appService.detectOs() !== constants.linux) {
+      if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
         this.appService.getApp().dock.setBadge("");
       }
     }
-    if (this.updaterService.getSavedVersionComparison() && this.updaterService.isReady()) {
-      voices.push({ type: "separator" });
-      voices.push({ label: "Check for Updates...", type: "normal", click: () => this.updaterService.updateDialog() });
-      this.appService.getApp().dock.setBadge("·");
+    if (this.updaterService.isReady() && this.updaterService.isUpdateNeeded()) {
+      this.voices.push({ type: "separator" });
+      this.voices.push({ label: "Check for Updates...", type: "normal", click: () => this.updaterService.updateDialog() });
+      if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
+        this.appService.getApp().dock.setBadge("·");
+      }
     }
-    voices = voices.concat(extraInfo);
-    const contextMenu = this.appService.getMenu().buildFromTemplate(voices);
-    if (this.appService.detectOs() !== constants.windows && this.appService.detectOs() !== constants.linux) {
+
+    this.voices = this.voices.concat([
+      ...this.sessions,
+      ...(this.moreSessions.length > 0 ? [{ type: "separator" }, { label: "More Sessions...", submenu: this.moreSessions }] : []),
+      ...extraInfo,
+    ]);
+
+    const contextMenu = this.appService.getMenu().buildFromTemplate(this.voices);
+    if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
       this.currentTray.setToolTip("Leapp");
     }
     this.currentTray.setContextMenu(contextMenu);
   }
+
   /**
    * Remove session and credential file before exiting program
    */
@@ -259,17 +222,25 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
   private getMetadata() {
     const printError = (error) => {
-      this.loggingService.log(new LoggedException(error.toString(), this, LogLevel.error, true, error.stack));
+      this.loggingService.log(new LoggedException(error.toString(), this, LogLevel.error, false, error.stack));
       if ((error as LeappBaseError).severity === LogLevel.error) {
-        this.messageToasterService.toast(error.toString(), ToastLevel.error, "");
+        if ((error as LeappLinkError).link === undefined || (error as LeappLinkError).link === null) {
+          this.messageToasterService.toast(error.toString(), ToastLevel.error, "");
+        } else {
+          this.messageToasterService.toast(error.toString(), ToastLevel.error, "", (error as LeappLinkError).link);
+        }
       }
     };
 
     this.getAwsCliVersion()
       .then(() => {
-        this.getSessionManagerPluginVersion().then(() => {
-          this.setIssueBody();
-        });
+        this.getSessionManagerPluginVersion()
+          .then(() => {
+            this.setIssueBody();
+          })
+          .catch((error) => {
+            printError(error);
+          });
       })
       .catch((error) => {
         printError(error);
@@ -280,12 +251,11 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     if (!this.awsCliVersion) {
       try {
         this.awsCliVersion = await this.appProviderService.executeService.execute("aws --version");
-      } catch (error) {
-        throw new LeappBaseError(
-          "An error occurred getting AWS CLI version. Please check if it is installed.",
+      } catch (_) {
+        throw new LeappLinkError(
+          "https://docs.leapp.cloud/latest/troubleshooting/faq/",
           this,
-          LogLevel.error,
-          "An error occurred getting AWS CLI version. Please check if it is installed."
+          "An error occurred getting AWS CLI version. Please check if it is installed and <span class='link'>add a symlink</span> following the documentation."
         );
       }
     }
@@ -297,11 +267,10 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
         const sessionManagerPluginVersion = await this.appProviderService.executeService.execute("session-manager-plugin --version");
         this.awsSsmPluginVersion = sessionManagerPluginVersion.replace(/(\r\n|\n|\r)/gm, "");
       } catch (error) {
-        throw new LeappBaseError(
-          "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed.",
+        throw new LeappLinkError(
+          "https://docs.leapp.cloud/latest/built-in-features/aws-ec2-connect/",
           this,
-          LogLevel.warn,
-          "An error occurred getting AWS Session Manager Plugin version. Please check if it is installed."
+          "An error occurred getting AWS Session Manager Plugin version. <span class='link'>Click here to follow the instructions on the docs</span> and solve the issue."
         );
       }
     }
@@ -319,5 +288,59 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 | Platform | ${process.platform} |
 | Awscli | ${this.awsCliVersion}
 `;
+  }
+
+  private createSessionVoice(session: Session) {
+    let icon = "";
+    let label = "";
+    const profile = this.appProviderService.namedProfileService.getNamedProfiles().filter((p) => p.id === this.getProfileId(session))[0];
+    const iconValue = profile && profile.name === "default" ? "home" : "user";
+    switch (session.type) {
+      case SessionType.awsIamUser:
+        // eslint-disable-next-line max-len
+        icon =
+          session.status === SessionStatus.active
+            ? __dirname + `/assets/images/${iconValue}-online.png`
+            : __dirname + `/assets/images/${iconValue}-offline.png`;
+        label = "  " + session.sessionName + " - " + "iam user";
+        break;
+      case SessionType.awsIamRoleFederated:
+      case SessionType.awsSsoRole:
+        // eslint-disable-next-line max-len
+        icon =
+          session.status === SessionStatus.active
+            ? __dirname + `/assets/images/${iconValue}-online.png`
+            : __dirname + `/assets/images/${iconValue}-offline.png`;
+        label = "  " + session.sessionName + " - " + (session as AwsIamRoleFederatedSession).roleArn.split("/")[1];
+        break;
+      case SessionType.awsIamRoleChained:
+        // eslint-disable-next-line max-len
+        icon =
+          session.status === SessionStatus.active
+            ? __dirname + `/assets/images/${iconValue}-online.png`
+            : __dirname + `/assets/images/${iconValue}-offline.png`;
+        label = "  " + session.sessionName + " - " + (session as AwsIamRoleChainedSession).roleArn.split("/")[1];
+        break;
+      case SessionType.azure:
+        // eslint-disable-next-line max-len
+        icon =
+          session.status === SessionStatus.active
+            ? __dirname + `/assets/images/icon-online-azure.png`
+            : __dirname + `/assets/images/icon-offline.png`;
+        label = "  " + session.sessionName;
+    }
+    return {
+      label,
+      type: "normal",
+      icon,
+      click: async () => {
+        const factorizedSessionService = this.sessionServiceFactory.getSessionService(session.type);
+        if (session.status !== SessionStatus.active) {
+          await factorizedSessionService.start(session.sessionId);
+        } else {
+          await factorizedSessionService.stop(session.sessionId);
+        }
+      },
+    };
   }
 }

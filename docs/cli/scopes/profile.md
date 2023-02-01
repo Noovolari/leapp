@@ -8,7 +8,7 @@ Leapp AWS Multi-profile management
 * [`leapp profile edit`](#leapp-profile-edit)
 * [`leapp profile list`](#leapp-profile-list)
 
-# `leapp profile create`
+## `leapp profile create`
 
 Create a new AWS named profile
 
@@ -28,7 +28,7 @@ EXAMPLES
   $leapp profile create --profileName PROFILENAME
 ```
 
-# `leapp profile delete`
+## `leapp profile delete`
 
 Delete an AWS named profile
 
@@ -51,7 +51,7 @@ EXAMPLES
   $leapp profile delete --profileId PROFILEID [--force, -f]
 ```
 
-# `leapp profile edit`
+## `leapp profile edit`
 
 Rename an AWS named profile
 
@@ -72,7 +72,7 @@ EXAMPLES
   $leapp profile edit --profileId ID --profileName PROFILENAME
 ```
 
-# `leapp profile list`
+## `leapp profile list`
 
 Show profile list
 

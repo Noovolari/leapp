@@ -18,6 +18,7 @@ describe("LogoutIntegration", () => {
       alias: "mock",
       portalUrl: "url",
       browserOpening: "In-app",
+      isOnline: true,
     };
 
     command = getTestCommand(new CliProviderService(), ["--integrationId", ""]);
@@ -27,8 +28,8 @@ describe("LogoutIntegration", () => {
     expect(command.selectIntegration).toHaveBeenCalled();
 
     const cliProviderService = {
-      awsSsoIntegrationService: {
-        getIntegration: jest.fn((id: string) => {
+      integrationFactory: {
+        getIntegrationById: jest.fn((id: string) => {
           if (id === "validId") {
             return mockIntegration;
           } else return null;
@@ -44,10 +45,10 @@ describe("LogoutIntegration", () => {
   });
 
   test("selectIntegration", async () => {
-    const integration = { alias: "integration1" };
+    const integration = { alias: "integration1", isOnline: true };
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
-        getOnlineIntegrations: jest.fn(() => [integration]),
+      integrationFactory: {
+        getIntegrations: jest.fn(() => [integration]),
       },
       inquirer: {
         prompt: async (params: any) => {
@@ -67,14 +68,14 @@ describe("LogoutIntegration", () => {
     const command = getTestCommand(cliProviderService);
     const selectedIntegration = await command.selectIntegration();
 
-    expect(cliProviderService.awsSsoIntegrationService.getOnlineIntegrations).toHaveBeenCalled();
+    expect(cliProviderService.integrationFactory.getIntegrations).toHaveBeenCalled();
     expect(selectedIntegration).toBe(integration);
   });
 
   test("selectIntegration, no integrations", async () => {
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
-        getOnlineIntegrations: jest.fn(() => []),
+      integrationFactory: {
+        getIntegrations: jest.fn(() => []),
       },
     };
 
@@ -84,7 +85,7 @@ describe("LogoutIntegration", () => {
 
   test("logout", async () => {
     const cliProviderService: any = {
-      awsSsoIntegrationService: {
+      integrationFactory: {
         logout: jest.fn(),
       },
       remoteProceduresClient: { refreshIntegrations: jest.fn(), refreshSessions: jest.fn() },
@@ -96,7 +97,7 @@ describe("LogoutIntegration", () => {
     const integration = { id: "id1" } as any;
     await command.logout(integration);
 
-    expect(cliProviderService.awsSsoIntegrationService.logout).toHaveBeenCalledWith(integration.id);
+    expect(cliProviderService.integrationFactory.logout).toHaveBeenCalledWith(integration.id);
     expect(command.log).toHaveBeenLastCalledWith("logout successful");
     expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
     expect(cliProviderService.remoteProceduresClient.refreshSessions).toHaveBeenCalled();
@@ -137,5 +138,17 @@ describe("LogoutIntegration", () => {
 
   test("run - logout throws undefined object", async () => {
     await runCommand({ hello: "randomObj" }, "Unknown error: [object Object]");
+  });
+
+  test("run - integration not found", async () => {
+    const cliProviderService = { integrationFactory: { getIntegrationById: () => null } };
+    const command = getTestCommand(cliProviderService, ["--integrationId", "invalidId"]);
+    await expect(command.run()).rejects.toThrow('integrationId "invalidId" is not associated to an existing integration');
+  });
+
+  test("run - integration already offline", async () => {
+    const cliProviderService = { integrationFactory: { getIntegrationById: () => ({ isOnline: false }) } };
+    const command = getTestCommand(cliProviderService, ["--integrationId", "already-offline-id"]);
+    await expect(command.run()).rejects.toThrow("integration is already offline");
   });
 });

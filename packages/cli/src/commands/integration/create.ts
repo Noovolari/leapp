@@ -1,23 +1,30 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { integrationAlias, integrationLocation, integrationPortalUrl, integrationRegion, integrationType, integrationTenantId } from "../../flags";
+import { IntegrationMethod } from "@noovolari/leapp-core/models/integration-method";
+import { IntegrationParams } from "@noovolari/leapp-core/models/integration-params";
+import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
-import { integrationAlias, integrationMethod, integrationPortalUrl, integrationRegion } from "../../flags";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
+import { AzureIntegrationCreationParams } from "@noovolari/leapp-core/models/azure/azure-integration-creation-params";
+import { AwsSsoIntegrationCreationParams } from "@noovolari/leapp-core/models/aws/aws-sso-integration-creation-params";
 
 export default class CreateSsoIntegration extends LeappCommand {
-  static description = "Create a new AWS SSO integration";
+  static description = "Create a new integration";
   static examples = [
     "$leapp integration create",
-    "$leapp integration create --integrationAlias ALIAS --integrationPortalUrl URL --integrationRegion REGION --integrationMethod [In-app, In-browser]",
+    `$leapp integration create --integrationType ${IntegrationType.awsSso} --integrationAlias ALIAS` +
+      ` --integrationPortalUrl URL --integrationRegion REGION`,
+    `$leapp integration create --integrationType ${IntegrationType.azure} --integrationAlias ALIAS` +
+      ` --integrationTenantId TENANT --integrationLocation LOCATION`,
   ];
 
   static flags = {
     integrationAlias,
     integrationPortalUrl,
     integrationRegion,
-    integrationMethod,
+    integrationType,
+    integrationTenantId,
+    integrationLocation,
   };
 
   constructor(argv: string[], config: Config) {
@@ -26,100 +33,144 @@ export default class CreateSsoIntegration extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      let creationParams: AwsSsoIntegration;
+      let creationParams: IntegrationParams;
+      let type: IntegrationType;
       const { flags } = await this.parse(CreateSsoIntegration);
-      if (this.checkFlags(flags)) {
-        creationParams = this.validateAndAssignFlags(flags);
+      if (LeappCommand.areFlagsNotDefined(flags, this)) {
+        const method = await this.chooseIntegrationMethod();
+        type = method.integrationType;
+        creationParams = await this.askConfigurationParameters(method);
       } else {
-        creationParams = await this.askConfigurationParameters();
+        creationParams = this.verifyAndExtractFlags(flags);
+        type = flags.integrationType as any;
       }
-      await this.createIntegration(creationParams);
+      await this.createIntegration(type, creationParams);
     } catch (error: any) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
   }
 
-  async askConfigurationParameters(): Promise<AwsSsoIntegration> {
-    const creationParams = { browserOpening: constants.inBrowser } as AwsSsoIntegration;
-    const aliasAnswer: any = await this.cliProviderService.inquirer.prompt([
+  async chooseIntegrationMethod(): Promise<IntegrationMethod> {
+    const integrationMethods = this.cliProviderService.cloudProviderService.creatableIntegrationMethods();
+    const accessMethodAnswer: any = await this.cliProviderService.inquirer.prompt([
       {
-        name: "selectedAlias",
-        message: "Insert an alias",
-        validate: AwsSsoIntegrationService.validateAlias,
-        type: "input",
-      },
-    ]);
-    creationParams.alias = aliasAnswer.selectedAlias;
-
-    const portalUrlAnswer: any = await this.cliProviderService.inquirer.prompt([
-      {
-        name: "selectedPortalUrl",
-        message: "Insert a portal URL",
-        validate: AwsSsoIntegrationService.validatePortalUrl,
-        type: "input",
-      },
-    ]);
-    creationParams.portalUrl = portalUrlAnswer.selectedPortalUrl;
-
-    const awsRegions = this.cliProviderService.cloudProviderService.availableRegions(SessionType.aws);
-    const regionAnswer = await this.cliProviderService.inquirer.prompt([
-      {
-        name: "selectedRegion",
-        message: "Select a region",
+        name: "selectedMethod",
+        message: "select an integration method",
         type: "list",
-        choices: awsRegions.map((region: { fieldName: any; fieldValue: any }) => ({ name: region.fieldName, value: region.fieldValue })),
+        choices: integrationMethods.map((method: any) => ({ name: method.alias, value: method })),
       },
     ]);
-    creationParams.region = regionAnswer.selectedRegion;
-
-    return creationParams;
+    return accessMethodAnswer.selectedMethod;
   }
 
-  async createIntegration(creationParams: AwsSsoIntegration): Promise<void> {
-    await this.cliProviderService.awsSsoIntegrationService.createIntegration(creationParams);
+  async askConfigurationParameters(chosenIntegrationMethod: IntegrationMethod): Promise<IntegrationParams> {
+    const integrationParams = {} as any;
+    for (const field of chosenIntegrationMethod.integrationMethodFields) {
+      const fieldAnswer: any = await this.cliProviderService.inquirer.prompt([
+        {
+          name: field.creationRequestField,
+          message: field.message,
+          type: field.type,
+          choices: field.choices?.map((choice: any) => ({ name: choice.fieldName, value: choice.fieldValue })),
+          validate: field.fieldValidator,
+        },
+      ]);
+      integrationParams[field.creationRequestField] = fieldAnswer[field.creationRequestField];
+    }
+    if (chosenIntegrationMethod.integrationType === IntegrationType.awsSso) {
+      integrationParams.browserOpening = constants.inBrowser;
+    }
+    return integrationParams;
+  }
+
+  async createIntegration(integType: IntegrationType, integrationParams: IntegrationParams): Promise<void> {
+    await this.cliProviderService.integrationFactory.create(integType, integrationParams);
     await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
-    this.log("aws sso integration created");
+    this.log("integration created");
   }
 
-  private checkFlags(flags: any): boolean {
-    return (
-      flags.integrationAlias !== undefined &&
-      flags.integrationRegion !== undefined &&
-      flags.integrationPortalUrl !== undefined &&
-      flags.integrationMethod !== undefined
-    );
-  }
-
-  private validateAndAssignFlags(flags: any): AwsSsoIntegration {
-    if (flags.integrationAlias === "") {
-      throw new Error("Alias must not be empty");
+  private verifyAndExtractFlags(flags: any): IntegrationParams {
+    if (flags.integrationType === undefined) {
+      throw new Error("flags --integrationType must always be specified");
     }
-    if (flags.integrationPortalUrl === "") {
-      throw new Error("Portal URL must not be empty");
+    const method = this.cliProviderService.cloudProviderService
+      .creatableIntegrationMethods()
+      .find((m: any) => m.integrationType === flags.integrationType);
+    if (method === undefined) {
+      throw new Error(`invalid integration type value. Valid values are: [${IntegrationType.awsSso}, ${IntegrationType.azure}]`);
     }
-    if (flags.integrationPortalUrl.indexOf("http://") < 0 && flags.integrationPortalUrl.indexOf("https://")) {
-      throw new Error("Portal URL is not valid");
+    switch (flags.integrationType) {
+      case IntegrationType.awsSso:
+        if (flags.integrationAlias === undefined || flags.integrationPortalUrl === undefined || flags.integrationRegion === undefined) {
+          throw new Error(
+            `missing values for flags: ${[
+              flags.integrationAlias ? "" : "--integrationAlias",
+              flags.integrationPortalUrl ? "" : "--integrationPortalUrl",
+              flags.integrationRegion ? "" : "--integrationRegion",
+            ]
+              .filter((el) => el !== "")
+              .join(", ")}`
+          );
+        }
+        const awsAliasValidator = (method.integrationMethodFields.find((field: any) => field.creationRequestField === "alias") as any).fieldValidator;
+        const portalUrlValidator = (method.integrationMethodFields.find((field: any) => field.creationRequestField === "portalUrl") as any)
+          .fieldValidator;
+        const aliasValidation = awsAliasValidator(flags.integrationAlias);
+        if (typeof aliasValidation === "string") {
+          throw new Error(aliasValidation);
+        }
+        const portalUrlValidation = portalUrlValidator(flags.integrationPortalUrl);
+        if (typeof portalUrlValidation === "string") {
+          throw new Error(portalUrlValidation);
+        }
+        if (flags.integrationRegion === "") {
+          throw new Error("AWS Region must not be empty");
+        }
+        if (!this.cliProviderService.awsCoreService.getRegions().find((region: any) => region.region === flags.integrationRegion)) {
+          throw new Error("Provided region is not a valid AWS region");
+        }
+        return {
+          portalUrl: flags.integrationPortalUrl,
+          alias: flags.integrationAlias,
+          browserOpening: constants.inBrowser,
+          region: flags.integrationRegion,
+        } as AwsSsoIntegrationCreationParams;
+      case IntegrationType.azure:
+        if (flags.integrationAlias === undefined || flags.integrationTenantId === undefined || flags.integrationLocation === undefined) {
+          throw new Error(
+            `missing values for flags: ${[
+              flags.integrationAlias ? "" : "--integrationAlias",
+              flags.integrationTenantId ? "" : "--integrationTenantId",
+              flags.integrationLocation ? "" : "--integrationLocation",
+            ]
+              .filter((el) => el !== "")
+              .join(", ")}`
+          );
+        }
+        const azureAliasValidator = (method.integrationMethodFields.find((field: any) => field.creationRequestField === "alias") as any)
+          .fieldValidator;
+        const tenantIdValidator = (method.integrationMethodFields.find((field: any) => field.creationRequestField === "tenantId") as any)
+          .fieldValidator;
+        const azureAliasValidation = azureAliasValidator(flags.integrationAlias);
+        if (typeof azureAliasValidation === "string") {
+          throw new Error(azureAliasValidation);
+        }
+        const tenantIdValidation = tenantIdValidator(flags.integrationTenantId);
+        if (typeof tenantIdValidation === "string") {
+          throw new Error(tenantIdValidation);
+        }
+        if (flags.integrationLocation === "") {
+          throw new Error("Azure Location must not be empty");
+        }
+        if (!this.cliProviderService.azureCoreService.getLocations().find((location: any) => location.location === flags.integrationLocation)) {
+          throw new Error("Provided location is not a valid Azure location");
+        }
+        return {
+          alias: flags.integrationAlias,
+          tenantId: flags.integrationTenantId,
+          location: flags.integrationLocation,
+        } as AzureIntegrationCreationParams;
     }
-    if (flags.integrationRegion === "") {
-      throw new Error("AWS Region must not be empty");
-    }
-    if (
-      this.cliProviderService.awsCoreService
-        .getRegions()
-        .map((r: { region: any }) => r.region)
-        .indexOf(flags.integrationRegion) < 0
-    ) {
-      throw new Error("Provided region is not a valid AWS region");
-    }
-    if (flags.integrationMethod.indexOf("In-app") < 0 && flags.integrationMethod.indexOf("In-browser") < 0) {
-      throw new Error("Provided method is not a valid integration method. Please use either In-app or In-browser");
-    }
-
-    return {
-      portalUrl: flags.integrationPortalUrl,
-      alias: flags.integrationAlias,
-      browserOpening: flags.integrationMethod,
-      region: flags.integrationRegion,
-    } as AwsSsoIntegration;
+    return undefined as any;
   }
 }

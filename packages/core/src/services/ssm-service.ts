@@ -1,13 +1,21 @@
 import { ExecuteService } from "./execute-service";
 import { CredentialsInfo } from "../models/credentials-info";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "./log-service";
+import { constants } from "../models/constants";
+import { INativeService } from "../interfaces/i-native-service";
+import { FileService } from "./file-service";
 
 export class SsmService {
   aws;
   ssmClient;
   ec2Client;
 
-  constructor(private logService: LogService, private executeService: ExecuteService) {
+  constructor(
+    private logService: LogService,
+    private executeService: ExecuteService,
+    private nativeService: INativeService,
+    private fileService: FileService
+  ) {
     this.aws = require("aws-sdk");
   }
 
@@ -70,48 +78,65 @@ export class SsmService {
       AWS_SESSION_TOKEN: credentials.sessionToken.aws_session_token,
     };
 
-    this.executeService.openTerminal(`aws ssm start-session --region ${region} --target ${quote}${instanceId}${quote}`, env, macOsTerminalType).then(
-      () => {},
-      (err) => {
-        throw new LoggedException(err.message, this, LogLevel.error);
-      }
-    );
+    if (this.nativeService.process.platform === "darwin") {
+      // Creates the ssm-set-env file for the openTerminal
+      const exportedEnvVars = `export AWS_SESSION_TOKEN=${env.AWS_SESSION_TOKEN} &&
+          export AWS_SECRET_ACCESS_KEY=${env.AWS_SECRET_ACCESS_KEY} &&
+          export AWS_ACCESS_KEY_ID=${env.AWS_ACCESS_KEY_ID}`;
+      this.fileService.writeFileSync(this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, exportedEnvVars);
+    }
+
+    this.executeService
+      .openTerminal(`aws ssm start-session --region ${region} --target ${quote}${instanceId}${quote}`, env, macOsTerminalType)
+      .then(() => {
+        if (this.nativeService.process.platform === "darwin")
+          this.nativeService.rimraf(this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
+      })
+      .catch((err) => {
+        if (this.nativeService.process.platform === "darwin") {
+          this.nativeService.rimraf(this.nativeService.os.homedir() + "/" + constants.ssmSourceFileDestination, {}, () => {});
+        }
+        this.logService.log(new LoggedException(err.message, this, LogLevel.error, true));
+      });
   }
 
   /**
    * Submit the request to do ssm to aws
    */
   private async requestSsmInstances(): Promise<any> {
+    let tmpInstances = [];
     let instances = [];
+    let nextToken = null;
 
     try {
-      // eslint-disable-next-line @typescript-eslint/naming-convention,max-len
-      const describeInstanceInformationResponse = await this.ssmClient.describeInstanceInformation({ MaxResults: 50 }).promise();
+      do {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const params = { MaxResults: 50, NextToken: nextToken };
 
-      // Once we have obtained data from SSM and EC2, we verify the list are not empty
-      // eslint-disable-next-line max-len
-      if (
-        describeInstanceInformationResponse["InstanceInformationList"] &&
-        describeInstanceInformationResponse["InstanceInformationList"].length > 0
-      ) {
-        // Filter only the instances that are currently online
+        const describeInstanceInformationResponse = await this.ssmClient.describeInstanceInformation(params).promise();
         // eslint-disable-next-line max-len
-        instances = describeInstanceInformationResponse["InstanceInformationList"].filter((i) => i.PingStatus === "Online");
-        if (instances.length > 0) {
-          // For every instance that fulfill we obtain...
-          instances.forEach((instance) => {
-            // Add name if exists
-            instance["ComputerName"] = instance.InstanceId;
-            instance["Name"] = instance["ComputerName"];
-          });
-
-          // We have found and managed a list of instances
-          this.logService.log(new LoggedEntry("Obtained smm info from aws for SSM", this, LogLevel.info));
-          return instances;
-        } else {
-          // No instances usable
-          throw new Error("No instances are accessible by this Role.");
+        if (
+          describeInstanceInformationResponse["InstanceInformationList"] &&
+          describeInstanceInformationResponse["InstanceInformationList"].length > 0
+        ) {
+          tmpInstances = describeInstanceInformationResponse["InstanceInformationList"].filter((i) => i.PingStatus === "Online");
+          if (tmpInstances.length > 0) {
+            instances = instances.concat(tmpInstances);
+          }
         }
+        nextToken = describeInstanceInformationResponse.NextToken;
+      } while (nextToken);
+
+      if (instances.length > 0) {
+        instances.forEach((instance) => {
+          // Add name if exists
+          instance["ComputerName"] = instance.InstanceId;
+          instance["Name"] = instance["ComputerName"];
+        });
+
+        // We have found and managed a list of instances
+        this.logService.log(new LoggedEntry("Obtained smm info from aws for SSM", this, LogLevel.info));
+        return instances;
       } else {
         // No instances usable
         throw new Error("No instances are accessible by this Role.");
@@ -122,13 +147,20 @@ export class SsmService {
   }
 
   private async applyEc2MetadataInformation(instances: any): Promise<any> {
-    try {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      const params = { MaxResults: 50 };
-      const reservations = await this.ec2Client.describeInstances(params).promise();
+    let reservations = [];
+    let nextToken = null;
 
+    try {
+      do {
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        const params = { MaxResults: 100, NextToken: nextToken };
+
+        const describeInstanceResponse = await this.ec2Client.describeInstances(params).promise();
+        reservations = reservations.concat(describeInstanceResponse.Reservations);
+        nextToken = describeInstanceResponse.NextToken;
+      } while (nextToken);
       instances.forEach((instance) => {
-        const foundInstance = reservations.Reservations.filter((r) => r.Instances[0].InstanceId === instance.Name);
+        const foundInstance = reservations.filter((r) => r.Instances[0].InstanceId === instance.Name);
         if (foundInstance.length > 0) {
           const foundName = foundInstance[0].Instances[0].Tags.filter((t) => t.Key === "Name");
           if (foundName.length > 0) {

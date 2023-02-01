@@ -46,9 +46,9 @@ DESCRIPTION
 EXAMPLES
   $leapp idp-url delete
 
-  $leapp idp-url delete --idpUrl ADDRESS
+  $leapp idp-url delete --idpUrlId ID
 
-  $leapp idp-url delete --idpUrl ADDRESS [--force, -f]
+  $leapp idp-url delete --idpUrlId ID [--force, -f]
 ```
 
 ## `leapp idp-url edit`

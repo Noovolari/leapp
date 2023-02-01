@@ -8,7 +8,6 @@ export class RotationService {
     const activeSessions = this.repository.listActive();
     activeSessions.forEach((session) => {
       if (session.expired()) {
-        console.log("rotating", session);
         const concreteSessionService = this.sessionServiceFactory.getSessionService(session.type);
         concreteSessionService.rotate(session.sessionId).then((_) => {});
       }

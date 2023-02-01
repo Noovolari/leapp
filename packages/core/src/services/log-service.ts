@@ -1,5 +1,6 @@
 import { ILogger } from "../interfaces/i-logger";
 
+/* istanbul ignore next */
 export enum LogLevel {
   success,
   info,
@@ -30,5 +31,9 @@ export class LogService {
     if (loggedEntry.display) {
       this.logger.show(loggedEntry.message, loggedEntry.level);
     }
+  }
+
+  getCoreVersion(): string {
+    return require("../../package.json").version;
   }
 }

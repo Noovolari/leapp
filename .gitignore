@@ -45,6 +45,9 @@ release/
 **/yarn-error.log
 **/testem.log
 **/typings
+**/generated
+**/layer
+**/dist
 
 # System Files
 .DS_Store
@@ -52,6 +55,7 @@ Thumbs.db
 
 # Windows certificate
 packages/desktop-app/windows.pfx
+packages/desktop-app/windows_sign_certificate.pfx
 
 start.sh
 buildAll.sh
@@ -83,3 +87,7 @@ lerna-debug.log
 .run
 
 packages/dpapi-addon/build
+
+packages/desktop-app/integration-tests/.env.ts
+
+nightly-version

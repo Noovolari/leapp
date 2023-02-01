@@ -13,6 +13,55 @@ describe("IdpUrlsService", () => {
     expect(idpUrls).toEqual([{ id: "1" }, { id: "2" }]);
   });
 
+  test("getIdpUrl, idpUrl exists", () => {
+    const expectedId = "fake-id";
+    const expectedIdpUrl = "fake-idp-url";
+    const repository = {
+      getIdpUrl: jest.fn(() => expectedIdpUrl),
+    } as any;
+    const idpUrlService = new IdpUrlsService(null, repository);
+    const result = idpUrlService.getIdpUrl(expectedId);
+    expect(repository.getIdpUrl).toHaveBeenCalledWith(expectedId);
+    expect(result).toStrictEqual(new IdpUrl(expectedId, expectedIdpUrl));
+  });
+
+  test("getIdpUrl, idpUrl doesn't exist", () => {
+    const expectedId = "fake-id";
+    const repository = {
+      getIdpUrl: jest.fn(() => undefined),
+    } as any;
+    const idpUrlService = new IdpUrlsService(null, repository);
+    const result = idpUrlService.getIdpUrl(expectedId);
+    expect(repository.getIdpUrl).toHaveBeenCalledWith(expectedId);
+    expect(result).toEqual(null);
+  });
+
+  test("getIdpUrlIdByUrl, success", () => {
+    const idpUrlService = new IdpUrlsService(null, null);
+    const idpUrls = [
+      { url: "fake-idp-url", id: "1" },
+      { url: "another-idp-url", id: "2" },
+    ];
+    idpUrlService.getIdpUrls = jest.fn(() => idpUrls);
+    const result = idpUrlService.getIdpUrlIdByUrl("fake-idp-url");
+    expect(idpUrlService.getIdpUrls).toHaveBeenCalled();
+    expect(result).toEqual("1");
+  });
+
+  test("getIdpUrlIdByUrl, creates a new idpUrl", () => {
+    const newId = "new-id";
+    const idpUrlService = new IdpUrlsService(null, null);
+    (idpUrlService as any).createIdpUrl = jest.fn(() => ({ id: newId }));
+    const idpUrls = [
+      { url: "fake-idp-url", id: "1" },
+      { url: "another-idp-url", id: "2" },
+    ];
+    idpUrlService.getIdpUrls = () => idpUrls;
+    const result = idpUrlService.getIdpUrlIdByUrl("new-idp-url");
+    expect(idpUrlService.createIdpUrl).toHaveBeenCalledWith("new-idp-url");
+    expect(result).toEqual(newId);
+  });
+
   test("createIdpUrl", () => {
     const repository = {
       addIdpUrl: jest.fn(),
@@ -125,5 +174,12 @@ describe("IdpUrlsService", () => {
     idpUrlsService.getIdpUrls = () => [new IdpUrl("1", "http://url1")];
 
     expect(idpUrlsService.validateIdpUrl(" http://url1 ")).toBe("IdP URL already exists");
+  });
+
+  test("validateIdpUrl, not a valid url", () => {
+    const fakeUrl = "fake-invalid-url";
+    const idpUrlService = new IdpUrlsService(null, null);
+    const result = idpUrlService.validateIdpUrl(fakeUrl);
+    expect(result).toStrictEqual("IdP URL is not a valid URL");
   });
 });

@@ -1,25 +1,43 @@
 <ng-container *ngIf="eGlobalFilteredSessions.length > 0">
-  <table class="table table-account-cards">
+  <table class="table">
     <thead>
     <tr class="{{eCompactMode ? 'compact' : ''}}">
-      <th (click)="orderSessionsByName(columnSettings[0].orderStyle)"><span>Session</span><i [ngClass]="[columnSettings[0].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[0].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[0].orderStyle && !columnSettings[0].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i></th>
-      <th (click)="orderSessionsByRole(columnSettings[1].orderStyle)" *ngIf="eGlobalColumns.role"><span>Role</span><i [ngClass]="[columnSettings[1].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[1].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[1].orderStyle && !columnSettings[1].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i></th>
-      <th (click)="orderSessionsByType(columnSettings[2].orderStyle)" *ngIf="eGlobalColumns.provider"><span>Provider</span><i [ngClass]="[columnSettings[2].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[2].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[2].orderStyle && !columnSettings[2].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i></th>
-      <th (click)="orderSessionsByNamedProfile(columnSettings[3].orderStyle)" *ngIf="eGlobalColumns.namedProfile"><span>Named P{{eCompactMode ? '' : 'rofile'}}</span><i [ngClass]="[columnSettings[3].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[3].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[3].orderStyle && !columnSettings[3].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i></th>
-      <th (click)="orderSessionsByNamedRegion(columnSettings[4].orderStyle)" *ngIf="!eCompactMode && eGlobalColumns.region"><span>Region</span><i [ngClass]="[columnSettings[4].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[4].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[4].orderStyle && !columnSettings[4].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i></th>
-      <th><a (click)="openFilterColumn();"><span class="vertical-rule"></span><i class="moon-Table"></i></a></th>
+      <th (click)="orderSessionsByName(columnSettings[0].orderStyle)"><span>Session</span><i
+        [ngClass]="[columnSettings[0].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[0].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[0].orderStyle && !columnSettings[0].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i>
+      </th>
+      <th (click)="orderSessionsByRole(columnSettings[1].orderStyle)" class="{{eGlobalColumns.role ? '' : 'hidden-column'}} active-columns-{{eGlobalColumnsCount}}"><span>Role</span><i
+        [ngClass]="[columnSettings[1].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[1].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[1].orderStyle && !columnSettings[1].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i>
+      </th>
+      <th (click)="orderSessionsByType(columnSettings[2].orderStyle)" class="{{eGlobalColumns.provider ? '' : 'hidden-column'}}"><span>Provider</span><i
+        [ngClass]="[columnSettings[2].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[2].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[2].orderStyle && !columnSettings[2].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i>
+      </th>
+      <th (click)="orderSessionsByNamedProfile(columnSettings[3].orderStyle)" class="{{eGlobalColumns.namedProfile ? '' : 'hidden-column'}}">
+        <span>Named P{{eCompactMode ? '' : 'rofile'}}</span><i
+        [ngClass]="[columnSettings[3].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[3].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[3].orderStyle && !columnSettings[3].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i>
+      </th>
+      <th (click)="orderSessionsByNamedRegion(columnSettings[4].orderStyle)"
+          class="{{!eCompactMode && eGlobalColumns.region ? '' : 'hidden-column'}}"><span>Region</span><i
+        [ngClass]="[columnSettings[4].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[4].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[4].orderStyle && !columnSettings[4].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i>
+      </th>
+      <th><a (click)="openFilterColumn();"><i class="moon-Table"></i></a></th>
     </tr>
     </thead>
-    <tbody>
-    <tr class="active {{eCompactMode ? 'compact' : ''}}" app-session-card [globalColumns]="eGlobalColumns" [compactMode]="eCompactMode" [session]="session" *ngFor="let session of eGlobalFilteredSessions | filtering:true"></tr>
-    <tr class="{{eCompactMode ? 'compact' : ''}}" app-session-card [globalColumns]="eGlobalColumns" [compactMode]="eCompactMode" [session]="session" *ngFor="let session of eGlobalFilteredSessions | filtering:false"></tr>
-    </tbody>
   </table>
+  <cdk-virtual-scroll-viewport itemSize="56" class="table-virtual-scroll">
+    <table class="table table-account-cards">
+      <tbody>
+      <tr class="{{session.status !== eSessionStatus.inactive ? 'active' : ''}} {{eCompactMode ? 'compact' : ''}}" app-session-card
+          [globalColumns]="eGlobalColumns" [compactMode]="eCompactMode" [globalColumnsCount]="eGlobalColumnsCount"
+          [session]="session" [isSelected]="selectedSession?.sessionId === session.sessionId"
+          *cdkVirtualFor="let session of orderedSessions"></tr>
+      </tbody>
+    </table>
+  </cdk-virtual-scroll-viewport>
 </ng-container>
 
 <ng-container *ngIf="eGlobalFilteredSessions.length === 0 && eGlobalFilterGroup.searchFilter !== '' && !eGlobalFilterExtended">
   <div class="centered">
-    <img src="assets/images/no-result-found.png" alt="" title="" />
+    <img src="assets/images/no-result-found.png" alt="" title=""/>
     <br>
     <span>No results found for "{{eGlobalFilterGroup.searchFilter}}".</span>
   </div>
@@ -27,7 +45,7 @@
 
 <ng-container *ngIf="eGlobalFilteredSessions.length === 0 && eGlobalFilterExtended">
   <div class="centered corrected">
-    <img src="assets/images/no-result-found-filter.png" alt="" title="" />
+    <img src="assets/images/no-result-found-filter.png" alt="" title=""/>
     <br>
     <span>No results found. Try to <u>remove</u> some filters.</span>
   </div>
@@ -35,8 +53,16 @@
 
 <ng-container *ngIf="eGlobalFilteredSessions.length === 0 && eGlobalFilterGroup.searchFilter === '' && !eGlobalFilterExtended">
   <div class="centered">
-    <img src="assets/images/no-sessions.png" alt="" title="" />
+    <img src="assets/images/no-sessions.png" alt="" title=""/>
     <br>
     <span>Start by adding your first session.</span>
   </div>
+</ng-container>
+
+<ng-container>
+  <app-bottom-bar [selectedSession]="selectedSession" [compact]="eCompactMode"></app-bottom-bar>
+</ng-container>
+
+<ng-container>
+  <app-contextual-menu></app-contextual-menu>
 </ng-container>

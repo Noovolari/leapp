@@ -10,10 +10,10 @@ module.exports = {
 
     try {
       console.log('Performing post-pack actions... ')
-      await deleteFunction(path, '../oclif.manifest.json')
+      await deleteFunction(path, "..", "oclif.manifest.json")
       console.log('post-pack actions completed successfully')
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   }

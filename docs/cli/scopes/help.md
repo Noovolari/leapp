@@ -5,7 +5,7 @@ Display help for leapp.
 
 * [`leapp help [COMMAND]`](#leapp-help-command)
 
-# `leapp help [COMMAND]`
+## `leapp help [COMMAND]`
 
 Display help for leapp.
 
@@ -23,4 +23,4 @@ DESCRIPTION
   Display help for leapp.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.12/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.1.22/src/commands/help.ts)_

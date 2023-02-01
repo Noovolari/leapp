@@ -1,0 +1,27 @@
+.ssm-tray-form {
+  margin-top: 20px;
+
+  a {
+    display: inline-block;
+    margin-left: 10px;
+  }
+}
+
+.loader {
+  text-align: center;
+  padding: 10px;
+}
+
+
+.ssm-ul {
+  padding: 20px;
+
+  .ssm-card {
+    height: 40px;
+
+    button {
+      padding: 5px 10px !important;
+      float: right;
+    }
+  }
+}

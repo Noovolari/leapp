@@ -1,12 +1,26 @@
-With Leapp you can group and activate more than one credential set at a time through [Named Profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html).
+---
+title: "Configure Named Profiles"
+description: "How to configure Named Profiles. Named Profiles are used by AWS to maintain more than one set of active credentials for you to use with AWS-CLI, SDK, or other third-party tools."
+page_type: "built-in"
+structured_data_how_to_title: "Configure Named Profiles"
+structured_data_how_to_tip1: "Option Panel. Click on the gear icon and select the **Profiles** tab. Insert the name of the new Named Profile in the input form, then click on the plus icon."
+structured_data_how_to_tip2: "When creating a new Session. When creating a new session, the user will have the option to choose a Named Profile or **add** a new one."
+structured_data_how_to_tip3: "Edit Profile in Contextual Menu. Right-click on a session and select **Change** then **Named Profile**: an option to select or add a new Named Profile will be available."
+structured_data_how_to_tip4: ""
+social_title: "Configure Named Profiles"
+social_description: "How to configure Named Profiles. Named Profiles are used by AWS to maintain more than one set of active credentials for you to use with AWS-CLI, SDK, or other third-party tools."
+social_relative_image_path: "configure-named-profile.png"
+---
 
-## Named Profiles
+## What is a Named Profile
 
 Named Profiles are used by AWS to maintain more than one set of active credentials for you to use with AWS-CLI, SDK, or other third-party tools. Named profiles are stored in *~/.aws/credentials* file in the **ini** file format.
 
-Named Profiles have a default profile which is the one you get from [aws configure](https://docs.aws.amazon.com/cli/latest/reference/configure/) command.
+Named Profiles have a default profile which is the one you get from [aws configure](https://docs.aws.amazon.com/cli/latest/reference/configure/){: target='_blank'} command.
 
-## Create a new Named Profile
+With Leapp you can group and activate more than one credential set at a time through [Named Profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html){: target='_blank'}.
+
+## How to configure a Named Profile in Leapp
 
 Named Profiles can be created in **3 ways**:
 
@@ -22,8 +36,8 @@ Named Profiles can be created in **3 ways**:
 === "Edit Profile in Contextual Menu"
 
     Right-click on a session and select **Change** then **Named Profile**: an option to select or add a new Named Profile will be available.
-    <br><br>  
-    <img width="560" alt="Screenshot 2022-02-03 at 15 25 43" src="https://user-images.githubusercontent.com/9497292/152361872-0f52d40b-7c02-4dce-999c-c1bd2db517af.png">
+<br>
+<img width="560" alt="Screenshot 2022-02-03 at 15 25 43" src="https://user-images.githubusercontent.com/9497292/152361872-0f52d40b-7c02-4dce-999c-c1bd2db517af.png">
 
 
 The new name is directly added to the Named Profile list and can then be used for other sessions too.
@@ -32,7 +46,7 @@ The new name is directly added to the Named Profile list and can then be used fo
 
     AWS SSO sessions will have the Named Profile ```default``` when obtained via Login or Sync. To change the Named Profile associated to a session you have to use the "Change Profile" option in the session list.
 
-##Named Profile List
+### Named Profile List
 
 Named profiles can be managed from the Option menu.
 

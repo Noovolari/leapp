@@ -46,8 +46,12 @@ By default, Leapp stores the configuration files in the following locations:
 
 !!! Info
 
-    - **Leapp-lock.json** is used to store your actual configuration and is **encrypted**.
-    - **.latest** contains the latest version of your Leapp application. In case the file is removed accidentally or intentionally it will be created again when the app is restarted.
+    - **Leapp-lock.json** stores the Leapp configuration and is **encrypted**.
+        - On startup, if Leapp-lock.json is not found, Leapp will create an empty version of it.
+    - **Leapp-lock.backup.bin** stores a backup of Leapp-lock.json and is updated on startup if Leapp-lock.json is considered valid.
+        - On startup, if Leapp-lock.json is corrupted, Leapp-lock.backup.bin will be used to restore it.
+        - If both files are corrupted, a new empty configuration will be created.
+    - **.latest** contains the latest version number of Leapp. If missing, it will be created again on startup.
 
 ### Credentials file
 By default, Leapp writes the credentials file in the following locations:

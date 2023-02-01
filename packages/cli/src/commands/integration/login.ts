@@ -1,7 +1,7 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { integrationId } from "../../flags";
+import { Integration } from "@noovolari/leapp-core/models/integration";
 
 export default class LoginIntegration extends LeappCommand {
   static description = "Login to synchronize integration sessions";
@@ -20,7 +20,13 @@ export default class LoginIntegration extends LeappCommand {
     try {
       const { flags } = await this.parse(LoginIntegration);
       if (flags.integrationId && flags.integrationId !== "") {
-        const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        const selectedIntegration = this.cliProviderService.integrationFactory.getIntegrationById(flags.integrationId);
+        if (!selectedIntegration) {
+          throw new Error(`integrationId "${flags.integrationId}" is not associated to an existing integration`);
+        }
+        if (selectedIntegration.isOnline) {
+          throw new Error("integration is already online");
+        }
         await this.login(selectedIntegration);
       } else {
         const selectedIntegration = await this.selectIntegration();
@@ -31,24 +37,25 @@ export default class LoginIntegration extends LeappCommand {
     }
   }
 
-  async login(integration: AwsSsoIntegration): Promise<void> {
-    this.log("waiting for browser authorization using your AWS sign-in...");
+  async login(integration: Integration): Promise<void> {
+    this.log("waiting for browser authorization...");
     try {
-      const sessionsDiff = await this.cliProviderService.awsSsoIntegrationService.syncSessions(integration.id);
-      this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
-      this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
+      const sessionsDiff = await this.cliProviderService.integrationFactory.syncSessions(integration.id);
+      this.log(`${sessionsDiff.sessionsAdded} sessions added`);
+      this.log(`${sessionsDiff.sessionsDeleted} sessions removed`);
     } finally {
       await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
       await this.cliProviderService.remoteProceduresClient.refreshSessions();
     }
   }
 
-  async selectIntegration(): Promise<AwsSsoIntegration> {
-    const offlineIntegrations = this.cliProviderService.awsSsoIntegrationService.getOfflineIntegrations();
+  async selectIntegration(): Promise<Integration> {
+    const offlineIntegrations = this.cliProviderService.integrationFactory
+      .getIntegrations()
+      .filter((integration: Integration) => !integration.isOnline);
     if (offlineIntegrations.length === 0) {
       throw new Error("no offline integrations available");
     }
-
     const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedIntegration",

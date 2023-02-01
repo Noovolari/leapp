@@ -1,5 +1,6 @@
 import { describe, test, expect, jest } from "@jest/globals";
 import { LeappCommand } from "./leapp-command";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
 
 describe("LeappCommand", () => {
   test("init", async () => {
@@ -40,5 +41,26 @@ describe("LeappCommand", () => {
     expect(leappCommand.error).toHaveBeenCalledWith(
       "Leapp app must be running to use this CLI. You can download it here: https://www.leapp.cloud/releases"
     );
+  });
+
+  test("unsupportedAzureSession - azure session should throw an error", async () => {
+    const mockedSession = { type: SessionType.azure };
+    const leappCommand = new (LeappCommand as any)(null, null, null);
+    leappCommand.error = jest.fn();
+    expect(() => leappCommand.unsupportedAzureSession(mockedSession)).toThrow(new Error("Azure sessions not supported for this command"));
+  });
+
+  test("unsupportedAzureSession - anything else then an azure session should not throw an error", async () => {
+    const mockedSession = { type: SessionType.awsIamUser };
+    const leappCommand = new (LeappCommand as any)(null, null, null);
+    leappCommand.error = jest.fn();
+    expect(() => leappCommand.unsupportedAzureSession(mockedSession)).not.toThrow();
+  });
+
+  test("unsupportedAzureSession - undefined should not throw an error", async () => {
+    const mockedSession = undefined;
+    const leappCommand = new (LeappCommand as any)(null, null, null);
+    leappCommand.error = jest.fn();
+    expect(() => leappCommand.unsupportedAzureSession(mockedSession)).not.toThrow();
   });
 });

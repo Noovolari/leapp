@@ -2,7 +2,200 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [0.12.2](https://github.com/Noovolari/leapp/compare/v0.12.1...v0.12.2) (2022-05-30)
+### [0.17.2](https://github.com/Noovolari/leapp/compare/v0.17.1...v0.17.2) (2023-01-30)
+
+### Features
+* added support for the ap-southeast-4 region [#386](https://github.com/Noovolari/leapp/issues/386)
+* added examples for the Leapp CLI list --filter option. They will be available in docs.leapp.cloud, under the CLI section.
+* updated crypto-js to 4.1.1
+
+### [0.17.1](https://github.com/Noovolari/leapp/compare/v0.17.0...v0.17.1) (2023-01-10)
+
+### Features
+* added support for Keycloak IdP [#374](https://github.com/Noovolari/leapp/issues/374) 
+  <br><br>
+  You can now create an AWS IAM role federated session using Keycloak as an identity provider.
+  <br><br>
+  A special thanks to [@patlachance](https://github.com/patlachance) for the contribution!
+
+### [0.17.0](https://github.com/Noovolari/leapp/compare/v0.16.2...v0.17.0) (2022-12-23)
+
+### Features
+* added configurable default webconsole timeout with [#319](https://github.com/Noovolari/leapp/pull/319) PR.
+  <br><br>
+  A new option is added in the general options with which the default webconsole
+  timeout can be configured between 1 hour and 12 hours.
+  <br><br>
+  Configurable duration will now also apply to the IAM Role Federated Service.
+  <br><br>
+  A special thanks to [@RaviBri](https://github.com/RaviBri) for the contribution!
+  <br><br>
+* updated Multi-Console Browser Extension documentation
+
+### Bug Fixes
+
+* fixed [#360](https://github.com/Noovolari/leapp/issues/360) issue with [#361](https://github.com/Noovolari/leapp/pull/361) PR.
+  <br><br>
+  The PR fixes the case when the region for AWS SSO changes
+  and the client isn't aware, leading to the "Session token not found
+  or invalid" error.
+  <br><br>
+  It adds a check to see if the clients' region is different to the
+  integration one and so recreate the client.
+  <br><br>
+  A special thanks to [@rusowyler](https://github.com/rusowyler) for the contribution!
+  <br><br>
+* added missing plugins initialization when running a CLI command with flags
+* fixed dependencies security issues (gushio and electron-builder are still moderate)
+
+### [0.16.2](https://github.com/Noovolari/leapp/compare/v0.16.1...v0.16.2) (2022-11-15)
+
+### Features
+
+* merged the open web console methods in a single menu action. Now you can set your favourite method from the Multi-Console tab in the option menu and choose between the
+  standard method or to use the extension (with a fallback to the standard method if any error occurs)
+* added a shortcut to the open web console action. Now you can use Command + left click (or Control + left click on Windows/Linux) to open it with a single click
+
+### Bug Fixes
+
+* fixed a bug with the dark theme showing the active icon of a session with the wrong color if the session is selected
+* introduced a SAML authentication timeout handler to avoid hanging sessions
+
+### [0.16.1](https://github.com/Noovolari/leapp/compare/v0.16.0...v0.16.1) (2022-11-09)
+
+### Features
+
+* added support for reusable Firefox Containers/Chrome Tabs
+
+### Bug Fixes
+
+* disabled IAM User "Open Web Console" and "Open Multi-Console Extension" actions
+
+### [0.16.0](https://github.com/Noovolari/leapp/compare/v0.15.2...v0.16.0) (2022-11-02)
+
+### Features
+
+* added AWS multi-console support. Now it is possible to open multiple AWS consoles in the same browser window by installing
+  the Leapp browser extension available for Firefox, Chrome, Edge and other Chromium-based browser. To learn more, see the [docs](https://docs.leapp.cloud/0.16.0/built-in-features/multi-console/).
+
+### Bug Fixes
+
+* updated Electron to version 19 to restore U2F support for AWS Single Sign-On
+
+### [0.15.2](https://github.com/Noovolari/leapp/compare/v0.15.1...v0.15.2) (2022-10-21)
+
+### Features
+
+* added a new tab in the options to manage AWS SSM deafult region behaviour. This feature closes GitHub Issues [#292](https://github.com/Noovolari/leapp/issues/292) and [#232](https://github.com/Noovolari/leapp/issues/232). Thanks to [@akymos](https://github.com/akymos) for the PR!
+
+### Bug Fixes
+
+* fixed AWS IAM Identity Center "Session token not found or invalid" issue [#347](https://github.com/Noovolari/leapp/issues/347)
+* increased Leapp Core tests coverage
+
+### [0.15.1](https://github.com/Noovolari/leapp/compare/v0.15.0...v0.15.1) (2022-10-06)
+
+### Bug Fixes
+
+* fixed installing Leapp Plugin from the Plugin Hub not completing properly when the app is not running
+* added Leapp Session role name info to CLI start session command [Issue #341](https://github.com/Noovolari/leapp/issues/341) [PR #344](https://github.com/Noovolari/leapp/pull/344). Thanks to [@lordgordon](https://github.com/lordgordon) for reporting the issue and [@andreacavagna01](https://github.com/andreacavagna01) for the PR!
+
+### [0.15.0](https://github.com/Noovolari/leapp/compare/v0.14.3...v0.15.0) (2022-10-03)
+
+### Features
+
+* refactored sessions list introducing recycle of views; in case of many sessions, CPU usage and memory footprint were dramatically reduced. Thanks to [@egauk](https://github.com/egauk) for the [Issue #314](https://github.com/Noovolari/leapp/issues/314)!
+* improved startup performance
+* now it is possible to create a new Azure Integration directly from Session creation dialog
+
+### [0.14.3](https://github.com/Noovolari/leapp/compare/v0.14.2...v0.14.3) (2022-09-15)
+
+### Features
+
+* added a new set of Leapp Plugin APIs to open the terminal and to work with Leapp sessions (create, edit and clone)
+* added a new [Plugin Hub](https://www.leapp.cloud/plugins) to search and install Leapp Plugins directly from the Leapp website
+
+### Bug Fixes
+
+* fixed a problem not allowing Leapp desktop app to start normally on Ubuntu 22.04 LTS [#334](https://github.com/Noovolari/leapp/issues/334)
+
+### [0.14.2](https://github.com/Noovolari/leapp/compare/v0.14.1...v0.14.2) (2022-08-26)
+
+### Features
+
+* added support to Auth0 as SAML IdP. Thanks to [@maintux](https://github.com/maintux) for the [Pull Request #321](https://github.com/Noovolari/leapp/pull/321)!
+
+### Bug Fixes
+
+* fixed constant keychain password prompt on macOS when using Leapp Desktop App/CLI [#317](https://github.com/Noovolari/leapp/issues/317) [#318](https://github.com/Noovolari/leapp/issues/318)
+* added a mechanism to backup and restore corrupted Leapp-lock.json files [#282](https://github.com/Noovolari/leapp/issues/282) [#302](https://github.com/Noovolari/leapp/issues/302)
+* added an error message with an additional link to download the Session Manager Plugin if the user doesn't have it installed on the computer [#245](https://github.com/Noovolari/leapp/issues/245)
+* added an error message with an additional link to troubleshoot problems if the AWS CLI was installed with alternative methods (e.g. Homebrew) [#257](https://github.com/Noovolari/leapp/issues/257)
+* fixed minor issues when using the Leapp option menu to download a Leapp plugin from npm
+
+### [0.14.1](https://github.com/Noovolari/leapp/compare/v0.14.0...v0.14.1) (2022-08-18)
+
+### Bug Fixes
+
+* fixed compiler option to allow desktop-app to read base class from plugins
+
+### [0.14.0](https://github.com/Noovolari/leapp/compare/v0.13.4...v0.14.0) (2022-08-18)
+
+### Features
+
+* added new plugin system: users have the ability to download, install, and create custom plugins for Leapp
+* added [plugin template](https://github.com/Noovolari/leapp-plugin-template) as a starting point to develop your own plugin
+
+Learn more about Leapp plugins in our in-depth [documentation](https://docs.leapp.cloud/latest/plugins/plugins-introduction/)
+
+### [0.13.4](https://github.com/Noovolari/leapp/compare/v0.13.3...v0.13.4) (2022-08-08)
+
+### Bug Fixes
+
+* fixed dev tools opening on app start
+
+### [0.13.3](https://github.com/Noovolari/leapp/compare/v0.13.2...v0.13.3) (2022-08-08)
+
+### Features
+
+* added feature to copy web-console URL [#296](https://github.com/Noovolari/leapp/issues/296) PR: [#306](https://github.com/Noovolari/leapp/pull/306)
+
+### Bug Fixes
+
+* fixed a bug that entered in CLI interactive mode when running with flags and prevented some commands to work properly [#301](https://github.com/Noovolari/leapp/issues/301) [#259](https://github.com/Noovolari/leapp/issues/259)
+* fixed permissions required for running Leapp on Windows. Now it will run with the same permissions as the user using Leapp PR: [#307](https://github.com/Noovolari/leapp/pull/307)
+
+A special **“thank you”** to **Sami Oksanen** ([@c-sami](https://github.com/c-sami)), who made 3 PRs this week!
+
+### [0.13.2](https://github.com/Noovolari/leapp/compare/v0.13.1...v0.13.2) (2022-08-02)
+
+### Bug Fixes
+* changed TPS limit introduced in the solution for AWS SSO TooManyRequest error [#281](https://github.com/Noovolari/leapp/issues/281) [#308](https://github.com/Noovolari/leapp/issues/308)
+
+### [0.13.1](https://github.com/Noovolari/leapp/compare/v0.13.0...v0.13.1) (2022-07-14)
+
+### Bug Fixes
+* added solution that solves AWS SSO TooManyRequest error [#281](https://github.com/Noovolari/leapp/issues/281) [#297](https://github.com/Noovolari/leapp/pull/297)
+* increased Leapp Core tests coverage
+
+Thank you! A huge shout out to the community members who contributed to this release of Leapp!
+
+@peteawood #281 #297
+
+### [0.13.0](https://github.com/Noovolari/leapp/compare/v0.12.2...v0.13.0) (2022-07-12)
+
+### Features
+
+* added support for Azure Integration: now it is possible to sync, start, rotate, edit, stop, and delete all Azure Sessions associated to Azure Tenant Subscriptions
+* added support for Brew on Linux: Linux and darwin-x64 rely on npm tarball, while darwin-arm64 rely on a custom installer [#251](https://github.com/Noovolari/leapp/issues/251) [#250](https://github.com/Noovolari/leapp/issues/250)
+
+### Bug Fixes
+* fixed tray menu Session list: now it is possible to see more than 10 Leapp Sessions
+* automatically strip AWS keys' white spaces [#289](https://github.com/Noovolari/leapp/issues/289)
+* added ap-southeast-3 region [#291](https://github.com/Noovolari/leapp/pull/291) [@nitrocode](https://github.com/nitrocode)
+* fixed filtering not saving after integration selection
+
+### [0.12.2](https://github.com/Noovolari/leapp/compare/v0.12.1...v0.12.2) (2022-05-30)
 
 ### Bug Fixes
 
@@ -22,7 +215,7 @@ All notable changes to this project will be documented in this file. See [standa
 * fixed selected but not applied filters behavior
 * dependabot security issues
 * fixed docs param typo [#268](https://github.com/Noovolari/leapp/pull/268) [@RafPe](https://github.com/RafPe)
-* removed error message shown when AWS SSM plugin is not 
+* removed error message shown when AWS SSM plugin is not
 * now it is possible to logout from AWS SSO Integrations without deleting sessions [#209](https://github.com/Noovolari/leapp/issues/209)
 
 ### [0.12.0](https://github.com/Noovolari/leapp/compare/v0.11.1...v0.12.0) (2022-04-28)
@@ -34,7 +227,7 @@ All notable changes to this project will be documented in this file. See [standa
 * added support to credential_process in ~/.aws/config file
 * Leapp CLI now [supports scripting using flags](https://docs.leapp.cloud/latest/cli/) for each available command [#259](https://github.com/Noovolari/leapp/issues/259)
 
-## [0.11.1](https://github.com/Noovolari/leapp/compare/v0.11.0...v0.11.1) (2022-04-21)
+### [0.11.1](https://github.com/Noovolari/leapp/compare/v0.11.0...v0.11.1) (2022-04-21)
 
 ### Bug Fixes
 

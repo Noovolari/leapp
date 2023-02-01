@@ -9,11 +9,11 @@ import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
-import { KeychainService } from "../../keychain-service";
 import { Repository } from "../../repository";
 import { AwsIamUserSessionRequest } from "./aws-iam-user-session-request";
 import { AwsSessionService } from "./aws-session-service";
 import { LoggedException, LogLevel } from "../../log-service";
+import { IKeychainService } from "../../../interfaces/i-keychain-service";
 
 export interface GenerateSessionTokenCallingMfaParams {
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -32,7 +32,7 @@ export class AwsIamUserService extends AwsSessionService {
     repository: Repository,
     private localMfaCodePrompter: IMfaCodePrompter,
     private remoteMfaCodePrompter: IMfaCodePrompter,
-    private keychainService: KeychainService,
+    private keychainService: IKeychainService,
     fileService: FileService,
     awsCoreService: AwsCoreService
   ) {
@@ -67,17 +67,35 @@ export class AwsIamUserService extends AwsSessionService {
       session.sessionId = request.sessionId;
     }
 
-    this.keychainService
-      .saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, request.accessKey)
-      .then((_: any) => {
-        this.keychainService
-          .saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, request.secretKey)
-          .catch((err: any) => console.error(err));
-      })
-      .catch((err: any) => console.error(err));
-
+    await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, request.accessKey);
+    await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, request.secretKey);
     this.repository.addSession(session);
     this.sessionNotifier?.setSessions(this.repository.getSessions());
+  }
+
+  async update(sessionId: string, updateRequest: AwsIamUserSessionRequest): Promise<void> {
+    const session = this.repository.getSessionById(sessionId) as AwsIamUserSession;
+    if (session) {
+      session.sessionName = updateRequest.sessionName;
+      session.region = updateRequest.region;
+      session.mfaDevice = updateRequest.mfaDevice;
+      session.profileId = updateRequest.profileId;
+
+      if (updateRequest.accessKey) {
+        await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, updateRequest.accessKey);
+      }
+
+      if (updateRequest.secretKey) {
+        await this.keychainService.saveSecret(
+          constants.appName,
+          `${session.sessionId}-iam-user-aws-session-secret-access-key`,
+          updateRequest.secretKey
+        );
+      }
+
+      this.repository.updateSession(sessionId, session);
+      this.sessionNotifier?.setSessions(this.repository.getSessions());
+    }
   }
 
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
@@ -200,22 +218,22 @@ export class AwsIamUserService extends AwsSessionService {
     });
   }
 
-  removeSecrets(sessionId: string): void {
-    this.removeAccessKeyFromKeychain(sessionId)
-      .then((_) => {
-        this.removeSecretKeyFromKeychain(sessionId)
-          .then((__) => {
-            this.removeSessionTokenFromKeychain(sessionId).catch((err) => {
-              throw err;
-            });
-          })
-          .catch((err) => {
-            throw err;
-          });
-      })
-      .catch((err) => {
-        throw err;
-      });
+  async removeSecrets(sessionId: string): Promise<void> {
+    await this.removeAccessKeyFromKeychain(sessionId);
+    await this.removeSecretKeyFromKeychain(sessionId);
+    await this.removeSessionTokenFromKeychain(sessionId);
+  }
+
+  async getCloneRequest(session: AwsIamUserSession): Promise<AwsIamUserSessionRequest> {
+    const accessKey = await this.getAccessKeyFromKeychain(session.sessionId);
+    const secretKey = await this.getSecretKeyFromKeychain(session.sessionId);
+    return {
+      profileId: session.profileId,
+      region: session.region,
+      sessionName: session.sessionName,
+      accessKey,
+      secretKey,
+    };
   }
 
   // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -250,15 +268,15 @@ export class AwsIamUserService extends AwsSessionService {
   }
 
   private async removeAccessKeyFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
+    await this.keychainService.deleteSecret(constants.appName, `${sessionId}-iam-user-aws-session-access-key-id`);
   }
 
   private async removeSecretKeyFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
+    await this.keychainService.deleteSecret(constants.appName, `${sessionId}-iam-user-aws-session-secret-access-key`);
   }
 
   private async removeSessionTokenFromKeychain(sessionId: string): Promise<void> {
-    await this.keychainService.deletePassword(constants.appName, `${sessionId}-iam-user-aws-session-token`);
+    await this.keychainService.deleteSecret(constants.appName, `${sessionId}-iam-user-aws-session-token`);
   }
 
   private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {
@@ -287,7 +305,7 @@ export class AwsIamUserService extends AwsSessionService {
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];
 
-    if (credentials !== undefined) {
+    if (credentials) {
       currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
     }
 

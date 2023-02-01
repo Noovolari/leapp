@@ -6,7 +6,7 @@ Leapp checks if a new version is available every **10 minutes** (starting from t
 If so, a dialog message will pop up and show a `version number`, the `release date` and the `changelog`
 
 
-![](../../images/screens/newuxui/update.png)
+![](../../images/screens/newuxui/update.png?style=smaller-img)
 In this modal, a user can do the following:
 
 === "Remind me later"
@@ -31,21 +31,21 @@ In this modal, a user can do the following:
 
 ### macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)
 
-Leapp can also be updated via [Homebrew Cask](https://brew.sh/) with:
+Leapp can also be updated via [Homebrew Cask](https://brew.sh/){: target='_blank'} with:
 `brew upgrade leapp`
 
 ## CLI
 
-Depeding on which method you used to install the CLI ([npm](https://www.npmjs.com/package/@noovolari/leapp-cli) or Homebrew on macOS) you can update it with the following commands:
+Depeding on which method you used to install the CLI ([npm](https://www.npmjs.com/package/@noovolari/leapp-cli){: target='_blank'} or Homebrew on macOS) you can update it with the following commands:
 
 === "npm"
 
     ```console
-    $ npm update -g @noovolari/leapp-cli
+    npm update -g @noovolari/leapp-cli
     ```
 
 === "Homebrew (macOS)"
 
     ```console
-    $ brew upgrade Noovolari/brew/leapp-cli
+    brew upgrade Noovolari/brew/leapp-cli
     ```

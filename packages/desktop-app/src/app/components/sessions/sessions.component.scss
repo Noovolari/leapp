@@ -1,3 +1,4 @@
+@import "../../../assets/scss/mixins/utility";
 @import "../../../assets/scss/mixins/palette";
 @import "../../../assets/scss/global";
 
@@ -20,18 +21,28 @@
     margin-top: calc(-14% - #{$commandbar-extended-height} + 87px);
   }
 
-  img { height: 210px; }
-  span { display: block; margin-top: 10px; font-size: 18px; color: $text-color; }
+  img {
+    height: 210px;
+  }
+
+  span {
+    display: block;
+    margin-top: 10px;
+    font-size: 18px;
+    color: $text-color;
+  }
 }
 
 th {
-  padding-bottom: 14px!important;
+  padding-bottom: 14px !important;
   z-index: 1;
+
   a {
     color: $text-color;
     cursor: pointer;
     text-decoration: none;
     transition: opacity 0.3s ease;
+
     &:hover {
       opacity: 0.6;
     }
@@ -41,27 +52,23 @@ th {
 i.moon-Table {
   color: $silver-dark;
   font-size: 23px;
-  padding-left: 27px;
   position: relative;
   top: 4px;
 }
 
 span.vertical-rule {
-  margin-right: 0!important;
-  margin-block: -4px!important;
-  height: 22px!important;
+  margin-right: 0 !important;
+  margin-block: -4px !important;
+  height: 22px !important;
 }
 
-th:nth-child(1) {
-  padding-left: 22px!important;
-}
 
 .compact th a span.vertical-rule {
-  margin-block: -1px!important;
+  margin-block: -1px !important;
 }
 
 .compact i.moon-Table {
-  padding-left: 22px;
+  padding-left: 8px;
 }
 
 i.moon-Dropdown,
@@ -72,32 +79,215 @@ i.moon-Caret-down {
   font-size: 16px;
   color: inherit;
   opacity: 0;
+
   &.ascendent-order-arrow.hidden-arrow {
-    display:inline-block;
-    opacity: 0!important;
+    display: inline-block;
+    opacity: 0 !important;
   }
+
   &.active-arrow.descendent-order-arrow {
-    display:inline-block;
-    opacity: 1!important;
+    display: inline-block;
+    opacity: 1 !important;
   }
+
   &.hidden-arrow.descendent-order-arrow {
-    display:inline-block;
-    opacity: 1!important;
+    display: inline-block;
+    opacity: 1 !important;
     transition: all 0.2s ease;
     transform: rotate(180deg);
   }
 }
 
-tr .status-item {display: inline-block; }
-tr .hover-item { display: none; }
+tr.compact {
+  th:nth-child(2) {
+    width: 114px;
+  }
+
+  th:nth-child(3) {
+    width: 115px;
+  }
+
+  th:nth-child(4) {
+    width: 80px;
+  }
+
+  th:nth-child(6) {
+    width: 50px;
+  }
+}
+
+tr {
+  &.status-item {
+    display: inline-block;
+  }
+
+  &.hover-item {
+    display: none;
+  }
+
+  th.hidden-column {
+    display: none;
+  }
+
+  th:nth-child(1) {
+    padding-left: 22px !important;
+  }
+
+  th:nth-child(2) {
+    width: 18%;
+    &.active-columns-3 {
+      width: 22%;
+    }
+    &.active-columns-2 {
+      width: 26%;
+    }
+    &.active-columns-1 {
+      width: 32%;
+    }
+  }
+
+  th:nth-child(3) {
+    width: 13%;
+  }
+
+  th:nth-child(4) {
+    width: 14%;
+  }
+
+  th:nth-child(5) {
+    width: 11%;
+  }
+
+  th:nth-child(6) {
+    width: 7%;
+    text-align: center;
+  }
+}
 
 ::ng-deep {
   th:hover i.moon-Dropdown.hidden-arrow.ascendent-order-arrow,
   th:hover i.moon-Caret-down.hidden-arrow.ascendent-order-arrow {
-    opacity: 1!important;
+    opacity: 1 !important;
   }
+
   tr:hover {
-    .status-item { display: none; }
-    .hover-item { display: inline-block!important; }
+    .status-item {
+      display: none;
+    }
+
+    .hover-item {
+      display: inline-block !important;
+    }
   }
+}
+
+.opt-bar-session-button {
+  position: relative;
+  top: 2px;
+}
+
+.opt-bar-middle-section {
+  position: relative;
+  left: -43px;
+
+  &.moon-Server {
+  }
+}
+
+.opt-bar-middle-left-buttons {
+  display: inline-block;
+
+  a .moon-Region {
+    position: relative;
+    left: -6px;
+  }
+
+  a .moon-User {
+    position: relative;
+    left: -3px;
+  }
+}
+
+.opt-bar-middle-right-buttons {
+  display: inline-block;
+  margin-left: -5px;
+
+  a .moon-Delete {
+    position: relative;
+    left: 2px;
+  }
+}
+
+.azure-opt-bar .opt-bar-middle-section {
+  position: relative;
+  left: 37px;
+}
+
+.awsiamrolefederated-opt-bar .opt-bar-middle-section,
+.awsiamrolechained-opt-bar .opt-bar-middle-section {
+  position: relative;
+  left: -43px;
+}
+
+.awsiamuser-opt-bar .opt-bar-middle-section,
+.awsssorole-opt-bar .opt-bar-middle-section {
+  position: relative;
+  left: -23px !important;
+}
+
+.icon-button.start-session,
+.icon-button.stop-session {
+  position: relative !important;
+  left: 7px !important;
+}
+
+.stop-session i {
+  color: $bright-red !important;
+}
+
+.start-session i {
+  color: $main-color-light !important;
+}
+
+.start-session, .stop-session {
+  display: inline-flex;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 15px;
+  min-width: 143px !important;
+  color: $text-color;
+
+  i {
+    font-size: 30px !important;
+    margin-right: 15px;
+  }
+}
+
+.open-web-console {
+  position: relative;
+  right: 10px;
+}
+
+.azure-opt-bar .separator {
+  visibility: hidden;
+}
+
+.session-name {
+  position: relative;
+  left: -1px;
+  color: $silver-dark;
+  font-size: 13px;
+}
+
+.table-virtual-scroll {
+  position: absolute;
+  top: 56.5px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.table-account-cards {
+  width: 100%;
+  table-layout: fixed;
 }

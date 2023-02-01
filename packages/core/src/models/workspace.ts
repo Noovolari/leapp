@@ -9,8 +9,10 @@ import Folder from "./folder";
 import Segment from "./segment";
 import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import { AzureIntegration } from "./azure/azure-integration";
+import PluginStatus from "./plugin-status";
 
 export class Workspace {
+  /* istanbul ignore next */
   @Type(() => Session)
   private _sessions: Session[];
 
@@ -23,11 +25,14 @@ export class Workspace {
   private _idpUrls: IdpUrl[];
   private _profiles: AwsNamedProfile[];
 
+  private _pluginsStatus: PluginStatus[];
+
   private _pinned: string[];
   private _folders: Folder[];
   private _segments: Segment[];
 
   private _colorTheme: string;
+  private _extensionEnabled: boolean;
 
   private _proxyConfiguration: {
     proxyProtocol: string;
@@ -38,8 +43,11 @@ export class Workspace {
   };
 
   private _credentialMethod: string;
+  private _samlRoleSessionDuration: number;
 
-  private _lastMigrationVersion: string;
+  private _ssmRegionBehaviour: string;
+
+  private _workspaceVersion: number;
 
   constructor() {
     this._pinned = [];
@@ -51,6 +59,8 @@ export class Workspace {
     this._macOsTerminal = constants.macOsTerminal;
     this._idpUrls = [];
     this._profiles = [{ id: uuid.v4(), name: constants.defaultAwsProfileName }];
+    this._pluginsStatus = [];
+    this._extensionEnabled = false;
 
     this._awsSsoIntegrations = [];
     this._azureIntegrations = [];
@@ -64,6 +74,13 @@ export class Workspace {
     };
 
     this._credentialMethod = constants.credentialFile;
+    this._samlRoleSessionDuration = constants.samlRoleSessionDuration;
+
+    this._ssmRegionBehaviour = constants.ssmRegionNo;
+  }
+
+  setNewWorkspaceVersion(): void {
+    this._workspaceVersion = constants.workspaceLastVersion;
   }
 
   addIpUrl(idpUrl: IdpUrl): void {
@@ -180,5 +197,37 @@ export class Workspace {
 
   set credentialMethod(credentialMethod: string) {
     this._credentialMethod = credentialMethod;
+  }
+
+  get pluginsStatus(): PluginStatus[] {
+    return this._pluginsStatus;
+  }
+
+  set pluginsStatus(newPlugins: PluginStatus[]) {
+    this._pluginsStatus = newPlugins;
+  }
+
+  get ssmRegionBehaviour(): string {
+    return this._ssmRegionBehaviour;
+  }
+
+  set ssmRegionBehaviour(ssmRegionBehaviour: string) {
+    this._ssmRegionBehaviour = ssmRegionBehaviour;
+  }
+
+  get extensionEnabled(): boolean {
+    return this._extensionEnabled;
+  }
+
+  set extensionEnabled(extensionEnabled: boolean) {
+    this._extensionEnabled = extensionEnabled;
+  }
+
+  get samlRoleSessionDuration(): number {
+    return this._samlRoleSessionDuration;
+  }
+
+  set samlRoleSessionDuration(duration: number) {
+    this._samlRoleSessionDuration = duration;
   }
 }

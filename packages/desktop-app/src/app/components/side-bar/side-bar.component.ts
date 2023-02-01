@@ -1,12 +1,17 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
-import { globalFilteredSessions, globalHasFilter, globalResetFilter, globalSegmentFilter } from "../command-bar/command-bar.component";
+import {
+  globalFilteredSessions,
+  globalFilterGroup,
+  globalHasFilter,
+  globalResetFilter,
+  globalSegmentFilter,
+} from "../command-bar/command-bar.component";
 import { BehaviorSubject } from "rxjs";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { ConfirmationDialogComponent } from "../dialogs/confirmation-dialog/confirmation-dialog.component";
 import Segment from "@noovolari/leapp-core/models/segment";
 import Folder from "@noovolari/leapp-core/models/folder";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
-import { Session } from "@noovolari/leapp-core/models/session";
 import { AppProviderService } from "../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { integrationHighlight } from "../integration-bar/integration-bar.component";
@@ -76,19 +81,19 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   showOnlyPinned(): void {
     sidebarHighlight.next({ showAll: false, showPinned: true, selectedSegment: -1 });
-    globalFilteredSessions.next(
-      this.behaviouralSubjectService.sessions.filter((s: Session) => this.optionsService.pinned.indexOf(s.sessionId) !== -1)
-    );
+    const globalFilters = globalFilterGroup.value;
+    globalFilters.integrationFilter = [];
+    globalFilters.pinnedFilter = true;
+    globalFilterGroup.next(globalFilters);
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   applySegmentFilter(segment: Segment, event: any): void {
     event.preventDefault();
     event.stopPropagation();
 
     const selectedIndex = this.selectedS.findIndex((s) => s.name === segment.name);
     this.selectedS[selectedIndex].selected = true;
-    document.querySelector(".sessions").classList.remove("option-bar-opened");
+    this.behaviouralSubjectService.unselectSessions();
     sidebarHighlight.next({ showAll: false, showPinned: false, selectedSegment: selectedIndex });
     globalSegmentFilter.next(JSON.parse(JSON.stringify(segment)));
   }

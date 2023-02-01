@@ -1,8 +1,9 @@
+import { describe, test, expect } from "@jest/globals";
 import { SessionType } from "../session-type";
 import { AwsIamUserSession } from "./aws-iam-user-session";
 
 describe("AWS IAM User Session Model", () => {
-  it("should create with MFA device", () => {
+  test("should create with MFA device", () => {
     const sessionName = "fake-iam-user-session";
     const region = "fake-region";
     const profileId = "fake-profile-id";
@@ -17,7 +18,7 @@ describe("AWS IAM User Session Model", () => {
     expect(mockedIamUserSession.mfaDevice).toEqual(mfaDevice);
   });
 
-  it("should create without MFA device", () => {
+  test("should create without MFA device", () => {
     const mockedIamUserSession = new AwsIamUserSession(null, null, null);
     expect(mockedIamUserSession.mfaDevice).toBe(undefined);
   });

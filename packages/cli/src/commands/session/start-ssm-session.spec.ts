@@ -39,24 +39,25 @@ describe("StartSsmSession", () => {
       },
       sessionFactory: new CliProviderService().sessionFactory,
       cloudProviderService: new CliProviderService().cloudProviderService,
+      awsCoreService: new CliProviderService().awsCoreService,
     };
 
     command = getTestCommand(cliMockService, ["--sessionId", "session", "--region", "x", "--ssmInstanceId", "ssmInstance"]);
     command.generateCredentials = jest.fn(async (): Promise<any> => "credentials");
-    await expect(command.run()).rejects.toThrow("No region found with name x");
+    await expect(command.run()).rejects.toThrow("Provided region is not a valid AWS region");
 
     command = getTestCommand(cliMockService, ["--sessionId", "session", "--region", "eu-west-1", "--ssmInstanceId"]);
     await expect(command.run()).rejects.toThrow("Flag --ssmInstanceId expects a value");
 
-    command = getTestCommand(cliMockService, ["--sessionId", "session", "--region", "region", "--ssmInstanceId", "ssmInstance"]);
+    command = getTestCommand(cliMockService, ["--sessionId", "session", "--region", "eu-west-1", "--ssmInstanceId", "ssmInstance"]);
     command.selectSession = jest.fn(async (): Promise<any> => "session");
     command.generateCredentials = jest.fn(async (): Promise<any> => "credentials");
-    (command as any).availableRegions = jest.fn((): any => [{ fieldName: "region" }]);
+    (command as any).availableRegions = jest.fn((): any => [{ fieldName: "eu-west-1", fieldValue: "eu-west-1" }]);
     command.selectSsmInstance = jest.fn(async (): Promise<any> => "ssmInstance");
     command.startSsmSession = jest.fn(async () => {});
     await command.run();
     expect(command.generateCredentials).toHaveBeenCalledWith({ sessionId: "session", sessionName: "sessionName", type: "awsIamUser" });
-    expect(command.startSsmSession).toHaveBeenCalledWith("credentials", "ssmInstance", "region");
+    expect(command.startSsmSession).toHaveBeenCalledWith("credentials", "ssmInstance", "eu-west-1");
   });
 
   const runCommand = async (errorToThrow: any, expectedErrorMessage: string) => {

@@ -1,4 +1,4 @@
-import { deserialize, serialize } from "class-transformer";
+import { serialize } from "class-transformer";
 import { INativeService } from "../interfaces/i-native-service";
 import { AwsIamRoleChainedSession } from "../models/aws/aws-iam-role-chained-session";
 import { AwsNamedProfile } from "../models/aws/aws-named-profile";
@@ -15,12 +15,18 @@ import * as uuid from "uuid";
 import Folder from "../models/folder";
 import { LoggedException, LogLevel } from "./log-service";
 import { AzureIntegration } from "../models/azure/azure-integration";
+import PluginStatus from "../models/plugin-status";
+import { WorkspaceConsistencyService } from "./workspace-consistency-service";
 
 export class Repository {
   // Private singleton workspace
   private _workspace: Workspace;
 
-  constructor(private nativeService: INativeService, private fileService: FileService) {
+  constructor(
+    private nativeService: INativeService,
+    private fileService: FileService,
+    private workspaceConsistencyService: WorkspaceConsistencyService
+  ) {
     this.createWorkspace();
   }
 
@@ -35,11 +41,7 @@ export class Repository {
   }
 
   reloadWorkspace(): void {
-    const workspaceJSON = this.fileService.decryptText(
-      this.fileService.readFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)
-    );
-    this._workspace = deserialize(Workspace, workspaceJSON);
-    // TODO: instantiate sessions with the proper runtime type (eg. AwsIamUserSession instead of Session)
+    this._workspace = this.workspaceConsistencyService.getWorkspace();
   }
 
   getWorkspace(): Workspace {
@@ -52,7 +54,7 @@ export class Repository {
   createWorkspace(): void {
     if (!this.fileService.existsSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)) {
       this.fileService.newDir(this.nativeService.os.homedir() + "/.Leapp", { recursive: true });
-      this._workspace = new Workspace();
+      this._workspace = this.workspaceConsistencyService.createNewWorkspace();
       this.persistWorkspace(this._workspace);
     }
   }
@@ -112,43 +114,43 @@ export class Repository {
   }
 
   listPending(): Session[] {
-    const workspace = this.getWorkspace();
-    return workspace.sessions && workspace.sessions.length > 0
-      ? workspace.sessions.filter((session) => session.status === SessionStatus.pending)
-      : [];
+    return this.getSessionsOrDefault().filter((session) => session.status === SessionStatus.pending);
   }
 
   listActive(): Session[] {
-    const workspace = this.getWorkspace();
-    return workspace.sessions && workspace.sessions.length > 0 ? workspace.sessions.filter((session) => session.status === SessionStatus.active) : [];
+    return this.getSessionsOrDefault().filter((session) => session.status === SessionStatus.active);
   }
 
   listActiveAndPending(): Session[] {
-    const workspace = this.getWorkspace();
-    return workspace.sessions && workspace.sessions.length > 0
-      ? workspace.sessions.filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending)
-      : [];
+    return this.getSessionsOrDefault().filter((s) => s.status === SessionStatus.active || s.status === SessionStatus.pending);
   }
 
   listAwsSsoRoles(): Session[] {
-    const workspace = this.getWorkspace();
-    return workspace.sessions && workspace.sessions.length > 0 ? workspace.sessions.filter((session) => session.type === SessionType.awsSsoRole) : [];
+    return this.getSessionsOrDefault().filter((session) => session.type === SessionType.awsSsoRole);
   }
 
   listAssumable(): Session[] {
-    return this.getWorkspace().sessions.length > 0 ? this.getWorkspace().sessions.filter((session) => session.type !== SessionType.azure) : [];
+    return this.getSessionsOrDefault().filter((session) => session.type !== SessionType.azure);
   }
 
   listIamRoleChained(parentSession?: Session): Session[] {
-    const workspace = this.getWorkspace();
-    let childSession =
-      workspace.sessions && workspace.sessions.length > 0
-        ? workspace.sessions.filter((session) => session.type === SessionType.awsIamRoleChained)
-        : [];
+    let childSession = this.getSessionsOrDefault().filter((session) => session.type === SessionType.awsIamRoleChained);
     if (parentSession) {
       childSession = childSession.filter((session) => (session as AwsIamRoleChainedSession).parentSessionId === parentSession.sessionId);
     }
     return childSession;
+  }
+
+  createPluginStatus(pluginId: string): void {
+    this._workspace.pluginsStatus.push({ id: pluginId, active: true });
+  }
+
+  getPluginStatus(pluginId: string): PluginStatus {
+    return this._workspace.pluginsStatus.find((pluginStatus) => pluginStatus.id === pluginId);
+  }
+
+  setPluginStatus(pluginId: string, newStatus: PluginStatus): void {
+    this._workspace.pluginsStatus = this._workspace.pluginsStatus.map((pluginStatus) => (pluginStatus.id === pluginId ? newStatus : pluginStatus));
   }
 
   // REGION AND LOCATION
@@ -272,9 +274,9 @@ export class Repository {
     return this.workspace.sessions.filter((sess) => (sess as any).awsSsoConfigurationId === id);
   }
 
-  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string, integrationId?: string): void {
+  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string): void {
     const workspace = this.getWorkspace();
-    workspace.awsSsoIntegrations.push(new AwsSsoIntegration(integrationId ?? uuid.v4(), alias, portalUrl, region, browserOpening, undefined));
+    workspace.awsSsoIntegrations.push(new AwsSsoIntegration(uuid.v4(), alias, portalUrl, region, browserOpening, undefined));
     this.persistWorkspace(workspace);
   }
 
@@ -320,9 +322,9 @@ export class Repository {
     }
   }
 
-  addAzureIntegration(alias: string, tenantId: string, region: string, integrationId?: string): void {
+  addAzureIntegration(alias: string, tenantId: string, region: string): void {
     const workspace = this.getWorkspace();
-    workspace.azureIntegrations.push(new AzureIntegration(integrationId ?? uuid.v4(), alias, tenantId, region));
+    workspace.azureIntegrations.push(new AzureIntegration(uuid.v4(), alias, tenantId, region));
     this.persistWorkspace(workspace);
   }
 
@@ -432,5 +434,15 @@ export class Repository {
   getColorTheme(): string {
     const workspace = this.getWorkspace();
     return workspace.colorTheme;
+  }
+
+  writeFile(data: string): void {
+    this.nativeService.fs.writeFileSync(__dirname + "/register-client-response", JSON.stringify(data));
+  }
+
+  private getSessionsOrDefault(): Session[] {
+    const workspace = this.getWorkspace();
+    if (workspace.sessions) return workspace.sessions;
+    else return [];
   }
 }

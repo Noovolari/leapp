@@ -60,7 +60,7 @@
             <div class="form-field">
               <div class="form-group">
                 <label>Auth. method</label>
-                <ng-select placeholder="Choose an Authentication method" formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [clearable]="false" [items]="[{type: eConstants.inApp.toString() }, {type: eConstants.inBrowser.toString() }]" [(ngModel)]="selectedConfiguration.browserOpening"></ng-select>
+                <ng-select placeholder="Choose an Authentication method" formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type" [clearable]="false" [items]="[{type: eConstants.inApp }, {type: eConstants.inBrowser }]" [(ngModel)]="selectedConfiguration.browserOpening"></ng-select>
               </div>
             </div>
           </div>

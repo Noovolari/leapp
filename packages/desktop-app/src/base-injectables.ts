@@ -12,6 +12,7 @@ import { HttpClient, HttpHandler } from "@angular/common/http";
 import { AppNativeService } from "./app/services/app-native.service";
 import { AppProviderService } from "./app/services/app-provider.service";
 import { MessageToasterService } from "./app/services/message-toaster.service";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 
 export class MockTray {
   constructor() {}
@@ -31,7 +32,7 @@ spyMatSnackBar.open.and.callFake(() => {});
 const spyAppService = jasmine.createSpyObj("AppService", ["getOS", "isDarkMode", "getMenu", "detectOs", "getApp"]);
 spyAppService.getOS.and.returnValue({ homedir: () => "~/testing" });
 spyAppService.isDarkMode.and.returnValue(true);
-spyAppService.detectOs.and.returnValue("mac");
+spyAppService.detectOs.and.returnValue(OperatingSystem.mac);
 spyAppService.getApp.and.returnValue({ dock: { setBadge: () => {} } });
 spyAppService.getMenu.and.returnValue({ buildFromTemplate: () => true, setApplicationMenu: () => [] });
 

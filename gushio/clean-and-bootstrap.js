@@ -20,11 +20,11 @@ module.exports = {
 
         // remove "node-modules" directory
         console.log(`removing ${packageName} node_modules...`)
-        await deleteFunction(path, `../packages/${packageName}/node_modules`)
+        await deleteFunction(path, "..", "packages", packageName, "node_modules")
 
         // remove "package-lock.json" file
         console.log(`removing ${packageName} package-lock.json...`)
-        await deleteFunction(path, `../packages/${packageName}/package-lock.json`)
+        await deleteFunction(path, "..", "packages", packageName, "package-lock.json")
 
         // clean additional directories (dist, ...)
         shellJs.cd(path.join(__dirname, '../packages', packageName))
@@ -36,7 +36,7 @@ module.exports = {
         await gushio.run(path.join(__dirname, './bootstrap.js'), [packageName])
       }
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     } finally {
       shellJs.cd(currentPath)

@@ -1,10 +1,10 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { integrationId } from "../../flags";
+import { Integration } from "@noovolari/leapp-core/models/integration";
 
 export default class LogoutIntegration extends LeappCommand {
-  static description = "Logout from integration";
+  static description = "Logout from an integration";
 
   static examples = ["$leapp integration logout", "$leapp integration logout --integrationId ID"];
 
@@ -20,7 +20,13 @@ export default class LogoutIntegration extends LeappCommand {
     try {
       const { flags } = await this.parse(LogoutIntegration);
       if (flags.integrationId && flags.integrationId !== "") {
-        const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        const selectedIntegration = this.cliProviderService.integrationFactory.getIntegrationById(flags.integrationId);
+        if (!selectedIntegration) {
+          throw new Error(`integrationId "${flags.integrationId}" is not associated to an existing integration`);
+        }
+        if (!selectedIntegration.isOnline) {
+          throw new Error("integration is already offline");
+        }
         await this.logout(selectedIntegration);
       } else {
         const selectedIntegration = await this.selectIntegration();
@@ -31,9 +37,9 @@ export default class LogoutIntegration extends LeappCommand {
     }
   }
 
-  async logout(integration: AwsSsoIntegration): Promise<void> {
+  async logout(integration: Integration): Promise<void> {
     try {
-      await this.cliProviderService.awsSsoIntegrationService.logout(integration.id);
+      await this.cliProviderService.integrationFactory.logout(integration.id);
       this.log("logout successful");
     } finally {
       await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
@@ -41,12 +47,13 @@ export default class LogoutIntegration extends LeappCommand {
     }
   }
 
-  async selectIntegration(): Promise<AwsSsoIntegration> {
-    const onlineIntegrations = await this.cliProviderService.awsSsoIntegrationService.getOnlineIntegrations();
+  async selectIntegration(): Promise<Integration> {
+    const onlineIntegrations = await this.cliProviderService.integrationFactory
+      .getIntegrations()
+      .filter((integration: Integration) => integration.isOnline);
     if (onlineIntegrations.length === 0) {
       throw new Error("no online integrations available");
     }
-
     const answer: any = await this.cliProviderService.inquirer.prompt([
       {
         name: "selectedIntegration",

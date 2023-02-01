@@ -115,4 +115,37 @@ export class OptionsService {
       this.workspaceService.persistWorkspace(workspace);
     }
   }
+
+  get ssmRegionBehaviour(): string {
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.ssmRegionBehaviour;
+  }
+
+  set ssmRegionBehaviour(ssmRegionBehaviour: string) {
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.ssmRegionBehaviour = ssmRegionBehaviour;
+    this.workspaceService.persistWorkspace(workspace);
+  }
+
+  set extensionEnabled(value: boolean) {
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.extensionEnabled = value;
+    this.workspaceService.persistWorkspace(workspace);
+  }
+
+  get extensionEnabled(): boolean {
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.extensionEnabled;
+  }
+
+  get samlRoleSessionDuration(): number {
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.samlRoleSessionDuration / 60 / 60;
+  }
+
+  set samlRoleSessionDuration(value: number) {
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.samlRoleSessionDuration = value * 60 * 60;
+    this.workspaceService.persistWorkspace(workspace);
+  }
 }

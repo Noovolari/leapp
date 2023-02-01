@@ -4,7 +4,7 @@ module.exports = {
     description: 'Build leapp desktop app',
     version: '0.1',
     arguments: [
-      {name: '<target>', choices: ['aot', 'configuration production']},
+      {name: '<target>', choices: ['aot', 'configuration production', 'configuration staging']},
     ],
   },
   run: async (args) => {
@@ -32,7 +32,7 @@ module.exports = {
 
       console.log('Build completed successfully')
     } catch (e) {
-      e.message = e.message.red
+      e.message = e.stack.red
       throw e
     }
   },

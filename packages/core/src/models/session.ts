@@ -3,6 +3,12 @@ import { SessionStatus } from "./session-status";
 import { SessionType } from "./session-type";
 import { constants } from "./constants";
 
+/**
+ * This class contains metadata that represents a Leapp Session;
+ * it has a concrete implementation for each specific Leapp Session type.
+ * It implements an expired method used to tell whether the Session needs to be rotated or not.
+ * In addition, this object is persisted in the Leapp configuration file (Leapp-lock.json).
+ */
 export class Session {
   sessionId: string;
   status: SessionStatus;

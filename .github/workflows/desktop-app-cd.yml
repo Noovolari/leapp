@@ -26,15 +26,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 1
           ref: master
 
       - name: Check Tag Validity
         id: validator
         run: |
           git fetch
-          LOG=$(git log --format="%H" -n 1)
-          TAG=$(git tag --contains $LOG)
+          TAG=$(git tag --points-at $GITHUB_SHA)
           REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
           if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
@@ -49,12 +47,9 @@ jobs:
         if: steps.validator.outputs.VALID_TAG != 1
         run: |
           echo "Not a Desktop App Release Tag or Invalid one Found - Exiting..."
+
   build-win:
-    strategy:
-      matrix:
-        os: [ windows-2022 ]
-        node_version: [ 16 ]
-    runs-on: ${{ matrix.os }}
+    runs-on: windows-2022
     needs: [ tag-validation ]
     if: needs.tag-validation.outputs.validator == 1
     steps:
@@ -65,36 +60,6 @@ jobs:
           git config --global core.eol lf
 
       - uses: actions/checkout@v3
-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_version }}
-
-      - name: Set pro environment
-        shell: bash
-        run: npm run set-pro-environment
-
-      - name: Bootstrap
-        shell: bash
-        run: npm run bootstrap
-
-      - name: Build Win desktop app
-        shell: bash
-        run: |
-          cd packages/desktop-app
-          WIN_CERTIFICATE=windows_sign_certificate.pfx
-          echo "Recreate the window certificate from the secure environment variable"
-          echo "${{ env.WIN_CERTIFICATE }}" | base64 --decode > $WIN_CERTIFICATE
-          npm install
-          npm run release-win
-          rm -Rf ./release/win-unpacked
-          rm -Rf ./release/.cache
-          rm -Rf ./release/builder-debug.yml
-          rm -Rf ./release/builder-effective-config.yaml
-          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
-          TAG_VERSION=${TAG_VERSION:1}
-          rm "./release/Leapp-$TAG_VERSION-win.zip"
-          zip "./release/Leapp-$TAG_VERSION-win.zip" "./release/Leapp Setup $TAG_VERSION.exe"
 
       - name: Build Win desktop app
         shell: bash
@@ -128,6 +93,7 @@ jobs:
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+
   build-linux:
     runs-on: ubuntu-latest
     needs: [ tag-validation ]
@@ -158,6 +124,7 @@ jobs:
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+
   build-macos-x64:
     runs-on: macos-latest
     needs: [ tag-validation ]
@@ -165,36 +132,44 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build macOS desktop app
+      - name: Build macOS x64 desktop app
+        uses: nick-fields/retry@v2
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
+        with:
+          timeout_minutes: 20
+          max_attempts: 5
+          command: |
+            cd packages/desktop-app
+            KEY_CHAIN=build.keychain
+            CERTIFICATE_P12=certificate.p12
+            CERTIFICATE_APPLICATION_P12=certificate-application.p12
+            echo "Recreate the certificate from the secure environment variable"
+            echo "security create-keychain"
+            echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
+            echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
+            security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            echo "security list-keychains"
+            security list-keychains -s login.keychain build.keychain
+            echo "security default-keychain"
+            security default-keychain -s $KEY_CHAIN
+            echo "security unlock-keychain"
+            security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            echo "security import"
+            security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+            security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+            echo "security find-identity"
+            security find-identity -v
+            echo "security set-key-partition-list"
+            security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            rm -fr *.p12
+            npm install
+            npm run set-target-x64
+            npm run release-mac
+
+      - name: Clean build
         run: |
           cd packages/desktop-app
-          KEY_CHAIN=build.keychain
-          CERTIFICATE_P12=certificate.p12
-          CERTIFICATE_APPLICATION_P12=certificate-application.p12
-          echo "Recreate the certificate from the secure environment variable"
-          echo "security create-keychain"
-          echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
-          echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
-          security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
-          echo "security list-keychains"
-          security list-keychains -s login.keychain build.keychain
-          echo "security default-keychain"
-          security default-keychain -s $KEY_CHAIN
-          echo "security unlock-keychain"
-          security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
-          echo "security import"
-          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
-          security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
-          echo "security find-identity"
-          security find-identity -v
-          echo "security set-key-partition-list"
-          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
-          rm -fr *.p12
-          npm install
-          npm run set-target-x64
-          npm run release-mac
           rm -Rf ./release/mac
           rm -Rf ./release/mac-unpacked
           rm -Rf ./release/.cache
@@ -219,6 +194,7 @@ jobs:
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+
   build-macos-arm:
     runs-on: macos-latest
     needs: [ tag-validation, build-macos-x64 ]
@@ -226,36 +202,44 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build macOS desktop app
+      - name: Build macOS arm64 desktop app
+        uses: nick-fields/retry@v2
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
+        with:
+          timeout_minutes: 20
+          max_attempts: 5
+          command: |
+            cd packages/desktop-app
+            KEY_CHAIN=build.keychain
+            CERTIFICATE_P12=certificate.p12
+            CERTIFICATE_APPLICATION_P12=certificate-application.p12
+            echo "Recreate the certificate from the secure environment variable"
+            echo "security create-keychain"
+            echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
+            echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
+            security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            echo "security list-keychains"
+            security list-keychains -s login.keychain build.keychain
+            echo "security default-keychain"
+            security default-keychain -s $KEY_CHAIN
+            echo "security unlock-keychain"
+            security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            echo "security import"
+            security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+            security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+            echo "security find-identity"
+            security find-identity -v
+            echo "security set-key-partition-list"
+            security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            rm -fr *.p12
+            npm install
+            npm run set-target-arm64
+            npm run release-mac
+
+      - name: Clean build
         run: |
           cd packages/desktop-app
-          KEY_CHAIN=build.keychain
-          CERTIFICATE_P12=certificate.p12
-          CERTIFICATE_APPLICATION_P12=certificate-application.p12
-          echo "Recreate the certificate from the secure environment variable"
-          echo "security create-keychain"
-          echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
-          echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
-          security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
-          echo "security list-keychains"
-          security list-keychains -s login.keychain build.keychain
-          echo "security default-keychain"
-          security default-keychain -s $KEY_CHAIN
-          echo "security unlock-keychain"
-          security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
-          echo "security import"
-          security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
-          security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
-          echo "security find-identity"
-          security find-identity -v
-          echo "security set-key-partition-list"
-          security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
-          rm -fr *.p12
-          npm install
-          npm run set-target-arm64
-          npm run release-mac
           rm -Rf ./release/mac
           rm -Rf ./release/mac-unpacked
           rm -Rf ./release/.cache
@@ -281,6 +265,7 @@ jobs:
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+
   publish-draft:
     runs-on: ubuntu-latest
     environment: prod
@@ -301,6 +286,7 @@ jobs:
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
           aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
+
   publish-changelog:
     runs-on: ubuntu-latest
     environment: prod
@@ -319,6 +305,7 @@ jobs:
       - name: Publish changelog
         run: |
           aws s3 cp CHANGELOG.md "${{ env.S3_BUCKET }}/"
+
   invalidate-distribution:
     runs-on: ubuntu-latest
     environment: prod
@@ -337,6 +324,7 @@ jobs:
       - name: Invalidate distribution
         run: |
           aws cloudfront create-invalidation --distribution-id ${{ env.DISTRIBUTION_ID }} --paths "/*"
+
   publish-github-release:
     runs-on: ubuntu-latest
     needs: [ invalidate-distribution, tag-validation ]

@@ -5,30 +5,47 @@ on:
     branches:
       - master
 
+env:
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: setup-python-3.x
+        uses: actions/setup-python@v2
         with:
           python-version: 3.x
-      - run: pip install mkdocs-material
-      - run: pip install mkdocs-video
-      - run: pip install mkdocs-img2fig-plugin
-      - run: pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
-      - run: pip install mike
-      - run: |
-             echo "PACKAGE_VERSION=$(cat packages/desktop-app/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')" >> $GITHUB_ENV
-      - run: |
-             echo "${{env.PACKAGE_VERSION}}"
-      - run: |
-             git config --global user.name Alessandro Gaggia
-             git config --global user.email alex@besharp.it
-      - run: git fetch origin gh-pages --depth=1
-      - run: mike deploy --force --push --update-aliases ${{env.PACKAGE_VERSION}} latest
-      - run: mike set-default --push latest
 
-      # - run: mkdocs gh-deploy --force
-env:
-  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+      - name: install-dependencies
+        run: |
+          pip install mkdocs-material
+          pip install mkdocs-video
+          pip install mkdocs-img2fig-plugin
+          pip install mkdocs-git-revision-date-plugin
+          pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
+          pip install mkdocs-minify-plugin
+          pip install mike
+
+      - name: get-leapp-version
+        run: |
+          echo "PACKAGE_VERSION=$(cat packages/desktop-app/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')" >> $GITHUB_ENV
+          echo "${{env.PACKAGE_VERSION}}"
+
+      - name: deploy
+        run: |
+          git config --global user.name Alessandro Gaggia
+          git config --global user.email alex@besharp.it
+          git fetch origin gh-pages --depth=1
+          cd packages/cli
+          npm install
+          npm run prepare-docs
+          cd ../..
+          mike deploy --no-redirect --force --push --update-aliases ${{env.PACKAGE_VERSION}} latest
+          mike set-default --push latest
+
+      - name: update-sitemap
+        run: curl https://www.google.com/ping?sitemap=https://docs.leapp.cloud/latest/sitemap.xml

@@ -1,4 +1,3 @@
-const fs = require("fs");
 module.exports = {
   cli: {
     name: 'prepare docs',
@@ -16,7 +15,7 @@ module.exports = {
       "\n" +
       "!!! warning\n" +
       "\n" +
-      "    Leapp CLI will works only with the Desktop App is installed and running.\n" +
+      "    Leapp CLI works only if the Desktop App is installed and running.\n" +
       "    Note that version >= v0.11.0 of the Desktop App is required.\n" +
       "    Check the [installation guide](../installation/install-leapp/){: target='_blank'} to install the Desktop App.\n" +
       "\n" +
@@ -31,7 +30,7 @@ module.exports = {
     filenames.forEach((filename) => {
       console.log("   |...corrected " + filename);
       let fileData = fs.readFileSync("scopes/" + filename, 'utf-8');
-      fileData = fileData.replace(/```\nUSAGE/g, "```console\nUSAGE").replace(/##/g, "#");
+      fileData = fileData.replace(/```\nUSAGE/g, "```console\nUSAGE");
       fs.writeFileSync("scopes/" + filename, fileData);
     });
     console.log("...conversion completed");

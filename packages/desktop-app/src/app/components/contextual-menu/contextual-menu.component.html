@@ -1,0 +1,141 @@
+<ng-container *ngIf="selectedSession">
+  <div [matMenuTriggerFor]="menu" [style.position]="'fixed'" [style.left.px]="menuX" [style.top.px]="menuY"></div>
+  <mat-menu #menu [hasBackdrop]="false" role="menu">
+    <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
+
+    <button mat-menu-item (click)="startSession();" *ngIf="selectedSession.status === eSessionStatus.inactive">
+      <i class="moon-Play"></i>&nbsp;
+      <span>Start Session</span>
+    </button>
+
+    <button mat-menu-item (click)="stopSession();" *ngIf="selectedSession.status === eSessionStatus.active || selectedSession.status === eSessionStatus.pending">
+      <img class="moon-stop-outline"
+           src="assets/images/stop-circle-light{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png"
+           alt="stop-circle">
+      <span style="margin-left: 7px;">Stop Session</span>
+    </button>
+
+    <ng-container *ngIf="selectedSession.type === eSessionType.awsIamRoleFederated">
+      <button mat-menu-item (click)="logoutFromFederatedSession();">
+        <i class="moon-Close"></i>
+        <span>&nbsp;&nbsp;Logout</span>
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="selectedSession.type !== eSessionType.azure && selectedSession.type !== eSessionType.awsIamRoleChained">
+      <div class="divider"></div>
+      <button mat-menu-item (click)="createAChainedSessionFromSelectedOne();">
+        <i class="moon-Add"></i>
+        <span>&nbsp;&nbsp;Create Chained Session</span>
+      </button>
+    </ng-container>
+
+    <div class="divider" *ngIf="selectedSession.type !== eSessionType.azure"></div>
+
+    <button mat-menu-item [matMenuTriggerFor]="change" *ngIf="selectedSession.type !== eSessionType.azure">
+      <i class="moon-Star"></i>
+      <span>&nbsp;&nbsp;Change</span>
+    </button>
+
+    <ng-container *ngIf="selectedSession.type !== eSessionType.azure">
+      <button mat-menu-item (click)="ssmModalOpen();">
+        <i class="moon-Server"></i>&nbsp;
+        <span>View SSM Sessions</span>
+      </button>
+    </ng-container>
+
+    <ng-container
+      *ngIf="selectedSession.type === eSessionType.awsSsoRole || selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained">
+      <button [disabled]="this.optionsService.extensionEnabled && isWebConsoleFetching ? true : null" [class.disabled]="isWebConsoleFetching" mat-menu-item (click)="openAwsWebConsole();">
+        <i class="moon-Open-Web-Console"></i>
+        <span>&nbsp;&nbsp;Open Web Console</span>
+      </button>
+    </ng-container>
+
+    <div class="divider"></div>
+
+    <ng-container
+      *ngIf="(selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained || selectedSession.type === eSessionType.awsSsoRole)">
+      <button mat-menu-item [matMenuTriggerFor]="copy">
+        <i class="moon-Copy"></i>
+        <span>&nbsp;&nbsp;Copy</span>
+      </button>
+      <div class="divider"></div>
+    </ng-container>
+
+    <button mat-menu-item (click)="editSession();"
+            *ngIf="selectedSession.type !== eSessionType.awsSsoRole && selectedSession.type !== eSessionType.azure">
+      <i class="moon-Edit"></i>&nbsp;
+      <span>Edit Session</span>
+    </button>
+
+    <ng-container *ngIf="optionsService.pinned.indexOf(selectedSession.sessionId) === -1">
+      <button mat-menu-item (click)="pinSession();">
+        <i class="moon-Pin"></i>&nbsp;
+        <span>Pin Session</span>
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="optionsService.pinned.indexOf(selectedSession.sessionId) !== -1">
+      <button mat-menu-item (click)="unpinSession();">
+        <i class="moon-Pin"></i>&nbsp;
+        <span>Unpin Session</span>
+      </button>
+    </ng-container>
+
+    <ng-container *ngIf="selectedSession.type !== eSessionType.awsSsoRole && selectedSession.type !== eSessionType.azure">
+      <button mat-menu-item (click)="deleteSession();">
+        <i class="moon-Delete"></i>&nbsp;
+        <span>Delete Session</span>
+      </button>
+    </ng-container>
+
+    <ng-container
+      *ngIf="!eConstants.disablePluginSystem && appProviderService.pluginManagerService.availableAwsCredentialsPlugins(appService.detectOs(), selectedSession).length > 0">
+      <div class="divider"></div>
+      <button mat-menu-item [matMenuTriggerFor]="pluginList">
+        <i class="moon-Puzzle"></i>
+        <span>&nbsp;&nbsp;Plugins</span>
+      </button>
+    </ng-container>
+
+  </mat-menu>
+
+  <mat-menu #change>
+    <button mat-menu-item (click)="changeRegionModalOpen();">
+      <i class="moon-Region"></i>&nbsp;
+      <span>Region</span>
+    </button>
+    <button mat-menu-item (click)="changeProfileModalOpen();"
+            *ngIf="(selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained || selectedSession.type === eSessionType.awsSsoRole || selectedSession.type === eSessionType.awsIamUser)">
+      <i class="moon-User"></i>&nbsp;
+      <span>Named Profile</span>
+    </button>
+  </mat-menu>
+
+  <mat-menu #copy>
+    <button mat-menu-item (click)="copyCredentials(1);">
+      <i class="fab fa-aws"></i>&nbsp;
+      <span>Account Number</span>
+    </button>
+    <button mat-menu-item (click)="copyCredentials(2);">
+      <i class="fab fa-aws"></i>&nbsp;
+      <span>Role ARN</span>
+    </button>
+    <button mat-menu-item (click)="copyAwsWebConsoleUrl();">
+      <i class="fab fa-aws"></i>&nbsp;
+      <span>Web Console URL</span>
+    </button>
+  </mat-menu>
+
+  <mat-menu #pluginList>
+    <ng-container *ngFor="let plugin of appProviderService.pluginManagerService.availableAwsCredentialsPlugins(appService.detectOs(), selectedSession)">
+      <ng-container>
+        <button mat-menu-item (click)="applyPluginAction(plugin);">
+          <i class="{{plugin.actionIcon}}"></i>
+          <span>&nbsp;&nbsp;{{plugin.actionName}}</span>
+        </button>
+      </ng-container>
+    </ng-container>
+  </mat-menu>
+</ng-container>

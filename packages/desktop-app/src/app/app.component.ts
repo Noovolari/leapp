@@ -28,6 +28,8 @@ import { OptionsService } from "./services/options.service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
+import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
+import { ExtensionWebsocketService } from "./services/extension-websocket.service";
 
 @Component({
   selector: "app-root",
@@ -49,6 +51,7 @@ export class AppComponent implements OnInit {
   private integrationIsOnlineStateRefreshService: IntegrationIsOnlineStateRefreshService;
   private azureSessionService: AzureSessionService;
   private azureCoreService: AzureCoreService;
+  private pluginManagerService: PluginManagerService;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -61,7 +64,8 @@ export class AppComponent implements OnInit {
     private optionsService: OptionsService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
-    private appNativeService: AppNativeService
+    private appNativeService: AppNativeService,
+    private extensionWebsocketService: ExtensionWebsocketService
   ) {
     appProviderService.mfaCodePrompter = mfaCodePrompter;
     appProviderService.awsAuthenticationService = awsAuthenticationService;
@@ -82,6 +86,7 @@ export class AppComponent implements OnInit {
     this.integrationIsOnlineStateRefreshService = appProviderService.integrationIsOnlineStateRefreshService;
     this.azureSessionService = appProviderService.azureSessionService;
     this.azureCoreService = appProviderService.azureCoreService;
+    this.pluginManagerService = appProviderService.pluginManagerService;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
@@ -108,6 +113,7 @@ export class AppComponent implements OnInit {
     }
 
     // Prevent Dev Tool to show on production mode
+    // this.windowService.getCurrentWindow().webContents.openDevTools();
     this.windowService.blockDevToolInProductionMode();
 
     // Create folders and files if missing
@@ -134,9 +140,37 @@ export class AppComponent implements OnInit {
     // Launch Auto Updater Routines
     this.manageAutoUpdate();
 
+    if (!constants.disablePluginSystem) {
+      this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+      await this.appProviderService.pluginManagerService.loadFromPluginDir();
+      this.loggingService.log(
+        new LoggedEntry(`Loaded plugins...\n\n${this.appProviderService.pluginManagerService.pluginContainers}`, this, LogLevel.info)
+      );
+    }
+
+    // Deep link with app closed
+    if (this.fileService.existsSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile))) {
+      try {
+        if (!constants.disablePluginSystem) {
+          const deepLink = this.fileService.readFileSync(
+            this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile)
+          );
+          await this.pluginManagerService.installPlugin(deepLink);
+          await this.pluginManagerService.loadFromPluginDir();
+        }
+      } catch (err) {
+        this.loggingService.log(new LoggedEntry(`Error in install plugin from file: ${err.toString()}`, this, LogLevel.info));
+      } finally {
+        this.appNativeService.fs.removeSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile));
+      }
+    }
+
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     await this.router.navigate(["/dashboard"]);
+
+    // Start the websocket server for the Leapp Browser Extension
+    this.extensionWebsocketService.bootstrap();
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
   }
@@ -240,6 +274,12 @@ export class AppComponent implements OnInit {
         this.appProviderService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
       }
     });
+
+    if (!constants.disablePluginSystem) {
+      ipc.on("PLUGIN_URL", (_, url) => {
+        this.pluginManagerService.installPlugin(url);
+      });
+    }
   }
 
   private setInitialColorSchema() {

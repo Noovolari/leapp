@@ -1,279 +1,563 @@
-/*
-import { TestBed } from '@angular/core/testing';
-
-import { RetrocompatibilityService } from './retrocompatibility.service';
-import {mustInjected} from '../../base-injectables';
-import {serialize} from 'class-transformer';
-import {Workspace} from '@noovolari/leapp-core/models/workspace';
-import {AppService} from './app.service';
-import SpyObj = jasmine.SpyObj;
-import {KeychainService} from '@noovolari/leapp-core/services/keychain-service';
-import {FileService} from '@noovolari/leapp-core/services/file-service';
-import { Repository } from '@noovolari/leapp-core/services/repository';
-
-describe('RetrocompatibilityService', () => {
-  let service: RetrocompatibilityService;
-  let behaviouralSubjectService: Repository;
-
-  let spyAppService: SpyObj<AppService>;
-  let spyFileService;
-
-  let spyKeychain: SpyObj<KeychainService>;
-
-  const mockedOldFile = {
-    licence: '',
-    uid: '',
-    language: 'en',
-    avatar: '',
-    name: 'default',
-    workspaces: [
-      {
-        defaultLocation: 'eastus',
-        defaultRegion: 'us-east-1',
-        type: null,
-        name: 'default',
-        lastIDPToken: null,
-        idpUrl: [
-          {
-            id: 'cb8a78b9-357f-4cb8-965b-655838f068c1',
-            url: 'https://accounts.google.com/o/saml2/initsso?idpid=C03eqis8s&spid=1033946587263&forceauthn=false'
-          }
-        ],
-        proxyConfiguration: {
-          proxyPort: '8080',
-          proxyProtocol: 'https',
-          proxyUrl: '',
-          username: '',
-          password: ''
-        },
-        sessions: [
-          {
-            account: {
-              region: 'us-east-1',
-              role: {
-                name: 'ViewOnlyAccess'
-              },
-              accountId: '198863347786',
-              accountName: 'noovolari-dev-account-1',
-              accountNumber: '198863347786',
-              email: 'info+noovolari-dev-account-1@noovolari.com',
-              type: 'aws_sso'
-            },
-            active: false,
-            id: '3217b15f-297c-4dbd-96c6-50860e1b4635',
-            lastStopDate: '2021-06-11T12:25:50.325Z',
-            loading: false
-          },
-          {
-            account: {
-              region: 'us-east-1',
-              role: {
-                name: 'DatabaseAdministrator'
-              },
-              accountId: '198863347786',
-              accountName: 'noovolari-dev-account-1',
-              accountNumber: '198863347786',
-              email: 'info+noovolari-dev-account-1@noovolari.com',
-              type: 'aws_sso'
-            },
-            active: false,
-            id: '46915c50-5dd1-4c08-86d5-4252ad5bb060',
-            lastStopDate: '2021-06-11T12:25:50.325Z',
-            loading: false
-          },
-          {
-            id: '5be85f93-04ba-4434-8095-131e24a3f73d',
-            active: false,
-            loading: false,
-            lastStopDate: '2021-06-11T12:25:50.325Z',
-            account: {
-              accountId: '637114329800',
-              accountName: 'main',
-              accountNumber: '637114329800',
-              role: {
-                name: 'alessandro.gaggia',
-                roleArn: 'arn:aws:iam::637114329800:role/alessandro.gaggia'
-              },
-              idpArn: 'arn:aws:iam::637114329800:saml-provider/GoogleApps',
-              region: 'eu-west-1',
-              idpUrl: 'cb8a78b9-357f-4cb8-965b-655838f068c1',
-              type: 'AWS'
-            }
-          },
-          {
-            id: 'f1f0f9dc-1d01-4b45-a984-0e8110e8af13',
-            active: false,
-            loading: false,
-            lastStopDate: '2021-06-11T12:25:50.325Z',
-            account: {
-              accountId: '707579108031',
-              accountName: 'noovolari-plain1',
-              accountNumber: '707579108031',
-              mfaDevice: '',
-              region: 'eu-west-1',
-              type: 'AWS_PLAIN_USER',
-              user: 'test-user'
-            }
-          },
-          {
-            id: 'e5ea8ab8-5a27-4787-81a9-a10dc3ddcb22',
-            active: false,
-            loading: false,
-            lastStopDate: '2021-06-11T12:25:50.325Z',
-            account: {
-              region: 'eastus',
-              accountId: '6d5f42d2-0b2a-4372-93da-3d835cb4852c',
-              accountName: 'azure',
-              subscriptionId: '6d5f42d2-0b2a-4372-93da-3d835cb4852c',
-              tenantId: '20f03cc3-841f-412b-8f24-16621d26a8cb',
-              type: 'azure'
-            }
-          }
-        ],
-        setupDone: true,
-        azureProfile: null,
-        azureConfig: null
-      },
-      {
-        defaultLocation: 'eastus',
-        defaultRegion: 'us-east-1',
-        type: null,
-        name: 'default',
-        lastIDPToken: null,
-        idpUrl: [],
-        proxyConfiguration: {
-          proxyPort: '8080',
-          proxyProtocol: 'https',
-          proxyUrl: '',
-          username: '',
-          password: ''
-        },
-        sessions: [],
-        setupDone: true,
-        azureProfile: null,
-        azureConfig: null
-      }
-    ],
-    defaultWorkspace: 'default'
-  };
-
-  beforeEach(() => {
-
-    spyAppService = jasmine.createSpyObj('AppService', ['getOS']);
-    spyAppService.getOS.and.returnValue({ homedir : () => '~/testing' });
-
-    spyFileService = jasmine.createSpyObj('FileService', ['encryptText', 'decryptText', 'writeFileSync', 'readFileSync', 'exists', 'newDir']);
-    spyFileService.exists.and.returnValue(true);
-    spyFileService.newDir.and.returnValue(true);
-    spyFileService.encryptText.and.callFake((text: string) => text);
-    spyFileService.decryptText.and.callFake((text: string) => text);
-    spyFileService.writeFileSync.and.callFake((_: string, __: string) => {});
-    spyFileService.readFileSync.and.callFake((_: string) => serialize(new Workspace()) );
-
-    spyKeychain = jasmine.createSpyObj('KeychainService', ['getSecret', 'saveSecret']);
-    spyKeychain.getSecret.and.callFake((serv: string, account: string) => serv + '_' + account);
-    spyKeychain.saveSecret.and.returnValue(Promise.resolve());
-
-    TestBed.configureTestingModule({
-      providers: [
-        RetrocompatibilityService,
-        { provide: AppService, useValue: spyAppService },
-        { provide: FileService, useValue: spyFileService },
-        { provide: KeychainService, useValue: spyKeychain }
-      ].concat(mustInjected())
-    });
-
-    service = TestBed.inject(RetrocompatibilityService);
-    behaviouralSubjectService = TestBed.inject(Repository);
-  });
-
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-
-  describe('isRetroPatchNecessary', () => {
-    it('should indicate true if a specific key is present in the file', () => {
-      const retroService = TestBed.inject(RetrocompatibilityService);
-
-      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify(mockedOldFile));
-      expect(retroService.isRetroPatchNecessary()).toEqual(true);
-    });
-
-    it('should indicate false if file is not present', () => {
-      const retroService = TestBed.inject(RetrocompatibilityService);
-      spyFileService.exists.and.returnValue(false);
-      expect(retroService.isRetroPatchNecessary()).toEqual(false);
-    });
-
-    it('should indicate false if key is not there', () => {
-      const retroService = TestBed.inject(RetrocompatibilityService);
-
-      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify({}));
-      expect(retroService.isRetroPatchNecessary()).toEqual(false);
-    });
-
-    it('should return a default workspace if false', () => {
-      behaviouralSubjectService = TestBed.inject(Repository);
-
-      const retroService = TestBed.inject(RetrocompatibilityService);
-      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify({}));
-      expect(retroService.isRetroPatchNecessary()).toEqual(false);
-
-      const workspace = new Workspace();
-      workspace.profiles = behaviouralSubjectService.getProfiles();
-
-      expect(JSON.stringify(workspace)).toEqual(JSON.stringify(behaviouralSubjectService.getWorkspace()));
-    });
-  });
-
-  describe('adaptOldWorkspaceFile', () => {
-    it('should return a modern copy of the workspace', async () => {
-
-      const retroService = TestBed.inject(RetrocompatibilityService);
-
-      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify(mockedOldFile));
-
-      const workspace = new Workspace();
-
-      workspace.defaultLocation = 'eastus';
-      workspace.defaultRegion = 'us-east-1';
-
-      workspace.idpUrls = mockedOldFile.workspaces[0].idpUrl;
-
-      const returnedWorkspace = await retroService.adaptOldWorkspaceFile();
-
-      workspace.sessions = returnedWorkspace.sessions;
-      workspace.profiles = returnedWorkspace.profiles;
-      workspace.proxyConfiguration = mockedOldFile.workspaces[0].proxyConfiguration;
-
-      workspace.awsSsoConfiguration.region = 'Leapp_AWS_SSO_REGION';
-      workspace.awsSsoConfiguration.portalUrl = 'Leapp_AWS_SSO_PORTAL_URL';
-      workspace.awsSsoConfiguration.expirationTime = 'Leapp_AWS_SSO_EXPIRATION_TIME';
-
-      spyFileService.decryptText.and.callFake((text: string) => JSON.stringify(new Workspace()));
-
-      expect(returnedWorkspace).toEqual(workspace);
-      expect((returnedWorkspace as any).defaultWorkspace).toBe(undefined);
-      expect((returnedWorkspace as any).avatar).toBe(undefined);
-      expect((returnedWorkspace as any).workspaces).toBe(undefined);
-    });
-  });
-});
-*/
-
-import { describe, test, expect } from "@jest/globals";
+import { describe, jest, expect, test } from "@jest/globals";
 import { RetroCompatibilityService } from "./retro-compatibility-service";
+import { SessionType } from "../models/session-type";
+import { IntegrationType } from "../models/integration-type";
+import { Workspace } from "../models/workspace";
+import * as uuid from "uuid";
+import { AwsSsoIntegration } from "../models/aws/aws-sso-integration";
+import { constants } from "../models/constants";
+
+jest.mock("uuid");
 
 describe("RetroCompatibilityService", () => {
-  test("Should exists when created", () => {
-    const fileService = {};
-    const keychainService = {};
-    const repository = {};
-    const behaviouralSubjectService = {};
-    const appName = "test";
-    const lockPath = "";
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    expect(new RetroCompatibilityService(fileService, keychainService, repository, behaviouralSubjectService, appName, lockPath)).not.toBe(undefined);
+  let service: RetroCompatibilityService;
+
+  describe("applyWorkspaceMigrations", () => {
+    test("should skip migrations if lock file is not present", async () => {
+      const fileService = {
+        existsSync: () => false,
+        homeDir: () => "",
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      (service as any).isRetroPatchNecessary = jest.fn();
+      (service as any).adaptOldWorkspaceFile = jest.fn();
+      (service as any).isIntegrationPatchNecessary = jest.fn();
+      (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).integrationTypeEnumPatch = jest.fn();
+      (service as any).migration1 = jest.fn();
+
+      await service.applyWorkspaceMigrations();
+
+      expect((service as any).isRetroPatchNecessary).not.toHaveBeenCalled();
+      expect((service as any).adaptOldWorkspaceFile).not.toHaveBeenCalled();
+      expect((service as any).isIntegrationPatchNecessary).not.toHaveBeenCalled();
+      expect((service as any).adaptIntegrationPatch).not.toHaveBeenCalled();
+      expect((service as any).integrationTypeEnumPatch).not.toHaveBeenCalled();
+      expect((service as any).migration1).not.toHaveBeenCalled();
+    });
+
+    test("should try migrations if lock file is present", async () => {
+      const fileService = {
+        existsSync: () => true,
+        homeDir: () => "",
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      (service as any).isRetroPatchNecessary = () => true;
+      (service as any).isIntegrationPatchNecessary = () => true;
+      (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).integrationTypeEnumPatch = jest.fn();
+      (service as any).migration1 = jest.fn();
+      (service as any).migration2 = jest.fn();
+      (service as any).migration3 = jest.fn();
+
+      await service.applyWorkspaceMigrations();
+
+      expect((service as any).adaptIntegrationPatch).toHaveBeenCalled();
+      expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
+      expect((service as any).migration1).toHaveBeenCalled();
+      expect((service as any).migration2).toHaveBeenCalled();
+      expect((service as any).migration3).toHaveBeenCalled();
+    });
+
+    test("should try migrations, retropatch not necessary", async () => {
+      const fileService = {
+        existsSync: () => true,
+        homeDir: () => "",
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      (service as any).isRetroPatchNecessary = () => false;
+      (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).isIntegrationPatchNecessary = () => true;
+      (service as any).integrationTypeEnumPatch = jest.fn();
+      (service as any).migration1 = jest.fn();
+      (service as any).migration2 = jest.fn();
+      (service as any).migration3 = jest.fn();
+
+      await service.applyWorkspaceMigrations();
+
+      expect((service as any).adaptIntegrationPatch).toHaveBeenCalled();
+      expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
+      expect((service as any).migration1).toHaveBeenCalled();
+      expect((service as any).migration2).toHaveBeenCalled();
+      expect((service as any).migration3).toHaveBeenCalled();
+    });
+
+    test("should try migrations, integrationpatch not necessary", async () => {
+      const fileService = {
+        existsSync: () => true,
+        homeDir: () => "",
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      (service as any).isRetroPatchNecessary = () => true;
+      (service as any).isIntegrationPatchNecessary = () => false;
+      (service as any).adaptIntegrationPatch = jest.fn();
+      (service as any).integrationTypeEnumPatch = jest.fn();
+      (service as any).migration1 = jest.fn();
+      (service as any).migration2 = jest.fn();
+      (service as any).migration3 = jest.fn();
+
+      await service.applyWorkspaceMigrations();
+
+      expect((service as any).adaptIntegrationPatch).not.toHaveBeenCalled();
+      expect((service as any).integrationTypeEnumPatch).toHaveBeenCalled();
+      expect((service as any).migration1).toHaveBeenCalled();
+      expect((service as any).migration2).toHaveBeenCalled();
+      expect((service as any).migration3).toHaveBeenCalled();
+    });
+  });
+
+  describe("isIntegrationPatchNecessary", () => {
+    test("should return true if a specific key is not present in the file", () => {
+      const fileService = {
+        homeDir: () => "",
+        decryptText: (text: string) => text,
+        readFileSync: (_: string) => JSON.stringify({}),
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      expect((service as any).isIntegrationPatchNecessary()).toEqual(true);
+    });
+
+    test("should return true if there are ssoRole sessions but not sso integrations", () => {
+      const fileService = {
+        homeDir: () => "",
+        decryptText: (text: string) => text,
+        readFileSync: (_: string) => JSON.stringify({ _awsSsoIntegrations: [], _sessions: [{ type: SessionType.awsSsoRole }] }),
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      expect((service as any).isIntegrationPatchNecessary()).toEqual(true);
+    });
+
+    test("should return false otherwise", () => {
+      const fileService = {
+        homeDir: () => "",
+        decryptText: (text: string) => text,
+        readFileSync: (_: string) => JSON.stringify({ _awsSsoIntegrations: [], _sessions: [] }),
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      expect((service as any).isIntegrationPatchNecessary()).toEqual(false);
+    });
+  });
+
+  test("integrationTypeEnumPatch, non empty case", async () => {
+    const retroService = new RetroCompatibilityService(null, null, null, null) as any;
+    const workspace = {
+      ["_awsSsoIntegrations"]: [{ type: "awsSso" }, { type: IntegrationType.awsSso }],
+      ["_azureIntegrations"]: [{ type: "azure" }, { type: IntegrationType.azure }],
+    };
+    retroService.getWorkspace = () => workspace;
+    retroService.reloadIntegrations = jest.fn();
+    await retroService.integrationTypeEnumPatch();
+
+    expect(workspace._awsSsoIntegrations[0].type === IntegrationType.awsSso);
+    expect(workspace._awsSsoIntegrations[1].type === IntegrationType.awsSso);
+
+    expect(workspace._azureIntegrations[0].type === IntegrationType.azure);
+    expect(workspace._azureIntegrations[1].type === IntegrationType.azure);
+
+    expect(retroService.reloadIntegrations).toHaveBeenCalledWith(workspace);
+  });
+
+  test("integrationTypeEnumPatch, empty case", async () => {
+    const retroService = new RetroCompatibilityService(null, null, null, null) as any;
+    const workspace = {
+      ["_awsSsoIntegrations"]: [],
+      ["_azureIntegrations"]: [],
+    };
+    retroService.getWorkspace = () => workspace;
+    retroService.reloadIntegrations = jest.fn();
+    await retroService.integrationTypeEnumPatch();
+
+    expect(workspace._awsSsoIntegrations.length).toBe(0);
+    expect(workspace._azureIntegrations.length).toBe(0);
+    expect(retroService.reloadIntegrations).toHaveBeenCalledWith(workspace);
+  });
+
+  test("integrationTypeEnumPatch, missing integration keys", async () => {
+    const retroService = new RetroCompatibilityService(null, null, null, null) as any;
+    const workspace = {};
+    retroService.getWorkspace = () => workspace;
+    retroService.reloadIntegrations = jest.fn();
+    await retroService.integrationTypeEnumPatch();
+
+    expect(retroService.reloadIntegrations).toHaveBeenCalledWith(workspace);
+  });
+
+  describe("migration1", () => {
+    test("should not migrate if _workspaceVersion is set", () => {
+      const fileService = {
+        homeDir: () => "",
+        decryptText: (text: string) => text,
+        readFileSync: (_: string) => JSON.stringify({ _workspaceVersion: "someVersion" }),
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, null, null);
+      (service as any).persists = jest.fn();
+
+      (service as any).migration1();
+      expect((service as any).persists).not.toHaveBeenCalled();
+    });
+
+    test("should migrate if _workspaceVersion is not set", () => {
+      let persistedWorkspace: any;
+
+      const fakeOldIntegration = {
+        id: "fakeId",
+        alias: "fakeAlias",
+        portalUrl: "fakePortalUrl",
+        region: "fakeRegion",
+        browserOpening: "fakeBrowserOpening",
+        accessTokenExpiration: "fakeAccessTokenExpiration",
+      } as any;
+
+      const fakeOldIntegrationWithIsOnline = {
+        id: "fakeId2",
+        alias: "fakeAlias2",
+        portalUrl: "fakePortalUrl2",
+        region: "fakeRegion2",
+        browserOpening: "fakeBrowserOpening2",
+        accessTokenExpiration: "fakeAccessTokenExpiration2",
+        isOnline: true,
+      } as any;
+
+      const fileService = {
+        homeDir: () => "",
+        decryptText: (text: string) => text,
+        readFileSync: (_: string) =>
+          JSON.stringify({
+            _awsSsoIntegrations: [fakeOldIntegration, fakeOldIntegrationWithIsOnline],
+            _sessions: [
+              { type: "notAzure" },
+              { type: SessionType.azure, tenantId: "fakeTenant1" },
+              { type: SessionType.azure, tenantId: "fakeTenant2" },
+              { type: SessionType.azure, tenantId: "fakeTenant2" },
+            ],
+            defaultLocation: "fakeLocation",
+          }),
+      } as any;
+
+      const repository = {
+        reloadWorkspace: jest.fn(),
+        listAwsSsoIntegrations: () => ["ssoIntegration"],
+        listAzureIntegrations: () => ["azureIntegration"],
+      } as any;
+
+      const behaviouralSubjectService = {
+        setIntegrations: jest.fn(),
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, repository, behaviouralSubjectService);
+      (service as any).persists = jest.fn((workspace) => (persistedWorkspace = workspace));
+
+      (service as any).migration1();
+
+      expect(persistedWorkspace._workspaceVersion).toBe(1);
+
+      expect(persistedWorkspace._awsSsoIntegrations.length).toBe(2);
+      const migratedIntegration = persistedWorkspace._awsSsoIntegrations[0];
+      expect(migratedIntegration).toMatchObject(fakeOldIntegration);
+      expect(migratedIntegration.isOnline).toBe(false);
+      expect(migratedIntegration.type).toBe(IntegrationType.awsSso);
+
+      expect(persistedWorkspace._sessions.length).toBe(1);
+      expect(persistedWorkspace._sessions[0]).toEqual({ type: "notAzure" });
+
+      expect(persistedWorkspace._azureIntegrations.length).toBe(2);
+      expect(persistedWorkspace._azureIntegrations[0]).toMatchObject({
+        alias: "AzureIntgr-1",
+        isOnline: false,
+        region: "fakeLocation",
+        tenantId: "fakeTenant1",
+        type: IntegrationType.azure,
+      });
+      expect(persistedWorkspace._azureIntegrations[1]).toMatchObject({
+        alias: "AzureIntgr-2",
+        isOnline: false,
+        region: "fakeLocation",
+        tenantId: "fakeTenant2",
+        type: IntegrationType.azure,
+      });
+
+      expect(repository.reloadWorkspace).toHaveBeenCalled();
+      expect(behaviouralSubjectService.setIntegrations).toHaveBeenCalledWith(["ssoIntegration", "azureIntegration"]);
+    });
+
+    test("should migrate but no integrations available", () => {
+      let persistedWorkspace: any;
+
+      const fileService = {
+        homeDir: () => "",
+        decryptText: (text: string) => text,
+        readFileSync: (_: string) =>
+          JSON.stringify({
+            _awsSsoIntegrations: [],
+            _sessions: [
+              { type: "notAzure" },
+              { type: SessionType.azure, tenantId: "fakeTenant1" },
+              { type: SessionType.azure, tenantId: "fakeTenant2" },
+              { type: SessionType.azure, tenantId: "fakeTenant2" },
+            ],
+            defaultLocation: "fakeLocation",
+          }),
+      } as any;
+
+      const repository = {
+        reloadWorkspace: jest.fn(),
+        listAwsSsoIntegrations: () => ["ssoIntegration"],
+        listAzureIntegrations: () => ["azureIntegration"],
+      } as any;
+
+      const behaviouralSubjectService = {
+        setIntegrations: jest.fn(),
+      } as any;
+
+      service = new RetroCompatibilityService(fileService, null, repository, behaviouralSubjectService);
+      (service as any).persists = jest.fn((workspace) => (persistedWorkspace = workspace));
+
+      (service as any).migration1();
+
+      expect(persistedWorkspace._workspaceVersion).toBe(1);
+
+      expect(persistedWorkspace._sessions.length).toBe(1);
+      expect(persistedWorkspace._sessions[0]).toEqual({ type: "notAzure" });
+
+      expect(repository.reloadWorkspace).toHaveBeenCalled();
+      expect(behaviouralSubjectService.setIntegrations).toHaveBeenCalledWith(["ssoIntegration", "azureIntegration"]);
+    });
+  });
+
+  describe("migration2", () => {
+    test("should not migrate if _workspaceVersion is not 1", () => {
+      const persistedWorkspace: any = {};
+      const repository = {
+        reloadWorkspace: jest.fn(),
+      } as any;
+
+      service = new RetroCompatibilityService(null, null, repository, null);
+      (service as any).getWorkspace = jest.fn(() => persistedWorkspace);
+      (service as any).checkMigration = jest.fn(() => false);
+      (service as any).persists = jest.fn();
+
+      (service as any).migration2();
+
+      expect((service as any).getWorkspace).toHaveBeenCalled();
+      expect((service as any).checkMigration).toHaveBeenCalledWith(persistedWorkspace, 1, 2);
+      expect(persistedWorkspace._pluginsStatus).toBeUndefined();
+      expect(repository.reloadWorkspace).not.toHaveBeenCalled();
+      expect((service as any).persists).not.toHaveBeenCalled();
+    });
+
+    test("should migrate", () => {
+      let persistedWorkspace: any = {};
+
+      const repository = {
+        reloadWorkspace: jest.fn(),
+      } as any;
+
+      service = new RetroCompatibilityService(null, null, repository, null);
+      (service as any).getWorkspace = jest.fn(() => persistedWorkspace);
+      (service as any).checkMigration = jest.fn(() => true);
+      (service as any).persists = jest.fn((workspace) => (persistedWorkspace = workspace));
+
+      (service as any).migration2();
+
+      expect((service as any).getWorkspace).toHaveBeenCalled();
+      expect((service as any).checkMigration).toHaveBeenCalledWith(persistedWorkspace, 1, 2);
+      expect(persistedWorkspace._pluginsStatus).toStrictEqual([]);
+      expect(repository.reloadWorkspace).toHaveBeenCalled();
+    });
+  });
+
+  test("adaptIntegrations", async () => {
+    jest.spyOn(uuid, "v4").mockImplementation(() => "fake-uuid");
+    const oldWOrkspace = {
+      _idpUrls: [{ idpUrlId: "idpUrlId" }],
+      _profiles: [{ profileid: "profileId", name: "default" }],
+      _proxyConfiguration: [],
+      _defaultRegion: "eu-west-1",
+      _defaultLocation: "useast1",
+      _awsSsoConfiguration: {},
+    };
+
+    const keyChainService = {
+      getSecret: jest.fn(() => "mocked-access-token"),
+      saveSecret: jest.fn(),
+    } as any;
+    const workspace = new Workspace();
+
+    const retrocompatibilityService = new RetroCompatibilityService(null, keyChainService, null, null);
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+
+    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+    oldWOrkspace._awsSsoConfiguration = undefined;
+    (oldWOrkspace as any).awsSsoConfiguration = {};
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+
+    oldWOrkspace._awsSsoConfiguration = {};
+    workspace.awsSsoIntegrations = undefined;
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+
+    oldWOrkspace._awsSsoConfiguration = {
+      portalUrl: "portal-url",
+      region: "fake-region",
+      expirationTime: "now",
+    };
+    workspace.awsSsoIntegrations = [];
+    workspace.sessions.push({
+      sessionName: "name",
+      sessionId: "1",
+      region: "eu-west-1",
+      sessionTokenExpiration: "",
+      startDateTime: "",
+      status: undefined,
+      expired: () => false,
+      type: SessionType.awsSsoRole,
+    });
+    workspace.sessions.push({
+      sessionName: "name2",
+      sessionId: "2",
+      region: "eu-west-1",
+      sessionTokenExpiration: "",
+      startDateTime: "",
+      status: undefined,
+      expired: () => false,
+      type: SessionType.awsIamRoleFederated,
+    });
+
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+    expect(workspace.awsSsoIntegrations[0]).toStrictEqual(
+      new AwsSsoIntegration("fake-uuid", "Aws Single Sign-On", "portal-url", "fake-region", constants.inApp, "now")
+    );
+    expect(workspace.sessions[0]["awsSsoConfigurationId"]).toBe("fake-uuid");
+    expect(keyChainService.saveSecret).toHaveBeenCalledWith(constants.appName, "aws-sso-integration-access-token-fake-uuid", "mocked-access-token");
+    expect(keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, `aws-sso-access-token`);
+
+    workspace.awsSsoIntegrations.push(
+      new AwsSsoIntegration(uuid.v4(), "Aws Single Sign-On", "portalUrl", "region", constants.inApp, "expirationTime")
+    );
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    expect(keyChainService.saveSecret).toHaveBeenCalledTimes(1);
+    expect(keyChainService.getSecret).toHaveBeenCalledTimes(1);
+  });
+
+  test("adaptIntegrations - throws an error", async () => {
+    jest.spyOn(uuid, "v4").mockImplementation(() => "fake-uuid");
+    const oldWOrkspace = {
+      _idpUrls: [{ idpUrlId: "idpUrlId" }],
+      _profiles: [{ profileid: "profileId", name: "default" }],
+      _proxyConfiguration: [],
+      _defaultRegion: "eu-west-1",
+      _defaultLocation: "useast1",
+      _awsSsoConfiguration: {},
+    };
+
+    const keyChainService = {
+      getSecret: jest.fn(() => "mocked-access-token"),
+      saveSecret: jest.fn(),
+    } as any;
+    const workspace = new Workspace();
+
+    let retrocompatibilityService = new RetroCompatibilityService(null, keyChainService, null, null);
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+
+    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+    oldWOrkspace._awsSsoConfiguration = undefined;
+    (oldWOrkspace as any).awsSsoConfiguration = {};
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+
+    oldWOrkspace._awsSsoConfiguration = {};
+    workspace.awsSsoIntegrations = undefined;
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+
+    oldWOrkspace._awsSsoConfiguration = {
+      portalUrl: "portal-url",
+      region: "fake-region",
+      expirationTime: "now",
+    };
+    workspace.awsSsoIntegrations = [];
+    workspace.sessions.push({
+      sessionName: "name",
+      sessionId: "1",
+      region: "eu-west-1",
+      sessionTokenExpiration: "",
+      startDateTime: "",
+      status: undefined,
+      expired: () => false,
+      type: SessionType.awsSsoRole,
+    });
+    workspace.sessions.push({
+      sessionName: "name2",
+      sessionId: "2",
+      region: "eu-west-1",
+      sessionTokenExpiration: "",
+      startDateTime: "",
+      status: undefined,
+      expired: () => false,
+      type: SessionType.awsIamRoleFederated,
+    });
+    keyChainService.getSecret = jest.fn(() => {
+      throw new Error();
+    });
+    retrocompatibilityService = new RetroCompatibilityService(null, keyChainService, null, null);
+    jest.spyOn(console, "log");
+    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    expect(console.log).toHaveBeenCalledWith("no need to save access token");
+  });
+
+  test("adaptIntegrationPatch", async () => {
+    jest.spyOn(uuid, "v4").mockImplementation(() => "fake-uuid");
+    const workspace = {
+      fakeKey: "fakeValue",
+    };
+    const fileService = {
+      writeFileSync: jest.fn(),
+      homeDir: jest.fn(() => "/home"),
+      encryptText: jest.fn((_workspace) => JSON.stringify(_workspace)),
+    } as any;
+    const repository = {
+      workspace: {},
+    } as any;
+    const behaviouralSubjectService = {
+      sessions: {},
+    } as any;
+    const retrocompatibilityService = new RetroCompatibilityService(fileService, null, repository, behaviouralSubjectService);
+    (retrocompatibilityService as any).getWorkspace = jest.fn(() => workspace);
+    (retrocompatibilityService as any).persists = jest.fn();
+    (retrocompatibilityService as any).adaptIntegrations = jest.fn();
+
+    await (retrocompatibilityService as any).adaptIntegrationPatch();
+
+    expect((retrocompatibilityService as any).getWorkspace).toHaveBeenCalled();
+    expect((retrocompatibilityService as any).persists).toHaveBeenCalledWith(new Workspace());
+    expect((retrocompatibilityService as any).adaptIntegrations).toHaveBeenCalledWith(workspace, new Workspace());
+    expect(behaviouralSubjectService.sessions).toStrictEqual(new Workspace().sessions);
+    expect(repository.workspace).toStrictEqual(new Workspace());
+  });
+
+  test("persists", () => {
+    const workspace = {
+      fakeKey: "fakeValue",
+    };
+    const fileService = {
+      writeFileSync: jest.fn(),
+      homeDir: jest.fn(() => "/home"),
+      encryptText: jest.fn((_workspace) => JSON.stringify(_workspace)),
+    } as any;
+    const retrocompatibilityService = new RetroCompatibilityService(fileService, null, null, null);
+    (retrocompatibilityService as any).persists(workspace);
+    jest.spyOn(retrocompatibilityService as any, "lockFilePath", "get");
+    expect((retrocompatibilityService as any).lockFilePath).toBe("/home/.Leapp/Leapp-lock.json");
+    expect(fileService.writeFileSync).toHaveBeenCalledWith("/home/.Leapp/Leapp-lock.json", '"{\\"fakeKey\\":\\"fakeValue\\"}"');
   });
 });

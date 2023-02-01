@@ -36,6 +36,9 @@ export default class StopSession extends LeappCommand {
   }
 
   async stopSession(session: Session): Promise<void> {
+    if (session.status === SessionStatus.inactive) {
+      throw new Error("session already stopped");
+    }
     try {
       const sessionService = this.cliProviderService.sessionFactory.getSessionService(session.type);
       await sessionService.stop(session.sessionId);

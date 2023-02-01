@@ -21,4 +21,10 @@ export interface INativeService {
   process: any;
   nodeIpc: typeof ipc;
   msalEncryptionService: IMsalEncryptionService;
+  hashElement: any;
+  requireModule: any;
+  crypto: any;
+  fixPath: any;
+  tar: any;
+  fetch: any;
 }

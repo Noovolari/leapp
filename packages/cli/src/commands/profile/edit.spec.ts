@@ -22,9 +22,10 @@ describe("EditNamedProfile", () => {
     command.log = jest.fn();
     await expect(command.run()).rejects.toThrow("Flag --profileId expects a value");
 
-    command = getTestCommand(cliProviderService, ["--profileId", "not-found", "--profileName", "mock"]);
+    const expectedNotFound = "not-found";
+    command = getTestCommand(cliProviderService, ["--profileId", expectedNotFound, "--profileName", "mock"]);
     command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Named profile not-found not found");
+    await expect(command.run()).rejects.toThrow("Named profile with Id " + expectedNotFound + " not found");
 
     command = getTestCommand(cliProviderService, ["--profileId", "mockedProfileId", "--profileName"]);
     command.log = jest.fn();

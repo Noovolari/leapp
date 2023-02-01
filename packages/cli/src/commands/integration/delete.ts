@@ -1,7 +1,7 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { integrationId } from "../../flags";
+import { Integration } from "@noovolari/leapp-core/models/integration";
 
 export default class DeleteIntegration extends LeappCommand {
   static description = "Delete an integration";
@@ -20,7 +20,10 @@ export default class DeleteIntegration extends LeappCommand {
     try {
       const { flags } = await this.parse(DeleteIntegration);
       if (flags.integrationId && flags.integrationId !== "") {
-        const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        const selectedIntegration = this.cliProviderService.integrationFactory.getIntegrationById(flags.integrationId);
+        if (!selectedIntegration) {
+          throw new Error(`integrationId "${flags.integrationId}" is not associated to an existing integration`);
+        }
         await this.delete(selectedIntegration);
       } else {
         const selectedIntegration = await this.selectIntegration();
@@ -31,9 +34,9 @@ export default class DeleteIntegration extends LeappCommand {
     }
   }
 
-  async delete(integration: AwsSsoIntegration): Promise<void> {
+  async delete(integration: Integration): Promise<void> {
     try {
-      await this.cliProviderService.awsSsoIntegrationService.deleteIntegration(integration.id);
+      await this.cliProviderService.integrationFactory.delete(integration.id);
       this.log(`integration deleted`);
     } finally {
       await this.cliProviderService.remoteProceduresClient.refreshIntegrations();
@@ -41,8 +44,8 @@ export default class DeleteIntegration extends LeappCommand {
     }
   }
 
-  async selectIntegration(): Promise<AwsSsoIntegration> {
-    const integrations = this.cliProviderService.awsSsoIntegrationService.getIntegrations();
+  async selectIntegration(): Promise<Integration> {
+    const integrations = this.cliProviderService.integrationFactory.getIntegrations();
     if (integrations.length === 0) {
       throw new Error("no integrations available");
     }

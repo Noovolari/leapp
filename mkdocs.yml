@@ -2,7 +2,7 @@ site_name: Leapp - Docs
 site_url: https://docs.leapp.cloud/
 repo_url: https://github.com/Noovolari/leapp
 site_description: 'Leapp is a tool for developers to manage, secure, and access the cloud. Manage AWS and Azure credentials centrally'
-copyright: '© 2021 Noovolari, All rights reserved. | Powered by beSharp'
+copyright: '© 2022 Noovolari, All rights reserved. | Powered by beSharp'
 
 nav:
   - 'Get Started':
@@ -29,9 +29,9 @@ nav:
           - 'Configure AWS IAM User': 'configuring-session/configure-aws-iam-user.md'
           - 'Configure AWS IAM Role Federated': 'configuring-session/configure-aws-iam-role-federated.md'
           - 'Configure AWS IAM Role Chained': 'configuring-session/configure-aws-iam-role-chained.md'
-          - 'Configure Azure Tenant': 'configuring-session/configure-azure-tenant.md'
       - 'Configuring an Integration':
           - 'Configure AWS Single Sign-On integration': 'configuring-integration/configure-aws-single-sign-on-integration.md'
+          - 'Configure Azure integration': 'configuring-integration/configure-azure-integration.md'
       - 'Editing a session': 'edit-session.md'
   - Security:
       - 'Intro': 'security/intro.md'
@@ -46,6 +46,10 @@ nav:
       - 'EC2 connect through AWS SSM': 'built-in-features/aws-ec2-connect.md'
       - 'AWS Multi-profile management': 'built-in-features/aws-named-profiles.md'
       - 'Opening AWS Web Console': 'built-in-features/opening-web-console.md'
+      - 'Multi-Console Browser Extension': 'built-in-features/multi-console.md'
+  - 'Plugins':
+      - 'Introduction to Plugins': 'plugins/plugins-introduction.md'
+      - 'Developer Reference': 'plugins/plugins-development.md'
   - 'General Options': 'built-in-features/general-options.md'
   - 'Roadmap': https://roadmap.leapp.cloud/tabs/4-in-progress
   - Contributing:
@@ -59,11 +63,16 @@ theme:
   titles_only: true
   favicon: images/icon.ico
   name: material
+  custom_dir: 'docs_extra/'
   features:
-    - navigation.instant
     - navigation.indexes
     - navigation.top
+    - navigation.footer
+    - content.action.edit
     - content.code.annotate
+    - search.suggest
+    - search.highlight
+    - search.share
   font:
     text: Montserrat
   palette:
@@ -87,6 +96,7 @@ extra:
   analytics:
     provider: google
     property: G-FB1NX90MYZ
+
   consent:
     cookies:
       analytics: Google Analytics
@@ -98,9 +108,7 @@ extra:
       make our documentation better.
 
 markdown_extensions:
-  - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.emoji
   - admonition
   - pymdownx.details
   - pymdownx.highlight
@@ -119,3 +127,14 @@ plugins:
   - search
   - mkdocs-video
   - img2fig
+  - git-revision-date
+  - mike:
+      canonical_version: latest
+  - minify:
+      minify_html: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+      cache_safe: true
+      css_files:
+        - stylesheets/extra.css

@@ -14,6 +14,9 @@ import { OptionsService } from "../../../services/options.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { AppNativeService } from "../../../services/app-native.service";
+import { PluginContainer } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 
 @Component({
   selector: "app-options-dialog",
@@ -29,6 +32,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   tabGroup: MatTabGroup;
 
   eConstants = constants;
+  eOperatingSystem = OperatingSystem;
 
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
@@ -52,6 +56,11 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   colorTheme: string;
   selectedColorTheme: string;
 
+  pluginList: PluginContainer[];
+  fetchingPlugins: boolean;
+
+  selectedSsmRegionBehaviour: string;
+
   form = new FormGroup({
     idpUrl: new FormControl(""),
     awsProfile: new FormControl(""),
@@ -67,9 +76,15 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     terminalSelect: new FormControl(""),
     colorThemeSelect: new FormControl(""),
     credentialMethodSelect: new FormControl(""),
+    sessionDuration: new FormControl(""),
+    pluginDeepLink: new FormControl(""),
+    ssmRegionBehaviourSelect: new FormControl(""),
   });
 
   selectedCredentialMethod: string;
+  webConsoleSessionDuration: number;
+
+  extensionEnabled: boolean;
 
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: SessionService;
@@ -78,6 +93,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     public appProviderService: AppProviderService,
     public appService: AppService,
     private optionsService: OptionsService,
+    private appNativeService: AppNativeService,
     private windowService: WindowService,
     private toasterService: MessageToasterService,
     private modalService: BsModalService,
@@ -89,15 +105,21 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.selectedColorTheme = this.colorTheme;
 
     this.selectedCredentialMethod = this.optionsService.credentialMethod || constants.credentialFile;
+
+    this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
+
+    this.extensionEnabled = this.optionsService.extensionEnabled || false;
   }
 
   ngOnInit(): void {
+    this.fetchingPlugins = false;
     this.idpUrlValue = "";
     this.proxyProtocol = this.optionsService.proxyConfiguration.proxyProtocol;
     this.proxyUrl = this.optionsService.proxyConfiguration.proxyUrl;
     this.proxyPort = this.optionsService.proxyConfiguration.proxyPort;
     this.proxyUsername = this.optionsService.proxyConfiguration.username || "";
     this.proxyPassword = this.optionsService.proxyConfiguration.password || "";
+    this.webConsoleSessionDuration = this.optionsService.samlRoleSessionDuration || constants.samlRoleSessionDuration;
 
     this.form.controls["idpUrl"].setValue(this.idpUrlValue);
     this.form.controls["proxyUrl"].setValue(this.proxyUrl);
@@ -105,6 +127,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.form.controls["proxyPort"].setValue(this.proxyPort);
     this.form.controls["proxyUsername"].setValue(this.proxyUsername);
     this.form.controls["proxyPassword"].setValue(this.proxyPassword);
+    this.form.controls["sessionDuration"].setValue(this.webConsoleSessionDuration);
 
     const isProxyUrl = this.optionsService.proxyConfiguration.proxyUrl && this.optionsService.proxyConfiguration.proxyUrl !== "undefined";
     this.proxyUrl = isProxyUrl ? this.optionsService.proxyConfiguration.proxyUrl : "";
@@ -119,6 +142,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.selectedLocation = this.optionsService.defaultLocation || constants.defaultLocation;
 
     this.appService.validateAllFormFields(this.form);
+
+    this.pluginList = this.appProviderService.pluginManagerService.pluginContainers;
+
+    this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
   }
 
   ngAfterViewInit(): void {
@@ -156,6 +183,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
       this.optionsService.defaultRegion = this.selectedRegion;
       this.optionsService.defaultLocation = this.selectedLocation;
       this.optionsService.macOsTerminal = this.selectedTerminal;
+      this.optionsService.samlRoleSessionDuration = this.form.controls["sessionDuration"].value;
+
+      this.optionsService.ssmRegionBehaviour = this.selectedSsmRegionBehaviour;
 
       if (this.checkIfNeedDialogBox()) {
         // eslint-disable-next-line max-len
@@ -354,8 +384,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  openJoinUs() {
-    this.windowService.openExternalUrl("https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA");
+  openBrowser(url: string) {
+    this.windowService.openExternalUrl(url);
   }
 
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
@@ -422,5 +452,60 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
         await sessionService.start(activeSessions[i].sessionId);
       }
     }
+  }
+
+  async installPlugin(): Promise<void> {
+    this.fetchingPlugins = true;
+    if (this.form.controls.pluginDeepLink.value) {
+      try {
+        await this.appProviderService.pluginManagerService.installPlugin(this.form.controls.pluginDeepLink.value);
+        await this.refreshPluginList();
+      } catch (error) {
+        this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
+      }
+    }
+    this.fetchingPlugins = false;
+  }
+
+  async refreshPluginList(isRefreshingFromAction?: boolean): Promise<void> {
+    this.fetchingPlugins = true;
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    await this.appProviderService.pluginManagerService.loadFromPluginDir();
+    this.pluginList = this.appProviderService.pluginManagerService.pluginContainers;
+    if (isRefreshingFromAction) {
+      this.appProviderService.logService.log(new LoggedEntry("Plugins refreshed", this, LogLevel.info, true));
+    }
+    this.fetchingPlugins = false;
+  }
+
+  togglePluginActivation(plugin: PluginContainer): void {
+    plugin.metadata.active = !plugin.metadata.active;
+    const status = this.appProviderService.repository.getPluginStatus(plugin.metadata.uniqueName);
+    status.active = plugin.metadata.active;
+    this.appProviderService.repository.setPluginStatus(plugin.metadata.uniqueName, status);
+  }
+
+  getPluginExtraInfo(plugin: PluginContainer): string {
+    return `Author: ${plugin.metadata.author}
+    Description: ${plugin.metadata.description}
+    Supported Sessions: ${plugin.metadata.supportedSessions.join(",")}`;
+  }
+
+  getSupportedOsIcons(plugin: PluginContainer): string {
+    const supportedOS = plugin.metadata.supportedOS;
+    const icon1 = `<i class="fa fa-apple ${supportedOS.includes(OperatingSystem.mac) ? "" : "bw"}"></i>`;
+    const icon2 = `<i class="fa fa-windows ${supportedOS.includes(OperatingSystem.windows) ? "" : "bw"}"></i>`;
+    const icon3 = `<i class="fa fa-linux ${supportedOS.includes(OperatingSystem.linux) ? "" : "bw"}"></i>`;
+    return `${icon1}&nbsp;${icon2}&nbsp;${icon3}`;
+  }
+
+  openPluginFolder(): void {
+    this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
+    this.appNativeService.shell.showItemInFolder(this.appNativeService.path.join(this.appNativeService.os.homedir(), ".Leapp", "plugins"));
+  }
+
+  toggleExtension(): void {
+    this.extensionEnabled = !this.extensionEnabled;
+    this.optionsService.extensionEnabled = this.extensionEnabled;
   }
 }

@@ -1,6 +1,7 @@
 import { INativeService } from "../interfaces/i-native-service";
+import { IKeychainService } from "../interfaces/i-keychain-service";
 
-export class KeychainService {
+export class KeychainService implements IKeychainService {
   constructor(private nativeService: INativeService) {}
 
   /**
@@ -31,7 +32,7 @@ export class KeychainService {
    * @param service - environment.appName
    * @param account - unique identifier
    */
-  async deletePassword(service: string, account: string): Promise<boolean> {
-    return await this.nativeService.keytar.deletePassword(service, account);
+  async deleteSecret(service: string, account: string): Promise<boolean> {
+    return await this.nativeService.keytar.deleteSecret(service, account);
   }
 }

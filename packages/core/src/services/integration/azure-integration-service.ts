@@ -26,6 +26,14 @@ export class AzureIntegrationService implements IIntegrationService {
     public azurePersistenceService: AzurePersistenceService
   ) {}
 
+  static validateAlias(alias: string): boolean | string {
+    return alias.trim() !== "" ? true : "Empty alias";
+  }
+
+  static validateTenantId(tenantId: string): boolean | string {
+    return tenantId.trim() !== "" ? true : "Empty tenant id";
+  }
+
   async checkCliVersion(): Promise<void> {
     let output;
     try {
@@ -112,6 +120,7 @@ export class AzureIntegrationService implements IIntegrationService {
   async syncSessions(integrationId: string): Promise<any> {
     const integration = this.getIntegration(integrationId);
     try {
+      // TODO: remove/clean msal_token_cache!!!
       await this.executeService.execute(`az login --tenant ${integration.tenantId} 2>&1`);
     } catch (err) {
       const errorObject = JSON.parse(JSON.stringify(err));
@@ -121,10 +130,14 @@ export class AzureIntegrationService implements IIntegrationService {
         errorObject.signal === null &&
         errorObject.stdout.indexOf("ERROR: No subscriptions found for") !== -1
       ) {
-        throw new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.error, true);
+        await this.deleteDependentSessions(integrationId);
+        // TODO: remove/clean msal_token_cache!!!
+        throw new LoggedException(`No Azure Subscriptions found for integration: ${integration.alias}`, this, LogLevel.warn, true);
       }
-      if (errorObject.code === null && errorObject.killed)
+      if (errorObject.code === null && errorObject.killed) {
         throw new LoggedException(`Timeout error during Azure login with integration: ${integration.alias}`, this, LogLevel.error, true);
+      }
+      throw new LoggedException(err.toString(), this, LogLevel.error, false);
     }
     const azureProfile = await this.azurePersistenceService.loadProfile();
     await this.moveSecretsToKeychain(integration, azureProfile);
@@ -151,6 +164,7 @@ export class AzureIntegrationService implements IIntegrationService {
       await this.azureSessionService.stop(azureSession.sessionId);
     }
 
+    let sessionsToDelete = 0;
     const integrationSessions = azureSessions.filter((session) => session.azureIntegrationId === integrationId);
     for (const azureSession of integrationSessions) {
       const creationRequest = sessionCreationRequests.find(
@@ -160,8 +174,9 @@ export class AzureIntegrationService implements IIntegrationService {
           azureSession.subscriptionId === request.subscriptionId &&
           azureSession.region === request.region
       );
-      const isSessionToDelete = !creationRequest;
+      const isSessionToDelete = creationRequest === undefined;
       if (isSessionToDelete) {
+        sessionsToDelete++;
         await this.azureSessionService.delete(azureSession.sessionId);
       } else {
         if (azureSession.status !== SessionStatus.inactive) {
@@ -174,6 +189,8 @@ export class AzureIntegrationService implements IIntegrationService {
     for (const creationRequest of sessionCreationRequests) {
       await this.azureSessionService.create(creationRequest);
     }
+
+    return { sessionsAdded: sessionCreationRequests.length, sessionsDeleted: sessionsToDelete };
   }
 
   private notifyIntegrationChanges() {

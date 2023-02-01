@@ -28,6 +28,20 @@ export class NamedProfilesService {
     return new Map(this.getNamedProfiles().map((profile) => [profile.id, profile] as [string, AwsNamedProfile]));
   }
 
+  /**
+   * Get or create the AWS named profile ID from the unique name
+   *
+   * @param profileName
+   * @return id the profile id if the named profile exists, otherwise creates a new profile and returns its id
+   */
+  getProfileIdByName(profileName: string): string {
+    const profileId = this.getNamedProfiles().find((profile) => profile.name === profileName)?.id;
+    if (!profileId) {
+      return this.createNamedProfile(profileName).id;
+    }
+    return profileId;
+  }
+
   getSessionsWithNamedProfile(id: string): Session[] {
     return this.repository.getSessions().filter((session) => (session as any).profileId === id);
   }

@@ -1,7 +1,7 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { integrationId } from "../../flags";
+import { Integration } from "@noovolari/leapp-core/models/integration";
 
 export default class SyncIntegration extends LeappCommand {
   static description = "Synchronize integration sessions";
@@ -20,7 +20,10 @@ export default class SyncIntegration extends LeappCommand {
     try {
       const { flags } = await this.parse(SyncIntegration);
       if (flags.integrationId && flags.integrationId !== "") {
-        const selectedIntegration = this.cliProviderService.awsSsoIntegrationService.getIntegration(flags.integrationId);
+        const selectedIntegration = this.cliProviderService.integrationFactory.getIntegrationById(flags.integrationId);
+        if (!selectedIntegration) {
+          throw new Error(`integrationId "${flags.integrationId}" is not associated to an existing integration`);
+        }
         await this.sync(selectedIntegration);
       } else {
         const selectedIntegration = await this.selectIntegration();
@@ -31,20 +34,20 @@ export default class SyncIntegration extends LeappCommand {
     }
   }
 
-  async sync(integration: AwsSsoIntegration): Promise<void> {
+  async sync(integration: Integration): Promise<void> {
     try {
-      const sessionsDiff = await this.cliProviderService.awsSsoIntegrationService.syncSessions(integration.id);
-      this.log(`${sessionsDiff.sessionsToAdd.length} sessions added`);
-      this.log(`${sessionsDiff.sessionsToDelete.length} sessions removed`);
+      const sessionsDiff = await this.cliProviderService.integrationFactory.syncSessions(integration.id);
+      this.log(`${sessionsDiff.sessionsAdded} sessions added`);
+      this.log(`${sessionsDiff.sessionsDeleted} sessions removed`);
     } finally {
       await this.cliProviderService.remoteProceduresClient.refreshSessions();
     }
   }
 
-  async selectIntegration(): Promise<AwsSsoIntegration> {
-    const onlineIntegrations = await this.cliProviderService.awsSsoIntegrationService.getOnlineIntegrations();
-    if (onlineIntegrations.length === 0) {
-      throw new Error("no online integrations available");
+  async selectIntegration(): Promise<Integration> {
+    const integrations = await this.cliProviderService.integrationFactory.getIntegrations();
+    if (integrations.length === 0) {
+      throw new Error("no integrations available");
     }
 
     const answer: any = await this.cliProviderService.inquirer.prompt([
@@ -52,7 +55,7 @@ export default class SyncIntegration extends LeappCommand {
         name: "selectedIntegration",
         message: "select an integration",
         type: "list",
-        choices: onlineIntegrations.map((integration: any) => ({ name: integration.alias, value: integration })),
+        choices: integrations.map((integration: any) => ({ name: integration.alias, value: integration })),
       },
     ]);
     return answer.selectedIntegration;

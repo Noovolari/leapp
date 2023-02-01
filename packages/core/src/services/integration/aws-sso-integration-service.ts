@@ -54,14 +54,8 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return portalUrlValidationRegex.test(portalUrl) ? true : "Invalid portal URL";
   }
 
-  async createIntegration(creationParams: AwsSsoIntegrationCreationParams, integrationId?: string): Promise<void> {
-    this.repository.addAwsSsoIntegration(
-      creationParams.portalUrl,
-      creationParams.alias,
-      creationParams.region,
-      creationParams.browserOpening,
-      integrationId
-    );
+  async createIntegration(creationParams: AwsSsoIntegrationCreationParams, _integrationId?: string): Promise<void> {
+    this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
   }
 
   updateIntegration(id: string, updateParams: AwsSsoIntegrationCreationParams): void {

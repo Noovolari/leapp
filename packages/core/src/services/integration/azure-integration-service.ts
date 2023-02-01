@@ -54,10 +54,10 @@ export class AzureIntegrationService implements IIntegrationService {
     }
   }
 
-  async createIntegration(creationParams: AzureIntegrationCreationParams, integrationId?: string): Promise<void> {
+  async createIntegration(creationParams: AzureIntegrationCreationParams, _integrationId?: string): Promise<void> {
     await this.checkCliVersion();
     const defaultLocation = this.repository.getDefaultLocation();
-    this.repository.addAzureIntegration(creationParams.alias, creationParams.tenantId, creationParams.region ?? defaultLocation, integrationId);
+    this.repository.addAzureIntegration(creationParams.alias, creationParams.tenantId, creationParams.region ?? defaultLocation);
   }
 
   updateIntegration(id: string, updateParams: AzureIntegrationCreationParams): void {

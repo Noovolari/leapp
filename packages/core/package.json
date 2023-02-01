@@ -7,7 +7,10 @@
   },
   "description": "Leapp's core module",
   "dependencies": {
-    "core-pro": "file:../../../leapp-pro-frontend/core-pro"
+    "leapp-team-core": "file:../../../../leapp-team/leapp-team/packages/leapp-team-core",
+    "folder-hash": "^4.0.2",
+    "require-module": "^0.1.0",
+    "tsoa": "^4.1.0"
   },
   "peerDependencies": {
     "@azure/msal-node": "^1.9.0",
@@ -99,10 +102,5 @@
   "bugs": {
     "url": "https://github.com/Noovolari/leapp/issues"
   },
-  "homepage": "https://github.com/Noovolari/leapp",
-  "dependencies": {
-    "folder-hash": "^4.0.2",
-    "require-module": "^0.1.0",
-    "tsoa": "^4.1.0"
-  }
+  "homepage": "https://github.com/Noovolari/leapp"
 }

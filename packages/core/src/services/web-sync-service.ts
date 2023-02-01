@@ -13,18 +13,18 @@ import { LoggedException, LogLevel } from "./log-service";
 import { AwsIamRoleFederatedService } from "./session/aws/aws-iam-role-federated-service";
 import { IdpUrlsService } from "./idp-urls-service";
 import { AzureIntegrationService } from "./integration/azure-integration-service";
-import { LocalSecretDto } from "core-pro/web-dto/local-secret-dto";
-import { AwsIamUserLocalSessionDto } from "core-pro/web-dto/aws-iam-user-local-session-dto";
-import { EncryptionProvider } from "core-pro/encryption/encryption.provider";
-import { VaultProvider } from "core-pro/vault/vault-provider";
-import { UserProvider } from "core-pro/user/user.provider";
-import { HttpClientInterface } from "core-pro/http/HttpClientInterface";
-import { User } from "core-pro/user/user";
-import { SecretType } from "core-pro/web-dto/secret-type";
-import { AwsIamFederatedLocalSessionDto } from "core-pro/web-dto/aws-iam-federated-local-session-dto";
-import { AwsSsoLocalIntegrationDto } from "core-pro/web-dto/aws-sso-local-integration-dto";
-import { AwsIamRoleChainedLocalSessionDto } from "core-pro/web-dto/aws-iam-role-chained-local-session-dto";
-import { AzureLocalIntegrationDto } from "core-pro/web-dto/azure-local-integration-dto";
+import { LocalSecretDto } from "leapp-team-core/encryptable-dto/local-secret-dto";
+import { AwsIamUserLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-iam-user-local-session-dto";
+import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provider";
+import { VaultProvider } from "leapp-team-core/vault/vault-provider";
+import { UserProvider } from "leapp-team-core/user/user.provider";
+import { HttpClientInterface } from "leapp-team-core/http/HttpClientInterface";
+import { User } from "leapp-team-core/user/user";
+import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
+import { AwsIamFederatedLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-iam-federated-local-session-dto";
+import { AwsSsoLocalIntegrationDto } from "leapp-team-core/encryptable-dto/aws-sso-local-integration-dto";
+import { AwsIamRoleChainedLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-iam-role-chained-local-session-dto";
+import { AzureLocalIntegrationDto } from "leapp-team-core/encryptable-dto/azure-local-integration-dto";
 
 export class WebSyncService {
   private readonly encryptionProvider: EncryptionProvider;
@@ -45,6 +45,7 @@ export class WebSyncService {
       get: async <T>(url: string): Promise<T> => (await axios.get<T>(url, this.getHttpClientConfig())).data,
       post: async <T>(url: string, body: any): Promise<T> => (await axios.post<T>(url, body, this.getHttpClientConfig())).data,
       put: async <T>(url: string, body: any): Promise<T> => (await axios.put<T>(url, body, this.getHttpClientConfig())).data,
+      delete: async <T>(url: string): Promise<T> => (await axios.delete<T>(url, this.getHttpClientConfig())).data,
     };
     this.encryptionProvider = new EncryptionProvider((crypto as any).webcrypto);
     this.vaultProvider = new VaultProvider(apiEndpoint, httpClient, this.encryptionProvider);

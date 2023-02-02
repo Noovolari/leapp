@@ -20,6 +20,8 @@ import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { User } from "leapp-team-core/user/user";
+import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -27,6 +29,8 @@ export const globalFilterGroup = new BehaviorSubject<GlobalFilters>(null);
 export const globalHasFilter = new BehaviorSubject<boolean>(false);
 export const globalResetFilter = new BehaviorSubject<boolean>(false);
 export const globalSegmentFilter = new BehaviorSubject<Segment>(null);
+
+export const globalUser = new BehaviorSubject<User>(null);
 
 export interface IGlobalColumns {
   role: boolean;
@@ -67,6 +71,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   eConstants = constants;
 
+  loggedIn = false;
+  user: User;
+
   private subscription0;
   private subscription1;
   private subscription2;
@@ -74,6 +81,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private subscription4;
   private subscription5;
   private subscription6;
+  private userSubscription;
 
   private currentSegment: Segment;
   private behaviouralSubjectService: BehaviouralSubjectService;
@@ -101,6 +109,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
 
     this.setInitialArrayFilters();
+    this.user = null;
   }
 
   private static changeSessionsTableHeight() {
@@ -164,6 +173,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.subscription6 = globalOrderingFilter.subscribe((sessions: Session[]) => {
       globalFilteredSessions.next(sessions);
     });
+
+    // TODO: persist the user in the workspace and check the user at app start
+    this.userSubscription = globalUser.subscribe((user: User) => (this.user = user));
   }
 
   ngOnDestroy(): void {
@@ -174,6 +186,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.subscription4.unsubscribe();
     this.subscription5.unsubscribe();
     this.subscription6.unsubscribe();
+    this.userSubscription.unsubscribe();
   }
 
   ngAfterContentChecked(): void {
@@ -256,6 +269,18 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         this.windowService.getCurrentWindow().maximize();
       }
     }
+  }
+
+  async loginToTeamPortal(): Promise<void> {
+    this.bsModalService.show(LoginTeamDialogComponent, {
+      animated: false,
+      class: "create-modal",
+    });
+  }
+
+  logoutFromTeamPortal(): void {
+    this.user = null;
+    // TODO: remove remote sessions and workspace, etc.
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

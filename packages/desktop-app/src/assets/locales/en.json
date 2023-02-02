@@ -10,11 +10,25 @@
   "Password": "Password",
   "PasswordPlaceholder": "Enter password",
   "ConfirmPassword": "Confirm password",
+  "CreateSession": "Create Session",
   "ConfirmPasswordPlaceholder": "Confirm your password",
   "HidePassword": "Hide password",
   "SignUpButtonLabel": "Sign Up",
   "SignInButtonLabel": "Sign In",
   "Ok": "Ok",
+  "Logout": "Logout",
+  "InvitationTitle": "Invite a user to Leapp Team",
+  "InviteInputLabel": "Invite User",
+  "InvitePlaceholder": "Insert email",
+  "InviteButtonLabel": "Invite",
+  "InvitationCreated": "Invitation Created",
+  "Users": "Users",
+  "InviteUser": "Invite a User",
+  "CreateAWSIAMUserSession": "Create AWS IAM User Session",
+  "CreateAWSIAMFederatedSession": "Create AWS IAM Federated Session",
+  "CreateAWSIAMRoleChainedSession": "Create AWS IAM Role Chained Session",
+  "CreateAWSSSOIntegration": "Create AWS SSO Integration",
+  "CreateAzureIntegration": "Create Azure Integration",
 
   "error": {
     "UnknownError": "Unknown error",
@@ -22,10 +36,10 @@
     "Required": "Field is required",
     "Email": "Invalid email",
     "MinLength": "Minimum length is {{requiredLength}} characters",
-    "PasswordPattern": "Password requires at least a lowercase char (abc), a uppercase char (ABC), a digit (123) and a symbol ($€!)",
+    "PasswordPattern": "Use one or more lowercase (abc), uppercase (ABC), digit (123) and symbol ($€!) char",
     "PasswordMismatch": "Password confirm mismatch",
     "EmailAlreadyTaken": "Email is already in use",
     "InvalidCredentials": "Invalid email or password",
-    "AccountNotActiveYet": "Account not active yet"
+    "UserNotActive": "Account not active"
   }
 }

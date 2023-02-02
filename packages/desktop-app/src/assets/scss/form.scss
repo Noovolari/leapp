@@ -199,3 +199,18 @@ form {
       font-size: 15px;
     }
   }
+
+.input-inner-button {
+  position: absolute;
+  right: -14px;
+  top: 0;
+  width: initial;
+  color: $text-color;
+  display: inline-block;
+  background: none;
+  i {
+    display: inline-block;
+    color: $text-color;
+    font-size: 16px;
+  }
+}

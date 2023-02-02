@@ -43,6 +43,16 @@ import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-di
 import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
 import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
 import { ScrollingModule } from "@angular/cdk/scrolling";
+import { LoginTeamDialogComponent } from "./dialogs/login-team-dialog/login-team-dialog.component";
+import { LeappAngularCommonModule } from "leapp-angular-common";
+import { BrowserModule } from "@angular/platform-browser";
+import { HttpClientModule } from "@angular/common/http";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { MatFormFieldModule } from "@angular/material/form-field";
+import { MatCardModule } from "@angular/material/card";
+import { MatSelectModule } from "@angular/material/select";
+import { MatInputModule } from "@angular/material/input";
+import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 
 @NgModule({
   declarations: [
@@ -72,6 +82,7 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
     SsmModalDialogComponent,
     ContextualMenuComponent,
     BottomBarComponent,
+    LoginTeamDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -93,6 +104,19 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
     MatButtonToggleModule,
     MatTooltipModule,
     ScrollingModule,
+    BrowserModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    BrowserAnimationsModule,
+    MatFormFieldModule,
+    MatButtonModule,
+    MatSelectModule,
+    MatCardModule,
+    MatInputModule,
+    MatIconModule,
+    MatProgressSpinnerModule,
+    NgSelectModule,
+    LeappAngularCommonModule,
   ],
   exports: [ConfirmationDialogComponent, InputDialogComponent, CommandBarComponent, SideBarComponent, SessionsComponent],
 })

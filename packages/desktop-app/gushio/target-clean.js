@@ -11,7 +11,7 @@ module.exports = {
     try {
       console.log('Performing cleanup... ')
       await deleteFunction(path, "..", "electron", "dist")
-      await deleteFunction(path, "..", "dist")
+      await deleteFunction(path, "..", "dist", "leapp-client")
       await deleteFunction(path, "..", "coverage")
       await deleteFunction(path, "..", ".angular")
       console.log('Cleanup completed successfully')

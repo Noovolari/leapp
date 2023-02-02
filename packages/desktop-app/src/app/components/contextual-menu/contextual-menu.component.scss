@@ -16,3 +16,14 @@ img.moon-stop-outline {
 .disabled span {
   color: $silver-30;
 }
+
+.userCircle {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 10px;
+  background: #00aaff;
+  color: #fff;
+  font-size: 10px;
+  text-transform: uppercase;
+}

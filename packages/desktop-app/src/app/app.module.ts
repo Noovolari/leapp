@@ -1,5 +1,5 @@
 import { BrowserModule } from "@angular/platform-browser";
-import { ErrorHandler, NgModule } from "@angular/core";
+import { APP_INITIALIZER, ErrorHandler, NgModule } from "@angular/core";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { LayoutModule } from "./layout/layout.module";
@@ -13,10 +13,11 @@ import { TrayMenuComponent } from "./components/tray-menu/tray-menu.component";
 import { TooltipModule } from "ngx-bootstrap/tooltip";
 import { ModalModule } from "ngx-bootstrap/modal";
 import { ErrorService } from "./services/middleware/error.service";
-
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { ComponentsModule } from "./components/components.module";
 import { ToastrModule } from "ngx-toastr";
+import { LocalizationService } from "leapp-angular-common";
+import { appInitializer } from "./app.initializer";
 
 @NgModule({
   declarations: [AppComponent, TrayMenuComponent],
@@ -36,7 +37,10 @@ import { ToastrModule } from "ngx-toastr";
     ToastrModule.forRoot(),
   ],
   entryComponents: [ConfirmationDialogComponent, InputDialogComponent],
-  providers: [{ provide: ErrorHandler, useClass: ErrorService }],
+  providers: [
+    { provide: APP_INITIALIZER, useFactory: appInitializer, deps: [LocalizationService], multi: true },
+    { provide: ErrorHandler, useClass: ErrorService },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

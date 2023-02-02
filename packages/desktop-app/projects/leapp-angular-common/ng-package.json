@@ -1,0 +1,10 @@
+{
+  "$schema": "../../node_modules/ng-packagr/ng-package.schema.json",
+  "dest": "../../dist/leapp-angular-common",
+  "assets": [
+    "assets/*"
+  ],
+  "lib": {
+    "entryFile": "src/leapp-angular-common-export.ts"
+  }
+}

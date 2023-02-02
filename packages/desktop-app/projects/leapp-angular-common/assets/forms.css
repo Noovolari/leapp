@@ -1,0 +1,17 @@
+.form-container {
+  border-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form-field {
+  width: 300px;
+  margin-bottom: 25px;
+}
+
+mat-icon > mat-spinner {
+  margin-left: 10px;
+}
+
+

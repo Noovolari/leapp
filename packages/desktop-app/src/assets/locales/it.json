@@ -15,17 +15,31 @@
   "SignUpButtonLabel": "Registrati",
   "SignInButtonLabel": "Accedi",
   "Ok": "Ok",
+  "Logout": "Esci",
+  "InvitationTitle": "Invita un utente su Leapp Team",
+  "InviteInputLabel": "Invita Utente",
+  "InvitePlaceholder": "Inserisci email",
+  "InviteButtonLabel": "Invita",
+  "InvitationCreated": "Invitazione Sottomessa con successo",
+  "CreateSession": "Crea una Sessione",
+  "Users": "Utenti",
+  "InviteUser": "Invita un Utente",
+  "CreateAWSIAMUserSession": "Crea una AWS IAM User Session",
+  "CreateAWSIAMFederatedSession": "Crea una AWS IAM Federated Session",
+  "CreateAWSIAMRoleChainedSession": "Crea una AWS IAM Role Chained Session",
+  "CreateAWSSSOIntegration": "Crea una AWS SSO Integration",
+  "CreateAzureIntegration": "Crea una Azure Integration",
 
   "error": {
     "UnknownError": "Errore sconosciuto",
     "0": "Errore di rete",
     "Required": "Campo richiesto",
     "Email": "Email invalida",
-    "MinLength": "Lunghezza minima richiesta: {{requiredLength}} caratteri",
+    "MinLength": "Minimo {{requiredLength}} caratteri richiesti",
     "PasswordPattern": "La password richiede almeno un carattere minuscolo (abc), uno maiuscolo (ABC), un numero (123) e un simbolo ($€!)",
     "PasswordMismatch": "Le password non coincidono",
     "EmailAlreadyTaken": "Email già utilizzata",
     "InvalidCredentials": "Email o password non validi",
-    "AccountNotActiveYet": "Account non ancora attivato, controlla la tua casella di posta"
+    "UserNotActive": "Account non ancora attivato, controlla la tua casella di posta"
   }
 }

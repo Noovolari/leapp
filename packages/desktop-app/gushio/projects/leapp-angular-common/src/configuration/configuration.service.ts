@@ -9,8 +9,6 @@ export class ConfigurationService {
     ConfigurationService.forcedAPiEndpoint = "";
   }
 
-  public static setForcedAPiEndpoint = (endpoint: string): string => (ConfigurationService.forcedAPiEndpoint = endpoint);
-
   public getLocation = (): Location => window.location;
   public getNavigator = (): Navigator => window.navigator;
 
@@ -38,7 +36,7 @@ export class ConfigurationService {
       hostName = "api.preview.leapp.com";
     }
     const port = this.environment === Environment.local ? ":3000" : "";
-    return `${protocol}//${hostName}${port}/TESTTTTT/${this.getLocation().hostname}/ttt/`;
+    return `${protocol}//${hostName}${port}`;
   }
 
   public get userLanguage(): string {

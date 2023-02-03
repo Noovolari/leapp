@@ -7,7 +7,7 @@
   },
   "description": "Leapp's core module",
   "dependencies": {
-    "leapp-team-core": "file:../../../../leapp-team/packages/leapp-team-core",
+    "leapp-team-core": "file:../../../leapp-team/packages/leapp-team-core",
     "folder-hash": "^4.0.2",
     "require-module": "^0.1.0",
     "tsoa": "^4.1.0"

@@ -17,6 +17,8 @@ const environment = {
   defaultAwsProfileName: "default",
   defaultAzureProfileName: "default-azure",
   latestUrl: "https://leapp.cloud/releases.html",
+  // TODO: add actual endpoint
+  apiEndpoint: "http://localhost:3000",
 };
 
 environment.lockFileDestination = `.Leapp/Leapp-lock.json`;

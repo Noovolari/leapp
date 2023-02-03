@@ -17,6 +17,7 @@ const environment = {
   defaultAwsProfileName: "default",
   defaultAzureProfileName: "default-azure",
   latestUrl: "https://leapp.cloud/releases.html",
+  apiEndpoint: "http://localhost:3000",
 };
 
 export { environment };

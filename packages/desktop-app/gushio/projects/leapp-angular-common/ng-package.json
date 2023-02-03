@@ -6,5 +6,6 @@
   ],
   "lib": {
     "entryFile": "src/leapp-angular-common-export.ts"
+
   }
 }

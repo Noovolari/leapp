@@ -21,7 +21,7 @@
       "assert": ["../node_modules/assert"],
       "fs": ["../node_modules/fs-web"],
       "leapp-angular-common": [
-        "../node_modules/leapp-angular-common"
+        "dist/leapp-angular-common"
       ]
     },
     "esModuleInterop": true,

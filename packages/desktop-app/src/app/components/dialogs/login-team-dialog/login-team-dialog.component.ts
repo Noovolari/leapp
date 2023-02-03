@@ -5,7 +5,6 @@ import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/service
 import { User } from "leapp-team-core/user/user";
 import { globalUser } from "../../command-bar/command-bar.component";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
-import { ConfigurationService } from "leapp-angular-common";
 
 @Component({
   selector: "app-login-team-dialog",
@@ -17,7 +16,7 @@ export class LoginTeamDialogComponent implements OnInit {
 
   constructor(public appService: AppService, public leappCoreService: AppProviderService, private messageToasterservice: MessageToasterService) {
     this.loggingService = leappCoreService.logService;
-    ConfigurationService.setForcedAPiEndpoint("http://example.com");
+    this.appService.setApiEndpoint();
   }
 
   ngOnInit(): void {}

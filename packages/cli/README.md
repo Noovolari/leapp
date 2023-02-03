@@ -25,7 +25,7 @@ $ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@noovolari/leapp-cli/0.1.29 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli/0.1.29 linux-x64 node-v16.14.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND
@@ -42,6 +42,7 @@ USAGE
 * [`leapp profile`](scopes/profile.md) - Leapp AWS Multi-profile management
 * [`leapp region`](scopes/region.md) - Leapp regions management
 * [`leapp session`](scopes/session.md) - Sessions management
+* [`leapp team`](scopes/team.md) - Login to your Team account
 * [`leapp version`](scopes/version.md) - Displays the Cli and Core versions
 
 <!-- commandsstop -->

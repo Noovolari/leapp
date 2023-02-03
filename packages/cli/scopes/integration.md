@@ -9,7 +9,6 @@ Leapp Integrations management
 * [`leapp integration login`](#leapp-integration-login)
 * [`leapp integration logout`](#leapp-integration-logout)
 * [`leapp integration sync`](#leapp-integration-sync)
-* [`leapp integration sync-pro`](#leapp-integration-sync-pro)
 
 ## `leapp integration create`
 
@@ -145,19 +144,4 @@ EXAMPLES
   $leapp integration sync
 
   $leapp integration sync --integrationId ID
-```
-
-## `leapp integration sync-pro`
-
-Synchronize Leapp-PRO integration sessions
-
-```
-USAGE
-  $ leapp integration sync-pro
-
-DESCRIPTION
-  Synchronize Leapp-PRO integration sessions
-
-EXAMPLES
-  $leapp integration pro sync
 ```

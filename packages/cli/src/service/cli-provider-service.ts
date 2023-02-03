@@ -47,6 +47,8 @@ import { CliRpcKeychainService } from "./cli-rpc-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import axios from "axios";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
+import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provider";
+import { UserProvider } from "leapp-team-core/user/user.provider";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -92,6 +94,8 @@ export class CliProviderService {
   private pluginManagerServiceInstance: PluginManagerService;
   private integrationFactoryInstance: IntegrationFactory;
   private azureIntegrationServiceInstance: AzureIntegrationService;
+  private leappTeamCoreEncryptionProviderInstance: EncryptionProvider;
+  private leappTeamCoreUserProviderInstance: UserProvider;
 
   private httpClient: any = {
     get: (url: string) => ({
@@ -434,5 +438,19 @@ export class CliProviderService {
 
   get inquirer(): CliInquirer.Inquirer {
     return CliInquirer;
+  }
+
+  get leappTeamCoreEncryptionProvider(): EncryptionProvider {
+    if (!this.leappTeamCoreEncryptionProviderInstance) {
+      this.leappTeamCoreEncryptionProviderInstance = new EncryptionProvider(this.cliNativeService.crypto);
+    }
+    return this.leappTeamCoreEncryptionProviderInstance;
+  }
+
+  get leappTeamCoreUserProvider(): UserProvider {
+    if (!this.leappTeamCoreUserProviderInstance) {
+      this.leappTeamCoreUserProviderInstance = new UserProvider("http://localhost:3000", this.httpClient, this.leappTeamCoreEncryptionProvider);
+    }
+    return this.leappTeamCoreUserProviderInstance;
   }
 }

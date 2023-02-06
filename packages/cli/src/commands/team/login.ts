@@ -1,7 +1,7 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 
-export default class ChangeSessionProfile extends LeappCommand {
+export default class TeamLogin extends LeappCommand {
   static description = "Login to your Team account";
 
   static examples = [`$leapp team login`];

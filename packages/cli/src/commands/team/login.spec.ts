@@ -97,5 +97,55 @@ describe("TeamLogin", () => {
       expect((command as any).error).toHaveBeenCalledTimes(1);
       expect((command as any).error).toHaveBeenCalledWith(mockedErrorMessage);
     });
+
+    test("if this.cliProviderService.leappTeamCoreUserProvider.signIn throws something that isn't an error", async () => {
+      const mockedError = "mocked-error";
+      const cliProviderService: any = {
+        leappTeamCoreUserProvider: {
+          signIn: jest.fn(() => {
+            throw mockedError;
+          }),
+        },
+      };
+      const command = getTestCommand(cliProviderService, []);
+      const mockedUserEmail = "mocked-user-email";
+      const mockedUserPassword = "mocked-user-password";
+      (command as any).insertUserEmail = () => mockedUserEmail;
+      (command as any).insertUserPassword = () => mockedUserPassword;
+      (command as any).error = jest.fn();
+      await command.run();
+      expect(cliProviderService.leappTeamCoreUserProvider.signIn).toHaveBeenCalledTimes(1);
+      expect(cliProviderService.leappTeamCoreUserProvider.signIn).toHaveBeenCalledWith(mockedUserEmail, mockedUserPassword);
+      expect((command as any).error).toHaveBeenCalledTimes(1);
+      expect((command as any).error).toHaveBeenCalledWith(`Unknown error: ${mockedError}`);
+    });
+
+    test("run - all ok", async () => {
+      const command = getTestCommand(null, []);
+      command.login = jest.fn();
+      await command.run();
+      expect(command.login).toHaveBeenCalled();
+    });
+
+    test("run - login throws an error", async () => {
+      const command = getTestCommand(null, []);
+      command.login = jest.fn(() => {
+        throw new Error("mocked-error");
+      });
+      (command as any).error = jest.fn();
+      await command.run();
+      expect(command.error).toHaveBeenCalledWith("mocked-error");
+    });
+
+    test("run - login throws something that isn't an error", async () => {
+      const mockedError = "mocked-error";
+      const command = getTestCommand(null, []);
+      command.login = jest.fn(() => {
+        throw mockedError;
+      });
+      (command as any).error = jest.fn();
+      await command.run();
+      expect(command.error).toHaveBeenCalledWith(`Unknown error: ${mockedError}`);
+    });
   });
 });

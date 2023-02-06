@@ -1,0 +1,18 @@
+name: Leapp Desktop App Brew bump
+
+on:
+  workflow_run:
+    workflows: ["Leapp Desktop App CD"]
+    branches: [main]
+    types:
+      - completed
+
+jobs:
+    runs-on: macos-latest
+    steps:
+      - name: Bump Brew
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.BREW_TOKEN }}
+        run: |
+          TAG=$(git tag --points-at $GITHUB_SHA)
+          brew bump-cask-pr leapp --version=$TAG --no-browse --no-audit

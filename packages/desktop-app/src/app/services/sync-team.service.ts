@@ -5,10 +5,14 @@ import { AppProviderService } from "./app-provider.service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
 import { serialize } from "class-transformer";
 import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
+import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
+import { AppNativeService } from "./app-native.service";
+import { AppService } from "./app.service";
 
 @Injectable({
   providedIn: "root",
@@ -16,19 +20,24 @@ import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 export class SyncTeamService {
   private repository: Repository;
   private fileService: FileService;
+  private sessionFactory: SessionFactory;
+  private integrationFactory: IntegrationFactory;
   private readonly localWorskpacePath: string;
   private readonly backupWorkspacePath: string;
 
   constructor(
     private vaultService: VaultService,
     private appProviderService: AppProviderService,
-    private nativeService: INativeService,
-    private sessionFactory: SessionFactory
+    private nativeService: AppNativeService,
+    private appService: AppService
   ) {
     this.repository = appProviderService.repository;
     this.fileService = appProviderService.fileService;
+    this.sessionFactory = appProviderService.sessionFactory;
+    this.integrationFactory = appProviderService.integrationFactory;
     this.localWorskpacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
     this.backupWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
+    this.appService.setApiEndpoint();
   }
 
   async getSecrets(): Promise<LocalSecretDto[]> {
@@ -56,14 +65,28 @@ export class SyncTeamService {
     localSecretsDto.forEach((localSecretDto) => {
       switch (localSecretDto.secretType) {
         case SecretType.awsIamRoleFederatedSession:
+          this.sessionFactory.createSession(
+            SessionType.awsIamRoleFederated,
+            Object.keys(localSecretDto).map((key) => ({ [key.replace("secret", "session")]: localSecretDto[key] })) as any
+          );
           break;
         case SecretType.awsIamRoleChainedSession:
+          this.sessionFactory.createSession(
+            SessionType.awsIamRoleChained,
+            Object.keys(localSecretDto).map((key) => ({ [key.replace("secret", "session")]: localSecretDto[key] })) as any
+          );
           break;
         case SecretType.awsIamUserSession:
+          this.sessionFactory.createSession(
+            SessionType.awsIamUser,
+            Object.keys(localSecretDto).map((key) => ({ [key.replace("secret", "session")]: localSecretDto[key] })) as any
+          );
           break;
         case SecretType.awsSsoIntegration:
+          this.integrationFactory.create(IntegrationType.awsSso, localSecretDto as any);
           break;
         case SecretType.azureIntegration:
+          this.integrationFactory.create(IntegrationType.azure, localSecretDto as any);
           break;
       }
     });

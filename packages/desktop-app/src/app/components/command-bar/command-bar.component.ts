@@ -22,6 +22,7 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { User } from "leapp-team-core/user/user";
 import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
+import { SyncTeamService } from "../../services/sync-team.service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -92,7 +93,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     public appService: AppService,
     public electronService: AppNativeService,
     private leappCoreService: AppProviderService,
-    private windowService: WindowService
+    private windowService: WindowService,
+    private syncTeamService: SyncTeamService
   ) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
 
@@ -110,6 +112,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.setInitialArrayFilters();
     this.user = null;
+    this.appService.setApiEndpoint();
   }
 
   private static changeSessionsTableHeight() {
@@ -278,12 +281,17 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
   }
 
-  logoutFromTeamPortal(): void {
+  async logoutFromTeamPortal(): Promise<void> {
     this.user = null;
-    // TODO: remove remote sessions and workspace, etc.
+    await this.syncTeamService.restoreLocalWorkspace();
   }
 
-  syncSecrets(): void {}
+  async syncSecrets(): Promise<void> {
+    console.log("Syncing secrets...");
+    const remoteSecrets = await this.syncTeamService.getSecrets();
+    console.log(remoteSecrets);
+    await this.syncTeamService.loadTeamSessions(remoteSecrets);
+  }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {
     let filteredSessions = sessions;

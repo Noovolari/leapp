@@ -5,6 +5,7 @@ import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/service
 import { User } from "leapp-team-core/user/user";
 import { globalUser } from "../../command-bar/command-bar.component";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
+import { SyncTeamService } from "../../../services/sync-team.service";
 
 @Component({
   selector: "app-login-team-dialog",
@@ -14,7 +15,12 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
 export class LoginTeamDialogComponent implements OnInit {
   private loggingService: LogService;
 
-  constructor(public appService: AppService, public leappCoreService: AppProviderService, private messageToasterservice: MessageToasterService) {
+  constructor(
+    public appService: AppService,
+    public leappCoreService: AppProviderService,
+    private messageToasterservice: MessageToasterService,
+    private readonly syncTeamService: SyncTeamService
+  ) {
     this.loggingService = leappCoreService.logService;
     this.appService.setApiEndpoint();
   }
@@ -27,6 +33,7 @@ export class LoginTeamDialogComponent implements OnInit {
     this.closeModal();
     this.loggingService.log(new LoggedEntry(`Welcome ${user.firstName}`, this, LogLevel.success));
     this.messageToasterservice.toast(`Welcome ${user.firstName}`, ToastLevel.success, "Log In to Team Portal");
+    await this.syncTeamService.saveLocalWorkspace();
   }
 
   onError(error: string | number): void {

@@ -99,8 +99,6 @@ export class CliProviderService {
   private leappTeamCoreUserProviderInstance: UserProvider;
   private webSyncServiceInstance: WebSyncService;
 
-
-
   public get azureIntegrationService(): AzureIntegrationService {
     if (!this.azureIntegrationServiceInstance) {
       this.azureIntegrationServiceInstance = new AzureIntegrationService(

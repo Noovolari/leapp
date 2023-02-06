@@ -27,6 +27,8 @@ import { AwsIamRoleChainedLocalSessionDto } from "leapp-team-core/encryptable-dt
 import { AzureLocalIntegrationDto } from "leapp-team-core/encryptable-dto/azure-local-integration-dto";
 
 export class WebSyncService {
+  httpClient: HttpClientInterface;
+
   private readonly encryptionProvider: EncryptionProvider;
   private readonly vaultProvider: VaultProvider;
   private readonly userProvider: UserProvider;
@@ -40,16 +42,17 @@ export class WebSyncService {
     private readonly azureIntegrationService: AzureIntegrationService,
     private readonly idpUrlService: IdpUrlsService
   ) {
-    const apiEndpoint = "http://localhost:3000";
-    const httpClient: HttpClientInterface = {
+    this.httpClient = {
       get: async <T>(url: string): Promise<T> => (await axios.get<T>(url, this.getHttpClientConfig())).data,
       post: async <T>(url: string, body: any): Promise<T> => (await axios.post<T>(url, body, this.getHttpClientConfig())).data,
       put: async <T>(url: string, body: any): Promise<T> => (await axios.put<T>(url, body, this.getHttpClientConfig())).data,
       delete: async <T>(url: string): Promise<T> => (await axios.delete<T>(url, this.getHttpClientConfig())).data,
     };
+
+    const apiEndpoint = "http://localhost:3000";
     this.encryptionProvider = new EncryptionProvider((crypto as any).webcrypto);
-    this.vaultProvider = new VaultProvider(apiEndpoint, httpClient, this.encryptionProvider);
-    this.userProvider = new UserProvider(apiEndpoint, httpClient, this.encryptionProvider);
+    this.vaultProvider = new VaultProvider(apiEndpoint, this.httpClient, this.encryptionProvider);
+    this.userProvider = new UserProvider(apiEndpoint, this.httpClient, this.encryptionProvider);
   }
 
   async syncSecrets(email: string, password: string): Promise<LocalSecretDto[]> {

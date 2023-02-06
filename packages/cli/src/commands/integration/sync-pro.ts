@@ -14,7 +14,7 @@ export default class SyncProIntegration extends LeappCommand {
     try {
       const email = await this.getEmail();
       const password = await this.getPassword();
-      const secretDtos = await this.cliProviderService.webSyncService.syncSecrets(email, password);
+      const secretDtos = await (this.cliProviderService as any).webSyncService.syncSecrets(email, password);
       this.log(`${secretDtos.length} elements synchronized.`);
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);

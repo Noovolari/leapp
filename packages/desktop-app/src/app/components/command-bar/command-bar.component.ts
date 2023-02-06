@@ -283,6 +283,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     // TODO: remove remote sessions and workspace, etc.
   }
 
+  syncSecrets(): void {}
+
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {
     let filteredSessions = sessions;
     const searchText = this.filterForm.get("searchFilter").value;

@@ -43,6 +43,10 @@
           <div mat-menu-item>
             <span>{{user.role}} - {{user.teamName}}</span>
           </div>
+          <button mat-menu-item (click)="syncSecrets();">
+            <i class="moon-Refresh"></i>&nbsp;
+            <span>Sync Secrets</span>
+          </button>
           <button mat-menu-item (click)="logoutFromTeamPortal();">
             <i class="moon-Close"></i>&nbsp;
             <span>Logout</span>

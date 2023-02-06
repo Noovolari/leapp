@@ -101,6 +101,9 @@ export class CliProviderService {
     get: (url: string) => ({
       toPromise: async () => (await axios.get(url)).data
     }),
+    post: (url: string, body: any) => ({
+      toPromise: async () => (await axios.post(url, JSON.stringify(body), { headers: { "Content-Type": "application/json" } })).data
+    }),
   };
 
   public get azureIntegrationService(): AzureIntegrationService {

@@ -12,76 +12,85 @@ import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 import { AppNativeService } from "./app-native.service";
+import { IBehaviouralNotifier } from "@noovolari/leapp-core/interfaces/i-behavioural-notifier";
 
 @Injectable({
   providedIn: "root",
 })
 export class SyncTeamService {
-  private repository: Repository;
-  private fileService: FileService;
-  private sessionFactory: SessionFactory;
-  private integrationFactory: IntegrationFactory;
+  private readonly repository: Repository;
+  private readonly fileService: FileService;
+  private readonly sessionFactory: SessionFactory;
+  private readonly integrationFactory: IntegrationFactory;
   private readonly localWorskpacePath: string;
   private readonly backupWorkspacePath: string;
+  private readonly behaviouralSubjectService: IBehaviouralNotifier;
 
   constructor(private vaultService: VaultService, private appProviderService: AppProviderService, private nativeService: AppNativeService) {
     this.repository = appProviderService.repository;
     this.fileService = appProviderService.fileService;
     this.sessionFactory = appProviderService.sessionFactory;
     this.integrationFactory = appProviderService.integrationFactory;
+    this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.localWorskpacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
     this.backupWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
   }
 
-  async getSecrets(): Promise<LocalSecretDto[]> {
-    return await this.vaultService.getSecrets();
+  setLocalSessions(): void {
+    this.restoreLocalWorkspace();
+    const workspace = this.repository.getWorkspace();
+    this.behaviouralSubjectService.setSessions(workspace.sessions);
+    this.behaviouralSubjectService.setIntegrations([...workspace.awsSsoIntegrations, ...workspace.azureIntegrations]);
   }
 
-  async saveLocalWorkspace(): Promise<void> {
-    const tempWorkspace = this.fileService.readFileSync(this.localWorskpacePath);
-    this.fileService.writeFileSync(this.backupWorkspacePath, this.fileService.encryptText(serialize(tempWorkspace)));
-  }
-
-  async restoreLocalWorkspace(): Promise<void> {
-    const workspaceString = this.fileService.readFileSync(this.backupWorkspacePath);
-    this.fileService.writeFileSync(this.localWorskpacePath, workspaceString);
-    this.repository.reloadWorkspace();
-  }
-
-  async loadTeamSessions(localSecretsDto: LocalSecretDto[]): Promise<void> {
+  async setTeamSessions(localSecretsDto: LocalSecretDto[]): Promise<void> {
+    this.saveLocalWorkspace();
     const workspace = this.repository.getWorkspace();
     workspace.sessions = [];
     workspace.awsSsoIntegrations = [];
     workspace.azureIntegrations = [];
     workspace.pinned = [];
     workspace.segments = [];
-    localSecretsDto.forEach((localSecretDto) => {
+    for (const localSecretDto of localSecretsDto) {
       switch (localSecretDto.secretType) {
         case SecretType.awsIamRoleFederatedSession:
-          this.sessionFactory.createSession(
+          await this.sessionFactory.createSession(
             SessionType.awsIamRoleFederated,
             Object.keys(localSecretDto).map((key) => ({ [key.replace("secret", "session")]: localSecretDto[key] })) as any
           );
           break;
         case SecretType.awsIamRoleChainedSession:
-          this.sessionFactory.createSession(
+          await this.sessionFactory.createSession(
             SessionType.awsIamRoleChained,
             Object.keys(localSecretDto).map((key) => ({ [key.replace("secret", "session")]: localSecretDto[key] })) as any
           );
           break;
         case SecretType.awsIamUserSession:
-          this.sessionFactory.createSession(
+          await this.sessionFactory.createSession(
             SessionType.awsIamUser,
             Object.keys(localSecretDto).map((key) => ({ [key.replace("secret", "session")]: localSecretDto[key] })) as any
           );
           break;
         case SecretType.awsSsoIntegration:
-          this.integrationFactory.create(IntegrationType.awsSso, localSecretDto as any);
+          await this.integrationFactory.create(IntegrationType.awsSso, localSecretDto as any);
           break;
         case SecretType.azureIntegration:
-          this.integrationFactory.create(IntegrationType.azure, localSecretDto as any);
+          await this.integrationFactory.create(IntegrationType.azure, localSecretDto as any);
           break;
       }
-    });
+    }
+    this.behaviouralSubjectService.setSessions(workspace.sessions);
+    this.behaviouralSubjectService.setIntegrations([...workspace.awsSsoIntegrations, ...workspace.azureIntegrations]);
+  }
+
+  private restoreLocalWorkspace(): void {
+    const workspaceString = this.fileService.readFileSync(this.backupWorkspacePath);
+    this.fileService.writeFileSync(this.localWorskpacePath, workspaceString);
+    this.repository.reloadWorkspace();
+  }
+
+  private saveLocalWorkspace(): void {
+    const tempWorkspace = this.fileService.readFileSync(this.localWorskpacePath);
+    this.fileService.writeFileSync(this.backupWorkspacePath, this.fileService.encryptText(serialize(tempWorkspace)));
   }
 }

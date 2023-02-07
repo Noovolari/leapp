@@ -285,12 +285,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     await this.syncTeamService.restoreLocalWorkspace();
   }
 
-  syncSecrets(event: any): void {
+  async syncSecrets(event: any): Promise<void> {
     console.log("Syncing secrets...");
     console.log(event);
-    //const remoteSecrets = await this.syncTeamService.getSecrets();
-    //console.log(remoteSecrets);
-    //await this.syncTeamService.loadTeamSessions(event);
+    await this.syncTeamService.setTeamSessions(event);
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

@@ -9,8 +9,6 @@ import { BsModalService } from "ngx-bootstrap/modal";
 import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 import { OperatingSystem, osMap } from "@noovolari/leapp-core/models/operating-system";
 import { constants } from "@noovolari/leapp-core/models/constants";
-import { ConfigurationService } from "leapp-angular-common";
-import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: "root",
@@ -229,9 +227,5 @@ export class AppService {
       t.closeMenu();
     });
     this.triggers = [];
-  }
-
-  setApiEndpoint(): void {
-    ConfigurationService.setForcedEndpoint(environment.apiEndpoint);
   }
 }

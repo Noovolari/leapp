@@ -12,7 +12,6 @@ import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 import { AppNativeService } from "./app-native.service";
-import { AppService } from "./app.service";
 
 @Injectable({
   providedIn: "root",
@@ -25,19 +24,13 @@ export class SyncTeamService {
   private readonly localWorskpacePath: string;
   private readonly backupWorkspacePath: string;
 
-  constructor(
-    private vaultService: VaultService,
-    private appProviderService: AppProviderService,
-    private nativeService: AppNativeService,
-    private appService: AppService
-  ) {
+  constructor(private vaultService: VaultService, private appProviderService: AppProviderService, private nativeService: AppNativeService) {
     this.repository = appProviderService.repository;
     this.fileService = appProviderService.fileService;
     this.sessionFactory = appProviderService.sessionFactory;
     this.integrationFactory = appProviderService.integrationFactory;
     this.localWorskpacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
     this.backupWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
-    this.appService.setApiEndpoint();
   }
 
   async getSecrets(): Promise<LocalSecretDto[]> {

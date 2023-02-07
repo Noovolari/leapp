@@ -22,7 +22,6 @@ export class LoginTeamDialogComponent implements OnInit {
     private readonly syncTeamService: SyncTeamService
   ) {
     this.loggingService = leappCoreService.logService;
-    this.appService.setApiEndpoint();
   }
 
   ngOnInit(): void {}

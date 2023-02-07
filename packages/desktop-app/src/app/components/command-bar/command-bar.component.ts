@@ -112,7 +112,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.setInitialArrayFilters();
     this.user = null;
-    this.appService.setApiEndpoint();
   }
 
   private static changeSessionsTableHeight() {
@@ -286,11 +285,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     await this.syncTeamService.restoreLocalWorkspace();
   }
 
-  async syncSecrets(): Promise<void> {
+  syncSecrets(event: any): void {
     console.log("Syncing secrets...");
-    const remoteSecrets = await this.syncTeamService.getSecrets();
-    console.log(remoteSecrets);
-    await this.syncTeamService.loadTeamSessions(remoteSecrets);
+    console.log(event);
+    //const remoteSecrets = await this.syncTeamService.getSecrets();
+    //console.log(remoteSecrets);
+    //await this.syncTeamService.loadTeamSessions(event);
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

@@ -30,6 +30,7 @@ import { AzureSessionService } from "@noovolari/leapp-core/services/session/azur
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { ExtensionWebsocketService } from "./services/extension-websocket.service";
+import { ConfigurationService } from "leapp-angular-common";
 
 @Component({
   selector: "app-root",
@@ -164,6 +165,8 @@ export class AppComponent implements OnInit {
         this.appNativeService.fs.removeSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile));
       }
     }
+
+    ConfigurationService.setForcedEndpoint(environment.apiEndpoint);
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit

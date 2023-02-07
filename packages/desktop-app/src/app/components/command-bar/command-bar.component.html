@@ -34,6 +34,9 @@
         <button class="icon-button" (click)="loginToTeamPortal();" matTooltip="Login to Portal"><i class="moon-User"></i></button>
       </ng-container>
       <ng-container *ngIf="user !== null">
+        <app-leapp-sync (syncEvent)="syncSecrets($event)">
+          <span>Sync</span>
+        </app-leapp-sync>
         <span class="user-circle" [matMenuTriggerFor]="userMenu">{{user.firstName.substring(0,1)}}{{user.lastName.substring(0,1)}}</span>
         <mat-menu #userMenu [hasBackdrop]="false" role="menu">
           <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
@@ -43,10 +46,8 @@
           <div mat-menu-item>
             <span>{{user.role}} - {{user.teamName}}</span>
           </div>
-          <button mat-menu-item (click)="syncSecrets();">
-            <i class="moon-Refresh"></i>&nbsp;
-            <span>Sync Secrets</span>
-          </button>
+          <div mat-menu-item>
+          </div>
           <button mat-menu-item (click)="logoutFromTeamPortal();">
             <i class="moon-Close"></i>&nbsp;
             <span>Logout</span>

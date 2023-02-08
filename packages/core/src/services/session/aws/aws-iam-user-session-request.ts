@@ -8,13 +8,12 @@ export interface AwsIamUserSessionRequest extends CreateAwsSessionRequest {
   mfaDevice?: string;
 }
 
-export const awsIamUserSessionRequestFromDto = (request: AwsIamUserSessionRequest, profileName: string): AwsIamUserLocalSessionDto =>
-  new AwsIamUserLocalSessionDto(
-    request.sessionId,
-    request.sessionName,
-    request.region,
-    request.accessKey,
-    request.secretKey,
-    request.mfaDevice,
-    profileName
-  );
+export const awsIamUserSessionRequestFromDto = (dto: AwsIamUserLocalSessionDto, profileId: string): AwsIamUserSessionRequest => ({
+  sessionName: dto.sessionName,
+  sessionId: dto.sessionId,
+  profileId,
+  region: dto.region,
+  accessKey: dto.accessKey,
+  secretKey: dto.secretKey,
+  mfaDevice: dto.mfaDevice,
+});

@@ -1,3 +1,4 @@
+import * as crypto from "crypto";
 import { CloudProviderService } from "@noovolari/leapp-core/services/cloud-provider-service";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { FileService } from "@noovolari/leapp-core/services/file-service";
@@ -47,6 +48,7 @@ import { CliRpcKeychainService } from "./cli-rpc-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import axios from "axios";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
+import { TeamService } from "@noovolari/leapp-core/services/team-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -92,6 +94,7 @@ export class CliProviderService {
   private pluginManagerServiceInstance: PluginManagerService;
   private integrationFactoryInstance: IntegrationFactory;
   private azureIntegrationServiceInstance: AzureIntegrationService;
+  private teamServiceInstance: TeamService;
 
   private httpClient: any = {
     get: (url: string) => ({
@@ -430,6 +433,14 @@ export class CliProviderService {
       this.ssmServiceInstance = new SsmService(this.logService, this.executeService, this.cliNativeService, this.fileService);
     }
     return this.ssmServiceInstance;
+  }
+
+  get teamService(): TeamService {
+    if (!this.teamServiceInstance) {
+      this.teamServiceInstance = new TeamService(this.sessionFactory, this.namedProfilesService, this.sessionManagementService, this.awsSsoIntegrationService,
+        this.azureIntegrationService, this.idpUrlsService, this.keyChainService, this.cliNativeService, this.fileService, this.repository, (crypto as any).webcrypto);
+    }
+    return this.teamServiceInstance;
   }
 
   get inquirer(): CliInquirer.Inquirer {

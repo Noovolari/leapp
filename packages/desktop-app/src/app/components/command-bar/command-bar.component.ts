@@ -22,7 +22,7 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { User } from "leapp-team-core/user/user";
 import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
-import { SyncTeamService } from "../../services/sync-team.service";
+import { TeamService } from "@noovolari/leapp-core/services/team-service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -30,8 +30,6 @@ export const globalFilterGroup = new BehaviorSubject<GlobalFilters>(null);
 export const globalHasFilter = new BehaviorSubject<boolean>(false);
 export const globalResetFilter = new BehaviorSubject<boolean>(false);
 export const globalSegmentFilter = new BehaviorSubject<Segment>(null);
-
-export const globalUser = new BehaviorSubject<User>(null);
 
 export interface IGlobalColumns {
   role: boolean;
@@ -69,11 +67,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   filterExtended: boolean;
   compactMode: boolean;
+  teamUser: User;
 
   eConstants = constants;
-
-  loggedIn = false;
-  user: User;
 
   private subscription0;
   private subscription1;
@@ -85,21 +81,23 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private userSubscription;
 
   private currentSegment: Segment;
+  private teamService: TeamService;
   private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
     public optionsService: OptionsService,
     private bsModalService: BsModalService,
     public appService: AppService,
-    public electronService: AppNativeService,
-    private leappCoreService: AppProviderService,
-    private windowService: WindowService,
-    private syncTeamService: SyncTeamService
+    public appNativeService: AppNativeService,
+    private appProviderService: AppProviderService,
+    private windowService: WindowService
   ) {
-    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
+    this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
+    this.teamService = appProviderService.teamService;
 
     this.filterExtended = false;
     this.compactMode = false;
+    this.teamUser = null;
 
     globalFilteredSessions.next(this.behaviouralSubjectService.sessions);
 
@@ -111,7 +109,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
 
     this.setInitialArrayFilters();
-    this.user = null;
   }
 
   private static changeSessionsTableHeight() {
@@ -176,8 +173,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       globalFilteredSessions.next(sessions);
     });
 
-    // TODO: persist the user in the workspace and check the user at app start
-    this.userSubscription = globalUser.subscribe((user: User) => (this.user = user));
+    this.userSubscription = this.teamService.signedInUser$.subscribe((user: User) => (this.teamUser = user));
   }
 
   ngOnDestroy(): void {
@@ -280,15 +276,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
   }
 
-  logoutFromTeamPortal(): void {
-    this.user = null;
-    this.syncTeamService.setLocalSessions();
+  async logoutFromTeamPortal(): Promise<void> {
+    await this.teamService.signOut();
   }
 
-  async syncSecrets(event: any): Promise<void> {
-    console.log("Syncing secrets...");
-    console.log(event);
-    await this.syncTeamService.setTeamSessions(event);
+  async syncTeamSecrets(): Promise<void> {
+    await this.teamService.syncSecrets();
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {
@@ -307,7 +300,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
         try {
           test ||=
-            this.leappCoreService.namedProfileService
+            this.appProviderService.namedProfileService
               .getProfileName((session as any).profileId)
               ?.toLowerCase()
               .indexOf(searchText.toLowerCase()) > -1;
@@ -454,10 +447,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       { show: true, id: SessionType.azure, category: "Microsoft Azure", name: "Azure Subscription", value: false },
     ];
 
-    this.profiles = this.leappCoreService.namedProfileService
+    this.profiles = this.appProviderService.namedProfileService
       .getNamedProfiles()
       .map((element) => ({ name: element.name, id: element.id, value: false, show: true }));
 
-    this.regions = this.leappCoreService.awsCoreService.getRegions().map((element) => ({ name: element.region, value: false, show: true }));
+    this.regions = this.appProviderService.awsCoreService.getRegions().map((element) => ({ name: element.region, value: false, show: true }));
   }
 }

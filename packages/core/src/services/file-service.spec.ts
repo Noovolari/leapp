@@ -28,6 +28,7 @@ describe("File Service", () => {
     fs: {
       existsSync: jest.fn((_path) => _path === existsPath),
       writeFileSync: jest.fn((_file, _data) => {}),
+      removeSync: jest.fn((_file) => {}),
       renameSync: jest.fn((_name, _newName) => (newName = _newName)),
       readFileSync: jest.fn((_filePath, _opt: { encoding: "utf-8" }) => "[config]\nfake-key=fake-value\n"),
       readdirSync: jest.fn((_source, _opt: { withFileTypes: true }) => directories),
@@ -131,6 +132,13 @@ describe("File Service", () => {
     const fileService = new FileService(nativeService);
     fileService.writeFileSync(newPath, data);
     expect(nativeService.fs.writeFileSync).toHaveBeenNthCalledWith(1, newPath, data);
+  });
+
+  test("removeFileSync", () => {
+    const path = "path";
+    const fileService = new FileService(nativeService);
+    fileService.removeFileSync(path);
+    expect(nativeService.fs.removeSync).toHaveBeenNthCalledWith(1, path);
   });
 
   test("iniWriteSync", () => {

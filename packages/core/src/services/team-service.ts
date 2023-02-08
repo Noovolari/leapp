@@ -1,4 +1,3 @@
-import * as crypto from "crypto";
 import axios, { AxiosRequestConfig } from "axios";
 import { SessionFactory } from "./session-factory";
 import { SessionType } from "../models/session-type";
@@ -25,12 +24,22 @@ import { AwsIamFederatedLocalSessionDto } from "leapp-team-core/encryptable-dto/
 import { AwsSsoLocalIntegrationDto } from "leapp-team-core/encryptable-dto/aws-sso-local-integration-dto";
 import { AwsIamRoleChainedLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-iam-role-chained-local-session-dto";
 import { AzureLocalIntegrationDto } from "leapp-team-core/encryptable-dto/azure-local-integration-dto";
+import { IKeychainService } from "../interfaces/i-keychain-service";
+import { constants } from "../models/constants";
+import { BehaviorSubject } from "rxjs";
+import { INativeService } from "../interfaces/i-native-service";
+import { FileService } from "./file-service";
+import { Repository } from "./repository";
 
-export class WebSyncService {
+export class TeamService {
+  readonly signedInUser$: BehaviorSubject<User>;
+  private readonly teamSignedInUserKeychainKey = "team-signed-in-user";
+
   private readonly encryptionProvider: EncryptionProvider;
   private readonly vaultProvider: VaultProvider;
   private readonly userProvider: UserProvider;
-  private currentUser: User;
+  private readonly localWorkspacePath: string;
+  private readonly backupWorkspacePath: string;
 
   constructor(
     private readonly sessionFactory: SessionFactory,
@@ -38,7 +47,12 @@ export class WebSyncService {
     private readonly sessionManagementService: SessionManagementService,
     private readonly awsSsoIntegrationService: AwsSsoIntegrationService,
     private readonly azureIntegrationService: AzureIntegrationService,
-    private readonly idpUrlService: IdpUrlsService
+    private readonly idpUrlService: IdpUrlsService,
+    private readonly keyChainService: IKeychainService,
+    private readonly nativeService: INativeService,
+    private readonly fileService: FileService,
+    private readonly repository: Repository,
+    private readonly crypto: Crypto
   ) {
     const apiEndpoint = "http://localhost:3000";
     const httpClient: HttpClientInterface = {
@@ -47,14 +61,47 @@ export class WebSyncService {
       put: async <T>(url: string, body: any): Promise<T> => (await axios.put<T>(url, body, this.getHttpClientConfig())).data,
       delete: async <T>(url: string): Promise<T> => (await axios.delete<T>(url, this.getHttpClientConfig())).data,
     };
-    this.encryptionProvider = new EncryptionProvider((crypto as any).webcrypto);
+    this.encryptionProvider = new EncryptionProvider(crypto);
     this.vaultProvider = new VaultProvider(apiEndpoint, httpClient, this.encryptionProvider);
     this.userProvider = new UserProvider(apiEndpoint, httpClient, this.encryptionProvider);
+    this.signedInUser$ = new BehaviorSubject(undefined);
+    this.localWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
+    this.backupWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
+    this.signedInUser$.next(null);
   }
 
-  async syncSecrets(email: string, password: string): Promise<LocalSecretDto[]> {
-    this.currentUser = await this.userProvider.signIn(email, password);
-    const rsaKeys = await this.getRSAKeys(this.currentUser);
+  async checkSignedInUser(): Promise<boolean> {
+    const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
+    if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
+      await this.signOut();
+    }
+    this.signedInUser$.next(signedInUser);
+    return signedInUser !== null;
+  }
+
+  async signIn(email: string, password: string): Promise<void> {
+    const signerInUser = await this.userProvider.signIn(email, password);
+    await this.setSignedInUser(signerInUser);
+  }
+
+  async setSignedInUser(signedInUser: User): Promise<void> {
+    await this.keyChainService.saveSecret(constants.appName, "team-signed-in-user", JSON.stringify(signedInUser));
+    this.signedInUser$.next(signedInUser);
+  }
+
+  async signOut(): Promise<void> {
+    await this.setSignedInUser(undefined);
+    await this.setLocalWorkspace();
+  }
+
+  async syncSecrets(): Promise<LocalSecretDto[]> {
+    if (!(await this.checkSignedInUser())) {
+      return;
+    }
+    if (!this.isRemoteWorkspace()) {
+      await this.setRemoteWorkspace();
+    }
+    const rsaKeys = await this.getRSAKeys(this.signedInUser$.getValue());
     const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
     const integrationDtos = localSecretDtos.filter(
       (secret) => secret.secretType === SecretType.awsSsoIntegration || secret.secretType === SecretType.azureIntegration
@@ -69,7 +116,7 @@ export class WebSyncService {
     return localSecretDtos;
   }
 
-  async syncIntegrationSecret(localIntegrationDto: LocalSecretDto): Promise<void> {
+  private async syncIntegrationSecret(localIntegrationDto: LocalSecretDto): Promise<void> {
     if (localIntegrationDto.secretType === SecretType.awsSsoIntegration) {
       const dto = localIntegrationDto as AwsSsoLocalIntegrationDto;
       const awsSsoIntegration = this.awsSsoIntegrationService.getIntegration(dto.id);
@@ -102,7 +149,7 @@ export class WebSyncService {
     }
   }
 
-  async syncSessionsSecret(localSecret: LocalSecretDto): Promise<void> {
+  private async syncSessionsSecret(localSecret: LocalSecretDto): Promise<void> {
     if (localSecret.secretType === SecretType.awsIamUserSession) {
       const localSessionDto = localSecret as AwsIamUserLocalSessionDto;
       const sessionService = (await this.sessionFactory.getSessionService(SessionType.awsIamUser)) as AwsIamUserService;
@@ -147,7 +194,7 @@ export class WebSyncService {
     }
   }
 
-  async getAssumerSessionId(localSessionDto: AwsIamRoleChainedLocalSessionDto): Promise<string> {
+  private async getAssumerSessionId(localSessionDto: AwsIamRoleChainedLocalSessionDto): Promise<string> {
     if (localSessionDto.assumerSessionId) {
       return localSessionDto.assumerSessionId;
     } else {
@@ -168,7 +215,7 @@ export class WebSyncService {
     }
   }
 
-  async setupAwsSession(sessionService: AwsSessionService, sessionId: string, profileName: string): Promise<string> {
+  private async setupAwsSession(sessionService: AwsSessionService, sessionId: string, profileName: string): Promise<string> {
     const localSession = this.sessionManagementService.getSessionById(sessionId) as AwsIamUserSession;
     if (localSession) {
       await sessionService.delete(sessionId);
@@ -178,17 +225,34 @@ export class WebSyncService {
     }
   }
 
-  async getRSAKeys(user: User): Promise<CryptoKeyPair> {
+  private async getRSAKeys(user: User): Promise<CryptoKeyPair> {
     const rsaKeyJsonPair = { privateKey: user.privateRSAKey, publicKey: user.publicRSAKey };
     return await this.encryptionProvider.importRsaKeys(rsaKeyJsonPair);
   }
 
-  getHttpClientConfig(): AxiosRequestConfig {
-    return this.currentUser
-      ? {
-          // eslint-disable-next-line @typescript-eslint/naming-convention
-          headers: { Authorization: `Bearer ${this.currentUser.accessToken}` },
-        }
-      : {};
+  private getHttpClientConfig(): AxiosRequestConfig {
+    const signedInUser = this.signedInUser$.getValue();
+    return signedInUser !== undefined ? { headers: { ["Authorization"]: `Bearer ${signedInUser.accessToken}` } } : {};
+  }
+
+  private isJwtTokenExpired(jwtToken: string): boolean {
+    const expiry = JSON.parse(atob(jwtToken.split(".")[1])).exp;
+    return Math.floor(new Date().getTime() / 1000) >= expiry;
+  }
+
+  private setLocalWorkspace(): void {
+    const workspaceString = this.fileService.readFileSync(this.backupWorkspacePath);
+    this.fileService.writeFileSync(this.localWorkspacePath, workspaceString);
+    this.repository.reloadWorkspace();
+    this.fileService.removeFileSync(this.backupWorkspacePath);
+  }
+
+  private setRemoteWorkspace(): void {
+    const tempWorkspace = this.fileService.readFileSync(this.localWorkspacePath);
+    this.fileService.writeFileSync(this.backupWorkspacePath, this.fileService.encryptText(JSON.stringify(tempWorkspace)));
+  }
+
+  private isRemoteWorkspace(): boolean {
+    return this.fileService.existsSync(this.backupWorkspacePath);
   }
 }

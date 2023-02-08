@@ -13,6 +13,7 @@ import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
 import { AppNativeService } from "./app-native.service";
 import { IBehaviouralNotifier } from "@noovolari/leapp-core/interfaces/i-behavioural-notifier";
+import { awsIamUserSessionRequestFromDto } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
 
 @Injectable({
   providedIn: "root",
@@ -60,10 +61,7 @@ export class SyncTeamService {
           );
           break;
         case SecretType.awsIamRoleChainedSession:
-          await this.sessionFactory.createSession(
-            SessionType.awsIamRoleChained,
-            Object.keys(localSecretDto).map((key) => ({ [key.replace("secret", "session")]: localSecretDto[key] })) as any
-          );
+          await this.sessionFactory.createSession(SessionType.awsIamRoleChained, awsIamUserSessionRequestFromDto(localSecretDto, "default"));
           break;
         case SecretType.awsIamUserSession:
           await this.sessionFactory.createSession(

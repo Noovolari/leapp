@@ -280,9 +280,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
   }
 
-  async logoutFromTeamPortal(): Promise<void> {
+  logoutFromTeamPortal(): void {
     this.user = null;
-    await this.syncTeamService.restoreLocalWorkspace();
+    this.syncTeamService.setLocalSessions();
   }
 
   async syncSecrets(event: any): Promise<void> {

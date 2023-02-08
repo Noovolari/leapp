@@ -32,7 +32,6 @@ export class LoginTeamDialogComponent implements OnInit {
     this.closeModal();
     this.loggingService.log(new LoggedEntry(`Welcome ${user.firstName}`, this, LogLevel.success));
     this.messageToasterservice.toast(`Welcome ${user.firstName}`, ToastLevel.success, "Log In to Team Portal");
-    await this.syncTeamService.saveLocalWorkspace();
   }
 
   onError(error: string | number): void {

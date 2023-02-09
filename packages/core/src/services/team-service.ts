@@ -30,6 +30,8 @@ import { BehaviorSubject } from "rxjs";
 import { INativeService } from "../interfaces/i-native-service";
 import { FileService } from "./file-service";
 import { Repository } from "./repository";
+import { WorkspaceService } from "./workspace-service";
+import { BehaviouralSubjectService } from "./behavioural-subject-service";
 
 export class TeamService {
   readonly signedInUser$: BehaviorSubject<User>;
@@ -38,8 +40,8 @@ export class TeamService {
   private readonly encryptionProvider: EncryptionProvider;
   private readonly vaultProvider: VaultProvider;
   private readonly userProvider: UserProvider;
+  private readonly currentWorkspacePath: string;
   private readonly localWorkspacePath: string;
-  private readonly backupWorkspacePath: string;
 
   constructor(
     private readonly sessionFactory: SessionFactory,
@@ -52,7 +54,9 @@ export class TeamService {
     private readonly nativeService: INativeService,
     private readonly fileService: FileService,
     private readonly repository: Repository,
-    private readonly crypto: Crypto
+    private readonly crypto: Crypto,
+    private readonly workspaceService: WorkspaceService,
+    private readonly behaviouralSubjectService?: BehaviouralSubjectService
   ) {
     const apiEndpoint = "http://localhost:3000";
     const httpClient: HttpClientInterface = {
@@ -65,8 +69,8 @@ export class TeamService {
     this.vaultProvider = new VaultProvider(apiEndpoint, httpClient, this.encryptionProvider);
     this.userProvider = new UserProvider(apiEndpoint, httpClient, this.encryptionProvider);
     this.signedInUser$ = new BehaviorSubject(undefined);
-    this.localWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
-    this.backupWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
+    this.currentWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
+    this.localWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
     this.signedInUser$.next(null);
   }
 
@@ -96,16 +100,22 @@ export class TeamService {
 
   async signOut(): Promise<void> {
     await this.setSignedInUser(undefined);
-    await this.setLocalWorkspace();
+    await this.setWorkspaceToLocalOne();
   }
 
   async syncSecrets(): Promise<LocalSecretDto[]> {
     if (!(await this.checkSignedInUser())) {
       return;
     }
+    // Check if ~/.Leapp/Leapp-lock.json.local does not exist
     if (!this.isRemoteWorkspace()) {
-      await this.setRemoteWorkspace();
+      // Create ~/.Leapp/Leapp-lock.json.local
+      await this.setWorkspaceToRemoteOne();
     }
+    this.workspaceService.removeWorkspace();
+    this.workspaceService.createWorkspace();
+    this.workspaceService.reloadWorkspace();
+    this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
     const rsaKeys = await this.getRSAKeys(this.signedInUser$.getValue());
     const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
     const integrationDtos = localSecretDtos.filter(
@@ -245,19 +255,21 @@ export class TeamService {
     return Math.floor(new Date().getTime() / 1000) >= expiry;
   }
 
-  private setLocalWorkspace(): void {
-    const workspaceString = this.fileService.readFileSync(this.backupWorkspacePath);
-    this.fileService.writeFileSync(this.localWorkspacePath, workspaceString);
-    this.repository.reloadWorkspace();
-    this.fileService.removeFileSync(this.backupWorkspacePath);
+  private setWorkspaceToLocalOne(): void {
+    if (this.fileService.existsSync(this.localWorkspacePath)) {
+      const workspaceString = this.fileService.readFileSync(this.localWorkspacePath);
+      this.fileService.writeFileSync(this.currentWorkspacePath, workspaceString);
+      this.repository.reloadWorkspace();
+      this.fileService.removeFileSync(this.localWorkspacePath);
+    }
   }
 
-  private setRemoteWorkspace(): void {
-    const tempWorkspace = this.fileService.readFileSync(this.localWorkspacePath);
-    this.fileService.writeFileSync(this.backupWorkspacePath, this.fileService.encryptText(JSON.stringify(tempWorkspace)));
+  private setWorkspaceToRemoteOne(): void {
+    const tempWorkspace = this.fileService.readFileSync(this.currentWorkspacePath);
+    this.fileService.writeFileSync(this.localWorkspacePath, this.fileService.encryptText(JSON.stringify(tempWorkspace)));
   }
 
   private isRemoteWorkspace(): boolean {
-    return this.fileService.existsSync(this.backupWorkspacePath);
+    return this.fileService.existsSync(this.localWorkspacePath);
   }
 }

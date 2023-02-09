@@ -140,7 +140,7 @@ export class CliProviderService {
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+      this.workspaceServiceInstance = new WorkspaceService(this.repository, this.fileService, this.cliNativeService);
     }
     return this.workspaceServiceInstance;
   }
@@ -438,7 +438,7 @@ export class CliProviderService {
   get teamService(): TeamService {
     if (!this.teamServiceInstance) {
       this.teamServiceInstance = new TeamService(this.sessionFactory, this.namedProfilesService, this.sessionManagementService, this.awsSsoIntegrationService,
-        this.azureIntegrationService, this.idpUrlsService, this.keyChainService, this.cliNativeService, this.fileService, this.repository, (crypto as any).webcrypto);
+        this.azureIntegrationService, this.idpUrlsService, this.keyChainService, this.cliNativeService, this.fileService, this.repository, (crypto as any).webcrypto, this.workspaceService);
     }
     return this.teamServiceInstance;
   }

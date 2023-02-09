@@ -14,8 +14,7 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
     this.sessions$ = new BehaviorSubject([]);
     this.integrations$ = new BehaviorSubject([]);
     this.sessionSelections$ = new BehaviorSubject([]);
-    this.sessions = this.repository.getSessions();
-    this.integrations = [...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()];
+    this.reloadSessionsAndIntegrationsFromRepository();
   }
 
   // the getter will return the last value emitted in _sessions subject
@@ -83,5 +82,10 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
 
   unselectSessions() {
     this.sessionSelections = [];
+  }
+
+  reloadSessionsAndIntegrationsFromRepository(): void {
+    this.sessions = this.repository.getSessions();
+    this.integrations = [...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()];
   }
 }

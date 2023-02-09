@@ -119,7 +119,7 @@ export class AppProviderService {
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+      this.workspaceServiceInstance = new WorkspaceService(this.repository, this.fileService, this.appNativeService);
     }
     return this.workspaceServiceInstance;
   }
@@ -459,7 +459,9 @@ export class AppProviderService {
         this.appNativeService,
         this.fileService,
         this.repository,
-        window.crypto
+        window.crypto,
+        this.workspaceService,
+        this.behaviouralSubjectService
       );
     }
     return this.teamServiceInstance;

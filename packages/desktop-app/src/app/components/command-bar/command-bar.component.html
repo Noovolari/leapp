@@ -30,7 +30,7 @@
 
       <button class="icon-button hide-in-taskbar" (click)="syncAll();" matTooltip="Sync all Integrations"><i class="moon-Refresh"></i></button>
 
-      <ng-container *ngIf="teamUser === null">
+      <ng-container *ngIf="teamUser === null || teamUser === undefined">
         <button class="icon-button" (click)="loginToTeamPortal();" matTooltip="Login to Portal"><i class="moon-User"></i></button>
       </ng-container>
       <ng-container *ngIf="teamUser !== null && teamUser !== undefined">

@@ -106,7 +106,9 @@ export class FileService {
    * @param filePath - the filepath to remove
    */
   removeFileSync(filePath: string): void {
-    this.nativeService.fs.removeSync(filePath);
+    if (this.existsSync(filePath)) {
+      this.nativeService.fs.removeSync(filePath);
+    }
   }
 
   /**

@@ -173,7 +173,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       globalFilteredSessions.next(sessions);
     });
 
-    this.userSubscription = this.teamService.signedInUser$.subscribe((user: User) => (this.teamUser = user));
+    this.userSubscription = this.teamService.signedInUser$.subscribe((user: User) => {
+      this.teamUser = user;
+    });
   }
 
   ngOnDestroy(): void {

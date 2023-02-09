@@ -33,7 +33,7 @@
       <ng-container *ngIf="teamUser === null">
         <button class="icon-button" (click)="loginToTeamPortal();" matTooltip="Login to Portal"><i class="moon-User"></i></button>
       </ng-container>
-      <ng-container *ngIf="teamUser !== null">
+      <ng-container *ngIf="teamUser !== null && teamUser !== undefined">
         <span class="user-circle" [matMenuTriggerFor]="userMenu">{{teamUser.firstName.substring(0,1)}}{{teamUser.lastName.substring(0,1)}}</span>
         <mat-menu #userMenu [hasBackdrop]="false" role="menu">
           <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>

@@ -85,7 +85,12 @@ export class TeamService {
   }
 
   async setSignedInUser(signedInUser: User): Promise<void> {
-    await this.keyChainService.saveSecret(constants.appName, "team-signed-in-user", JSON.stringify(signedInUser));
+    if (signedInUser !== undefined) {
+      await this.keyChainService.saveSecret(constants.appName, "team-signed-in-user", JSON.stringify(signedInUser));
+    } else {
+      await this.keyChainService.deleteSecret(constants.appName, "team-signed-in-user");
+    }
+
     this.signedInUser$.next(signedInUser);
   }
 

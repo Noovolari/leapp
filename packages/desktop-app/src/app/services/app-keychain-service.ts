@@ -12,9 +12,6 @@ export class AppKeychainService implements IKeychainService {
    * @param password - secret
    */
   async saveSecret(service: string, account: string, password: string): Promise<void> {
-    console.log("SERVICE:", service);
-    console.log("ACCOUNT:", account);
-    console.log("PASSWORD:", password);
     return await this.nativeService.keytar.setPassword(service, account, password);
   }
 

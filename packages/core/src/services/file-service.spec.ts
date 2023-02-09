@@ -134,7 +134,7 @@ describe("File Service", () => {
     expect(nativeService.fs.writeFileSync).toHaveBeenNthCalledWith(1, newPath, data);
   });
 
-  test("removeFileSync", () => {
+  test("removeFileSync, if file exists", () => {
     const path = "path";
     const fileService = new FileService(nativeService);
     fileService.removeFileSync(path);

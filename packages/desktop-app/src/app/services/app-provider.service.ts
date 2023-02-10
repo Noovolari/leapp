@@ -461,6 +461,7 @@ export class AppProviderService {
         this.repository,
         window.crypto,
         this.workspaceService,
+        this.integrationFactory,
         this.behaviouralSubjectService
       );
     }

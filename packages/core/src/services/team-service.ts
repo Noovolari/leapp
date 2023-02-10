@@ -32,6 +32,7 @@ import { FileService } from "./file-service";
 import { Repository } from "./repository";
 import { WorkspaceService } from "./workspace-service";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
+import { IntegrationFactory } from "./integration-factory";
 
 export class TeamService {
   readonly signedInUser$: BehaviorSubject<User>;
@@ -47,6 +48,7 @@ export class TeamService {
     private readonly sessionFactory: SessionFactory,
     private readonly namedProfilesService: NamedProfilesService,
     private readonly sessionManagementService: SessionManagementService,
+    // TODO: remove these two ones
     private readonly awsSsoIntegrationService: AwsSsoIntegrationService,
     private readonly azureIntegrationService: AzureIntegrationService,
     private readonly idpUrlService: IdpUrlsService,
@@ -56,6 +58,7 @@ export class TeamService {
     private readonly repository: Repository,
     private readonly crypto: Crypto,
     private readonly workspaceService: WorkspaceService,
+    private readonly integrationFactory: IntegrationFactory,
     private readonly behaviouralSubjectService?: BehaviouralSubjectService
   ) {
     const apiEndpoint = "http://localhost:3000";
@@ -100,7 +103,20 @@ export class TeamService {
 
   async signOut(): Promise<void> {
     await this.setSignedInUser(undefined);
+    if (this.behaviouralSubjectService.sessions.length > 0) {
+      for (let i = 0; i < this.behaviouralSubjectService.sessions.length; i++) {
+        const concreteSessionService = this.sessionFactory.getSessionService(this.behaviouralSubjectService.sessions[i].type);
+        await concreteSessionService.delete(this.behaviouralSubjectService.sessions[i].sessionId);
+      }
+    }
+    if (this.behaviouralSubjectService.integrations.length > 0) {
+      for (let i = 0; i < this.behaviouralSubjectService.integrations.length; i++) {
+        const concreteIntegrationService = this.integrationFactory.getIntegrationService(this.behaviouralSubjectService.integrations[i].type);
+        await concreteIntegrationService.logout(this.behaviouralSubjectService.integrations[i].id);
+      }
+    }
     await this.setWorkspaceToLocalOne();
+    this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
   }
 
   async syncSecrets(): Promise<LocalSecretDto[]> {
@@ -266,7 +282,7 @@ export class TeamService {
 
   private setWorkspaceToRemoteOne(): void {
     const tempWorkspace = this.fileService.readFileSync(this.currentWorkspacePath);
-    this.fileService.writeFileSync(this.localWorkspacePath, this.fileService.encryptText(JSON.stringify(tempWorkspace)));
+    this.fileService.writeFileSync(this.localWorkspacePath, tempWorkspace);
   }
 
   private isRemoteWorkspace(): boolean {

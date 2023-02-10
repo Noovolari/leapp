@@ -3,8 +3,8 @@ import { AppService } from "../../../services/app.service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { User } from "leapp-team-core/user/user";
-import { globalUser } from "../../command-bar/command-bar.component";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
+import { TeamService } from "@noovolari/leapp-core/services/team-service";
 
 @Component({
   selector: "app-login-team-dialog",
@@ -13,25 +13,25 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
 })
 export class LoginTeamDialogComponent implements OnInit {
   private loggingService: LogService;
+  private teamService: TeamService;
 
-  constructor(public appService: AppService, public leappCoreService: AppProviderService, private messageToasterservice: MessageToasterService) {
-    this.loggingService = leappCoreService.logService;
-    this.appService.setApiEndpoint();
+  constructor(public appService: AppService, public appProviderService: AppProviderService, private messageToasterService: MessageToasterService) {
+    this.loggingService = appProviderService.logService;
+    this.teamService = appProviderService.teamService;
   }
 
   ngOnInit(): void {}
 
-  async onSignIn($event: User): Promise<void> {
-    const user: User = $event;
-    globalUser.next(user);
+  async onSignIn(user: User): Promise<void> {
+    await this.teamService.setSignedInUser(user);
     this.closeModal();
     this.loggingService.log(new LoggedEntry(`Welcome ${user.firstName}`, this, LogLevel.success));
-    this.messageToasterservice.toast(`Welcome ${user.firstName}`, ToastLevel.success, "Log In to Team Portal");
+    this.messageToasterService.toast(`Welcome ${user.firstName}`, ToastLevel.success, "Log In to Team Portal");
   }
 
   onError(error: string | number): void {
     this.loggingService.log(new LoggedEntry(`Error while trying to sign in: ${error}`, this, LogLevel.warn));
-    this.messageToasterservice.toast(`Error while trying to sign in: ${error}`, ToastLevel.warn, "Log In to Team Portal");
+    this.messageToasterService.toast(`Error while trying to sign in: ${error}`, ToastLevel.warn, "Log In to Team Portal");
   }
 
   goBack(): void {

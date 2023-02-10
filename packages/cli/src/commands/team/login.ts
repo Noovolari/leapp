@@ -46,8 +46,7 @@ export default class TeamLogin extends LeappCommand {
     const userEmail = await this.insertUserEmail();
     const userPassword = await this.insertUserPassword();
     try {
-      const user = await this.cliProviderService.leappTeamCoreUserProvider.signIn(userEmail, userPassword);
-      this.log(JSON.stringify(user));
+      await this.cliProviderService.teamService.signIn(userEmail, userPassword);
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }

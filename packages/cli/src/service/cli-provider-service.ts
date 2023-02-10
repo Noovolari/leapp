@@ -45,11 +45,11 @@ import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-f
 import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
 import { CliRpcKeychainService } from "./cli-rpc-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
-import { WebSyncService } from "@noovolari/leapp-core/services/web-sync-service";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provider";
 import { UserProvider } from "leapp-team-core/user/user.provider";
 import * as crypto from "crypto";
+import { TeamService } from "@noovolari/leapp-core/services/team-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -97,7 +97,7 @@ export class CliProviderService {
   private azureIntegrationServiceInstance: AzureIntegrationService;
   private leappTeamCoreEncryptionProviderInstance: EncryptionProvider;
   private leappTeamCoreUserProviderInstance: UserProvider;
-  private webSyncServiceInstance: WebSyncService;
+  private teamServiceInstance: TeamService;
 
   public get azureIntegrationService(): AzureIntegrationService {
     if (!this.azureIntegrationServiceInstance) {
@@ -129,7 +129,7 @@ export class CliProviderService {
         this.logService,
         this.repository,
         this.sessionFactory,
-        this.webSyncService.httpClient
+        this.teamService.httpClient
       );
     }
     return this.pluginManagerServiceInstance;
@@ -137,7 +137,7 @@ export class CliProviderService {
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+      this.workspaceServiceInstance = new WorkspaceService(this.repository, this.fileService, this.cliNativeService);
     }
     return this.workspaceServiceInstance;
   }
@@ -425,18 +425,32 @@ export class CliProviderService {
     return this.webConsoleServiceInstance;
   }
 
-  get webSyncService(): WebSyncService {
-    if (!this.webSyncServiceInstance) {
-      this.webSyncServiceInstance = new WebSyncService(this.sessionFactory, this.namedProfilesService, this.sessionManagementService, this.awsSsoIntegrationService, this.azureIntegrationService, this.idpUrlsService);
-    }
-    return this.webSyncServiceInstance;
-  }
-
   get ssmService(): SsmService {
     if (!this.ssmServiceInstance) {
       this.ssmServiceInstance = new SsmService(this.logService, this.executeService, this.cliNativeService, this.fileService);
     }
     return this.ssmServiceInstance;
+  }
+
+  get teamService(): TeamService {
+    if (!this.teamServiceInstance) {
+      this.teamServiceInstance = new TeamService(
+        this.sessionFactory,
+        this.namedProfilesService,
+        this.sessionManagementService,
+        this.awsSsoIntegrationService,
+        this.azureIntegrationService,
+        this.idpUrlsService,
+        this.keyChainService,
+        this.cliNativeService,
+        this.fileService,
+        this.repository,
+        (crypto as any).webcrypto,
+        this.workspaceService,
+        this.integrationFactory
+      );
+    }
+    return this.teamServiceInstance;
   }
 
   get inquirer(): CliInquirer.Inquirer {
@@ -452,7 +466,7 @@ export class CliProviderService {
 
   get leappTeamCoreUserProvider(): UserProvider {
     if (!this.leappTeamCoreUserProviderInstance) {
-      this.leappTeamCoreUserProviderInstance = new UserProvider("http://localhost:3000", this.webSyncService.httpClient, this.leappTeamCoreEncryptionProvider);
+      this.leappTeamCoreUserProviderInstance = new UserProvider("http://localhost:3000", this.teamService.httpClient, this.leappTeamCoreEncryptionProvider);
     }
     return this.leappTeamCoreUserProviderInstance;
   }

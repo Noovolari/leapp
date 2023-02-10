@@ -46,6 +46,7 @@ import { AppKeychainService } from "./app-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
+import { TeamService } from "@noovolari/leapp-core/services/team-service";
 
 @Injectable({
   providedIn: "root",
@@ -93,6 +94,7 @@ export class AppProviderService {
   private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
   private pluginManagerServiceInstance: PluginManagerService;
   private integrationFactoryInstance: IntegrationFactory;
+  private teamServiceInstance: TeamService;
 
   constructor(
     private appNativeService: AppNativeService,
@@ -117,7 +119,7 @@ export class AppProviderService {
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository);
+      this.workspaceServiceInstance = new WorkspaceService(this.repository, this.fileService, this.appNativeService);
     }
     return this.workspaceServiceInstance;
   }
@@ -442,5 +444,27 @@ export class AppProviderService {
       );
     }
     return this.integrationIsOnlineStateRefreshServiceInstance;
+  }
+
+  public get teamService(): TeamService {
+    if (!this.teamServiceInstance) {
+      this.teamServiceInstance = new TeamService(
+        this.sessionFactory,
+        this.namedProfileService,
+        this.sessionManagementService,
+        this.awsSsoIntegrationService,
+        this.azureIntegrationService,
+        this.idpUrlService,
+        this.keychainService,
+        this.appNativeService,
+        this.fileService,
+        this.repository,
+        window.crypto,
+        this.workspaceService,
+        this.integrationFactory,
+        this.behaviouralSubjectService
+      );
+    }
+    return this.teamServiceInstance;
   }
 }

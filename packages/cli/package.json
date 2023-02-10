@@ -143,7 +143,8 @@
     "release-homebrew": "gushio gushio/target-brew-release.js",
     "release-npm": "gushio gushio/target-npm-release.js",
     "run-plugin": "./bin/run session run-aws-credential-plugin",
-    "nightly": "gushio gushio/target-nightly.js"
+    "nightly": "gushio gushio/target-nightly.js",
+    "debug": "bin/run team login"
   },
   "types": "dist/index.d.ts"
 }

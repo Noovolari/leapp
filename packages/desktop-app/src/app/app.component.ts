@@ -30,6 +30,8 @@ import { AzureSessionService } from "@noovolari/leapp-core/services/session/azur
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { ExtensionWebsocketService } from "./services/extension-websocket.service";
+import { ConfigurationService } from "leapp-angular-common";
+import { TeamService } from "@noovolari/leapp-core/services/team-service";
 
 @Component({
   selector: "app-root",
@@ -52,6 +54,7 @@ export class AppComponent implements OnInit {
   private azureSessionService: AzureSessionService;
   private azureCoreService: AzureCoreService;
   private pluginManagerService: PluginManagerService;
+  private teamService: TeamService;
 
   /* Main app file: launches the Angular framework inside Electron app */
   constructor(
@@ -87,6 +90,7 @@ export class AppComponent implements OnInit {
     this.azureSessionService = appProviderService.azureSessionService;
     this.azureCoreService = appProviderService.azureCoreService;
     this.pluginManagerService = appProviderService.pluginManagerService;
+    this.teamService = appProviderService.teamService;
 
     this.setInitialColorSchema();
     this.setColorSchemaChangeEventListener();
@@ -164,6 +168,9 @@ export class AppComponent implements OnInit {
         this.appNativeService.fs.removeSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile));
       }
     }
+
+    ConfigurationService.setForcedEndpoint(environment.apiEndpoint);
+    await this.teamService.checkSignedInUser();
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit

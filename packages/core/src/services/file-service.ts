@@ -100,6 +100,16 @@ export class FileService {
   }
 
   /**
+   * Remove a file in a synchronous way
+   *
+   * @returns - {void}
+   * @param filePath - the filepath to remove
+   */
+  removeFileSync(filePath: string): void {
+    this.nativeService.fs.removeSync(filePath);
+  }
+
+  /**
    * Write the ini file passing each key to the writer avoinding the empty key/value couple
    *
    * @returns - {any} - the result of the operation

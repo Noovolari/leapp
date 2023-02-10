@@ -1,6 +1,6 @@
 ---
 title: "Configure AWS IAM User"
-description: "How to configure AWS IAM User session. An AWS Identity and Access Management (IAM) user is an entity that you create in AWS to represent the person or application that uses it to interact with AWS."
+description: "How to configure AWS IAM User session. An AWS IAM user is an entity that you create in AWS to represent the person or application that interact with AWS."
 page_type: "session"
 structured_data_how_to_title: "Configure AWS IAM User"
 structured_data_how_to_tip1: "From the top bar, click on the plus icon to ass a new session."

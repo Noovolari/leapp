@@ -59,6 +59,12 @@ export class Repository {
     }
   }
 
+  removeWorkspace(): void {
+    if (this.fileService.existsSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)) {
+      this.fileService.removeFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination);
+    }
+  }
+
   persistWorkspace(workspace: Workspace): void {
     const path = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));

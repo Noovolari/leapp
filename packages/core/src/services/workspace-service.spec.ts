@@ -8,7 +8,7 @@ describe("WorkspaceService", () => {
     const repository = {
       getWorkspace: jest.fn(() => new Workspace()),
     };
-    const workspaceService = new WorkspaceService(repository as any);
+    const workspaceService = new WorkspaceService(repository as any, null, null);
     expect(workspaceService.getWorkspace()).toBeInstanceOf(Workspace);
     expect(repository.getWorkspace).toHaveBeenCalled();
   });
@@ -21,7 +21,7 @@ describe("WorkspaceService", () => {
         modifiedWorkspace = Object.assign(workspace, {});
       }),
     };
-    const workspaceService = new WorkspaceService(repository as any);
+    const workspaceService = new WorkspaceService(repository as any, null, null);
     const newWorkspace = workspaceService.getWorkspace();
     newWorkspace.colorTheme = "testValue";
     workspaceService.persistWorkspace(newWorkspace);
@@ -33,7 +33,7 @@ describe("WorkspaceService", () => {
     const repository = {
       getWorkspace: jest.fn(() => new Workspace()),
     };
-    const workspaceService = new WorkspaceService(repository as any);
+    const workspaceService = new WorkspaceService(repository as any, null, null);
     expect(workspaceService.workspaceExists()).toStrictEqual(true);
     expect(repository.getWorkspace).toHaveBeenCalled();
   });
@@ -54,11 +54,38 @@ describe("WorkspaceService", () => {
         }
       }),
     } as any;
-    const workspaceService = new WorkspaceService(repository);
+    const workspaceService = new WorkspaceService(repository, null, null);
     expect(workspaceService.getDefaultProfileId()).toBe("2");
 
     profiles.splice(1, 1);
     expect(() => workspaceService.getDefaultProfileId()).toThrow(new LoggedException(`no default named profile found.`, this, LogLevel.warn));
     expect(repository.getDefaultProfileId).toHaveBeenCalled();
+  });
+
+  test("createWorkspace", () => {
+    const repository = {
+      createWorkspace: jest.fn(() => {}),
+    };
+    const workspaceService = new WorkspaceService(repository as any, null, null);
+    workspaceService.createWorkspace();
+    expect(repository.createWorkspace).toHaveBeenCalled();
+  });
+
+  test("removeWorkspace", () => {
+    const repository = {
+      removeWorkspace: jest.fn(() => {}),
+    };
+    const workspaceService = new WorkspaceService(repository as any, null, null);
+    workspaceService.removeWorkspace();
+    expect(repository.removeWorkspace).toHaveBeenCalled();
+  });
+
+  test("reloadWorkspace", () => {
+    const repository = {
+      reloadWorkspace: jest.fn(() => {}),
+    };
+    const workspaceService = new WorkspaceService(repository as any, null, null);
+    workspaceService.reloadWorkspace();
+    expect(repository.reloadWorkspace).toHaveBeenCalled();
   });
 });

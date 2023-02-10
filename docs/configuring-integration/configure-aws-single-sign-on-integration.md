@@ -1,22 +1,22 @@
 ---
-title: "Configure an AWS Single Sign-On integration"
+title: "Configure an AWS Identity Center (ex AWS Single Sign-On) integration"
 description: "AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts."
 pageType: "integration"
-structured_data_how_to_title: "Configure an AWS Single Sign-On integration"
+structured_data_how_to_title: "Configure an AWS Identity Center (ex AWS Single Sign-On) integration"
 structured_data_how_to_tip1: "Click on the _Add integration_ button in the sidebar"
-structured_data_how_to_tip2: "Select AWS Single Sign-On as _Integration type_"
+structured_data_how_to_tip2: "Select AWS Identity Center (ex AWS Single Sign-On) as _Integration type_"
 structured_data_how_to_tip3: "Provide the required information (described in the next section)"
 structured_data_how_to_tip4: "Click on the _Add integration_ button"
-social_title: "Configure an AWS Single Sign-On integration"
-social_description: "AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts."
+social_title: "Configure an AWS Identity Center (ex AWS Single Sign-On) integration"
+social_description: "AWS Identity Center (ex AWS Single Sign-On) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts."
 social_relative_image_path: "aws-single-sign-on-integration.png"
 sitemap_video_title: "Configure an AWS Single Sign-On integration"
 sitemap_video_content: "newuxui/aws-sso.mp4"
 ---
 
-## What is AWS Single Sign-On
+## What is AWS Identity Center (ex AWS Single Sign-On)
 
-AWS Single Sign-On (AWS SSO) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts.
+AWS Identity Center (ex AWS Single Sign-On) is a cloud service that allows you to grant your users access to AWS resources across multiple AWS accounts.
 
 AWS SSO provides a directory that you can use to create users, organize them in groups, and set permissions across those groups; alternatively, you can obtain them from your Microsoft Active Directory or any standards-based identity provider, such as Okta Universal Directory or Azure AD.
 
@@ -26,7 +26,7 @@ After logging in the first time, Leapp will map all your roles and users into Se
 
     To get started using AWS SSO refer to [this guide](https://docs.aws.amazon.com/singlesignon/latest/userguide/getting-started.html){: target='_blank'}.
 
-## How to configure an AWS Single Sign-On integration in Leapp
+## How to configure an AWS Identity Center (ex AWS Single Sign-On) integration in Leapp
 
 1. "Click on the _Add integration_ button in the sidebar"
 2. "Select AWS Single Sign-On as _Integration type_"

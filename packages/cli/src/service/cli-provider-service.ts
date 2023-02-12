@@ -437,9 +437,21 @@ export class CliProviderService {
 
   get teamService(): TeamService {
     if (!this.teamServiceInstance) {
-      this.teamServiceInstance = new TeamService(this.sessionFactory, this.namedProfilesService, this.sessionManagementService, this.awsSsoIntegrationService,
-        this.azureIntegrationService, this.idpUrlsService, this.keyChainService, this.cliNativeService, this.fileService, this.repository, (crypto as any).webcrypto,
-        this.sessionFactory, this.integrationFactory, this.workspaceService);
+      this.teamServiceInstance = new TeamService(
+        this.sessionFactory,
+        this.namedProfilesService,
+        this.sessionManagementService,
+        this.awsSsoIntegrationService,
+        this.azureIntegrationService,
+        this.idpUrlsService,
+        this.keyChainService,
+        this.cliNativeService,
+        this.fileService,
+        this.repository,
+        (crypto as any).webcrypto,
+        this.workspaceService,
+        this.integrationFactory
+      );
     }
     return this.teamServiceInstance;
   }

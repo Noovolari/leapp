@@ -83,8 +83,9 @@ export class TeamService {
   }
 
   async signIn(email: string, password: string): Promise<void> {
-    const signerInUser = await this.userProvider.signIn(email, password);
-    await this.setSignedInUser(signerInUser);
+    const signedInUser = await this.userProvider.signIn(email, password);
+    await this.setSignedInUser(signedInUser);
+    this.fileService.aesKey = signedInUser.publicRSAKey;
   }
 
   async setSignedInUser(signedInUser: User): Promise<void> {
@@ -100,6 +101,7 @@ export class TeamService {
 
   async signOut(): Promise<void> {
     await this.setSignedInUser(undefined);
+    this.fileService.aesKey = this.nativeService.machineId;
     if (this.behaviouralSubjectService.sessions.length > 0) {
       while (this.behaviouralSubjectService.sessions.length > 0) {
         const concreteSessionService = this.sessionFactory.getSessionService(this.behaviouralSubjectService.sessions[0].type);
@@ -142,6 +144,11 @@ export class TeamService {
     }
     this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
     return localSecretDtos;
+  }
+
+  private async getPublicRsaKey(): Promise<string> {
+    const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
+    return signedInUser.publicRSAKey;
   }
 
   private async syncIntegrationSecret(localIntegrationDto: LocalSecretDto): Promise<void> {

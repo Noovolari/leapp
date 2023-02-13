@@ -5,8 +5,19 @@ const cryptoJS = require("crypto-js");
 
 export class FileService {
   private readSubscription: Subscription;
+  private _aesKey: string;
 
-  constructor(private nativeService: INativeService) {}
+  constructor(private nativeService: INativeService) {
+    this._aesKey = this.nativeService.machineId;
+  }
+
+  get aesKey(): string {
+    return this._aesKey;
+  }
+
+  set aesKey(value: string) {
+    this._aesKey = value;
+  }
 
   /* ====================================================
    * === Wrapper functions over the fs native library ===
@@ -156,13 +167,13 @@ export class FileService {
    * Encrypt Text
    */
   encryptText(text: string): string {
-    return cryptoJS.AES.encrypt(text.trim(), this.nativeService.machineId).toString();
+    return cryptoJS.AES.encrypt(text.trim(), this.aesKey).toString();
   }
 
   /**
    * Decrypt Text
    */
   decryptText(text: string): string {
-    return cryptoJS.AES.decrypt(text.trim(), this.nativeService.machineId).toString(cryptoJS.enc.Utf8);
+    return cryptoJS.AES.decrypt(text.trim(), this.aesKey).toString(cryptoJS.enc.Utf8);
   }
 }

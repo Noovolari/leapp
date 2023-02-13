@@ -102,6 +102,27 @@ describe("Repository", () => {
     expect(repository.persistWorkspace).not.toHaveBeenCalled();
   });
 
+  test("removeWorkspace() - the workspace file exists", () => {
+    const mockedHomedirPath = "mocked-homedir-path";
+    mockedFileService.existsSync = jest.fn(() => true);
+    mockedFileService.removeFileSync = jest.fn();
+    mockedNativeService.os.homedir = jest.fn(() => mockedHomedirPath);
+    repository.removeWorkspace();
+    expect(mockedNativeService.os.homedir).toHaveBeenCalled();
+    expect(mockedFileService.existsSync).toHaveBeenCalledWith(mockedHomedirPath + "/" + constants.lockFileDestination);
+    expect(mockedFileService.removeFileSync).toHaveBeenCalledWith(mockedHomedirPath + "/" + constants.lockFileDestination);
+  });
+
+  test("removeWorkspace() - the workspace file doesn't exists", () => {
+    const mockedHomedirPath = "mocked-homedir-path";
+    mockedNativeService.os.homedir = () => mockedHomedirPath;
+    mockedFileService.existsSync = jest.fn(() => false);
+    mockedFileService.removeFileSync = jest.fn();
+    repository.removeWorkspace();
+    expect(mockedFileService.existsSync).toHaveBeenCalledWith(mockedHomedirPath + "/" + constants.lockFileDestination);
+    expect(mockedFileService.removeFileSync).not.toHaveBeenCalled();
+  });
+
   test("getWorkspace() - workspace not set", () => {
     (repository as any).reloadWorkspace = jest.fn();
     (repository as any)._workspace = undefined;

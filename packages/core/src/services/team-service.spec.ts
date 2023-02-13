@@ -4,6 +4,7 @@ import { constants } from "../models/constants";
 import { SecretType } from "../../../../../leapp-team/packages/leapp-team-core/encryptable-dto/secret-type";
 import { SessionType } from "../models/session-type";
 import { IntegrationType } from "../models/integration-type";
+import { LoggedException, LogLevel } from "./log-service";
 
 describe("TeamService", () => {
   let sessionFactory: any;
@@ -526,5 +527,216 @@ describe("TeamService", () => {
         sessionId: localSecret.sessionId,
       });
     });
+  });
+
+  describe("getAssumerSessionId()", () => {
+    beforeEach(() => {
+      createTeamServiceInstance();
+    });
+
+    test("localSessionDto.assumereSessionId defined", async () => {
+      const localSessionDto = { assumerSessionId: "fake-assumer-session-id" };
+
+      const result = await teamService.getAssumerSessionId(localSessionDto);
+      expect(result).toBe("fake-assumer-session-id");
+    });
+
+    test("localSessionDto.assumereSessionId not defined ssoSession.length === 1", async () => {
+      const localSessionDto = {
+        assumerIntegrationId: "fake-assumer-integration-id",
+        assumerAccountId: "fake-assumer-account-id",
+        assumerRoleName: "fake-assumer-role-name",
+      };
+      const sessions = [
+        {
+          sessionId: "fake-session-id-1",
+          awsSsoConfigurationId: localSessionDto.assumerIntegrationId,
+          roleArn: `arn:aws:iam::${localSessionDto.assumerAccountId}/${localSessionDto.assumerRoleName}`,
+        },
+        {
+          sessionId: "fake-session-id-2",
+          awsSsoConfigurationId: "another-fake-assumer-integration-id",
+          roleArn: "another::arn:aws:iam::another-fake-assumer-account-id/another-fake-assumer-role-name",
+        },
+        {
+          sessionId: "fake-session-id-3",
+          awsSsoConfigurationId: "another-fake-assumer-integration-id",
+          roleArn: "another::arn:aws:iam::another-fake-assumer-account-id/another-fake-assumer-role-name",
+        },
+      ];
+      teamService.awsSsoIntegrationService = {
+        syncSessions: jest.fn(() => sessions),
+      };
+      teamService.sessionManagementService = { getAwsSsoRoles: jest.fn(() => sessions) };
+
+      const result = await teamService.getAssumerSessionId(localSessionDto);
+      expect(result).toBe("fake-session-id-1");
+      expect(teamService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(localSessionDto.assumerIntegrationId);
+      expect(teamService.sessionManagementService.getAwsSsoRoles).toHaveBeenCalled();
+    });
+
+    test("localSessionDto.assumereSessionId not defined ssoSession.length < 1", async () => {
+      const localSessionDto = {
+        assumerIntegrationId: "fake-assumer-integration-id",
+        assumerAccountId: "fake-assumer-account-id",
+        assumerRoleName: "fake-assumer-role-name",
+      };
+      teamService.awsSsoIntegrationService = {
+        syncSessions: jest.fn(() => []),
+      };
+      teamService.sessionManagementService = { getAwsSsoRoles: jest.fn(() => []) };
+
+      await expect(teamService.getAssumerSessionId(localSessionDto)).rejects.toThrow(
+        new LoggedException("Cannot find a proper SSO role from SSO integrations", this, LogLevel.error)
+      );
+      expect(teamService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(localSessionDto.assumerIntegrationId);
+      expect(teamService.sessionManagementService.getAwsSsoRoles).toHaveBeenCalled();
+    });
+
+    test("localSessionDto.assumereSessionId not defined ssoSession.length > 1", async () => {
+      const localSessionDto = {
+        assumerIntegrationId: "fake-assumer-integration-id",
+        assumerAccountId: "fake-assumer-account-id",
+        assumerRoleName: "fake-assumer-role-name",
+      };
+      const sessions = [
+        {
+          sessionId: "fake-session-id-1",
+          awsSsoConfigurationId: localSessionDto.assumerIntegrationId,
+          roleArn: `arn:aws:iam::${localSessionDto.assumerAccountId}/${localSessionDto.assumerRoleName}`,
+        },
+        {
+          sessionId: "fake-session-id-1",
+          awsSsoConfigurationId: localSessionDto.assumerIntegrationId,
+          roleArn: `arn:aws:iam::${localSessionDto.assumerAccountId}/${localSessionDto.assumerRoleName}`,
+        },
+        {
+          sessionId: "fake-session-id-3",
+          awsSsoConfigurationId: "another-fake-assumer-integration-id",
+          roleArn: "another::arn:aws:iam::another-fake-assumer-account-id/another-fake-assumer-role-name",
+        },
+      ];
+      teamService.awsSsoIntegrationService = {
+        syncSessions: jest.fn(() => sessions),
+      };
+      teamService.sessionManagementService = { getAwsSsoRoles: jest.fn(() => sessions) };
+
+      await expect(teamService.getAssumerSessionId(localSessionDto)).rejects.toThrow(
+        new LoggedException("Multiple SSO roles found in SSO integrations", this, LogLevel.error)
+      );
+      expect(teamService.awsSsoIntegrationService.syncSessions).toHaveBeenCalledWith(localSessionDto.assumerIntegrationId);
+      expect(teamService.sessionManagementService.getAwsSsoRoles).toHaveBeenCalled();
+    });
+  });
+
+  describe("setupAwsSession()", () => {
+    beforeEach(() => {
+      createTeamServiceInstance();
+    });
+    test("localSession defined", async () => {
+      const sessionService = { delete: jest.fn() };
+      const sessionId = "fake-session-id";
+      const profileName = "fake-profile-name";
+      teamService.sessionManagementService = { getSessionById: jest.fn(() => ({ profileId: "fake-profile-id" })) };
+
+      const result = await teamService.setupAwsSession(sessionService, sessionId, profileName);
+      expect(result).toBe("fake-profile-id");
+      expect(teamService.sessionManagementService.getSessionById).toHaveBeenCalledWith(sessionId);
+      expect(sessionService.delete).toHaveBeenCalledWith(sessionId);
+    });
+
+    test("localSession undefined", async () => {
+      const sessionService = { delete: jest.fn() };
+      const sessionId = "fake-session-id";
+      const profileName = "fake-profile-name";
+      teamService.sessionManagementService = { getSessionById: jest.fn(() => undefined) };
+      teamService.namedProfilesService = { mergeProfileName: jest.fn(() => ({ id: "fake-id" })) };
+
+      const result = await teamService.setupAwsSession(sessionService, sessionId, profileName);
+      expect(result).toBe("fake-id");
+      expect(teamService.sessionManagementService.getSessionById).toHaveBeenCalledWith(sessionId);
+      expect(sessionService.delete).not.toHaveBeenCalledWith(sessionId);
+      expect(teamService.namedProfilesService.mergeProfileName).toHaveBeenCalledWith(profileName);
+    });
+  });
+
+  test("getRSAKeys()", async () => {
+    teamService.encryptionProvider = { importRsaKeys: jest.fn() };
+    const user = { privateRSAKey: "fake-private-rsa-key", publicRSAKey: "fake-public-rsa-key" };
+
+    await teamService.getRSAKeys(user);
+    expect(teamService.encryptionProvider.importRsaKeys).toHaveBeenCalledWith({
+      privateKey: "fake-private-rsa-key",
+      publicKey: "fake-public-rsa-key",
+    });
+  });
+
+  test("isJwtTokenExpired()", () => {
+    jest.useFakeTimers().setSystemTime(new Date("1995-05-21"));
+    let expirationDate = '{"exp":"801100800"}';
+    let expirationDateEncoded = btoa(expirationDate);
+    let jwtToken = `querty.${expirationDateEncoded}`;
+    let result = teamService.isJwtTokenExpired(jwtToken);
+    expect(result).toBe(false);
+
+    expirationDate = '{"exp":"800928000"}';
+    expirationDateEncoded = btoa(expirationDate);
+    jwtToken = `querty.${expirationDateEncoded}`;
+    result = teamService.isJwtTokenExpired(jwtToken);
+    expect(result).toBe(true);
+    jest.useRealTimers();
+  });
+
+  test("setWorkspaceToLocalOne", () => {
+    teamService.fileService = {
+      existsSync: jest.fn((location) => location === "good-local-workspace-path"),
+      readFileSync: jest.fn(() => "fake-file-content"),
+      writeFileSync: jest.fn(),
+      removeFileSync: jest.fn(),
+    };
+    teamService.localWorkspacePath = "good-local-workspace-path";
+    teamService.currentWorkspacePath = "fake-current-workspace-path";
+    teamService.repository = { reloadWorkspace: jest.fn() };
+
+    teamService.setWorkspaceToLocalOne();
+    expect(teamService.fileService.existsSync).toHaveBeenCalledWith("good-local-workspace-path");
+    expect(teamService.fileService.readFileSync).toHaveBeenCalledWith("good-local-workspace-path");
+    expect(teamService.fileService.writeFileSync).toHaveBeenCalledWith("fake-current-workspace-path", "fake-file-content");
+    expect(teamService.repository.reloadWorkspace).toHaveBeenCalled();
+    expect(teamService.fileService.removeFileSync).toHaveBeenCalledWith("good-local-workspace-path");
+
+    teamService.localWorkspacePath = "bad-local-workspace-path";
+    teamService.setWorkspaceToLocalOne();
+    expect(teamService.fileService.existsSync).toHaveBeenCalledWith("bad-local-workspace-path");
+    expect(teamService.fileService.readFileSync).toHaveBeenCalledTimes(1);
+    expect(teamService.fileService.writeFileSync).toHaveBeenCalledTimes(1);
+    expect(teamService.repository.reloadWorkspace).toHaveBeenCalledTimes(1);
+  });
+
+  test("setWorkspaceToRemoteOne()", () => {
+    teamService.fileService = {
+      readFileSync: jest.fn(() => "fake-file-content"),
+      writeFileSync: jest.fn(),
+    };
+    teamService.currentWorkspacePath = "fake-current-workspace-path";
+    teamService.localWorkspacePath = "fake-local-workspace-path";
+
+    teamService.setWorkspaceToRemoteOne();
+    expect(teamService.fileService.readFileSync).toHaveBeenCalledWith("fake-current-workspace-path");
+    expect(teamService.fileService.writeFileSync).toHaveBeenCalledWith("fake-local-workspace-path", "fake-file-content");
+  });
+
+  test("isRemoteWorkspace()", () => {
+    teamService.fileService = { existsSync: jest.fn((location) => location === "remote") };
+
+    teamService.localWorkspacePath = "remote";
+    let result = teamService.isRemoteWorkspace();
+    expect(result).toBe(true);
+    expect(teamService.fileService.existsSync).toHaveBeenCalledWith("remote");
+
+    teamService.localWorkspacePath = "local";
+    result = teamService.isRemoteWorkspace();
+    expect(result).toBe(false);
+    expect(teamService.fileService.existsSync).toHaveBeenCalledWith("local");
   });
 });

@@ -232,7 +232,7 @@ export class TeamService {
             ssoSession.awsSsoConfigurationId === localSessionDto.assumerIntegrationId &&
             ssoSession.roleArn === `arn:aws:iam::${localSessionDto.assumerAccountId}/${localSessionDto.assumerRoleName}`
         );
-      if (ssoSessions.length < 0) {
+      if (ssoSessions.length < 1) {
         throw new LoggedException("Cannot find a proper SSO role from SSO integrations", this, LogLevel.error);
       } else if (ssoSessions.length > 1) {
         throw new LoggedException("Multiple SSO roles found in SSO integrations", this, LogLevel.error);

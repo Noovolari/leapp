@@ -333,6 +333,7 @@ export class AppProviderService {
   public get fileService(): FileService {
     if (!this.fileServiceInstance) {
       this.fileServiceInstance = new FileService(this.appNativeService);
+      this.fileServiceInstance.aesKey = this.appNativeService.machineId;
     }
     return this.fileServiceInstance;
   }

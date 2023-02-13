@@ -102,16 +102,18 @@ export class TeamService {
   async signOut(): Promise<void> {
     await this.setSignedInUser(undefined);
     this.fileService.aesKey = this.nativeService.machineId;
-    if (this.behaviouralSubjectService.sessions.length > 0) {
-      while (this.behaviouralSubjectService.sessions.length > 0) {
-        const concreteSessionService = this.sessionFactory.getSessionService(this.behaviouralSubjectService.sessions[0].type);
-        await concreteSessionService.delete(this.behaviouralSubjectService.sessions[0].sessionId);
+    if (this.fileService.existsSync(this.localWorkspacePath)) {
+      if (this.behaviouralSubjectService.sessions.length > 0) {
+        while (this.behaviouralSubjectService.sessions.length > 0) {
+          const concreteSessionService = this.sessionFactory.getSessionService(this.behaviouralSubjectService.sessions[0].type);
+          await concreteSessionService.delete(this.behaviouralSubjectService.sessions[0].sessionId);
+        }
       }
-    }
-    if (this.behaviouralSubjectService.integrations.length > 0) {
-      while (this.behaviouralSubjectService.integrations.length > 0) {
-        const concreteIntegrationService = this.integrationFactory.getIntegrationService(this.behaviouralSubjectService.integrations[0].type);
-        await concreteIntegrationService.logout(this.behaviouralSubjectService.integrations[0].id);
+      if (this.behaviouralSubjectService.integrations.length > 0) {
+        while (this.behaviouralSubjectService.integrations.length > 0) {
+          const concreteIntegrationService = this.integrationFactory.getIntegrationService(this.behaviouralSubjectService.integrations[0].type);
+          await concreteIntegrationService.logout(this.behaviouralSubjectService.integrations[0].id);
+        }
       }
     }
     await this.setWorkspaceToLocalOne();
@@ -144,6 +146,14 @@ export class TeamService {
     }
     this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
     return localSecretDtos;
+  }
+
+  setEncryptionKeyToMachineId(): void {
+    this.fileService.aesKey = this.nativeService.machineId;
+  }
+
+  setEncryptionKeyToPublicRsaKey(publicRsaKey: string): void {
+    this.fileService.aesKey = publicRsaKey;
   }
 
   private async getPublicRsaKey(): Promise<string> {

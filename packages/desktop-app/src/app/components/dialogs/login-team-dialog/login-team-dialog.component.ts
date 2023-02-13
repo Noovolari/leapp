@@ -24,12 +24,14 @@ export class LoginTeamDialogComponent implements OnInit {
 
   async onSignIn(user: User): Promise<void> {
     await this.teamService.setSignedInUser(user);
+    this.teamService.setEncryptionKeyToPublicRsaKey(JSON.parse(user.publicRSAKey).n);
     this.closeModal();
     this.loggingService.log(new LoggedEntry(`Welcome ${user.firstName}`, this, LogLevel.success));
     this.messageToasterService.toast(`Welcome ${user.firstName}`, ToastLevel.success, "Log In to Team Portal");
   }
 
   onError(error: string | number): void {
+    this.teamService.setEncryptionKeyToMachineId();
     this.loggingService.log(new LoggedEntry(`Error while trying to sign in: ${error}`, this, LogLevel.warn));
     this.messageToasterService.toast(`Error while trying to sign in: ${error}`, ToastLevel.warn, "Log In to Team Portal");
   }

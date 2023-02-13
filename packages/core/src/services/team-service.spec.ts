@@ -3,6 +3,7 @@ import { TeamService } from "./team-service";
 import { constants } from "../models/constants";
 import { SecretType } from "../../../../../leapp-team/packages/leapp-team-core/encryptable-dto/secret-type";
 import { SessionType } from "../models/session-type";
+import { IntegrationType } from "../models/integration-type";
 
 describe("TeamService", () => {
   let sessionFactory: any;
@@ -21,6 +22,9 @@ describe("TeamService", () => {
   let behaviouralSubjectService: any;
 
   let teamService;
+
+  let awsIamRoleFederatedSessionService;
+  let awsIamUserSessionService;
 
   const createTeamServiceInstance = () => {
     sessionFactory = {};
@@ -163,14 +167,95 @@ describe("TeamService", () => {
       createTeamServiceInstance();
       teamService.behaviouralSubjectService = {
         sessions: [],
+        integrations: [],
         reloadSessionsAndIntegrationsFromRepository: jest.fn(),
       };
       teamService.sessionFactory = {
-        getSessionService: jest.fn(),
+        getSessionService: jest.fn((type: SessionType) => {
+          if (type === SessionType.awsIamRoleFederated) {
+            return awsIamRoleFederatedSessionService;
+          }
+          if (type === SessionType.awsIamUser) {
+            return awsIamUserSessionService;
+          }
+        }),
       };
       teamService.integrationFactory = {
-        getIntegrationService: jest.fn(),
+        getIntegrationService: jest.fn((type: IntegrationType) => {
+          if (type === IntegrationType.awsSso) {
+            return awsSsoIntegrationService;
+          }
+          if (type === IntegrationType.azure) {
+            return azureIntegrationService;
+          }
+        }),
       };
+    });
+
+    test("sign out and stop all sessions", async () => {
+      const sessions = [
+        { type: SessionType.awsIamRoleFederated, sessionId: 1 },
+        { type: SessionType.awsIamUser, sessionId: 2 },
+      ];
+      const sessionsArrayLength = sessions.length;
+      awsIamRoleFederatedSessionService = {
+        delete: jest.fn(() => sessions.shift()),
+      };
+      awsIamUserSessionService = {
+        delete: jest.fn(() => sessions.shift()),
+      };
+      teamService.setSignedInUser = jest.fn();
+      teamService.setWorkspaceToLocalOne = jest.fn();
+      teamService.behaviouralSubjectService.sessions = sessions;
+
+      await teamService.signOut();
+      expect(teamService.setSignedInUser).toHaveBeenCalledWith(undefined);
+      expect(teamService.sessionFactory.getSessionService).toHaveBeenCalledTimes(sessionsArrayLength);
+      expect(teamService.sessionFactory.getSessionService).toHaveBeenNthCalledWith(1, SessionType.awsIamRoleFederated);
+      expect(teamService.sessionFactory.getSessionService).toHaveBeenNthCalledWith(2, SessionType.awsIamUser);
+      expect(awsIamRoleFederatedSessionService.delete).toHaveBeenCalledWith(1);
+      expect(awsIamUserSessionService.delete).toHaveBeenCalledWith(2);
+      expect(teamService.setWorkspaceToLocalOne).toHaveBeenCalled();
+      expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
+    });
+
+    test("sign out and logout from all integrations", async () => {
+      const integrations = [
+        { type: IntegrationType.azure, id: 1 },
+        { type: IntegrationType.awsSso, id: 2 },
+      ];
+      const integrationsArrayLength = integrations.length;
+      awsSsoIntegrationService = {
+        logout: jest.fn(() => integrations.shift()),
+      };
+      azureIntegrationService = {
+        logout: jest.fn(() => integrations.shift()),
+      };
+      teamService.setSignedInUser = jest.fn();
+      teamService.setWorkspaceToLocalOne = jest.fn();
+      teamService.behaviouralSubjectService.integrations = integrations;
+
+      await teamService.signOut();
+      expect(teamService.setSignedInUser).toHaveBeenCalledWith(undefined);
+      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenCalledTimes(integrationsArrayLength);
+      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenNthCalledWith(1, IntegrationType.azure);
+      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenNthCalledWith(2, IntegrationType.awsSso);
+      expect(azureIntegrationService.logout).toHaveBeenCalledWith(1);
+      expect(awsSsoIntegrationService.logout).toHaveBeenCalledWith(2);
+      expect(teamService.setWorkspaceToLocalOne).toHaveBeenCalled();
+      expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
+    });
+
+    test("sign out without any session or integration", async () => {
+      teamService.setSignedInUser = jest.fn();
+      teamService.setWorkspaceToLocalOne = jest.fn();
+
+      await teamService.signOut();
+      expect(teamService.setSignedInUser).toHaveBeenCalledWith(undefined);
+      expect(teamService.sessionFactory.getSessionService).not.toHaveBeenCalled();
+      expect(teamService.integrationFactory.getIntegrationService).not.toHaveBeenCalled();
+      expect(teamService.setWorkspaceToLocalOne).toHaveBeenCalled();
+      expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
     });
   });
 
@@ -255,6 +340,68 @@ describe("TeamService", () => {
 
       expect(teamService.syncSessionsSecret).toHaveBeenCalledTimes(1);
       expect(teamService.syncSessionsSecret).toHaveBeenCalledWith(mockedSecretDto);
+    });
+  });
+
+  describe("TeamService.syncIntegrationSecret", () => {
+    beforeEach(() => {
+      createTeamServiceInstance();
+      teamService.awsSsoIntegrationService = {
+        getIntegration: jest.fn(() => ({ id: "aws-sso-id" })),
+        deleteIntegration: jest.fn(async () => {}),
+        createIntegration: jest.fn(async () => {}),
+      };
+      teamService.azureIntegrationService = {
+        getIntegration: jest.fn(() => ({ id: "azure-sso-id" })),
+        deleteIntegration: jest.fn(async () => {}),
+        createIntegration: jest.fn(async () => {}),
+      };
+    });
+
+    test("sync an aws sso integration", async () => {
+      const awsSsomockDto = {
+        secretType: SecretType.awsSsoIntegration,
+        id: "mock-id",
+        alias: "mock-alias",
+        portalUrl: "mock-portal-url",
+        region: "mock-region",
+        browserOpening: "mock-browser-opening",
+      };
+
+      await teamService.syncIntegrationSecret(awsSsomockDto);
+      expect(teamService.awsSsoIntegrationService.getIntegration).toHaveBeenCalledWith("mock-id");
+      expect(teamService.awsSsoIntegrationService.deleteIntegration).toHaveBeenCalledWith("aws-sso-id");
+      expect(teamService.awsSsoIntegrationService.createIntegration).toHaveBeenCalledWith(
+        {
+          alias: awsSsomockDto.alias,
+          portalUrl: awsSsomockDto.portalUrl,
+          region: awsSsomockDto.region,
+          browserOpening: awsSsomockDto.browserOpening,
+        },
+        "mock-id"
+      );
+    });
+
+    test("sync an azure integration", async () => {
+      const azureMockDto = {
+        secretType: SecretType.azureIntegration,
+        id: "mock-id",
+        alias: "mock-alias",
+        tenantId: "mock-tenant-id",
+        region: "mock-region",
+      };
+
+      await teamService.syncIntegrationSecret(azureMockDto);
+      expect(teamService.azureIntegrationService.getIntegration).toHaveBeenCalledWith("mock-id");
+      expect(teamService.azureIntegrationService.deleteIntegration).toHaveBeenCalledWith("azure-sso-id");
+      expect(teamService.azureIntegrationService.createIntegration).toHaveBeenCalledWith(
+        {
+          alias: azureMockDto.alias,
+          tenantId: azureMockDto.tenantId,
+          region: azureMockDto.region,
+        },
+        "mock-id"
+      );
     });
   });
 

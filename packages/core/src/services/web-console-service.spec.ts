@@ -19,7 +19,7 @@ describe("WebConsoleService", () => {
           ["SigninToken"]: "mocked-aws_session_token",
         }),
       }),
-    };
+    } as any;
     return new WebConsoleService(shellService, logService, nativeService);
   };
 

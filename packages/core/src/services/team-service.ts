@@ -1,4 +1,3 @@
-import axios, { AxiosRequestConfig } from "axios";
 import { SessionFactory } from "./session-factory";
 import { SessionType } from "../models/session-type";
 import { NamedProfilesService } from "./named-profiles-service";
@@ -17,7 +16,6 @@ import { AwsIamUserLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-i
 import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provider";
 import { VaultProvider } from "leapp-team-core/vault/vault-provider";
 import { UserProvider } from "leapp-team-core/user/user.provider";
-import { HttpClientInterface } from "leapp-team-core/http/HttpClientInterface";
 import { User } from "leapp-team-core/user/user";
 import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
 import { AwsIamFederatedLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-iam-federated-local-session-dto";
@@ -33,6 +31,8 @@ import { Repository } from "./repository";
 import { WorkspaceService } from "./workspace-service";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IntegrationFactory } from "./integration-factory";
+import { HttpClientProvider } from "leapp-team-core/http/http-client.provider";
+import { HttpClientInterface } from "leapp-team-core/http/http-client-interface";
 
 export class TeamService {
   httpClient: HttpClientInterface;
@@ -43,6 +43,7 @@ export class TeamService {
   private readonly userProvider: UserProvider;
   private readonly currentWorkspacePath: string;
   private readonly localWorkspacePath: string;
+  private readonly httpClientProvider: HttpClientProvider;
 
   constructor(
     private readonly sessionFactory: SessionFactory,
@@ -61,17 +62,11 @@ export class TeamService {
     private readonly integrationFactory: IntegrationFactory,
     private readonly behaviouralSubjectService?: BehaviouralSubjectService
   ) {
-    this.httpClient = {
-      get: async <T>(url: string): Promise<T> => (await axios.get<T>(url, this.getHttpClientConfig())).data,
-      post: async <T>(url: string, body: any): Promise<T> => (await axios.post<T>(url, body, this.getHttpClientConfig())).data,
-      put: async <T>(url: string, body: any): Promise<T> => (await axios.put<T>(url, body, this.getHttpClientConfig())).data,
-      delete: async <T>(url: string): Promise<T> => (await axios.delete<T>(url, this.getHttpClientConfig())).data,
-    };
-
     const apiEndpoint = "http://localhost:3000";
     this.encryptionProvider = new EncryptionProvider(crypto);
-    this.vaultProvider = new VaultProvider(apiEndpoint, this.httpClient, this.encryptionProvider);
-    this.userProvider = new UserProvider(apiEndpoint, this.httpClient, this.encryptionProvider);
+    this.httpClientProvider = new HttpClientProvider();
+    this.vaultProvider = new VaultProvider(apiEndpoint, this.httpClientProvider, this.encryptionProvider);
+    this.userProvider = new UserProvider(apiEndpoint, this.httpClientProvider, this.encryptionProvider);
     this.signedInUser$ = new BehaviorSubject(undefined);
     this.currentWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
     this.localWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
@@ -95,25 +90,26 @@ export class TeamService {
   async setSignedInUser(signedInUser: User): Promise<void> {
     if (signedInUser !== undefined) {
       await this.keyChainService.saveSecret(constants.appName, "team-signed-in-user", JSON.stringify(signedInUser));
+      this.httpClientProvider.accessToken = signedInUser.accessToken;
     } else {
       await this.keyChainService.deleteSecret(constants.appName, "team-signed-in-user");
+      this.httpClientProvider.accessToken = "";
     }
-
     this.signedInUser$.next(signedInUser);
   }
 
   async signOut(): Promise<void> {
     await this.setSignedInUser(undefined);
     if (this.behaviouralSubjectService.sessions.length > 0) {
-      for (let i = 0; i < this.behaviouralSubjectService.sessions.length; i++) {
-        const concreteSessionService = this.sessionFactory.getSessionService(this.behaviouralSubjectService.sessions[i].type);
-        await concreteSessionService.delete(this.behaviouralSubjectService.sessions[i].sessionId);
+      while (this.behaviouralSubjectService.sessions.length > 0) {
+        const concreteSessionService = this.sessionFactory.getSessionService(this.behaviouralSubjectService.sessions[0].type);
+        await concreteSessionService.delete(this.behaviouralSubjectService.sessions[0].sessionId);
       }
     }
     if (this.behaviouralSubjectService.integrations.length > 0) {
-      for (let i = 0; i < this.behaviouralSubjectService.integrations.length; i++) {
-        const concreteIntegrationService = this.integrationFactory.getIntegrationService(this.behaviouralSubjectService.integrations[i].type);
-        await concreteIntegrationService.logout(this.behaviouralSubjectService.integrations[i].id);
+      while (this.behaviouralSubjectService.integrations.length > 0) {
+        const concreteIntegrationService = this.integrationFactory.getIntegrationService(this.behaviouralSubjectService.integrations[0].type);
+        await concreteIntegrationService.logout(this.behaviouralSubjectService.integrations[0].id);
       }
     }
     await this.setWorkspaceToLocalOne();
@@ -132,7 +128,6 @@ export class TeamService {
     this.workspaceService.removeWorkspace();
     this.workspaceService.createWorkspace();
     this.workspaceService.reloadWorkspace();
-    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
     const rsaKeys = await this.getRSAKeys(this.signedInUser$.getValue());
     const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
     const integrationDtos = localSecretDtos.filter(
@@ -145,6 +140,7 @@ export class TeamService {
     for (const sessionDto of sessionsDtos) {
       await this.syncSessionsSecret(sessionDto);
     }
+    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
     return localSecretDtos;
   }
 
@@ -238,7 +234,7 @@ export class TeamService {
             ssoSession.awsSsoConfigurationId === localSessionDto.assumerIntegrationId &&
             ssoSession.roleArn === `arn:aws:iam::${localSessionDto.assumerAccountId}/${localSessionDto.assumerRoleName}`
         );
-      if (ssoSessions.length < 0) {
+      if (ssoSessions.length < 1) {
         throw new LoggedException("Cannot find a proper SSO role from SSO integrations", this, LogLevel.error);
       } else if (ssoSessions.length > 1) {
         throw new LoggedException("Multiple SSO roles found in SSO integrations", this, LogLevel.error);
@@ -260,11 +256,6 @@ export class TeamService {
   private async getRSAKeys(user: User): Promise<CryptoKeyPair> {
     const rsaKeyJsonPair = { privateKey: user.privateRSAKey, publicKey: user.publicRSAKey };
     return await this.encryptionProvider.importRsaKeys(rsaKeyJsonPair);
-  }
-
-  private getHttpClientConfig(): AxiosRequestConfig {
-    const signedInUser = this.signedInUser$.getValue();
-    return signedInUser !== undefined && signedInUser !== null ? { headers: { ["Authorization"]: `Bearer ${signedInUser.accessToken}` } } : {};
   }
 
   private isJwtTokenExpired(jwtToken: string): boolean {

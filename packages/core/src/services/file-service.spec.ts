@@ -250,16 +250,18 @@ describe("File Service", () => {
   test("encryptText", () => {
     const text = " fake-text ";
     const fileService = new FileService(nativeService);
+    fileService.aesKey = "fake-key";
     const result = fileService.encryptText(text);
-    expect(cryptoJS.AES.encrypt).toHaveBeenCalledWith(text.trim(), nativeService.machineId);
+    expect(cryptoJS.AES.encrypt).toHaveBeenCalledWith(text.trim(), "fake-key");
     expect(result).toEqual("fake-text-encrypted");
   });
 
   test("decryptText", () => {
     const text = " fake-text ";
     const fileService = new FileService(nativeService);
+    fileService.aesKey = "fake-key";
     const result = fileService.decryptText(text);
-    expect(cryptoJS.AES.decrypt).toHaveBeenCalledWith(text.trim(), nativeService.machineId);
+    expect(cryptoJS.AES.decrypt).toHaveBeenCalledWith(text.trim(), "fake-key");
     expect(result).toEqual("fake-text-decrypted");
   });
 });

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.3](https://github.com/Noovolari/leapp/compare/v0.17.2...v0.17.3) (2023-02-14)
+
+### Bug Fixes
+* migrated oclif/core to v2.1.4 to fix [issue #389](https://github.com/Noovolari/leapp/issues/389)
+* fixed dot-delimited named profiles reported in [issue #392](https://github.com/Noovolari/leapp/issues/392)
+
 ### [0.17.2](https://github.com/Noovolari/leapp/compare/v0.17.1...v0.17.2) (2023-01-30)
 
 ### Features
@@ -12,7 +18,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### [0.17.1](https://github.com/Noovolari/leapp/compare/v0.17.0...v0.17.1) (2023-01-10)
 
 ### Features
-* added support for Keycloak IdP [#374](https://github.com/Noovolari/leapp/issues/374) 
+* added support for Keycloak IdP [#374](https://github.com/Noovolari/leapp/issues/374)
   <br><br>
   You can now create an AWS IAM role federated session using Keycloak as an identity provider.
   <br><br>

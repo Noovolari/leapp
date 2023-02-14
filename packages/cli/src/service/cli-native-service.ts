@@ -32,7 +32,7 @@ export class CliNativeService implements INativeService {
     this.fs = require("fs-extra");
     this.rimraf = require("rimraf");
     this.os = require("os");
-    this.ini = require("ini");
+    this.ini = require("js-ini");
     this.path = require("path");
     this.exec = require("child_process").exec;
     this.process = global.process;

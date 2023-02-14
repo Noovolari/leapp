@@ -51,7 +51,7 @@ export class AppNativeService implements INativeService {
       this.fs = window.require("fs-extra");
       this.rimraf = window.require("rimraf");
       this.os = window.require("os");
-      this.ini = window.require("ini");
+      this.ini = window.require("js-ini");
       this.path = window.require("path");
       this.exec = window.require("child_process").exec;
       this.url = window.require("url");

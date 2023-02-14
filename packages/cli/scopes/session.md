@@ -158,10 +158,7 @@ Generate STS temporary credentials for the given AWS session id
 
 ```
 USAGE
-  $ leapp session generate [SESSIONID]
-
-ARGUMENTS
-  SESSIONID  id of the session
+  $ leapp session generate SESSIONID
 
 DESCRIPTION
   Generate STS temporary credentials for the given AWS session id

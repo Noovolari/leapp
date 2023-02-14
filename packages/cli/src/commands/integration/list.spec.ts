@@ -1,5 +1,5 @@
 import ListIntegrations from "./list";
-import { CliUx } from "@oclif/core";
+import { ux } from "@oclif/core";
 import { describe, expect, jest, test } from "@jest/globals";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 
@@ -72,7 +72,7 @@ describe("ListIntegrations", () => {
     };
 
     const command = getTestCommand(cliProviderService);
-    const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
+    const tableSpy = jest.spyOn(ux, "table").mockImplementation(() => null);
 
     await command.showIntegrations();
 

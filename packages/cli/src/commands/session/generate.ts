@@ -3,11 +3,16 @@ import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
+import { Args } from "@oclif/core";
 
 export default class GenerateSession extends LeappCommand {
   static description = "Generate STS temporary credentials for the given AWS session id";
   static examples = [`$leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d`];
-  static args = [{ name: "sessionId", description: "id of the session", required: true }];
+  static args = {
+    sessionId: Args.string({
+      required: true,
+    }),
+  };
 
   constructor(argv: string[], config: Config) {
     super(argv, config);

@@ -1,4 +1,4 @@
-import { CliUx } from "@oclif/core";
+import { ux } from "@oclif/core";
 import { Config } from "@oclif/core/lib/config/config";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { LeappCommand } from "../../leapp-command";
@@ -22,7 +22,7 @@ export default class ListSessions extends LeappCommand {
   ];
 
   static flags = {
-    ...CliUx.ux.table.flags(),
+    ...ux.table.flags(),
   };
 
   constructor(argv: string[], config: Config) {
@@ -61,7 +61,7 @@ export default class ListSessions extends LeappCommand {
       status: { header: "Status" },
     };
 
-    CliUx.ux.table(data, columns, { ...flags });
+    ux.table(data, columns, { ...flags });
   }
 
   private getRole(session: Session): string {

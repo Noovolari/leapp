@@ -200,6 +200,8 @@ export class AppComponent implements OnInit {
 
     this.remoteProceduresServer.stopServer();
 
+    await this.teamService.signOut();
+
     // Stop all the sessions
     const sessions = this.appProviderService.sessionManagementService.getSessions();
     sessions.forEach((s) => {
@@ -215,7 +217,6 @@ export class AppComponent implements OnInit {
     } catch (err) {
       this.loggingService.log(new LoggedException("No sessions to stop, skipping...", this, LogLevel.error, true, err.stack));
     }
-    await this.teamService.signOut();
 
     // Finally quit
     this.appService.quit();

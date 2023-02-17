@@ -50,7 +50,7 @@ import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provid
 import { UserProvider } from "leapp-team-core/user/user.provider";
 import * as crypto from "crypto";
 import { TeamService } from "@noovolari/leapp-core/services/team-service";
-import { WorkspaceFileNameService } from "@noovolari/leapp-core/dist/services/workspace-file-name-service";
+import { WorkspaceFileNameService } from "@noovolari/leapp-core/services/workspace-file-name-service";
 
 /* eslint-disable */
 export class CliProviderService {

@@ -17,6 +17,7 @@ import { LoggedException, LogLevel } from "./log-service";
 import { AzureIntegration } from "../models/azure/azure-integration";
 import PluginStatus from "../models/plugin-status";
 import { WorkspaceConsistencyService } from "./workspace-consistency-service";
+import { WorkspaceFileNameService } from "./workspace-file-name-service";
 
 export class Repository {
   // Private singleton workspace
@@ -25,7 +26,8 @@ export class Repository {
   constructor(
     private nativeService: INativeService,
     private fileService: FileService,
-    private workspaceConsistencyService: WorkspaceConsistencyService
+    private workspaceConsistencyService: WorkspaceConsistencyService,
+    private workspaceFileNameService: WorkspaceFileNameService
   ) {
     this.createWorkspace();
   }
@@ -52,7 +54,7 @@ export class Repository {
   }
 
   createWorkspace(): void {
-    if (!this.fileService.existsSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)) {
+    if (!this.fileService.existsSync(this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName)) {
       this.fileService.newDir(this.nativeService.os.homedir() + "/.Leapp", { recursive: true });
       this._workspace = this.workspaceConsistencyService.createNewWorkspace();
       this.persistWorkspace(this._workspace);
@@ -60,13 +62,13 @@ export class Repository {
   }
 
   removeWorkspace(): void {
-    if (this.fileService.existsSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination)) {
-      this.fileService.removeFileSync(this.nativeService.os.homedir() + "/" + constants.lockFileDestination);
+    if (this.fileService.existsSync(this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName)) {
+      this.fileService.removeFileSync(this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName);
     }
   }
 
   persistWorkspace(workspace: Workspace): void {
-    const path = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
+    const path = this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
 

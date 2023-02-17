@@ -50,6 +50,7 @@ import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provid
 import { UserProvider } from "leapp-team-core/user/user.provider";
 import * as crypto from "crypto";
 import { TeamService } from "@noovolari/leapp-core/services/team-service";
+import { WorkspaceFileNameService } from "@noovolari/leapp-core/dist/services/workspace-file-name-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -98,6 +99,7 @@ export class CliProviderService {
   private leappTeamCoreEncryptionProviderInstance: EncryptionProvider;
   private leappTeamCoreUserProviderInstance: UserProvider;
   private teamServiceInstance: TeamService;
+  private workspaceFileNameServiceInstance: WorkspaceFileNameService;
 
   public get azureIntegrationService(): AzureIntegrationService {
     if (!this.azureIntegrationServiceInstance) {
@@ -137,7 +139,7 @@ export class CliProviderService {
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository, this.fileService, this.cliNativeService);
+      this.workspaceServiceInstance = new WorkspaceService(this.repository, this.workspaceFileNameService);
     }
     return this.workspaceServiceInstance;
   }
@@ -304,14 +306,14 @@ export class CliProviderService {
 
   public get workspaceConsistencyService(): WorkspaceConsistencyService {
     if (!this.workspaceConsistencyServiceInstance) {
-      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.cliNativeServiceInstance, this.logService);
+      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.cliNativeServiceInstance, this.logService, this.workspaceFileNameService);
     }
     return this.workspaceConsistencyServiceInstance;
   }
 
   get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService, this.workspaceConsistencyService);
+      this.repositoryInstance = new Repository(this.cliNativeService, this.fileService, this.workspaceConsistencyService, this.workspaceFileNameService);
     }
     return this.repositoryInstance;
   }
@@ -444,7 +446,6 @@ export class CliProviderService {
         this.keyChainService,
         this.cliNativeService,
         this.fileService,
-        this.repository,
         (crypto as any).webcrypto,
         this.workspaceService,
         this.integrationFactory
@@ -469,5 +470,12 @@ export class CliProviderService {
       this.leappTeamCoreUserProviderInstance = new UserProvider("http://localhost:3000", this.teamService.httpClient, this.leappTeamCoreEncryptionProvider);
     }
     return this.leappTeamCoreUserProviderInstance;
+  }
+
+  public get workspaceFileNameService(): WorkspaceFileNameService {
+    if (!this.workspaceFileNameServiceInstance) {
+      this.workspaceFileNameServiceInstance = new WorkspaceFileNameService();
+    }
+    return this.workspaceFileNameServiceInstance;
   }
 }

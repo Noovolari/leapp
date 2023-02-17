@@ -23,7 +23,6 @@ import { constants } from "../models/constants";
 import { BehaviorSubject } from "rxjs";
 import { INativeService } from "../interfaces/i-native-service";
 import { FileService } from "./file-service";
-import { Repository } from "./repository";
 import { WorkspaceService } from "./workspace-service";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IntegrationFactory } from "./integration-factory";
@@ -56,7 +55,6 @@ export class TeamService {
     private readonly keyChainService: IKeychainService,
     private readonly nativeService: INativeService,
     private readonly fileService: FileService,
-    private readonly repository: Repository,
     private readonly crypto: Crypto,
     private readonly workspaceService: WorkspaceService,
     private readonly integrationFactory: IntegrationFactory,
@@ -73,6 +71,10 @@ export class TeamService {
     this.signedInUser$.next(null);
   }
 
+  setWorkspaceFileName(signedInUser: User): void {
+    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
+  }
+
   async checkSignedInUser(): Promise<boolean> {
     const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
     if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
@@ -86,14 +88,16 @@ export class TeamService {
     const signedInUser = await this.userProvider.signIn(email, password);
     await this.setSignedInUser(signedInUser);
     this.fileService.aesKey = signedInUser.publicRSAKey;
+    // TODO: this implementation should be modified as soon as we create the sidebar
+    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
   }
 
   async setSignedInUser(signedInUser: User): Promise<void> {
     if (signedInUser !== undefined) {
-      await this.keyChainService.saveSecret(constants.appName, "team-signed-in-user", JSON.stringify(signedInUser));
+      await this.keyChainService.saveSecret(constants.appName, this.teamSignedInUserKeychainKey, JSON.stringify(signedInUser));
       this.httpClientProvider.accessToken = signedInUser.accessToken;
     } else {
-      await this.keyChainService.deleteSecret(constants.appName, "team-signed-in-user");
+      await this.keyChainService.deleteSecret(constants.appName, this.teamSignedInUserKeychainKey);
       this.httpClientProvider.accessToken = "";
     }
     this.signedInUser$.next(signedInUser);
@@ -102,21 +106,23 @@ export class TeamService {
   async signOut(): Promise<void> {
     await this.setSignedInUser(undefined);
     this.fileService.aesKey = this.nativeService.machineId;
-    if (this.fileService.existsSync(this.localWorkspacePath)) {
-      if (this.behaviouralSubjectService.sessions.length > 0) {
-        while (this.behaviouralSubjectService.sessions.length > 0) {
-          const concreteSessionService = this.sessionFactory.getSessionService(this.behaviouralSubjectService.sessions[0].type);
-          await concreteSessionService.delete(this.behaviouralSubjectService.sessions[0].sessionId);
-        }
-      }
-      if (this.behaviouralSubjectService.integrations.length > 0) {
-        while (this.behaviouralSubjectService.integrations.length > 0) {
-          const concreteIntegrationService = this.integrationFactory.getIntegrationService(this.behaviouralSubjectService.integrations[0].type);
-          await concreteIntegrationService.logout(this.behaviouralSubjectService.integrations[0].id);
-        }
-      }
+    // TODO: refactor to teamNames, so we can save multiple teams
+    const workspace = this.workspaceService.getWorkspace();
+    while (workspace.awsSsoIntegrations.length > 0) {
+      const concreteIntegrationService = this.integrationFactory.getIntegrationService(workspace.awsSsoIntegrations[0].type);
+      await concreteIntegrationService.logout(workspace.awsSsoIntegrations[0].id);
     }
-    await this.setWorkspaceToLocalOne();
+    while (workspace.azureIntegrations.length > 0) {
+      const concreteIntegrationService = this.integrationFactory.getIntegrationService(workspace.azureIntegrations[0].type);
+      await concreteIntegrationService.logout(workspace.azureIntegrations[0].id);
+    }
+    while (workspace.sessions.length > 0) {
+      const concreteSessionService = this.sessionFactory.getSessionService(workspace.sessions[0].type);
+      await concreteSessionService.delete(workspace.sessions[0].sessionId);
+    }
+    // TODO: this implementation should be modified as soon as we create the sidebar
+    this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
+    this.workspaceService.reloadWorkspace();
     this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
   }
 
@@ -124,15 +130,11 @@ export class TeamService {
     if (!(await this.checkSignedInUser())) {
       return;
     }
-    // Check if ~/.Leapp/Leapp-lock.json.local does not exist
-    if (!this.isRemoteWorkspace()) {
-      // Create ~/.Leapp/Leapp-lock.json.local
-      await this.setWorkspaceToRemoteOne();
-    }
+    const signedInUser = this.signedInUser$.getValue();
     this.workspaceService.removeWorkspace();
     this.workspaceService.createWorkspace();
     this.workspaceService.reloadWorkspace();
-    const rsaKeys = await this.getRSAKeys(this.signedInUser$.getValue());
+    const rsaKeys = await this.getRSAKeys(signedInUser);
     const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
     const integrationDtos = localSecretDtos.filter(
       (secret) => secret.secretType === SecretType.awsSsoIntegration || secret.secretType === SecretType.azureIntegration
@@ -284,7 +286,7 @@ export class TeamService {
     if (this.fileService.existsSync(this.localWorkspacePath)) {
       const workspaceString = this.fileService.readFileSync(this.localWorkspacePath);
       this.fileService.writeFileSync(this.currentWorkspacePath, workspaceString);
-      this.repository.reloadWorkspace();
+      this.workspaceService.reloadWorkspace();
       this.fileService.removeFileSync(this.localWorkspacePath);
     }
   }
@@ -296,5 +298,9 @@ export class TeamService {
 
   private isRemoteWorkspace(): boolean {
     return this.fileService.existsSync(this.localWorkspacePath);
+  }
+
+  private getTeamLockFileName(teamName: string): string {
+    return `.Leapp/Leapp-${teamName}-lock.json`;
   }
 }

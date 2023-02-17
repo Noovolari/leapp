@@ -1,10 +1,9 @@
 import { Repository } from "./repository";
 import { Workspace } from "../models/workspace";
-import { FileService } from "./file-service";
-import { INativeService } from "../interfaces/i-native-service";
+import { WorkspaceFileNameService } from "./workspace-file-name-service";
 
 export class WorkspaceService {
-  constructor(private repository: Repository, private fileService: FileService, private nativeService: INativeService) {}
+  constructor(private repository: Repository, private workspaceFileNameService: WorkspaceFileNameService) {}
 
   getWorkspace(): Workspace {
     return this.repository.getWorkspace();
@@ -32,5 +31,13 @@ export class WorkspaceService {
 
   reloadWorkspace(): void {
     this.repository.reloadWorkspace();
+  }
+
+  setWorkspaceFileName(value: string): void {
+    this.workspaceFileNameService.workspaceFileName = value;
+  }
+
+  getWorkspaceFileName(): string {
+    return this.workspaceFileNameService.workspaceFileName;
   }
 }

@@ -47,6 +47,7 @@ import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-se
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
 import { TeamService } from "@noovolari/leapp-core/services/team-service";
+import { WorkspaceFileNameService } from "@noovolari/leapp-core/services/workspace-file-name-service";
 
 @Injectable({
   providedIn: "root",
@@ -95,6 +96,7 @@ export class AppProviderService {
   private pluginManagerServiceInstance: PluginManagerService;
   private integrationFactoryInstance: IntegrationFactory;
   private teamServiceInstance: TeamService;
+  private workspaceFileNameServiceInstance: WorkspaceFileNameService;
 
   constructor(
     private appNativeService: AppNativeService,
@@ -119,7 +121,7 @@ export class AppProviderService {
 
   public get workspaceService(): WorkspaceService {
     if (!this.workspaceServiceInstance) {
-      this.workspaceServiceInstance = new WorkspaceService(this.repository, this.fileService, this.appNativeService);
+      this.workspaceServiceInstance = new WorkspaceService(this.repository, this.workspaceFileNameService);
     }
     return this.workspaceServiceInstance;
   }
@@ -340,14 +342,24 @@ export class AppProviderService {
 
   public get workspaceConsistencyService(): WorkspaceConsistencyService {
     if (!this.workspaceConsistencyServiceInstance) {
-      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(this.fileService, this.appNativeService, this.logService);
+      this.workspaceConsistencyServiceInstance = new WorkspaceConsistencyService(
+        this.fileService,
+        this.appNativeService,
+        this.logService,
+        this.workspaceFileNameService
+      );
     }
     return this.workspaceConsistencyServiceInstance;
   }
 
   public get repository(): Repository {
     if (!this.repositoryInstance) {
-      this.repositoryInstance = new Repository(this.appNativeService, this.fileService, this.workspaceConsistencyService);
+      this.repositoryInstance = new Repository(
+        this.appNativeService,
+        this.fileService,
+        this.workspaceConsistencyService,
+        this.workspaceFileNameService
+      );
     }
     return this.repositoryInstance;
   }
@@ -459,7 +471,6 @@ export class AppProviderService {
         this.keychainService,
         this.appNativeService,
         this.fileService,
-        this.repository,
         window.crypto,
         this.workspaceService,
         this.integrationFactory,
@@ -467,5 +478,12 @@ export class AppProviderService {
       );
     }
     return this.teamServiceInstance;
+  }
+
+  public get workspaceFileNameService(): WorkspaceFileNameService {
+    if (!this.workspaceFileNameServiceInstance) {
+      this.workspaceFileNameServiceInstance = new WorkspaceFileNameService();
+    }
+    return this.workspaceFileNameServiceInstance;
   }
 }

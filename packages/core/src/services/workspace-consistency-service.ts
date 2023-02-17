@@ -5,9 +5,15 @@ import { Workspace } from "../models/workspace";
 import { constants } from "../models/constants";
 import { deserialize, serialize } from "class-transformer";
 import { IntegrationType } from "../models/integration-type";
+import { WorkspaceFileNameService } from "./workspace-file-name-service";
 
 export class WorkspaceConsistencyService {
-  constructor(private fileService: FileService, private nativeService: INativeService, private logService: LogService) {}
+  constructor(
+    private fileService: FileService,
+    private nativeService: INativeService,
+    private logService: LogService,
+    private workspaceFileNameService: WorkspaceFileNameService
+  ) {}
 
   private get fileLockPath(): string {
     return this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
@@ -21,11 +27,14 @@ export class WorkspaceConsistencyService {
     try {
       const workspace = this.loadWorkspace();
       this.checkConsistency(workspace);
-      this.saveBackup(workspace);
+      if (this.workspaceFileNameService.workspaceFileName === constants.lockFileDestination) {
+        this.saveBackup(workspace);
+      }
       return workspace;
     } catch (error) {
       this.logService.log(new LoggedEntry(error.message, this, LogLevel.error, false, error.stack));
-      if (this.fileService.existsSync(this.fileLockBackupPath)) {
+      const path = this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName;
+      if (this.workspaceFileNameService.workspaceFileName === constants.lockFileDestination && this.fileService.existsSync(path)) {
         try {
           return this.restoreBackup();
         } catch (restoreError) {
@@ -89,6 +98,7 @@ export class WorkspaceConsistencyService {
         workspace.awsSsoIntegrations[i].type = IntegrationType.awsSso;
       }
     }
+
     this.save(workspace);
   }
 
@@ -97,11 +107,13 @@ export class WorkspaceConsistencyService {
   }
 
   private save(workspace: Workspace) {
-    this.fileService.writeFileSync(this.fileLockPath, this.fileService.encryptText(serialize(workspace)));
+    const path = `${this.fileService.homeDir()}/${this.workspaceFileNameService.workspaceFileName}`;
+    this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
 
   private loadWorkspace(): Workspace {
-    const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(this.fileLockPath));
+    const path = this.fileService.homeDir() + "/" + this.workspaceFileNameService.workspaceFileName;
+    const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(path));
     return deserialize(Workspace, workspaceJSON);
   }
 
@@ -117,8 +129,11 @@ export class WorkspaceConsistencyService {
   private cleanWorkspace(): Workspace {
     const newWorkspace = this.createNewWorkspace();
     const encryptedWorkspace = this.fileService.encryptText(serialize(newWorkspace));
-    this.fileService.writeFileSync(this.fileLockPath, encryptedWorkspace);
-    this.fileService.writeFileSync(this.fileLockBackupPath, encryptedWorkspace);
+    const path = this.fileService.homeDir() + "/" + this.workspaceFileNameService.workspaceFileName;
+    this.fileService.writeFileSync(path, encryptedWorkspace);
+    if (this.workspaceFileNameService.workspaceFileName === constants.lockFileDestination) {
+      this.fileService.writeFileSync(this.fileLockBackupPath, encryptedWorkspace);
+    }
     this.logService.log(
       new LoggedEntry("Leapp failed to restore the latest Leapp-lock.json backup. Leapp-lock.json was reinitialized.", this, LogLevel.error, true)
     );

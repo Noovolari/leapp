@@ -25,6 +25,7 @@ export class LoginTeamDialogComponent implements OnInit {
   async onSignIn(user: User): Promise<void> {
     await this.teamService.setSignedInUser(user);
     this.teamService.setEncryptionKeyToPublicRsaKey(JSON.parse(user.publicRSAKey).n);
+    this.teamService.setWorkspaceFileName(user);
     this.closeModal();
     this.loggingService.log(new LoggedEntry(`Welcome ${user.firstName}`, this, LogLevel.success));
     this.messageToasterService.toast(`Welcome ${user.firstName}`, ToastLevel.success, "Log In to Team Portal");

@@ -34,6 +34,7 @@ export class WorkspaceService {
   }
 
   setWorkspaceFileName(value: string): void {
+    console.log(value);
     this.workspaceFileNameService.workspaceFileName = value;
   }
 

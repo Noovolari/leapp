@@ -108,13 +108,13 @@ export class TeamService {
     this.fileService.aesKey = this.nativeService.machineId;
     // TODO: refactor to teamNames, so we can save multiple teams
     const workspace = this.workspaceService.getWorkspace();
-    while (workspace.awsSsoIntegrations.length > 0) {
-      const concreteIntegrationService = this.integrationFactory.getIntegrationService(workspace.awsSsoIntegrations[0].type);
-      await concreteIntegrationService.logout(workspace.awsSsoIntegrations[0].id);
+    for (const awsSsoIntegration of workspace.awsSsoIntegrations) {
+      const concreteIntegrationService = this.integrationFactory.getIntegrationService(awsSsoIntegration.type);
+      await concreteIntegrationService.logout(awsSsoIntegration.id);
     }
-    while (workspace.azureIntegrations.length > 0) {
-      const concreteIntegrationService = this.integrationFactory.getIntegrationService(workspace.azureIntegrations[0].type);
-      await concreteIntegrationService.logout(workspace.azureIntegrations[0].id);
+    for (const azureIntegration of workspace.azureIntegrations) {
+      const concreteIntegrationService = this.integrationFactory.getIntegrationService(azureIntegration.type);
+      await concreteIntegrationService.logout(azureIntegration.id);
     }
     while (workspace.sessions.length > 0) {
       const concreteSessionService = this.sessionFactory.getSessionService(workspace.sessions[0].type);

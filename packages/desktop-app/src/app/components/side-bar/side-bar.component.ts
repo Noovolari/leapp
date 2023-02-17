@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import {
   globalFilteredSessions,
   globalFilterGroup,
@@ -15,7 +15,9 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
 import { AppProviderService } from "../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { integrationHighlight } from "../integration-bar/integration-bar.component";
-import { OptionsService } from "../../services/options.service";
+import { User } from "leapp-team-core/user/user";
+import { MatMenuTrigger } from "@angular/material/menu";
+import { AppService } from "../../services/app.service";
 
 export interface SelectedSegment {
   name: string;
@@ -29,7 +31,6 @@ export interface HighlightSettings {
 }
 
 export const segmentFilter = new BehaviorSubject<Segment[]>([]);
-// eslint-disable-next-line max-len
 export const sidebarHighlight = new BehaviorSubject<HighlightSettings>({ showAll: false, showPinned: true, selectedSegment: -1 });
 
 @Component({
@@ -38,6 +39,9 @@ export const sidebarHighlight = new BehaviorSubject<HighlightSettings>({ showAll
   styleUrls: ["./side-bar.component.scss"],
 })
 export class SideBarComponent implements OnInit, OnDestroy {
+  @ViewChild("workspaceSelectionTrigger")
+  workspaceSelectionTrigger: MatMenuTrigger;
+
   folders: Folder[];
   segments: Segment[];
   selectedS: SelectedSegment[];
@@ -45,13 +49,18 @@ export class SideBarComponent implements OnInit, OnDestroy {
   showAll: boolean;
   showPinned: boolean;
   modalRef: BsModalRef;
+  workspaceName: string;
+  teamUser: User;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
+  private userSubscription;
 
-  constructor(private bsModalService: BsModalService, private leappCoreService: AppProviderService, private optionsService: OptionsService) {
+  constructor(private bsModalService: BsModalService, private leappCoreService: AppProviderService, private appService: AppService) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
     this.showAll = true;
     this.showPinned = false;
+    this.workspaceName = this.leappCoreService.workspaceFileNameService.getWorkspaceName();
+    this.teamUser = null;
   }
 
   ngOnInit(): void {
@@ -65,6 +74,11 @@ export class SideBarComponent implements OnInit, OnDestroy {
       this.highlightSelectedRow(value.showAll, value.showPinned, value.selectedSegment);
     });
     sidebarHighlight.next({ showAll: true, showPinned: false, selectedSegment: -1 });
+
+    this.leappCoreService.workspaceFileNameService.workspaceFileNameBehaviouralSubject.subscribe(() => {
+      this.workspaceName = this.leappCoreService.workspaceFileNameService.getWorkspaceName();
+    });
+    this.userSubscription = this.leappCoreService.teamService.signedInUser$.subscribe((user: User) => (this.teamUser = user));
   }
 
   ngOnDestroy(): void {
@@ -139,5 +153,12 @@ export class SideBarComponent implements OnInit, OnDestroy {
       this.selectedS[selectedSegmentIndex].selected = true;
     }
     integrationHighlight.next(-1);
+  }
+
+  setTrigger(): void {
+    setTimeout(() => {
+      this.workspaceSelectionTrigger.openMenu();
+      this.appService.setMenuTrigger(this.workspaceSelectionTrigger);
+    }, 100);
   }
 }

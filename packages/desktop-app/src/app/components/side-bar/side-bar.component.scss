@@ -124,3 +124,29 @@ i.moon-Caret-down {
     transition: all 0.3s ease;
   }
 }
+
+.mat-list-base .mat-list-item .workspace-selector:hover{
+  background: #f9f9f9;
+  border-radius: 6px;
+  margin-left: 10px !important;
+  width: initial !important;
+  margin-right: 12px;
+  padding: 0;
+}
+
+.workspace-selector {
+  & .moon-Caret-down {
+    left: 10px !important;
+  }
+}
+
+.mat-list-base .mat-list-item .workspace-selector:hover .workspace-selector-line:hover {
+  all: revert;
+  opacity: 1;
+}
+
+::ng-deep {
+  .mat-list-base .mat-list-item:hover .mat-list-item-content {
+    padding: 0 0 0 16px !important;
+  }
+}

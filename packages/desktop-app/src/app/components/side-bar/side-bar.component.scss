@@ -146,7 +146,7 @@ i.moon-Caret-down {
 }
 
 ::ng-deep {
-  .mat-list-base .mat-list-item:hover .mat-list-item-content {
+  .mat-list-base .mat-list-item.workspace-selector:hover .mat-list-item-content {
     padding: 0 0 0 16px !important;
   }
 }

@@ -68,6 +68,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   filterExtended: boolean;
   compactMode: boolean;
   teamUser: User;
+  workspaceName: string;
 
   eConstants = constants;
 
@@ -94,6 +95,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   ) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.teamService = appProviderService.teamService;
+    this.workspaceName = appProviderService.workspaceFileNameService.getWorkspaceName();
 
     this.filterExtended = false;
     this.compactMode = false;
@@ -174,6 +176,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
 
     this.userSubscription = this.teamService.signedInUser$.subscribe((user: User) => (this.teamUser = user));
+
+    this.appProviderService.workspaceFileNameService.workspaceFileNameBehaviouralSubject.subscribe(() => {
+      this.workspaceName = this.appProviderService.workspaceFileNameService.getWorkspaceName();
+    });
   }
 
   ngOnDestroy(): void {

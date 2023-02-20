@@ -109,7 +109,7 @@
 
     <div mat-line>
       <img src="assets/images/{{intConfiguration.type === eIntegrationType.azure ? 'azure' : 'aws'}}{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png" />
-      <section class="status" matTooltip="{{(intConfiguration.isOnline) ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline'}}">
+      <section class="status" matTooltip="{{(intConfiguration?.isOnline) ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline'}}">
         <ng-container *ngIf="intConfiguration.isOnline">
           <b class="green-dot"></b>
         </ng-container>

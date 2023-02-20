@@ -155,10 +155,20 @@ export class SideBarComponent implements OnInit, OnDestroy {
     integrationHighlight.next(-1);
   }
 
-  setTrigger(): void {
+  setTrigger(event: any): void {
+    event.preventDefault();
+    event.stopPropagation();
     setTimeout(() => {
       this.workspaceSelectionTrigger.openMenu();
       this.appService.setMenuTrigger(this.workspaceSelectionTrigger);
     }, 100);
+  }
+
+  async switchWorkspace(selectedWorkspace?: string): Promise<void> {
+    if (selectedWorkspace === "local") {
+      this.leappCoreService.teamService.switchToLocal();
+    } else {
+      this.leappCoreService.teamService.syncSecrets();
+    }
   }
 }

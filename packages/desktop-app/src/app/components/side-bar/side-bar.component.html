@@ -1,6 +1,6 @@
 <mat-list>
   <mat-list-item class="workspace-selector">
-    <div mat-line class="workspace-selector-line" [matMenuTriggerFor]="workspaceSelectionMenu" (click)="setTrigger()" #workspaceSelectionTrigger="matMenuTrigger">
+    <div mat-line class="workspace-selector-line" [matMenuTriggerFor]="workspaceSelectionMenu" (click)="setTrigger($event)" #workspaceSelectionTrigger="matMenuTrigger">
       <i class="moon-Home"></i><span>{{workspaceName}}</span><i class="moon-Caret-down"></i>
       <mat-menu #workspaceSelectionMenu="matMenu" [hasBackdrop]="false" role="menu">
         <ng-container *ngIf="teamUser === null || teamUser === undefined">
@@ -11,11 +11,11 @@
         </ng-container>
         <ng-container *ngIf="teamUser !== null && teamUser !== undefined">
           <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
-          <div mat-menu-item>
+          <div mat-menu-item (click)="switchWorkspace('local')">
             <span>My Workspace</span>
           </div>
           <!-- TODO add an ngFor when supporting multiple teams-->
-          <div mat-menu-item>
+          <div mat-menu-item (click)="switchWorkspace()">
             <span>{{teamUser.teamName}}</span>
           </div>
         </ng-container>

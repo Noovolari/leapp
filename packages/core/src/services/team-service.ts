@@ -87,9 +87,6 @@ export class TeamService {
   async signIn(email: string, password: string): Promise<void> {
     const signedInUser = await this.userProvider.signIn(email, password);
     await this.setSignedInUser(signedInUser);
-    this.fileService.aesKey = signedInUser.publicRSAKey;
-    // TODO: this implementation should be modified as soon as we create the sidebar
-    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
   }
 
   async setSignedInUser(signedInUser: User): Promise<void> {
@@ -105,6 +102,10 @@ export class TeamService {
 
   async signOut(): Promise<void> {
     await this.setSignedInUser(undefined);
+    await this.switchToLocal();
+  }
+
+  async switchToLocal(): Promise<void> {
     this.fileService.aesKey = this.nativeService.machineId;
     // TODO: refactor to teamNames, so we can save multiple teams
     const workspace = this.workspaceService.getWorkspace();
@@ -120,7 +121,6 @@ export class TeamService {
       const concreteSessionService = this.sessionFactory.getSessionService(workspace.sessions[0].type);
       await concreteSessionService.delete(workspace.sessions[0].sessionId);
     }
-    // TODO: this implementation should be modified as soon as we create the sidebar
     this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
     this.workspaceService.reloadWorkspace();
     this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
@@ -131,6 +131,8 @@ export class TeamService {
       return;
     }
     const signedInUser = this.signedInUser$.getValue();
+    this.fileService.aesKey = signedInUser.publicRSAKey;
+    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
     this.workspaceService.removeWorkspace();
     this.workspaceService.createWorkspace();
     this.workspaceService.reloadWorkspace();

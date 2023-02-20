@@ -59,7 +59,11 @@ export class IntegrationFactory {
   getRemainingHours(integration: Integration): string {
     const integrationType = this.getIntegrationById(integration.id)?.type;
     const integrationService = this.getIntegrationService(integrationType);
-    return integrationService.remainingHours(integration);
+    if (integrationType && integrationService) {
+      return integrationService.remainingHours(integration);
+    } else {
+      return "";
+    }
   }
 
   async setOnline(integration: Integration): Promise<void> {

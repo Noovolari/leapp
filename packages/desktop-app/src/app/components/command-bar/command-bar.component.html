@@ -19,7 +19,7 @@
     <div class="main-bar">
       <button class="icon-button show-in-taskbar-only" (click)="false;" matTooltip="Sync all Integrations"><i class="moon-Refresh"></i></button>
 
-      <button class="icon-button line-start hide-in-taskbar" (click)="showCreateDialog();" matTooltip="Add a new Session"><i class="moon-Add"></i></button>
+      <button class="icon-button line-start hide-in-taskbar" (click)="showCreateDialog();" matTooltip="Add a new Session" [disabled]="workspaceName !== 'My Workspace'" [ngClass]="workspaceName !== 'My Workspace' ? 'disabled-add-session' : ''"><i class="moon-Add"></i></button>
 
       <button class="icon-button hide-in-taskbar filtering {{filterExtended ? 'toggled-filter' : ''}}" (click)="toggleFilters();" matTooltip="Filter the Session list"><i class="moon-Filter"></i></button>
 

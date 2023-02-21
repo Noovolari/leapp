@@ -26,8 +26,8 @@ import { FileService } from "./file-service";
 import { WorkspaceService } from "./workspace-service";
 import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IntegrationFactory } from "./integration-factory";
-import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provider";
 import { VaultProvider } from "leapp-team-core/vault/vault-provider";
+import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provider";
 import { UserProvider } from "leapp-team-core/user/user.provider";
 import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
 import { HttpClientProvider } from "leapp-team-core/http/http-client.provider";
@@ -285,24 +285,6 @@ export class TeamService {
   private isJwtTokenExpired(jwtToken: string): boolean {
     const expiry = JSON.parse(atob(jwtToken.split(".")[1])).exp;
     return Math.floor(new Date().getTime() / 1000) >= expiry;
-  }
-
-  private setWorkspaceToLocalOne(): void {
-    if (this.fileService.existsSync(this.localWorkspacePath)) {
-      const workspaceString = this.fileService.readFileSync(this.localWorkspacePath);
-      this.fileService.writeFileSync(this.currentWorkspacePath, workspaceString);
-      this.workspaceService.reloadWorkspace();
-      this.fileService.removeFileSync(this.localWorkspacePath);
-    }
-  }
-
-  private setWorkspaceToRemoteOne(): void {
-    const tempWorkspace = this.fileService.readFileSync(this.currentWorkspacePath);
-    this.fileService.writeFileSync(this.localWorkspacePath, tempWorkspace);
-  }
-
-  private isRemoteWorkspace(): boolean {
-    return this.fileService.existsSync(this.localWorkspacePath);
   }
 
   private getTeamLockFileName(teamName: string): string {

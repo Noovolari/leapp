@@ -1,4 +1,4 @@
-import { jest, describe, test, expect, beforeEach } from "@jest/globals";
+import { beforeEach, describe, expect, jest, test } from "@jest/globals";
 import { TeamService } from "./team-service";
 import { constants } from "../models/constants";
 import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
@@ -16,7 +16,6 @@ describe("TeamService", () => {
   let keyChainService: any;
   let nativeService: any;
   let fileService: any;
-  let repository: any;
   let workspaceService: any;
   let integrationFactory: any;
   let crypto: any;
@@ -37,7 +36,6 @@ describe("TeamService", () => {
     keyChainService = {};
     nativeService = {};
     fileService = {};
-    repository = {};
     workspaceService = {};
     integrationFactory = {};
     crypto = {};
@@ -57,7 +55,6 @@ describe("TeamService", () => {
       keyChainService,
       nativeService,
       fileService,
-      repository,
       crypto,
       workspaceService,
       integrationFactory,
@@ -122,7 +119,7 @@ describe("TeamService", () => {
 
   test("signIn()", async () => {
     createTeamServiceInstance();
-    const signedInUser = { publicRSAKey: "fake-public-rsa-key" };
+    const signedInUser = "signed-user-mock";
     teamService.userProvider = {
       signIn: jest.fn(() => signedInUser),
     };
@@ -131,7 +128,6 @@ describe("TeamService", () => {
     await teamService.signIn("mock-email", "mock-password");
     expect(teamService.userProvider.signIn).toHaveBeenCalledWith("mock-email", "mock-password");
     expect(teamService.setSignedInUser).toHaveBeenCalledWith(signedInUser);
-    expect(teamService.fileService.aesKey).toBe(signedInUser.publicRSAKey);
   });
 
   describe("setSignedInUser()", () => {
@@ -165,7 +161,7 @@ describe("TeamService", () => {
     });
   });
 
-  describe("TeamService.signOut()", () => {
+  describe("TeamService.switchToLocal()", () => {
     beforeEach(() => {
       createTeamServiceInstance();
       teamService.behaviouralSubjectService = {
@@ -203,78 +199,93 @@ describe("TeamService", () => {
       teamService.localWorkspacePath = "fake-local-workspace-path";
     });
 
-    test("sign out and stop all sessions", async () => {
-      const sessions = [
-        { type: SessionType.awsIamRoleFederated, sessionId: 1 },
-        { type: SessionType.awsIamUser, sessionId: 2 },
-      ];
-      const sessionsArrayLength = sessions.length;
+    test("sign out and stop all sessions and integrations", async () => {
+      const secrets = {
+        awsSsoIntegrations: [
+          { type: IntegrationType.awsSso, id: 1 },
+          { type: IntegrationType.awsSso, id: 2 },
+        ],
+        azureIntegrations: [
+          { type: IntegrationType.azure, id: 3 },
+          { type: IntegrationType.azure, id: 4 },
+        ],
+        sessions: [
+          { type: SessionType.awsIamRoleFederated, sessionId: 5 },
+          { type: SessionType.awsIamUser, sessionId: 6 },
+        ],
+      };
       awsIamRoleFederatedSessionService = {
-        delete: jest.fn(() => sessions.shift()),
+        delete: jest.fn(() => secrets.sessions.shift()),
       };
       awsIamUserSessionService = {
-        delete: jest.fn(() => sessions.shift()),
+        delete: jest.fn(() => secrets.sessions.shift()),
       };
-      teamService.setSignedInUser = jest.fn();
-      teamService.setWorkspaceToLocalOne = jest.fn();
-      teamService.behaviouralSubjectService.sessions = sessions;
-      teamService.fileService.existsSync = jest.fn(() => true);
+      teamService.workspaceService = {
+        setWorkspaceFileName: jest.fn(),
+        getWorkspace: jest.fn(() => secrets),
+        reloadWorkspace: jest.fn(),
+      };
+      teamService.behaviouralSubjectService = {
+        reloadSessionsAndIntegrationsFromRepository: jest.fn(),
+      };
+      awsSsoIntegrationService = { logout: jest.fn() };
+      azureIntegrationService = { logout: jest.fn() };
 
-      await teamService.signOut();
-      expect(teamService.setSignedInUser).toHaveBeenCalledWith(undefined);
+      await teamService.switchToLocal();
       expect(teamService.fileService.aesKey).toBe(teamService.nativeService.machineId);
-      expect(teamService.fileService.existsSync).toHaveBeenCalledWith(teamService.localWorkspacePath);
-      expect(teamService.sessionFactory.getSessionService).toHaveBeenCalledTimes(sessionsArrayLength);
+      expect(teamService.workspaceService.getWorkspace).toHaveBeenCalled();
+      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenNthCalledWith(1, IntegrationType.awsSso);
+      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenNthCalledWith(2, IntegrationType.awsSso);
+      expect(awsSsoIntegrationService.logout).toHaveBeenNthCalledWith(1, 1);
+      expect(awsSsoIntegrationService.logout).toHaveBeenNthCalledWith(2, 2);
+      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenNthCalledWith(3, IntegrationType.azure);
+      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenNthCalledWith(4, IntegrationType.azure);
+      expect(azureIntegrationService.logout).toHaveBeenNthCalledWith(1, 3);
+      expect(azureIntegrationService.logout).toHaveBeenNthCalledWith(2, 4);
       expect(teamService.sessionFactory.getSessionService).toHaveBeenNthCalledWith(1, SessionType.awsIamRoleFederated);
       expect(teamService.sessionFactory.getSessionService).toHaveBeenNthCalledWith(2, SessionType.awsIamUser);
-      expect(awsIamRoleFederatedSessionService.delete).toHaveBeenCalledWith(1);
-      expect(awsIamUserSessionService.delete).toHaveBeenCalledWith(2);
-      expect(teamService.setWorkspaceToLocalOne).toHaveBeenCalled();
+      expect(awsIamRoleFederatedSessionService.delete).toHaveBeenCalledWith(5);
+      expect(awsIamUserSessionService.delete).toHaveBeenCalledWith(6);
+      expect(teamService.workspaceService.setWorkspaceFileName).toHaveBeenCalledWith(constants.lockFileDestination);
+      expect(teamService.workspaceService.reloadWorkspace).toHaveBeenCalled();
       expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
+      expect(secrets.sessions.length).toBe(0);
     });
 
-    test("sign out and logout from all integrations", async () => {
-      const integrations = [
-        { type: IntegrationType.azure, id: 1 },
-        { type: IntegrationType.awsSso, id: 2 },
-      ];
-      const integrationsArrayLength = integrations.length;
-      awsSsoIntegrationService = {
-        logout: jest.fn(() => integrations.shift()),
+    test("sign out without stopping any session or integration", async () => {
+      const secrets = {
+        awsSsoIntegrations: [],
+        azureIntegrations: [],
+        sessions: [],
       };
-      azureIntegrationService = {
-        logout: jest.fn(() => integrations.shift()),
+      teamService.workspaceService = {
+        setWorkspaceFileName: jest.fn(),
+        getWorkspace: jest.fn(() => secrets),
+        reloadWorkspace: jest.fn(),
       };
-      teamService.setSignedInUser = jest.fn();
-      teamService.setWorkspaceToLocalOne = jest.fn();
-      teamService.behaviouralSubjectService.integrations = integrations;
-      teamService.fileService.existsSync = jest.fn(() => true);
+      teamService.behaviouralSubjectService = {
+        reloadSessionsAndIntegrationsFromRepository: jest.fn(),
+      };
+      awsIamRoleFederatedSessionService = {
+        delete: jest.fn(() => secrets.sessions.shift()),
+      };
+      awsIamUserSessionService = {
+        delete: jest.fn(() => secrets.sessions.shift()),
+      };
+      awsSsoIntegrationService = { logout: jest.fn() };
+      azureIntegrationService = { logout: jest.fn() };
 
-      await teamService.signOut();
-      expect(teamService.setSignedInUser).toHaveBeenCalledWith(undefined);
+      await teamService.switchToLocal();
       expect(teamService.fileService.aesKey).toBe(teamService.nativeService.machineId);
-      expect(teamService.fileService.existsSync).toHaveBeenCalledWith(teamService.localWorkspacePath);
-      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenCalledTimes(integrationsArrayLength);
-      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenNthCalledWith(1, IntegrationType.azure);
-      expect(teamService.integrationFactory.getIntegrationService).toHaveBeenNthCalledWith(2, IntegrationType.awsSso);
-      expect(azureIntegrationService.logout).toHaveBeenCalledWith(1);
-      expect(awsSsoIntegrationService.logout).toHaveBeenCalledWith(2);
-      expect(teamService.setWorkspaceToLocalOne).toHaveBeenCalled();
-      expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
-    });
-
-    test("sign out without any session or integration", async () => {
-      teamService.setSignedInUser = jest.fn();
-      teamService.setWorkspaceToLocalOne = jest.fn();
-      teamService.fileService.existsSync = jest.fn(() => true);
-
-      await teamService.signOut();
-      expect(teamService.setSignedInUser).toHaveBeenCalledWith(undefined);
-      expect(teamService.fileService.aesKey).toBe(teamService.nativeService.machineId);
-      expect(teamService.fileService.existsSync).toHaveBeenCalledWith(teamService.localWorkspacePath);
-      expect(teamService.sessionFactory.getSessionService).not.toHaveBeenCalled();
+      expect(teamService.workspaceService.getWorkspace).toHaveBeenCalled();
+      expect(awsSsoIntegrationService.logout).not.toHaveBeenCalled();
+      expect(azureIntegrationService.logout).not.toHaveBeenCalled();
+      expect(awsIamRoleFederatedSessionService.delete).not.toHaveBeenCalled();
+      expect(awsIamUserSessionService.delete).not.toHaveBeenCalled();
       expect(teamService.integrationFactory.getIntegrationService).not.toHaveBeenCalled();
-      expect(teamService.setWorkspaceToLocalOne).toHaveBeenCalled();
+      expect(teamService.sessionFactory.getSessionService).not.toHaveBeenCalled();
+      expect(teamService.workspaceService.setWorkspaceFileName).toHaveBeenCalledWith(constants.lockFileDestination);
+      expect(teamService.workspaceService.reloadWorkspace).toHaveBeenCalled();
       expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
     });
   });
@@ -296,9 +307,12 @@ describe("TeamService", () => {
       (teamService as any).checkSignedInUser = jest.fn(() => true);
       (teamService as any).isRemoteWorkspace = jest.fn(() => false);
       (teamService as any).setWorkspaceToRemoteOne = jest.fn();
+      teamService.getTeamLockFileName = jest.fn(() => "lock-file-name-mock");
+      teamService.signedInUser$ = { getValue: jest.fn(() => ({ publicRSAKey: "public-rsa-key-mock" })) };
       workspaceService.removeWorkspace = jest.fn();
       workspaceService.createWorkspace = jest.fn();
       workspaceService.reloadWorkspace = jest.fn();
+      workspaceService.setWorkspaceFileName = jest.fn();
       const mockedRsaKeys = {
         privateKey: "mocked-private-key",
       };
@@ -309,7 +323,9 @@ describe("TeamService", () => {
 
       await teamService.syncSecrets();
 
-      expect(teamService.setWorkspaceToRemoteOne).toHaveBeenCalledTimes(1);
+      expect(teamService.signedInUser$.getValue).toHaveBeenCalled();
+      expect(teamService.getTeamLockFileName).toHaveBeenCalled();
+      expect(workspaceService.setWorkspaceFileName).toHaveBeenCalledWith("lock-file-name-mock");
       expect(workspaceService.removeWorkspace).toHaveBeenCalledTimes(1);
       expect(workspaceService.createWorkspace).toHaveBeenCalledTimes(1);
       expect(workspaceService.reloadWorkspace).toHaveBeenCalledTimes(1);
@@ -320,9 +336,11 @@ describe("TeamService", () => {
       (teamService as any).checkSignedInUser = jest.fn(() => true);
       (teamService as any).isRemoteWorkspace = jest.fn(() => false);
       (teamService as any).setWorkspaceToRemoteOne = jest.fn();
+      teamService.signedInUser$ = { getValue: jest.fn(() => ({ publicRSAKey: "public-rsa-key-mock" })) };
       workspaceService.removeWorkspace = jest.fn();
       workspaceService.createWorkspace = jest.fn();
       workspaceService.reloadWorkspace = jest.fn();
+      workspaceService.setWorkspaceFileName = jest.fn();
       const mockedRsaKeys = {
         privateKey: "mocked-private-key",
       };
@@ -343,9 +361,11 @@ describe("TeamService", () => {
       (teamService as any).checkSignedInUser = jest.fn(() => true);
       (teamService as any).isRemoteWorkspace = jest.fn(() => false);
       (teamService as any).setWorkspaceToRemoteOne = jest.fn();
+      teamService.signedInUser$ = { getValue: jest.fn(() => ({ publicRSAKey: "public-rsa-key-mock" })) };
       workspaceService.removeWorkspace = jest.fn();
       workspaceService.createWorkspace = jest.fn();
       workspaceService.reloadWorkspace = jest.fn();
+      workspaceService.setWorkspaceFileName = jest.fn();
       const mockedRsaKeys = {
         privateKey: "mocked-private-key",
       };
@@ -704,59 +724,6 @@ describe("TeamService", () => {
     result = teamService.isJwtTokenExpired(jwtToken);
     expect(result).toBe(true);
     jest.useRealTimers();
-  });
-
-  test("setWorkspaceToLocalOne", () => {
-    teamService.fileService = {
-      existsSync: jest.fn((location) => location === "good-local-workspace-path"),
-      readFileSync: jest.fn(() => "fake-file-content"),
-      writeFileSync: jest.fn(),
-      removeFileSync: jest.fn(),
-    };
-    teamService.localWorkspacePath = "good-local-workspace-path";
-    teamService.currentWorkspacePath = "fake-current-workspace-path";
-    teamService.repository = { reloadWorkspace: jest.fn() };
-
-    teamService.setWorkspaceToLocalOne();
-    expect(teamService.fileService.existsSync).toHaveBeenCalledWith("good-local-workspace-path");
-    expect(teamService.fileService.readFileSync).toHaveBeenCalledWith("good-local-workspace-path");
-    expect(teamService.fileService.writeFileSync).toHaveBeenCalledWith("fake-current-workspace-path", "fake-file-content");
-    expect(teamService.repository.reloadWorkspace).toHaveBeenCalled();
-    expect(teamService.fileService.removeFileSync).toHaveBeenCalledWith("good-local-workspace-path");
-
-    teamService.localWorkspacePath = "bad-local-workspace-path";
-    teamService.setWorkspaceToLocalOne();
-    expect(teamService.fileService.existsSync).toHaveBeenCalledWith("bad-local-workspace-path");
-    expect(teamService.fileService.readFileSync).toHaveBeenCalledTimes(1);
-    expect(teamService.fileService.writeFileSync).toHaveBeenCalledTimes(1);
-    expect(teamService.repository.reloadWorkspace).toHaveBeenCalledTimes(1);
-  });
-
-  test("setWorkspaceToRemoteOne()", () => {
-    teamService.fileService = {
-      readFileSync: jest.fn(() => "fake-file-content"),
-      writeFileSync: jest.fn(),
-    };
-    teamService.currentWorkspacePath = "fake-current-workspace-path";
-    teamService.localWorkspacePath = "fake-local-workspace-path";
-
-    teamService.setWorkspaceToRemoteOne();
-    expect(teamService.fileService.readFileSync).toHaveBeenCalledWith("fake-current-workspace-path");
-    expect(teamService.fileService.writeFileSync).toHaveBeenCalledWith("fake-local-workspace-path", "fake-file-content");
-  });
-
-  test("isRemoteWorkspace()", () => {
-    teamService.fileService = { existsSync: jest.fn((location) => location === "remote") };
-
-    teamService.localWorkspacePath = "remote";
-    let result = teamService.isRemoteWorkspace();
-    expect(result).toBe(true);
-    expect(teamService.fileService.existsSync).toHaveBeenCalledWith("remote");
-
-    teamService.localWorkspacePath = "local";
-    result = teamService.isRemoteWorkspace();
-    expect(result).toBe(false);
-    expect(teamService.fileService.existsSync).toHaveBeenCalledWith("local");
   });
 
   test("setEncryptionKeyToMachineId", () => {

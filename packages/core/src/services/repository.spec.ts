@@ -16,6 +16,7 @@ describe("Repository", () => {
   let repository;
   let mockedSession: Session;
   let workspaceConsistencyService: any;
+  let workspaceFileNameService: any;
 
   beforeEach(() => {
     mockedWorkspace = new Workspace();
@@ -45,6 +46,8 @@ describe("Repository", () => {
       createNewWorkspace: () => mockedWorkspace,
     };
 
+    workspaceFileNameService = { workspaceFileName: constants.lockFileDestination };
+
     mockedFileService = new FileService(mockedNativeService);
     mockedFileService.readFileSync = jest.fn();
     mockedFileService.writeFileSync = jest.fn(() => {});
@@ -52,7 +55,7 @@ describe("Repository", () => {
     mockedFileService.existsSync = jest.fn(() => false);
     mockedFileService.newDir = jest.fn();
 
-    repository = new Repository(mockedNativeService, mockedFileService, workspaceConsistencyService);
+    repository = new Repository(mockedNativeService, mockedFileService, workspaceConsistencyService, workspaceFileNameService);
 
     mockedSession = {
       sessionTokenExpiration: "",
@@ -1298,5 +1301,12 @@ describe("Repository", () => {
     };
     repository.setPluginStatus("id1", "new-status");
     expect((repository as any)._workspace.pluginsStatus).toStrictEqual(["new-status", { id: "id2" }]);
+  });
+
+  test("writeFile", () => {
+    const data = "data-mock";
+    repository.nativeService = { fs: { writeFileSync: jest.fn() } };
+    repository.writeFile(data);
+    expect(repository.nativeService.fs.writeFileSync).toHaveBeenCalledWith(__dirname + "/register-client-response", JSON.stringify(data));
   });
 });

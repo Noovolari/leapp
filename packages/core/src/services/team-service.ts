@@ -101,7 +101,10 @@ export class TeamService {
   }
 
   async signOut(): Promise<void> {
+    const signedInUser = this.signedInUser$.getValue();
     await this.setSignedInUser(undefined);
+    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
+    this.workspaceService.reloadWorkspace();
     await this.switchToLocal();
   }
 

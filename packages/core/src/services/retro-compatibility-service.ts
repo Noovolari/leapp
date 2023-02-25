@@ -112,6 +112,7 @@ export class RetroCompatibilityService {
             awsSsoConfiguration.portalUrl,
             awsSsoConfiguration.region,
             constants.inApp,
+            awsSsoConfiguration.trustSystemCA,
             awsSsoConfiguration.expirationTime
           )
         );
@@ -178,6 +179,7 @@ export class RetroCompatibilityService {
             awsSsoIntegrations[i].portalUrl,
             awsSsoIntegrations[i].region,
             awsSsoIntegrations[i].browserOpening,
+            awsSsoIntegrations[i].trustSystemCA,
             awsSsoIntegrations[i].accessTokenExpiration
           );
         } else {

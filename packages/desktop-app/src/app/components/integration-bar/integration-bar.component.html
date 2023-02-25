@@ -64,6 +64,15 @@
               </div>
             </div>
           </div>
+
+          <div class="form-group">
+            <div class="form-field">
+              <div class="form-group">
+                <label><i class="fa fa-info-circle" matTooltip="By default Node's built-in certificate store is used. If you need to trust custom certificate, add certificate's CA into your OS as trusted and enable this setting. This feature is in beta."></i>&nbsp;Trust system CA</label>
+                <mat-checkbox (change)="trustSystemCAChanged($event)" [checked]="selectedConfiguration.trustSystemCA"></mat-checkbox>(Beta)
+              </div>
+            </div>
+          </div>
         </ng-container>
         <ng-container *ngIf="selectedIntegration === eIntegrationType.azure">
           <div class="form-group">

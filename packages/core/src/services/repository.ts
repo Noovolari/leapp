@@ -274,9 +274,9 @@ export class Repository {
     return this.workspace.sessions.filter((sess) => (sess as any).awsSsoConfigurationId === id);
   }
 
-  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string): void {
+  addAwsSsoIntegration(portalUrl: string, alias: string, region: string, browserOpening: string, trustSystemCA: boolean): void {
     const workspace = this.getWorkspace();
-    workspace.awsSsoIntegrations.push(new AwsSsoIntegration(uuid.v4(), alias, portalUrl, region, browserOpening, undefined));
+    workspace.awsSsoIntegrations.push(new AwsSsoIntegration(uuid.v4(), alias, portalUrl, region, browserOpening, trustSystemCA, undefined));
     this.persistWorkspace(workspace);
   }
 
@@ -286,6 +286,7 @@ export class Repository {
     region: string,
     portalUrl: string,
     browserOpening: string,
+    trustSystemCA: boolean,
     isOnline: boolean,
     expirationTime?: string
   ): void {
@@ -296,6 +297,7 @@ export class Repository {
       workspace.awsSsoIntegrations[index].region = region;
       workspace.awsSsoIntegrations[index].portalUrl = portalUrl;
       workspace.awsSsoIntegrations[index].browserOpening = browserOpening;
+      workspace.awsSsoIntegrations[index].trustSystemCA = trustSystemCA;
       workspace.awsSsoIntegrations[index].isOnline = isOnline;
       if (expirationTime) {
         workspace.awsSsoIntegrations[index].accessTokenExpiration = expirationTime;

@@ -8,6 +8,7 @@ export class AwsSsoIntegration extends Integration {
     public portalUrl: string,
     public region: string,
     public browserOpening: string,
+    public trustSystemCA: boolean,
     public accessTokenExpiration: string
   ) {
     super(id, alias, IntegrationType.awsSso, false);

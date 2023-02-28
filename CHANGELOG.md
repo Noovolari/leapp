@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.4](https://github.com/Noovolari/leapp/compare/v0.17.3...v0.17.4) (2023-02-28)
+
+To have access to the following Leapp CLI feature, please download the latest Leapp CLI 0.1.32 version.
+To update it, refer to our [documentation](https://docs.leapp.cloud/latest/installation/update-leapp/#cli).
+
+### Features
+* now it is also possible to start a Leapp Session from the CLI by specifying the session name and/or the session role; this is possible using both interactive and non-interactive mode.
+
 ### [0.17.3](https://github.com/Noovolari/leapp/compare/v0.17.2...v0.17.3) (2023-02-14)
 
 ### Bug Fixes

@@ -65,6 +65,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   ];
   selectedIntegration: string;
 
+  trustSystemCA: boolean;
+
   form = new FormGroup({
     alias: new FormControl("", [Validators.required]),
     portalUrl: new FormControl("", [Validators.required, Validators.pattern("https?://.+")]),
@@ -287,6 +289,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       region: this.regions[0].region,
       portalUrl: "",
       browserOpening: constants.inApp,
+      trustSystemCA: false,
       accessTokenExpiration: undefined,
       tenantId: "",
     };
@@ -310,6 +313,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.chooseIntegration = false;
     this.modifying = modifying;
     this.selectedConfiguration = integration;
+    console.log(this.selectedConfiguration.trustSystemCA);
     if (modifying === 1) {
       this.selectedConfiguration = {
         id: "new integration",
@@ -317,6 +321,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         region: this.regions[0].region,
         portalUrl: "",
         browserOpening: constants.inApp,
+        trustSystemCA: false,
         accessTokenExpiration: undefined,
         tenantId: "",
       };
@@ -344,13 +349,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       const portalUrl = this.form.get("portalUrl").value?.trim();
       const region = this.form.get("awsRegion").value;
       const browserOpening = this.form.get("defaultBrowserOpening").value;
+      const trustSystemCA = this.trustSystemCA;
       const tenantId = this.form.get("tenantId").value;
 
       let integrationParams: IntegrationParams;
       if (this.modifying > 0) {
         integrationParams =
           this.selectedIntegration === IntegrationType.awsSso
-            ? ({ alias, browserOpening, portalUrl, region } as IntegrationParams)
+            ? ({ alias, browserOpening, portalUrl, region, trustSystemCA } as IntegrationParams)
             : ({ alias, tenantId } as IntegrationParams);
       }
       if (this.modifying === 1) {
@@ -407,5 +413,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   get defaultLocation(): string {
     return this.appProviderService.repository.getDefaultLocation();
+  }
+
+  trustSystemCAChanged(event: any): void {
+    this.trustSystemCA = event.checked;
   }
 }

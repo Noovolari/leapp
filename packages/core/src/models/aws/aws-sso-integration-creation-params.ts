@@ -4,4 +4,5 @@ export interface AwsSsoIntegrationCreationParams extends IntegrationParams {
   portalUrl: string;
   region: string;
   browserOpening: string;
+  trustSystemCA: boolean;
 }

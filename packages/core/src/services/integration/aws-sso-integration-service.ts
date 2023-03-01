@@ -55,7 +55,13 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   }
 
   async createIntegration(creationParams: AwsSsoIntegrationCreationParams): Promise<void> {
-    this.repository.addAwsSsoIntegration(creationParams.portalUrl, creationParams.alias, creationParams.region, creationParams.browserOpening);
+    this.repository.addAwsSsoIntegration(
+      creationParams.portalUrl,
+      creationParams.alias,
+      creationParams.region,
+      creationParams.browserOpening,
+      creationParams.trustSystemCA
+    );
   }
 
   updateIntegration(id: string, updateParams: AwsSsoIntegrationCreationParams): void {
@@ -66,6 +72,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       updateParams.region,
       updateParams.portalUrl,
       updateParams.browserOpening,
+      updateParams.trustSystemCA,
       isOnline
     );
   }
@@ -101,6 +108,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       integration.region,
       integration.portalUrl,
       integration.browserOpening,
+      integration.trustSystemCA,
       integration.isOnline,
       integration.accessTokenExpiration
     );
@@ -210,6 +218,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
         region,
         loginResponse.portalUrlUnrolled,
         integration.browserOpening,
+        integration.trustSystemCA,
         loginResponse.expirationTime.toISOString(),
         loginResponse.accessToken
       );
@@ -263,11 +272,12 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     region: string,
     portalUrl: string,
     browserOpening: string,
+    trustSystemCA: boolean,
     expirationTime: string,
     accessToken: string
   ): Promise<void> {
     const isOnline = this.repository.getAwsSsoIntegration(integrationId).isOnline;
-    this.repository.updateAwsSsoIntegration(integrationId, alias, region, portalUrl, browserOpening, isOnline, expirationTime);
+    this.repository.updateAwsSsoIntegration(integrationId, alias, region, portalUrl, browserOpening, trustSystemCA, isOnline, expirationTime);
     await this.keyChainService.saveSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId), accessToken);
   }
 
@@ -280,9 +290,17 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   }
 
   private async login(integrationId: string | number, region: string, portalUrl: string): Promise<LoginResponse> {
+    const awsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId);
+    let options = {};
+    if (awsSsoIntegration.trustSystemCA) {
+      const systemCerts = await this.nativeService.systemCertsAsync();
+      options = {
+        ca: systemCerts,
+      };
+    }
     const redirectClient = this.nativeService.followRedirects[this.getProtocol(portalUrl)];
     portalUrl = await new Promise((resolve, _) => {
-      const request = redirectClient.request(portalUrl, (response) => resolve(response.responseUrl));
+      const request = redirectClient.request(portalUrl, options, (response) => resolve(response.responseUrl));
       request.end();
     });
 

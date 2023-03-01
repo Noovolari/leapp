@@ -29,6 +29,7 @@ export class AppNativeService implements INativeService {
   machineId: any;
   ipcRenderer: any;
   keytar: typeof Keytar;
+  systemCertsAsync: any;
   followRedirects: any;
   httpProxyAgent: any;
   httpsProxyAgent: any;
@@ -62,6 +63,7 @@ export class AppNativeService implements INativeService {
       this.shell = window.require("electron").shell;
       this.machineId = window.require("node-machine-id").machineIdSync();
       this.keytar = window.require("keytar");
+      this.systemCertsAsync = window.require("system-ca").systemCertsAsync;
       this.followRedirects = window.require("follow-redirects");
       this.httpProxyAgent = window.require("http-proxy-agent");
       this.httpsProxyAgent = window.require("https-proxy-agent");

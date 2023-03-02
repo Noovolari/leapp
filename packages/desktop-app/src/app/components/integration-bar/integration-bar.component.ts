@@ -313,7 +313,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.chooseIntegration = false;
     this.modifying = modifying;
     this.selectedConfiguration = integration;
-    console.log(this.selectedConfiguration.trustSystemCA);
+
     if (modifying === 1) {
       this.selectedConfiguration = {
         id: "new integration",

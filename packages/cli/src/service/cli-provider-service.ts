@@ -251,7 +251,7 @@ export class CliProviderService {
 
   get awsSsoOidcService(): AwsSsoOidcService {
     if (!this.awsSsoOidcServiceInstance) {
-      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliAwsSsoOidcVerificationWindowService, this.repository, true);
+      this.awsSsoOidcServiceInstance = new AwsSsoOidcService(this.cliAwsSsoOidcVerificationWindowService, this.cliNativeService,this.repository, true);
     }
     return this.awsSsoOidcServiceInstance;
   }

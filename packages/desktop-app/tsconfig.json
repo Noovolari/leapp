@@ -19,7 +19,9 @@
     "paths": {
       "stream": ["../node_modules/stream-browserify"],
       "assert": ["../node_modules/assert"],
-      "fs": ["../node_modules/fs-web"]
+      "fs": ["../node_modules/fs-web"],
+      "http": ["./node_modules/stream-http"],
+      "https": ["./node_modules/https-browserify"]
     },
     "esModuleInterop": true,
     "resolveJsonModule": true,

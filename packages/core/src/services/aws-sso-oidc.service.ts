@@ -7,6 +7,7 @@ import {
   VerificationResponse,
 } from "./session/aws/aws-sso-role-service";
 import { IAwsSsoOidcVerificationWindowService } from "../interfaces/i-aws-sso-oidc-verification-window-service";
+import { INativeService } from "../interfaces/i-native-service";
 import { BrowserWindowClosing } from "../interfaces/i-browser-window-closing";
 import SSOOIDC, { CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest } from "aws-sdk/clients/ssooidc";
 import { LoggedException, LogLevel } from "./log-service";
@@ -23,6 +24,7 @@ export class AwsSsoOidcService {
 
   constructor(
     private verificationWindowService: IAwsSsoOidcVerificationWindowService,
+    private nativeService: INativeService,
     private repository: Repository,
     private disableInAppBrowser: boolean = false
   ) {
@@ -53,7 +55,7 @@ export class AwsSsoOidcService {
       this.timeoutOccurred = false;
       this.interruptOccurred = false;
 
-      const registerClientResponse = await this.registerSsoOidcClient();
+      const registerClientResponse = await this.registerSsoOidcClient(configurationId);
       const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(registerClientResponse, portalUrl);
       const windowModality = this.repository.getAwsSsoIntegration(configurationId).browserOpening;
       const verificationResponse = await this.verificationWindowService.openVerificationWindow(
@@ -123,8 +125,22 @@ export class AwsSsoOidcService {
     return this.ssoOidc;
   }
 
-  private async registerSsoOidcClient(): Promise<RegisterClientResponse> {
+  private async registerSsoOidcClient(configurationId: string | number): Promise<RegisterClientResponse> {
     const registerClientRequest: RegisterClientRequest = { clientName: "leapp", clientType: "public" };
+    const awsSsoIntegration = this.repository.getAwsSsoIntegration(configurationId);
+    let options = {};
+    if (awsSsoIntegration.trustSystemCA) {
+      const systemCerts = await this.nativeService.systemCertsAsync();
+      options = {
+        ca: systemCerts,
+      };
+    }
+    const https = require("https");
+    this.getAwsSsoOidcClient().config.update({
+      httpOptions: {
+        agent: new https.Agent(options),
+      },
+    });
     return await this.getAwsSsoOidcClient().registerClient(registerClientRequest).promise();
   }
 

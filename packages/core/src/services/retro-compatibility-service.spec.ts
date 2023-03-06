@@ -376,7 +376,7 @@ describe("RetroCompatibilityService", () => {
 
   test("adaptIntegrations", async () => {
     jest.spyOn(uuid, "v4").mockImplementation(() => "fake-uuid");
-    const oldWOrkspace = {
+    const oldWorkspace = {
       _idpUrls: [{ idpUrlId: "idpUrlId" }],
       _profiles: [{ profileid: "profileId", name: "default" }],
       _proxyConfiguration: [],
@@ -392,23 +392,24 @@ describe("RetroCompatibilityService", () => {
     const workspace = new Workspace();
 
     const retrocompatibilityService = new RetroCompatibilityService(null, keyChainService, null, null);
-    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    await (retrocompatibilityService as any).adaptIntegrations(oldWorkspace, workspace);
 
-    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
-    oldWOrkspace._awsSsoConfiguration = undefined;
-    (oldWOrkspace as any).awsSsoConfiguration = {};
-    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
-    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+    expect(workspace.idpUrls).toStrictEqual(oldWorkspace._idpUrls);
+    oldWorkspace._awsSsoConfiguration = undefined;
+    (oldWorkspace as any).awsSsoConfiguration = {};
+    await (retrocompatibilityService as any).adaptIntegrations(oldWorkspace, workspace);
+    expect(workspace.idpUrls).toStrictEqual(oldWorkspace._idpUrls);
 
-    oldWOrkspace._awsSsoConfiguration = {};
+    oldWorkspace._awsSsoConfiguration = {};
     workspace.awsSsoIntegrations = undefined;
-    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
-    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+    await (retrocompatibilityService as any).adaptIntegrations(oldWorkspace, workspace);
+    expect(workspace.idpUrls).toStrictEqual(oldWorkspace._idpUrls);
 
-    oldWOrkspace._awsSsoConfiguration = {
+    oldWorkspace._awsSsoConfiguration = {
       portalUrl: "portal-url",
       region: "fake-region",
       expirationTime: "now",
+      trustSystemCA: true,
     };
     workspace.awsSsoIntegrations = [];
     workspace.sessions.push({
@@ -432,19 +433,19 @@ describe("RetroCompatibilityService", () => {
       type: SessionType.awsIamRoleFederated,
     });
 
-    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
-    expect(workspace.idpUrls).toStrictEqual(oldWOrkspace._idpUrls);
+    await (retrocompatibilityService as any).adaptIntegrations(oldWorkspace, workspace);
+    expect(workspace.idpUrls).toStrictEqual(oldWorkspace._idpUrls);
     expect(workspace.awsSsoIntegrations[0]).toStrictEqual(
-      new AwsSsoIntegration("fake-uuid", "Aws Single Sign-On", "portal-url", "fake-region", constants.inApp, "now")
+      new AwsSsoIntegration("fake-uuid", "Aws Single Sign-On", "portal-url", "fake-region", constants.inApp, true, "now")
     );
     expect(workspace.sessions[0]["awsSsoConfigurationId"]).toBe("fake-uuid");
     expect(keyChainService.saveSecret).toHaveBeenCalledWith(constants.appName, "aws-sso-integration-access-token-fake-uuid", "mocked-access-token");
     expect(keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, `aws-sso-access-token`);
 
     workspace.awsSsoIntegrations.push(
-      new AwsSsoIntegration(uuid.v4(), "Aws Single Sign-On", "portalUrl", "region", constants.inApp, "expirationTime")
+      new AwsSsoIntegration(uuid.v4(), "Aws Single Sign-On", "portalUrl", "region", constants.inApp, true, "expirationTime")
     );
-    await (retrocompatibilityService as any).adaptIntegrations(oldWOrkspace, workspace);
+    await (retrocompatibilityService as any).adaptIntegrations(oldWorkspace, workspace);
     expect(keyChainService.saveSecret).toHaveBeenCalledTimes(1);
     expect(keyChainService.getSecret).toHaveBeenCalledTimes(1);
   });
@@ -559,5 +560,35 @@ describe("RetroCompatibilityService", () => {
     jest.spyOn(retrocompatibilityService as any, "lockFilePath", "get");
     expect((retrocompatibilityService as any).lockFilePath).toBe("/home/.Leapp/Leapp-lock.json");
     expect(fileService.writeFileSync).toHaveBeenCalledWith("/home/.Leapp/Leapp-lock.json", '"{\\"fakeKey\\":\\"fakeValue\\"}"');
+  });
+
+  test("migration3 - check migration true", () => {
+    const repository: any = { reloadWorkspace: jest.fn() };
+    const retrocompatibilityService = new RetroCompatibilityService(null, null, repository, null);
+    const workspace = { ssmRegionBehaviour: "fake-ssm-region-behaviour" };
+    (retrocompatibilityService as any).getWorkspace = jest.fn(() => workspace);
+    (retrocompatibilityService as any).checkMigration = jest.fn(() => true);
+    (retrocompatibilityService as any).persists = jest.fn();
+
+    (retrocompatibilityService as any).migration3();
+    expect((retrocompatibilityService as any).getWorkspace).toHaveBeenCalled();
+    expect((retrocompatibilityService as any).checkMigration).toHaveBeenCalledWith(workspace, 2, 3);
+    expect(workspace.ssmRegionBehaviour).toBe(constants.ssmRegionNo);
+    expect((retrocompatibilityService as any).persists).toHaveBeenCalledWith(workspace);
+    expect(repository.reloadWorkspace).toHaveBeenCalled();
+  });
+
+  test("migration3 - check migration false", () => {
+    const repository: any = { reloadWorkspace: jest.fn() };
+    const retrocompatibilityService = new RetroCompatibilityService(null, null, repository, null);
+    const workspace = { ssmRegionBehaviour: "fake-ssm-region-behaviour" };
+    (retrocompatibilityService as any).getWorkspace = jest.fn(() => workspace);
+    (retrocompatibilityService as any).checkMigration = jest.fn(() => false);
+    (retrocompatibilityService as any).persists = jest.fn();
+
+    (retrocompatibilityService as any).migration3();
+    expect((retrocompatibilityService as any).getWorkspace).toHaveBeenCalled();
+    expect((retrocompatibilityService as any).checkMigration).toHaveBeenCalledWith(workspace, 2, 3);
+    expect(workspace.ssmRegionBehaviour).toBe("fake-ssm-region-behaviour");
   });
 });

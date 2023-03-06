@@ -1,6 +1,14 @@
 import { LeappCommand } from "../../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
-import { integrationAlias, integrationLocation, integrationPortalUrl, integrationRegion, integrationType, integrationTenantId } from "../../flags";
+import {
+  integrationAlias,
+  integrationLocation,
+  integrationPortalUrl,
+  integrationRegion,
+  integrationType,
+  integrationTenantId,
+  trustCertificate,
+} from "../../flags";
 import { IntegrationMethod } from "@noovolari/leapp-core/models/integration-method";
 import { IntegrationParams } from "@noovolari/leapp-core/models/integration-params";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
@@ -25,6 +33,7 @@ export default class CreateSsoIntegration extends LeappCommand {
     integrationType,
     integrationTenantId,
     integrationLocation,
+    trustCertificate,
   };
 
   constructor(argv: string[], config: Config) {
@@ -36,7 +45,19 @@ export default class CreateSsoIntegration extends LeappCommand {
       let creationParams: IntegrationParams;
       let type: IntegrationType;
       const { flags } = await this.parse(CreateSsoIntegration);
-      if (LeappCommand.areFlagsNotDefined(flags, this)) {
+      if (
+        LeappCommand.areFlagsNotDefined(
+          {
+            integrationAlias: flags.integrationAlias,
+            integrationPortalUrl: flags.integrationPortalUrl,
+            integrationRegion: flags.integrationRegion,
+            integrationType: flags.integrationType,
+            integrationTenantId: flags.integrationTenantId,
+            integrationLocation: flags.integrationLocation,
+          },
+          this
+        )
+      ) {
         const method = await this.chooseIntegrationMethod();
         type = method.integrationType;
         creationParams = await this.askConfigurationParameters(method);
@@ -79,6 +100,7 @@ export default class CreateSsoIntegration extends LeappCommand {
     }
     if (chosenIntegrationMethod.integrationType === IntegrationType.awsSso) {
       integrationParams.browserOpening = constants.inBrowser;
+      integrationParams.trustSystemCA = integrationParams.trustSystemCA === "true";
     }
     return integrationParams;
   }
@@ -134,6 +156,7 @@ export default class CreateSsoIntegration extends LeappCommand {
           alias: flags.integrationAlias,
           browserOpening: constants.inBrowser,
           region: flags.integrationRegion,
+          trustSystemCA: flags.trustCertificate,
         } as AwsSsoIntegrationCreationParams;
       case IntegrationType.azure:
         if (flags.integrationAlias === undefined || flags.integrationTenantId === undefined || flags.integrationLocation === undefined) {

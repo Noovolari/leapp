@@ -28,6 +28,11 @@ packages/desktop-app/.angular
 *.sublime-workspace
 release/
 
+package-lock.json
+packages/core/package-lock.json
+packages/cli/package-lock.json
+packages/desktop-app/package-lock.json
+
 # IDE - VSCode
 .vscode/*
 !.vscode/settings.json

@@ -48,6 +48,10 @@ export class CloudProviderService {
           AwsSsoIntegrationService.validatePortalUrl
         ),
         new AccessMethodField("region", "Select region", AccessMethodFieldType.list, awsRegionChoices),
+        new AccessMethodField("trustSystemCA", "Add self signed certificate?", AccessMethodFieldType.list, [
+          new FieldChoice("yes", "true"),
+          new FieldChoice("no", "false"),
+        ]),
       ]),
       new IntegrationMethod(IntegrationType.azure, "Azure", [
         new AccessMethodField("alias", "Insert integration alias", AccessMethodFieldType.input, undefined, AzureIntegrationService.validateAlias),

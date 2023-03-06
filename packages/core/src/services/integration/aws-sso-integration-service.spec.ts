@@ -245,11 +245,11 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("getAccessToken, token expired", async () => {
-    const integration = { alias: "fake-alias", browserOpening: "fake-browser-opening" };
+    const integration = { alias: "fake-alias", browserOpening: "fake-browser-opening", trustSystemCA: true };
     const repository = { getAwsSsoIntegration: jest.fn(() => integration) } as any;
     const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null) as any;
     awsIntegrationService.isAwsSsoAccessTokenExpired = jest.fn(async () => true);
-    const loginResponse = { portalUrlUnrolled: "fake-portal-url-unrolled", expirationTime: new Date(0), accessToken: "fake-access-token" };
+    const loginResponse = { portalUrlUnrolled: "fake-portal-url", expirationTime: new Date(0), accessToken: "fake-access-token" };
     awsIntegrationService.login = jest.fn(async () => loginResponse);
     awsIntegrationService.configureAwsSso = jest.fn(async () => {});
 
@@ -268,6 +268,7 @@ describe("AwsSsoIntegrationService", () => {
       fakeRegion,
       loginResponse.portalUrlUnrolled,
       integration.browserOpening,
+      true,
       "1970-01-01T00:00:00.000Z",
       loginResponse.accessToken
     );
@@ -388,7 +389,7 @@ describe("AwsSsoIntegrationService", () => {
 
     const requestMock = { end: jest.fn() };
     const httpClient = {
-      request: jest.fn((actualPortalUrl, responseFn: any) => {
+      request: jest.fn((actualPortalUrl, _options, responseFn: any) => {
         expect(actualPortalUrl).toBe(portalUrl);
         responseFn({ responseUrl: resolvedPortalUrl });
         return requestMock;
@@ -396,6 +397,7 @@ describe("AwsSsoIntegrationService", () => {
     };
     const nativeService = {
       followRedirects: { https: httpClient },
+      systemCertsAsync: jest.fn(),
     } as any;
 
     const generateSsoTokenResponse = { accessToken: "fake-access-token", expirationTime: "fake-expiration-time" };
@@ -403,7 +405,8 @@ describe("AwsSsoIntegrationService", () => {
       login: jest.fn(async () => generateSsoTokenResponse),
     } as any;
 
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, nativeService, null, awsSsoOidcService, null) as any;
+    const repository = { getAwsSsoIntegration: jest.fn(() => ({ trustSystemCA: true })) };
+    const awsIntegrationService = new AwsSsoIntegrationService(repository as any, null, null, nativeService, null, awsSsoOidcService, null) as any;
     awsIntegrationService.getProtocol = jest.fn(() => "https");
 
     const integrationId = "fake-integration-id";
@@ -418,6 +421,7 @@ describe("AwsSsoIntegrationService", () => {
 
     expect(awsIntegrationService.getProtocol).toHaveBeenCalledWith(portalUrl);
     expect(requestMock.end).toHaveBeenCalled();
+    expect(nativeService.systemCertsAsync).toHaveBeenCalled();
     expect(awsSsoOidcService.login).toHaveBeenCalledWith(integrationId, region, resolvedPortalUrl);
   });
 
@@ -510,10 +514,11 @@ describe("AwsSsoIntegrationService", () => {
       region: "region",
       browserOpening: "browserOpening",
       type: IntegrationType.awsSso,
+      trustSystemCA: true,
     } as any;
     awsIntegrationService.createIntegration(creationParams);
 
-    expect(repository.addAwsSsoIntegration).toHaveBeenCalledWith("portalUrl", "alias", "region", "browserOpening");
+    expect(repository.addAwsSsoIntegration).toHaveBeenCalledWith("portalUrl", "alias", "region", "browserOpening", true);
   });
 
   test("deleteIntegration", async () => {
@@ -582,7 +587,8 @@ describe("AwsSsoIntegrationService", () => {
     const browserOpening = "fake-browser-opening";
     const expirationTime = "fake-expiration-time";
     const accessToken = "fake-access-token";
-    await awsIntegrationService.configureAwsSso(integrationId, alias, region, portalUrl, browserOpening, expirationTime, accessToken);
+    const trustSystemCA = true;
+    await awsIntegrationService.configureAwsSso(integrationId, alias, region, portalUrl, browserOpening, trustSystemCA, expirationTime, accessToken);
     expect(repository.getAwsSsoIntegration).toHaveBeenCalledWith(integrationId);
     expect(repository.updateAwsSsoIntegration).toHaveBeenCalledWith(
       integrationId,
@@ -590,6 +596,7 @@ describe("AwsSsoIntegrationService", () => {
       region,
       portalUrl,
       browserOpening,
+      trustSystemCA,
       isOnline,
       expirationTime
     );
@@ -627,11 +634,12 @@ describe("AwsSsoIntegrationService", () => {
       region: "region",
       browserOpening: "browserOpening",
       type: IntegrationType.awsSso,
+      trustSystemCA: true,
     } as any;
     awsIntegrationService.updateIntegration("1234", updateParams);
 
     expect(repository.getAwsSsoIntegration).toHaveBeenCalledWith("1234");
-    expect(repository.updateAwsSsoIntegration).toHaveBeenCalledWith("1234", "alias", "region", "portalUrl", "browserOpening", true);
+    expect(repository.updateAwsSsoIntegration).toHaveBeenCalledWith("1234", "alias", "region", "portalUrl", "browserOpening", true, true);
   });
 
   test("getIntegration", () => {

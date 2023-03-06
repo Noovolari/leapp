@@ -136,6 +136,12 @@ export const print = Flags.boolean({
   default: false,
   char: "p",
 });
+export const trustCertificate = Flags.boolean({
+  description: "Allow to use self signed certificates",
+  hidden: false,
+  default: false,
+  char: "t",
+});
 
 export const integrationType = Flags.string({
   description: `Identify the type of your integration. Valid types are [${IntegrationType.awsSso}, ${IntegrationType.azure}]`,

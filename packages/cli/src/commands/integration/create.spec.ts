@@ -170,6 +170,7 @@ describe("CreateSsoIntegration", () => {
       portalUrl: "https://www.google.it",
       region: "eu-west-1",
       browserOpening: constants.inBrowser,
+      trustSystemCA: false,
     });
   });
 
@@ -362,6 +363,7 @@ describe("CreateSsoIntegration", () => {
       alias: "alias",
       portalUrl: "portalUrl",
       region: "region",
+      trustSystemCA: false,
     });
   });
 

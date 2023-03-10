@@ -17,9 +17,10 @@ Create a new integration
 ```
 USAGE
   $ leapp integration create [--integrationAlias <value>] [--integrationPortalUrl <value>] [--integrationRegion <value>]
-    [--integrationType AWS-SSO|AZURE] [--integrationTenantId <value>] [--integrationLocation <value>]
+    [--integrationType AWS-SSO|AZURE] [--integrationTenantId <value>] [--integrationLocation <value>] [-t]
 
 FLAGS
+  -t, --trustCertificate          Allow to use self signed certificates
   --integrationAlias=<value>      alias that identifies an integration
   --integrationLocation=<value>   Location of an Azure Integration
   --integrationPortalUrl=<value>  url that identifies the integration portal where you authenticate

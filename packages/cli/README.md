@@ -17,9 +17,26 @@ For more information about the project visit the [site](www.leapp.cloud).
 * [Usage](#usage)
 * [Commands](#commands)
 * [Command Topics](#command-topics)
+* [Command Topics](#command-topics-1)
+<!-- tocstop -->
+* [Usage](#usage)
+* [Commands](#commands)
+* [Command Topics](#command-topics)
 <!-- tocstop -->
 # Usage
 <!-- usage -->
+```sh-session
+$ npm install -g @noovolari/leapp-cli
+$ leapp COMMAND
+running command...
+$ leapp (--version)
+@noovolari/leapp-cli/0.1.30 win32-x64 node-v16.15.1
+$ leapp --help [COMMAND]
+USAGE
+  $ leapp COMMAND
+...
+```
+<!-- usagestop -->
 ```sh-session
 $ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
@@ -34,6 +51,17 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
+# Command Topics
+
+* [`leapp help`](scopes/help.md) - Display help for leapp.
+* [`leapp idp-url`](scopes/idp-url.md) - SAML 2.0 Identity providers URL management
+* [`leapp integration`](scopes/integration.md) - Leapp Integrations management
+* [`leapp profile`](scopes/profile.md) - Leapp AWS Multi-profile management
+* [`leapp region`](scopes/region.md) - Leapp regions management
+* [`leapp session`](scopes/session.md) - Sessions management
+* [`leapp version`](scopes/version.md) - Displays the Cli and Core versions
+
+<!-- commandsstop -->
 # Command Topics
 
 * [`leapp help`](scopes/help.md) - Display help for leapp.

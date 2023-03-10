@@ -25,7 +25,7 @@ import { AwsSsoIntegrationCreationParams } from "../../models/aws/aws-sso-integr
 import { ThrottleService } from "../throttle-service";
 import { IKeychainService } from "../../interfaces/i-keychain-service";
 
-const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
+const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}(\.[a-zA-Z0-9()]{1,6})?\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
 export interface SsoSessionsDiff {
   sessionsToDelete: AwsSsoRoleSession[];

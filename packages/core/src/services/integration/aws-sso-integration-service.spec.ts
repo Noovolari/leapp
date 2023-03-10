@@ -249,7 +249,7 @@ describe("AwsSsoIntegrationService", () => {
     const repository = { getAwsSsoIntegration: jest.fn(() => integration) } as any;
     const awsIntegrationService = new AwsSsoIntegrationService(repository, null, null, null, null, null, null) as any;
     awsIntegrationService.isAwsSsoAccessTokenExpired = jest.fn(async () => true);
-    const loginResponse = { portalUrlUnrolled: "fake-portal-url", expirationTime: new Date(0), accessToken: "fake-access-token" };
+    const loginResponse = { portalUrlUnrolled: "fake-portal-url-unrolled", expirationTime: new Date(0), accessToken: "fake-access-token" };
     awsIntegrationService.login = jest.fn(async () => loginResponse);
     awsIntegrationService.configureAwsSso = jest.fn(async () => {});
 
@@ -266,7 +266,7 @@ describe("AwsSsoIntegrationService", () => {
       fakeIntegrationId,
       integration.alias,
       fakeRegion,
-      loginResponse.portalUrlUnrolled,
+      fakePortalUrl,
       integration.browserOpening,
       true,
       "1970-01-01T00:00:00.000Z",
@@ -386,18 +386,22 @@ describe("AwsSsoIntegrationService", () => {
   test("login", async () => {
     const portalUrl = "fake-portal-url";
     const resolvedPortalUrl = "fake-resolved-portal-url";
+    const mockedSystemCerts = "mocked-system-certs";
 
     const requestMock = { end: jest.fn() };
     const httpClient = {
       request: jest.fn((actualPortalUrl, _options, responseFn: any) => {
         expect(actualPortalUrl).toBe(portalUrl);
+        expect(_options).toEqual({
+          ca: mockedSystemCerts,
+        });
         responseFn({ responseUrl: resolvedPortalUrl });
         return requestMock;
       }),
     };
     const nativeService = {
       followRedirects: { https: httpClient },
-      systemCertsAsync: jest.fn(),
+      systemCertsAsync: jest.fn(() => mockedSystemCerts),
     } as any;
 
     const generateSsoTokenResponse = { accessToken: "fake-access-token", expirationTime: "fake-expiration-time" };

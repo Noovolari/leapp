@@ -33,8 +33,6 @@ export class ExecuteService {
     if (this.nativeService.process.platform === "darwin") {
       if (command.indexOf("osascript") !== -1) {
         command = "/usr/bin/" + command;
-      } else if (command.indexOf("cd") !== -1) {
-        command = "" + command;
       }
     }
     // ========================================================

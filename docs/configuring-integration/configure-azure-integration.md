@@ -3,10 +3,10 @@ title: "Configure an Azure integration"
 description: "Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD."
 pageType: "integration"
 structured_data_how_to_title: "Configure an Azure integration"
-structured_data_how_to_tip1: "Click on the _Add integration_ button in the sidebar"
-structured_data_how_to_tip2: "Select Azure as _Integration type_"
-structured_data_how_to_tip3: "Provide the required information (described in the next section)"
-structured_data_how_to_tip4: "Click on the _Add integration_ button"
+structured_data_how_to_tip1: "Click on the _Add Integration_ button in the sidebar."
+structured_data_how_to_tip2: "Select _Azure_ as the Integration type."
+structured_data_how_to_tip3: "Provide the required information (described in the next section)."
+structured_data_how_to_tip4: "Click on the _Add integration_ button."
 social_title: "Configure an Azure integration"
 social_description: "Our Leapp integration refers to Azure Tenant which is a dedicated and trusted instance of Azure AD."
 social_relative_image_path: "azure.png"
@@ -28,19 +28,19 @@ Please refer to [How to find your Azure Active Directory tenant ID](https://docs
 
 !!! Warning
 
-    For azure-cli users with version < 2.30.0: Leapp no more support this version of the CLI. Please update to a newer version.
+    For azure-cli users with version < 2.30.0: Leapp no longer supports this version of the CLI. Please update to a newer version.
 
-To create a new Azure Integration go to the left sidebar of Leapp Desktop and click on the "+" icon. 
+To create a new Azure Integration, go to the left sidebar of Leapp Desktop and click on the :fontawesome-solid-circle-plus: icon. 
 A new modal will be presented with the following option to compile. After submitting the new Integration 
 and have logged into your *Azure Portal*, 
 *Subscriptions* will be automatically retrieved and mapped into Leapp Azure Sessions.
 
 ## How to configure an Azure integration in Leapp
 
-1. "Click on the _Add integration_ button in the sidebar"
-2. "Select Azure as _Integration type_"
-3. "Provide the required information (described in the next section)"
-4. "Click on the _Add integration_ button"
+1. Click on the _Add Integration_ button in the sidebar.
+2. Select _Azure_ as the Integration type.
+3. Provide the required information (described in the next section).
+4. Click on the _Add integration_ button.
 
 ## Required information
 

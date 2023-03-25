@@ -90,7 +90,7 @@ The extension can only be installed manually. To do so, follow these instruction
 
 ### How to use it
 
-Once you installed the extension on your browser, you need to enable the Multi-Console Extension on the Leapp Desktop App in order to use it.
+Once you've installed the extension on your browser, you need to enable the Multi-Console Extension on the Leapp Desktop App in order to use it.
 
 Click on the top-right cog icon to access the settings, click on the **Multi-Console** tab and then click **Enable Multi-Console Extension**.
 

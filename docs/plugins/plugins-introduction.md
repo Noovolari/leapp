@@ -56,7 +56,7 @@ From Leapp Desktop App, right click on a session to open the contextual menu, cl
 
     This contextual menu option is not available if you have no plugins that you can run on the selected session and/or your operating system.
 
-From Leapp CLI, you can use the command `leapp session run-plugin`. For more information on how to use this CLI command, see the [documentation](https://docs.leapp.cloud/latest/cli/scopes/session/#leapp-session-run-aws-credential-plugin)
+From Leapp CLI, you can use the command `leapp session run-plugin`. For more information on how to use this CLI command, see the [documentation](https://docs.leapp.cloud/latest/cli/scopes/session/#leapp-session-run-aws-credential-plugin).
 
 ##Plugin Menu
 
@@ -70,7 +70,7 @@ From there, you can see a list of currently installed plugins, check whether a p
 
 You can start creating a plugin [from the template](https://github.com/Noovolari/leapp-plugin-template).
 
-Leapp plugins are written in TypeScript. They must contain at least a class that extend sa base class provided by the Plugin SDK
+Leapp plugins are written in TypeScript. They must contain at least a class that extends a base class provided by the Plugin SDK.
 
 There's currently only one of these classes, `AwsCredentialsPlugin` , that can be used to create a plugin that generates temporary credentials.
 

@@ -1,4 +1,4 @@
-Once you opened the Leapp option menu - which can be accessed by clicking the top right gear icon - you can edit the following settings in the General tab
+Once you've opened the Leapp option menu - which can be accessed by clicking the top right gear icon - you can edit the following settings in the General tab
 
 ![](../../images/screens/newuxui/leapp-options.png?style=center-img)
 

@@ -35,7 +35,7 @@ An IAM Chained Role is used to access another AWS account services through a mai
 
 [How to generate temporary credentials on AWS](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp_request.html)
 
-**If you do not pass DurationSeconds parameter (as in the case of Leapp), the temporary credentials expire in 1 hour.**
+**If you do not pass the DurationSeconds parameter (as in the case of Leapp), the temporary credentials expire in 1 hour.**
 
 ## IAM User
 

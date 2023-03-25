@@ -1,6 +1,6 @@
 ## Azure credentials generation
 
-Azure generates a set of access and refresh tokens that are put inside **msal_token_cache.json** inside **.azure** directory. 
+Azure generates a set of access and refresh tokens that are put inside the **msal_token_cache.json** file inside the **.azure** directory. 
 Following is the procedure used to generate a set of credentials.
 
 !!! info
@@ -12,13 +12,13 @@ Azure Users profile info is saved in the **azureProfile.json** file inside the *
 
 ### Access strategy - login integration
 
-Before accessing Azure sessions you now have to [create](../../configuring-integration/configure-azure-integration.md){: target='_blank'} an Azure integration.
-After that, these are the steps required to login and then retrieve Azure sessions.
+Before accessing Azure sessions, you now have to [create](../../configuring-integration/configure-azure-integration.md){: target='_blank'} an Azure integration.
+After that, these are the steps required to log in and then retrieve Azure sessions.
 
-1. *msal_token_cache* and *azureProfile.json* files are cleaned for security reason.
+1. *msal_token_cache* and *azureProfile.json* files are cleaned for security reasons.
 2. We execute `az login --tenantId <TENANTID>`. We do this to obtain the updated user profile and the refresh token (associated to this integration).
 3. We extract all the Azure subscriptions associated with the integration and for each one we map a Leapp Azure session.
-4. We extract the *refresh token*, *account*, and *profile* information from *msal_token_cache and azureProfile.json* and persist them in the [System's vault](../system-vault.md){: target='_blank'}.
+4. We extract the *refresh token*, *account*, and *profile* information from *msal_token_cache* and *azureProfile.json* and persist them in the [System's vault](../system-vault.md){: target='_blank'}.
 5. We also remove the previous information from the original files, to increase security and avoid external tampering.
 
 ### Access strategy - start session
@@ -34,7 +34,7 @@ To start an Azure session we follow these steps.
 2. *azureProfile.json* is only filled with profile information from the current subscription.
 3. We write the *account information* and the *refresh token* back in the *msal_token_cache*
 4. We execute `az account get-access-token --subscriptionId <SUBSCRIPTIONID>`, to retrieve the **access token** and the **id token** of the subscription.
-5. The previous command also write *access* and *id token* back to the *msal_token_cache file*.
+5. The previous command also writes *access* and *id token* back to the *msal_token_cache* file.
 6. We update the *expiration time* of the session to the current datetime.
 7. We update the *refresh token* in the Vault with the new information.
 8. We remove the *refresh token* from the *msal_token_cache*.
@@ -42,7 +42,7 @@ To start an Azure session we follow these steps.
 
 !!! info
 
-    - The **refresh token** is a long term credential that potentially lasts for **90 days**. The **access token** is a short term credential and last for **70 minutes**. [Source](https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens){: target='_blank'}
+    - The **refresh token** is a long term credential that potentially lasts for **90 days**. The **access token** is a short term credential and lasts for **70 minutes**. [Source](https://docs.microsoft.com/en-us/azure/active-directory/develop/access-tokens){: target='_blank'}
 
 ### Access strategy - rotate session
 

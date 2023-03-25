@@ -21,7 +21,7 @@ Currently available methods:
 ###fetch
 - **`fetch`**`(url: string): any`
 
-  Retrieve the content of an URL. Returns a promise for the URL
+  Retrieve the content of a URL. Returns a promise for the URL
 
   | argument          | type |  description |
   | -------------------------- | --------- | --------|
@@ -121,7 +121,7 @@ const res = await this.pluginEnvironment.fetch(""); //Insert a custom URL
 const response = await res.json();
 ```
 
-###Example: open an URL in the browser
+###Example: open a URL in the browser
 
 ```typescript
 this.pluginEnvironment.openExternalUrl("https://leapp.cloud");

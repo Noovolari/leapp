@@ -34,7 +34,7 @@ jobs:
           cd packages/cli
           npm run prepack
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -66,10 +66,10 @@ jobs:
         id: validator
         run: |
           git fetch
-          TAG=$(git tag --points-at $GITHUB_SHA)
+          TAG=$(git tag --points-at "$GITHUB_SHA")
           MATCH=$(echo "$TAG" | grep "^cli-v[0-9]\+\.[0-9]\+\.[0-9]\+$" || true)
           if [[ $MATCH != "" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
-          echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
+          echo "VALID_TAG=$IS_VALID_TAG" >> "$GITHUB_OUTPUT"
 
       - name: If valid tag set
         if: steps.validator.outputs.VALID_TAG == 1

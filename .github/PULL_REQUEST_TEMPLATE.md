@@ -1,6 +1,6 @@
 **Changelog**
 
-List of new feature and/or fixes here.
+List of new features and/or fixes here.
 
 **Bugfixes**
 

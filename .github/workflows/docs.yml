@@ -13,27 +13,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: setup-python-3.x
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.x
 
       - name: install-dependencies
         run: |
-          pip install mkdocs-material
-          pip install mkdocs-video
-          pip install mkdocs-img2fig-plugin
-          pip install mkdocs-git-revision-date-plugin
-          pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
-          pip install mkdocs-minify-plugin
-          pip install mike
+          pip install mkdocs-material \
+                      mkdocs-video \
+                      mkdocs-img2fig-plugin \
+                      mkdocs-git-revision-date-plugin \
+                      git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git \
+                      mkdocs-minify-plugin \
+                      mike
 
       - name: get-leapp-version
         run: |
-          echo "PACKAGE_VERSION=$(cat packages/desktop-app/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')" >> $GITHUB_ENV
-          echo "${{env.PACKAGE_VERSION}}"
+          PACKAGE_VERSION=$(cat packages/desktop-app/package.json | grep version | head -1 | awk -F: '{ print $2 }' | sed 's/[",]//g' | tr -d '[[:space:]]')
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> "$GITHUB_ENV"
+          echo "$PACKAGE_VERSION"
 
       - name: deploy
         run: |

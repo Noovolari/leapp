@@ -1,4 +1,4 @@
-**Leapp is built with a security-first approach.** Every information that has to be persisted is encrypted and saved on your workstation.
+**Leapp is built with a security-first approach.** Every piece of information that has to be persisted is encrypted and saved on your workstation.
 
 We devised two main methods to store data, based on its sensitiveness.
 

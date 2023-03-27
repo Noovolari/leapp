@@ -2,7 +2,7 @@ Information that can be used, or potentially exploited, to gain access to cloud 
 
 Leapp uses [Keytar](https://github.com/atom/node-keytar/){: target='_blank'} as an interface to the secure vault on macOS, Windows and Linux systems.
 
-Every key is stored in the vault under the name **Leapp**, in the description you will find the underlying name used by Leapp to retrieve the secret.
+Every key is stored in the vault under the name **Leapp**. In the description, you will find the underlying name used by Leapp to retrieve the secret.
 
 ## Supported System Vaults
 

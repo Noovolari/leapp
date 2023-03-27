@@ -14,7 +14,7 @@ The name **Leapp** is based on the word *leap* and is pronounced */l:ip/*. We ch
 
 Leapp CLI (Command Line Interface) for Leapp is built on Node.js with [Oclif](https://oclif.io/){: target='_blank'} and the **leapp core library**. 
 
-You can follow the [installation guidelines](installation/install-leapp/){: target='_blank'} in order to make it works!
+You can follow the [installation guidelines](installation/install-leapp/){: target='_blank'} in order to make it work!
 
 It allows you to use Leapp application functionality in your terminal.
 

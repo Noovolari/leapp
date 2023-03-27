@@ -1,4 +1,4 @@
-Now it's time to add your very first configuration, follow the link to your preferred supported method and start enjoying Leapp. 
+Now it's time to add your very first configuration. Follow the link to your preferred supported method and start enjoying Leapp. 
 
 ## Sessions
 ### AWS

@@ -21,7 +21,7 @@ When users have complete control of the encryption key, they control access to t
 
 ## Criteria
 
-** During any phase of the registration and login process **the client does not provide any password-related info to the server**.
+- During any phase of the registration and login process **the client does not provide any password-related info to the server**.
 - The server **does not store any information that can be used to guess the password in a convenient way**. In other words, the system must not be prone to brute force or dictionary attacks.
 - **Any sensible data is encrypted client-side**, the server will work with encrypted blocks only.
 - All the **implementation is released as open-source**.

@@ -6,7 +6,7 @@ structured_data_how_to_title: "Configure AWS EC2 Connect"
 structured_data_how_to_tip1: "Right-click on a suitable AWS session to open the contextual menu. Click on View SSM sessions."
 structured_data_how_to_tip2: "Select the AWS region in which your instance is located. Wait for Leapp to load your instances."
 structured_data_how_to_tip3: "Select the instance and click connect. Wait for the terminal to open."
-structured_data_how_to_tip4: "Focus the terminal window and write ```/bin/bash```; press  ++return++  and you'll be inside the terminal of your Instance."
+structured_data_how_to_tip4: "Focus the terminal window and write ```/bin/bash```; press  ++return++  and you'll be inside the terminal of your instance."
 social_title: "Configure AWS EC2 Connect"
 social_description: "How to configure AWS EC2 Connect. You can directly connect to an AWS EC2 instance from Leapp through AWS System Manager (AWS SSM)."
 social_relative_image_path: "configure-ec2-connect.png"
@@ -36,13 +36,13 @@ You can directly connect to an AWS EC2 instance from Leapp through AWS System Ma
 
 To correctly connect follow these steps:
 
-1. Right-click on a suitable AWS session to open the contextual menu
-2. Click on View SSM sessions
-3. Select the AWS region in which your instance is located
-4. Wait for Leapp to load your instances
-5. Select the instance and click connect
-6. Wait for the terminal to open
-7. Focus the terminal window and write ```/bin/bash```; press  ++return++  and you'll be inside the terminal of your Instance
+1. Right-click on a suitable AWS session to open the contextual menu.
+2. Click on View SSM sessions.
+3. Select the AWS region in which your instance is located.
+4. Wait for Leapp to load your instances.
+5. Select the instance and click connect.
+6. Wait for the terminal to open.
+7. Focus the terminal window and write ```/bin/bash```; press  ++return++  and you'll be inside the terminal of your instance.
 
 ## Video tutorial
 

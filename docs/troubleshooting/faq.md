@@ -1,7 +1,7 @@
 ## I'm using the open-source app, do you store my data online?
 **NO.**
 
-The open-source software don't transfer, persist, or share anything with other services. All your data is secured and encrypted on your workstation.
+The open-source software doesn't transfer, persist, or share anything with other services. All your data is secured and encrypted on your workstation.
 
 **Nobody can access it, not even ourselves.**
 
@@ -42,7 +42,7 @@ ln -s /path/to/my/az /usr/local/bin/az
 
 ## How can I add support to a new SAML 2.0 Identity Provider?
 
-To add support tu a new SAML 2.0 Identity Provider, you have to perform the following steps:
+To add support to a new SAML 2.0 Identity Provider, you have to perform the following steps:
 
 * create a [Fork](https://github.com/Noovolari/leapp/fork) of the Noovolari/leapp GitHub repository;
 * create a Pull Request and set up your local environment following _[Install dependencies and build packages](https://github.com/Noovolari/leapp/blob/master/DEVELOPMENT.md#development-environment-setup)_ section of the DEVELOPMENT.md;

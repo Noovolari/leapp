@@ -28,9 +28,7 @@ const getRootCause = async (sourceMapFilePath, sourceMapLine, sourceMapColumn) =
 
   const fileContent = fs.readFileSync(sourceMapFilePath);
   const rawSourceMap = JSON.parse(fileContent.toString());
-  //console.log(rawSourceMap);
   const consumer = await new sourceMap.SourceMapConsumer(rawSourceMap);
-  //console.log(consumer);
 
   let rootCause = consumer.originalPositionFor({
     line: sourceMapLine,

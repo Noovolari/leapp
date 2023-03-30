@@ -1,6 +1,6 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.133",
+  "version": "0.1.134-rc2",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
@@ -99,6 +99,7 @@
   "dependencies": {
     "folder-hash": "^4.0.2",
     "require-module": "^0.1.0",
+    "stacktrace-js": "^2.0.2",
     "tsoa": "^4.1.0"
   }
 }

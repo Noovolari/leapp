@@ -18,5 +18,14 @@ export class ErrorService implements ErrorHandler {
     } else {
       logService.log(new LoggedEntry(error.message, this, LogLevel.error, true, error.stack));
     }
+
+    /**StackTrace.fromError(error).then((stackFrames: StackTrace.StackFrame[]) => {
+      if (error instanceof LoggedException) {
+        error.customStack = JSON.stringify(stackFrames, null, 2);
+        logService.log(error);
+      } else {
+        logService.log(new LoggedEntry(error.message, this, LogLevel.error, true, JSON.stringify(stackFrames, null, 2)));
+      }
+    });*/
   }
 }

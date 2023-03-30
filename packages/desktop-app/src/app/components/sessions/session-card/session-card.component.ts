@@ -82,6 +82,7 @@ export class SessionCardComponent implements OnInit {
    * Start the selected sessions
    */
   async startSession(): Promise<void> {
+    throw new Error("booooooom");
     await this.selectedSessionActionService.startSession(this.session);
   }
 

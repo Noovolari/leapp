@@ -33,6 +33,9 @@ import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
 import { HttpClientProvider } from "leapp-team-core/http/http-client.provider";
 import { HttpClientInterface } from "leapp-team-core/http/http-client-interface";
 
+const CURRENT_WORKSPACE_KEYCHAIN_KEY = "current-workspace";
+const LOCAL_WORKSPACE_NAME = "local";
+
 export class TeamService {
   httpClient: HttpClientInterface;
   readonly signedInUser$: BehaviorSubject<User>;
@@ -126,6 +129,7 @@ export class TeamService {
     }
     this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
     this.workspaceService.reloadWorkspace();
+    await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, LOCAL_WORKSPACE_NAME);
     this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
   }
 
@@ -151,6 +155,7 @@ export class TeamService {
     for (const sessionDto of sessionsDtos) {
       await this.syncSessionsSecret(sessionDto);
     }
+    await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, signedInUser.teamName);
     this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
     return localSecretDtos;
   }
@@ -161,6 +166,19 @@ export class TeamService {
 
   setEncryptionKeyToPublicRsaKey(publicRsaKey: string): void {
     this.fileService.aesKey = publicRsaKey;
+  }
+
+  async setCurrentWorkspace(): Promise<void> {
+    const currentWorkspace = await this.keyChainService.getSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY);
+    if (currentWorkspace === null) {
+      await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, LOCAL_WORKSPACE_NAME);
+    } else {
+      // TODO: check if the user is logged in.
+      //    If it is logged in, make sure the token is not expired.
+      //    If it is expired, log it out and set the current-workspace to local and return.
+      //    If it is not expired, invoke syncSecrets().
+      await this.syncSecrets();
+    }
   }
 
   private async getPublicRsaKey(): Promise<string> {

@@ -172,6 +172,10 @@ export class AppComponent implements OnInit {
     ConfigurationService.setForcedEndpoint(environment.apiEndpoint);
     await this.teamService.checkSignedInUser();
 
+    // Check the existence of a current-workspace key in the system keychain and
+    // load the corresponding workspace
+    await this.teamService.setCurrentWorkspace();
+
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit
     await this.router.navigate(["/dashboard"]);

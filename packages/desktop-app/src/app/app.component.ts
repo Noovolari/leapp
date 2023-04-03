@@ -170,7 +170,6 @@ export class AppComponent implements OnInit {
     }
 
     ConfigurationService.setForcedEndpoint(environment.apiEndpoint);
-    await this.teamService.checkSignedInUser();
 
     // Check the existence of a current-workspace key in the system keychain and
     // load the corresponding workspace
@@ -204,8 +203,6 @@ export class AppComponent implements OnInit {
 
     this.remoteProceduresServer.stopServer();
 
-    //await this.teamService.signOut();
-
     // Stop all the sessions
     const sessions = this.appProviderService.sessionManagementService.getSessions();
     sessions.forEach((s) => {
@@ -213,7 +210,7 @@ export class AppComponent implements OnInit {
     });
     this.appProviderService.sessionManagementService.updateSessions(sessions);
 
-    // We need the Try/Catch as we have a the possibility to call the method without sessions
+    // We need the Try/Catch as we have the possibility to call the method without sessions
     try {
       // Clean the config file
       await this.azureCoreService.stopAllSessionsOnQuit();
@@ -221,6 +218,9 @@ export class AppComponent implements OnInit {
     } catch (err) {
       this.loggingService.log(new LoggedException("No sessions to stop, skipping...", this, LogLevel.error, true, err.stack));
     }
+
+    // Delete team-workspace file if exists, for security reasons
+    await this.teamService.deleteTeamWorkspace();
 
     // Finally quit
     this.appService.quit();

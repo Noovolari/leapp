@@ -43,8 +43,6 @@ export class TeamService {
   private readonly encryptionProvider: EncryptionProvider;
   private readonly vaultProvider: VaultProvider;
   private readonly userProvider: UserProvider;
-  private readonly currentWorkspacePath: string;
-  private readonly localWorkspacePath: string;
   private readonly httpClientProvider: HttpClientProvider;
 
   constructor(
@@ -64,25 +62,27 @@ export class TeamService {
     private readonly behaviouralSubjectService?: BehaviouralSubjectService
   ) {
     const apiEndpoint = "http://localhost:3000";
+    this._signedInUserState$ = new BehaviorSubject<User>(null);
     this.encryptionProvider = new EncryptionProvider(crypto);
     this.httpClientProvider = new HttpClientProvider();
     this.vaultProvider = new VaultProvider(apiEndpoint, this.httpClientProvider, this.encryptionProvider);
     this.userProvider = new UserProvider(apiEndpoint, this.httpClientProvider, this.encryptionProvider);
-    this.currentWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
-    this.localWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
   }
 
-  setWorkspaceFileName(signedInUser: User): void {
-    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
+  get signedInUserState(): BehaviorSubject<User> {
+    return this._signedInUserState$;
   }
 
-  async checkSignedInUser(): Promise<boolean> {
-    const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
-    if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
-      await this.signOut(signedInUser);
+  async setCurrentWorkspace(): Promise<void> {
+    this.signedInUserState.next(JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)));
+    const currentWorkspaceName = await this.getCurrentWorkspaceName();
+    // Local or null workspace saved in keychain
+    if (currentWorkspaceName === null || currentWorkspaceName === LOCAL_WORKSPACE_NAME) {
+      await this.setLocalWorkspace();
+      // Remote workspace saved in keychain
+    } else if (currentWorkspaceName !== LOCAL_WORKSPACE_NAME) {
+      await this.syncSecrets();
     }
-    this._signedInUserState$.next(signedInUser);
-    return signedInUser !== null;
   }
 
   async signIn(email: string, password: string): Promise<void> {
@@ -91,49 +91,30 @@ export class TeamService {
   }
 
   async setSignedInUser(signedInUser: User): Promise<void> {
-    if (signedInUser !== undefined) {
-      await this.keyChainService.saveSecret(constants.appName, this.teamSignedInUserKeychainKey, JSON.stringify(signedInUser));
-      this.httpClientProvider.accessToken = signedInUser.accessToken;
-    } else {
-      await this.keyChainService.deleteSecret(constants.appName, this.teamSignedInUserKeychainKey);
-      this.httpClientProvider.accessToken = "";
-    }
-    this._signedInUserState$.next(signedInUser);
+    await this.keyChainService.saveSecret(constants.appName, this.teamSignedInUserKeychainKey, JSON.stringify(signedInUser));
+    this.signedInUserState.next(signedInUser);
   }
 
-  async signOut(signedInUser: User): Promise<void> {
-    await this.setSignedInUser(undefined);
-    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
-    this.workspaceService.reloadWorkspace();
-    await this.switchToLocal();
+  async signOut(): Promise<void> {
+    await this.keyChainService.deleteSecret(constants.appName, this.teamSignedInUserKeychainKey);
+    this.httpClientProvider.accessToken = "";
+    if ((await this.getCurrentWorkspaceName()) !== LOCAL_WORKSPACE_NAME) {
+      const signedInUser = this.signedInUserState.getValue();
+      this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
+      this.workspaceService.reloadWorkspace();
+      await this.deleteCurrentWorkspace();
+      await this.setLocalWorkspace();
+    }
+    this.signedInUserState.next(null);
   }
 
-  async switchToLocal(): Promise<void> {
-    this.fileService.aesKey = this.nativeService.machineId;
-    // TODO: refactor to teamNames, so we can save multiple teams
-    const workspace = this.workspaceService.getWorkspace();
-    for (const awsSsoIntegration of workspace.awsSsoIntegrations) {
-      const concreteIntegrationService = this.integrationFactory.getIntegrationService(awsSsoIntegration.type);
-      await concreteIntegrationService.logout(awsSsoIntegration.id);
-    }
-    for (const azureIntegration of workspace.azureIntegrations) {
-      const concreteIntegrationService = this.integrationFactory.getIntegrationService(azureIntegration.type);
-      await concreteIntegrationService.logout(azureIntegration.id);
-    }
-    while (workspace.sessions.length > 0) {
-      const concreteSessionService = this.sessionFactory.getSessionService(workspace.sessions[0].type);
-      await concreteSessionService.delete(workspace.sessions[0].sessionId);
-    }
-    this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
-    this.workspaceService.reloadWorkspace();
-    await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, LOCAL_WORKSPACE_NAME);
-    this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
-  }
-
-  async syncSecrets(signedInUser: User): Promise<LocalSecretDto[]> {
-    if (!(await this.checkSignedInUser())) {
+  async syncSecrets(): Promise<void> {
+    const signedInUser = this.signedInUserState.getValue();
+    if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
+      await this.signOut();
       return;
     }
+    this.httpClientProvider.accessToken = signedInUser.accessToken;
     this.fileService.aesKey = signedInUser.publicRSAKey;
     this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
     this.workspaceService.removeWorkspace();
@@ -151,54 +132,52 @@ export class TeamService {
     for (const sessionDto of sessionsDtos) {
       await this.syncSessionsSecret(sessionDto);
     }
-    await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, signedInUser.teamName);
-    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
-    return localSecretDtos;
+    await this.setCurrentWorkspaceName(signedInUser.teamName);
+    this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
   }
 
-  setEncryptionKeyToMachineId(): void {
+  async deleteTeamWorkspace() {
+    if ((await this.getCurrentWorkspaceName()) !== LOCAL_WORKSPACE_NAME) {
+      await this.deleteCurrentWorkspace();
+    }
+  }
+
+  async switchToLocalWorkspace() {
+    await this.deleteTeamWorkspace();
+    await this.setLocalWorkspace();
+  }
+
+  private async getCurrentWorkspaceName(): Promise<string> {
+    return await this.keyChainService.getSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY);
+  }
+
+  private async setCurrentWorkspaceName(workspaceName: string): Promise<void> {
+    await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, workspaceName);
+  }
+
+  private async setLocalWorkspace(): Promise<void> {
     this.fileService.aesKey = this.nativeService.machineId;
+    this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
+    this.workspaceService.reloadWorkspace();
+    await this.setCurrentWorkspaceName(LOCAL_WORKSPACE_NAME);
+    this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
   }
 
-  setEncryptionKeyToPublicRsaKey(publicRsaKey: string): void {
-    this.fileService.aesKey = publicRsaKey;
-  }
-
-  async setCurrentWorkspace(): Promise<void> {
-    const currentWorkspace = await this.keyChainService.getSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY);
-    const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
-    if (currentWorkspace === null) {
-      await this.switchToLocal();
-    } else if (currentWorkspace === LOCAL_WORKSPACE_NAME) {
-      if (signedInUser) {
-        await this.signOut(signedInUser);
-      }
-    } else {
-      // TODO: check if the user is logged in.
-      //    If it is logged in, make sure the token is not expired.
-      //    If it is expired, log it out and set the current-workspace to local and return.
-      //    If it is not expired, invoke syncSecrets().
-      if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
-        await this.signOut(signedInUser);
-      } else {
-        await this.syncSecrets(signedInUser);
-      }
+  private async deleteCurrentWorkspace(): Promise<void> {
+    const workspace = this.workspaceService.getWorkspace();
+    for (const awsSsoIntegration of workspace.awsSsoIntegrations) {
+      const concreteIntegrationService = this.integrationFactory.getIntegrationService(awsSsoIntegration.type);
+      await concreteIntegrationService.logout(awsSsoIntegration.id);
     }
-  }
-
-  get signedInUserState(): BehaviorSubject<User> {
-    if (this._signedInUserState$ === undefined) {
-      this._signedInUserState$ = new BehaviorSubject<User>(null);
-      this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey).then((res) => {
-        this._signedInUserState$.next(JSON.parse(res));
-      });
+    for (const azureIntegration of workspace.azureIntegrations) {
+      const concreteIntegrationService = this.integrationFactory.getIntegrationService(azureIntegration.type);
+      await concreteIntegrationService.logout(azureIntegration.id);
     }
-    return this._signedInUserState$;
-  }
-
-  private async getPublicRsaKey(): Promise<string> {
-    const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
-    return signedInUser.publicRSAKey;
+    while (workspace.sessions.length > 0) {
+      const concreteSessionService = this.sessionFactory.getSessionService(workspace.sessions[0].type);
+      await concreteSessionService.delete(workspace.sessions[0].sessionId);
+    }
+    this.workspaceService.removeWorkspace();
   }
 
   private async syncIntegrationSecret(localIntegrationDto: LocalSecretDto): Promise<void> {

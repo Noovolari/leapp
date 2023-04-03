@@ -166,9 +166,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   async switchWorkspace(selectedWorkspace?: string): Promise<void> {
     if (selectedWorkspace === "local") {
-      this.leappCoreService.teamService.switchToLocal();
+      await this.leappCoreService.teamService.switchToLocalWorkspace();
     } else {
-      this.leappCoreService.teamService.syncSecrets(this.leappCoreService.teamService.signedInUser$.getValue());
+      await this.leappCoreService.teamService.syncSecrets();
     }
   }
 }

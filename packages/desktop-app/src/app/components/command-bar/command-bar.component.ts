@@ -283,11 +283,11 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   async logoutFromTeamPortal(): Promise<void> {
-    await this.teamService.signOut(this.teamService.signedInUser$.getValue());
+    await this.teamService.signOut();
   }
 
   async syncTeamSecrets(): Promise<void> {
-    await this.teamService.syncSecrets(this.teamService.signedInUser$.getValue());
+    await this.teamService.syncSecrets();
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

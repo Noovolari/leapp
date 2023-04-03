@@ -29,8 +29,7 @@ export class LoginTeamDialogComponent implements OnInit {
     this.messageToasterService.toast(`Welcome ${user.firstName}`, ToastLevel.success, "Log In to Team Portal");
   }
 
-  onError(error: string | number): void {
-    this.teamService.setEncryptionKeyToMachineId();
+  async onError(error: string | number): Promise<void> {
     this.loggingService.log(new LoggedEntry(`Error while trying to sign in: ${error}`, this, LogLevel.warn));
     this.messageToasterService.toast(`Error while trying to sign in: ${error}`, ToastLevel.warn, "Log In to Team Portal");
   }

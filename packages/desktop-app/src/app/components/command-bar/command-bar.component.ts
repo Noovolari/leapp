@@ -175,7 +175,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       globalFilteredSessions.next(sessions);
     });
 
-    this.userSubscription = this.teamService.signedInUser$.subscribe((user: User) => (this.teamUser = user));
+    this.userSubscription = this.teamService.signedInUserState.subscribe((user: User) => (this.teamUser = user));
 
     this.appProviderService.workspaceFileNameService.workspaceFileNameBehaviouralSubject.subscribe(() => {
       this.workspaceName = this.appProviderService.workspaceFileNameService.getWorkspaceName();
@@ -283,11 +283,11 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   async logoutFromTeamPortal(): Promise<void> {
-    await this.teamService.signOut();
+    await this.teamService.signOut(this.teamService.signedInUser$.getValue());
   }
 
   async syncTeamSecrets(): Promise<void> {
-    await this.teamService.syncSecrets();
+    await this.teamService.syncSecrets(this.teamService.signedInUser$.getValue());
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

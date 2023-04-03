@@ -204,7 +204,7 @@ export class AppComponent implements OnInit {
 
     this.remoteProceduresServer.stopServer();
 
-    await this.teamService.signOut();
+    //await this.teamService.signOut();
 
     // Stop all the sessions
     const sessions = this.appProviderService.sessionManagementService.getSessions();

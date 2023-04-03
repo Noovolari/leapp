@@ -78,7 +78,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     this.leappCoreService.workspaceFileNameService.workspaceFileNameBehaviouralSubject.subscribe(() => {
       this.workspaceName = this.leappCoreService.workspaceFileNameService.getWorkspaceName();
     });
-    this.userSubscription = this.leappCoreService.teamService.signedInUser$.subscribe((user: User) => (this.teamUser = user));
+    this.userSubscription = this.leappCoreService.teamService.signedInUserState.subscribe((user: User) => (this.teamUser = user));
   }
 
   ngOnDestroy(): void {
@@ -168,7 +168,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     if (selectedWorkspace === "local") {
       this.leappCoreService.teamService.switchToLocal();
     } else {
-      this.leappCoreService.teamService.syncSecrets();
+      this.leappCoreService.teamService.syncSecrets(this.leappCoreService.teamService.signedInUser$.getValue());
     }
   }
 }

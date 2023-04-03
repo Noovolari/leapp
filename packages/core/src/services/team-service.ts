@@ -38,7 +38,7 @@ const LOCAL_WORKSPACE_NAME = "local";
 
 export class TeamService {
   httpClient: HttpClientInterface;
-  readonly signedInUser$: BehaviorSubject<User>;
+  private _signedInUserState$: BehaviorSubject<User>;
   private readonly teamSignedInUserKeychainKey = "team-signed-in-user";
   private readonly encryptionProvider: EncryptionProvider;
   private readonly vaultProvider: VaultProvider;
@@ -68,10 +68,8 @@ export class TeamService {
     this.httpClientProvider = new HttpClientProvider();
     this.vaultProvider = new VaultProvider(apiEndpoint, this.httpClientProvider, this.encryptionProvider);
     this.userProvider = new UserProvider(apiEndpoint, this.httpClientProvider, this.encryptionProvider);
-    this.signedInUser$ = new BehaviorSubject(undefined);
     this.currentWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
     this.localWorkspacePath = this.nativeService.os.homedir() + "/" + constants.lockFileDestination + ".local";
-    this.signedInUser$.next(null);
   }
 
   setWorkspaceFileName(signedInUser: User): void {
@@ -81,9 +79,9 @@ export class TeamService {
   async checkSignedInUser(): Promise<boolean> {
     const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
     if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
-      await this.signOut();
+      await this.signOut(signedInUser);
     }
-    this.signedInUser$.next(signedInUser);
+    this._signedInUserState$.next(signedInUser);
     return signedInUser !== null;
   }
 
@@ -100,11 +98,10 @@ export class TeamService {
       await this.keyChainService.deleteSecret(constants.appName, this.teamSignedInUserKeychainKey);
       this.httpClientProvider.accessToken = "";
     }
-    this.signedInUser$.next(signedInUser);
+    this._signedInUserState$.next(signedInUser);
   }
 
-  async signOut(): Promise<void> {
-    const signedInUser = this.signedInUser$.getValue();
+  async signOut(signedInUser: User): Promise<void> {
     await this.setSignedInUser(undefined);
     this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
     this.workspaceService.reloadWorkspace();
@@ -133,11 +130,10 @@ export class TeamService {
     this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
   }
 
-  async syncSecrets(): Promise<LocalSecretDto[]> {
+  async syncSecrets(signedInUser: User): Promise<LocalSecretDto[]> {
     if (!(await this.checkSignedInUser())) {
       return;
     }
-    const signedInUser = this.signedInUser$.getValue();
     this.fileService.aesKey = signedInUser.publicRSAKey;
     this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
     this.workspaceService.removeWorkspace();
@@ -172,10 +168,10 @@ export class TeamService {
     const currentWorkspace = await this.keyChainService.getSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY);
     const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
     if (currentWorkspace === null) {
-      await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, LOCAL_WORKSPACE_NAME);
+      await this.switchToLocal();
     } else if (currentWorkspace === LOCAL_WORKSPACE_NAME) {
       if (signedInUser) {
-        await this.signOut();
+        await this.signOut(signedInUser);
       }
     } else {
       // TODO: check if the user is logged in.
@@ -183,13 +179,21 @@ export class TeamService {
       //    If it is expired, log it out and set the current-workspace to local and return.
       //    If it is not expired, invoke syncSecrets().
       if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
-        await this.signOut();
+        await this.signOut(signedInUser);
       } else {
-        await this.syncSecrets();
-        return;
+        await this.syncSecrets(signedInUser);
       }
-      await this.switchToLocal();
     }
+  }
+
+  get signedInUserState(): BehaviorSubject<User> {
+    if (this._signedInUserState$ === undefined) {
+      this._signedInUserState$ = new BehaviorSubject<User>(null);
+      this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey).then((res) => {
+        this._signedInUserState$.next(JSON.parse(res));
+      });
+    }
+    return this._signedInUserState$;
   }
 
   private async getPublicRsaKey(): Promise<string> {

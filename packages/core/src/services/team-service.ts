@@ -170,14 +170,25 @@ export class TeamService {
 
   async setCurrentWorkspace(): Promise<void> {
     const currentWorkspace = await this.keyChainService.getSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY);
+    const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)) as User;
     if (currentWorkspace === null) {
       await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, LOCAL_WORKSPACE_NAME);
+    } else if (currentWorkspace === LOCAL_WORKSPACE_NAME) {
+      if (signedInUser) {
+        await this.signOut();
+      }
     } else {
       // TODO: check if the user is logged in.
       //    If it is logged in, make sure the token is not expired.
       //    If it is expired, log it out and set the current-workspace to local and return.
       //    If it is not expired, invoke syncSecrets().
-      await this.syncSecrets();
+      if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
+        await this.signOut();
+      } else {
+        await this.syncSecrets();
+        return;
+      }
+      await this.switchToLocal();
     }
   }
 

@@ -88,3 +88,4 @@ packages/dpapi-addon/build
 packages/desktop-app/integration-tests/.env.ts
 
 nightly-version
+packages/desktop-app/projects

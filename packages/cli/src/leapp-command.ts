@@ -23,6 +23,7 @@ export abstract class LeappCommand extends Command {
   }
 
   async init(): Promise<void> {
+    await this.cliProviderService.teamService.setCurrentWorkspace();
     this.cliProviderService.awsSsoRoleService.setAwsIntegrationDelegate(this.cliProviderService.awsSsoIntegrationService);
     const isDesktopAppRunning = await this.cliProviderService.remoteProceduresClient.isDesktopAppRunning();
     if (!isDesktopAppRunning) {

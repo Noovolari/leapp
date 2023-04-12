@@ -7,7 +7,9 @@ export class FileService {
   private readSubscription: Subscription;
   private _aesKey: string;
 
-  constructor(private nativeService: INativeService) {}
+  constructor(private nativeService: INativeService) {
+    this.aesKey = this.nativeService.machineId;
+  }
 
   get aesKey(): string {
     return this._aesKey;

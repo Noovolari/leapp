@@ -81,7 +81,12 @@ export class TeamService {
       await this.setLocalWorkspace();
       // Remote workspace saved in keychain
     } else if (currentWorkspaceName !== LOCAL_WORKSPACE_NAME) {
-      await this.syncSecrets();
+      try {
+        await this.syncSecrets();
+      } catch (error) {
+        // TODO: NOTIFY USER
+        await this.signOut();
+      }
     }
   }
 
@@ -96,7 +101,6 @@ export class TeamService {
   }
 
   async signOut(): Promise<void> {
-    await this.keyChainService.deleteSecret(constants.appName, this.teamSignedInUserKeychainKey);
     this.httpClientProvider.accessToken = "";
     if ((await this.getCurrentWorkspaceName()) !== LOCAL_WORKSPACE_NAME) {
       const signedInUser = this.signedInUserState.getValue();
@@ -105,12 +109,14 @@ export class TeamService {
       await this.deleteCurrentWorkspace();
       await this.setLocalWorkspace();
     }
+    await this.keyChainService.deleteSecret(constants.appName, this.teamSignedInUserKeychainKey);
     this.signedInUserState.next(null);
   }
 
   async syncSecrets(): Promise<void> {
     const signedInUser = this.signedInUserState.getValue();
-    if (signedInUser && this.isJwtTokenExpired(signedInUser.accessToken)) {
+    if (!signedInUser || this.isJwtTokenExpired(signedInUser.accessToken)) {
+      // TODO: NOTIFY USER
       await this.signOut();
       return;
     }
@@ -118,6 +124,7 @@ export class TeamService {
     this.fileService.aesKey = signedInUser.publicRSAKey;
     this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
     this.workspaceService.removeWorkspace();
+    // TODO: copy or merge local workspace settings like theme
     this.workspaceService.createWorkspace();
     this.workspaceService.reloadWorkspace();
     const rsaKeys = await this.getRSAKeys(signedInUser);
@@ -128,12 +135,14 @@ export class TeamService {
     for (const integrationDto of integrationDtos) {
       await this.syncIntegrationSecret(integrationDto as AwsSsoLocalIntegrationDto);
     }
-    const sessionsDtos = localSecretDtos.filter((secret) => secret.secretType !== SecretType.awsSsoIntegration);
+    const sessionsDtos = localSecretDtos.filter(
+      (secret) => secret.secretType !== SecretType.awsSsoIntegration && secret.secretType !== SecretType.azureIntegration
+    );
     for (const sessionDto of sessionsDtos) {
       await this.syncSessionsSecret(sessionDto);
     }
     await this.setCurrentWorkspaceName(signedInUser.teamName);
-    this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
+    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
   }
 
   async deleteTeamWorkspace() {
@@ -160,7 +169,7 @@ export class TeamService {
     this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
     this.workspaceService.reloadWorkspace();
     await this.setCurrentWorkspaceName(LOCAL_WORKSPACE_NAME);
-    this.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository();
+    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
   }
 
   private async deleteCurrentWorkspace(): Promise<void> {

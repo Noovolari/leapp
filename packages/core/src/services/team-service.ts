@@ -100,7 +100,7 @@ export class TeamService {
     this.httpClientProvider.accessToken = "";
     if ((await this.getCurrentWorkspaceName()) !== LOCAL_WORKSPACE_NAME) {
       const signedInUser = this.signedInUserState.getValue();
-      this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
+      this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
       this.workspaceService.reloadWorkspace();
       await this.deleteCurrentWorkspace();
       await this.setLocalWorkspace();
@@ -116,7 +116,7 @@ export class TeamService {
     }
     this.httpClientProvider.accessToken = signedInUser.accessToken;
     this.fileService.aesKey = signedInUser.publicRSAKey;
-    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamName));
+    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
     this.workspaceService.removeWorkspace();
     this.workspaceService.createWorkspace();
     this.workspaceService.reloadWorkspace();

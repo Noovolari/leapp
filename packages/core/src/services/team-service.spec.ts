@@ -154,7 +154,7 @@ describe("TeamService", () => {
     createTeamServiceInstance();
     teamService.getCurrentWorkspaceName = jest.fn(() => "remote-workspace-name");
     teamService._signedInUserState$ = {
-      getValue: jest.fn(() => ({ teamName: "mock-team-name" })),
+      getValue: jest.fn(() => ({ teamId: "1" })),
       next: jest.fn(),
     } as any;
     teamService.getTeamLockFileName = jest.fn(() => "mock-value");
@@ -168,7 +168,7 @@ describe("TeamService", () => {
     await teamService.signOut();
 
     expect(teamService._signedInUserState$.getValue).toHaveBeenCalled();
-    expect(teamService.getTeamLockFileName).toHaveBeenCalledWith("mock-team-name");
+    expect(teamService.getTeamLockFileName).toHaveBeenCalledWith("1");
     expect(workspaceService.setWorkspaceFileName).toHaveBeenCalledWith("mock-value");
     expect(workspaceService.reloadWorkspace).toHaveBeenCalled();
     expect(teamService.deleteCurrentWorkspace).toHaveBeenCalled();

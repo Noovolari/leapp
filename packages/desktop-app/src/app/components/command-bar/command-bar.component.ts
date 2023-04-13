@@ -22,7 +22,6 @@ import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { User } from "leapp-team-core/user/user";
 import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
-import { TeamService } from "@noovolari/leapp-core/services/team-service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -82,8 +81,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private userSubscription;
 
   private currentSegment: Segment;
-  private teamService: TeamService;
   private behaviouralSubjectService: BehaviouralSubjectService;
+  private workspaceNameSubscription;
 
   constructor(
     public optionsService: OptionsService,
@@ -94,8 +93,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     private windowService: WindowService
   ) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
-    this.teamService = appProviderService.teamService;
-    this.workspaceName = appProviderService.workspaceFileNameService.getWorkspaceName();
 
     this.filterExtended = false;
     this.compactMode = false;
@@ -175,10 +172,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       globalFilteredSessions.next(sessions);
     });
 
-    this.userSubscription = this.teamService.signedInUserState.subscribe((user: User) => (this.teamUser = user));
+    this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.teamUser = user));
 
-    this.appProviderService.workspaceFileNameService.workspaceFileNameBehaviouralSubject.subscribe(() => {
-      this.workspaceName = this.appProviderService.workspaceFileNameService.getWorkspaceName();
+    this.workspaceNameSubscription = this.appProviderService.teamService.workspaceNameState.subscribe((workspaceName: string) => {
+      this.workspaceName = workspaceName;
     });
   }
 
@@ -191,6 +188,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.subscription5.unsubscribe();
     this.subscription6.unsubscribe();
     this.userSubscription.unsubscribe();
+    this.workspaceNameSubscription.unsubscribe();
   }
 
   ngAfterContentChecked(): void {
@@ -283,11 +281,11 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   async logoutFromTeamPortal(): Promise<void> {
-    await this.teamService.signOut();
+    await this.appProviderService.teamService.signOut();
   }
 
   async syncTeamSecrets(): Promise<void> {
-    await this.teamService.syncSecrets();
+    await this.appProviderService.teamService.syncSecrets();
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

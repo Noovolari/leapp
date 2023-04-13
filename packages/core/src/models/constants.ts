@@ -5,6 +5,7 @@ export const constants = {
   lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",
   workspaceLastVersion: 3,
+  localWorkspaceName: "My Workspace",
 
   //Aws
   samlRoleSessionDuration: 3600, // 1h

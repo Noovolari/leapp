@@ -69,13 +69,13 @@ describe("TeamService", () => {
       next: jest.fn(),
     };
     teamService.setLocalWorkspace = jest.fn();
-    teamService.getCurrentWorkspaceName = jest.fn(() => "local");
+    teamService.getKeychainCurrentWorkspace = jest.fn(() => "local");
     teamService.teamSignedInUserKeychainKey = "mock-team-signed-in-key";
 
     await teamService.setCurrentWorkspace();
     expect(teamService.keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, "mock-team-signed-in-key");
     expect(teamService._signedInUserState$.next).toHaveBeenCalledWith({ mockKey: "mockValue" });
-    expect(teamService.getCurrentWorkspaceName).toHaveBeenCalled();
+    expect(teamService.getKeychainCurrentWorkspace).toHaveBeenCalled();
     expect(teamService.setLocalWorkspace).toHaveBeenCalled();
   });
 
@@ -88,14 +88,14 @@ describe("TeamService", () => {
       next: jest.fn(),
     };
     teamService.setLocalWorkspace = jest.fn();
-    teamService.getCurrentWorkspaceName = jest.fn(() => "team-name");
+    teamService.getKeychainCurrentWorkspace = jest.fn(() => "team-name");
     teamService.teamSignedInUserKeychainKey = "mock-team-signed-in-key";
     teamService.syncSecrets = jest.fn();
 
     await teamService.setCurrentWorkspace();
     expect(teamService.keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, "mock-team-signed-in-key");
     expect(teamService._signedInUserState$.next).toHaveBeenCalledWith({ mockKey: "mockValue" });
-    expect(teamService.getCurrentWorkspaceName).toHaveBeenCalled();
+    expect(teamService.getKeychainCurrentWorkspace).toHaveBeenCalled();
     expect(teamService.setLocalWorkspace).not.toHaveBeenCalled();
     expect(teamService.syncSecrets).toHaveBeenCalled();
   });
@@ -109,7 +109,7 @@ describe("TeamService", () => {
       next: () => {},
     };
     teamService.setLocalWorkspace = () => {};
-    teamService.getCurrentWorkspaceName = () => "team-name";
+    teamService.getKeychainCurrentWorkspace = () => "team-name";
     teamService.teamSignedInUserKeychainKey = "mock-team-signed-in-key";
     teamService.syncSecrets = () => {
       throw new Error();
@@ -152,9 +152,9 @@ describe("TeamService", () => {
 
   test("signOut, a remote workspace is currently set", async () => {
     createTeamServiceInstance();
-    teamService.getCurrentWorkspaceName = jest.fn(() => "remote-workspace-name");
+    teamService.getKeychainCurrentWorkspace = jest.fn(() => "remote-workspace-name");
     teamService._signedInUserState$ = {
-      getValue: jest.fn(() => ({ teamName: "mock-team-name" })),
+      getValue: jest.fn(() => ({ teamId: "1" })),
       next: jest.fn(),
     } as any;
     teamService.getTeamLockFileName = jest.fn(() => "mock-value");
@@ -168,7 +168,7 @@ describe("TeamService", () => {
     await teamService.signOut();
 
     expect(teamService._signedInUserState$.getValue).toHaveBeenCalled();
-    expect(teamService.getTeamLockFileName).toHaveBeenCalledWith("mock-team-name");
+    expect(teamService.getTeamLockFileName).toHaveBeenCalledWith("1");
     expect(workspaceService.setWorkspaceFileName).toHaveBeenCalledWith("mock-value");
     expect(workspaceService.reloadWorkspace).toHaveBeenCalled();
     expect(teamService.deleteCurrentWorkspace).toHaveBeenCalled();
@@ -179,7 +179,7 @@ describe("TeamService", () => {
 
   test("signOut, a local workspace is currently set", async () => {
     createTeamServiceInstance();
-    teamService.getCurrentWorkspaceName = jest.fn(() => "local");
+    teamService.getKeychainCurrentWorkspace = jest.fn(() => "local");
     teamService._signedInUserState$ = {
       getValue: jest.fn(() => {}),
       next: jest.fn(),
@@ -218,6 +218,9 @@ describe("TeamService", () => {
       teamService._signedInUserState$ = {
         getValue: jest.fn(() => signedInUser),
       };
+      teamService._workspaceNameState$ = {
+        next: jest.fn(),
+      };
       teamService.getTeamLockFileName = jest.fn(() => "lock-file-name-mock");
       workspaceService.setWorkspaceFileName = jest.fn();
       workspaceService.removeWorkspace = jest.fn();
@@ -228,7 +231,7 @@ describe("TeamService", () => {
       };
       teamService.getRSAKeys = jest.fn(() => ({ privateKey: mockedRsaKeys }));
       teamService.vaultProvider.getSecrets = jest.fn(() => mockedLocalSecretDtos);
-      teamService.setCurrentWorkspaceName = jest.fn(async () => {});
+      teamService.setKeychainCurrentWorkspace = jest.fn(async () => {});
       teamService.syncIntegrationSecret = jest.fn(async () => {});
       teamService.syncSessionsSecret = jest.fn(async () => {});
       behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository = jest.fn();
@@ -256,6 +259,10 @@ describe("TeamService", () => {
     });
 
     test("user signed in, no localSecretDtos", async () => {
+      signedInUser = {
+        teamName: "team-name",
+        accessToken: "access-token",
+      };
       teamService.isJwtTokenExpired = jest.fn(() => false);
 
       await teamService.syncSecrets();
@@ -266,11 +273,16 @@ describe("TeamService", () => {
       expect(workspaceService.removeWorkspace).toHaveBeenCalledTimes(1);
       expect(workspaceService.createWorkspace).toHaveBeenCalledTimes(1);
       expect(workspaceService.reloadWorkspace).toHaveBeenCalledTimes(1);
-      expect(teamService.setCurrentWorkspaceName).toHaveBeenCalledWith("team-name");
+      expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith("team-name");
+      expect(teamService._workspaceNameState$.next).toHaveBeenCalledWith("team-name");
       expect(behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalledTimes(1);
     });
 
     test("if the returned localSecretDto array contains an integration, expect syncIntegrationSecret to have been called once passing the expected integration dto", async () => {
+      signedInUser = {
+        teamName: "team-name",
+        accessToken: "access-token",
+      };
       teamService.isJwtTokenExpired = jest.fn(() => false);
 
       const awsIntegration = { secretType: SecretType.awsSsoIntegration };
@@ -291,28 +303,29 @@ describe("TeamService", () => {
       expect(teamService.syncIntegrationSecret).toHaveBeenNthCalledWith(1, awsIntegration);
       expect(teamService.syncIntegrationSecret).toHaveBeenNthCalledWith(2, azureIntegration);
       expect(teamService.syncSessionsSecret).toHaveBeenNthCalledWith(1, session);
-      expect(teamService.setCurrentWorkspaceName).toHaveBeenCalledWith("team-name");
+      expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith("team-name");
+      expect(teamService._workspaceNameState$.next).toHaveBeenCalledWith("team-name");
       expect(behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalledTimes(1);
     });
   });
 
   test("deleteTeamWorkspace, local workspace is the current one", async () => {
     createTeamServiceInstance();
-    teamService.getCurrentWorkspaceName = jest.fn(async () => "local");
+    teamService.getKeychainCurrentWorkspace = jest.fn(async () => "local");
     teamService.deleteCurrentWorkspace = jest.fn();
 
     await teamService.deleteTeamWorkspace();
-    expect(teamService.getCurrentWorkspaceName).toHaveBeenCalled();
+    expect(teamService.getKeychainCurrentWorkspace).toHaveBeenCalled();
     expect(teamService.deleteCurrentWorkspace).not.toHaveBeenCalled();
   });
 
   test("deleteTeamWorkspace, remote workspace is the current one", async () => {
     createTeamServiceInstance();
-    teamService.getCurrentWorkspaceName = jest.fn(async () => "remote-workspace");
+    teamService.getKeychainCurrentWorkspace = jest.fn(async () => "remote-workspace");
     teamService.deleteCurrentWorkspace = jest.fn();
 
     await teamService.deleteTeamWorkspace();
-    expect(teamService.getCurrentWorkspaceName).toHaveBeenCalled();
+    expect(teamService.getKeychainCurrentWorkspace).toHaveBeenCalled();
     expect(teamService.deleteCurrentWorkspace).toHaveBeenCalled();
   });
 
@@ -326,20 +339,20 @@ describe("TeamService", () => {
     expect(teamService.setLocalWorkspace).toHaveBeenCalled();
   });
 
-  test("getCurrentWorkspaceName", async () => {
+  test("getKeychainCurrentWorkspace", async () => {
     createTeamServiceInstance();
     keyChainService.getSecret = jest.fn(async () => "mock-name");
 
-    const result = await teamService.getCurrentWorkspaceName();
+    const result = await teamService.getKeychainCurrentWorkspace();
     expect(keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, "current-workspace");
     expect(result).toBe("mock-name");
   });
 
-  test("setCurrentWorkspaceName", async () => {
+  test("setKeychainCurrentWorkspace", async () => {
     createTeamServiceInstance();
     keyChainService.saveSecret = jest.fn();
 
-    await teamService.setCurrentWorkspaceName("mock-name");
+    await teamService.setKeychainCurrentWorkspace("mock-name");
     expect(keyChainService.saveSecret).toHaveBeenCalledWith(constants.appName, "current-workspace", "mock-name");
   });
 
@@ -347,15 +360,19 @@ describe("TeamService", () => {
     createTeamServiceInstance();
     workspaceService.setWorkspaceFileName = jest.fn();
     workspaceService.reloadWorkspace = jest.fn();
-    teamService.setCurrentWorkspaceName = jest.fn();
+    teamService.setKeychainCurrentWorkspace = jest.fn();
     behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository = jest.fn();
+    teamService._workspaceNameState$ = {
+      next: jest.fn(),
+    };
 
     await teamService.setLocalWorkspace();
 
     expect(fileService.aesKey).toBe("mocked-machine-id");
     expect(workspaceService.setWorkspaceFileName).toHaveBeenCalledWith(constants.lockFileDestination);
     expect(workspaceService.reloadWorkspace).toHaveBeenCalled();
-    expect(teamService.setCurrentWorkspaceName).toHaveBeenCalledWith("local");
+    expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith("local");
+    expect(teamService._workspaceNameState$.next).toHaveBeenCalledWith(constants.localWorkspaceName);
     expect(behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
   });
 

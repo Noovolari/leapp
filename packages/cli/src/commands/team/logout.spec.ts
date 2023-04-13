@@ -14,10 +14,16 @@ describe("TeamLogout", () => {
         teamService: {
           signOut: jest.fn(),
         },
+        remoteProceduresClient: {
+          refreshWorkspaceState: jest.fn(),
+        },
       };
       const command = getTestCommand(cliProviderService, []);
+      (command as any).log = jest.fn();
       await command.run();
       expect(cliProviderService.teamService.signOut).toHaveBeenCalledTimes(1);
+      expect(cliProviderService.remoteProceduresClient.refreshWorkspaceState).toHaveBeenCalled();
+      expect((command as any).log).toHaveBeenCalledWith("logout successful");
     });
 
     test("if this.cliProviderService.leappTeamCoreUserProvider.signOut throws an error", async () => {

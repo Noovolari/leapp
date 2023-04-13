@@ -12,6 +12,9 @@ describe("LeappCommand", () => {
       remoteProceduresClient: {
         isDesktopAppRunning: jest.fn(async () => true),
       },
+      teamService: {
+        setCurrentWorkspace: jest.fn(),
+      },
     };
 
     const leappCommand = new (LeappCommand as any)(null, null, cliProviderService);
@@ -19,6 +22,7 @@ describe("LeappCommand", () => {
 
     expect(cliProviderService.awsSsoRoleService.setAwsIntegrationDelegate).toHaveBeenCalledWith(cliProviderService.awsSsoIntegrationService);
     expect(cliProviderService.remoteProceduresClient.isDesktopAppRunning).toHaveBeenCalled();
+    expect(cliProviderService.teamService.setCurrentWorkspace).toHaveBeenCalled();
   });
 
   test("init - desktop app not running", async () => {
@@ -29,6 +33,9 @@ describe("LeappCommand", () => {
       awsSsoIntegrationService: "integrationService",
       remoteProceduresClient: {
         isDesktopAppRunning: jest.fn(async () => false),
+      },
+      teamService: {
+        setCurrentWorkspace: jest.fn(),
       },
     };
 
@@ -41,6 +48,7 @@ describe("LeappCommand", () => {
     expect(leappCommand.error).toHaveBeenCalledWith(
       "Leapp app must be running to use this CLI. You can download it here: https://www.leapp.cloud/releases"
     );
+    expect(cliProviderService.teamService.setCurrentWorkspace).toHaveBeenCalled();
   });
 
   test("unsupportedAzureSession - azure session should throw an error", async () => {

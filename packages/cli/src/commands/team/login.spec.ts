@@ -58,8 +58,11 @@ describe("TeamLogin", () => {
     test("without errors", async () => {
       const mockedUser = "mocked-user";
       const cliProviderService: any = {
-        leappTeamCoreUserProvider: {
+        teamService: {
           signIn: jest.fn(() => mockedUser),
+        },
+        remoteProceduresClient: {
+          refreshWorkspaceState: jest.fn(),
         },
       };
       const command = getTestCommand(cliProviderService, []);
@@ -69,17 +72,17 @@ describe("TeamLogin", () => {
       (command as any).insertUserPassword = () => mockedUserPassword;
       (command as any).log = jest.fn();
       await command.run();
-      expect(cliProviderService.leappTeamCoreUserProvider.signIn).toHaveBeenCalledTimes(1);
-      expect(cliProviderService.leappTeamCoreUserProvider.signIn).toHaveBeenCalledWith(mockedUserEmail, mockedUserPassword);
-      expect((command as any).log).toHaveBeenCalledTimes(1);
-      expect((command as any).log).toHaveBeenCalledWith(JSON.stringify(mockedUser));
+      expect(cliProviderService.teamService.signIn).toHaveBeenCalledTimes(1);
+      expect(cliProviderService.teamService.signIn).toHaveBeenCalledWith(mockedUserEmail, mockedUserPassword);
+      expect(cliProviderService.remoteProceduresClient.refreshWorkspaceState).toHaveBeenCalled();
+      expect((command as any).log).toHaveBeenCalledWith("login successful");
     });
 
     test("if this.cliProviderService.leappTeamCoreUserProvider.signIn throws an error", async () => {
       const mockedErrorMessage = "mocked-error";
       const mockedError = new Error(mockedErrorMessage);
       const cliProviderService: any = {
-        leappTeamCoreUserProvider: {
+        teamService: {
           signIn: jest.fn(() => {
             throw mockedError;
           }),
@@ -92,8 +95,6 @@ describe("TeamLogin", () => {
       (command as any).insertUserPassword = () => mockedUserPassword;
       (command as any).error = jest.fn();
       await command.run();
-      expect(cliProviderService.leappTeamCoreUserProvider.signIn).toHaveBeenCalledTimes(1);
-      expect(cliProviderService.leappTeamCoreUserProvider.signIn).toHaveBeenCalledWith(mockedUserEmail, mockedUserPassword);
       expect((command as any).error).toHaveBeenCalledTimes(1);
       expect((command as any).error).toHaveBeenCalledWith(mockedErrorMessage);
     });
@@ -101,7 +102,7 @@ describe("TeamLogin", () => {
     test("if this.cliProviderService.leappTeamCoreUserProvider.signIn throws something that isn't an error", async () => {
       const mockedError = "mocked-error";
       const cliProviderService: any = {
-        leappTeamCoreUserProvider: {
+        teamService: {
           signIn: jest.fn(() => {
             throw mockedError;
           }),
@@ -114,8 +115,6 @@ describe("TeamLogin", () => {
       (command as any).insertUserPassword = () => mockedUserPassword;
       (command as any).error = jest.fn();
       await command.run();
-      expect(cliProviderService.leappTeamCoreUserProvider.signIn).toHaveBeenCalledTimes(1);
-      expect(cliProviderService.leappTeamCoreUserProvider.signIn).toHaveBeenCalledWith(mockedUserEmail, mockedUserPassword);
       expect((command as any).error).toHaveBeenCalledTimes(1);
       expect((command as any).error).toHaveBeenCalledWith(`Unknown error: ${mockedError}`);
     });

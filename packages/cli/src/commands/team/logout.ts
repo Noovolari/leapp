@@ -24,6 +24,7 @@ export default class TeamLogout extends LeappCommand {
     try {
       await this.cliProviderService.teamService.signOut();
       await this.cliProviderService.remoteProceduresClient.refreshWorkspaceState();
+      this.log("logout successful");
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }

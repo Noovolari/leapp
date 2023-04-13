@@ -48,6 +48,7 @@ export default class TeamLogin extends LeappCommand {
     try {
       await this.cliProviderService.teamService.signIn(userEmail, userPassword);
       await this.cliProviderService.remoteProceduresClient.refreshWorkspaceState();
+      this.log("login successful");
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }

@@ -17,18 +17,18 @@ import { LoggedException, LogLevel } from "./log-service";
 import { AzureIntegration } from "../models/azure/azure-integration";
 import PluginStatus from "../models/plugin-status";
 import { WorkspaceConsistencyService } from "./workspace-consistency-service";
-import { WorkspaceFileNameService } from "./workspace-file-name-service";
 
 export class Repository {
   // Private singleton workspace
   private _workspace: Workspace;
+  private _workspaceFileName: string;
 
   constructor(
     private nativeService: INativeService,
     private fileService: FileService,
-    private workspaceConsistencyService: WorkspaceConsistencyService,
-    private workspaceFileNameService: WorkspaceFileNameService
+    private workspaceConsistencyService: WorkspaceConsistencyService
   ) {
+    this.workspaceFileName = constants.lockFileDestination;
     this.createWorkspace();
   }
 
@@ -40,6 +40,15 @@ export class Repository {
 
   set workspace(value: Workspace) {
     this._workspace = value;
+  }
+
+  get workspaceFileName(): string {
+    return this._workspaceFileName;
+  }
+
+  set workspaceFileName(value: string) {
+    this._workspaceFileName = value;
+    this.workspaceConsistencyService.workspaceFileName = value;
   }
 
   reloadWorkspace(): void {
@@ -54,7 +63,7 @@ export class Repository {
   }
 
   createWorkspace(): void {
-    if (!this.fileService.existsSync(this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName)) {
+    if (!this.fileService.existsSync(this.nativeService.os.homedir() + "/" + this.workspaceFileName)) {
       this.fileService.newDir(this.nativeService.os.homedir() + "/.Leapp", { recursive: true });
       this._workspace = this.workspaceConsistencyService.createNewWorkspace();
       this.persistWorkspace(this._workspace);
@@ -62,13 +71,13 @@ export class Repository {
   }
 
   removeWorkspace(): void {
-    if (this.fileService.existsSync(this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName)) {
-      this.fileService.removeFileSync(this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName);
+    if (this.fileService.existsSync(this.nativeService.os.homedir() + "/" + this.workspaceFileName)) {
+      this.fileService.removeFileSync(this.nativeService.os.homedir() + "/" + this.workspaceFileName);
     }
   }
 
   persistWorkspace(workspace: Workspace): void {
-    const path = this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName;
+    const path = this.nativeService.os.homedir() + "/" + this.workspaceFileName;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
 

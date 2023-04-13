@@ -12,14 +12,12 @@ describe("WorkspaceConsistencyService", () => {
   let nativeService;
   let logService;
   let service;
-  let workspaceFileNameService;
 
   beforeEach(() => {
     fileService = {} as any;
     nativeService = {} as any;
     logService = {} as any;
-    workspaceFileNameService = {} as any;
-    service = new WorkspaceConsistencyService(fileService, nativeService, logService, workspaceFileNameService) as any;
+    service = new WorkspaceConsistencyService(fileService, nativeService, logService) as any;
   });
 
   test("fileLockPath", () => {
@@ -35,7 +33,7 @@ describe("WorkspaceConsistencyService", () => {
   });
 
   test("getWorkspace, everything ok", () => {
-    service.workspaceFileNameService.workspaceFileName = constants.lockFileDestination;
+    service.workspaceFileName = constants.lockFileDestination;
     service.loadWorkspace = jest.fn(() => "workspace");
     service.checkConsistency = jest.fn();
     service.saveBackup = jest.fn();
@@ -49,7 +47,7 @@ describe("WorkspaceConsistencyService", () => {
   });
 
   test("getWorkspace, something wrong, backup existing", () => {
-    service.workspaceFileNameService.workspaceFileName = constants.lockFileDestination;
+    service.workspaceFileName = constants.lockFileDestination;
     service.nativeService = { os: { homedir: jest.fn(() => "homedir-mock") } };
     logService.log = jest.fn();
     fileService.existsSync = jest.fn(() => true);
@@ -111,7 +109,7 @@ describe("WorkspaceConsistencyService", () => {
       throw new Error("error-mock-1");
     });
     service.logService = { log: jest.fn() };
-    service.workspaceFileNameService = { workspaceFileName: constants.lockFileDestination };
+    service.workspaceFileName = constants.lockFileDestination;
     service.nativeService = { os: { homedir: jest.fn(() => "homedir-mock") } };
     service.fileService = { existsSync: jest.fn(() => true) };
     service.restoreBackup = jest.fn(() => {
@@ -218,7 +216,7 @@ describe("WorkspaceConsistencyService", () => {
   });
 
   test("save", () => {
-    service.workspaceFileNameService = { workspaceFileName: "workspace-file-name-mock" };
+    service.workspaceFileName = "workspace-file-name-mock";
     service.fileService = { homeDir: jest.fn(() => "homedir-mock"), encryptText: jest.fn(() => "encrypted-text-mock"), writeFileSync: jest.fn() };
     const mockedWorkspace = { mockedObject: "mocked-object", sessions: [] };
     mockedWorkspace.sessions = [{ name: "testName" } as any];
@@ -232,7 +230,7 @@ describe("WorkspaceConsistencyService", () => {
   });
 
   test("loadWorkspace", () => {
-    service.workspaceFileNameService = { workspaceFileName: "workspace-file-name-mock" };
+    service.workspaceFileName = "workspace-file-name-mock";
     const decryptedWorkspace = serialize({ mockedObject: "Mocked-object" });
     service.fileService = {
       homeDir: jest.fn(() => "homedir-mock"),
@@ -276,7 +274,7 @@ describe("WorkspaceConsistencyService", () => {
   });
 
   test("cleanWorkspace", () => {
-    service.workspaceFileNameService = { workspaceFileName: constants.lockFileDestination };
+    service.workspaceFileName = constants.lockFileDestination;
     const decryptedWorkspace = serialize({ mockedObject: "mocked-object" });
     service.fileService = {
       homeDir: jest.fn(() => "homedir-mock"),

@@ -54,12 +54,12 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   private behaviouralSubjectService: BehaviouralSubjectService;
   private userSubscription;
+  private workspaceNameSubscription;
 
-  constructor(private bsModalService: BsModalService, private leappCoreService: AppProviderService, private appService: AppService) {
-    this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
+  constructor(private bsModalService: BsModalService, private appProviderService: AppProviderService, private appService: AppService) {
+    this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.showAll = true;
     this.showPinned = false;
-    this.workspaceName = this.leappCoreService.workspaceFileNameService.getWorkspaceName();
     this.teamUser = null;
   }
 
@@ -68,21 +68,23 @@ export class SideBarComponent implements OnInit, OnDestroy {
       this.segments = segments;
       this.selectedS = this.segments.map((segment) => ({ name: segment.name, selected: false }));
     });
-    segmentFilter.next(this.leappCoreService.segmentService.list());
+    segmentFilter.next(this.appProviderService.segmentService.list());
 
     sidebarHighlight.subscribe((value) => {
       this.highlightSelectedRow(value.showAll, value.showPinned, value.selectedSegment);
     });
     sidebarHighlight.next({ showAll: true, showPinned: false, selectedSegment: -1 });
 
-    this.leappCoreService.workspaceFileNameService.workspaceFileNameBehaviouralSubject.subscribe(() => {
-      this.workspaceName = this.leappCoreService.workspaceFileNameService.getWorkspaceName();
+    this.workspaceNameSubscription = this.appProviderService.teamService.workspaceNameState.subscribe((workspaceName: string) => {
+      this.workspaceName = workspaceName;
     });
-    this.userSubscription = this.leappCoreService.teamService.signedInUserState.subscribe((user: User) => (this.teamUser = user));
+    this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.teamUser = user));
   }
 
   ngOnDestroy(): void {
     this.subscription.unsubscribe();
+    this.workspaceNameSubscription.unsubscribe();
+    this.userSubscription.unsubscribe();
   }
 
   resetFilters(): void {
@@ -117,8 +119,8 @@ export class SideBarComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
 
-    this.leappCoreService.segmentService.removeSegment(segment);
-    this.segments = JSON.parse(JSON.stringify(this.leappCoreService.segmentService.list()));
+    this.appProviderService.segmentService.removeSegment(segment);
+    this.segments = JSON.parse(JSON.stringify(this.appProviderService.segmentService.list()));
   }
 
   selectedSegmentCheck(segment: Segment): string {
@@ -166,9 +168,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   async switchWorkspace(selectedWorkspace?: string): Promise<void> {
     if (selectedWorkspace === "local") {
-      await this.leappCoreService.teamService.switchToLocalWorkspace();
+      await this.appProviderService.teamService.switchToLocalWorkspace();
     } else {
-      await this.leappCoreService.teamService.syncSecrets();
+      await this.appProviderService.teamService.syncSecrets();
     }
   }
 }

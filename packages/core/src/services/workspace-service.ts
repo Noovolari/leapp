@@ -1,9 +1,8 @@
 import { Repository } from "./repository";
 import { Workspace } from "../models/workspace";
-import { WorkspaceFileNameService } from "./workspace-file-name-service";
 
 export class WorkspaceService {
-  constructor(private repository: Repository, private workspaceFileNameService: WorkspaceFileNameService) {}
+  constructor(private repository: Repository) {}
 
   getWorkspace(): Workspace {
     return this.repository.getWorkspace();
@@ -34,10 +33,10 @@ export class WorkspaceService {
   }
 
   setWorkspaceFileName(value: string): void {
-    this.workspaceFileNameService.workspaceFileName = value;
+    this.repository.workspaceFileName = value;
   }
 
   getWorkspaceFileName(): string {
-    return this.workspaceFileNameService.workspaceFileName;
+    return this.repository.workspaceFileName;
   }
 }

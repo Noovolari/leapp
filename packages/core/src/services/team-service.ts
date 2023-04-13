@@ -38,7 +38,8 @@ const LOCAL_WORKSPACE_NAME = "local";
 
 export class TeamService {
   httpClient: HttpClientInterface;
-  private _signedInUserState$: BehaviorSubject<User>;
+  private readonly _signedInUserState$: BehaviorSubject<User>;
+  private readonly _workspaceNameState$: BehaviorSubject<string>;
   private readonly teamSignedInUserKeychainKey = "team-signed-in-user";
   private readonly encryptionProvider: EncryptionProvider;
   private readonly vaultProvider: VaultProvider;
@@ -63,6 +64,7 @@ export class TeamService {
   ) {
     const apiEndpoint = "http://localhost:3000";
     this._signedInUserState$ = new BehaviorSubject<User>(null);
+    this._workspaceNameState$ = new BehaviorSubject<string>("");
     this.encryptionProvider = new EncryptionProvider(crypto);
     this.httpClientProvider = new HttpClientProvider();
     this.vaultProvider = new VaultProvider(apiEndpoint, this.httpClientProvider, this.encryptionProvider);
@@ -73,9 +75,13 @@ export class TeamService {
     return this._signedInUserState$;
   }
 
+  get workspaceNameState(): BehaviorSubject<string> {
+    return this._workspaceNameState$;
+  }
+
   async setCurrentWorkspace(): Promise<void> {
     this.signedInUserState.next(JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)));
-    const currentWorkspaceName = await this.getCurrentWorkspaceName();
+    const currentWorkspaceName = await this.getKeychainCurrentWorkspace();
     // Local or null workspace saved in keychain
     if (currentWorkspaceName === null || currentWorkspaceName === LOCAL_WORKSPACE_NAME) {
       await this.setLocalWorkspace();
@@ -102,7 +108,7 @@ export class TeamService {
 
   async signOut(): Promise<void> {
     this.httpClientProvider.accessToken = "";
-    if ((await this.getCurrentWorkspaceName()) !== LOCAL_WORKSPACE_NAME) {
+    if ((await this.getKeychainCurrentWorkspace()) !== LOCAL_WORKSPACE_NAME) {
       const signedInUser = this.signedInUserState.getValue();
       this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
       this.workspaceService.reloadWorkspace();
@@ -141,26 +147,27 @@ export class TeamService {
     for (const sessionDto of sessionsDtos) {
       await this.syncSessionsSecret(sessionDto);
     }
-    await this.setCurrentWorkspaceName(signedInUser.teamName);
+    await this.setKeychainCurrentWorkspace(signedInUser.teamName);
+    this.workspaceNameState.next(signedInUser.teamName);
     this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
   }
 
-  async deleteTeamWorkspace() {
-    if ((await this.getCurrentWorkspaceName()) !== LOCAL_WORKSPACE_NAME) {
+  async deleteTeamWorkspace(): Promise<void> {
+    if ((await this.getKeychainCurrentWorkspace()) !== LOCAL_WORKSPACE_NAME) {
       await this.deleteCurrentWorkspace();
     }
   }
 
-  async switchToLocalWorkspace() {
+  async switchToLocalWorkspace(): Promise<void> {
     await this.deleteTeamWorkspace();
     await this.setLocalWorkspace();
   }
 
-  private async getCurrentWorkspaceName(): Promise<string> {
+  private async getKeychainCurrentWorkspace(): Promise<string> {
     return await this.keyChainService.getSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY);
   }
 
-  private async setCurrentWorkspaceName(workspaceName: string): Promise<void> {
+  private async setKeychainCurrentWorkspace(workspaceName: string): Promise<void> {
     await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, workspaceName);
   }
 
@@ -168,7 +175,8 @@ export class TeamService {
     this.fileService.aesKey = this.nativeService.machineId;
     this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
     this.workspaceService.reloadWorkspace();
-    await this.setCurrentWorkspaceName(LOCAL_WORKSPACE_NAME);
+    await this.setKeychainCurrentWorkspace(LOCAL_WORKSPACE_NAME);
+    this.workspaceNameState.next(constants.localWorkspaceName);
     this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
   }
 

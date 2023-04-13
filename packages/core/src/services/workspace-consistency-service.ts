@@ -5,15 +5,11 @@ import { Workspace } from "../models/workspace";
 import { constants } from "../models/constants";
 import { deserialize, serialize } from "class-transformer";
 import { IntegrationType } from "../models/integration-type";
-import { WorkspaceFileNameService } from "./workspace-file-name-service";
 
 export class WorkspaceConsistencyService {
-  constructor(
-    private fileService: FileService,
-    private nativeService: INativeService,
-    private logService: LogService,
-    private workspaceFileNameService: WorkspaceFileNameService
-  ) {}
+  private _workspaceFileName: string;
+
+  constructor(private fileService: FileService, private nativeService: INativeService, private logService: LogService) {}
 
   private get fileLockPath(): string {
     return this.nativeService.os.homedir() + "/" + constants.lockFileDestination;
@@ -23,18 +19,26 @@ export class WorkspaceConsistencyService {
     return this.nativeService.os.homedir() + "/" + constants.lockFileBackupPath;
   }
 
+  get workspaceFileName(): string {
+    return this._workspaceFileName;
+  }
+
+  set workspaceFileName(value: string) {
+    this._workspaceFileName = value;
+  }
+
   getWorkspace(): Workspace {
     try {
       const workspace = this.loadWorkspace();
       this.checkConsistency(workspace);
-      if (this.workspaceFileNameService.workspaceFileName === constants.lockFileDestination) {
+      if (this.workspaceFileName === constants.lockFileDestination) {
         this.saveBackup(workspace);
       }
       return workspace;
     } catch (error) {
       this.logService.log(new LoggedEntry(error.message, this, LogLevel.error, false, error.stack));
-      const path = this.nativeService.os.homedir() + "/" + this.workspaceFileNameService.workspaceFileName;
-      if (this.workspaceFileNameService.workspaceFileName === constants.lockFileDestination && this.fileService.existsSync(path)) {
+      const path = this.nativeService.os.homedir() + "/" + this.workspaceFileName;
+      if (this.workspaceFileName === constants.lockFileDestination && this.fileService.existsSync(path)) {
         try {
           return this.restoreBackup();
         } catch (restoreError) {
@@ -107,12 +111,12 @@ export class WorkspaceConsistencyService {
   }
 
   private save(workspace: Workspace) {
-    const path = `${this.fileService.homeDir()}/${this.workspaceFileNameService.workspaceFileName}`;
+    const path = `${this.fileService.homeDir()}/${this.workspaceFileName}`;
     this.fileService.writeFileSync(path, this.fileService.encryptText(serialize(workspace)));
   }
 
   private loadWorkspace(): Workspace {
-    const path = this.fileService.homeDir() + "/" + this.workspaceFileNameService.workspaceFileName;
+    const path = this.fileService.homeDir() + "/" + this.workspaceFileName;
     const workspaceJSON = this.fileService.decryptText(this.fileService.readFileSync(path));
     return deserialize(Workspace, workspaceJSON);
   }
@@ -129,9 +133,9 @@ export class WorkspaceConsistencyService {
   private cleanWorkspace(): Workspace {
     const newWorkspace = this.createNewWorkspace();
     const encryptedWorkspace = this.fileService.encryptText(serialize(newWorkspace));
-    const path = this.fileService.homeDir() + "/" + this.workspaceFileNameService.workspaceFileName;
+    const path = this.fileService.homeDir() + "/" + this.workspaceFileName;
     this.fileService.writeFileSync(path, encryptedWorkspace);
-    if (this.workspaceFileNameService.workspaceFileName === constants.lockFileDestination) {
+    if (this.workspaceFileName === constants.lockFileDestination) {
       this.fileService.writeFileSync(this.fileLockBackupPath, encryptedWorkspace);
     }
     this.logService.log(

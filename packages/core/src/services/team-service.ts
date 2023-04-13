@@ -126,30 +126,28 @@ export class TeamService {
       await this.signOut();
       return;
     }
-    this.httpClientProvider.accessToken = signedInUser.accessToken;
-    this.fileService.aesKey = signedInUser.publicRSAKey;
-    this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
-    this.workspaceService.removeWorkspace();
-    // TODO: copy or merge local workspace settings like theme
-    this.workspaceService.createWorkspace();
-    this.workspaceService.reloadWorkspace();
-    const rsaKeys = await this.getRSAKeys(signedInUser);
-    const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
-    const integrationDtos = localSecretDtos.filter(
-      (secret) => secret.secretType === SecretType.awsSsoIntegration || secret.secretType === SecretType.azureIntegration
-    );
-    for (const integrationDto of integrationDtos) {
-      await this.syncIntegrationSecret(integrationDto as AwsSsoLocalIntegrationDto);
-    }
-    const sessionsDtos = localSecretDtos.filter(
-      (secret) => secret.secretType !== SecretType.awsSsoIntegration && secret.secretType !== SecretType.azureIntegration
-    );
-    for (const sessionDto of sessionsDtos) {
-      await this.syncSessionsSecret(sessionDto);
-    }
     await this.setKeychainCurrentWorkspace(signedInUser.teamName);
-    this.workspaceNameState.next(signedInUser.teamName);
-    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
+    await this.refreshWorkspaceState(async (): Promise<void> => {
+      this.workspaceService.removeWorkspace();
+      // TODO: copy or merge local workspace settings like theme
+      this.workspaceService.createWorkspace();
+      this.workspaceService.reloadWorkspace();
+      const rsaKeys = await this.getRSAKeys(signedInUser);
+      this.httpClientProvider.accessToken = signedInUser.accessToken;
+      const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
+      const integrationDtos = localSecretDtos.filter(
+        (secret) => secret.secretType === SecretType.awsSsoIntegration || secret.secretType === SecretType.azureIntegration
+      );
+      for (const integrationDto of integrationDtos) {
+        await this.syncIntegrationSecret(integrationDto as AwsSsoLocalIntegrationDto);
+      }
+      const sessionsDtos = localSecretDtos.filter(
+        (secret) => secret.secretType !== SecretType.awsSsoIntegration && secret.secretType !== SecretType.azureIntegration
+      );
+      for (const sessionDto of sessionsDtos) {
+        await this.syncSessionsSecret(sessionDto);
+      }
+    });
   }
 
   async deleteTeamWorkspace(): Promise<void> {
@@ -163,6 +161,29 @@ export class TeamService {
     await this.setLocalWorkspace();
   }
 
+  async refreshWorkspaceState(callback?: () => Promise<void>): Promise<void> {
+    const keychainCurrentWorkspace = await this.getKeychainCurrentWorkspace();
+    const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey));
+    let workspaceName;
+
+    if (keychainCurrentWorkspace === LOCAL_WORKSPACE_NAME) {
+      this.fileService.aesKey = this.nativeService.machineId;
+      this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
+      this.workspaceService.reloadWorkspace();
+      workspaceName = constants.localWorkspaceName;
+    } else {
+      this.fileService.aesKey = signedInUser.publicRSAKey;
+      this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
+      // If called from CLI, it needs workspaceService.reloadWorkspace() to be invoked.
+      await callback?.();
+      workspaceName = signedInUser.teamName;
+    }
+
+    this.signedInUserState.next(signedInUser);
+    this.workspaceNameState.next(workspaceName);
+    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
+  }
+
   private async getKeychainCurrentWorkspace(): Promise<string> {
     return await this.keyChainService.getSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY);
   }
@@ -172,12 +193,8 @@ export class TeamService {
   }
 
   private async setLocalWorkspace(): Promise<void> {
-    this.fileService.aesKey = this.nativeService.machineId;
-    this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
-    this.workspaceService.reloadWorkspace();
     await this.setKeychainCurrentWorkspace(LOCAL_WORKSPACE_NAME);
-    this.workspaceNameState.next(constants.localWorkspaceName);
-    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
+    await this.refreshWorkspaceState();
   }
 
   private async deleteCurrentWorkspace(): Promise<void> {

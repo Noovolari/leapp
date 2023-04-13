@@ -23,6 +23,7 @@ export default class TeamLogout extends LeappCommand {
   async logout(): Promise<void> {
     try {
       await this.cliProviderService.teamService.signOut();
+      await this.cliProviderService.remoteProceduresClient.refreshWorkspaceState();
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }

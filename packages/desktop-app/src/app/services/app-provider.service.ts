@@ -431,6 +431,8 @@ export class AppProviderService {
         this.mfaCodePrompter,
         this.repository,
         this.behaviouralSubjectService,
+        this.teamService,
+        this.workspaceService,
         (uiSafeBlock) => this.ngZone.run(() => uiSafeBlock())
       );
     }

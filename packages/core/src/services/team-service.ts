@@ -139,7 +139,7 @@ export class TeamService {
         (secret) => secret.secretType === SecretType.awsSsoIntegration || secret.secretType === SecretType.azureIntegration
       );
       for (const integrationDto of integrationDtos) {
-        await this.syncIntegrationSecret(integrationDto as AwsSsoLocalIntegrationDto);
+        await this.syncIntegrationSecret(integrationDto);
       }
       const sessionsDtos = localSecretDtos.filter(
         (secret) => secret.secretType !== SecretType.awsSsoIntegration && secret.secretType !== SecretType.azureIntegration

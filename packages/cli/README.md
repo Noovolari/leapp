@@ -44,5 +44,6 @@ USAGE
 * [`leapp session`](scopes/session.md) - Sessions management
 * [`leapp team`](scopes/team.md) - Login to your Team account
 * [`leapp version`](scopes/version.md) - Displays the Cli and Core versions
+* [`leapp workspace`](scopes/workspace.md) - Show the current workspace
 
 <!-- commandsstop -->

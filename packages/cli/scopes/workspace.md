@@ -3,19 +3,21 @@
 
 Show the current workspace
 
-* [`leapp workspace current`](#leapp-workspace-current)
+* [`leapp workspace`](#leapp-workspace)
 
-## `leapp workspace current`
+## `leapp workspace`
 
 Show the current workspace
 
 ```
 USAGE
-  $ leapp workspace current
+  $ leapp workspace
 
 DESCRIPTION
   Show the current workspace
 
 EXAMPLES
-  $leapp workspace current
+  $leapp workspace
 ```
+
+_See code: [dist/commands/workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.29/dist/commands/workspace.ts)_

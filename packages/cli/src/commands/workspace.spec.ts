@@ -1,15 +1,15 @@
 import { describe, expect, jest, test } from "@jest/globals";
-import WorkspaceCurrent from "./current";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import Workspace from "./workspace";
 
-describe("WorkspaceCurrent", () => {
-  const getTestCommand = (cliProviderService: any = null, argv = []): WorkspaceCurrent => {
-    const command = new WorkspaceCurrent(argv, {} as any);
+describe("Workspace", () => {
+  const getTestCommand = (cliProviderService: any = null, argv = []): Workspace => {
+    const command = new Workspace(argv, {} as any);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
 
-  describe("WorkspaceCurrent.current", () => {
+  describe("Workspace.current", () => {
     test("without errors, local workspace", async () => {
       const mockedWorkspace = constants.localWorkspaceName;
       const cliProviderService: any = {

@@ -1,11 +1,11 @@
-import { LeappCommand } from "../../leapp-command";
+import { LeappCommand } from "../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { constants } from "@noovolari/leapp-core/models/constants";
 
-export default class WorkspaceCurrent extends LeappCommand {
+export default class Workspace extends LeappCommand {
   static description = "Show the current workspace";
 
-  static examples = [`$leapp workspace current`];
+  static examples = [`$leapp workspace`];
 
   static flags = {};
 
@@ -15,7 +15,7 @@ export default class WorkspaceCurrent extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const workspaceName = await this.cliProviderService.teamService.workspaceNameState.getValue();
+      const workspaceName = this.cliProviderService.teamService.workspaceNameState.getValue();
       if (workspaceName === constants.localWorkspaceName) {
         this.log("local");
       } else {

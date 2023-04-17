@@ -48,7 +48,7 @@ describe("LeappCommand", () => {
     expect(leappCommand.error).toHaveBeenCalledWith(
       "Leapp app must be running to use this CLI. You can download it here: https://www.leapp.cloud/releases"
     );
-    expect(cliProviderService.teamService.setCurrentWorkspace).toHaveBeenCalled();
+    expect(cliProviderService.teamService.setCurrentWorkspace).not.toHaveBeenCalled();
   });
 
   test("unsupportedAzureSession - azure session should throw an error", async () => {

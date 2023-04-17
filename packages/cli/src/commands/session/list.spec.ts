@@ -1,5 +1,5 @@
 import ListSessions from "./list";
-import { CliUx } from "@oclif/core";
+import { ux } from "@oclif/core";
 import { describe, expect, jest, test } from "@jest/globals";
 import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws/aws-iam-user-session";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
@@ -61,7 +61,7 @@ describe("ListSessions", () => {
     };
 
     const command = getTestCommand(cliProviderService);
-    const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
+    const tableSpy = jest.spyOn(ux, "table").mockImplementation(() => null);
 
     await command.showSessions();
     expect(tableSpy.mock.calls[0][0]).toEqual([

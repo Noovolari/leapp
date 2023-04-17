@@ -1,4 +1,4 @@
-import { CliUx } from "@oclif/core";
+import { ux } from "@oclif/core";
 import { describe, expect, jest, test } from "@jest/globals";
 import ListProfiles from "./list";
 
@@ -55,7 +55,7 @@ describe("ListProfiles", () => {
     };
 
     const command = getTestCommand(cliProviderService);
-    const tableSpy = jest.spyOn(CliUx.ux, "table").mockImplementation(() => null);
+    const tableSpy = jest.spyOn(ux, "table").mockImplementation(() => null);
 
     await command.showProfiles();
 

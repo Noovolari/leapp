@@ -62,7 +62,7 @@ export class TeamService {
     private readonly integrationFactory: IntegrationFactory,
     private readonly behaviouralSubjectService?: BehaviouralSubjectService
   ) {
-    const apiEndpoint = "http://localhost:3000";
+    const apiEndpoint = "https://2nfksla7qi.execute-api.eu-west-1.amazonaws.com";
     this._signedInUserState$ = new BehaviorSubject<User>(null);
     this._workspaceNameState$ = new BehaviorSubject<string>("");
     this.encryptionProvider = new EncryptionProvider(crypto);

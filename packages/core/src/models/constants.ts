@@ -6,6 +6,8 @@ export const constants = {
   latestUrl: "https://leapp.cloud/releases.html",
   workspaceLastVersion: 3,
   localWorkspaceName: "My Workspace",
+  currentWorkspaceKeychainKey: "current-workspace",
+  localWorkspaceKeychainValue: "local",
 
   //Aws
   samlRoleSessionDuration: 3600, // 1h

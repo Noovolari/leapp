@@ -33,9 +33,6 @@ import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
 import { HttpClientProvider } from "leapp-team-core/http/http-client.provider";
 import { HttpClientInterface } from "leapp-team-core/http/http-client-interface";
 
-const CURRENT_WORKSPACE_KEYCHAIN_KEY = "current-workspace";
-const LOCAL_WORKSPACE_NAME = "local";
-
 export class TeamService {
   httpClient: HttpClientInterface;
   private readonly _signedInUserState$: BehaviorSubject<User>;
@@ -83,10 +80,10 @@ export class TeamService {
     this.signedInUserState.next(JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)));
     const currentWorkspaceName = await this.getKeychainCurrentWorkspace();
     // Local or null workspace saved in keychain
-    if (currentWorkspaceName === null || currentWorkspaceName === LOCAL_WORKSPACE_NAME) {
+    if (currentWorkspaceName === null || currentWorkspaceName === constants.localWorkspaceKeychainValue) {
       await this.setLocalWorkspace();
       // Remote workspace saved in keychain
-    } else if (currentWorkspaceName !== LOCAL_WORKSPACE_NAME) {
+    } else if (currentWorkspaceName !== constants.localWorkspaceKeychainValue) {
       try {
         await this.syncSecrets();
       } catch (error) {
@@ -108,7 +105,7 @@ export class TeamService {
 
   async signOut(): Promise<void> {
     this.httpClientProvider.accessToken = "";
-    if ((await this.getKeychainCurrentWorkspace()) !== LOCAL_WORKSPACE_NAME) {
+    if ((await this.getKeychainCurrentWorkspace()) !== constants.localWorkspaceKeychainValue) {
       const signedInUser = this.signedInUserState.getValue();
       this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
       this.workspaceService.reloadWorkspace();
@@ -119,6 +116,7 @@ export class TeamService {
     this.signedInUserState.next(null);
   }
 
+  // TODO: in the future, when we'll introduce multiple workspace, this method this will become setRemoteWorkspace(workspaceId)
   async syncSecrets(): Promise<void> {
     const signedInUser = this.signedInUserState.getValue();
     if (!signedInUser || this.isJwtTokenExpired(signedInUser.accessToken)) {
@@ -151,7 +149,7 @@ export class TeamService {
   }
 
   async deleteTeamWorkspace(): Promise<void> {
-    if ((await this.getKeychainCurrentWorkspace()) !== LOCAL_WORKSPACE_NAME) {
+    if ((await this.getKeychainCurrentWorkspace()) !== constants.localWorkspaceKeychainValue) {
       await this.deleteCurrentWorkspace();
     }
   }
@@ -166,7 +164,7 @@ export class TeamService {
     const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey));
     let workspaceName;
 
-    if (keychainCurrentWorkspace === LOCAL_WORKSPACE_NAME) {
+    if (keychainCurrentWorkspace === constants.localWorkspaceKeychainValue) {
       this.fileService.aesKey = this.nativeService.machineId;
       this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
       this.workspaceService.reloadWorkspace();
@@ -185,15 +183,15 @@ export class TeamService {
   }
 
   private async getKeychainCurrentWorkspace(): Promise<string> {
-    return await this.keyChainService.getSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY);
+    return await this.keyChainService.getSecret(constants.appName, constants.currentWorkspaceKeychainKey);
   }
 
   private async setKeychainCurrentWorkspace(workspaceName: string): Promise<void> {
-    await this.keyChainService.saveSecret(constants.appName, CURRENT_WORKSPACE_KEYCHAIN_KEY, workspaceName);
+    await this.keyChainService.saveSecret(constants.appName, constants.currentWorkspaceKeychainKey, workspaceName);
   }
 
   private async setLocalWorkspace(): Promise<void> {
-    await this.setKeychainCurrentWorkspace(LOCAL_WORKSPACE_NAME);
+    await this.setKeychainCurrentWorkspace(constants.localWorkspaceKeychainValue);
     await this.refreshWorkspaceState();
   }
 

@@ -1,4 +1,4 @@
-import { CliUx } from "@oclif/core";
+import { ux } from "@oclif/core";
 import { Config } from "@oclif/core/lib/config/config";
 import { LeappCommand } from "../../leapp-command";
 
@@ -7,7 +7,7 @@ export default class ListIdpUrls extends LeappCommand {
   static examples = ["$leapp idp-url list"];
 
   static flags = {
-    ...CliUx.ux.table.flags(),
+    ...ux.table.flags(),
   };
 
   constructor(argv: string[], config: Config) {
@@ -34,6 +34,6 @@ export default class ListIdpUrls extends LeappCommand {
       url: { header: "Identity Provider URL" },
     };
 
-    CliUx.ux.table(data, columns, { ...flags });
+    ux.table(data, columns, { ...flags });
   }
 }

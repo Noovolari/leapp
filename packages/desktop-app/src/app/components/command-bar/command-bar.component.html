@@ -19,51 +19,33 @@
     <div class="main-bar">
       <button class="icon-button show-in-taskbar-only" (click)="false;" matTooltip="Sync all Integrations"><i class="moon-Refresh"></i></button>
 
-      <button class="icon-button line-start hide-in-taskbar" (click)="showCreateDialog();" matTooltip="Add a new Session" [disabled]="workspaceName !== 'My Workspace'" [ngClass]="workspaceName !== 'My Workspace' ? 'disabled-add-session' : ''"><i class="moon-Add"></i></button>
+      <button class="icon-button line-start hide-in-taskbar" (click)="showCreateDialog();" matTooltip="Add a new Session"
+              [disabled]="!isLocalWorkspace" [ngClass]="isLocalWorkspace ? '' : 'disabled-add-session'"><i class="moon-Add"></i></button>
 
-      <button class="icon-button hide-in-taskbar filtering {{filterExtended ? 'toggled-filter' : ''}}" (click)="toggleFilters();" matTooltip="Filter the Session list"><i class="moon-Filter"></i></button>
+      <button class="icon-button hide-in-taskbar filtering {{filterExtended ? 'toggled-filter' : ''}}" (click)="toggleFilters();"
+              matTooltip="Filter the Session list"><i class="moon-Filter"></i></button>
 
       <div class="form-control-input-icon">
-        <input formControlName="searchFilter" type="text" class="form-control search-bar" placeholder="Search session" />
+        <input formControlName="searchFilter" type="text" class="form-control search-bar" placeholder="Search session"/>
         <i class="moon-Search"></i>
       </div>
 
       <button class="icon-button hide-in-taskbar" (click)="syncAll();" matTooltip="Sync all Integrations"><i class="moon-Refresh"></i></button>
 
-      <ng-container *ngIf="teamUser === null || teamUser === undefined">
-        <button class="icon-button" (click)="loginToTeamPortal();" matTooltip="Login to Portal"><i class="moon-User"></i></button>
-      </ng-container>
-      <ng-container *ngIf="teamUser !== null && teamUser !== undefined">
-        <span class="user-circle" [matMenuTriggerFor]="userMenu">{{teamUser.firstName.substring(0,1)}}{{teamUser.lastName.substring(0,1)}}</span>
-        <mat-menu #userMenu [hasBackdrop]="false" role="menu">
-          <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
-          <div mat-menu-item>
-            <span>{{teamUser.firstName}} {{teamUser.lastName}}</span>
-          </div>
-          <div mat-menu-item>
-            <span>{{teamUser.role}} - {{teamUser.teamName}}</span>
-          </div>
-          <div mat-menu-item>
-          </div>
-          <button mat-menu-item (click)="syncTeamSecrets();">
-            <i class="moon-Refresh"></i>&nbsp;
-            <span>Sync</span>
-          </button>
-          <button mat-menu-item (click)="logoutFromTeamPortal();">
-            <i class="moon-Close"></i>&nbsp;
-            <span>Logout</span>
-          </button>
-        </mat-menu>
-      </ng-container>
-
       <div class="line-end">
-        <button class="icon-button top-right-option-button" (click)="showOptionDialog();" matTooltip="Show Leapp Options"><i class="moon-Settings"></i></button>
+        <button class="icon-button top-right-option-button" (click)="showOptionDialog();" matTooltip="Show Leapp Options"><i
+          class="moon-Settings"></i></button>
       </div>
 
       <div class="window-buttons">
-        <span class="minimize" (click)="appNativeService.currentWindow.minimize()"><img src="assets/images/windows_minimize{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
-        <span class="maximize {{compactMode ? 'disabled' : ''}}" (click)="windowMaximizeAction();"><img src="assets/images/windows_maximize{{windowButtonDetectTheme()}}.png" alt="" title=""></span>
-        <span class="quit" (click)="appNativeService.currentWindow.hide()"><img src="assets/images/windows_close{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png" alt="" title=""></span>
+        <span class="minimize" (click)="appNativeService.currentWindow.minimize()"><img
+          src="assets/images/windows_minimize{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png"
+          alt="" title=""></span>
+        <span class="maximize {{compactMode ? 'disabled' : ''}}" (click)="windowMaximizeAction();"><img
+          src="assets/images/windows_maximize{{windowButtonDetectTheme()}}.png" alt="" title=""></span>
+        <span class="quit" (click)="appNativeService.currentWindow.hide()"><img
+          src="assets/images/windows_close{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '_dark' : ''}}.png"
+          alt="" title=""></span>
       </div>
     </div>
 
@@ -73,17 +55,23 @@
       <div class="tag-filters-area" #parent>
 
         <div #child>
-          <input formControlName="dateFilter" type="checkbox" class="hidden" />
-          <button class="toggle-button filter-button {{filterForm.get('dateFilter').value ? 'toggled' : ''}}" (click)="toggleDateFilter();"><i class="moon-Order"></i> Order by date</button>
+          <input formControlName="dateFilter" type="checkbox" class="hidden"/>
+          <button class="toggle-button filter-button {{filterForm.get('dateFilter').value ? 'toggled' : ''}}" (click)="toggleDateFilter();"><i
+            class="moon-Order"></i> Order by date
+          </button>
 
-          <app-filter-menu [control]="'providerFilter'" [data]="providers" [icon]="'moon-Cloud'" [name]="'Providers'" [form]="filterForm"></app-filter-menu>
-          <app-filter-menu [control]="'profileFilter'" [data]="profiles" [icon]="'moon-User'" [name]="'Profile'" [form]="filterForm" [searchable]="true"></app-filter-menu>
-          <app-filter-menu [control]="'regionFilter'" [data]="regions" [icon]="'moon-Region'" [name]="'Region'" [form]="filterForm" [searchable]="true"></app-filter-menu>
-          <app-filter-menu [control]="'typeFilter'" [data]="types" [icon]="'moon-Bookmark'" [name]="'Type'" [form]="filterForm" [categories]="['Amazon AWS', 'Microsoft Azure']"></app-filter-menu>
+          <app-filter-menu [control]="'providerFilter'" [data]="providers" [icon]="'moon-Cloud'" [name]="'Providers'"
+                           [form]="filterForm"></app-filter-menu>
+          <app-filter-menu [control]="'profileFilter'" [data]="profiles" [icon]="'moon-User'" [name]="'Profile'" [form]="filterForm"
+                           [searchable]="true"></app-filter-menu>
+          <app-filter-menu [control]="'regionFilter'" [data]="regions" [icon]="'moon-Region'" [name]="'Region'" [form]="filterForm"
+                           [searchable]="true"></app-filter-menu>
+          <app-filter-menu [control]="'typeFilter'" [data]="types" [icon]="'moon-Bookmark'" [name]="'Type'" [form]="filterForm"
+                           [categories]="['Amazon AWS', 'Microsoft Azure']"></app-filter-menu>
         </div>
       </div>
 
-      <a class="save-segments" (click)="openSaveSegmentDialog();" *ngIf="checkFormIsDirty();">Save{{compactMode ? '': ' Segments'}}</a>
+      <a class="save-segments" (click)="openSaveSegmentDialog();" *ngIf="checkFormIsDirty();">Save{{compactMode ? '' : ' Segments'}}</a>
     </div>
 
   </form>

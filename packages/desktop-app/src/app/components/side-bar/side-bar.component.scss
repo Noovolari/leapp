@@ -4,20 +4,33 @@
 ::ng-deep {
   .mat-list.mat-list-base {
     user-select: none;
+
     .mat-list-item.workspace-menu {
-      height: 55px!important;
+      height: 55px !important;
     }
   }
+
+  .mat-menu-content {
+    .mat-menu-item.workspace-select-item {
+      display: flex;
+      height: 42px !important;
+      padding: 0 10px;
+    }
+  }
+
   .mat-line {
     font-size: 15px;
+
     &:hover {
       &:not(.workspace-menu-line) {
-        all: unset!important;
+        all: unset !important;
       }
+
       transition: all 0.2s ease;
       opacity: 0.7;
     }
   }
+
   .mat-list-item-content {
     cursor: pointer;
     margin-top: 2px;
@@ -25,6 +38,9 @@
 
     i {
       font-size: 20px;
+    }
+
+    i:not(.moon-Home) {
       margin-right: 8px;
       position: relative;
       top: -1px;
@@ -38,12 +54,13 @@
       opacity: 0.7;
     }
   }
+
   .moon-Row {
-    top: -2px!important;
+    top: -2px !important;
   }
 
   .mat-list-item-content:hover i.moon-Close {
-    display: inline-block!important;
+    display: inline-block !important;
     color: $text-color;
     font-size: 18px;
     margin-top: 6px;
@@ -71,17 +88,18 @@
 .selected-segment {
   background-color: $silver-25;
   border-radius: 6px;
-  margin-left: 10px!important;
-  width: 218px!important;
+  margin-left: 10px !important;
+  width: 218px !important;
   transition: all 0.2s ease;
 }
 
 ::ng-deep {
   .mat-expansion-panel-header {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"!important;
-    font-size: 14px!important;
-    font-weight: 500!important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
   }
+
   .selected-segment .mat-list-item-content .mat-list-text {
     margin-left: -10px;
   }
@@ -97,9 +115,11 @@ div.space-between-mat-lists {
     display: none;
     margin-top: -4px;
   }
+
   .mat-list-item.selected-segment:hover {
-    background-color:$silver-25!important;
+    background-color: $silver-25 !important;
   }
+
   .mat-list-item.selected-segment:hover .mat-list-item-content .mat-list-text .mat-line {
     transition: unset;
     opacity: 1;
@@ -119,6 +139,7 @@ i.moon-Caret-down {
   .mat-expansion-panel-header:not([aria-disabled=true]) {
     width: 250px;
   }
+
   .mat-expanded .mat-content mat-panel-title .mat-subheader i.moon-Caret-down {
     display: inline-block;
     transform: rotate(180deg);
@@ -126,7 +147,7 @@ i.moon-Caret-down {
   }
 }
 
-.mat-list-base .mat-list-item .workspace-menu:hover{
+.mat-list-base .mat-list-item .workspace-menu:hover {
   background: #f9f9f9;
   border-radius: 6px;
   margin-left: 10px !important;
@@ -135,29 +156,49 @@ i.moon-Caret-down {
   padding: 0;
 }
 
-.workspace-menu {
+.workspace-menu, .workspace-select-item {
   .workspace-name {
-    margin: auto;
-    padding-left: 5px;
+    padding-left: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+    flex-grow: 1;
   }
+
   .workspace-menu-line {
     display: flex;
   }
+
   & .moon-Caret-down {
     margin: auto;
     position: initial;
   }
+
   .workspace-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
     width: 40px;
     height: 40px;
-    background-color: $local-workspace-blu;
     border: solid $silver-50 1px;
     border-radius: 5px;
+
+    &.local {
+      background-color: $local-workspace-blu;
+    }
+
+    &.remote {
+      background-color: $remote-workspace-purple;
+
+      span {
+        color: $white-text-color;
+        font-size: 16px;
+      }
+    }
+
     i {
       position: relative;
-      top: 8px;
-      left: 8px;
+      top: 0;
       color: $white-text-color;
     }
   }
@@ -166,10 +207,11 @@ i.moon-Caret-down {
 ::ng-deep {
   .mat-list .workspace-menu {
     .mat-list-item-content {
-      padding-left: 10px!important;
-      padding-bottom: 15px!important;
+      padding-left: 10px !important;
+      padding-bottom: 15px !important;
     }
   }
+
   .mat-menu-panel .mat-menu-content {
     .mat-menu-item {
       img {
@@ -182,6 +224,6 @@ i.moon-Caret-down {
 }
 
 .mat-list-base .mat-list-item.workspace-menu:hover {
-  background: none!important;
-  width: unset!important;
+  background: none !important;
+  width: unset !important;
 }

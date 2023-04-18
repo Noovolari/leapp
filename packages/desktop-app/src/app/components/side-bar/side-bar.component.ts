@@ -19,6 +19,8 @@ import { User } from "leapp-team-core/user/user";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { AppService } from "../../services/app.service";
 import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
+import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
+import { WorkspaceState } from "@noovolari/leapp-core/services/team-service";
 
 export interface SelectedSegment {
   name: string;
@@ -50,8 +52,8 @@ export class SideBarComponent implements OnInit, OnDestroy {
   showAll: boolean;
   showPinned: boolean;
   modalRef: BsModalRef;
-  workspaceName: string;
-  teamUser: User;
+  workspaceState: WorkspaceState;
+  loggedUser: User;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
   private userSubscription;
@@ -61,7 +63,15 @@ export class SideBarComponent implements OnInit, OnDestroy {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.showAll = true;
     this.showPinned = false;
-    this.teamUser = null;
+    this.loggedUser = null;
+  }
+
+  get isLocalWorkspaceSelected(): boolean {
+    return this.workspaceState.id === constants.localWorkspaceKeychainValue;
+  }
+
+  get isUserLoggedIn(): boolean {
+    return !!this.loggedUser;
   }
 
   ngOnInit(): void {
@@ -76,10 +86,10 @@ export class SideBarComponent implements OnInit, OnDestroy {
     });
     sidebarHighlight.next({ showAll: true, showPinned: false, selectedSegment: -1 });
 
-    this.workspaceNameSubscription = this.appProviderService.teamService.workspaceNameState.subscribe((workspaceName: string) => {
-      this.workspaceName = workspaceName;
+    this.workspaceNameSubscription = this.appProviderService.teamService.workspaceState.subscribe((workspaceState: WorkspaceState) => {
+      this.workspaceState = workspaceState;
     });
-    this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.teamUser = user));
+    this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.loggedUser = user));
   }
 
   ngOnDestroy(): void {
@@ -169,6 +179,23 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   showOptionDialog(): void {
     this.bsModalService.show(OptionsDialogComponent, { animated: false, class: "option-modal" });
+  }
+
+  async loginToLeappTeam(): Promise<void> {
+    if (this.isUserLoggedIn) return;
+    this.bsModalService.show(LoginTeamDialogComponent, {
+      animated: false,
+      class: "create-modal",
+    });
+  }
+
+  async logoutFromLeappTeam(): Promise<void> {
+    if (!this.isUserLoggedIn) return;
+    await this.appProviderService.teamService.signOut();
+  }
+
+  async syncLeappTeam(): Promise<void> {
+    await this.appProviderService.teamService.syncSecrets();
   }
 
   async switchWorkspace(selectedWorkspace?: string): Promise<void> {

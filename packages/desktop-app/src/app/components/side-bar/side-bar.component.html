@@ -1,12 +1,36 @@
 <mat-list>
-  <mat-list-item class="workspace-selector">
-    <div mat-line class="workspace-selector-line" [matMenuTriggerFor]="workspaceSelectionMenu" (click)="setTrigger($event)" #workspaceSelectionTrigger="matMenuTrigger">
-      <i class="moon-Home"></i><span>{{workspaceName}}</span><i class="moon-Caret-down"></i>
-      <mat-menu #workspaceSelectionMenu="matMenu" [hasBackdrop]="false" role="menu">
+  <mat-list-item class="workspace-menu">
+    <div mat-line class="workspace-menu-line" [matMenuTriggerFor]="workspaceMenu" (click)="setTrigger($event)" #workspaceSelectionTrigger="matMenuTrigger">
+      <div class="workspace-icon-container">
+        <i class="moon-Home"></i>
+      </div>
+      <span class="workspace-name">{{workspaceName}}</span>
+      <i class="moon-Caret-down"></i>
+      <mat-menu #workspaceMenu="matMenu" [hasBackdrop]="false" role="menu">
         <ng-container *ngIf="teamUser === null || teamUser === undefined">
           <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
+
           <div mat-menu-item>
             <span>User not logged in</span>
+          </div>
+
+          <div class="divider"></div>
+          <div mat-menu-item>
+            <img src="assets/images/sign-in.svg" alt="sign-in">
+            <span>Sign-in Workspace</span>
+          </div>
+          <div mat-menu-item>
+            <img src="assets/images/buildings.svg" alt="manage-workspaces">
+            <span>Manage Workspaces</span>
+          </div>
+          <div class="divider"></div>
+          <div mat-menu-item (click)="showOptionDialog()">
+            <img src="assets/images/gear.svg" alt="settings">
+            <span>Settings...</span>
+          </div>
+          <div mat-menu-item>
+            <img src="assets/images/sign-out.svg" alt="sign-out">
+            <span>Lock</span>
           </div>
         </ng-container>
         <ng-container *ngIf="teamUser !== null && teamUser !== undefined">

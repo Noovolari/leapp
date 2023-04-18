@@ -18,6 +18,7 @@ import { integrationHighlight } from "../integration-bar/integration-bar.compone
 import { User } from "leapp-team-core/user/user";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { AppService } from "../../services/app.service";
+import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
 
 export interface SelectedSegment {
   name: string;
@@ -164,6 +165,10 @@ export class SideBarComponent implements OnInit, OnDestroy {
       this.workspaceSelectionTrigger.openMenu();
       this.appService.setMenuTrigger(this.workspaceSelectionTrigger);
     }, 100);
+  }
+
+  showOptionDialog(): void {
+    this.bsModalService.show(OptionsDialogComponent, { animated: false, class: "option-modal" });
   }
 
   async switchWorkspace(selectedWorkspace?: string): Promise<void> {

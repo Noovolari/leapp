@@ -4,15 +4,16 @@
 ::ng-deep {
   .mat-list.mat-list-base {
     user-select: none;
+    .mat-list-item.workspace-menu {
+      height: 55px!important;
+    }
   }
-  /* .mat-list-item:hover {
-    transition: all 0.2s ease;
-    opacity: 0.7;
-  } */
   .mat-line {
     font-size: 15px;
     &:hover {
-      all: unset!important;
+      &:not(.workspace-menu-line) {
+        all: unset!important;
+      }
       transition: all 0.2s ease;
       opacity: 0.7;
     }
@@ -125,7 +126,7 @@ i.moon-Caret-down {
   }
 }
 
-.mat-list-base .mat-list-item .workspace-selector:hover{
+.mat-list-base .mat-list-item .workspace-menu:hover{
   background: #f9f9f9;
   border-radius: 6px;
   margin-left: 10px !important;
@@ -134,19 +135,53 @@ i.moon-Caret-down {
   padding: 0;
 }
 
-.workspace-selector {
-  & .moon-Caret-down {
-    left: 10px !important;
+.workspace-menu {
+  .workspace-name {
+    margin: auto;
+    padding-left: 5px;
   }
-}
-
-.mat-list-base .mat-list-item .workspace-selector:hover .workspace-selector-line:hover {
-  all: revert;
-  opacity: 1;
+  .workspace-menu-line {
+    display: flex;
+  }
+  & .moon-Caret-down {
+    margin: auto;
+    position: initial;
+  }
+  .workspace-icon-container {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    background-color: $local-workspace-blu;
+    border: solid $silver-50 1px;
+    border-radius: 5px;
+    i {
+      position: relative;
+      top: 8px;
+      left: 8px;
+      color: $white-text-color;
+    }
+  }
 }
 
 ::ng-deep {
-  .mat-list-base .mat-list-item.workspace-selector:hover .mat-list-item-content {
-    padding: 0 0 0 16px !important;
+  .mat-list .workspace-menu {
+    .mat-list-item-content {
+      padding-left: 10px!important;
+      padding-bottom: 15px!important;
+    }
   }
+  .mat-menu-panel .mat-menu-content {
+    .mat-menu-item {
+      img {
+        width: 22px;
+        margin-right: 5px;
+        margin-left: -5px;
+      }
+    }
+  }
+}
+
+.mat-list-base .mat-list-item.workspace-menu:hover {
+  background: none!important;
+  width: unset!important;
 }

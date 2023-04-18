@@ -5,7 +5,7 @@ export const constants = {
   lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",
   workspaceLastVersion: 3,
-  localWorkspaceName: "My Workspace",
+  localWorkspaceName: "Local workspace",
   currentWorkspaceKeychainKey: "current-workspace",
   localWorkspaceKeychainValue: "local",
 

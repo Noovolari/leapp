@@ -28,11 +28,16 @@ export class ExecuteService {
     }
     // NOTE: Electron works in sandbox mode when built.
     // Unfortunately this comes with some problems with executing OS commands.
+    // This code just uses absolute path for the commands Leapp uses to interact with both AWS and AZ command line tools.
     // If this part is modified for some reason,
     // PLEASE TEST BUILD APPLICATION BEFORE RELEASING
     if (this.nativeService.process.platform === "darwin") {
       if (command.indexOf("osascript") !== -1) {
         command = "/usr/bin/" + command;
+      } else if (command.indexOf("cd") !== -1) {
+        command = "" + command;
+      } else {
+        command = "/usr/local/bin/" + command;
       }
     }
     // ========================================================

@@ -13,9 +13,12 @@
   .mat-menu-content {
     .mat-menu-item.workspace-select-item {
       display: flex;
-      height: 42px !important;
+      height: 50px !important;
       padding: 0 10px;
       margin-bottom: 5px;
+      margin-left: 5px;
+      margin-top: 5px;
+      align-items: center;
     }
   }
 
@@ -76,7 +79,7 @@
 }
 
 ::ng-deep {
-  .mat-list-text div span {
+  .mat-list-text div span:not(.workspace-name-initial) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -164,6 +167,19 @@ i.moon-Caret-down {
     margin-bottom: auto;
     flex-grow: 1;
     font-size: 15px;
+  }
+
+  .workspace-name-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    span:nth-child(1) {
+      font-size: 15px;
+    }
+    span:nth-child(2) {
+      font-size: 12px;
+      color: $table-text;
+    }
   }
 
   .workspace-menu-line {

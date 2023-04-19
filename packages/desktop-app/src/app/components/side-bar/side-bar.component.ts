@@ -54,6 +54,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   workspaceState: WorkspaceState;
   loggedUser: User;
+  localWorkspaceName: string;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
   private userSubscription;
@@ -64,6 +65,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     this.showAll = true;
     this.showPinned = false;
     this.loggedUser = null;
+    this.localWorkspaceName = constants.localWorkspaceName;
   }
 
   get isLocalWorkspaceSelected(): boolean {
@@ -198,10 +200,14 @@ export class SideBarComponent implements OnInit, OnDestroy {
     await this.appProviderService.teamService.syncSecrets();
   }
 
-  async switchWorkspace(selectedWorkspace?: string): Promise<void> {
-    if (selectedWorkspace === "local") {
+  async switchToLocalWorkspace(): Promise<void> {
+    if (!this.isLocalWorkspaceSelected) {
       await this.appProviderService.teamService.switchToLocalWorkspace();
-    } else {
+    }
+  }
+
+  async switchToRemoteWorkspace(): Promise<void> {
+    if (this.isLocalWorkspaceSelected) {
       await this.appProviderService.teamService.syncSecrets();
     }
   }

@@ -10,7 +10,7 @@
       </ng-container>
       <ng-container *ngIf="!isLocalWorkspaceSelected">
         <div class="workspace-icon-container remote">
-          <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
+          <span class="workspace-name-initial">{{loggedUser.teamName[0].toUpperCase()}}</span>
         </div>
         <span class="workspace-name">{{loggedUser.teamName}}</span>
       </ng-container>
@@ -18,21 +18,37 @@
       <mat-menu #workspaceMenu="matMenu" [hasBackdrop]="false" role="menu">
         <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
 
-        <div mat-menu-item class="workspace-select-item">
+
+
+
+        <div mat-menu-item class="workspace-select-item" (click)="switchToLocalWorkspace()">
           <div class="workspace-icon-container local">
             <i class="moon-Home"></i>
           </div>
-          <span class="workspace-name">{{workspaceState.name}}</span>
+          <div class="workspace-name-container">
+            <span>{{localWorkspaceName}}</span>
+            <span>Community Edition</span>
+          </div>
           <img class="workspace-menu-icon" *ngIf="isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
         </div>
 
-        <div *ngIf="isUserLoggedIn" mat-menu-item class="workspace-select-item">
+
+
+
+
+        <div *ngIf="isUserLoggedIn" mat-menu-item class="workspace-select-item" (click)="switchToRemoteWorkspace()">
           <div class="workspace-icon-container remote">
             <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
           </div>
-          <span class="workspace-name">{{loggedUser.teamName}}</span>
+          <div class="workspace-name-container">
+            <span>{{loggedUser.teamName}}</span>
+            <span>Team Plan early access</span>
+          </div>
           <img class="workspace-menu-icon" *ngIf="!isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
         </div>
+
+
+
 
         <div class="divider"></div>
         <div [disabled]="isUserLoggedIn" mat-menu-item (click)="loginToLeappTeam()">

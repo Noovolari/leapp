@@ -342,7 +342,11 @@ describe("TeamService", () => {
     createTeamServiceInstance();
     const workspaceKeychainSecret = `{"publicRSAKey":"mock-rsa-key","teamId":"mock-id","teamName":"mock-name"}`;
     teamService.teamSignedInUserKeychainKey = "mock-keychain";
-    teamService.getKeychainCurrentWorkspace = jest.fn(() => "local");
+    teamService.getKeychainCurrentWorkspace = jest.fn(() => {
+      expect(teamService.switchingWorkspaceState.next).toHaveBeenCalledTimes(1);
+      expect(teamService.switchingWorkspaceState.next).toHaveBeenCalledWith(true);
+      return "local";
+    });
     teamService.keyChainService = {
       getSecret: jest.fn(() => workspaceKeychainSecret),
     };
@@ -354,6 +358,7 @@ describe("TeamService", () => {
     };
     teamService.signedInUserState.next = jest.fn();
     teamService.workspaceState.next = jest.fn();
+    teamService.switchingWorkspaceState.next = jest.fn();
     teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository = jest.fn();
 
     await teamService.refreshWorkspaceState();
@@ -366,6 +371,23 @@ describe("TeamService", () => {
     expect(teamService.signedInUserState.next).toHaveBeenCalledWith(JSON.parse(workspaceKeychainSecret));
     expect(teamService.workspaceState.next).toHaveBeenCalledWith({ name: constants.localWorkspaceName, id: constants.localWorkspaceKeychainValue });
     expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
+    expect(teamService.switchingWorkspaceState.next).toHaveBeenCalledTimes(2);
+    expect(teamService.switchingWorkspaceState.next).toHaveBeenNthCalledWith(2, false);
+  });
+
+  test("refreshWorkspaceState, switchingWorkspaceState set to false even with errors", async () => {
+    createTeamServiceInstance();
+    teamService.switchingWorkspaceState.next = jest.fn();
+    teamService.getKeychainCurrentWorkspace = jest.fn(() => {
+      throw new Error("some error");
+    });
+
+    try {
+      await teamService.refreshWorkspaceState();
+    } catch (error: any) {}
+
+    expect(teamService.switchingWorkspaceState.next).toHaveBeenCalledTimes(2);
+    expect(teamService.switchingWorkspaceState.next).toHaveBeenNthCalledWith(2, false);
   });
 
   test("refreshWorkspaceState, remote workspace", async () => {

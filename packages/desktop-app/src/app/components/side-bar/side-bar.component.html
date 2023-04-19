@@ -18,9 +18,6 @@
       <mat-menu #workspaceMenu="matMenu" [hasBackdrop]="false" role="menu">
         <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
 
-
-
-
         <div mat-menu-item class="workspace-select-item" (click)="switchToLocalWorkspace()">
           <div class="workspace-icon-container local">
             <i class="moon-Home"></i>
@@ -32,10 +29,6 @@
           <img class="workspace-menu-icon" *ngIf="isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
         </div>
 
-
-
-
-
         <div *ngIf="isUserLoggedIn" mat-menu-item class="workspace-select-item" (click)="switchToRemoteWorkspace()">
           <div class="workspace-icon-container remote">
             <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
@@ -46,9 +39,6 @@
           </div>
           <img class="workspace-menu-icon" *ngIf="!isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
         </div>
-
-
-
 
         <div class="divider"></div>
         <div [disabled]="isUserLoggedIn" mat-menu-item (click)="loginToLeappTeam()">

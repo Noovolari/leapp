@@ -188,6 +188,8 @@ export class SideBarComponent implements OnInit, OnDestroy {
     this.bsModalService.show(LoginTeamDialogComponent, {
       animated: false,
       class: "create-modal",
+      backdrop: "static",
+      keyboard: false,
     });
   }
 
@@ -196,19 +198,17 @@ export class SideBarComponent implements OnInit, OnDestroy {
     await this.appProviderService.teamService.signOut();
   }
 
-  async syncLeappTeam(): Promise<void> {
-    await this.appProviderService.teamService.syncSecrets();
-  }
-
   async switchToLocalWorkspace(): Promise<void> {
     if (!this.isLocalWorkspaceSelected) {
       await this.appProviderService.teamService.switchToLocalWorkspace();
+      this.resetFilters();
     }
   }
 
   async switchToRemoteWorkspace(): Promise<void> {
     if (this.isLocalWorkspaceSelected) {
       await this.appProviderService.teamService.syncSecrets();
+      this.resetFilters();
     }
   }
 }

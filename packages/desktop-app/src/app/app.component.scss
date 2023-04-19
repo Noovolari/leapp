@@ -4,3 +4,31 @@
   margin-top: -30px;
   top: 50%;
 }
+
+#loader-overlay {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+
+  i {
+    color: #CCC;
+    font-size: 30px;
+  }
+
+  span {
+    margin-top: 15px;
+    color: #CCC;
+  }
+
+  &.hidden {
+    display: none;
+  }
+}

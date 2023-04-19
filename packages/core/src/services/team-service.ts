@@ -42,6 +42,7 @@ export class TeamService {
   httpClient: HttpClientInterface;
   private readonly _signedInUserState$: BehaviorSubject<User>;
   private readonly _workspaceState$: BehaviorSubject<WorkspaceState>;
+  private readonly _switchingWorkspaceState$: BehaviorSubject<boolean>;
   private readonly teamSignedInUserKeychainKey = "team-signed-in-user";
   private readonly encryptionProvider: EncryptionProvider;
   private readonly vaultProvider: VaultProvider;
@@ -67,6 +68,7 @@ export class TeamService {
     const apiEndpoint = "https://2nfksla7qi.execute-api.eu-west-1.amazonaws.com";
     this._signedInUserState$ = new BehaviorSubject<User>(null);
     this._workspaceState$ = new BehaviorSubject<WorkspaceState>({ id: "", name: "" });
+    this._switchingWorkspaceState$ = new BehaviorSubject<boolean>(false);
     this.encryptionProvider = new EncryptionProvider(crypto);
     this.httpClientProvider = new HttpClientProvider();
     this.vaultProvider = new VaultProvider(apiEndpoint, this.httpClientProvider, this.encryptionProvider);
@@ -79,6 +81,10 @@ export class TeamService {
 
   get workspaceState(): BehaviorSubject<WorkspaceState> {
     return this._workspaceState$;
+  }
+
+  get switchingWorkspaceState(): BehaviorSubject<boolean> {
+    return this._switchingWorkspaceState$;
   }
 
   async setCurrentWorkspace(): Promise<void> {
@@ -165,26 +171,31 @@ export class TeamService {
   }
 
   async refreshWorkspaceState(callback?: () => Promise<void>): Promise<void> {
-    const keychainCurrentWorkspace = await this.getKeychainCurrentWorkspace();
-    const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey));
-    let workspaceState: WorkspaceState;
+    this.switchingWorkspaceState.next(true);
+    try {
+      const keychainCurrentWorkspace = await this.getKeychainCurrentWorkspace();
+      const signedInUser = JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey));
+      let workspaceState: WorkspaceState;
 
-    if (keychainCurrentWorkspace === constants.localWorkspaceKeychainValue) {
-      this.fileService.aesKey = this.nativeService.machineId;
-      this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
-      this.workspaceService.reloadWorkspace();
-      workspaceState = { name: constants.localWorkspaceName, id: constants.localWorkspaceKeychainValue };
-    } else {
-      this.fileService.aesKey = signedInUser.publicRSAKey;
-      this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
-      // If called from CLI, it needs workspaceService.reloadWorkspace() to be invoked.
-      await callback?.();
-      workspaceState = { name: signedInUser.teamName, id: signedInUser.teamId };
+      if (keychainCurrentWorkspace === constants.localWorkspaceKeychainValue) {
+        this.fileService.aesKey = this.nativeService.machineId;
+        this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
+        this.workspaceService.reloadWorkspace();
+        workspaceState = { name: constants.localWorkspaceName, id: constants.localWorkspaceKeychainValue };
+      } else {
+        this.fileService.aesKey = signedInUser.publicRSAKey;
+        this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
+        // If called from CLI, it needs workspaceService.reloadWorkspace() to be invoked.
+        await callback?.();
+        workspaceState = { name: signedInUser.teamName, id: signedInUser.teamId };
+      }
+
+      this.signedInUserState.next(signedInUser);
+      this.workspaceState.next(workspaceState);
+      this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
+    } finally {
+      this.switchingWorkspaceState.next(false);
     }
-
-    this.signedInUserState.next(signedInUser);
-    this.workspaceState.next(workspaceState);
-    this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
   }
 
   private async getKeychainCurrentWorkspace(): Promise<string> {

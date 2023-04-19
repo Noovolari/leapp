@@ -42,6 +42,7 @@ USAGE
 * [`leapp profile`](scopes/profile.md) - Leapp AWS Multi-profile management
 * [`leapp region`](scopes/region.md) - Leapp regions management
 * [`leapp session`](scopes/session.md) - Sessions management
+* [`leapp set-workspace`](scopes/set-workspace.md) - Set the current Leapp workspace
 * [`leapp team`](scopes/team.md) - Login to your Team account
 * [`leapp version`](scopes/version.md) - Displays the Cli and Core versions
 * [`leapp workspace`](scopes/workspace.md) - Show the current workspace

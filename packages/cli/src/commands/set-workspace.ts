@@ -1,7 +1,12 @@
-import { LeappCommand } from "../../leapp-command";
+import { LeappCommand } from "../leapp-command";
 import { Config } from "@oclif/core/lib/config/config";
 import { Args } from "@oclif/core";
 import { constants } from "@noovolari/leapp-core/models/constants";
+
+interface WorkspaceInfo {
+  workspaceId: string;
+  workspaceName: string;
+}
 
 export default class SetWorkspace extends LeappCommand {
   static description = "Set the current Leapp workspace";
@@ -22,57 +27,62 @@ export default class SetWorkspace extends LeappCommand {
     try {
       const { args } = await this.parse(SetWorkspace);
       if (args.workspaceName !== undefined) {
-        const workspaceId = await this.getWorkspaceIdByName(args.workspaceName);
-        await this.setWorkspace(workspaceId);
+        const workspace = await this.getWorkspaceByName(args.workspaceName);
+        await this.setWorkspace(workspace);
       } else {
-        const workspaceId = await this.getWorkspaceIdInteractively();
-        await this.setWorkspace(workspaceId);
+        const workspace = await this.getWorkspaceInteractively();
+        await this.setWorkspace(workspace);
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);
     }
   }
 
-  private async getWorkspaceIdByName(workspaceName: string): Promise<string> {
+  private async getWorkspaceByName(workspaceName: string): Promise<WorkspaceInfo> {
     const signedInUser = this.cliProviderService.teamService.signedInUserState?.getValue();
-    if (signedInUser && workspaceName === signedInUser.teamName) {
+    if (signedInUser && workspaceName.toLowerCase() === signedInUser.teamName.toLowerCase()) {
       //TODO: when we are going to implement multiple teams, we'll need to retrieve the correct one
-      return signedInUser.teamId;
-    } else if (workspaceName === constants.localWorkspaceKeychainValue) {
-      return constants.localWorkspaceKeychainValue;
+      return { workspaceId: signedInUser.teamId, workspaceName: signedInUser.teamName };
+    } else if (
+      workspaceName.toLowerCase() === constants.localWorkspaceKeychainValue.toLowerCase() ||
+      workspaceName.toLowerCase() === constants.localWorkspaceName.toLowerCase()
+    ) {
+      return { workspaceId: constants.localWorkspaceKeychainValue, workspaceName: constants.localWorkspaceName };
     } else {
       throw new Error("the selected workspace does not exist");
     }
   }
 
-  private async getWorkspaceIdInteractively(): Promise<string> {
+  private async getWorkspaceInteractively(): Promise<WorkspaceInfo> {
     const signedInUser = this.cliProviderService.teamService.signedInUserState?.getValue();
-    const workspaces = signedInUser ? [{ name: signedInUser.teamName, value: signedInUser.teamId }] : [];
+    const workspaces = signedInUser
+      ? [{ name: signedInUser.teamName, value: { workspaceId: signedInUser.teamId, workspaceName: signedInUser.teamName } }]
+      : [];
     const answer: any = await this.cliProviderService.inquirer.prompt([
       {
-        name: "selectedWorkspaceId",
+        name: "selectedWorkspace",
         message: "select a workspace",
         type: "list",
         choices: [
           {
-            name: constants.localWorkspaceName,
-            value: constants.localWorkspaceKeychainValue,
+            name: `${constants.localWorkspaceName} (${constants.localWorkspaceKeychainValue})`,
+            value: { workspaceId: constants.localWorkspaceKeychainValue, workspaceName: constants.localWorkspaceName },
           },
           ...workspaces,
         ],
       },
     ]);
-    return answer.selectedWorkspaceId;
+    return answer.selectedWorkspace;
   }
 
-  private async setWorkspace(workspaceId: string) {
-    if (workspaceId === constants.localWorkspaceKeychainValue) {
+  private async setWorkspace(workspace: WorkspaceInfo) {
+    if (workspace.workspaceId === constants.localWorkspaceKeychainValue) {
       await this.cliProviderService.teamService.switchToLocalWorkspace();
     } else {
       //TODO: with multiple workspace, this method this will call setRemoteWorkspace(workspaceId)
       await this.cliProviderService.teamService.syncSecrets();
     }
-    this.log("workspace set correctly");
+    this.log(`workspace ${workspace.workspaceName} set correctly`);
     await this.cliProviderService.remoteProceduresClient.refreshWorkspaceState();
   }
 }

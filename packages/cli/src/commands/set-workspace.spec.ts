@@ -11,28 +11,27 @@ describe("SetWorkspace", () => {
 
   test("run in interactive mode", async () => {
     const args = {};
-    const workspaceId = "mock-workspace-id";
+    const workspaceInfo = { workspaceId: "mock-workspace-id", workspaceName: "mock-name" };
     const command = getTestCommand(null, []);
     command.parse = jest.fn(() => ({ args }));
-    command.getWorkspaceIdInteractively = jest.fn(() => workspaceId);
+    command.getWorkspaceInteractively = jest.fn(() => workspaceInfo);
     command.setWorkspace = jest.fn();
     await command.run();
     expect(command.parse).toHaveBeenCalled();
-    expect(command.getWorkspaceIdInteractively).toHaveBeenCalled();
-    expect(command.setWorkspace).toHaveBeenCalledWith(workspaceId);
+    expect(command.getWorkspaceInteractively).toHaveBeenCalled();
+    expect(command.setWorkspace).toHaveBeenCalledWith(workspaceInfo);
   });
 
   test("run with argument", async () => {
-    const workspaceId = "mock-workspace-id";
-    const workspaceName = "mock-workspace-name";
-    const args = { workspaceName };
+    const workspaceInfo = { workspaceId: "mock-workspace-id", workspaceName: "mock-name" };
+    const args = { workspaceName: workspaceInfo.workspaceName };
     const command = getTestCommand(null, []);
     command.parse = () => ({ args });
     command.setWorkspace = jest.fn(() => {});
-    command.getWorkspaceIdByName = jest.fn(() => workspaceId);
+    command.getWorkspaceByName = jest.fn(() => workspaceInfo);
     await command.run();
-    expect(command.getWorkspaceIdByName).toHaveBeenCalledWith(workspaceName);
-    expect(command.setWorkspace).toHaveBeenCalledWith(workspaceId);
+    expect(command.getWorkspaceByName).toHaveBeenCalledWith(workspaceInfo.workspaceName);
+    expect(command.setWorkspace).toHaveBeenCalledWith(workspaceInfo);
   });
 
   test("run - throws an error", async () => {
@@ -56,7 +55,7 @@ describe("SetWorkspace", () => {
     expect(command.error).toHaveBeenCalledWith(`Unknown error: ${mockedError}`);
   });
 
-  test("getWorkspaceIdByName - local workspace", async () => {
+  test("getWorkspaceByName - local workspace", async () => {
     const command = getTestCommand(null, []);
     command.cliProviderService = {
       teamService: {
@@ -65,12 +64,12 @@ describe("SetWorkspace", () => {
         },
       },
     };
-    const result = await command.getWorkspaceIdByName("local");
-    expect(result).toBe(constants.localWorkspaceKeychainValue);
+    const result = await command.getWorkspaceByName("locAL");
+    expect(result).toStrictEqual({ workspaceId: constants.localWorkspaceKeychainValue, workspaceName: constants.localWorkspaceName });
   });
 
-  test("getWorkspaceIdByName - remote workspace exists", async () => {
-    const signedInUser = { teamName: "mocked-team-name", teamId: "mocked-id" };
+  test("getWorkspaceByName - remote workspace exists", async () => {
+    const signedInUser = { teamName: "mocked-TEAM-name", teamId: "mocked-id" };
     const command = getTestCommand(null, []);
     command.cliProviderService = {
       teamService: {
@@ -79,12 +78,12 @@ describe("SetWorkspace", () => {
         },
       },
     };
-    const result = await command.getWorkspaceIdByName("mocked-team-name");
+    const result = await command.getWorkspaceByName("Mocked-Team-Name");
     expect(command.cliProviderService.teamService.signedInUserState.getValue).toHaveBeenCalled();
-    expect(result).toBe("mocked-id");
+    expect(result).toStrictEqual({ workspaceId: "mocked-id", workspaceName: "mocked-TEAM-name" });
   });
 
-  test("getWorkspaceIdByName - remote workspace does not exists", async () => {
+  test("getWorkspaceByName - remote workspace does not exists", async () => {
     const signedInUser = { teamName: "mocked-team-name", teamId: "mocked-id" };
     const command = getTestCommand(null, []);
     command.cliProviderService = {
@@ -94,11 +93,11 @@ describe("SetWorkspace", () => {
         },
       },
     };
-    await expect(command.getWorkspaceIdByName("wrong-mocked-team-name")).rejects.toThrow("the selected workspace does not exist");
+    await expect(command.getWorkspaceByName("wrong-mocked-team-name")).rejects.toThrow("the selected workspace does not exist");
   });
 
-  test("getWorkspaceIdByName - user is not signed in", async () => {
-    const signedInUser = {};
+  test("getWorkspaceByName - user is not signed in", async () => {
+    const signedInUser = { teamName: "wrong-team-name" };
     const command = getTestCommand(null, []);
     command.cliProviderService = {
       teamService: {
@@ -107,29 +106,29 @@ describe("SetWorkspace", () => {
         },
       },
     };
-    await expect(command.getWorkspaceIdByName("mocked-team-name")).rejects.toThrow("the selected workspace does not exist");
+    await expect(command.getWorkspaceByName("mocked-team-name")).rejects.toThrow("the selected workspace does not exist");
   });
 
-  test("getWorkspaceIdInteractively - user is signed in", async () => {
+  test("getWorkspaceInteractively - user is signed in", async () => {
     const questions = [
       {
-        name: "selectedWorkspaceId",
+        name: "selectedWorkspace",
         message: "select a workspace",
         type: "list",
         choices: [
           {
-            name: constants.localWorkspaceName,
-            value: constants.localWorkspaceKeychainValue,
+            name: `${constants.localWorkspaceName} (${constants.localWorkspaceKeychainValue})`,
+            value: { workspaceId: constants.localWorkspaceKeychainValue, workspaceName: constants.localWorkspaceName },
           },
           {
-            name: "mocked-team-name",
-            value: "mocked-id",
+            name: "mocked-workspace-name",
+            value: { workspaceId: "mocked-id", workspaceName: "mocked-workspace-name" },
           },
         ],
       },
     ];
-    const signedInUser = { teamName: "mocked-team-name", teamId: "mocked-id" };
-    const selectedWorkspaceId = "mocked-id";
+    const signedInUser = { teamName: "mocked-workspace-name", teamId: "mocked-id" };
+    const selectedWorkspace = { workspaceId: "mocked-id", workspaceName: "mocked-workspace-name" };
     const command = getTestCommand(null, []);
     command.cliProviderService = {
       teamService: {
@@ -138,31 +137,31 @@ describe("SetWorkspace", () => {
         },
       },
       inquirer: {
-        prompt: jest.fn(async () => ({ selectedWorkspaceId })),
+        prompt: jest.fn(async () => ({ selectedWorkspace })),
       },
     };
-    const result = await command.getWorkspaceIdInteractively();
+    const result = await command.getWorkspaceInteractively();
     expect(command.cliProviderService.teamService.signedInUserState.getValue).toHaveBeenCalled();
     expect(command.cliProviderService.inquirer.prompt).toHaveBeenCalledWith(questions);
-    expect(result).toBe(selectedWorkspaceId);
+    expect(result).toBe(selectedWorkspace);
   });
 
-  test("getWorkspaceIdInteractively - user is not signed in", async () => {
+  test("getWorkspaceInteractively - user is not signed in", async () => {
     const questions = [
       {
-        name: "selectedWorkspaceId",
+        name: "selectedWorkspace",
         message: "select a workspace",
         type: "list",
         choices: [
           {
-            name: constants.localWorkspaceName,
-            value: constants.localWorkspaceKeychainValue,
+            name: `${constants.localWorkspaceName} (${constants.localWorkspaceKeychainValue})`,
+            value: { workspaceId: constants.localWorkspaceKeychainValue, workspaceName: constants.localWorkspaceName },
           },
         ],
       },
     ];
     const signedInUser = undefined;
-    const selectedWorkspaceId = constants.localWorkspaceKeychainValue;
+    const selectedWorkspace = { workspaceId: constants.localWorkspaceKeychainValue, workspaceName: constants.localWorkspaceName };
     const command = getTestCommand(null, []);
     command.cliProviderService = {
       teamService: {
@@ -171,13 +170,13 @@ describe("SetWorkspace", () => {
         },
       },
       inquirer: {
-        prompt: jest.fn(async () => ({ selectedWorkspaceId })),
+        prompt: jest.fn(async () => ({ selectedWorkspace })),
       },
     };
-    const result = await command.getWorkspaceIdInteractively();
+    const result = await command.getWorkspaceInteractively();
     expect(command.cliProviderService.teamService.signedInUserState.getValue).toHaveBeenCalled();
     expect(command.cliProviderService.inquirer.prompt).toHaveBeenCalledWith(questions);
-    expect(result).toBe(selectedWorkspaceId);
+    expect(result).toBe(selectedWorkspace);
   });
 
   test("setWorkspace - local", async () => {
@@ -191,9 +190,9 @@ describe("SetWorkspace", () => {
       },
     };
     command.log = jest.fn();
-    await command.setWorkspace(constants.localWorkspaceKeychainValue);
+    await command.setWorkspace({ workspaceId: constants.localWorkspaceKeychainValue, workspaceName: constants.localWorkspaceName });
     expect(command.cliProviderService.teamService.switchToLocalWorkspace).toHaveBeenCalled();
-    expect(command.log).toHaveBeenCalledWith("workspace set correctly");
+    expect(command.log).toHaveBeenCalledWith(`workspace ${constants.localWorkspaceName} set correctly`);
     expect(command.cliProviderService.remoteProceduresClient.refreshWorkspaceState).toHaveBeenCalled();
   });
 
@@ -208,9 +207,9 @@ describe("SetWorkspace", () => {
       },
     };
     command.log = jest.fn();
-    await command.setWorkspace("mocked-workspace-id");
+    await command.setWorkspace({ workspaceId: "mocked-workspace-id", workspaceName: "mocked-workspace-name" });
     expect(command.cliProviderService.teamService.syncSecrets).toHaveBeenCalled();
-    expect(command.log).toHaveBeenCalledWith("workspace set correctly");
+    expect(command.log).toHaveBeenCalledWith(`workspace mocked-workspace-name set correctly`);
     expect(command.cliProviderService.remoteProceduresClient.refreshWorkspaceState).toHaveBeenCalled();
   });
 });

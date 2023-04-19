@@ -23,7 +23,7 @@
             <i class="moon-Home"></i>
           </div>
           <span class="workspace-name">{{workspaceState.name}}</span>
-          <img *ngIf="isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
+          <img class="workspace-menu-icon" *ngIf="isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
         </div>
 
         <div *ngIf="isUserLoggedIn" mat-menu-item class="workspace-select-item">
@@ -31,25 +31,25 @@
             <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
           </div>
           <span class="workspace-name">{{loggedUser.teamName}}</span>
-          <img *ngIf="!isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
+          <img class="workspace-menu-icon" *ngIf="!isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
         </div>
 
         <div class="divider"></div>
         <div [disabled]="isUserLoggedIn" mat-menu-item (click)="loginToLeappTeam()">
-          <img src="assets/images/sign-in.svg" alt="sign-in">
+          <img class="workspace-menu-icon" src="assets/images/sign-in.svg" alt="sign-in">
           <span>Sign-in Workspace</span>
         </div>
         <div mat-menu-item>
-          <img src="assets/images/buildings.svg" alt="manage-workspaces">
+          <img class="workspace-menu-icon" src="assets/images/buildings.svg" alt="manage-workspaces">
           <span>Manage Workspaces</span>
         </div>
         <div class="divider"></div>
         <div mat-menu-item (click)="showOptionDialog()">
-          <img src="assets/images/gear.svg" alt="settings">
+          <img class="workspace-menu-icon" src="assets/images/gear.svg" alt="settings">
           <span>Settings...</span>
         </div>
         <div [disabled]="!isUserLoggedIn" mat-menu-item (click)="logoutFromLeappTeam()">
-          <img src="assets/images/sign-out.svg" alt="sign-out">
+          <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out">
           <span>Lock</span>
         </div>
       </mat-menu>

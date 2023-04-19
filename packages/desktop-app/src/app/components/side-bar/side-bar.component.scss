@@ -15,6 +15,7 @@
       display: flex;
       height: 42px !important;
       padding: 0 10px;
+      margin-bottom: 5px;
     }
   }
 
@@ -162,6 +163,7 @@ i.moon-Caret-down {
     margin-top: auto;
     margin-bottom: auto;
     flex-grow: 1;
+    font-size: 15px;
   }
 
   .workspace-menu-line {
@@ -215,8 +217,8 @@ i.moon-Caret-down {
   .mat-menu-panel .mat-menu-content {
     .mat-menu-item {
       img {
-        width: 22px;
-        margin-right: 5px;
+        width: 20px;
+        margin-right: 7px;
         margin-left: -5px;
       }
     }

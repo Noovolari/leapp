@@ -521,4 +521,8 @@ body.dark-theme {
   .selected i.fa-circle.active {
     color: #64D1B9 !important;
   }
+
+  .workspace-menu-icon {
+    filter: invert(1);
+  }
 }

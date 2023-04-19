@@ -4,19 +4,37 @@
 ::ng-deep {
   .mat-list.mat-list-base {
     user-select: none;
+
+    .mat-list-item.workspace-menu {
+      height: 55px !important;
+    }
   }
-  /* .mat-list-item:hover {
-    transition: all 0.2s ease;
-    opacity: 0.7;
-  } */
+
+  .mat-menu-content {
+    .mat-menu-item.workspace-select-item {
+      display: flex;
+      height: 50px !important;
+      padding: 0 10px;
+      margin-bottom: 5px;
+      margin-left: 5px;
+      margin-top: 5px;
+      align-items: center;
+    }
+  }
+
   .mat-line {
     font-size: 15px;
+
     &:hover {
-      all: unset!important;
+      &:not(.workspace-menu-line) {
+        all: unset !important;
+      }
+
       transition: all 0.2s ease;
       opacity: 0.7;
     }
   }
+
   .mat-list-item-content {
     cursor: pointer;
     margin-top: 2px;
@@ -24,6 +42,9 @@
 
     i {
       font-size: 20px;
+    }
+
+    i:not(.moon-Home) {
       margin-right: 8px;
       position: relative;
       top: -1px;
@@ -37,12 +58,13 @@
       opacity: 0.7;
     }
   }
+
   .moon-Row {
-    top: -2px!important;
+    top: -2px !important;
   }
 
   .mat-list-item-content:hover i.moon-Close {
-    display: inline-block!important;
+    display: inline-block !important;
     color: $text-color;
     font-size: 18px;
     margin-top: 6px;
@@ -57,7 +79,7 @@
 }
 
 ::ng-deep {
-  .mat-list-text div span {
+  .mat-list-text div span:not(.workspace-name-initial) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -70,17 +92,18 @@
 .selected-segment {
   background-color: $silver-25;
   border-radius: 6px;
-  margin-left: 10px!important;
-  width: 218px!important;
+  margin-left: 10px !important;
+  width: 218px !important;
   transition: all 0.2s ease;
 }
 
 ::ng-deep {
   .mat-expansion-panel-header {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"!important;
-    font-size: 14px!important;
-    font-weight: 500!important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
   }
+
   .selected-segment .mat-list-item-content .mat-list-text {
     margin-left: -10px;
   }
@@ -96,9 +119,11 @@ div.space-between-mat-lists {
     display: none;
     margin-top: -4px;
   }
+
   .mat-list-item.selected-segment:hover {
-    background-color:$silver-25!important;
+    background-color: $silver-25 !important;
   }
+
   .mat-list-item.selected-segment:hover .mat-list-item-content .mat-list-text .mat-line {
     transition: unset;
     opacity: 1;
@@ -118,6 +143,7 @@ i.moon-Caret-down {
   .mat-expansion-panel-header:not([aria-disabled=true]) {
     width: 250px;
   }
+
   .mat-expanded .mat-content mat-panel-title .mat-subheader i.moon-Caret-down {
     display: inline-block;
     transform: rotate(180deg);
@@ -125,7 +151,7 @@ i.moon-Caret-down {
   }
 }
 
-.mat-list-base .mat-list-item .workspace-selector:hover{
+.mat-list-base .mat-list-item .workspace-menu:hover {
   background: #f9f9f9;
   border-radius: 6px;
   margin-left: 10px !important;
@@ -134,19 +160,102 @@ i.moon-Caret-down {
   padding: 0;
 }
 
-.workspace-selector {
-  & .moon-Caret-down {
-    left: 10px !important;
+.workspace-menu, .workspace-select-item {
+  .workspace-name {
+    padding-left: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+    flex-grow: 1;
+    font-size: 15px;
   }
-}
 
-.mat-list-base .mat-list-item .workspace-selector:hover .workspace-selector-line:hover {
-  all: revert;
-  opacity: 1;
+  .workspace-name-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    span {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 180px;
+    }
+
+    span:nth-child(1) {
+      font-size: 15px;
+      line-height: initial;
+      padding-left: 10px;
+    }
+
+    span:nth-child(2) {
+      font-size: 12px;
+      color: $table-text;
+      line-height: initial;
+      padding-left: 10px;
+      padding-top: 2px;
+    }
+  }
+
+  .workspace-menu-line {
+    display: flex;
+  }
+
+  & .moon-Caret-down {
+    margin: auto;
+    position: initial;
+  }
+
+  .workspace-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border: solid $silver-50 1px;
+    border-radius: 5px;
+
+    &.local {
+      background-color: $local-workspace-blu;
+    }
+
+    &.remote {
+      background-color: $remote-workspace-purple;
+
+      span {
+        color: $white-text-color;
+        font-size: 16px;
+      }
+    }
+
+    i {
+      position: relative;
+      top: 0;
+      color: $white-text-color;
+    }
+  }
 }
 
 ::ng-deep {
-  .mat-list-base .mat-list-item.workspace-selector:hover .mat-list-item-content {
-    padding: 0 0 0 16px !important;
+  .mat-list .workspace-menu {
+    .mat-list-item-content {
+      padding-left: 10px !important;
+      padding-bottom: 15px !important;
+    }
   }
+
+  .mat-menu-panel .mat-menu-content {
+    .mat-menu-item {
+      img {
+        width: 20px;
+        margin-right: 7px;
+        margin-left: -5px;
+      }
+    }
+  }
+}
+
+.mat-list-base .mat-list-item.workspace-menu:hover {
+  background: none !important;
+  width: unset !important;
 }

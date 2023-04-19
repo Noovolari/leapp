@@ -15,11 +15,11 @@ export default class Workspace extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const workspaceName = this.cliProviderService.teamService.workspaceNameState.getValue();
-      if (workspaceName === constants.localWorkspaceName) {
+      const workspaceState = this.cliProviderService.teamService.workspaceState.getValue();
+      if (workspaceState.id === constants.localWorkspaceKeychainValue) {
         this.log("local");
       } else {
-        this.log(workspaceName);
+        this.log(workspaceState.name);
       }
     } catch (error) {
       this.error(error instanceof Error ? error.message : `Unknown error: ${error}`);

@@ -75,6 +75,10 @@ html, body {
     top: 2px;
   }
 
+  .mat-menu-item[disabled] {
+    opacity: 0.5;
+  }
+
   .mat-menu-item:hover:not([disabled]),
   .mat-menu-item.cdk-program-focused:not([disabled]),
   .mat-menu-item.cdk-keyboard-focused:not([disabled]),
@@ -861,7 +865,7 @@ tr:hover .moon-hover-session {
 .enable-option {
   .mat-slide-toggle-label {
     gap: 10px;
-    left: -148px!important;
+    left: -148px !important;
     position: relative;
   }
 

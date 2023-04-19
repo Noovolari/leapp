@@ -5,6 +5,7 @@ import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/service
 import { User } from "leapp-team-core/user/user";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { TeamService } from "@noovolari/leapp-core/services/team-service";
+import { BsModalRef } from "ngx-bootstrap/modal";
 
 @Component({
   selector: "app-login-team-dialog",
@@ -15,7 +16,12 @@ export class LoginTeamDialogComponent implements OnInit {
   private loggingService: LogService;
   private teamService: TeamService;
 
-  constructor(public appService: AppService, public appProviderService: AppProviderService, private messageToasterService: MessageToasterService) {
+  constructor(
+    private bsModalRef: BsModalRef,
+    public appService: AppService,
+    public appProviderService: AppProviderService,
+    private messageToasterService: MessageToasterService
+  ) {
     this.loggingService = appProviderService.logService;
     this.teamService = appProviderService.teamService;
   }

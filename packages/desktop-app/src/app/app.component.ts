@@ -39,6 +39,8 @@ import { TeamService } from "@noovolari/leapp-core/services/team-service";
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent implements OnInit {
+  isSwitchingWorkspace: boolean;
+
   private fileService: FileService;
   private awsCoreService: AwsCoreService;
   private loggingService: LogService;
@@ -170,6 +172,8 @@ export class AppComponent implements OnInit {
     }
 
     ConfigurationService.setForcedEndpoint(environment.apiEndpoint);
+
+    this.teamService.switchingWorkspaceState.subscribe((isSwitchingWorkspace: boolean) => (this.isSwitchingWorkspace = isSwitchingWorkspace));
 
     // Check the existence of a current-workspace key in the system keychain and
     // load the corresponding workspace

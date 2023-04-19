@@ -20,8 +20,6 @@ import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
-import { User } from "leapp-team-core/user/user";
-import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -66,8 +64,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   filterExtended: boolean;
   compactMode: boolean;
-  teamUser: User;
-  workspaceName: string;
+  isLocalWorkspace: boolean;
 
   eConstants = constants;
 
@@ -78,11 +75,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private subscription4;
   private subscription5;
   private subscription6;
-  private userSubscription;
+  private workspaceStateSubscription;
 
   private currentSegment: Segment;
   private behaviouralSubjectService: BehaviouralSubjectService;
-  private workspaceNameSubscription;
 
   constructor(
     public optionsService: OptionsService,
@@ -96,7 +92,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.filterExtended = false;
     this.compactMode = false;
-    this.teamUser = null;
 
     globalFilteredSessions.next(this.behaviouralSubjectService.sessions);
 
@@ -172,10 +167,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       globalFilteredSessions.next(sessions);
     });
 
-    this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.teamUser = user));
-
-    this.workspaceNameSubscription = this.appProviderService.teamService.workspaceNameState.subscribe((workspaceName: string) => {
-      this.workspaceName = workspaceName;
+    this.workspaceStateSubscription = this.appProviderService.teamService.workspaceState.subscribe((state) => {
+      this.isLocalWorkspace = state.id === constants.localWorkspaceKeychainValue;
     });
   }
 
@@ -187,8 +180,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.subscription4.unsubscribe();
     this.subscription5.unsubscribe();
     this.subscription6.unsubscribe();
-    this.userSubscription.unsubscribe();
-    this.workspaceNameSubscription.unsubscribe();
   }
 
   ngAfterContentChecked(): void {
@@ -271,21 +262,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         this.windowService.getCurrentWindow().maximize();
       }
     }
-  }
-
-  async loginToTeamPortal(): Promise<void> {
-    this.bsModalService.show(LoginTeamDialogComponent, {
-      animated: false,
-      class: "create-modal",
-    });
-  }
-
-  async logoutFromTeamPortal(): Promise<void> {
-    await this.appProviderService.teamService.signOut();
-  }
-
-  async syncTeamSecrets(): Promise<void> {
-    await this.appProviderService.teamService.syncSecrets();
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

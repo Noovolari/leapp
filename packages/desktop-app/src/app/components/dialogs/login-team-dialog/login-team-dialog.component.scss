@@ -1,0 +1,56 @@
+@import "../../../../assets/scss/mixins/palette";
+
+.signin-modal-title {
+  margin-bottom: 30px;
+}
+
+.close-modal:hover {
+  color: $table-text;
+}
+
+.form-field {
+  margin-bottom: 15px;
+}
+
+.form-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 15px;
+
+  img {
+    filter: invert(79%) sepia(34%) saturate(7293%) hue-rotate(166deg) brightness(92%) contrast(92%);
+    margin-right: 3px;
+    height: 20px;
+  }
+
+  a {
+    color: $local-workspace-blu;
+  }
+}
+
+.signin-modal-bottom {
+  margin-top: 15px;
+
+  button {
+    background-color: $local-workspace-blu;
+  }
+
+  a {
+    display: inline-block;
+    margin-left: 10px;
+    opacity: 1;
+    transition: all 0.2s ease;
+
+    &:hover {
+      opacity: 0.6;
+      transition: all 0.2s ease;
+    }
+  }
+
+  .fa-spinner {
+    margin-left: 7px;
+  }
+}

@@ -73,10 +73,6 @@ export class LoginTeamDialogComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  goBack(): void {
-    this.appService.closeModal();
-  }
-
   closeModal(): void {
     this.appService.closeModal();
   }

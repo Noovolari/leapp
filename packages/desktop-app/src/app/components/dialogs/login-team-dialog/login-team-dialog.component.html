@@ -1,4 +1,4 @@
-<a class="close-modal" (click)="goBack();"><i class="moon-Close"></i></a>
+<a class="close-modal" (click)="closeModal();"><i class="moon-Close"></i></a>
 <div class="form-container">
   <form [formGroup]="signinForm" (ngSubmit)="signIn()" spellcheck="false">
     <fieldset class="form-container" [disabled]="submitting">

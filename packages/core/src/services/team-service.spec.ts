@@ -60,6 +60,39 @@ describe("TeamService", () => {
     );
   };
 
+  test("getTeamStatus, logged in", async () => {
+    createTeamServiceInstance();
+    teamService.teamSignedInUserKeychainKey = "mock-team-signed-in-key";
+    teamService.keyChainService = {
+      getSecret: jest.fn(() => `{"teamName": "mock-team-name", "email": "mock-email", "accessToken": "mock-token"}`),
+    };
+    const result = await teamService.getTeamStatus();
+    expect(teamService.keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, "mock-team-signed-in-key");
+    expect(result).toBe(`workspace: mock-team-name\nemail: mock-email\nstatus: online`);
+  });
+
+  test("getTeamStatus, logged in no access token", async () => {
+    createTeamServiceInstance();
+    teamService.teamSignedInUserKeychainKey = "mock-team-signed-in-key";
+    teamService.keyChainService = {
+      getSecret: jest.fn(() => `{"teamName": "mock-team-name", "email": "mock-email"}`),
+    };
+    const result = await teamService.getTeamStatus();
+    expect(teamService.keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, "mock-team-signed-in-key");
+    expect(result).toBe(`workspace: mock-team-name\nemail: mock-email\nstatus: offline`);
+  });
+
+  test("getTeamStatus, not logged in", async () => {
+    createTeamServiceInstance();
+    teamService.teamSignedInUserKeychainKey = "mock-team-signed-in-key";
+    teamService.keyChainService = {
+      getSecret: jest.fn(() => null),
+    };
+    const result = await teamService.getTeamStatus();
+    expect(teamService.keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, "mock-team-signed-in-key");
+    expect(result).toBe(`you're not logged in`);
+  });
+
   test("setCurrentWorkspace, local or null workspace saved in keychain", async () => {
     createTeamServiceInstance();
     teamService.keyChainService = {

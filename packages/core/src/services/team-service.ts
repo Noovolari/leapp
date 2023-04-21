@@ -38,6 +38,12 @@ export interface WorkspaceState {
   id: string;
 }
 
+export interface TeamStatus {
+  workspaceName: string;
+  email: string;
+  isOnline: boolean;
+}
+
 export class TeamService {
   httpClient: HttpClientInterface;
   private readonly _signedInUserState$: BehaviorSubject<User>;
@@ -85,6 +91,18 @@ export class TeamService {
 
   get switchingWorkspaceState(): BehaviorSubject<boolean> {
     return this._switchingWorkspaceState$;
+  }
+
+  async getTeamStatus(): Promise<string> {
+    const signedInUser = await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey);
+    if (signedInUser === null) {
+      return "you're not logged in";
+    } else {
+      const signedInUserValues = JSON.parse(signedInUser) as User;
+      return `workspace: ${signedInUserValues.teamName}\nemail: ${signedInUserValues.email}\nstatus: ${
+        signedInUserValues.accessToken ? "online" : "offline"
+      }`;
+    }
   }
 
   async setCurrentWorkspace(): Promise<void> {

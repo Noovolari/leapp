@@ -5,6 +5,7 @@ Login to your Team account
 
 * [`leapp team login`](#leapp-team-login)
 * [`leapp team logout`](#leapp-team-logout)
+* [`leapp team status`](#leapp-team-status)
 
 ## `leapp team login`
 
@@ -34,4 +35,19 @@ DESCRIPTION
 
 EXAMPLES
   $leapp team logout
+```
+
+## `leapp team status`
+
+Get the team login status
+
+```
+USAGE
+  $ leapp team status
+
+DESCRIPTION
+  Get the team login status
+
+EXAMPLES
+  $leapp team status
 ```

@@ -23,7 +23,7 @@
           <div class="form-field">
             <div class="form-group">
               <label>Select an Instance</label>
-              <input class="form-control" type="text" placeholder="searchFilter by..." (keyup)="searchSSMInstance($event)"/>
+              <input (keydown.meta.a)="$event.target.select()" spellcheck="false" class="form-control" type="text" placeholder="searchFilter by..." (keyup)="searchSSMInstance($event)"/>
             </div>
           </div>
         </div>

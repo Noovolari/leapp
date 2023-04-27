@@ -21,7 +21,7 @@
             <div class="form-group">
               <label>Integration type</label>
               <ng-select formControlName="integrationType" bindLabel="label" bindValue="value" [clearable]="false" [items]="integrations" [(ngModel)]="selectedIntegration" *ngIf="modifying === 1"></ng-select>
-              <input class="form-control" type="text" value="{{getIntegrationLabel()}}" readonly="true" *ngIf="modifying === 2"/>
+              <input (keydown.meta.a)="$event.target.select()" spellcheck="false" class="form-control" type="text" value="{{getIntegrationLabel()}}" readonly="true" *ngIf="modifying === 2"/>
             </div>
           </div>
         </div>
@@ -30,7 +30,7 @@
           <div class="form-field">
             <div class="form-group">
               <label>Alias*</label>
-              <input formControlName="alias" type="url" class="form-control" placeholder="Custom name to identify the configuration" value="{{selectedConfiguration.alias}}">
+              <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="alias" type="url" class="form-control" placeholder="Custom name to identify the configuration" value="{{selectedConfiguration.alias}}">
               <small class="text-error" *ngIf="(form.controls['alias'].dirty || form.controls['alias'].touched) && form.controls['alias'].errors">Insert a custom alias</small>
             </div>
           </div>
@@ -41,7 +41,7 @@
             <div class="form-field">
               <div class="form-group">
                 <label>Portal Url*</label>
-                <input formControlName="portalUrl" type="url" class="form-control" placeholder="AWS SSO URL (e.g. https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedConfiguration.portalUrl}}">
+                <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="portalUrl" type="url" class="form-control" placeholder="AWS SSO URL (e.g. https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedConfiguration.portalUrl}}">
                 <small class="text-error" *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert a valid SSO portal URL</small>
               </div>
             </div>
@@ -70,7 +70,7 @@
             <div class="form-field">
               <div class="form-group">
                 <label>Tenant ID</label>
-                <input formControlName="tenantId" type="text" class="form-control" placeholder="Tenant ID *" value="{{selectedConfiguration.tenantId}}">
+                <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="tenantId" type="text" class="form-control" placeholder="Tenant ID *" value="{{selectedConfiguration.tenantId}}">
                 <small class="text-error" *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert a valid Azure Tenant ID</small>
               </div>
             </div>

@@ -127,22 +127,28 @@ export class TeamService {
     await this.setSignedInUser(signedInUser);
   }
 
-  async setSignedInUser(signedInUser: User): Promise<void> {
-    await this.keyChainService.saveSecret(constants.appName, this.teamSignedInUserKeychainKey, JSON.stringify(signedInUser));
-    this.signedInUserState.next(signedInUser);
-  }
-
-  async signOut(): Promise<void> {
+  async signOut(lock: boolean = false): Promise<void> {
     this.httpClientProvider.accessToken = "";
+    const signedInUser = this.signedInUserState.getValue();
+    if (!signedInUser) {
+      return;
+    }
     if ((await this.getKeychainCurrentWorkspace()) !== constants.localWorkspaceKeychainValue) {
-      const signedInUser = this.signedInUserState.getValue();
       this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
       this.workspaceService.reloadWorkspace();
       await this.deleteCurrentWorkspace();
       await this.setLocalWorkspace();
     }
-    await this.keyChainService.deleteSecret(constants.appName, this.teamSignedInUserKeychainKey);
-    this.signedInUserState.next(null);
+    if (lock) {
+      signedInUser.symmetricKey = "";
+      signedInUser.privateRSAKey = "";
+      signedInUser.publicRSAKey = "";
+      signedInUser.accessToken = "";
+      await this.setSignedInUser(signedInUser);
+    } else {
+      await this.keyChainService.deleteSecret(constants.appName, this.teamSignedInUserKeychainKey);
+      this.signedInUserState.next(null);
+    }
   }
 
   // TODO: in the future, when we'll introduce multiple workspace, this method this will become setRemoteWorkspace(workspaceId)
@@ -214,6 +220,11 @@ export class TeamService {
     } finally {
       this.switchingWorkspaceState.next(false);
     }
+  }
+
+  private async setSignedInUser(signedInUser: User): Promise<void> {
+    await this.keyChainService.saveSecret(constants.appName, this.teamSignedInUserKeychainKey, JSON.stringify(signedInUser));
+    this.signedInUserState.next(signedInUser);
   }
 
   private async getKeychainCurrentWorkspace(): Promise<string> {

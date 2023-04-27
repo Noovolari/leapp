@@ -26,10 +26,10 @@
             <span>{{localWorkspaceName}}</span>
             <span>Community Edition</span>
           </div>
-          <img class="workspace-menu-icon" *ngIf="isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
+          <img class="workspace-menu-icon" *ngIf="isLocalWorkspaceSelected" src="assets/images/check.svg" alt="current workspace">
         </div>
 
-        <div *ngIf="isUserLoggedIn" mat-menu-item class="workspace-select-item" (click)="switchToRemoteWorkspace()">
+        <div *ngIf="doesTeamExist" mat-menu-item class="workspace-select-item" (click)="switchToRemoteWorkspace()">
           <div class="workspace-icon-container remote">
             <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
           </div>
@@ -37,15 +37,16 @@
             <span>{{loggedUser.teamName}}</span>
             <span>Team Plan early access</span>
           </div>
-          <img class="workspace-menu-icon" *ngIf="!isLocalWorkspaceSelected" src="assets/images/check.svg" alt="sign-in">
+          <img class="workspace-menu-icon" *ngIf="!isLocalWorkspaceSelected" src="assets/images/check.svg" alt="current workspace">
+          <img class="workspace-menu-icon" *ngIf="isTeamLocked" src="assets/images/lock-key-fill.svg" alt="locked workspace">
         </div>
 
         <div class="divider"></div>
-        <div [disabled]="isUserLoggedIn" mat-menu-item (click)="loginToLeappTeam()">
+        <div [disabled]="doesTeamExist" mat-menu-item (click)="loginToLeappTeam()">
           <img class="workspace-menu-icon" src="assets/images/sign-in.svg" alt="sign-in">
           <span>Sign-in Workspace</span>
         </div>
-        <div mat-menu-item>
+        <div mat-menu-item (click)="showManageWorkspacesDialog()">
           <img class="workspace-menu-icon" src="assets/images/buildings.svg" alt="manage-workspaces">
           <span>Manage Workspaces</span>
         </div>
@@ -54,9 +55,13 @@
           <img class="workspace-menu-icon" src="assets/images/gear.svg" alt="settings">
           <span>Settings...</span>
         </div>
-        <div [disabled]="!isUserLoggedIn" mat-menu-item (click)="logoutFromLeappTeam()">
+        <div [disabled]="!doesTeamExist || isTeamLocked" mat-menu-item (click)="logoutFromLeappTeam(true)">
           <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out">
           <span>Lock</span>
+        </div>
+        <div mat-menu-item (click)="logoutFromLeappTeam()">
+          <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out">
+          <span>Sign out</span>
         </div>
       </mat-menu>
     </div>

@@ -38,9 +38,15 @@ export class LoginTeamDialogComponent implements OnInit {
       this.submitting = true;
       const formValue = this.signinForm.value;
       try {
+        const signedInUser = await this.teamService.signedInUserState.getValue();
+        const doesTeamExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
-        this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         this.closeModal();
+        if (doesTeamExist) {
+          await this.teamService.syncSecrets();
+        } else {
+          this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
+        }
       } catch (responseException: any) {
         if (responseException.error?.errorCode === ApiErrorCodes.invalidCredentials) {
           this.password.setErrors({ [FormErrorCodes.invalidCredentials]: {} });

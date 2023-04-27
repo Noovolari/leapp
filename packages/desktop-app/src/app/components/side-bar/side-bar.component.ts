@@ -21,6 +21,7 @@ import { AppService } from "../../services/app.service";
 import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
 import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
 import { WorkspaceState } from "@noovolari/leapp-core/services/team-service";
+import { ManageTeamWorkspacesDialogComponent } from "../dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 
 export interface SelectedSegment {
   name: string;
@@ -72,8 +73,12 @@ export class SideBarComponent implements OnInit, OnDestroy {
     return this.workspaceState.id === constants.localWorkspaceKeychainValue;
   }
 
-  get isUserLoggedIn(): boolean {
+  get doesTeamExist(): boolean {
     return !!this.loggedUser;
+  }
+
+  get isTeamLocked(): boolean {
+    return !this.loggedUser?.accessToken;
   }
 
   ngOnInit(): void {
@@ -184,7 +189,6 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   async loginToLeappTeam(): Promise<void> {
-    if (this.isUserLoggedIn) return;
     this.bsModalService.show(LoginTeamDialogComponent, {
       animated: false,
       class: "create-modal",
@@ -193,9 +197,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  async logoutFromLeappTeam(): Promise<void> {
-    if (!this.isUserLoggedIn) return;
-    await this.appProviderService.teamService.signOut();
+  async logoutFromLeappTeam(lock: boolean = false): Promise<void> {
+    if (!this.doesTeamExist) return;
+    await this.appProviderService.teamService.signOut(lock);
   }
 
   async switchToLocalWorkspace(): Promise<void> {
@@ -206,9 +210,22 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   async switchToRemoteWorkspace(): Promise<void> {
-    if (this.isLocalWorkspaceSelected) {
-      await this.appProviderService.teamService.syncSecrets();
-      this.resetFilters();
+    if (this.isTeamLocked) {
+      await this.loginToLeappTeam();
+    } else {
+      if (this.isLocalWorkspaceSelected) {
+        await this.appProviderService.teamService.syncSecrets();
+        this.resetFilters();
+      }
     }
+  }
+
+  showManageWorkspacesDialog(): void {
+    this.bsModalService.show(ManageTeamWorkspacesDialogComponent, {
+      animated: false,
+      class: "create-modal",
+      backdrop: "static",
+      keyboard: false,
+    });
   }
 }

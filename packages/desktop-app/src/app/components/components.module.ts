@@ -53,6 +53,7 @@ import { MatCardModule } from "@angular/material/card";
 import { MatSelectModule } from "@angular/material/select";
 import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
+import { ManageTeamWorkspacesDialogComponent } from "./dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 
 @NgModule({
   declarations: [
@@ -83,6 +84,7 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
     ContextualMenuComponent,
     BottomBarComponent,
     LoginTeamDialogComponent,
+    ManageTeamWorkspacesDialogComponent,
   ],
   imports: [
     CommonModule,

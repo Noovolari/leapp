@@ -1,63 +1,90 @@
 @import "../../../../assets/scss/mixins/palette";
 
-.workspace-menu-line {
-  display: flex;
+.not-displayed {
+  display: none;
 }
 
-.workspace-name-container {
+.workspaces-container {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
+  margin-top: 25px;
+  height: 400px;
+  overflow: scroll;
 
-  span {
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    width: 180px;
-  }
-
-  span:nth-child(1) {
-    font-size: 15px;
-    line-height: initial;
-    padding-left: 10px;
-  }
-
-  span:nth-child(2) {
-    font-size: 12px;
-    color: $table-text;
-    line-height: initial;
-    padding-left: 10px;
-    padding-top: 2px;
-  }
-}
-
-.workspace-icon-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border: solid $silver-50 1px;
-  border-radius: 5px;
-
-  &.local {
-    background-color: $local-workspace-blu;
-  }
-
-  &.remote {
-    background-color: $remote-workspace-purple;
-
-    span {
-      color: $white-text-color;
-      font-size: 16px;
+  .workspace-menu-line {
+    display: flex;
+    margin-bottom: 10px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+    .workspace-menu-icon {
+      width: 20px;
+    }
+    .manage-workspaces-actions-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      &img:hover {
+        cursor: pointer;
+      }
     }
   }
 
-  i {
+  .workspace-name-container {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+
+    span {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 180px;
+    }
+
+    span:nth-child(1) {
+      font-size: 15px;
+      line-height: initial;
+      padding-left: 10px;
+    }
+
+    span:nth-child(2) {
+      font-size: 12px;
+      color: $table-text;
+      line-height: initial;
+      padding-left: 10px;
+      padding-top: 2px;
+    }
+  }
+
+  .workspace-icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
-    top: 0;
-    color: $white-text-color;
+    width: 40px;
+    height: 40px;
+    border: solid $silver-50 1px;
+    border-radius: 5px;
+
+    &.local {
+      background-color: $local-workspace-blu;
+    }
+
+    &.remote {
+      background-color: $remote-workspace-purple;
+
+      span {
+        color: $white-text-color;
+        font-size: 16px;
+      }
+    }
+
+    i {
+      position: relative;
+      top: 0;
+      color: $white-text-color;
+    }
   }
 }
 

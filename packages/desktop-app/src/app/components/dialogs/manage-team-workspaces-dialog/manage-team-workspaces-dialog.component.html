@@ -1,23 +1,39 @@
 <a class="close-modal" (click)="closeModal();"><i class="moon-Close"></i></a>
 <h4>Manage Workspaces</h4>
 
-<div class="workspace-menu-line">
-  <div class="workspace-icon-container local">
-    <i class="moon-Home"></i>
+<div class="workspaces-container">
+  <div class="workspace-menu-line">
+    <div class="workspace-icon-container local">
+      <i class="moon-Home"></i>
+    </div>
+    <div class="workspace-name-container">
+      <span>{{localWorkspaceName}}</span>
+      <span>Community Edition</span>
+    </div>
   </div>
-  <div class="workspace-name-container">
-    <span>{{localWorkspaceName}}</span>
-    <span>Community Edition</span>
+
+  <div *ngIf="doesTeamExist" class="workspace-menu-line">
+    <div class="workspace-icon-container remote">
+      <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
+    </div>
+    <div class="workspace-name-container">
+      <span>{{loggedUser.teamName}}</span>
+      <span>Team Plan early access</span>
+    </div>
+    <div class="manage-workspaces-actions-container">
+      <img class="workspace-menu-icon" src="assets/images/dots-three-outline-vertical-fill.svg" alt="actions" [matMenuTriggerFor]="manageWorkspacesActionsMenu">
+    </div>
   </div>
 </div>
 
-<div *ngIf="doesTeamExist" class="workspace-menu-line">
-  <div class="workspace-icon-container remote">
-    <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
+<mat-menu #manageWorkspacesActionsMenu="matMenu" [hasBackdrop]="false" role="menu">
+  <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
+  <div mat-menu-item (click)="syncWorkspace()">
+    <img class="workspace-menu-icon" src="assets/images/arrows-clockwise-fill.svg" alt="sync">
+    <span>Sync Workspace</span>
   </div>
-  <div class="workspace-name-container">
-    <span>{{loggedUser.teamName}}</span>
-    <span>Team Plan early access</span>
+  <div mat-menu-item (click)="signOutFromWorkspace()">
+    <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out">
+    <span>Sign-out Workspace</span>
   </div>
-</div>
-
+</mat-menu>

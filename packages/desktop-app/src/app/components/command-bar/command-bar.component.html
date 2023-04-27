@@ -24,7 +24,7 @@
       <button class="icon-button hide-in-taskbar filtering {{filterExtended ? 'toggled-filter' : ''}}" (click)="toggleFilters();" matTooltip="Filter the Session list"><i class="moon-Filter"></i></button>
 
       <div class="form-control-input-icon">
-        <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="searchFilter" type="text" class="form-control search-bar" placeholder="Search session" />
+        <input spellcheck="false" formControlName="searchFilter" type="text" class="form-control search-bar" placeholder="Search session" />
         <i class="moon-Search"></i>
       </div>
 

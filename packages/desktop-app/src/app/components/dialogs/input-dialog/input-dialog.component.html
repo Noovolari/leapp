@@ -11,7 +11,7 @@
         <div class="form-field">
           <div class="form-group">
             <label>{{placeholder}}<span class="danger-text">*</span></label>
-            <input (keydown.meta.a)="$event.target.select()" spellcheck="false" #inputField formControlName="value" type="text" class="form-control" placeholder="{{placeholder}}" (keyup.enter)="checkAndConfirm();" autofocus>
+            <input spellcheck="false" #inputField formControlName="value" type="text" class="form-control" placeholder="{{placeholder}}" (keyup.enter)="checkAndConfirm();" autofocus>
             <small class="text-error" *ngIf="(form.controls['value'].dirty || form.controls['value'].touched) && form.controls['value'].errors">Insert a value</small>
           </div>
         </div>

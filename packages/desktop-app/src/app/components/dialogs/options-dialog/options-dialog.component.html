@@ -35,7 +35,7 @@
             <div class="form-group">
               <div class="form-field">
                 <label>MacOS Terminal</label>
-                <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false"
+                <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [searchable]="false"
                            [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}]" [(ngModel)]="selectedTerminal"
                            [appendTo]="'body'"></ng-select>
               </div>
@@ -107,11 +107,11 @@
 
               <span class="proxy-length-2">://</span>
 
-              <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="proxyUrl" type="text" class="form-control proxy-length-3" placeholder="Enter Proxy Url" [value]="proxyUrl">
+              <input spellcheck="false" formControlName="proxyUrl" type="text" class="form-control proxy-length-3" placeholder="Enter Proxy Url" [value]="proxyUrl">
 
               <span class="proxy-length-4">:</span>
 
-              <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="proxyPort" type="text" class="form-control proxy-length-5" placeholder="Enter Proxy Port" [value]="proxyPort">
+              <input spellcheck="false" formControlName="proxyPort" type="text" class="form-control proxy-length-5" placeholder="Enter Proxy Port" [value]="proxyPort">
             </div>
           </div>
 
@@ -125,7 +125,7 @@
           <div class="form-group" *ngIf="showProxyAuthentication">
             <div class="form-field">
               <label>Username</label>
-              <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="proxyUsername" type="text" class="form-control" placeholder="Proxy Username" [value]="proxyUsername">
+              <input spellcheck="false" formControlName="proxyUsername" type="text" class="form-control" placeholder="Proxy Username" [value]="proxyUsername">
             </div>
 
             <div class="form-field">
@@ -151,7 +151,7 @@
 
           <div class="form-group">
             <div class="form-field form-control-input-button max-width">
-              <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="idpUrl" type="text" class="form-control max-width" placeholder="Add SAML 2.0 IdP URL"
+              <input spellcheck="false" formControlName="idpUrl" type="text" class="form-control max-width" placeholder="Add SAML 2.0 IdP URL"
                      (keydown.enter)="$event.preventDefault(); manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"
                      [value]="idpUrlValue ? idpUrlValue.url : ''">
               <button type="button" (click)="manageIdpUrl(idpUrlValue ? idpUrlValue.id: -1);"><i
@@ -189,7 +189,7 @@
 
         <div class="form-group">
           <div class="form-field form-control-input-button max-width">
-            <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="awsProfile" type="text" class="form-control max-width" placeholder="Add a new Named Profile"
+            <input spellcheck="false" formControlName="awsProfile" type="text" class="form-control max-width" placeholder="Add a new Named Profile"
                    (keydown.enter)="$event.preventDefault(); manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);"
                    [value]="awsProfileValue ? awsProfileValue.name : ''">
             <button class="button" type="button" (click)="manageAwsProfile(awsProfileValue ? awsProfileValue.id: -1);"><i
@@ -275,7 +275,7 @@
 
         <div class="form-group">
           <div class="form-field form-control-input-button max-width">
-            <input (keydown.meta.a)="$event.target.select()" spellcheck="false" formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Insert an npm package name"
+            <input spellcheck="false" formControlName="pluginDeepLink" type="text" class="form-control max-width" placeholder="Insert an npm package name"
                    (keydown.enter)="$event.preventDefault(); installPlugin();">
             <button [disabled]="fetchingPlugins" class="button" type="button" (click)="installPlugin();"><i class="moon-Add"></i></button>
           </div>

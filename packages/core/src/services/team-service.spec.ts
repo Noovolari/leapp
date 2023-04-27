@@ -183,6 +183,13 @@ describe("TeamService", () => {
     expect(teamService._signedInUserState$.next).toHaveBeenCalledWith(mockUser);
   });
 
+  test("signOut, returns immediately if signedInUser is null", async () => {
+    createTeamServiceInstance();
+    teamService.getKeychainCurrentWorkspace = jest.fn();
+    await teamService.signOut();
+    expect(teamService.getKeychainCurrentWorkspace).not.toHaveBeenCalled();
+  });
+
   test("signOut, a remote workspace is currently set", async () => {
     createTeamServiceInstance();
     teamService.getKeychainCurrentWorkspace = jest.fn(() => "remote-workspace-name");
@@ -214,7 +221,7 @@ describe("TeamService", () => {
     createTeamServiceInstance();
     teamService.getKeychainCurrentWorkspace = jest.fn(() => "local");
     teamService._signedInUserState$ = {
-      getValue: jest.fn(() => {}),
+      getValue: jest.fn(() => ({ teamId: "1" })),
       next: jest.fn(),
     } as any;
     teamService.getTeamLockFileName = jest.fn(() => {});
@@ -227,7 +234,7 @@ describe("TeamService", () => {
 
     await teamService.signOut();
 
-    expect(teamService._signedInUserState$.getValue).not.toHaveBeenCalled();
+    expect(teamService.getKeychainCurrentWorkspace).toHaveBeenCalledTimes(1);
     expect(teamService.getTeamLockFileName).not.toHaveBeenCalledWith("mock-team-name");
     expect(workspaceService.setWorkspaceFileName).not.toHaveBeenCalledWith("mock-value");
     expect(workspaceService.reloadWorkspace).not.toHaveBeenCalled();
@@ -235,6 +242,35 @@ describe("TeamService", () => {
     expect(teamService.setLocalWorkspace).not.toHaveBeenCalled();
     expect(keyChainService.deleteSecret).toHaveBeenCalledWith(constants.appName, "mockTeamSignedInUserKeychainKey");
     expect(teamService._signedInUserState$.next).toHaveBeenCalledWith(null);
+  });
+
+  test("signOut, if lock input is true", async () => {
+    createTeamServiceInstance();
+    teamService.getKeychainCurrentWorkspace = jest.fn(() => "local");
+    teamService._signedInUserState$ = {
+      getValue: jest.fn(() => ({
+        teamId: "1",
+        symmetricKey: "mocked-symmetric-key",
+        privateRSAKey: "mocked-private-rsa-key",
+        publicRSAKey: "mocked-public-rsa-key",
+        accessToken: "mocked-access-token",
+      })),
+      next: jest.fn(),
+    } as any;
+    teamService.teamSignedInUserKeychainKey = "mockTeamSignedInUserKeychainKey";
+    teamService.setSignedInUser = jest.fn();
+    keyChainService.deleteSecret = jest.fn();
+
+    await teamService.signOut(true);
+
+    expect(teamService.getKeychainCurrentWorkspace).toHaveBeenCalledTimes(1);
+    expect(teamService.setSignedInUser).toHaveBeenCalledWith({
+      teamId: "1",
+      symmetricKey: "",
+      privateRSAKey: "",
+      publicRSAKey: "",
+      accessToken: "",
+    });
   });
 
   describe("TeamService.syncSecrets", () => {
@@ -867,5 +903,11 @@ describe("TeamService", () => {
     result = teamService.isJwtTokenExpired(jwtToken);
     expect(result).toBe(true);
     jest.useRealTimers();
+  });
+
+  test("getTeamLockFileName", () => {
+    createTeamServiceInstance();
+    const result = (teamService as any).getTeamLockFileName("mocked-team-name");
+    expect(result).toBe(".Leapp/Leapp-mocked-team-name-lock.json");
   });
 });

@@ -15,7 +15,9 @@ const remote = require("@electron/remote/main");
 remote.initialize();
 
 contextMenu({
-  showInspectElement: false
+  showInspectElement: false,
+  showLookUpSelection: false,
+  showSearchWithGoogle: false
 });
 
 // Fix for warning at startup

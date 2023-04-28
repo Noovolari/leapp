@@ -24,8 +24,14 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      &img:hover {
+      .workspace-menu-icon {
+        transition: opacity ease 0.3s;
+        opacity: 1;
+      }
+      .workspace-menu-icon:hover {
         cursor: pointer;
+        transition: opacity ease 0.3s;
+        opacity: 0.7;
       }
     }
   }

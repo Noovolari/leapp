@@ -208,7 +208,7 @@ describe("SetWorkspace", () => {
     };
     command.log = jest.fn();
     await command.setWorkspace({ workspaceId: "mocked-workspace-id", workspaceName: "mocked-workspace-name" });
-    expect(command.cliProviderService.teamService.syncSecrets).toHaveBeenCalled();
+    expect(command.cliProviderService.teamService.syncSecrets).toHaveBeenCalledWith(false);
     expect(command.log).toHaveBeenCalledWith(`workspace mocked-workspace-name set correctly`);
     expect(command.cliProviderService.remoteProceduresClient.refreshWorkspaceState).toHaveBeenCalled();
   });

@@ -22,7 +22,7 @@ describe("LeappCommand", () => {
 
     expect(cliProviderService.awsSsoRoleService.setAwsIntegrationDelegate).toHaveBeenCalledWith(cliProviderService.awsSsoIntegrationService);
     expect(cliProviderService.remoteProceduresClient.isDesktopAppRunning).toHaveBeenCalled();
-    expect(cliProviderService.teamService.setCurrentWorkspace).toHaveBeenCalled();
+    expect(cliProviderService.teamService.setCurrentWorkspace).toHaveBeenCalledWith(true);
   });
 
   test("init - desktop app not running", async () => {

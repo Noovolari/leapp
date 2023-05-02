@@ -29,7 +29,7 @@ export abstract class LeappCommand extends Command {
       this.error("Leapp app must be running to use this CLI. You can download it here: https://www.leapp.cloud/releases");
       return;
     }
-    await this.cliProviderService.teamService.setCurrentWorkspace();
+    await this.cliProviderService.teamService.setCurrentWorkspace(true);
   }
 
   unsupportedAzureSession(session: Session): void {

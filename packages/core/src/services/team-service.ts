@@ -105,7 +105,7 @@ export class TeamService {
     }
   }
 
-  async setCurrentWorkspace(): Promise<void> {
+  async setCurrentWorkspace(reloadOnly: boolean = false): Promise<void> {
     this.signedInUserState.next(JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)));
     const currentWorkspaceName = await this.getKeychainCurrentWorkspace();
     // Local or null workspace saved in keychain
@@ -114,7 +114,7 @@ export class TeamService {
       // Remote workspace saved in keychain
     } else if (currentWorkspaceName !== constants.localWorkspaceKeychainValue) {
       try {
-        await this.syncSecrets();
+        await this.syncSecrets(reloadOnly);
       } catch (error) {
         // TODO: NOTIFY USER
         await this.signOut();
@@ -152,7 +152,7 @@ export class TeamService {
   }
 
   // TODO: in the future, when we'll introduce multiple workspace, this method this will become setRemoteWorkspace(workspaceId)
-  async syncSecrets(): Promise<void> {
+  async syncSecrets(reloadOnly: boolean = false): Promise<void> {
     const signedInUser = this.signedInUserState.getValue();
     if (!signedInUser || this.isJwtTokenExpired(signedInUser.accessToken)) {
       // TODO: NOTIFY USER
@@ -161,6 +161,10 @@ export class TeamService {
     }
     await this.setKeychainCurrentWorkspace(signedInUser.teamName);
     await this.refreshWorkspaceState(async (): Promise<void> => {
+      if (reloadOnly) {
+        this.workspaceService.reloadWorkspace();
+        return;
+      }
       this.workspaceService.removeWorkspace();
       // TODO: copy or merge local workspace settings like theme
       this.workspaceService.createWorkspace();

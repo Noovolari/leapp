@@ -80,7 +80,7 @@ export default class SetWorkspace extends LeappCommand {
       await this.cliProviderService.teamService.switchToLocalWorkspace();
     } else {
       //TODO: with multiple workspace, this method this will call setRemoteWorkspace(workspaceId)
-      await this.cliProviderService.teamService.syncSecrets();
+      await this.cliProviderService.teamService.syncSecrets(false);
     }
     this.log(`workspace ${workspace.workspaceName} set correctly`);
     await this.cliProviderService.remoteProceduresClient.refreshWorkspaceState();

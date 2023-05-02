@@ -153,6 +153,23 @@ describe("TeamService", () => {
     expect(teamService.signOut).toHaveBeenCalled();
   });
 
+  test("setCurrentWorkspace, reloadOnly is set to true", async () => {
+    createTeamServiceInstance();
+    teamService.keyChainService = {
+      getSecret: () => `{"mockKey": "mockValue"}`,
+    };
+    teamService._signedInUserState$ = {
+      next: () => {},
+    };
+    teamService.getKeychainCurrentWorkspace = () => "team-name";
+    teamService.syncSecrets = jest.fn();
+
+    await teamService.setCurrentWorkspace(true);
+
+    expect(teamService.syncSecrets).toHaveBeenCalledTimes(1);
+    expect(teamService.syncSecrets).toHaveBeenCalledWith(true);
+  });
+
   test("signIn()", async () => {
     createTeamServiceInstance();
     const signedInUser = "signed-user-mock";
@@ -374,6 +391,33 @@ describe("TeamService", () => {
       expect(teamService.syncIntegrationSecret).toHaveBeenNthCalledWith(1, awsIntegration);
       expect(teamService.syncIntegrationSecret).toHaveBeenNthCalledWith(2, azureIntegration);
       expect(teamService.syncSessionsSecret).toHaveBeenNthCalledWith(1, session);
+    });
+
+    test("if readOnly is set to true", async () => {
+      signedInUser = {
+        teamName: "team-name",
+        accessToken: "access-token",
+      };
+      teamService.isJwtTokenExpired = jest.fn(() => false);
+
+      const awsIntegration = { secretType: SecretType.awsSsoIntegration };
+      const azureIntegration = { secretType: SecretType.azureIntegration };
+      const session = { secretType: SecretType.awsIamUserSession };
+      mockedLocalSecretDtos = [awsIntegration, azureIntegration, session];
+      teamService.syncIntegrationSecret = jest.fn();
+      teamService.syncSessionsSecret = jest.fn();
+      teamService.refreshWorkspaceState = jest.fn(async (callback: () => Promise<void>) => {
+        await callback();
+      });
+
+      await teamService.syncSecrets(true);
+
+      expect(teamService._signedInUserState$.getValue).toHaveBeenCalled();
+      expect(teamService.isJwtTokenExpired).toHaveBeenCalledWith("access-token");
+      expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith(signedInUser.teamName);
+      expect(teamService.refreshWorkspaceState).toHaveBeenCalledTimes(1);
+      expect(workspaceService.removeWorkspace).not.toHaveBeenCalled();
+      expect(workspaceService.reloadWorkspace).toHaveBeenCalledTimes(1);
     });
   });
 

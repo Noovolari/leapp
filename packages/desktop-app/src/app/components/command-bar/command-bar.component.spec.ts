@@ -25,7 +25,7 @@ describe("CommandBarComponent", () => {
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       namedProfileService: { getNamedProfiles: () => [] },
-      teamService: { signedInUserState: { subscribe: () => {} }, workspaceNameState: { subscribe: () => {} } },
+      teamService: { signedInUserState: { subscribe: () => {} }, workspaceState: { subscribe: () => {} } },
     });
 
     const optionsService = { colorTheme: "dark-theme" };

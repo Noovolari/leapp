@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.17.5](https://github.com/Noovolari/leapp/compare/v0.17.4...v0.17.5) (2023-05-08)
+
+### Features
+* added ability to select text in the search bar (and other text fields) using CMD/CTRL + a; this feature is available for macOS, Windows, and Linux.
+
 ### [0.17.4](https://github.com/Noovolari/leapp/compare/v0.17.3...v0.17.4) (2023-02-28)
 
 To have access to the following Leapp CLI feature, please download the latest Leapp CLI 0.1.32 version.

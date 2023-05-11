@@ -186,8 +186,6 @@ layers:
     typography:
       content: *site_name
       color: *color
-      line:
-        amount: 1
       font:
         family: *font_family
         style: Bold

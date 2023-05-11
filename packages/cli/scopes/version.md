@@ -20,4 +20,4 @@ EXAMPLES
   $leapp version
 ```
 
-_See code: [dist/commands/version.ts](https://github.com/noovolari/leapp/blob/v0.1.34/dist/commands/version.ts)_
+_See code: [dist/commands/version.ts](https://github.com/noovolari/leapp/blob/v0.1.35/dist/commands/version.ts)_

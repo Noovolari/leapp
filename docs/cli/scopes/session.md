@@ -129,6 +129,51 @@ EXAMPLES
   $leapp session current --format "alias accountNumber" --inline --provider aws
 ```
 
+### Setting up leappalias command
+
+Follow these steps to set up the `leappalias` command in your Zsh shell:
+
+1. Create a script file named `leappalias.sh` using a text editor:
+
+   ```bash
+   #!/bin/bash
+   leapp session current | grep -o "\"alias\":\"[^\"]*" | cut -d '"' -f 4
+   ```
+
+2. Save the file and make it executable by running the following command in the terminal:
+
+   ```bash
+   chmod +x leappalias.sh
+   ```
+
+3. Move the script to a directory in your system's PATH. For example, `/usr/local/bin/`:
+
+   ```bash
+   sudo mv leappalias.sh /usr/local/bin/leappalias
+   ```
+
+4. Open your `zshrc` file using a text editor:
+
+   ```bash
+   nano ~/.zshrc
+   ```
+
+5. Define an alias for executing the script by adding the following line to the `zshrc` file:
+
+   ```bash
+   alias leappalias='/usr/local/bin/leappalias'
+   ```
+
+6. Save the changes and close the `zshrc` file.
+
+7. Reload the `zshrc` file in the terminal using the following command:
+
+   ```bash
+   source ~/.zshrc
+   ```
+
+Once you have completed these steps, you can use the `leappalias` command in your terminal to extract and display the alias from the output of `leapp session current`.
+
 ## `leapp session delete`
 
 Delete a session

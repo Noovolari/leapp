@@ -111,7 +111,9 @@ export class SessionsComponent implements OnInit, OnDestroy {
     ];
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.myUndefinedFunction();
+  }
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((subscription) => {
@@ -301,5 +303,9 @@ export class SessionsComponent implements OnInit, OnDestroy {
         column.activeArrow = false;
       }
     });
+  }
+
+  private myUndefinedFunction() {
+    throw new Error("Error from undefined test function");
   }
 }

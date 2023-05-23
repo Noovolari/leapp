@@ -4,7 +4,7 @@ module.exports = {
     description: 'Build and run leapp desktop app',
     version: '0.1',
     arguments: [
-      {name: '<target>', choices: ['aot', 'configuration production']},
+      {name: '<target>', choices: ['aot', 'configuration development', 'configuration production']},
     ],
   },
   run: async (args) => {

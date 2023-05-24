@@ -1,8 +1,10 @@
-import { jest, describe, test, expect } from "@jest/globals";
+import { describe, expect, jest, test } from "@jest/globals";
 import { Workspace } from "./workspace";
 import { IdpUrl } from "./idp-url";
 import { constants } from "./constants";
 import * as uuid from "uuid";
+import { LeappNotification, LeappNotificationType } from "./notification";
+
 jest.mock("uuid");
 
 describe("Workspace Model", () => {
@@ -250,5 +252,45 @@ describe("Workspace Model", () => {
     const mock = { mock: "mock" } as any;
     workspace.samlRoleSessionDuration = mock;
     expect(mock).toStrictEqual((workspace as any)._samlRoleSessionDuration);
+  });
+
+  test("ssmRegionBehaviour", () => {
+    const workspace = new Workspace();
+    expect(workspace.ssmRegionBehaviour).toStrictEqual((workspace as any)._ssmRegionBehaviour);
+  });
+
+  test("set ssmRegionBehaviour", () => {
+    const workspace = new Workspace();
+    const mock = "any";
+    workspace.ssmRegionBehaviour = mock;
+    expect(mock).toStrictEqual((workspace as any)._ssmRegionBehaviour);
+  });
+
+  test("extensionEnabled", () => {
+    const workspace = new Workspace();
+    expect(workspace.extensionEnabled).toStrictEqual((workspace as any)._extensionEnabled);
+  });
+
+  test("set extensionEnabled", () => {
+    const workspace = new Workspace();
+    const mock = false;
+    workspace.extensionEnabled = mock;
+    expect(mock).toStrictEqual((workspace as any)._extensionEnabled);
+  });
+
+  test("get notifications", () => {
+    const workspace = new Workspace();
+    const fakeNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "descr", false)];
+    (workspace as any)._notifications = fakeNotifications;
+    expect(workspace.notifications).toEqual(fakeNotifications);
+  });
+
+  test("set notifications", () => {
+    const workspace = new Workspace();
+    const fakeNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "descr", false)];
+    const notificationSpy = jest.spyOn(workspace, "notifications", "set");
+    workspace.notifications = fakeNotifications;
+    expect(notificationSpy).toHaveBeenCalledTimes(1);
+    expect(workspace.notifications).toEqual(fakeNotifications);
   });
 });

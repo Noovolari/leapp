@@ -89,3 +89,5 @@ packages/desktop-app/integration-tests/.env.ts
 
 nightly-version
 packages/desktop-app/projects
+
+packages/desktop-app/.sentry-token

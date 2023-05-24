@@ -5,6 +5,7 @@ export const constants = {
   lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",
   workspaceLastVersion: 3,
+  slackUrl: "https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q",
 
   //Aws
   samlRoleSessionDuration: 3600, // 1h

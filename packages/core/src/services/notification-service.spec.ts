@@ -19,6 +19,16 @@ describe("NotificationService", () => {
     } as any;
   });
 
+  test("constructor", () => {
+    mockedRepository.setNotifications(undefined);
+    let service = new NotificationService(mockedRepository);
+    expect(service.getNotifications()).toEqual([]);
+
+    mockedRepository.setNotifications(mockedNotifications);
+    service = new NotificationService(mockedRepository);
+    expect(service.getNotifications()).toEqual(mockedNotifications);
+  });
+
   test("getNotifications() - can return both all notifications or only the unread ones", () => {
     const service = new NotificationService(mockedRepository);
     let notifications = service.getNotifications();

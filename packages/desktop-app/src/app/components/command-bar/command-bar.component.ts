@@ -20,6 +20,9 @@ import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { UpdaterService } from "../../services/updater.service";
+import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
+import { LeappNotification, LeappNotificationType } from "@noovolari/leapp-core/models/notification";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -84,7 +87,9 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     public appService: AppService,
     public electronService: AppNativeService,
     private leappCoreService: AppProviderService,
-    private windowService: WindowService
+    private windowService: WindowService,
+    public updaterService: UpdaterService,
+    private messageToasterService: MessageToasterService
   ) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
 
@@ -101,10 +106,24 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
 
     this.setInitialArrayFilters();
+
+    // TODO: FAKE TEST remove after test
+    this.leappCoreService.repository.setNotifications([new LeappNotification("uuid", LeappNotificationType.info, "Title", "Description", false)]);
   }
 
   private static changeSessionsTableHeight() {
     document.querySelector(".sessions").classList.toggle("filtered");
+  }
+
+  get isIssueButtonEnabled(): boolean {
+    return !!this.appService.awsSsmPluginVersion && !!this.appService.awsCliVersion && !!this.appService.issueBody;
+  }
+
+  get isNotificationPending(): boolean {
+    return (
+      this.leappCoreService.notificationService.getNotifications(true).length > 0 ||
+      (this.updaterService.isReady() && this.updaterService.isUpdateNeeded())
+    );
   }
 
   ngOnInit(): void {
@@ -256,6 +275,34 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         this.windowService.getCurrentWindow().maximize();
       }
     }
+  }
+
+  goToWhatsNew(): void {
+    if (this.updaterService.isReady() && this.updaterService.isUpdateNeeded()) {
+      this.updaterService.updateDialog();
+    } else {
+      this.messageToasterService.toast("No update needed.", ToastLevel.info, "What's new");
+    }
+  }
+
+  goToGettingStarted(): void {
+    this.windowService.openExternalUrl("https://docs.leapp.cloud/");
+  }
+
+  goToJoinTheCommunity(): void {
+    this.windowService.openExternalUrl(constants.slackUrl);
+  }
+
+  openAnIssue(): void {
+    this.windowService.openExternalUrl(
+      `https://github.com/noovolari/leapp/issues/new?labels=bug&body=${encodeURIComponent(this.appService.issueBody)}`
+    );
+  }
+
+  requestAFeature(): void {
+    this.windowService.openExternalUrl(
+      `https://github.com/noovolari/leapp/issues/new?labels=enhancement&body=${encodeURIComponent(this.appService.featureBody)}`
+    );
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

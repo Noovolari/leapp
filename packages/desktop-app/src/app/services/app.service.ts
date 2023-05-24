@@ -6,15 +6,23 @@ import { AppProviderService } from "./app-provider.service";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { WindowService } from "./window.service";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { LogService, LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { LogService, LoggedEntry, LogLevel, LoggedException } from "@noovolari/leapp-core/services/log-service";
 import { OperatingSystem, osMap } from "@noovolari/leapp-core/models/operating-system";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { LeappBaseError } from "@noovolari/leapp-core/errors/leapp-base-error";
+import { LeappLinkError } from "@noovolari/leapp-core/errors/leapp-link-error";
+import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 
 @Injectable({
   providedIn: "root",
 })
 export class AppService {
   profileOpen: EventEmitter<boolean> = new EventEmitter<boolean>();
+
+  awsSsmPluginVersion: string;
+  awsCliVersion: string;
+  issueBody: string;
+  featureBody: string;
 
   /* Is used to detect if application is in compact or full mode */
   private triggers: MatMenuTrigger[];
@@ -26,7 +34,8 @@ export class AppService {
     private appNativeService: AppNativeService,
     private windowService: WindowService,
     private modalService: BsModalService,
-    private appProviderService: AppProviderService
+    private appProviderService: AppProviderService,
+    private messageToasterService: MessageToasterService
   ) {
     this.triggers = [];
 
@@ -44,6 +53,8 @@ export class AppService {
       this.appNativeService.log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}";
       this.appNativeService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
     }
+
+    this.getMetadata();
   }
 
   // TODO: get directly from AppNativeService
@@ -227,5 +238,86 @@ export class AppService {
       t.closeMenu();
     });
     this.triggers = [];
+  }
+
+  getMetadata() {
+    const printError = (error) => {
+      this.appProviderService.logService.log(new LoggedException(error.toString(), this, LogLevel.error, false, error.stack));
+      if ((error as LeappBaseError).severity === LogLevel.error) {
+        if ((error as LeappLinkError).link === undefined || (error as LeappLinkError).link === null) {
+          this.messageToasterService.toast(error.toString(), ToastLevel.error, "");
+        } else {
+          this.messageToasterService.toast(error.toString(), ToastLevel.error, "", (error as LeappLinkError).link);
+        }
+      }
+    };
+
+    this.getAwsCliVersion()
+      .then(() => {
+        this.getSessionManagerPluginVersion()
+          .then(() => {
+            this.setIssueBody();
+          })
+          .catch((error) => {
+            printError(error);
+          });
+      })
+      .catch((error) => {
+        printError(error);
+      });
+  }
+
+  private async getAwsCliVersion(): Promise<void> {
+    if (!this.awsCliVersion) {
+      try {
+        this.awsCliVersion = await this.appProviderService.executeService.execute("aws --version");
+      } catch (_) {
+        throw new LeappLinkError(
+          "https://docs.leapp.cloud/latest/troubleshooting/faq/",
+          this,
+          "An error occurred getting AWS CLI version. Please check if it is installed and <span class='link'>add a symlink</span> following the documentation."
+        );
+      }
+    }
+  }
+
+  private async getSessionManagerPluginVersion(): Promise<void> {
+    if (!this.awsSsmPluginVersion) {
+      try {
+        const sessionManagerPluginVersion = await this.appProviderService.executeService.execute("session-manager-plugin --version");
+        this.awsSsmPluginVersion = sessionManagerPluginVersion.replace(/(\r\n|\n|\r)/gm, "");
+      } catch (error) {
+        throw new LeappLinkError(
+          "https://docs.leapp.cloud/latest/built-in-features/aws-ec2-connect/",
+          this,
+          "An error occurred getting AWS Session Manager Plugin version. <span class='link'>Click here to follow the instructions on the docs</span> and solve the issue."
+        );
+      }
+    }
+  }
+
+  private setIssueBody(): void {
+    this.issueBody = `### Description:
+> Please include a detailed description of the issue (and an image or screen recording, if applicable)
+
+
+### Details:
+| Leapp Version | ${this.appNativeService.app.getVersion()} |
+| --- | --- |
+| SsmPluginVersion | ${this.awsSsmPluginVersion} |
+| Platform | ${process.platform} |
+| Awscli | ${this.awsCliVersion}
+`;
+    this.featureBody = `### Description:
+> Please include a detailed description of the feature you'd like to propose (and an image or screen recording, if applicable)
+
+
+### Details:
+| Leapp Version | ${this.appNativeService.app.getVersion()} |
+| --- | --- |
+| SsmPluginVersion | ${this.awsSsmPluginVersion} |
+| Platform | ${process.platform} |
+| Awscli | ${this.awsCliVersion}
+`;
   }
 }

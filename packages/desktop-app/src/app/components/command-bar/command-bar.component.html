@@ -31,6 +31,29 @@
       <button class="icon-button hide-in-taskbar" (click)="syncAll();" matTooltip="Sync all Integrations"><i class="moon-Refresh"></i></button>
 
       <div class="line-end">
+        <button class="icon-button top-right-option-button margin-right-fix notification" [matMenuTriggerFor]="notification_menu"
+                matTooltip="Show Leapp Notifications">
+          <img src="assets/images/notifications.svg" alt="notificatgions button" title="" />
+          <span class="notification-dot" *ngIf="isNotificationPending"></span>
+        </button>
+        <mat-menu #notification_menu>
+          <button mat-menu-item (click)="goToWhatsNew();" [disabled]="this.updaterService.isReady() && this.updaterService.isUpdateNeeded()"><i class="icon-not-menu moon-Help"></i>&nbsp;<span>What's new</span></button>
+          <button mat-menu-item (click)="goToGettingStarted();"><i class="icon-not-menu moon-Check"></i>&nbsp;<span>Getting started</span></button>
+          <button mat-menu-item (click)="goToJoinTheCommunity();">
+            <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/slack.svg" />
+            &nbsp;<span>Join the community</span>
+          </button>
+          <button mat-menu-item (click)="openAnIssue();" [disabled]="!isIssueButtonEnabled">
+            <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/bug.svg" />
+            &nbsp;<span>Open an Issue</span>
+          </button>
+          <button mat-menu-item (click)="requestAFeature();" [disabled]="!isIssueButtonEnabled">
+            <i class="icon-not-menu moon-Puzzle"></i>
+            &nbsp;<span>Request a Feature</span>
+          </button>
+        </mat-menu>
+
+
         <button class="icon-button top-right-option-button" (click)="showOptionDialog();"
                 matTooltip="Show Leapp Options"><i class="moon-Settings"></i></button>
       </div>

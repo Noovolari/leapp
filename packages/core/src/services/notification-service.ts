@@ -2,7 +2,11 @@ import { Repository } from "./repository";
 import { LeappNotification } from "../models/notification";
 
 export class NotificationService {
-  constructor(private repository: Repository) {}
+  constructor(private repository: Repository) {
+    if (!this.repository.getNotifications()) {
+      this.repository.setNotifications([]);
+    }
+  }
 
   getNotifications(unread?: boolean): LeappNotification[] {
     if (unread !== undefined && unread === true) {

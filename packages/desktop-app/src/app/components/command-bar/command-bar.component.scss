@@ -128,3 +128,34 @@
   font-size: 20px;
   color: $search-icon-color;
 }
+
+.notification {
+  margin-right: 10px;
+  cursor: pointer;
+  position: relative;
+  img {
+    height: 20px;
+    width: 20px;
+    opacity: 0.45;
+  }
+}
+
+.notification-dot {
+  position: absolute;
+  right: -4px;
+  top: -4px;
+  width: 4px;
+  height: 4px;
+  color: #90030C;
+  border-radius: 50%;
+}
+
+.icon-not-menu {
+  height: 20px;
+  width: 20px;
+  opacity: 0.45;
+}
+
+.invert {
+  filter: invert(1);
+}

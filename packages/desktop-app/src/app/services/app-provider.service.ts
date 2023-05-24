@@ -46,6 +46,7 @@ import { AppKeychainService } from "./app-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
+import { NotificationService } from "@noovolari/leapp-core/services/notification-service";
 
 @Injectable({
   providedIn: "root",
@@ -93,6 +94,7 @@ export class AppProviderService {
   private integrationIsOnlineStateRefreshServiceInstance: IntegrationIsOnlineStateRefreshService;
   private pluginManagerServiceInstance: PluginManagerService;
   private integrationFactoryInstance: IntegrationFactory;
+  private notificationServiceInstance: NotificationService;
 
   constructor(
     private appNativeService: AppNativeService,
@@ -100,6 +102,13 @@ export class AppProviderService {
     private ngZone: NgZone,
     private http: HttpClient
   ) {}
+
+  public get notificationService(): NotificationService {
+    if (!this.notificationServiceInstance) {
+      this.notificationServiceInstance = new NotificationService(this.repository);
+    }
+    return this.notificationServiceInstance;
+  }
 
   public get pluginManagerService(): PluginManagerService {
     if (!this.pluginManagerServiceInstance) {

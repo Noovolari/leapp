@@ -19,12 +19,19 @@ describe("CommandBarComponent", () => {
     const spyRepositoryService = jasmine.createSpyObj("Repository", {
       getProfiles: [],
       getColorTheme: () => constants.darkTheme,
+      setNotifications: () => {},
+      getNotifications: () => [],
+    });
+    const spyNotificationsService = jasmine.createSpyObj("Notification", {
+      setNotifications: () => {},
+      getNotifications: () => [],
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       behaviouralSubjectService: spyBehaviouralSubjectService,
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       namedProfileService: { getNamedProfiles: () => [] },
+      notificationService: spyNotificationsService,
     });
 
     const optionsService = { colorTheme: "dark-theme" };

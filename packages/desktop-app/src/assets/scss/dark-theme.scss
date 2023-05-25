@@ -500,6 +500,9 @@ body.dark-theme {
       color: #373737;
       border-radius: 5px;
     }
+    .enabled {
+      background-color: $dark-button-color!important;
+    }
   }
 
   .plugin-table thead th {

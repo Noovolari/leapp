@@ -6,74 +6,73 @@
     max-width: 520px;
     width: 100%;
   }
-}
-
-h3 {
-  text-align: left;
-  font-size: 17px;
-  color: $text-color;
-  font-weight: bold;
-
-  span {
-    font-size: 1.3rem; color: $silver-dark; font-weight: normal;
-  }
-}
-
-div.updater > div.html-content {
-  color: $text-color;
-  overflow-y: scroll;
-  text-align: left;
-  height: 330px;
-  margin: -39px -5px 22px 3px;
-
-  h1 {
-    font-size: 19px;
-    padding-top: 20px;
-    font-weight: 600;
-    letter-spacing: -.5px;
-    margin-left: 2px;
-    margin-right: 6px;
-  }
-
-  h2 {
-    text-align: center!important;
-    color: $text-color;
-    font-size: 19px!important;
-    font-weight: bold!important;
-    margin-top: 10px;
-    margin-right: 6px;
-  }
   h3 {
-    text-align: left!important;
+    text-align: left;
+    font-size: 17px;
     color: $text-color;
-    font-size: 17px!important;
-    font-weight: bold!important;
-    margin-left: 2px;
-    margin-right: 6px;
+    font-weight: bold;
+
+    span {
+      font-size: 1.3rem; color: $silver-dark; font-weight: normal;
+    }
   }
 
-  p {
-    font-size: 14px;
-    padding-bottom: 10px;
-    margin-bottom: 0;
-    margin-left: 2px;
-    color: $changelog-date-color;
-    margin-right: 6px;
-  }
+  div.updater > div.html-content {
+    color: $text-color;
+    overflow-y: scroll;
+    text-align: left;
+    height: 330px;
+    margin: -39px -5px 22px 3px;
 
-  a {
-    color: $main-color-light;
-    text-decoration: none;
-    background-color: transparent;
-    display: inline;
-    cursor: default;
-  }
+    h1 {
+      font-size: 19px;
+      padding-top: 20px;
+      font-weight: 600;
+      letter-spacing: -.5px;
+      margin-left: 2px;
+      margin-right: 6px;
+    }
 
-  li {
-    font-size: 14px;
-    white-space:pre-wrap;
-    color: $changelog-date-color;
-    margin-right: 6px;
+    h2 {
+      text-align: center!important;
+      color: $text-color;
+      font-size: 19px!important;
+      font-weight: bold!important;
+      margin-top: 10px;
+      margin-right: 6px;
+    }
+    h3 {
+      text-align: left!important;
+      color: $text-color;
+      font-size: 17px!important;
+      font-weight: bold!important;
+      margin-left: 2px;
+      margin-right: 6px;
+    }
+
+    p {
+      font-size: 14px;
+      padding-bottom: 10px;
+      margin-bottom: 0;
+      margin-left: 2px;
+      color: $changelog-date-color;
+      margin-right: 6px;
+    }
+
+    a {
+      color: $main-color-light;
+      text-decoration: none;
+      background-color: transparent;
+      display: inline;
+      cursor: default;
+    }
+
+    li {
+      font-size: 14px;
+      white-space:pre-wrap;
+      color: $changelog-date-color;
+      margin-right: 6px;
+    }
   }
 }
 
@@ -87,13 +86,13 @@ div.updater > div.html-content {
   margin-top: -10px;
   height: 60px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
   width: 460px;
   position: relative;
 
   .modal-title-icon {
     position: inherit;
-    top: 15px;
     i {
       background-color: $main-color-light;
       color: $primary-text-color;
@@ -105,8 +104,8 @@ div.updater > div.html-content {
 
   .modal-title-message {
     position: inherit;
-    left: -90px;
-    top: 2px;
+    flex-grow: 1;
+    margin-left: 20px;
 
     span {
       letter-spacing: -.5px;
@@ -124,7 +123,10 @@ div.updater > div.html-content {
 
   .modal-title-close {
     position: relative;
-    top: 14px;
+    i {
+      position: relative;
+      bottom: 2px;
+    }
   }
 }
 
@@ -142,7 +144,7 @@ div.updater > div.html-content {
   button {
     border: none;
     margin: 0 10px;
-    padding: 8px;
+    padding: 8px 16px;
     font-weight: 500;
     letter-spacing: -.5px;
 

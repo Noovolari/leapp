@@ -21,7 +21,6 @@ import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { UpdaterService } from "../../services/updater.service";
-import { MessageToasterService } from "../../services/message-toaster.service";
 import { LeappNotification, LeappNotificationType } from "@noovolari/leapp-core/models/notification";
 import { InfoDialogComponent } from "../dialogs/info-dialog/info-dialog.component";
 
@@ -89,8 +88,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     public electronService: AppNativeService,
     private leappCoreService: AppProviderService,
     private windowService: WindowService,
-    public updaterService: UpdaterService,
-    private messageToasterService: MessageToasterService
+    public updaterService: UpdaterService
   ) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
 

@@ -60,6 +60,20 @@
             &nbsp;<span>Request a Feature</span>
           </button>
 
+          <div *ngIf="notifications.length > 0" class="divider"></div>
+
+          <ng-container *ngFor="let notification of notifications">
+            <button class="notification-menu-item" mat-menu-item (click)="openInfoModal(notification);" [disabled]="!isIssueButtonEnabled">
+              <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/{{notification.read ? 'read-notification' : 'unread-notification'}}.svg" alt="{{notification.title}}"/>
+              <span class="notification-dot" *ngIf="!notification.read"></span>
+              &nbsp;<span [ngClass]="!notification.read ? 'unread-text' : ''">{{notification.title}}</span>
+            </button>
+<!--            <div class="notification-menu-item mat-menu-item-style">-->
+<!--              <button class="notification-button-clickable">-->
+<!--                             </button>-->
+<!--            </div>-->
+          </ng-container>
+
         </mat-menu>
 
 

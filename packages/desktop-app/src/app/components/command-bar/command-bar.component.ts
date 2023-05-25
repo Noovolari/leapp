@@ -23,6 +23,7 @@ import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { UpdaterService } from "../../services/updater.service";
 import { LeappNotification, LeappNotificationType } from "@noovolari/leapp-core/models/notification";
 import { InfoDialogComponent } from "../dialogs/info-dialog/info-dialog.component";
+import { NotificationService } from "@noovolari/leapp-core/services/notification-service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -70,6 +71,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   eConstants = constants;
 
+  notificationService: NotificationService;
+  surveyDescription = `We would like to invite you to participate in our survey. Your feedback is very important to us and will help us improve Leapp to better meet your needs. <br><br>
+        To participate in the survey, simply click on the link below and answer a few short questions. The survey will only take a few minutes to complete, and your responses will remain anonymous. <br><br>
+        As a thank you for your time and effort, the first 200 participants will receive $25 of AWS credits (you will need to insert an email so that we can send them to you). <br><br>
+        So hurry up and complete the survey now to claim your reward!`;
+
   private subscription0;
   private subscription1;
   private subscription2;
@@ -106,12 +113,32 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.setInitialArrayFilters();
 
-    // TODO: FAKE TEST remove after test
-    this.leappCoreService.repository.setNotifications([new LeappNotification("uuid", LeappNotificationType.info, "Title", "Description", false)]);
+    this.notificationService = this.leappCoreService.notificationService;
+
+    //TODO remove this
+    this.notificationService.setNotifications([]);
+
+    if (this.notificationService.getNotifications().length === 0) {
+      this.notificationService.setNotifications([
+        new LeappNotification(
+          "uuid",
+          LeappNotificationType.info,
+          "Take a survey, get some credits",
+          this.surveyDescription,
+          false,
+          //TODO add the actual link for the survey
+          "https://docs.leapp.cloud"
+        ),
+      ]);
+    }
   }
 
   private static changeSessionsTableHeight() {
     document.querySelector(".sessions").classList.toggle("filtered");
+  }
+
+  get notifications(): LeappNotification[] {
+    return this.notificationService.getNotifications();
   }
 
   get isIssueButtonEnabled(): boolean {
@@ -286,7 +313,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       animated: false,
       initialState: {
         title,
-        releaseNotes,
+        description: releaseNotes,
       },
     });
   }
@@ -309,6 +336,19 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.windowService.openExternalUrl(
       `https://github.com/noovolari/leapp/issues/new?labels=enhancement&body=${encodeURIComponent(this.appService.featureBody)}`
     );
+  }
+
+  openInfoModal(notification: LeappNotification): void {
+    this.notificationService.setNotificationAsRead(notification.uuid);
+    this.bsModalService.show(InfoDialogComponent, {
+      animated: false,
+      initialState: {
+        title: notification.title,
+        description: notification.description,
+        link: notification?.link,
+        buttonName: notification?.link ? "Open Link" : "Ok",
+      },
+    });
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {

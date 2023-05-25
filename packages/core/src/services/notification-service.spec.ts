@@ -57,4 +57,24 @@ describe("NotificationService", () => {
     expect(notifications).toEqual([]);
     expect(mockedRepository.getNotifications).toHaveBeenCalled();
   });
+
+  test("setNotifications() - set the notifications", () => {
+    const service = new NotificationService(mockedRepository);
+    service.setNotifications([]);
+    let notifications = service.getNotifications();
+    expect(mockedRepository.setNotifications).toHaveBeenCalledWith([]);
+    expect(notifications).toEqual([]);
+
+    service.setNotifications([mockedNotification1, mockedNotification2]);
+    notifications = service.getNotifications();
+    expect(mockedRepository.setNotifications).toHaveBeenCalledWith([mockedNotification1, mockedNotification2]);
+    expect(notifications).toEqual([mockedNotification1, mockedNotification2]);
+  });
+
+  test("removeNotification() - remove a notification", () => {
+    const service = new NotificationService(mockedRepository);
+    expect(service.getNotifications()).toEqual(mockedNotifications);
+    service.removeNotification(mockedNotification2);
+    expect(service.getNotifications()).toEqual([mockedNotification1]);
+  });
 });

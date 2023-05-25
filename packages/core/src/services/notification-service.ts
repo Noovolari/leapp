@@ -24,4 +24,14 @@ export class NotificationService {
     });
     this.repository.setNotifications(notifications);
   }
+
+  setNotifications(notifications: LeappNotification[]): void {
+    this.repository.setNotifications(notifications);
+  }
+
+  removeNotification(notificationToBeRemoved: LeappNotification): void {
+    const notifications = this.getNotifications();
+    const newNotifications = notifications.filter((notification) => notification.uuid !== notificationToBeRemoved.uuid);
+    this.setNotifications(newNotifications);
+  }
 }

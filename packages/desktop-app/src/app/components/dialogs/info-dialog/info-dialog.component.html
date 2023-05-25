@@ -17,11 +17,11 @@
 <div class="modal-body text-center updater">
 
   <br>
-  <div class="html-content" [innerHTML]="releaseNotes" (click)="$event.preventDefault()"></div>
+  <div class="html-content" [innerHTML]="description" (click)="$event.preventDefault()"></div>
   <br>
 
   <div class="button-equalizer">
-    <button type="button" (click)="close();" class="enabled">Ok</button>
+    <button type="button" (click)="closeAndOpenLink();" class="enabled">{{buttonName ?? 'Ok'}}</button>
   </div>
 
 </div>

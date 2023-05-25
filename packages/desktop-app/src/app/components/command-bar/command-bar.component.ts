@@ -21,8 +21,9 @@ import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { UpdaterService } from "../../services/updater.service";
-import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
+import { MessageToasterService } from "../../services/message-toaster.service";
 import { LeappNotification, LeappNotificationType } from "@noovolari/leapp-core/models/notification";
+import { InfoDialogComponent } from "../dialogs/info-dialog/info-dialog.component";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -277,12 +278,19 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
-  goToWhatsNew(): void {
-    if (this.updaterService.isReady() && this.updaterService.isUpdateNeeded()) {
-      this.updaterService.updateDialog();
-    } else {
-      this.messageToasterService.toast("No update needed.", ToastLevel.info, "What's new");
-    }
+  async goToWhatsNew(): Promise<void> {
+    this.leappCoreService.notificationService.setNotificationAsRead("uuid");
+
+    const title = "What's new";
+    const releaseNotes = await this.updaterService.getReleaseNote();
+
+    this.bsModalService.show(InfoDialogComponent, {
+      animated: false,
+      initialState: {
+        title,
+        releaseNotes,
+      },
+    });
   }
 
   goToGettingStarted(): void {

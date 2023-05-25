@@ -43,6 +43,7 @@ import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-di
 import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
 import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
 import { ScrollingModule } from "@angular/cdk/scrolling";
+import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component";
 
 @NgModule({
   declarations: [
@@ -72,6 +73,7 @@ import { ScrollingModule } from "@angular/cdk/scrolling";
     SsmModalDialogComponent,
     ContextualMenuComponent,
     BottomBarComponent,
+    InfoDialogComponent,
   ],
   imports: [
     CommonModule,

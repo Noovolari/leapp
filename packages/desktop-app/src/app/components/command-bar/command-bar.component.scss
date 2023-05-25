@@ -1,5 +1,6 @@
 @import "../../../assets/scss/global";
 @import "../../../assets/scss/form";
+@import "../../../assets/scss/mixins/palette";
 
 .left {
   float: left;
@@ -141,21 +142,44 @@
 }
 
 .notification-dot {
+  display: inline-block;
   position: absolute;
   right: -4px;
   top: -4px;
-  width: 4px;
-  height: 4px;
-  color: #90030C;
+  width: 8px;
+  height: 8px;
+  background-color: $copper;
   border-radius: 50%;
+  border: 1px solid white;
+  z-index: 1;
 }
 
 .icon-not-menu {
   height: 20px;
   width: 20px;
   opacity: 0.45;
+  font-size: 22px;
+  top: 0;
 }
 
-.invert {
+.invert:not(i) {
   filter: invert(1);
+  opacity: 1;
+}
+.invert {
+  color: white;
+  opacity: 1;
+}
+
+.notification-menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  span {
+    display: inline-flex;
+    text-align: left;
+    flex-grow: 1;
+    margin-left: 5px;
+  }
 }

@@ -304,8 +304,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   async goToWhatsNew(): Promise<void> {
-    this.leappCoreService.notificationService.setNotificationAsRead("uuid");
-
     const title = "What's new";
     const releaseNotes = await this.updaterService.getReleaseNote();
 
@@ -506,7 +504,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     ];
 
     this.types = [
-      // eslint-disable-next-line max-len
       { show: true, id: SessionType.awsIamRoleFederated, category: "Amazon AWS", name: "IAM Role Federated", value: false },
       { show: true, id: SessionType.awsIamUser, category: "Amazon AWS", name: "IAM User", value: false },
       { show: true, id: SessionType.awsIamRoleChained, category: "Amazon AWS", name: "IAM Role Chained", value: false },

@@ -72,10 +72,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   eConstants = constants;
 
   notificationService: NotificationService;
-  surveyDescription = `We would like to invite you to participate in our survey. Your feedback is very important to us and will help us improve Leapp to better meet your needs. <br><br>
-        To participate in the survey, simply click on the link below and answer a few short questions. The survey will only take a few minutes to complete, and your responses will remain anonymous. <br><br>
-        As a thank you for your time and effort, the first 200 participants will receive $25 of AWS credits (you will need to insert an email so that we can send them to you). <br><br>
-        So hurry up and complete the survey now to claim your reward!`;
+  surveyDescription = `<span>We would like to invite you to participate in our survey. Your feedback is very important to us and will help us improve Leapp to better meet your needs.</span><br><br>
+        <span>To participate in the survey, simply click on the link below and answer a few short questions. The survey will only take a few minutes to complete, and your responses will remain anonymous.</span><br><br>
+        <span>As a thank you for your time and effort, the first 200 participants will receive $25 of AWS credits (you will need to insert an email so that we can send them to you).</span><br><br>
+        <span>So hurry up and complete the survey now to claim your reward!</span>`;
 
   private subscription0;
   private subscription1;

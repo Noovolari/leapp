@@ -1,51 +1,47 @@
-import { SessionFactory } from "./session-factory";
-import { SessionType } from "../models/session-type";
-import { NamedProfilesService } from "./named-profiles-service";
-import { SessionManagementService } from "./session-management-service";
-import { AwsSsoIntegrationService } from "./integration/aws-sso-integration-service";
-import { AwsIamUserSession } from "../models/aws/aws-iam-user-session";
-import { AwsSessionService } from "./session/aws/aws-session-service";
-import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-service";
-import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
-import { LoggedException, LogLevel } from "./log-service";
-import { AwsIamRoleFederatedService } from "./session/aws/aws-iam-role-federated-service";
-import { IdpUrlsService } from "./idp-urls-service";
-import { AzureIntegrationService } from "./integration/azure-integration-service";
-import { LocalSecretDto } from "leapp-team-core/encryptable-dto/local-secret-dto";
-import { AwsIamUserLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-iam-user-local-session-dto";
-import { User } from "leapp-team-core/user/user";
-import { AwsIamFederatedLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-iam-federated-local-session-dto";
-import { AwsSsoLocalIntegrationDto } from "leapp-team-core/encryptable-dto/aws-sso-local-integration-dto";
-import { AwsIamRoleChainedLocalSessionDto } from "leapp-team-core/encryptable-dto/aws-iam-role-chained-local-session-dto";
-import { AzureLocalIntegrationDto } from "leapp-team-core/encryptable-dto/azure-local-integration-dto";
-import { IKeychainService } from "../interfaces/i-keychain-service";
-import { constants } from "../models/constants";
+import { LocalSecretDto } from "../../../leapp-team-core/encryptable-dto/local-secret-dto";
+import { AwsIamUserLocalSessionDto } from "../../../leapp-team-core/encryptable-dto/aws-iam-user-local-session-dto";
+import { User } from "../../../leapp-team-core/user/user";
+import { AwsIamFederatedLocalSessionDto } from "../../../leapp-team-core/encryptable-dto/aws-iam-federated-local-session-dto";
+import { AwsSsoLocalIntegrationDto } from "../../../leapp-team-core/encryptable-dto/aws-sso-local-integration-dto";
+import { AwsIamRoleChainedLocalSessionDto } from "../../../leapp-team-core/encryptable-dto/aws-iam-role-chained-local-session-dto";
+import { AzureLocalIntegrationDto } from "../../../leapp-team-core/encryptable-dto/azure-local-integration-dto";
+import { VaultProvider } from "../../../leapp-team-core/vault/vault-provider";
+import { EncryptionProvider } from "../../../leapp-team-core/encryption/encryption.provider";
+import { UserProvider } from "../../../leapp-team-core/user/user.provider";
+import { SecretType } from "../../../leapp-team-core/encryptable-dto/secret-type";
+import { HttpClientProvider } from "../../../leapp-team-core/http/http-client.provider";
 import { BehaviorSubject } from "rxjs";
-import { INativeService } from "../interfaces/i-native-service";
-import { FileService } from "./file-service";
-import { WorkspaceService } from "./workspace-service";
-import { BehaviouralSubjectService } from "./behavioural-subject-service";
-import { IntegrationFactory } from "./integration-factory";
-import { VaultProvider } from "leapp-team-core/vault/vault-provider";
-import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provider";
-import { UserProvider } from "leapp-team-core/user/user.provider";
-import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
-import { HttpClientProvider } from "leapp-team-core/http/http-client.provider";
-import { HttpClientInterface } from "leapp-team-core/http/http-client-interface";
+import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
+import { NamedProfilesService } from "@noovolari/leapp-core/services/named-profiles-service";
+import { SessionManagementService } from "@noovolari/leapp-core/services/session-management-service";
+import { AzureIntegrationService } from "@noovolari/leapp-core/services/integration/azure-integration-service";
+import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
+import { IdpUrlsService } from "@noovolari/leapp-core/services/idp-urls-service";
+import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
+import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
+import { FileService } from "@noovolari/leapp-core/services/file-service";
+import { IntegrationFactory } from "@noovolari/leapp-core/services/integration-factory";
+import { WorkspaceService } from "@noovolari/leapp-core/services/workspace-service";
+import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
+import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
+import { AwsIamRoleFederatedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-service";
+import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
+import { AwsIamUserSession } from "@noovolari/leapp-core/models/aws/aws-iam-user-session";
+
+export { User } from "../../../leapp-team-core/user/user";
+export { ApiErrorCodes } from "../../../leapp-team-core/errors/api-error-codes";
+export { FormErrorCodes } from "../../../leapp-team-core/errors/form-error-codes";
 
 export interface WorkspaceState {
   name: string;
   id: string;
 }
 
-export interface TeamStatus {
-  workspaceName: string;
-  email: string;
-  isOnline: boolean;
-}
-
 export class TeamService {
-  httpClient: HttpClientInterface;
   private readonly _signedInUserState$: BehaviorSubject<User>;
   private readonly _workspaceState$: BehaviorSubject<WorkspaceState>;
   private readonly _switchingWorkspaceState$: BehaviorSubject<boolean>;
@@ -56,6 +52,7 @@ export class TeamService {
   private readonly httpClientProvider: HttpClientProvider;
 
   constructor(
+    apiEndpoint: string,
     private readonly sessionFactory: SessionFactory,
     private readonly namedProfilesService: NamedProfilesService,
     private readonly sessionManagementService: SessionManagementService,
@@ -71,7 +68,6 @@ export class TeamService {
     private readonly integrationFactory: IntegrationFactory,
     private readonly behaviouralSubjectService?: BehaviouralSubjectService
   ) {
-    const apiEndpoint = "https://2nfksla7qi.execute-api.eu-west-1.amazonaws.com";
     this._signedInUserState$ = new BehaviorSubject<User>(null);
     this._workspaceState$ = new BehaviorSubject<WorkspaceState>({ id: "", name: "" });
     this._switchingWorkspaceState$ = new BehaviorSubject<boolean>(false);

@@ -15,13 +15,12 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
 import { AppProviderService } from "../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { integrationHighlight } from "../integration-bar/integration-bar.component";
-import { User } from "leapp-team-core/user/user";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { AppService } from "../../services/app.service";
 import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
 import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
-import { WorkspaceState } from "@noovolari/leapp-core/services/team-service";
 import { ManageTeamWorkspacesDialogComponent } from "../dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
+import { User, WorkspaceState } from "../../services/team-service";
 
 export interface SelectedSegment {
   name: string;

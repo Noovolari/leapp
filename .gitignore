@@ -10,6 +10,7 @@ packages/desktop-app/electron/dist
 # Only exists if Bazel was run
 packages/desktop-app/bazel-out
 packages/desktop-app/.angular
+**/leapp-team-core
 
 # dependencies
 **/node_modules

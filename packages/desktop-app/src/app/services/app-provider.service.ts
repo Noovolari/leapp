@@ -46,7 +46,8 @@ import { AppKeychainService } from "./app-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
-import { TeamService } from "@noovolari/leapp-core/services/team-service";
+import { TeamService } from "./team-service";
+import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: "root",
@@ -452,6 +453,7 @@ export class AppProviderService {
   public get teamService(): TeamService {
     if (!this.teamServiceInstance) {
       this.teamServiceInstance = new TeamService(
+        environment.apiEndpoint,
         this.sessionFactory,
         this.namedProfileService,
         this.sessionManagementService,

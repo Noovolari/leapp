@@ -1,15 +1,15 @@
 import { Injectable } from "@angular/core";
 import { HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from "@angular/common/http";
 import { Observable } from "rxjs";
-import { UserService } from "leapp-angular-common";
+import { TeamService } from "./team-service";
 
 @Injectable()
 export class AuthenticationInterceptor implements HttpInterceptor {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly teamService: TeamService) {}
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (this.userService.isSignedIn) {
-      req = req.clone({ setHeaders: { ["Authorization"]: "Bearer " + this.userService.getAuthenticationToken() } });
+    if (this.teamService.signedInUserState.getValue()) {
+      req = req.clone({ setHeaders: { ["Authorization"]: "Bearer " + this.teamService.signedInUserState.getValue().accessToken } });
     }
 
     return next.handle(req);

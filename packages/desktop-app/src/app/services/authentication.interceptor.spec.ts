@@ -1,29 +1,28 @@
 import { TestBed } from "@angular/core/testing";
-
 import { AuthenticationInterceptor } from "./authentication.interceptor";
-import { HTTP_INTERCEPTORS, HttpResponse } from "@angular/common/http";
+import { HTTP_INTERCEPTORS, HttpResponse, HttpClient } from "@angular/common/http";
 import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
-import { TestService, UserService } from "leapp-angular-common";
+import { TeamService } from "./team-service";
 
 describe(`AuthenticationInterceptor`, () => {
-  const userServiceMock: any = {};
-  let testService: TestService;
+  const testUrl = `http://localhost/not-available/route`;
+  const teamServiceMock: any = {};
+  let httpClient: HttpClient;
   let httpMock: HttpTestingController;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
       providers: [
-        TestService,
         {
           provide: HTTP_INTERCEPTORS,
           useClass: AuthenticationInterceptor,
           multi: true,
         },
       ],
-    }).overrideProvider(UserService, { useValue: userServiceMock });
+    }).overrideProvider(TeamService, { useValue: teamServiceMock });
 
-    testService = TestBed.inject(TestService);
+    httpClient = TestBed.inject(HttpClient);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -32,24 +31,25 @@ describe(`AuthenticationInterceptor`, () => {
   });
 
   it("Intercept - user is not logged in", (done) => {
-    userServiceMock.isSignedIn = false;
-    testService.getTestUrl().subscribe(() => {
+    teamServiceMock.signedInUserState = { getValue: jasmine.createSpy().and.callFake(() => null) };
+    httpClient.get(testUrl).subscribe(() => {
       done();
     });
 
-    const httpRequest = httpMock.expectOne(testService.testUrl);
+    const httpRequest = httpMock.expectOne(testUrl);
     expect(httpRequest.request.headers.has("Authorization")).toEqual(false);
+    expect(teamServiceMock.signedInUserState.getValue).toHaveBeenCalled();
     httpRequest.event(new HttpResponse({ status: 200, body: {} }));
   });
 
   it("Intercept - user already logged in", (done) => {
-    userServiceMock.isSignedIn = true;
-    userServiceMock.getAuthenticationToken = () => "auth_token";
-    testService.getTestUrl().subscribe(() => {
+    teamServiceMock.isSignedIn = true;
+    teamServiceMock.signedInUserState = { getValue: jasmine.createSpy().and.callFake(() => ({ accessToken: "auth_token" })) };
+    httpClient.get(testUrl).subscribe(() => {
       done();
     });
 
-    const httpRequest = httpMock.expectOne(testService.testUrl);
+    const httpRequest = httpMock.expectOne(testUrl);
     expect(httpRequest.request.headers.has("Authorization")).toEqual(true);
     expect(httpRequest.request.headers.get("Authorization")).toBe("Bearer auth_token");
     httpRequest.event(new HttpResponse({ status: 200, body: {} }));

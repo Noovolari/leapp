@@ -44,7 +44,6 @@ import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.compo
 import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { LoginTeamDialogComponent } from "./dialogs/login-team-dialog/login-team-dialog.component";
-import { LeappAngularCommonModule } from "leapp-angular-common";
 import { BrowserModule } from "@angular/platform-browser";
 import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -118,7 +117,6 @@ import { ManageTeamWorkspacesDialogComponent } from "./dialogs/manage-team-works
     MatIconModule,
     MatProgressSpinnerModule,
     NgSelectModule,
-    LeappAngularCommonModule,
   ],
   exports: [ConfirmationDialogComponent, InputDialogComponent, CommandBarComponent, SideBarComponent, SessionsComponent],
 })

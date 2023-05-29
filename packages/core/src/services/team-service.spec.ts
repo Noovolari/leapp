@@ -729,6 +729,7 @@ describe("TeamService", () => {
       teamService.sessionFactory.getSessionService = jest.fn(() => mockedSessionService);
       teamService.setupAwsSession = jest.fn(() => mockedProfileId);
       teamService.getAssumerSessionId = jest.fn(() => mockedParentSessionId);
+      (teamService as any).isOrphanedChainedSession = jest.fn(() => false);
 
       await teamService.syncSessionsSecret(localSecret);
 
@@ -736,6 +737,7 @@ describe("TeamService", () => {
       expect(teamService.sessionFactory.getSessionService).toHaveBeenCalledWith(SessionType.awsIamRoleChained);
       expect(teamService.setupAwsSession).toHaveBeenCalledTimes(1);
       expect(teamService.setupAwsSession).toHaveBeenCalledWith(mockedSessionService, localSecret.sessionId, localSecret.profileName);
+      expect((teamService as any).isOrphanedChainedSession).toHaveBeenCalledWith(localSecret);
       expect(mockedSessionService.create).toHaveBeenCalledTimes(1);
       expect(mockedSessionService.create).toHaveBeenCalledWith({
         sessionName: localSecret.sessionName,
@@ -746,6 +748,18 @@ describe("TeamService", () => {
         roleSessionName: localSecret.roleSessionName,
         sessionId: localSecret.sessionId,
       });
+    });
+
+    test("if the input secret is an aws iam role chained orphaned session, the session is skipped", async () => {
+      const localSecret = {
+        secretType: SecretType.awsIamRoleChainedSession,
+      } as any;
+      (teamService as any).isOrphanedChainedSession = jest.fn(() => true);
+      teamService.sessionFactory.getSessionService = jest.fn();
+
+      await teamService.syncSessionsSecret(localSecret);
+
+      expect(teamService.sessionFactory.getSessionService).not.toHaveBeenCalled();
     });
 
     test("if the input secret is an aws iam role federated session, sessionFactory.getSessionService is called with aws iam role federated session type and sessionService.create is called with the expected AwsIamRoleFedetatedSessionRequest", async () => {
@@ -789,6 +803,13 @@ describe("TeamService", () => {
         sessionId: localSecret.sessionId,
       });
     });
+  });
+
+  test("TeamService.isOrphanedChainedSession", () => {
+    createTeamServiceInstance();
+    expect((teamService as any).isOrphanedChainedSession({ assumerSessionId: undefined, assumerIntegrationId: undefined })).toBe(true);
+    expect((teamService as any).isOrphanedChainedSession({ assumerSessionId: "assumer-id", assumerIntegrationId: undefined })).toBe(false);
+    expect((teamService as any).isOrphanedChainedSession({ assumerSessionId: undefined, assumerIntegrationId: "assumer-id" })).toBe(false);
   });
 
   describe("getAssumerSessionId()", () => {

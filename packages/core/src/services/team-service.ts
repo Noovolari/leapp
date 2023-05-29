@@ -308,7 +308,10 @@ export class TeamService {
         profileId,
         sessionId: localSessionDto.sessionId,
       });
-    } else if (localSecret.secretType === SecretType.awsIamRoleChainedSession) {
+    } else if (
+      localSecret.secretType === SecretType.awsIamRoleChainedSession &&
+      !this.isOrphanedChainedSession(localSecret as AwsIamRoleChainedLocalSessionDto)
+    ) {
       const localSessionDto = localSecret as AwsIamRoleChainedLocalSessionDto;
       const sessionService = (await this.sessionFactory.getSessionService(SessionType.awsIamRoleChained)) as AwsIamRoleChainedService;
       const profileId = await this.setupAwsSession(sessionService, localSessionDto.sessionId, localSessionDto.profileName);
@@ -337,6 +340,10 @@ export class TeamService {
         sessionId: localSessionDto.sessionId,
       });
     }
+  }
+
+  private isOrphanedChainedSession(localSessionDto: AwsIamRoleChainedLocalSessionDto): boolean {
+    return localSessionDto.assumerSessionId === undefined && localSessionDto.assumerIntegrationId === undefined;
   }
 
   private async getAssumerSessionId(localSessionDto: AwsIamRoleChainedLocalSessionDto): Promise<string> {

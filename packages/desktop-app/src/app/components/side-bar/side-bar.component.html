@@ -42,11 +42,11 @@
         </div>
 
         <div class="divider"></div>
-        <div [disabled]="doesTeamExist" mat-menu-item (click)="loginToLeappTeam()">
+        <div [disabled]="doesTeamExist || isLeappTeamStubbed" mat-menu-item (click)="loginToLeappTeam()">
           <img class="workspace-menu-icon" src="assets/images/sign-in.svg" alt="sign-in">
           <span>Sign-in Workspace</span>
         </div>
-        <div mat-menu-item (click)="showManageWorkspacesDialog()">
+        <div [disabled]="isLeappTeamStubbed" mat-menu-item (click)="showManageWorkspacesDialog()">
           <img class="workspace-menu-icon" src="assets/images/buildings.svg" alt="manage-workspaces">
           <span>Manage Workspaces</span>
         </div>
@@ -55,7 +55,7 @@
           <img class="workspace-menu-icon" src="assets/images/gear.svg" alt="settings">
           <span>Settings...</span>
         </div>
-        <div [disabled]="!doesTeamExist || isTeamLocked" mat-menu-item (click)="logoutFromLeappTeam(true)">
+        <div [disabled]="!doesTeamExist || isTeamLocked || isLeappTeamStubbed" mat-menu-item (click)="logoutFromLeappTeam(true)">
           <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out">
           <span>Lock</span>
         </div>

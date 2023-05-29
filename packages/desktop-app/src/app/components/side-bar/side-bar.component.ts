@@ -55,6 +55,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   workspaceState: WorkspaceState;
   loggedUser: User;
   localWorkspaceName: string;
+  isLeappTeamStubbed: boolean;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
   private userSubscription;
@@ -96,6 +97,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
       this.workspaceState = workspaceState;
     });
     this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.loggedUser = user));
+    this.isLeappTeamStubbed = this.appProviderService.teamService.isLeappTeamStubbed;
   }
 
   ngOnDestroy(): void {
@@ -188,6 +190,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   async loginToLeappTeam(): Promise<void> {
+    if (this.isLeappTeamStubbed) return;
     this.bsModalService.show(LoginTeamDialogComponent, {
       animated: false,
       class: "create-modal",
@@ -197,7 +200,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   async logoutFromLeappTeam(lock: boolean = false): Promise<void> {
-    if (!this.doesTeamExist) return;
+    if (!this.doesTeamExist || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
   }
 
@@ -220,6 +223,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   showManageWorkspacesDialog(): void {
+    if (this.isLeappTeamStubbed) return;
     this.bsModalService.show(ManageTeamWorkspacesDialogComponent, {
       animated: false,
       class: "create-modal",

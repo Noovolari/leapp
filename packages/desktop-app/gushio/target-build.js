@@ -10,12 +10,19 @@ module.exports = {
   run: async (args) => {
     const path = require('path')
     const shellJs = require('shelljs')
+    const fs = require("fs");
     const copyFunction = require('./copy-func')
     const makeDirFunction = require('./makedir-func')
     const compileFunction = require('./compile-func')
     try {
       await gushio.run(path.join(__dirname, './target-clean.js'))
       console.log('Building leapp... ')
+
+      const teamServiceStubFile = path.join(__dirname, '../src/app/services/team-service-stub.ts')
+      const teamServiceTargetFile = path.join(__dirname, '../src/app/services/team-service.ts')
+      if (!fs.existsSync(teamServiceTargetFile)) {
+        fs.copyFileSync(teamServiceStubFile, teamServiceTargetFile)
+      }
 
       await makeDirFunction(path, '../dist/leapp-client')
       await copyFunction(path, '../src/assets/icons', '../dist/leapp-client')

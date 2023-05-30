@@ -46,10 +46,8 @@ import { AzureIntegrationService } from "@noovolari/leapp-core/services/integrat
 import { CliRpcKeychainService } from "./cli-rpc-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
-import { EncryptionProvider } from "leapp-team-core/encryption/encryption.provider";
-import { UserProvider } from "leapp-team-core/user/user.provider";
 import * as crypto from "crypto";
-import { TeamService } from "@noovolari/leapp-core/services/team-service";
+import { TeamService } from "./team-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -95,8 +93,6 @@ export class CliProviderService {
   private pluginManagerServiceInstance: PluginManagerService;
   private integrationFactoryInstance: IntegrationFactory;
   private azureIntegrationServiceInstance: AzureIntegrationService;
-  private leappTeamCoreEncryptionProviderInstance: EncryptionProvider;
-  private leappTeamCoreUserProviderInstance: UserProvider;
   private teamServiceInstance: TeamService;
 
   public get azureIntegrationService(): AzureIntegrationService {
@@ -129,7 +125,7 @@ export class CliProviderService {
         this.logService,
         this.repository,
         this.sessionFactory,
-        this.teamService.httpClient
+        null
       );
     }
     return this.pluginManagerServiceInstance;
@@ -446,7 +442,8 @@ export class CliProviderService {
         this.fileService,
         (crypto as any).webcrypto,
         this.workspaceService,
-        this.integrationFactory
+        this.integrationFactory,
+        this.behaviouralSubjectService
       );
     }
     return this.teamServiceInstance;
@@ -454,19 +451,5 @@ export class CliProviderService {
 
   get inquirer(): CliInquirer.Inquirer {
     return CliInquirer;
-  }
-
-  get leappTeamCoreEncryptionProvider(): EncryptionProvider {
-    if (!this.leappTeamCoreEncryptionProviderInstance) {
-      this.leappTeamCoreEncryptionProviderInstance = new EncryptionProvider((crypto as any).webcrypto);
-    }
-    return this.leappTeamCoreEncryptionProviderInstance;
-  }
-
-  get leappTeamCoreUserProvider(): UserProvider {
-    if (!this.leappTeamCoreUserProviderInstance) {
-      this.leappTeamCoreUserProviderInstance = new UserProvider("http://localhost:3000", this.teamService.httpClient, this.leappTeamCoreEncryptionProvider);
-    }
-    return this.leappTeamCoreUserProviderInstance;
   }
 }

@@ -3,7 +3,7 @@ import { ErrorHandler, NgModule } from "@angular/core";
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
 import { LayoutModule } from "./layout/layout.module";
-import { HTTP_INTERCEPTORS, HttpClientModule } from "@angular/common/http";
+import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { ConfirmationDialogComponent } from "./components/dialogs/confirmation-dialog/confirmation-dialog.component";
 import { InputDialogComponent } from "./components/dialogs/input-dialog/input-dialog.component";
@@ -16,7 +16,6 @@ import { ErrorService } from "./services/middleware/error.service";
 import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { ComponentsModule } from "./components/components.module";
 import { ToastrModule } from "ngx-toastr";
-import { AuthenticationInterceptor } from "./services/authentication.interceptor";
 
 @NgModule({
   declarations: [AppComponent, TrayMenuComponent],
@@ -36,10 +35,7 @@ import { AuthenticationInterceptor } from "./services/authentication.interceptor
     ToastrModule.forRoot(),
   ],
   entryComponents: [ConfirmationDialogComponent, InputDialogComponent],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthenticationInterceptor, multi: true },
-    { provide: ErrorHandler, useClass: ErrorService },
-  ],
+  providers: [{ provide: ErrorHandler, useClass: ErrorService }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

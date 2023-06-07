@@ -1,9 +1,5 @@
-import { describe, expect, jest, test } from "@jest/globals";
+import { describe, expect, test } from "@jest/globals";
 import { AzureCoreService } from "./azure-core-service";
-import { AzureSession } from "../models/azure/azure-session";
-import { SessionStatus } from "../models/session-status";
-import { SessionType } from "../models/session-type";
-import { AzureSessionService } from "./session/azure/azure-session-service";
 
 describe("azureCoreService", () => {
   test("getLocations", () => {
@@ -197,63 +193,5 @@ describe("azureCoreService", () => {
         location: "brazilsoutheast",
       },
     ]);
-  });
-
-  test("stopAllSessionsOnQuit", async () => {
-    const sessionId = "fakeSessionId";
-
-    const logService = {
-      log: jest.fn(() => {}),
-    } as any;
-
-    const azureSession: AzureSession = {
-      sessionName: "fakeSessionName",
-      region: "fakeRegion",
-      startDateTime: "fakeStartDateTime ",
-      azureIntegrationId: "fakeIntegrationId",
-      sessionId,
-      sessionTokenExpiration: "fakeTokenExpiration",
-      status: SessionStatus.active,
-      subscriptionId: "fakeSubscriptionId",
-      tenantId: "fakeTenantId",
-      type: SessionType.azure,
-      expired: () => false,
-    };
-
-    const executeService = {
-      execute: () => {},
-    } as any;
-
-    const repository = {
-      getSessions: () => [azureSession],
-      getSessionById: () => azureSession,
-      updateAzureIntegration: () => {},
-      getAzureIntegration: () => {},
-      updateSessions: () => {},
-    } as any;
-
-    const azurePersistenceService = {
-      loadProfile: () => ({
-        subscriptions: [],
-      }),
-      saveProfile: () => {},
-    } as any;
-
-    const azureSessionService = new AzureSessionService(null, repository, null, executeService, null, null, azurePersistenceService, logService);
-
-    const sessionManagementService = {
-      getSessions: jest.fn(() => [azureSession]),
-    } as any;
-
-    const spySessionDeactivated = jest.spyOn(azureSessionService, "sessionDeactivated");
-    const spyStop = jest.spyOn(azureSessionService, "stop");
-    const azureCoreService = new AzureCoreService(sessionManagementService, azureSessionService);
-
-    await azureCoreService.stopAllSessionsOnQuit();
-    expect(sessionManagementService.getSessions).toHaveBeenCalledTimes(1);
-    expect(sessionManagementService.getSessions).toHaveReturnedWith([azureSession]);
-    expect(spySessionDeactivated).toHaveBeenCalledWith(sessionId);
-    expect(spyStop).toHaveBeenCalledWith(sessionId);
-    expect(azureSession.status).toBe(SessionStatus.inactive);
   });
 });

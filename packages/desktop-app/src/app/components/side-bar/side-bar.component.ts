@@ -214,6 +214,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
       await this.loginToLeappTeam();
     } else {
       if (this.isLocalWorkspaceSelected) {
+        await this.appProviderService.sessionManagementService.stopAllSessions();
         await this.appProviderService.teamService.syncSecrets();
         this.resetFilters();
       }

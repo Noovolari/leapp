@@ -1,9 +1,10 @@
 import { Session } from "../models/session";
 import { Repository } from "./repository";
 import { AwsSsoRoleSession } from "../models/aws/aws-sso-role-session";
+import { SessionFactory } from "./session-factory";
 
 export class SessionManagementService {
-  constructor(private repository: Repository) {}
+  constructor(private repository: Repository, private sessionFactory: SessionFactory) {}
 
   getSessions(): Session[] {
     return this.repository.getSessions();
@@ -47,5 +48,13 @@ export class SessionManagementService {
 
   deleteSession(sessionId: string): void {
     this.repository.deleteSession(sessionId);
+  }
+
+  async stopAllSessions(): Promise<void> {
+    const activeSessions = this.getActiveAndPendingSessions();
+    for (const session of activeSessions) {
+      const sessionService = this.sessionFactory.getSessionService(session.type);
+      await sessionService.stop(session.sessionId);
+    }
   }
 }

@@ -106,6 +106,7 @@ export class TeamService {
   }
 
   async setCurrentWorkspace(reloadOnly: boolean = false): Promise<void> {
+    await this.sessionManagementService.stopAllSessions();
     this.signedInUserState.next(JSON.parse(await this.keyChainService.getSecret(constants.appName, this.teamSignedInUserKeychainKey)));
     const currentWorkspaceName = await this.getKeychainCurrentWorkspace();
     // Local or null workspace saved in keychain
@@ -256,6 +257,7 @@ export class TeamService {
     }
     while (workspace.sessions.length > 0) {
       const concreteSessionService = this.sessionFactory.getSessionService(workspace.sessions[0].type);
+      await concreteSessionService.stop(workspace.sessions[0].sessionId);
       await concreteSessionService.delete(workspace.sessions[0].sessionId);
     }
     this.workspaceService.removeWorkspace();

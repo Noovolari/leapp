@@ -201,14 +201,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     this.loggingService.log(new LoggedEntry("Closing app with cleaning process...", this, LogLevel.info));
     // We need the Try/Catch as we have the possibility to call the method without sessions
     try {
-      // Stop the sessions...
-      const activeSessions = this.appProviderService.sessionManagementService.getActiveAndPendingSessions();
-      activeSessions.forEach((sess) => {
-        const factorizedService = this.sessionServiceFactory.getSessionService(sess.type);
-        factorizedService.stop(sess.sessionId);
-      });
-      // Clean the config file
-      this.awsCoreService.cleanCredentialFile();
+      await this.appProviderService.sessionManagementService.stopAllSessions();
     } catch (err) {
       this.loggingService.log(new LoggedEntry("No sessions to stop, skipping...", this, LogLevel.error, false, err.stack));
     }

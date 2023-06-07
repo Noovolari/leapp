@@ -1,7 +1,6 @@
-import { describe, test, expect } from "@jest/globals";
+import { describe, test, expect, jest } from "@jest/globals";
 import { AwsCoreService } from "./aws-core-service";
 import { constants } from "../models/constants";
-import { LoggedEntry, LogLevel } from "./log-service";
 
 describe("AwsCoreService", () => {
   const homedir = "homedir-path";
@@ -147,34 +146,5 @@ describe("AwsCoreService", () => {
       maxRetries: 0,
       httpOptions: { timeout },
     });
-  });
-
-  test("cleanCredentialFile", () => {
-    const awsCredentialsPath = nativeService.path.join(`${homedir}`, `.aws`, `credentials`);
-    const awsCoreService = new AwsCoreService(nativeService, null);
-    awsCoreService.cleanCredentialFile();
-    expect(nativeService.fs.writeFileSync).toHaveBeenCalledTimes(1);
-    expect(nativeService.fs.writeFileSync).toHaveBeenCalledWith(awsCredentialsPath, "");
-  });
-
-  test("cleanCredentialFile, throw error", () => {
-    const errorMessage = {
-      toString: () => "Error Message",
-      stack: "fake-stack",
-    };
-    const awsCredentialPath = jest.fn(() => {
-      throw new Error(errorMessage.toString());
-    });
-    const logService = {
-      log: jest.fn(() => {}),
-    } as any;
-    const awsCoreService = new AwsCoreService(nativeService, logService);
-    awsCoreService.awsCredentialPath = awsCredentialPath;
-    expect(awsCredentialPath).toThrowError(errorMessage.toString());
-    awsCoreService.cleanCredentialFile();
-    expect(logService.log).toHaveBeenCalledTimes(1);
-    expect(logService.log).toHaveBeenCalledWith(
-      new LoggedEntry(`Can't delete aws credential file probably missing: Error: ${errorMessage}`, this, LogLevel.warn, false, errorMessage.stack)
-    );
   });
 });

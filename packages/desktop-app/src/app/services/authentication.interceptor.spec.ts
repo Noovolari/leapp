@@ -44,7 +44,7 @@ describe(`AuthenticationInterceptor`, () => {
 
   it("Intercept - user already logged in", (done) => {
     userServiceMock.isSignedIn = true;
-    userServiceMock.getAuthenticationToken = () => "auth_token";
+    userServiceMock.accessToken = () => "auth_token";
     testService.getTestUrl().subscribe(() => {
       done();
     });

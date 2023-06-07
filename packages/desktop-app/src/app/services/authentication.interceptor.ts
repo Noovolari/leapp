@@ -9,7 +9,7 @@ export class AuthenticationInterceptor implements HttpInterceptor {
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (this.userService.isSignedIn) {
-      req = req.clone({ setHeaders: { ["Authorization"]: "Bearer " + this.userService.getAuthenticationToken() } });
+      req = req.clone({ setHeaders: { ["Authorization"]: "Bearer " + this.userService.accessToken } });
     }
 
     return next.handle(req);

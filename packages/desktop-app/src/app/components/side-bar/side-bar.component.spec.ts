@@ -19,7 +19,18 @@ describe("SideBarComponent", () => {
       repository: spyRepositoryService,
       segmentService: { list: () => [] },
       awsCoreService: { getRegions: () => [] },
-      teamService: { workspaceState: { subscribe: () => {} }, signedInUserState: { subscribe: () => {} } },
+      teamService: {
+        workspaceState: {
+          subscribe: () => {
+            component.workspaceState = { id: "mocked-id" } as any;
+          },
+        },
+        signedInUserState: {
+          subscribe: () => {
+            component.loggedUser = { teamName: "mock-name" } as any;
+          },
+        },
+      },
     });
 
     await TestBed.configureTestingModule({
@@ -41,7 +52,6 @@ describe("SideBarComponent", () => {
     (component as any).userSubscription = {
       unsubscribe: () => {},
     };
-    (component as any).workspaceState = { id: "mocked-id" };
   });
 
   it("should create", () => {

@@ -52,7 +52,6 @@ export class WorkspaceService {
       const purgedPinned = remotePinned.filter((remoteSessionId) => remoteSessionIds.includes(remoteSessionId));
       globalSettings.pinned = [...localPinned, ...purgedPinned];
     }
-    console.log(globalSettings.pinned);
     this.repository.globalSettings = globalSettings;
   }
 }

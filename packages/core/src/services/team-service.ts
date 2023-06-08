@@ -155,9 +155,7 @@ export class TeamService {
 
   // TODO: in the future, when we'll introduce multiple workspace, this method this will become setRemoteWorkspace(workspaceId)
   async syncSecrets(reloadOnly: boolean = false): Promise<void> {
-    this.fileService.aesKey = this.nativeService.machineId;
-    this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
-    this.workspaceService.reloadWorkspace();
+    this.loadAndDecryptWorkspace();
     const localSessionIds = this.workspaceService.getWorkspace().sessions.map((session) => session.sessionId);
     const globalSettings = this.workspaceService.extractGlobalSettings();
     const signedInUser = this.signedInUserState.getValue();
@@ -215,13 +213,10 @@ export class TeamService {
       let workspaceState: WorkspaceState;
 
       if (keychainCurrentWorkspace === constants.localWorkspaceKeychainValue) {
-        this.fileService.aesKey = this.nativeService.machineId;
-        this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
-        this.workspaceService.reloadWorkspace();
+        this.loadAndDecryptWorkspace();
         workspaceState = { name: constants.localWorkspaceName, id: constants.localWorkspaceKeychainValue };
       } else {
-        this.fileService.aesKey = signedInUser.publicRSAKey;
-        this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
+        this.loadAndDecryptWorkspace(signedInUser);
         // If called from CLI, it needs workspaceService.reloadWorkspace() to be invoked.
         await callback?.();
         workspaceState = { name: signedInUser.teamName, id: signedInUser.teamId };
@@ -232,6 +227,17 @@ export class TeamService {
       this.behaviouralSubjectService?.reloadSessionsAndIntegrationsFromRepository();
     } finally {
       this.switchingWorkspaceState.next(false);
+    }
+  }
+
+  private loadAndDecryptWorkspace(signedInUser?: any): void {
+    if (!signedInUser) {
+      this.fileService.aesKey = this.nativeService.machineId;
+      this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
+      this.workspaceService.reloadWorkspace();
+    } else {
+      this.fileService.aesKey = signedInUser.publicRSAKey;
+      this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
     }
   }
 
@@ -250,9 +256,7 @@ export class TeamService {
 
   private async setLocalWorkspace(globalSettings?: GlobalSettings): Promise<void> {
     if (globalSettings) {
-      this.fileService.aesKey = this.nativeService.machineId;
-      this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
-      this.workspaceService.reloadWorkspace();
+      this.loadAndDecryptWorkspace();
       this.workspaceService.applyGlobalSettings(globalSettings);
     }
     await this.setKeychainCurrentWorkspace(constants.localWorkspaceKeychainValue);

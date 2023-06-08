@@ -17,6 +17,7 @@ import { LoggedException, LogLevel } from "./log-service";
 import { AzureIntegration } from "../models/azure/azure-integration";
 import PluginStatus from "../models/plugin-status";
 import { WorkspaceConsistencyService } from "./workspace-consistency-service";
+import { GlobalSettings } from "../interfaces/i-global-settings";
 
 export class Repository {
   // Private singleton workspace
@@ -455,6 +456,37 @@ export class Repository {
 
   writeFile(data: string): void {
     this.nativeService.fs.writeFileSync(__dirname + "/register-client-response", JSON.stringify(data));
+  }
+
+  get globalSettings(): GlobalSettings {
+    const workspace = this.getWorkspace();
+    return {
+      colorTheme: workspace.colorTheme,
+      credentialMethod: workspace.credentialMethod,
+      defaultLocation: workspace.defaultLocation,
+      defaultRegion: workspace.defaultRegion,
+      extensionEnabled: workspace.extensionEnabled,
+      macOsTerminal: workspace.macOsTerminal,
+      pluginsStatus: workspace.pluginsStatus,
+      samlRoleSessionDuration: workspace.samlRoleSessionDuration,
+      segments: workspace.segments,
+      ssmRegionBehaviour: workspace.ssmRegionBehaviour,
+    };
+  }
+
+  set globalSettings(globalSettingsInput: GlobalSettings) {
+    const workspace = this.getWorkspace();
+    workspace.colorTheme = globalSettingsInput.colorTheme;
+    workspace.credentialMethod = globalSettingsInput.credentialMethod;
+    workspace.defaultLocation = globalSettingsInput.defaultLocation;
+    workspace.defaultRegion = globalSettingsInput.defaultRegion;
+    workspace.extensionEnabled = globalSettingsInput.extensionEnabled;
+    workspace.macOsTerminal = globalSettingsInput.macOsTerminal;
+    workspace.pluginsStatus = globalSettingsInput.pluginsStatus;
+    workspace.samlRoleSessionDuration = globalSettingsInput.samlRoleSessionDuration;
+    workspace.segments = globalSettingsInput.segments;
+    workspace.ssmRegionBehaviour = globalSettingsInput.ssmRegionBehaviour;
+    this.persistWorkspace(workspace);
   }
 
   private getSessionsOrDefault(): Session[] {

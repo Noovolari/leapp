@@ -32,6 +32,7 @@ import { UserProvider } from "leapp-team-core/user/user.provider";
 import { SecretType } from "leapp-team-core/encryptable-dto/secret-type";
 import { HttpClientProvider } from "leapp-team-core/http/http-client.provider";
 import { HttpClientInterface } from "leapp-team-core/http/http-client-interface";
+import { GlobalSettings } from "../interfaces/i-global-settings";
 
 export interface WorkspaceState {
   name: string;
@@ -136,8 +137,9 @@ export class TeamService {
     if ((await this.getKeychainCurrentWorkspace()) !== constants.localWorkspaceKeychainValue) {
       this.workspaceService.setWorkspaceFileName(this.getTeamLockFileName(signedInUser.teamId));
       this.workspaceService.reloadWorkspace();
+      const globalSettings = this.workspaceService.extractGlobalSettings();
       await this.deleteCurrentWorkspace();
-      await this.setLocalWorkspace();
+      await this.setLocalWorkspace(globalSettings);
     }
     if (lock) {
       signedInUser.symmetricKey = "";
@@ -153,6 +155,10 @@ export class TeamService {
 
   // TODO: in the future, when we'll introduce multiple workspace, this method this will become setRemoteWorkspace(workspaceId)
   async syncSecrets(reloadOnly: boolean = false): Promise<void> {
+    this.fileService.aesKey = this.nativeService.machineId;
+    this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
+    this.workspaceService.reloadWorkspace();
+    const globalSettings = this.workspaceService.extractGlobalSettings();
     const signedInUser = this.signedInUserState.getValue();
     if (!signedInUser || this.isJwtTokenExpired(signedInUser.accessToken)) {
       // TODO: NOTIFY USER
@@ -166,9 +172,9 @@ export class TeamService {
         return;
       }
       this.workspaceService.removeWorkspace();
-      // TODO: copy or merge local workspace settings like theme
       this.workspaceService.createWorkspace();
       this.workspaceService.reloadWorkspace();
+      this.workspaceService.applyGlobalSettings(globalSettings);
       const rsaKeys = await this.getRSAKeys(signedInUser);
       this.httpClientProvider.accessToken = signedInUser.accessToken;
       const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
@@ -194,8 +200,9 @@ export class TeamService {
   }
 
   async switchToLocalWorkspace(): Promise<void> {
+    const globalSettings = this.workspaceService.extractGlobalSettings();
     await this.deleteTeamWorkspace();
-    await this.setLocalWorkspace();
+    await this.setLocalWorkspace(globalSettings);
   }
 
   async refreshWorkspaceState(callback?: () => Promise<void>): Promise<void> {
@@ -239,7 +246,13 @@ export class TeamService {
     await this.keyChainService.saveSecret(constants.appName, constants.currentWorkspaceKeychainKey, workspaceName);
   }
 
-  private async setLocalWorkspace(): Promise<void> {
+  private async setLocalWorkspace(globalSettings?: GlobalSettings): Promise<void> {
+    if (globalSettings) {
+      this.fileService.aesKey = this.nativeService.machineId;
+      this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
+      this.workspaceService.reloadWorkspace();
+      this.workspaceService.applyGlobalSettings(globalSettings);
+    }
     await this.setKeychainCurrentWorkspace(constants.localWorkspaceKeychainValue);
     await this.refreshWorkspaceState();
   }

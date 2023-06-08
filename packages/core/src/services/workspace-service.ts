@@ -1,5 +1,6 @@
 import { Repository } from "./repository";
 import { Workspace } from "../models/workspace";
+import { GlobalSettings } from "../interfaces/i-global-settings";
 
 export class WorkspaceService {
   constructor(private repository: Repository) {}
@@ -38,5 +39,13 @@ export class WorkspaceService {
 
   getWorkspaceFileName(): string {
     return this.repository.workspaceFileName;
+  }
+
+  extractGlobalSettings(): GlobalSettings {
+    return this.repository.globalSettings;
+  }
+
+  applyGlobalSettings(globalSettings: GlobalSettings): void {
+    this.repository.globalSettings = globalSettings;
   }
 }

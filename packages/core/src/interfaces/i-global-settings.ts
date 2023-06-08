@@ -6,6 +6,7 @@ export interface GlobalSettings {
   defaultLocation: string;
   macOsTerminal: string;
   pluginsStatus: PluginStatus[];
+  pinned: string[];
   segments: Segment[];
   colorTheme: string;
   extensionEnabled: boolean;

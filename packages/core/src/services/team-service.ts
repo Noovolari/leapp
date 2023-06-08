@@ -158,6 +158,7 @@ export class TeamService {
     this.fileService.aesKey = this.nativeService.machineId;
     this.workspaceService.setWorkspaceFileName(constants.lockFileDestination);
     this.workspaceService.reloadWorkspace();
+    const localSessionIds = this.workspaceService.getWorkspace().sessions.map((session) => session.sessionId);
     const globalSettings = this.workspaceService.extractGlobalSettings();
     const signedInUser = this.signedInUserState.getValue();
     if (!signedInUser || this.isJwtTokenExpired(signedInUser.accessToken)) {
@@ -174,7 +175,6 @@ export class TeamService {
       this.workspaceService.removeWorkspace();
       this.workspaceService.createWorkspace();
       this.workspaceService.reloadWorkspace();
-      this.workspaceService.applyGlobalSettings(globalSettings);
       const rsaKeys = await this.getRSAKeys(signedInUser);
       this.httpClientProvider.accessToken = signedInUser.accessToken;
       const localSecretDtos = await this.vaultProvider.getSecrets(rsaKeys.privateKey);
@@ -190,6 +190,8 @@ export class TeamService {
       for (const sessionDto of sessionsDtos) {
         await this.syncSessionsSecret(sessionDto);
       }
+      const remoteSessionIds = this.workspaceService.getWorkspace().sessions.map((session) => session.sessionId);
+      this.workspaceService.applyGlobalSettings(globalSettings, localSessionIds, remoteSessionIds);
     });
   }
 

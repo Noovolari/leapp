@@ -45,7 +45,14 @@ export class WorkspaceService {
     return this.repository.globalSettings;
   }
 
-  applyGlobalSettings(globalSettings: GlobalSettings): void {
+  applyGlobalSettings(globalSettings: GlobalSettings, localSessionIds?: string[], remoteSessionIds?: string[]): void {
+    if (localSessionIds && remoteSessionIds) {
+      const localPinned = globalSettings.pinned.filter((sessionId) => localSessionIds.includes(sessionId));
+      const remotePinned = globalSettings.pinned.filter((sessionId) => !localSessionIds.includes(sessionId));
+      const purgedPinned = remotePinned.filter((remoteSessionId) => remoteSessionIds.includes(remoteSessionId));
+      globalSettings.pinned = [...localPinned, ...purgedPinned];
+    }
+    console.log(globalSettings.pinned);
     this.repository.globalSettings = globalSettings;
   }
 }

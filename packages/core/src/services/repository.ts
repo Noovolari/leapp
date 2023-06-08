@@ -469,6 +469,7 @@ export class Repository {
       macOsTerminal: workspace.macOsTerminal,
       pluginsStatus: workspace.pluginsStatus,
       samlRoleSessionDuration: workspace.samlRoleSessionDuration,
+      pinned: workspace.pinned,
       segments: workspace.segments,
       ssmRegionBehaviour: workspace.ssmRegionBehaviour,
     };
@@ -484,6 +485,7 @@ export class Repository {
     workspace.macOsTerminal = globalSettingsInput.macOsTerminal;
     workspace.pluginsStatus = globalSettingsInput.pluginsStatus;
     workspace.samlRoleSessionDuration = globalSettingsInput.samlRoleSessionDuration;
+    workspace.pinned = globalSettingsInput.pinned;
     workspace.segments = globalSettingsInput.segments;
     workspace.ssmRegionBehaviour = globalSettingsInput.ssmRegionBehaviour;
     this.persistWorkspace(workspace);

@@ -45,6 +45,10 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
       request.roleArn,
       request.profileId
     );
+    if (request.sessionId) {
+      session.sessionId = request.sessionId;
+    }
+
     this.repository.addSession(session);
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }

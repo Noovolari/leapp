@@ -16,9 +16,11 @@ Alternatively, you can use **Remote workspaces**.
 
 ## Remote
 
-A **Remote workspace** is a configuration set **created remotely by a Leapp Team manager**. 
+A **Remote workspace** is a **[Leapp Team](https://www.leapp.cloud/team)** configuration set **created remotely by a Leapp Team manager**. 
 
 When you **sync** a remote workspace, you will receive sessions and integrations **automatically**, without having to configure them yourself. 
+
+A remote workspace is **persisted online** by using **[Zero-Knowledge encryption](https://docs.leapp.cloud/latest/security/zero-knowledge/)**.
 
 You will have access to the same configurations **instantly** on any machine, by logging in to your Leapp Team account after having been invited by your Leapp Team manager.
 

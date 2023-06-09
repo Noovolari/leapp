@@ -11,11 +11,11 @@ describe("Workspace", () => {
 
   describe("Workspace.current", () => {
     test("without errors, local workspace", async () => {
-      const mockedWorkspace = constants.localWorkspaceName;
+      const mockedWorkspaceState = { id: constants.localWorkspaceKeychainValue };
       const cliProviderService: any = {
         teamService: {
-          workspaceNameState: {
-            getValue: jest.fn(() => mockedWorkspace),
+          workspaceState: {
+            getValue: jest.fn(() => mockedWorkspaceState),
           },
         },
       };
@@ -23,16 +23,16 @@ describe("Workspace", () => {
 
       (command as any).log = jest.fn();
       await command.run();
-      expect(cliProviderService.teamService.workspaceNameState.getValue).toHaveBeenCalled();
+      expect(cliProviderService.teamService.workspaceState.getValue).toHaveBeenCalled();
       expect((command as any).log).toHaveBeenCalledWith("local");
     });
 
     test("without errors, remote workspace", async () => {
-      const mockedWorkspace = "mocked-workspace-name";
+      const mockedWorkspaceState = { name: "mocked-workspace-name" };
       const cliProviderService: any = {
         teamService: {
-          workspaceNameState: {
-            getValue: jest.fn(() => mockedWorkspace),
+          workspaceState: {
+            getValue: jest.fn(() => mockedWorkspaceState),
           },
         },
       };
@@ -40,7 +40,7 @@ describe("Workspace", () => {
 
       (command as any).log = jest.fn();
       await command.run();
-      expect(cliProviderService.teamService.workspaceNameState.getValue).toHaveBeenCalled();
+      expect(cliProviderService.teamService.workspaceState.getValue).toHaveBeenCalled();
       expect((command as any).log).toHaveBeenCalledWith("mocked-workspace-name");
     });
 
@@ -48,7 +48,7 @@ describe("Workspace", () => {
       const mockedError = "mocked-error";
       const cliProviderService: any = {
         teamService: {
-          workspaceNameState: {
+          workspaceState: {
             getValue: jest.fn(() => {
               throw mockedError;
             }),
@@ -59,7 +59,7 @@ describe("Workspace", () => {
 
       (command as any).error = jest.fn();
       await command.run();
-      expect(cliProviderService.teamService.workspaceNameState.getValue).toHaveBeenCalled();
+      expect(cliProviderService.teamService.workspaceState.getValue).toHaveBeenCalled();
       expect((command as any).error).toHaveBeenCalledWith(`Unknown error: ${mockedError}`);
     });
   });

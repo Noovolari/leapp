@@ -16,7 +16,6 @@ describe("Repository", () => {
   let repository;
   let mockedSession: Session;
   let workspaceConsistencyService: any;
-  let workspaceFileNameService: any;
 
   beforeEach(() => {
     mockedWorkspace = new Workspace();
@@ -46,8 +45,6 @@ describe("Repository", () => {
       createNewWorkspace: () => mockedWorkspace,
     };
 
-    workspaceFileNameService = { workspaceFileName: constants.lockFileDestination };
-
     mockedFileService = new FileService(mockedNativeService);
     mockedFileService.readFileSync = jest.fn();
     mockedFileService.writeFileSync = jest.fn(() => {});
@@ -55,7 +52,7 @@ describe("Repository", () => {
     mockedFileService.existsSync = jest.fn(() => false);
     mockedFileService.newDir = jest.fn();
 
-    repository = new Repository(mockedNativeService, mockedFileService, workspaceConsistencyService, workspaceFileNameService);
+    repository = new Repository(mockedNativeService, mockedFileService, workspaceConsistencyService);
 
     mockedSession = {
       sessionTokenExpiration: "",
@@ -1308,5 +1305,69 @@ describe("Repository", () => {
     repository.nativeService = { fs: { writeFileSync: jest.fn() } };
     repository.writeFile(data);
     expect(repository.nativeService.fs.writeFileSync).toHaveBeenCalledWith(__dirname + "/register-client-response", JSON.stringify(data));
+  });
+
+  test("globalSettings, getter", () => {
+    mockedWorkspace.colorTheme = "mock-theme";
+    mockedWorkspace.credentialMethod = "mock-credential-method";
+    mockedWorkspace.defaultLocation = "mock-default-location";
+    mockedWorkspace.defaultRegion = "mock-default-region";
+    mockedWorkspace.extensionEnabled = "mock-extension-enabled";
+    mockedWorkspace.macOsTerminal = "mock-terminal";
+    mockedWorkspace.pluginsStatus = "mock-plugin-status";
+    mockedWorkspace.samlRoleSessionDuration = "mock-saml-role-session-duration";
+    mockedWorkspace.pinned = "mock-pinned";
+    mockedWorkspace.segments = "mock-segments";
+    mockedWorkspace.ssmRegionBehaviour = "mock-ssm-region-behaviour";
+    repository.getWorkspace = jest.fn(() => mockedWorkspace);
+
+    const result = repository.globalSettings;
+    expect(repository.getWorkspace).toHaveBeenCalled();
+    expect(result).toEqual({
+      colorTheme: "mock-theme",
+      credentialMethod: "mock-credential-method",
+      defaultLocation: "mock-default-location",
+      defaultRegion: "mock-default-region",
+      extensionEnabled: "mock-extension-enabled",
+      macOsTerminal: "mock-terminal",
+      pluginsStatus: "mock-plugin-status",
+      samlRoleSessionDuration: "mock-saml-role-session-duration",
+      pinned: "mock-pinned",
+      segments: "mock-segments",
+      ssmRegionBehaviour: "mock-ssm-region-behaviour",
+    });
+  });
+
+  test("globalSettings, setter", () => {
+    const mockedGlobalSettings = {
+      colorTheme: "mock-theme",
+      credentialMethod: "mock-credential-method",
+      defaultLocation: "mock-default-location",
+      defaultRegion: "mock-default-region",
+      extensionEnabled: "mock-extension-enabled",
+      macOsTerminal: "mock-terminal",
+      pluginsStatus: "mock-plugin-status",
+      samlRoleSessionDuration: "mock-saml-role-session-duration",
+      pinned: "mock-pinned",
+      segments: "mock-segments",
+      ssmRegionBehaviour: "mock-ssm-region-behaviour",
+    };
+    repository.getWorkspace = jest.fn(() => mockedWorkspace);
+    repository.persistWorkspace = jest.fn(() => mockedWorkspace);
+
+    repository.globalSettings = mockedGlobalSettings;
+    expect(repository.getWorkspace).toHaveBeenCalled();
+    expect(mockedWorkspace.colorTheme).toEqual("mock-theme");
+    expect(mockedWorkspace.credentialMethod).toEqual("mock-credential-method");
+    expect(mockedWorkspace.defaultLocation).toEqual("mock-default-location");
+    expect(mockedWorkspace.defaultRegion).toEqual("mock-default-region");
+    expect(mockedWorkspace.extensionEnabled).toEqual("mock-extension-enabled");
+    expect(mockedWorkspace.macOsTerminal).toEqual("mock-terminal");
+    expect(mockedWorkspace.pluginsStatus).toEqual("mock-plugin-status");
+    expect(mockedWorkspace.samlRoleSessionDuration).toEqual("mock-saml-role-session-duration");
+    expect(mockedWorkspace.pinned).toEqual("mock-pinned");
+    expect(mockedWorkspace.segments).toEqual("mock-segments");
+    expect(mockedWorkspace.ssmRegionBehaviour).toEqual("mock-ssm-region-behaviour");
+    expect(repository.persistWorkspace).toHaveBeenCalled();
   });
 });

@@ -28,10 +28,10 @@ jobs:
           node-version: ${{ matrix.node_version }}
       - name: Inject Team Feature
         env:
-          team_feature: ${{ secrets.INJECT_TEAM_FEATURE }}
-        if: ${{ env.team_feature != '' }}
+          team_repository: ${{ secrets.TEAM_REPOSITORY }}
+        if: ${{ env.team_repository != '' }}
         run: |
-          git checkout leapp-team
+          git clone ${{ env.team_repository }}
           pwd
           ls
       - name: Bootstrap

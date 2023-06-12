@@ -26,6 +26,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
+      - name: Inject Team Feature
+        env:
+          team_feature: ${{ secrets.INJECT_TEAM_FEATURE }}
+        if: ${{ env.team_feature != '' }}
+        run: |
+          git checkout leapp-team
+          pwd
+          ls
       - name: Bootstrap
         run: |
           npm run bootstrap

@@ -1,5 +1,6 @@
 import { Repository } from "./repository";
 import { Workspace } from "../models/workspace";
+import { GlobalSettings } from "../interfaces/i-global-settings";
 
 export class WorkspaceService {
   constructor(private repository: Repository) {}
@@ -38,5 +39,19 @@ export class WorkspaceService {
 
   getWorkspaceFileName(): string {
     return this.repository.workspaceFileName;
+  }
+
+  extractGlobalSettings(): GlobalSettings {
+    return this.repository.globalSettings;
+  }
+
+  applyGlobalSettings(globalSettings: GlobalSettings, localSessionIds?: string[], remoteSessionIds?: string[]): void {
+    if (localSessionIds && remoteSessionIds) {
+      const localPinned = globalSettings.pinned.filter((sessionId) => localSessionIds.includes(sessionId));
+      const remotePinned = globalSettings.pinned.filter((sessionId) => !localSessionIds.includes(sessionId));
+      const purgedPinned = remotePinned.filter((remoteSessionId) => remoteSessionIds.includes(remoteSessionId));
+      globalSettings.pinned = [...localPinned, ...purgedPinned];
+    }
+    this.repository.globalSettings = globalSettings;
   }
 }

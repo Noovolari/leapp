@@ -8,7 +8,7 @@ import { AppMfaCodePromptService } from "./services/app-mfa-code-prompt.service"
 import { AppAwsAuthenticationService } from "./services/app-aws-authentication.service";
 import { UpdaterService } from "./services/updater.service";
 import compareVersions from "compare-versions";
-import { LoggedEntry, LoggedException, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
+import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
 import { constants } from "@noovolari/leapp-core/models/constants";
@@ -23,7 +23,6 @@ import { WindowService } from "./services/window.service";
 import { AppNativeService } from "./services/app-native.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
-import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OptionsService } from "./services/options.service";
 import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/services/integration/integration-is-online-state-refresh-service";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
@@ -214,20 +213,7 @@ export class AppComponent implements OnInit {
     this.remoteProceduresServer.stopServer();
 
     // Stop all the sessions
-    const sessions = this.appProviderService.sessionManagementService.getSessions();
-    sessions.forEach((s) => {
-      s.status = SessionStatus.inactive;
-    });
-    this.appProviderService.sessionManagementService.updateSessions(sessions);
-
-    // We need the Try/Catch as we have the possibility to call the method without sessions
-    try {
-      // Clean the config file
-      await this.azureCoreService.stopAllSessionsOnQuit();
-      this.awsCoreService.cleanCredentialFile();
-    } catch (err) {
-      this.loggingService.log(new LoggedException("No sessions to stop, skipping...", this, LogLevel.error, true, err.stack));
-    }
+    await this.appProviderService.sessionManagementService.stopAllSessions();
 
     // Delete team-workspace file if exists, for security reasons
     await this.teamService.deleteTeamWorkspace();

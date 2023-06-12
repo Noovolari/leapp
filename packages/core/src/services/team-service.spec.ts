@@ -214,6 +214,7 @@ describe("TeamService", () => {
       getValue: jest.fn(() => ({ teamId: "1" })),
       next: jest.fn(),
     } as any;
+    workspaceService.extractGlobalSettings = jest.fn(() => "mocked-global-settings");
     teamService.getTeamLockFileName = jest.fn(() => "mock-value");
     teamService.teamSignedInUserKeychainKey = "mockTeamSignedInUserKeychainKey";
     workspaceService.setWorkspaceFileName = jest.fn();
@@ -229,7 +230,7 @@ describe("TeamService", () => {
     expect(workspaceService.setWorkspaceFileName).toHaveBeenCalledWith("mock-value");
     expect(workspaceService.reloadWorkspace).toHaveBeenCalled();
     expect(teamService.deleteCurrentWorkspace).toHaveBeenCalled();
-    expect(teamService.setLocalWorkspace).toHaveBeenCalled();
+    expect(teamService.setLocalWorkspace).toHaveBeenCalledWith("mocked-global-settings");
     expect(keyChainService.deleteSecret).toHaveBeenCalledWith(constants.appName, "mockTeamSignedInUserKeychainKey");
     expect(teamService._signedInUserState$.next).toHaveBeenCalledWith(null);
   });
@@ -307,9 +308,13 @@ describe("TeamService", () => {
       workspaceService.removeWorkspace = jest.fn();
       workspaceService.createWorkspace = jest.fn();
       workspaceService.reloadWorkspace = jest.fn();
+      workspaceService.getWorkspace = jest.fn(() => ({ sessions: [] }));
+      workspaceService.extractGlobalSettings = jest.fn(() => []);
+      workspaceService.applyGlobalSettings = jest.fn(() => []);
       const mockedRsaKeys = {
         privateKey: "mocked-private-key",
       };
+      teamService.loadAndDecryptWorkspace = jest.fn();
       teamService.getRSAKeys = jest.fn(() => ({ privateKey: mockedRsaKeys }));
       teamService.vaultProvider.getSecrets = jest.fn(() => mockedLocalSecretDtos);
       teamService.setKeychainCurrentWorkspace = jest.fn(async () => {});
@@ -321,6 +326,9 @@ describe("TeamService", () => {
       teamService.isJwtTokenExpired = jest.fn(() => true);
       teamService.signOut = jest.fn();
       await teamService.syncSecrets();
+      expect(teamService.loadAndDecryptWorkspace).toHaveBeenCalled();
+      expect(workspaceService.getWorkspace).toHaveBeenCalled();
+      expect(workspaceService.extractGlobalSettings).toHaveBeenCalled();
       expect(teamService._signedInUserState$.getValue).toHaveBeenCalled();
       expect(teamService.isJwtTokenExpired).toHaveBeenCalledWith("access-token");
       expect(teamService.signOut).toHaveBeenCalled();
@@ -333,6 +341,9 @@ describe("TeamService", () => {
 
       await teamService.syncSecrets();
 
+      expect(teamService.loadAndDecryptWorkspace).toHaveBeenCalled();
+      expect(workspaceService.getWorkspace).toHaveBeenCalled();
+      expect(workspaceService.extractGlobalSettings).toHaveBeenCalled();
       expect(teamService._signedInUserState$.getValue).toHaveBeenCalled();
       expect(teamService.isJwtTokenExpired).not.toHaveBeenCalled();
       expect(teamService.signOut).toHaveBeenCalled();
@@ -351,6 +362,9 @@ describe("TeamService", () => {
 
       await teamService.syncSecrets();
 
+      expect(teamService.loadAndDecryptWorkspace).toHaveBeenCalled();
+      expect(workspaceService.getWorkspace).toHaveBeenCalled();
+      expect(workspaceService.extractGlobalSettings).toHaveBeenCalled();
       expect(teamService._signedInUserState$.getValue).toHaveBeenCalled();
       expect(teamService.isJwtTokenExpired).toHaveBeenCalledWith("access-token");
       expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith(signedInUser.teamName);
@@ -380,6 +394,9 @@ describe("TeamService", () => {
 
       await teamService.syncSecrets();
 
+      expect(teamService.loadAndDecryptWorkspace).toHaveBeenCalled();
+      expect(workspaceService.getWorkspace).toHaveBeenCalled();
+      expect(workspaceService.extractGlobalSettings).toHaveBeenCalled();
       expect(teamService._signedInUserState$.getValue).toHaveBeenCalled();
       expect(teamService.isJwtTokenExpired).toHaveBeenCalledWith("access-token");
       expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith(signedInUser.teamName);
@@ -412,6 +429,9 @@ describe("TeamService", () => {
 
       await teamService.syncSecrets(true);
 
+      expect(teamService.loadAndDecryptWorkspace).toHaveBeenCalled();
+      expect(workspaceService.getWorkspace).toHaveBeenCalled();
+      expect(workspaceService.extractGlobalSettings).toHaveBeenCalled();
       expect(teamService._signedInUserState$.getValue).toHaveBeenCalled();
       expect(teamService.isJwtTokenExpired).toHaveBeenCalledWith("access-token");
       expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith(signedInUser.teamName);
@@ -445,10 +465,11 @@ describe("TeamService", () => {
     createTeamServiceInstance();
     teamService.deleteTeamWorkspace = jest.fn();
     teamService.setLocalWorkspace = jest.fn();
+    workspaceService.extractGlobalSettings = jest.fn(() => "mocked-global-settings");
 
     await teamService.switchToLocalWorkspace();
     expect(teamService.deleteTeamWorkspace).toHaveBeenCalled();
-    expect(teamService.setLocalWorkspace).toHaveBeenCalled();
+    expect(teamService.setLocalWorkspace).toHaveBeenCalledWith("mocked-global-settings");
   });
 
   test("refreshWorkspaceState, local workspace", async () => {
@@ -460,14 +481,9 @@ describe("TeamService", () => {
       expect(teamService.switchingWorkspaceState.next).toHaveBeenCalledWith(true);
       return "local";
     });
+    teamService.loadAndDecryptWorkspace = jest.fn();
     teamService.keyChainService = {
       getSecret: jest.fn(() => workspaceKeychainSecret),
-    };
-    teamService.fileService.aesKey = "";
-    teamService.nativeService.machineId = "mock-machine-id";
-    teamService.workspaceService = {
-      setWorkspaceFileName: jest.fn(),
-      reloadWorkspace: jest.fn(),
     };
     teamService.signedInUserState.next = jest.fn();
     teamService.workspaceState.next = jest.fn();
@@ -476,11 +492,9 @@ describe("TeamService", () => {
 
     await teamService.refreshWorkspaceState();
 
+    expect(teamService.loadAndDecryptWorkspace.mock.calls[0].length).toBe(0);
     expect(teamService.getKeychainCurrentWorkspace).toHaveBeenCalled();
     expect(teamService.keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, "mock-keychain");
-    expect(teamService.fileService.aesKey).toBe("mock-machine-id");
-    expect(teamService.workspaceService.setWorkspaceFileName).toHaveBeenCalledWith(constants.lockFileDestination);
-    expect(teamService.workspaceService.reloadWorkspace).toHaveBeenCalled();
     expect(teamService.signedInUserState.next).toHaveBeenCalledWith(JSON.parse(workspaceKeychainSecret));
     expect(teamService.workspaceState.next).toHaveBeenCalledWith({ name: constants.localWorkspaceName, id: constants.localWorkspaceKeychainValue });
     expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
@@ -508,14 +522,9 @@ describe("TeamService", () => {
     const workspaceKeychainSecret = `{"publicRSAKey":"mock-rsa-key","teamId":"mock-id","teamName":"mock-name"}`;
     teamService.teamSignedInUserKeychainKey = "mock-keychain";
     teamService.getKeychainCurrentWorkspace = jest.fn(() => "remote-workspace");
+    teamService.loadAndDecryptWorkspace = jest.fn();
     teamService.keyChainService = {
       getSecret: jest.fn(() => workspaceKeychainSecret),
-    };
-    teamService.fileService.aesKey = "";
-    teamService.nativeService.machineId = "mock-machine-id";
-    teamService.workspaceService = {
-      setWorkspaceFileName: jest.fn(),
-      reloadWorkspace: jest.fn(),
     };
     teamService.getTeamLockFileName = jest.fn(() => "team-lock-file-name");
     teamService.signedInUserState.next = jest.fn();
@@ -525,12 +534,11 @@ describe("TeamService", () => {
     await teamService.refreshWorkspaceState(mockCallback);
 
     expect(mockCallback).toHaveBeenCalled();
+    expect(teamService.loadAndDecryptWorkspace).toHaveBeenCalledWith(
+      JSON.parse(`{"publicRSAKey":"mock-rsa-key","teamId":"mock-id","teamName":"mock-name"}`)
+    );
     expect(teamService.getKeychainCurrentWorkspace).toHaveBeenCalled();
     expect(teamService.keyChainService.getSecret).toHaveBeenCalledWith(constants.appName, "mock-keychain");
-    expect(teamService.fileService.aesKey).toBe("mock-rsa-key");
-    expect(teamService.getTeamLockFileName).toHaveBeenCalledWith("mock-id");
-    expect(teamService.workspaceService.setWorkspaceFileName).toHaveBeenCalledWith("team-lock-file-name");
-    expect(teamService.workspaceService.reloadWorkspace).not.toHaveBeenCalled();
     expect(teamService.signedInUserState.next).toHaveBeenCalledWith(JSON.parse(workspaceKeychainSecret));
     expect(teamService.workspaceState.next).toHaveBeenCalledWith({ name: "mock-name", id: "mock-id" });
     expect(teamService.behaviouralSubjectService.reloadSessionsAndIntegrationsFromRepository).toHaveBeenCalled();
@@ -561,6 +569,21 @@ describe("TeamService", () => {
     await teamService.setLocalWorkspace();
 
     expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith("local");
+    expect(teamService.refreshWorkspaceState).toHaveBeenCalledTimes(1);
+  });
+
+  test("setLocalWorkspace, with global settings", async () => {
+    createTeamServiceInstance();
+    teamService.setKeychainCurrentWorkspace = jest.fn();
+    teamService.refreshWorkspaceState = jest.fn();
+    (teamService as any).loadAndDecryptWorkspace = jest.fn();
+    workspaceService.applyGlobalSettings = jest.fn();
+
+    await teamService.setLocalWorkspace("mocked-global-settings");
+
+    expect(teamService.setKeychainCurrentWorkspace).toHaveBeenCalledWith("local");
+    expect((teamService as any).loadAndDecryptWorkspace).toHaveBeenCalled();
+    expect(workspaceService.applyGlobalSettings).toHaveBeenCalledWith("mocked-global-settings");
     expect(teamService.refreshWorkspaceState).toHaveBeenCalledTimes(1);
   });
 
@@ -974,5 +997,29 @@ describe("TeamService", () => {
     createTeamServiceInstance();
     const result = (teamService as any).getTeamLockFileName("mocked-team-name");
     expect(result).toBe(".Leapp/Leapp-mocked-team-name-lock.json");
+  });
+
+  test("loadAndDecryptWorkspace, local workspace", () => {
+    createTeamServiceInstance();
+    teamService.nativeService = {
+      machineId: "mocked-id",
+    };
+    workspaceService.setWorkspaceFileName = jest.fn();
+    workspaceService.reloadWorkspace = jest.fn();
+    teamService.loadAndDecryptWorkspace();
+    expect(fileService.aesKey).toEqual("mocked-id");
+    expect(workspaceService.setWorkspaceFileName).toHaveBeenCalledWith(constants.lockFileDestination);
+    expect(workspaceService.reloadWorkspace).toHaveBeenCalled();
+  });
+
+  test("loadAndDecryptWorkspace, remote workspace", () => {
+    createTeamServiceInstance();
+    const signedInUser = { publicRSAKey: "mocked-public-rsa-key", teamId: "mocked-team-id" };
+    workspaceService.setWorkspaceFileName = jest.fn();
+    teamService.getTeamLockFileName = jest.fn(() => "mocked-team-lock-file-name");
+    teamService.loadAndDecryptWorkspace(signedInUser);
+    expect(fileService.aesKey).toEqual("mocked-public-rsa-key");
+    expect(teamService.getTeamLockFileName).toHaveBeenCalledWith("mocked-team-id");
+    expect(workspaceService.setWorkspaceFileName).toHaveBeenCalledWith("mocked-team-lock-file-name");
   });
 });

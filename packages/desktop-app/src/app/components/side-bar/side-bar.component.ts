@@ -214,6 +214,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
       await this.loginToLeappTeam();
     } else {
       if (this.isLocalWorkspaceSelected) {
+        await this.appProviderService.sessionManagementService.stopAllSessions();
         await this.appProviderService.teamService.syncSecrets();
         this.resetFilters();
       }
@@ -227,5 +228,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
       backdrop: "static",
       keyboard: false,
     });
+  }
+
+  openWorkspaceDocumentation(): void {
+    this.appProviderService.windowService.openExternalUrl("https://docs.leapp.cloud/latest/workspaces/");
   }
 }

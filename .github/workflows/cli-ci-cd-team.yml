@@ -1,0 +1,119 @@
+name: Leapp CLI CI/CD
+
+on:
+  push:
+    branches:
+      - 'LPTM-203-how-to-integrate-leapp-team-core-in-open-source-repository'
+
+  workflow_dispatch:
+
+jobs:
+  build_and_test:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        node_version: [ 16 ]
+    env:
+      SKIP_INTEGRATION_TESTS: "true"
+      S3_BUCKET: s3://noovolari-leapp-website-distribution
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Prepare GIT
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node_version }}
+      - name: Bootstrap
+        run: |
+          npm run bootstrap
+      - name: Build CLI
+        run: |
+          cd packages/cli
+          npm run prepack
+#      - name: Configure AWS Credentials
+#        uses: aws-actions/configure-aws-credentials@v1
+#        with:
+#          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          aws-region: eu-west-1
+#      - name: Test
+#        run: |
+#          npm run make-badges-cli
+#      - name: Send badge to S3
+#        shell: bash
+#        run: |
+#          cd coverage
+#          aws s3 cp cli-badges.svg "${{ env.S3_BUCKET }}/coverage-badges/"
+      - name: Lint
+        run: |
+          npm run lint
+      - name: Print Team Service
+        run: |
+          cat packages/cli/src/service/team-service.ts
+
+#  check_for_release:
+#    needs: build_and_test
+#    runs-on: ubuntu-latest
+#    outputs:
+#      to-release: ${{ steps.validator.outputs.VALID_TAG }}
+#    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v3
+#        with:
+#          ref: master
+#
+#      - name: Check Tag Validity
+#        id: validator
+#        run: |
+#          git fetch
+#          TAG=$(git tag --points-at $GITHUB_SHA)
+#          MATCH=$(echo "$TAG" | grep "^cli-v[0-9]\+\.[0-9]\+\.[0-9]\+$" || true)
+#          if [[ $MATCH != "" ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
+#          echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
+#
+#      - name: If valid tag set
+#        if: steps.validator.outputs.VALID_TAG == 1
+#        run: |
+#          echo "Valid Tag - Releasing..."
+#
+#      - name: If not valid tag set
+#        if: steps.validator.outputs.VALID_TAG != 1
+#        run: |
+#          echo "Invalid Tag - Not releasing"
+#
+#  release:
+#    needs: check_for_release
+#    runs-on: macos-latest
+#    if: needs.check_for_release.outputs.to-release == 1
+#    steps:
+#      - uses: actions/checkout@v3
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 16
+#      - name: Bootstrap
+#        run: |
+#          npm run bootstrap
+#      - name: Build CLI
+#        run: |
+#          cd packages/cli
+#          npm run prepack
+#      - name: Release npm
+#        env:
+#          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+#        run: |
+#          cd packages/cli
+#          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+#          npm run release-npm
+#      - name: Release Homebrew
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          GIT_PUSH_TOKEN: ${{ secrets.GIT_PUSH_TOKEN }}
+#        run: |
+#          git config --global user.name "Noovolari Bot"
+#          git config --global user.email "info@noovolari.com"
+#          cd packages/cli
+#          npm run release-homebrew

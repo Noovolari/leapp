@@ -37,16 +37,11 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
-          pwd
-          ls
-          echo '---'
-          cd ..
-          ls
-          echo '---'
-          cd ..
-          ls
-#          cd ../leapp-team/packages/leapp-team-service
-#          npm run enable-team-features
+          mv leapp-team ..
+          cd ../leapp-team/packages/leapp-team-service
+          npm run enable-team-features
+#         cd ../leapp-team/packages/leapp-team-service
+#         npm run enable-team-features
       - name: Bootstrap
         run: |
           npm run bootstrap

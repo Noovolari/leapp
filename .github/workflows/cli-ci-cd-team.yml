@@ -16,6 +16,7 @@ jobs:
     env:
       SKIP_INTEGRATION_TESTS: "true"
       S3_BUCKET: s3://noovolari-leapp-website-distribution
+      TEAM_REPOSITORY: ${{ secrets.TEAM_REPOSITORY }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Prepare GIT
@@ -26,12 +27,14 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
+      - uses: actions/checkout@v3
+        if: ${{ env.TEAM_REPOSITORY != '' }}
+        with:
+          name: noovolari/leapp-team
+          ref: LPTM-203-how-to-integrate-leapp-team-core-in-open-source-repository
       - name: Inject Team Feature
-        env:
-          team_repository: ${{ secrets.TEAM_REPOSITORY }}
-        if: ${{ env.team_repository != '' }}
+        if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
-          git clone ${{ env.team_repository }}
           pwd
           ls
       - name: Bootstrap

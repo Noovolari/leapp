@@ -30,12 +30,16 @@ jobs:
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
-          name: noovolari/leapp-team
+          repository: Noovolari/leapp-team
           ref: LPTM-203-how-to-integrate-leapp-team-core-in-open-source-repository
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
-          cd ../..
+          pwd
+          ls
+          cd ..
+          ls
+          cd ..
           ls
 #          cd ../leapp-team/packages/leapp-team-service
 #          npm run enable-team-features

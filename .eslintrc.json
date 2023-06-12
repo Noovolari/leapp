@@ -93,7 +93,8 @@
             "prefix": "app",
             "style": "camelCase"
           }
-        ]
+        ],
+        "jsdoc/newline-after-description": "off"
       }
     },
     {

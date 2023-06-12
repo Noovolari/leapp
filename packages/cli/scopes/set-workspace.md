@@ -27,4 +27,4 @@ EXAMPLES
   $leapp team set-workspace WORKSPACE-NAME
 ```
 
-_See code: [dist/commands/set-workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.29/dist/commands/set-workspace.ts)_
+_See code: [dist/commands/set-workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.35/dist/commands/set-workspace.ts)_

@@ -40,6 +40,7 @@ jobs:
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
           npm run enable-team-features
+
 #         cd ../leapp-team/packages/leapp-team-service
 #         npm run enable-team-features
       - name: Bootstrap

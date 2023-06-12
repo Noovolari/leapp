@@ -35,7 +35,7 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
-          cd ..
+          cd ../..
           ls
 #          cd ../leapp-team/packages/leapp-team-service
 #          npm run enable-team-features

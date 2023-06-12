@@ -33,13 +33,16 @@ jobs:
           repository: Noovolari/leapp-team
           ref: LPTM-203-how-to-integrate-leapp-team-core-in-open-source-repository
           token: ${{ secrets.GH_TOKEN }}
+          path: ../leapp-team
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
           pwd
           ls
+          echo '---'
           cd ..
           ls
+          echo '---'
           cd ..
           ls
 #          cd ../leapp-team/packages/leapp-team-service

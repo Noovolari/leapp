@@ -30,7 +30,7 @@ jobs:
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
-          repository: Noovolari/leapp-team
+          repository: ${{ env.TEAM_REPOSITORY }}
           ref: LPTM-203-how-to-integrate-leapp-team-core-in-open-source-repository
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team

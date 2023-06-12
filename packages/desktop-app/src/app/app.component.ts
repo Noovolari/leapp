@@ -108,6 +108,12 @@ export class AppComponent implements OnInit {
       this.beforeCloseInstructions();
     });
 
+    ipcRenderer.on("select-all", () => {
+      if (document.activeElement.tagName === "INPUT" && document.activeElement.attributes.getNamedItem("type").value === "text") {
+        (document.activeElement as HTMLInputElement).select();
+      }
+    });
+
     // Use ngx bootstrap 4
     setTheme("bs4");
 

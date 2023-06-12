@@ -157,3 +157,6 @@ img[src$=even-smaller-img]{
   font-weight: 700;
   font-size: 41px;
 }
+.md-typeset a code{
+  color: #4da7de!important;
+}

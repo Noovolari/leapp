@@ -1,7 +1,7 @@
 {
   "name": "@noovolari/leapp-cli",
   "description": "Leapp's Command Line Interface\n\nIt relies on Leapp Core, which encapsulates the domain logic.\n\nFor more information about the project visit the [site](www.leapp.cloud).",
-  "version": "0.1.29",
+  "version": "0.1.35",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
@@ -38,10 +38,10 @@
     "fs-web": "1.0.1",
     "http-proxy-agent": "4.0.1",
     "https-proxy-agent": "5.0.0",
-    "ini": "~2.0.0",
     "inquirer": "8.2.0",
     "is-url": "^1.2.4",
     "leapp-team-core": "file:../../../leapp-team/packages/leapp-team-core",
+    "js-ini": "1.5.1",
     "jwt-decode": "~3.1.2",
     "keytar": "7.9.0",
     "ms": "^2.1.3",

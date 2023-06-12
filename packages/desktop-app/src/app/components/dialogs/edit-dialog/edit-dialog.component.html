@@ -11,7 +11,7 @@
   <div class="form-group">
     <div class="form-field">
       <label>Session Alias</label>
-      <input formControlName="name" type="text" class="form-control" placeholder="Session Alias *">
+      <input spellcheck="false" formControlName="name" type="text" class="form-control" placeholder="Session Alias *">
       <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert a Session Alias</small>
     </div>
   </div>
@@ -53,7 +53,7 @@
       <div class="form-group">
         <div class="form-field">
           <label>Role ARN</label>
-          <input formControlName="roleArn" type="text" class="form-control" placeholder="Role ARN" />
+          <input spellcheck="false" formControlName="roleArn" type="text" class="form-control" placeholder="Role ARN" />
           <small class="text-error" *ngIf="(form.controls['roleArn'].dirty || form.controls['roleArn'].touched) && form.controls['roleArn'].errors">Insert the Role ARN</small>
         </div>
       </div>
@@ -84,7 +84,7 @@
 
         <div class="form-field">
           <label>Identity Provider</label>
-          <input formControlName="idpArn" type="text" class="form-control" placeholder="Identity Provider ARN *">
+          <input spellcheck="false" formControlName="idpArn" type="text" class="form-control" placeholder="Identity Provider ARN *">
           <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the AWS Identity Provider ARN</small>
         </div>
       </div>
@@ -95,7 +95,7 @@
       <div class="form-group">
         <div class="form-field">
         <label>Mfa Device</label>
-        <input formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
+        <input spellcheck="false" formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
         </div>
       </div>
 
@@ -122,7 +122,7 @@
     <div class="form-group">
       <div class="form-field">
         <label>Role Session Name</label>
-        <input formControlName="roleSessionName" type="text" class="form-control" placeholder="Role Session Name" />
+        <input spellcheck="false" formControlName="roleSessionName" type="text" class="form-control" placeholder="Role Session Name" />
         <small class="text-error" *ngIf="(form.controls['roleSessionName'].dirty || form.controls['roleSessionName'].touched) && form.controls['roleSessionName'].errors">Invalid Role Session Name</small>
       </div>
       <div class="form-field">

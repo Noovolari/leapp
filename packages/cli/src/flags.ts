@@ -58,6 +58,16 @@ export const sessionId = Flags.string({
   hidden: false,
 });
 
+export const sessionRole = Flags.string({
+  description: "Session Role of one or more sessions in Leapp",
+  hidden: false,
+});
+
+export const noInteractive = Flags.boolean({
+  description: "If the specified session is not unique or doesn't exist, throw an error without starting the interactive session selection mode",
+  hidden: false,
+});
+
 export const sessionName = Flags.string({
   description: "Session Alias to identify the session in Leapp",
   hidden: false,

@@ -36,7 +36,7 @@ Leapp can also be updated via [Homebrew Cask](https://brew.sh/){: target='_blank
 
 ## CLI
 
-Depeding on which method you used to install the CLI ([npm](https://www.npmjs.com/package/@noovolari/leapp-cli){: target='_blank'} or Homebrew on macOS) you can update it with the following commands:
+Depending on which method you used to install the CLI ([npm](https://www.npmjs.com/package/@noovolari/leapp-cli){: target='_blank'} or Homebrew on macOS), you can update it with the following commands:
 
 === "npm"
 

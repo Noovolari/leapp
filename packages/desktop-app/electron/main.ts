@@ -4,6 +4,7 @@ import { environment } from "../src/environments/environment";
 const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
 const electronLocalshortcut = require('electron-localshortcut');
 const { autoUpdater } = require("electron-updater");
+const contextMenu = require('electron-context-menu');
 
 const url = require("url");
 const fs = require("fs");
@@ -12,6 +13,12 @@ const ipc = ipcMain;
 
 const remote = require("@electron/remote/main");
 remote.initialize();
+
+contextMenu({
+  showInspectElement: false,
+  showLookUpSelection: false,
+  showSearchWithGoogle: false
+});
 
 // Fix for warning at startup
 app.allowRendererProcessReuse = true;
@@ -151,6 +158,12 @@ const generateMainWindow = () => {
 
     app.on("browser-window-focus", () => {
       electronLocalshortcut.register(win, ['CommandOrControl+R', 'CommandOrControl+Shift+R', 'F5'], () => {});
+    });
+
+    app.on("browser-window-focus", () => {
+      electronLocalshortcut.register(win, ['CommandOrControl+A'], () => {
+        win.webContents.send("select-all");
+      });
     });
 
     app.on("browser-window-blur", () => {

@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.6](https://github.com/Noovolari/leapp/compare/v0.17.5...v0.17.6) (2023-05-11)
+
+### Features
+* added support to eu-central-2 and eu-south-2 AWS regions. A special thanks to [@DanielMuller](https://github.com/DanielMuller) for the contribution!
+
+### [0.17.5](https://github.com/Noovolari/leapp/compare/v0.17.4...v0.17.5) (2023-05-08)
+
+### Features
+* added ability to select text in the search bar (and other text fields) using CMD/CTRL + a; this feature is available for macOS, Windows, and Linux.
+
+### [0.17.4](https://github.com/Noovolari/leapp/compare/v0.17.3...v0.17.4) (2023-02-28)
+
+To have access to the following Leapp CLI feature, please download the latest Leapp CLI 0.1.32 version.
+To update it, refer to our [documentation](https://docs.leapp.cloud/latest/installation/update-leapp/#cli).
+
+### Features
+* now it is also possible to start a Leapp Session from the CLI by specifying the session name and/or the session role; this is possible using both interactive and non-interactive mode.
+
+### [0.17.3](https://github.com/Noovolari/leapp/compare/v0.17.2...v0.17.3) (2023-02-14)
+
+### Bug Fixes
+* migrated oclif/core to v2.1.4 to fix [issue #389](https://github.com/Noovolari/leapp/issues/389)
+* fixed dot-delimited named profiles reported in [issue #392](https://github.com/Noovolari/leapp/issues/392)
+
 ### [0.17.2](https://github.com/Noovolari/leapp/compare/v0.17.1...v0.17.2) (2023-01-30)
 
 ### Features
@@ -12,7 +36,7 @@ All notable changes to this project will be documented in this file. See [standa
 ### [0.17.1](https://github.com/Noovolari/leapp/compare/v0.17.0...v0.17.1) (2023-01-10)
 
 ### Features
-* added support for Keycloak IdP [#374](https://github.com/Noovolari/leapp/issues/374) 
+* added support for Keycloak IdP [#374](https://github.com/Noovolari/leapp/issues/374)
   <br><br>
   You can now create an AWS IAM role federated session using Keycloak as an identity provider.
   <br><br>

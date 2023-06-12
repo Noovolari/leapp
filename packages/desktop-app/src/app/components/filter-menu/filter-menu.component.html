@@ -2,7 +2,7 @@
 <mat-menu #matMenu="matMenu">
   <div class="search-bar" (click)="$event.preventDefault(); $event.stopPropagation();" *ngIf="searchable">
     <div class="icon"><i class="moon-Search"></i></div>
-    <input type="text" placeholder="Search" (input)="searchContent($event)" />
+    <input spellcheck="false" type="text" placeholder="Search" (input)="searchContent($event)" />
     <div class="clear"></div>
   </div>
   <div class="filter-menu" (click)="$event.preventDefault(); $event.stopPropagation();">

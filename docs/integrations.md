@@ -1,7 +1,5 @@
 This section provides an overview of Leapp's integrations, useful to extend the functionality of Leapp to 3rd party services.
 
-Integrations help manage access and identities on your preferred service of choice and use Leapp on your daily activities by automatically mapping them into [Sessions](../sessions/).
-
 Integrations help manage access and identities on your service of choice while using Leapp during your daily activities. They are automatically mapped into [Sessions](../sessions/).
 
 ## Actions
@@ -10,10 +8,10 @@ Integrations have four main actions available: **Create**, **Delete**, **Sync**,
 
 | Action    | Description |
 | --------- | ----------- |
-| `CREATE`  | **Configure a new Integration with the data needed to start the authentication flow.** Required to Sync and map the service response into Sessions. |
-| `DELETE`  | **Remove an existing Integration.** Removes all the associated Sessions as well and wipes everything related to the Integration from the system (tokens, cache, etc.) |
-| `SYNC`    | **Start the authentication flow to log into the Integration Provider.** Leapp will automatically retrieve all the related data and map the response into Sessions. Any change in your service of choice requires a manual Sync to reflect the current status. |
-| `LOGOUT`  | **Disable the Integration.** Removes all the Sessions but keeps the Integration data. Running a Sync will restore all the Sessions tied to it. |
+| `CREATE`  | :fontawesome-solid-square-plus:    &nbsp;**Configure a new Integration with the data needed to start the authentication flow.** Required to Sync and map the service response into Sessions. |
+| `DELETE`  | :fontawesome-solid-square-minus:    &nbsp;**Remove an existing Integration.** Removes all the associated Sessions as well and wipes everything related to the Integration from the system (tokens, cache, etc.) |
+| `SYNC`    | :fontawesome-solid-rotate:    &nbsp;**Start the authentication flow to log into the Integration Provider.** Leapp will automatically retrieve all the related data and map the response into Sessions. Any change in your service of choice requires a manual Sync to reflect the current status. |
+| `LOGOUT`  | :fontawesome-solid-lock-open:    &nbsp;**Disable the Integration.** Removes all the Sessions but keeps the Integration data. Running a Sync will restore all the Sessions tied to it. |
 
 ## Supported Services
 

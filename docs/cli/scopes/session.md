@@ -13,9 +13,9 @@ Sessions management
 * [`leapp session list`](#leapp-session-list)
 * [`leapp session open-web-console`](#leapp-session-open-web-console)
 * [`leapp session run-aws-credential-plugin`](#leapp-session-run-aws-credential-plugin)
-* [`leapp session start`](#leapp-session-start)
+* [`leapp session start [SESSIONNAME]`](#leapp-session-start-sessionname)
 * [`leapp session start-ssm-session`](#leapp-session-start-ssm-session)
-* [`leapp session stop`](#leapp-session-stop)
+* [`leapp session stop [SESSIONNAME]`](#leapp-session-stop-sessionname)
 
 ## `leapp session add`
 
@@ -158,10 +158,7 @@ Generate STS temporary credentials for the given AWS session id
 
 ```console
 USAGE
-  $ leapp session generate [SESSIONID]
-
-ARGUMENTS
-  SESSIONID  id of the session
+  $ leapp session generate SESSIONID
 
 DESCRIPTION
   Generate STS temporary credentials for the given AWS session id
@@ -266,22 +263,34 @@ EXAMPLES
   $leapp session run-plugin --sessionName SESSIONAME --pluginName PLUGINNAME
 ```
 
-## `leapp session start`
+## `leapp session start [SESSIONNAME]`
 
 Start a session
 
 ```console
 USAGE
-  $ leapp session start [--sessionId <value>]
+  $ leapp session start [SESSIONNAME] [--sessionId <value>] [--sessionRole <value>] [--noInteractive]
+
+ARGUMENTS
+  SESSIONNAME  Name of the Leapp session
 
 FLAGS
-  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
+  --noInteractive        If the specified session is not unique or doesn't exist, throw an error without starting the
+                         interactive session selection mode
+  --sessionId=<value>    Session Id to identify the session in Leapp, recover it with $leapp session list -x
+  --sessionRole=<value>  Session Role of one or more sessions in Leapp
 
 DESCRIPTION
   Start a session
 
 EXAMPLES
   $leapp session start
+
+  $leapp session start SESSIONNAME
+
+  $leapp session start SESSIONNAME --sessionRole SESSIONROLE
+
+  $leapp session start SESSIONNAME --noInteractive
 
   $leapp session start --sessionId SESSIONID
 ```
@@ -308,22 +317,34 @@ EXAMPLES
   $leapp session start-ssm-session --sessionId SESSIONID --region AWSREGION --ssmInstanceId EC2INSTANCEID
 ```
 
-## `leapp session stop`
+## `leapp session stop [SESSIONNAME]`
 
 Stop a session
 
 ```console
 USAGE
-  $ leapp session stop [--sessionId <value>]
+  $ leapp session stop [SESSIONNAME] [--sessionId <value>] [--sessionRole <value>] [--noInteractive]
+
+ARGUMENTS
+  SESSIONNAME  Name of the Leapp session
 
 FLAGS
-  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
+  --noInteractive        If the specified session is not unique or doesn't exist, throw an error without starting the
+                         interactive session selection mode
+  --sessionId=<value>    Session Id to identify the session in Leapp, recover it with $leapp session list -x
+  --sessionRole=<value>  Session Role of one or more sessions in Leapp
 
 DESCRIPTION
   Stop a session
 
 EXAMPLES
   $leapp session stop
+
+  $leapp session stop SESSIONNAME
+
+  $leapp session stop SESSIONNAME --sessionRole SESSIONROLE
+
+  $leapp session stop SESSIONNAME --noInteractive
 
   $leapp session stop --sessionId SESSIONID
 ```

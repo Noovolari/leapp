@@ -14,6 +14,7 @@ nav:
       - 'Concepts':
           - Sessions: 'sessions.md'
           - Integrations: 'integrations.md'
+          - Workspaces: 'workspaces.md'
   - 'CLI':
       - Index: 'cli/index.md'
       - Usage:

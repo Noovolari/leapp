@@ -229,4 +229,8 @@ export class SideBarComponent implements OnInit, OnDestroy {
       keyboard: false,
     });
   }
+
+  openWorkspaceDocumentation(): void {
+    this.appProviderService.windowService.openExternalUrl("https://docs.leapp.cloud/latest/workspaces/");
+  }
 }

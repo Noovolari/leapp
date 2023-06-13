@@ -3,12 +3,12 @@ import { AppService } from "../../../services/app.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
-import { User } from "leapp-team-core/user/user";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 import { LoginTeamDialogComponent } from "../login-team-dialog/login-team-dialog.component";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { globalFilteredSessions, globalHasFilter, globalResetFilter } from "../../command-bar/command-bar.component";
 import { sidebarHighlight } from "../../side-bar/side-bar.component";
+import { User } from "../../../services/team-service";
 
 @Component({
   selector: "app-manage-team-workspaces-dialog",

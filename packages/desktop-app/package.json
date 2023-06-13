@@ -128,16 +128,14 @@
       ]
     },
     "win": {
-      "target": [
-        "nsis",
-        "zip"
-      ],
       "icon": "src/assets/images/Leapp.ico",
       "legalTrademarks": "beSharp",
       "publisherName": "beSharp",
       "requestedExecutionLevel": "asInvoker",
       "verifyUpdateCodeSignature": false,
-      "certificateFile": "windows_sign_certificate.pfx"
+      "signingHashAlgorithms": ["sha256"],
+      "sign": "scripts/windows-sign.js",
+      "target": ["nsis"]
     }
   },
   "dependencies": {

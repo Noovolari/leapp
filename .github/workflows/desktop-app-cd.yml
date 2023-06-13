@@ -15,6 +15,11 @@ env:
   S3_BUCKET: s3://noovolari-leapp-website-distribution
   WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+  ESIGNER_WIN_USERNAME: ${{ secrets.ESIGNER_WIN_USERNAME }}
+  ESIGNER_WIN_PASSWORD: ${{ secrets.ESIGNER_WIN_PASSWORD }}
+  ESIGNER_WIN_CREDENTIAL_ID: ${{ secrets.ESIGNER_WIN_CREDENTIAL_ID }}
+  ESIGNER_WIN_TOTP: ${{ secrets.ESIGNER_WIN_TOTP }}
+  ESIGNER_WIN_CLIENT_ID: ${{ secrets.ESIGNER_WIN_CLIENT_ID }}
 
 jobs:
   tag-validation:
@@ -65,9 +70,10 @@ jobs:
         shell: bash
         run: |
           cd packages/desktop-app
-          WIN_CERTIFICATE=windows_sign_certificate.pfx
-          echo "Recreate the window certificate from the secure environment variable"
-          echo "${{ env.WIN_CERTIFICATE }}" | base64 --decode > $WIN_CERTIFICATE
+          curl https://asset.noovolari.com/signing-tool/CodeSignTool-v1.2.7-windows.zip --output CodeSignTool-v1.2.7-windows.zip -s
+          unzip CodeSignTool-v1.2.7-windows.zip
+          CONFIG_FILE=code_sign_tool.properties
+          cat "./CodeSignTool-v1.2.7-windows/conf/$CONFIG_FILE"
           npm install
           npm run release-win
           rm -Rf ./release/win-unpacked

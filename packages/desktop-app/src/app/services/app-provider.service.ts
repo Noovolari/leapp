@@ -46,7 +46,7 @@ import { AppKeychainService } from "./app-keychain-service";
 import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-service";
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
-import { TeamService } from "@noovolari/leapp-core/services/team-service";
+import { TeamService } from "./team-service";
 
 @Injectable({
   providedIn: "root",
@@ -443,6 +443,7 @@ export class AppProviderService {
     if (!this.integrationIsOnlineStateRefreshServiceInstance) {
       this.integrationIsOnlineStateRefreshServiceInstance = new IntegrationIsOnlineStateRefreshService(
         this.integrationFactory,
+
         this.behaviouralSubjectService
       );
     }

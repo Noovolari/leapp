@@ -26,7 +26,7 @@ describe("TeamLogout", () => {
       expect((command as any).log).toHaveBeenCalledWith("logout successful");
     });
 
-    test("if this.cliProviderService.leappTeamCoreUserProvider.signOut throws an error", async () => {
+    test("if this.teamService.signOut throws an error", async () => {
       const mockedErrorMessage = "mocked-error";
       const mockedError = new Error(mockedErrorMessage);
       const cliProviderService: any = {
@@ -44,7 +44,7 @@ describe("TeamLogout", () => {
       expect((command as any).error).toHaveBeenCalledWith(mockedErrorMessage);
     });
 
-    test("if this.cliProviderService.leappTeamCoreUserProvider.signOut throws something that isn't an error", async () => {
+    test("if this.teamService.signOut throws something that isn't an error", async () => {
       const mockedError = "mocked-error";
       const cliProviderService: any = {
         teamService: {

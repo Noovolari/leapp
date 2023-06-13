@@ -8,8 +8,8 @@ import { BehaviouralSubjectService } from "./behavioural-subject-service";
 import { IMfaCodePrompter } from "../interfaces/i-mfa-code-prompter";
 import { IntegrationFactory } from "./integration-factory";
 import { IKeychainService } from "../interfaces/i-keychain-service";
-import { TeamService } from "./team-service";
 import { WorkspaceService } from "./workspace-service";
+import { ITeamService } from "../interfaces/i-team-service";
 
 export const uInt8ArrayToArray = (uint8array: Uint8Array): Array<number> => {
   if (uint8array === null || uint8array === undefined) return null;
@@ -46,7 +46,7 @@ export class RemoteProceduresServer {
     private mfaCodePrompter: IMfaCodePrompter,
     private repository: Repository,
     private behaviouralSubjectService: BehaviouralSubjectService,
-    private teamService: TeamService,
+    private teamService: ITeamService,
     private workspaceService: WorkspaceService,
     private uiSafeFn: (uiSafeBlock: () => void) => void,
     private serverId = constants.ipcServerId

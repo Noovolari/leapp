@@ -2,10 +2,9 @@ import { Component, OnInit } from "@angular/core";
 import { AppService } from "../../../services/app.service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
-import { TeamService } from "@noovolari/leapp-core/services/team-service";
+import { TeamService, ApiErrorCodes, FormErrorCodes } from "../../../services/team-service";
+
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
-import { ApiErrorCodes } from "leapp-team-core/errors/api-error-codes";
-import { FormErrorCodes } from "leapp-team-core/errors/form-error-codes";
 
 @Component({
   selector: "app-login-team-dialog",

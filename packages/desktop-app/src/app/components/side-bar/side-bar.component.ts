@@ -15,13 +15,12 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
 import { AppProviderService } from "../../services/app-provider.service";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { integrationHighlight } from "../integration-bar/integration-bar.component";
-import { User } from "leapp-team-core/user/user";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { AppService } from "../../services/app.service";
 import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
 import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
-import { WorkspaceState } from "@noovolari/leapp-core/services/team-service";
 import { ManageTeamWorkspacesDialogComponent } from "../dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
+import { User, WorkspaceState } from "../../services/team-service";
 
 export interface SelectedSegment {
   name: string;
@@ -56,6 +55,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   workspaceState: WorkspaceState;
   loggedUser: User;
   localWorkspaceName: string;
+  isLeappTeamStubbed: boolean;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
   private userSubscription;
@@ -97,6 +97,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
       this.workspaceState = workspaceState;
     });
     this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.loggedUser = user));
+    this.isLeappTeamStubbed = this.appProviderService.teamService.isLeappTeamStubbed;
   }
 
   ngOnDestroy(): void {
@@ -189,6 +190,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   async loginToLeappTeam(): Promise<void> {
+    if (this.isLeappTeamStubbed) return;
     this.bsModalService.show(LoginTeamDialogComponent, {
       animated: false,
       class: "create-modal",
@@ -198,7 +200,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   async logoutFromLeappTeam(lock: boolean = false): Promise<void> {
-    if (!this.doesTeamExist) return;
+    if (!this.doesTeamExist || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
   }
 
@@ -222,6 +224,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   showManageWorkspacesDialog(): void {
+    if (this.isLeappTeamStubbed) return;
     this.bsModalService.show(ManageTeamWorkspacesDialogComponent, {
       animated: false,
       class: "create-modal",

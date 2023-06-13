@@ -78,7 +78,7 @@ describe("TeamLogin", () => {
       expect((command as any).log).toHaveBeenCalledWith("login successful");
     });
 
-    test("if this.cliProviderService.leappTeamCoreUserProvider.signIn throws an error", async () => {
+    test("if this.teamService.signIn throws an error", async () => {
       const mockedErrorMessage = "mocked-error";
       const mockedError = new Error(mockedErrorMessage);
       const cliProviderService: any = {
@@ -99,7 +99,7 @@ describe("TeamLogin", () => {
       expect((command as any).error).toHaveBeenCalledWith(mockedErrorMessage);
     });
 
-    test("if this.cliProviderService.leappTeamCoreUserProvider.signIn throws something that isn't an error", async () => {
+    test("if this.teamService.signIn throws something that isn't an error", async () => {
       const mockedError = "mocked-error";
       const cliProviderService: any = {
         teamService: {

@@ -152,37 +152,6 @@
           }
         }
       }
-    },
-    "leapp-angular-common": {
-      "projectType": "library",
-      "root": "projects/leapp-angular-common",
-      "sourceRoot": "projects/leapp-angular-common/src",
-      "prefix": "lib",
-      "architect": {
-        "build": {
-          "builder": "@angular-devkit/build-angular:ng-packagr",
-          "options": {
-            "project": "projects/leapp-angular-common/ng-package.json"
-          },
-          "configurations": {
-            "production": {
-              "tsConfig": "projects/leapp-angular-common/tsconfig.lib.prod.json"
-            },
-            "development": {
-              "tsConfig": "projects/leapp-angular-common/tsconfig.lib.json"
-            }
-          },
-          "defaultConfiguration": "production"
-        },
-        "test": {
-          "builder": "@angular-devkit/build-angular:karma",
-          "options": {
-            "main": "projects/leapp-angular-common/src/test.ts",
-            "tsConfig": "projects/leapp-angular-common/tsconfig.spec.json",
-            "karmaConfig": "projects/leapp-angular-common/karma.conf.js"
-          }
-        }
-      }
     }
   },
   "defaultProject": "leapp-client"

@@ -154,7 +154,7 @@ export class CliProviderService {
 
   public get sessionManagementService(): SessionManagementService {
     if (!this.sessionManagementServiceInstance) {
-      this.sessionManagementServiceInstance = new SessionManagementService(this.repository);
+      this.sessionManagementServiceInstance = new SessionManagementService(this.repository, this.sessionFactory);
     }
     return this.sessionManagementServiceInstance;
   }

@@ -15,6 +15,7 @@
     "packages/desktop-app/e2e/**/*",
     "packages/desktop-app/gushio",
     "packages/desktop-app/scripts/notarize.js",
+    "packages/desktop-app/scripts/windows-sign.js",
     "gushio/**/*"
   ],
   "overrides": [

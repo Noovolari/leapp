@@ -76,7 +76,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         <span class="centered-text">📣 Attention desktop users! 🖥️</span>
         <span>Join us in the Leapp survey today and participate in our journey towards an enhanced user experience.</span>
         <span>Your feedback is crucial in understanding your needs and preferences. Participating in this survey allows you to voice your opinions, share your insights, and contribute to developing a better Cloud Workflow.</span>
-        <span>By participating, you'll influence the development and make a real impact. Plus, <b>the first 200 participants will receive $25 in AWS credits</b> as a thank-you!</span>
+        <span><b>The first 200 participants will receive $25 in AWS credits</b> as a thank-you!</span>
         <span>Don't miss this opportunity to make a difference. Take <a href="https://www.leapp.cloud/survey">the survey</a> today and help us create a fantastic desktop experience!</span>
         <span>Thank you for your support.</span>`;
 

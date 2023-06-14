@@ -118,9 +118,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.notificationService = this.leappCoreService.notificationService;
 
-    //TODO remove this
-    this.notificationService.setNotifications([]);
-
     if (this.notificationService.getNotifications().length === 0) {
       this.notificationService.setNotifications([
         new LeappNotification(

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.7](https://github.com/Noovolari/leapp/compare/v0.17.6...v0.17.7) (2023-06-14)
+
+### Features
+* added notifications menu located right to the search bar. Inside it, you can see in-app notifications.
+  In addition, you can request a GitHub enhancement or join the community, directly from the app.
+* added a survey in the notification menu to help us improving the product experience.
+
 ### [0.17.6](https://github.com/Noovolari/leapp/compare/v0.17.5...v0.17.6) (2023-05-11)
 
 ### Features

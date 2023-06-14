@@ -132,9 +132,13 @@
       "publisherName": "beSharp",
       "requestedExecutionLevel": "asInvoker",
       "verifyUpdateCodeSignature": false,
-      "signingHashAlgorithms": ["sha256"],
+      "signingHashAlgorithms": [
+        "sha256"
+      ],
       "sign": "scripts/windows-sign.js",
-      "target": ["nsis"]
+      "target": [
+        "nsis"
+      ]
     }
   },
   "dependencies": {
@@ -154,7 +158,7 @@
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
     "@noovolari/dpapi-addon": "0.1.2",
-    "@noovolari/leapp-core": "file:../core",
+    "@noovolari/leapp-core": "0.1.136",
     "@types/aws-sdk": "^2.7.0",
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",

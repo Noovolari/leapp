@@ -21,7 +21,7 @@
     color: $text-color;
     overflow-y: scroll;
     text-align: left;
-    height: 330px;
+    height: 480px;
     margin: -39px -5px 22px 3px;
 
     h1 {
@@ -64,7 +64,7 @@
       text-decoration: none;
       background-color: transparent;
       display: inline;
-      cursor: default;
+      cursor: pointer;
     }
 
     li {
@@ -72,6 +72,23 @@
       white-space:pre-wrap;
       color: $changelog-date-color;
       margin-right: 6px;
+    }
+
+    span {
+      display: inline-block;
+      color: $silver-dark;
+      font-weight: normal;
+      margin-bottom: 7px;
+    }
+
+    span.centered-text {
+      display: block;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    img {
+      margin-bottom: 7px;
     }
   }
 }

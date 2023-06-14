@@ -38,7 +38,7 @@
         </button>
         <mat-menu #notification_menu>
           <button class="notification-menu-item" mat-menu-item (click)="goToWhatsNew();">
-            <i class="icon-not-menu moon-Help {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}"></i>&nbsp;<span>What's new</span>
+            <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/books.svg" />&nbsp;<span>What's new</span>
           </button>
 
           <button class="notification-menu-item" mat-menu-item (click)="goToGettingStarted();">
@@ -56,7 +56,7 @@
           </button>
 
           <button class="notification-menu-item" mat-menu-item (click)="requestAFeature();" [disabled]="!isIssueButtonEnabled">
-            <i class="icon-not-menu moon-Puzzle {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}"></i>
+            <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/lightbulb.svg" />
             &nbsp;<span>Request a Feature</span>
           </button>
 
@@ -64,7 +64,7 @@
 
           <ng-container *ngFor="let notification of notifications">
             <button class="notification-menu-item" mat-menu-item (click)="openInfoModal(notification);" [disabled]="!isIssueButtonEnabled">
-              <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/{{notification.read ? 'read-notification' : 'unread-notification'}}.svg" alt="{{notification.title}}"/>
+              <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/{{notification.read ? 'read-notification' : notification.icon ?? 'unread-notification'}}.svg" alt="{{notification.title}}"/>
               <span class="notification-dot" *ngIf="!notification.read"></span>
               &nbsp;<span [ngClass]="!notification.read ? 'unread-text' : ''">{{notification.title}}</span>
             </button>

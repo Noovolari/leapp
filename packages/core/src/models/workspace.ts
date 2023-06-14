@@ -76,6 +76,8 @@ export class Workspace {
       password: undefined,
     };
 
+    this._notifications = [];
+
     this._credentialMethod = constants.credentialFile;
     this._samlRoleSessionDuration = constants.samlRoleSessionDuration;
 

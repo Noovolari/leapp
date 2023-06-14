@@ -33,6 +33,7 @@ export class RetroCompatibilityService {
       this.migration1();
       this.migration2();
       this.migration3();
+      this.migration4();
       // When adding new migrations remember to increase constants.workspaceLastVersion
     }
   }
@@ -231,6 +232,17 @@ export class RetroCompatibilityService {
     }
 
     workspace.ssmRegionBehaviour = constants.ssmRegionNo;
+    this.persists(workspace);
+    this.repository.reloadWorkspace();
+  }
+
+  private migration4(): void {
+    const workspace = this.getWorkspace();
+    if (!this.checkMigration(workspace, 3, 4)) {
+      return;
+    }
+
+    workspace.notifications = [];
     this.persists(workspace);
     this.repository.reloadWorkspace();
   }

@@ -10,6 +10,7 @@ import Segment from "./segment";
 import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import { AzureIntegration } from "./azure/azure-integration";
 import PluginStatus from "./plugin-status";
+import { LeappNotification } from "./notification";
 
 export class Workspace {
   /* istanbul ignore next */
@@ -24,6 +25,8 @@ export class Workspace {
   private _macOsTerminal: string;
   private _idpUrls: IdpUrl[];
   private _profiles: AwsNamedProfile[];
+
+  private _notifications: LeappNotification[];
 
   private _pluginsStatus: PluginStatus[];
 
@@ -72,6 +75,8 @@ export class Workspace {
       username: undefined,
       password: undefined,
     };
+
+    this._notifications = [];
 
     this._credentialMethod = constants.credentialFile;
     this._samlRoleSessionDuration = constants.samlRoleSessionDuration;
@@ -229,5 +234,13 @@ export class Workspace {
 
   set samlRoleSessionDuration(duration: number) {
     this._samlRoleSessionDuration = duration;
+  }
+
+  get notifications(): LeappNotification[] {
+    return this._notifications;
+  }
+
+  set notifications(notifications: LeappNotification[]) {
+    this._notifications = notifications;
   }
 }

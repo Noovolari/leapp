@@ -51,6 +51,7 @@ describe("RetroCompatibilityService", () => {
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
       (service as any).migration3 = jest.fn();
+      (service as any).migration4 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
@@ -59,6 +60,7 @@ describe("RetroCompatibilityService", () => {
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
       expect((service as any).migration3).toHaveBeenCalled();
+      expect((service as any).migration4).toHaveBeenCalled();
     });
 
     test("should try migrations, retropatch not necessary", async () => {
@@ -75,6 +77,7 @@ describe("RetroCompatibilityService", () => {
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
       (service as any).migration3 = jest.fn();
+      (service as any).migration4 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
@@ -83,6 +86,7 @@ describe("RetroCompatibilityService", () => {
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
       expect((service as any).migration3).toHaveBeenCalled();
+      expect((service as any).migration4).toHaveBeenCalled();
     });
 
     test("should try migrations, integrationpatch not necessary", async () => {
@@ -99,6 +103,7 @@ describe("RetroCompatibilityService", () => {
       (service as any).migration1 = jest.fn();
       (service as any).migration2 = jest.fn();
       (service as any).migration3 = jest.fn();
+      (service as any).migration4 = jest.fn();
 
       await service.applyWorkspaceMigrations();
 
@@ -107,6 +112,7 @@ describe("RetroCompatibilityService", () => {
       expect((service as any).migration1).toHaveBeenCalled();
       expect((service as any).migration2).toHaveBeenCalled();
       expect((service as any).migration3).toHaveBeenCalled();
+      expect((service as any).migration4).toHaveBeenCalled();
     });
   });
 
@@ -372,6 +378,70 @@ describe("RetroCompatibilityService", () => {
       expect(persistedWorkspace._pluginsStatus).toStrictEqual([]);
       expect(repository.reloadWorkspace).toHaveBeenCalled();
     });
+  });
+
+  test("migration3, not needed", () => {
+    service = new RetroCompatibilityService(null, null, null, null);
+    (service as any).getWorkspace = jest.fn(() => "mocked-workspace");
+    (service as any).persists = jest.fn();
+    (service as any).checkMigration = jest.fn(() => false);
+
+    (service as any).migration3();
+
+    expect((service as any).getWorkspace).toHaveBeenCalled();
+    expect((service as any).checkMigration).toHaveBeenCalledWith("mocked-workspace", 2, 3);
+    expect((service as any).persists).not.toHaveBeenCalled();
+  });
+
+  test("migration3, migrate to version 3", () => {
+    const repository = {
+      reloadWorkspace: jest.fn(),
+    } as any;
+    const workspace = {};
+    service = new RetroCompatibilityService(null, null, repository, null);
+    (service as any).getWorkspace = jest.fn(() => workspace);
+    (service as any).persists = jest.fn();
+    (service as any).checkMigration = jest.fn(() => true);
+
+    (service as any).migration3();
+
+    expect((service as any).getWorkspace).toHaveBeenCalled();
+    expect((service as any).checkMigration).toHaveBeenCalledWith(workspace, 2, 3);
+    expect((service as any).persists).toHaveBeenCalledWith(workspace);
+    expect((workspace as any).ssmRegionBehaviour).not.toBeUndefined();
+    expect(repository.reloadWorkspace).toHaveBeenCalled();
+  });
+
+  test("migration4, not needed", () => {
+    service = new RetroCompatibilityService(null, null, null, null);
+    (service as any).getWorkspace = jest.fn(() => "mocked-workspace");
+    (service as any).persists = jest.fn();
+    (service as any).checkMigration = jest.fn(() => false);
+
+    (service as any).migration4();
+
+    expect((service as any).getWorkspace).toHaveBeenCalled();
+    expect((service as any).checkMigration).toHaveBeenCalledWith("mocked-workspace", 3, 4);
+    expect((service as any).persists).not.toHaveBeenCalled();
+  });
+
+  test("migration4, migrate to version 4", () => {
+    const repository = {
+      reloadWorkspace: jest.fn(),
+    } as any;
+    const workspace = {};
+    service = new RetroCompatibilityService(null, null, repository, null);
+    (service as any).getWorkspace = jest.fn(() => workspace);
+    (service as any).persists = jest.fn();
+    (service as any).checkMigration = jest.fn(() => true);
+
+    (service as any).migration4();
+
+    expect((service as any).getWorkspace).toHaveBeenCalled();
+    expect((service as any).checkMigration).toHaveBeenCalledWith(workspace, 3, 4);
+    expect((service as any).persists).toHaveBeenCalledWith(workspace);
+    expect((workspace as any).notifications).toEqual([]);
+    expect(repository.reloadWorkspace).toHaveBeenCalled();
   });
 
   test("adaptIntegrations", async () => {

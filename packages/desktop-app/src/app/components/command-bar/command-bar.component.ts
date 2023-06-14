@@ -20,6 +20,10 @@ import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
+import { UpdaterService } from "../../services/updater.service";
+import { LeappNotification, LeappNotificationType } from "@noovolari/leapp-core/models/notification";
+import { InfoDialogComponent } from "../dialogs/info-dialog/info-dialog.component";
+import { NotificationService } from "@noovolari/leapp-core/services/notification-service";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -67,6 +71,15 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   eConstants = constants;
 
+  notificationService: NotificationService;
+  surveyDescription = `<img src="assets/images/survey-infographic.png" alt="survey-banner" width="100%"><br>
+        <span class="centered-text">📣 Attention desktop users! 🖥️</span>
+        <span>Join us in the Leapp survey today and participate in our journey towards an enhanced user experience.</span>
+        <span>Your feedback is crucial in understanding your needs and preferences. Participating in this survey allows you to voice your opinions, share your insights, and contribute to developing a better Cloud Workflow.</span>
+        <span><b>The first 200 participants will receive $25 in AWS credits</b> as a thank-you!</span>
+        <span>Don't miss this opportunity to make a difference. Take <a href="https://www.leapp.cloud/survey">the survey</a> today and help us create a fantastic desktop experience!</span>
+        <span>Thank you for your support.</span>`;
+
   private subscription0;
   private subscription1;
   private subscription2;
@@ -84,7 +97,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     public appService: AppService,
     public electronService: AppNativeService,
     private leappCoreService: AppProviderService,
-    private windowService: WindowService
+    private windowService: WindowService,
+    public updaterService: UpdaterService
   ) {
     this.behaviouralSubjectService = leappCoreService.behaviouralSubjectService;
 
@@ -101,10 +115,41 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     });
 
     this.setInitialArrayFilters();
+
+    this.notificationService = this.leappCoreService.notificationService;
+
+    if (this.notificationService.getNotifications().length === 0) {
+      this.notificationService.setNotifications([
+        new LeappNotification(
+          "uuid",
+          LeappNotificationType.info,
+          "Take the Survey, get AWS credits",
+          this.surveyDescription,
+          false,
+          "https://www.leapp.cloud/survey",
+          "medal"
+        ),
+      ]);
+    }
   }
 
   private static changeSessionsTableHeight() {
     document.querySelector(".sessions").classList.toggle("filtered");
+  }
+
+  get notifications(): LeappNotification[] {
+    return this.notificationService.getNotifications();
+  }
+
+  get isIssueButtonEnabled(): boolean {
+    return !!this.appService.awsSsmPluginVersion && !!this.appService.awsCliVersion && !!this.appService.issueBody;
+  }
+
+  get isNotificationPending(): boolean {
+    return (
+      this.leappCoreService.notificationService.getNotifications(true).length > 0 ||
+      (this.updaterService.isReady() && this.updaterService.isUpdateNeeded())
+    );
   }
 
   ngOnInit(): void {
@@ -256,6 +301,52 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         this.windowService.getCurrentWindow().maximize();
       }
     }
+  }
+
+  async goToWhatsNew(): Promise<void> {
+    const title = "What's new";
+    const releaseNotes = await this.updaterService.getReleaseNote();
+
+    this.bsModalService.show(InfoDialogComponent, {
+      animated: false,
+      initialState: {
+        title,
+        description: releaseNotes,
+      },
+    });
+  }
+
+  goToGettingStarted(): void {
+    this.windowService.openExternalUrl("https://docs.leapp.cloud/");
+  }
+
+  goToJoinTheCommunity(): void {
+    this.windowService.openExternalUrl(constants.slackUrl);
+  }
+
+  openAnIssue(): void {
+    this.windowService.openExternalUrl(
+      `https://github.com/noovolari/leapp/issues/new?labels=bug&body=${encodeURIComponent(this.appService.issueBody)}`
+    );
+  }
+
+  requestAFeature(): void {
+    this.windowService.openExternalUrl(
+      `https://github.com/noovolari/leapp/issues/new?labels=enhancement&body=${encodeURIComponent(this.appService.featureBody)}`
+    );
+  }
+
+  openInfoModal(notification: LeappNotification): void {
+    this.notificationService.setNotificationAsRead(notification.uuid);
+    this.bsModalService.show(InfoDialogComponent, {
+      animated: false,
+      initialState: {
+        title: notification.title,
+        description: notification.description,
+        link: notification?.link,
+        buttonName: notification?.link ? "Take the Survey" : "Ok",
+      },
+    });
   }
 
   private applyFiltersToSessions(globalFilters: GlobalFilters, sessions: Session[]) {
@@ -413,7 +504,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     ];
 
     this.types = [
-      // eslint-disable-next-line max-len
       { show: true, id: SessionType.awsIamRoleFederated, category: "Amazon AWS", name: "IAM Role Federated", value: false },
       { show: true, id: SessionType.awsIamUser, category: "Amazon AWS", name: "IAM User", value: false },
       { show: true, id: SessionType.awsIamRoleChained, category: "Amazon AWS", name: "IAM Role Chained", value: false },

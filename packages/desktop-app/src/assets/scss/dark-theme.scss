@@ -486,7 +486,7 @@ body.dark-theme {
     }
   }
   .html-content {
-    h1, h2, h3, p, ul, li {
+    h1, h2, h3, p, ul, li, div, span,  {
       color: $dark-main-text-color!important;
     }
     a {
@@ -499,6 +499,9 @@ body.dark-theme {
       background-color: grey !important;
       color: #373737;
       border-radius: 5px;
+    }
+    .enabled {
+      background-color: $dark-button-color!important;
     }
   }
 

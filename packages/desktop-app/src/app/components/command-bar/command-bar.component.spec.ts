@@ -22,9 +22,10 @@ describe("CommandBarComponent", () => {
       setNotifications: () => {},
       getNotifications: () => [],
     });
-    const spyNotificationsService = jasmine.createSpyObj("Notification", {
+    const spyNotificationsService = jasmine.createSpyObj("NotificationService", {
       setNotifications: () => {},
       getNotifications: () => [],
+      getNotificationByUuid: () => {},
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       behaviouralSubjectService: spyBehaviouralSubjectService,
@@ -45,12 +46,9 @@ describe("CommandBarComponent", () => {
         ])
       ),
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(CommandBarComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
 
     (component as any).subscription0 = {
       unsubscribe: () => {},
@@ -74,6 +72,12 @@ describe("CommandBarComponent", () => {
       unsubscribe: () => {},
     };
     (component as any).optionsService = { colorTheme: "dark-theme", workspaceService: { getWorkspace: () => new Workspace() } };
+
+    (component as any).notificationService.getNotificationByUuid = () => {};
+    const spy = spyOnProperty(component as any, "notifications", "get");
+    spy.and.returnValue([]);
+
+    fixture.detectChanges();
   });
 
   it("should create", () => {

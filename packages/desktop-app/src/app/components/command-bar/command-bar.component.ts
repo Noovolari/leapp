@@ -135,7 +135,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     const notification = this.notificationService.getNotificationByUuid("uuid");
     if (notification && notification.popup && !notification.read) {
-      this.openInfoModal(notification);
+      const timeout = setTimeout(() => {
+        clearTimeout(timeout);
+        this.openInfoModal(notification);
+      }, 5000);
     }
   }
 

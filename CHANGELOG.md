@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.17.8](https://github.com/Noovolari/leapp/compare/v0.17.7...v0.17.8) (2023-06-16)
+
+### Bug fixes
+* fixed dependencies as suggested by dependabot
+* updated xml2js from 0.4.19 to 0.5.0
+* updated aws-sdk from 2.928.0 to 2.1354.0
+
 ### [0.17.7](https://github.com/Noovolari/leapp/compare/v0.17.6...v0.17.7) (2023-06-14)
 
 ### Features

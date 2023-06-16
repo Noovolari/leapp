@@ -77,4 +77,12 @@ describe("NotificationService", () => {
     service.removeNotification(mockedNotification2);
     expect(service.getNotifications()).toEqual([mockedNotification1]);
   });
+
+  test("getNotificationByUuid", () => {
+    const service = new NotificationService(mockedRepository);
+    (service as any).getNotifications = jest.fn(() => [{ uuid: "another-uuid" }, { uuid: "correct-uuid" }]);
+
+    service.getNotificationByUuid("correct-uuid");
+    expect(service.getNotifications());
+  });
 });

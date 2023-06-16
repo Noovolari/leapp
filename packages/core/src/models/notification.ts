@@ -13,6 +13,7 @@ export class LeappNotification {
     public description: string,
     public read: boolean,
     public link?: string,
-    public icon?: string
+    public icon?: string,
+    public popup?: boolean
   ) {}
 }

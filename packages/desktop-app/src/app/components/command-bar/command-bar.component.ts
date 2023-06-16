@@ -127,9 +127,18 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
           this.surveyDescription,
           false,
           "https://www.leapp.cloud/survey",
-          "medal"
+          "medal",
+          true
         ),
       ]);
+    }
+
+    const notification = this.notificationService.getNotificationByUuid("uuid");
+    if (notification && notification.popup && !notification.read) {
+      const timeout = setTimeout(() => {
+        clearTimeout(timeout);
+        this.openInfoModal(notification);
+      }, 5000);
     }
   }
 
@@ -212,13 +221,13 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   ngOnDestroy(): void {
-    this.subscription0.unsubscribe();
-    this.subscription1.unsubscribe();
-    this.subscription2.unsubscribe();
-    this.subscription3.unsubscribe();
-    this.subscription4.unsubscribe();
-    this.subscription5.unsubscribe();
-    this.subscription6.unsubscribe();
+    this.subscription0?.unsubscribe();
+    this.subscription1?.unsubscribe();
+    this.subscription2?.unsubscribe();
+    this.subscription3?.unsubscribe();
+    this.subscription4?.unsubscribe();
+    this.subscription5?.unsubscribe();
+    this.subscription6?.unsubscribe();
   }
 
   ngAfterContentChecked(): void {

@@ -127,9 +127,15 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
           this.surveyDescription,
           false,
           "https://www.leapp.cloud/survey",
-          "medal"
+          "medal",
+          true
         ),
       ]);
+    }
+
+    const notification = this.notificationService.getNotificationByUuid("uuid");
+    if (notification && notification.popup && !notification.read) {
+      this.openInfoModal(notification);
     }
   }
 

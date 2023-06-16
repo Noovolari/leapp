@@ -13,6 +13,7 @@ import { AzureSession } from "../models/azure/azure-session";
 import { AzureIntegration } from "../models/azure/azure-integration";
 import { IKeychainService } from "../interfaces/i-keychain-service";
 import { IntegrationType } from "../models/integration-type";
+import { LeappNotification } from "../models/notification";
 
 export class RetroCompatibilityService {
   constructor(
@@ -34,6 +35,7 @@ export class RetroCompatibilityService {
       this.migration2();
       this.migration3();
       this.migration4();
+      this.migration5();
       // When adding new migrations remember to increase constants.workspaceLastVersion
     }
   }
@@ -243,6 +245,21 @@ export class RetroCompatibilityService {
     }
 
     workspace.notifications = [];
+    this.persists(workspace);
+    this.repository.reloadWorkspace();
+  }
+
+  private migration5(): void {
+    const workspace = this.getWorkspace();
+    if (!this.checkMigration(workspace, 4, 5)) {
+      return;
+    }
+
+    const leappNotifications = this.repository.getNotifications();
+    leappNotifications.forEach((notification: LeappNotification) => {
+      notification.popup = notification.uuid === "uuid";
+    });
+    workspace.notifications = leappNotifications;
     this.persists(workspace);
     this.repository.reloadWorkspace();
   }

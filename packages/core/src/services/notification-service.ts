@@ -34,4 +34,8 @@ export class NotificationService {
     const newNotifications = notifications.filter((notification) => notification.uuid !== notificationToBeRemoved.uuid);
     this.setNotifications(newNotifications);
   }
+
+  getNotificationByUuid(uuid: string): LeappNotification | undefined {
+    return this.getNotifications().find((leappNotification) => leappNotification.uuid === uuid);
+  }
 }

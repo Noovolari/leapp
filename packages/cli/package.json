@@ -44,7 +44,6 @@
     "ini": "~2.0.0",
     "inquirer": "8.2.0",
     "is-url": "^1.2.4",
-    "leapp-team-core": "file:../../../leapp-team/packages/leapp-team-core",
     "js-ini": "1.5.1",
     "jwt-decode": "~3.1.2",
     "keytar": "7.9.0",

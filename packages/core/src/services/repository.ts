@@ -17,6 +17,7 @@ import { LoggedException, LogLevel } from "./log-service";
 import { AzureIntegration } from "../models/azure/azure-integration";
 import PluginStatus from "../models/plugin-status";
 import { WorkspaceConsistencyService } from "./workspace-consistency-service";
+import { LeappNotification } from "../models/notification";
 import { GlobalSettings } from "../interfaces/i-global-settings";
 
 export class Repository {
@@ -490,6 +491,32 @@ export class Repository {
     workspace.ssmRegionBehaviour = globalSettingsInput.ssmRegionBehaviour;
     this.persistWorkspace(workspace);
   }
+
+  // NOTIFICATIONS
+
+  /**
+   * Get Notifications
+   * Get all the notifications that the user has received
+   *
+   * @return LeappNotification[] - the notification array
+   */
+  getNotifications(): LeappNotification[] {
+    const workspace = this.getWorkspace();
+    return workspace.notifications;
+  }
+
+  /**
+   * Set Notifications
+   * Set the array of new notifications , it can be used to re-update the current array, i.e. after a read message
+   *
+   * @param notifications - the notification array
+   */
+  setNotifications(notifications: LeappNotification[]): void {
+    const workspace = this.getWorkspace();
+    workspace.notifications = notifications;
+  }
+
+  // PRIVATE
 
   private getSessionsOrDefault(): Session[] {
     const workspace = this.getWorkspace();

@@ -1,11 +1,32 @@
-import { jest, describe, test, expect } from "@jest/globals";
+import { describe, expect, jest, test } from "@jest/globals";
 import { Workspace } from "./workspace";
 import { IdpUrl } from "./idp-url";
 import { constants } from "./constants";
 import * as uuid from "uuid";
+import { LeappNotification, LeappNotificationType } from "./notification";
+
 jest.mock("uuid");
 
 describe("Workspace Model", () => {
+  test("if changing a field in the workspace class, warn about workspace version", () => {
+    const workspace = new Workspace();
+    const stringifiedWorkspace = JSON.stringify(workspace);
+    try {
+      expect(stringifiedWorkspace).toEqual(
+        '{"_sessions":[],"_awsSsoIntegrations":[],"_azureIntegrations":[],"_defaultRegion":"us-east-1",' +
+          '"_defaultLocation":"eastus","_macOsTerminal":"Terminal","_idpUrls":[],"_profiles":[{"name":"default"}],' +
+          '"_notifications":[],"_pluginsStatus":[],"_pinned":[],"_folders":[],"_segments":[],"_extensionEnabled":false,' +
+          '"_proxyConfiguration":{"proxyProtocol":"https","proxyPort":"8080"},' +
+          '"_credentialMethod":"credential-file-method","_samlRoleSessionDuration":3600,"_ssmRegionBehaviour":"No"}'
+      );
+    } catch (err) {
+      throw new Error(
+        "This test fails meaning you need to create a new migration for the workspace since you changed its properties, " +
+          "and then increase the workspace version in constants.workspaceVersion"
+      );
+    }
+  });
+
   test("should create", () => {
     const workspace = new Workspace();
     expect(workspace).toBeTruthy();
@@ -93,7 +114,7 @@ describe("Workspace Model", () => {
   test("setNewWorkspaceVersion", () => {
     const workspace = new Workspace();
     workspace.setNewWorkspaceVersion();
-    expect((workspace as any)._workspaceVersion).toBe(3);
+    expect((workspace as any)._workspaceVersion).toBe(5);
   });
 
   test("get Sessions", () => {
@@ -250,5 +271,45 @@ describe("Workspace Model", () => {
     const mock = { mock: "mock" } as any;
     workspace.samlRoleSessionDuration = mock;
     expect(mock).toStrictEqual((workspace as any)._samlRoleSessionDuration);
+  });
+
+  test("ssmRegionBehaviour", () => {
+    const workspace = new Workspace();
+    expect(workspace.ssmRegionBehaviour).toStrictEqual((workspace as any)._ssmRegionBehaviour);
+  });
+
+  test("set ssmRegionBehaviour", () => {
+    const workspace = new Workspace();
+    const mock = "any";
+    workspace.ssmRegionBehaviour = mock;
+    expect(mock).toStrictEqual((workspace as any)._ssmRegionBehaviour);
+  });
+
+  test("extensionEnabled", () => {
+    const workspace = new Workspace();
+    expect(workspace.extensionEnabled).toStrictEqual((workspace as any)._extensionEnabled);
+  });
+
+  test("set extensionEnabled", () => {
+    const workspace = new Workspace();
+    const mock = false;
+    workspace.extensionEnabled = mock;
+    expect(mock).toStrictEqual((workspace as any)._extensionEnabled);
+  });
+
+  test("get notifications", () => {
+    const workspace = new Workspace();
+    const fakeNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "descr", false)];
+    (workspace as any)._notifications = fakeNotifications;
+    expect(workspace.notifications).toEqual(fakeNotifications);
+  });
+
+  test("set notifications", () => {
+    const workspace = new Workspace();
+    const fakeNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "descr", false)];
+    const notificationSpy = jest.spyOn(workspace, "notifications", "set");
+    workspace.notifications = fakeNotifications;
+    expect(notificationSpy).toHaveBeenCalledTimes(1);
+    expect(workspace.notifications).toEqual(fakeNotifications);
   });
 });

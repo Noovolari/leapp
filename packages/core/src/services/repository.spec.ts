@@ -8,6 +8,7 @@ import { SessionType } from "../models/session-type";
 import { SessionStatus } from "../models/session-status";
 import { AwsSsoRoleSession } from "../models/aws/aws-sso-role-session";
 import { LoggedException } from "./log-service";
+import { LeappNotification, LeappNotificationType } from "../models/notification";
 
 describe("Repository", () => {
   let mockedWorkspace;
@@ -16,9 +17,12 @@ describe("Repository", () => {
   let repository;
   let mockedSession: Session;
   let workspaceConsistencyService: any;
+  let mockedNotifications: any;
 
   beforeEach(() => {
+    mockedNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "descr", false)];
     mockedWorkspace = new Workspace();
+    mockedWorkspace.notifications = mockedNotifications;
 
     mockedNativeService = {
       copydir: jest.fn(),
@@ -1369,5 +1373,15 @@ describe("Repository", () => {
     expect(mockedWorkspace.segments).toEqual("mock-segments");
     expect(mockedWorkspace.ssmRegionBehaviour).toEqual("mock-ssm-region-behaviour");
     expect(repository.persistWorkspace).toHaveBeenCalled();
+  });
+
+  test("getNotifications() - returns the notification array", () => {
+    const notifications = repository.getNotifications();
+    expect(notifications).toBe(mockedNotifications);
+  });
+
+  test("setNotifications() - set the notification array", () => {
+    repository.setNotifications(mockedNotifications);
+    expect(mockedNotifications).toBe(repository.getNotifications());
   });
 });

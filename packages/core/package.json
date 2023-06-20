@@ -1,6 +1,6 @@
 {
   "name": "@noovolari/leapp-core",
-  "version": "0.1.135",
+  "version": "0.1.137",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
@@ -59,6 +59,8 @@
     "zlib": "~1.0.5"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.16.5",
+    "@babel/plugin-proposal-private-property-in-object": "^7.16.5",
     "@babel/preset-env": "^7.16.5",
     "@babel/preset-typescript": "^7.16.5",
     "@babel/plugin-proposal-class-properties": "^7.18.6",

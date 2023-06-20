@@ -35,6 +35,50 @@
       <div class="line-end">
         <button class="icon-button top-right-option-button" (click)="showOptionDialog();" matTooltip="Show Leapp Options"><i
           class="moon-Settings"></i></button>
+        <button class="icon-button top-right-option-button margin-right-fix notification" [matMenuTriggerFor]="notification_menu"
+                matTooltip="Show Leapp Notifications">
+          <img class="{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/notifications.svg" alt="notifications button" title="" />
+          <span class="notification-dot" *ngIf="isNotificationPending"></span>
+        </button>
+        <mat-menu #notification_menu>
+          <button class="notification-menu-item" mat-menu-item (click)="goToWhatsNew();">
+            <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/books.svg" />&nbsp;<span>What's new</span>
+          </button>
+
+          <button class="notification-menu-item" mat-menu-item (click)="goToGettingStarted();">
+            <i class="icon-not-menu moon-Check {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}"></i>&nbsp;<span>Getting started</span>
+          </button>
+
+          <button class="notification-menu-item" mat-menu-item (click)="goToJoinTheCommunity();">
+            <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/slack.svg" />
+            &nbsp;<span>Join the community</span>
+          </button>
+
+          <button class="notification-menu-item" mat-menu-item (click)="openAnIssue();" [disabled]="!isIssueButtonEnabled">
+            <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/bug.svg" />
+            &nbsp;<span>Open an Issue</span>
+          </button>
+
+          <button class="notification-menu-item" mat-menu-item (click)="requestAFeature();" [disabled]="!isIssueButtonEnabled">
+            <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/lightbulb.svg" />
+            &nbsp;<span>Request a Feature</span>
+          </button>
+
+          <div *ngIf="notifications.length > 0" class="divider"></div>
+
+          <ng-container *ngFor="let notification of notifications">
+            <button class="notification-menu-item" mat-menu-item (click)="openInfoModal(notification);" [disabled]="!isIssueButtonEnabled">
+              <img class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/{{notification.read ? 'read-notification' : notification.icon ?? 'unread-notification'}}.svg" alt="{{notification.title}}"/>
+              <span class="notification-dot" *ngIf="!notification.read"></span>
+              &nbsp;<span [ngClass]="!notification.read ? 'unread-text' : ''">{{notification.title}}</span>
+            </button>
+          </ng-container>
+
+        </mat-menu>
+
+
+        <button class="icon-button top-right-option-button" (click)="showOptionDialog();"
+                matTooltip="Show Leapp Options"><i class="moon-Settings"></i></button>
       </div>
 
       <div class="window-buttons">

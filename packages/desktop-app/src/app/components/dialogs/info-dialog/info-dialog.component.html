@@ -1,0 +1,27 @@
+<div class="mat-tab-labels updater-header">
+  <div class="modal-title">
+    <div class="modal-title-icon">
+      <i class="moon-Clock"></i>
+    </div>
+    <div class="modal-title-message">
+      <span>{{title}}</span>
+    </div>
+    <div class="modal-title-close">
+      <a class="close pull-right" aria-label="Close" (click)="close();">
+        <span aria-hidden="true"><i class="moon-Close"></i></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-body text-center updater">
+
+  <br>
+  <div class="html-content" [innerHTML]="description" (click)="$event.preventDefault()"></div>
+  <br>
+
+  <div class="button-equalizer">
+    <button type="button" (click)="closeAndOpenLink();" class="enabled">{{buttonName ?? 'Ok'}}</button>
+  </div>
+
+</div>

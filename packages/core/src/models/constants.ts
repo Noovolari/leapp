@@ -1,6 +1,7 @@
 export const constants = {
   //General
   appName: "Leapp",
+  rsaBinFileDestination: ".Leapp/rsa.bin",
   lockFileDestination: ".Leapp/Leapp-lock.json",
   lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",

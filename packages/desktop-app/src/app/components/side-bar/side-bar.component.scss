@@ -236,6 +236,14 @@ i.moon-Caret-down {
   }
 }
 
+.segment-row {
+  i.moon-Close {
+    position: absolute!important;
+    top: 2px!important;
+    right: 2px!important;
+  }
+}
+
 ::ng-deep {
   .mat-list .workspace-menu {
     .mat-list-item-content {

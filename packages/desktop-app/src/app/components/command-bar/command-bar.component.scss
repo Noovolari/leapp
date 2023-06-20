@@ -248,4 +248,13 @@
   .mat-menu-panel {
     max-width: 320px!important;
   }
+  .mat-menu-panel .mat-menu-content {
+    .mat-menu-item {
+      img.icon-not-menu {
+        width: 20px;
+        margin-right: 0;
+        margin-left: 0;
+      }
+    }
+  }
 }

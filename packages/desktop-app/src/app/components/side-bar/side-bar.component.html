@@ -85,8 +85,7 @@
 
       <mat-list-item [disableRipple]="true" *ngFor="let segment of segments" [ngClass]="selectedSegmentCheck(segment)"
                      (click)="applySegmentFilter(segment, $event);">
-        <div mat-line class="visible-option-menu"><i class="moon-Tag"></i> <span>{{segment.name}}</span><i class="moon-Close"
-                                                                                                           (click)="showConfirmationDialog(segment, $event)"></i>
+        <div mat-line class="visible-option-menu segment-row"><i class="moon-Tag"></i> <span>{{segment.name}}</span><i class="moon-Close" (click)="showConfirmationDialog(segment, $event)"></i>
         </div>
       </mat-list-item>
 

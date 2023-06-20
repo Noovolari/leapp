@@ -33,8 +33,8 @@
       <button class="icon-button hide-in-taskbar" (click)="syncAll();" matTooltip="Sync all Integrations"><i class="moon-Refresh"></i></button>
 
       <div class="line-end">
-        <button class="icon-button top-right-option-button" (click)="showOptionDialog();" matTooltip="Show Leapp Options"><i
-          class="moon-Settings"></i></button>
+<!--        <button class="icon-button top-right-option-button" (click)="showOptionDialog();" matTooltip="Show Leapp Options"><i-->
+<!--          class="moon-Settings"></i></button>-->
         <button class="icon-button top-right-option-button margin-right-fix notification" [matMenuTriggerFor]="notification_menu"
                 matTooltip="Show Leapp Notifications">
           <img class="{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}" src="assets/images/notifications.svg" alt="notifications button" title="" />

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.0](https://github.com/Noovolari/leapp/compare/v0.17.8...v0.18.0) (2023-06-21)
+
+### Features
+* introducing [Workspaces](https://docs.leapp.cloud/latest/workspaces/)! A global configuration that contains all the relevant information about your Leapp setup.
+  You can now switch from Local to remote Workspaces.
+
 ### [0.17.8](https://github.com/Noovolari/leapp/compare/v0.17.7...v0.17.8) (2023-06-16)
 
 ### Bug fixes

@@ -42,7 +42,7 @@
         </div>
 
         <div class="divider"></div>
-        <div [disabled]="doesTeamExist || isLeappTeamStubbed" mat-menu-item (click)="loginToLeappTeam()">
+        <div [disabled]="doesTeamExist || isLeappTeamStubbed" mat-menu-item (click)="doesTeamExist ? false : loginToLeappTeam()">
           <img class="workspace-menu-icon" src="assets/images/sign-in.svg" alt="sign-in">
           <span>Sign-in Workspace</span>
         </div>

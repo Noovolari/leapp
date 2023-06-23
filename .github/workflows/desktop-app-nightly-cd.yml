@@ -82,7 +82,7 @@ jobs:
           rm -Rf ./release/builder-effective-config.yaml
 
           TAG_VERSION=$(cat nightly-version)
-          rm "./release/Leapp-$TAG_VERSION-win.zip"
+          rm "./release/Leapp-$TAG_VERSION-win.zip" ||:
           powershell "Compress-Archive './release/Leapp Setup $TAG_VERSION.exe' './release/Leapp-$TAG_VERSION-win.zip'"
 
       - name: Configure AWS Credentials

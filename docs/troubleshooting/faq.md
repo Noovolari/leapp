@@ -39,6 +39,52 @@ Examples:
 ln -s /path/to/my/aws /usr/local/bin/aws
 ln -s /path/to/my/az /usr/local/bin/az
 ```
+## I use leapp session current but want to see the alias and not the id. 
+### Setting up leappalias command
+
+Follow these steps to set up the `leappalias` command in your Zsh shell:
+
+- Create a script file named `leappalias.sh` using a text editor:
+
+   ```bash
+   #!/bin/bash
+   leapp session current | grep -o "\"alias\":\"[^\"]*" | cut -d '"' -f 4
+   ```
+
+- Save the file and make it executable by running the following command in the terminal:
+
+   ```bash
+   chmod +x leappalias.sh
+   ```
+
+- Move the script to a directory in your system's PATH. For example, `/usr/local/bin/`:
+
+   ```bash
+   sudo mv leappalias.sh /usr/local/bin/leappalias
+   ```
+
+- Open your `zshrc` file using a text editor:
+
+   ```bash
+   nano ~/.zshrc
+   ```
+
+- Define an alias for executing the script by adding the following line to the `zshrc` file:
+
+   ```bash
+   alias leappalias='/usr/local/bin/leappalias'
+   ```
+
+- Save the changes and close the `zshrc` file.
+
+- Reload the `zshrc` file in the terminal using the following command:
+
+   ```bash
+   source ~/.zshrc
+   ```
+
+Once you have completed these steps, you can use the `leappalias` command in your terminal to extract and display the alias from the output of `leapp session current`.
+Credit goes to [bspansinQdo](https://github.com/bspansinQdo).
 
 ## How can I add support to a new SAML 2.0 Identity Provider?
 

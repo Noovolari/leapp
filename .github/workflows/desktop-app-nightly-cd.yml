@@ -74,10 +74,6 @@ jobs:
         shell: bash
         run: |
           cd packages/desktop-app
-          WIN_CERTIFICATE=windows_sign_certificate.pfx
-          echo "Recreate the window certificate from the secure environment variable"
-          echo "${{ env.WIN_CERTIFICATE }}" | base64 --decode > $WIN_CERTIFICATE
-
           npm install
           npm run nightly-win
           rm -Rf ./release/win-unpacked

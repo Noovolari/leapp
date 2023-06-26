@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.1](https://github.com/Noovolari/leapp/compare/v0.18.0...v0.18.1) (2023-06-26)
+
+### Features
+* added support to JumpCloud as SAML IdP. Thanks to [@adys](https://github.com/adys) for the [Pull Request #414](https://github.com/Noovolari/leapp/pull/414)!
+* added "leappalias command" setup in the docs FAQ section. Thanks to [@bspansinQdo](https://github.com/bspansinQdo) for the guide!
+
 ### [0.18.0](https://github.com/Noovolari/leapp/compare/v0.17.8...v0.18.0) (2023-06-21)
 
 ### Features

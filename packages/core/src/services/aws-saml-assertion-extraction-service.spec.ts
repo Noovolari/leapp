@@ -34,6 +34,8 @@ describe("AwsSamlAssertionExtractionService", () => {
 
     /* Tests for keycloak Identity Providers */
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX/auth/realms/XX/protocol/saml/clients/XX")).toBe(true);
+
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://sso.jumpcloud.com/saml2/aws")).toBe(true);
   });
 
   test("isSamlAssertionUrl", () => {

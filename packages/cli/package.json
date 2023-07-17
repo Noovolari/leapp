@@ -15,7 +15,7 @@
     "@aws-sdk/client-sso": "^3.85.0",
     "@aws-sdk/client-sso-oidc": "^3.85.0",
     "@babel/plugin-proposal-decorators": "^7.16.5",
-    "@noovolari/leapp-core": "0.1.139",
+    "@noovolari/leapp-core": "file:../core",
     "@oclif/core": "2.1.4",
     "@oclif/plugin-help": "^5.1.12",
     "@types/inquirer": "8.2.0",

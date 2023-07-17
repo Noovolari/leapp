@@ -1,10 +1,10 @@
+import { contextMenu } from "./context-menu";
 import * as path from "path";
 import { environment } from "../src/environments/environment";
 
 const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
 const electronLocalshortcut = require('electron-localshortcut');
 const { autoUpdater } = require("electron-updater");
-const contextMenu = require('electron-context-menu');
 
 const url = require("url");
 const fs = require("fs");

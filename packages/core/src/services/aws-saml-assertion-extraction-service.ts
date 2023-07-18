@@ -16,6 +16,7 @@ const authenticationUrlRegexes = new Map([
       /^https:\/\/login\.microsoftonline\.com\/*.*\/oauth2\/authorize.*/,
       /^https:\/\/.+\.auth0\.com\/samlp\/.+/,
       /^https:\/\/.*\/auth\/realms\/.*\/protocol\/saml\/clients\/.*/,
+      /^https:\/\/.*\/realms\/.*\/protocol\/saml\/clients\/.*/,
       /^https:\/\/sso\.jumpcloud\.com\/saml2\/aws/,
     ],
   ],

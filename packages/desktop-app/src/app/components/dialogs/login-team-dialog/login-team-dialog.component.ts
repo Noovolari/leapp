@@ -28,6 +28,10 @@ export class LoginTeamDialogComponent implements OnInit {
     this.hidePassword = true;
     this.loggingService = appProviderService.logService;
     this.teamService = appProviderService.teamService;
+    const user = this.teamService.signedInUserState.getValue();
+    if (user && user.email) {
+      this.email.setValue(user.email);
+    }
   }
 
   async signIn(): Promise<void> {

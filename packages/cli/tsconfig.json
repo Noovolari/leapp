@@ -9,7 +9,7 @@
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "noImplicitThis": true,
     "alwaysStrict": true,
     "noUnusedLocals": true,

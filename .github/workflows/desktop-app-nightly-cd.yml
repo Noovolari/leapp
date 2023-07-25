@@ -70,6 +70,20 @@ jobs:
         with:
           ref: master
 
+      - uses: actions/checkout@v3
+        if: ${{ env.TEAM_REPOSITORY != '' }}
+        with:
+          repository: ${{ env.TEAM_REPOSITORY }}
+          ref: main
+          token: ${{ secrets.GH_TOKEN }}
+          path: leapp-team
+          - name: Inject Team Feature
+            if: ${{ env.TEAM_REPOSITORY != '' }}
+            run: |
+              mv leapp-team ..
+              cd ../leapp-team/packages/leapp-team-service
+              npm run enable-team-features
+
       - name: Build Win desktop app (nightly)
         shell: bash
         run: |
@@ -108,6 +122,19 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: master
+      - uses: actions/checkout@v3
+        if: ${{ env.TEAM_REPOSITORY != '' }}
+        with:
+          repository: ${{ env.TEAM_REPOSITORY }}
+          ref: main
+          token: ${{ secrets.GH_TOKEN }}
+          path: leapp-team
+        - name: Inject Team Feature
+          if: ${{ env.TEAM_REPOSITORY != '' }}
+          run: |
+            mv leapp-team ..
+            cd ../leapp-team/packages/leapp-team-service
+            npm run enable-team-features
 
       - name: Build Linux desktop app (nightly)
         run: |
@@ -141,6 +168,20 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: master
+
+      - uses: actions/checkout@v3
+        if: ${{ env.TEAM_REPOSITORY != '' }}
+        with:
+          repository: ${{ env.TEAM_REPOSITORY }}
+          ref: main
+          token: ${{ secrets.GH_TOKEN }}
+          path: leapp-team
+        - name: Inject Team Feature
+          if: ${{ env.TEAM_REPOSITORY != '' }}
+          run: |
+            mv leapp-team ..
+            cd ../leapp-team/packages/leapp-team-service
+            npm run enable-team-features
 
       - name: Build macOS x64 desktop app (nightly)
         uses: nick-fields/retry@v2
@@ -212,6 +253,20 @@ jobs:
       - uses: actions/checkout@v3
         with:
           ref: master
+
+      - uses: actions/checkout@v3
+        if: ${{ env.TEAM_REPOSITORY != '' }}
+        with:
+          repository: ${{ env.TEAM_REPOSITORY }}
+          ref: main
+          token: ${{ secrets.GH_TOKEN }}
+          path: leapp-team
+        - name: Inject Team Feature
+          if: ${{ env.TEAM_REPOSITORY != '' }}
+          run: |
+            mv leapp-team ..
+            cd ../leapp-team/packages/leapp-team-service
+            npm run enable-team-features
 
       - name: Build macOS arm64 desktop app (nightly)
         uses: nick-fields/retry@v2

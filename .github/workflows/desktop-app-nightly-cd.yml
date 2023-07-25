@@ -75,7 +75,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
-          ref: main
+          ref: development
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -127,7 +127,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
-          ref: main
+          ref: development
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -174,7 +174,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
-          ref: main
+          ref: development
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -259,7 +259,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
-          ref: main
+          ref: development
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature

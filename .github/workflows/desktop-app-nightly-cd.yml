@@ -16,6 +16,7 @@ env:
   WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+  TEAM_REPOSITORY: ${{ secrets.TEAM_REPOSITORY }}
 
 jobs:
   clean-nightly-latest:

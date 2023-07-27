@@ -132,6 +132,10 @@
       "publisherName": "beSharp",
       "requestedExecutionLevel": "asInvoker",
       "verifyUpdateCodeSignature": false,
+      "signingHashAlgorithms": [
+        "sha256"
+      ],
+      "sign": "scripts/windows-sign.js",
       "target": [
         "nsis"
       ]

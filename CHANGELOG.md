@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.3](https://github.com/Noovolari/leapp/compare/v0.18.2...v0.18.3) (2023-07-28)
+
+### Bug fixes
+* endpoint url fix
+
 ### [0.18.2](https://github.com/Noovolari/leapp/compare/v0.18.1...v0.18.2) (2023-07-28)
 
 ### Bug fixes

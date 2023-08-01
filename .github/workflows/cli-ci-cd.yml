@@ -39,6 +39,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm run test
           npm run enable-team-features
       - name: Bootstrap
         run: |

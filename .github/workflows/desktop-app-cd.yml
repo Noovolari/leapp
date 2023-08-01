@@ -79,6 +79,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm run test
           npm run enable-team-features
 
       - name: Build Win desktop app
@@ -134,6 +135,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm run test
           npm run enable-team-features
 
       - name: Build Linux desktop app
@@ -179,6 +181,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm run test
           npm run enable-team-features
 
       - name: Build macOS x64 desktop app
@@ -263,6 +266,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm run test
           npm run enable-team-features
 
       - name: Build macOS arm64 desktop app

@@ -528,4 +528,23 @@ body.dark-theme {
   .workspace-menu-icon {
     filter: invert(1);
   }
+
+ .plan {
+   border: 1px solid $dark-tablehead-border;
+   .plan-header {
+     border-bottom: 1px solid $dark-tablehead-border;
+   }
+   .plan-body {
+     background-color: $dark-select-component;
+   }
+   .price-description {
+     color: #DEDCDD;
+   }
+   .cta-button.clickable {
+     background: $dark-button-color;
+     color: $white-text-color;
+     outline: none;
+     border: none;
+   }
+ }
 }

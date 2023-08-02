@@ -246,25 +246,6 @@
 
     </mat-tab>
 
-    <mat-tab>
-      <ng-template mat-tab-label>
-        <i class="mat-tab-icon moon-User"></i>
-        <span class="mat-tab-label-text">Account</span>
-      </ng-template>
-      <div class="no-padding no-margin panel">
-
-        <div class="hero-unit">
-          <img src="assets/images/account-hero.png" alt="">
-          <p>
-            <strong>Leapp Pro coming soon</strong>
-            <span>Join our community and give us feedback</span>
-            <br>
-            <button type="button" class="join-community-button" (click)="openBrowser('https://join.slack.com/t/noovolari/shared_invite/zt-noc0ju05-18_GRX~Zi6Jz8~95j5CySA')">Join</button>
-          </p>
-        </div>
-      </div>
-    </mat-tab>
-
     <mat-tab *ngIf=!eConstants.disablePluginSystem>
       <ng-template mat-tab-label>
         <i class="mat-tab-icon moon-Puzzle"></i>
@@ -347,6 +328,111 @@
         <div class="enable-option">
           <mat-slide-toggle class="enable-extension-toggle" (toggleChange)="toggleExtension()" [checked]="extensionEnabled">Enable Multi-Console Extension</mat-slide-toggle>
           <span class="extension-description">Use the Extension as default. Fallback to the Single-Console method if the browser is closed or any error occurs.</span>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <i class="mat-tab-icon moon-User"></i>
+        <span class="mat-tab-label-text">Plans</span>
+      </ng-template>
+      <div class="no-padding no-margin panel">
+
+        <div class="plans-group-container">
+          <div class="plan">
+            <div class="plan-header">
+              <span class="free-plan">Free</span>
+              <p>This is the free plan for the community</p>
+            </div>
+            <div class="plan-body">
+              <div class="price-container">
+                <span class="price-value">$0</span>
+                <span class="price-description">Unlimited blocks for individuals and limited block trial for teams</span>
+              </div>
+              <div class="cta-button">Your Active Plan</div>
+              <ul class="plan-features">
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>Interesting Feature 1</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>An even more interesting Feature 2</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>Very peculiar Feature 3 unique to Leapp</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>Feature 4</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="plan">
+            <div class="plan-header">
+              <span class="pro-plan">Pro</span>
+              <p>Pro plan for an enhanced single user experience</p>
+            </div>
+            <div class="plan-body">
+              <div class="price-container">
+                <span class="price-value">$10</span>
+                <span class="price-description">Billed montlhy</span>
+              </div>
+              <div class="cta-button clickable">Upgrade</div>
+              <ul class="plan-features">
+                <li>
+                  <span class="all-free-features">All the Free features, plus</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>An even more interesting Feature 5</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>Very peculiar Feature 6 unique to Leapp</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>Feature 7</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="plan">
+            <div class="plan-header">
+              <span class="team-plan">Team</span>
+              <p>Team plan to manage your team</p>
+            </div>
+            <div class="plan-body">
+              <div class="price-container">
+                <span class="price-value">$50</span>
+                <span class="price-description">Unlimited blocks for individuals and limited block trial for teams</span>
+              </div>
+              <div class="cta-button clickable">Request a demo</div>
+              <ul class="plan-features">
+                <li>
+                  <span class="all-free-features">All the Pro features, plus</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>An even more interesting Feature 8</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>Awesome Feature 9 to help you manage your team</span>
+                </li>
+                <li>
+                  <span class="check-mark-icon">✓</span>
+                  <span>Feature 10</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
     </mat-tab>

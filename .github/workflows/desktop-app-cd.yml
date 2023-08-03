@@ -77,6 +77,10 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
+          cd packages/core
+          npm install
+          npm run build
+          cd ../..
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-core
           npm run bootstrap
@@ -136,6 +140,10 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
+          cd packages/core
+          npm install
+          npm run build
+          cd ../..
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-core
           npm run bootstrap
@@ -185,6 +193,10 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
+          cd packages/core
+          npm install
+          npm run build
+          cd ../..
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-core
           npm run bootstrap
@@ -273,6 +285,10 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
+          cd packages/core
+          npm install
+          npm run build
+          cd ../..
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-core
           npm run bootstrap

@@ -79,6 +79,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm install
           npm run test
           npm run enable-team-features-prod
 
@@ -135,6 +136,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm install
           npm run test
           npm run enable-team-features-prod
 
@@ -181,6 +183,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm install
           npm run test
           npm run enable-team-features-prod
 
@@ -266,6 +269,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
+          npm install
           npm run test
           npm run enable-team-features-prod
 

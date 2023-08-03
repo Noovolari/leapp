@@ -37,7 +37,7 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
-          cd packages/leapp-core
+          cd packages/core
           npm run install
           npm run build
           cd ../..

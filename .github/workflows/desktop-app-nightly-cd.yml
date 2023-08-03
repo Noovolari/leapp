@@ -83,7 +83,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
-          npm run enable-team-features
+          npm run enable-team-features-dev
 
       - name: Build Win desktop app (nightly)
         shell: bash
@@ -135,7 +135,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
-          npm run enable-team-features
+          npm run enable-team-features-dev
 
       - name: Build Linux desktop app (nightly)
         run: |
@@ -182,7 +182,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
-          npm run enable-team-features
+          npm run enable-team-features-dev
 
       - name: Build macOS x64 desktop app (nightly)
         uses: nick-fields/retry@v2
@@ -267,7 +267,7 @@ jobs:
         run: |
           mv leapp-team ..
           cd ../leapp-team/packages/leapp-team-service
-          npm run enable-team-features
+          npm run enable-team-features-dev
 
       - name: Build macOS arm64 desktop app (nightly)
         uses: nick-fields/retry@v2

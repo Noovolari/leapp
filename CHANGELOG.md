@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.4](https://github.com/Noovolari/leapp/compare/v0.18.3...v0.18.4) (2023-08-03)
+
+### Bug fixes
+* fixed IAM Federated session G Suite SAML authentication flow ([issue #453](https://github.com/Noovolari/leapp/issues/453))
+
 ### [0.18.3](https://github.com/Noovolari/leapp/compare/v0.18.2...v0.18.3) (2023-07-28)
 
 ### Bug fixes

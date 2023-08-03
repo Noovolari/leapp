@@ -78,7 +78,9 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
           mv leapp-team ..
-          cd ../leapp-team/packages/leapp-team-service
+          cd ../leapp-team/packages/leapp-team-core
+          npm run bootstrap
+          cd ../leapp-team-service
           npm install
           npm run test
           npm run enable-team-features-prod
@@ -135,7 +137,9 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
           mv leapp-team ..
-          cd ../leapp-team/packages/leapp-team-service
+          cd ../leapp-team/packages/leapp-team-core
+          npm run bootstrap
+          cd ../leapp-team-service
           npm install
           npm run test
           npm run enable-team-features-prod
@@ -182,7 +186,9 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
           mv leapp-team ..
-          cd ../leapp-team/packages/leapp-team-service
+          cd ../leapp-team/packages/leapp-team-core
+          npm run bootstrap
+          cd ../leapp-team-service
           npm install
           npm run test
           npm run enable-team-features-prod
@@ -268,7 +274,9 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
           mv leapp-team ..
-          cd ../leapp-team/packages/leapp-team-service
+          cd ../leapp-team/packages/leapp-team-core
+          npm run bootstrap
+          cd ../leapp-team-service
           npm install
           npm run test
           npm run enable-team-features-prod

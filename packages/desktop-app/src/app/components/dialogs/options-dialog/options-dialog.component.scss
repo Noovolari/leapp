@@ -3,7 +3,7 @@
 @import "../../../../assets/scss/modals";
 
 .option-modal {
-  max-width: 520px;
+  max-width: 650px;
   width: 100%;
   .modal-content {
     padding: 0 0 20px;
@@ -29,7 +29,6 @@
     font-weight: 400;
     color: $text-black;
     width: 83%;
-    max-width: 395px;
     overflow: hidden;
   }
   td:nth-child(2) {
@@ -225,7 +224,7 @@
   text-align: right!important;
   display: inline-block;
   right: 388px;
-  border-top: 0.5px solid #DADADA !important;
+  border-top: 0.5px solid $silver-50 !important;
   width: 37%;
   padding: 15px;
   .extension-description {
@@ -240,3 +239,107 @@
   right: -16px;
   position: relative;
 }
+
+.plans-group-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+  width: 31%;
+  height: 400px;
+  border-radius: 5px;
+  border: 1px solid $silver-50;
+}
+
+.plan-header {
+  padding: 10px 13px;
+  border-bottom: 1px solid $silver-50;
+  span {
+    font-weight: 600;
+    font-size: 20px;
+  }
+  p {
+    font-size: 14px;
+    margin: 5px 0 0 0;
+  }
+}
+
+.free-plan {
+  color: $free-plan-title-color!important;
+}
+
+.pro-plan {
+  color: $pro-plan-title-color!important;
+}
+
+.team-plan {
+  color: $team-plan-title-color!important;
+}
+
+.plan-body {
+  height: 100%;
+  background-color: rgba(207, 210, 211, 0.3);
+  overflow: hidden;
+  .price-container {
+    padding: 10px 13px;
+    display: flex;
+    flex-direction: column;
+    height: 105px;
+    .price-value {
+      font-size: 22px;
+      font-weight: 600;
+    }
+    .price-description {
+      font-size: 12px;
+      color: $table-text;
+    }
+  }
+
+  .cta-button {
+    margin: 7px 16px;
+    padding: 3px 6px;
+    display: block;
+    border-radius: 5px;
+    border: 1px solid $silver-50;
+    text-align: center;
+    background-color: white;
+    font-size: 15px;
+    &.clickable {
+      background: $black;
+      cursor: pointer;
+      color: $white-text-color;
+      outline: none;
+      border: none;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      &:hover {
+        transition: opacity 0.3s ease;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .plan-features {
+    padding: 10px 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    li {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      span.check-mark-icon {
+        margin-right: 5px;
+      }
+      span.all-free-features {
+        font-weight: 600;
+      }
+    }
+  }
+}
+

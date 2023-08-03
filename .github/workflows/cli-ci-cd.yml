@@ -38,7 +38,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
           cd packages/core
-          npm run install
+          npm install
           npm run build
           cd ../..
           mv leapp-team ..

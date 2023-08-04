@@ -508,4 +508,40 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.extensionEnabled = !this.extensionEnabled;
     this.optionsService.extensionEnabled = this.extensionEnabled;
   }
+
+  async upgradeToLeappPro(): Promise<void> {
+    // TODO: we have to make it dynamic (fetch it from Stripe)
+    const leappProAnnualPriceId = "price_1Nb2oJG98GaBkiWThmpRRu3o";
+    const checkoutUrl = await this.appProviderService.teamService.createCheckoutSession(leappProAnnualPriceId);
+
+    // Get active window position for extracting new windows coordinate
+    const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
+    const nearX = 200;
+    const nearY = 50;
+
+    let checkoutWindow = this.appProviderService.windowService.newWindow(
+      checkoutUrl,
+      true,
+      "",
+      activeWindowPosition[0] + nearX,
+      activeWindowPosition[1] + nearY
+    );
+
+    checkoutWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+      console.log("Intercepted HTTP redirect call:", details.url);
+
+      if (details.url === "https://www.leapp.cloud/success") {
+        checkoutWindow.close();
+        checkoutWindow = null;
+        this.toasterService.toast("God job!", ToastLevel.success);
+      }
+
+      callback({
+        requestHeaders: details.requestHeaders,
+        url: details.url,
+      });
+    });
+
+    checkoutWindow.loadURL(checkoutUrl);
+  }
 }

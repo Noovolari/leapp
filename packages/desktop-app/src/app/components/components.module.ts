@@ -54,6 +54,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { ManageTeamWorkspacesDialogComponent } from "./dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component";
+import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
 
 @NgModule({
   declarations: [
@@ -86,6 +87,7 @@ import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component
     InfoDialogComponent,
     LoginTeamDialogComponent,
     ManageTeamWorkspacesDialogComponent,
+    LeappProPreCheckoutDialogComponent,
   ],
   imports: [
     CommonModule,

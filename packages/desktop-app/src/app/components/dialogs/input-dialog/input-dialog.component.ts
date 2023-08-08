@@ -25,7 +25,7 @@ export class InputDialogComponent implements OnInit, AfterViewInit {
   inputField: ElementRef;
 
   public form = new FormGroup({
-    value: new FormControl("", [Validators.required]),
+    value: new FormControl("", [Validators.required, Validators.email]),
   });
 
   /* Just a restyled modal to show a confirmation for delete actions */

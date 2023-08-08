@@ -1,0 +1,21 @@
+<a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
+<h4>Provide your email address</h4>
+
+<div class="content">
+  <form [formGroup]="form" class="form center-vertical text-left">
+    <div class="form-container">
+      <div class="form-group">
+        <div class="form-field">
+          <div class="form-group">
+            <label>Email address<span class="danger-text">*</span></label>
+            <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com" (keyup.enter)="checkAndConfirm();" autofocus>
+            <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email address</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <button (click)="checkAndConfirm();" class="btn-control btn-right-margin">Submit</button>
+  <a (click)="close();">Cancel</a>
+</div>

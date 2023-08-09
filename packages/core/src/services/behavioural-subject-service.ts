@@ -9,11 +9,13 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
   readonly sessions$: BehaviorSubject<Session[]>;
   readonly integrations$: BehaviorSubject<Integration[]>;
   readonly sessionSelections$: BehaviorSubject<SessionSelectionState[]>;
+  readonly fetchingIntegrationState$: BehaviorSubject<string | undefined>;
 
   constructor(private repository: Repository) {
     this.sessions$ = new BehaviorSubject([]);
     this.integrations$ = new BehaviorSubject([]);
     this.sessionSelections$ = new BehaviorSubject([]);
+    this.fetchingIntegrationState$ = new BehaviorSubject<string | undefined>(undefined);
     this.reloadSessionsAndIntegrationsFromRepository();
   }
 
@@ -87,5 +89,9 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
   reloadSessionsAndIntegrationsFromRepository(): void {
     this.sessions = this.repository.getSessions();
     this.integrations = [...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()];
+  }
+
+  setFetchingIntegrations(fetchingState: string | undefined): void {
+    this.fetchingIntegrationState$.next(fetchingState);
   }
 }

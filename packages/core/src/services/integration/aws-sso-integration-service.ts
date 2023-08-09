@@ -299,7 +299,11 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   private setupSsoPortalClient(region: string): void {
     if (!this.ssoPortal || this.ssoPortal.config.region !== region) {
-      this.ssoPortal = new SSO({ region, maxRetries: 30 });
+      this.ssoPortal = new SSO({
+        region,
+        maxRetries: 30,
+        retryDelayOptions: { customBackoff: (retryCount: number, _err?: Error) => Math.floor(Math.random() * retryCount * 1000) },
+      });
       this.listAccountRolesCall = new ThrottleService((...params) => this.ssoPortal.listAccountRoles(...params).promise(), constants.maxSsoTps);
     }
   }

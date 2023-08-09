@@ -545,7 +545,8 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("getSessions", async () => {
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
+    const behaviouralNotifier = { setFetchingIntegrations: jest.fn() };
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, behaviouralNotifier as any, null, null, null, null) as any;
     awsIntegrationService.setupSsoPortalClient = jest.fn();
     awsIntegrationService.listAccounts = jest.fn(async () => ["account1", "account2"]);
     awsIntegrationService.getSessionsFromAccount = jest.fn(async () => ["session1", "session2"]);
@@ -560,6 +561,10 @@ describe("AwsSsoIntegrationService", () => {
     expect(awsIntegrationService.listAccounts).toHaveBeenCalledWith(fakeAccessToken);
     expect(awsIntegrationService.getSessionsFromAccount).toHaveBeenNthCalledWith(1, fakeIntegrationId, "account1", fakeAccessToken);
     expect(awsIntegrationService.getSessionsFromAccount).toHaveBeenNthCalledWith(2, fakeIntegrationId, "account2", fakeAccessToken);
+    expect(behaviouralNotifier.setFetchingIntegrations).toHaveBeenNthCalledWith(1, "");
+    expect(behaviouralNotifier.setFetchingIntegrations).toHaveBeenNthCalledWith(2, "Fetched 1 of 2 accounts...");
+    expect(behaviouralNotifier.setFetchingIntegrations).toHaveBeenNthCalledWith(3, "Fetched 2 of 2 accounts...");
+    expect(behaviouralNotifier.setFetchingIntegrations).toHaveBeenNthCalledWith(4, undefined);
   });
 
   test("configureAwsSso", async () => {

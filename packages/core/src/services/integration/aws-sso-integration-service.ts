@@ -255,7 +255,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     this.behaviouralNotifier.setFetchingIntegrations("");
     this.setupSsoPortalClient(region);
     const accounts: AccountInfo[] = await this.listAccounts(accessToken);
-    accounts.push(...[...accounts, ...accounts, ...accounts, ...accounts, ...accounts, ...accounts]);
+
     let accountSynced = 0;
     let errorFetching = false;
     const promiseArray = accounts.map((account) =>

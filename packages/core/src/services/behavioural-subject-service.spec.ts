@@ -184,4 +184,10 @@ describe("WorkspaceService", () => {
     expect(behaviouralSubjectService.integrations).toEqual(integrations);
     expect(behaviouralSubjectService.integrations$.next).toHaveBeenCalledWith(integrations);
   });
+
+  test("setFetchingIntegrations", () => {
+    jest.spyOn(behaviouralSubjectService.fetchingIntegrationState$, "next");
+    behaviouralSubjectService.setFetchingIntegrations("fake-state");
+    expect(behaviouralSubjectService.fetchingIntegrationState$.next).toHaveBeenCalledWith("fake-state");
+  });
 });

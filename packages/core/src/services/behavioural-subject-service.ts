@@ -72,16 +72,19 @@ export class BehaviouralSubjectService implements IBehaviouralNotifier {
     this.sessionSelections$.next(sessionSelections);
   }
 
+  // TODO: add tests
   selectSession(sessionId: string) {
     const sessionSelections = [new SessionSelectionState(sessionId, true, null, null, false)];
     this.sessionSelections = sessionSelections;
   }
 
+  // TODO: add tests
   openContextualMenu(sessionId: string, menuX: number, menuY: number) {
     const sessionSelections = [new SessionSelectionState(sessionId, true, menuX, menuY, true)];
     this.sessionSelections = sessionSelections;
   }
 
+  // TODO: add tests
   unselectSessions() {
     this.sessionSelections = [];
   }

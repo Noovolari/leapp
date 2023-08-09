@@ -253,6 +253,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     this.setupSsoPortalClient(region);
     const accounts: AccountInfo[] = await this.listAccounts(accessToken);
+    accounts.push(...[...accounts, ...accounts, ...accounts, ...accounts, ...accounts, ...accounts]);
     const promiseArray = accounts.map((account) => this.getSessionsFromAccount(integrationId, account, accessToken));
     return (await Promise.all(promiseArray)).flat();
   }
@@ -298,7 +299,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   private setupSsoPortalClient(region: string): void {
     if (!this.ssoPortal || this.ssoPortal.config.region !== region) {
-      this.ssoPortal = new SSO({ region });
+      this.ssoPortal = new SSO({ region, maxRetries: 30 });
       this.listAccountRolesCall = new ThrottleService((...params) => this.ssoPortal.listAccountRoles(...params).promise(), constants.maxSsoTps);
     }
   }

@@ -31,12 +31,12 @@ You will have access to the same configurations **instantly** on any machine, by
 
 The actions below only applies to Remote workspaces.
 
-| Action     | Description                                                                                                       |
-|------------|-------------------------------------------------------------------------------------------------------------------|
-| `Sign-in`  | :fontawesome-solid-sign-in: &nbsp;Connect to a Remote workspace. This action will not switch your Local workspace |
-| `Switch`   | :fontawesome-solid-check: &nbsp;Switch to the selected workspace by clicking on its name in the workspace menu    |
-| `Lock`     | :fontawesome-solid-lock-alt: &nbsp;Switch back to the Local workspace disabling all the Remote ones               |
-| `Sign-out` | :fontawesome-solid-sign-out: &nbsp;Sign-out from a Remote workspace removing all your login details               |
+| Action     | Description                                                                                                 |
+|------------|-------------------------------------------------------------------------------------------------------------|
+| `Sign-in`  | :material-login: &nbsp;Connect to a Remote workspace. This action will not switch your Local workspace |
+| `Switch`   | :material-check: &nbsp;Switch to the selected workspace by clicking on its name in the workspace menu |
+| `Lock`     | :material-lock: &nbsp;Switch back to the Local workspace disabling all the Remote ones         |
+| `Sign-out` | :material-logout: &nbsp;Sign-out from a Remote workspace removing all your login details         |
 
 
 !!! Info

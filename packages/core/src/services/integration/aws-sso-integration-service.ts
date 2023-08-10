@@ -110,11 +110,12 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return formatDistance(new Date(integration.accessTokenExpiration), this.getDate(), { addSuffix: true });
   }
 
-  async loginAndGetSessionsDiff(integrationId: string): Promise<SsoSessionsDiff> {
+  async loginAndGetSessionsDiff(integrationId: string, onUserAuthenticated?: () => void): Promise<SsoSessionsDiff> {
     const awsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId);
     const region = awsSsoIntegration.region;
     const portalUrl = awsSsoIntegration.portalUrl;
     const accessToken = await this.getAccessToken(integrationId, region, portalUrl);
+    onUserAuthenticated?.();
 
     const onlineSessions = await this.getSessions(integrationId, accessToken, region);
     const persistedSessions = this.repository.getAwsSsoIntegrationSessions(integrationId);
@@ -149,8 +150,8 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return { sessionsToDelete, sessionsToAdd };
   }
 
-  async syncSessions(integrationId: string): Promise<any> {
-    const sessionsDiff = await this.loginAndGetSessionsDiff(integrationId);
+  async syncSessions(integrationId: string, onUserAuthenticated?: () => void): Promise<any> {
+    const sessionsDiff = await this.loginAndGetSessionsDiff(integrationId, onUserAuthenticated);
 
     for (const ssoRoleSession of sessionsDiff.sessionsToAdd) {
       ssoRoleSession.awsSsoConfigurationId = integrationId;
@@ -251,10 +252,25 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   }
 
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
+    this.behaviouralNotifier.setFetchingIntegrations("");
     this.setupSsoPortalClient(region);
     const accounts: AccountInfo[] = await this.listAccounts(accessToken);
-    const promiseArray = accounts.map((account) => this.getSessionsFromAccount(integrationId, account, accessToken));
-    return (await Promise.all(promiseArray)).flat();
+
+    let accountSynced = 0;
+    let errorFetching = false;
+    const promiseArray = accounts.map((account) =>
+      this.getSessionsFromAccount(integrationId, account, accessToken).finally(() => {
+        if (errorFetching) return;
+        accountSynced++;
+        this.behaviouralNotifier.setFetchingIntegrations(`Fetched ${accountSynced} of ${accounts.length} accounts...`);
+      })
+    );
+    return (
+      await Promise.all(promiseArray).finally(() => {
+        errorFetching = true;
+        this.behaviouralNotifier.setFetchingIntegrations(undefined);
+      })
+    ).flat();
   }
 
   private async configureAwsSso(
@@ -298,7 +314,11 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   private setupSsoPortalClient(region: string): void {
     if (!this.ssoPortal || this.ssoPortal.config.region !== region) {
-      this.ssoPortal = new SSO({ region });
+      this.ssoPortal = new SSO({
+        region,
+        maxRetries: 30,
+        retryDelayOptions: { customBackoff: (retryCount: number, _err?: Error) => Math.floor(Math.random() * retryCount * 1000) },
+      });
       this.listAccountRolesCall = new ThrottleService((...params) => this.ssoPortal.listAccountRoles(...params).promise(), constants.maxSsoTps);
     }
   }
@@ -337,8 +357,8 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
     const accountRoles: RoleInfo[] = [];
 
-    await new Promise((resolve, _) => {
-      this.recursiveListRoles(accountRoles, listAccountRolesRequest, resolve);
+    await new Promise<void>((resolve, reject) => {
+      this.recursiveListRoles(accountRoles, listAccountRolesRequest, resolve, reject);
     });
 
     const awsSsoSessions: SsoRoleSession[] = [];
@@ -361,17 +381,25 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     return awsSsoSessions;
   }
 
-  private recursiveListRoles(accountRoles: RoleInfo[], listAccountRolesRequest: ListAccountRolesRequest, promiseCallback: any) {
-    this.listAccountRolesCall.callWithThrottle(listAccountRolesRequest).then((response) => {
-      accountRoles.push(...response.roleList);
+  private recursiveListRoles(
+    accountRoles: RoleInfo[],
+    listAccountRolesRequest: ListAccountRolesRequest,
+    resolve: () => void,
+    reject: (error: Error) => void
+  ) {
+    this.listAccountRolesCall
+      .callWithThrottle(listAccountRolesRequest)
+      .then((response) => {
+        accountRoles.push(...response.roleList);
 
-      if (response.nextToken !== null) {
-        listAccountRolesRequest.nextToken = response.nextToken;
-        this.recursiveListRoles(accountRoles, listAccountRolesRequest, promiseCallback);
-      } else {
-        promiseCallback(accountRoles);
-      }
-    });
+        if (response.nextToken !== null) {
+          listAccountRolesRequest.nextToken = response.nextToken;
+          this.recursiveListRoles(accountRoles, listAccountRolesRequest, resolve, reject);
+        } else {
+          resolve();
+        }
+      })
+      .catch((error) => reject(error));
   }
 
   private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {

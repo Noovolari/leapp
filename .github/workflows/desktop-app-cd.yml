@@ -77,9 +77,17 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
+          cd packages/core
+          npm install
+          npm run build
+          cd ../..
           mv leapp-team ..
-          cd ../leapp-team/packages/leapp-team-service
-          npm run enable-team-features
+          cd ../leapp-team/packages/leapp-team-core
+          npm run bootstrap
+          cd ../leapp-team-service
+          npm install
+          npm run test
+          npm run enable-team-features-prod
 
       - name: Build Win desktop app
         shell: bash
@@ -132,9 +140,17 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
+          cd packages/core
+          npm install
+          npm run build
+          cd ../..
           mv leapp-team ..
-          cd ../leapp-team/packages/leapp-team-service
-          npm run enable-team-features
+          cd ../leapp-team/packages/leapp-team-core
+          npm run bootstrap
+          cd ../leapp-team-service
+          npm install
+          npm run test
+          npm run enable-team-features-prod
 
       - name: Build Linux desktop app
         run: |
@@ -177,9 +193,17 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
+          cd packages/core
+          npm install
+          npm run build
+          cd ../..
           mv leapp-team ..
-          cd ../leapp-team/packages/leapp-team-service
-          npm run enable-team-features
+          cd ../leapp-team/packages/leapp-team-core
+          npm run bootstrap
+          cd ../leapp-team-service
+          npm install
+          npm run test
+          npm run enable-team-features-prod
 
       - name: Build macOS x64 desktop app
         uses: nick-fields/retry@v2
@@ -261,9 +285,17 @@ jobs:
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
+          cd packages/core
+          npm install
+          npm run build
+          cd ../..
           mv leapp-team ..
-          cd ../leapp-team/packages/leapp-team-service
-          npm run enable-team-features
+          cd ../leapp-team/packages/leapp-team-core
+          npm run bootstrap
+          cd ../leapp-team-service
+          npm install
+          npm run test
+          npm run enable-team-features-prod
 
       - name: Build macOS arm64 desktop app
         uses: nick-fields/retry@v2

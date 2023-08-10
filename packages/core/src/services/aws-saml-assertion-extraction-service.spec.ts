@@ -19,6 +19,7 @@ describe("AwsSamlAssertionExtractionService", () => {
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX.okta.com")).toBe(false);
 
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://accounts.google.com/ServiceLoginXX")).toBe(true);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://accounts.google.com/AccountChooser?continue=testtest")).toBe(true);
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://accounts.google.com")).toBe(false);
 
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://login.microsoftonline.com/XX/oauth2/authorizeXXXX")).toBe(true);
@@ -36,7 +37,7 @@ describe("AwsSamlAssertionExtractionService", () => {
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX/auth/realms/XX/protocol/saml/clients/XX")).toBe(true);
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX/realms/XX/protocol/saml/clients/XX")).toBe(true);
 
-    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://sso.jumpcloud.com/saml2/aws")).toBe(true);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://console.jumpcloud.com/login.mocked-suffix")).toBe(true);
   });
 
   test("isSamlAssertionUrl", () => {

@@ -37,7 +37,7 @@ import { TeamService } from "./services/team-service";
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent implements OnInit {
-  isSwitchingWorkspace: boolean;
+  fetchingState: string | undefined;
 
   private fileService: FileService;
   private awsCoreService: AwsCoreService;
@@ -175,7 +175,12 @@ export class AppComponent implements OnInit {
       }
     }
 
-    this.teamService.switchingWorkspaceState.subscribe((isSwitchingWorkspace: boolean) => (this.isSwitchingWorkspace = isSwitchingWorkspace));
+    this.teamService.switchingWorkspaceState.subscribe((isSwitchingWorkspace: boolean) => {
+      this.fetchingState = isSwitchingWorkspace ? "Loading workspace..." : undefined;
+    });
+    this.behaviouralSubjectService.fetchingIntegrationState$.subscribe((fetchingState: string | undefined) => {
+      this.fetchingState = fetchingState;
+    });
 
     // Check the existence of a current-workspace key in the system keychain and
     // load the corresponding workspace

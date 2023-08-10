@@ -84,6 +84,9 @@ describe("AwsCoreService", () => {
         region: "eu-west-3",
       },
       {
+        region: "me-central-1",
+      },
+      {
         region: "me-south-1",
       },
       {

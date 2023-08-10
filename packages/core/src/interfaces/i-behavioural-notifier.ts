@@ -11,4 +11,6 @@ export interface IBehaviouralNotifier {
   getIntegrations(): Integration[];
 
   setIntegrations(integrations: Integration[]): void;
+
+  setFetchingIntegrations(fetchingState: string | undefined): void;
 }

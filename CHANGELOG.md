@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.4](https://github.com/Noovolari/leapp/compare/v0.18.3...v0.18.4) (2023-08-03)
+
+### Bug fixes
+* fixed IAM Federated session G Suite SAML authentication flow ([issue #453](https://github.com/Noovolari/leapp/issues/453))
+
+### [0.18.3](https://github.com/Noovolari/leapp/compare/v0.18.2...v0.18.3) (2023-07-28)
+
+### Bug fixes
+* endpoint url fix
+
+### [0.18.2](https://github.com/Noovolari/leapp/compare/v0.18.1...v0.18.2) (2023-07-28)
+
+### Bug fixes
+* fixed JumpCloud authentication URL regex bug(related to the [Pull Request #414](https://github.com/Noovolari/leapp/pull/414)). Thanks to [@adys](https://github.com/adys)!
+* added support to me-central-1 AWS region. A special thanks to [@MattBlanco](https://github.com/MattBlanco) for the [Pull Request #446](https://github.com/Noovolari/leapp/pull/446)!
+* fixed Leapp Team workspace expiration bug
+
 ### [0.18.1](https://github.com/Noovolari/leapp/compare/v0.18.0...v0.18.1) (2023-06-26)
 
 ### Features

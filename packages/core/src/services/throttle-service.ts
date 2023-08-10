@@ -5,7 +5,7 @@ export class ThrottleService {
   private lastCallTime: number;
   private readonly minDelay: number;
 
-  constructor(private call: (...params: any) => Promise<any>, maxCallsPerSecond: number) {
+  constructor(private call: (...params: any) => Promise<any>, private maxCallsPerSecond: number) {
     this.lastCallId = -1;
     this.totalCalls = 0;
     this.pendingCalls = 0;
@@ -19,21 +19,16 @@ export class ThrottleService {
 
   async callWithThrottle(...params: any): Promise<any> {
     const callId = this.totalCalls++;
-    if (this.lastCallTime) {
-      const timeout = this.pendingCalls * this.minDelay;
-      this.pendingCalls++;
-      await this.waitFor(timeout);
-
-      let timeSinceLastCall = new Date().getTime() - this.lastCallTime;
-      while (timeSinceLastCall <= this.minDelay || this.lastCallId !== callId - 1) {
-        await this.waitFor(1);
-        timeSinceLastCall = new Date().getTime() - this.lastCallTime;
-      }
-
+    while (this.lastCallId !== callId - 1 || this.pendingCalls >= this.maxCallsPerSecond || Date.now() - this.lastCallTime < this.minDelay) {
+      await this.waitFor(1);
+    }
+    this.pendingCalls++;
+    this.lastCallId = callId;
+    this.lastCallTime = Date.now();
+    try {
+      return await this.call(...params);
+    } finally {
       this.pendingCalls--;
     }
-    this.lastCallId = callId;
-    this.lastCallTime = new Date().getTime();
-    return this.call(...params);
   }
 }

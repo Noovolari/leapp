@@ -15,9 +15,9 @@ const authenticationUrlRegexes = new Map([
       /^https:\/\/accounts\.google\.com\/ServiceLogin.*/,
       /^https:\/\/login\.microsoftonline\.com\/*.*\/oauth2\/authorize.*/,
       /^https:\/\/.+\.auth0\.com\/samlp\/.+/,
-      /^https:\/\/.*\/auth\/realms\/.*\/protocol\/saml\/clients\/.*/,
+      /^https:\/\/.*[/auth]?\/realms\/.*\/protocol\/saml\/clients\/.*/,
       /^https:\/\/console\.jumpcloud\.com\/login.*/,
-      /^https:\/\/accounts\.google\.com\/AccountChooser.*/,
+      /^https:\/\/accounts\.google\.com\/AccountChooser.*/, 
     ],
   ],
 ]);

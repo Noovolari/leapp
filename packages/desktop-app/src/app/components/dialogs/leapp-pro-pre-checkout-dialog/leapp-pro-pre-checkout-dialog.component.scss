@@ -1,0 +1,24 @@
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.billing-selector {
+  display: flex;
+  align-items: center;
+  margin: 15px 0 20px 0;
+
+  label {
+    margin: 0;
+  }
+
+  .billing-option {
+    width: 20px;
+    height: 20px;
+    margin: 0 10px 0 10px;
+  }
+
+  .biling-option:nth-child(2) {
+    margin-left: 20px;
+  }
+}

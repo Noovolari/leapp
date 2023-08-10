@@ -12,10 +12,12 @@ import { ApiErrorCodes } from "../../../services/team-service";
   styleUrls: ["./leapp-pro-pre-checkout-dialog.component.scss"],
 })
 export class LeappProPreCheckoutDialogComponent implements OnInit {
-  public emailFormControl = new FormControl("", [Validators.required]);
+  public emailFormControl = new FormControl("", [Validators.required, Validators.email]);
+  public planFormControl = new FormControl("annually");
 
   public form = new FormGroup({
     email: this.emailFormControl,
+    plan: this.planFormControl,
   });
 
   constructor(
@@ -66,6 +68,7 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
   }
 
   async checkAndConfirm(): Promise<void> {
+    this.emailFormControl.markAsTouched();
     if (this.form.valid) {
       let checkoutUrl = "";
       try {

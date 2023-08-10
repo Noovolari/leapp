@@ -5,12 +5,18 @@
   <form [formGroup]="form" class="form center-vertical text-left">
     <div class="form-container">
       <div class="form-group">
+        <div class="billing-selector">
+          <input formControlName="plan" type="radio" class="billing-option" value="annually" id="annually-option" checked autofocus>
+          <label for="annually-option">Billed annually</label>
+          <input formControlName="plan" type="radio" class="billing-option" value="monthly" id="monthly-option">
+          <label for="monthly-option">Billed monthly</label>
+        </div>
         <div class="form-field">
-          <div class="form-group">
-            <label>Email address<span class="danger-text">*</span></label>
-            <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com" (keyup.enter)="checkAndConfirm();" autofocus>
-            <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email address</small>
-          </div>
+          <label>Email address<span class="danger-text">*</span></label>
+          <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
+                 (keyup.enter)="checkAndConfirm();">
+          <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email
+            address</small>
         </div>
       </div>
     </div>

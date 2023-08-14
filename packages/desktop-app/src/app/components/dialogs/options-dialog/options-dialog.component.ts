@@ -511,6 +511,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
   }
 
   openLeappProPreCheckoutDialog(): void {
-    this.modalService.show(LeappProPreCheckoutDialogComponent, { animated: false, class: "create-modal", backdrop: "static", keyboard: false });
+    this.modalService.show(LeappProPreCheckoutDialogComponent, { animated: false, class: "pre-checkout-modal", backdrop: "static", keyboard: false });
   }
 }

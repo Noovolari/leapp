@@ -1,6 +1,28 @@
-<a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
-<h4>Provide your email address</h4>
+<div class="left-side">
+  <h2>Upgrade to Pro</h2>
+  <span>Billing period</span>
+  <div>
+    <div><span>Yearly</span><span>20% off</span></div>
+    <div><span>Monthly</span></div>
+  </div>
+  <span>Billed to</span>
+  <form [formGroup]="form" class="form center-vertical text-left">
+    <div class="form-field">
+      <label>Email address<span class="danger-text">*</span></label>
+      <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
+             (keyup.enter)="checkAndConfirm();">
+      <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email
+        address</small>
+    </div>
+  </form>
+</div>
+<div class="right-side">
+  <h2>Order summary</h2>
+  <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
+  <button (click)="checkAndConfirm();" class="btn-control btn-right-margin">Upgrade now</button>
+</div>
 
+<!--
 <div class="content">
   <form [formGroup]="form" class="form center-vertical text-left">
     <div class="form-container">
@@ -25,3 +47,4 @@
   <button (click)="checkAndConfirm();" class="btn-control btn-right-margin">Submit</button>
   <a (click)="close();">Cancel</a>
 </div>
+-->

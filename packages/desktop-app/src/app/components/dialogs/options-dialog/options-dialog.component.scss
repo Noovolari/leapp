@@ -6,9 +6,38 @@
   max-width: 650px;
   width: 100%;
   .modal-content {
-    padding: 0 0 20px;
-
+    padding: 0;
     h2 { margin: 0; }
+  }
+}
+
+.pre-checkout-modal {
+  max-width: 650px;
+  width: 100%;
+  .modal-content {
+    padding: 0;
+    app-leapp-pro-pre-checkout-dialog {
+      display: flex;
+      flex-direction: row;
+      .left-side {
+        padding: 20px 0 20px 20px;
+        h2 {
+         color: $text-color;
+        }
+        span {
+          color: $table-text;
+        }
+      }
+      .right-side {
+        padding: 20px 0 20px 20px;
+        h2 {
+          color: $text-color;
+        }
+        span {
+          color: $table-text;
+        }
+      }
+    }
   }
 }
 
@@ -342,4 +371,3 @@
     }
   }
 }
-

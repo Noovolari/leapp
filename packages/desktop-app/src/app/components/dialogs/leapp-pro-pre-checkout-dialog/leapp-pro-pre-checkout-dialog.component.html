@@ -1,25 +1,45 @@
 <div class="left-side">
+
   <h2>Upgrade to Pro</h2>
-  <span>Billing period</span>
+  <small><strong>Billing period</strong></small>
+  <br><br>
   <div>
-    <div><span>Yearly</span><span>20% off</span></div>
-    <div><span>Monthly</span></div>
+    <div>
+      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}" (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>20% off</small></span>
+      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}" (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
+    </div>
   </div>
-  <span>Billed to</span>
+  <br><br>
+
+  <small><strong>Billed to</strong></small>
+  <br><br>
   <form [formGroup]="form" class="form center-vertical text-left">
     <div class="form-field">
-      <label>Email address<span class="danger-text">*</span></label>
+      <label>Email address*</label>
       <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
-             (keyup.enter)="checkAndConfirm();">
+             (keyup)="checkAndConfirm();">
       <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email
         address</small>
     </div>
   </form>
+  <br><br>
+
 </div>
+
 <div class="right-side">
+
   <h2>Order summary</h2>
   <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
-  <button (click)="checkAndConfirm();" class="btn-control btn-right-margin">Upgrade now</button>
+
+  <div class="plan-summary" *ngIf="">
+
+  </div>
+  <div class="plan-summary">
+
+  </div>
+
+  <button (click)="upgradeToLeappPro();" class="btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}" [disabled]="!isEmailValid">Upgrade now</button>
+
 </div>
 
 <!--

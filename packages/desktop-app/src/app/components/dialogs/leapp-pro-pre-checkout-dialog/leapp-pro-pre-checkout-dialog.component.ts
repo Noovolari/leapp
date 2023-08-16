@@ -6,12 +6,19 @@ import { AppProviderService } from "../../../services/app-provider.service";
 import { WindowService } from "../../../services/window.service";
 import { ApiErrorCodes } from "../../../services/team-service";
 
+enum BillingPeriod {
+  yearly,
+  monthly,
+}
+
 @Component({
   selector: "app-leapp-pro-pre-checkout-dialog",
   templateUrl: "./leapp-pro-pre-checkout-dialog.component.html",
   styleUrls: ["./leapp-pro-pre-checkout-dialog.component.scss"],
 })
 export class LeappProPreCheckoutDialogComponent implements OnInit {
+  public eBillingPeriod = BillingPeriod;
+
   public emailFormControl = new FormControl("", [Validators.required, Validators.email]);
   public planFormControl = new FormControl("annually");
 
@@ -19,6 +26,9 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
     email: this.emailFormControl,
     plan: this.planFormControl,
   });
+
+  public selectedPeriod: BillingPeriod = BillingPeriod.yearly;
+  public isEmailValid = false;
 
   constructor(
     private bsModalRef: BsModalRef,
@@ -33,43 +43,12 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
     this.bsModalRef.hide();
   }
 
-  async upgradeToLeappPro(checkoutUrl: string): Promise<void> {
-    // Get active window position for extracting new windows coordinate
-    const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
-    const nearX = 200;
-    const nearY = 50;
-
-    let checkoutWindow = this.appProviderService.windowService.newWindow(
-      checkoutUrl,
-      true,
-      "",
-      activeWindowPosition[0] + nearX,
-      activeWindowPosition[1] + nearY
-    );
-
-    checkoutWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
-      console.log("Intercepted HTTP redirect call:", details.url);
-
-      if (details.url === "https://www.leapp.cloud/success") {
-        checkoutWindow.close();
-        checkoutWindow = null;
-        this.toasterService.toast("Checkout completed", ToastLevel.success);
-      }
-
-      // TODO: manage cancel
-
-      callback({
-        requestHeaders: details.requestHeaders,
-        url: details.url,
-      });
-    });
-
-    checkoutWindow.loadURL(checkoutUrl);
+  setBillingPeriod(period: BillingPeriod) {
+    this.selectedPeriod = period;
   }
 
-  async checkAndConfirm(): Promise<void> {
-    this.emailFormControl.markAsTouched();
-    if (this.form.valid) {
+  async upgradeToLeappPro(): Promise<void> {
+    if (this.isEmailValid) {
       let checkoutUrl = "";
       try {
         checkoutUrl = await this.appProviderService.teamService.createCheckoutSession(this.emailFormControl.value);
@@ -81,9 +60,42 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
         }
         return;
       }
-      await this.upgradeToLeappPro(checkoutUrl);
-    } else {
-      return;
+
+      // Get active window position for extracting new windows coordinate
+      const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
+      const nearX = 200;
+      const nearY = 50;
+
+      let checkoutWindow = this.appProviderService.windowService.newWindow(
+        checkoutUrl,
+        true,
+        "",
+        activeWindowPosition[0] + nearX,
+        activeWindowPosition[1] + nearY
+      );
+
+      checkoutWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+        console.log("Intercepted HTTP redirect call:", details.url);
+
+        if (details.url === "https://www.leapp.cloud/success") {
+          checkoutWindow.close();
+          checkoutWindow = null;
+          this.toasterService.toast("Checkout completed", ToastLevel.success);
+        }
+
+        // TODO: manage cancel
+
+        callback({
+          requestHeaders: details.requestHeaders,
+          url: details.url,
+        });
+      });
+      checkoutWindow.loadURL(checkoutUrl);
     }
+  }
+
+  checkAndConfirm(): void {
+    this.emailFormControl.markAsTouched();
+    this.isEmailValid = this.form.valid;
   }
 }

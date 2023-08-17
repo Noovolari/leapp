@@ -13,7 +13,7 @@
 
 .right-side {
   border-left: 1px solid #dddddd;
-  background: #ededed;
+  background: rgba(0, 0, 0, 0.024);
   width: 50%;
   padding: 20px !important;
 }
@@ -108,11 +108,36 @@ button.disabled {
     justify-content: space-between;
   }
 
-  .light {
+  .black {
+    color: rgb(23, 23, 23);
+  }
+
+  .small-text {
+    font-size: small;
     font-weight: lighter;
   }
 
-  .heavy {
-    font-weight: bolder;
+  .large-text {
+    font-size: large;
+    color: #0c0c0c;
   }
+
+  .margin-top-high {
+    margin-top: 20px;
+  }
+
+  .margin-top-low {
+    margin-top: 10px;
+  }
+}
+
+.btn-center {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.tc {
+  margin-top: 10px;
+  font-size: small;
+  font-weight: lighter;
 }

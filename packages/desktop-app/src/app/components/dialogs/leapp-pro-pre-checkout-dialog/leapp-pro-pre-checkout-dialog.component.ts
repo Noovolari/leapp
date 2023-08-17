@@ -5,11 +5,10 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
 import { AppProviderService } from "../../../services/app-provider.service";
 import { WindowService } from "../../../services/window.service";
 import { ApiErrorCodes } from "../../../services/team-service";
-import { PriceDto } from "../../../leapp-team-core/payment/dto/price-dto";
 
 enum BillingPeriod {
-  yearly = "Annual subscription",
-  monthly = "Monthly subscription",
+  yearly = "Annual subscription" as any,
+  monthly = "Monthly subscription" as any,
 }
 
 @Component({
@@ -30,8 +29,8 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
 
   public selectedPeriod: BillingPeriod = BillingPeriod.yearly;
   public isEmailValid = false;
-  public price: PriceDto;
-  private prices: PriceDto[];
+  public price: any;
+  private prices: any[];
 
   constructor(
     private bsModalRef: BsModalRef,
@@ -41,7 +40,13 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.prices = await this.appProviderService.teamService.getPrices();
+    const tempPrices = await this.appProviderService.teamService.getPrices();
+    this.prices = tempPrices.map((price) => {
+      price["priceAmount"] = (parseInt(price.stripePriceAmount, 10) / 100.0).toFixed(2);
+      price["monthlyPrice"] =
+        price.stripePriceNickname === BillingPeriod.yearly.toString() ? (price["priceAmount"] / 12.0).toFixed(2) : price["priceAmount"];
+      return price as any;
+    });
     this.price = this.prices.find((price) => price.stripePriceNickname === this.selectedPeriod);
   }
 
@@ -49,7 +54,7 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
     this.bsModalRef.hide();
   }
 
-  setBillingPeriod(period: BillingPeriod) {
+  setBillingPeriod(period: BillingPeriod): void {
     this.selectedPeriod = period;
     this.price = this.prices.find((price) => price.stripePriceNickname === this.selectedPeriod);
   }

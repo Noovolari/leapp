@@ -34,31 +34,36 @@
   <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
 
   <div class="plan-summary">
-    <div>
-      <span><strong>Plus plan</strong></span>
-      <span><strong>{{this.price?.stripePriceAmount}}</strong></span>
+
+    <div class="small-text margin-top-low">
+      <span><strong class="black">{{selectedPeriod.toString()}} plan</strong></span>
+      <span><strong class="black">${{price?.priceAmount}}</strong></span>
     </div>
-    <div><span>$10 / member / month × 1 member</span></div>
-    <div><span>Billed monthly</span></div>
-    <hr>
-    <div>
+    <div class="small-text"><span>${{price?.monthlyPrice}} / member / month × 1 member</span></div>
+    <div class="small-text"><span>Billed {{eBillingPeriod[selectedPeriod]}}</span></div>
+
+    <hr class="margin-top-high">
+
+    <div class="small-text margin-top-low">
       <span>Subtotal</span>
-      <span>{{this.price?.stripePriceAmount}}</span>
+      <span>${{price?.priceAmount}}</span>
     </div>
-    <div>
+    <div class="small-text">
       <span>Tax if applicable</span>
-      <span>{{this.price?.stripePriceAmount}}</span>
+      <span>-</span>
     </div>
-    <div>
-      <span><strong>Total for today</strong></span>
-      <span><strong>{{this.price?.stripePriceAmount}}</strong></span>
+    <div class="large-text margin-top-high">
+      <span><strong class="black">Total for today</strong></span>
+      <span><strong class="black">${{price?.priceAmount}}</strong></span>
     </div>
   </div>
 
-  <button (click)="upgradeToLeappPro();" class="btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}" [disabled]="!isEmailValid">Upgrade
-    now
+  <button (click)="upgradeToLeappPro();" class="margin-top-high btn-center btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}"
+          [disabled]="!isEmailValid">
+    Upgrade now
   </button>
 
+  <div class="tc margin-top-high"><span>By clicking “Upgrade now” you agree to the Leapp Terms and Conditions.</span></div>
 </div>
 
 <!--

@@ -63,7 +63,7 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
     if (this.isEmailValid) {
       let checkoutUrl = "";
       try {
-        checkoutUrl = await this.appProviderService.teamService.createCheckoutSession(this.emailFormControl.value);
+        checkoutUrl = await this.appProviderService.teamService.createCheckoutSession(this.emailFormControl.value, this.price);
       } catch (error) {
         if (error.response.data?.errorCode === ApiErrorCodes.emailAlreadyTaken) {
           this.toasterService.toast("Email already taken", ToastLevel.error);
@@ -73,36 +73,43 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
         return;
       }
 
-      // Get active window position for extracting new windows coordinate
-      const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
-      const nearX = 200;
-      const nearY = 50;
+      try {
+        // Get active window position for extracting new windows coordinate
+        const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
+        const nearX = 200;
+        const nearY = 50;
 
-      let checkoutWindow = this.appProviderService.windowService.newWindow(
-        checkoutUrl,
-        true,
-        "",
-        activeWindowPosition[0] + nearX,
-        activeWindowPosition[1] + nearY
-      );
+        let checkoutWindow = this.appProviderService.windowService.newWindow(
+          checkoutUrl,
+          true,
+          "",
+          activeWindowPosition[0] + nearX,
+          activeWindowPosition[1] + nearY
+        );
 
-      checkoutWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
-        console.log("Intercepted HTTP redirect call:", details.url);
+        checkoutWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+          console.log("Intercepted HTTP redirect call:", details.url);
 
-        if (details.url === "https://www.leapp.cloud/success") {
-          checkoutWindow.close();
-          checkoutWindow = null;
-          this.toasterService.toast("Checkout completed", ToastLevel.success);
-        }
+          if (details.url === "https://www.leapp.cloud/success") {
+            checkoutWindow.close();
+            checkoutWindow = null;
+            this.close();
+            this.toasterService.toast("Checkout completed", ToastLevel.success);
+          } else if (details.url === "https://www.leapp.cloud/cancel") {
+            checkoutWindow.close();
+            checkoutWindow = null;
+          }
 
-        // TODO: manage cancel
-
-        callback({
-          requestHeaders: details.requestHeaders,
-          url: details.url,
+          callback({
+            requestHeaders: details.requestHeaders,
+            url: details.url,
+          });
         });
-      });
-      checkoutWindow.loadURL(checkoutUrl);
+        checkoutWindow.loadURL(checkoutUrl);
+      } catch (error) {
+        this.toasterService.toast("Something went wrong during checkout", ToastLevel.error);
+        return;
+      }
     }
   }
 

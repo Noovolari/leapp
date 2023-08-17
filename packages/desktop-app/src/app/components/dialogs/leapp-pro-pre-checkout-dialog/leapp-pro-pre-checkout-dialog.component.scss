@@ -8,6 +8,11 @@
 
   .form-field {
     display: flex;
+    flex-direction: column;
+
+    .form-control {
+      width: 100%
+    }
   }
 }
 
@@ -114,7 +119,6 @@ button.disabled {
 
   .small-text {
     font-size: small;
-    font-weight: lighter;
   }
 
   .large-text {
@@ -139,5 +143,4 @@ button.disabled {
 .tc {
   margin-top: 10px;
   font-size: small;
-  font-weight: lighter;
 }

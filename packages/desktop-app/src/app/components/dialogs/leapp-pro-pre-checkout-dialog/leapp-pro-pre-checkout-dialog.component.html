@@ -1,8 +1,8 @@
 <div class="left-side">
-
   <h2>Upgrade to Pro</h2>
+  <br>
   <small><strong>Billing period</strong></small>
-  <br><br>
+  <br>
   <div>
     <div>
       <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
@@ -11,21 +11,20 @@
             (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
     </div>
   </div>
-  <br><br>
-
+  <br>
   <small><strong>Billed to</strong></small>
-  <br><br>
+  <br>
   <form [formGroup]="form" class="form center-vertical text-left">
     <div class="form-field">
-      <label>Email address*</label>
+      <!-- <label>Email address*</label> -->
       <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
              (keyup)="checkAndConfirm();">
       <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email
         address</small>
     </div>
   </form>
-  <br><br>
-
+  <br>
+  <br>
 </div>
 
 <div class="right-side">
@@ -36,8 +35,8 @@
   <div class="plan-summary">
 
     <div class="small-text margin-top-low">
-      <span><strong class="black">{{selectedPeriod.toString()}} plan</strong></span>
-      <span><strong class="black">${{price?.priceAmount}}</strong></span>
+      <span class="black">{{selectedPeriod}} plan</span>
+      <span class="black">${{price?.priceAmount}}</span>
     </div>
     <div class="small-text"><span>${{price?.monthlyPrice}} / member / month × 1 member</span></div>
     <div class="small-text"><span>Billed {{eBillingPeriod[selectedPeriod]}}</span></div>
@@ -53,7 +52,7 @@
       <span>-</span>
     </div>
     <div class="large-text margin-top-high">
-      <span><strong class="black">Total for today</strong></span>
+      <span class="black">Total for today</span>
       <span><strong class="black">${{price?.priceAmount}}</strong></span>
     </div>
   </div>

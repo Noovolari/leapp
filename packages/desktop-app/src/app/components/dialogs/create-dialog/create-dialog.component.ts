@@ -21,6 +21,8 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { OptionsService } from "../../../services/options.service";
+import { LocalstackSessionRequest } from "@noovolari/leapp-core/services/session/localstack/localstack-session-request";
+import { LocalstackSessionService } from "@noovolari/leapp-core/services/session/localstack/localstack-session-service";
 
 @Component({
   selector: "app-create-dialog",
@@ -94,6 +96,7 @@ export class CreateDialogComponent implements OnInit {
   private awsIamRoleFederatedService: AwsIamRoleFederatedService;
   private awsIamUserService: AwsIamUserService;
   private awsIamRoleChainedService: AwsIamRoleChainedService;
+  private localstackSessionService: LocalstackSessionService;
   private azureSessionService: AzureSessionService;
   private loggingService: LogService;
 
@@ -113,6 +116,7 @@ export class CreateDialogComponent implements OnInit {
     this.awsIamUserService = leappCoreService.awsIamUserService;
     this.awsIamRoleChainedService = leappCoreService.awsIamRoleChainedService;
     this.azureSessionService = leappCoreService.azureSessionService;
+    this.localstackSessionService = leappCoreService.localstackSessionService;
     this.loggingService = leappCoreService.logService;
   }
 
@@ -238,6 +242,9 @@ export class CreateDialogComponent implements OnInit {
           this.form.get("tenantId").valid &&
           this.form.get("azureLocation").valid;
         break;
+      case SessionType.localstack:
+        result = this.form.get("name").valid;
+        break;
     }
     return result;
   }
@@ -303,6 +310,8 @@ export class CreateDialogComponent implements OnInit {
     switch (provider) {
       case SessionType.azure:
         return "Microsoft Azure session";
+      case SessionType.localstack:
+        return "Localstack session";
       case SessionType.google:
         return "Google Cloud session";
       case SessionType.alibaba:
@@ -318,6 +327,8 @@ export class CreateDialogComponent implements OnInit {
         return "azure-logo.svg";
       case SessionType.google:
         return "google.png";
+      case SessionType.localstack:
+        return "localstack.png";
       case SessionType.alibaba:
         return "alibaba.png";
       default:
@@ -384,6 +395,15 @@ export class CreateDialogComponent implements OnInit {
             profileId: this.selectedProfile.value,
           };
           this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
+          break;
+        case SessionType.localstack:
+          console.log("creating localstack session...");
+          const localstackSessionRequest: LocalstackSessionRequest = {
+            sessionName: this.form.value.name.trim(),
+            region: this.selectedRegion,
+            profileId: this.selectedProfile.value,
+          };
+          this.localstackSessionService.create(localstackSessionRequest);
           break;
         /*case SessionType.azure:
           const azureSessionRequest: AzureSessionRequest = {

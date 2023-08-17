@@ -106,6 +106,8 @@ export class SessionCardComponent implements OnInit {
         return "red";
       case SessionType.awsIamRoleFederated:
         return "green";
+      case SessionType.localstack:
+        return "localstack";
       case SessionType.awsIamRoleChained:
         return "purple";
     }
@@ -115,6 +117,8 @@ export class SessionCardComponent implements OnInit {
     switch (type) {
       case SessionType.azure:
         return "Azure";
+      case SessionType.localstack:
+        return "Localstack";
       case SessionType.awsIamUser:
         return "IAM User";
       case SessionType.awsSsoRole:

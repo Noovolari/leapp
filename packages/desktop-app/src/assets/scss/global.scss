@@ -357,6 +357,10 @@ small.text-error {
     background: $main-color-light;
     color: $white-text-color;
   }
+  &.badge-localstack {
+    background: #251F53;
+    color: $white-text-color;
+  }
 }
 
 .table {

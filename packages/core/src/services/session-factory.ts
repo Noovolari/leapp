@@ -6,6 +6,7 @@ import { AwsSsoRoleService } from "./session/aws/aws-sso-role-service";
 import { AzureSessionService } from "./session/azure/azure-session-service";
 import { CreateSessionRequest } from "./session/create-session-request";
 import { SessionService } from "./session/session-service";
+import { LocalstackSessionService } from "./session/localstack/localstack-session-service";
 
 export class SessionFactory {
   constructor(
@@ -13,7 +14,8 @@ export class SessionFactory {
     private readonly awsIamRoleFederatedService: AwsIamRoleFederatedService,
     private readonly awsIamRoleChainedService: AwsIamRoleChainedService,
     private readonly awsSsoRoleService: AwsSsoRoleService,
-    private readonly azureSessionService: AzureSessionService
+    private readonly azureSessionService: AzureSessionService,
+    private readonly localstackSessionService: LocalstackSessionService
   ) {}
 
   getSessionService(sessionType: SessionType): SessionService {
@@ -28,6 +30,8 @@ export class SessionFactory {
         return this.awsSsoRoleService;
       case SessionType.azure:
         return this.azureSessionService;
+      case SessionType.localstack:
+        return this.localstackSessionService;
       case SessionType.anytype:
         return this.azureSessionService as SessionService;
     }

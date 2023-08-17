@@ -5,8 +5,10 @@
   <br><br>
   <div>
     <div>
-      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}" (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>20% off</small></span>
-      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}" (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
+      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
+            (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>20% off</small></span>
+      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}"
+            (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
     </div>
   </div>
   <br><br>
@@ -31,14 +33,31 @@
   <h2>Order summary</h2>
   <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
 
-  <div class="plan-summary" *ngIf="">
-
-  </div>
   <div class="plan-summary">
-
+    <div>
+      <span><strong>Plus plan</strong></span>
+      <span><strong>{{this.price?.stripePriceAmount}}</strong></span>
+    </div>
+    <div><span>$10 / member / month × 1 member</span></div>
+    <div><span>Billed monthly</span></div>
+    <hr>
+    <div>
+      <span>Subtotal</span>
+      <span>{{this.price?.stripePriceAmount}}</span>
+    </div>
+    <div>
+      <span>Tax if applicable</span>
+      <span>{{this.price?.stripePriceAmount}}</span>
+    </div>
+    <div>
+      <span><strong>Total for today</strong></span>
+      <span><strong>{{this.price?.stripePriceAmount}}</strong></span>
+    </div>
   </div>
 
-  <button (click)="upgradeToLeappPro();" class="btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}" [disabled]="!isEmailValid">Upgrade now</button>
+  <button (click)="upgradeToLeappPro();" class="btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}" [disabled]="!isEmailValid">Upgrade
+    now
+  </button>
 
 </div>
 

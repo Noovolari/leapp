@@ -1,6 +1,6 @@
 .left-side {
   width: 60%;
-  padding-right: 20px!important;
+  padding: 20px !important;
 
   label {
     padding-top: 0;
@@ -15,6 +15,7 @@
   border-left: 1px solid #dddddd;
   background: #ededed;
   width: 50%;
+  padding: 20px !important;
 }
 
 .form-group {
@@ -69,18 +70,22 @@
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
   }
+
   &:last-of-type {
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
     left: -2px;
   }
+
   &:hover {
     background: #eee;
   }
+
   &.selected {
     border: 2px solid #00aaff;
     color: #0c0c0c;
     z-index: 2;
+
     &:hover {
       background: #52a8dc42;
     }
@@ -88,6 +93,26 @@
 }
 
 button.disabled {
-  background: #dddddd!important;
-  color: #9A9A9A!important;
+  background: #dddddd !important;
+  color: #9A9A9A !important;
+}
+
+.plan-summary {
+  display: flex;
+  flex-direction: column;
+
+  div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .light {
+    font-weight: lighter;
+  }
+
+  .heavy {
+    font-weight: bolder;
+  }
 }

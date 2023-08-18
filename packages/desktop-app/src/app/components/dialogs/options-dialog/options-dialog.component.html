@@ -340,7 +340,7 @@
       <div class="no-padding no-margin panel">
 
         <div class="plans-group-container">
-          <div class="plan">
+          <div class="plan {{leappPlanStatus === eEnabledLeappPlanStatus.free ? 'selected' : ''}}">
             <div class="plan-header">
               <span class="free-plan">Free</span>
               <p>This is the free plan for the community</p>
@@ -350,7 +350,8 @@
                 <span class="price-value">$0</span>
                 <span class="price-description">Unlimited blocks for individuals and limited block trial for teams</span>
               </div>
-              <div class="cta-button">Your Active Plan</div>
+              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">Your Active Plan</div>
+              <div class="cta-button clickable" *ngIf="leappPlanStatus !== eEnabledLeappPlanStatus.free">Already upgraded</div>
               <ul class="plan-features">
                 <li>
                   <span class="check-mark-icon">✓</span>
@@ -372,7 +373,7 @@
             </div>
           </div>
 
-          <div class="plan">
+          <div class="plan {{leappPlanStatus === eEnabledLeappPlanStatus.proEnabled || leappPlanStatus === eEnabledLeappPlanStatus.proPending ? 'selected' : ''}}">
             <div class="plan-header">
               <span class="pro-plan">Pro</span>
               <p>Pro plan for an enhanced single user experience</p>
@@ -382,7 +383,12 @@
                 <span class="price-value">$10</span>
                 <span class="price-description">Billed montlhy</span>
               </div>
-              <div class="cta-button clickable" (click)="openLeappProPreCheckoutDialog()">Upgrade</div>
+
+              <div class="cta-button clickable" (click)="openLeappProPreCheckoutDialog()" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">Upgrade</div>
+              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">Pending (step 1/2) <i class="fa fa-info-circle" [matTooltip]="'To complete the registration follow the instructions received via email and register on Leapp portal'"></i></div>
+              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proEnabled">Your active plan</div>
+              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.enterprise">Already upgraded</div>
+
               <ul class="plan-features">
                 <li>
                   <span class="all-free-features">All the Free features, plus</span>
@@ -403,7 +409,7 @@
             </div>
           </div>
 
-          <div class="plan">
+          <div class="plan {{leappPlanStatus === eEnabledLeappPlanStatus.enterprise ? 'selected' : ''}}">
             <div class="plan-header">
               <span class="team-plan">Team</span>
               <p>Team plan to manage your team</p>

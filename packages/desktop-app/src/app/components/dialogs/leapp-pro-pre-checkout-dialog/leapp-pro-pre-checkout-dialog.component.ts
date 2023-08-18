@@ -5,8 +5,9 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
 import { AppProviderService } from "../../../services/app-provider.service";
 import { WindowService } from "../../../services/window.service";
 import { ApiErrorCodes } from "../../../services/team-service";
+import { globalLeappProPlanStatus, LeappPlanStatus } from "../options-dialog/options-dialog.component";
 
-enum BillingPeriod {
+export enum BillingPeriod {
   yearly = "Annual subscription" as any,
   monthly = "Monthly subscription" as any,
 }
@@ -87,10 +88,15 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
           activeWindowPosition[1] + nearY
         );
 
+        console.log("QUA");
+
         checkoutWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
+          console.log("QUA 2");
           console.log("Intercepted HTTP redirect call:", details.url);
 
           if (details.url === "https://www.leapp.cloud/success") {
+            this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.proPending.toString());
+            globalLeappProPlanStatus.next(LeappPlanStatus.proPending);
             checkoutWindow.close();
             checkoutWindow = null;
             this.close();
@@ -100,12 +106,18 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
             checkoutWindow = null;
           }
 
+          console.log("QUA 3");
+
           callback({
             requestHeaders: details.requestHeaders,
             url: details.url,
           });
+
+          console.log("QUA 4");
         });
         checkoutWindow.loadURL(checkoutUrl);
+
+        console.log("QUA 5");
       } catch (error) {
         this.toasterService.toast("Something went wrong during checkout", ToastLevel.error);
         return;

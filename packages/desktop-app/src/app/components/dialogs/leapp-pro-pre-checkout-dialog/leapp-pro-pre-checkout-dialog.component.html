@@ -1,93 +1,68 @@
-<div class="left-side">
-  <h2>Upgrade to Pro</h2>
-  <br>
-  <small><strong>Billing period</strong></small>
-  <br>
-  <div>
-    <div>
-      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
-            (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>20% off</small></span>
-      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}"
-            (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
-    </div>
-  </div>
-  <br>
-  <small><strong>Billed to</strong></small>
-  <br>
-  <form [formGroup]="form" class="form center-vertical text-left">
-    <div class="form-field">
-      <!-- <label>Email address*</label> -->
-      <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
-             (keyup)="checkAndConfirm();">
-      <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email
-        address</small>
-    </div>
-  </form>
-  <br>
-  <br>
-</div>
-
-<div class="right-side">
-
-  <h2>Order summary</h2>
-  <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
-
-  <div class="plan-summary">
-
-    <div class="small-text margin-top-low">
-      <span class="black">{{selectedPeriod}} plan</span>
-      <span class="black">${{price?.priceAmount}}</span>
-    </div>
-    <div class="small-text"><span>${{price?.monthlyPrice}} / member / month × 1 member</span></div>
-    <div class="small-text"><span>Billed {{eBillingPeriod[selectedPeriod]}}</span></div>
-
-    <hr class="margin-top-high">
-
-    <div class="small-text margin-top-low">
-      <span>Subtotal</span>
-      <span>${{price?.priceAmount}}</span>
-    </div>
-    <div class="small-text">
-      <span>Tax if applicable</span>
-      <span>-</span>
-    </div>
-    <div class="large-text margin-top-high">
-      <span class="black">Total for today</span>
-      <span><strong class="black">${{price?.priceAmount}}</strong></span>
-    </div>
-  </div>
-
-  <button (click)="upgradeToLeappPro();" class="margin-top-high btn-center btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}"
-          [disabled]="!isEmailValid">
-    Upgrade now
-  </button>
-
-  <div class="tc margin-top-high"><span>By clicking “Upgrade now” you agree to the Leapp Terms and Conditions.</span></div>
-</div>
-
-<!--
 <div class="content">
-  <form [formGroup]="form" class="form center-vertical text-left">
-    <div class="form-container">
-      <div class="form-group">
-        <div class="billing-selector">
-          <input formControlName="plan" type="radio" class="billing-option" value="annually" id="annually-option" checked autofocus>
-          <label for="annually-option">Billed annually</label>
-          <input formControlName="plan" type="radio" class="billing-option" value="monthly" id="monthly-option">
-          <label for="monthly-option">Billed monthly</label>
-        </div>
-        <div class="form-field">
-          <label>Email address<span class="danger-text">*</span></label>
-          <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
-                 (keyup.enter)="checkAndConfirm();">
-          <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email
-            address</small>
-        </div>
+  <div class="left-side">
+    <h2>Upgrade to Pro</h2>
+    <br>
+    <small><strong>Billing period</strong></small>
+    <br>
+    <div>
+      <div>
+        <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
+              (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>20% off</small></span>
+        <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}"
+              (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
       </div>
     </div>
-  </form>
+    <br>
+    <small><strong>Billed to</strong></small>
+    <br>
+    <form [formGroup]="form" class="form center-vertical text-left">
+      <div class="form-field">
+        <!-- <label>Email address*</label> -->
+        <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
+               (keyup)="checkAndConfirm();">
+        <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email
+          address</small>
+      </div>
+    </form>
+    <br>
+    <br>
+  </div>
 
-  <button (click)="checkAndConfirm();" class="btn-control btn-right-margin">Submit</button>
-  <a (click)="close();">Cancel</a>
+  <div class="right-side">
+
+    <h2>Order summary</h2>
+    <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
+
+    <div class="plan-summary">
+
+      <div class="small-text margin-top-low">
+        <span class="black">{{selectedPeriod}} plan</span>
+        <span class="black">${{price?.priceAmount}}</span>
+      </div>
+      <div class="small-text"><span>${{price?.monthlyPrice}} / member / month × 1 member</span></div>
+      <div class="small-text"><span>Billed {{eBillingPeriod[selectedPeriod]}}</span></div>
+
+      <hr class="margin-top-high">
+
+      <div class="small-text margin-top-low">
+        <span>Subtotal</span>
+        <span>${{price?.priceAmount}}</span>
+      </div>
+      <div class="small-text">
+        <span>Tax if applicable</span>
+        <span>-</span>
+      </div>
+      <div class="large-text margin-top-high">
+        <span class="black">Total for today</span>
+        <span><strong class="black">${{price?.priceAmount}}</strong></span>
+      </div>
+    </div>
+
+    <button (click)="upgradeToLeappPro();" class="margin-top-high btn-center btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}"
+            [disabled]="!isEmailValid">
+      Upgrade now
+    </button>
+
+    <div class="tc margin-top-high"><span>By clicking “Upgrade now” you agree to the Leapp Terms and Conditions.</span></div>
+  </div>
 </div>
--->

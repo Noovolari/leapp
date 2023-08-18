@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnInit, ViewChild, ViewEncapsulation } from "@angular/core";
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 import { AppService } from "../../../services/app.service";
 import { Router } from "@angular/router";
@@ -18,6 +18,16 @@ import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { AppNativeService } from "../../../services/app-native.service";
 import { PluginContainer } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { LeappProPreCheckoutDialogComponent } from "../leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
+import { BehaviorSubject, Subscription } from "rxjs";
+
+export enum LeappPlanStatus {
+  free = "free",
+  proPending = "proPending",
+  proEnabled = "proEnabled",
+  enterprise = "enterprise",
+}
+
+export const globalLeappProPlanStatus = new BehaviorSubject<LeappPlanStatus>(LeappPlanStatus.free);
 
 @Component({
   selector: "app-options-dialog",
@@ -25,7 +35,7 @@ import { LeappProPreCheckoutDialogComponent } from "../leapp-pro-pre-checkout-di
   styleUrls: ["./options-dialog.component.scss"],
   encapsulation: ViewEncapsulation.None,
 })
-export class OptionsDialogComponent implements OnInit, AfterViewInit {
+export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   selectedIndex;
 
@@ -87,6 +97,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
 
   extensionEnabled: boolean;
 
+  eEnabledLeappPlanStatus = LeappPlanStatus;
+  leappStatusSubscription: Subscription;
+  leappPlanStatus;
+
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: SessionService;
 
@@ -112,7 +126,11 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.extensionEnabled = this.optionsService.extensionEnabled || false;
   }
 
-  ngOnInit(): void {
+  ngOnDestroy(): void {
+    this.leappStatusSubscription?.unsubscribe();
+  }
+
+  async ngOnInit(): Promise<void> {
     this.fetchingPlugins = false;
     this.idpUrlValue = "";
     this.proxyProtocol = this.optionsService.proxyConfiguration.proxyProtocol;
@@ -147,6 +165,19 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit {
     this.pluginList = this.appProviderService.pluginManagerService.pluginContainers;
 
     this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
+
+    this.leappStatusSubscription = globalLeappProPlanStatus.subscribe((value) => (this.leappPlanStatus = value));
+
+    try {
+      const plan = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan");
+      if (plan) {
+        globalLeappProPlanStatus.next(plan as unknown as LeappPlanStatus);
+      } else {
+        globalLeappProPlanStatus.next(LeappPlanStatus.free);
+      }
+    } catch (err) {
+      globalLeappProPlanStatus.next(LeappPlanStatus.free);
+    }
   }
 
   ngAfterViewInit(): void {

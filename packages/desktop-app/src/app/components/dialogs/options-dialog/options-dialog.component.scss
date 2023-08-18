@@ -11,36 +11,6 @@
   }
 }
 
-.pre-checkout-modal {
-  max-width: 650px;
-  width: 100%;
-  .modal-content {
-    padding: 0;
-    app-leapp-pro-pre-checkout-dialog {
-      display: flex;
-      flex-direction: row;
-      .left-side {
-        padding: 20px 0 20px 20px;
-        h2 {
-         color: $text-color;
-        }
-        span {
-          color: $table-text;
-        }
-      }
-      .right-side {
-        padding: 20px 0 20px 20px;
-        h2 {
-          color: $text-color;
-        }
-        span {
-          color: $table-text;
-        }
-      }
-    }
-  }
-}
-
 .proxy-length-1 { width: 18%!important; }
 .proxy-length-2 { position: relative; top: 3px; display: inline-block; width: 22%!important; padding: 0 3px; text-align: right; color: $silver-dark; }
 .proxy-length-3 { position: relative; top: 3px; width: 60%!important; }
@@ -283,6 +253,11 @@
   height: 400px;
   border-radius: 5px;
   border: 1px solid $silver-50;
+
+  &.selected {
+    border: 2px solid #00aaff;
+    box-sizing: border-box;
+  }
 }
 
 .plan-header {

@@ -1,6 +1,28 @@
+@import "../../../../assets/scss/mixins/palette";
+@import "../../../../assets/scss/mixins/utility";
+@import "../../../../assets/scss/modals";
+
+::ng-deep {
+  .pre-checkout-modal {
+    max-width: 650px;
+    width: 100%;
+    .modal-content, .content {
+      padding: 0;
+      display: flex;
+      flex-direction: row;
+    }
+  }
+}
+
 .left-side {
   width: 60%;
   padding: 20px !important;
+  h2 {
+    color: $text-color;
+  }
+  span {
+    color: $table-text;
+  }
 
   label {
     padding-top: 0;
@@ -21,6 +43,13 @@
   background: rgba(0, 0, 0, 0.024);
   width: 50%;
   padding: 20px !important;
+
+  h2 {
+    color: $text-color;
+  }
+  span {
+    color: $table-text;
+  }
 }
 
 .form-group {

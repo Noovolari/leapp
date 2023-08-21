@@ -150,8 +150,8 @@ jobs:
           rm -Rf ./release/builder-effective-config.yaml
 
           TAG_VERSION=$(cat nightly-version)
-          zip "./release/Leapp-deb.zip" './release/Leapp_${TAG_VERSION}_amd64.deb'
-          zip "./release/Leapp-appImage.zip" './release/Leapp-${TAG_VERSION}.AppImage'
+          zip "./release/Leapp-deb.zip" "./release/Leapp_${TAG_VERSION}_amd64.deb"
+          zip "./release/Leapp-appImage.zip" "./release/Leapp-${TAG_VERSION}.AppImage"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1

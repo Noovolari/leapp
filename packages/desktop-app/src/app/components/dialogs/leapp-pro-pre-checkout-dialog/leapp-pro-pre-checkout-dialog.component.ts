@@ -87,11 +87,7 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
           activeWindowPosition[0] + nearX,
           activeWindowPosition[1] + nearY
         );
-
-        console.log("QUA");
-
         checkoutWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
-          console.log("QUA 2");
           console.log("Intercepted HTTP redirect call:", details.url);
 
           if (details.url === "https://www.leapp.cloud/success") {
@@ -106,18 +102,12 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
             checkoutWindow = null;
           }
 
-          console.log("QUA 3");
-
           callback({
             requestHeaders: details.requestHeaders,
             url: details.url,
           });
-
-          console.log("QUA 4");
         });
         checkoutWindow.loadURL(checkoutUrl);
-
-        console.log("QUA 5");
       } catch (error) {
         this.toasterService.toast("Something went wrong during checkout", ToastLevel.error);
         return;

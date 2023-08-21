@@ -149,7 +149,7 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
 
-          TAG_VERSION=$(cat nightly-version)
+          TAG_VERSION=$(<nightly-version)
           echo ls -la
           echo $TAG_VERSION
           zip "./release/Leapp-deb.zip" "./release/Leapp_$TAG_VERSION_amd64.deb"

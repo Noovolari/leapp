@@ -8,6 +8,7 @@ import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-inte
 import { globalLeappProPlanStatus, LeappPlanStatus } from "../options-dialog/options-dialog.component";
 import { ToastLevel } from "../../../services/message-toaster.service";
 import { WindowService } from "../../../services/window.service";
+import { ApiErrorCodes } from "../../../services/team-service";
 
 describe("LeappProPreCheckoutDialogComponent", () => {
   let component: LeappProPreCheckoutDialogComponent;
@@ -82,6 +83,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     fixture = TestBed.createComponent(LeappProPreCheckoutDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+    globalLeappProPlanStatus.next(LeappPlanStatus.free);
   });
 
   it("should create", () => {
@@ -140,61 +142,6 @@ describe("LeappProPreCheckoutDialogComponent", () => {
   });
 
   it("upgradeToLeappPro", async (done) => {
-    /*
-    if (this.isEmailValid) {
-      let checkoutUrl = "";
-      try {
-        checkoutUrl = await this.appProviderService.teamService.createCheckoutSession(this.emailFormControl.value, this.price);
-      } catch (error) {
-        if (error.response.data?.errorCode === ApiErrorCodes.emailAlreadyTaken) {
-          this.toasterService.toast("Email already taken", ToastLevel.error);
-        } else {
-          this.toasterService.toast("Something went wrong during pre-checkout", ToastLevel.error);
-        }
-        return;
-      }
-
-      try {
-        // Get active window position for extracting new windows coordinate
-        const activeWindowPosition = this.windowService.getCurrentWindow().getPosition();
-        const nearX = 200;
-        const nearY = 50;
-
-        let checkoutWindow = this.appProviderService.windowService.newWindow(
-          checkoutUrl,
-          true,
-          "",
-          activeWindowPosition[0] + nearX,
-          activeWindowPosition[1] + nearY
-        );
-
-        checkoutWindow.webContents.session.webRequest.onBeforeRequest((details, callback) => {
-          console.log("Intercepted HTTP redirect call:", details.url);
-
-          if (details.url === "https://www.leapp.cloud/success") {
-            this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.proPending.toString());
-            globalLeappProPlanStatus.next(LeappPlanStatus.proPending);
-            checkoutWindow.close();
-            checkoutWindow = null;
-            this.close();
-            this.toasterService.toast("Checkout completed", ToastLevel.success);
-          } else if (details.url === "https://www.leapp.cloud/cancel") {
-            checkoutWindow.close();
-            checkoutWindow = null;
-          }
-
-          callback({
-            requestHeaders: details.requestHeaders,
-            url: details.url,
-          });
-        });
-        checkoutWindow.loadURL(checkoutUrl);
-      } catch (error) {
-        this.toasterService.toast("Something went wrong during checkout", ToastLevel.error);
-        return;
-      }
-    }
-    * */
     const fakeBackendCallData = { details: {}, callback: (..._args) => {} };
     const fakeWindow = {
       webContents: {
@@ -238,6 +185,115 @@ describe("LeappProPreCheckoutDialogComponent", () => {
       expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.proPending);
       expect((component as any).toasterService.toast).toHaveBeenCalledWith("Checkout completed", ToastLevel.success);
       expect(spyOnCallback).toHaveBeenCalledWith({ requestHeaders: "fake-details", url: "https://www.leapp.cloud/success" });
+      done();
+    }, 200);
+  });
+
+  it("upgradeToLeappPro - callback in cancel mode", async (done) => {
+    const fakeBackendCallData = { details: {}, callback: (..._args) => {} };
+    const fakeWindow = {
+      webContents: {
+        session: {
+          webRequest: {
+            onBeforeRequest: (clk) => {
+              setTimeout(() => clk(fakeBackendCallData.details, fakeBackendCallData.callback), 100);
+            },
+          },
+        },
+      },
+      loadURL: (_str) => {},
+      close: () => {},
+    };
+    const spyOnLoadUrl = spyOn(fakeWindow, "loadURL").and.callThrough();
+    const spyOnRequest = spyOn(fakeWindow.webContents.session.webRequest, "onBeforeRequest").and.callThrough();
+    const spyOnNewWindow = spyOn((component as any).appProviderService.windowService, "newWindow").and.returnValue(fakeWindow);
+    const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.callThrough();
+    const spyOnSaveSecret = spyOn((component as any).appProviderService.keychainService, "saveSecret").and.callThrough();
+    const spyOnClose = spyOn(fakeWindow, "close").and.callThrough();
+    const spyOnCallback = spyOn(fakeBackendCallData, "callback").and.callThrough();
+
+    (component as any).isEmailValid = true;
+    (component as any).emailFormControl.setValue("alex@fake.it");
+    fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
+
+    await (component as any).ngOnInit();
+    await (component as any).upgradeToLeappPro();
+
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
+    expect(spyOnLoadUrl).toHaveBeenCalledWith("fakeUrl");
+
+    setTimeout(() => {
+      expect(spyOnRequest).toHaveBeenCalled();
+      expect(spyOnSaveSecret).not.toHaveBeenCalled();
+      expect(spyOnClose).toHaveBeenCalled();
+      expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.free);
+      expect((component as any).toasterService.toast).not.toHaveBeenCalled();
+      expect(spyOnCallback).toHaveBeenCalledWith({ requestHeaders: "fake-details", url: "https://www.leapp.cloud/cancel" });
+      done();
+    }, 200);
+  });
+
+  it("upgradeToLeappPro - error in checkout session", async () => {
+    const fakeBackendCallData = { details: {}, callback: (..._args) => {} };
+
+    const error = {
+      name: "Email Already Taken",
+      message: "",
+      response: { data: { errorCode: ApiErrorCodes.emailAlreadyTaken } },
+    };
+
+    const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.throwError(error);
+
+    (component as any).isEmailValid = true;
+    (component as any).emailFormControl.setValue("alex@fake.it");
+    fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
+
+    await (component as any).ngOnInit();
+    await (component as any).upgradeToLeappPro();
+
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect((component as any).toasterService.toast).toHaveBeenCalledWith("Email already taken", ToastLevel.error);
+  });
+
+  it("upgradeToLeappPro - error in checkout session, but is generic and not about email", async () => {
+    const fakeBackendCallData = { details: {}, callback: (..._args) => {} };
+
+    const error = {
+      name: "Catastrophic Error",
+      message: "",
+      response: { data: { errorCode: "500" } },
+    };
+
+    const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.throwError(error);
+
+    (component as any).isEmailValid = true;
+    (component as any).emailFormControl.setValue("alex@fake.it");
+    fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
+
+    await (component as any).ngOnInit();
+    await (component as any).upgradeToLeappPro();
+
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect((component as any).toasterService.toast).toHaveBeenCalledWith("Something went wrong during pre-checkout", ToastLevel.error);
+  });
+
+  it("upgradeToLeappPro - error after pre-checkout", async (done) => {
+    const spyOnNewWindow = spyOn((component as any).appProviderService.windowService, "newWindow").and.throwError(new Error());
+    const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.callThrough();
+
+    (component as any).isEmailValid = true;
+    (component as any).emailFormControl.setValue("alex@fake.it");
+
+    await (component as any).ngOnInit();
+    await (component as any).upgradeToLeappPro();
+
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
+
+    setTimeout(() => {
+      expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.free);
+      expect((component as any).toasterService.toast).toHaveBeenCalledWith("Something went wrong during checkout", ToastLevel.error);
       done();
     }, 200);
   });

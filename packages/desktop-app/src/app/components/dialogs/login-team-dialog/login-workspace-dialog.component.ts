@@ -8,10 +8,10 @@ import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/fo
 
 @Component({
   selector: "app-login-team-dialog",
-  templateUrl: "./login-team-dialog.component.html",
-  styleUrls: ["./login-team-dialog.component.scss"],
+  templateUrl: "./login-workspace-dialog.component.html",
+  styleUrls: ["./login-workspace-dialog.component.scss"],
 })
-export class LoginTeamDialogComponent implements OnInit {
+export class LoginWorkspaceDialogComponent implements OnInit {
   email: FormControl;
   password: FormControl;
   signinForm: FormGroup;
@@ -42,10 +42,10 @@ export class LoginTeamDialogComponent implements OnInit {
       const formValue = this.signinForm.value;
       try {
         const signedInUser = await this.teamService.signedInUserState.getValue();
-        const doesTeamExist = !!signedInUser;
+        const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
         this.closeModal();
-        if (doesTeamExist) {
+        if (doesWorkspaceExist) {
           await this.teamService.syncSecrets();
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));

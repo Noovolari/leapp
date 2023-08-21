@@ -18,7 +18,7 @@ import { integrationHighlight } from "../integration-bar/integration-bar.compone
 import { MatMenuTrigger } from "@angular/material/menu";
 import { AppService } from "../../services/app.service";
 import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
-import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
+import { LoginWorkspaceDialogComponent } from "../dialogs/login-team-dialog/login-workspace-dialog.component";
 import { ManageTeamWorkspacesDialogComponent } from "../dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 import { User, WorkspaceState } from "../../services/team-service";
 
@@ -191,7 +191,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   async loginToLeappTeam(): Promise<void> {
     if (this.isLeappTeamStubbed) return;
-    this.bsModalService.show(LoginTeamDialogComponent, {
+    this.bsModalService.show(LoginWorkspaceDialogComponent, {
       animated: false,
       class: "create-modal",
       backdrop: "static",

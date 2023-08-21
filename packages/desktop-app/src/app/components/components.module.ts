@@ -43,7 +43,7 @@ import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-di
 import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
 import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
 import { ScrollingModule } from "@angular/cdk/scrolling";
-import { LoginTeamDialogComponent } from "./dialogs/login-team-dialog/login-team-dialog.component";
+import { LoginWorkspaceDialogComponent } from "./dialogs/login-team-dialog/login-workspace-dialog.component";
 import { BrowserModule } from "@angular/platform-browser";
 import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -85,7 +85,7 @@ import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-chec
     ContextualMenuComponent,
     BottomBarComponent,
     InfoDialogComponent,
-    LoginTeamDialogComponent,
+    LoginWorkspaceDialogComponent,
     ManageTeamWorkspacesDialogComponent,
     LeappProPreCheckoutDialogComponent,
   ],

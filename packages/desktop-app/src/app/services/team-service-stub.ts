@@ -18,6 +18,7 @@ export { User, ApiErrorCodes, FormErrorCodes };
 
 export interface WorkspaceState {
   name: string;
+  description: string;
   id: string;
 }
 
@@ -33,7 +34,11 @@ export class TeamService {
   }
 
   get workspaceState(): BehaviorSubject<WorkspaceState> {
-    return new BehaviorSubject<WorkspaceState>({ name: constants.localWorkspaceName, id: constants.localWorkspaceKeychainValue });
+    return new BehaviorSubject<WorkspaceState>({
+      name: constants.localWorkspaceName,
+      description: constants.localWorkspaceDescription,
+      id: constants.localWorkspaceKeychainValue,
+    });
   }
 
   get switchingWorkspaceState(): BehaviorSubject<boolean> {

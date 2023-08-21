@@ -4,7 +4,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
-import { LoginTeamDialogComponent } from "../login-team-dialog/login-team-dialog.component";
+import { LoginWorkspaceDialogComponent } from "../login-team-dialog/login-workspace-dialog.component";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { globalFilteredSessions, globalHasFilter, globalResetFilter } from "../../command-bar/command-bar.component";
 import { sidebarHighlight } from "../../side-bar/side-bar.component";
@@ -28,11 +28,11 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit {
     this.localWorkspaceName = constants.localWorkspaceName;
   }
 
-  get doesTeamExist(): boolean {
+  get doesRemoteWorkspaceExist(): boolean {
     return !!this.loggedUser;
   }
 
-  get isTeamLocked(): boolean {
+  get isWorkspaceLocked(): boolean {
     return !this.loggedUser?.accessToken;
   }
 
@@ -63,16 +63,16 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit {
   }
 
   async switchToRemoteWorkspace(): Promise<void> {
-    if (this.isTeamLocked) {
-      await this.loginToLeappTeam();
+    if (this.isWorkspaceLocked) {
+      await this.loginToWorkspace();
     } else {
       await this.appProviderService.teamService.syncSecrets();
       this.resetFilters();
     }
   }
 
-  async loginToLeappTeam(): Promise<void> {
-    this.bsModalService.show(LoginTeamDialogComponent, {
+  async loginToWorkspace(): Promise<void> {
+    this.bsModalService.show(LoginWorkspaceDialogComponent, {
       animated: false,
       class: "create-modal",
       backdrop: "static",

@@ -53,10 +53,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
   showPinned: boolean;
   modalRef: BsModalRef;
   workspaceState: WorkspaceState;
-  loggedUser: User;
-  localWorkspaceName: string;
   isLeappTeamStubbed: boolean;
 
+  private loggedUser: User;
   private behaviouralSubjectService: BehaviouralSubjectService;
   private userSubscription;
   private workspaceNameSubscription;
@@ -66,18 +65,17 @@ export class SideBarComponent implements OnInit, OnDestroy {
     this.showAll = true;
     this.showPinned = false;
     this.loggedUser = null;
-    this.localWorkspaceName = constants.localWorkspaceName;
   }
 
   get isLocalWorkspaceSelected(): boolean {
-    return this.workspaceState.id === constants.localWorkspaceKeychainValue;
+    return this.workspaceState.type === "local";
   }
 
-  get doesTeamExist(): boolean {
+  get doesRemoteWorkspaceExist(): boolean {
     return !!this.loggedUser;
   }
 
-  get isTeamLocked(): boolean {
+  get isWorkspaceLocked(): boolean {
     return !this.loggedUser?.accessToken;
   }
 
@@ -200,7 +198,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   async logoutFromLeappTeam(lock: boolean = false): Promise<void> {
-    if (!this.doesTeamExist || this.isLeappTeamStubbed) return;
+    if (!this.doesRemoteWorkspaceExist || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
   }
 
@@ -212,7 +210,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   async switchToRemoteWorkspace(): Promise<void> {
-    if (this.isTeamLocked) {
+    if (this.isWorkspaceLocked) {
       await this.loginToLeappTeam();
     } else {
       if (this.isLocalWorkspaceSelected) {

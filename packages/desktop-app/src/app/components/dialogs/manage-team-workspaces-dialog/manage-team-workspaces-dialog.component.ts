@@ -1,6 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { AppService } from "../../../services/app.service";
-import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
@@ -8,24 +7,23 @@ import { LoginWorkspaceDialogComponent } from "../login-team-dialog/login-worksp
 import { BsModalService } from "ngx-bootstrap/modal";
 import { globalFilteredSessions, globalHasFilter, globalResetFilter } from "../../command-bar/command-bar.component";
 import { sidebarHighlight } from "../../side-bar/side-bar.component";
-import { User } from "../../../services/team-service";
+import { User, WorkspaceState } from "../../../services/team-service";
 
 @Component({
   selector: "app-manage-team-workspaces-dialog",
   templateUrl: "./manage-team-workspaces-dialog.component.html",
   styleUrls: ["./manage-team-workspaces-dialog.component.scss"],
 })
-export class ManageTeamWorkspacesDialogComponent implements OnInit {
-  localWorkspaceName: string;
-  loggedUser: User;
+export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
+  workspacesState: WorkspaceState[];
 
+  private loggedUser: User;
   private behaviouralSubjectService: BehaviouralSubjectService;
-  private userSubscription;
+  private unsubscribe: () => void;
 
   constructor(private appProviderService: AppProviderService, public appService: AppService, private bsModalService: BsModalService) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.loggedUser = null;
-    this.localWorkspaceName = constants.localWorkspaceName;
   }
 
   get doesRemoteWorkspaceExist(): boolean {
@@ -37,7 +35,18 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.loggedUser = user));
+    const signedInUserStateSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.loggedUser = user));
+    const workspaceStateSubscription = this.appProviderService.teamService.workspacesState.subscribe(
+      (workspacesState: WorkspaceState[]) => (this.workspacesState = workspacesState)
+    );
+    this.unsubscribe = () => {
+      signedInUserStateSubscription.unsubscribe();
+      workspaceStateSubscription.unsubscribe();
+    };
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe();
   }
 
   closeModal(): void {
@@ -63,7 +72,7 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit {
   }
 
   async switchToRemoteWorkspace(): Promise<void> {
-    if (this.isWorkspaceLocked) {
+    if (this.workspacesState.find((state) => state.locked)) {
       await this.loginToWorkspace();
     } else {
       await this.appProviderService.teamService.syncSecrets();

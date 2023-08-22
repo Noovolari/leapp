@@ -10,9 +10,9 @@
       </ng-container>
       <ng-container *ngIf="!isLocalWorkspaceSelected">
         <div class="workspace-icon-container remote">
-          <span class="workspace-name-initial">{{loggedUser.teamName[0].toUpperCase()}}</span>
+          <span class="workspace-name-initial">{{workspaceState.name[0].toUpperCase()}}</span>
         </div>
-        <span class="workspace-name">{{loggedUser.teamName}}</span>
+        <span class="workspace-name">{{workspaceState.name}}</span>
       </ng-container>
       <i class="moon-Caret-down"></i>
       <mat-menu #workspaceMenu="matMenu" [hasBackdrop]="false" role="menu">
@@ -23,26 +23,27 @@
             <i class="moon-Home"></i>
           </div>
           <div class="workspace-name-container">
-            <span>{{localWorkspaceName}}</span>
-            <span>Community Edition</span>
+            <span>{{workspaceState.name}}</span>
+            <span>{{workspaceState.description}}</span>
           </div>
           <img class="workspace-menu-icon" *ngIf="isLocalWorkspaceSelected" src="assets/images/check.svg" alt="current workspace">
         </div>
 
-        <div *ngIf="doesTeamExist" mat-menu-item class="workspace-select-item" (click)="switchToRemoteWorkspace()">
+        <div *ngIf="doesRemoteWorkspaceExist" mat-menu-item class="workspace-select-item" (click)="switchToRemoteWorkspace()">
           <div class="workspace-icon-container remote">
-            <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
+            <span>{{workspaceState.name[0].toUpperCase()}}</span>
           </div>
           <div class="workspace-name-container">
-            <span>{{loggedUser.teamName}}</span>
-            <span>Team Plan early access</span>
+            <span>{{workspaceState.name}}</span>
+            <span>{{workspaceState.description}}</span>
           </div>
           <img class="workspace-menu-icon" *ngIf="!isLocalWorkspaceSelected" src="assets/images/check.svg" alt="current workspace">
-          <img class="workspace-menu-icon" *ngIf="isTeamLocked" src="assets/images/lock-key-fill.svg" alt="locked workspace">
+          <img class="workspace-menu-icon" *ngIf="isWorkspaceLocked" src="assets/images/lock-key-fill.svg" alt="locked workspace">
         </div>
 
         <div class="divider"></div>
-        <div [disabled]="doesTeamExist || isLeappTeamStubbed" mat-menu-item (click)="doesTeamExist ? false : loginToLeappTeam()">
+        <div [disabled]="doesRemoteWorkspaceExist || isLeappTeamStubbed" mat-menu-item
+             (click)="doesRemoteWorkspaceExist ? false : loginToLeappTeam()">
           <img class="workspace-menu-icon" src="assets/images/sign-in.svg" alt="sign-in">
           <span>Sign-in Workspace</span>
         </div>
@@ -59,7 +60,7 @@
           <img class="workspace-menu-icon" src="assets/images/gear.svg" alt="settings">
           <span>Settings...</span>
         </div>
-        <div [disabled]="!doesTeamExist || isTeamLocked || isLeappTeamStubbed" mat-menu-item (click)="logoutFromLeappTeam(true)">
+        <div [disabled]="!doesRemoteWorkspaceExist || isWorkspaceLocked || isLeappTeamStubbed" mat-menu-item (click)="logoutFromLeappTeam(true)">
           <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out">
           <span>Lock</span>
         </div>
@@ -85,7 +86,8 @@
 
       <mat-list-item [disableRipple]="true" *ngFor="let segment of segments" [ngClass]="selectedSegmentCheck(segment)"
                      (click)="applySegmentFilter(segment, $event);">
-        <div mat-line class="visible-option-menu segment-row"><i class="moon-Tag"></i> <span>{{segment.name}}</span><i class="moon-Close" (click)="showConfirmationDialog(segment, $event)"></i>
+        <div mat-line class="visible-option-menu segment-row"><i class="moon-Tag"></i> <span>{{segment.name}}</span><i class="moon-Close"
+                                                                                                                       (click)="showConfirmationDialog(segment, $event)"></i>
         </div>
       </mat-list-item>
 

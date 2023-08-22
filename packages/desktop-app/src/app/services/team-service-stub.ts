@@ -19,6 +19,7 @@ export { User, ApiErrorCodes, FormErrorCodes };
 export interface WorkspaceState {
   name: string;
   description: string;
+  type: "local" | "team" | "pro";
   id: string;
 }
 
@@ -37,6 +38,7 @@ export class TeamService {
     return new BehaviorSubject<WorkspaceState>({
       name: constants.localWorkspaceName,
       description: constants.localWorkspaceDescription,
+      type: "local",
       id: constants.localWorkspaceKeychainValue,
     });
   }

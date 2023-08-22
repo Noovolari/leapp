@@ -1,8 +1,6 @@
 name: Leapp Desktop App Nightly CD
 
 on:
-  schedule:
-    - cron: '0 0 * * *'
   workflow_dispatch:
 
 env:
@@ -39,8 +37,6 @@ jobs:
     needs: [ clean-nightly-latest ]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: master
       - name: Build and release core (nightly)
         run: |
           cd packages/core
@@ -68,8 +64,6 @@ jobs:
           git config --global core.eol lf
 
       - uses: actions/checkout@v3
-        with:
-          ref: master
 
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
@@ -97,9 +91,8 @@ jobs:
           rm -Rf ./release/builder-effective-config.yaml
 
           TAG_VERSION=$(cat nightly-version)
-          rm "./release/Leapp-${TAG_VERSION}-win.zip" ||:
-          powershell "Compress-Archive './release/Leapp Setup ${TAG_VERSION}.exe' './release/Leapp-${TAG_VERSION}-win.zip'"
-          powershell "Compress-Archive './release/Leapp Setup ${TAG_VERSION}.exe' './release/Leapp-windows.zip'"
+          rm "./release/Leapp-$TAG_VERSION-win.zip" ||:
+          powershell "Compress-Archive './release/Leapp Setup $TAG_VERSION.exe' './release/Leapp-$TAG_VERSION-win.zip'"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -122,8 +115,6 @@ jobs:
     needs: [ build-and-release-core-and-cli ]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: master
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
@@ -149,10 +140,6 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
 
-          TAG_VERSION=$(cat nightly-version)
-          zip "./release/Leapp-deb.zip" "./release/Leapp_${TAG_VERSION}_amd64.deb"
-          zip "./release/Leapp-appImage.zip" "./release/Leapp-${TAG_VERSION}.AppImage"
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -172,8 +159,6 @@ jobs:
     needs: [ build-and-release-core-and-cli ]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: master
 
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
@@ -234,10 +219,9 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
           TAG_VERSION=$(cat nightly-version)
-          rm "./release/Leapp-${TAG_VERSION}-mac.zip"
-          rm "./release/Leapp-${TAG_VERSION}-mac.zip.blockmap"
-          zip "./release/Leapp-${TAG_VERSION}-mac.zip" "./release/Leapp-${TAG_VERSION}.dmg"
-          zip "./release/Leapp-mac.zip" "./release/Leapp-${TAG_VERSION}.dmg"
+          rm "./release/Leapp-$TAG_VERSION-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-mac.zip.blockmap"
+          zip "./release/Leapp-$TAG_VERSION-mac.zip" "./release/Leapp-$TAG_VERSION.dmg"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -258,8 +242,6 @@ jobs:
     needs: [ build-and-release-core-and-cli, build-macos-x64 ]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: master
 
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
@@ -321,10 +303,9 @@ jobs:
           rm -Rf ./release/builder-effective-config.yaml
           rm -Rf ./release/mac-arm64
           TAG_VERSION=$(cat nightly-version)
-          rm "./release/Leapp-${TAG_VERSION}-arm64-mac.zip"
-          rm "./release/Leapp-${TAG_VERSION}-arm64-mac.zip.blockmap"
-          zip "./release/Leapp-${TAG_VERSION}-mac-arm64.zip" "./release/Leapp-${TAG_VERSION}-arm64.dmg"
-          zip "./release/Leapp-arm-mac.zip" "./release/Leapp-${TAG_VERSION}-arm64.dmg"
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
+          zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.dmg"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1

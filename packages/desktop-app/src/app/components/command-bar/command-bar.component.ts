@@ -221,8 +221,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       globalFilteredSessions.next(sessions);
     });
 
-    this.workspaceStateSubscription = this.appProviderService.teamService.workspaceState.subscribe((workspaceState) => {
-      this.isLeappTeamWorkspace = workspaceState.type === "team";
+    this.workspaceStateSubscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState) => {
+      this.isLeappTeamWorkspace = !!workspacesState.find((workspace) => workspace.type === "team" && workspace.selected);
     });
   }
 

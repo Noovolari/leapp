@@ -7,7 +7,7 @@ import { LoginWorkspaceDialogComponent } from "../login-team-dialog/login-worksp
 import { BsModalService } from "ngx-bootstrap/modal";
 import { globalFilteredSessions, globalHasFilter, globalResetFilter } from "../../command-bar/command-bar.component";
 import { sidebarHighlight } from "../../side-bar/side-bar.component";
-import { User, WorkspaceState } from "../../../services/team-service";
+import { WorkspaceState } from "../../../services/team-service";
 
 @Component({
   selector: "app-manage-team-workspaces-dialog",
@@ -17,30 +17,22 @@ import { User, WorkspaceState } from "../../../services/team-service";
 export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
   workspacesState: WorkspaceState[];
 
-  private loggedUser: User;
   private behaviouralSubjectService: BehaviouralSubjectService;
   private unsubscribe: () => void;
 
+  get isWorkspaceLocked(): boolean {
+    return !!this.workspacesState.find((state) => state.locked);
+  }
+
   constructor(private appProviderService: AppProviderService, public appService: AppService, private bsModalService: BsModalService) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
-    this.loggedUser = null;
-  }
-
-  get doesRemoteWorkspaceExist(): boolean {
-    return !!this.loggedUser;
-  }
-
-  get isWorkspaceLocked(): boolean {
-    return !this.loggedUser?.accessToken;
   }
 
   ngOnInit(): void {
-    const signedInUserStateSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.loggedUser = user));
     const workspaceStateSubscription = this.appProviderService.teamService.workspacesState.subscribe(
       (workspacesState: WorkspaceState[]) => (this.workspacesState = workspacesState)
     );
     this.unsubscribe = () => {
-      signedInUserStateSubscription.unsubscribe();
       workspaceStateSubscription.unsubscribe();
     };
   }
@@ -56,7 +48,6 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
   async syncWorkspace(): Promise<void> {
     try {
       this.closeModal();
-      //await this.appProviderService.teamService.syncSecrets();
       await this.switchToRemoteWorkspace();
     } catch (error) {
       this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
@@ -72,7 +63,7 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
   }
 
   async switchToRemoteWorkspace(): Promise<void> {
-    if (this.workspacesState.find((state) => state.locked)) {
+    if (this.isWorkspaceLocked) {
       await this.loginToWorkspace();
     } else {
       await this.appProviderService.teamService.syncSecrets();

@@ -22,7 +22,7 @@ describe("SideBarComponent", () => {
       teamService: {
         workspaceState: {
           subscribe: () => {
-            component.workspaceState = { id: "mocked-id" } as any;
+            component.workspacesState = { id: "mocked-id" } as any;
           },
         },
         signedInUserState: {

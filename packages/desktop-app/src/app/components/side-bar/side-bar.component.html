@@ -2,65 +2,60 @@
   <mat-list-item class="workspace-menu">
     <div mat-line class="workspace-menu-line" [matMenuTriggerFor]="workspaceMenu" (click)="setTrigger($event)"
          #workspaceSelectionTrigger="matMenuTrigger">
-      <ng-container *ngIf="isLocalWorkspaceSelected">
-        <div class="workspace-icon-container local">
-          <i class="moon-Home"></i>
-        </div>
-        <span class="workspace-name">{{workspaceState.name}}</span>
-      </ng-container>
-      <ng-container *ngIf="!isLocalWorkspaceSelected">
-        <div class="workspace-icon-container remote">
-          <span class="workspace-name-initial">{{workspaceState.name[0].toUpperCase()}}</span>
-        </div>
-        <span class="workspace-name">{{workspaceState.name}}</span>
-      </ng-container>
+
+      <div *ngIf="isLocalWorkspaceSelected" class="workspace-icon-container local">
+        <i class="moon-Home"></i>
+      </div>
+      <div *ngIf="!isLocalWorkspaceSelected" class="workspace-icon-container remote">
+        <span class="workspace-name-initial">{{selectedWorkspace.name[0].toUpperCase()}}</span>
+      </div>
+      <span class="workspace-name">{{selectedWorkspace.name}}</span>
       <i class="moon-Caret-down"></i>
+
       <mat-menu #workspaceMenu="matMenu" [hasBackdrop]="false" role="menu">
         <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
 
-        <div mat-menu-item class="workspace-select-item" (click)="switchToLocalWorkspace()">
-          <div class="workspace-icon-container local">
+        <div *ngFor="let workspace of workspacesState" mat-menu-item class="workspace-select-item" (click)="switchToWorkspace(workspace)">
+          <div *ngIf="workspace.type === 'local'" class="workspace-icon-container local">
             <i class="moon-Home"></i>
           </div>
-          <div class="workspace-name-container">
-            <span>{{workspaceState.name}}</span>
-            <span>{{workspaceState.description}}</span>
-          </div>
-          <img class="workspace-menu-icon" *ngIf="isLocalWorkspaceSelected" src="assets/images/check.svg" alt="current workspace">
-        </div>
-
-        <div *ngIf="doesRemoteWorkspaceExist" mat-menu-item class="workspace-select-item" (click)="switchToRemoteWorkspace()">
-          <div class="workspace-icon-container remote">
-            <span>{{workspaceState.name[0].toUpperCase()}}</span>
+          <div *ngIf="workspace.type !== 'local'" class="workspace-icon-container remote">
+            <span>{{workspace.name[0].toUpperCase()}}</span>
           </div>
           <div class="workspace-name-container">
-            <span>{{workspaceState.name}}</span>
-            <span>{{workspaceState.description}}</span>
+            <span>{{workspace.name}}</span>
+            <span>{{workspace.description}}</span>
           </div>
-          <img class="workspace-menu-icon" *ngIf="!isLocalWorkspaceSelected" src="assets/images/check.svg" alt="current workspace">
-          <img class="workspace-menu-icon" *ngIf="isWorkspaceLocked" src="assets/images/lock-key-fill.svg" alt="locked workspace">
+          <img class="workspace-menu-icon" *ngIf="workspace.selected" src="assets/images/check.svg" alt="current workspace">
+          <img class="workspace-menu-icon" *ngIf="workspace.locked" src="assets/images/lock-key-fill.svg" alt="locked workspace">
         </div>
 
         <div class="divider"></div>
+
         <div [disabled]="doesRemoteWorkspaceExist || isLeappTeamStubbed" mat-menu-item
-             (click)="doesRemoteWorkspaceExist ? false : loginToLeappTeam()">
+             (click)="doesRemoteWorkspaceExist ? false : loginToRemoteWorkspace()">
           <img class="workspace-menu-icon" src="assets/images/sign-in.svg" alt="sign-in">
           <span>Sign-in Workspace</span>
         </div>
+
         <div [disabled]="isLeappTeamStubbed" mat-menu-item (click)="showManageWorkspacesDialog()">
           <img class="workspace-menu-icon" src="assets/images/buildings.svg" alt="manage-workspaces">
           <span>Manage Workspaces</span>
         </div>
+
         <div class="divider"></div>
+
         <div mat-menu-item (click)="openWorkspaceDocumentation()">
           <img class="workspace-menu-icon" src="assets/images/book-open-text.svg" alt="settings">
           <span>What's a workspace?</span>
         </div>
+
         <div mat-menu-item (click)="showOptionDialog()">
           <img class="workspace-menu-icon" src="assets/images/gear.svg" alt="settings">
           <span>Settings...</span>
         </div>
-        <div [disabled]="!doesRemoteWorkspaceExist || isWorkspaceLocked || isLeappTeamStubbed" mat-menu-item (click)="logoutFromLeappTeam(true)">
+
+        <div [disabled]="!canLockWorkspace || isLeappTeamStubbed" mat-menu-item (click)="logoutFromRemoteWorkspace(true)">
           <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out">
           <span>Lock</span>
         </div>

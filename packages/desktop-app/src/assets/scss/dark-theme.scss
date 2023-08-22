@@ -529,22 +529,34 @@ body.dark-theme {
     filter: invert(1);
   }
 
- .plan {
-   border: 1px solid $dark-tablehead-border;
-   .plan-header {
-     border-bottom: 1px solid $dark-tablehead-border;
-   }
-   .plan-body {
-     background-color: $dark-select-component;
-   }
-   .price-description {
-     color: #DEDCDD;
-   }
-   .cta-button.clickable {
-     background: $dark-button-color;
-     color: $white-text-color;
-     outline: none;
-     border: none;
-   }
- }
+  .plan {
+    border: 1px solid $dark-tablehead-border;
+    &.selected {
+      border: 2px solid #00aaff;
+      box-sizing: border-box;
+    }
+    .plan-header {
+      border-bottom: 1px solid $dark-tablehead-border;
+    }
+    .plan-body {
+      background-color: $dark-select-component;
+    }
+    .price-description {
+      color: #DEDCDD;
+    }
+    .cta-button.clickable {
+      background: $dark-button-color;
+      color: $white-text-color;
+      outline: none;
+      border: none;
+    }
+  }
+
+  .right-side h2, .left-side h2, .plan-summary .black {
+    color: #DEDCDD!important;
+  }
+
+  .right-side {
+    border-left-color: #424242!important;
+  }
 }

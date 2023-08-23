@@ -1,4 +1,4 @@
-import { Component, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
+import { Component, Input, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
 import { globalFilterGroup } from "../command-bar/command-bar.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -43,6 +43,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
   @ViewChild("ssoModalTemplate", { static: false })
   ssoModalTemplate: TemplateRef<any>;
+
+  @Input()
+  isTeamWorkspace: boolean;
 
   eConstants = constants;
   regions = [];
@@ -306,6 +309,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   gotoForm(modifying: number, integration: Integration, overrideType?: IntegrationType): void {
+    if (this.isTeamWorkspace) {
+      return;
+    }
     // Change graphical values to show the form
     this.chooseIntegration = false;
     this.modifying = modifying;

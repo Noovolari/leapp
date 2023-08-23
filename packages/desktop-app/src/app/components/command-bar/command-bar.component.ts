@@ -68,7 +68,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   filterExtended: boolean;
   compactMode: boolean;
-  isLocalWorkspace: boolean;
+  isLeappTeamWorkspace: boolean;
 
   eConstants = constants;
 
@@ -221,8 +221,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
       globalFilteredSessions.next(sessions);
     });
 
-    this.workspaceStateSubscription = this.appProviderService.teamService.workspaceState.subscribe((state) => {
-      this.isLocalWorkspace = state.id === constants.localWorkspaceKeychainValue;
+    this.workspaceStateSubscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState) => {
+      this.isLeappTeamWorkspace = !!workspacesState.find((workspace) => workspace.type === "team" && workspace.selected);
     });
   }
 

@@ -1,0 +1,11 @@
+<hr>
+<section>
+  <span *ngIf="isLoggedAsPro" class="sync"><img src="assets/images/sync.png" alt="" title=""> Sync enabled</span>
+  <span *ngIf="!isLoggedAsPro" class="unsync"><img src="assets/images/unsynk.png" alt="" title=""> Sync disabled <i class="fa fa-info-circle" (click)="isOpen = !isOpen"></i></span>
+  <div class="html-tooltip {{isOpen ? '': 'hide'}}">
+    <span>You need to Upgrade to Pro Edition to enable syncing on the Cloud</span>
+    <button class="btn btn-primary" (click)="goToUpgrade();">Upgrade</button>
+  </div>
+</section>
+
+

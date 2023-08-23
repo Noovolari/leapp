@@ -55,6 +55,8 @@ import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { ManageTeamWorkspacesDialogComponent } from "./dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component";
 import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
+import { SyncProWidgetComponent } from "./sync-pro-widget/sync-pro-widget.component";
+import { OverlayModule } from "@angular/cdk/overlay";
 
 @NgModule({
   declarations: [
@@ -88,6 +90,7 @@ import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-chec
     LoginTeamDialogComponent,
     ManageTeamWorkspacesDialogComponent,
     LeappProPreCheckoutDialogComponent,
+    SyncProWidgetComponent,
   ],
   imports: [
     CommonModule,
@@ -121,6 +124,7 @@ import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-chec
     MatIconModule,
     MatProgressSpinnerModule,
     NgSelectModule,
+    OverlayModule,
   ],
   exports: [ConfirmationDialogComponent, InputDialogComponent, CommandBarComponent, SideBarComponent, SessionsComponent],
 })

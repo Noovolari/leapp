@@ -48,16 +48,14 @@ export class SideBarComponent implements OnInit, OnDestroy {
   folders: Folder[];
   segments: Segment[];
   selectedS: SelectedSegment[];
-  subscription;
   showAll: boolean;
   showPinned: boolean;
   modalRef: BsModalRef;
   workspacesState: WorkspaceState[];
   isLeappTeamStubbed: boolean;
 
+  private unsubscribe: () => void;
   private behaviouralSubjectService: BehaviouralSubjectService;
-  private userSubscription;
-  private workspaceNameSubscription;
 
   constructor(private bsModalService: BsModalService, private appProviderService: AppProviderService, private appService: AppService) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
@@ -82,27 +80,30 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.subscription = segmentFilter.subscribe((segments) => {
+    const segmentFilterSubscription = segmentFilter.subscribe((segments) => {
       this.segments = segments;
       this.selectedS = this.segments.map((segment) => ({ name: segment.name, selected: false }));
     });
     segmentFilter.next(this.appProviderService.segmentService.list());
 
-    sidebarHighlight.subscribe((value) => {
+    const sidebarHighlightSubscription = sidebarHighlight.subscribe((value) => {
       this.highlightSelectedRow(value.showAll, value.showPinned, value.selectedSegment);
     });
     sidebarHighlight.next({ showAll: true, showPinned: false, selectedSegment: -1 });
 
-    this.workspaceNameSubscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState: WorkspaceState[]) => {
+    const workspaceStateSubscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState: WorkspaceState[]) => {
       this.workspacesState = workspacesState;
     });
     this.isLeappTeamStubbed = this.appProviderService.teamService.isLeappTeamStubbed;
+    this.unsubscribe = () => {
+      segmentFilterSubscription.unsubscribe();
+      sidebarHighlightSubscription.unsubscribe();
+      workspaceStateSubscription.unsubscribe();
+    };
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-    this.workspaceNameSubscription.unsubscribe();
-    this.userSubscription.unsubscribe();
+    this.unsubscribe();
   }
 
   resetFilters(): void {

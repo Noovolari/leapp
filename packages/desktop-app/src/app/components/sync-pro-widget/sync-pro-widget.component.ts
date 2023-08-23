@@ -22,7 +22,7 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
     this.isOpen = false;
     this.isLoggedAsPro = false;
     this.subscription = this.appProviderService.teamService.signedInUserState.subscribe((userState: User) => {
-      this.isLoggedAsPro = userState !== null && userState?.role === "Pro";
+      this.isLoggedAsPro = userState !== null && userState?.role === "pro";
     });
   }
 

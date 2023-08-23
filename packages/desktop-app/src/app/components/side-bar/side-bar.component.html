@@ -69,7 +69,7 @@
     <div mat-line><i class="moon-Pin"></i> <span>Pinned</span></div>
   </mat-list-item>
   <div class="space-between-mat-lists"></div>
-  <app-integration-bar></app-integration-bar>
+  <app-integration-bar [isTeamWorkspace]="selectedWorkspace.type === 'team'"></app-integration-bar>
   <div class="space-between-mat-lists"></div>
   <mat-accordion>
     <mat-expansion-panel [expanded]="true">

@@ -47,7 +47,7 @@ export class TeamService {
     });
   }
 
-  get switchingWorkspaceState(): BehaviorSubject<boolean> {
+  get syncingWorkspaceState(): BehaviorSubject<boolean> {
     return new BehaviorSubject<boolean>(false);
   }
 

@@ -37,7 +37,7 @@ import { TeamService } from "./services/team-service";
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent implements OnInit {
-  isSwitchingWorkspace: boolean;
+  isSyncingWorkspace: boolean;
 
   private fileService: FileService;
   private awsCoreService: AwsCoreService;
@@ -175,7 +175,7 @@ export class AppComponent implements OnInit {
       }
     }
 
-    this.teamService.switchingWorkspaceState.subscribe((isSwitchingWorkspace: boolean) => (this.isSwitchingWorkspace = isSwitchingWorkspace));
+    this.teamService.syncingWorkspaceState.subscribe((isSyncingWorkspace: boolean) => (this.isSyncingWorkspace = isSyncingWorkspace));
 
     // Check the existence of a current-workspace key in the system keychain and
     // load the corresponding workspace

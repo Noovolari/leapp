@@ -1,9 +1,11 @@
 <hr>
 <section>
-  <span *ngIf="!isLoggedAsPro" class="unsync"><img src="assets/images/unsync.png" alt="" title=""> Sync disabled <i class="fa fa-info-circle" (click)="isOpen = !isOpen"></i></span>
-  <span *ngIf="isLoggedAsPro" class="sync"><img src="assets/images/sync.png" alt="" title=""> Sync enabled</span>
-  <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed"><img src="assets/images/syncfailed.png" alt="" title=""> Sync failed <i class="fa fa-info-triangle" (click)="isOpenFailed = !isOpenFailed"></i></span>
+  <span *ngIf="!isLoggedAsPro" class="unsync"><img src="assets/images/unsync.png" alt="" title=""> Sync disabled <i class="fa fa-info-circle"
+                                                                                                                    (click)="isOpen = !isOpen"></i></span>
+  <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed"><img src="assets/images/syncfailed.png" alt="" title=""> Sync failed <i
+    class="fa fa-info-triangle" (click)="isOpenFailed = !isOpenFailed"></i></span>
   <span *ngIf="isLoggedAsPro && isProgress" class="sync-progress"><img src="assets/images/syncprogress.png" alt="" title=""> Sync in progress</span>
+  <span *ngIf="isLoggedAsPro && !isProgress && !isFailed" class="sync"><img src="assets/images/sync.png" alt="" title=""> Sync enabled</span>
 
 
   <div class="html-tooltip {{isOpen ? '': 'hide'}}">

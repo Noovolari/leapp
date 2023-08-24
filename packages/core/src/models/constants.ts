@@ -8,6 +8,7 @@ export const constants = {
   workspaceLastVersion: 5,
   slackUrl: "https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q",
   localWorkspaceName: "Local workspace",
+  localWorkspaceDescription: "Community Edition",
   currentWorkspaceKeychainKey: "current-workspace",
   localWorkspaceKeychainValue: "local",
 

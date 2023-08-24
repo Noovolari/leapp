@@ -20,14 +20,19 @@ describe("SideBarComponent", () => {
       segmentService: { list: () => [] },
       awsCoreService: { getRegions: () => [] },
       teamService: {
-        workspaceState: {
+        workspacesState: {
           subscribe: () => {
-            component.workspaceState = { id: "mocked-id" } as any;
-          },
-        },
-        signedInUserState: {
-          subscribe: () => {
-            component.loggedUser = { teamName: "mock-name" } as any;
+            component.workspacesState = [
+              {
+                name: "fake-name",
+                description: "fake-description",
+                type: "local",
+                selected: true,
+                locked: false,
+                id: "fake-id",
+              },
+            ];
+            return { unsubscribe: () => {} };
           },
         },
       },
@@ -43,15 +48,7 @@ describe("SideBarComponent", () => {
     component = fixture.componentInstance;
     fixture.detectChanges();
 
-    (component as any).subscription = {
-      unsubscribe: () => {},
-    };
-    (component as any).workspaceNameSubscription = {
-      unsubscribe: () => {},
-    };
-    (component as any).userSubscription = {
-      unsubscribe: () => {},
-    };
+    (component as any).unsubscribe = () => {};
   });
 
   it("should create", () => {

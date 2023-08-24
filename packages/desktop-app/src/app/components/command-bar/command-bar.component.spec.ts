@@ -32,7 +32,7 @@ describe("CommandBarComponent", () => {
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       namedProfileService: { getNamedProfiles: () => [] },
-      teamService: { signedInUserState: { subscribe: () => {} }, workspaceState: { subscribe: () => {} } },
+      teamService: { signedInUserState: { subscribe: () => {} }, workspacesState: { subscribe: () => {} } },
       notificationService: spyNotificationsService,
     });
 
@@ -75,7 +75,7 @@ describe("CommandBarComponent", () => {
     (component as any).userSubscription = {
       unsubscribe: () => {},
     };
-    (component as any).workspaceNameSubscription = {
+    (component as any).workspaceStateSubscription = {
       unsubscribe: () => {},
     };
     (component as any).optionsService = { colorTheme: "dark-theme", workspaceService: { getWorkspace: () => new Workspace() } };

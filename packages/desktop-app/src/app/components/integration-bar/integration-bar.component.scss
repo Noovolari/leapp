@@ -3,7 +3,7 @@
 
 ::ng-deep {
   .sso-modal {
-    max-width: 520px!important;
+    max-width: 520px !important;
     width: 100%;
   }
 }
@@ -13,15 +13,15 @@ form {
 }
 
 .panel-header {
-  margin-left: 0!important;
+  margin-left: 0 !important;
   width: 100%;
 
   span {
     display: block;
     width: 87%;
-    font-size: 14px!important;
-    font-weight: 500!important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"!important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
   }
 
   i.moon-Add {
@@ -31,7 +31,13 @@ form {
     right: -8px;
     transition: all 0.3s ease;
     cursor: pointer;
-    &:hover {
+
+    &.disabled {
+      opacity: 0.7;
+      cursor: default;
+    }
+
+    &:hover:not(.disabled) {
       color: $text-color;
     }
   }
@@ -52,6 +58,7 @@ b.moon-More {
     color: $text-color;
     opacity: 0.7;
   }
+
   .status {
     left: 19px;
   }
@@ -70,8 +77,24 @@ img {
   left: 29px;
   width: inherit;
 }
-.green-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #8fc92a; border: 1px solid white; }
-.red-dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px; background: #d64123; border: 1px solid white; }
+
+.green-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: #8fc92a;
+  border: 1px solid white;
+}
+
+.red-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: #d64123;
+  border: 1px solid white;
+}
 
 .gray-line {
   color: $region-tag-color;
@@ -90,12 +113,12 @@ img {
 }
 
 .loading-title {
-  font-size: 16px!important;
-  font-weight: bold!important;
-  color: #666!important;
-  position: relative!important;
-  margin-top: 10px!important;
-  padding-left: 86px!important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  color: #666 !important;
+  position: relative !important;
+  margin-top: 10px !important;
+  padding-left: 86px !important;
 }
 
 .loading-leapp {
@@ -126,20 +149,24 @@ img {
 
 ::ng-deep {
   .mat-list-item.selected-integration:hover {
-    background-color:$silver-25!important;
+    background-color: $silver-25 !important;
   }
+
   .selected-integration .mat-list-item-content {
-    padding: 0 6px 0!important;
+    padding: 0 6px 0 !important;
   }
+
   .selected-integration:hover .mat-list-item-content {
-    padding: 0 6px 0!important;
+    padding: 0 6px 0 !important;
   }
+
   .selected-integration:hover .mat-list-item-content .mat-list-text .mat-line {
     section.status {
-      left: 18px!important;
+      left: 18px !important;
     }
+
     b.moon-More {
-      right: 7px!important;
+      right: 7px !important;
     }
   }
 }

@@ -18,6 +18,10 @@ export { User, ApiErrorCodes, FormErrorCodes };
 
 export interface WorkspaceState {
   name: string;
+  description: string;
+  type: "local" | "team" | "pro";
+  selected: boolean;
+  locked: boolean;
   id: string;
 }
 
@@ -33,7 +37,14 @@ export class TeamService {
   }
 
   get workspaceState(): BehaviorSubject<WorkspaceState> {
-    return new BehaviorSubject<WorkspaceState>({ name: constants.localWorkspaceName, id: constants.localWorkspaceKeychainValue });
+    return new BehaviorSubject<WorkspaceState>({
+      name: constants.localWorkspaceName,
+      description: constants.localWorkspaceDescription,
+      type: "local",
+      selected: true,
+      locked: false,
+      id: constants.localWorkspaceKeychainValue,
+    });
   }
 
   get switchingWorkspaceState(): BehaviorSubject<boolean> {

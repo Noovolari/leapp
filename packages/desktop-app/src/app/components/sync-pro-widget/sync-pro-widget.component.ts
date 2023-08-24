@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Subscription } from "rxjs";
 import { AppProviderService } from "../../services/app-provider.service";
-import { User } from "../../leapp-team-core/user/user";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
+import { WorkspaceState } from "../../services/team-service";
 
 @Component({
   selector: "app-sync-pro-widget",
@@ -12,6 +12,10 @@ import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog
 })
 export class SyncProWidgetComponent implements OnInit, OnDestroy {
   isLoggedAsPro = false;
+  isFailed = false;
+  isProgress = false;
+
+  isOpenFailed = false;
   isOpen = false;
 
   private subscription: Subscription;
@@ -20,9 +24,10 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isOpen = false;
+    this.isOpenFailed = false;
     this.isLoggedAsPro = false;
-    this.subscription = this.appProviderService.teamService.signedInUserState.subscribe((userState: User) => {
-      this.isLoggedAsPro = userState !== null && userState?.role === "pro";
+    this.subscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState: WorkspaceState[]) => {
+      this.isLoggedAsPro = !!workspacesState.find((wState) => wState.type === "pro");
     });
   }
 
@@ -34,4 +39,6 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
     this.isOpen = false;
     this.bsModalService.show(OptionsDialogComponent, { animated: false, class: "option-modal", initialState: { selectedIndex: 6 } });
   }
+
+  resyncAll(): void {}
 }

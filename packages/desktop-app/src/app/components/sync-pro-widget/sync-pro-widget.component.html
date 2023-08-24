@@ -1,11 +1,21 @@
 <hr>
 <section>
+  <span *ngIf="!isLoggedAsPro" class="unsync"><img src="assets/images/unsync.png" alt="" title=""> Sync disabled <i class="fa fa-info-circle" (click)="isOpen = !isOpen"></i></span>
   <span *ngIf="isLoggedAsPro" class="sync"><img src="assets/images/sync.png" alt="" title=""> Sync enabled</span>
-  <span *ngIf="!isLoggedAsPro" class="unsync"><img src="assets/images/unsynk.png" alt="" title=""> Sync disabled <i class="fa fa-info-circle" (click)="isOpen = !isOpen"></i></span>
+  <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed"><img src="assets/images/syncfailed.png" alt="" title=""> Sync failed <i class="fa fa-info-triangle" (click)="isOpenFailed = !isOpenFailed"></i></span>
+  <span *ngIf="isLoggedAsPro && isProgress" class="sync-progress"><img src="assets/images/syncprogress.png" alt="" title=""> Sync in progress</span>
+
+
   <div class="html-tooltip {{isOpen ? '': 'hide'}}">
     <span>You need to Upgrade to Pro Edition to enable syncing on the Cloud</span>
     <button class="btn btn-primary" (click)="goToUpgrade();">Upgrade</button>
   </div>
+
+  <div class="html-tooltip {{isOpenFailed ? '': 'hide'}}">
+    <span>We had a problem syncing your workspace online, please retry from here</span>
+    <button class="btn btn-primary" (click)="resyncAll();">Sync all</button>
+  </div>
+
 </section>
 
 

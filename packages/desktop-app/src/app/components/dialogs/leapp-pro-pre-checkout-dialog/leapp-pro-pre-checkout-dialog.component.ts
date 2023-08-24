@@ -19,6 +19,8 @@ export enum BillingPeriod {
 })
 export class LeappProPreCheckoutDialogComponent implements OnInit {
   public eBillingPeriod = BillingPeriod;
+  public isFetchingPrices = false;
+  public isRedirectingToCheckout = false;
 
   public emailFormControl = new FormControl("", [Validators.required, Validators.email]);
   public planFormControl = new FormControl("annually");
@@ -41,7 +43,9 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
   ) {}
 
   async ngOnInit(): Promise<void> {
+    this.isFetchingPrices = true;
     const tempPrices = await this.appProviderService.teamService.getPrices();
+    this.isFetchingPrices = false;
     this.prices = tempPrices.map((price) => {
       price["priceAmount"] = (parseInt(price.stripePriceAmount, 10) / 100.0).toFixed(2);
       price["monthlyPrice"] =
@@ -64,7 +68,9 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
     if (this.isEmailValid) {
       let checkoutUrl = "";
       try {
+        this.isRedirectingToCheckout = true;
         checkoutUrl = await this.appProviderService.teamService.createCheckoutSession(this.emailFormControl.value, this.price);
+        this.isRedirectingToCheckout = false;
       } catch (error) {
         if (error.response.data?.errorCode === ApiErrorCodes.emailAlreadyTaken) {
           this.toasterService.toast("Email already taken", ToastLevel.error);

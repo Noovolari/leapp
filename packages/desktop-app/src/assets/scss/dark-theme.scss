@@ -559,4 +559,11 @@ body.dark-theme {
   .right-side {
     border-left-color: #424242!important;
   }
+
+  .sync {
+    color: $white-text-color;
+    img {
+      filter: invert(1);
+    }
+  }
 }

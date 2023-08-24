@@ -1,13 +1,13 @@
 <div class="content">
-  <div class="left-side">
+  <div *ngIf="!isFetchingPrices" class="left-side">
     <h2>Upgrade to Pro</h2>
     <br>
     <small><strong>Billing period</strong></small>
     <br>
     <div>
       <div>
-        <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
-              (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>20% off</small></span>
+      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
+            (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>20% off</small></span>
         <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}"
               (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
       </div>
@@ -28,7 +28,7 @@
     <br>
   </div>
 
-  <div class="right-side">
+  <div *ngIf="!isFetchingPrices" class="right-side">
 
     <h2>Order summary</h2>
     <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
@@ -61,8 +61,14 @@
     <button (click)="upgradeToLeappPro();" class="margin-top-high btn-center btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}"
             [disabled]="!isEmailValid">
       Upgrade now
+      <i *ngIf="isRedirectingToCheckout" class="fa fa-spin fa-spinner"></i>
     </button>
 
     <div class="tc margin-top-high"><span>By clicking “Upgrade now” you agree to the Leapp Terms and Conditions.</span></div>
+  </div>
+
+  <div class="loader" *ngIf="isFetchingPrices">
+    <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </div>

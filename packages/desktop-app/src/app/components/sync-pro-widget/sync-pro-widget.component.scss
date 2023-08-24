@@ -21,6 +21,12 @@ section {
 .sync { color: #212529; }
 .unsync { color: #999999; }
 
+span.sync, span.unsync, span.sync-failed, span.sync-progress {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 img { height: 24px; width: 24px; }
 
 .html-tooltip {

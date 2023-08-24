@@ -14,6 +14,17 @@
   }
 }
 
+.content .loader {
+  height: 386px;
+  .fa.fa-spinner {
+    top: 190px;
+    left: 320px;
+    position: relative;
+    font-size: 22px;
+    color: #6A6A6A;
+  }
+}
+
 .left-side {
   width: 60%;
   padding: 20px !important;

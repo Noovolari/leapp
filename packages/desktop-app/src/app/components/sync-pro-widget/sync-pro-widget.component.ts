@@ -27,7 +27,10 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
     this.isOpenFailed = false;
     this.isLoggedAsPro = false;
     this.subscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState: WorkspaceState[]) => {
-      this.isLoggedAsPro = !!workspacesState.find((wState) => wState.type === "pro");
+      const workspaceState = workspacesState.find((wState) => wState.type === "pro");
+      this.isLoggedAsPro = !!workspacesState;
+      this.isProgress = workspaceState?.syncState === "in-progress";
+      this.isFailed = workspaceState?.syncState === "failed";
     });
   }
 

@@ -255,6 +255,10 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
         await this.sessionService.start(this.selectedSession.sessionId);
       }
 
+      this.leappCoreService.teamService
+        .synchronizationWithRemoteServer()
+        .then(() => {})
+        .catch((err) => console.log(err));
       this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
       this.closeModal();
     } else {

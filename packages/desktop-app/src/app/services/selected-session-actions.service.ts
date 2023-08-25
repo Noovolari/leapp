@@ -113,7 +113,12 @@ export class SelectedSessionActionsService {
           this.logSessionData(session, "Session Deleted");
           this.getSelectedSessionService(session)
             .delete(session.sessionId)
-            .then(() => {});
+            .then(() => {
+              this.appProviderService.teamService
+                .synchronizationWithRemoteServer()
+                .then(() => {})
+                .catch((err) => console.log(err));
+            });
         }
       },
       "Delete Session",

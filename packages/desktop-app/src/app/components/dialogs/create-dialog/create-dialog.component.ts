@@ -397,6 +397,10 @@ export class CreateDialogComponent implements OnInit {
           break;*/
       }
 
+      this.leappCoreService.teamService
+        .synchronizationWithRemoteServer()
+        .then(() => {})
+        .catch((err) => console.log(err));
       this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, "");
       this.closeModal();
     } else {

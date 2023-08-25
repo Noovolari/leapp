@@ -361,8 +361,16 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       }
       if (this.modifying === 1) {
         await this.appProviderService.integrationFactory.create(this.selectedIntegration as any, integrationParams);
+        this.appProviderService.teamService
+          .synchronizationWithRemoteServer()
+          .then(() => {})
+          .catch((err) => console.log(err));
       } else if (this.modifying === 2) {
         await this.appProviderService.integrationFactory.update(this.selectedConfiguration.id, integrationParams);
+        this.appProviderService.teamService
+          .synchronizationWithRemoteServer()
+          .then(() => {})
+          .catch((err) => console.log(err));
       }
 
       this.ngZone.run(() => {
@@ -386,6 +394,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           this.loggingService.log(new LoggedEntry(`Removing sessions with attached integration id: ${integration.id}`, this, LogLevel.info));
           await this.logout(integration.id);
           await this.appProviderService.integrationFactory.delete(integration.id);
+          this.appProviderService.teamService
+            .synchronizationWithRemoteServer()
+            .then(() => {})
+            .catch((err) => console.log(err));
           this.setValues();
           this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
         }

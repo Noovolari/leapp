@@ -46,7 +46,7 @@ export class LoginWorkspaceDialogComponent implements OnInit {
         await this.teamService.signIn(formValue.email, formValue.password);
         this.closeModal();
         if (doesWorkspaceExist) {
-          await this.teamService.syncSecrets();
+          await this.teamService.pullFromRemote();
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }

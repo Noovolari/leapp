@@ -99,9 +99,10 @@
           </div>
         </ng-container>
 
-        <button class="btn-right-margin {{formValid() ? '': 'mat-button-disabled'}}" [disabled]="!formValid()" (click)="save();">
-          <ng-container *ngIf="modifying === 1">Add integration</ng-container>
-          <ng-container *ngIf="modifying === 2">Edit integration</ng-container>
+        <button class="btn-right-margin {{formValid() ? '': 'mat-button-disabled'}}" [disabled]="!formValid() || submitting" (click)="save();">
+          <ng-container *ngIf="modifying === 1">Add integration </ng-container>
+          <ng-container *ngIf="modifying === 2">Edit integration </ng-container>
+          <i *ngIf="submitting" class="fa fa-spinner fa-spin"></i>
         </button>
         <a (click)="modalRef.hide()">Cancel</a>
 
@@ -143,7 +144,8 @@
 
   <mat-list-item *ngIf="!isTeamWorkspace" (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedConfiguration);">
     <div mat-line class="gray-line">
-      <i class="moon-Add"></i><span>Add Integration</span></div>
+      <i class="moon-Add"></i><span>Add Integration</span>
+    </div>
   </mat-list-item>
 </mat-list>
 

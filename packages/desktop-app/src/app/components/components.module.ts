@@ -57,6 +57,7 @@ import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component
 import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
 import { SyncProWidgetComponent } from "./sync-pro-widget/sync-pro-widget.component";
 import { OverlayModule } from "@angular/cdk/overlay";
+import { LoginPageComponent } from "./login-page/login-page.component";
 
 @NgModule({
   declarations: [
@@ -91,6 +92,7 @@ import { OverlayModule } from "@angular/cdk/overlay";
     ManageTeamWorkspacesDialogComponent,
     LeappProPreCheckoutDialogComponent,
     SyncProWidgetComponent,
+    LoginPageComponent,
   ],
   imports: [
     CommonModule,

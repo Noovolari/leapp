@@ -1,0 +1,116 @@
+@import "../../../assets/scss/mixins/palette";
+
+.form-field {
+  margin-bottom: 15px;
+}
+
+.form-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 15px;
+
+  img {
+    filter: invert(79%) sepia(34%) saturate(7293%) hue-rotate(166deg) brightness(92%) contrast(92%);
+    margin-right: 3px;
+    height: 20px;
+  }
+
+  a {
+    color: $local-workspace-blu;
+  }
+}
+
+
+.full-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  background: white;
+
+  width: 100%;
+  height: 100%;
+
+  .logo-column {
+    height: 100%;
+    width: 96px;
+    margin-left: 48px;
+    border-left: 1px solid #dadada;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 96px;
+      height: 96px;
+      position: relative;
+      left: -48px;
+    }
+  }
+
+  .form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .personal-data {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+
+      .letter-avatar {
+        background: #ffffff;
+        color: #dadada;
+        border-radius: 50%;
+        border: 1px solid #dadada;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        span {
+          text-align: center;
+          color: #666;
+          font-size: 17px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 34px;
+        }
+      }
+
+      .name {
+        color: #000;
+        font-size: 23px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 34px;
+        text-align: left;
+      }
+
+      .email {
+        color: #999;
+        font-size: 20px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 23px;
+      }
+    }
+  }
+
+  .vertical-hr {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    .hr {
+
+    }
+  }
+}

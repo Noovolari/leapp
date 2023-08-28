@@ -21,6 +21,8 @@ import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog
 import { LoginWorkspaceDialogComponent } from "../dialogs/login-team-dialog/login-workspace-dialog.component";
 import { ManageTeamWorkspacesDialogComponent } from "../dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 import { WorkspaceState } from "../../services/team-service";
+import { Role } from "../../leapp-team-core/user/role";
+import { Router } from "@angular/router";
 
 export interface SelectedSegment {
   name: string;
@@ -57,7 +59,12 @@ export class SideBarComponent implements OnInit, OnDestroy {
   private unsubscribe: () => void;
   private behaviouralSubjectService: BehaviouralSubjectService;
 
-  constructor(private bsModalService: BsModalService, private appProviderService: AppProviderService, private appService: AppService) {
+  constructor(
+    private router: Router,
+    private bsModalService: BsModalService,
+    private appProviderService: AppProviderService,
+    private appService: AppService
+  ) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.showAll = true;
     this.showPinned = false;
@@ -72,7 +79,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   }
 
   get canLockWorkspace(): boolean {
-    return !!this.workspacesState.find((state) => state.type === "team" && !state.locked);
+    return !!this.workspacesState.find((state) => (state.type === "team" || state.type === "pro") && !state.locked);
   }
 
   get selectedWorkspace(): WorkspaceState {
@@ -202,6 +209,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
   async logoutFromRemoteWorkspace(lock: boolean = false): Promise<void> {
     if (!this.canLockWorkspace || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
+    if (this.appProviderService.teamService.signedInUserState.getValue().role === Role.pro) {
+      await this.router.navigate(["/login"]);
+    }
   }
 
   async switchToWorkspace(workspace: WorkspaceState) {

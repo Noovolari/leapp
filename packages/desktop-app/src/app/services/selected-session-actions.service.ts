@@ -115,7 +115,7 @@ export class SelectedSessionActionsService {
             .delete(session.sessionId)
             .then(() => {
               this.appProviderService.teamService
-                .synchronizationWithRemoteServer()
+                .pushToRemote()
                 .then(() => {})
                 .catch((err) => console.log(err));
             });

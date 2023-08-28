@@ -66,7 +66,7 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
     if (this.isWorkspaceLocked) {
       await this.loginToWorkspace();
     } else {
-      await this.appProviderService.teamService.syncSecrets();
+      await this.appProviderService.teamService.pullFromRemote();
       this.resetFilters();
     }
   }

@@ -83,6 +83,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   menuX: number;
   menuY: number;
 
+  submitting = false;
+
   public behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoRoleService: AwsSsoRoleService;
   private awsSsoOidcService: AwsSsoOidcService;
@@ -312,6 +314,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     if (this.isTeamWorkspace) {
       return;
     }
+
     // Change graphical values to show the form
     this.chooseIntegration = false;
     this.modifying = modifying;
@@ -344,42 +347,43 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   async save(): Promise<void> {
-    // TODO: Add spinner since the Azure is async...
-    if (this.formValid()) {
-      const alias = this.form.get("alias").value?.trim();
-      const portalUrl = this.form.get("portalUrl").value?.trim();
-      const region = this.form.get("awsRegion").value;
-      const browserOpening = this.form.get("defaultBrowserOpening").value;
-      const tenantId = this.form.get("tenantId").value;
+    this.submitting = true;
+    try {
+      if (this.formValid()) {
+        const alias = this.form.get("alias").value?.trim();
+        const portalUrl = this.form.get("portalUrl").value?.trim();
+        const region = this.form.get("awsRegion").value;
+        const browserOpening = this.form.get("defaultBrowserOpening").value;
+        const tenantId = this.form.get("tenantId").value;
 
-      let integrationParams: IntegrationParams;
-      if (this.modifying > 0) {
-        integrationParams =
-          this.selectedIntegration === IntegrationType.awsSso
-            ? ({ alias, browserOpening, portalUrl, region } as IntegrationParams)
-            : ({ alias, tenantId } as IntegrationParams);
-      }
-      if (this.modifying === 1) {
-        await this.appProviderService.integrationFactory.create(this.selectedIntegration as any, integrationParams);
-        this.appProviderService.teamService
-          .synchronizationWithRemoteServer()
-          .then(() => {})
-          .catch((err) => console.log(err));
-      } else if (this.modifying === 2) {
-        await this.appProviderService.integrationFactory.update(this.selectedConfiguration.id, integrationParams);
-        this.appProviderService.teamService
-          .synchronizationWithRemoteServer()
-          .then(() => {})
-          .catch((err) => console.log(err));
-      }
+        let integrationParams: IntegrationParams;
+        if (this.modifying > 0) {
+          integrationParams =
+            this.selectedIntegration === IntegrationType.awsSso
+              ? ({ alias, browserOpening, portalUrl, region } as IntegrationParams)
+              : ({ alias, tenantId } as IntegrationParams);
+        }
 
-      this.ngZone.run(() => {
-        this.setValues();
-        this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
-      });
-      this.modalRef.hide();
-    } else {
-      this.messageToasterService.toast("Form is not valid", ToastLevel.warn, "Form validation");
+        if (this.modifying === 1) {
+          await this.appProviderService.integrationFactory.create(this.selectedIntegration as any, integrationParams);
+          await this.appProviderService.teamService.pushToRemote();
+        } else if (this.modifying === 2) {
+          await this.appProviderService.integrationFactory.update(this.selectedConfiguration.id, integrationParams);
+          await this.appProviderService.teamService.pushToRemote();
+        }
+
+        this.ngZone.run(() => {
+          this.setValues();
+          this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
+        });
+        this.modalRef.hide();
+      } else {
+        this.messageToasterService.toast("Form is not valid", ToastLevel.warn, "Form validation");
+      }
+    } catch (error) {
+      this.messageToasterService.toast(error.message, ToastLevel.error);
+    } finally {
+      this.submitting = false;
     }
   }
 
@@ -395,7 +399,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
           await this.logout(integration.id);
           await this.appProviderService.integrationFactory.delete(integration.id);
           this.appProviderService.teamService
-            .synchronizationWithRemoteServer()
+            .pushToRemote()
             .then(() => {})
             .catch((err) => console.log(err));
           this.setValues();

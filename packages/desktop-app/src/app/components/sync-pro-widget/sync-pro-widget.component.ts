@@ -44,6 +44,7 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
   }
 
   resyncAll(): void {
-    this.appProviderService.teamService.synchronizationWithRemoteServer();
+    // TODO: change to pullFromRemote
+    this.appProviderService.teamService.pushToRemote();
   }
 }

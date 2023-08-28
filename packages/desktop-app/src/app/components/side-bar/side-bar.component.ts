@@ -214,7 +214,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     } else {
       if (!this.isLocalWorkspaceSelected) return;
       await this.appProviderService.sessionManagementService.stopAllSessions();
-      await this.appProviderService.teamService.syncSecrets();
+      await this.appProviderService.teamService.pullFromRemote();
       this.resetFilters();
     }
   }

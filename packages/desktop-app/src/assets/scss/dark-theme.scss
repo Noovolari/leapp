@@ -566,4 +566,35 @@ body.dark-theme {
       filter: invert(1);
     }
   }
+
+  .full-container {
+    background-color: $dark-modal-background!important;
+    color: #DEDCDD!important;
+    .logo-column {
+      border-right-color: #404040!important;
+      img {
+        border-color: #404040!important;
+      }
+    }
+    .form-column-container {
+      .letter-avatar {
+        background-color: $dark-main-background!important;
+        border-color: $dark-input-form-border!important;
+        span {
+          color: #DEDCDD!important;
+        }
+      }
+      .name {
+        color: $white-text-color!important;
+      }
+    }
+    .vertical-hr {
+      .hr {
+        border-right-color: #404040!important;
+      }
+    }
+    .fa-eye-slash, .fa-eye {
+      color: #DEDCDD!important;
+    }
+  }
 }

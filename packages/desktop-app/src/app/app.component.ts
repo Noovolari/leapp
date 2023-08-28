@@ -186,7 +186,7 @@ export class AppComponent implements OnInit {
     // go to the list page if is your second visit.
     // If there is a pro user registered go to login page instead
     if (this.teamService.signedInUserState.getValue()?.role === Role.pro) {
-      await this.router.navigate(["/login"]);
+      await this.router.navigate(["/lock"]);
     } else {
       await this.router.navigate(["/dashboard"]);
     }

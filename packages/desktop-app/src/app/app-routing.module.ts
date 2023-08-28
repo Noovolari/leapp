@@ -1,7 +1,7 @@
 import { NgModule } from "@angular/core";
 import { RouterModule, Routes } from "@angular/router";
 import { MainLayoutComponent } from "./layout/main-layout/main-layout.component";
-import { LoginPageComponent } from "./components/login-page/login-page.component";
+import { LockPageComponent } from "./components/lock-page/lock-page.component";
 
 const routes: Routes = [
   {
@@ -9,8 +9,8 @@ const routes: Routes = [
     component: MainLayoutComponent,
   },
   {
-    path: "login",
-    component: LoginPageComponent,
+    path: "lock",
+    component: LockPageComponent,
   },
 ];
 

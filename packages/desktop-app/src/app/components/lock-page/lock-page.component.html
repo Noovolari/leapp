@@ -1,14 +1,15 @@
+<div class="draggable-area"></div>
 <div class="full-container">
   <div class="logo-column">
     <img src="assets/images/Leapp-rounded.png" alt="" title="">
   </div>
 
-  <div class="form-container">
+  <div class="form-column-container">
     <div class="personal-data">
       <div class="letter-avatar"><span>{{initials}}</span></div>
       <div class="email-and-name">
         <div class="name">{{name}}</div>
-        <div class="email">{{email?.toString()}}</div>
+        <div class="email">{{email.value}}</div>
       </div>
     </div>
 
@@ -16,14 +17,13 @@
       <fieldset class="form-container" [disabled]="submitting">
         <input class="form-control" type="hidden" placeholder="Company email" [formControl]="email" required>
         <div class="form-field">
-          <label for="password-field">Password</label>
           <input class="form-control" id="password-field" [type]="hidePassword ? 'password' : 'text'" placeholder="Enter your workspace password"
                  [formControl]="password" (keyup.enter)="signIn()" required>
           <button class="input-inner-button" type="button" (click)="hidePassword = !hidePassword"
                   [attr.aria-pressed]="hidePassword">
             <i class="fa {{hidePassword ? 'fa-eye-slash' : 'fa-eye'}}"></i>
           </button>
-          <small class="text-error" *ngIf="password.invalid && password.touched">{{getFormError(password)}}</small>
+          <div *ngIf="submitting" class="sign-in-loader"><i class="fa fa-spinner fa-spin"></i></div>
         </div>
       </fieldset>
     </form>
@@ -34,7 +34,7 @@
   </div>
 
   <div class="local-workspace">
-    <p><span>Or switch back to </span><span (click)="switchToLocalWorkspace();"></span></p>
+    <p><span>Or switch back </span><span class="link-to-local" (click)="switchToLocalWorkspace();">to the local workspace</span></p>
   </div>
 </div>
 

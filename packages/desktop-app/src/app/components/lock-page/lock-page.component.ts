@@ -7,11 +7,11 @@ import { AppProviderService } from "../../services/app-provider.service";
 import { Router } from "@angular/router";
 
 @Component({
-  selector: "app-login-page",
-  templateUrl: "./login-page.component.html",
-  styleUrls: ["./login-page.component.scss"],
+  selector: "app-lock-page",
+  templateUrl: "./lock-page.component.html",
+  styleUrls: ["./lock-page.component.scss"],
 })
-export class LoginPageComponent implements OnInit {
+export class LockPageComponent implements OnInit {
   email: FormControl;
   password: FormControl;
   signinForm: FormGroup;
@@ -86,5 +86,7 @@ export class LoginPageComponent implements OnInit {
     return "";
   }
 
-  switchToLocalWorkspace() {}
+  async switchToLocalWorkspace(): Promise<void> {
+    await this.router.navigate(["/dashboard"]);
+  }
 }

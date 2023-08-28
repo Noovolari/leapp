@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { LoginPageComponent } from "./login-page.component";
+import { LockPageComponent } from "./lock-page.component";
 
 describe("LoginPageComponent", () => {
-  let component: LoginPageComponent;
-  let fixture: ComponentFixture<LoginPageComponent>;
+  let component: LockPageComponent;
+  let fixture: ComponentFixture<LockPageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [LoginPageComponent],
+      declarations: [LockPageComponent],
     }).compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(LoginPageComponent);
+    fixture = TestBed.createComponent(LockPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

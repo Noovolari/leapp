@@ -210,7 +210,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     if (!this.canLockWorkspace || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
     if (this.appProviderService.teamService.signedInUserState.getValue().role === Role.pro) {
-      await this.router.navigate(["/login"]);
+      await this.router.navigate(["/lock"]);
     }
   }
 

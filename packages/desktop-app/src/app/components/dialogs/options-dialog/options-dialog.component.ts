@@ -17,7 +17,7 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { AppNativeService } from "../../../services/app-native.service";
 import { PluginContainer } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
-import { LeappProPreCheckoutDialogComponent } from "../leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
+import { BillingPeriod, LeappProPreCheckoutDialogComponent } from "../leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
 import { BehaviorSubject, Subscription } from "rxjs";
 
 export enum LeappPlanStatus {
@@ -44,6 +44,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
 
   eConstants = constants;
   eOperatingSystem = OperatingSystem;
+  eBillingPeriod = BillingPeriod;
 
   awsProfileValue: { id: string; name: string };
   idpUrlValue;
@@ -71,6 +72,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   fetchingPlugins: boolean;
 
   selectedSsmRegionBehaviour: string;
+  selectedPeriod: BillingPeriod = BillingPeriod.yearly;
 
   form = new FormGroup({
     idpUrl: new FormControl(""),
@@ -543,5 +545,9 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
 
   openLeappProPreCheckoutDialog(): void {
     this.modalService.show(LeappProPreCheckoutDialogComponent, { animated: false, class: "pre-checkout-modal", backdrop: "static", keyboard: false });
+  }
+
+  setBillingPeriod(billingPeriod: BillingPeriod): void {
+    this.selectedPeriod = billingPeriod;
   }
 }

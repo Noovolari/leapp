@@ -51,9 +51,10 @@ export class LoginWorkspaceDialogComponent implements OnInit {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }
       } catch (responseException: any) {
-        if (responseException.error?.errorCode === ApiErrorCodes.invalidCredentials) {
+        if (responseException?.response.data?.errorCode === ApiErrorCodes.invalidCredentials) {
+          this.loggingService.log(new LoggedEntry("Invalid email or password", this, LogLevel.error, true));
           this.password.setErrors({ [FormErrorCodes.invalidCredentials]: {} });
-        } else if (responseException.error?.errorCode === ApiErrorCodes.userNotActive) {
+        } else if (responseException?.response.data?.errorCode === ApiErrorCodes.userNotActive) {
           this.loggingService.log(new LoggedEntry("The user is not active", this, LogLevel.error, true));
         } else {
           this.loggingService.log(new LoggedEntry(responseException, this, LogLevel.error, true));

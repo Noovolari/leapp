@@ -367,9 +367,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         if (this.modifying === 1) {
           await this.appProviderService.integrationFactory.create(this.selectedIntegration as any, integrationParams);
           await this.appProviderService.teamService.pushToRemote();
+          this.messageToasterService.toast(`Integration: ${integrationParams.alias}, created.`, ToastLevel.success, "");
         } else if (this.modifying === 2) {
           await this.appProviderService.integrationFactory.update(this.selectedConfiguration.id, integrationParams);
           await this.appProviderService.teamService.pushToRemote();
+          this.messageToasterService.toast(`Integration: ${integrationParams.alias}, edited.`, ToastLevel.success, "");
         }
 
         this.ngZone.run(() => {
@@ -393,17 +395,19 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.windowService.confirmDialog(
       `Deleting this configuration will also logout from its sessions: do you want to proceed?`,
       async (res) => {
-        if (res !== constants.confirmClosed) {
-          // eslint-disable-next-line max-len
-          this.loggingService.log(new LoggedEntry(`Removing sessions with attached integration id: ${integration.id}`, this, LogLevel.info));
-          await this.logout(integration.id);
-          await this.appProviderService.integrationFactory.delete(integration.id);
-          this.appProviderService.teamService
-            .pushToRemote()
-            .then(() => {})
-            .catch((err) => console.log(err));
-          this.setValues();
-          this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
+        try {
+          if (res !== constants.confirmClosed) {
+            // eslint-disable-next-line max-len
+            this.loggingService.log(new LoggedEntry(`Removing sessions with attached integration id: ${integration.id}`, this, LogLevel.info));
+            await this.logout(integration.id);
+            await this.appProviderService.integrationFactory.delete(integration.id);
+            await this.appProviderService.teamService.pushToRemote();
+            this.messageToasterService.toast(`Integration: ${integration.alias}, deleted.`, ToastLevel.success, "");
+            this.setValues();
+            this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
+          }
+        } catch (error) {
+          this.messageToasterService.toast(error.message, ToastLevel.error);
         }
       },
       "Delete Configuration",

@@ -88,7 +88,7 @@ export class LockPageComponent implements OnInit {
   }
 
   async switchToLocalWorkspace(): Promise<void> {
-    await this.appProviderService.teamService.signOut(true);
+    await this.appProviderService.teamService.signOut();
     await this.router.navigate(["/dashboard"]);
   }
 }

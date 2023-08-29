@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
     public awsAuthenticationService: AppAwsAuthenticationService,
     public verificationWindowService: AppVerificationWindowService,
     public appService: AppService,
-    private router: Router,
+    public router: Router,
     private optionsService: OptionsService,
     private updaterService: UpdaterService,
     private windowService: WindowService,

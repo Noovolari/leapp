@@ -3,7 +3,7 @@
 <app-tray-menu></app-tray-menu>
 <div class="app-{{appService.detectOs()}}-detected" (click)="closeAllRightClickMenus();">
   <router-outlet></router-outlet>
-  <div [ngClass]="isSyncingWorkspace ? '' : 'hidden'" id="loader-overlay">
+  <div [ngClass]="isSyncingWorkspace && router.url !== '/lock' ? '' : 'hidden'" id="loader-overlay">
     <i class="fa fa-spinner fa-spin"></i>
     <span>Loading workspace...</span>
   </div>

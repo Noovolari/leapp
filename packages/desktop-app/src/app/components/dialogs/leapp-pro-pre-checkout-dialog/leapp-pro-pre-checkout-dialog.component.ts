@@ -121,6 +121,14 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
     }
   }
 
+  openPrivacyPolicy() {
+    this.windowService.openExternalUrl("https://d3o59asa8udcq9.cloudfront.net/docs/Privacy_Policy_Noovolari.pdf");
+  }
+
+  openTermsAndConditions() {
+    this.windowService.openExternalUrl("https://d3o59asa8udcq9.cloudfront.net/docs/Terms_and_conditions_SAAS.pdf");
+  }
+
   checkAndConfirm(): void {
     this.emailFormControl.markAsTouched();
     this.isEmailValid = this.form.valid;

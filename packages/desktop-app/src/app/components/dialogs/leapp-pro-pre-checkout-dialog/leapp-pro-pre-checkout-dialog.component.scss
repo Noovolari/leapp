@@ -6,6 +6,7 @@
   .pre-checkout-modal {
     max-width: 650px;
     width: 100%;
+
     .modal-content, .content {
       padding: 0;
       display: flex;
@@ -16,6 +17,7 @@
 
 .content .loader {
   height: 386px;
+
   .fa.fa-spinner {
     top: 190px;
     left: 320px;
@@ -28,9 +30,11 @@
 .left-side {
   width: 60%;
   padding: 20px !important;
+
   h2 {
     color: $text-color;
   }
+
   span {
     color: $table-text;
   }
@@ -58,6 +62,7 @@
   h2 {
     color: $text-color;
   }
+
   span {
     color: $table-text;
   }
@@ -183,4 +188,8 @@ button.disabled {
 .tc {
   margin-top: 10px;
   font-size: small;
+}
+
+.terms-disclaimer a {
+  text-decoration: underline;
 }

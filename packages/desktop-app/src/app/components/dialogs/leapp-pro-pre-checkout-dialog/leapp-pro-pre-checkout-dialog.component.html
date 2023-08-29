@@ -64,7 +64,7 @@
       <i *ngIf="isRedirectingToCheckout" class="fa fa-spin fa-spinner"></i>
     </button>
 
-    <div class="tc margin-top-high"><span>By clicking “Upgrade now” you agree to the Leapp Terms and Conditions.</span></div>
+    <div class="tc margin-top-high terms-disclaimer"><span>By clicking “Upgrade now” you agree to the Leapp <a (click)="openTermsAndConditions()">Terms and Conditions</a> and <a (click)="openPrivacyPolicy()">Privacy Policy</a>.</span></div>
   </div>
 
   <div class="loader" *ngIf="isFetchingPrices">

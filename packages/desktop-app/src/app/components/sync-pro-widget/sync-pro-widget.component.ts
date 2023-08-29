@@ -15,16 +15,11 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
   isFailed = false;
   isProgress = false;
 
-  isOpenFailed = false;
-  isOpen = false;
-
   private subscription: Subscription;
 
   constructor(private appProviderService: AppProviderService, private bsModalService: BsModalService) {}
 
   ngOnInit(): void {
-    this.isOpen = false;
-    this.isOpenFailed = false;
     this.isLoggedAsPro = false;
     this.subscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState: WorkspaceState[]) => {
       const workspaceState = workspacesState.find((wState) => wState.type === "pro");
@@ -39,7 +34,6 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
   }
 
   goToUpgrade(): void {
-    this.isOpen = false;
     this.bsModalService.show(OptionsDialogComponent, { animated: false, class: "option-modal", initialState: { selectedIndex: 6 } });
   }
 

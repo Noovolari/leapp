@@ -1,9 +1,14 @@
 <hr>
 <section>
-  <span *ngIf="!isLoggedAsPro" class="unsync"><img src="assets/images/unsync.png" alt="" title=""> Sync disabled <button class="btn btn-primary" (click)="goToUpgrade();">Pro</button></span>
-  <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed"><img src="assets/images/syncfailed.png" alt="" title=""> Sync failed</span>
-  <span *ngIf="isLoggedAsPro && isProgress" class="sync-progress"><img src="assets/images/syncprogress.png" alt="" title=""> Sync in progress</span>
-  <span *ngIf="isLoggedAsPro && !isProgress && !isFailed" class="sync"><img src="assets/images/sync.png" alt="" title=""> Sync enabled</span>
+  <span *ngIf="!isLoggedAsPro" class="unsync">
+    <span><img src="assets/images/unsync.png" alt="" title=""> Sync disabled</span>
+    <button class="btn btn-primary" (click)="goToUpgrade();">Pro</button>
+  </span>
+  <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed"><span><img src="assets/images/syncfailed.png" alt="" title=""> Sync failed</span></span>
+  <span *ngIf="isLoggedAsPro && isProgress" class="sync-progress"><span><img src="assets/images/syncprogress.png" alt=""
+                                                                             title=""> Sync in progress</span></span>
+  <span *ngIf="isLoggedAsPro && !isProgress && !isFailed" class="sync"><span><img src="assets/images/sync.png" alt=""
+                                                                                  title=""> Sync enabled</span></span>
 </section>
 
 

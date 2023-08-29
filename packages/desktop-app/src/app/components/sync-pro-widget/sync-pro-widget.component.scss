@@ -1,33 +1,54 @@
 hr {
   width: 100%;
 }
+
 span {
   display: inline-block;
   width: 100%;
   font-weight: normal;
   font-size: 14px;
 }
+
 section {
   padding: 10px 15px;
   margin: 0;
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: flex-start;
+  align-items: cen;
   width: 100%;
   position: relative;
 }
 
-.sync { color: #212529; }
-.unsync { color: #999999; }
+.sync {
+  color: #212529;
+}
+
+.unsync {
+  color: #999999;
+}
 
 span.sync, span.unsync, span.sync-failed, span.sync-progress {
   display: flex;
   align-items: center;
   gap: 10px;
+  justify-content: space-between;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  button {
+    padding: 0 5px !important;
+  }
 }
 
-img { height: 24px; width: 24px; }
+img {
+  height: 24px;
+  width: 24px;
+}
 
 .html-tooltip {
   padding: 10px;
@@ -44,11 +65,19 @@ img { height: 24px; width: 24px; }
   text-align: center;
   background: white;
   z-index: 2;
-  span { color: #3c3c3c; font-size: 14px; margin-bottom: 10px; display: inline-block; }
+
+  span {
+    color: #3c3c3c;
+    font-size: 14px;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
 }
 
 .hide {
   display: none;
 }
 
-i { cursor: pointer; }
+i {
+  cursor: pointer;
+}

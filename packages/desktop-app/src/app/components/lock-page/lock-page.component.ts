@@ -51,7 +51,7 @@ export class LockPageComponent implements OnInit {
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
         if (doesWorkspaceExist) {
-          await this.teamService.syncSecrets();
+          await this.teamService.pullFromRemote();
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }

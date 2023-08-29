@@ -37,8 +37,8 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
     this.bsModalService.show(OptionsDialogComponent, { animated: false, class: "option-modal", initialState: { selectedIndex: 6 } });
   }
 
+  // TODO: is it still used?
   resyncAll(): void {
-    // TODO: change to pullFromRemote
-    this.appProviderService.teamService.pushToRemote();
+    this.appProviderService.teamService.pullFromRemote();
   }
 }

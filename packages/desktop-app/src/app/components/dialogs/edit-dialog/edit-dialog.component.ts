@@ -84,6 +84,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   public locations = [];
   public selectedLocation;
 
+  public submitting = false;
+
   private behaviouralSubjectService: BehaviouralSubjectService;
   private keychainService: IKeychainService;
   private sessionService: SessionService;
@@ -219,50 +221,54 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
    * Save the edited account in the workspace
    */
   async saveAccount(): Promise<void> {
-    if (this.formValid()) {
-      this.addProfileToWorkspace();
-      this.addIpdUrlToWorkspace();
-      this.updateProperties();
+    this.submitting = true;
+    try {
+      if (this.formValid()) {
+        this.addProfileToWorkspace();
+        this.addIpdUrlToWorkspace();
+        this.updateProperties();
 
-      if (this.selectedSession.type !== SessionType.azure) {
-        try {
-          this.leappCoreService.namedProfileService.getProfileName(this.selectedProfile.value);
-        } catch (e) {
-          this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
+        if (this.selectedSession.type !== SessionType.azure) {
+          try {
+            this.leappCoreService.namedProfileService.getProfileName(this.selectedProfile.value);
+          } catch (e) {
+            this.selectedProfile.value = this.leappCoreService.namedProfileService.createNamedProfile(this.selectedProfile.label).id;
+          }
         }
-      }
 
-      let wasActive = false;
-      if (this.selectedSession.status === SessionStatus.active) {
-        await this.sessionService.stop(this.selectedSession.sessionId);
-        wasActive = true;
-      }
+        let wasActive = false;
+        if (this.selectedSession.status === SessionStatus.active) {
+          await this.sessionService.stop(this.selectedSession.sessionId);
+          wasActive = true;
+        }
 
-      if (this.selectedSession.type !== SessionType.azure) {
-        this.leappCoreService.namedProfileService.changeNamedProfile(this.selectedSession, this.selectedProfile.value);
-        this.selectedSession.region = this.form.get("awsRegion").value;
+        if (this.selectedSession.type !== SessionType.azure) {
+          await this.leappCoreService.namedProfileService.changeNamedProfile(this.selectedSession, this.selectedProfile.value);
+          this.selectedSession.region = this.form.get("awsRegion").value;
+        } else {
+          this.selectedSession.region = this.form.get("azureLocation").value;
+        }
+
+        const sessions = this.leappCoreService.sessionManagementService.getSessions();
+        const index = sessions.findIndex((s) => s.sessionId === this.selectedSession.sessionId);
+        sessions[index] = this.selectedSession;
+        this.leappCoreService.sessionManagementService.updateSessions(sessions);
+        this.behaviouralSubjectService.setSessions(this.leappCoreService.sessionManagementService.getSessions());
+
+        if (wasActive) {
+          await this.sessionService.start(this.selectedSession.sessionId);
+        }
+
+        await this.leappCoreService.teamService.pushToRemote();
+        this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
       } else {
-        this.selectedSession.region = this.form.get("azureLocation").value;
+        this.messageToasterService.toast(`One or more parameters are invalid, check your choices.`, ToastLevel.warn, "");
       }
-
-      const sessions = this.leappCoreService.sessionManagementService.getSessions();
-      const index = sessions.findIndex((s) => s.sessionId === this.selectedSession.sessionId);
-      sessions[index] = this.selectedSession;
-      this.leappCoreService.sessionManagementService.updateSessions(sessions);
-      this.behaviouralSubjectService.setSessions(this.leappCoreService.sessionManagementService.getSessions());
-
-      if (wasActive) {
-        await this.sessionService.start(this.selectedSession.sessionId);
-      }
-
-      this.leappCoreService.teamService
-        .pushToRemote()
-        .then(() => {})
-        .catch((err) => console.log(err));
-      this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
+    } catch (error) {
+      this.messageToasterService.toast(error.message, ToastLevel.error);
+    } finally {
+      this.submitting = false;
       this.closeModal();
-    } else {
-      this.messageToasterService.toast(`One or more parameters are invalid, check your choices.`, ToastLevel.warn, "");
     }
   }
 

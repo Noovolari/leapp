@@ -108,17 +108,16 @@ export class SelectedSessionActionsService {
     const dialogMessage = this.generateDeleteDialogMessage(session);
     this.windowService.confirmDialog(
       dialogMessage,
-      (status) => {
-        if (status === constants.confirmed) {
-          this.logSessionData(session, "Session Deleted");
-          this.getSelectedSessionService(session)
-            .delete(session.sessionId)
-            .then(() => {
-              this.appProviderService.teamService
-                .pushToRemote()
-                .then(() => {})
-                .catch((err) => console.log(err));
-            });
+      async (status) => {
+        try {
+          if (status === constants.confirmed) {
+            this.logSessionData(session, "Session Deleted");
+            await this.getSelectedSessionService(session).delete(session.sessionId);
+            await this.appProviderService.teamService.pushToRemote();
+            this.messageToasterService.toast(`Session: ${session.sessionName}, deleted.`, ToastLevel.success, "");
+          }
+        } catch (error) {
+          this.messageToasterService.toast(error.message, ToastLevel.error);
         }
       },
       "Delete Session",

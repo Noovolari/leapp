@@ -15,7 +15,7 @@ export default class Workspace extends LeappCommand {
 
   async run(): Promise<void> {
     try {
-      const workspaceState = this.cliProviderService.teamService.workspaceState.getValue();
+      const workspaceState = this.cliProviderService.teamService.workspacesState.getValue().find((tmpWorkspaceState) => tmpWorkspaceState.selected);
       if (workspaceState.id === constants.localWorkspaceKeychainValue) {
         this.log("local");
       } else {

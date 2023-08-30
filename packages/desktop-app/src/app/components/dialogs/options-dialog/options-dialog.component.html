@@ -417,13 +417,14 @@
               <div class="cta-button clickable" (click)="openLeappProPreCheckoutDialog()" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">
                 Upgrade
               </div>
-              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">Pending (step 1/2) <i class="fa fa-info-circle"
-                                                                                                                           [matTooltip]="'To complete the registration follow the instructions received via email and register on Leapp portal'"></i>
+              <div class="cta-label" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">
+                To complete the registration follow the instructions received via email and register on Leapp portal.
+                If you have problem please contact our support at <a (click)="contactSupport();">support@noovolari.com</a>.
               </div>
               <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proEnabled">Your active plan</div>
               <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.enterprise">Already upgraded</div>
 
-              <ul class="plan-features">
+              <ul class="plan-features" *ngIf="leappPlanStatus !== eEnabledLeappPlanStatus.proPending">
                 <li>
                   <span class="all-free-features">All the Free features, plus</span>
                 </li>

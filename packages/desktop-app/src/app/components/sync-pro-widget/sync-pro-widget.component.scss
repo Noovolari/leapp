@@ -6,7 +6,7 @@ span {
   display: inline-block;
   width: 100%;
   font-weight: normal;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 section {
@@ -15,7 +15,7 @@ section {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: cen;
+  align-items: center;
   width: 100%;
   position: relative;
 }
@@ -41,7 +41,11 @@ span.sync, span.unsync, span.sync-failed, span.sync-progress {
   }
 
   button {
-    padding: 0 5px !important;
+    padding: 0 5px!important;
+    font-size: 10px;
+    background: #52A8DC;
+    border-color: #52A8DC;
+    width: 148px;
   }
 }
 

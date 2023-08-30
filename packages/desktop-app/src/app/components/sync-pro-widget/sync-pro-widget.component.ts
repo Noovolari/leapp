@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from "@angular/core";
 import { Subscription } from "rxjs";
 import { AppProviderService } from "../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
-import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
+import { LeappPlanStatus, OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
 import { WorkspaceState } from "../../services/team-service";
 
 @Component({
@@ -14,6 +14,7 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
   isLoggedAsPro = false;
   isFailed = false;
   isProgress = false;
+  canRemoveButton = false;
 
   private subscription: Subscription;
 
@@ -21,11 +22,13 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.isLoggedAsPro = false;
-    this.subscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState: WorkspaceState[]) => {
+    this.subscription = this.appProviderService.teamService.workspacesState.subscribe(async (workspacesState: WorkspaceState[]) => {
       const workspaceState = workspacesState.find((wState) => wState.type === "pro");
       this.isLoggedAsPro = !!workspaceState;
       this.isProgress = workspaceState?.syncState === "in-progress";
       this.isFailed = workspaceState?.syncState === "failed";
+      const currentState = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan");
+      this.canRemoveButton = currentState === LeappPlanStatus.proPending.toString() || currentState === LeappPlanStatus.proEnabled.toString();
     });
   }
 

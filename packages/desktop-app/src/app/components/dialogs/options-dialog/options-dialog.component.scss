@@ -256,13 +256,30 @@
   }
 }
 
+
+.dark-theme {
+  .cta-label {
+    color: white!important;
+  }
+}
+
 .cta-label {
-  background: #52A8DC;
-  color: white;
-  border-radius: 5px;
-  padding: 7px 14px;
-  font-size: 14px;
-  margin: 0 10px;
+  background: transparent;
+  color: #292929;
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  margin: 5px 0 10px 0;
+
+  a {
+    color: #52A8DC!important;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 }
 
 .button-container {
@@ -304,8 +321,8 @@
   flex-direction: column;
   margin: 15px 0;
   width: 31%;
-  height: 400px;
-  border-radius: 5px;
+  height: 370px;
+  border-radius: 8px!important;
   border: 1px solid $silver-50;
 
   &.selected {
@@ -314,120 +331,104 @@
   }
 }
 
+.plan-free, .plan-team {
+  margin: 40px 0!important;
+  height: 320px!important;
+}
+
+.dark-theme {
+  .plan-free.selected { border-color: #d8d8d8!important; }
+  .plan-pro.selected { border-color: #4aadac!important; }
+  .plan-team.selected { border-color: #2e78a9!important; }
+}
+
+.plan-free.selected { border-color: #292929!important; }
+.plan-pro.selected { border-color: #378180!important; }
+.plan-team.selected { border-color: #1b4c6a!important; }
+
+.plan-free .plan-header {
+  background: #d9d9d9;
+  span, p { color: #292929!important; }
+}
+.plan-pro .plan-header {
+  background: rgb(164, 214, 213);
+  span, p { color: #378180!important; }
+}
+.plan-team .plan-header {
+  background: rgb(77,167,222);
+  span, p { color: #1b4c6a!important; }
+}
+
 .plan-header {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
   padding: 10px 13px;
+  position: relative;
+
+  span, p {
+    width: 100%;
+    text-align: center;
+    display: block;
+  }
+
   border-bottom: 1px solid $silver-50;
 
   span {
     font-weight: 600;
     font-size: 20px;
+    text-align: center;
   }
 
   p {
-    font-size: 14px;
+    font-size: 13px;
     margin: 5px 0 0 0;
   }
 }
 
-.free-plan {
-  color: $free-plan-title-color !important;
+.discounted-price {
+  color: #0A81D1;
+  padding: 0 4px;
+  font-weight: 600;
 }
 
-.pro-plan {
-  color: $pro-plan-title-color !important;
-}
-
-.team-plan {
-  color: $team-plan-title-color !important;
+.lifetime-deal {
+  background-color: #ff6a00;
+  border-radius: 10px;
+  border: 1px solid #292929;
+  font-size: 10px;
+  color: #292929;
+  padding: 1px 5px;
+  position: absolute;
+  top: 15px;
+  right: -15px;
+  transform: rotate(45deg);
 }
 
 .plan-body {
   height: 100%;
-  background-color: rgba(207, 210, 211, 0.3);
+  background-color: white;
   overflow: hidden;
+  text-align: center;
 
   .price-container {
     padding: 10px 13px;
     display: flex;
     flex-direction: column;
-    height: 105px;
+    text-align: center;
 
     .price-value {
-      font-size: 22px;
+      font-size: 20px;
+      font-weight: 600;
 
       .full-price {
-        font-weight: 400;
         text-decoration: line-through;
         padding: 0 4px;
-      }
-
-      .discounted-price {
         font-weight: 600;
-        color: #0A81D1;
-        padding: 0 4px;
-      }
-
-      .lifetime-deal {
-        background-color: #0A81D1;
-        border-radius: 5px;
-        font-size: 10px;
-        color: white;
-        padding: 1px 5px;
       }
     }
-
     .price-description {
       font-size: 12px;
       color: $table-text;
-    }
-
-    .toggle-btn-stripe {
-      display: inline-flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      width: 50%;
-      height: 30px;
-      text-align: center;
-      border: 2px solid #ddd;
-      cursor: pointer;
-      color: #9A9A9A;
-      transition: all 0.3s ease;
-      font-size: 12px;
-
-      small {
-        color: #8fc92a;
-        position: relative;
-        top: 2px;
-        margin-left: 5px;
-        font-size: 12px;
-      }
-
-      &:first-child {
-        border-top-left-radius: 4px;
-        border-bottom-left-radius: 4px;
-      }
-
-      &:last-of-type {
-        border-top-right-radius: 4px;
-        border-bottom-right-radius: 4px;
-        left: -2px;
-      }
-
-      &:hover {
-        background: #eee;
-      }
-
-      &.selected {
-        border: 2px solid #00aaff;
-        color: #0c0c0c;
-        z-index: 2;
-
-        &:hover {
-          background: #52a8dc42;
-        }
-      }
     }
   }
 
@@ -467,14 +468,164 @@
       font-size: 12px;
       display: flex;
       align-items: center;
+      text-align: center;
+      justify-content: center;
+      font-weight: 400;
 
       span.check-mark-icon {
         margin-right: 5px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
       }
 
-      span.all-free-features {
-        font-weight: 600;
+      span:not(.check-mark-icon) {
+        font-weight: 400;
+        font-size: 11px;
       }
     }
   }
+}
+
+.toggle-btn-stripe {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 50%;
+  height: 30px;
+  text-align: center;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  color: #9A9A9A;
+  transition: all 0.3s ease;
+  font-size: 12px;
+
+  small {
+    color: #8fc92a;
+    position: relative;
+    top: 2px;
+    margin-left: 5px;
+    font-size: 12px;
+  }
+
+  &:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+
+  &:last-of-type {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    left: -2px;
+  }
+
+  &:hover {
+    background: #eee;
+  }
+
+  &.selected {
+    border: 2px solid #52A8DC;
+    color: #0c0c0c;
+    z-index: 2;
+
+    &:hover {
+      background: #52a8dc42;
+    }
+  }
+}
+
+
+
+/* The switch - the box around the slider */
+.toggle-prices {
+  text-align: center;
+}
+
+.switch {
+  font-size: 14px;
+  position: relative;
+  display: inline-block;
+  width: 50%;
+  height: 2em;
+}
+
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  color: #9A9A9A;
+  font-weight: 400;
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  transition: .4s;
+  padding: 0 18px;
+
+  span {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+  }
+}
+
+.dark-theme .slider {
+  color: white;
+}
+.dark-theme {
+  .switch input:checked + .slider {
+    background-color: transparent;
+    color: white;
+  }
+}
+
+.slider:before {
+  position: absolute;
+  content: "Monthly";
+  height: 90%;
+  width: 50%;
+  left: 0;
+  border-radius: 20px;
+  background-color: #52A8DC;
+  color: white;
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  transition: .4s;
+}
+
+.slider:after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  right: -7px;
+  bottom: -7px;
+  border-radius: 1.71em;
+  border: 1px solid #d8d8d8;
+  z-index: -1;
+}
+
+.switch input:checked + .slider {
+  background-color: white;
+  color: #d8d8d8;
+}
+
+.switch input:checked + .slider:before {
+  content: "Yearly (33% discount)";
+  transform: translateX(100%);
+  color: white;
+}
+
+.switch input {
+  display: none;
 }

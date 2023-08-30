@@ -19,6 +19,7 @@ import { AppNativeService } from "../../../services/app-native.service";
 import { PluginContainer } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { BillingPeriod, LeappProPreCheckoutDialogComponent } from "../leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
 import { BehaviorSubject, Subscription } from "rxjs";
+import { colorThemeSubject } from "../../check-icon-svg/check-icon-svg.component";
 
 export enum LeappPlanStatus {
   free = "free",
@@ -193,10 +194,13 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.colorTheme = this.optionsService.colorTheme;
     this.selectedColorTheme = this.colorTheme;
     if (this.colorTheme === constants.darkTheme) {
+      colorThemeSubject.next(true);
       document.querySelector("body").classList.add("dark-theme");
     } else if (this.colorTheme === constants.lightTheme) {
+      colorThemeSubject.next(false);
       document.querySelector("body").classList.remove("dark-theme");
     } else if (this.colorTheme === constants.systemDefaultTheme) {
+      colorThemeSubject.next(true);
       document.querySelector("body").classList.toggle("dark-theme", this.appService.isDarkMode());
     }
   }
@@ -547,8 +551,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.modalService.show(LeappProPreCheckoutDialogComponent, { animated: false, class: "pre-checkout-modal", backdrop: "static", keyboard: false });
   }
 
-  setBillingPeriod(billingPeriod: BillingPeriod): void {
-    this.selectedPeriod = billingPeriod;
+  setBillingPeriod(): void {
+    this.selectedPeriod = this.selectedPeriod === BillingPeriod.yearly ? BillingPeriod.monthly : BillingPeriod.yearly;
   }
 
   async contactSupport(): Promise<void> {

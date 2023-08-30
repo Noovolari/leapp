@@ -50,6 +50,7 @@ export class LockPageComponent implements OnInit {
         const signedInUser = await this.teamService.signedInUserState.getValue();
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
+        this.appService.closeAllMenuTriggers();
         if (doesWorkspaceExist) {
           await this.teamService.pullFromRemote();
         } else {
@@ -89,6 +90,7 @@ export class LockPageComponent implements OnInit {
 
   async switchToLocalWorkspace(): Promise<void> {
     await this.appProviderService.teamService.signOut();
+    this.appService.closeAllMenuTriggers();
     await this.router.navigate(["/dashboard"]);
   }
 }

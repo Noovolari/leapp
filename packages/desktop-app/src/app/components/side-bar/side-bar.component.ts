@@ -209,6 +209,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   async logoutFromRemoteWorkspace(lock: boolean = false): Promise<void> {
     if (!this.canLockWorkspace || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
+    this.appService.closeAllMenuTriggers();
     if (this.appProviderService.teamService.signedInUserState.getValue().role === Role.pro) {
       await this.router.navigate(["/lock"]);
     }

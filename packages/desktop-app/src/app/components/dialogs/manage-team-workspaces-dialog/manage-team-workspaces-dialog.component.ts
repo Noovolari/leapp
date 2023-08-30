@@ -57,6 +57,7 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
   async signOutFromWorkspace(): Promise<void> {
     try {
       await this.appProviderService.teamService.signOut();
+      this.appService.closeAllMenuTriggers();
     } catch (error) {
       this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
     }

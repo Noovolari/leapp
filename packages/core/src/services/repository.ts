@@ -473,6 +473,7 @@ export class Repository {
       pinned: workspace.pinned,
       segments: workspace.segments,
       ssmRegionBehaviour: workspace.ssmRegionBehaviour,
+      notifications: workspace.notifications,
     };
   }
 
@@ -489,6 +490,7 @@ export class Repository {
     workspace.pinned = globalSettingsInput.pinned;
     workspace.segments = globalSettingsInput.segments;
     workspace.ssmRegionBehaviour = globalSettingsInput.ssmRegionBehaviour;
+    workspace.notifications = globalSettingsInput.notifications;
     this.persistWorkspace(workspace);
   }
 

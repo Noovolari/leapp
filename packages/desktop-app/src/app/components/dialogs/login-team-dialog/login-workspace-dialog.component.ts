@@ -44,6 +44,7 @@ export class LoginWorkspaceDialogComponent implements OnInit {
         const signedInUser = await this.teamService.signedInUserState.getValue();
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
+        this.appService.closeAllMenuTriggers();
         this.closeModal();
         if (doesWorkspaceExist) {
           await this.teamService.pullFromRemote();

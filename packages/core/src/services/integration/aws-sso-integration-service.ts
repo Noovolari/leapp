@@ -253,7 +253,6 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   private async getSessions(integrationId: string, accessToken: string, region: string): Promise<SsoRoleSession[]> {
     this.setupSsoPortalClient(region);
     const accounts: AccountInfo[] = await this.listAccounts(accessToken);
-    accounts.push(...[...accounts, ...accounts, ...accounts, ...accounts, ...accounts, ...accounts]);
     const promiseArray = accounts.map((account) => this.getSessionsFromAccount(integrationId, account, accessToken));
     return (await Promise.all(promiseArray)).flat();
   }

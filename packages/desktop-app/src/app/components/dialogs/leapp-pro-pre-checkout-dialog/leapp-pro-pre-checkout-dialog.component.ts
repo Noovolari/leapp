@@ -77,6 +77,7 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
         } else {
           this.toasterService.toast("Something went wrong during pre-checkout", ToastLevel.error);
         }
+        this.isRedirectingToCheckout = false;
         return;
       }
 
@@ -98,6 +99,7 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
 
           if (details.url === "https://www.leapp.cloud/success") {
             this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.proPending.toString());
+            this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan-email", this.emailFormControl.value);
             globalLeappProPlanStatus.next(LeappPlanStatus.proPending);
             checkoutWindow.close();
             checkoutWindow = null;
@@ -121,11 +123,11 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
     }
   }
 
-  openPrivacyPolicy() {
+  openPrivacyPolicy(): void {
     this.windowService.openExternalUrl("https://d3o59asa8udcq9.cloudfront.net/docs/Privacy_Policy_Noovolari.pdf");
   }
 
-  openTermsAndConditions() {
+  openTermsAndConditions(): void {
     this.windowService.openExternalUrl("https://d3o59asa8udcq9.cloudfront.net/docs/Terms_and_conditions_SAAS.pdf");
   }
 

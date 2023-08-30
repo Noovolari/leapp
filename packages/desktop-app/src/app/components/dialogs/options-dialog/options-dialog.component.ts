@@ -550,4 +550,11 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   setBillingPeriod(billingPeriod: BillingPeriod): void {
     this.selectedPeriod = billingPeriod;
   }
+
+  async contactSupport(): Promise<void> {
+    const email = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan-email");
+    this.windowService.openExternalUrl(
+      `mailto:support@noovolari.com?subject=upgrade%20plan%20support&body=${email}%20needs%20support%20on%20upgrading.`
+    );
+  }
 }

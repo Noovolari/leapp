@@ -5,6 +5,7 @@ import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/service
 import { TeamService, ApiErrorCodes, FormErrorCodes } from "../../../services/team-service";
 
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
+import { globalLeappProPlanStatus, LeappPlanStatus } from "../options-dialog/options-dialog.component";
 
 @Component({
   selector: "app-login-team-dialog",
@@ -45,6 +46,8 @@ export class LoginWorkspaceDialogComponent implements OnInit {
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
         this.appService.closeAllMenuTriggers();
+        globalLeappProPlanStatus.next(LeappPlanStatus.proEnabled);
+        await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.proEnabled);
         this.closeModal();
         if (doesWorkspaceExist) {
           await this.teamService.pullFromRemote();

@@ -6,7 +6,7 @@ span {
   display: inline-block;
   width: 100%;
   font-weight: normal;
-  font-size: 14px;
+  font-size: 12px;
 }
 
 section {
@@ -15,7 +15,7 @@ section {
   display: flex;
   flex-direction: row;
   justify-content: center;
-  align-items: cen;
+  align-items: center;
   width: 100%;
   position: relative;
 }
@@ -25,7 +25,7 @@ section {
 }
 
 .unsync {
-  color: #999999;
+  color: #dadada;
 }
 
 span.sync, span.unsync, span.sync-failed, span.sync-progress {
@@ -41,12 +41,24 @@ span.sync, span.unsync, span.sync-failed, span.sync-progress {
   }
 
   button {
-    padding: 0 5px !important;
+    padding: 0 1px !important;
+    font-size: 11px;
+    background: #23d4b8;
+    border-color: #23d4b8;
+    width: 250px;
   }
 }
 
+span.sync-progress span {
+  color: #28c840;
+}
+
+span.sync-failed span {
+  color: #febc2e;
+}
+
 img {
-  height: 24px;
+  height: 17.5px;
   width: 24px;
 }
 

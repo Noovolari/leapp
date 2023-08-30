@@ -36,7 +36,7 @@ export class TeamService {
     return new BehaviorSubject<User | null>(null);
   }
 
-  get workspaceState(): BehaviorSubject<WorkspaceState> {
+  get workspacesState(): BehaviorSubject<WorkspaceState> {
     return new BehaviorSubject<WorkspaceState>({
       name: constants.localWorkspaceName,
       description: constants.localWorkspaceDescription,
@@ -61,11 +61,17 @@ export class TeamService {
 
   async signOut(_: boolean = false): Promise<void> {}
 
-  async syncSecrets(_: boolean = false): Promise<void> {}
-
   async deleteTeamWorkspace(): Promise<void> {}
 
   async switchToLocalWorkspace(): Promise<void> {}
 
   async refreshWorkspaceState(_?: () => Promise<void>): Promise<void> {}
+
+  async createCheckoutSession(_?: any, __?: any): Promise<void> {}
+
+  async getPrices(): Promise<void> {}
+
+  async pushToRemote(): Promise<void> {}
+
+  async pullFromRemote(_?: any): Promise<void> {}
 }

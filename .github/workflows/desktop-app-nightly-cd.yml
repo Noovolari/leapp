@@ -46,14 +46,6 @@ jobs:
           npm install
           npm run nightly
 
-      - name: Build and release CLI (nightly)
-        run: |
-          cd packages/cli
-
-          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
-          npm install
-          npm run nightly
-
   build-win:
     runs-on: windows-2022
     needs: [ build-and-release-core-and-cli ]

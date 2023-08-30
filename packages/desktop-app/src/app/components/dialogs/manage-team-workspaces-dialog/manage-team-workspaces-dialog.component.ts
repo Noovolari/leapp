@@ -8,6 +8,7 @@ import { BsModalService } from "ngx-bootstrap/modal";
 import { globalFilteredSessions, globalHasFilter, globalResetFilter } from "../../command-bar/command-bar.component";
 import { sidebarHighlight } from "../../side-bar/side-bar.component";
 import { WorkspaceState } from "../../../services/team-service";
+import { globalLeappProPlanStatus, LeappPlanStatus } from "../options-dialog/options-dialog.component";
 
 @Component({
   selector: "app-manage-team-workspaces-dialog",
@@ -57,6 +58,8 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
   async signOutFromWorkspace(): Promise<void> {
     try {
       await this.appProviderService.teamService.signOut();
+      globalLeappProPlanStatus.next(LeappPlanStatus.free);
+      await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
     } catch (error) {
       this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
     }

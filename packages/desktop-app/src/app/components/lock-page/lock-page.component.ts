@@ -5,6 +5,7 @@ import { ApiErrorCodes, FormErrorCodes, TeamService } from "../../services/team-
 import { AppService } from "../../services/app.service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { Router } from "@angular/router";
+import { globalLeappProPlanStatus, LeappPlanStatus } from "../dialogs/options-dialog/options-dialog.component";
 
 @Component({
   selector: "app-lock-page",
@@ -89,6 +90,8 @@ export class LockPageComponent implements OnInit {
 
   async switchToLocalWorkspace(): Promise<void> {
     await this.appProviderService.teamService.signOut();
+    globalLeappProPlanStatus.next(LeappPlanStatus.free);
+    await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
     await this.router.navigate(["/dashboard"]);
   }
 }

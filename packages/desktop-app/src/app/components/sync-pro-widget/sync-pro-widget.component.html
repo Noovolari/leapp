@@ -1,12 +1,12 @@
 <hr>
 <section>
   <span *ngIf="!isLoggedAsPro" class="unsync">
-    <span><img src="assets/images/unsync.png" alt="" title=""> Sync disabled</span>
-    <button class="btn btn-primary" (click)="goToUpgrade();" *ngIf="!canRemoveButton">Upgrade to Pro</button>
+    <span><img src="assets/images/unsync.png" alt="" title=""> Not active</span>
+    <button class="btn btn-primary" (click)="goToUpgrade();" *ngIf="!canRemoveButton">UPGRADE TO PRO</button>
   </span>
-  <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed"><span><img src="assets/images/syncfailed.png" alt="" title=""> Sync failed</span></span>
+  <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed"><span><img src="assets/images/syncfailed.png" alt="" title=""> An issue in syncing Workspace...</span></span>
   <span *ngIf="isLoggedAsPro && isProgress" class="sync-progress"><span><img src="assets/images/syncprogress.png" alt=""
-                                                                             title=""> Sync in progress</span></span>
+                                                                             title=""> Syncing Workspace...</span></span>
   <span *ngIf="isLoggedAsPro && !isProgress && !isFailed" class="sync"><span><img src="assets/images/sync.png" alt=""
-                                                                                  title=""> Sync enabled</span></span>
+                                                                                  title=""> Synchronized Workspace</span></span>
 </section>

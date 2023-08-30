@@ -5,24 +5,59 @@
 .option-modal {
   max-width: 650px;
   width: 100%;
+
   .modal-content {
     padding: 0;
-    h2 { margin: 0; }
+
+    h2 {
+      margin: 0;
+    }
   }
 }
 
-.proxy-length-1 { width: 18%!important; }
-.proxy-length-2 { position: relative; top: 3px; display: inline-block; width: 22%!important; padding: 0 3px; text-align: right; color: $silver-dark; }
-.proxy-length-3 { position: relative; top: 3px; width: 60%!important; }
-.proxy-length-4 { position: relative; top: 3px; display: inline-block; width: 3%!important; padding: 0 3px; text-align: center; color: $silver-dark; }
-.proxy-length-5 { position: relative; top: 3px; width: 15%!important; }
+.proxy-length-1 {
+  width: 18% !important;
+}
+
+.proxy-length-2 {
+  position: relative;
+  top: 3px;
+  display: inline-block;
+  width: 22% !important;
+  padding: 0 3px;
+  text-align: right;
+  color: $silver-dark;
+}
+
+.proxy-length-3 {
+  position: relative;
+  top: 3px;
+  width: 60% !important;
+}
+
+.proxy-length-4 {
+  position: relative;
+  top: 3px;
+  display: inline-block;
+  width: 3% !important;
+  padding: 0 3px;
+  text-align: center;
+  color: $silver-dark;
+}
+
+.proxy-length-5 {
+  position: relative;
+  top: 3px;
+  width: 15% !important;
+}
 
 .option-table {
   td {
-    padding-left: 10px!important;
-    padding-right: 10px!important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
     display: inline-block;
   }
+
   td:nth-child(1) {
     font-size: 13px;
     font-weight: 400;
@@ -30,12 +65,14 @@
     width: 83%;
     overflow: hidden;
   }
+
   td:nth-child(2) {
     width: 80px;
-    position:relative;
+    position: relative;
     top: calc(50% - 10px);
+
     button {
-      display: inline-block!important;
+      display: inline-block !important;
       margin-left: 10px;
       position: relative;
       top: calc(50% - 10px);
@@ -59,6 +96,7 @@
     display: inline-flex;
     justify-self: center;
   }
+
   p {
     width: 71%;
     padding: 20px 10px;
@@ -68,6 +106,7 @@
       font-size: 18px;
       display: block;
     }
+
     span {
       display: block;
       font-size: 16px;
@@ -75,7 +114,7 @@
   }
 }
 
-.panel{
+.panel {
   animation: fadein .8s;
   overflow-x: hidden;
   padding: 0 1px;
@@ -99,10 +138,10 @@
 
 @keyframes fadein {
   from {
-    opacity:0;
+    opacity: 0;
   }
   to {
-    opacity:1;
+    opacity: 1;
   }
 }
 
@@ -129,6 +168,7 @@
   display: inline-block;
   margin-left: 10px;
   float: right;
+
   &:hover {
     cursor: pointer;
   }
@@ -136,7 +176,7 @@
 
 .plugin-table {
   th {
-    height: 42px!important;
+    height: 42px !important;
     z-index: 2;
   }
 
@@ -154,19 +194,20 @@
   td:nth-child(5) {
     text-align: right;
   }
+
   i.fa-apple, i.fa-windows, i.fa-linux {
     color: $dark-main-background;
   }
 }
 
 .bw {
-  filter: grayscale(1)!important;
+  filter: grayscale(1) !important;
 }
 
 .borderless-button {
   margin: 0 0 0 15px;
   padding: 0;
-  background-color: unset!important;
+  background-color: unset !important;
 }
 
 .centered-column {
@@ -182,6 +223,7 @@
 .extension-info {
   position: relative;
   bottom: 40px;
+
   strong {
     bottom: 5px;
     position: relative;
@@ -204,28 +246,31 @@
 .description-container {
   position: relative;
   top: 16px;
+
   a {
-    color: #52A8DC!important;
+    color: #52A8DC !important;
+
     &:hover {
-      color: #00D9FF!important;
+      color: #00D9FF !important;
     }
   }
 }
 
 .button-container {
-  position: relative!important;
-  top: 16px!important;
+  position: relative !important;
+  top: 16px !important;
 }
 
 .enable-option {
   top: 54%;
   position: fixed;
-  text-align: right!important;
+  text-align: right !important;
   display: inline-block;
   right: 388px;
   border-top: 0.5px solid $silver-50 !important;
   width: 37%;
   padding: 15px;
+
   .extension-description {
     text-align: left;
     justify-content: left;
@@ -263,10 +308,12 @@
 .plan-header {
   padding: 10px 13px;
   border-bottom: 1px solid $silver-50;
+
   span {
     font-weight: 600;
     font-size: 20px;
   }
+
   p {
     font-size: 14px;
     margin: 5px 0 0 0;
@@ -274,33 +321,104 @@
 }
 
 .free-plan {
-  color: $free-plan-title-color!important;
+  color: $free-plan-title-color !important;
 }
 
 .pro-plan {
-  color: $pro-plan-title-color!important;
+  color: $pro-plan-title-color !important;
 }
 
 .team-plan {
-  color: $team-plan-title-color!important;
+  color: $team-plan-title-color !important;
 }
 
 .plan-body {
   height: 100%;
   background-color: rgba(207, 210, 211, 0.3);
   overflow: hidden;
+
   .price-container {
     padding: 10px 13px;
     display: flex;
     flex-direction: column;
     height: 105px;
+
     .price-value {
       font-size: 22px;
-      font-weight: 600;
+
+      .full-price {
+        font-weight: 400;
+        text-decoration: line-through;
+        padding: 0 4px;
+      }
+
+      .discounted-price {
+        font-weight: 600;
+        color: #0A81D1;
+        padding: 0 4px;
+      }
+
+      .lifetime-deal {
+        background-color: #0A81D1;
+        border-radius: 5px;
+        font-size: 10px;
+        color: white;
+        padding: 1px 5px;
+      }
     }
+
     .price-description {
       font-size: 12px;
       color: $table-text;
+    }
+
+    .toggle-btn-stripe {
+      display: inline-flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 50%;
+      height: 30px;
+      text-align: center;
+      border: 2px solid #ddd;
+      cursor: pointer;
+      color: #9A9A9A;
+      transition: all 0.3s ease;
+      font-size: 12px;
+
+      small {
+        color: #8fc92a;
+        position: relative;
+        top: 2px;
+        margin-left: 5px;
+        font-size: 12px;
+      }
+
+      &:first-child {
+        border-top-left-radius: 4px;
+        border-bottom-left-radius: 4px;
+      }
+
+      &:last-of-type {
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+        left: -2px;
+      }
+
+      &:hover {
+        background: #eee;
+      }
+
+      &.selected {
+        border: 2px solid #00aaff;
+        color: #0c0c0c;
+        z-index: 2;
+
+        &:hover {
+          background: #52a8dc42;
+        }
+      }
     }
   }
 
@@ -313,6 +431,7 @@
     text-align: center;
     background-color: white;
     font-size: 15px;
+
     &.clickable {
       background: $black;
       cursor: pointer;
@@ -321,6 +440,7 @@
       border: none;
       opacity: 1;
       transition: opacity 0.3s ease;
+
       &:hover {
         transition: opacity 0.3s ease;
         opacity: 0.7;
@@ -333,13 +453,16 @@
     display: flex;
     flex-direction: column;
     gap: 5px;
+
     li {
       font-size: 12px;
       display: flex;
       align-items: center;
+
       span.check-mark-icon {
         margin-right: 5px;
       }
+
       span.all-free-features {
         font-weight: 600;
       }

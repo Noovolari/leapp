@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { AppService } from "../../services/app.service";
 import { MatMenuTrigger } from "@angular/material/menu";
@@ -11,13 +11,14 @@ import { OptionsService } from "../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
 import { ExtensionWebsocketService, FetchingState } from "../../services/extension-websocket.service";
+import { Subscription } from "rxjs";
 
 @Component({
   selector: "app-contextual-menu",
   templateUrl: "./contextual-menu.component.html",
   styleUrls: ["./contextual-menu.component.scss"],
 })
-export class ContextualMenuComponent implements OnInit {
+export class ContextualMenuComponent implements OnInit, OnDestroy {
   @ViewChild(MatMenuTrigger)
   public trigger: MatMenuTrigger;
 
@@ -28,6 +29,8 @@ export class ContextualMenuComponent implements OnInit {
   public menuX: number;
   public menuY: number;
   public isWebConsoleFetching: boolean;
+  private sessionSelectionsSubscription: Subscription;
+  private fetchingSubscription: Subscription;
 
   constructor(
     public appService: AppService,
@@ -38,27 +41,34 @@ export class ContextualMenuComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.appProviderService.behaviouralSubjectService.sessionSelections$.subscribe((sessionSelections: SessionSelectionState[]) => {
-      if (sessionSelections.length === 0) {
-        return;
+    this.sessionSelectionsSubscription = this.appProviderService.behaviouralSubjectService.sessionSelections$.subscribe(
+      (sessionSelections: SessionSelectionState[]) => {
+        if (sessionSelections.length === 0) {
+          return;
+        }
+
+        this.appService.closeAllMenuTriggers();
+        this.selectedSession = this.appProviderService.repository.getSessionById(sessionSelections[0].sessionId);
+        this.menuY = sessionSelections[0].menuY;
+        this.menuX = sessionSelections[0].menuX;
+
+        if (sessionSelections[0].isContextualMenuOpen) {
+          setTimeout(() => {
+            this.trigger.openMenu();
+            this.appService.setMenuTrigger(this.trigger);
+          }, 100);
+        }
       }
+    );
 
-      this.appService.closeAllMenuTriggers();
-      this.selectedSession = this.appProviderService.repository.getSessionById(sessionSelections[0].sessionId);
-      this.menuY = sessionSelections[0].menuY;
-      this.menuX = sessionSelections[0].menuX;
-
-      if (sessionSelections[0].isContextualMenuOpen) {
-        setTimeout(() => {
-          this.trigger.openMenu();
-          this.appService.setMenuTrigger(this.trigger);
-        }, 100);
-      }
-    });
-
-    this.extensionWebsocketService.fetching$.subscribe((value) => {
+    this.fetchingSubscription = this.extensionWebsocketService.fetching$.subscribe((value) => {
       this.isWebConsoleFetching = value !== FetchingState.notFetching;
     });
+  }
+
+  ngOnDestroy() {
+    this.sessionSelectionsSubscription?.unsubscribe();
+    this.fetchingSubscription?.unsubscribe();
   }
 
   async startSession(): Promise<void> {

@@ -557,8 +557,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
 
   async contactSupport(): Promise<void> {
     const email = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan-email");
-    this.windowService.openExternalUrl(
-      `mailto:support@noovolari.com?subject=upgrade%20plan%20support&body=${email}%20needs%20support%20on%20upgrading.`
-    );
+    this.windowService.openExternalUrl(`mailto:support@noovolari.com?subject=Leapp%20Sign-up%20support%20request%20${email}`);
   }
 }

@@ -5,8 +5,11 @@
     <button class="btn btn-primary" (click)="goToUpgrade();" *ngIf="!canRemoveButton">UPGRADE TO PRO</button>
   </span>
   <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed">
+    <div class="floating-message">
+      <span>Wait a second and then retry to manually sync</span>
+      <button class="btn btn-primary" (click)="retrySync();">RETRY</button>
+    </div>
     <span><img src="assets/images/syncfailed.svg" alt="" title=""> An issue in syncing Workspace...</span>
-    <button class="btn btn-primary" (click)="retrySync();">Retry</button>
   </span>
   <span *ngIf="isLoggedAsPro && isProgress" class="sync-progress"><span><img src="assets/images/syncprogress.svg" alt=""
                                                                              title=""> Syncing Workspace...</span></span>

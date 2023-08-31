@@ -29,6 +29,7 @@ section {
 }
 
 span.sync, span.unsync, span.sync-failed, span.sync-progress {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -47,6 +48,38 @@ span.sync, span.unsync, span.sync-failed, span.sync-progress {
     border-color: #23d4b8;
     color: #292929;
     width: 250px;
+  }
+
+  .floating-message {
+    position: absolute;
+    top: -107px;
+    left: -10px;
+    border-radius: 5px;
+    width: 228px;
+    padding: 16px 19px;
+    background-color: rgba(255, 153, 0, 0.40);
+
+
+    span {
+      color: #FF6A00;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    button {
+      border: none !important;
+      width: 60px;
+      height: 21px;
+      float: right;
+      background-color: #FF9900;
+      color: white;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
   }
 }
 

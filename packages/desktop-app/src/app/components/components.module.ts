@@ -58,6 +58,7 @@ import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-chec
 import { SyncProWidgetComponent } from "./sync-pro-widget/sync-pro-widget.component";
 import { OverlayModule } from "@angular/cdk/overlay";
 import { LockPageComponent } from "./lock-page/lock-page.component";
+import { CheckIconSvgComponent } from "./check-icon-svg/check-icon-svg.component";
 
 @NgModule({
   declarations: [
@@ -93,6 +94,7 @@ import { LockPageComponent } from "./lock-page/lock-page.component";
     LeappProPreCheckoutDialogComponent,
     SyncProWidgetComponent,
     LockPageComponent,
+    CheckIconSvgComponent,
   ],
   imports: [
     CommonModule,

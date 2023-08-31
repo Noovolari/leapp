@@ -356,125 +356,117 @@
       </ng-template>
       <div class="no-padding no-margin panel">
 
+        <br>
+        <div class="toggle-prices">
+          <label class="switch">
+            <input type="checkbox" (click)="setBillingPeriod();" checked>
+            <div class="slider">
+              <span>Monthly</span>
+              <span>Yearly (33% discount)</span>
+            </div>
+          </label>
+        </div>
+
         <div class="plans-group-container">
-          <div class="plan {{leappPlanStatus === eEnabledLeappPlanStatus.free ? 'selected' : ''}}">
+          <div class="plan plan-free {{leappPlanStatus === eEnabledLeappPlanStatus.free ? 'selected' : ''}}">
             <div class="plan-header">
-              <span class="free-plan">Free</span>
-              <p>This is the free plan for the community</p>
+              <span>Community</span>
+              <p>Open-source version with local workspace</p>
             </div>
             <div class="plan-body">
               <div class="price-container">
-                <span class="price-value">$0</span>
-                <span class="price-description">Unlimited blocks for individuals and limited block trial for teams</span>
+                <span class="price-value">FREE</span>
               </div>
-              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">Your Active Plan</div>
-              <div class="cta-button clickable" *ngIf="leappPlanStatus !== eEnabledLeappPlanStatus.free">Already upgraded</div>
+              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">CURRENT PLAN</div>
+              <div class="cta-button clickable" *ngIf="leappPlanStatus !== eEnabledLeappPlanStatus.free">DOWNGRADE</div>
               <ul class="plan-features">
                 <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>Interesting Feature 1</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#292929'"></app-check-icon-svg></span>
+                  <span>Open-source version with local workspace</span>
                 </li>
                 <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>An even more interesting Feature 2</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#292929'"></app-check-icon-svg></span>
+                  <span>Local workspace with device encryption</span>
                 </li>
                 <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>Very peculiar Feature 3 unique to Leapp</span>
-                </li>
-                <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>Feature 4</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#292929'"></app-check-icon-svg></span>
+                  <span>Automatic credentials management</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div
-            class="plan {{leappPlanStatus === eEnabledLeappPlanStatus.proEnabled || leappPlanStatus === eEnabledLeappPlanStatus.proPending ? 'selected' : ''}}">
+          <div class="plan plan-pro {{leappPlanStatus === eEnabledLeappPlanStatus.proEnabled || leappPlanStatus === eEnabledLeappPlanStatus.proPending ? 'selected' : ''}}">
             <div class="plan-header">
-              <span class="pro-plan">Pro</span>
-              <p>Pro plan for an enhanced single user experience</p>
+              <span>Pro</span>
+              <p>Lock your Leapp Client and sync with unlimited devices</p>
+              <small class="lifetime-deal" *ngIf="selectedPeriod === eBillingPeriod.yearly">LIFETIME&nbsp;DEAL</small>
             </div>
             <div class="plan-body">
               <div class="price-container">
-                <span *ngIf="selectedPeriod === eBillingPeriod.yearly" class="price-value">
-                  <small class="full-price">89$</small><small class="discounted-price">59$</small><small class="lifetime-deal">LIFETIME&nbsp;DEAL</small>
+                <span *ngIf="selectedPeriod === eBillingPeriod.yearly && leappPlanStatus !== eEnabledLeappPlanStatus.proPending" class="price-value">
+                  <small class="full-price">89$</small><small class="discounted-price">59$</small>
                 </span>
-                <span *ngIf="selectedPeriod === eBillingPeriod.monthly" class="price-value">
+                <span *ngIf="selectedPeriod === eBillingPeriod.monthly && leappPlanStatus !== eEnabledLeappPlanStatus.proPending" class="price-value">
                   <small class="full-price">8.99$</small><small class="discounted-price">5.99$</small>
                 </span>
-                <div>
-                  <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
-                        (click)="setBillingPeriod(eBillingPeriod.yearly)">Billed yearly
-                  </span>
-                  <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}"
-                        (click)="setBillingPeriod(eBillingPeriod.monthly)">Billed montlhy
-                  </span>
-                </div>
+                <span class="price-value" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">Check your email</span>
               </div>
 
-              <div class="cta-button clickable" (click)="openLeappProPreCheckoutDialog()" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">
-                Upgrade
-              </div>
-              <div class="cta-label" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">
-                To complete the registration follow the instructions received via email and register on Leapp portal.
-                If you have problem please contact our support at <a (click)="contactSupport();">support@noovolari.com</a>.
-              </div>
-              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proEnabled">Your active plan</div>
-              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.enterprise">Already upgraded</div>
+              <div class="cta-button clickable" (click)="openLeappProPreCheckoutDialog()" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">UPGRADE TO PRO</div>
+              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proEnabled">CURRENT PLAN</div>
+              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">UPGRADED</div>
+              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.enterprise">UPGRADED</div>
 
-              <ul class="plan-features" *ngIf="leappPlanStatus !== eEnabledLeappPlanStatus.proPending">
+              <ul class="plan-features">
                 <li>
-                  <span class="all-free-features">All the Free features, plus</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#378180'"></app-check-icon-svg></span>
+                  <span class="all-free-features">Lock your Leapp access with Username and Password</span>
                 </li>
                 <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>An even more interesting Feature 5</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#378180'"></app-check-icon-svg></span>
+                  <span>Create an encrypted backup of your Configuration</span>
                 </li>
                 <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>Very peculiar Feature 6 unique to Leapp</span>
-                </li>
-                <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>Feature 7</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#378180'"></app-check-icon-svg></span>
+                  <span>Bring your Leapp configuration on every device</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div class="plan {{leappPlanStatus === eEnabledLeappPlanStatus.enterprise ? 'selected' : ''}}">
+          <div class="plan plan-team {{leappPlanStatus === eEnabledLeappPlanStatus.enterprise ? 'selected' : ''}}">
             <div class="plan-header">
-              <span class="team-plan">Team</span>
-              <p>Team plan to manage your team</p>
+              <span>Business</span>
+              <p>Collaborate with your team and centralize Cloud Access</p>
             </div>
             <div class="plan-body">
               <div class="price-container">
-                <span class="price-value">$50</span>
-                <span class="price-description">Unlimited blocks for individuals and limited block trial for teams</span>
+                <span class="price-value">Custom princing</span>
               </div>
-              <div class="cta-button clickable">Request a demo</div>
+              <div class="cta-button clickable">CONTACT SALES</div>
               <ul class="plan-features">
                 <li>
-                  <span class="all-free-features">All the Pro features, plus</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#292929'"></app-check-icon-svg></span>
+                  <span>Team collaboration and management</span>
                 </li>
                 <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>An even more interesting Feature 8</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#292929'"></app-check-icon-svg></span>
+                  <span>Leapp session sharing with team members</span>
                 </li>
                 <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>Awesome Feature 9 to help you manage your team</span>
-                </li>
-                <li>
-                  <span class="check-mark-icon">✓</span>
-                  <span>Feature 10</span>
+                  <span class="check-mark-icon"><app-check-icon-svg [color]="'#292929'"></app-check-icon-svg></span>
+                  <span>Centralized point of access for the Company</span>
                 </li>
               </ul>
             </div>
           </div>
         </div>
+      </div>
+
+
+      <div class="cta-label" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">
+        Check your email to continue the registration to the Leapp portal, if you have any trouble contact us at <a (click)="contactSupport();">support@noovolari.com</a>.
       </div>
     </mat-tab>
 

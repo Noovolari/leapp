@@ -219,7 +219,7 @@ export class AppComponent implements OnInit {
     await this.appProviderService.sessionManagementService.stopAllSessions();
 
     // Delete team-workspace file if exists, for security reasons
-    await this.teamService.deleteTeamWorkspace();
+    // await this.teamService.deleteTeamWorkspace();
 
     // Finally quit
     this.appService.quit();

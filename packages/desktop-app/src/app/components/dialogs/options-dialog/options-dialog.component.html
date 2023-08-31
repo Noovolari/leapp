@@ -362,10 +362,12 @@
             <input type="checkbox" (click)="setBillingPeriod();" checked>
             <div class="slider">
               <span>Monthly</span>
-              <span>Yearly (33% discount)</span>
+              <span>Yearly (17% discount)</span>
             </div>
           </label>
         </div>
+
+        <div class="best-discount-ever">EARLY PROMO (33% additional discount)</div>
 
         <div class="plans-group-container">
           <div class="plan plan-free {{leappPlanStatus === eEnabledLeappPlanStatus.free ? 'selected' : ''}}">
@@ -396,7 +398,7 @@
             </div>
           </div>
 
-          <div class="plan plan-pro {{leappPlanStatus === eEnabledLeappPlanStatus.proEnabled || leappPlanStatus === eEnabledLeappPlanStatus.proPending ? 'selected' : ''}}">
+          <div class="plan plan-pro {{(leappPlanStatus === eEnabledLeappPlanStatus.proEnabled || leappPlanStatus === eEnabledLeappPlanStatus.proPending) ? 'selected' : ''}}">
             <div class="plan-header">
               <span>Pro</span>
               <p>Lock your Leapp Client and sync with unlimited devices</p>
@@ -406,9 +408,11 @@
               <div class="price-container">
                 <span *ngIf="selectedPeriod === eBillingPeriod.yearly && leappPlanStatus !== eEnabledLeappPlanStatus.proPending" class="price-value">
                   <small class="full-price">89$</small><small class="discounted-price">59$</small>
+                  <small class="micro-small">4.92$ per Month, billed yearly</small>
                 </span>
                 <span *ngIf="selectedPeriod === eBillingPeriod.monthly && leappPlanStatus !== eEnabledLeappPlanStatus.proPending" class="price-value">
                   <small class="full-price">8.99$</small><small class="discounted-price">5.99$</small>
+                  <small class="micro-small">Billed monthly</small>
                 </span>
                 <span class="price-value" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">Check your email</span>
               </div>

@@ -3,7 +3,7 @@
 @import "../../../../assets/scss/modals";
 
 .option-modal {
-  max-width: 650px;
+  max-width: 720px;
   width: 100%;
 
   .modal-content {
@@ -540,7 +540,8 @@
 
 /* The switch - the box around the slider */
 .toggle-prices {
-  text-align: center;
+  text-align: right;
+  width: 67%;
 }
 
 .switch {
@@ -568,13 +569,17 @@
   justify-content: space-around;
   align-items: center;
   transition: .4s;
-  padding: 0 18px;
+  padding: 0 2px 0 18px;
 
   span {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    width: 50%;
+    width: 66%;
+    font-size: 11px;
+  }
+  span:first-child {
+    width: 40%!important;
   }
 }
 
@@ -592,7 +597,7 @@
   position: absolute;
   content: "Monthly";
   height: 90%;
-  width: 50%;
+  width: 52%;
   left: 0;
   border-radius: 20px;
   background-color: #52A8DC;
@@ -601,6 +606,7 @@
   align-content: center;
   justify-content: center;
   transition: .4s;
+  font-size: 11px;
 }
 
 .slider:after {
@@ -621,11 +627,28 @@
 }
 
 .switch input:checked + .slider:before {
-  content: "Yearly (33% discount)";
-  transform: translateX(100%);
+  content: "Yearly (17% discount)";
+  transform: translateX(91%);
   color: white;
 }
 
 .switch input {
   display: none;
+}
+
+.micro-small {
+  color: #bbbbbb;
+  font-size: 12px;
+  display: block;
+}
+
+.best-discount-ever {
+  position: absolute;
+  right: 0;
+  top: 31px;
+  background: #23D4B8;
+  color: #292929;
+  font-size: 10px;
+  border-radius: 20px;
+  padding: 0 5px;
 }

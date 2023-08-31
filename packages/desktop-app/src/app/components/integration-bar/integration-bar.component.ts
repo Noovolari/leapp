@@ -366,11 +366,25 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
 
         if (this.modifying === 1) {
           await this.appProviderService.integrationFactory.create(this.selectedIntegration as any, integrationParams);
-          await this.appProviderService.teamService.pushToRemote();
+
+          try {
+            await this.appProviderService.teamService.pushToRemote();
+          } catch (error) {
+            this.appProviderService.teamService.setSyncState("failed");
+            throw error;
+          }
+
           this.messageToasterService.toast(`Integration: ${integrationParams.alias}, created.`, ToastLevel.success, "");
         } else if (this.modifying === 2) {
           await this.appProviderService.integrationFactory.update(this.selectedConfiguration.id, integrationParams);
-          await this.appProviderService.teamService.pushToRemote();
+
+          try {
+            await this.appProviderService.teamService.pushToRemote();
+          } catch (error) {
+            this.appProviderService.teamService.setSyncState("failed");
+            throw error;
+          }
+
           this.messageToasterService.toast(`Integration: ${integrationParams.alias}, edited.`, ToastLevel.success, "");
         }
 
@@ -401,7 +415,14 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
             this.loggingService.log(new LoggedEntry(`Removing sessions with attached integration id: ${integration.id}`, this, LogLevel.info));
             await this.logout(integration.id);
             await this.appProviderService.integrationFactory.delete(integration.id);
-            await this.appProviderService.teamService.pushToRemote();
+
+            try {
+              await this.appProviderService.teamService.pushToRemote();
+            } catch (error) {
+              this.appProviderService.teamService.setSyncState("failed");
+              throw error;
+            }
+
             this.messageToasterService.toast(`Integration: ${integration.alias}, deleted.`, ToastLevel.success, "");
             this.setValues();
             this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());

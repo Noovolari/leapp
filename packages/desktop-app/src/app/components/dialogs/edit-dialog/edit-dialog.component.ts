@@ -259,7 +259,13 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
           await this.sessionService.start(this.selectedSession.sessionId);
         }
 
-        await this.leappCoreService.teamService.pushToRemote();
+        try {
+          await this.leappCoreService.teamService.pushToRemote();
+        } catch (error) {
+          this.leappCoreService.teamService.setSyncState("failed");
+          throw error;
+        }
+
         this.messageToasterService.toast(`Session: ${this.form.value.name}, edited.`, ToastLevel.success, "");
       } else {
         this.messageToasterService.toast(`One or more parameters are invalid, check your choices.`, ToastLevel.warn, "");

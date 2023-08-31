@@ -409,7 +409,13 @@ export class CreateDialogComponent implements OnInit {
           break;*/
       }
 
-      await this.leappCoreService.teamService.pushToRemote();
+      try {
+        await this.leappCoreService.teamService.pushToRemote();
+      } catch (error) {
+        this.leappCoreService.teamService.setSyncState("failed");
+        throw error;
+      }
+
       this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, "");
       this.closeModal();
     } else {

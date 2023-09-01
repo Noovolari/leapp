@@ -71,8 +71,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
-          ref: main/26c2812
-          fetch-depth: 0
+          ref: 26c281200defa1e3ac1d584ab9287c985f4659c3
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -136,8 +135,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
-          ref: main/26c2812
-          fetch-depth: 0
+          ref: 26c281200defa1e3ac1d584ab9287c985f4659c3
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -195,8 +193,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
-          ref: main/26c2812
-          fetch-depth: 0
+          ref: 26c281200defa1e3ac1d584ab9287c985f4659c3
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -289,8 +286,7 @@ jobs:
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
-          ref: main/26c2812
-          fetch-depth: 0
+          ref: 26c281200defa1e3ac1d584ab9287c985f4659c3
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature

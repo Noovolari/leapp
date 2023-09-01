@@ -200,7 +200,7 @@ describe("SetWorkspace", () => {
     const command = getTestCommand(null, []);
     command.cliProviderService = {
       teamService: {
-        syncSecrets: jest.fn(),
+        pullFromRemote: jest.fn(),
       },
       remoteProceduresClient: {
         refreshWorkspaceState: jest.fn(),

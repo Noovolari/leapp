@@ -105,8 +105,9 @@ jobs:
           rm -Rf ./release/builder-effective-config.yaml
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
-          rm "./release/Leapp-$TAG_VERSION-win.zip" ||:
-          powershell "Compress-Archive './release/Leapp Setup $TAG_VERSION.exe' './release/Leapp-$TAG_VERSION-win.zip'"
+          rm "./release/Leapp-${TAG_VERSION}-win.zip" ||:
+          powershell "Compress-Archive './release/Leapp Setup ${TAG_VERSION}.exe' './release/Leapp-${TAG_VERSION}-win.zip'"
+          powershell "Compress-Archive './release/Leapp Setup ${TAG_VERSION}.exe' './release/Leapp-windows.zip'"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -121,7 +122,7 @@ jobs:
           cd packages/desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
-          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/${TAG_VERSION}/" --recursive
 
   build-linux:
     runs-on: ubuntu-latest
@@ -162,6 +163,11 @@ jobs:
           rm -Rf ./release/builder-debug.yml
           rm -Rf ./release/builder-effective-config.yaml
 
+          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
+          TAG_VERSION=${TAG_VERSION:1}
+          zip "./release/Leapp-deb.zip" "./release/Leapp_${TAG_VERSION}_amd64.deb"
+          zip "./release/Leapp-appImage.zip" "./release/Leapp-${TAG_VERSION}.AppImage"
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -174,7 +180,7 @@ jobs:
           cd packages/desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
-          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/${TAG_VERSION}/" --recursive
 
   build-macos-x64:
     runs-on: macos-latest
@@ -250,9 +256,10 @@ jobs:
           rm -Rf ./release/builder-effective-config.yaml
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
-          rm "./release/Leapp-$TAG_VERSION-mac.zip"
-          rm "./release/Leapp-$TAG_VERSION-mac.zip.blockmap"
-          zip "./release/Leapp-$TAG_VERSION-mac.zip" "./release/Leapp-$TAG_VERSION.dmg"
+          rm "./release/Leapp-${TAG_VERSION}-mac.zip"
+          rm "./release/Leapp-${TAG_VERSION}-mac.zip.blockmap"
+          zip "./release/Leapp-${TAG_VERSION}-mac.zip" "./release/Leapp-${TAG_VERSION}.dmg"
+          zip "./release/Leapp-mac.zip" "./release/Leapp-${TAG_VERSION}.dmg"
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -266,7 +273,7 @@ jobs:
           cd packages/desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
-          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/${TAG_VERSION}/" --recursive
 
   build-macos-arm:
     runs-on: macos-latest
@@ -343,9 +350,10 @@ jobs:
           rm -Rf ./release/mac-arm64
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
-          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
-          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
-          zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.dmg"
+          rm "./release/Leapp-${TAG_VERSION}-arm64-mac.zip"
+          rm "./release/Leapp-${TAG_VERSION}-arm64-mac.zip.blockmap"
+          zip "./release/Leapp-${TAG_VERSION}-mac-arm64.zip" "./release/Leapp-${TAG_VERSION}-arm64.dmg"
+          zip "./release/Leapp-arm-mac.zip" "./release/Leapp-${TAG_VERSION}-arm64.dmg"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -359,7 +367,7 @@ jobs:
           cd packages/desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
-          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/$TAG_VERSION/" --recursive
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/${TAG_VERSION}/" --recursive
 
   publish-draft:
     runs-on: ubuntu-latest
@@ -380,7 +388,7 @@ jobs:
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}
           aws s3 rm "${{ env.S3_BUCKET }}/latest" --recursive
-          aws s3 cp "${{ env.S3_BUCKET }}/$TAG_VERSION/" "${{ env.S3_BUCKET }}/latest" --recursive
+          aws s3 cp "${{ env.S3_BUCKET }}/${TAG_VERSION}/" "${{ env.S3_BUCKET }}/latest" --recursive
 
   publish-changelog:
     runs-on: ubuntu-latest

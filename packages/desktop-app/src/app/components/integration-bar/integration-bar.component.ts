@@ -238,7 +238,11 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       if (this.loadingInBrowser && !this.selectedConfiguration.isOnline) {
         this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
       }
-      await this.appProviderService.awsSsoIntegrationService.syncSessions(integrationId);
+      await this.appProviderService.awsSsoIntegrationService.syncSessions(integrationId, () => {
+        if (this.modalRef) {
+          this.modalRef.hide();
+        }
+      });
     } catch (err) {
       this.awsSsoOidcService.interrupt();
       await this.logout(integrationId);

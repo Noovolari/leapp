@@ -194,10 +194,10 @@ describe("AwsSsoIntegrationService", () => {
     const awsSsoIntegrationService = new AwsSsoIntegrationService(null, null, null, null, sessionFactory as any, null, awsSsoRoleService as any);
     (awsSsoIntegrationService as any).loginAndGetSessionsDiff = loginAndGetSessionsDiff;
 
-    const syncedSessions = await awsSsoIntegrationService.syncSessions(integrationId);
+    const syncedSessions = await awsSsoIntegrationService.syncSessions(integrationId, "onAuthenticatedCallback" as any);
 
     expect(syncedSessions).toEqual({ sessionsAdded: 1, sessionsDeleted: 1 });
-    expect(loginAndGetSessionsDiff).toHaveBeenCalledWith(integrationId);
+    expect(loginAndGetSessionsDiff).toHaveBeenCalledWith(integrationId, "onAuthenticatedCallback");
     expect(awsSsoRoleService.create).toHaveBeenCalledWith({
       awsSsoConfigurationId: "integrationId",
     });
@@ -428,8 +428,20 @@ describe("AwsSsoIntegrationService", () => {
     awsIntegrationService.setupSsoPortalClient(fakeRegion);
 
     expect(awsIntegrationService.ssoPortal.config.region).toBe(fakeRegion);
+    expect(awsIntegrationService.ssoPortal.config.maxRetries).toBe(30);
     expect(awsIntegrationService.listAccountRolesCall).toBeInstanceOf(ThrottleService);
     expect(awsIntegrationService.listAccountRolesCall.minDelay).toBe(100);
+
+    let actualRetryTime = awsIntegrationService.ssoPortal.config.retryDelayOptions.customBackoff(30);
+    expect(actualRetryTime).toBeLessThanOrEqual(30000);
+    expect(actualRetryTime).toBeGreaterThanOrEqual(0);
+
+    const startTime = Date.now();
+    while (actualRetryTime === (actualRetryTime = awsIntegrationService.ssoPortal.config.retryDelayOptions.customBackoff(30))) {
+      if (Date.now() - startTime > 1000) {
+        throw new Error("customBackoff function is not randomic!");
+      }
+    }
 
     const callParams = ["fake-param1", "fake-param2"];
     const callPromise = "fake-call-promise";
@@ -532,6 +544,7 @@ describe("AwsSsoIntegrationService", () => {
       setSessions: () => {},
       getIntegrations: () => [],
       setIntegrations: () => {},
+      setFetchingIntegrations: () => {},
     };
     const awsIntegrationService = new AwsSsoIntegrationService(repository, null, behavioralNotifier, null, null, null, null);
 
@@ -545,7 +558,8 @@ describe("AwsSsoIntegrationService", () => {
   });
 
   test("getSessions", async () => {
-    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
+    const behaviouralNotifier = { setFetchingIntegrations: jest.fn() };
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, behaviouralNotifier as any, null, null, null, null) as any;
     awsIntegrationService.setupSsoPortalClient = jest.fn();
     awsIntegrationService.listAccounts = jest.fn(async () => ["account1", "account2"]);
     awsIntegrationService.getSessionsFromAccount = jest.fn(async () => ["session1", "session2"]);
@@ -560,6 +574,10 @@ describe("AwsSsoIntegrationService", () => {
     expect(awsIntegrationService.listAccounts).toHaveBeenCalledWith(fakeAccessToken);
     expect(awsIntegrationService.getSessionsFromAccount).toHaveBeenNthCalledWith(1, fakeIntegrationId, "account1", fakeAccessToken);
     expect(awsIntegrationService.getSessionsFromAccount).toHaveBeenNthCalledWith(2, fakeIntegrationId, "account2", fakeAccessToken);
+    expect(behaviouralNotifier.setFetchingIntegrations).toHaveBeenNthCalledWith(1, "");
+    expect(behaviouralNotifier.setFetchingIntegrations).toHaveBeenNthCalledWith(2, "Fetched 1 of 2 accounts...");
+    expect(behaviouralNotifier.setFetchingIntegrations).toHaveBeenNthCalledWith(3, "Fetched 2 of 2 accounts...");
+    expect(behaviouralNotifier.setFetchingIntegrations).toHaveBeenNthCalledWith(4, undefined);
   });
 
   test("configureAwsSso", async () => {
@@ -855,9 +873,18 @@ describe("AwsSsoIntegrationService", () => {
 
     expect(i).toBe(1);
     expect(spy).toHaveBeenCalledWith(listAccountRolesRequest);
-    /*expect(promiseCallback).toHaveBeenCalledWith([
-      { roleId: 1, roleName: "a" },
-      { roleId: 1, roleName: "a" },
-    ]);*/
+  });
+
+  test("recursiveListRoles - callWithThrottle throwing an error", async () => {
+    const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null);
+    (awsIntegrationService as any).listAccountRolesCall = {
+      callWithThrottle: async () => {
+        throw new Error("fake error");
+      },
+    };
+
+    await expect(new Promise((resolve, reject) => (awsIntegrationService as any).recursiveListRoles([], null, null, reject))).rejects.toEqual(
+      new Error("fake error")
+    );
   });
 });

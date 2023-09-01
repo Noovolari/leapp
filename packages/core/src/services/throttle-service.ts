@@ -25,8 +25,10 @@ export class ThrottleService {
     this.pendingCalls++;
     this.lastCallId = callId;
     this.lastCallTime = Date.now();
-    const result = await this.call(...params);
-    this.pendingCalls--;
-    return result;
+    try {
+      return await this.call(...params);
+    } finally {
+      this.pendingCalls--;
+    }
   }
 }

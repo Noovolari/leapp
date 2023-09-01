@@ -38,6 +38,7 @@ import { TeamService } from "./services/team-service";
 })
 export class AppComponent implements OnInit {
   isSyncingWorkspace: boolean;
+  fetchingState: string | undefined;
 
   private fileService: FileService;
   private awsCoreService: AwsCoreService;
@@ -176,6 +177,10 @@ export class AppComponent implements OnInit {
     }
 
     this.teamService.syncingWorkspaceState.subscribe((isSyncingWorkspace: boolean) => (this.isSyncingWorkspace = isSyncingWorkspace));
+
+    this.behaviouralSubjectService.fetchingIntegrationState$.subscribe((fetchingState: string | undefined) => {
+      this.fetchingState = fetchingState;
+    });
 
     // Check the existence of a current-workspace key in the system keychain and
     // load the corresponding workspace

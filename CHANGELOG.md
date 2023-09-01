@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.18.5](https://github.com/Noovolari/leapp/compare/v0.18.4...v0.18.5) (2023-08-10)
+
+### Bug fixes
+* fixed `HTTP 429 TooManyRequestsException` error generated during AWS SSO integration sync ([issue #459](https://github.com/Noovolari/leapp/issues/459))
+
+### Features
+* added AWS SSO integration sync loading screen
+* SAML IdP keycloak `/auth` base path is now optional. Thanks to [@hugocortes](https://github.com/hugocortes) for the [Pull Request #428](https://github.com/Noovolari/leapp/pull/428)
+
+### [0.18.4](https://github.com/Noovolari/leapp/compare/v0.18.3...v0.18.4) (2023-08-03)
+
+### Bug fixes
+* fixed IAM Federated session G Suite SAML authentication flow ([issue #453](https://github.com/Noovolari/leapp/issues/453))
+
 ### [0.18.3](https://github.com/Noovolari/leapp/compare/v0.18.2...v0.18.3) (2023-07-28)
 
 ### Bug fixes

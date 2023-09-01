@@ -1,4 +1,4 @@
-import { Component, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
+import { Component, Input, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
 import { globalFilterGroup } from "../command-bar/command-bar.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
@@ -44,6 +44,9 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   @ViewChild("ssoModalTemplate", { static: false })
   ssoModalTemplate: TemplateRef<any>;
 
+  @Input()
+  isTeamWorkspace: boolean;
+
   eConstants = constants;
   regions = [];
   selectedConfiguration: any;
@@ -79,6 +82,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   menuX: number;
   menuY: number;
+
+  submitting = false;
 
   public behaviouralSubjectService: BehaviouralSubjectService;
   private awsSsoRoleService: AwsSsoRoleService;
@@ -310,6 +315,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   gotoForm(modifying: number, integration: Integration, overrideType?: IntegrationType): void {
+    if (this.isTeamWorkspace) {
+      return;
+    }
+
     // Change graphical values to show the form
     this.chooseIntegration = false;
     this.modifying = modifying;
@@ -342,34 +351,59 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   }
 
   async save(): Promise<void> {
-    // TODO: Add spinner since the Azure is async...
-    if (this.formValid()) {
-      const alias = this.form.get("alias").value?.trim();
-      const portalUrl = this.form.get("portalUrl").value?.trim();
-      const region = this.form.get("awsRegion").value;
-      const browserOpening = this.form.get("defaultBrowserOpening").value;
-      const tenantId = this.form.get("tenantId").value;
+    this.submitting = true;
+    try {
+      if (this.formValid()) {
+        const alias = this.form.get("alias").value?.trim();
+        const portalUrl = this.form.get("portalUrl").value?.trim();
+        const region = this.form.get("awsRegion").value;
+        const browserOpening = this.form.get("defaultBrowserOpening").value;
+        const tenantId = this.form.get("tenantId").value;
 
-      let integrationParams: IntegrationParams;
-      if (this.modifying > 0) {
-        integrationParams =
-          this.selectedIntegration === IntegrationType.awsSso
-            ? ({ alias, browserOpening, portalUrl, region } as IntegrationParams)
-            : ({ alias, tenantId } as IntegrationParams);
-      }
-      if (this.modifying === 1) {
-        await this.appProviderService.integrationFactory.create(this.selectedIntegration as any, integrationParams);
-      } else if (this.modifying === 2) {
-        await this.appProviderService.integrationFactory.update(this.selectedConfiguration.id, integrationParams);
-      }
+        let integrationParams: IntegrationParams;
+        if (this.modifying > 0) {
+          integrationParams =
+            this.selectedIntegration === IntegrationType.awsSso
+              ? ({ alias, browserOpening, portalUrl, region } as IntegrationParams)
+              : ({ alias, tenantId } as IntegrationParams);
+        }
 
-      this.ngZone.run(() => {
-        this.setValues();
-        this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
-      });
-      this.modalRef.hide();
-    } else {
-      this.messageToasterService.toast("Form is not valid", ToastLevel.warn, "Form validation");
+        if (this.modifying === 1) {
+          await this.appProviderService.integrationFactory.create(this.selectedIntegration as any, integrationParams);
+
+          try {
+            await this.appProviderService.teamService.pushToRemote();
+          } catch (error) {
+            this.appProviderService.teamService.setSyncState("failed");
+            throw error;
+          }
+
+          this.messageToasterService.toast(`Integration: ${integrationParams.alias}, created.`, ToastLevel.success, "");
+        } else if (this.modifying === 2) {
+          await this.appProviderService.integrationFactory.update(this.selectedConfiguration.id, integrationParams);
+
+          try {
+            await this.appProviderService.teamService.pushToRemote();
+          } catch (error) {
+            this.appProviderService.teamService.setSyncState("failed");
+            throw error;
+          }
+
+          this.messageToasterService.toast(`Integration: ${integrationParams.alias}, edited.`, ToastLevel.success, "");
+        }
+
+        this.ngZone.run(() => {
+          this.setValues();
+          this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
+        });
+        this.modalRef.hide();
+      } else {
+        this.messageToasterService.toast("Form is not valid", ToastLevel.warn, "Form validation");
+      }
+    } catch (error) {
+      this.messageToasterService.toast(error.message, ToastLevel.error);
+    } finally {
+      this.submitting = false;
     }
   }
 
@@ -379,13 +413,26 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.windowService.confirmDialog(
       `Deleting this configuration will also logout from its sessions: do you want to proceed?`,
       async (res) => {
-        if (res !== constants.confirmClosed) {
-          // eslint-disable-next-line max-len
-          this.loggingService.log(new LoggedEntry(`Removing sessions with attached integration id: ${integration.id}`, this, LogLevel.info));
-          await this.logout(integration.id);
-          await this.appProviderService.integrationFactory.delete(integration.id);
-          this.setValues();
-          this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
+        try {
+          if (res !== constants.confirmClosed) {
+            // eslint-disable-next-line max-len
+            this.loggingService.log(new LoggedEntry(`Removing sessions with attached integration id: ${integration.id}`, this, LogLevel.info));
+            await this.logout(integration.id);
+            await this.appProviderService.integrationFactory.delete(integration.id);
+
+            try {
+              await this.appProviderService.teamService.pushToRemote();
+            } catch (error) {
+              this.appProviderService.teamService.setSyncState("failed");
+              throw error;
+            }
+
+            this.messageToasterService.toast(`Integration: ${integration.alias}, deleted.`, ToastLevel.success, "");
+            this.setValues();
+            this.behaviouralSubjectService.setIntegrations(this.appProviderService.integrationFactory.getIntegrations());
+          }
+        } catch (error) {
+          this.messageToasterService.toast(error.message, ToastLevel.error);
         }
       },
       "Delete Configuration",

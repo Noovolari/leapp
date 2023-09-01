@@ -1,0 +1,20 @@
+<hr>
+<section>
+  <span *ngIf="!isLoggedAsPro" class="unsync">
+    <span><img src="assets/images/unsync.svg" alt="" title=""> Not active</span>
+    <button class="btn btn-primary" (click)="callToAction();">
+      {{buttonText}}
+    </button>
+  </span>
+  <span *ngIf="isLoggedAsPro && isFailed" class="sync-failed">
+    <div class="floating-message">
+      <span>Wait a second and then retry to manually sync</span>
+      <button class="btn btn-primary" (click)="retrySync();">RETRY</button>
+    </div>
+    <span><img src="assets/images/syncfailed.svg" alt="" title=""> An issue in syncing Workspace...</span>
+  </span>
+  <span *ngIf="isLoggedAsPro && isProgress" class="sync-progress"><span><img src="assets/images/syncprogress.svg" alt=""
+                                                                             title=""> Syncing Workspace...</span></span>
+  <span *ngIf="isLoggedAsPro && !isProgress && !isFailed" class="sync"><span><img src="assets/images/sync.svg" alt=""
+                                                                                  title=""> Synchronized Workspace</span></span>
+</section>

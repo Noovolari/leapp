@@ -199,7 +199,7 @@
     <!-- ==                             BUTTONS                          == -->
     <!-- ================================================================== -->
     <br>
-    <button type="button" (click)="saveSession();" [disabled]="!formValid()" *ngIf="sessionType" class="btn-right-margin {{formValid() ? '': 'mat-button-disabled'}}">Create Session</button>
+    <button type="button" (click)="saveSession();" [disabled]="!formValid() || submitting" *ngIf="sessionType" class="btn-right-margin {{formValid() ? '': 'mat-button-disabled'}}">Create Session <i *ngIf="submitting" class="fa fa-spinner fa-spin"></i></button>
     <a (click)="closeModal()">Cancel</a>
   </ng-container>
 

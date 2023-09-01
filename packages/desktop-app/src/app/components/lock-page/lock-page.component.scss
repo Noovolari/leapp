@@ -1,0 +1,174 @@
+@import "../../../assets/scss/mixins/palette";
+
+.draggable-area {
+  width: 100vw;
+  height: 80px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  -webkit-user-select: auto;
+  -webkit-user-drag: auto;
+  -webkit-app-region: drag;
+}
+
+.form-field {
+  margin-bottom: 15px;
+  width: 350px;
+  input {
+    width: 100%;
+  }
+  .input-inner-button {
+    top: -2px;
+  }
+  .sign-in-loader {
+    position: absolute;
+    top: 7px;
+    right: -40px;
+    font-size: 17px;
+  }
+}
+
+.form-help {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 10px;
+  font-size: 15px;
+
+  img {
+    filter: invert(79%) sepia(34%) saturate(7293%) hue-rotate(166deg) brightness(92%) contrast(92%);
+    margin-right: 3px;
+    height: 20px;
+  }
+
+  a {
+    color: $local-workspace-blu;
+  }
+}
+
+
+.full-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+
+  background: white;
+
+  width: 100%;
+  height: 100vh;
+
+  .logo-column {
+    height: 100%;
+    width: 240px;
+    border-right: 1px solid #dadada;
+    display: flex;
+    align-items: center;
+
+    img {
+      width: 96px;
+      height: 96px;
+      position: relative;
+      left: 192px;
+      border-radius: 23%;
+      border: 1px solid #dadada;
+    }
+  }
+
+  .form-column-container {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 100px;
+    gap: 15px;
+    margin-right: 70px;
+
+    .personal-data {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 15px;
+
+      .letter-avatar {
+        background: #ffffff;
+        color: #dadada;
+        border-radius: 50%;
+        border: 1px solid #dadada;
+        width: 50px;
+        height: 50px;
+        position: relative;
+        top: 5px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        span {
+          text-align: center;
+          color: #666;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 34px;
+        }
+      }
+
+      .email-and-name {
+        width: 350px;
+      }
+
+      .name {
+        color: #000;
+        font-size: 19px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 34px;
+        text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+
+      .email {
+        color: #999;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 23px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+  }
+
+  .vertical-hr {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-right: 50px;
+
+    .hr {
+      color: #dadada;
+      border-right: 1px solid #dadada;
+      height: 140px;
+    }
+  }
+
+  .local-workspace {
+    .link-to-local {
+      text-decoration: underline;
+      transition: opacity 0.3s ease;
+      &:hover {
+        transition: opacity 0.3s ease;
+        cursor: pointer;
+        opacity: 0.7;
+      }
+    }
+  }
+
+
+}

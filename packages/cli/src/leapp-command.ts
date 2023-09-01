@@ -32,6 +32,12 @@ export abstract class LeappCommand extends Command {
     await this.cliProviderService.teamService.setCurrentWorkspace(true);
   }
 
+  async finally(error: any): Promise<void> {
+    if (error === undefined) {
+      await this.cliProviderService.teamService.pushToRemote();
+    }
+  }
+
   unsupportedAzureSession(session: Session): void {
     if (session && session.type === SessionType.azure) {
       throw new Error("Azure sessions not supported for this command");

@@ -528,4 +528,73 @@ body.dark-theme {
   .workspace-menu-icon {
     filter: invert(1);
   }
+
+  .plan {
+    border: 1px solid $dark-tablehead-border;
+    &.selected {
+      border: 2px solid #00aaff;
+      box-sizing: border-box;
+    }
+    .plan-header {
+      border-bottom: 1px solid $dark-tablehead-border;
+    }
+    .plan-body {
+      background-color: $dark-select-component;
+    }
+    .price-description {
+      color: #DEDCDD;
+    }
+    .cta-button.clickable {
+      background: $dark-button-color;
+      color: $white-text-color;
+      outline: none;
+      border: none;
+    }
+  }
+
+  .right-side h2, .left-side h2, .plan-summary .black {
+    color: #DEDCDD!important;
+  }
+
+  .right-side {
+    border-left-color: #424242!important;
+  }
+
+  .sync {
+    color: $white-text-color;
+    img {
+      filter: invert(1);
+    }
+  }
+
+  .full-container {
+    background-color: $dark-modal-background!important;
+    color: #DEDCDD!important;
+    .logo-column {
+      border-right-color: #404040!important;
+      img {
+        border-color: #404040!important;
+      }
+    }
+    .form-column-container {
+      .letter-avatar {
+        background-color: $dark-main-background!important;
+        border-color: $dark-input-form-border!important;
+        span {
+          color: #DEDCDD!important;
+        }
+      }
+      .name {
+        color: $white-text-color!important;
+      }
+    }
+    .vertical-hr {
+      .hr {
+        border-right-color: #404040!important;
+      }
+    }
+    .fa-eye-slash, .fa-eye {
+      color: #DEDCDD!important;
+    }
+  }
 }

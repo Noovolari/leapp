@@ -8,6 +8,7 @@ interface User {
 enum ApiErrorCodes {
   invalidCredentials,
   userNotActive,
+  emailAlreadyTaken,
 }
 
 enum FormErrorCodes {
@@ -18,6 +19,11 @@ export { User, ApiErrorCodes, FormErrorCodes };
 
 export interface WorkspaceState {
   name: string;
+  description: string;
+  type: "local" | "team" | "pro";
+  syncState: "disabled" | "enabled" | "in-progress" | "failed";
+  selected: boolean;
+  locked: boolean;
   id: string;
 }
 
@@ -32,11 +38,21 @@ export class TeamService {
     return new BehaviorSubject<User | null>(null);
   }
 
-  get workspaceState(): BehaviorSubject<WorkspaceState> {
-    return new BehaviorSubject<WorkspaceState>({ name: constants.localWorkspaceName, id: constants.localWorkspaceKeychainValue });
+  get workspacesState(): BehaviorSubject<WorkspaceState[]> {
+    return new BehaviorSubject<WorkspaceState[]>([
+      {
+        name: constants.localWorkspaceName,
+        description: constants.localWorkspaceDescription,
+        type: "local",
+        syncState: "disabled",
+        selected: true,
+        locked: false,
+        id: constants.localWorkspaceKeychainValue,
+      },
+    ]);
   }
 
-  get switchingWorkspaceState(): BehaviorSubject<boolean> {
+  get syncingWorkspaceState(): BehaviorSubject<boolean> {
     return new BehaviorSubject<boolean>(false);
   }
 
@@ -50,11 +66,25 @@ export class TeamService {
 
   async signOut(_: boolean = false): Promise<void> {}
 
-  async syncSecrets(_: boolean = false): Promise<void> {}
-
   async deleteTeamWorkspace(): Promise<void> {}
 
   async switchToLocalWorkspace(): Promise<void> {}
 
   async refreshWorkspaceState(_?: () => Promise<void>): Promise<void> {}
+
+  async createCheckoutSession(_?: any, __?: any): Promise<any> {
+    return "checkout-session-url";
+  }
+
+  async getPrices(): Promise<any> {
+    return [];
+  }
+
+  setSyncState(_?: any): void {}
+
+  async pushToRemote(): Promise<void> {}
+
+  async pullFromRemote(_?: any): Promise<void> {}
+
+  async removeSessionsAndIntegrationsFromCurrentWorkspace(): Promise<void> {}
 }

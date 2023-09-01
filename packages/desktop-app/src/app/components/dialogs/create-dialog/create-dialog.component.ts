@@ -68,6 +68,8 @@ export class CreateDialogComponent implements OnInit {
   eSessionType = SessionType;
   eConstants = constants;
 
+  submitting = false;
+
   public form = new FormGroup({
     idpArn: new FormControl("", [Validators.required]),
     accountNumber: new FormControl("", [Validators.required, Validators.maxLength(12), Validators.minLength(12)]),
@@ -187,12 +189,22 @@ export class CreateDialogComponent implements OnInit {
   /**
    * Save the first account in the workspace
    */
-  saveSession(): void {
+  async saveSession(): Promise<void> {
     this.loggingService.log(new LoggedEntry(`Saving account...`, this, LogLevel.info));
-    this.addProfileToWorkspace();
-    this.addIpdUrlToWorkspace();
-    this.createSession();
-    this.router.navigate(["/dashboard"]).then(() => {});
+    if (this.submitting) {
+      return;
+    }
+    this.submitting = true;
+    try {
+      this.addProfileToWorkspace();
+      this.addIpdUrlToWorkspace();
+      await this.createSession();
+      this.router.navigate(["/dashboard"]).then(() => {});
+    } catch (error) {
+      this.messageToasterService.toast(error.message, ToastLevel.error);
+    } finally {
+      this.submitting = false;
+    }
   }
 
   /**
@@ -349,7 +361,7 @@ export class CreateDialogComponent implements OnInit {
    *
    * @private
    */
-  private createSession() {
+  private async createSession(): Promise<void> {
     if (this.formValid()) {
       switch (this.sessionType) {
         case SessionType.awsIamRoleFederated:
@@ -361,7 +373,7 @@ export class CreateDialogComponent implements OnInit {
             roleArn: this.form.value.roleArn.trim(),
             profileId: this.selectedProfile.value,
           };
-          this.awsIamRoleFederatedService.create(awsFederatedAccountRequest);
+          await this.awsIamRoleFederatedService.create(awsFederatedAccountRequest);
           break;
         case SessionType.awsIamUser:
           const awsIamUserSessionRequest: AwsIamUserSessionRequest = {
@@ -372,7 +384,7 @@ export class CreateDialogComponent implements OnInit {
             mfaDevice: this.form.value.mfaDevice.trim(),
             profileId: this.selectedProfile.value,
           };
-          this.awsIamUserService.create(awsIamUserSessionRequest).then(() => {});
+          await this.awsIamUserService.create(awsIamUserSessionRequest);
           break;
         case SessionType.awsIamRoleChained:
           const awsIamRoleChainedAccountRequest: AwsIamRoleChainedSessionRequest = {
@@ -383,7 +395,7 @@ export class CreateDialogComponent implements OnInit {
             parentSessionId: this.selectedSession.sessionId,
             profileId: this.selectedProfile.value,
           };
-          this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
+          await this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
           break;
         /*case SessionType.azure:
           const azureSessionRequest: AzureSessionRequest = {
@@ -395,6 +407,13 @@ export class CreateDialogComponent implements OnInit {
           };
           this.azureSessionService.create(azureSessionRequest);
           break;*/
+      }
+
+      try {
+        await this.leappCoreService.teamService.pushToRemote();
+      } catch (error) {
+        this.leappCoreService.teamService.setSyncState("failed");
+        throw error;
       }
 
       this.messageToasterService.toast(`Session: ${this.form.value.name}, created.`, ToastLevel.success, "");

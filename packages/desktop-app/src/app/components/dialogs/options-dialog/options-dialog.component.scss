@@ -3,41 +3,76 @@
 @import "../../../../assets/scss/modals";
 
 .option-modal {
-  max-width: 520px;
+  max-width: 720px;
   width: 100%;
-  .modal-content {
-    padding: 0 0 20px;
 
-    h2 { margin: 0; }
+  .modal-content {
+    padding: 0;
+
+    h2 {
+      margin: 0;
+    }
   }
 }
 
-.proxy-length-1 { width: 18%!important; }
-.proxy-length-2 { position: relative; top: 3px; display: inline-block; width: 22%!important; padding: 0 3px; text-align: right; color: $silver-dark; }
-.proxy-length-3 { position: relative; top: 3px; width: 60%!important; }
-.proxy-length-4 { position: relative; top: 3px; display: inline-block; width: 3%!important; padding: 0 3px; text-align: center; color: $silver-dark; }
-.proxy-length-5 { position: relative; top: 3px; width: 15%!important; }
+.proxy-length-1 {
+  width: 18% !important;
+}
+
+.proxy-length-2 {
+  position: relative;
+  top: 3px;
+  display: inline-block;
+  width: 22% !important;
+  padding: 0 3px;
+  text-align: right;
+  color: $silver-dark;
+}
+
+.proxy-length-3 {
+  position: relative;
+  top: 3px;
+  width: 60% !important;
+}
+
+.proxy-length-4 {
+  position: relative;
+  top: 3px;
+  display: inline-block;
+  width: 3% !important;
+  padding: 0 3px;
+  text-align: center;
+  color: $silver-dark;
+}
+
+.proxy-length-5 {
+  position: relative;
+  top: 3px;
+  width: 15% !important;
+}
 
 .option-table {
   td {
-    padding-left: 10px!important;
-    padding-right: 10px!important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
     display: inline-block;
   }
+
   td:nth-child(1) {
     font-size: 13px;
     font-weight: 400;
     color: $text-black;
     width: 83%;
-    max-width: 395px;
     overflow: hidden;
   }
+
   td:nth-child(2) {
     width: 80px;
-    position:relative;
+    position: relative;
     top: calc(50% - 10px);
+
     button {
-      display: inline-block!important;
+      display: inline-block !important;
       margin-left: 10px;
       position: relative;
       top: calc(50% - 10px);
@@ -61,6 +96,7 @@
     display: inline-flex;
     justify-self: center;
   }
+
   p {
     width: 71%;
     padding: 20px 10px;
@@ -70,6 +106,7 @@
       font-size: 18px;
       display: block;
     }
+
     span {
       display: block;
       font-size: 16px;
@@ -77,14 +114,14 @@
   }
 }
 
-.panel{
+.panel {
   animation: fadein .8s;
   overflow-x: hidden;
   padding: 0 1px;
 }
 
 .margin-fix {
-  margin: 0 20px 0;
+  margin: 0 20px 20px;
 }
 
 .max-height-200 {
@@ -101,10 +138,10 @@
 
 @keyframes fadein {
   from {
-    opacity:0;
+    opacity: 0;
   }
   to {
-    opacity:1;
+    opacity: 1;
   }
 }
 
@@ -131,6 +168,7 @@
   display: inline-block;
   margin-left: 10px;
   float: right;
+
   &:hover {
     cursor: pointer;
   }
@@ -138,7 +176,7 @@
 
 .plugin-table {
   th {
-    height: 42px!important;
+    height: 42px !important;
     z-index: 2;
   }
 
@@ -156,19 +194,20 @@
   td:nth-child(5) {
     text-align: right;
   }
+
   i.fa-apple, i.fa-windows, i.fa-linux {
     color: $dark-main-background;
   }
 }
 
 .bw {
-  filter: grayscale(1)!important;
+  filter: grayscale(1) !important;
 }
 
 .borderless-button {
   margin: 0 0 0 15px;
   padding: 0;
-  background-color: unset!important;
+  background-color: unset !important;
 }
 
 .centered-column {
@@ -184,6 +223,7 @@
 .extension-info {
   position: relative;
   bottom: 40px;
+
   strong {
     bottom: 5px;
     position: relative;
@@ -206,28 +246,57 @@
 .description-container {
   position: relative;
   top: 16px;
+
+  a {
+    color: #52A8DC !important;
+
+    &:hover {
+      color: #00D9FF !important;
+    }
+  }
+}
+
+
+.dark-theme {
+  .cta-label {
+    color: white!important;
+  }
+}
+
+.cta-label {
+  background: transparent;
+  color: #292929;
+  font-size: 10px;
+  font-weight: bold;
+  text-align: center;
+  margin: 5px 0 10px 0;
+
   a {
     color: #52A8DC!important;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
     &:hover {
-      color: #00D9FF!important;
+      opacity: 0.8;
     }
   }
 }
 
 .button-container {
-  position: relative!important;
-  top: 16px!important;
+  position: relative !important;
+  top: 16px !important;
 }
 
 .enable-option {
   top: 54%;
   position: fixed;
-  text-align: right!important;
+  text-align: right !important;
   display: inline-block;
   right: 388px;
-  border-top: 0.5px solid #DADADA !important;
+  border-top: 0.5px solid $silver-50 !important;
   width: 37%;
   padding: 15px;
+
   .extension-description {
     text-align: left;
     justify-content: left;
@@ -239,4 +308,347 @@
 .enable-extension-toggle {
   right: -16px;
   position: relative;
+}
+
+.plans-group-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  margin: 15px 0;
+  width: 31%;
+  height: 370px;
+  border-radius: 8px!important;
+  border: 1px solid $silver-50;
+
+  &.selected {
+    border: 2px solid #00aaff;
+    box-sizing: border-box;
+  }
+}
+
+.plan-free, .plan-team {
+  margin: 40px 0!important;
+  height: 320px!important;
+}
+
+.dark-theme {
+  .plan-free.selected { border-color: #d8d8d8!important; }
+  .plan-pro.selected { border-color: #4aadac!important; }
+  .plan-team.selected { border-color: #2e78a9!important; }
+}
+
+.plan-free.selected { border-color: #292929!important; }
+.plan-pro.selected { border-color: #378180!important; }
+.plan-team.selected { border-color: #1b4c6a!important; }
+
+.plan-free .plan-header {
+  background: #d9d9d9;
+  span, p { color: #292929!important; }
+}
+.plan-pro .plan-header {
+  background: rgb(164, 214, 213);
+  span, p { color: #378180!important; }
+}
+.plan-team .plan-header {
+  background: rgb(77,167,222);
+  span, p { color: #1b4c6a!important; }
+}
+
+.plan-header {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  padding: 10px 13px;
+  position: relative;
+
+  span, p {
+    width: 100%;
+    text-align: center;
+    display: block;
+  }
+
+  border-bottom: 1px solid $silver-50;
+
+  span {
+    font-weight: 600;
+    font-size: 20px;
+    text-align: center;
+  }
+
+  p {
+    font-size: 13px;
+    margin: 5px 0 0 0;
+  }
+}
+
+.discounted-price {
+  color: #0A81D1;
+  padding: 0 4px;
+  font-weight: 600;
+}
+
+.lifetime-deal {
+  background-color: #ff6a00;
+  border-radius: 10px;
+  border: 1px solid #292929;
+  font-size: 10px;
+  color: #292929;
+  padding: 1px 5px;
+  position: absolute;
+  top: 15px;
+  right: -15px;
+  transform: rotate(45deg);
+}
+
+.plan-body {
+  height: 100%;
+  background-color: white;
+  overflow: hidden;
+  text-align: center;
+
+  .price-container {
+    padding: 10px 13px;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    .price-value {
+      font-size: 20px;
+      font-weight: 600;
+
+      .full-price {
+        text-decoration: line-through;
+        padding: 0 4px;
+        font-weight: 600;
+      }
+    }
+    .price-description {
+      font-size: 12px;
+      color: $table-text;
+    }
+  }
+
+  .cta-button {
+    margin: 7px 16px;
+    padding: 3px 6px;
+    display: block;
+    border-radius: 5px;
+    border: 1px solid $silver-50;
+    text-align: center;
+    background-color: white;
+    font-size: 15px;
+
+    &.clickable {
+      background: $black;
+      cursor: pointer;
+      color: $white-text-color;
+      outline: none;
+      border: none;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+
+      &:hover {
+        transition: opacity 0.3s ease;
+        opacity: 0.7;
+      }
+    }
+  }
+
+  .plan-features {
+    padding: 10px 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+
+    li {
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      font-weight: 400;
+
+      span.check-mark-icon {
+        margin-right: 5px;
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      span:not(.check-mark-icon) {
+        font-weight: 400;
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+.toggle-btn-stripe {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 50%;
+  height: 30px;
+  text-align: center;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  color: #9A9A9A;
+  transition: all 0.3s ease;
+  font-size: 12px;
+
+  small {
+    color: #8fc92a;
+    position: relative;
+    top: 2px;
+    margin-left: 5px;
+    font-size: 12px;
+  }
+
+  &:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+
+  &:last-of-type {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+    left: -2px;
+  }
+
+  &:hover {
+    background: #eee;
+  }
+
+  &.selected {
+    border: 2px solid #52A8DC;
+    color: #0c0c0c;
+    z-index: 2;
+
+    &:hover {
+      background: #52a8dc42;
+    }
+  }
+}
+
+
+
+/* The switch - the box around the slider */
+.toggle-prices {
+  text-align: right;
+  width: 67%;
+}
+
+.switch {
+  font-size: 14px;
+  position: relative;
+  display: inline-block;
+  width: 50%;
+  height: 2em;
+}
+
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  color: #9A9A9A;
+  font-weight: 400;
+  border-radius: 30px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  transition: .4s;
+  padding: 0 2px 0 18px;
+
+  span {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 66%;
+    font-size: 11px;
+  }
+  span:first-child {
+    width: 40%!important;
+  }
+}
+
+.dark-theme .slider {
+  color: white;
+}
+.dark-theme {
+  .switch input:checked + .slider {
+    background-color: transparent;
+    color: white;
+  }
+}
+
+.slider:before {
+  position: absolute;
+  content: "Monthly";
+  height: 90%;
+  width: 52%;
+  left: 0;
+  border-radius: 20px;
+  background-color: #52A8DC;
+  color: white;
+  display: grid;
+  align-content: center;
+  justify-content: center;
+  transition: .4s;
+  font-size: 11px;
+}
+
+.slider:after {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: -7px;
+  right: -7px;
+  bottom: -7px;
+  border-radius: 1.71em;
+  border: 1px solid #d8d8d8;
+  z-index: -1;
+}
+
+.switch input:checked + .slider {
+  background-color: white;
+  color: #d8d8d8;
+}
+
+.switch input:checked + .slider:before {
+  content: "Yearly (17% discount)";
+  transform: translateX(91%);
+  color: white;
+}
+
+.switch input {
+  display: none;
+}
+
+.micro-small {
+  color: #bbbbbb;
+  font-size: 12px;
+  display: block;
+}
+
+.best-discount-ever {
+  position: absolute;
+  right: 0;
+  top: 31px;
+  background: #23D4B8;
+  color: #292929;
+  font-size: 10px;
+  border-radius: 20px;
+  padding: 0 5px;
 }

@@ -20,6 +20,7 @@
   height: calc(100vh - #{$commandbar-height});
   border-right: 1px solid $silver-75;
   overflow-y: auto;
+  overflow-x: hidden;
 
   &.compact {
     display: none!important;

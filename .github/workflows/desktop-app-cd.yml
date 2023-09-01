@@ -72,6 +72,7 @@ jobs:
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
           ref: main/26c2812
+          fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -136,6 +137,7 @@ jobs:
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
           ref: main/26c2812
+          fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -194,6 +196,7 @@ jobs:
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
           ref: main/26c2812
+          fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature
@@ -287,6 +290,7 @@ jobs:
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
           ref: main/26c2812
+          fetch-depth: 0
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
       - name: Inject Team Feature

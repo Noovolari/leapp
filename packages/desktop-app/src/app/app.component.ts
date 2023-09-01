@@ -30,7 +30,6 @@ import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-serv
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { ExtensionWebsocketService } from "./services/extension-websocket.service";
 import { TeamService } from "./services/team-service";
-import { Role } from "./leapp-team-core/user/role";
 
 @Component({
   selector: "app-root",
@@ -185,7 +184,7 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit.
     // If there is a pro user registered go to login page instead
-    if (this.teamService.signedInUserState.getValue()?.role === Role.pro) {
+    if (this.teamService.signedInUserState.getValue()?.role === "pro") {
       await this.router.navigate(["/lock"]);
     } else {
       await this.router.navigate(["/dashboard"]);

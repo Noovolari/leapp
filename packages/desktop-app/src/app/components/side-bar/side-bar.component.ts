@@ -21,7 +21,6 @@ import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog
 import { LoginWorkspaceDialogComponent } from "../dialogs/login-team-dialog/login-workspace-dialog.component";
 import { ManageTeamWorkspacesDialogComponent } from "../dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 import { WorkspaceState } from "../../services/team-service";
-import { Role } from "../../leapp-team-core/user/role";
 import { Router } from "@angular/router";
 
 export interface SelectedSegment {
@@ -210,7 +209,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     if (!this.canLockWorkspace || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
     this.appService.closeAllMenuTriggers();
-    if (this.appProviderService.teamService.signedInUserState.getValue().role === Role.pro) {
+    if (this.appProviderService.teamService.signedInUserState.getValue().role === "pro") {
       await this.router.navigate(["/lock"]);
     }
   }

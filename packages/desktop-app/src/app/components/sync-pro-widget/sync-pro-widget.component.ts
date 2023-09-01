@@ -4,7 +4,6 @@ import { AppProviderService } from "../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { globalLeappProPlanStatus, LeappPlanStatus, OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
 import { WorkspaceState } from "../../services/team-service";
-import { Role } from "../../leapp-team-core/user/role";
 import { Router } from "@angular/router";
 import { LoginWorkspaceDialogComponent } from "../dialogs/login-team-dialog/login-workspace-dialog.component";
 
@@ -70,7 +69,7 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
   async retrySync(): Promise<void> {
     const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
     const isFirstLogin = !signedInUser.lastLogin;
-    if (isFirstLogin && signedInUser.role === Role.pro) {
+    if (isFirstLogin && signedInUser.role === "pro") {
       try {
         await this.appProviderService.teamService.pushToRemote();
       } catch (error) {

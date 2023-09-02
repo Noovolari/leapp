@@ -4,7 +4,7 @@
 
 ## [Please follow one of the issue templates](https://github.com/noovolari/leapp/issues/new/choose)
 
-To keep the backlog clean and actionable, issues should be opened using [one the provided issue templates](https://github.com/arcticicestudio/nord-visual-studio-code/issues/new/choose) to help maintainers and the community to understand it, find related reports and to resolve tickets faster.
+To keep the backlog clean and actionable, issues should be opened using [one of the provided issue templates](https://github.com/arcticicestudio/nord-visual-studio-code/issues/new/choose) to help maintainers and the community to understand it, find related reports and to resolve tickets faster.
 
 ### Support
 

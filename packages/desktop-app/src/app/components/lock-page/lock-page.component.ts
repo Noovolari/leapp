@@ -6,6 +6,8 @@ import { AppService } from "../../services/app.service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { Router } from "@angular/router";
 import { globalLeappProPlanStatus, LeappPlanStatus } from "../dialogs/options-dialog/options-dialog.component";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 
 @Component({
   selector: "app-lock-page",
@@ -23,10 +25,16 @@ export class LockPageComponent implements OnInit {
 
   private loggingService: LogService;
   private teamService: TeamService;
+  private serviceString = "touch-id-lock-password";
 
-  constructor(private router: Router, public appService: AppService, public appProviderService: AppProviderService) {}
+  constructor(
+    private router: Router,
+    public appService: AppService,
+    public appProviderService: AppProviderService,
+    private messageToasterService: MessageToasterService
+  ) {}
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.email = new FormControl("", [Validators.required, Validators.email]);
     this.password = new FormControl("", [Validators.required]);
     this.signinForm = new FormGroup({ email: this.email, password: this.password });
@@ -38,6 +46,8 @@ export class LockPageComponent implements OnInit {
       this.name = user.firstName + " " + user.lastName;
       this.initials = user.firstName[0].toUpperCase() + user.lastName[0].toUpperCase();
       this.email.setValue(user.email);
+
+      this.touchId();
     }
   }
 
@@ -56,6 +66,9 @@ export class LockPageComponent implements OnInit {
           await this.teamService.pullFromRemote();
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
+        }
+        if (!(await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString))) {
+          await this.appProviderService.keychainService.saveSecret(constants.appName, this.serviceString, formValue.password);
         }
         await this.router.navigate(["/dashboard"]);
       } catch (responseException: any) {
@@ -95,5 +108,23 @@ export class LockPageComponent implements OnInit {
     globalLeappProPlanStatus.next(LeappPlanStatus.free);
     await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
     await this.router.navigate(["/dashboard"]);
+  }
+
+  async launchTouchId() {
+    await this.touchId();
+  }
+
+  private async touchId(): Promise<void> {
+    if (this.appService.isTouchIdAvailable() && (await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString))) {
+      try {
+        await this.appService.usePromptId();
+        const encodedString = await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString);
+        this.password.setValue(encodedString, { emitEvent: true });
+        console.log(encodedString);
+        await this.signIn();
+      } catch (_err) {
+        this.messageToasterService.toast("Touch ID error", ToastLevel.warn, "Touch ID authentication");
+      }
+    }
   }
 }

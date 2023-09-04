@@ -11,6 +11,9 @@
         <div class="name">{{name}}</div>
         <div class="email">{{email.value}}</div>
       </div>
+      <div class="touch-id">
+        <img src="assets/images/touchid.png" (click)="launchTouchId();">
+      </div>
     </div>
 
     <form [formGroup]="signinForm" (ngSubmit)="signIn()" spellcheck="false">

@@ -1,5 +1,6 @@
 import PluginStatus from "../models/plugin-status";
 import Segment from "../models/segment";
+import { LeappNotification } from "../models/notification";
 
 export interface GlobalSettings {
   defaultRegion: string;
@@ -13,4 +14,5 @@ export interface GlobalSettings {
   credentialMethod: string;
   samlRoleSessionDuration: number;
   ssmRegionBehaviour: string;
+  notifications: LeappNotification[];
 }

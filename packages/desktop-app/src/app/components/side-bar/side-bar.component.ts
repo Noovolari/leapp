@@ -18,9 +18,10 @@ import { integrationHighlight } from "../integration-bar/integration-bar.compone
 import { MatMenuTrigger } from "@angular/material/menu";
 import { AppService } from "../../services/app.service";
 import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
-import { LoginTeamDialogComponent } from "../dialogs/login-team-dialog/login-team-dialog.component";
+import { LoginWorkspaceDialogComponent } from "../dialogs/login-team-dialog/login-workspace-dialog.component";
 import { ManageTeamWorkspacesDialogComponent } from "../dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
-import { User, WorkspaceState } from "../../services/team-service";
+import { WorkspaceState } from "../../services/team-service";
+import { Router } from "@angular/router";
 
 export interface SelectedSegment {
   name: string;
@@ -48,62 +49,67 @@ export class SideBarComponent implements OnInit, OnDestroy {
   folders: Folder[];
   segments: Segment[];
   selectedS: SelectedSegment[];
-  subscription;
   showAll: boolean;
   showPinned: boolean;
   modalRef: BsModalRef;
-  workspaceState: WorkspaceState;
-  loggedUser: User;
-  localWorkspaceName: string;
+  workspacesState: WorkspaceState[];
   isLeappTeamStubbed: boolean;
 
+  private unsubscribe: () => void;
   private behaviouralSubjectService: BehaviouralSubjectService;
-  private userSubscription;
-  private workspaceNameSubscription;
 
-  constructor(private bsModalService: BsModalService, private appProviderService: AppProviderService, private appService: AppService) {
+  constructor(
+    private router: Router,
+    private bsModalService: BsModalService,
+    private appProviderService: AppProviderService,
+    private appService: AppService
+  ) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.showAll = true;
     this.showPinned = false;
-    this.loggedUser = null;
-    this.localWorkspaceName = constants.localWorkspaceName;
   }
 
   get isLocalWorkspaceSelected(): boolean {
-    return this.workspaceState.id === constants.localWorkspaceKeychainValue;
+    return !!this.workspacesState.find((state) => state.type === "local" && state.selected);
   }
 
-  get doesTeamExist(): boolean {
-    return !!this.loggedUser;
+  get doesRemoteWorkspaceExist(): boolean {
+    return !!this.workspacesState.find((state) => state.type !== "local");
   }
 
-  get isTeamLocked(): boolean {
-    return !this.loggedUser?.accessToken;
+  get canLockWorkspace(): boolean {
+    return !!this.workspacesState.find((state) => (state.type === "team" || state.type === "pro") && !state.locked);
+  }
+
+  get selectedWorkspace(): WorkspaceState {
+    return this.workspacesState.find((state) => state.selected);
   }
 
   ngOnInit(): void {
-    this.subscription = segmentFilter.subscribe((segments) => {
+    const segmentFilterSubscription = segmentFilter.subscribe((segments) => {
       this.segments = segments;
       this.selectedS = this.segments.map((segment) => ({ name: segment.name, selected: false }));
     });
     segmentFilter.next(this.appProviderService.segmentService.list());
 
-    sidebarHighlight.subscribe((value) => {
+    const sidebarHighlightSubscription = sidebarHighlight.subscribe((value) => {
       this.highlightSelectedRow(value.showAll, value.showPinned, value.selectedSegment);
     });
     sidebarHighlight.next({ showAll: true, showPinned: false, selectedSegment: -1 });
 
-    this.workspaceNameSubscription = this.appProviderService.teamService.workspaceState.subscribe((workspaceState: WorkspaceState) => {
-      this.workspaceState = workspaceState;
+    const workspaceStateSubscription = this.appProviderService.teamService.workspacesState.subscribe((workspacesState: WorkspaceState[]) => {
+      this.workspacesState = workspacesState;
     });
-    this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.loggedUser = user));
     this.isLeappTeamStubbed = this.appProviderService.teamService.isLeappTeamStubbed;
+    this.unsubscribe = () => {
+      segmentFilterSubscription.unsubscribe();
+      sidebarHighlightSubscription.unsubscribe();
+      workspaceStateSubscription.unsubscribe();
+    };
   }
 
   ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-    this.workspaceNameSubscription.unsubscribe();
-    this.userSubscription.unsubscribe();
+    this.unsubscribe();
   }
 
   resetFilters(): void {
@@ -189,9 +195,9 @@ export class SideBarComponent implements OnInit, OnDestroy {
     this.bsModalService.show(OptionsDialogComponent, { animated: false, class: "option-modal" });
   }
 
-  async loginToLeappTeam(): Promise<void> {
+  async loginToRemoteWorkspace(): Promise<void> {
     if (this.isLeappTeamStubbed) return;
-    this.bsModalService.show(LoginTeamDialogComponent, {
+    this.bsModalService.show(LoginWorkspaceDialogComponent, {
       animated: false,
       class: "create-modal",
       backdrop: "static",
@@ -199,27 +205,27 @@ export class SideBarComponent implements OnInit, OnDestroy {
     });
   }
 
-  async logoutFromLeappTeam(lock: boolean = false): Promise<void> {
-    if (!this.doesTeamExist || this.isLeappTeamStubbed) return;
+  async logoutFromRemoteWorkspace(lock: boolean = false): Promise<void> {
+    if (!this.canLockWorkspace || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
-  }
-
-  async switchToLocalWorkspace(): Promise<void> {
-    if (!this.isLocalWorkspaceSelected) {
-      await this.appProviderService.teamService.switchToLocalWorkspace();
-      this.resetFilters();
+    this.appService.closeAllMenuTriggers();
+    if (this.appProviderService.teamService.signedInUserState.getValue().role === "pro") {
+      await this.router.navigate(["/lock"]);
     }
   }
 
-  async switchToRemoteWorkspace(): Promise<void> {
-    if (this.isTeamLocked) {
-      await this.loginToLeappTeam();
+  async switchToWorkspace(workspace: WorkspaceState) {
+    if (workspace.type === "local") {
+      if (this.isLocalWorkspaceSelected) return;
+      await this.appProviderService.teamService.switchToLocalWorkspace();
+      this.resetFilters();
+    } else if (workspace.locked) {
+      await this.loginToRemoteWorkspace();
     } else {
-      if (this.isLocalWorkspaceSelected) {
-        await this.appProviderService.sessionManagementService.stopAllSessions();
-        await this.appProviderService.teamService.syncSecrets();
-        this.resetFilters();
-      }
+      if (!this.isLocalWorkspaceSelected) return;
+      await this.appProviderService.sessionManagementService.stopAllSessions();
+      await this.appProviderService.teamService.pullFromRemote();
+      this.resetFilters();
     }
   }
 

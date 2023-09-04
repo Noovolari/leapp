@@ -37,6 +37,7 @@ import { TeamService } from "./services/team-service";
   styleUrls: ["./app.component.scss"],
 })
 export class AppComponent implements OnInit {
+  isSyncingWorkspace: boolean;
   fetchingState: string | undefined;
 
   private fileService: FileService;
@@ -63,7 +64,7 @@ export class AppComponent implements OnInit {
     public awsAuthenticationService: AppAwsAuthenticationService,
     public verificationWindowService: AppVerificationWindowService,
     public appService: AppService,
-    private router: Router,
+    public router: Router,
     private optionsService: OptionsService,
     private updaterService: UpdaterService,
     private windowService: WindowService,
@@ -175,9 +176,8 @@ export class AppComponent implements OnInit {
       }
     }
 
-    this.teamService.switchingWorkspaceState.subscribe((isSwitchingWorkspace: boolean) => {
-      this.fetchingState = isSwitchingWorkspace ? "Loading workspace..." : undefined;
-    });
+    this.teamService.syncingWorkspaceState.subscribe((isSyncingWorkspace: boolean) => (this.isSyncingWorkspace = isSyncingWorkspace));
+
     this.behaviouralSubjectService.fetchingIntegrationState$.subscribe((fetchingState: string | undefined) => {
       this.fetchingState = fetchingState;
     });
@@ -187,8 +187,13 @@ export class AppComponent implements OnInit {
     await this.teamService.setCurrentWorkspace();
 
     // Go to initial page if no sessions are already created or
-    // go to the list page if is your second visit
-    await this.router.navigate(["/dashboard"]);
+    // go to the list page if is your second visit.
+    // If there is a pro user registered go to login page instead
+    if (this.teamService.signedInUserState.getValue()?.role === "pro") {
+      await this.router.navigate(["/lock"]);
+    } else {
+      await this.router.navigate(["/dashboard"]);
+    }
 
     // Start the websocket server for the Leapp Browser Extension
     this.extensionWebsocketService.bootstrap();
@@ -218,7 +223,7 @@ export class AppComponent implements OnInit {
     await this.appProviderService.sessionManagementService.stopAllSessions();
 
     // Delete team-workspace file if exists, for security reasons
-    await this.teamService.deleteTeamWorkspace();
+    // await this.teamService.deleteTeamWorkspace();
 
     // Finally quit
     this.appService.quit();

@@ -1334,6 +1334,7 @@ describe("Repository", () => {
       defaultRegion: "mock-default-region",
       extensionEnabled: "mock-extension-enabled",
       macOsTerminal: "mock-terminal",
+      notifications: mockedNotifications,
       pluginsStatus: "mock-plugin-status",
       samlRoleSessionDuration: "mock-saml-role-session-duration",
       pinned: "mock-pinned",

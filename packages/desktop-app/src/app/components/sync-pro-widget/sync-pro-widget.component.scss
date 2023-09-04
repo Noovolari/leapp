@@ -1,0 +1,129 @@
+hr {
+  width: 100%;
+}
+
+span {
+  display: inline-block;
+  width: 100%;
+  font-weight: normal;
+  font-size: 12px;
+}
+
+section {
+  padding: 10px 15px;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+}
+
+.sync {
+  color: #212529;
+}
+
+.unsync {
+  color: #dadada;
+}
+
+span.sync, span.unsync, span.sync-failed, span.sync-progress {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+
+  span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  button {
+    padding: 0 1px !important;
+    font-size: 11px;
+    background: #23d4b8;
+    border-color: #23d4b8;
+    color: #292929;
+    width: 250px;
+  }
+
+  .floating-message {
+    position: absolute;
+    top: -107px;
+    left: -10px;
+    border-radius: 5px;
+    width: 228px;
+    padding: 16px 19px;
+    background-color: rgba(255, 153, 0, 0.40);
+
+
+    span {
+      color: #FF6A00;
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    button {
+      border: none !important;
+      width: 60px;
+      height: 21px;
+      float: right;
+      background-color: #FF9900;
+      color: white;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+span.sync-progress span {
+  color: #28c840;
+}
+
+span.sync-failed span {
+  color: #febc2e;
+}
+
+img {
+  height: 17.5px;
+  width: 24px;
+}
+
+.html-tooltip {
+  padding: 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%);
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  left: 40px;
+  top: -163px;
+  width: 150px;
+  text-align: center;
+  background: white;
+  z-index: 2;
+
+  span {
+    color: #3c3c3c;
+    font-size: 14px;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+}
+
+.hide {
+  display: none;
+}
+
+i {
+  cursor: pointer;
+}

@@ -114,6 +114,16 @@ div.space-between-mat-lists {
   height: 13px;
 }
 
+.sidebar-flex {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
 ::ng-deep {
   .mat-expansion-indicator {
     display: none;
@@ -266,4 +276,8 @@ i.moon-Caret-down {
 .mat-list-base .mat-list-item.workspace-menu:hover {
   background: none !important;
   width: unset !important;
+}
+
+app-sync-pro-widget {
+  width: 100%;
 }

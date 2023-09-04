@@ -461,7 +461,8 @@ small.text-error {
   flex-direction: column !important;
   text-align: center;
   padding: 5px 6px;
-  margin: 5px;
+  margin: 5px 0;
+  width: 80px;
 }
 
 .mat-tab-icon, .mat-tab-label-text {

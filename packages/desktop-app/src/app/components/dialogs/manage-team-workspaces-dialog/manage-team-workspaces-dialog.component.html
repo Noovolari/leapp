@@ -2,26 +2,21 @@
 <h4>Manage Workspaces</h4>
 
 <div class="workspaces-container">
-  <div class="workspace-menu-line">
-    <div class="workspace-icon-container local">
+
+  <div *ngFor="let workspaceState of workspacesState" class="workspace-menu-line">
+    <div *ngIf="workspaceState.type === 'local'" class="workspace-icon-container local">
       <i class="moon-Home"></i>
     </div>
-    <div class="workspace-name-container">
-      <span>{{localWorkspaceName}}</span>
-      <span>Community Edition</span>
-    </div>
-  </div>
-
-  <div *ngIf="doesTeamExist" class="workspace-menu-line">
-    <div class="workspace-icon-container remote">
-      <span>{{loggedUser.teamName[0].toUpperCase()}}</span>
+    <div *ngIf="workspaceState.type !== 'local'" class="workspace-icon-container remote">
+      <span>{{workspaceState.name[0].toUpperCase()}}</span>
     </div>
     <div class="workspace-name-container">
-      <span>{{loggedUser.teamName}}</span>
-      <span>Team Plan early access</span>
+      <span>{{workspaceState.name}}</span>
+      <span>{{workspaceState.description}}</span>
     </div>
-    <div class="manage-workspaces-actions-container">
-      <img class="workspace-menu-icon" src="assets/images/dots-three-outline-vertical-fill.svg" alt="actions" [matMenuTriggerFor]="manageWorkspacesActionsMenu">
+    <div *ngIf="workspaceState.type !== 'local'" class="manage-workspaces-actions-container">
+      <img class="workspace-menu-icon" src="assets/images/dots-three-outline-vertical-fill.svg" alt="actions"
+           [matMenuTriggerFor]="manageWorkspacesActionsMenu">
     </div>
   </div>
 </div>

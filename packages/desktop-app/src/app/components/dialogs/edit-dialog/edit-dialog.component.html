@@ -164,6 +164,6 @@
     </div>
   </div>
   <br>
-  <button type="button" (click)="saveAccount();" [disabled]="!formValid()" [ngClass]="!formValid() ? 'mat-button-disabled': ''" *ngIf="accountType">Edit session</button>
+  <button type="button" (click)="saveAccount();" [disabled]="!formValid() || submitting" [ngClass]="!formValid() ? 'mat-button-disabled': ''" *ngIf="accountType">Edit session <i *ngIf="submitting" class="fa fa-spinner fa-spin"></i></button>
   <a (click)="closeModal()" class="cancel">Cancel</a>
 </form>

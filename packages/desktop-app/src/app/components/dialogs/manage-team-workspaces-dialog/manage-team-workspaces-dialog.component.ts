@@ -1,43 +1,45 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { AppService } from "../../../services/app.service";
-import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
-import { LoginTeamDialogComponent } from "../login-team-dialog/login-team-dialog.component";
+import { LoginWorkspaceDialogComponent } from "../login-team-dialog/login-workspace-dialog.component";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { globalFilteredSessions, globalHasFilter, globalResetFilter } from "../../command-bar/command-bar.component";
 import { sidebarHighlight } from "../../side-bar/side-bar.component";
-import { User } from "../../../services/team-service";
+import { WorkspaceState } from "../../../services/team-service";
+import { globalLeappProPlanStatus, LeappPlanStatus } from "../options-dialog/options-dialog.component";
 
 @Component({
   selector: "app-manage-team-workspaces-dialog",
   templateUrl: "./manage-team-workspaces-dialog.component.html",
   styleUrls: ["./manage-team-workspaces-dialog.component.scss"],
 })
-export class ManageTeamWorkspacesDialogComponent implements OnInit {
-  localWorkspaceName: string;
-  loggedUser: User;
+export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
+  workspacesState: WorkspaceState[];
 
   private behaviouralSubjectService: BehaviouralSubjectService;
-  private userSubscription;
+  private unsubscribe: () => void;
+
+  get isWorkspaceLocked(): boolean {
+    return !!this.workspacesState.find((state) => state.locked);
+  }
 
   constructor(private appProviderService: AppProviderService, public appService: AppService, private bsModalService: BsModalService) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
-    this.loggedUser = null;
-    this.localWorkspaceName = constants.localWorkspaceName;
-  }
-
-  get doesTeamExist(): boolean {
-    return !!this.loggedUser;
-  }
-
-  get isTeamLocked(): boolean {
-    return !this.loggedUser?.accessToken;
   }
 
   ngOnInit(): void {
-    this.userSubscription = this.appProviderService.teamService.signedInUserState.subscribe((user: User) => (this.loggedUser = user));
+    const workspaceStateSubscription = this.appProviderService.teamService.workspacesState.subscribe(
+      (workspacesState: WorkspaceState[]) => (this.workspacesState = workspacesState)
+    );
+    this.unsubscribe = () => {
+      workspaceStateSubscription.unsubscribe();
+    };
+  }
+
+  ngOnDestroy(): void {
+    this.unsubscribe();
   }
 
   closeModal(): void {
@@ -47,7 +49,6 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit {
   async syncWorkspace(): Promise<void> {
     try {
       this.closeModal();
-      //await this.appProviderService.teamService.syncSecrets();
       await this.switchToRemoteWorkspace();
     } catch (error) {
       this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
@@ -57,22 +58,25 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit {
   async signOutFromWorkspace(): Promise<void> {
     try {
       await this.appProviderService.teamService.signOut();
+      this.appService.closeAllMenuTriggers();
+      globalLeappProPlanStatus.next(LeappPlanStatus.free);
+      await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
     } catch (error) {
       this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
     }
   }
 
   async switchToRemoteWorkspace(): Promise<void> {
-    if (this.isTeamLocked) {
-      await this.loginToLeappTeam();
+    if (this.isWorkspaceLocked) {
+      await this.loginToWorkspace();
     } else {
-      await this.appProviderService.teamService.syncSecrets();
+      await this.appProviderService.teamService.pullFromRemote();
       this.resetFilters();
     }
   }
 
-  async loginToLeappTeam(): Promise<void> {
-    this.bsModalService.show(LoginTeamDialogComponent, {
+  async loginToWorkspace(): Promise<void> {
+    this.bsModalService.show(LoginWorkspaceDialogComponent, {
       animated: false,
       class: "create-modal",
       backdrop: "static",

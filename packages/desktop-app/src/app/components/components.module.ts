@@ -43,7 +43,7 @@ import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-di
 import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
 import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
 import { ScrollingModule } from "@angular/cdk/scrolling";
-import { LoginTeamDialogComponent } from "./dialogs/login-team-dialog/login-team-dialog.component";
+import { LoginWorkspaceDialogComponent } from "./dialogs/login-team-dialog/login-workspace-dialog.component";
 import { BrowserModule } from "@angular/platform-browser";
 import { HttpClientModule } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
@@ -54,6 +54,11 @@ import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { ManageTeamWorkspacesDialogComponent } from "./dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component";
+import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
+import { SyncProWidgetComponent } from "./sync-pro-widget/sync-pro-widget.component";
+import { OverlayModule } from "@angular/cdk/overlay";
+import { LockPageComponent } from "./lock-page/lock-page.component";
+import { CheckIconSvgComponent } from "./check-icon-svg/check-icon-svg.component";
 
 @NgModule({
   declarations: [
@@ -84,8 +89,12 @@ import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component
     ContextualMenuComponent,
     BottomBarComponent,
     InfoDialogComponent,
-    LoginTeamDialogComponent,
+    LoginWorkspaceDialogComponent,
     ManageTeamWorkspacesDialogComponent,
+    LeappProPreCheckoutDialogComponent,
+    SyncProWidgetComponent,
+    LockPageComponent,
+    CheckIconSvgComponent,
   ],
   imports: [
     CommonModule,
@@ -119,6 +128,7 @@ import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component
     MatIconModule,
     MatProgressSpinnerModule,
     NgSelectModule,
+    OverlayModule,
   ],
   exports: [ConfirmationDialogComponent, InputDialogComponent, CommandBarComponent, SideBarComponent, SessionsComponent],
 })

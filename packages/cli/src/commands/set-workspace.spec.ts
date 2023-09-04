@@ -200,7 +200,7 @@ describe("SetWorkspace", () => {
     const command = getTestCommand(null, []);
     command.cliProviderService = {
       teamService: {
-        syncSecrets: jest.fn(),
+        pullFromRemote: jest.fn(),
       },
       remoteProceduresClient: {
         refreshWorkspaceState: jest.fn(),
@@ -208,7 +208,7 @@ describe("SetWorkspace", () => {
     };
     command.log = jest.fn();
     await command.setWorkspace({ workspaceId: "mocked-workspace-id", workspaceName: "mocked-workspace-name" });
-    expect(command.cliProviderService.teamService.syncSecrets).toHaveBeenCalledWith(false);
+    expect(command.cliProviderService.teamService.pullFromRemote).toHaveBeenCalledWith(false);
     expect(command.log).toHaveBeenCalledWith(`workspace mocked-workspace-name set correctly`);
     expect(command.cliProviderService.remoteProceduresClient.refreshWorkspaceState).toHaveBeenCalled();
   });

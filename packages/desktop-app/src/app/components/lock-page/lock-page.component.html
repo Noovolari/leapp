@@ -11,25 +11,27 @@
         <div class="name">{{name}}</div>
         <div class="email">{{email.value}}</div>
       </div>
-      <div class="touch-id">
-        <img src="assets/images/touchid.png" (click)="launchTouchId();">
-      </div>
     </div>
 
-    <form [formGroup]="signinForm" (ngSubmit)="signIn()" spellcheck="false">
-      <fieldset class="form-container" [disabled]="submitting">
-        <input class="form-control" type="hidden" placeholder="Company email" [formControl]="email" required>
-        <div class="form-field">
-          <input class="form-control" id="password-field" [type]="hidePassword ? 'password' : 'text'" placeholder="Enter your workspace password"
-                 [formControl]="password" (keyup.enter)="signIn()" required>
-          <button class="input-inner-button" type="button" (click)="hidePassword = !hidePassword"
-                  [attr.aria-pressed]="hidePassword">
-            <i class="fa {{hidePassword ? 'fa-eye-slash' : 'fa-eye'}}"></i>
-          </button>
-          <div *ngIf="submitting" class="sign-in-loader"><i class="fa fa-spinner fa-spin"></i></div>
-        </div>
-      </fieldset>
-    </form>
+    <div class="form-psw-container">
+      <form [formGroup]="signinForm" (ngSubmit)="signIn()" spellcheck="false">
+        <fieldset class="form-container" [disabled]="submitting">
+          <input class="form-control" type="hidden" placeholder="Company email" [formControl]="email" required>
+          <div class="form-field">
+            <input class="form-control" id="password-field" [type]="hidePassword ? 'password' : 'text'" placeholder="Enter your workspace password"
+                   [formControl]="password" (keyup.enter)="signIn()" required>
+            <button class="input-inner-button" type="button" (click)="hidePassword = !hidePassword"
+                    [attr.aria-pressed]="hidePassword">
+              <i class="fa {{hidePassword ? 'fa-eye-slash' : 'fa-eye'}}"></i>
+            </button>
+          </div>
+        </fieldset>
+      </form>
+      <div class="touch-id" (click)="!submitting ? launchTouchId() : ''" [ngClass]="submitting ? 'disabled' : ''">
+        <div *ngIf="submitting" class="sign-in-loader"><i class="fa fa-spinner fa-spin"></i></div>
+        <img *ngIf="!submitting" src="assets/images/fingerprint.png" alt="">
+      </div>
+    </div>
   </div>
 
   <div class="vertical-hr">

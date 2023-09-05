@@ -74,7 +74,7 @@ export class AppService {
   }
 
   usePromptId(): Promise<any> {
-    return this.appNativeService.systemPreferences.promptTouchID("To get consent for a Security-Gated Thing");
+    return this.appNativeService.systemPreferences.promptTouchID("unlock");
   }
 
   isDarkMode(): boolean {

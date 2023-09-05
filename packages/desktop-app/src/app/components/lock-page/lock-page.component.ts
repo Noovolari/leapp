@@ -20,6 +20,7 @@ export class LockPageComponent implements OnInit {
   signinForm: FormGroup;
   hidePassword?: boolean;
   submitting?: boolean;
+  previousRoute: string;
   initials = "";
   name = "";
 
@@ -32,7 +33,9 @@ export class LockPageComponent implements OnInit {
     public appService: AppService,
     public appProviderService: AppProviderService,
     private messageToasterService: MessageToasterService
-  ) {}
+  ) {
+    this.previousRoute = this.router.getCurrentNavigation().previousNavigation.finalUrl.toString();
+  }
 
   async ngOnInit(): Promise<void> {
     this.email = new FormControl("", [Validators.required, Validators.email]);
@@ -46,8 +49,10 @@ export class LockPageComponent implements OnInit {
       this.name = user.firstName + " " + user.lastName;
       this.initials = user.firstName[0].toUpperCase() + user.lastName[0].toUpperCase();
       this.email.setValue(user.email);
-
-      this.touchId();
+      console.log(this.previousRoute);
+      if (this.previousRoute !== "/dashboard") {
+        this.touchId();
+      }
     }
   }
 
@@ -110,7 +115,7 @@ export class LockPageComponent implements OnInit {
     await this.router.navigate(["/dashboard"]);
   }
 
-  async launchTouchId() {
+  async launchTouchId(): Promise<void> {
     await this.touchId();
   }
 
@@ -120,10 +125,9 @@ export class LockPageComponent implements OnInit {
         await this.appService.usePromptId();
         const encodedString = await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString);
         this.password.setValue(encodedString, { emitEvent: true });
-        console.log(encodedString);
         await this.signIn();
       } catch (err) {
-        this.messageToasterService.toast(`Touch ID error: ${err.toString()}`, ToastLevel.warn, "Touch ID authentication");
+        this.messageToasterService.toast(`${err.toString().replace("Error: ", "")}`, ToastLevel.warn, "Touch ID authentication");
       }
     }
   }

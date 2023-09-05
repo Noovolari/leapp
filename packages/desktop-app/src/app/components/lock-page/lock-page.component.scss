@@ -20,12 +20,6 @@
   .input-inner-button {
     top: -2px;
   }
-  .sign-in-loader {
-    position: absolute;
-    top: 7px;
-    right: -32px;
-    font-size: 17px;
-  }
 }
 
 .form-help {
@@ -70,14 +64,14 @@
       width: 96px;
       height: 96px;
       position: relative;
-      left: 192px;
+      left: 172px;
       border-radius: 23%;
       border: 1px solid #dadada;
     }
   }
 
   .form-column-container {
-    width: 375px;
+    width: 395px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -169,26 +163,37 @@
       }
     }
   }
+}
 
-
+.form-psw-container {
+  display: flex;
+  gap: 12px;
 }
 
 .touch-id {
-  width: 50px;
-  height: 50px;
-  border-radius: 25px;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  border: 1px solid #ddd;
+  padding: 19px;
+  border: 1px solid $silver-25;
+  background-color: $silver-25;
   cursor: pointer;
   position: relative;
-  top: 5px;
+
+  &.disabled {
+    cursor: initial;
+  }
+
+  .sign-in-loader {
+    font-size: 17px;
+  }
 
   img {
-    width: 38px;
+    width: 29px;
     border-radius: 19px;
   }
 }

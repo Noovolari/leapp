@@ -122,8 +122,8 @@ export class LockPageComponent implements OnInit {
         this.password.setValue(encodedString, { emitEvent: true });
         console.log(encodedString);
         await this.signIn();
-      } catch (_err) {
-        this.messageToasterService.toast("Touch ID error", ToastLevel.warn, "Touch ID authentication");
+      } catch (err) {
+        this.messageToasterService.toast(`Touch ID error: ${err.toString()}`, ToastLevel.warn, "Touch ID authentication");
       }
     }
   }

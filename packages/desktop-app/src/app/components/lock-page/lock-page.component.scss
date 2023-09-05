@@ -13,7 +13,7 @@
 
 .form-field {
   margin-bottom: 15px;
-  width: 350px;
+  width: 400px;
   input {
     width: 100%;
   }
@@ -23,7 +23,7 @@
   .sign-in-loader {
     position: absolute;
     top: 7px;
-    right: -40px;
+    right: -32px;
     font-size: 17px;
   }
 }
@@ -77,7 +77,7 @@
   }
 
   .form-column-container {
-    width: 350px;
+    width: 375px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -116,7 +116,7 @@
       }
 
       .email-and-name {
-        width: 350px;
+        width: 270px;
       }
 
       .name {
@@ -171,4 +171,24 @@
   }
 
 
+}
+
+.touch-id {
+  width: 50px;
+  height: 50px;
+  border-radius: 25px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  position: relative;
+  top: 5px;
+
+  img {
+    width: 38px;
+    border-radius: 19px;
+  }
 }

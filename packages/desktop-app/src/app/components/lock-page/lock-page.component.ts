@@ -8,6 +8,7 @@ import { Router } from "@angular/router";
 import { globalLeappProPlanStatus, LeappPlanStatus } from "../dialogs/options-dialog/options-dialog.component";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
+import { AppNativeService } from "../../services/app-native.service";
 
 @Component({
   selector: "app-lock-page",
@@ -32,7 +33,8 @@ export class LockPageComponent implements OnInit {
     private router: Router,
     public appService: AppService,
     public appProviderService: AppProviderService,
-    private messageToasterService: MessageToasterService
+    private messageToasterService: MessageToasterService,
+    private appNativeService: AppNativeService
   ) {
     this.previousRoute = this.router.getCurrentNavigation().previousNavigation.finalUrl.toString();
   }
@@ -72,7 +74,11 @@ export class LockPageComponent implements OnInit {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }
         if (!(await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString))) {
-          await this.appProviderService.keychainService.saveSecret(constants.appName, this.serviceString, formValue.password);
+          const oldKey = this.appProviderService.fileService.aesKey;
+          this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
+          const encodedSecret = this.appProviderService.fileService.encryptText(formValue.password);
+          await this.appProviderService.keychainService.saveSecret(constants.appName, this.serviceString, encodedSecret);
+          this.appProviderService.fileService.aesKey = oldKey;
         }
         await this.router.navigate(["/dashboard"]);
       } catch (responseException: any) {
@@ -122,12 +128,18 @@ export class LockPageComponent implements OnInit {
     if (this.appService.isTouchIdAvailable() && (await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString))) {
       try {
         await this.appService.usePromptId();
-        const encodedString = await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString);
-        this.password.setValue(encodedString, { emitEvent: true });
+        const oldKey = this.appProviderService.fileService.aesKey;
+        this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
+        const encodedSecret = await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString);
+        const decodedSecret = this.appProviderService.fileService.decryptText(encodedSecret);
+        this.appProviderService.fileService.aesKey = oldKey;
+        this.password.setValue(decodedSecret, { emitEvent: true });
         await this.signIn();
       } catch (err) {
         this.messageToasterService.toast(`${err.toString().replace("Error: ", "")}`, ToastLevel.warn, "Touch ID authentication");
       }
+    } else {
+      this.messageToasterService.toast("Touch ID error. Please insert the password manually", ToastLevel.warn, "Touch ID key error");
     }
   }
 }

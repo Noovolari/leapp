@@ -1,4 +1,4 @@
-name: Docs
+name: Docs docs.leapp.cloud
 
 on:
   push:

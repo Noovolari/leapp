@@ -1,4 +1,4 @@
-name: PR
+name: Pull Request semantic versioning check
 
 on:
   pull_request_target:

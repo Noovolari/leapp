@@ -1,4 +1,4 @@
-name: Leapp Desktop App CD
+name: Leapp Desktop App CD - prod
 
 on:
   push:

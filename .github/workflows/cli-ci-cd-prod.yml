@@ -1,4 +1,4 @@
-name: Leapp CLI CI/CD
+name: Leapp CLI CI/CD - prod
 
 on:
   push:

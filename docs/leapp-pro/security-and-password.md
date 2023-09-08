@@ -27,3 +27,12 @@ used by Leapp Pro Desktop App/CLI to access the cloud providers. In addition, th
 access configurations DO NOT include temporary credentials. There is a single edge case: the IAM User. 
 Indeed, the IAM User Session access configuration contains IAM User’s access keys, which are long-term credentials. 
 Still, the Leapp Pro backend has no visibility on these long-term credentials, as they’re encrypted by the client before being forwarded to the Leapp Team backend.
+
+## Touch ID
+
+When you use [Apple Watch](getting-started/lock.md) or [Touch ID](getting-started/lock.md) to unlock Leapp Pro, using a longer and more secure account password is easier than you might otherwise have chosen.
+
+### Your fingerprint is not stored in Leapp.
+Leapp never scans or stores your fingerprint. Touch ID is provided by macOS, which only tells Leapp Pro if your fingerprint was recognized or not.
+
+Learn more about [Touch ID's advanced security technology](https://support.apple.com/HT204587).

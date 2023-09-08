@@ -15,4 +15,5 @@ export interface GlobalSettings {
   samlRoleSessionDuration: number;
   ssmRegionBehaviour: string;
   notifications: LeappNotification[];
+  requirePassword: number;
 }

@@ -474,6 +474,7 @@ export class Repository {
       segments: workspace.segments,
       ssmRegionBehaviour: workspace.ssmRegionBehaviour,
       notifications: workspace.notifications,
+      requirePassword: workspace.requirePassword,
     };
   }
 
@@ -491,6 +492,7 @@ export class Repository {
     workspace.segments = globalSettingsInput.segments;
     workspace.ssmRegionBehaviour = globalSettingsInput.ssmRegionBehaviour;
     workspace.notifications = globalSettingsInput.notifications;
+    workspace.requirePassword = globalSettingsInput.requirePassword;
     this.persistWorkspace(workspace);
   }
 

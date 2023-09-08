@@ -63,7 +63,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   regions: { region: string }[];
   selectedLocation: string;
   selectedRegion: string;
-  selectedRequirePassword: string;
+  selectedRequirePassword: number;
   selectedBrowserOpening = constants.inApp.toString();
   selectedTerminal;
 
@@ -128,7 +128,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
 
     this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
 
-    this.selectedRequirePassword = this.optionsService.requirePassword || constants.requirePassword;
+    this.selectedRequirePassword = this.optionsService.requirePassword || constants.requirePasswordEveryTwoWeeks.value;
 
     this.extensionEnabled = this.optionsService.extensionEnabled || false;
   }
@@ -226,6 +226,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
       this.optionsService.defaultLocation = this.selectedLocation;
       this.optionsService.macOsTerminal = this.selectedTerminal;
       this.optionsService.samlRoleSessionDuration = this.form.controls["sessionDuration"].value;
+      this.optionsService.requirePassword = this.selectedRequirePassword;
 
       this.optionsService.ssmRegionBehaviour = this.selectedSsmRegionBehaviour;
 

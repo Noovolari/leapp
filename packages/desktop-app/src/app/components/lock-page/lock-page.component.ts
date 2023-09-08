@@ -9,6 +9,7 @@ import { globalLeappProPlanStatus, LeappPlanStatus } from "../dialogs/options-di
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 import { AppNativeService } from "../../services/app-native.service";
+import { OptionsService } from "../../services/options.service";
 
 @Component({
   selector: "app-lock-page",
@@ -34,7 +35,8 @@ export class LockPageComponent implements OnInit {
     public appService: AppService,
     public appProviderService: AppProviderService,
     private messageToasterService: MessageToasterService,
-    private appNativeService: AppNativeService
+    private appNativeService: AppNativeService,
+    private optionService: OptionsService
   ) {
     this.previousRoute = this.router.getCurrentNavigation().previousNavigation.finalUrl.toString();
   }
@@ -77,7 +79,7 @@ export class LockPageComponent implements OnInit {
           const oldKey = this.appProviderService.fileService.aesKey;
           this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
           const encodedSecret = this.appProviderService.fileService.encryptText(formValue.password);
-          const nextExpiration = new Date().setDate(new Date().getDate() + 7); //TODO: this 7 should be based on your configuration (every 7 days, 14, 30 or never[use a huge number])
+          const nextExpiration = new Date().setDate(new Date().getDate() + this.optionService.requirePassword);
           const newTouchIdKeychainItem = { encodedSecret, nextExpiration };
           await this.appProviderService.keychainService.saveSecret(constants.appName, this.serviceString, JSON.stringify(newTouchIdKeychainItem));
           this.appProviderService.fileService.aesKey = oldKey;
@@ -127,7 +129,7 @@ export class LockPageComponent implements OnInit {
   }
 
   private async touchId(): Promise<void> {
-    const isTouchIdExpired = await this.checkTouchIdExpiration();
+    const isTouchIdExpired = await this.isTouchIdExpired();
     if (
       this.appService.isTouchIdAvailable() &&
       (await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString)) &&
@@ -150,7 +152,7 @@ export class LockPageComponent implements OnInit {
     }
   }
 
-  private async checkTouchIdExpiration(): Promise<boolean> {
+  private async isTouchIdExpired(): Promise<boolean> {
     const touchIdKechainItem = await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString);
     if (touchIdKechainItem) {
       if (JSON.parse(touchIdKechainItem).nextExpiration > new Date().getTime()) {

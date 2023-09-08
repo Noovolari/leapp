@@ -83,4 +83,10 @@ export const constants = {
     "yP6Ekgn8yeDmON1JoX0E0Tdm6dfXVY5v2K8KaT2/XtsqRlwCCU+pXRsQwJfQcknZ\n" +
     "aNqnY3aBtCwmaesTlrc5bR8CAwEAAQ==\n" +
     "-----END PUBLIC KEY-----",
+
+  requirePasswordEveryWeek: "Every week",
+  requirePasswordEveryTwoWeeks: "Every 2 weeks",
+  requirePasswordEveryMonth: "Every month",
+  requirePasswordNever: "Never",
+  requirePassword: "Every 2 weeks",
 };

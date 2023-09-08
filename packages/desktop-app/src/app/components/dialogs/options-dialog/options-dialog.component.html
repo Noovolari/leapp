@@ -9,6 +9,33 @@
       </ng-template>
 
       <div class="panel">
+
+
+
+
+        <h2>Security</h2>
+
+        <div class="form-container">
+          <div class="form-group">
+            <div class="form-field">
+              <label>Require password</label>
+              <ng-select formControlName="requirePasswordSelect" bindLabel="require-password" bindValue="require-password" [clearable]="false"
+                         [items]="[
+                           eConstants.requirePasswordEveryWeek,
+                           eConstants.requirePasswordEveryTwoWeeks,
+                           eConstants.requirePasswordEveryMonth,
+                           eConstants.requirePasswordNever
+                         ]"
+                         [(ngModel)]="selectedRequirePassword" [appendTo]="'body'"></ng-select>
+            </div>
+          </div>
+        </div>
+
+
+
+
+
+
         <h2>Default Regions</h2>
 
         <div class="form-container">

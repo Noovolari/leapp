@@ -63,6 +63,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   regions: { region: string }[];
   selectedLocation: string;
   selectedRegion: string;
+  selectedRequirePassword: string;
   selectedBrowserOpening = constants.inApp.toString();
   selectedTerminal;
 
@@ -93,6 +94,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     sessionDuration: new FormControl(""),
     pluginDeepLink: new FormControl(""),
     ssmRegionBehaviourSelect: new FormControl(""),
+    requirePasswordSelect: new FormControl(""),
   });
 
   selectedCredentialMethod: string;
@@ -125,6 +127,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.selectedCredentialMethod = this.optionsService.credentialMethod || constants.credentialFile;
 
     this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
+
+    this.selectedRequirePassword = this.optionsService.requirePassword || constants.requirePassword;
 
     this.extensionEnabled = this.optionsService.extensionEnabled || false;
   }

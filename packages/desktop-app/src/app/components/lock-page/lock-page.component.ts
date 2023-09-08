@@ -77,7 +77,9 @@ export class LockPageComponent implements OnInit {
           const oldKey = this.appProviderService.fileService.aesKey;
           this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
           const encodedSecret = this.appProviderService.fileService.encryptText(formValue.password);
-          await this.appProviderService.keychainService.saveSecret(constants.appName, this.serviceString, encodedSecret);
+          const nextExpiration = new Date().setDate(new Date().getDate() + 7); //TODO: this 7 should be based on your configuration (every 7 days, 14, 30 or never[use a huge number])
+          const newTouchIdKeychainItem = { encodedSecret, nextExpiration };
+          await this.appProviderService.keychainService.saveSecret(constants.appName, this.serviceString, JSON.stringify(newTouchIdKeychainItem));
           this.appProviderService.fileService.aesKey = oldKey;
         }
         await this.router.navigate(["/dashboard"]);
@@ -125,13 +127,18 @@ export class LockPageComponent implements OnInit {
   }
 
   private async touchId(): Promise<void> {
-    if (this.appService.isTouchIdAvailable() && (await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString))) {
+    const isTouchIdExpired = await this.checkTouchIdExpiration();
+    if (
+      this.appService.isTouchIdAvailable() &&
+      (await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString)) &&
+      !isTouchIdExpired
+    ) {
       try {
         await this.appService.usePromptId();
         const oldKey = this.appProviderService.fileService.aesKey;
         this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
-        const encodedSecret = await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString);
-        const decodedSecret = this.appProviderService.fileService.decryptText(encodedSecret);
+        const touchIdKeychainItem = JSON.parse(await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString));
+        const decodedSecret = this.appProviderService.fileService.decryptText(touchIdKeychainItem.encodedSecret);
         this.appProviderService.fileService.aesKey = oldKey;
         this.password.setValue(decodedSecret, { emitEvent: true });
         await this.signIn();
@@ -139,7 +146,21 @@ export class LockPageComponent implements OnInit {
         this.messageToasterService.toast(`${err.toString().replace("Error: ", "")}`, ToastLevel.warn, "Touch ID authentication");
       }
     } else {
-      this.messageToasterService.toast("Touch ID error. Please insert the password manually", ToastLevel.warn, "Touch ID key error");
+      this.messageToasterService.toast("Touch ID not set or expired. Password is required", ToastLevel.warn, "Touch ID key error");
+    }
+  }
+
+  private async checkTouchIdExpiration(): Promise<boolean> {
+    const touchIdKechainItem = await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString);
+    if (touchIdKechainItem) {
+      if (JSON.parse(touchIdKechainItem).nextExpiration > new Date().getTime()) {
+        return false;
+      } else {
+        await this.appProviderService.keychainService.deleteSecret(constants.appName, this.serviceString);
+        return true;
+      }
+    } else {
+      return true;
     }
   }
 }

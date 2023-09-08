@@ -37,6 +37,8 @@ export class Workspace {
   private _colorTheme: string;
   private _extensionEnabled: boolean;
 
+  private _requirePassword: number;
+
   private _proxyConfiguration: {
     proxyProtocol: string;
     proxyUrl?: string;
@@ -242,5 +244,13 @@ export class Workspace {
 
   set notifications(notifications: LeappNotification[]) {
     this._notifications = notifications;
+  }
+
+  get requirePassword(): number {
+    return this._requirePassword;
+  }
+
+  set requirePassword(value: number) {
+    this._requirePassword = value;
   }
 }

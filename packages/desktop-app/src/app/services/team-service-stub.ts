@@ -66,6 +66,8 @@ export class TeamService {
 
   async signOut(_: boolean = false): Promise<void> {}
 
+  async writeTouchIdCredentials(_: string, __: number): Promise<void> {}
+
   async deleteTeamWorkspace(): Promise<void> {}
 
   async switchToLocalWorkspace(): Promise<void> {}

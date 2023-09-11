@@ -30,7 +30,7 @@ Still, the Leapp Pro backend has no visibility on these long-term credentials, a
 
 ## Touch ID
 
-When you use [Apple Watch](getting-started/lock.md) or [Touch ID](getting-started/lock.md) to unlock Leapp Pro, using a longer and more secure account password is easier than you might otherwise have chosen.
+When you unlock Leapp Pro, using a longer and more secure account password is easier than you might otherwise have chosen.
 
 ### Your fingerprint is not stored in Leapp.
 Leapp never scans or stores your fingerprint. Touch ID is provided by macOS, which only tells Leapp Pro if your fingerprint was recognized or not.

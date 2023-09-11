@@ -134,6 +134,15 @@ describe("File Service", () => {
     expect(nativeService.fs.writeFileSync).toHaveBeenNthCalledWith(1, newPath, data);
   });
 
+  test("writeFileSyncWithOptions", () => {
+    const data = "fake-content";
+    const newPath = "new-path";
+    const options = { mode: "600" };
+    const fileService = new FileService(nativeService);
+    fileService.writeFileSyncWithOptions(newPath, data, options);
+    expect(nativeService.fs.writeFileSync).toHaveBeenCalledWith(newPath, data, options);
+  });
+
   test("removeFileSync, if file exists", () => {
     const path = "path";
     const fileService = new FileService(nativeService);

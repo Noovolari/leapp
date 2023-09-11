@@ -159,4 +159,15 @@ export class OptionsService {
     workspace.requirePassword = value;
     this.workspaceService.persistWorkspace(workspace);
   }
+
+  get touchIdEnabled(): boolean {
+    const workspace = this.workspaceService.getWorkspace();
+    return workspace.touchIdEnabled;
+  }
+
+  set touchIdEnabled(value: boolean) {
+    const workspace = this.workspaceService.getWorkspace();
+    workspace.touchIdEnabled = value;
+    this.workspaceService.persistWorkspace(workspace);
+  }
 }

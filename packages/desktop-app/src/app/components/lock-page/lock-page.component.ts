@@ -25,23 +25,24 @@ export class LockPageComponent implements OnInit {
   previousRoute: string;
   initials = "";
   name = "";
+  showTouchId: boolean;
 
   private loggingService: LogService;
   private teamService: TeamService;
-  private serviceString = "touch-id-lock-password";
 
   constructor(
+    private appProviderService: AppProviderService,
     private router: Router,
-    public appService: AppService,
-    public appProviderService: AppProviderService,
+    private appService: AppService,
+    private optionService: OptionsService,
     private messageToasterService: MessageToasterService,
-    private appNativeService: AppNativeService,
-    private optionService: OptionsService
+    private appNativeService: AppNativeService
   ) {
     this.previousRoute = this.router.getCurrentNavigation().previousNavigation.finalUrl.toString();
   }
 
   async ngOnInit(): Promise<void> {
+    this.showTouchId = this.appService.isTouchIdAvailable() && this.optionService.touchIdEnabled;
     this.email = new FormControl("", [Validators.required, Validators.email]);
     this.password = new FormControl("", [Validators.required]);
     this.signinForm = new FormGroup({ email: this.email, password: this.password });
@@ -53,7 +54,7 @@ export class LockPageComponent implements OnInit {
       this.name = user.firstName + " " + user.lastName;
       this.initials = user.firstName[0].toUpperCase() + user.lastName[0].toUpperCase();
       this.email.setValue(user.email);
-      if (this.previousRoute !== "/dashboard" && this.appService.isTouchIdAvailable()) {
+      if (this.previousRoute !== "/dashboard" && this.appService.isTouchIdAvailable() && this.optionService.touchIdEnabled) {
         this.touchId();
       }
     }
@@ -75,13 +76,17 @@ export class LockPageComponent implements OnInit {
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }
-        if (!(await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString))) {
+        if (!(await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName))) {
           const oldKey = this.appProviderService.fileService.aesKey;
           this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
           const encodedSecret = this.appProviderService.fileService.encryptText(formValue.password);
           const nextExpiration = new Date().setDate(new Date().getDate() + this.optionService.requirePassword);
           const newTouchIdKeychainItem = { encodedSecret, nextExpiration };
-          await this.appProviderService.keychainService.saveSecret(constants.appName, this.serviceString, JSON.stringify(newTouchIdKeychainItem));
+          await this.appProviderService.keychainService.saveSecret(
+            constants.appName,
+            constants.touchIdKeychainItemName,
+            JSON.stringify(newTouchIdKeychainItem)
+          );
           this.appProviderService.fileService.aesKey = oldKey;
         }
         await this.router.navigate(["/dashboard"]);
@@ -132,14 +137,16 @@ export class LockPageComponent implements OnInit {
     const isTouchIdExpired = await this.isTouchIdExpired();
     if (
       this.appService.isTouchIdAvailable() &&
-      (await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString)) &&
+      (await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName)) &&
       !isTouchIdExpired
     ) {
       try {
         await this.appService.usePromptId();
         const oldKey = this.appProviderService.fileService.aesKey;
         this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
-        const touchIdKeychainItem = JSON.parse(await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString));
+        const touchIdKeychainItem = JSON.parse(
+          await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName)
+        );
         const decodedSecret = this.appProviderService.fileService.decryptText(touchIdKeychainItem.encodedSecret);
         this.appProviderService.fileService.aesKey = oldKey;
         this.password.setValue(decodedSecret, { emitEvent: true });
@@ -153,12 +160,12 @@ export class LockPageComponent implements OnInit {
   }
 
   private async isTouchIdExpired(): Promise<boolean> {
-    const touchIdKechainItem = await this.appProviderService.keychainService.getSecret(constants.appName, this.serviceString);
+    const touchIdKechainItem = await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName);
     if (touchIdKechainItem) {
       if (JSON.parse(touchIdKechainItem).nextExpiration > new Date().getTime()) {
         return false;
       } else {
-        await this.appProviderService.keychainService.deleteSecret(constants.appName, this.serviceString);
+        await this.appProviderService.keychainService.deleteSecret(constants.appName, constants.touchIdKeychainItemName);
         return true;
       }
     } else {

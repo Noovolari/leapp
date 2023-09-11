@@ -16,4 +16,5 @@ export interface GlobalSettings {
   ssmRegionBehaviour: string;
   notifications: LeappNotification[];
   requirePassword: number;
+  touchIdEnabled: boolean;
 }

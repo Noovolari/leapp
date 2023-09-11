@@ -10,31 +10,34 @@
 
       <div class="panel">
 
+        <ng-container *ngIf="appService.detectOs() === eOperatingSystem.mac">
+          <h2>Security</h2>
 
-
-
-        <h2>Security</h2>
-
-        <div class="form-container">
-          <div class="form-group">
-            <div class="form-field">
-              <label>Require password</label>
-              <ng-select formControlName="requirePasswordSelect" bindLabel="key" bindValue="value" [clearable]="false"
-                         [items]="[
-                           eConstants.requirePasswordEveryWeek,
-                           eConstants.requirePasswordEveryTwoWeeks,
-                           eConstants.requirePasswordEveryMonth,
-                           eConstants.requirePasswordNever
-                         ]"
-                         [(ngModel)]="selectedRequirePassword" [appendTo]="'body'"></ng-select>
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label>Unlock with Touch ID</label>
+                <mat-checkbox class="touch-id-enable-checkbox" formControlName="touchIdEnableSelect" [(ngModel)]="selectedTouchIdEnabled"></mat-checkbox>
+              </div>
             </div>
           </div>
-        </div>
 
-
-
-
-
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label>Require password</label>
+                <ng-select formControlName="requirePasswordSelect" bindLabel="key" bindValue="value" [clearable]="false"
+                           [items]="[
+                             eConstants.requirePasswordEveryWeek,
+                             eConstants.requirePasswordEveryTwoWeeks,
+                             eConstants.requirePasswordEveryMonth,
+                             eConstants.requirePasswordNever
+                           ]"
+                           [(ngModel)]="selectedRequirePassword" [appendTo]="'body'"></ng-select>
+              </div>
+            </div>
+          </div>
+        </ng-container>
 
         <h2>Default Regions</h2>
 

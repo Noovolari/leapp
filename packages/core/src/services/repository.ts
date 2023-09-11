@@ -475,6 +475,7 @@ export class Repository {
       ssmRegionBehaviour: workspace.ssmRegionBehaviour,
       notifications: workspace.notifications,
       requirePassword: workspace.requirePassword,
+      touchIdEnabled: workspace.touchIdEnabled,
     };
   }
 
@@ -493,6 +494,7 @@ export class Repository {
     workspace.ssmRegionBehaviour = globalSettingsInput.ssmRegionBehaviour;
     workspace.notifications = globalSettingsInput.notifications;
     workspace.requirePassword = globalSettingsInput.requirePassword;
+    workspace.touchIdEnabled = globalSettingsInput.touchIdEnabled;
     this.persistWorkspace(workspace);
   }
 

@@ -38,6 +38,7 @@ export class Workspace {
   private _extensionEnabled: boolean;
 
   private _requirePassword: number;
+  private _touchIdEnabled: boolean;
 
   private _proxyConfiguration: {
     proxyProtocol: string;
@@ -252,5 +253,13 @@ export class Workspace {
 
   set requirePassword(value: number) {
     this._requirePassword = value;
+  }
+
+  get touchIdEnabled(): boolean {
+    return this._touchIdEnabled;
+  }
+
+  set touchIdEnabled(value: boolean) {
+    this._touchIdEnabled = value;
   }
 }

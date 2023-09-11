@@ -37,8 +37,6 @@ jobs:
     needs: [ clean-nightly-latest ]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: develop-pro
       - name: Build and release core (nightly)
         run: |
           cd packages/core
@@ -66,8 +64,6 @@ jobs:
           git config --global core.eol lf
 
       - uses: actions/checkout@v3
-        with:
-          ref: develop-pro
 
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
@@ -119,8 +115,7 @@ jobs:
     needs: [ build-and-release-core-and-cli ]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: develop-pro
+
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
@@ -165,8 +160,6 @@ jobs:
     needs: [ build-and-release-core-and-cli ]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: develop-pro
 
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}
@@ -250,8 +243,6 @@ jobs:
     needs: [ build-and-release-core-and-cli, build-macos-x64 ]
     steps:
       - uses: actions/checkout@v3
-        with:
-          ref: develop-pro
 
       - uses: actions/checkout@v3
         if: ${{ env.TEAM_REPOSITORY != '' }}

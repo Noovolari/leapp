@@ -36,6 +36,7 @@ export class RetroCompatibilityService {
       this.migration3();
       this.migration4();
       this.migration5();
+      this.migration6();
       // When adding new migrations remember to increase constants.workspaceLastVersion
     }
   }
@@ -260,6 +261,18 @@ export class RetroCompatibilityService {
       notification.popup = notification.uuid === "uuid";
     });
     workspace.notifications = leappNotifications;
+    this.persists(workspace);
+    this.repository.reloadWorkspace();
+  }
+
+  private migration6(): void {
+    const workspace = this.getWorkspace();
+    if (!this.checkMigration(workspace, 5, 6)) {
+      return;
+    }
+
+    workspace.requirePassword = constants.requirePasswordEveryTwoWeeks.value;
+    workspace.touchIdEnabled = constants.touchIdEnabled;
     this.persists(workspace);
     this.repository.reloadWorkspace();
   }

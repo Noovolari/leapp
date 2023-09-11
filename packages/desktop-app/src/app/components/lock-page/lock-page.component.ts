@@ -76,19 +76,7 @@ export class LockPageComponent implements OnInit {
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }
-        if (!(await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName))) {
-          const oldKey = this.appProviderService.fileService.aesKey;
-          this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
-          const encodedSecret = this.appProviderService.fileService.encryptText(formValue.password);
-          const nextExpiration = new Date().setDate(new Date().getDate() + this.optionService.requirePassword);
-          const newTouchIdKeychainItem = { encodedSecret, nextExpiration };
-          await this.appProviderService.keychainService.saveSecret(
-            constants.appName,
-            constants.touchIdKeychainItemName,
-            JSON.stringify(newTouchIdKeychainItem)
-          );
-          this.appProviderService.fileService.aesKey = oldKey;
-        }
+        await this.teamService.writeTouchIdCredentials(formValue.password, this.optionService.requirePassword);
         await this.router.navigate(["/dashboard"]);
       } catch (responseException: any) {
         if (responseException?.response.data?.errorCode === ApiErrorCodes.invalidCredentials) {

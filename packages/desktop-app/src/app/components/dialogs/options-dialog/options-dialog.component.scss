@@ -259,7 +259,7 @@
 
 .dark-theme {
   .cta-label {
-    color: white!important;
+    color: white !important;
   }
 }
 
@@ -272,10 +272,11 @@
   margin: 5px 0 10px 0;
 
   a {
-    color: #52A8DC!important;
+    color: #52A8DC !important;
     text-decoration: underline;
     cursor: pointer;
     transition: opacity 0.3s ease;
+
     &:hover {
       opacity: 0.8;
     }
@@ -322,7 +323,7 @@
   margin: 15px 0;
   width: 31%;
   height: 370px;
-  border-radius: 8px!important;
+  border-radius: 8px !important;
   border: 1px solid $silver-50;
 
   &.selected {
@@ -332,31 +333,58 @@
 }
 
 .plan-free, .plan-team {
-  margin: 40px 0!important;
-  height: 320px!important;
+  margin: 40px 0 !important;
+  height: 320px !important;
 }
 
 .dark-theme {
-  .plan-free.selected { border-color: #d8d8d8!important; }
-  .plan-pro.selected { border-color: #4aadac!important; }
-  .plan-team.selected { border-color: #2e78a9!important; }
+  .plan-free.selected {
+    border-color: #d8d8d8 !important;
+  }
+
+  .plan-pro.selected {
+    border-color: #4aadac !important;
+  }
+
+  .plan-team.selected {
+    border-color: #2e78a9 !important;
+  }
 }
 
-.plan-free.selected { border-color: #292929!important; }
-.plan-pro.selected { border-color: #378180!important; }
-.plan-team.selected { border-color: #1b4c6a!important; }
+.plan-free.selected {
+  border-color: #292929 !important;
+}
+
+.plan-pro.selected {
+  border-color: #378180 !important;
+}
+
+.plan-team.selected {
+  border-color: #1b4c6a !important;
+}
 
 .plan-free .plan-header {
   background: #d9d9d9;
-  span, p { color: #292929!important; }
+
+  span, p {
+    color: #292929 !important;
+  }
 }
+
 .plan-pro .plan-header {
   background: rgb(164, 214, 213);
-  span, p { color: #378180!important; }
+
+  span, p {
+    color: #378180 !important;
+  }
 }
+
 .plan-team .plan-header {
-  background: rgb(77,167,222);
-  span, p { color: #1b4c6a!important; }
+  background: rgb(77, 167, 222);
+
+  span, p {
+    color: #1b4c6a !important;
+  }
 }
 
 .plan-header {
@@ -426,6 +454,7 @@
         font-weight: 600;
       }
     }
+
     .price-description {
       font-size: 12px;
       color: $table-text;
@@ -537,7 +566,6 @@
 }
 
 
-
 /* The switch - the box around the slider */
 .toggle-prices {
   text-align: right;
@@ -578,14 +606,16 @@
     width: 66%;
     font-size: 11px;
   }
+
   span:first-child {
-    width: 40%!important;
+    width: 40% !important;
   }
 }
 
 .dark-theme .slider {
   color: white;
 }
+
 .dark-theme {
   .switch input:checked + .slider {
     background-color: transparent;
@@ -644,7 +674,7 @@
 
 .best-discount-ever {
   position: absolute;
-  right: 0;
+  right: 25px;
   top: 31px;
   background: #23D4B8;
   color: #292929;
@@ -656,4 +686,20 @@
 .touch-id-enable-checkbox {
   position: relative;
   top: 3px;
+}
+
+.mat-tab-body {
+  height: calc(100vh - 235px);
+}
+
+.mat-tab-body-content {
+  padding: 0 19px;
+}
+
+.mat-tab-body-wrapper {
+  padding: 0 !important;
+}
+
+.modal.show .modal-dialog {
+  border-radius: 10px;
 }

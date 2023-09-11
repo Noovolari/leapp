@@ -5,7 +5,7 @@ export const constants = {
   lockFileDestination: ".Leapp/Leapp-lock.json",
   lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
   latestUrl: "https://leapp.cloud/releases.html",
-  workspaceLastVersion: 5,
+  workspaceLastVersion: 6,
   slackUrl: "https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q",
   localWorkspaceName: "Local workspace",
   localWorkspaceDescription: "Community Edition",

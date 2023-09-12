@@ -12,6 +12,7 @@ import { FileService } from "../../file-service";
 import { LocalstackSession } from "../../../models/localstack/localstack-session";
 import { LocalstackSessionRequest } from "./localstack-session-request";
 import { Session } from "../../../models/session";
+import { AwsProcessCredentials } from "../../../models/aws/aws-process-credential";
 
 export class LocalstackSessionService extends SessionService {
   /* This service manage the session manipulation as we need top generate credentials and maintain them for a specific duration */
@@ -137,7 +138,7 @@ export class LocalstackSessionService extends SessionService {
     return Promise.resolve(credentials);
   };
 
-  applyCredentials(sessionId, credentialsInfo) {
+  applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): any {
     const session = this.repository.getSessionById(sessionId);
     if (session.type === SessionType.localstack) {
       const localStackSession: LocalstackSession = session as LocalstackSession;
@@ -156,8 +157,11 @@ export class LocalstackSessionService extends SessionService {
     }
   }
 
-  async deApplyCredentials(sessionId) {
-    //const session = this.behaviouralSubjectService.get(sessionId);
+  async generateProcessCredentials(_: string): Promise<AwsProcessCredentials> {
+    throw new Error("Localstack only support Credential file method, please switch back to it in the option panel.");
+  }
+
+  async deApplyCredentials(sessionId: string): Promise<any> {
     const session = this.repository.getSessions().find((sess) => sess.sessionId === sessionId);
     if (session.type === SessionType.localstack) {
       const localStackSession: LocalstackSession = session as LocalstackSession;
@@ -183,7 +187,7 @@ export class LocalstackSessionService extends SessionService {
     return Promise.resolve(false);
   }
 
-  private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string) {
+  private isThereAnotherPendingSessionWithSameNamedProfile(sessionId: string): boolean {
     const session = this.repository.getSessionById(sessionId);
     const profileId = (session as any).profileId;
     const pendingSessions = this.repository.listPending();

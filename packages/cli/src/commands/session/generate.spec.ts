@@ -2,6 +2,7 @@ import { describe, expect, jest, test } from "@jest/globals";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import GenerateSession from "./generate";
+import { LocalstackSessionService } from "@noovolari/leapp-core/services/session/localstack/localstack-session-service";
 
 describe("GenerateSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): GenerateSession => {
@@ -95,6 +96,14 @@ describe("GenerateSession", () => {
   test("isAwsSession - true", () => {
     const command = getTestCommand();
     const session = new (AwsSessionService as any)();
+    const isAwsSession = command.isAwsSession(session);
+
+    expect(isAwsSession).toBe(true);
+  });
+
+  test("isAwsSession, localstack - true", () => {
+    const command = getTestCommand();
+    const session = new (LocalstackSessionService as any)();
     const isAwsSession = command.isAwsSession(session);
 
     expect(isAwsSession).toBe(true);

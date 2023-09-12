@@ -17,9 +17,107 @@ env:
   TEAM_REPOSITORY: ${{ secrets.TEAM_REPOSITORY }}
 
 jobs:
+  generate-build-identifier:
+    outputs:
+      build-identifier: ${{ steps.build-identifier-generator.outputs.BUILD_IDENTIFIER }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: generate build identifier
+        id: build-identifier-generator
+        run: |
+          IDENTIFIER=$(date +%Y%m%d%H%M%S)
+          echo "::set-output name=BUILD_IDENTIFIER::$IDENTIFIER"
+
+  build-and-release-core-and-cli:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Build and release core (nightly)
+        run: |
+          cd packages/core
+
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+          npm install
+          npm run nightly
+
+      - name: Build and release CLI (nightly)
+        run: |
+          cd packages/cli
+
+          echo "//registry.npmjs.org/:_authToken=\${NPM_TOKEN}" > .npmrc
+          npm install
+          npm run nightly
+
   build-macos-arm:
     runs-on: macos-latest
+    needs: [ build-and-release-core-and-cli, generate-build-identifier ]
     steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/checkout@v3
+        if: ${{ env.TEAM_REPOSITORY != '' }}
+        with:
+          repository: ${{ env.TEAM_REPOSITORY }}
+          ref: development
+          token: ${{ secrets.GH_TOKEN }}
+          path: leapp-team
+      - name: Inject Team Feature
+        if: ${{ env.TEAM_REPOSITORY != '' }}
+        run: |
+          mv leapp-team ..
+          cd ../leapp-team/packages/leapp-team-service
+          npm run enable-team-features-dev
+
+      - name: Build macOS arm64 desktop app (nightly)
+        uses: nick-fields/retry@v2
+        env:
+          APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
+        with:
+          timeout_minutes: 20
+          max_attempts: 5
+          command: |
+            cd packages/desktop-app
+            KEY_CHAIN=build.keychain
+            CERTIFICATE_P12=certificate.p12
+            CERTIFICATE_APPLICATION_P12=certificate-application.p12
+            echo "Recreate the certificate from the secure environment variable"
+            echo "security create-keychain"
+            echo "${{ env.CERTIFICATE_OSX_P12 }}" | base64 --decode > $CERTIFICATE_P12
+            echo "${{ env.CERTIFICATE_APPLICATION_OSX_P12 }}" | base64 --decode > $CERTIFICATE_APPLICATION_P12
+            security create-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            echo "security list-keychains"
+            security list-keychains -s login.keychain build.keychain
+            echo "security default-keychain"
+            security default-keychain -s $KEY_CHAIN
+            echo "security unlock-keychain"
+            security unlock-keychain -p ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            echo "security import"
+            security import $CERTIFICATE_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+            security import $CERTIFICATE_APPLICATION_P12 -k $KEY_CHAIN -P '${{ env.DECODE_PASSWORD }}' -T /usr/bin/codesign;
+            echo "security find-identity"
+            security find-identity -v
+            echo "security set-key-partition-list"
+            security set-key-partition-list -S apple-tool:,apple:,codesign:, -s -k ${{ env.KEYCHAIN_PASSWORD }} $KEY_CHAIN
+            rm -fr *.p12
+
+            npm install
+            npm run set-target-arm64
+            npm run nightly
+
+      - name: Clean build
+        run: |
+          cd packages/desktop-app
+          rm -Rf ./release/mac
+          rm -Rf ./release/mac-unpacked
+          rm -Rf ./release/.cache
+          rm -Rf ./release/builder-debug.yml
+          rm -Rf ./release/builder-effective-config.yaml
+          rm -Rf ./release/mac-arm64
+          TAG_VERSION=$(cat nightly-version)
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip"
+          rm "./release/Leapp-$TAG_VERSION-arm64-mac.zip.blockmap"
+          zip "./release/Leapp-$TAG_VERSION-mac-arm64.zip" "./release/Leapp-$TAG_VERSION-arm64.dmg"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -30,4 +128,13 @@ jobs:
 
       - name: Release draft to S3 (nightly)
         run: |
-          aws s3 presign "${{ env.S3_BUCKET }}/nightly/20230912101304/Leapp-0.19.0-nightly.202309121018-arm64.dmg"
+          cd packages/desktop-app
+          TAG_VERSION=$(cat nightly-version)
+          BUILD_IDENTIFIER=${{ needs.generate-build-identifier.outputs.build-identifier }}
+          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/nightly/${BUILD_IDENTIFIER}/" --recursive
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          PRESIGN_URL=$(aws s3 presign "${{ env.S3_BUCKET }}/nightly/${BUILD_IDENTIFIER}/Leapp-${TAG_VERSION}-arm64.dmg")
+          unset AWS_ACCESS_KEY_ID
+          unset AWS_SECRET_ACCESS_KEY
+          echo "Leapp-${TAG_VERSION}-arm64.dmg: ${PRESIGN_URL}"

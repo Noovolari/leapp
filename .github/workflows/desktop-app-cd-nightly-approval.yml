@@ -127,6 +127,7 @@ jobs:
           aws-region: eu-west-1
 
       - name: Release draft to S3 (nightly)
+        id: release
         run: |
           cd packages/desktop-app
           TAG_VERSION=$(cat nightly-version)
@@ -136,3 +137,10 @@ jobs:
           echo "${PRESIGN_URL}" > presign_url.txt
           aws s3 cp presign_url.txt "${{ env.S3_BUCKET }}/nightly/${BUILD_IDENTIFIER}/"
           rm presign_url.txt
+          echo "::set-output name=TAG_VERSION::$TAG_VERSION"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ needs.generate-build-identifier.outputs.build-identifier }}/Leapp-${{ steps.release.outputs.TAG_VERSION }}-arm64.dmg
+          path: packages/desktop-app/release/Leapp-${{ steps.release.outputs.TAG_VERSION }}-arm64.dmg

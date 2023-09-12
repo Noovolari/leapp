@@ -132,5 +132,5 @@ jobs:
           TAG_VERSION=$(cat nightly-version)
           BUILD_IDENTIFIER=${{ needs.generate-build-identifier.outputs.build-identifier }}
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/nightly/${BUILD_IDENTIFIER}/" --recursive
-          PRESIGN_URL=aws s3 presign "${{ env.S3_BUCKET }}/nightly/${BUILD_IDENTIFIER}/Leapp-${TAG_VERSION}-arm64.dmg"
+          PRESIGN_URL=$(aws s3 presign "${{ env.S3_BUCKET }}/nightly/${BUILD_IDENTIFIER}/Leapp-${TAG_VERSION}-arm64.dmg")
           echo "Leapp-${TAG_VERSION}-arm64.dmg: ${PRESIGN_URL}"

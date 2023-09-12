@@ -16,6 +16,8 @@ export class DetailPipe implements PipeTransform {
         return (session as AwsIamRoleFederatedSession).roleArn.split("role/")[1] || "";
       case SessionType.azure:
         return (session as AzureSession).subscriptionId;
+      case SessionType.localstack:
+        return "local";
       case SessionType.awsIamUser:
         return ""; // (sessions as AwsIamUserSession).sessionName;
       case SessionType.awsSsoRole:

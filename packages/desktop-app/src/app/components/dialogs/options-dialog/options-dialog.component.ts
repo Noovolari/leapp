@@ -585,7 +585,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.windowService.openExternalUrl(`mailto:support@noovolari.com?subject=Leapp%20Sign-up%20support%20request%20${email}`);
   }
 
-  contactSales() {
+  contactSales(): void {
     this.windowService.openExternalUrl("https://www.leapp.cloud/solutions/business");
   }
 }

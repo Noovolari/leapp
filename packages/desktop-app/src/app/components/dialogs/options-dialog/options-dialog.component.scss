@@ -497,9 +497,10 @@
       font-size: 12px;
       display: flex;
       align-items: center;
-      text-align: center;
+      text-align: initial;
       justify-content: center;
       font-weight: 400;
+      gap: 5px;
 
       span.check-mark-icon {
         margin-right: 5px;

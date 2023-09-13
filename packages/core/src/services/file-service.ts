@@ -110,6 +110,10 @@ export class FileService {
     return this.nativeService.fs.writeFileSync(filePath, content);
   }
 
+  writeFileSyncWithOptions(filePath: string, content: string, options: any): any {
+    return this.nativeService.fs.writeFileSync(filePath, content, options);
+  }
+
   /**
    * Remove a file in a synchronous way
    *

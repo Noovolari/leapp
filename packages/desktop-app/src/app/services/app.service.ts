@@ -70,11 +70,19 @@ export class AppService {
   }
 
   isTouchIdAvailable(): boolean {
-    return this.appNativeService.systemPreferences.canPromptTouchID();
+    try {
+      return this.appNativeService.systemPreferences.canPromptTouchID();
+    } catch (err) {
+      return false;
+    }
   }
 
   usePromptId(): Promise<any> {
-    return this.appNativeService.systemPreferences.promptTouchID("unlock");
+    try {
+      return this.appNativeService.systemPreferences.promptTouchID("unlock");
+    } catch (err) {
+      this.logService.log(new LoggedEntry("Touch ID error", this, LogLevel.error, true));
+    }
   }
 
   isDarkMode(): boolean {

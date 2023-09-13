@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { AppService } from "../../../services/app.service";
+import { OptionsService } from "../../../services/options.service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { TeamService, ApiErrorCodes, FormErrorCodes } from "../../../services/team-service";
@@ -22,7 +23,7 @@ export class LoginWorkspaceDialogComponent implements OnInit {
   private loggingService: LogService;
   private teamService: TeamService;
 
-  constructor(public appService: AppService, public appProviderService: AppProviderService) {
+  constructor(public appService: AppService, public appProviderService: AppProviderService, public optionsService: OptionsService) {
     this.email = new FormControl("", [Validators.required, Validators.email]);
     this.password = new FormControl("", [Validators.required]);
     this.signinForm = new FormGroup({ email: this.email, password: this.password });
@@ -45,6 +46,7 @@ export class LoginWorkspaceDialogComponent implements OnInit {
         const signedInUser = await this.teamService.signedInUserState.getValue();
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
+        await this.teamService.writeTouchIdCredentials(formValue.password, this.optionsService.requirePassword);
         this.appService.closeAllMenuTriggers();
         await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.proEnabled);
         globalLeappProPlanStatus.next(LeappPlanStatus.proEnabled);

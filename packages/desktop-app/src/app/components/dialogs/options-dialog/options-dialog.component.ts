@@ -63,6 +63,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   regions: { region: string }[];
   selectedLocation: string;
   selectedRegion: string;
+  selectedRequirePassword: number;
+  selectedTouchIdEnabled: boolean;
   selectedBrowserOpening = constants.inApp.toString();
   selectedTerminal;
 
@@ -93,6 +95,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     sessionDuration: new FormControl(""),
     pluginDeepLink: new FormControl(""),
     ssmRegionBehaviourSelect: new FormControl(""),
+    requirePasswordSelect: new FormControl(""),
+    touchIdEnableSelect: new FormControl(""),
   });
 
   selectedCredentialMethod: string;
@@ -125,6 +129,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.selectedCredentialMethod = this.optionsService.credentialMethod || constants.credentialFile;
 
     this.selectedSsmRegionBehaviour = this.optionsService.ssmRegionBehaviour || constants.ssmRegionNo;
+
+    this.selectedRequirePassword = this.optionsService.requirePassword || constants.requirePasswordEveryTwoWeeks.value;
+
+    this.selectedTouchIdEnabled = this.optionsService.touchIdEnabled ?? constants.touchIdEnabled;
 
     this.extensionEnabled = this.optionsService.extensionEnabled || false;
   }
@@ -208,7 +216,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   /**
    * Save the idp-url again
    */
-  saveOptions(): void {
+  async saveOptions(): Promise<void> {
     if (this.form.valid) {
       this.optionsService.updateProxyConfiguration({
         proxyUrl: this.form.controls["proxyUrl"].value,
@@ -222,6 +230,23 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
       this.optionsService.defaultLocation = this.selectedLocation;
       this.optionsService.macOsTerminal = this.selectedTerminal;
       this.optionsService.samlRoleSessionDuration = this.form.controls["sessionDuration"].value;
+
+      const previousRequirePassword = this.optionsService.requirePassword;
+      if (previousRequirePassword !== this.selectedRequirePassword) {
+        const keychainItem = await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName);
+        if (keychainItem) {
+          const updatedRequirePassword = JSON.parse(keychainItem);
+          updatedRequirePassword.nextExpiration = new Date().setDate(new Date().getDate() + this.selectedRequirePassword);
+          await this.appProviderService.keychainService.saveSecret(
+            constants.appName,
+            constants.touchIdKeychainItemName,
+            JSON.stringify(updatedRequirePassword)
+          );
+        }
+      }
+
+      this.optionsService.requirePassword = this.selectedRequirePassword;
+      this.optionsService.touchIdEnabled = this.form.controls["touchIdEnableSelect"].value;
 
       this.optionsService.ssmRegionBehaviour = this.selectedSsmRegionBehaviour;
 
@@ -560,7 +585,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.windowService.openExternalUrl(`mailto:support@noovolari.com?subject=Leapp%20Sign-up%20support%20request%20${email}`);
   }
 
-  contactSales() {
+  contactSales(): void {
     this.windowService.openExternalUrl("https://www.leapp.cloud/solutions/business");
   }
 }

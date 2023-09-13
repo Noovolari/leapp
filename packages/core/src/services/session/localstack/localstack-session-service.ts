@@ -57,7 +57,7 @@ export class LocalstackSessionService extends SessionService {
         const credentialsInfo = await this.generateCredentials();
         await this.applyCredentials(sessionId, credentialsInfo);
       } else {
-        await this.applyConfigProfileCommand(sessionId);
+        await this.generateProcessCredentials(undefined);
       }
       this.sessionActivated(sessionId);
     } catch (error) {
@@ -92,24 +92,6 @@ export class LocalstackSessionService extends SessionService {
       }
       this.repository.deleteSession(sessionId);
       this.sessionNotifier?.setSessions(this.repository.getSessions());
-    } catch (error) {
-      this.sessionError(sessionId, error);
-    }
-  }
-
-  async applyConfigProfileCommand(sessionId: string): Promise<void> {
-    try {
-      const session = this.repository.getSessionById(sessionId) as any;
-      const command = `leapp session generate ${sessionId}`;
-      const profileName = this.repository.getProfileName(session.profileId);
-      const profile = `profile ${profileName}`;
-      const credentialProcess: { [key: string]: any } = {};
-      credentialProcess[profile] = {
-        ["credential_process"]: command,
-        region: session.region,
-      };
-
-      await this.fileService.iniWriteSync(this.awsCoreService.awsConfigPath(), credentialProcess);
     } catch (error) {
       this.sessionError(sessionId, error);
     }

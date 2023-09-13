@@ -136,5 +136,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ needs.generate-build-identifier.outputs.build-identifier }}-Leapp-${{ steps.release.outputs.TAG_VERSION }}-arm64.dmg
+          name: Leapp-${{ steps.release.outputs.TAG_VERSION }}-arm64.dmg
           path: packages/desktop-app/release/Leapp-${{ steps.release.outputs.TAG_VERSION }}-arm64.dmg

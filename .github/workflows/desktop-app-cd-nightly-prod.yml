@@ -349,6 +349,6 @@ jobs:
           # You can pass in multiple channels to post to by providing a comma-delimited list of channel IDs.
           channel-id: "C05S4TSQ919"
           # For posting a simple plain text message
-          slack-message: "${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}} approval builds: https://github.com/Noovolari/leapp/actions/runs/${{ github. run_id }}"
+          slack-message: "${{ github.ref }} approval builds: https://github.com/Noovolari/leapp/actions/runs/${{ github.run_id }}"
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_TOKEN }}

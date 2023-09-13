@@ -69,6 +69,14 @@ export class AppService {
     return this.appNativeService.menu;
   }
 
+  isTouchIdAvailable(): boolean {
+    return this.appNativeService.systemPreferences.canPromptTouchID();
+  }
+
+  usePromptId(): Promise<any> {
+    return this.appNativeService.systemPreferences.promptTouchID("unlock");
+  }
+
   isDarkMode(): boolean {
     return this.appNativeService.nativeTheme.shouldUseDarkColors;
   }

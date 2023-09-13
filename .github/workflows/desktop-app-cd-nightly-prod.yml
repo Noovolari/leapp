@@ -245,6 +245,7 @@ jobs:
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/nightly/" --recursive
           aws s3 cp ./release/ "${{ env.S3_BUCKET }}/nightly/latest-temp/" --recursive
 
+
   build-macos-arm:
     runs-on: macos-latest
     needs: [ build-and-release-core-and-cli, build-macos-x64 ]

@@ -274,6 +274,8 @@ export class SessionsComponent implements OnInit, OnDestroy {
         return (s as AwsIamRoleFederatedSession).roleArn.split("role/")[1];
       case SessionType.azure:
         return (s as AzureSession).subscriptionId;
+      case SessionType.localstack:
+        return "local";
       case SessionType.awsIamUser:
         return "";
       case SessionType.awsSsoRole:

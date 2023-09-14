@@ -9,8 +9,9 @@ Select the configuration you need from the Access Method dropdown menu:
 Then follow the links below.
 
 - [Configure an AWS IAM User](configuring-session/configure-aws-iam-user.md)
-- Configure an AWS IAM Role Federated](configuring-session/configure-aws-iam-role-federated.md)
+- [Configure an AWS IAM Role Federated](configuring-session/configure-aws-iam-role-federated.md)
 - [Configure an AWS IAM Role Chained](configuring-session/configure-aws-iam-role-chained.md)
+- [Configure Localstack](configuring-session/configure-localstack.md)
 
 ## Integrations
 

@@ -134,6 +134,21 @@ export class CloudProviderService {
           ),
         ],
       ],
+      [
+        CloudProviderType.localstack,
+        [
+          new AccessMethod(
+            SessionType.localstack,
+            "Localstack",
+            [
+              new AccessMethodField("sessionName", "Insert session alias", AccessMethodFieldType.input),
+              new AccessMethodField("region", "Select Location", AccessMethodFieldType.list, awsRegionChoices),
+              new AccessMethodField("profileId", "Select the Named Profile", AccessMethodFieldType.list, awsNamedProfileChoices),
+            ],
+            true
+          ),
+        ],
+      ],
     ]);
   }
 

@@ -48,6 +48,7 @@ import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-se
 import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/workspace-consistency-service";
 import * as crypto from "crypto";
 import { TeamService } from "./team-service";
+import { LocalstackSessionService } from "@noovolari/leapp-core/services/session/localstack/localstack-session-service";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -94,6 +95,7 @@ export class CliProviderService {
   private integrationFactoryInstance: IntegrationFactory;
   private azureIntegrationServiceInstance: AzureIntegrationService;
   private teamServiceInstance: TeamService;
+  private localstackSessionServiceInstance: LocalstackSessionService;
 
   public get azureIntegrationService(): AzureIntegrationService {
     if (!this.azureIntegrationServiceInstance) {
@@ -252,6 +254,14 @@ export class CliProviderService {
     return this.awsSsoOidcServiceInstance;
   }
 
+  public get localstackSessionService(): LocalstackSessionService {
+    if (!this.localstackSessionServiceInstance) {
+      this.localstackSessionServiceInstance = new LocalstackSessionService(this.behaviouralSubjectService, this.repository, this.awsCoreService,
+        this.fileService);
+    }
+    return this.localstackSessionServiceInstance;
+  }
+
   public get azurePersistenceService(): AzurePersistenceService {
     if (!this.azurePersistenceServiceInstance) {
       this.azurePersistenceServiceInstance = new AzurePersistenceService(this.cliNativeService, this.keyChainService);
@@ -278,7 +288,7 @@ export class CliProviderService {
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
-        this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureSessionService);
+        this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureSessionService, this.localstackSessionService);
     }
     return this.sessionFactoryInstance;
   }

@@ -245,7 +245,7 @@ export class AppComponent implements OnInit {
 
     if (check) {
       this.fileService.renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
-      this.fileService.writeFileSync(oldAwsCredentialsPath, "");
+      this.fileService.writeFileSyncWithOptions(oldAwsCredentialsPath, "", { mode: "600" });
       this.appService.getDialog().showMessageBox({
         type: "info",
         icon: __dirname + "/assets/images/Leapp.png",
@@ -253,7 +253,7 @@ export class AppComponent implements OnInit {
         message: "You had a previous credential file. We made a backup of the old one in the same directory before starting.",
       });
     } else if (!this.fileService.existsSync(this.awsCoreService.awsCredentialPath())) {
-      this.fileService.writeFileSync(this.awsCoreService.awsCredentialPath(), "");
+      this.fileService.writeFileSyncWithOptions(this.awsCoreService.awsCredentialPath(), "", { mode: "600" });
     }
   }
 

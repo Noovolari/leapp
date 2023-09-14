@@ -4,6 +4,7 @@ import { Config } from "@oclif/core/lib/config/config";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { Args } from "@oclif/core";
+import { LocalstackSessionService } from "@noovolari/leapp-core/services/session/localstack/localstack-session-service";
 
 export default class GenerateSession extends LeappCommand {
   static description = "Generate STS temporary credentials for the given AWS session id";
@@ -52,6 +53,6 @@ export default class GenerateSession extends LeappCommand {
   }
 
   isAwsSession(sessionService: SessionService): boolean {
-    return sessionService instanceof AwsSessionService;
+    return sessionService instanceof AwsSessionService || sessionService instanceof LocalstackSessionService;
   }
 }

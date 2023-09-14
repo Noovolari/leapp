@@ -8,4 +8,5 @@ export enum SessionType {
   azure = "azure",
   google = "google",
   alibaba = "alibaba",
+  localstack = "localstack",
 }

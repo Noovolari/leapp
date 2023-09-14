@@ -597,4 +597,12 @@ body.dark-theme {
       color: #DEDCDD!important;
     }
   }
+
+  .touch-id {
+    border-color: #787878;
+    background-color: #363336;
+    img {
+    filter: invert(1);
+    }
+  }
 }

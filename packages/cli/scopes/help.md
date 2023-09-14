@@ -9,7 +9,7 @@ Display help for leapp.
 
 Display help for leapp.
 
-```
+```console
 USAGE
   $ leapp help [COMMANDS] [-n]
 
@@ -23,4 +23,4 @@ DESCRIPTION
   Display help for leapp.
 ```
 
-_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.2.9/src/commands/help.ts)_
+_See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v5.2.10/src/commands/help.ts)_

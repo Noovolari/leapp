@@ -242,7 +242,7 @@ jobs:
 
   build-macos-arm:
     runs-on: macos-latest
-    needs: [ build-and-release-core-and-cli, generate-build-identifier ]
+    needs: [ build-and-release-core-and-cli, generate-build-identifier, build-macos-x64]
     steps:
       - uses: actions/checkout@v3
 

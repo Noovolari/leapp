@@ -7,10 +7,11 @@ import {
 } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { WindowService } from "./window.service";
+import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 
 @Injectable({ providedIn: "root" })
 export class AppVerificationWindowService implements IAwsSsoOidcVerificationWindowService {
-  constructor(private windowService: WindowService) {}
+  constructor(private windowService: WindowService, private toasterService: MessageToasterService) {}
 
   async openVerificationWindow(
     registerClientResponse: RegisterClientResponse,
@@ -19,6 +20,12 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
     onWindowClose: () => void
   ): Promise<VerificationResponse> {
     const openWindowInApp = constants.inApp.toString();
+
+    if (startDeviceAuthorizationResponse.verificationUriComplete.indexOf("?user_code=") > -1) {
+      const code = startDeviceAuthorizationResponse.verificationUriComplete.split("?user_code=")[1];
+      this.toasterService.toast(`Your AWS user code for this SSO request is: ${code}`, ToastLevel.info, "SSO Security Code");
+    }
+
     if (windowModality === openWindowInApp) {
       return this.openVerificationBrowserWindow(registerClientResponse, startDeviceAuthorizationResponse, onWindowClose);
     } else {
@@ -39,6 +46,7 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
       parentWindowPosition[0] + 200,
       parentWindowPosition[1] + 50
     );
+
     verificationWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
     verificationWindow.on("close", (e) => {
       e.preventDefault();

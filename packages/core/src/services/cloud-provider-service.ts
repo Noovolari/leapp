@@ -139,7 +139,7 @@ export class CloudProviderService {
         [
           new AccessMethod(
             SessionType.localstack,
-            "Localstack",
+            "LocalStack",
             [
               new AccessMethodField("sessionName", "Insert session alias", AccessMethodFieldType.input),
               new AccessMethodField("region", "Select Location", AccessMethodFieldType.list, awsRegionChoices),

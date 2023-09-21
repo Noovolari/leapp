@@ -59,6 +59,7 @@ import { SyncProWidgetComponent } from "./sync-pro-widget/sync-pro-widget.compon
 import { OverlayModule } from "@angular/cdk/overlay";
 import { LockPageComponent } from "./lock-page/lock-page.component";
 import { CheckIconSvgComponent } from "./check-icon-svg/check-icon-svg.component";
+import { AuthorizationDialogComponent } from "./dialogs/authorization-dialog/authorization-dialog.component";
 
 @NgModule({
   declarations: [
@@ -69,6 +70,7 @@ import { CheckIconSvgComponent } from "./check-icon-svg/check-icon-svg.component
     QueryingPipe,
     DetailPipe,
     ConfirmationDialogComponent,
+    AuthorizationDialogComponent,
     InputDialogComponent,
     UpdateDialogComponent,
     SnackbarComponent,
@@ -130,6 +132,13 @@ import { CheckIconSvgComponent } from "./check-icon-svg/check-icon-svg.component
     NgSelectModule,
     OverlayModule,
   ],
-  exports: [ConfirmationDialogComponent, InputDialogComponent, CommandBarComponent, SideBarComponent, SessionsComponent],
+  exports: [
+    ConfirmationDialogComponent,
+    AuthorizationDialogComponent,
+    InputDialogComponent,
+    CommandBarComponent,
+    SideBarComponent,
+    SessionsComponent,
+  ],
 })
 export class ComponentsModule {}

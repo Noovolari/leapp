@@ -20,7 +20,7 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
   ): Promise<VerificationResponse> {
     if (startDeviceAuthorizationResponse.verificationUriComplete.indexOf("?user_code=") > -1) {
       const code = startDeviceAuthorizationResponse.verificationUriComplete.split("?user_code=")[1];
-      this.windowService.confirmDialog(`Your AWS user code for this SSO request is: <b>${code}</b>`, () => {}, "Ok", "Cancel");
+      this.windowService.authorizationDialog(code);
     }
 
     const openWindowInApp = constants.inApp.toString();

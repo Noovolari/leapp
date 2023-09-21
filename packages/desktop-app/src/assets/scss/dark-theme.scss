@@ -233,6 +233,9 @@ body.dark-theme {
     div.message {
       color: $dark-main-text-color!important;
     }
+    div.authorization-code {
+      color: $dark-main-text-color!important;
+    }
     .mat-tab-header {
       border-bottom: 0.3px solid $dark-session-card-border;
       border-top: none;

@@ -118,7 +118,7 @@ export class SessionCardComponent implements OnInit {
       case SessionType.azure:
         return "Azure";
       case SessionType.localstack:
-        return "Localstack";
+        return "LocalStack";
       case SessionType.awsIamUser:
         return "IAM User";
       case SessionType.awsSsoRole:

@@ -186,7 +186,7 @@ describe("LocalstackSessionService", () => {
   test("generateProcessCredentials", async () => {
     const service = new LocalstackSessionService(null, null, null, null);
     await expect(service.generateProcessCredentials(undefined)).rejects.toThrow(
-      new Error("LocalStack only support Credential file method, please switch back to it in the option panel.")
+      new Error("Localstack only support Credential file method, please switch back to it in the option panel.")
     );
   });
 

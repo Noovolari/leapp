@@ -169,13 +169,14 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     expect(spyOnRequest).not.toHaveBeenCalled();
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
     fakeBackendCallData.details = { url: "https://www.leapp.cloud/success", requestHeaders: "fake-details" };
 
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "");
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
     expect(spyOnLoadUrl).toHaveBeenCalledWith("fakeUrl");
     setTimeout(() => {
@@ -213,13 +214,14 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     const spyOnCallback = spyOn(fakeBackendCallData, "callback").and.callThrough();
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
     fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
 
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "");
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
     expect(spyOnLoadUrl).toHaveBeenCalledWith("fakeUrl");
 
@@ -246,13 +248,14 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.throwError(error);
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
     fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
 
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "");
     expect((component as any).toasterService.toast).toHaveBeenCalledWith("Email already taken", ToastLevel.error);
   });
 
@@ -268,13 +271,14 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.throwError(error);
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
     fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
 
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "");
     expect((component as any).toasterService.toast).toHaveBeenCalledWith("Something went wrong during pre-checkout", ToastLevel.error);
   });
 
@@ -283,12 +287,14 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.callThrough();
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
+    (component as any).fiscalCodeFormControl.setValue("RRRLSN86A10F205B");
 
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "RRRLSN86A10F205B");
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
 
     setTimeout(() => {

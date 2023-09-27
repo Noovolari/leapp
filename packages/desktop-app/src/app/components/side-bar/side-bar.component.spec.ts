@@ -4,6 +4,7 @@ import { SideBarComponent } from "./side-bar.component";
 import { mustInjected } from "../../../base-injectables";
 import { AppProviderService } from "../../services/app-provider.service";
 import { MatMenuModule } from "@angular/material/menu";
+import { RouterTestingModule } from "@angular/router/testing";
 
 describe("SideBarComponent", () => {
   let component: SideBarComponent;
@@ -30,6 +31,7 @@ describe("SideBarComponent", () => {
                 selected: true,
                 locked: false,
                 id: "fake-id",
+                syncState: "disabled",
               },
             ];
             return { unsubscribe: () => {} };
@@ -40,7 +42,7 @@ describe("SideBarComponent", () => {
 
     await TestBed.configureTestingModule({
       declarations: [SideBarComponent],
-      imports: [MatMenuModule],
+      imports: [MatMenuModule, RouterTestingModule],
       providers: [].concat(mustInjected().concat({ provide: AppProviderService, useValue: spyLeappCoreService })),
     }).compileComponents();
 

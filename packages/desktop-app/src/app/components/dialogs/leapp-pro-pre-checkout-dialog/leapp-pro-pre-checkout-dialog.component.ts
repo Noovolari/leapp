@@ -24,17 +24,17 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
 
   public emailFormControl = new FormControl("", [Validators.required, Validators.email]);
   public planFormControl = new FormControl("annually");
-  public fiscalCodeFormControl = new FormControl("", [Validators.pattern(/^[A-Za-z]{6}[0-9]{2}[A-Za-z]{1}[0-9]{2}[A-Za-z]{1}[0-9]{3}[A-Za-z]{1}$/)]);
+  // public fiscalCodeFormControl = new FormControl("", [Validators.pattern(/^[A-Za-z]{6}[0-9]{2}[A-Za-z]{1}[0-9]{2}[A-Za-z]{1}[0-9]{3}[A-Za-z]{1}$/)]);
 
   public form = new FormGroup({
     email: this.emailFormControl,
     plan: this.planFormControl,
-    fiscalCode: this.fiscalCodeFormControl,
+    // fiscalCode: this.fiscalCodeFormControl,
   });
 
   public selectedPeriod: BillingPeriod = BillingPeriod.yearly;
   public isEmailValid = false;
-  public isCFValid = false;
+  // public isCFValid = false;
   public price: any;
   private prices: any[];
 
@@ -68,14 +68,14 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
   }
 
   async upgradeToLeappPro(): Promise<void> {
-    if (this.isEmailValid && this.isCFValid) {
+    if (this.isEmailValid /* && this.isCFValid*/) {
       let checkoutUrl = "";
       try {
         this.isRedirectingToCheckout = true;
         checkoutUrl = await this.appProviderService.teamService.createCheckoutSession(
           this.emailFormControl.value,
-          this.price,
-          this.fiscalCodeFormControl?.value
+          this.price
+          // this.fiscalCodeFormControl?.value
         );
         this.isRedirectingToCheckout = false;
       } catch (error) {
@@ -142,7 +142,7 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
     this.emailFormControl.markAsTouched();
     this.isEmailValid = this.emailFormControl.valid;
 
-    this.fiscalCodeFormControl.markAsTouched();
-    this.isCFValid = this.fiscalCodeFormControl.valid;
+    // this.fiscalCodeFormControl.markAsTouched();
+    // this.isCFValid = this.fiscalCodeFormControl.valid;
   }
 }

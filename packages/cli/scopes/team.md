@@ -11,7 +11,7 @@ Login to your Team account
 
 Login to your Team account
 
-```
+```console
 USAGE
   $ leapp team login
 
@@ -26,7 +26,7 @@ EXAMPLES
 
 Logout from your Team account
 
-```
+```console
 USAGE
   $ leapp team logout
 
@@ -41,7 +41,7 @@ EXAMPLES
 
 Get the team login status
 
-```
+```console
 USAGE
   $ leapp team status
 

@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.20.2](https://github.com/Noovolari/leapp/compare/v0.20.1...v0.20.2) (2023-10-05)
+
+### Bug fixes
+* fixed change the authentication URL regexp for Auth0 ([issue #475](https://github.com/Noovolari/leapp/issues/475)). Thanks to [@maintux](https://github.com/maintux)!
+* fixed search common locations for binary ([issue #476](https://github.com/Noovolari/leapp/issues/476)). Thanks to [@icholi](https://github.com/icholy)!
+
 ### [0.20.1](https://github.com/Noovolari/leapp/compare/v0.20.0...v0.20.1) (2023-09-21)
 
 ### Features

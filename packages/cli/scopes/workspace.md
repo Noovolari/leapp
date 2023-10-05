@@ -9,7 +9,7 @@ Show the current workspace
 
 Show the current workspace
 
-```console
+```
 USAGE
   $ leapp workspace
 

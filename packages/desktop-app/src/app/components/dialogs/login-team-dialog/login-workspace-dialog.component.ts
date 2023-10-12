@@ -43,26 +43,37 @@ export class LoginWorkspaceDialogComponent implements OnInit {
       this.submitting = true;
       const formValue = this.signinForm.value;
       try {
+        console.log("step 1");
         const signedInUser = await this.teamService.signedInUserState.getValue();
+        console.log("step 2");
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
+        console.log("step 3");
         await this.teamService.writeTouchIdCredentials(formValue.password, this.optionsService.requirePassword);
+        console.log("step 4");
         this.appService.closeAllMenuTriggers();
+        console.log("step 5");
         await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.proEnabled);
+        console.log("step 6");
         globalLeappProPlanStatus.next(LeappPlanStatus.proEnabled);
+        console.log("step 7");
         this.closeModal();
+        console.log("step 8");
         if (doesWorkspaceExist) {
+          console.log("step 9");
           await this.teamService.pullFromRemote();
+          console.log("step 10");
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }
       } catch (responseException: any) {
-        if (responseException?.response.data?.errorCode === ApiErrorCodes.invalidCredentials) {
+        if (responseException?.response?.data?.errorCode === ApiErrorCodes.invalidCredentials) {
           this.loggingService.log(new LoggedEntry("Invalid email or password", this, LogLevel.error, true));
           this.password.setErrors({ [FormErrorCodes.invalidCredentials]: {} });
-        } else if (responseException?.response.data?.errorCode === ApiErrorCodes.userNotActive) {
+        } else if (responseException?.response?.data?.errorCode === ApiErrorCodes.userNotActive) {
           this.loggingService.log(new LoggedEntry("The user is not active", this, LogLevel.error, true));
         } else {
+          console.log("ECCEZIONE", responseException);
           this.loggingService.log(new LoggedEntry(responseException, this, LogLevel.error, true));
         }
       } finally {

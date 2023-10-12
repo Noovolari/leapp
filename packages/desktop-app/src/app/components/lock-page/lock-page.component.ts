@@ -25,6 +25,7 @@ export class LockPageComponent implements OnInit {
   previousRoute: string;
   initials = "";
   name = "";
+  teamName = "";
   showTouchId: boolean;
 
   private loggingService: LogService;
@@ -54,6 +55,7 @@ export class LockPageComponent implements OnInit {
       this.name = user.firstName + " " + user.lastName;
       this.initials = user.firstName[0].toUpperCase() + user.lastName[0].toUpperCase();
       this.email.setValue(user.email);
+      this.teamName = user?.teamName;
       if (this.previousRoute !== "/dashboard" && this.appService.isTouchIdAvailable() && this.optionService.touchIdEnabled) {
         this.touchId();
       }
@@ -71,6 +73,12 @@ export class LockPageComponent implements OnInit {
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
         this.appService.closeAllMenuTriggers();
+
+        const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
+        const planStatus = teamOrPro.type === "team" ? LeappPlanStatus.enterprise : LeappPlanStatus.proEnabled;
+        await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", planStatus);
+        globalLeappProPlanStatus.next(planStatus);
+
         if (doesWorkspaceExist) {
           await this.teamService.pullFromRemote();
         } else {

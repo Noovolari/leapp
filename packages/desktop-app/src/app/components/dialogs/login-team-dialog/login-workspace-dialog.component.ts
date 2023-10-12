@@ -3,7 +3,7 @@ import { AppService } from "../../../services/app.service";
 import { OptionsService } from "../../../services/options.service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
-import { TeamService, ApiErrorCodes, FormErrorCodes } from "../../../services/team-service";
+import { ApiErrorCodes, FormErrorCodes, TeamService } from "../../../services/team-service";
 
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { globalLeappProPlanStatus, LeappPlanStatus } from "../options-dialog/options-dialog.component";
@@ -43,26 +43,19 @@ export class LoginWorkspaceDialogComponent implements OnInit {
       this.submitting = true;
       const formValue = this.signinForm.value;
       try {
-        console.log("step 1");
         const signedInUser = await this.teamService.signedInUserState.getValue();
-        console.log("step 2");
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
-        console.log("step 3");
         await this.teamService.writeTouchIdCredentials(formValue.password, this.optionsService.requirePassword);
-        console.log("step 4");
         this.appService.closeAllMenuTriggers();
-        console.log("step 5");
-        await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.proEnabled);
-        console.log("step 6");
-        globalLeappProPlanStatus.next(LeappPlanStatus.proEnabled);
-        console.log("step 7");
+
+        const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
+        const planStatus = teamOrPro.type === "team" ? LeappPlanStatus.enterprise : LeappPlanStatus.proEnabled;
+        await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", planStatus);
+        globalLeappProPlanStatus.next(planStatus);
         this.closeModal();
-        console.log("step 8");
         if (doesWorkspaceExist) {
-          console.log("step 9");
           await this.teamService.pullFromRemote();
-          console.log("step 10");
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }

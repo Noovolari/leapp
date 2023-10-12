@@ -209,9 +209,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
     if (!this.canLockWorkspace || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
     this.appService.closeAllMenuTriggers();
-    if (this.appProviderService.teamService.signedInUserState.getValue().role === "pro") {
-      await this.router.navigate(["/lock"]);
-    }
+    await this.router.navigate(["/lock"]);
   }
 
   async switchToWorkspace(workspace: WorkspaceState) {
@@ -220,7 +218,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
       await this.appProviderService.teamService.switchToLocalWorkspace();
       this.resetFilters();
     } else if (workspace.locked) {
-      await this.loginToRemoteWorkspace();
+      await this.router.navigate(["/lock"]);
     } else {
       if (!this.isLocalWorkspaceSelected) return;
       await this.appProviderService.sessionManagementService.stopAllSessions();

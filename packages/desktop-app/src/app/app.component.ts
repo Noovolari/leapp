@@ -188,8 +188,8 @@ export class AppComponent implements OnInit {
 
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit.
-    // If there is a pro user registered go to login page instead
-    if (this.teamService.signedInUserState.getValue()?.role === "pro") {
+    // If there is a pro or team user registered go to login page instead
+    if (this.teamService.signedInUserState.getValue()) {
       await this.router.navigate(["/lock"]);
     } else {
       await this.router.navigate(["/dashboard"]);

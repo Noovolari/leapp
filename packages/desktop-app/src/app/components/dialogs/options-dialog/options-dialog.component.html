@@ -450,7 +450,7 @@
               <div class="cta-button clickable" (click)="openLeappProPreCheckoutDialog()" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">UPGRADE TO PRO</div>
               <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proEnabled">CURRENT PLAN</div>
               <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">UPGRADED</div>
-              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.enterprise">UPGRADED</div>
+              <div class="cta-button clickable" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.enterprise">DOWNGRADE</div>
 
               <ul class="plan-features">
                 <li>
@@ -478,7 +478,7 @@
               <div class="price-container">
                 <span class="price-value">Custom pricing</span>
               </div>
-              <div class="cta-button clickable" (click)="contactSales();">CONTACT SALES</div>
+              <div class="cta-button {{leappPlanStatus === eEnabledLeappPlanStatus.enterprise ? '': 'clickable'}}" (click)="contactSales();">{{leappPlanStatus === eEnabledLeappPlanStatus.enterprise ? 'UPGRADED' : 'CONTACT SALES'}}</div>
               <ul class="plan-features">
                 <li>
                   <span class="check-mark-icon"><app-check-icon-svg [color]="'#292929'"></app-check-icon-svg></span>

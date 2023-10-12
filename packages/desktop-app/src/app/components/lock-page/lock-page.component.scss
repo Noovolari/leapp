@@ -84,6 +84,19 @@
       flex-direction: row;
       align-items: center;
       gap: 15px;
+      position: relative;
+
+      .team-name {
+        position: absolute;
+        top: -22px;
+        left: 0;
+
+        color: #000;
+        font-size: 21px;
+        font-style: normal;
+        font-weight: 600;
+        line-height: 24px; /* 150% */
+      }
 
       .letter-avatar {
         background: #ffffff;

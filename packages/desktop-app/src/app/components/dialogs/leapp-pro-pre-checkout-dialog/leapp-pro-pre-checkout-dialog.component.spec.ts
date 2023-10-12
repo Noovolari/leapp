@@ -176,7 +176,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "");
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
     expect(spyOnLoadUrl).toHaveBeenCalledWith("fakeUrl");
     setTimeout(() => {
@@ -221,7 +221,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "");
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
     expect(spyOnLoadUrl).toHaveBeenCalledWith("fakeUrl");
 
@@ -255,7 +255,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "");
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
     expect((component as any).toasterService.toast).toHaveBeenCalledWith("Email already taken", ToastLevel.error);
   });
 
@@ -278,7 +278,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "");
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
     expect((component as any).toasterService.toast).toHaveBeenCalledWith("Something went wrong during pre-checkout", ToastLevel.error);
   });
 
@@ -289,12 +289,11 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     (component as any).isEmailValid = true;
     (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
-    (component as any).fiscalCodeFormControl.setValue("RRRLSN86A10F205B");
 
     await (component as any).ngOnInit();
     await (component as any).upgradeToLeappPro();
 
-    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price, "RRRLSN86A10F205B");
+    expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
 
     setTimeout(() => {

@@ -453,6 +453,7 @@ export class CliProviderService {
         (crypto as any).webcrypto,
         this.workspaceService,
         this.integrationFactory,
+        this.logService,
         this.behaviouralSubjectService
       );
     }

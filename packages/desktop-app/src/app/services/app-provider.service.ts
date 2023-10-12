@@ -490,6 +490,7 @@ export class AppProviderService {
         window.crypto,
         this.workspaceService,
         this.integrationFactory,
+        this.logService,
         this.behaviouralSubjectService
       );
     }

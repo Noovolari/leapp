@@ -55,7 +55,7 @@ export class LockPageComponent implements OnInit {
       this.name = user.firstName + " " + user.lastName;
       this.initials = user.firstName[0].toUpperCase() + user.lastName[0].toUpperCase();
       this.email.setValue(user.email);
-      this.teamName = user?.teamName;
+      this.teamName = user?.teamName !== user.email ? user?.teamName : "";
       if (this.previousRoute !== "/dashboard" && this.appService.isTouchIdAvailable() && this.optionService.touchIdEnabled) {
         this.touchId();
       }

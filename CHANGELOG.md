@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.21.0](https://github.com/Noovolari/leapp/compare/v0.20.2...v0.21.0) (2023-10-18)
+
+### Features
+* added support to dynamic "Assumer Session" field in AWS IAM Role Chained Sessions created in Leapp Team
+
+### Bug fixes
+* Leapp Team UX/UI adjustments
+
 ### [0.20.2](https://github.com/Noovolari/leapp/compare/v0.20.1...v0.20.2) (2023-10-05)
 
 ### Bug fixes

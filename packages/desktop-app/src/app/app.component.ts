@@ -159,13 +159,23 @@ export class AppComponent implements OnInit {
       );
     }
 
+    let teamMemberEmail;
+    let teamMemberFirstName;
+    let teamMemberLastName;
+    let teamMemberTeamName;
+
     // Deep link with app closed
     if (this.fileService.existsSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile))) {
       try {
-        if (!constants.disablePluginSystem) {
-          const deepLink = this.fileService.readFileSync(
-            this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile)
-          );
+        const deepLink = this.fileService.readFileSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile));
+        if (this.isOpenLeappDeepLink(deepLink)) {
+          const afterQuestionMark = deepLink.split("?")[1];
+          const splitByAmpersand = afterQuestionMark.split("&");
+          teamMemberEmail = splitByAmpersand[0].split("=")[1];
+          teamMemberFirstName = splitByAmpersand[1].split("=")[1];
+          teamMemberLastName = splitByAmpersand[2].split("=")[1];
+          teamMemberTeamName = splitByAmpersand[3].split("=")[1];
+        } else if (!constants.disablePluginSystem) {
           await this.pluginManagerService.installPlugin(deepLink);
           await this.pluginManagerService.loadFromPluginDir();
         }
@@ -189,8 +199,19 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit.
     // If there is a pro user registered go to login page instead
-    if (this.teamService.signedInUserState.getValue()?.role === "pro") {
-      await this.router.navigate(["/lock"]);
+    if (this.teamService.signedInUserState.getValue()?.role === "pro" || teamMemberEmail !== undefined) {
+      if (this.teamService.signedInUserState.getValue()?.role === "pro") {
+        await this.router.navigate(["/lock"]);
+      } else if (
+        teamMemberEmail !== undefined &&
+        teamMemberFirstName !== undefined &&
+        teamMemberLastName !== undefined &&
+        teamMemberTeamName !== undefined
+      ) {
+        await this.router.navigate([
+          `/lock?teamMemberEmail=${teamMemberEmail}&teamMemberFirstName=${teamMemberFirstName}&teamMemberLastName=${teamMemberLastName}&teamMemberTeamName=${teamMemberTeamName}`,
+        ]);
+      }
     } else {
       await this.router.navigate(["/dashboard"]);
     }
@@ -291,11 +312,23 @@ export class AppComponent implements OnInit {
       }
     });
 
-    if (!constants.disablePluginSystem) {
-      ipc.on("PLUGIN_URL", (_, url) => {
+    ipc.on("PLUGIN_URL", (_, url) => {
+      if (this.isOpenLeappDeepLink(url)) {
+        const afterQuestionMark = url.split("?")[1];
+        const splitByAmpersand = afterQuestionMark.split("&");
+        const teamMemberEmail = splitByAmpersand[0].split("=")[1];
+        const teamMemberFirstName = splitByAmpersand[1].split("=")[1];
+        const teamMemberLastName = splitByAmpersand[2].split("=")[1];
+        const teamMemberTeamName = splitByAmpersand[3].split("=")[1];
+        if (teamMemberEmail !== undefined) {
+          this.router.navigate([
+            `/lock?teamMemberEmail=${teamMemberEmail}&teamMemberFirstName=${teamMemberFirstName}&teamMemberLastName=${teamMemberLastName}&teamMemberTeamName=${teamMemberTeamName}`,
+          ]);
+        }
+      } else if (!constants.disablePluginSystem) {
         this.pluginManagerService.installPlugin(url);
-      });
-    }
+      }
+    });
   }
 
   private setInitialColorSchema() {
@@ -326,5 +359,9 @@ export class AppComponent implements OnInit {
         }
       }
     });
+  }
+
+  private isOpenLeappDeepLink(deepLinkUrl: string): boolean {
+    return deepLinkUrl.indexOf("01255ef8-open-leapp?email=") > -1;
   }
 }

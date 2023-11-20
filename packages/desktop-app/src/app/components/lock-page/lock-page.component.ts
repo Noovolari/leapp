@@ -4,7 +4,7 @@ import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/service
 import { ApiErrorCodes, FormErrorCodes, TeamService } from "../../services/team-service";
 import { AppService } from "../../services/app.service";
 import { AppProviderService } from "../../services/app-provider.service";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { globalLeappProPlanStatus, LeappPlanStatus } from "../dialogs/options-dialog/options-dialog.component";
 
 @Component({
@@ -24,7 +24,12 @@ export class LockPageComponent implements OnInit {
   private loggingService: LogService;
   private teamService: TeamService;
 
-  constructor(private router: Router, public appService: AppService, public appProviderService: AppProviderService) {}
+  constructor(
+    private router: Router,
+    public appService: AppService,
+    public appProviderService: AppProviderService,
+    public routeCalled: ActivatedRoute
+  ) {}
 
   ngOnInit(): void {
     this.email = new FormControl("", [Validators.required, Validators.email]);
@@ -38,6 +43,17 @@ export class LockPageComponent implements OnInit {
       this.name = user.firstName + " " + user.lastName;
       this.initials = user.firstName[0].toUpperCase() + user.lastName[0].toUpperCase();
       this.email.setValue(user.email);
+    }
+
+    const teamMemberEmail = this.routeCalled.snapshot.queryParamMap.get("teamMemberEmail");
+    const teamMemberFirstName = this.routeCalled.snapshot.queryParamMap.get("teamMemberFirstName");
+    const teamMemberLastName = this.routeCalled.snapshot.queryParamMap.get("teamMemberLastName");
+    const teamMemberTeamName = this.routeCalled.snapshot.queryParamMap.get("teamMemberTeamName");
+
+    if (teamMemberEmail !== undefined && teamMemberFirstName !== undefined && teamMemberLastName !== undefined && teamMemberTeamName !== undefined) {
+      this.name = `${teamMemberFirstName} ${teamMemberLastName}`;
+      this.initials = `${teamMemberFirstName[0].toUpperCase()}${teamMemberLastName[0].toUpperCase()}`;
+      this.email.setValue(teamMemberEmail);
     }
   }
 

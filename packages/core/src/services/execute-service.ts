@@ -27,17 +27,18 @@ export class ExecuteService {
       command = command.substring(5, command.length);
     }
     // NOTE: Electron works in sandbox mode when built.
-    // Unfortunately this comes with some problems with executing OS commands.
-    // This code just uses absolute path for the commands Leapp uses to interact with both AWS and AZ command line tools.
+    // A side effect is that we cannot read the PATH variable to find binary locations.
+    // As a workaround, we search a preset list of directories.
     // If this part is modified for some reason,
     // PLEASE TEST BUILD APPLICATION BEFORE RELEASING
     if (this.nativeService.process.platform === "darwin") {
-      if (command.indexOf("osascript") !== -1) {
-        command = "/usr/bin/" + command;
-      } else if (command.indexOf("cd") !== -1) {
-        command = "" + command;
-      } else {
-        command = "/usr/local/bin/" + command;
+      const [bin] = command.split(" ");
+      const directories = ["/usr/bin/", "/usr/local/bin/", "/opt/homebrew/bin/"];
+      for (const dir of directories) {
+        if (this.nativeService.fs.existsSync(dir + bin)) {
+          command = dir + command;
+          break;
+        }
       }
     }
     // ========================================================

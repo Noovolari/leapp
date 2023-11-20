@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.21.0](https://github.com/Noovolari/leapp/compare/v0.20.2...v0.21.0) (2023-10-18)
+
+### Features
+* added support to dynamic "Assumer Session" field in AWS IAM Role Chained Sessions created in Leapp Team
+
+### Bug fixes
+* Leapp Team UX/UI adjustments
+
+### [0.20.2](https://github.com/Noovolari/leapp/compare/v0.20.1...v0.20.2) (2023-10-05)
+
+### Bug fixes
+* fixed change the authentication URL regexp for Auth0 ([issue #475](https://github.com/Noovolari/leapp/issues/475)). Thanks to [@maintux](https://github.com/maintux)!
+* fixed search common locations for binary ([issue #476](https://github.com/Noovolari/leapp/issues/476)). Thanks to [@icholi](https://github.com/icholy)!
+
+### [0.20.1](https://github.com/Noovolari/leapp/compare/v0.20.0...v0.20.1) (2023-09-21)
+
+### Features
+* added support to AWS SSO authorization code with confirmation modal window
+
+### [0.20.0](https://github.com/Noovolari/leapp/compare/v0.19.0...v0.20.0) (2023-09-14)
+
+### Features
+* added support to LocalStack! You can use Leapp to create a LocalStack session that can then be used to set your local credential file and access your LocalStack resources.
+* added support to Touch ID; now, you can use your fingerprint to unlock Leapp Pro if you're using a Touch ID compatible macOS system.
+
+### Bug fixes
+* fixed AWS credentials file permission so that its owner only has full read and write access to the file
+* fixed Leapp CLI bug that made it unstable
+
 ### [0.19.0](https://github.com/Noovolari/leapp/compare/v0.18.6...v0.19.0) (2023-09-04)
 
 ### Features

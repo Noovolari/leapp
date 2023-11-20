@@ -6,6 +6,7 @@ import { BsModalService } from "ngx-bootstrap/modal";
 import { IOpenExternalUrlService } from "@noovolari/leapp-core/interfaces/i-open-external-url-service";
 import { AppProviderService } from "./app-provider.service";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
+import { AuthorizationDialogComponent } from "../components/dialogs/authorization-dialog/authorization-dialog.component";
 
 @Injectable({
   providedIn: "root",
@@ -86,6 +87,23 @@ export class WindowService implements IOpenExternalUrlService {
       animated: false,
       class: "confirm-modal",
       initialState: { message, callback, confirmText, cancelText },
+    });
+  }
+
+  /**
+   * Authorization requested dialog popup
+   */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  authorizationDialog(authorizationCode: string) {
+    for (let i = 1; i <= this.modalService.getModalsCount(); i++) {
+      this.modalService.hide(i);
+    }
+
+    this.getCurrentWindow().show();
+    return this.modalService.show(AuthorizationDialogComponent, {
+      animated: false,
+      class: "confirm-modal",
+      initialState: { authorizationCode },
     });
   }
 

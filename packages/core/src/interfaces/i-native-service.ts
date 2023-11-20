@@ -27,4 +27,5 @@ export interface INativeService {
   fixPath: any;
   tar: any;
   fetch: any;
+  systemPreferences: any;
 }

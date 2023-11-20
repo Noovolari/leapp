@@ -1,0 +1,28 @@
+@import "../../../../assets/scss/mixins/palette";
+@import "../../../../assets/scss/modals";
+
+::ng-deep {
+  .confirm-modal {
+    max-width: 520px!important;
+    width: 100%;
+    padding: $modal-padding;
+  }
+}
+
+.content {
+  .message {
+    max-height: 318px;
+    overflow-y: auto;
+    padding-top: 20px;
+    font-size: 15px;
+    color: $medium-dark;
+    text-align: center;
+  }
+  .authorization-code {
+    overflow-y: auto;
+    padding-top: 20px;
+    font-size: 30px;
+    color: $black;
+    text-align: center;
+  }
+}

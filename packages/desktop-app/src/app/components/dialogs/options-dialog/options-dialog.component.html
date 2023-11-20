@@ -9,6 +9,36 @@
       </ng-template>
 
       <div class="panel">
+
+        <ng-container *ngIf="appService.detectOs() === eOperatingSystem.mac">
+          <h2>Security</h2>
+
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label>Unlock with Touch ID</label>
+                <mat-checkbox class="touch-id-enable-checkbox" formControlName="touchIdEnableSelect" [(ngModel)]="selectedTouchIdEnabled"></mat-checkbox>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label>Require password</label>
+                <ng-select formControlName="requirePasswordSelect" bindLabel="key" bindValue="value" [clearable]="false"
+                           [items]="[
+                             eConstants.requirePasswordEveryWeek,
+                             eConstants.requirePasswordEveryTwoWeeks,
+                             eConstants.requirePasswordEveryMonth,
+                             eConstants.requirePasswordNever
+                           ]"
+                           [(ngModel)]="selectedRequirePassword" [appendTo]="'body'"></ng-select>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
         <h2>Default Regions</h2>
 
         <div class="form-container">
@@ -420,7 +450,7 @@
               <div class="cta-button clickable" (click)="openLeappProPreCheckoutDialog()" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.free">UPGRADE TO PRO</div>
               <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proEnabled">CURRENT PLAN</div>
               <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.proPending">UPGRADED</div>
-              <div class="cta-button" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.enterprise">UPGRADED</div>
+              <div class="cta-button clickable" *ngIf="leappPlanStatus === eEnabledLeappPlanStatus.enterprise">DOWNGRADE</div>
 
               <ul class="plan-features">
                 <li>
@@ -448,7 +478,7 @@
               <div class="price-container">
                 <span class="price-value">Custom pricing</span>
               </div>
-              <div class="cta-button clickable" (click)="contactSales();">CONTACT SALES</div>
+              <div class="cta-button {{leappPlanStatus === eEnabledLeappPlanStatus.enterprise ? '': 'clickable'}}" (click)="contactSales();">{{leappPlanStatus === eEnabledLeappPlanStatus.enterprise ? 'UPGRADED' : 'CONTACT SALES'}}</div>
               <ul class="plan-features">
                 <li>
                   <span class="check-mark-icon"><app-check-icon-svg [color]="'#292929'"></app-check-icon-svg></span>

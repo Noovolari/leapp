@@ -1,0 +1,11 @@
+<a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
+<h4>Authorization requested</h4>
+
+<div class="content">
+  <br>
+  <div class="message">AWS user code for this SSO request is</div>
+  <div class="authorization-code">{{authorizationCode}}</div>
+  <br>
+  <br>
+  <button (click)="close();" class="btn-control btn-right-margin">Ok</button>
+</div>

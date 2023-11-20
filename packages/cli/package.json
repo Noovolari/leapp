@@ -1,7 +1,7 @@
 {
   "name": "@noovolari/leapp-cli",
   "description": "Leapp's Command Line Interface\n\nIt relies on Leapp Core, which encapsulates the domain logic.\n\nFor more information about the project visit the [site](www.leapp.cloud).",
-  "version": "0.1.43",
+  "version": "0.1.46",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
@@ -146,7 +146,8 @@
     "release-homebrew": "gushio gushio/target-brew-release.js",
     "release-npm": "gushio gushio/target-npm-release.js",
     "run-plugin": "./bin/run session run-aws-credential-plugin",
-    "nightly": "gushio gushio/target-nightly.js"
+    "nightly": "gushio gushio/target-nightly.js",
+    "debug-session-list": "./bin/run session list"
   },
   "types": "dist/index.d.ts"
 }

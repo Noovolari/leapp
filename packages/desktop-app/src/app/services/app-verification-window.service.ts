@@ -19,6 +19,11 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
     windowModality: string,
     onWindowClose: () => void
   ): Promise<VerificationResponse> {
+    if (startDeviceAuthorizationResponse.verificationUriComplete.indexOf("?user_code=") > -1) {
+      const code = startDeviceAuthorizationResponse.verificationUriComplete.split("?user_code=")[1];
+      this.windowService.authorizationDialog(code);
+    }
+
     const openWindowInApp = constants.inApp.toString();
 
     if (startDeviceAuthorizationResponse.verificationUriComplete.indexOf("?user_code=") > -1) {

@@ -9,10 +9,10 @@ export class KeychainService implements IKeychainService {
    *
    * @param service - environment.appName
    * @param account - unique identifier
-   * @param password - secret
+   * @param password - secret - not null
    */
   async saveSecret(service: string, account: string, password: string): Promise<void> {
-    return await this.nativeService.keytar.setPassword(service, account, password);
+    return await this.nativeService.keytar.setPassword(service, account, password ?? "<EMPTY>");
   }
 
   /**

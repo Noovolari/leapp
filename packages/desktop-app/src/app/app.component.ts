@@ -208,9 +208,7 @@ export class AppComponent implements OnInit {
         teamMemberLastName !== undefined &&
         teamMemberTeamName !== undefined
       ) {
-        await this.router.navigate([
-          `/lock?teamMemberEmail=${teamMemberEmail}&teamMemberFirstName=${teamMemberFirstName}&teamMemberLastName=${teamMemberLastName}&teamMemberTeamName=${teamMemberTeamName}`,
-        ]);
+        await this.router.navigate(["/lock"], { queryParams: { teamMemberEmail, teamMemberFirstName, teamMemberLastName, teamMemberTeamName } });
       }
     } else {
       await this.router.navigate(["/dashboard"]);
@@ -266,7 +264,7 @@ export class AppComponent implements OnInit {
 
     if (check) {
       this.fileService.renameSync(oldAwsCredentialsPath, newAwsCredentialsPath);
-      this.fileService.writeFileSync(oldAwsCredentialsPath, "");
+      this.fileService.writeFileSyncWithOptions(oldAwsCredentialsPath, "", { mode: "600" });
       this.appService.getDialog().showMessageBox({
         type: "info",
         icon: __dirname + "/assets/images/Leapp.png",
@@ -274,7 +272,7 @@ export class AppComponent implements OnInit {
         message: "You had a previous credential file. We made a backup of the old one in the same directory before starting.",
       });
     } else if (!this.fileService.existsSync(this.awsCoreService.awsCredentialPath())) {
-      this.fileService.writeFileSync(this.awsCoreService.awsCredentialPath(), "");
+      this.fileService.writeFileSyncWithOptions(this.awsCoreService.awsCredentialPath(), "", { mode: "600" });
     }
   }
 
@@ -320,10 +318,8 @@ export class AppComponent implements OnInit {
         const teamMemberFirstName = splitByAmpersand[1].split("=")[1];
         const teamMemberLastName = splitByAmpersand[2].split("=")[1];
         const teamMemberTeamName = splitByAmpersand[3].split("=")[1];
-        if (teamMemberEmail !== undefined) {
-          this.router.navigate([
-            `/lock?teamMemberEmail=${teamMemberEmail}&teamMemberFirstName=${teamMemberFirstName}&teamMemberLastName=${teamMemberLastName}&teamMemberTeamName=${teamMemberTeamName}`,
-          ]);
+        if (teamMemberEmail) {
+          this.router.navigate(["/lock"], { queryParams: { teamMemberEmail, teamMemberFirstName, teamMemberLastName, teamMemberTeamName } });
         }
       } else if (!constants.disablePluginSystem) {
         this.pluginManagerService.installPlugin(url);

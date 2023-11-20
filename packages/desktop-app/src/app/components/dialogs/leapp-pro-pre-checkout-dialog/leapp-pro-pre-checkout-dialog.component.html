@@ -7,22 +7,29 @@
     <div>
       <div>
       <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
-            (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>20% off</small></span>
+            (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>17% off</small></span>
         <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}"
               (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
       </div>
     </div>
     <br>
-    <small><strong>Billed to</strong></small>
-    <br>
     <form [formGroup]="form" class="form center-vertical text-left">
+      <small><strong>Billed to</strong></small>
+      <br>
       <div class="form-field">
         <!-- <label>Email address*</label> -->
         <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
                (keyup)="checkAndConfirm();">
-        <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email
-          address</small>
+        <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email address</small>
       </div>
+<!--      <small><strong>Fiscal Code (only for italian customers)</strong></small>-->
+<!--      <br>-->
+<!--      <div class="form-field">-->
+<!--        &lt;!&ndash; <label>Email address*</label> &ndash;&gt;-->
+<!--        <input spellcheck="false" formControlName="fiscalCode" type="text" class="form-control" placeholder="fiscal code, only for italian customers"-->
+<!--               (keyup)="checkAndConfirm();">-->
+<!--        <small class="text-error" *ngIf="(fiscalCodeFormControl.dirty || fiscalCodeFormControl.touched) && fiscalCodeFormControl.errors">Insert a valid fiscal code</small>-->
+<!--      </div>-->
     </form>
     <br>
     <br>

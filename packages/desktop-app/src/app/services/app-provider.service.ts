@@ -48,6 +48,7 @@ import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/work
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
 import { NotificationService } from "@noovolari/leapp-core/services/notification-service";
 import { TeamService } from "./team-service";
+import { LocalstackSessionService } from "@noovolari/leapp-core/services/session/localstack/localstack-session-service";
 
 @Injectable({
   providedIn: "root",
@@ -69,6 +70,7 @@ export class AppProviderService {
   private awsCoreServiceInstance: AwsCoreService;
   private azureServiceInstance: AzureSessionService;
   private azureIntegrationServiceInstance: AzureIntegrationService;
+  private localstackServiceInstance: LocalstackSessionService;
   private authenticationServiceInstance: AwsSamlAssertionExtractionService;
   private sessionFactoryInstance: SessionFactory;
   private awsParentSessionFactoryInstance: AwsParentSessionFactory;
@@ -301,6 +303,19 @@ export class AppProviderService {
     return this.azurePersistenceServiceInstance;
   }
 
+  public get localstackSessionService(): LocalstackSessionService {
+    if (!this.localstackServiceInstance) {
+      this.localstackServiceInstance = new LocalstackSessionService(
+        this.behaviouralSubjectService,
+        this.repository,
+        this.awsCoreService,
+        this.fileService
+      );
+    }
+
+    return this.localstackServiceInstance;
+  }
+
   public get authenticationService(): AwsSamlAssertionExtractionService {
     if (!this.authenticationServiceInstance) {
       this.authenticationServiceInstance = new AwsSamlAssertionExtractionService();
@@ -315,7 +330,8 @@ export class AppProviderService {
         this.awsIamRoleFederatedService,
         this.awsIamRoleChainedService,
         this.awsSsoRoleService,
-        this.azureSessionService
+        this.azureSessionService,
+        this.localstackSessionService
       );
     }
     return this.sessionFactoryInstance;
@@ -474,6 +490,7 @@ export class AppProviderService {
         window.crypto,
         this.workspaceService,
         this.integrationFactory,
+        this.logService,
         this.behaviouralSubjectService
       );
     }

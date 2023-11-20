@@ -6,6 +6,10 @@ import { AppService } from "../../services/app.service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { ActivatedRoute, Router } from "@angular/router";
 import { globalLeappProPlanStatus, LeappPlanStatus } from "../dialogs/options-dialog/options-dialog.component";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
+import { AppNativeService } from "../../services/app-native.service";
+import { OptionsService } from "../../services/options.service";
 
 @Component({
   selector: "app-lock-page",
@@ -18,20 +22,29 @@ export class LockPageComponent implements OnInit {
   signinForm: FormGroup;
   hidePassword?: boolean;
   submitting?: boolean;
+  previousRoute: string;
   initials = "";
   name = "";
+  teamName = "";
+  showTouchId: boolean;
 
   private loggingService: LogService;
   private teamService: TeamService;
 
   constructor(
+    private appProviderService: AppProviderService,
     private router: Router,
-    public appService: AppService,
-    public appProviderService: AppProviderService,
-    public routeCalled: ActivatedRoute
-  ) {}
+    private appService: AppService,
+    private optionService: OptionsService,
+    private messageToasterService: MessageToasterService,
+    private appNativeService: AppNativeService,
+    private routeCalled: ActivatedRoute
+  ) {
+    this.previousRoute = this.router.getCurrentNavigation().previousNavigation.finalUrl.toString();
+  }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
+    this.showTouchId = this.appService.isTouchIdAvailable() && this.optionService.touchIdEnabled;
     this.email = new FormControl("", [Validators.required, Validators.email]);
     this.password = new FormControl("", [Validators.required]);
     this.signinForm = new FormGroup({ email: this.email, password: this.password });
@@ -43,6 +56,10 @@ export class LockPageComponent implements OnInit {
       this.name = user.firstName + " " + user.lastName;
       this.initials = user.firstName[0].toUpperCase() + user.lastName[0].toUpperCase();
       this.email.setValue(user.email);
+      this.teamName = user?.teamName !== user.email ? user?.teamName : "";
+      if (this.previousRoute !== "/dashboard" && this.appService.isTouchIdAvailable() && this.optionService.touchIdEnabled) {
+        this.touchId();
+      }
     }
 
     const teamMemberEmail = this.routeCalled.snapshot.queryParamMap.get("teamMemberEmail");
@@ -50,7 +67,7 @@ export class LockPageComponent implements OnInit {
     const teamMemberLastName = this.routeCalled.snapshot.queryParamMap.get("teamMemberLastName");
     const teamMemberTeamName = this.routeCalled.snapshot.queryParamMap.get("teamMemberTeamName");
 
-    if (teamMemberEmail !== undefined && teamMemberFirstName !== undefined && teamMemberLastName !== undefined && teamMemberTeamName !== undefined) {
+    if (teamMemberEmail !== null && teamMemberFirstName !== null && teamMemberLastName !== null && teamMemberTeamName !== null) {
       this.name = `${teamMemberFirstName} ${teamMemberLastName}`;
       this.initials = `${teamMemberFirstName[0].toUpperCase()}${teamMemberLastName[0].toUpperCase()}`;
       this.email.setValue(teamMemberEmail);
@@ -68,11 +85,18 @@ export class LockPageComponent implements OnInit {
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
         this.appService.closeAllMenuTriggers();
+
+        const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
+        const planStatus = teamOrPro.type === "team" ? LeappPlanStatus.enterprise : LeappPlanStatus.proEnabled;
+        await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", planStatus);
+        globalLeappProPlanStatus.next(planStatus);
+
         if (doesWorkspaceExist) {
           await this.teamService.pullFromRemote();
         } else {
           this.loggingService.log(new LoggedEntry(`Welcome ${formValue.email}!`, this, LogLevel.success, true));
         }
+        await this.teamService.writeTouchIdCredentials(formValue.password, this.optionService.requirePassword);
         await this.router.navigate(["/dashboard"]);
       } catch (responseException: any) {
         if (responseException?.response.data?.errorCode === ApiErrorCodes.invalidCredentials) {
@@ -111,5 +135,49 @@ export class LockPageComponent implements OnInit {
     globalLeappProPlanStatus.next(LeappPlanStatus.free);
     await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
     await this.router.navigate(["/dashboard"]);
+  }
+
+  async launchTouchId(): Promise<void> {
+    await this.touchId();
+  }
+
+  private async touchId(): Promise<void> {
+    const isTouchIdExpired = await this.isTouchIdExpired();
+    if (
+      this.appService.isTouchIdAvailable() &&
+      (await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName)) &&
+      !isTouchIdExpired
+    ) {
+      try {
+        await this.appService.usePromptId();
+        const oldKey = this.appProviderService.fileService.aesKey;
+        this.appProviderService.fileService.aesKey = this.appNativeService.machineId;
+        const touchIdKeychainItem = JSON.parse(
+          await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName)
+        );
+        const decodedSecret = this.appProviderService.fileService.decryptText(touchIdKeychainItem.encodedSecret);
+        this.appProviderService.fileService.aesKey = oldKey;
+        this.password.setValue(decodedSecret, { emitEvent: true });
+        await this.signIn();
+      } catch (err) {
+        this.messageToasterService.toast(`${err.toString().replace("Error: ", "")}`, ToastLevel.warn, "Touch ID authentication");
+      }
+    } else {
+      this.messageToasterService.toast("Touch ID not set or expired. Password is required", ToastLevel.warn, "Touch ID key error");
+    }
+  }
+
+  private async isTouchIdExpired(): Promise<boolean> {
+    const touchIdKechainItem = await this.appProviderService.keychainService.getSecret(constants.appName, constants.touchIdKeychainItemName);
+    if (touchIdKechainItem) {
+      if (JSON.parse(touchIdKechainItem).nextExpiration > new Date().getTime()) {
+        return false;
+      } else {
+        await this.appProviderService.keychainService.deleteSecret(constants.appName, constants.touchIdKeychainItemName);
+        return true;
+      }
+    } else {
+      return true;
+    }
   }
 }

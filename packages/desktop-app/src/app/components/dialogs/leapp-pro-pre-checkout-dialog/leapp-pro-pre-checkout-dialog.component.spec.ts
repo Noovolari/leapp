@@ -169,6 +169,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     expect(spyOnRequest).not.toHaveBeenCalled();
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
     fakeBackendCallData.details = { url: "https://www.leapp.cloud/success", requestHeaders: "fake-details" };
 
@@ -213,6 +214,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     const spyOnCallback = spyOn(fakeBackendCallData, "callback").and.callThrough();
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
     fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
 
@@ -246,6 +248,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.throwError(error);
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
     fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
 
@@ -268,6 +271,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.throwError(error);
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
     fakeBackendCallData.details = { url: "https://www.leapp.cloud/cancel", requestHeaders: "fake-details" };
 
@@ -283,6 +287,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.callThrough();
 
     (component as any).isEmailValid = true;
+    (component as any).isCFValid = true;
     (component as any).emailFormControl.setValue("alex@fake.it");
 
     await (component as any).ngOnInit();

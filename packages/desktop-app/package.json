@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.19.0",
+  "version": "0.21.0",
   "private": true,
   "author": {
     "name": "Noovolari",
@@ -252,7 +252,7 @@
     "@types/node-ipc": "9.2.0",
     "@types/uuid": "^8.3.0",
     "dotenv": "^10.0.0",
-    "electron": "22.0.0",
+    "electron": "22.3.24",
     "electron-builder": "23.6.0",
     "electron-builder-squirrel-windows": "23.6.0",
     "electron-packager": "^17.1.1",

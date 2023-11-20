@@ -13,9 +13,11 @@ import { LoginWorkspaceDialogComponent } from "../dialogs/login-team-dialog/logi
   styleUrls: ["./sync-pro-widget.component.scss"],
 })
 export class SyncProWidgetComponent implements OnInit, OnDestroy {
-  isLoggedAsPro = false;
+  isLoggedAsProOrTeam = false;
+  isTeam = false;
   isFailed = false;
   isProgress = false;
+  alreadyUpgraded = false;
   buttonText = "UPGRADE TO PRO";
 
   private subscription: Subscription;
@@ -24,20 +26,27 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
   constructor(private appProviderService: AppProviderService, private bsModalService: BsModalService, private router: Router) {}
 
   ngOnInit(): void {
-    this.isLoggedAsPro = false;
+    this.isLoggedAsProOrTeam = false;
+    this.isTeam = false;
+    this.alreadyUpgraded = false;
     this.subscription = this.appProviderService.teamService.workspacesState.subscribe(async (workspacesState: WorkspaceState[]) => {
-      const workspaceState = workspacesState.find((wState) => wState.type === "pro");
-      this.isLoggedAsPro = !!workspaceState;
+      console.log(workspacesState);
+      this.alreadyUpgraded = workspacesState.length > 1;
+
+      const workspaceState = workspacesState.find((wState) => (wState.type === "pro" || wState.type === "team") && wState.selected);
+      this.isLoggedAsProOrTeam = !!workspaceState;
+      this.isTeam = !!workspaceState && workspaceState.type === "team";
       this.isProgress = workspaceState?.syncState === "in-progress";
       this.isFailed = workspaceState?.syncState === "failed";
-      this.subscription2 = globalLeappProPlanStatus.subscribe(async (_) => {
-        const currentState = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan");
-        if (currentState === LeappPlanStatus.proEnabled || currentState === LeappPlanStatus.proPending) {
-          this.buttonText = "SIGN IN";
-        } else {
-          this.buttonText = "UPGRADE TO PRO";
-        }
-      });
+    });
+
+    this.subscription2 = globalLeappProPlanStatus.subscribe(async (_) => {
+      const currentState = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan");
+      if (currentState === LeappPlanStatus.proEnabled || currentState === LeappPlanStatus.proPending) {
+        this.buttonText = "SIGN IN";
+      } else {
+        this.buttonText = "UPGRADE TO PRO";
+      }
     });
   }
 

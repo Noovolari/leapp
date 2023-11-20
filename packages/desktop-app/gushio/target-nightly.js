@@ -1,3 +1,4 @@
+const getNightlyVersion = require("../../../gushio/get-nightly-version");
 module.exports = {
   cli: {
     name: 'nightly',
@@ -24,8 +25,11 @@ module.exports = {
       desktopAppPackage = await readPackageJsonFunction(path, "desktop-app");
       originalPackage = JSON.parse(JSON.stringify(desktopAppPackage));
 
-      const nightlyVersion = desktopAppPackage["version"] + `-nightly.${getNightlyVersion(false)}`;
-      await fs.writeFile(path.join(__dirname, '..', 'nightly-version'), nightlyVersion)
+      let nightlyVersion = desktopAppPackage["version"];
+      if (desktopAppPackage["version"].indexOf("-nightly.") === -1) {
+          nightlyVersion += `-nightly.${getNightlyVersion(false)}`;
+      }
+      await fs.writeFile(path.join(__dirname, '..', 'nightly-version'), nightlyVersion);
       desktopAppPackage["version"] = nightlyVersion;
 
       await writePackageJsonFunction(path, "desktop-app", desktopAppPackage);

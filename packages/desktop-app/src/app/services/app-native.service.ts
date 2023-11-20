@@ -44,6 +44,7 @@ export class AppNativeService implements INativeService {
   tar: any;
   fetch: any;
   ws: any;
+  systemPreferences: any;
 
   constructor() {
     if (this.isElectron) {
@@ -85,6 +86,7 @@ export class AppNativeService implements INativeService {
       this.tar = window.require("tar");
       this.fetch = window.fetch.bind(window);
       this.ws = window.require("ws");
+      this.systemPreferences = window.require("@electron/remote").systemPreferences;
     }
   }
 

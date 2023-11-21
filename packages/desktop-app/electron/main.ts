@@ -170,7 +170,7 @@ const generateMainWindow = () => {
       electronLocalshortcut.unregisterAll(win);
     });
 
-    // On macOS th edeep link is correctly retrieved from the event, and because
+    // On macOS the deep link is correctly retrieved from the event, and because
     // we are in the ready action the ipc can correctly send the url to the frontend
     app.on('open-url', (event, url) => {
       event.preventDefault();

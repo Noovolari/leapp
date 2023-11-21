@@ -1,34 +1,40 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-
 import { LockPageComponent } from "./lock-page.component";
-import { RouterTestingModule } from "@angular/router/testing";
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from "@angular/material/snack-bar";
 import { mustInjected } from "../../../base-injectables";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 
-describe("LoginPageComponent", () => {
+describe("LockPageComponent", () => {
   let component: LockPageComponent;
   let fixture: ComponentFixture<LockPageComponent>;
 
-  beforeEach(async () => {
-    const router = {
-      getCurrentNavigation: () => ({
-        previousNavigation: { finalUrl: "" },
-      }),
-    };
-
-    await TestBed.configureTestingModule({
+  beforeEach(() => {
+    TestBed.configureTestingModule({
       declarations: [LockPageComponent],
-      imports: [RouterTestingModule],
       providers: [
         { provide: MAT_SNACK_BAR_DATA, useValue: {} },
         { provide: MatSnackBarRef, useValue: {} },
-        { provide: Router, useValue: router },
+        {
+          provide: Router,
+          useValue: {
+            getCurrentNavigation: () => ({
+              previousNavigation: { finalUrl: "" },
+            }),
+          },
+        },
+        {
+          provide: ActivatedRoute,
+          useValue: {
+            snapshot: {
+              queryParamMap: {
+                get: (str) => str,
+              },
+            },
+          },
+        },
       ].concat(mustInjected()),
     }).compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(LockPageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
@@ -36,5 +42,12 @@ describe("LoginPageComponent", () => {
 
   it("should create", () => {
     expect(component).toBeTruthy();
+
+    (component as any).appService.isTouchIdAvailable = () => true;
+    (component as any).optionService = { touchIdEnabled: true };
+    component.ngOnInit();
+    expect((component as any).email.value).toEqual("teamMemberEmail");
+    expect((component as any).name).toEqual("teamMemberFirstName teamMemberLastName");
+    expect((component as any).initials).toEqual("TT");
   });
 });

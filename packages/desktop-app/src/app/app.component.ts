@@ -211,7 +211,6 @@ export class AppComponent implements OnInit {
         await this.router.navigate(["/lock"], { queryParams: { teamMemberEmail, teamMemberFirstName, teamMemberLastName, teamMemberTeamName } });
       }
     } else {
-      console.log("miaoooo");
       await this.router.navigate(["/dashboard"]);
     }
 

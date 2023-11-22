@@ -50,6 +50,7 @@ jobs:
           npm run enable-team-features-prod
       - name: Bootstrap
         run: |
+          python3 -m pip install packaging
           npm run bootstrap
       - name: Build CLI
         run: |

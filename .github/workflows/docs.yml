@@ -28,7 +28,7 @@ jobs:
           pip install mkdocs-git-revision-date-plugin
           pip install git+https://${GH_TOKEN}@github.com/squidfunk/mkdocs-material-insiders.git
           pip install mkdocs-minify-plugin
-          pip install mike
+          pip install mike==1.1.2
 
       - name: get-leapp-version
         run: |

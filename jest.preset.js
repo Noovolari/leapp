@@ -8,5 +8,6 @@ module.exports = {
   ],
   moduleNameMapper: {
     "^@noovolari/leapp-core/(.*)$": "@noovolari/leapp-core/dist/$1",
+    "axios": "axios/dist/node/axios.cjs"
   }
 }

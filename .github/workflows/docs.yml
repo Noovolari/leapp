@@ -15,10 +15,10 @@ jobs:
       - name: checkout
         uses: actions/checkout@v2
 
-      - name: setup-python-3.x
-        uses: actions/setup-python@v2
+      - name: setup-python-3.11
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.x
+          python-version: 3.11
 
       - name: install-dependencies
         run: |

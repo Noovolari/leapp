@@ -71,6 +71,7 @@ export class LockPageComponent implements OnInit {
       this.name = `${teamMemberFirstName} ${teamMemberLastName}`;
       this.initials = `${teamMemberFirstName[0].toUpperCase()}${teamMemberLastName[0].toUpperCase()}`;
       this.email.setValue(teamMemberEmail);
+      this.teamName = teamMemberTeamName;
     }
   }
 

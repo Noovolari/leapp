@@ -80,6 +80,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         <span><b>The first 200 participants will receive $25 in AWS credits</b> as a thank-you!</span>
         <span>Don't miss this opportunity to make a difference. Take <a href="https://www.leapp.cloud/survey">the survey</a> today and help us create a fantastic desktop experience!</span>
         <span>Thank you for your support.</span>`;
+  leappTeamNotificationDescription = `<img src="assets/images/survey-infographic.png" alt="survey-banner" width="100%"><br>
+        <span class="centered-text">📣 Leapp team is out! 🖥️</span>
+        <span>If you want you can <a href="https://app.leapp.cloud/register">register</a> now!</span>
+        <span>Thank you for your support.</span>`;
 
   private subscription0;
   private subscription1;
@@ -90,7 +94,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private subscription6;
   private workspaceStateSubscription;
 
-  private currentSegment: Segment;
   private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
@@ -120,26 +123,57 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.notificationService = this.appProviderService.notificationService;
 
-    if (this.notificationService.getNotifications().length === 0) {
-      this.notificationService.setNotifications([
+    // ****************************
+    // ****************************
+    // ****************************
+    // ****************************
+    // ****************************
+    // TODO: remove before flight!
+    this.notificationService.removeNotification(this.notificationService.getNotificationByUuid("leapp-team-1"));
+    // ****************************
+    // ****************************
+    // ****************************
+    // ****************************
+    // ****************************
+
+    const notifications = this.notificationService.getNotifications();
+    if (!notifications.find((n) => n.uuid === "uuid")) {
+      notifications.push(
         new LeappNotification(
           "uuid",
           LeappNotificationType.info,
           "Take the Survey, get AWS credits",
+          "Take the Survey",
           this.surveyDescription,
           false,
           "https://www.leapp.cloud/survey",
           "medal",
           true
-        ),
-      ]);
+        )
+      );
     }
+    if (!notifications.find((n) => n.uuid === "leapp-team-1")) {
+      notifications.push(
+        new LeappNotification(
+          "leapp-team-1",
+          LeappNotificationType.info,
+          "Leapp team was released!",
+          "Try it out!",
+          this.leappTeamNotificationDescription,
+          false,
+          "https://app.leapp.cloud/register",
+          "medal",
+          true
+        )
+      );
+    }
+    this.notificationService.setNotifications(notifications);
 
-    const notification = this.notificationService.getNotificationByUuid("uuid");
-    if (notification && notification.popup && !notification.read) {
+    const firstNotReadPopupNotification = notifications.find((n) => n.popup && !n.read);
+    if (firstNotReadPopupNotification) {
       const timeout = setTimeout(() => {
         clearTimeout(timeout);
-        this.openInfoModal(notification);
+        this.openInfoModal(firstNotReadPopupNotification);
       }, 5000);
     }
   }
@@ -234,6 +268,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.subscription4?.unsubscribe();
     this.subscription5?.unsubscribe();
     this.subscription6?.unsubscribe();
+    this.workspaceStateSubscription?.unsubscribe();
   }
 
   ngAfterContentChecked(): void {
@@ -359,7 +394,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         title: notification.title,
         description: notification.description,
         link: notification?.link,
-        buttonName: notification?.link ? "Take the Survey" : "Ok",
+        buttonName: notification.buttonActionName,
       },
     });
   }

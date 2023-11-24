@@ -40,12 +40,9 @@ describe("AnalyticsService", () => {
   });
 
   it("captureEvent()", () => {
-    const spy1 = spyOn(service as any, "captureUser").and.stub();
     const spy2 = spyOn((service as any).myPosthog, "capture").and.stub();
-    service.captureEvent("event", user);
-
-    expect(spy1).toHaveBeenCalledWith(user);
-    expect(spy2).toHaveBeenCalledWith("event", { ["leapp_agent"]: "Portal", groups: { company: undefined } });
+    service.captureEvent("event", { dummy: "test" });
+    expect(spy2).toHaveBeenCalledWith("event", { ["leapp_agent"]: "Desktop App", dummy: "test" });
   });
 
   it("captureUser()", () => {
@@ -65,14 +62,14 @@ describe("AnalyticsService", () => {
     const spy = spyOn((service as any).myPosthog, "group").and.stub();
     service.captureGroupOnce("1", "company", date.toISOString(), "free trial");
 
-    expect(spy).toHaveBeenCalledWith("company", "1", { name: "company", plan: "free trial", created: date.toISOString() });
+    expect(spy).toHaveBeenCalledWith("company", "1", { name: "company" });
   });
 
   it("capturePageView()", () => {
     const spy = spyOn((service as any).myPosthog, "capture").and.stub();
     service.capturePageView();
 
-    expect(spy).toHaveBeenCalledWith("$pageview");
+    expect(spy).toHaveBeenCalledWith("$pageview", { ["leapp_agent"]: "Desktop App" });
   });
   it("reset()", () => {
     const spy = spyOn((service as any).myPosthog, "reset").and.stub();

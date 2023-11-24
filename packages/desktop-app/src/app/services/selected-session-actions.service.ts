@@ -56,10 +56,9 @@ export class SelectedSessionActionsService {
 
     const userLoggedIn = await this.appProviderService.teamService.signedInUserState.getValue();
     if (userLoggedIn) {
-      this.analyticsService.captureUser(userLoggedIn);
       this.analyticsService.captureEvent("Session Started", {
-        leappSessionId: session.sessionId,
-        leappSessionType: session.type,
+        sessionId: session.sessionId,
+        sessionType: session.type,
         startedAt: new Date().toISOString(),
       });
     }
@@ -72,10 +71,9 @@ export class SelectedSessionActionsService {
 
     const userLoggedIn = await this.appProviderService.teamService.signedInUserState.getValue();
     if (userLoggedIn) {
-      this.analyticsService.captureUser(userLoggedIn);
       this.analyticsService.captureEvent("Session Stopped", {
-        leappSessionId: session.sessionId,
-        leappSessionType: session.type,
+        sessionId: session.sessionId,
+        sessionType: session.type,
         stoppedAt: new Date().toISOString(),
       });
     }

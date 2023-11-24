@@ -91,7 +91,7 @@ export class LockPageComponent implements OnInit {
         // Get the user again after login
         const userLoggedIn = await this.teamService.signedInUserState.getValue();
 
-        this.analyticsService.captureUser(userLoggedIn);
+        this.analyticsService.init(userLoggedIn);
         this.analyticsService.captureEvent("Sign In");
 
         this.appService.closeAllMenuTriggers();
@@ -171,7 +171,7 @@ export class LockPageComponent implements OnInit {
         await this.signIn();
         // Get the user again after login
         const userLoggedIn = await this.teamService.signedInUserState.getValue();
-        this.analyticsService.captureUser(userLoggedIn);
+        this.analyticsService.init(userLoggedIn);
         this.analyticsService.captureEvent("Sign In");
       } catch (err) {
         this.messageToasterService.toast(`${err.toString().replace("Error: ", "")}`, ToastLevel.warn, "Touch ID authentication");

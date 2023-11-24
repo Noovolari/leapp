@@ -14,53 +14,70 @@ export class AnalyticsService {
   }
 
   initConfig(): void {
-    this.myPosthog.init("phc_jfCfo3xkpQHalmoHmyUvx1exA4K4dC9ao2lFc434nxr", {
-      ["api_host"]: "https://eu.posthog.com",
-      ["capture_pageview"]: false,
-      ["capture_pageleave"]: false,
-    });
+    try {
+      this.myPosthog.init("phc_jfCfo3xkpQHalmoHmyUvx1exA4K4dC9ao2lFc434nxr", {
+        ["api_host"]: "https://eu.posthog.com",
+        ["capture_pageview"]: false,
+        ["capture_pageleave"]: false,
+      });
+    } catch (err: any) {
+      console.log("PostHog error: " + err.toString());
+    }
   }
 
   init(user: User): void {
-    this.currentLoggedUser = user;
-    const createdAt = new Date().toISOString();
-    this.captureGroupOnce(user.teamId, user.teamName, createdAt, "Free Trial");
-    this.captureUser(user, createdAt);
+    try {
+      this.currentLoggedUser = user;
+      const createdAt = new Date().toISOString();
+      this.captureGroupOnce(user.teamId, user.teamName, createdAt, "Free Trial");
+      this.captureUser(user, createdAt);
+    } catch (err: any) {
+      console.log("PostHog error: " + err.toString());
+    }
   }
 
-  captureEvent(eventName: string, user: User, properties?: any): void {
-    if (!this.currentLoggedUser || this.currentLoggedUser.userId !== user.userId) {
-      this.captureUser(user);
+  captureEvent(eventName: string, properties?: any): void {
+    console.log("EVENT: ", eventName);
+    try {
+      this.myPosthog.capture(eventName, Object.assign({ ["leapp_agent"]: "Desktop App" }, properties ?? {}));
+    } catch (err: any) {
+      console.log("PostHog error: " + err.toString());
     }
-    this.myPosthog.capture(
-      eventName,
-      Object.assign(
-        {
-          ["leapp_agent"]: "Portal",
-          groups: { company: this.currentLoggedUser?.teamId },
-        },
-        properties ?? {}
-      )
-    );
   }
 
   captureUser(user: User, createdAt?: string): void {
-    this.myPosthog.identify(
-      user.userId,
-      Object.assign({ email: user.email }, { role: user.role, firstName: user.firstName, lastName: user.lastName, created: createdAt })
-    );
-    this.currentLoggedUser = user;
+    try {
+      this.myPosthog.identify(
+        user.userId,
+        Object.assign({ email: user.email }, { role: user.role, firstName: user.firstName, lastName: user.lastName, created: createdAt })
+      );
+      this.currentLoggedUser = user;
+    } catch (err: any) {
+      console.log("PostHog error: " + err.toString());
+    }
   }
 
-  captureGroupOnce(companyId: string, companyName: string, createdAt: string, plan: string): void {
-    this.myPosthog.group("company", companyId, { name: companyName, plan, created: createdAt });
+  captureGroupOnce(companyId: string, companyName: string, _createdAt: string, _plan: string): void {
+    try {
+      this.myPosthog.group("company", companyId, { name: companyName });
+    } catch (err: any) {
+      console.log("PostHog error: " + err.toString());
+    }
   }
 
   capturePageView(): void {
-    this.myPosthog.capture("$pageview");
+    try {
+      this.myPosthog.capture("$pageview", { ["leapp_agent"]: "Desktop App" });
+    } catch (err: any) {
+      console.log("PostHog error: " + err.toString());
+    }
   }
 
   reset(): void {
-    this.myPosthog.reset();
+    try {
+      this.myPosthog.reset();
+    } catch (err: any) {
+      console.log("PostHog error: " + err.toString());
+    }
   }
 }

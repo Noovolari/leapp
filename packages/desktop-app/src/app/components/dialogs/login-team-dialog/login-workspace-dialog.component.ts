@@ -57,7 +57,7 @@ export class LoginWorkspaceDialogComponent implements OnInit {
 
         // Get the user again after login
         const userLoggedIn = await this.teamService.signedInUserState.getValue();
-        this.analyticsService.captureUser(userLoggedIn);
+        this.analyticsService.init(userLoggedIn);
         this.analyticsService.captureEvent("Sign In");
 
         const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
@@ -77,7 +77,6 @@ export class LoginWorkspaceDialogComponent implements OnInit {
         } else if (responseException?.response?.data?.errorCode === ApiErrorCodes.userNotActive) {
           this.loggingService.log(new LoggedEntry("The user is not active", this, LogLevel.error, true));
         } else {
-          console.log("ECCEZIONE", responseException);
           this.loggingService.log(new LoggedEntry(responseException, this, LogLevel.error, true));
         }
       } finally {

@@ -30,6 +30,7 @@ import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-serv
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { ExtensionWebsocketService } from "./services/extension-websocket.service";
 import { TeamService } from "./services/team-service";
+import { AnalyticsService } from "./services/analytics.service";
 
 @Component({
   selector: "app-root",
@@ -69,7 +70,8 @@ export class AppComponent implements OnInit {
     private updaterService: UpdaterService,
     private windowService: WindowService,
     private appNativeService: AppNativeService,
-    private extensionWebsocketService: ExtensionWebsocketService
+    private extensionWebsocketService: ExtensionWebsocketService,
+    private analyticsService: AnalyticsService
   ) {
     appProviderService.mfaCodePrompter = mfaCodePrompter;
     appProviderService.awsAuthenticationService = awsAuthenticationService;
@@ -211,6 +213,7 @@ export class AppComponent implements OnInit {
         await this.router.navigate(["/lock"], { queryParams: { teamMemberEmail, teamMemberFirstName, teamMemberLastName, teamMemberTeamName } });
       }
     } else {
+      this.analyticsService.init(this.teamService.signedInUserState.getValue());
       await this.router.navigate(["/dashboard"]);
     }
 

@@ -7,9 +7,14 @@ import { User } from "../leapp-team-core/user/user";
 })
 export class AnalyticsService {
   private currentLoggedUser: User | undefined;
+  private myPosthog = posthog;
 
   constructor() {
-    posthog.init("phc_jfCfo3xkpQHalmoHmyUvx1exA4K4dC9ao2lFc434nxr", {
+    this.initConfig();
+  }
+
+  initConfig(): void {
+    this.myPosthog.init("phc_jfCfo3xkpQHalmoHmyUvx1exA4K4dC9ao2lFc434nxr", {
       ["api_host"]: "https://eu.posthog.com",
       ["capture_pageview"]: false,
       ["capture_pageleave"]: false,
@@ -23,12 +28,15 @@ export class AnalyticsService {
     this.captureUser(user, createdAt);
   }
 
-  captureEvent(eventName: string, properties?: any): void {
-    posthog.capture(
+  captureEvent(eventName: string, user: User, properties?: any): void {
+    if (!this.currentLoggedUser || this.currentLoggedUser.userId !== user.userId) {
+      this.captureUser(user);
+    }
+    this.myPosthog.capture(
       eventName,
       Object.assign(
         {
-          ["leapp_agent"]: "Desktop App",
+          ["leapp_agent"]: "Portal",
           groups: { company: this.currentLoggedUser?.teamId },
         },
         properties ?? {}
@@ -37,7 +45,7 @@ export class AnalyticsService {
   }
 
   captureUser(user: User, createdAt?: string): void {
-    posthog.identify(
+    this.myPosthog.identify(
       user.userId,
       Object.assign({ email: user.email }, { role: user.role, firstName: user.firstName, lastName: user.lastName, created: createdAt })
     );
@@ -45,14 +53,14 @@ export class AnalyticsService {
   }
 
   captureGroupOnce(companyId: string, companyName: string, createdAt: string, plan: string): void {
-    posthog.group("company", companyId, { name: companyName, plan, created: createdAt });
+    this.myPosthog.group("company", companyId, { name: companyName, plan, created: createdAt });
   }
 
   capturePageView(): void {
-    posthog.capture("$pageview");
+    this.myPosthog.capture("$pageview");
   }
 
-  reset() {
-    posthog.reset();
+  reset(): void {
+    this.myPosthog.reset();
   }
 }

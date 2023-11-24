@@ -10,6 +10,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { MessageToasterService, ToastLevel } from "../../services/message-toaster.service";
 import { AppNativeService } from "../../services/app-native.service";
 import { OptionsService } from "../../services/options.service";
+import { AnalyticsService } from "../../services/analytics.service";
 
 @Component({
   selector: "app-lock-page",
@@ -38,7 +39,8 @@ export class LockPageComponent implements OnInit {
     private optionService: OptionsService,
     private messageToasterService: MessageToasterService,
     private appNativeService: AppNativeService,
-    private routeCalled: ActivatedRoute
+    private routeCalled: ActivatedRoute,
+    private analyticsService: AnalyticsService
   ) {
     this.previousRoute = this.router.getCurrentNavigation().previousNavigation.finalUrl.toString();
   }
@@ -82,9 +84,16 @@ export class LockPageComponent implements OnInit {
       this.submitting = true;
       const formValue = this.signinForm.value;
       try {
+        // It could be that a user was already logged in the app because it came from dashboard using lock button
         const signedInUser = await this.teamService.signedInUserState.getValue();
         const doesWorkspaceExist = !!signedInUser;
         await this.teamService.signIn(formValue.email, formValue.password);
+        // Get the user again after login
+        const userLoggedIn = await this.teamService.signedInUserState.getValue();
+
+        this.analyticsService.captureUser(userLoggedIn);
+        this.analyticsService.captureEvent("Sign In");
+
         this.appService.closeAllMenuTriggers();
 
         const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
@@ -160,6 +169,10 @@ export class LockPageComponent implements OnInit {
         this.appProviderService.fileService.aesKey = oldKey;
         this.password.setValue(decodedSecret, { emitEvent: true });
         await this.signIn();
+        // Get the user again after login
+        const userLoggedIn = await this.teamService.signedInUserState.getValue();
+        this.analyticsService.captureUser(userLoggedIn);
+        this.analyticsService.captureEvent("Sign In");
       } catch (err) {
         this.messageToasterService.toast(`${err.toString().replace("Error: ", "")}`, ToastLevel.warn, "Touch ID authentication");
       }

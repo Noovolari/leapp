@@ -7,6 +7,7 @@ import { ApiErrorCodes, FormErrorCodes, TeamService } from "../../../services/te
 
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { globalLeappProPlanStatus, LeappPlanStatus } from "../options-dialog/options-dialog.component";
+import { AnalyticsService } from "../../../services/analytics.service";
 
 @Component({
   selector: "app-login-team-dialog",
@@ -23,7 +24,12 @@ export class LoginWorkspaceDialogComponent implements OnInit {
   private loggingService: LogService;
   private teamService: TeamService;
 
-  constructor(public appService: AppService, public appProviderService: AppProviderService, public optionsService: OptionsService) {
+  constructor(
+    public appService: AppService,
+    public appProviderService: AppProviderService,
+    public optionsService: OptionsService,
+    private analyticsService: AnalyticsService
+  ) {
     this.email = new FormControl("", [Validators.required, Validators.email]);
     this.password = new FormControl("", [Validators.required]);
     this.signinForm = new FormGroup({ email: this.email, password: this.password });
@@ -48,6 +54,11 @@ export class LoginWorkspaceDialogComponent implements OnInit {
         await this.teamService.signIn(formValue.email, formValue.password);
         await this.teamService.writeTouchIdCredentials(formValue.password, this.optionsService.requirePassword);
         this.appService.closeAllMenuTriggers();
+
+        // Get the user again after login
+        const userLoggedIn = await this.teamService.signedInUserState.getValue();
+        this.analyticsService.captureUser(userLoggedIn);
+        this.analyticsService.captureEvent("Sign In");
 
         const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
         const planStatus = teamOrPro.type === "team" ? LeappPlanStatus.enterprise : LeappPlanStatus.proEnabled;

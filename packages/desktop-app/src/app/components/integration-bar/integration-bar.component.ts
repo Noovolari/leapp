@@ -217,6 +217,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.loadingInBrowser = false;
     this.loadingInApp = false;
     this.setValues();
+
     this.analyticsService.captureEvent("Integration Logout", {
       integrationId,
       logoutAt: new Date().toISOString(),
@@ -245,6 +246,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
       }
       await this.appProviderService.awsSsoIntegrationService.syncSessions(integrationId, () => {
+        this.analyticsService.captureEvent("Integration Login", { integrationId, integrationType: "AWS SSO", startedAt: new Date().toISOString() });
+
         if (this.modalRef) {
           this.modalRef.hide();
         }

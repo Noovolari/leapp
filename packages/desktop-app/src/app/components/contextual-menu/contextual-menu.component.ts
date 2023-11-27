@@ -12,6 +12,8 @@ import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-crede
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
 import { ExtensionWebsocketService, FetchingState } from "../../services/extension-websocket.service";
 import { Subscription } from "rxjs";
+import { AnalyticsService } from "../../services/analytics.service";
+import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
 
 @Component({
   selector: "app-contextual-menu",
@@ -37,7 +39,8 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
     public optionsService: OptionsService,
     public appProviderService: AppProviderService,
     private selectedSessionActionsService: SelectedSessionActionsService,
-    private extensionWebsocketService: ExtensionWebsocketService
+    private extensionWebsocketService: ExtensionWebsocketService,
+    private readonly analyticsService: AnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -72,7 +75,18 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
   }
 
   async startSession(): Promise<void> {
+    const integrationId = (this.selectedSession as AwsSsoRoleSession).awsSsoConfigurationId;
+    const integration = this.appProviderService.awsSsoIntegrationService.getIntegration(integrationId);
+
     await this.selectedSessionActionsService.startSession(this.selectedSession);
+
+    if (this.selectedSession.type === SessionType.awsSsoRole && this.selectedSession.status === SessionStatus.active && !integration.isOnline) {
+      this.analyticsService.captureEvent("Integration Login", {
+        integrationId: (this.selectedSession as AwsSsoRoleSession).awsSsoConfigurationId,
+        integrationType: "AWS SSO",
+        startedAt: new Date().toISOString(),
+      });
+    }
   }
 
   async stopSession(): Promise<void> {

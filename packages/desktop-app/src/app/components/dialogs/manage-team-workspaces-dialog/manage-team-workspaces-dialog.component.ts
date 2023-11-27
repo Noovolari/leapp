@@ -9,6 +9,7 @@ import { globalFilteredSessions, globalHasFilter, globalResetFilter } from "../.
 import { sidebarHighlight } from "../../side-bar/side-bar.component";
 import { WorkspaceState } from "../../../services/team-service";
 import { globalLeappProPlanStatus, LeappPlanStatus } from "../options-dialog/options-dialog.component";
+import { AnalyticsService } from "../../../services/analytics.service";
 
 @Component({
   selector: "app-manage-team-workspaces-dialog",
@@ -25,7 +26,12 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
     return !!this.workspacesState.find((state) => state.locked);
   }
 
-  constructor(private appProviderService: AppProviderService, public appService: AppService, private bsModalService: BsModalService) {
+  constructor(
+    private appProviderService: AppProviderService,
+    public appService: AppService,
+    private bsModalService: BsModalService,
+    private readonly analyticsService: AnalyticsService
+  ) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
   }
 
@@ -61,6 +67,11 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
       this.appService.closeAllMenuTriggers();
       globalLeappProPlanStatus.next(LeappPlanStatus.free);
       await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
+      const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
+      if (signedInUser) {
+        this.analyticsService.captureEvent("Sign Out");
+        this.analyticsService.reset();
+      }
     } catch (error) {
       this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
     }

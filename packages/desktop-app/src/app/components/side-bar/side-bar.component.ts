@@ -22,6 +22,7 @@ import { LoginWorkspaceDialogComponent } from "../dialogs/login-team-dialog/logi
 import { ManageTeamWorkspacesDialogComponent } from "../dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 import { WorkspaceState } from "../../services/team-service";
 import { Router } from "@angular/router";
+import { AnalyticsService } from "../../services/analytics.service";
 
 export interface SelectedSegment {
   name: string;
@@ -62,7 +63,8 @@ export class SideBarComponent implements OnInit, OnDestroy {
     private router: Router,
     private bsModalService: BsModalService,
     private appProviderService: AppProviderService,
-    private appService: AppService
+    private appService: AppService,
+    private readonly analyticsService: AnalyticsService
   ) {
     this.behaviouralSubjectService = appProviderService.behaviouralSubjectService;
     this.showAll = true;
@@ -209,6 +211,11 @@ export class SideBarComponent implements OnInit, OnDestroy {
     if (!this.canLockWorkspace || this.isLeappTeamStubbed) return;
     await this.appProviderService.teamService.signOut(lock);
     this.appService.closeAllMenuTriggers();
+    const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
+    if (signedInUser) {
+      this.analyticsService.captureEvent("Sign Out");
+      this.analyticsService.reset();
+    }
     await this.router.navigate(["/lock"]);
   }
 

@@ -22,6 +22,7 @@ import { Integration } from "@noovolari/leapp-core/models/integration";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 import { AzureIntegration } from "@noovolari/leapp-core/models/azure/azure-integration";
 import { IntegrationParams } from "@noovolari/leapp-core/models/integration-params";
+import { AnalyticsService } from "../../services/analytics.service";
 
 export interface SelectedIntegration {
   id: string;
@@ -99,7 +100,8 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     private windowService: WindowService,
     private messageToasterService: MessageToasterService,
     public appProviderService: AppProviderService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private analyticsService: AnalyticsService
   ) {
     this.awsSsoRoleService = this.appProviderService.awsSsoRoleService;
     this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
@@ -215,6 +217,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.loadingInBrowser = false;
     this.loadingInApp = false;
     this.setValues();
+    this.analyticsService.captureEvent("Integration Logout", {
+      integrationId,
+      logoutAt: new Date().toISOString(),
+    });
   }
 
   async forceSync(integrationId: string): Promise<void> {

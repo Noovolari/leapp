@@ -81,11 +81,14 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
     await this.selectedSessionActionsService.startSession(this.selectedSession);
 
     if (this.selectedSession.type === SessionType.awsSsoRole && this.selectedSession.status === SessionStatus.active && !integration.isOnline) {
-      this.analyticsService.captureEvent("Integration Login", {
-        integrationId: (this.selectedSession as AwsSsoRoleSession).awsSsoConfigurationId,
-        integrationType: "AWS SSO",
-        startedAt: new Date().toISOString(),
-      });
+      const userLoggedIn = this.appProviderService.teamService.signedInUserState.getValue();
+      if (userLoggedIn) {
+        this.analyticsService.captureEvent("Integration Login", {
+          integrationId: (this.selectedSession as AwsSsoRoleSession).awsSsoConfigurationId,
+          integrationType: "AWS SSO",
+          startedAt: new Date().toISOString(),
+        });
+      }
     }
   }
 

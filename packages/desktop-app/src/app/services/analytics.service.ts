@@ -80,4 +80,8 @@ export class AnalyticsService {
       console.log("PostHog error: " + err.toString());
     }
   }
+
+  isUserLogged(): boolean {
+    return !!this.currentLoggedUser;
+  }
 }

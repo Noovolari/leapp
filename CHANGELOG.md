@@ -2,19 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.22.1](https://github.com/Noovolari/leapp/compare/v0.22.0...v0.22.1) (2023-11-28)
+
+### Bug fixes
+* Performance improvement
+
 ### [0.22.0](https://github.com/Noovolari/leapp/compare/v0.21.0...v0.22.0) (2023-11-23)
 
 ### Features
-* updated the following packages versions:
-  * axios from 1.4.0 to 1.6.1;
-  * axios from 0.27.2 to 1.6.0 in desktop-app;
-  * axios from 0.27.2 to 1.6.0 in cli;
-  * crypto-js from 4.1.1 to 4.2.0 in cli;
-  * crypto-js from 4.1.1 to 4.2.0 in desktop-app;
-  * @babel/traverse from 7.22.10 to 7.23.2 in desktop-app;
-  * @babel/traverse from 7.22.10 to 7.23.2 in cli;
-  * @babel/traverse from 7.22.8 to 7.23.2;
-  * electron from 22.3.24 to 22.3.25 in desktop-app.
+Updated the following packages versions:
+* axios from 1.4.0 to 1.6.1;
+* axios from 0.27.2 to 1.6.0 in desktop-app;
+* axios from 0.27.2 to 1.6.0 in cli;
+* crypto-js from 4.1.1 to 4.2.0 in cli;
+* crypto-js from 4.1.1 to 4.2.0 in desktop-app;
+* @babel/traverse from 7.22.10 to 7.23.2 in desktop-app;
+* @babel/traverse from 7.22.10 to 7.23.2 in cli;
+* @babel/traverse from 7.22.8 to 7.23.2;
+* electron from 22.3.24 to 22.3.25 in desktop-app.
 
 ### [0.21.0](https://github.com/Noovolari/leapp/compare/v0.20.2...v0.21.0) (2023-10-18)
 

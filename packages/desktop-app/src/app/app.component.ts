@@ -31,6 +31,7 @@ import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-ma
 import { ExtensionWebsocketService } from "./services/extension-websocket.service";
 import { TeamService } from "./services/team-service";
 import { AnalyticsService } from "./services/analytics.service";
+import { Role } from "./leapp-team-core/user/role";
 
 @Component({
   selector: "app-root",
@@ -201,8 +202,9 @@ export class AppComponent implements OnInit {
     // Go to initial page if no sessions are already created or
     // go to the list page if is your second visit.
     // If there is a pro user registered go to login page instead
-    if (this.teamService.signedInUserState.getValue()?.role === "pro" || teamMemberEmail !== undefined) {
-      if (this.teamService.signedInUserState.getValue()?.role === "pro") {
+    const userRole = this.teamService.signedInUserState.getValue()?.role;
+    if (userRole === Role.pro || userRole === Role.user || userRole === Role.manager || teamMemberEmail !== undefined) {
+      if (userRole === Role.pro || ((userRole === Role.user || userRole === Role.manager) && teamMemberEmail === undefined)) {
         await this.router.navigate(["/lock"]);
       } else if (
         teamMemberEmail !== undefined &&

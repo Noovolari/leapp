@@ -42,7 +42,7 @@ export class AnalyticsService {
     try {
       this.myPosthog.capture(
         eventName,
-        Object.assign({ ["leapp_agent"]: "Desktop App", ["environment"]: environment.production ? "production" : "development" }, properties ?? {})
+        Object.assign({ ["leapp_agent"]: "Desktop App", environment: environment.production ? "production" : "development" }, properties ?? {})
       );
     } catch (err: any) {
       console.log("PostHog error: " + err.toString());

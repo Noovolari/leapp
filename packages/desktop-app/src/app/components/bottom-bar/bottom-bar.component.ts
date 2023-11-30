@@ -5,6 +5,8 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
 import { OptionsService } from "../../services/options.service";
 import { ExtensionWebsocketService, FetchingState } from "../../services/extension-websocket.service";
+import { AppProviderService } from "../../services/app-provider.service";
+import { AnalyticsService } from "../../services/analytics.service";
 
 @Component({
   selector: "app-bottom-bar",
@@ -25,7 +27,9 @@ export class BottomBarComponent implements OnInit {
   constructor(
     private selectedSessionActionsService: SelectedSessionActionsService,
     public optionsService: OptionsService,
-    private extensionWebsocketService: ExtensionWebsocketService
+    private extensionWebsocketService: ExtensionWebsocketService,
+    private readonly appProviderService: AppProviderService,
+    private readonly analyticsService: AnalyticsService
   ) {}
 
   ngOnInit(): void {
@@ -44,6 +48,14 @@ export class BottomBarComponent implements OnInit {
 
   async stopSession(): Promise<void> {
     await this.selectedSessionActionsService.stopSession(this.selectedSession);
+    const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
+    if (signedInUser) {
+      this.analyticsService.captureEvent("Session Stopped", {
+        sessionId: this.selectedSession.sessionId,
+        sessionType: this.selectedSession.type,
+        stoppedAt: new Date().toISOString(),
+      });
+    }
   }
 
   async openAwsWebConsole(): Promise<void> {

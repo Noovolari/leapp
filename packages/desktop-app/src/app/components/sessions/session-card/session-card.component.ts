@@ -11,6 +11,7 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { OptionsService } from "../../../services/options.service";
 import { SelectedSessionActionsService } from "../../../services/selected-session-actions.service";
 import { ExtensionWebsocketService } from "../../../services/extension-websocket.service";
+import { AnalyticsService } from "../../../services/analytics.service";
 
 @Component({
   // eslint-disable-next-line @angular-eslint/component-selector
@@ -46,7 +47,8 @@ export class SessionCardComponent implements OnInit {
     public appProviderService: AppProviderService,
     public optionService: OptionsService,
     private selectedSessionActionService: SelectedSessionActionsService,
-    private extensionWebSocketService: ExtensionWebsocketService
+    private extensionWebSocketService: ExtensionWebsocketService,
+    private readonly analyticsService: AnalyticsService
   ) {
     this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
   }
@@ -90,6 +92,14 @@ export class SessionCardComponent implements OnInit {
    */
   async stopSession(): Promise<void> {
     await this.selectedSessionActionService.stopSession(this.session);
+    const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
+    if (signedInUser) {
+      this.analyticsService.captureEvent("Session Stopped", {
+        sessionId: this.session.sessionId,
+        sessionType: this.session.type,
+        stoppedAt: new Date().toISOString(),
+      });
+    }
   }
 
   getSessionTypeIcon(type: SessionType): string {

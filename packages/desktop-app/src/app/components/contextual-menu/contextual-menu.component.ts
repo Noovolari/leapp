@@ -94,6 +94,14 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
 
   async stopSession(): Promise<void> {
     await this.selectedSessionActionsService.stopSession(this.selectedSession);
+    const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
+    if (signedInUser) {
+      this.analyticsService.captureEvent("Session Stopped", {
+        sessionId: this.selectedSession.sessionId,
+        sessionType: this.selectedSession.type,
+        stoppedAt: new Date().toISOString(),
+      });
+    }
   }
 
   logoutFromFederatedSession(): void {

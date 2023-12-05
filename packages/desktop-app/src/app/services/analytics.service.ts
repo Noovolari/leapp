@@ -1,6 +1,7 @@
 import { Injectable } from "@angular/core";
 import posthog from "posthog-js";
 import { User } from "../leapp-team-core/user/user";
+import { environment } from "../../environments/environment";
 
 @Injectable({
   providedIn: "root",
@@ -39,7 +40,10 @@ export class AnalyticsService {
   captureEvent(eventName: string, properties?: any): void {
     console.log("EVENT: ", eventName);
     try {
-      this.myPosthog.capture(eventName, Object.assign({ ["leapp_agent"]: "Desktop App" }, properties ?? {}));
+      this.myPosthog.capture(
+        eventName,
+        Object.assign({ ["leapp_agent"]: "Desktop App", environment: environment.production ? "production" : "development" }, properties ?? {})
+      );
     } catch (err: any) {
       console.log("PostHog error: " + err.toString());
     }

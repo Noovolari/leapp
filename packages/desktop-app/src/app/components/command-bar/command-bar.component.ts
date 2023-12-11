@@ -125,19 +125,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.notificationService = this.appProviderService.notificationService;
 
-    // ****************************
-    // ****************************
-    // ****************************
-    // ****************************
-    // ****************************
-    // TODO: remove before flight!
-    // this.notificationService.removeNotification(this.notificationService.getNotificationByUuid("leapp-team-1"));
-    // ****************************
-    // ****************************
-    // ****************************
-    // ****************************
-    // ****************************
-
     const notifications = this.notificationService.getNotifications();
     if (!notifications.find((n) => n.uuid === "leapp-team-1")) {
       notifications.push(

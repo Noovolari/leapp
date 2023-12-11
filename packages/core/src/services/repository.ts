@@ -520,6 +520,7 @@ export class Repository {
   setNotifications(notifications: LeappNotification[]): void {
     const workspace = this.getWorkspace();
     workspace.notifications = notifications;
+    this.persistWorkspace(workspace);
   }
 
   // PRIVATE

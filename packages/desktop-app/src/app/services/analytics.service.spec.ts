@@ -42,7 +42,7 @@ describe("AnalyticsService", () => {
   it("captureEvent()", () => {
     const spy2 = spyOn((service as any).myPosthog, "capture").and.stub();
     service.captureEvent("event", { dummy: "test" });
-    expect(spy2).toHaveBeenCalledWith("event", { ["leapp_agent"]: "Desktop App", dummy: "test" });
+    expect(spy2).toHaveBeenCalledWith("event", { ["leapp_agent"]: "Desktop App", environment: "development", dummy: "test" });
   });
 
   it("captureUser()", () => {

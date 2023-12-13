@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.0](https://github.com/Noovolari/leapp/compare/v0.22.2...v0.23.0) (2023-12-13)
+
+We are in early access! Our first company solution is now in early access and available for FREE.
+
+### Features
+* AWS SSO integration default opening type is now "in browser", if you're logged into Leapp Team.
+
 ### [0.22.2](https://github.com/Noovolari/leapp/compare/v0.22.1...v0.22.2) (2023-12-06)
 
 ### Bug fixes

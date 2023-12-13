@@ -115,6 +115,13 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+      - uses: actions/checkout@v3
+        if: ${{ env.TEAM_REPOSITORY != '' }}
+        with:
+          repository: ${{ env.TEAM_REPOSITORY }}
+          ref: main
+          token: ${{ secrets.GH_TOKEN }}
+          path: leapp-team
       - uses: actions/setup-python@v4
         with:
           python-version: "3.11"

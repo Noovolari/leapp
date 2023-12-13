@@ -31,6 +31,12 @@ export class InfoDialogComponent implements OnInit {
     this.close();
   }
 
+  manageLinkEvents(event: any): void {
+    if (event?.target?.localName === "a" && event?.target?.href) {
+      this.windowService.openExternalUrl(event.target.href);
+    }
+  }
+
   close(): void {
     this.bsModalRef.hide();
   }

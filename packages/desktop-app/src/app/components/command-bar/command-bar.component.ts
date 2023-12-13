@@ -81,6 +81,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         <span>Don't miss this opportunity to make a difference. Take <a href="https://www.leapp.cloud/survey">the survey</a> today and help us create a fantastic desktop experience!</span>
         <span>Thank you for your support.</span>`;
 
+  leappTeamNotificationDescription = `<img src="assets/images/leapp-team-early-access.png" alt="survey-banner" width="100%"><br>
+        <span class="centered-text">🚀 <b>We are in early access!:</b> Our first company solution is now in early access and <b>available for FREE.</b></span>
+        <span>🙌 <b>Your Role is Crucial:</b> Join us in this new chapter! Your support during the free early access phase is vital. Your feedback and active participation will help shape Leapp Team’s future.</span>
+        <span>🌟 <b>Support Us on Product Hunt:</b> Visit our <a href="https://www.producthunt.com/products/leapp-2">Product Hunt page</a>. Sign up, click ‘Notify’, and engage with upvotes and comments. Your involvement is essential in making Leapp Team the top product of the day, ensuring our project’s continued success.</span>
+        <span>🤝 <b>Be Part of Our Journey:</b> Your enthusiasm and support are the driving forces behind Leapp. Let’s make this launch a remarkable success together! This launch is a crucial step to ensure the future and sustainability of <b>our open-source project.</b></span>`;
+
   private subscription0;
   private subscription1;
   private subscription2;
@@ -90,7 +96,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   private subscription6;
   private workspaceStateSubscription;
 
-  private currentSegment: Segment;
   private behaviouralSubjectService: BehaviouralSubjectService;
 
   constructor(
@@ -120,26 +125,44 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.notificationService = this.appProviderService.notificationService;
 
-    if (this.notificationService.getNotifications().length === 0) {
-      this.notificationService.setNotifications([
+    const notifications = this.notificationService.getNotifications();
+    if (!notifications.find((n) => n.uuid === "leapp-team-1")) {
+      notifications.push(
+        new LeappNotification(
+          "leapp-team-1",
+          LeappNotificationType.info,
+          "Leapp Team is Out Now!",
+          "Get started for FREE",
+          this.leappTeamNotificationDescription,
+          false,
+          "https://www.leapp.cloud/solutions/team",
+          "medal",
+          true
+        )
+      );
+    }
+    if (!notifications.find((n) => n.uuid === "uuid")) {
+      notifications.push(
         new LeappNotification(
           "uuid",
           LeappNotificationType.info,
           "Take the Survey, get AWS credits",
+          "Take the Survey",
           this.surveyDescription,
           false,
           "https://www.leapp.cloud/survey",
           "medal",
           true
-        ),
-      ]);
+        )
+      );
     }
+    this.notificationService.setNotifications(notifications);
 
-    const notification = this.notificationService.getNotificationByUuid("uuid");
-    if (notification && notification.popup && !notification.read) {
+    const firstNotReadPopupNotification = notifications.find((n) => n.popup && !n.read);
+    if (firstNotReadPopupNotification) {
       const timeout = setTimeout(() => {
         clearTimeout(timeout);
-        this.openInfoModal(notification);
+        this.openInfoModal(firstNotReadPopupNotification);
       }, 5000);
     }
   }
@@ -234,6 +257,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.subscription4?.unsubscribe();
     this.subscription5?.unsubscribe();
     this.subscription6?.unsubscribe();
+    this.workspaceStateSubscription?.unsubscribe();
   }
 
   ngAfterContentChecked(): void {
@@ -355,11 +379,12 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.notificationService.setNotificationAsRead(notification.uuid);
     this.bsModalService.show(InfoDialogComponent, {
       animated: false,
+      class: "leapp-team-early-access-modal",
       initialState: {
         title: notification.title,
         description: notification.description,
         link: notification?.link,
-        buttonName: notification?.link ? "Take the Survey" : "Ok",
+        buttonName: notification.buttonActionName,
       },
     });
   }

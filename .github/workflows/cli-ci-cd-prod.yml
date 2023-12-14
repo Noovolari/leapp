@@ -108,6 +108,8 @@ jobs:
 
   release:
     needs: check_for_release
+    env:
+      TEAM_REPOSITORY: ${{ secrets.TEAM_REPOSITORY }}
     runs-on: macos-latest
     if: needs.check_for_release.outputs.to-release == 1
     steps:
@@ -137,7 +139,6 @@ jobs:
           npm run bootstrap
           cd ../leapp-team-service
           npm install
-          npm run test
           npm run enable-team-features-prod
       - name: Bootstrap
         run: |

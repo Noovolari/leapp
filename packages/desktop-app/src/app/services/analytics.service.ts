@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import posthog from "posthog-js";
 import { User } from "../leapp-team-core/user/user";
 import { environment } from "../../environments/environment";
+import { AppProviderService } from "./app-provider.service";
 
 @Injectable({
   providedIn: "root",
@@ -10,7 +11,7 @@ export class AnalyticsService {
   private currentLoggedUser: User | undefined;
   private myPosthog = posthog;
 
-  constructor() {
+  constructor(private appProviderService: AppProviderService) {
     this.initConfig();
   }
 
@@ -37,15 +38,21 @@ export class AnalyticsService {
     }
   }
 
-  captureEvent(eventName: string, properties?: any): void {
-    console.log("EVENT: ", eventName);
-    try {
-      this.myPosthog.capture(
-        eventName,
-        Object.assign({ ["leapp_agent"]: "Desktop App", environment: environment.production ? "production" : "development" }, properties ?? {})
-      );
-    } catch (err: any) {
-      console.log("PostHog error: " + err.toString());
+  captureEvent(eventName: string, properties: any = {}, captureAnonymousEvent = false, resetAfterCapture = false): void {
+    const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
+    if (captureAnonymousEvent || (signedInUser && signedInUser.accessToken !== "")) {
+      console.log("EVENT: ", eventName);
+      try {
+        this.myPosthog.capture(
+          eventName,
+          Object.assign({ ["leapp_agent"]: "Desktop App", environment: environment.production ? "production" : "development" }, properties)
+        );
+      } catch (err: any) {
+        console.log("PostHog error: " + err.toString());
+      }
+      if (resetAfterCapture) {
+        this.reset();
+      }
     }
   }
 
@@ -77,15 +84,11 @@ export class AnalyticsService {
     }
   }
 
-  reset(): void {
+  private reset(): void {
     try {
       this.myPosthog.reset();
     } catch (err: any) {
       console.log("PostHog error: " + err.toString());
     }
-  }
-
-  isUserLogged(): boolean {
-    return !!this.currentLoggedUser;
   }
 }

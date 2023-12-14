@@ -21,6 +21,7 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 import { AnalyticsService } from "./analytics.service";
+import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 
 @Injectable({
   providedIn: "root",
@@ -44,7 +45,7 @@ export class SelectedSessionActionsService {
     this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
   }
 
-  getSelectedSessionService(session: Session) {
+  getSelectedSessionService(session: Session): SessionService {
     return this.sessionFactory.getSessionService(session.type);
   }
 
@@ -54,14 +55,11 @@ export class SelectedSessionActionsService {
     await this.getSelectedSessionService(session).start(session.sessionId);
     document.querySelector(".table thead tr").scrollIntoView();
 
-    const userLoggedIn = await this.appProviderService.teamService.signedInUserState.getValue();
-    if (userLoggedIn) {
-      this.analyticsService.captureEvent("Session Started", {
-        sessionId: session.sessionId,
-        sessionType: session.type,
-        startedAt: new Date().toISOString(),
-      });
-    }
+    this.analyticsService.captureEvent("Session Started", {
+      sessionId: session.sessionId,
+      sessionType: session.type,
+      startedAt: new Date().toISOString(),
+    });
   }
 
   async stopSession(session: Session): Promise<void> {
@@ -69,14 +67,11 @@ export class SelectedSessionActionsService {
     this.logSessionData(session, `Stopped Session`);
     await this.getSelectedSessionService(session).stop(session.sessionId);
 
-    const userLoggedIn = await this.appProviderService.teamService.signedInUserState.getValue();
-    if (userLoggedIn) {
-      this.analyticsService.captureEvent("Session Stopped", {
-        sessionId: session.sessionId,
-        sessionType: session.type,
-        stoppedAt: new Date().toISOString(),
-      });
-    }
+    this.analyticsService.captureEvent("Session Stopped", {
+      sessionId: session.sessionId,
+      sessionType: session.type,
+      stoppedAt: new Date().toISOString(),
+    });
   }
 
   async openAwsWebConsole(session: Session): Promise<void> {

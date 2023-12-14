@@ -38,6 +38,7 @@ export const constants = {
 
   macOsTerminal: "Terminal",
   macOsIterm2: "iTerm2",
+  macOsWarp: "Warp",
   systemDefaultTheme: "System Default",
 
   lightTheme: "Light Theme",

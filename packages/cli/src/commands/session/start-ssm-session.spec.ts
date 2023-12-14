@@ -211,6 +211,18 @@ describe("StartSsmSession", () => {
     expect(command.log).toHaveBeenCalledWith("started AWS SSM session");
   });
 
+  test("startSsmSession, macOS, Warp", async () => {
+    const cliProviderService: any = {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      cliNativeService: { process: { platform: "darwin", env: { TERM_PROGRAM: "Warp.app" } } },
+      ssmService: { startSession: jest.fn(() => null) },
+    };
+    const command = getTestCommand(cliProviderService);
+
+    await command.startSsmSession("credentials" as any, "instanceId", "region");
+    expect(cliProviderService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", constants.macOsTerminal);
+  });
+
   test("startSsmSession, macOS, other terminal", async () => {
     const cliProviderService: any = {
       // eslint-disable-next-line @typescript-eslint/naming-convention

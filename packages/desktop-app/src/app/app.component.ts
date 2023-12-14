@@ -175,9 +175,9 @@ export class AppComponent implements OnInit {
           const afterQuestionMark = deepLink.split("?")[1];
           const splitByAmpersand = afterQuestionMark.split("&");
           teamMemberEmail = splitByAmpersand[0].split("=")[1];
-          teamMemberFirstName = splitByAmpersand[1].split("=")[1];
-          teamMemberLastName = splitByAmpersand[2].split("=")[1];
-          teamMemberTeamName = splitByAmpersand[3].split("=")[1];
+          teamMemberFirstName = decodeURIComponent(splitByAmpersand[1].split("=")[1]);
+          teamMemberLastName = decodeURIComponent(splitByAmpersand[2].split("=")[1]);
+          teamMemberTeamName = decodeURIComponent(splitByAmpersand[3].split("=")[1]);
         } else if (!constants.disablePluginSystem) {
           await this.pluginManagerService.installPlugin(deepLink);
           await this.pluginManagerService.loadFromPluginDir();
@@ -320,9 +320,9 @@ export class AppComponent implements OnInit {
         const afterQuestionMark = url.split("?")[1];
         const splitByAmpersand = afterQuestionMark.split("&");
         const teamMemberEmail = splitByAmpersand[0].split("=")[1];
-        const teamMemberFirstName = splitByAmpersand[1].split("=")[1];
-        const teamMemberLastName = splitByAmpersand[2].split("=")[1];
-        const teamMemberTeamName = splitByAmpersand[3].split("=")[1];
+        const teamMemberFirstName = decodeURIComponent(splitByAmpersand[1].split("=")[1]);
+        const teamMemberLastName = decodeURIComponent(splitByAmpersand[2].split("=")[1]);
+        const teamMemberTeamName = decodeURIComponent(splitByAmpersand[3].split("=")[1]);
         if (teamMemberEmail) {
           this.router.navigate(["/lock"], { queryParams: { teamMemberEmail, teamMemberFirstName, teamMemberLastName, teamMemberTeamName } });
         }

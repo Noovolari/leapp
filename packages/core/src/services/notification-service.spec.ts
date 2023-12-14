@@ -9,8 +9,8 @@ describe("NotificationService", () => {
   let mockedRepository: any;
 
   beforeEach(() => {
-    mockedNotification1 = new LeappNotification("1234a", LeappNotificationType.info, "title1", "", false);
-    mockedNotification2 = new LeappNotification("3456a", LeappNotificationType.info, "title2", "", true);
+    mockedNotification1 = new LeappNotification("1234a", LeappNotificationType.info, "title1", "Ok", "", false);
+    mockedNotification2 = new LeappNotification("3456a", LeappNotificationType.info, "title2", "Ok", "", true);
     mockedNotifications = [mockedNotification1, mockedNotification2];
 
     mockedRepository = {

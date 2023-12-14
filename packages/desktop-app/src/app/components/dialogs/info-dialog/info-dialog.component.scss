@@ -16,7 +16,6 @@
       font-size: 1.3rem; color: $silver-dark; font-weight: normal;
     }
   }
-
   div.updater > div.html-content {
     color: $text-color;
     overflow-y: scroll;
@@ -91,10 +90,25 @@
       margin-bottom: 7px;
     }
   }
+  .leapp-team-early-access-modal {
+    max-width: 600px;
+    .modal-content {
+      padding: 20px 5px 20px 20px;
+    }
+    .html-content {
+      padding-right: 20px;
+    }
+    .centered-text {
+      font-weight: 400;
+    }
+    b {
+      font-weight: 800;
+    }
+  }
 }
 
 .updater-header {
-  margin-right: -20px;
+  margin-right: -5px;
   margin-left: -20px;
   border-bottom: 1px solid #E0E0E0;
 }
@@ -105,7 +119,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 460px;
+  width: 560px;
   position: relative;
 
   .modal-title-icon {
@@ -154,7 +168,7 @@
   position: relative;
   margin: -36px;
   margin-left: -20px;
-  margin-right: -20px;
+  margin-right: -5px;
   top: -10px;
   padding-top: 15px;
 

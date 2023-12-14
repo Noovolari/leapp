@@ -122,6 +122,13 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
     } else {
       await this.selectedSessionActionsService.openAwsWebConsole(this.selectedSession);
     }
+
+    this.analyticsService.captureEvent("Web Console opened", {
+      withExtension: this.optionsService.extensionEnabled,
+      sessionType: this.selectedSession.type,
+      sessionId: this.selectedSession.sessionId,
+      startedAt: new Date().toISOString(),
+    });
   }
 
   async editSession(): Promise<void> {
@@ -158,5 +165,10 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
 
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {
     await this.selectedSessionActionsService.applyPluginAction(this.selectedSession, plugin);
+
+    this.analyticsService.captureEvent("Plugin started", {
+      pluginName: plugin.metadata.uniqueName,
+      startedAt: new Date().toISOString(),
+    });
   }
 }

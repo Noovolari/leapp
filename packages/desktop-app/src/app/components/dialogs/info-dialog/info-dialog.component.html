@@ -17,7 +17,7 @@
 <div class="modal-body text-center updater">
 
   <br>
-  <div class="html-content" [innerHTML]="description" (click)="$event.preventDefault()"></div>
+  <div class="html-content" [innerHTML]="description" (click)="$event.preventDefault();manageLinkEvents($event)"></div>
   <br>
 
   <div class="button-equalizer">

@@ -5,6 +5,7 @@ import { ExecuteService } from "@noovolari/leapp-core/services/execute-service";
 import { AppProviderService } from "./app-provider.service";
 import { SsmService } from "@noovolari/leapp-core/services/ssm-service";
 import { LogService } from "@noovolari/leapp-core/services/log-service";
+import { AnalyticsService } from "./analytics.service";
 
 @Injectable({
   providedIn: "root",
@@ -17,7 +18,7 @@ export class AppSsmService {
   private executeService: ExecuteService;
   private coreSsmService: SsmService;
 
-  constructor(private appService: AppService, private leappCoreService: AppProviderService) {
+  constructor(private appService: AppService, private leappCoreService: AppProviderService, private analyticsService: AnalyticsService) {
     this.coreSsmService = leappCoreService.ssmService;
     this.logService = leappCoreService.logService;
     this.executeService = leappCoreService.executeService;
@@ -54,5 +55,6 @@ export class AppSsmService {
    */
   startSession(credentials: CredentialsInfo, instanceId: string, region: string): void {
     this.coreSsmService.startSession(credentials, instanceId, region);
+    this.analyticsService.captureEvent("SSM session started", { instanceId, startedAt: new Date().toISOString() });
   }
 }

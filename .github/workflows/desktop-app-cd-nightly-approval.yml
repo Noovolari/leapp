@@ -60,6 +60,9 @@ jobs:
           ref: development
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
@@ -104,6 +107,9 @@ jobs:
           ref: development
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
@@ -148,6 +154,9 @@ jobs:
           ref: development
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |
@@ -224,6 +233,9 @@ jobs:
           ref: development
           token: ${{ secrets.GH_TOKEN }}
           path: leapp-team
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
       - name: Inject Team Feature
         if: ${{ env.TEAM_REPOSITORY != '' }}
         run: |

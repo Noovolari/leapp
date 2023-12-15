@@ -1,5 +1,4 @@
 import { TestBed } from "@angular/core/testing";
-
 import { AnalyticsService } from "./analytics.service";
 import { User } from "../leapp-team-core/user/user";
 
@@ -7,10 +6,11 @@ describe("AnalyticsService", () => {
   let service: AnalyticsService;
   let user: User;
   let date: Date;
+  let appProviderService: any = {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(AnalyticsService);
+    service = new AnalyticsService(appProviderService);
 
     jasmine.clock().install();
     date = new Date();
@@ -26,7 +26,7 @@ describe("AnalyticsService", () => {
   it("should be created", () => {
     expect(service).toBeTruthy();
     const spy = spyOn(AnalyticsService.prototype, "initConfig").and.stub();
-    service = new AnalyticsService();
+    service = new AnalyticsService(appProviderService);
     expect(spy).toHaveBeenCalled();
   });
 
@@ -40,9 +40,31 @@ describe("AnalyticsService", () => {
   });
 
   it("captureEvent()", () => {
-    const spy2 = spyOn((service as any).myPosthog, "capture").and.stub();
-    service.captureEvent("event", { dummy: "test" });
+    appProviderService = {
+      teamService: {
+        signedInUserState: {
+          getValue: jasmine.createSpy().and.returnValue({ accessToken: "mocked-access-token" }),
+        },
+      },
+    } as any;
+    const service2 = new AnalyticsService(appProviderService);
+    const spy2 = spyOn((service2 as any).myPosthog, "capture").and.stub();
+    service2.captureEvent("event", { dummy: "test" });
     expect(spy2).toHaveBeenCalledWith("event", { ["leapp_agent"]: "Desktop App", environment: "development", dummy: "test" });
+  });
+
+  it("captureEvent() - if anonymous user do not log the event", () => {
+    appProviderService = {
+      teamService: {
+        signedInUserState: {
+          getValue: jasmine.createSpy().and.returnValue({ accessToken: "" }),
+        },
+      },
+    } as any;
+    const service2 = new AnalyticsService(appProviderService);
+    const spy2 = spyOn((service2 as any).myPosthog, "capture").and.stub();
+    service2.captureEvent("event", { dummy: "test" });
+    expect(spy2).not.toHaveBeenCalled();
   });
 
   it("captureUser()", () => {
@@ -73,7 +95,7 @@ describe("AnalyticsService", () => {
   });
   it("reset()", () => {
     const spy = spyOn((service as any).myPosthog, "reset").and.stub();
-    service.reset();
+    (service as any).reset();
 
     expect(spy).toHaveBeenCalled();
   });

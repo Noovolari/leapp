@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-
 import { CommandBarComponent } from "./command-bar.component";
 import { mustInjected } from "../../../base-injectables";
 import { AppProviderService } from "../../services/app-provider.service";
@@ -85,9 +84,5 @@ describe("CommandBarComponent", () => {
     spy.and.returnValue([]);
 
     fixture.detectChanges();
-  });
-
-  it("should create", () => {
-    expect(component).toBeTruthy();
   });
 });

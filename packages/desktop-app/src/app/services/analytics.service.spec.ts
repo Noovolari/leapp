@@ -35,7 +35,7 @@ describe("AnalyticsService", () => {
     const spy2 = spyOn(service as any, "captureUser").and.stub();
     service.init(user);
 
-    expect(spy1).toHaveBeenCalledWith("1", "team", date.toISOString(), "Free Trial");
+    expect(spy1).toHaveBeenCalledWith("1", "team", date.toISOString(), "user");
     expect(spy2).toHaveBeenCalledWith(user, date.toISOString());
   });
 
@@ -82,9 +82,13 @@ describe("AnalyticsService", () => {
 
   it("captureGroupOnce()", () => {
     const spy = spyOn((service as any).myPosthog, "group").and.stub();
-    service.captureGroupOnce("1", "company", date.toISOString(), "free trial");
+    service.captureGroupOnce("1", "company", date.toISOString(), "pro");
 
-    expect(spy).toHaveBeenCalledWith("company", "1", { name: "company" });
+    expect(spy).toHaveBeenCalledWith("company", "1", { name: "company", tier: "PRO" });
+
+    service.captureGroupOnce("1", "company", date.toISOString(), "manager");
+
+    expect(spy).toHaveBeenCalledWith("company", "1", { name: "company", tier: "TEAM" });
   });
 
   it("capturePageView()", () => {

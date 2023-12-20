@@ -3,6 +3,7 @@ import posthog from "posthog-js";
 import { User } from "../leapp-team-core/user/user";
 import { environment } from "../../environments/environment";
 import { AppProviderService } from "./app-provider.service";
+import { Role } from "../leapp-team-core/user/role";
 
 @Injectable({
   providedIn: "root",
@@ -31,7 +32,7 @@ export class AnalyticsService {
     try {
       this.currentLoggedUser = user;
       const createdAt = new Date().toISOString();
-      this.captureGroupOnce(user.teamId, user.teamName, createdAt, "Free Trial");
+      this.captureGroupOnce(user.teamId, user.teamName, createdAt, user.role);
       this.captureUser(user, createdAt);
     } catch (err: any) {
       console.log("PostHog error: " + err.toString());
@@ -68,9 +69,10 @@ export class AnalyticsService {
     }
   }
 
-  captureGroupOnce(companyId: string, companyName: string, _createdAt: string, _plan: string): void {
+  captureGroupOnce(companyId: string, companyName: string, _createdAt: string, role: string): void {
     try {
-      this.myPosthog.group("company", companyId, { name: companyName });
+      const plan = role === Role.pro ? "PRO" : "TEAM";
+      this.myPosthog.group("company", companyId, { name: companyName, tier: plan });
     } catch (err: any) {
       console.log("PostHog error: " + err.toString());
     }

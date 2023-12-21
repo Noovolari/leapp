@@ -4,6 +4,7 @@ import { User } from "../leapp-team-core/user/user";
 import { environment } from "../../environments/environment";
 import { AppProviderService } from "./app-provider.service";
 import { Role } from "../leapp-team-core/user/role";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Injectable({
   providedIn: "root",
@@ -39,9 +40,10 @@ export class AnalyticsService {
     }
   }
 
-  captureEvent(eventName: string, properties: any = {}, captureAnonymousEvent = false, resetAfterCapture = false): void {
+  async captureEvent(eventName: string, properties: any = {}, captureAnonymousEvent = false, resetAfterCapture = false): Promise<void> {
     const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
-    if (captureAnonymousEvent || (signedInUser && signedInUser.accessToken !== "")) {
+    const currentWorkspace = await this.appProviderService.teamService.getKeychainCurrentWorkspace();
+    if (captureAnonymousEvent || (signedInUser && signedInUser.accessToken !== "" && currentWorkspace !== constants.localWorkspaceKeychainValue)) {
       console.log("EVENT: ", eventName);
       try {
         this.myPosthog.capture(

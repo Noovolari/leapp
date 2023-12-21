@@ -39,31 +39,33 @@ describe("AnalyticsService", () => {
     expect(spy2).toHaveBeenCalledWith(user, date.toISOString());
   });
 
-  it("captureEvent()", () => {
+  it("captureEvent()", async () => {
     appProviderService = {
       teamService: {
         signedInUserState: {
           getValue: jasmine.createSpy().and.returnValue({ accessToken: "mocked-access-token" }),
         },
+        getKeychainCurrentWorkspace: () => "remoteWorkspace",
       },
     } as any;
     const service2 = new AnalyticsService(appProviderService);
     const spy2 = spyOn((service2 as any).myPosthog, "capture").and.stub();
-    service2.captureEvent("event", { dummy: "test" });
+    await service2.captureEvent("event", { dummy: "test" });
     expect(spy2).toHaveBeenCalledWith("event", { ["leapp_agent"]: "Desktop App", environment: "development", dummy: "test" });
   });
 
-  it("captureEvent() - if anonymous user do not log the event", () => {
+  it("captureEvent() - if anonymous user do not log the event", async () => {
     appProviderService = {
       teamService: {
         signedInUserState: {
           getValue: jasmine.createSpy().and.returnValue({ accessToken: "" }),
         },
+        getKeychainCurrentWorkspace: () => "remoteWorkspace",
       },
     } as any;
     const service2 = new AnalyticsService(appProviderService);
     const spy2 = spyOn((service2 as any).myPosthog, "capture").and.stub();
-    service2.captureEvent("event", { dummy: "test" });
+    await service2.captureEvent("event", { dummy: "test" });
     expect(spy2).not.toHaveBeenCalled();
   });
 

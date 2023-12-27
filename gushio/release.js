@@ -154,7 +154,7 @@ async function releaseCore(version) {
       //The pipeline starts now. The following commands are to ensure that
       //we set the pro environment and bootstrap it before releasing the CLI/DA
 
-      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/core-ci-cd.yml")
+      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/core-ci-cd-prod.yml")
     } else {
       await rollbackProject(commitId, version, "core");
     }
@@ -230,7 +230,7 @@ async function releaseCli(version) {
         throw new Error(result.stderr)
       }
 
-      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/cli-ci-cd.yml")
+      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/cli-ci-cd-prod.yml")
     } else {
       await rollbackProject(commitId, version, "cli");
     }
@@ -317,7 +317,7 @@ async function releaseDesktopApp(version) {
         throw new Error(result.stderr)
       }
 
-      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/desktop-app-cd.yml")
+      console.log(FgGreen, "keep track of the release pipeline here: https://github.com/Noovolari/leapp/actions/workflows/desktop-app-cd-prod.yml")
     } else {
       await rollbackProject(commitId, version, "desktop-app");
     }

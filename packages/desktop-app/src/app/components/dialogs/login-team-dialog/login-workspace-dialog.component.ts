@@ -58,7 +58,7 @@ export class LoginWorkspaceDialogComponent implements OnInit {
         // Get the user again after login
         const userLoggedIn = await this.teamService.signedInUserState.getValue();
         this.analyticsService.init(userLoggedIn);
-        this.analyticsService.captureEvent("Sign In");
+        await this.analyticsService.captureEvent("Sign In");
 
         const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
         const planStatus = teamOrPro.type === "team" ? LeappPlanStatus.enterprise : LeappPlanStatus.proEnabled;

@@ -111,7 +111,6 @@ export class SsmModalDialogComponent implements OnInit {
     const credentials = await (this.sessionService as AwsSessionService).generateCredentials(this.session.sessionId);
 
     this.ssmService.startSession(credentials, instanceId, this.selectedSsmRegion);
-    this.analyticsService.captureEvent("SSM session started", { instanceId, startedAt: new Date().toISOString() });
 
     setTimeout(() => {
       this.instances.forEach((instance) => {

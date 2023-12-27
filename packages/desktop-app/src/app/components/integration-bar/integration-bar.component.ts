@@ -218,13 +218,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.loadingInApp = false;
     this.setValues();
 
-    const userLoggedIn = await this.appProviderService.teamService.signedInUserState.getValue();
-    if (userLoggedIn) {
-      this.analyticsService.captureEvent("Integration Logout", {
-        integrationId,
-        logoutAt: new Date().toISOString(),
-      });
-    }
+    await this.analyticsService.captureEvent("Integration Logout", {
+      integrationId,
+      logoutAt: new Date().toISOString(),
+    });
   }
 
   async forceSync(integrationId: string): Promise<void> {
@@ -249,11 +246,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         this.modalRef = this.bsModalService.show(this.ssoModalTemplate, { class: "sso-modal" });
       }
       await this.appProviderService.awsSsoIntegrationService.syncSessions(integrationId, () => {
-        const userLoggedIn = this.appProviderService.teamService.signedInUserState.getValue();
-        if (userLoggedIn) {
-          this.analyticsService.captureEvent("Integration Login", { integrationId, integrationType: "AWS SSO", startedAt: new Date().toISOString() });
-        }
-
+        this.analyticsService.captureEvent("Integration Login", { integrationId, integrationType: "AWS SSO", startedAt: new Date().toISOString() });
         if (this.modalRef) {
           this.modalRef.hide();
         }
@@ -281,7 +274,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     await this.appProviderService.azureIntegrationService.syncSessions(integrationId);
     const userLoggedIn = this.appProviderService.teamService.signedInUserState.getValue();
     if (userLoggedIn) {
-      this.analyticsService.captureEvent("Integration Login", { integrationId, integrationType: "Azure", startedAt: new Date().toISOString() });
+      await this.analyticsService.captureEvent("Integration Login", { integrationId, integrationType: "Azure", startedAt: new Date().toISOString() });
     }
   }
 

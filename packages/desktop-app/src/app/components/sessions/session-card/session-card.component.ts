@@ -92,14 +92,6 @@ export class SessionCardComponent implements OnInit {
    */
   async stopSession(): Promise<void> {
     await this.selectedSessionActionService.stopSession(this.session);
-    const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
-    if (signedInUser) {
-      this.analyticsService.captureEvent("Session Stopped", {
-        sessionId: this.session.sessionId,
-        sessionType: this.session.type,
-        stoppedAt: new Date().toISOString(),
-      });
-    }
   }
 
   getSessionTypeIcon(type: SessionType): string {

@@ -81,27 +81,16 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
     await this.selectedSessionActionsService.startSession(this.selectedSession);
 
     if (this.selectedSession.type === SessionType.awsSsoRole && this.selectedSession.status === SessionStatus.active && !integration.isOnline) {
-      const userLoggedIn = this.appProviderService.teamService.signedInUserState.getValue();
-      if (userLoggedIn) {
-        this.analyticsService.captureEvent("Integration Login", {
-          integrationId: (this.selectedSession as AwsSsoRoleSession).awsSsoConfigurationId,
-          integrationType: "AWS SSO",
-          startedAt: new Date().toISOString(),
-        });
-      }
+      await this.analyticsService.captureEvent("Integration Login", {
+        integrationId: (this.selectedSession as AwsSsoRoleSession).awsSsoConfigurationId,
+        integrationType: "AWS SSO",
+        startedAt: new Date().toISOString(),
+      });
     }
   }
 
   async stopSession(): Promise<void> {
     await this.selectedSessionActionsService.stopSession(this.selectedSession);
-    const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
-    if (signedInUser) {
-      this.analyticsService.captureEvent("Session Stopped", {
-        sessionId: this.selectedSession.sessionId,
-        sessionType: this.selectedSession.type,
-        stoppedAt: new Date().toISOString(),
-      });
-    }
   }
 
   logoutFromFederatedSession(): void {
@@ -123,7 +112,7 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
       await this.selectedSessionActionsService.openAwsWebConsole(this.selectedSession);
     }
 
-    this.analyticsService.captureEvent("Web Console opened", {
+    await this.analyticsService.captureEvent("Web Console opened", {
       withExtension: this.optionsService.extensionEnabled,
       sessionType: this.selectedSession.type,
       sessionId: this.selectedSession.sessionId,
@@ -166,7 +155,7 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
   async applyPluginAction(plugin: AwsCredentialsPlugin): Promise<void> {
     await this.selectedSessionActionsService.applyPluginAction(this.selectedSession, plugin);
 
-    this.analyticsService.captureEvent("Plugin started", {
+    await this.analyticsService.captureEvent("Plugin started", {
       pluginName: plugin.metadata.uniqueName,
       startedAt: new Date().toISOString(),
     });

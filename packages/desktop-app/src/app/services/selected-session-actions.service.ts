@@ -55,11 +55,13 @@ export class SelectedSessionActionsService {
     await this.getSelectedSessionService(session).start(session.sessionId);
     document.querySelector(".table thead tr").scrollIntoView();
 
-    this.analyticsService.captureEvent("Session Started", {
-      sessionId: session.sessionId,
-      sessionType: session.type,
-      startedAt: new Date().toISOString(),
-    });
+    this.analyticsService
+      .captureEvent("Session Started", {
+        sessionId: session.sessionId,
+        sessionType: session.type,
+        startedAt: new Date().toISOString(),
+      })
+      .then();
   }
 
   async stopSession(session: Session): Promise<void> {
@@ -67,11 +69,13 @@ export class SelectedSessionActionsService {
     this.logSessionData(session, `Stopped Session`);
     await this.getSelectedSessionService(session).stop(session.sessionId);
 
-    this.analyticsService.captureEvent("Session Stopped", {
-      sessionId: session.sessionId,
-      sessionType: session.type,
-      stoppedAt: new Date().toISOString(),
-    });
+    this.analyticsService
+      .captureEvent("Session Stopped", {
+        sessionId: session.sessionId,
+        sessionType: session.type,
+        stoppedAt: new Date().toISOString(),
+      })
+      .then();
   }
 
   async openAwsWebConsole(session: Session): Promise<void> {

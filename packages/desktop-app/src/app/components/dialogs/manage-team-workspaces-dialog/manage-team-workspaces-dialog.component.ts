@@ -67,7 +67,7 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
       this.appService.closeAllMenuTriggers();
       globalLeappProPlanStatus.next(LeappPlanStatus.free);
       await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
-      this.analyticsService.captureEvent("Sign Out", undefined, false, true);
+      await this.analyticsService.captureEvent("Sign Out", undefined, false, true);
     } catch (error) {
       this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
     }

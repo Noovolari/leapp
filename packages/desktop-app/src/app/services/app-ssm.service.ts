@@ -55,6 +55,6 @@ export class AppSsmService {
    */
   startSession(credentials: CredentialsInfo, instanceId: string, region: string): void {
     this.coreSsmService.startSession(credentials, instanceId, region);
-    this.analyticsService.captureEvent("SSM session started", { instanceId, startedAt: new Date().toISOString() });
+    this.analyticsService.captureEvent("SSM session started", { instanceId, startedAt: new Date().toISOString() }).then();
   }
 }

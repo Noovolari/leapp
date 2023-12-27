@@ -46,11 +46,6 @@ export class BottomBarComponent implements OnInit {
 
   async stopSession(): Promise<void> {
     await this.selectedSessionActionsService.stopSession(this.selectedSession);
-    this.analyticsService.captureEvent("Session Stopped", {
-      sessionId: this.selectedSession.sessionId,
-      sessionType: this.selectedSession.type,
-      stoppedAt: new Date().toISOString(),
-    });
   }
 
   async openAwsWebConsole(): Promise<void> {

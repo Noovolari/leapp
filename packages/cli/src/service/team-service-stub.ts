@@ -89,4 +89,10 @@ export class TeamService {
   async pullFromRemote(_?: any): Promise<void> {}
 
   async removeSessionsAndIntegrationsFromCurrentWorkspace(): Promise<void> {}
+
+  async getKeychainCurrentWorkspace(): Promise<string> {
+    return "current-workspace";
+  }
+
+  async setKeychainCurrentWorkspace(_: string): Promise<void> {}
 }

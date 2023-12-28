@@ -476,6 +476,7 @@ export class Repository {
       notifications: workspace.notifications,
       requirePassword: workspace.requirePassword,
       touchIdEnabled: workspace.touchIdEnabled,
+      remoteWorkspacesSettingsMap: workspace.remoteWorkspacesSettingsMap,
     };
   }
 
@@ -495,6 +496,7 @@ export class Repository {
     workspace.notifications = globalSettingsInput.notifications;
     workspace.requirePassword = globalSettingsInput.requirePassword;
     workspace.touchIdEnabled = globalSettingsInput.touchIdEnabled;
+    workspace.remoteWorkspacesSettingsMap = globalSettingsInput.remoteWorkspacesSettingsMap;
     this.persistWorkspace(workspace);
   }
 

@@ -37,6 +37,7 @@ export class RetroCompatibilityService {
       this.migration4();
       this.migration5();
       this.migration6();
+      this.migration7();
       // When adding new migrations remember to increase constants.workspaceLastVersion
     }
   }
@@ -273,6 +274,17 @@ export class RetroCompatibilityService {
 
     workspace.requirePassword = constants.requirePasswordEveryTwoWeeks.value;
     workspace.touchIdEnabled = constants.touchIdEnabled;
+    this.persists(workspace);
+    this.repository.reloadWorkspace();
+  }
+
+  private migration7(): void {
+    const workspace = this.getWorkspace();
+    if (!this.checkMigration(workspace, 6, 7)) {
+      return;
+    }
+
+    workspace.remoteWorkspacesSettingsMap = {};
     this.persists(workspace);
     this.repository.reloadWorkspace();
   }

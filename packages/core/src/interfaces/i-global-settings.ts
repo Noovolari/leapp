@@ -1,6 +1,7 @@
 import PluginStatus from "../models/plugin-status";
 import Segment from "../models/segment";
 import { LeappNotification } from "../models/notification";
+import { RemoteWorkspacesSettingsMap } from "../models/remote-workspace-settings-map";
 
 export interface GlobalSettings {
   defaultRegion: string;
@@ -17,4 +18,5 @@ export interface GlobalSettings {
   notifications: LeappNotification[];
   requirePassword: number;
   touchIdEnabled: boolean;
+  remoteWorkspacesSettingsMap: RemoteWorkspacesSettingsMap;
 }

@@ -11,6 +11,7 @@ import { AwsSsoIntegration } from "./aws/aws-sso-integration";
 import { AzureIntegration } from "./azure/azure-integration";
 import PluginStatus from "./plugin-status";
 import { LeappNotification } from "./notification";
+import { RemoteWorkspacesSettingsMap } from "./remote-workspace-settings-map";
 
 export class Workspace {
   /* istanbul ignore next */
@@ -25,6 +26,7 @@ export class Workspace {
   private _macOsTerminal: string;
   private _idpUrls: IdpUrl[];
   private _profiles: AwsNamedProfile[];
+  private _remoteWorkspacesSettingsMap: RemoteWorkspacesSettingsMap;
 
   private _notifications: LeappNotification[];
 
@@ -65,6 +67,7 @@ export class Workspace {
     this._macOsTerminal = constants.macOsTerminal;
     this._idpUrls = [];
     this._profiles = [{ id: uuid.v4(), name: constants.defaultAwsProfileName }];
+    this._remoteWorkspacesSettingsMap = {};
     this._pluginsStatus = [];
     this._extensionEnabled = false;
 
@@ -117,6 +120,14 @@ export class Workspace {
 
   set profiles(value: AwsNamedProfile[]) {
     this._profiles = value;
+  }
+
+  get remoteWorkspacesSettingsMap(): RemoteWorkspacesSettingsMap {
+    return this._remoteWorkspacesSettingsMap;
+  }
+
+  set remoteWorkspacesSettingsMap(value: RemoteWorkspacesSettingsMap) {
+    this._remoteWorkspacesSettingsMap = value;
   }
 
   get sessions(): Session[] {

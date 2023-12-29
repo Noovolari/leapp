@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.23.1](https://github.com/Noovolari/leapp/compare/v0.23.0...v0.23.1) (2023-12-27)
+
+### Bug fixes
+* Solved Leapp Team configuration consistency bug; now, Leapp skips invalid sessions that are pulled from remote.
+
 ### [0.23.0](https://github.com/Noovolari/leapp/compare/v0.22.2...v0.23.0) (2023-12-13)
 
 We are in early access! Our first company solution is now in early access and available for FREE.

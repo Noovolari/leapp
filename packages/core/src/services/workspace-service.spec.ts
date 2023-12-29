@@ -116,12 +116,28 @@ describe("WorkspaceService", () => {
     expect(result).toEqual("mock-global-settings");
   });
 
+  test("extractGlobalSettings, by passing parameters", () => {
+    const repository = {
+      globalSettings: { remoteWorkspacesSettingsMap: {} },
+      getProfiles: jest.fn(() => [{ id: "mocked-profile-id", name: "mocked-profile-name" }]),
+    };
+    const workspaceService = new WorkspaceService(repository as any);
+    const result = workspaceService.extractGlobalSettings("mocked-user-id", "mocked-team-id", [
+      { sessionId: "mocked-session-id", profileId: "mocked-profile-id", region: "mocked-region" },
+    ] as any);
+    expect(result).toEqual({
+      remoteWorkspacesSettingsMap: {
+        "mocked-team-id-mocked-user-id": { "mocked-session-id": { profileName: "mocked-profile-name", region: "mocked-region" } },
+      },
+    });
+  });
+
   test("applyGlobalSettings, without purging any remote pinned sessions", () => {
     const repository = {
       globalSettings: "",
     };
     const workspaceService = new WorkspaceService(repository as any);
-    workspaceService.applyGlobalSettings("mock-global-settings" as any);
+    workspaceService.applyGlobalSettings("mock-global-settings" as any, []);
     expect(repository.globalSettings).toEqual("mock-global-settings");
   });
 
@@ -129,13 +145,13 @@ describe("WorkspaceService", () => {
     const mockedGlobalSettings = {
       pinned: ["id1", "id2", "id3", "id4"],
     } as any;
-    const localSessionIds = ["id1"];
+    const localSessions = [{ sessionId: "id1" }] as any;
     const remoteSessionIds = ["id2", "id3"];
     const repository = {
       globalSettings: {},
     };
     const workspaceService = new WorkspaceService(repository as any);
-    workspaceService.applyGlobalSettings(mockedGlobalSettings, localSessionIds, remoteSessionIds);
+    workspaceService.applyGlobalSettings(mockedGlobalSettings, localSessions, remoteSessionIds);
     expect(repository.globalSettings).toEqual({ pinned: ["id1", "id2", "id3"] });
   });
 });

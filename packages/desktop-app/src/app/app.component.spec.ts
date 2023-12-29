@@ -5,6 +5,7 @@ import { mustInjected } from "../base-injectables";
 import { AppProviderService } from "./services/app-provider.service";
 import { Workspace } from "@noovolari/leapp-core/models/workspace";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 describe("AppComponent", () => {
   beforeEach(waitForAsync(() => {
@@ -179,5 +180,27 @@ describe("AppComponent", () => {
     expect(result).toBeTruthy();
     result = (app as any).isOpenLeappDeepLink("https://open-plugin-name");
     expect(result).toBeFalsy();
+  });
+
+  it("beforeCloseInstructions", async () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.debugElement.componentInstance;
+    (app as any).loggingService = { log: jasmine.createSpy().and.callFake(() => {}) };
+    (app as any).remoteProceduresServer = { stopServer: jasmine.createSpy().and.callFake(() => {}) };
+    (app as any).appProviderService = {
+      sessionManagementService: {
+        stopAllSessions: jasmine.createSpy().and.callFake(() => {}),
+      },
+    };
+    (app as any).teamService = { signOut: jasmine.createSpy().and.callFake(() => {}) };
+    (app as any).appService = { quit: jasmine.createSpy().and.callFake(() => {}) };
+
+    await (app as any).beforeCloseInstructions();
+
+    expect((app as any).loggingService.log).toHaveBeenCalledWith(new LoggedEntry("Closing app with cleaning process...", this, LogLevel.info));
+    expect((app as any).remoteProceduresServer.stopServer).toHaveBeenCalledTimes(1);
+    expect((app as any).appProviderService.sessionManagementService.stopAllSessions).toHaveBeenCalledTimes(1);
+    expect((app as any).teamService.signOut).toHaveBeenCalledTimes(1);
+    expect((app as any).appService.quit).toHaveBeenCalledTimes(1);
   });
 });

@@ -20,7 +20,7 @@ describe("Repository", () => {
   let mockedNotifications: any;
 
   beforeEach(() => {
-    mockedNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "descr", false)];
+    mockedNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "button-action-name", "description", false)];
     mockedWorkspace = new Workspace();
     mockedWorkspace.notifications = mockedNotifications;
 
@@ -76,7 +76,6 @@ describe("Repository", () => {
 
   test("set workspace() - set the private workspace", () => {
     const workspace = new Workspace();
-
     repository.workspace = workspace;
     expect(workspace).toBe((repository as any)._workspace);
   });
@@ -1336,10 +1335,13 @@ describe("Repository", () => {
       macOsTerminal: "mock-terminal",
       notifications: mockedNotifications,
       pluginsStatus: "mock-plugin-status",
+      remoteWorkspacesSettingsMap: {},
+      requirePassword: undefined,
       samlRoleSessionDuration: "mock-saml-role-session-duration",
       pinned: "mock-pinned",
       segments: "mock-segments",
       ssmRegionBehaviour: "mock-ssm-region-behaviour",
+      touchIdEnabled: undefined,
     });
   });
 
@@ -1356,6 +1358,7 @@ describe("Repository", () => {
       pinned: "mock-pinned",
       segments: "mock-segments",
       ssmRegionBehaviour: "mock-ssm-region-behaviour",
+      remoteWorkspacesSettingsMap: { "team-id-user-id": { "session-id": { region: "region", profileName: "profile-name" } } },
     };
     repository.getWorkspace = jest.fn(() => mockedWorkspace);
     repository.persistWorkspace = jest.fn(() => mockedWorkspace);
@@ -1373,6 +1376,9 @@ describe("Repository", () => {
     expect(mockedWorkspace.pinned).toEqual("mock-pinned");
     expect(mockedWorkspace.segments).toEqual("mock-segments");
     expect(mockedWorkspace.ssmRegionBehaviour).toEqual("mock-ssm-region-behaviour");
+    expect(mockedWorkspace.remoteWorkspacesSettingsMap).toEqual({
+      "team-id-user-id": { "session-id": { region: "region", profileName: "profile-name" } },
+    });
     expect(repository.persistWorkspace).toHaveBeenCalled();
   });
 

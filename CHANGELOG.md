@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.24.0](https://github.com/Noovolari/leapp/compare/v0.23.1...v0.24.0) (2023-12-29)
+
+### Features
+* Now Leapp options relative to the pro/team workspace are saved.
+
+### Bug fixes
+* In the docs.leapp.cloud navigation sidebar, all the CLI commands are now visible
+* Added [export profile script](https://docs.leapp.cloud/latest/usefull-scripts/export-profile) to the docs
+
 ### [0.23.1](https://github.com/Noovolari/leapp/compare/v0.23.0...v0.23.1) (2023-12-27)
 
 ### Bug fixes

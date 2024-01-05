@@ -1,9 +1,8 @@
 import { Injectable } from "@angular/core";
 import posthog from "posthog-js";
-import { User } from "../leapp-team-core/user/user";
+import { User, Role } from "./team-service";
 import { environment } from "../../environments/environment";
 import { AppProviderService } from "./app-provider.service";
-import { Role } from "../leapp-team-core/user/role";
 import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Injectable({

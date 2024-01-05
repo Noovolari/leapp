@@ -29,9 +29,8 @@ import { AzureSessionService } from "@noovolari/leapp-core/services/session/azur
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
 import { ExtensionWebsocketService } from "./services/extension-websocket.service";
-import { TeamService } from "./services/team-service";
+import { TeamService, Role } from "./services/team-service";
 import { AnalyticsService } from "./services/analytics.service";
-import { Role } from "./leapp-team-core/user/role";
 
 @Component({
   selector: "app-root",

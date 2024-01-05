@@ -15,7 +15,14 @@ enum FormErrorCodes {
   invalidCredentials,
 }
 
-export { User, ApiErrorCodes, FormErrorCodes };
+enum Role {
+  user = "user",
+  pro = "pro",
+  manager = "manager",
+  admin = "admin",
+}
+
+export { User, ApiErrorCodes, FormErrorCodes, Role };
 
 export interface WorkspaceState {
   name: string;

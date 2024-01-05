@@ -78,7 +78,7 @@ export class ExecuteService {
                     end if'`,
           Object.assign(newEnv, env)
         );
-      } else {
+      } else if (terminalType === constants.macOsIterm2) {
         return this.execute(
           `osascript -e 'if application "iTerm" is running then\n
                     \ttell application "iTerm"\n
@@ -93,6 +93,30 @@ export class ExecuteService {
                     \tend tell\n
                     else\n
                     \ttell application "iTerm"\n
+                    \t\treopen\n
+                    \t\tdelay 1\n
+                    \t\ttell current session of current window\n
+                    \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+                    \t\tend tell\n
+                    \tend tell\n
+                    end if'`,
+          Object.assign(newEnv, env)
+        );
+      } else if (terminalType === constants.macOsWarp) {
+        return this.execute(
+          `osascript -e 'if application "Warp" is running then\n
+                    \ttell application "Warp"\n
+                    \t\tset newWindow to (create window with default profile)\n
+                    \t\ttell current session of newWindow\n
+                    \t\t\twrite text "source ${path}"\n
+                    \t\t\tdelay 3.5\n
+                    \t\t\twrite text "clear"\n
+                    \t\t\tdelay 2.5\n
+                    \t\t\twrite text "${command} && unset AWS_SESSION_TOKEN && unset AWS_SECRET_ACCESS_KEY && unset AWS_ACCESS_KEY_ID"\n
+                    \t\tend tell\n
+                    \tend tell\n
+                    else\n
+                    \ttell application "Warp"\n
                     \t\treopen\n
                     \t\tdelay 1\n
                     \t\ttell current session of current window\n

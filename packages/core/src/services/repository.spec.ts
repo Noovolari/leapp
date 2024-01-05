@@ -1248,6 +1248,9 @@ describe("Repository", () => {
 
     repository.updateMacOsTerminal(constants.macOsIterm2);
     expect(workspace.macOsTerminal).toBe(constants.macOsIterm2);
+
+    repository.updateMacOsTerminal(constants.macOsWarp);
+    expect(workspace.macOsTerminal).toBe(constants.macOsWarp);
   });
 
   test("updateColorTheme() - set the color theme variable in the workspace", () => {

@@ -59,6 +59,14 @@ describe("Workspace Model", () => {
     expect(workspace.macOsTerminal).toEqual(constants.macOsIterm2);
   });
 
+  test("set macOSTerminal", () => {
+    const workspace = new Workspace();
+    const macOsTerminalSetterSpy = jest.spyOn(workspace, "macOsTerminal", "set");
+    workspace.macOsTerminal = constants.macOsWarp;
+    expect(macOsTerminalSetterSpy).toHaveBeenCalledTimes(1);
+    expect(workspace.macOsTerminal).toEqual(constants.macOsWarp);
+  });
+
   test("get idpUrls", () => {
     const workspace = new Workspace();
     expect(workspace.idpUrls).toEqual([]);

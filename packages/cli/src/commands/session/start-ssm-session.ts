@@ -109,7 +109,12 @@ export default class StartSsmSession extends LeappCommand {
     const process = this.cliProviderService.cliNativeService.process;
     if (process.platform === "darwin") {
       const terminalProgram = process.env["TERM_PROGRAM"];
-      macOsTerminalType = terminalProgram && terminalProgram.toLowerCase().includes("iterm") ? constants.macOsIterm2 : constants.macOsTerminal;
+      macOsTerminalType =
+        terminalProgram && terminalProgram.toLowerCase().includes("iterm")
+          ? constants.macOsIterm2
+          : terminalProgram.toLowerCase().includes("warp")
+          ? constants.macOsWarp
+          : constants.macOsTerminal;
     }
     await this.cliProviderService.ssmService.startSession(credentials, ssmInstanceIdString, r, macOsTerminalType);
     this.log("started AWS SSM session");

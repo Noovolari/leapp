@@ -220,7 +220,7 @@ describe("StartSsmSession", () => {
     const command = getTestCommand(cliProviderService);
 
     await command.startSsmSession("credentials" as any, "instanceId", "region");
-    expect(cliProviderService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", constants.macOsTerminal);
+    expect(cliProviderService.ssmService.startSession).toHaveBeenCalledWith("credentials", "instanceId", "region", constants.macOsWarp);
   });
 
   test("startSsmSession, macOS, other terminal", async () => {

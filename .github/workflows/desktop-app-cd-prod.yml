@@ -21,6 +21,8 @@ env:
   ESIGNER_WIN_TOTP: ${{ secrets.ESIGNER_WIN_TOTP }}
   ESIGNER_WIN_CLIENT_ID: ${{ secrets.ESIGNER_WIN_CLIENT_ID }}
   TEAM_REPOSITORY: ${{ secrets.TEAM_REPOSITORY }}
+  APPLE_ID: ${{ secrets.APPLE_ID }}
+  APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
 
 jobs:
   tag-validation:

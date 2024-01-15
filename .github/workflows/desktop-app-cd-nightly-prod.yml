@@ -15,6 +15,8 @@ env:
   WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
   NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   TEAM_REPOSITORY: ${{ secrets.TEAM_REPOSITORY }}
+  APPLE_ID: ${{ secrets.APPLE_ID }}
+  APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
 
 jobs:
   clean-nightly-latest:

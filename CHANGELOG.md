@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.24.1](https://github.com/Noovolari/leapp/compare/v0.24.0...v0.24.1) (2024-01-15)
+
+### Features
+* added support to macOS Warp terminal [#510](https://github.com/Noovolari/leapp/pull/510). A special thanks to [@blyzer](https://github.com/blyzer)!
+* updated macOS build notarization method
+
 ### [0.24.0](https://github.com/Noovolari/leapp/compare/v0.23.1...v0.24.0) (2023-12-29)
 
 ### Features

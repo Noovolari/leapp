@@ -43,7 +43,7 @@ describe("AnalyticsService", () => {
     appProviderService = {
       teamService: {
         signedInUserState: {
-          getValue: jasmine.createSpy().and.returnValue({ accessToken: "mocked-access-token" }),
+          getValue: jasmine.createSpy().and.returnValue({ accessToken: "mocked-access-token", email: "mocked@email.com" }),
         },
         getKeychainCurrentWorkspace: () => "remoteWorkspace",
       },
@@ -51,7 +51,12 @@ describe("AnalyticsService", () => {
     const service2 = new AnalyticsService(appProviderService);
     const spy2 = spyOn((service2 as any).myPosthog, "capture").and.stub();
     await service2.captureEvent("event", { dummy: "test" });
-    expect(spy2).toHaveBeenCalledWith("event", { ["leapp_agent"]: "Desktop App", environment: "development", dummy: "test" });
+    expect(spy2).toHaveBeenCalledWith("event", {
+      ["leapp_agent"]: "Desktop App",
+      environment: "development",
+      $set: { email: "mocked@email.com" },
+      dummy: "test",
+    });
   });
 
   it("captureEvent() - if anonymous user do not log the event", async () => {

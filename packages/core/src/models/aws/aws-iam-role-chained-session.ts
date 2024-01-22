@@ -6,8 +6,17 @@ export class AwsIamRoleChainedSession extends Session {
   profileId: string;
   parentSessionId: string;
   roleSessionName?: string;
+  awsAccount?: { accountName: string; accountId: string };
 
-  constructor(sessionName: string, region: string, roleArn: string, profileId: string, parentSessionId: string, roleSessionName?: string) {
+  constructor(
+    sessionName: string,
+    region: string,
+    roleArn: string,
+    profileId: string,
+    parentSessionId: string,
+    roleSessionName?: string,
+    awsAccount?: { accountName: string; accountId: string }
+  ) {
     super(sessionName, region);
 
     this.roleArn = roleArn;
@@ -15,5 +24,7 @@ export class AwsIamRoleChainedSession extends Session {
     this.parentSessionId = parentSessionId;
     this.type = SessionType.awsIamRoleChained;
     this.roleSessionName = roleSessionName ? roleSessionName : `assumed-from-leapp`;
+
+    this.awsAccount = awsAccount;
   }
 }

@@ -5,7 +5,7 @@
       <th (click)="orderSessionsByName(columnSettings[0].orderStyle)"><span>Session</span><i
         [ngClass]="[columnSettings[0].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[0].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[0].orderStyle && !columnSettings[0].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i>
       </th>
-      <th (click)="orderSessionsByRole(columnSettings[1].orderStyle)" class="{{eGlobalColumns.role ? '' : 'hidden-column'}} active-columns-{{eGlobalColumnsCount}}"><span>Role</span><i
+      <th (click)="orderSessionsByRole(columnSettings[1].orderStyle)" class="{{eGlobalColumns.role ? '' : 'hidden-column'}} active-columns-{{eGlobalColumnsCount}}"><span>Identity</span><i
         [ngClass]="[columnSettings[1].orderStyle ? 'descendent-order-arrow' : 'ascendent-order-arrow', columnSettings[1].activeArrow ? 'active-arrow' : 'hidden-arrow', !columnSettings[1].orderStyle && !columnSettings[1].activeArrow ? 'moon-Caret-down' : 'moon-Dropdown']"></i>
       </th>
       <th (click)="orderSessionsByType(columnSettings[2].orderStyle)" class="{{eGlobalColumns.provider ? '' : 'hidden-column'}}"><span>Provider</span><i

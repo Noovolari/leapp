@@ -67,6 +67,10 @@ export class AwsIamUserService extends AwsSessionService {
       session.sessionId = request.sessionId;
     }
 
+    if (request.awsAccount) {
+      session.awsAccount = request.awsAccount;
+    }
+
     await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-access-key-id`, request.accessKey);
     await this.keychainService.saveSecret(constants.appName, `${session.sessionId}-iam-user-aws-session-secret-access-key`, request.secretKey);
     this.repository.addSession(session);

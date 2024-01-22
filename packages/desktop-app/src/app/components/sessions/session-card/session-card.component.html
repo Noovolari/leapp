@@ -8,7 +8,7 @@
     <i
       class="moon-Hover-{{session.status !== eSessionStatus.active && session.status !== eSessionStatus.pending ? 'Start' : 'Stop'}} moon-hover-session hover-item"
       (click)="session.status === eSessionStatus.active || session.status === eSessionStatus.pending ? stopSession() : startSession()"></i>
-    <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session.sessionName}}</span>
+    <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session?.awsAccount ? session?.awsAccount?.accountName : session.sessionName}}</span>
     <i class="moon-Pin" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1"></i>
   </div>
 </td>
@@ -18,6 +18,7 @@
   <div class="span-limiter">
     <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">
       <ng-container *ngIf="session.type !== eSessionType.awsIamUser && session.type !== eSessionType.azure">{{ session | detail }}</ng-container>
+      <ng-container *ngIf="session.type === eSessionType.awsIamUser">{{ session.sessionName }}</ng-container>
     </span>
   </div>
 </td>

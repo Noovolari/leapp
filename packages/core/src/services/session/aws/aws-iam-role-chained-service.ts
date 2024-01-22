@@ -54,6 +54,10 @@ export class AwsIamRoleChainedService extends AwsSessionService {
       session.sessionId = request.sessionId;
     }
 
+    if (request.awsAccount) {
+      session.awsAccount = request.awsAccount;
+    }
+
     this.repository.addSession(session);
     this.sessionNotifier?.setSessions(this.repository.getSessions());
   }

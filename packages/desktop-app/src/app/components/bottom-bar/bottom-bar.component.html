@@ -28,7 +28,7 @@
         <a class="icon-button" (click)="ssmModalOpen();" *ngIf="selectedSession.type !== eSessionType.azure" matTooltip="View SSM sessions"><i
           class="moon-Server"></i></a>
         <a class="icon-button"
-           *ngIf="selectedSession.type === eSessionType.awsIamUser || selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained"
+           *ngIf="(selectedSession.type === eSessionType.awsIamUser || selectedSession.type === eSessionType.awsIamRoleFederated || selectedSession.type === eSessionType.awsIamRoleChained) && !isLeappTeamUser"
            (click)="editCurrentSession();" matTooltip="Edit Session"><i class="moon-Edit"></i></a>
       </div>
       <span class="separator"></span>

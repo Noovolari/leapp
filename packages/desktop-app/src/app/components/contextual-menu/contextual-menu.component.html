@@ -64,7 +64,7 @@
     </ng-container>
 
     <button mat-menu-item (click)="editSession();"
-            *ngIf="selectedSession.type !== eSessionType.awsSsoRole && selectedSession.type !== eSessionType.azure">
+            *ngIf="selectedSession.type !== eSessionType.awsSsoRole && selectedSession.type !== eSessionType.azure && !isLeappTeamUser">
       <i class="moon-Edit"></i>&nbsp;
       <span>Edit Session</span>
     </button>

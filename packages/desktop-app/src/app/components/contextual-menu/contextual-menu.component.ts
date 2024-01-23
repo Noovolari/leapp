@@ -14,6 +14,7 @@ import { ExtensionWebsocketService, FetchingState } from "../../services/extensi
 import { Subscription } from "rxjs";
 import { AnalyticsService } from "../../services/analytics.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
+import { Role } from "../../services/team-service";
 
 @Component({
   selector: "app-contextual-menu",
@@ -42,6 +43,13 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
     private extensionWebsocketService: ExtensionWebsocketService,
     private readonly analyticsService: AnalyticsService
   ) {}
+
+  get isLeappTeamUser(): boolean {
+    return (
+      this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.manager ||
+      this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.user
+    );
+  }
 
   ngOnInit(): void {
     this.sessionSelectionsSubscription = this.appProviderService.behaviouralSubjectService.sessionSelections$.subscribe(

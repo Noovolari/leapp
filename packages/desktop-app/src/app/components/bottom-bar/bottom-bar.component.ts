@@ -6,6 +6,8 @@ import { SelectedSessionActionsService } from "../../services/selected-session-a
 import { OptionsService } from "../../services/options.service";
 import { ExtensionWebsocketService, FetchingState } from "../../services/extension-websocket.service";
 import { AnalyticsService } from "../../services/analytics.service";
+import { AppProviderService } from "../../services/app-provider.service";
+import { Role } from "../../services/team-service";
 
 @Component({
   selector: "app-bottom-bar",
@@ -26,6 +28,7 @@ export class BottomBarComponent implements OnInit {
   constructor(
     private selectedSessionActionsService: SelectedSessionActionsService,
     public optionsService: OptionsService,
+    private appProviderService: AppProviderService,
     private extensionWebsocketService: ExtensionWebsocketService,
     private readonly analyticsService: AnalyticsService
   ) {}
@@ -34,6 +37,13 @@ export class BottomBarComponent implements OnInit {
     this.extensionWebsocketService.fetching$.subscribe((value) => {
       this.isWebConsoleFetching = value !== FetchingState.notFetching;
     });
+  }
+
+  get isLeappTeamUser(): boolean {
+    return (
+      this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.manager ||
+      this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.user
+    );
   }
 
   get isPinned(): boolean {

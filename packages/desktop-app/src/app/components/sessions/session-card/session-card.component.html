@@ -8,7 +8,7 @@
     <i
       class="moon-Hover-{{session.status !== eSessionStatus.active && session.status !== eSessionStatus.pending ? 'Start' : 'Stop'}} moon-hover-session hover-item"
       (click)="session.status === eSessionStatus.active || session.status === eSessionStatus.pending ? stopSession() : startSession()"></i>
-    <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{session?.awsAccount ? session?.awsAccount?.accountName : session.sessionName}}</span>
+    <span class="{{session.status === eSessionStatus.active ? 'strong' : ''}}">{{$any(session)?.awsAccount ? $any(session)?.awsAccount?.accountName : session.sessionName}}</span>
     <i class="moon-Pin" *ngIf="optionService.pinned.indexOf(session.sessionId) !== -1"></i>
   </div>
 </td>

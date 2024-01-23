@@ -45,9 +45,13 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
   ) {}
 
   get isLeappTeamUser(): boolean {
+    const localWorkspace = this.appProviderService.teamService.workspacesState
+      .getValue()
+      .find((workspace) => workspace.name === constants.localWorkspaceName);
     return (
-      this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.manager ||
-      this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.user
+      (this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.manager ||
+        this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.user) &&
+      localWorkspace.selected === false
     );
   }
 

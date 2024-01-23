@@ -8,6 +8,7 @@ import { ExtensionWebsocketService, FetchingState } from "../../services/extensi
 import { AnalyticsService } from "../../services/analytics.service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { Role } from "../../services/team-service";
+import { constants } from "@noovolari/leapp-core/models/constants";
 
 @Component({
   selector: "app-bottom-bar",
@@ -40,9 +41,13 @@ export class BottomBarComponent implements OnInit {
   }
 
   get isLeappTeamUser(): boolean {
+    const localWorkspace = this.appProviderService.teamService.workspacesState
+      .getValue()
+      .find((workspace) => workspace.name === constants.localWorkspaceName);
     return (
-      this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.manager ||
-      this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.user
+      (this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.manager ||
+        this.appProviderService.teamService.signedInUserState?.getValue()?.role === Role.user) &&
+      localWorkspace.selected === false
     );
   }
 

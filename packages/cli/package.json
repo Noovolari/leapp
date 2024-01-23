@@ -1,7 +1,7 @@
 {
   "name": "@noovolari/leapp-cli",
   "description": "Leapp's Command Line Interface\n\nIt relies on Leapp Core, which encapsulates the domain logic.\n\nFor more information about the project visit the [site](www.leapp.cloud).",
-  "version": "0.1.57",
+  "version": "0.1.58",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"
@@ -15,7 +15,7 @@
     "@aws-sdk/client-sso": "^3.85.0",
     "@aws-sdk/client-sso-oidc": "^3.85.0",
     "@babel/plugin-proposal-decorators": "^7.16.5",
-    "@noovolari/leapp-core": "file:../core",
+    "@noovolari/leapp-core": "0.1.158",
     "@oclif/core": "2.1.4",
     "@oclif/plugin-help": "^5.1.12",
     "@types/inquirer": "8.2.0",

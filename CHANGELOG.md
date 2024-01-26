@@ -2,11 +2,6 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [0.24.4](https://github.com/Noovolari/leapp/compare/v0.24.3...v0.24.4) (2024-01-25)
-
-### Features
-* new Leapp Team feature: if you log into Leapp Team as a Manager user, you'll see only the Sessions that you've explicitly shared with that user.
-
 ### [0.24.3](https://github.com/Noovolari/leapp/compare/v0.24.2...v0.24.3) (2024-01-23)
 
 ### Bug Fixes

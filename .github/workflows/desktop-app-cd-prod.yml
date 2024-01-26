@@ -124,6 +124,9 @@ jobs:
       - name: Release draft to S3
         shell: bash
         run: |
+          python --version
+          aws --version
+          pip3 install --upgrade awscli
           cd packages/desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
           TAG_VERSION=${TAG_VERSION:1}

@@ -29,6 +29,7 @@ jobs:
     outputs:
       validator: ${{ steps.validator.outputs.VALID_TAG }}
       tag-version: ${{ steps.validator.outputs.TAG_VERSION }}
+      tag-version-without-v: ${{ steps.validator.outputs.TAG_VERSION_WITHOUT_V }}
     runs-on: macos-latest
     steps:
       - name: Checkout
@@ -41,10 +42,13 @@ jobs:
         run: |
           git fetch
           TAG=$(git tag --points-at $GITHUB_SHA)
+          TAG_WITHOUT_V=${TAG:1}
           REGEX="^v[0-9]+\.[0-9]+.[0-9]+"
           if [[ $TAG =~ $REGEX ]]; then IS_VALID_TAG=1; else IS_VALID_TAG=0; fi;
           echo "::set-output name=VALID_TAG::$IS_VALID_TAG"
           echo "::set-output name=TAG_VERSION::$TAG"
+          echo "::set-output name=TAG_VERSION::$TAG"
+          echo "::set-output name=TAG_VERSION_WITHOUT_V::$TAG_WITHOUT_V"
 
       - name: If valid tag set
         if: steps.validator.outputs.VALID_TAG == 1
@@ -114,23 +118,11 @@ jobs:
           powershell "Compress-Archive './release/Leapp Setup ${TAG_VERSION}.exe' './release/Leapp-${TAG_VERSION}-win.zip'"
           powershell "Compress-Archive './release/Leapp Setup ${TAG_VERSION}.exe' './release/Leapp-windows.zip'"
 
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: eu-west-1
-
-      - name: Release draft to S3
-        shell: bash
-        run: |
-          python --version
-          aws --version
-          pip3 install --upgrade awscli
-          cd packages/desktop-app
-          TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}
-          TAG_VERSION=${TAG_VERSION:1}
-          aws s3 cp ./release/ "${{ env.S3_BUCKET }}/${TAG_VERSION}/" --recursive
+          name: Leapp-${{ needs.tag-validation.outputs.tag-version-without-v }}-win.zip
+          path: packages/desktop-app/release/Leapp-${{ needs.tag-validation.outputs.tag-version-without-v }}-win.zip
 
   build-linux:
     runs-on: ubuntu-latest
@@ -406,7 +398,6 @@ jobs:
 
   publish-changelog:
     runs-on: ubuntu-latest
-    environment: prod
     needs: [ publish-draft ]
     if: needs.tag-validation.outputs.validator == 1
     steps:
@@ -425,7 +416,6 @@ jobs:
 
   invalidate-distribution:
     runs-on: ubuntu-latest
-    environment: prod
     needs: [ publish-changelog ]
     if: needs.tag-validation.outputs.validator == 1
     steps:

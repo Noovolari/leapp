@@ -122,7 +122,6 @@ jobs:
           aws-region: eu-west-1
 
       - name: Release draft to S3
-        shell: bash
         run: |
           cd packages/desktop-app
           TAG_VERSION=${{ needs.tag-validation.outputs.tag-version }}

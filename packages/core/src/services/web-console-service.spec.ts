@@ -61,19 +61,23 @@ describe("WebConsoleService", () => {
       },
     };
 
-    const signinToken = credentialsInfo.sessionToken.aws_session_token;
-    let federationUrl = "https://signin.aws.amazon.com/federation";
-    let consoleHomeURL = `https://${mockedSessionRegion}.console.aws.amazon.com/console/home?region=${mockedSessionRegion}`;
-    let truthUrl = `${federationUrl}?Action=login&Issuer=Leapp&Destination=${consoleHomeURL}&SigninToken=${signinToken}`;
+    let truthUrl =
+      "https://us-east-1.signin.aws.amazon.com/oauth?Action=logout&redirect_uri=" +
+      "https%3A%2F%2Fus-east-1.signin.aws.amazon.com%2Ffederation%3FAction%3Dlogin" +
+      "%26Issuer%3DLeapp%26Destination%3Dhttps%253A%252F%252Feu-west-1.console.aws.amazon.com%252F" +
+      "console%252Fhome%253Fregion%253Deu-west-1%26SigninToken%3Dmocked-aws_session_token";
 
     const webConsoleService: WebConsoleService = getService();
     const result1 = await webConsoleService.getWebConsoleUrl(credentialsInfo, mockedSessionRegion, mockedSessionDuration);
     expect(result1).toStrictEqual(truthUrl);
 
     mockedSessionRegion = "us-gov-";
-    federationUrl = "https://signin.amazonaws-us-gov.com/federation";
-    consoleHomeURL = `https://console.amazonaws-us-gov.com/console/home?region=${mockedSessionRegion}`;
-    truthUrl = `${federationUrl}?Action=login&Issuer=Leapp&Destination=${consoleHomeURL}&SigninToken=${signinToken}`;
+    truthUrl =
+      "https://us-east-1.signin.amazonaws-us-gov.com/oauth?Action=logout&redirect_uri=" +
+      "https%3A%2F%2Fus-east-1.signin.amazonaws-us-gov.com%2Ffederation%3FAction%3Dlogin" +
+      "%26Issuer%3DLeapp%26Destination%3Dhttps%253A%252F%252Fconsole.amazonaws-us-gov.com%252F" +
+      "console%252Fhome%253Fregion%253Dus-gov-%26SigninToken%3Dmocked-aws_session_token";
+
     const result2 = await webConsoleService.getWebConsoleUrl(credentialsInfo, mockedSessionRegion);
     expect(result2).toStrictEqual(truthUrl);
   });

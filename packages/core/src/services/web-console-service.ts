@@ -16,16 +16,19 @@ export class WebConsoleService {
   ): Promise<string> {
     const isUSGovCloud = sessionRegion.startsWith("us-gov-");
 
-    let federationUrl;
-    let consoleHomeURL;
+    let consoleHomeUrl;
+    let signInUrl;
 
     if (!isUSGovCloud) {
-      federationUrl = "https://signin.aws.amazon.com/federation";
-      consoleHomeURL = `https://${sessionRegion}.console.aws.amazon.com/console/home?region=${sessionRegion}`;
+      signInUrl = "https://us-east-1.signin.aws.amazon.com";
+      consoleHomeUrl = `https://${sessionRegion}.console.aws.amazon.com/console/home?region=${sessionRegion}`;
     } else {
-      federationUrl = "https://signin.amazonaws-us-gov.com/federation";
-      consoleHomeURL = `https://console.amazonaws-us-gov.com/console/home?region=${sessionRegion}`;
+      signInUrl = "https://us-east-1.signin.amazonaws-us-gov.com";
+      consoleHomeUrl = `https://console.amazonaws-us-gov.com/console/home?region=${sessionRegion}`;
     }
+
+    const federationUrl = `${signInUrl}/federation`;
+    const oAuthUrl = `${signInUrl}/oauth`;
 
     if (sessionRegion.startsWith("cn-")) {
       throw new Error("Unsupported Region");
@@ -46,7 +49,17 @@ export class WebConsoleService {
     const res = await this.nativeService.fetch(`${federationUrl}${queryParametersSigninToken}`);
     const response = await res.json();
 
-    return `${federationUrl}?Action=login&Issuer=Leapp&Destination=${consoleHomeURL}&SigninToken=${(response as any).SigninToken}`;
+    const redirectUrl = new URL(federationUrl);
+    redirectUrl.searchParams.append("Action", "login");
+    redirectUrl.searchParams.append("Issuer", "Leapp");
+    redirectUrl.searchParams.append("Destination", consoleHomeUrl);
+    redirectUrl.searchParams.append("SigninToken", (response as any).SigninToken);
+
+    const webConsoleUrl = new URL(oAuthUrl);
+    webConsoleUrl.searchParams.append("Action", "logout");
+    webConsoleUrl.searchParams.append("redirect_uri", redirectUrl.toString());
+
+    return webConsoleUrl.toString();
   }
 
   async openWebConsole(

@@ -31,7 +31,11 @@ describe("CommandBarComponent", () => {
       repository: spyRepositoryService,
       awsCoreService: { getRegions: () => [] },
       namedProfileService: { getNamedProfiles: () => [] },
-      teamService: { signedInUserState: { subscribe: () => {} }, workspacesState: { subscribe: () => {} } },
+      teamService: {
+        signedInUserState: { subscribe: () => {} },
+        workspacesState: { subscribe: () => {} },
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
+      },
       notificationService: spyNotificationsService,
     });
 

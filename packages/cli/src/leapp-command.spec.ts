@@ -14,6 +14,7 @@ describe("LeappCommand", () => {
       },
       teamService: {
         setCurrentWorkspace: jest.fn(),
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     };
 
@@ -36,6 +37,7 @@ describe("LeappCommand", () => {
       },
       teamService: {
         setCurrentWorkspace: jest.fn(),
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     };
 

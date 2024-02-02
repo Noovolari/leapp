@@ -62,6 +62,7 @@ describe("SetWorkspace", () => {
         signedInUserState: {
           getValue: jest.fn(),
         },
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     };
     const result = await command.getWorkspaceByName("locAL");
@@ -76,6 +77,7 @@ describe("SetWorkspace", () => {
         signedInUserState: {
           getValue: jest.fn(() => signedInUser),
         },
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     };
     const result = await command.getWorkspaceByName("Mocked-Team-Name");
@@ -91,6 +93,7 @@ describe("SetWorkspace", () => {
         signedInUserState: {
           getValue: () => signedInUser,
         },
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     };
     await expect(command.getWorkspaceByName("wrong-mocked-team-name")).rejects.toThrow("the selected workspace does not exist");
@@ -104,6 +107,7 @@ describe("SetWorkspace", () => {
         signedInUserState: {
           getValue: () => signedInUser,
         },
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     };
     await expect(command.getWorkspaceByName("mocked-team-name")).rejects.toThrow("the selected workspace does not exist");
@@ -135,6 +139,7 @@ describe("SetWorkspace", () => {
         signedInUserState: {
           getValue: jest.fn(() => signedInUser),
         },
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
       inquirer: {
         prompt: jest.fn(async () => ({ selectedWorkspace })),
@@ -168,6 +173,7 @@ describe("SetWorkspace", () => {
         signedInUserState: {
           getValue: jest.fn(() => signedInUser),
         },
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
       inquirer: {
         prompt: jest.fn(async () => ({ selectedWorkspace })),
@@ -184,6 +190,7 @@ describe("SetWorkspace", () => {
     command.cliProviderService = {
       teamService: {
         switchToLocalWorkspace: jest.fn(),
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
       remoteProceduresClient: {
         refreshWorkspaceState: jest.fn(),
@@ -201,6 +208,7 @@ describe("SetWorkspace", () => {
     command.cliProviderService = {
       teamService: {
         pullFromRemote: jest.fn(),
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
       remoteProceduresClient: {
         refreshWorkspaceState: jest.fn(),

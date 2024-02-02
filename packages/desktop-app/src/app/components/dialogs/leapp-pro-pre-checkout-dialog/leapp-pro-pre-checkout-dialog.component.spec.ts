@@ -44,6 +44,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
       azureIntegrationService: { getIntegrations: () => [] },
       integrationFactory: spyIntegrationFactory,
       teamService: {
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         createCheckoutSession: () => "fakeUrl",
         getPrices: () => [
           {

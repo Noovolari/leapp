@@ -19,6 +19,12 @@ describe("SsmService", () => {
       },
       logService: {},
       executeService: {},
+      teamService: {
+        signedInUserState: {
+          getValue: jasmine.createSpy().and.returnValue({ accessToken: "mocked-access-token", email: "mocked@email.com" }),
+        },
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
+      },
     });
 
     TestBed.configureTestingModule({

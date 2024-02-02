@@ -1,6 +1,6 @@
 import { TestBed } from "@angular/core/testing";
 import { AnalyticsService } from "./analytics.service";
-import { User } from "../leapp-team-core/user/user";
+import { Role, User } from "./team-service";
 
 describe("AnalyticsService", () => {
   let service: AnalyticsService;
@@ -16,7 +16,14 @@ describe("AnalyticsService", () => {
     date = new Date();
     jasmine.clock().mockDate(date);
 
-    user = new User("1", "fn", "ln", "email@email.com", "user", "team", "1", "", "", "", "");
+    user = {
+      teamId: "1",
+      teamName: "team",
+      role: Role.user,
+      email: "email@email.com",
+      firstName: "fn",
+      lastName: "ln",
+    };
   });
 
   afterEach(() => {
@@ -42,10 +49,10 @@ describe("AnalyticsService", () => {
   it("captureEvent()", async () => {
     appProviderService = {
       teamService: {
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         signedInUserState: {
           getValue: jasmine.createSpy().and.returnValue({ accessToken: "mocked-access-token", email: "mocked@email.com" }),
         },
-        getKeychainCurrentWorkspace: () => "remoteWorkspace",
       },
     } as any;
     const service2 = new AnalyticsService(appProviderService);
@@ -65,7 +72,7 @@ describe("AnalyticsService", () => {
         signedInUserState: {
           getValue: jasmine.createSpy().and.returnValue({ accessToken: "" }),
         },
-        getKeychainCurrentWorkspace: () => "remoteWorkspace",
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     } as any;
     const service2 = new AnalyticsService(appProviderService);

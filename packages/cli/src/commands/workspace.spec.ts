@@ -17,6 +17,7 @@ describe("Workspace", () => {
           workspacesState: {
             getValue: jest.fn(() => mockedWorkspaceState),
           },
+          getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         },
       };
       const command = getTestCommand(cliProviderService, []);
@@ -34,6 +35,7 @@ describe("Workspace", () => {
           workspacesState: {
             getValue: jest.fn(() => mockedWorkspaceState),
           },
+          getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         },
       };
       const command = getTestCommand(cliProviderService, []);
@@ -52,6 +54,7 @@ describe("Workspace", () => {
             getValue: jest.fn(() => {
               throw mockedError;
             }),
+            getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
           },
         },
       };

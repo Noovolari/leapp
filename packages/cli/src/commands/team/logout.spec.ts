@@ -13,6 +13,7 @@ describe("TeamLogout", () => {
       const cliProviderService: any = {
         teamService: {
           signOut: jest.fn(),
+          getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         },
         remoteProceduresClient: {
           refreshWorkspaceState: jest.fn(),
@@ -34,6 +35,7 @@ describe("TeamLogout", () => {
           signOut: jest.fn(() => {
             throw mockedError;
           }),
+          getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         },
       };
       const command = getTestCommand(cliProviderService, []);
@@ -51,6 +53,7 @@ describe("TeamLogout", () => {
           signOut: jest.fn(() => {
             throw mockedError;
           }),
+          getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         },
       };
       const command = getTestCommand(cliProviderService, []);

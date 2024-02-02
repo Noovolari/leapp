@@ -21,6 +21,7 @@ describe("SideBarComponent", () => {
       segmentService: { list: () => [] },
       awsCoreService: { getRegions: () => [] },
       teamService: {
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         workspacesState: {
           subscribe: () => {
             component.workspacesState = [

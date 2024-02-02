@@ -60,6 +60,7 @@ describe("TeamLogin", () => {
       const cliProviderService: any = {
         teamService: {
           signIn: jest.fn(() => mockedUser),
+          getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         },
         remoteProceduresClient: {
           refreshWorkspaceState: jest.fn(),
@@ -86,6 +87,7 @@ describe("TeamLogin", () => {
           signIn: jest.fn(() => {
             throw mockedError;
           }),
+          getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         },
       };
       const command = getTestCommand(cliProviderService, []);
@@ -106,6 +108,7 @@ describe("TeamLogin", () => {
           signIn: jest.fn(() => {
             throw mockedError;
           }),
+          getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
         },
       };
       const command = getTestCommand(cliProviderService, []);

@@ -12,6 +12,7 @@ describe("Workspace", () => {
     const cliProviderService: any = {
       teamService: {
         getTeamStatus: jest.fn(() => "mocked-team-status"),
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     };
     const command = getTestCommand(cliProviderService, []);
@@ -29,6 +30,7 @@ describe("Workspace", () => {
         getTeamStatus: jest.fn(() => {
           throw mockedError;
         }),
+        getKeychainCurrentWorkspace: async () => Promise.resolve("remoteWorkspace"),
       },
     };
     const command = getTestCommand(cliProviderService, []);

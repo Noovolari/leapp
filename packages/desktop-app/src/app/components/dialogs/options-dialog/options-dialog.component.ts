@@ -109,6 +109,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   leappPlanStatus;
 
   exporting: boolean;
+  isUserSignedIn: boolean;
+  signedInUserStateSubscription: Subscription;
 
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: SessionService;
@@ -139,10 +141,13 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.extensionEnabled = this.optionsService.extensionEnabled || false;
 
     this.exporting = false;
+
+    this.isUserSignedIn = false;
   }
 
   ngOnDestroy(): void {
     this.leappStatusSubscription?.unsubscribe();
+    this.signedInUserStateSubscription?.unsubscribe();
   }
 
   async ngOnInit(): Promise<void> {
@@ -193,16 +198,15 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     } catch (err) {
       globalLeappProPlanStatus.next(LeappPlanStatus.free);
     }
+
+    const selectedWorkspace = this.appProviderService.teamService.workspacesState.getValue().find((workspaceState) => workspaceState.selected);
+    this.isUserSignedIn = selectedWorkspace.name !== constants.localWorkspaceName;
   }
 
   ngAfterViewInit(): void {
     if (this.selectedIndex) {
       this.tabGroup.selectedIndex = this.selectedIndex;
     }
-  }
-
-  get isUserLogged(): boolean {
-    return this.appProviderService.teamService.signedInUserState.getValue().userId !== constants.localWorkspaceKeychainValue;
   }
 
   setColorTheme(theme: string): void {

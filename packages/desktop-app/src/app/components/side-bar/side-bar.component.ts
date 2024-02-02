@@ -55,6 +55,7 @@ export class SideBarComponent implements OnInit, OnDestroy {
   modalRef: BsModalRef;
   workspacesState: WorkspaceState[];
   isLeappTeamStubbed: boolean;
+  exporting = false;
 
   private unsubscribe: () => void;
   private behaviouralSubjectService: BehaviouralSubjectService;
@@ -242,5 +243,14 @@ export class SideBarComponent implements OnInit, OnDestroy {
 
   openWorkspaceDocumentation(): void {
     this.appProviderService.windowService.openExternalUrl("https://docs.leapp.cloud/latest/workspaces/");
+  }
+
+  async exportProWorkspace(): Promise<void> {
+    this.exporting = true;
+    await this.appProviderService.teamService.exportProWorkspace();
+    await new Promise((resolve, _reject) => {
+      setTimeout(resolve, 2000);
+    });
+    this.exporting = false;
   }
 }

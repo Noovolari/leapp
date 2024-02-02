@@ -39,6 +39,17 @@
           </div>
         </ng-container>
 
+        <ng-container *ngIf="getIsUserLogged()">
+          <div class="form-container">
+            <div class="form-group">
+              <div class="form-field">
+                <label>Export Pro/Team workspace</label>
+                <button type="button" (click)="exportProWorkspace();">Export <i *ngIf="exporting" class="fa fa-spinner fa-spin"></i></button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
         <h2>Default Regions</h2>
 
         <div class="form-container">

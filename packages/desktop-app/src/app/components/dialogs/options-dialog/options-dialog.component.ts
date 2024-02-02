@@ -108,6 +108,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   leappStatusSubscription: Subscription;
   leappPlanStatus;
 
+  exporting: boolean;
+
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: SessionService;
 
@@ -135,6 +137,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.selectedTouchIdEnabled = this.optionsService.touchIdEnabled ?? constants.touchIdEnabled;
 
     this.extensionEnabled = this.optionsService.extensionEnabled || false;
+
+    this.exporting = false;
   }
 
   ngOnDestroy(): void {
@@ -195,6 +199,10 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     if (this.selectedIndex) {
       this.tabGroup.selectedIndex = this.selectedIndex;
     }
+  }
+
+  get isUserLogged(): boolean {
+    return this.appProviderService.teamService.signedInUserState.getValue().userId !== constants.localWorkspaceKeychainValue;
   }
 
   setColorTheme(theme: string): void {
@@ -587,5 +595,14 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
 
   contactSales(): void {
     this.windowService.openExternalUrl("https://www.leapp.cloud/solutions/business");
+  }
+
+  async exportProWorkspace(): Promise<void> {
+    this.exporting = true;
+    await this.appProviderService.teamService.exportProWorkspace();
+    await new Promise((resolve, _reject) => {
+      setTimeout(resolve, 2000);
+    });
+    this.exporting = false;
   }
 }

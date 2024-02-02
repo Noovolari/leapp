@@ -1,6 +1,24 @@
 @import "../../../assets/scss/global";
 @import "../../../assets/scss/mixins/palette";
 
+.sidebar-flex div button {
+  position: absolute;
+  bottom: 49px;
+  left: 8px;
+  background: none;
+  border: none;
+  color: #171717;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol" !important;
+  &:hover {
+    opacity: 0.7;
+  }
+  i {
+    color: #171717;
+  }
+}
+
 ::ng-deep {
   .mat-list.mat-list-base {
     user-select: none;

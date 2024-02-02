@@ -4,8 +4,8 @@ import { LoggedEntry, LogLevel, LogService } from "./log-service";
 import { INativeService } from "../interfaces/i-native-service";
 
 export class WebConsoleService {
-  private secondsInAHour = 3200;
-  private sessionDurationInHours = 1;
+  private secondsInAHour = 3600;
+  private sessionDurationInHours = 12;
 
   constructor(private shellService: IOpenExternalUrlService, private logService: LogService, private nativeService: INativeService) {}
 

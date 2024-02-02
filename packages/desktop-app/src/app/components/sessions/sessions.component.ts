@@ -63,7 +63,12 @@ export class SessionsComponent implements OnInit, OnDestroy {
 
   private behaviouralSubjectService: BehaviouralSubjectService;
 
-  constructor(private modalService: BsModalService, private appProviderService: AppProviderService, public optionService: OptionsService) {
+  constructor(
+    private modalService: BsModalService,
+    private appProviderService: AppProviderService,
+    public optionService: OptionsService,
+    public bsModalService: BsModalService
+  ) {
     this.sessionFiltering = new FilteringPipe();
     this.behaviouralSubjectService = this.appProviderService.behaviouralSubjectService;
     this.columnSettings = Array.from(Array(5)).map((): ArrowSettings => ({ activeArrow: false, orderStyle: false }));

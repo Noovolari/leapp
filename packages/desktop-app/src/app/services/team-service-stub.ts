@@ -102,4 +102,6 @@ export class TeamService {
   }
 
   async setKeychainCurrentWorkspace(_: string): Promise<void> {}
+
+  async exportProWorkspace(): Promise<void> {}
 }

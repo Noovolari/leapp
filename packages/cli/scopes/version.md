@@ -9,7 +9,7 @@ Displays the Cli and Core versions
 
 Displays the Cli and Core versions
 
-```
+```console
 USAGE
   $ leapp version
 
@@ -20,4 +20,4 @@ EXAMPLES
   $leapp version
 ```
 
-_See code: [dist/commands/version.ts](https://github.com/noovolari/leapp/blob/v0.1.59/dist/commands/version.ts)_
+_See code: [dist/commands/version.ts](https://github.com/noovolari/leapp/blob/v0.1.60/dist/commands/version.ts)_

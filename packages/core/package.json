@@ -22,7 +22,7 @@
     "assert": "2.0.0",
     "aws-sdk": "2.928.0",
     "aws-sdk-mock": "5.3.0",
-    "axios": "^1.6.2",
+    "axios": "1.6.2",
     "chdir": "0.0.0",
     "class-transformer": "^0.4.0",
     "compare-versions": "^3.6.0",
@@ -32,7 +32,7 @@
     "es6-shim": "^0.35.6",
     "extract-zip": "~2.0.1",
     "fix-path": "~3.0.0",
-    "follow-redirects": "^1.14.9",
+    "follow-redirects": "1.15.4",
     "fs-extra": "~9.1.0",
     "fs-web": "1.0.1",
     "http-proxy-agent": "4.0.1",
@@ -55,7 +55,7 @@
     "tar": "^6.1.11",
     "tslib": "^2.3.1",
     "uuid": "~8.3.2",
-    "wait-on": "^6.0.0",
+    "wait-on": "7.2.0",
     "zlib": "~1.0.5"
   },
   "devDependencies": {

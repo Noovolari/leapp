@@ -9,7 +9,7 @@ Set the current Leapp workspace
 
 Set the current Leapp workspace
 
-```console
+```
 USAGE
   $ leapp set-workspace [WORKSPACENAME]
 

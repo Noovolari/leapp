@@ -14,7 +14,7 @@ Leapp Integrations management
 
 Create a new integration
 
-```console
+```
 USAGE
   $ leapp integration create [--integrationAlias <value>] [--integrationPortalUrl <value>] [--integrationRegion <value>]
     [--integrationType AWS-SSO|AZURE] [--integrationTenantId <value>] [--integrationLocation <value>]
@@ -43,7 +43,7 @@ EXAMPLES
 
 Delete an integration
 
-```console
+```
 USAGE
   $ leapp integration delete [--integrationId <value>]
 
@@ -63,7 +63,7 @@ EXAMPLES
 
 Show integrations list
 
-```console
+```
 USAGE
   $ leapp integration list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
     [--csv | --no-truncate]] [--no-header | ]
@@ -90,7 +90,7 @@ EXAMPLES
 
 Login to synchronize integration sessions
 
-```console
+```
 USAGE
   $ leapp integration login [--integrationId <value>]
 
@@ -110,7 +110,7 @@ EXAMPLES
 
 Logout from an integration
 
-```console
+```
 USAGE
   $ leapp integration logout [--integrationId <value>]
 
@@ -130,7 +130,7 @@ EXAMPLES
 
 Synchronize integration sessions
 
-```console
+```
 USAGE
   $ leapp integration sync [--integrationId <value>]
 

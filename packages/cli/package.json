@@ -1,7 +1,7 @@
 {
   "name": "@noovolari/leapp-cli",
   "description": "Leapp's Command Line Interface\n\nIt relies on Leapp Core, which encapsulates the domain logic.\n\nFor more information about the project visit the [site](www.leapp.cloud).",
-  "version": "0.1.59",
+  "version": "0.1.60",
   "author": {
     "name": "Noovolari",
     "email": "info@noovolari.com"

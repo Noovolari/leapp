@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.24.5](https://github.com/Noovolari/leapp/compare/v0.24.4...v0.24.5) (2024-02-05)
+
+### Features
+* now, if you're logged into a remote workspace (Pro/Team), you can export it from the option menu.
+
+### Bug Fixes
+* now, if a browser extension Leapp Session is expired, you can keep using that session by opening that again from Leapp.
+
 ### [0.24.4](https://github.com/Noovolari/leapp/compare/v0.24.3...v0.24.4) (2024-01-26)
 
 ### Features

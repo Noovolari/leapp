@@ -117,12 +117,13 @@ jobs:
           rm "./release/Leapp-${TAG_VERSION}-win.zip" ||:
           powershell "Compress-Archive './release/Leapp Setup ${TAG_VERSION}.exe' './release/Leapp-${TAG_VERSION}-win.zip'"
           powershell "Compress-Archive './release/Leapp Setup ${TAG_VERSION}.exe' './release/Leapp-windows.zip'"
+          powershell "Compress-Archive './release/' './release/Leapp-windows-release.zip'"
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: Leapp-${{ needs.tag-validation.outputs.tag-version-without-v }}-win.zip
-          path: packages/desktop-app/release/Leapp-${{ needs.tag-validation.outputs.tag-version-without-v }}-win.zip
+          name: Leapp-windows-release.zip
+          path: packages/desktop-app/release/Leapp-windows-release.zip
 
   build-linux:
     runs-on: ubuntu-latest

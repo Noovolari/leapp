@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.24.6](https://github.com/Noovolari/leapp/compare/v0.24.5...v0.24.6) (2024-02-06)
+
+### Bug Fixes
+* updated axios to v1.6.2 and wait-on to v7.2.0.
+
 ### [0.24.5](https://github.com/Noovolari/leapp/compare/v0.24.4...v0.24.5) (2024-02-05)
 
 ### Features

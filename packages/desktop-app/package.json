@@ -43,10 +43,9 @@
     },
     "publish": [
       {
-        "provider": "github",
-        "owner": "Noovolari",
-        "repo": "leapp",
-        "releaseType": "release"
+        "provider": "generic",
+        "url": "http://localhost:8000/latest",
+        "channel": "latest"
       }
     ],
     "productName": "Leapp",
@@ -157,6 +156,7 @@
     "@aws-sdk/client-sso": "^3.85.0",
     "@aws-sdk/client-sso-oidc": "^3.85.0",
     "@azure/msal-node": "^1.9.0",
+    "@electron/notarize": "^2.1.0",
     "@electron/remote": "^2.0.1",
     "@ng-select/ng-select": "8.1.1",
     "@ngx-translate/core": "~13.0.0",
@@ -177,15 +177,15 @@
     "copy-dir": "~1.3.0",
     "crypto-js": "4.2.0",
     "date-fns": "^2.26.0",
+    "decompress": "^4.2.1",
     "electron-default-menu": "~1.0.2",
     "electron-dl": "3.2.1",
     "electron-is-dev": "2.0.0",
     "electron-localshortcut": "^3.2.1",
     "electron-log": "~4.3.4",
-    "@electron/notarize": "^2.1.0",
     "electron-osx-sign": "~0.5.0",
     "electron-reload": "^1.5.0",
-    "electron-updater": "^4.3.8",
+    "electron-updater": "4.6.5",
     "emoji-regex": "^8.0.0",
     "extract-zip": "~2.0.1",
     "fix-path": "~3.0.0",
@@ -204,6 +204,7 @@
     "jwt-decode": "~3.1.2",
     "keytar": "7.9.0",
     "markdown-it": "^12.0.6",
+    "mount-dmg": "^1.0.1",
     "mousetrap": "~1.6.5",
     "ms": "^2.1.3",
     "nan": "^2.13.2",

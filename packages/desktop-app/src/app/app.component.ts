@@ -305,12 +305,15 @@ export class AppComponent implements OnInit {
 
     const ipc = this.appNativeService.ipcRenderer;
     ipc.on("UPDATE_AVAILABLE", async (_, info) => {
+      alert(JSON.parse(info));
       const releaseNote = await this.updaterService.getReleaseNote();
       this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
       if (this.updaterService.isUpdateNeeded()) {
+        // if auto update === false
         this.updaterService.updateDialog();
         this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
         this.appProviderService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
+        // else fai auto update usando constants.latestUrl per scaricare pacchetto
       }
     });
 

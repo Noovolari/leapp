@@ -76,7 +76,9 @@ export class UpdaterService {
           this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
           this.leappCoreService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
         } else if (event === constants.confirmCloseAndDownloadUpdate) {
-          this.windowService.openExternalUrl(`${constants.latestUrl}`);
+          // this.windowService.openExternalUrl(`${constants.latestUrl}`);
+          const ipc = this.electronService.ipcRenderer;
+          ipc.invoke("make-update", {});
         }
         this.bsModalRef = undefined;
       };

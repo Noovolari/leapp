@@ -1,18 +1,62 @@
 import { contextMenu } from "./context-menu";
 import * as path from "path";
 import { environment } from "../src/environments/environment";
+import * as https from "https";
+import * as http from "http";
+import { execFile as child } from "child_process";
 
-const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
+const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = require("electron");
 const electronLocalshortcut = require('electron-localshortcut');
 const { autoUpdater } = require("electron-updater");
 
 const url = require("url");
 const fs = require("fs");
+const fsextra = require("fs-extra");
 const os = require("os");
+const decompress = require("decompress");
+const mount = require('mount-dmg');
 const ipc = ipcMain;
 
 const remote = require("@electron/remote/main");
 remote.initialize();
+
+async function download(url, filePath) {
+  const proto = !url.charAt(4).localeCompare('s') ? https : http;
+
+  return new Promise((resolve, reject) => {
+    const file = fs.createWriteStream(filePath);
+    let fileInfo = null;
+
+    const request = proto.get(url, response => {
+      if (response.statusCode !== 200) {
+        fs.unlink(filePath, () => {
+          reject(new Error(`Failed to get '${url}' (${response.statusCode})`));
+        });
+        return;
+      }
+
+      fileInfo = {
+        mime: response.headers['content-type'],
+        size: parseInt(response.headers['content-length'], 10),
+      };
+
+      response.pipe(file);
+    });
+
+    // The destination stream is ended by the time it's called
+    file.on('finish', () => resolve(fileInfo));
+
+    request.on('error', err => {
+      fs.unlink(filePath, () => reject(err));
+    });
+
+    file.on('error', err => {
+      fs.unlink(filePath, () => reject(err));
+    });
+
+    request.end();
+  });
+}
 
 contextMenu({
   showInspectElement: false,
@@ -68,11 +112,11 @@ const buildAutoUpdater = (win: any): void => {
   autoUpdater.allowPrerelease = false;
   autoUpdater.autoDownload = false;
 
-  const minutes = 10;
+  const minutes = 1;
 
   const data = {
     provider: "generic",
-    url: "https://asset.noovolari.com/latest",
+    url: "http://localhost:8000/latest", // "https://asset.noovolari.com/latest",
     channel: "latest",
   };
   autoUpdater.setFeedURL(data);
@@ -82,8 +126,72 @@ const buildAutoUpdater = (win: any): void => {
     autoUpdater.checkForUpdates().then((_) => {});
   }, 1000 * 60 * minutes);
 
-  autoUpdater.on("update-available", (info) => {
+  autoUpdater.on("update-available", async (info) => {
+    console.log("update available log by console: ", info);
     win.webContents.send("UPDATE_AVAILABLE", info);
+
+    // 1) Verificare la versione del sistema operativo e architettura e scaricare il file (eseguile) giusto in una cartella safe
+    // 2a) Usare il dialog per confermare la scelta dell'utente
+    // 2b) Lanciare il child process con detached true per avviare il file (es. dmg) e quittare contemporaneamente Leapp
+    // 3) L'utente installa
+
+    // linux, darwin, win32
+    const chosenOs = os.platform();
+    console.log("Chosen OS: " + chosenOs);
+    const chosenArch = os.arch();
+    console.log("Chosen Arch: ", chosenArch);
+
+    const fileMap = {
+      "linux": { "x64": "https://asset.noovolari.com/latest/Leapp-deb.zip", "ext": "deb" },
+      "darwin": {
+        "x64": "https://asset.noovolari.com/latest/Leapp-mac.zip",
+        "arm64": "https://asset.noovolari.com/latest/Leapp-arm-mac.zip",
+        "ext": "dmg"
+      },
+      "win32": { "x64": "https://asset.noovolari.com/latest/Leapp-windows.zip", "ext": "exe" }
+    };
+    const url = fileMap[chosenOs][chosenArch];
+    const tempDir = path.join(os.tmpdir(), "leapp-updater");
+
+    fsextra.removeSync(tempDir);
+    fsextra.mkdirSync(tempDir)
+
+    const archivePath = path.join(tempDir, "leapp-archive.zip");
+    await download(url, archivePath);
+    console.log("Download Completed");
+
+    decompress(archivePath, tempDir).then((files) => {
+      fsextra.removeSync(archivePath);
+
+      dialog.showMessageBox({
+        type: 'question',
+        buttons: ['Install and Restart', 'Later'],
+        defaultId: 0,
+        message: 'A new update has been downloaded. Would you like to install and restart the app now?'
+      }).then(async (selection) => {
+        if (selection.response === 0) {
+          // User clicked 'Install and Restart'
+          const extension = fileMap[chosenOs]["ext"];
+          const file = files.find((f) => f.path.indexOf(extension) > -1);
+          if (file) {
+            console.log("User selected the option to install file: ", file.path);
+
+            console.log(extension);
+            if(extension === "dmg") {
+              console.log(path.join(tempDir, file.path));
+              // const { volumePath, _diskPath, _unmount } = await mount(path.join(tempDir, file.path));
+              app.on ("before-quit", () => {
+                const child = require('child_process');
+                // Qui bisogna mettere magari un micro sleep nello script per essere sicuri che il processo padre sia veramente quittato
+                child.exec("open \"" + path.join(tempDir, file.path) + "\" &");
+                process.exit();
+              });
+              app.quit();
+            } else if (extension === "deb") {} else {}
+          }
+        }
+      });
+    });
   });
 };
 
@@ -124,6 +232,11 @@ const generateMainWindow = () => {
       } else {
         win.webContents.send("app-close");
       }
+    });
+
+    ipc.handle("make-update", async () => {
+      await autoUpdater.downloadUpdate();
+      autoUpdater.quitAndInstall(true, true);
     });
 
     ipc.on("closed", () => {

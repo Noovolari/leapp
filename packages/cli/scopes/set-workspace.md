@@ -9,7 +9,7 @@ Set the current Leapp workspace
 
 Set the current Leapp workspace
 
-```
+```console
 USAGE
   $ leapp set-workspace [WORKSPACENAME]
 
@@ -27,4 +27,4 @@ EXAMPLES
   $leapp team set-workspace WORKSPACE-NAME
 ```
 
-_See code: [dist/commands/set-workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.60/dist/commands/set-workspace.ts)_
+_See code: [dist/commands/set-workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.61/dist/commands/set-workspace.ts)_

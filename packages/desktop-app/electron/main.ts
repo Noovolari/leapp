@@ -116,7 +116,7 @@ const buildAutoUpdater = (win: any): void => {
 
   const data = {
     provider: "generic",
-    url: "http://localhost:8000/latest", // "https://asset.noovolari.com/latest",
+    url: "https://asset.noovolari.com/latest",
     channel: "latest",
   };
   autoUpdater.setFeedURL(data);
@@ -177,13 +177,40 @@ const buildAutoUpdater = (win: any): void => {
             console.log("User selected the option to install file: ", file.path);
 
             console.log(extension);
-            if(extension === "dmg") {
+            if (extension === "dmg") {
               console.log(path.join(tempDir, file.path));
               // const { volumePath, _diskPath, _unmount } = await mount(path.join(tempDir, file.path));
-              app.on ("before-quit", () => {
+              app.on("before-quit", () => {
                 const child = require('child_process');
                 // Qui bisogna mettere magari un micro sleep nello script per essere sicuri che il processo padre sia veramente quittato
-                child.exec("open \"" + path.join(tempDir, file.path) + "\" &");
+                // Scrivo uno script di installazione da lanciare prima di morire
+                const updateScript = "#!/bin/bash\n" +
+                  "DMG_PATH=\"/Users/marcovanetti/Desktop/Leapp-0.24.6.dmg\"\n" +
+                  "MOUNT_POINT=\"/Volumes/LeappAutoUpdate\"\n" +
+                  "hdiutil detach \"$MOUNT_POINT\" -quiet\n" +
+                  "hdiutil attach \"$DMG_PATH\" -nobrowse -quiet -mountpoint \"$MOUNT_POINT\"\n" +
+                  "rm -rf /Applications/Leapp.app\n" +
+                  "cp -R \"$MOUNT_POINT/Leapp.app\" /Applications/\n" +
+                  "hdiutil detach \"$MOUNT_POINT\" -quiet\n" +
+                  "while :\n" +
+                  "do\n" +
+                  "  open -b \"com.leapp.app\"\n" +
+                  "  state=$?\n" +
+                  "\n" +
+                  "  if [ $state -eq 0 ]; then\n" +
+                  "    break\n" +
+                  "  else\n" +
+                  "    sleep 1\n" +
+                  "  fi\n" +
+                  "done";
+                const updateScriptPath = path.join(tempDir, "update.sh");
+                fs.writeFileSync(updateScriptPath, updateScript, "utf-8")
+                const stat = fs.statSync(updateScriptPath);
+                const permissions = stat.mode | 0o111;
+                fs.chmodSync(updateScriptPath, permissions);
+                //child.exec(`osascript -e 'do shell script "${updateScriptPath}"'`);
+                child.exec(`osascript -e 'tell application "Terminal" to do script "bash -c \\"${updateScriptPath}\\""';`);
+                //child.exec(`osascript -e 'do shell script "bash -c \\"${updateScriptPath}\\""';`);
                 process.exit();
               });
               app.quit();
@@ -297,7 +324,7 @@ const generateMainWindow = () => {
     // launched, this way the frontend can read the temp file and load the plugin
     if (process.platform !== 'darwin' && process.argv[1] && process.argv[1].split("leapp://")[1]) {
       // Keep only command line / deep linked arguments
-      fs.writeFileSync(path.join(os.homedir(),environment.deeplinkFile), process.argv[1].split("leapp://")[1]);
+      fs.writeFileSync(path.join(os.homedir(), environment.deeplinkFile), process.argv[1].split("leapp://")[1]);
     }
   };
 
@@ -383,8 +410,8 @@ const generateMainWindow = () => {
     app.on('open-url', (event, url) => {
       event.preventDefault();
       try {
-        fs.writeFileSync(path.join(os.homedir(),environment.deeplinkFile), url);
-      } catch(err) {
+        fs.writeFileSync(path.join(os.homedir(), environment.deeplinkFile), url);
+      } catch (err) {
         console.log(err);
       }
     });
@@ -402,9 +429,9 @@ const generateMainWindow = () => {
         // Keep only command line / deep linked arguments
         if (win) {
           // Win32 and Linux on app already open
-          if(argv.length > 0) {
-            if(argv[argv.length-1] && argv[argv.length-1]?.split("leapp://")[1]) {
-              win.webContents.send("PLUGIN_URL", argv[argv.length-1]?.split("leapp://")[1]);
+          if (argv.length > 0) {
+            if (argv[argv.length - 1] && argv[argv.length - 1]?.split("leapp://")[1]) {
+              win.webContents.send("PLUGIN_URL", argv[argv.length - 1]?.split("leapp://")[1]);
             }
           }
           win.focus();

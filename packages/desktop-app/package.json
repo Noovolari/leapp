@@ -229,7 +229,6 @@
     "sudo-prompt": "~9.2.1",
     "tar": "^6.1.11",
     "tslib": "^2.3.1",
-    "update-electron-app": "~2.0.1",
     "uuid": "~8.3.2",
     "v8-compile-cache": "~2.3.0",
     "wait-on": "7.2.0",

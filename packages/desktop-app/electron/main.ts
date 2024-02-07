@@ -11,10 +11,7 @@ const { autoUpdater } = require("electron-updater");
 
 const url = require("url");
 const fs = require("fs");
-const fsextra = require("fs-extra");
 const os = require("os");
-const decompress = require("decompress");
-const mount = require('mount-dmg');
 const ipc = ipcMain;
 
 const remote = require("@electron/remote/main");
@@ -128,7 +125,7 @@ const buildAutoUpdater = (win: any): void => {
 
   autoUpdater.on("update-available", async (info) => {
     console.log("update available log by console: ", info);
-    win.webContents.send("UPDATE_AVAILABLE", info);
+    //win.webContents.send("UPDATE_AVAILABLE", info);
 
     // 1) Verificare la versione del sistema operativo e architettura e scaricare il file (eseguile) giusto in una cartella safe
     // 2a) Usare il dialog per confermare la scelta dell'utente
@@ -136,90 +133,55 @@ const buildAutoUpdater = (win: any): void => {
     // 3) L'utente installa
 
     // linux, darwin, win32
-    const chosenOs = os.platform();
-    console.log("Chosen OS: " + chosenOs);
-    const chosenArch = os.arch();
-    console.log("Chosen Arch: ", chosenArch);
+    // const chosenOs = os.platform();
+    // console.log("Chosen OS: " + chosenOs);
+    // const chosenArch = os.arch();
+    // console.log("Chosen Arch: ", chosenArch);
+    //
+    // const fileMap = {
+    //   "linux": { "x64": "https://asset.noovolari.com/latest/Leapp-deb.zip", "ext": "deb" },
+    //   "darwin": {
+    //     "x64": "https://asset.noovolari.com/latest/Leapp-mac.zip",
+    //     "arm64": "https://asset.noovolari.com/latest/Leapp-arm-mac.zip",
+    //     "ext": "dmg"
+    //   },
+    //   "win32": { "x64": "https://asset.noovolari.com/latest/Leapp-windows.zip", "ext": "exe" }
+    // };
+    // const url = fileMap[chosenOs][chosenArch];
+    // const tempDir = path.join(os.tmpdir(), "leapp-updater");
+    //
+    // fsextra.removeSync(tempDir);
+    // fsextra.mkdirSync(tempDir)
+    //
+    // const archivePath = path.join(tempDir, "leapp-archive.zip");
+    // await download(url, archivePath);
+    // console.log("Download Completed");
 
-    const fileMap = {
-      "linux": { "x64": "https://asset.noovolari.com/latest/Leapp-deb.zip", "ext": "deb" },
-      "darwin": {
-        "x64": "https://asset.noovolari.com/latest/Leapp-mac.zip",
-        "arm64": "https://asset.noovolari.com/latest/Leapp-arm-mac.zip",
-        "ext": "dmg"
-      },
-      "win32": { "x64": "https://asset.noovolari.com/latest/Leapp-windows.zip", "ext": "exe" }
-    };
-    const url = fileMap[chosenOs][chosenArch];
-    const tempDir = path.join(os.tmpdir(), "leapp-updater");
+    // decompress(archivePath, tempDir).then((files) => {
+    //   fsextra.removeSync(archivePath);
 
-    fsextra.removeSync(tempDir);
-    fsextra.mkdirSync(tempDir)
-
-    const archivePath = path.join(tempDir, "leapp-archive.zip");
-    await download(url, archivePath);
-    console.log("Download Completed");
-
-    decompress(archivePath, tempDir).then((files) => {
-      fsextra.removeSync(archivePath);
-
-      dialog.showMessageBox({
-        type: 'question',
-        buttons: ['Install and Restart', 'Later'],
-        defaultId: 0,
-        message: 'A new update has been downloaded. Would you like to install and restart the app now?'
-      }).then(async (selection) => {
-        if (selection.response === 0) {
-          // User clicked 'Install and Restart'
-          const extension = fileMap[chosenOs]["ext"];
-          const file = files.find((f) => f.path.indexOf(extension) > -1);
-          if (file) {
-            console.log("User selected the option to install file: ", file.path);
-
-            console.log(extension);
-            if (extension === "dmg") {
-              console.log(path.join(tempDir, file.path));
-              // const { volumePath, _diskPath, _unmount } = await mount(path.join(tempDir, file.path));
-              app.on("before-quit", () => {
-                const child = require('child_process');
-                // Qui bisogna mettere magari un micro sleep nello script per essere sicuri che il processo padre sia veramente quittato
-                // Scrivo uno script di installazione da lanciare prima di morire
-                const updateScript = "#!/bin/bash\n" +
-                  "DMG_PATH=\"/Users/marcovanetti/Desktop/Leapp-0.24.6.dmg\"\n" +
-                  "MOUNT_POINT=\"/Volumes/LeappAutoUpdate\"\n" +
-                  "hdiutil detach \"$MOUNT_POINT\" -quiet\n" +
-                  "hdiutil attach \"$DMG_PATH\" -nobrowse -quiet -mountpoint \"$MOUNT_POINT\"\n" +
-                  "rm -rf /Applications/Leapp.app\n" +
-                  "cp -R \"$MOUNT_POINT/Leapp.app\" /Applications/\n" +
-                  "hdiutil detach \"$MOUNT_POINT\" -quiet\n" +
-                  "while :\n" +
-                  "do\n" +
-                  "  open -b \"com.leapp.app\"\n" +
-                  "  state=$?\n" +
-                  "\n" +
-                  "  if [ $state -eq 0 ]; then\n" +
-                  "    break\n" +
-                  "  else\n" +
-                  "    sleep 1\n" +
-                  "  fi\n" +
-                  "done";
-                const updateScriptPath = path.join(tempDir, "update.sh");
-                fs.writeFileSync(updateScriptPath, updateScript, "utf-8")
-                const stat = fs.statSync(updateScriptPath);
-                const permissions = stat.mode | 0o111;
-                fs.chmodSync(updateScriptPath, permissions);
-                //child.exec(`osascript -e 'do shell script "${updateScriptPath}"'`);
-                child.exec(`osascript -e 'tell application "Terminal" to do script "bash -c \\"${updateScriptPath}\\""';`);
-                //child.exec(`osascript -e 'do shell script "bash -c \\"${updateScriptPath}\\""';`);
-                process.exit();
-              });
-              app.quit();
-            } else if (extension === "deb") {} else {}
-          }
+    dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Install and Restart', 'Later'],
+      defaultId: 0,
+      message: 'A new update has been downloaded. Would you like to install and restart the app now?'
+    }).then(async (selection) => {
+      if (selection.response === 0) {
+        /*
+        export interface FileInfo {
+        readonly name: string
+        readonly url: string
+        readonly sha2?: string
+        readonly sha512?: string
+        readonly headers?: Object
         }
-      });
+         */
+        await (autoUpdater as any).doDownloadUpdate(undefined, {name:undefined, url:"https://asset.noovolari.com/latest/Leapp-0.24.6-mac.zip"});
+        //autoUpdater.quitAndInstall(true, true);
+      }
     });
   });
+  //});
 };
 
 // Generate the main Electron window

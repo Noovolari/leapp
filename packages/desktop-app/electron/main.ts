@@ -113,15 +113,16 @@ const buildAutoUpdater = (win: any): void => {
 
   const data = {
     provider: "generic",
-    url: "https://asset.noovolari.com/latest",
+    url: "http://localhost:8000/", //"https://asset.noovolari.com/latest",
     channel: "latest",
   };
   autoUpdater.setFeedURL(data);
 
   autoUpdater.checkForUpdates().then((_) => {});
-  setInterval(() => {
-    autoUpdater.checkForUpdates().then((_) => {});
-  }, 1000 * 60 * minutes);
+  //autoUpdater.checkForUpdates().then((_) => {});
+  // setInterval(() => {
+  //   autoUpdater.checkForUpdates().then((_) => {});
+  // }, 1000 * 60 * minutes);
 
   // Ref here: https://www.electronjs.org/docs/latest/api/auto-updater
   autoUpdater.on("update-available", (info) => {

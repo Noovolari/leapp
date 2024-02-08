@@ -123,43 +123,13 @@ const buildAutoUpdater = (win: any): void => {
     autoUpdater.checkForUpdates().then((_) => {});
   }, 1000 * 60 * minutes);
 
-  autoUpdater.on("update-available", async (info) => {
+  // Ref here: https://www.electronjs.org/docs/latest/api/auto-updater
+  autoUpdater.on("update-available", (info) => {
     console.log("update available log by console: ", info);
-    //win.webContents.send("UPDATE_AVAILABLE", info);
+    autoUpdater.downloadUpdate().catch(error => console.error(error));
+  });
 
-    // 1) Verificare la versione del sistema operativo e architettura e scaricare il file (eseguile) giusto in una cartella safe
-    // 2a) Usare il dialog per confermare la scelta dell'utente
-    // 2b) Lanciare il child process con detached true per avviare il file (es. dmg) e quittare contemporaneamente Leapp
-    // 3) L'utente installa
-
-    // linux, darwin, win32
-    // const chosenOs = os.platform();
-    // console.log("Chosen OS: " + chosenOs);
-    // const chosenArch = os.arch();
-    // console.log("Chosen Arch: ", chosenArch);
-    //
-    // const fileMap = {
-    //   "linux": { "x64": "https://asset.noovolari.com/latest/Leapp-deb.zip", "ext": "deb" },
-    //   "darwin": {
-    //     "x64": "https://asset.noovolari.com/latest/Leapp-mac.zip",
-    //     "arm64": "https://asset.noovolari.com/latest/Leapp-arm-mac.zip",
-    //     "ext": "dmg"
-    //   },
-    //   "win32": { "x64": "https://asset.noovolari.com/latest/Leapp-windows.zip", "ext": "exe" }
-    // };
-    // const url = fileMap[chosenOs][chosenArch];
-    // const tempDir = path.join(os.tmpdir(), "leapp-updater");
-    //
-    // fsextra.removeSync(tempDir);
-    // fsextra.mkdirSync(tempDir)
-    //
-    // const archivePath = path.join(tempDir, "leapp-archive.zip");
-    // await download(url, archivePath);
-    // console.log("Download Completed");
-
-    // decompress(archivePath, tempDir).then((files) => {
-    //   fsextra.removeSync(archivePath);
-
+  autoUpdater.on("update-downloaded", () => {
     dialog.showMessageBox({
       type: 'question',
       buttons: ['Install and Restart', 'Later'],
@@ -167,21 +137,10 @@ const buildAutoUpdater = (win: any): void => {
       message: 'A new update has been downloaded. Would you like to install and restart the app now?'
     }).then(async (selection) => {
       if (selection.response === 0) {
-        /*
-        export interface FileInfo {
-        readonly name: string
-        readonly url: string
-        readonly sha2?: string
-        readonly sha512?: string
-        readonly headers?: Object
-        }
-         */
-        await (autoUpdater as any).doDownloadUpdate(undefined, {name:undefined, url:"https://asset.noovolari.com/latest/Leapp-0.24.6-mac.zip"});
-        //autoUpdater.quitAndInstall(true, true);
+        autoUpdater.quitAndInstall();
       }
     });
   });
-  //});
 };
 
 // Generate the main Electron window

@@ -1,3 +1,0 @@
-provider: "generic",
-url: "http://localhost:8000/latest",
-channel: "latest",

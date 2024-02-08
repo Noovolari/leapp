@@ -138,7 +138,10 @@ const buildAutoUpdater = (win: any): void => {
       message: 'A new update has been downloaded. Would you like to install and restart the app now?'
     }).then(async (selection) => {
       if (selection.response === 0) {
-        autoUpdater.quitAndInstall();
+        setTimeout(() => {
+          autoUpdater.quitAndInstall();
+          app.exit();
+        }, 10000);
       }
     });
   });

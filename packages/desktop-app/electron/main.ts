@@ -4,12 +4,11 @@ import { environment } from "../src/environments/environment";
 import * as https from "https";
 import * as http from "http";
 import { execFile as child } from "child_process";
-import findProcess from 'find-process';
-import Electron from "electron";
 
 const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = require("electron");
 const electronLocalshortcut = require('electron-localshortcut');
 const { autoUpdater } = require("electron-updater");
+const findProcess = require("find-process");
 
 const url = require("url");
 const fs = require("fs");

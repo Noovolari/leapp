@@ -4,6 +4,8 @@ import { environment } from "../src/environments/environment";
 import * as https from "https";
 import * as http from "http";
 import { execFile as child } from "child_process";
+import findProcess from 'find-process';
+import Electron from "electron";
 
 const { app, BrowserWindow, ipcMain, Tray, Menu, dialog } = require("electron");
 const electronLocalshortcut = require('electron-localshortcut');
@@ -138,10 +140,7 @@ const buildAutoUpdater = (win: any): void => {
       message: 'A new update has been downloaded. Would you like to install and restart the app now?'
     }).then(async (selection) => {
       if (selection.response === 0) {
-        setTimeout(() => {
-          autoUpdater.quitAndInstall();
-          app.exit();
-        }, 10000);
+        autoUpdater.quitAndInstall();
       }
     });
   });
@@ -322,11 +321,30 @@ const generateMainWindow = () => {
     forceQuit = true;
   });
 
-  app.on("ready", () => {
+  app.on("ready", async () => {
     createWindow();
     // createTray();
-    buildAutoUpdater(win);
 
+    let isShipItStillRunning = true;
+    let shouldRestartBeforeLaunch = false;
+
+    while (isShipItStillRunning) {
+      const shipItProcesses = await findProcess("name", "ShipIt");
+      if (shipItProcesses.some(f => f.cmd.includes("com.leapp.app"))) {
+        // if we don't restart, the old app from memory will keep running
+        shouldRestartBeforeLaunch = true;
+        console.debug("Waiting for auto update to finish");
+      } else {
+        isShipItStillRunning = false;
+      }
+    }
+
+    if (shouldRestartBeforeLaunch) {
+      app.relaunch();
+      app.exit(0);
+    }
+
+    buildAutoUpdater(win);
   });
 
   // when the app on macOS is starting for the first time the frontend is not ready so we use 'will-finish-launching'

@@ -65,6 +65,7 @@ nav:
           - 'Lock your Workspace': 'leapp-pro/getting-started/lock.md'
       - 'Synchronization': 'leapp-pro/synchronization.md'
       - 'Security and password': 'leapp-pro/security-and-password.md'
+      - 'Export PRO Workspace': 'leapp-pro/export-pro-workspace.md'
   - 'Roadmap': https://roadmap.leapp.cloud/tabs/4-in-progress
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'

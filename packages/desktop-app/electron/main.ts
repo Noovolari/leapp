@@ -333,6 +333,11 @@ const generateMainWindow = () => {
     createWindow();
     // createTray();
 
+    while(autoUpdater.isUpdaterActive()) {
+      // do nothing
+    }
+
+    /*
     let isShipItStillRunning = true;
     let shouldRestartBeforeLaunch = false;
 
@@ -350,7 +355,7 @@ const generateMainWindow = () => {
     if (shouldRestartBeforeLaunch) {
       app.relaunch();
       app.exit(0);
-    }
+    }*/
 
     buildAutoUpdater(win);
   });

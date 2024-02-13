@@ -127,8 +127,17 @@ const buildAutoUpdater = (win: any): void => {
 
   // Ref here: https://www.electronjs.org/docs/latest/api/auto-updater
   autoUpdater.on("update-available", (info) => {
-    console.log("update available log by console: ", info);
-    autoUpdater.downloadUpdate().catch(error => console.error(error));
+    dialog.showMessageBox({
+      type: 'question',
+      buttons: ['Download update', 'Skip'],
+      defaultId: 0,
+      message: 'update-available event'
+    }).then(async (selection) => {
+      if (selection.response === 0) {
+        console.log("update available log by console: ", info);
+        autoUpdater.downloadUpdate().catch(error => console.error(error));
+      }
+    });
   });
 
   autoUpdater.on("update-downloaded", () => {

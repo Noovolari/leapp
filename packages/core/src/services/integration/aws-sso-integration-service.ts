@@ -5,7 +5,7 @@ import { formatDistance } from "date-fns";
 import { INativeService } from "../../interfaces/i-native-service";
 import { AwsSsoOidcService } from "../aws-sso-oidc.service";
 import { constants } from "../../models/constants";
-import SSO, {
+import {
   AccountInfo,
   GetRoleCredentialsRequest,
   GetRoleCredentialsResponse,
@@ -13,7 +13,8 @@ import SSO, {
   ListAccountsRequest,
   LogoutRequest,
   RoleInfo,
-} from "aws-sdk/clients/sso";
+  SSO,
+} from "@aws-sdk/client-sso";
 
 import { SessionType } from "../../models/session-type";
 import { AwsSsoRoleSession } from "../../models/aws/aws-sso-role-session";
@@ -24,6 +25,7 @@ import { IIntegrationService } from "../../interfaces/i-integration-service";
 import { AwsSsoIntegrationCreationParams } from "../../models/aws/aws-sso-integration-creation-params";
 import { ThrottleService } from "../throttle-service";
 import { IKeychainService } from "../../interfaces/i-keychain-service";
+import { ConfiguredRetryStrategy } from "@aws-sdk/util-retry";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 
@@ -179,7 +181,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     const logoutRequest: LogoutRequest = { accessToken: savedAccessToken };
 
     try {
-      await this.ssoPortal.logout(logoutRequest).promise();
+      await this.ssoPortal.logout(logoutRequest);
     } catch (_) {
       // logout request has to be handled in reject Promise by design
 
@@ -230,7 +232,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       accessToken,
     };
 
-    return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest).promise();
+    return this.ssoPortal.getRoleCredentials(getRoleCredentialsRequest);
   }
 
   async getAwsSsoIntegrationTokenInfo(awsSsoIntegrationId: string): Promise<AwsSsoIntegrationTokenInfo> {
@@ -314,12 +316,26 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   private setupSsoPortalClient(region: string): void {
     if (!this.ssoPortal || this.ssoPortal.config.region !== region) {
+      /*this.ssoPortal = new SSO({
+        region,
+        maxAttempts: 30,
+        retryStrategy: { customBackoff: (retryCount: number, _err?: Error) => Math.floor(Math.random() * retryCount * 1000) },
+      });*/
       this.ssoPortal = new SSO({
         region,
-        maxRetries: 30,
-        retryDelayOptions: { customBackoff: (retryCount: number, _err?: Error) => Math.floor(Math.random() * retryCount * 1000) },
+        maxAttempts: 30,
+        retryStrategy: new ConfiguredRetryStrategy(30, (attempt: number) => Math.floor(Math.random() * attempt * 1000)),
       });
-      this.listAccountRolesCall = new ThrottleService((...params) => this.ssoPortal.listAccountRoles(...params).promise(), constants.maxSsoTps);
+      this.listAccountRolesCall = new ThrottleService(
+        (...params) =>
+          this.ssoPortal.listAccountRoles({
+            accessToken: params.accessToken,
+            accountId: params.accountId,
+            maxResults: params.maxResults,
+            nextToken: params.nextToken,
+          }),
+        constants.maxSsoTps
+      );
     }
   }
 
@@ -333,19 +349,16 @@ export class AwsSsoIntegrationService implements IIntegrationService {
   }
 
   private recursiveListAccounts(accountList: AccountInfo[], listAccountsRequest: ListAccountsRequest, promiseCallback: any) {
-    this.ssoPortal
-      .listAccounts(listAccountsRequest)
-      .promise()
-      .then((response) => {
-        accountList.push(...response.accountList);
+    this.ssoPortal.listAccounts(listAccountsRequest).then((response) => {
+      accountList.push(...response.accountList);
 
-        if (response.nextToken !== null) {
-          listAccountsRequest.nextToken = response.nextToken;
-          this.recursiveListAccounts(accountList, listAccountsRequest, promiseCallback);
-        } else {
-          promiseCallback(accountList);
-        }
-      });
+      if (response.nextToken !== null) {
+        listAccountsRequest.nextToken = response.nextToken;
+        this.recursiveListAccounts(accountList, listAccountsRequest, promiseCallback);
+      } else {
+        promiseCallback(accountList);
+      }
+    });
   }
 
   private async getSessionsFromAccount(integrationId: string, accountInfo: AccountInfo, accessToken: string): Promise<SsoRoleSession[]> {
@@ -402,7 +415,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       .catch((error) => reject(error));
   }
 
-  private findOldSession(accountInfo: SSO.AccountInfo, accountRole: SSO.RoleInfo): { region: string; profileId: string } {
+  private findOldSession(accountInfo: AccountInfo, accountRole: RoleInfo): { region: string; profileId: string } {
     const oldSession = this.repository
       .getSessions()
       .find(

@@ -1,4 +1,3 @@
-import SSO from "aws-sdk/clients/sso";
 import { BrowserWindowClosing } from "../../../interfaces/i-browser-window-closing";
 import { INativeService } from "../../../interfaces/i-native-service";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
@@ -7,17 +6,16 @@ import { CredentialsInfo } from "../../../models/credentials-info";
 import { AwsCoreService } from "../../aws-core-service";
 import { FileService } from "../../file-service";
 import { Repository } from "../../repository";
-
 import { AwsSessionService } from "./aws-session-service";
 import { AwsSsoOidcService } from "../../aws-sso-oidc.service";
 import { AwsSsoRoleSessionRequest } from "./aws-sso-role-session-request";
 import { IAwsIntegrationDelegate } from "../../../interfaces/i-aws-integration-delegate";
 import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
-import * as AWS from "aws-sdk";
 import { IKeychainService } from "../../../interfaces/i-keychain-service";
 import { LoggedException, LogLevel } from "../../log-service";
 import { CreateSessionRequest } from "../create-session-request";
+import { GetRoleCredentialsResponse } from "@aws-sdk/client-sso";
 
 export interface GenerateSSOTokenResponse {
   accessToken: string;
@@ -78,7 +76,7 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     awsSsoOidcService.appendListener(this);
   }
 
-  static sessionTokenFromGetSessionTokenResponse(getRoleCredentialResponse: SSO.GetRoleCredentialsResponse): { sessionToken: any } {
+  static sessionTokenFromGetSessionTokenResponse(getRoleCredentialResponse: GetRoleCredentialsResponse): { sessionToken: any } {
     return {
       sessionToken: {
         ["aws_access_key_id"]: getRoleCredentialResponse.roleCredentials.accessKeyId.trim(),
@@ -161,11 +159,11 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
       credentials = await this.awsIntegrationDelegate.getRoleCredentials(accessToken, region, roleArn);
     }
 
-    const awsCredentials: AWS.STS.Credentials = {
-      ["AccessKeyId"]: credentials.roleCredentials.accessKeyId,
-      ["SecretAccessKey"]: credentials.roleCredentials.secretAccessKey,
-      ["SessionToken"]: credentials.roleCredentials.sessionToken,
-      ["Expiration"]: new Date(credentials.roleCredentials.expiration),
+    const awsCredentials: any = {
+      ["accessKeyId"]: credentials.roleCredentials.accessKeyId,
+      ["secretAccessKey"]: credentials.roleCredentials.secretAccessKey,
+      ["sessionToken"]: credentials.roleCredentials.sessionToken,
+      ["expiration"]: new Date(credentials.roleCredentials.expiration),
     };
 
     // Save session token expiration
@@ -204,13 +202,13 @@ export class AwsSsoRoleService extends AwsSessionService implements BrowserWindo
     throw new LoggedException(`Clone is not supported for sessionType ${session.type}`, this, LogLevel.error, false);
   }
 
-  private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
+  private saveSessionTokenExpirationInTheSession(session: Session, credentials: any): void {
     const sessions = this.repository.getSessions();
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];
 
     if (credentials !== undefined) {
-      currentSession.sessionTokenExpiration = credentials.Expiration.toISOString();
+      currentSession.sessionTokenExpiration = credentials.expiration.toISOString();
     }
 
     sessions[index] = currentSession;

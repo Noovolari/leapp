@@ -1,4 +1,3 @@
-import * as Aws from "aws-sdk";
 import { IAwsSamlAuthenticationService } from "../../../interfaces/i-aws-saml-authentication-service";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsIamRoleFederatedSession } from "../../../models/aws/aws-iam-role-federated-session";
@@ -10,9 +9,8 @@ import { AwsIamRoleFederatedSessionRequest } from "./aws-iam-role-federated-sess
 import { AwsSessionService } from "./aws-session-service";
 import { SessionType } from "../../../models/session-type";
 import { Session } from "../../../models/session";
-import * as AWS from "aws-sdk";
 import { LoggedException, LogLevel } from "../../log-service";
-import { STS } from "aws-sdk";
+import { AssumeRoleWithSAMLCommand, AssumeRoleWithSAMLResponse, Credentials, STSClient } from "@aws-sdk/client-sts";
 
 export class AwsIamRoleFederatedService extends AwsSessionService {
   constructor(
@@ -26,7 +24,7 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     super(iSessionNotifier, repository, awsCoreService, fileService);
   }
 
-  static sessionTokenFromGetSessionTokenResponse(assumeRoleResponse: Aws.STS.AssumeRoleWithSAMLResponse): { sessionToken: any } {
+  static sessionTokenFromGetSessionTokenResponse(assumeRoleResponse: AssumeRoleWithSAMLResponse): { sessionToken: any } {
     return {
       sessionToken: {
         ["aws_access_key_id"]: assumeRoleResponse.Credentials.AccessKeyId.trim(),
@@ -115,7 +113,8 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     const samlResponse = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
 
     // Setup STS to generate the credentials
-    const sts = new Aws.STS(this.awsCoreService.stsOptions(session));
+    //const sts = new Aws.STS(this.awsCoreService.stsOptions(session));
+    const sts = new STSClient(this.awsCoreService.stsOptions(session));
 
     // Params for the calls
     const params = {
@@ -169,17 +168,23 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
   }
 
   private async assumeRoleWithSAML(
-    sts: STS,
+    sts: STSClient,
     params: { ["SAMLAssertion"]: string; ["PrincipalArn"]: string; ["DurationSeconds"]: number; ["RoleArn"]: string }
-  ): Promise<STS.Types.AssumeRoleWithSAMLResponse> {
+  ): Promise<AssumeRoleWithSAMLResponse> {
     try {
-      return await sts.assumeRoleWithSAML(params).promise();
+      const assumeRoleWithSAMLCommand: AssumeRoleWithSAMLCommand = new AssumeRoleWithSAMLCommand({
+        ["RoleArn"]: params["RoleArn"],
+        ["PrincipalArn"]: params["PrincipalArn"],
+        ["SAMLAssertion"]: params["SAMLAssertion"],
+        ["DurationSeconds"]: params["DurationSeconds"],
+      });
+      return await sts.send(assumeRoleWithSAMLCommand);
     } catch (err) {
       throw new LoggedException(err.message, this, LogLevel.warn);
     }
   }
 
-  private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
+  private saveSessionTokenExpirationInTheSession(session: Session, credentials: Credentials): void {
     const sessions = this.repository.getSessions();
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];

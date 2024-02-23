@@ -1,5 +1,7 @@
-import * as AWS from "aws-sdk";
-import { AssumeRoleResponse } from "aws-sdk/clients/sts";
+import { STSClient, AssumeRoleResponse, Credentials, AssumeRoleCommand } from "@aws-sdk/client-sts";
+
+// import * as AWS from "aws-sdk";
+// import { AssumeRoleResponse } from "aws-sdk/clients/sts";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
@@ -121,15 +123,21 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     const parentCredentialsInfo = await parentSessionService.generateCredentialsProxy(parentSession.sessionId);
 
     // Make second jump: configure aws SDK with parent credentials set
-    AWS.config.update({
-      sessionToken: parentCredentialsInfo.sessionToken.aws_session_token,
-      accessKeyId: parentCredentialsInfo.sessionToken.aws_access_key_id,
-      secretAccessKey: parentCredentialsInfo.sessionToken.aws_secret_access_key,
-    });
+    // AWS.config.update({
+    //   sessionToken: parentCredentialsInfo.sessionToken.aws_session_token,
+    //   accessKeyId: parentCredentialsInfo.sessionToken.aws_access_key_id,
+    //   secretAccessKey: parentCredentialsInfo.sessionToken.aws_secret_access_key,
+    // });
+    const parentCredentials = {
+      ["SessionToken"]: parentCredentialsInfo.sessionToken.aws_session_token,
+      ["AccessKeyId"]: parentCredentialsInfo.sessionToken.aws_access_key_id,
+      ["SecretAccessKey"]: parentCredentialsInfo.sessionToken.aws_secret_access_key,
+    } as Credentials;
 
     // Assume Role from parent
     // Prepare session credentials set parameters and client
-    const sts = new AWS.STS(this.awsCoreService.stsOptions(session));
+    const sts = new STSClient(this.awsCoreService.stsOptions(session, true, parentCredentials));
+    // const sts = new AWS.STS(this.awsCoreService.stsOptions(session));
 
     // Configure IamRoleChained Account session parameters
     const roleSessionName = (session as AwsIamRoleChainedSession).roleSessionName;
@@ -182,7 +190,9 @@ export class AwsIamRoleChainedService extends AwsSessionService {
   private async generateSessionToken(session, sts, params): Promise<CredentialsInfo> {
     try {
       // Assume Role
-      const assumeRoleResponse: AssumeRoleResponse = await sts.assumeRole(params).promise();
+      const assumeRoleCommand = new AssumeRoleCommand(params);
+      const assumeRoleResponse = await sts.send(assumeRoleCommand);
+      // const assumeRoleResponse: AssumeRoleResponse = await sts.assumeRole(params).promise();
 
       // Save session token expiration
       this.saveSessionTokenExpirationInTheSession(session, assumeRoleResponse.Credentials);
@@ -194,7 +204,7 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     }
   }
 
-  private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
+  private saveSessionTokenExpirationInTheSession(session: Session, credentials: Credentials): void {
     const sessions = this.repository.getSessions();
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];

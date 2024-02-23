@@ -1,10 +1,12 @@
-import * as AWS from "aws-sdk";
-import { GetSessionTokenResponse } from "aws-sdk/clients/sts";
+// import * as AWS from "aws-sdk";
+// import { GetSessionTokenResponse } from "aws-sdk/clients/sts";
+import { STSClient, Credentials, GetSessionTokenResponse, GetCallerIdentityCommand, GetSessionTokenCommand } from "@aws-sdk/client-sts";
+
 import { IMfaCodePrompter } from "../../../interfaces/i-mfa-code-prompter";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsIamUserSession } from "../../../models/aws/aws-iam-user-session";
 import { constants } from "../../../models/constants";
-import { Credentials } from "../../../models/credentials";
+import { Credentials as LeappCredentials } from "../../../models/credentials";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { Session } from "../../../models/session";
 import { AwsCoreService } from "../../aws-core-service";
@@ -105,7 +107,7 @@ export class AwsIamUserService extends AwsSessionService {
   async applyCredentials(sessionId: string, credentialsInfo: CredentialsInfo): Promise<void> {
     const session = this.repository.getSessionById(sessionId);
     const profileName = this.repository.getProfileName((session as AwsIamUserSession).profileId);
-    const credentialObject: { [key: string]: Credentials } = {};
+    const credentialObject: { [key: string]: LeappCredentials } = {};
 
     credentialObject[profileName] = {
       // eslint-disable-next-line @typescript-eslint/naming-convention,@typescript-eslint/naming-convention
@@ -164,10 +166,15 @@ export class AwsIamUserService extends AwsSessionService {
 
       // Get session token
       // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
-      AWS.config.update({ accessKeyId, secretAccessKey });
+      // AWS.config.update({ accessKeyId, secretAccessKey });
+      const credentials = {
+        ["AccessKeyId"]: accessKeyId,
+        ["SecretAccessKey"]: secretAccessKey,
+      } as Credentials;
 
       // Configure sts client options
-      const sts = new AWS.STS(this.awsCoreService.stsOptions(session));
+      // const sts = new AWS.STS(this.awsCoreService.stsOptions(session));
+      const sts = new STSClient(this.awsCoreService.stsOptions(session, true, credentials));
 
       // Configure sts get-session-token api call params
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -194,16 +201,24 @@ export class AwsIamUserService extends AwsSessionService {
 
   async getAccountNumberFromCallerIdentity(session: Session): Promise<string> {
     // Get credentials
-    const credentials: CredentialsInfo = await this.generateCredentials(session.sessionId);
-    AWS.config.update({
-      accessKeyId: credentials.sessionToken.aws_access_key_id,
-      secretAccessKey: credentials.sessionToken.aws_secret_access_key,
-      sessionToken: credentials.sessionToken.aws_session_token,
-    });
+    const credentialsInfo: CredentialsInfo = await this.generateCredentials(session.sessionId);
+    // AWS.config.update({
+    //   accessKeyId: credentials.sessionToken.aws_access_key_id,
+    //   secretAccessKey: credentials.sessionToken.aws_secret_access_key,
+    //   sessionToken: credentials.sessionToken.aws_session_token,
+    // });
+    const credentials = {
+      ["SessionToken"]: credentialsInfo.sessionToken.aws_session_token,
+      ["AccessKeyId"]: credentialsInfo.sessionToken.aws_access_key_id,
+      ["SecretAccessKey"]: credentialsInfo.sessionToken.aws_secret_access_key,
+    } as Credentials;
     // Configure sts client options
     try {
-      const sts = new AWS.STS(this.awsCoreService.stsOptions(session));
-      const response = await sts.getCallerIdentity({}).promise();
+      // const sts = new AWS.STS(this.awsCoreService.stsOptions(session));
+      const sts = new STSClient(this.awsCoreService.stsOptions(session, true, credentials));
+      const getCallerIdentityCommand = new GetCallerIdentityCommand({});
+      const response = await sts.send(getCallerIdentityCommand);
+      // const response = await sts.getCallerIdentity({}).promise();
       return response.Account ?? "";
     } catch (err: any) {
       throw new LoggedException(err.message, this, LogLevel.warn);
@@ -243,7 +258,7 @@ export class AwsIamUserService extends AwsSessionService {
   // eslint-disable-next-line @typescript-eslint/naming-convention
   private generateSessionTokenCallingMfaModal(
     session: Session,
-    sts: AWS.STS,
+    sts: STSClient,
     params: GenerateSessionTokenCallingMfaParams
   ): Promise<CredentialsInfo> {
     return new Promise((resolve, reject) => {
@@ -283,10 +298,13 @@ export class AwsIamUserService extends AwsSessionService {
     await this.keychainService.deleteSecret(constants.appName, `${sessionId}-iam-user-aws-session-token`);
   }
 
-  private async generateSessionToken(session: Session, sts: AWS.STS, params: any): Promise<CredentialsInfo> {
+  private async generateSessionToken(session: Session, sts: STSClient, params: any): Promise<CredentialsInfo> {
     try {
       // Invoke sts get-session-token api
-      const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
+      // const getSessionTokenResponse: GetSessionTokenResponse = await sts.getSessionToken(params).promise();
+
+      const getSessionTokenCommand = new GetSessionTokenCommand(params);
+      const getSessionTokenResponse: GetSessionTokenResponse = await sts.send(getSessionTokenCommand);
 
       // Save session token expiration
       this.saveSessionTokenExpirationInTheSession(session, getSessionTokenResponse.Credentials);
@@ -304,7 +322,7 @@ export class AwsIamUserService extends AwsSessionService {
     }
   }
 
-  private saveSessionTokenExpirationInTheSession(session: Session, credentials: AWS.STS.Credentials): void {
+  private saveSessionTokenExpirationInTheSession(session: Session, credentials: Credentials): void {
     const sessions = this.repository.getSessions();
     const index = sessions.indexOf(session);
     const currentSession: Session = sessions[index];

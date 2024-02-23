@@ -3,7 +3,7 @@ import { Session } from "../models/session";
 import { INativeService } from "../interfaces/i-native-service";
 import { LogService } from "./log-service";
 import { FetchHttpHandler } from "@smithy/fetch-http-handler";
-import { Credentials } from "@aws-sdk/client-sts";
+//import { Credentials } from "@aws-sdk/client-sts";
 
 // TODO: rename it. This naming is ambiguous.
 export class AwsCoreService {
@@ -58,7 +58,7 @@ export class AwsCoreService {
     return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "config.bkp");
   }
 
-  stsOptions(session: Session, isV3 = false, credentials: Credentials = undefined): any {
+  stsOptions(session: Session, isV3 = false, credentials: any = undefined): any {
     let options: any = {};
     console.log(credentials);
     if (isV3 && credentials) {

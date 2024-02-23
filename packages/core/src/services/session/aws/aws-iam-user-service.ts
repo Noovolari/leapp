@@ -167,10 +167,10 @@ export class AwsIamUserService extends AwsSessionService {
       // Get session token
       // https://docs.aws.amazon.com/STS/latest/APIReference/API_GetSessionToken.html
       // AWS.config.update({ accessKeyId, secretAccessKey });
-      const credentials = {
-        ["AccessKeyId"]: accessKeyId,
-        ["SecretAccessKey"]: secretAccessKey,
-      } as Credentials;
+      const credentials: any = {
+        ["accessKeyId"]: accessKeyId,
+        ["secretAccessKey"]: secretAccessKey,
+      };
 
       // Configure sts client options
       // const sts = new AWS.STS(this.awsCoreService.stsOptions(session));

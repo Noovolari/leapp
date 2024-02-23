@@ -129,10 +129,10 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     //   secretAccessKey: parentCredentialsInfo.sessionToken.aws_secret_access_key,
     // });
     const parentCredentials = {
-      ["SessionToken"]: parentCredentialsInfo.sessionToken.aws_session_token,
-      ["AccessKeyId"]: parentCredentialsInfo.sessionToken.aws_access_key_id,
-      ["SecretAccessKey"]: parentCredentialsInfo.sessionToken.aws_secret_access_key,
-    } as Credentials;
+      ["sessionToken"]: parentCredentialsInfo.sessionToken.aws_session_token,
+      ["accessKeyId"]: parentCredentialsInfo.sessionToken.aws_access_key_id,
+      ["secretAccessKey"]: parentCredentialsInfo.sessionToken.aws_secret_access_key,
+    };
 
     // Assume Role from parent
     // Prepare session credentials set parameters and client

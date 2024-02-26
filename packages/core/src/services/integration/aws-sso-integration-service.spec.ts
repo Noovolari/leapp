@@ -220,8 +220,8 @@ describe("AwsSsoIntegrationService", () => {
     const savedAccessToken = "fake-access-token";
     awsIntegrationService.getAccessTokenFromKeychain = jest.fn(async () => savedAccessToken);
     awsIntegrationService.setupSsoPortalClient = jest.fn();
-    const logoutPromise = jest.fn(() => Promise.reject("logout successful"));
-    const logoutFnMock = jest.fn(() => ({ promise: logoutPromise }));
+    const logoutPromise = new Promise((resolve, reject) => reject("logout successful"));
+    const logoutFnMock = jest.fn(() => logoutPromise);
     awsIntegrationService.ssoPortal = { logout: logoutFnMock };
     const fakeIntegrationAccessToken = "fake-integration-access-token";
     awsIntegrationService.getIntegrationAccessTokenKey = jest.fn(() => fakeIntegrationAccessToken);
@@ -234,7 +234,6 @@ describe("AwsSsoIntegrationService", () => {
     expect(awsIntegrationService.getAccessTokenFromKeychain).toHaveBeenCalledWith(fakeIntegrationId);
     expect(awsIntegrationService.setupSsoPortalClient).toHaveBeenCalledWith(awsSsoIntegration.region);
     expect(logoutFnMock).toHaveBeenCalledWith({ accessToken: savedAccessToken });
-    expect(logoutPromise).toHaveBeenCalled();
     expect(keyChainService.deleteSecret).toHaveBeenCalledWith(constants.appName, fakeIntegrationAccessToken);
     expect(awsIntegrationService.getIntegrationAccessTokenKey).toHaveBeenCalledWith(fakeIntegrationId);
     expect(repository.unsetAwsSsoIntegrationExpiration).toHaveBeenCalledWith(fakeIntegrationId);
@@ -290,7 +289,7 @@ describe("AwsSsoIntegrationService", () => {
     const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
     awsIntegrationService.setupSsoPortalClient = jest.fn();
     const credentials = { credentials: "secret" };
-    awsIntegrationService.ssoPortal = { getRoleCredentials: jest.fn(() => ({ promise: () => Promise.resolve(credentials) })) };
+    awsIntegrationService.ssoPortal = { getRoleCredentials: jest.fn(() => new Promise((resolve, _reject) => resolve(credentials))) };
 
     const fakeRegion = "fake-region";
     const fakeAccessToken = "fake-access-token";
@@ -475,15 +474,13 @@ describe("AwsSsoIntegrationService", () => {
     const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
 
     let callNumber = 1;
-    const listAccountsFn = jest.fn(() => ({
-      promise: () => {
-        if (callNumber++ === 1) {
-          return Promise.resolve({ accountList: ["fake-first-account"], nextToken });
-        } else {
-          return Promise.resolve({ accountList: ["fake-last-account"], nextToken: null });
-        }
-      },
-    }));
+    const listAccountsFn = jest.fn(() => {
+      if (callNumber++ === 1) {
+        return Promise.resolve({ accountList: ["fake-first-account"], nextToken });
+      } else {
+        return Promise.resolve({ accountList: ["fake-last-account"], nextToken: null });
+      }
+    });
     awsIntegrationService.ssoPortal = { listAccounts: listAccountsFn };
 
     const promiseCallback = () => {

@@ -1,7 +1,4 @@
 import { STSClient, AssumeRoleResponse, Credentials, AssumeRoleCommand } from "@aws-sdk/client-sts";
-
-// import * as AWS from "aws-sdk";
-// import { AssumeRoleResponse } from "aws-sdk/clients/sts";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
@@ -122,12 +119,6 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     const parentSessionService = this.parentSessionServiceFactory.getSessionService(parentSession.type);
     const parentCredentialsInfo = await parentSessionService.generateCredentialsProxy(parentSession.sessionId);
 
-    // Make second jump: configure aws SDK with parent credentials set
-    // AWS.config.update({
-    //   sessionToken: parentCredentialsInfo.sessionToken.aws_session_token,
-    //   accessKeyId: parentCredentialsInfo.sessionToken.aws_access_key_id,
-    //   secretAccessKey: parentCredentialsInfo.sessionToken.aws_secret_access_key,
-    // });
     const parentCredentials = {
       ["sessionToken"]: parentCredentialsInfo.sessionToken.aws_session_token,
       ["accessKeyId"]: parentCredentialsInfo.sessionToken.aws_access_key_id,
@@ -137,7 +128,6 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     // Assume Role from parent
     // Prepare session credentials set parameters and client
     const sts = new STSClient(this.awsCoreService.stsOptions(session, true, parentCredentials));
-    // const sts = new AWS.STS(this.awsCoreService.stsOptions(session));
 
     // Configure IamRoleChained Account session parameters
     const roleSessionName = (session as AwsIamRoleChainedSession).roleSessionName;
@@ -192,7 +182,6 @@ export class AwsIamRoleChainedService extends AwsSessionService {
       // Assume Role
       const assumeRoleCommand = new AssumeRoleCommand(params);
       const assumeRoleResponse = await sts.send(assumeRoleCommand);
-      // const assumeRoleResponse: AssumeRoleResponse = await sts.assumeRole(params).promise();
 
       // Save session token expiration
       this.saveSessionTokenExpirationInTheSession(session, assumeRoleResponse.Credentials);

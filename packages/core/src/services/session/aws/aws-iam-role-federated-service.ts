@@ -113,7 +113,6 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     const samlResponse = await this.awsAuthenticationService.awsSignIn(idpUrl, needToAuthenticate);
 
     // Setup STS to generate the credentials
-    //const sts = new Aws.STS(this.awsCoreService.stsOptions(session));
     const sts = new STSClient(this.awsCoreService.stsOptions(session));
 
     // Params for the calls

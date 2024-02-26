@@ -5,7 +5,6 @@ import { SessionType } from "../../../models/session-type";
 import { LeappNotFoundError } from "../../../errors/leapp-not-found-error";
 import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { constants } from "../../../models/constants";
-import * as AWS from "aws-sdk";
 import { AwsIamRoleChainedSessionRequest } from "./aws-iam-role-chained-session-request";
 import { AssumeRoleCommand } from "@aws-sdk/client-sts";
 
@@ -230,8 +229,6 @@ describe("AwsIamRoleChainedService", () => {
     );
     (awsIamRoleChainedService as any).generateSessionToken = jest.fn();
     await awsIamRoleChainedService.generateCredentials("fake-session-id");
-    const sts = new AWS.STS();
-    (sts as any)._clientId = 2;
     expect((awsIamRoleChainedService as any).generateSessionToken.mock.calls[0][2]).toEqual({
       ["RoleSessionName"]: constants.roleSessionName,
       ["RoleArn"]: session2.roleArn,
@@ -322,7 +319,6 @@ describe("AwsIamRoleChainedService", () => {
 
     await (awsIamRoleChainedService as any).generateSessionToken(session, stsMock, {});
 
-    //console.log(stsMock.send.mock.calls[0]);
     expect((awsIamRoleChainedService as any).saveSessionTokenExpirationInTheSession).toHaveBeenCalled();
     expect(JSON.stringify(stsMock.send.mock.calls[0])).toBe(JSON.stringify([new AssumeRoleCommand({} as any)]));
   });

@@ -204,9 +204,6 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       const loginResponse = await this.login(integrationId, region, portalUrl);
       const integration: AwsSsoIntegration = this.repository.getAwsSsoIntegration(integrationId);
 
-      // loginResponse.expirationTime.toISOString()
-      // new Date(new Date().getTime() + 1000 * 120).toISOString()
-
       await this.configureAwsSso(
         integrationId,
         integration.alias,
@@ -316,11 +313,6 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   private setupSsoPortalClient(region: string): void {
     if (!this.ssoPortal || this.ssoPortal.config.region !== region) {
-      /*this.ssoPortal = new SSO({
-        region,
-        maxAttempts: 30,
-        retryStrategy: { customBackoff: (retryCount: number, _err?: Error) => Math.floor(Math.random() * retryCount * 1000) },
-      });*/
       this.ssoPortal = new SSO({
         region,
         maxAttempts: 30,

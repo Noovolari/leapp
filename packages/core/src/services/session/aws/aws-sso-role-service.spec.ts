@@ -6,7 +6,6 @@ import { IAwsIntegrationDelegate } from "../../../interfaces/i-aws-integration-d
 import * as uuid from "uuid";
 import { AwsSsoRoleSessionRequest } from "./aws-sso-role-session-request";
 import { AwsSessionService } from "./aws-session-service";
-import * as AWS from "aws-sdk";
 import { LoggedException, LogLevel } from "../../log-service";
 jest.mock("uuid");
 
@@ -254,11 +253,11 @@ describe("AwsSsoRoleService", () => {
       awsSsoConfiguration.region,
       session.roleArn
     );
-    const expectedAwsCredential: AWS.STS.Credentials = {
-      ["AccessKeyId"]: credentials.roleCredentials.accessKeyId,
-      ["Expiration"]: new Date(credentials.roleCredentials.expiration),
-      ["SecretAccessKey"]: credentials.roleCredentials.secretAccessKey,
-      ["SessionToken"]: credentials.roleCredentials.sessionToken,
+    const expectedAwsCredential: any = {
+      ["accessKeyId"]: credentials.roleCredentials.accessKeyId,
+      ["expiration"]: new Date(credentials.roleCredentials.expiration),
+      ["secretAccessKey"]: credentials.roleCredentials.secretAccessKey,
+      ["sessionToken"]: credentials.roleCredentials.sessionToken,
     };
     expect((awsSsoRoleService as any).saveSessionTokenExpirationInTheSession).toHaveBeenCalledWith(session, expectedAwsCredential);
     expect(AwsSsoRoleService.sessionTokenFromGetSessionTokenResponse).toHaveBeenCalledWith(credentials);
@@ -318,12 +317,12 @@ describe("AwsSsoRoleService", () => {
       setSessions: jest.fn(),
     } as any;
     const fakeCredentials = {
-      ["Expiration"]: new Date(),
+      ["expiration"]: new Date(),
     };
     const awsSsoRoleService = new AwsSsoRoleService(sessionNotifier, repository, null, null, null, null, { appendListener: () => {} } as any);
     (awsSsoRoleService as any).saveSessionTokenExpirationInTheSession(session, fakeCredentials);
     expect(repository.getSessions).toHaveBeenCalled();
-    expect(session.sessionTokenExpiration).toBe(fakeCredentials.Expiration.toISOString());
+    expect(session.sessionTokenExpiration).toBe(fakeCredentials.expiration.toISOString());
     expect(repository.updateSessions).toHaveBeenCalledWith([{ id: "wrong-session-id" }, session]);
     expect(sessionNotifier.setSessions).toHaveBeenCalledWith([{ id: "wrong-session-id" }, session]);
 

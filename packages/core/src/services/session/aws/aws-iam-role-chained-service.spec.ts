@@ -7,6 +7,7 @@ import { LeappAwsStsError } from "../../../errors/leapp-aws-sts-error";
 import { constants } from "../../../models/constants";
 import * as AWS from "aws-sdk";
 import { AwsIamRoleChainedSessionRequest } from "./aws-iam-role-chained-session-request";
+import { AssumeRoleCommand } from "@aws-sdk/client-sts";
 
 describe("AwsIamRoleChainedService", () => {
   let sessionNotifier;
@@ -306,25 +307,24 @@ describe("AwsIamRoleChainedService", () => {
     );
     (awsIamRoleChainedService as any).saveSessionTokenExpirationInTheSession = jest.fn();
     const stsMock = {
-      assumeRole: jest.fn(() => ({
-        promise: () => ({
+      send: jest.fn(() => ({
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        Credentials: {
           // eslint-disable-next-line @typescript-eslint/naming-convention
-          Credentials: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            AccessKeyId: "",
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            SecretAccessKey: "",
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            SessionToken: "",
-          },
-        }),
+          AccessKeyId: "",
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          SecretAccessKey: "",
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          SessionToken: "",
+        },
       })),
     };
 
     await (awsIamRoleChainedService as any).generateSessionToken(session, stsMock, {});
 
+    //console.log(stsMock.send.mock.calls[0]);
     expect((awsIamRoleChainedService as any).saveSessionTokenExpirationInTheSession).toHaveBeenCalled();
-    expect(stsMock.assumeRole).toHaveBeenCalled();
+    expect(JSON.stringify(stsMock.send.mock.calls[0])).toBe(JSON.stringify([new AssumeRoleCommand({} as any)]));
   });
 
   test("generateSessionToken - throws error", async () => {

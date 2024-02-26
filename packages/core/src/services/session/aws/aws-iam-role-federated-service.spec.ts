@@ -341,9 +341,7 @@ describe("AwsIamRoleFederatedService", () => {
 
   test("assumeRoleWithSAML- success", async () => {
     const sts = {
-      assumeRoleWithSAML: jest.fn(() => ({
-        promise: jest.fn(() => Promise.resolve("saml-response")),
-      })),
+      send: jest.fn(() => "saml-response"),
     } as any;
     const params = {
       ["SAMLAssertion"]: "",
@@ -361,9 +359,7 @@ describe("AwsIamRoleFederatedService", () => {
 
   test("assumeRoleWithSAML- fail", async () => {
     const sts = {
-      assumeRoleWithSAML: jest.fn(() => ({
-        promise: jest.fn(() => Promise.reject({ message: "error" })),
-      })),
+      send: jest.fn(() => ({ message: "error" })),
     } as any;
     const params = {
       ["SAMLAssertion"]: "",

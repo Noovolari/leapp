@@ -75,7 +75,6 @@ export class AwsCoreService {
           region: session.region,
         };
       }
-      console.log("im using v3!");
     } else {
       options = {
         maxRetries: 0,

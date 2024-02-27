@@ -322,10 +322,10 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       this.listAccountRolesCall = new ThrottleService(
         (...params) =>
           this.ssoPortal.listAccountRoles({
-            accessToken: params[0],
-            accountId: params[1],
-            maxResults: params[2],
-            nextToken: params[3],
+            accessToken: params[0][0],
+            accountId: params[0][1],
+            maxResults: params[0][2],
+            nextToken: params[0][3],
           }),
         constants.maxSsoTps
       );

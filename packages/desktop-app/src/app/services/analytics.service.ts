@@ -43,7 +43,6 @@ export class AnalyticsService {
     const signedInUser = this.appProviderService.teamService.signedInUserState.getValue();
     const currentWorkspace = await this.appProviderService.teamService.getKeychainCurrentWorkspace();
     if (captureAnonymousEvent || (signedInUser && signedInUser.accessToken !== "" && currentWorkspace !== constants.localWorkspaceKeychainValue)) {
-      console.log("EVENT: ", eventName);
       try {
         this.myPosthog.capture(
           eventName,

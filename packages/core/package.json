@@ -12,9 +12,9 @@
     "tsoa": "^4.1.0"
   },
   "peerDependencies": {
-    "@aws-sdk/client-sso": "3.502.0",
-    "@aws-sdk/client-sso-oidc": "3.502.0",
-    "@aws-sdk/client-sts": "3.502.0",
+    "@aws-sdk/client-sso": "3.504.0",
+    "@aws-sdk/client-sso-oidc": "3.504.0",
+    "@aws-sdk/client-sts": "3.504.0",
     "@aws-sdk/util-retry": "3.374.0",
     "@azure/msal-node": "^1.9.0",
     "@babel/plugin-proposal-class-properties": "^7.18.6",

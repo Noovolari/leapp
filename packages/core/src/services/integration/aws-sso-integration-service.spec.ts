@@ -451,7 +451,7 @@ describe("AwsSsoIntegrationService", () => {
       }
     }
 
-    const callParams = ["mocked-access-token", "mocked-account-id", "mocked-max-results", "mocked-next-token"];
+    const callParams = [["mocked-access-token", "mocked-account-id", "mocked-max-results", "mocked-next-token"]];
     const callPromise = "fake-call-promise";
     awsIntegrationService.ssoPortal = {
       ["listAccountRoles"]: (args: ListAccountRolesCommandInput) => {

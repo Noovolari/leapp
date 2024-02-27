@@ -221,8 +221,7 @@ describe("AwsSsoIntegrationService", () => {
     const savedAccessToken = "fake-access-token";
     awsIntegrationService.getAccessTokenFromKeychain = jest.fn(async () => savedAccessToken);
     awsIntegrationService.setupSsoPortalClient = jest.fn();
-    const logoutPromise = new Promise((resolve, reject) => reject("logout successful"));
-    const logoutFnMock = jest.fn(() => logoutPromise);
+    const logoutFnMock = jest.fn(() => {});
     awsIntegrationService.ssoPortal = { logout: logoutFnMock };
     const fakeIntegrationAccessToken = "fake-integration-access-token";
     awsIntegrationService.getIntegrationAccessTokenKey = jest.fn(() => fakeIntegrationAccessToken);

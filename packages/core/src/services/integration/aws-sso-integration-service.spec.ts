@@ -7,6 +7,7 @@ import { SessionType } from "../../models/session-type";
 import { ListAccountRolesRequest } from "aws-sdk/clients/sso";
 import { constants } from "../../models/constants";
 import { ThrottleService } from "../throttle-service";
+import { ListAccountRolesCommandInput } from "@aws-sdk/client-sso";
 
 describe("AwsSsoIntegrationService", () => {
   afterEach(() => {
@@ -420,37 +421,50 @@ describe("AwsSsoIntegrationService", () => {
     expect(awsSsoOidcService.login).toHaveBeenCalledWith(integrationId, region, resolvedPortalUrl);
   });
 
-  test("setupSsoPortalClient, sso portal not set up", () => {
+  test("setupSsoPortalClient, sso portal not set up", async () => {
     const awsIntegrationService = new AwsSsoIntegrationService(null, null, null, null, null, null, null) as any;
 
     const fakeRegion = "fake-region";
     awsIntegrationService.setupSsoPortalClient(fakeRegion);
 
-    expect(awsIntegrationService.ssoPortal.config.region).toBe(fakeRegion);
-    expect(awsIntegrationService.ssoPortal.config.maxRetries).toBe(30);
+    const region = await awsIntegrationService.ssoPortal.config.region();
+    const retryStrategy = await awsIntegrationService.ssoPortal.config.retryStrategy();
+    const maxAttempts = await retryStrategy.maxAttempts();
+
+    expect(region).toBe(fakeRegion);
+    expect(maxAttempts).toBe(30);
     expect(awsIntegrationService.listAccountRolesCall).toBeInstanceOf(ThrottleService);
     expect(awsIntegrationService.listAccountRolesCall.minDelay).toBe(100);
 
-    let actualRetryTime = awsIntegrationService.ssoPortal.config.retryDelayOptions.customBackoff(30);
+    let actualRetryTime = retryStrategy.computeNextBackoffDelay(30);
     expect(actualRetryTime).toBeLessThanOrEqual(30000);
     expect(actualRetryTime).toBeGreaterThanOrEqual(0);
 
+    // It tries to generate a new random custom backoff delay for 1 second;
+    // if, after one second, the last generated backoff delay is still equal to
+    // the original one, it means the custom backoff generation function does
+    // not generate a random value.
     const startTime = Date.now();
-    while (actualRetryTime === (actualRetryTime = awsIntegrationService.ssoPortal.config.retryDelayOptions.customBackoff(30))) {
+    while (actualRetryTime === (actualRetryTime = retryStrategy.computeNextBackoffDelay(30))) {
       if (Date.now() - startTime > 1000) {
         throw new Error("customBackoff function is not randomic!");
       }
     }
 
-    const callParams = ["fake-param1", "fake-param2"];
+    const callParams = ["mocked-access-token", "mocked-account-id", "mocked-max-results", "mocked-next-token"];
     const callPromise = "fake-call-promise";
     awsIntegrationService.ssoPortal = {
-      ["listAccountRoles"]: (...params) => {
-        expect(params).toEqual(callParams);
+      ["listAccountRoles"]: (args: ListAccountRolesCommandInput) => {
+        expect(args).toEqual({
+          accessToken: "mocked-access-token",
+          accountId: "mocked-account-id",
+          maxResults: "mocked-max-results",
+          nextToken: "mocked-next-token",
+        });
         return { promise: () => callPromise };
       },
     };
-    const actualCallPromise = awsIntegrationService.listAccountRolesCall.call(...callParams);
+    const actualCallPromise = awsIntegrationService.listAccountRolesCall.call(...callParams).promise();
     expect(actualCallPromise).toBe(callPromise);
   });
 
@@ -869,7 +883,7 @@ describe("AwsSsoIntegrationService", () => {
     (awsIntegrationService as any).recursiveListRoles([], listAccountRolesRequest, promiseCallback);
 
     expect(i).toBe(1);
-    expect(spy).toHaveBeenCalledWith(listAccountRolesRequest);
+    expect(spy).toHaveBeenCalledWith([listAccountRolesRequest.accessToken, listAccountRolesRequest.accountId, undefined, undefined]);
   });
 
   test("recursiveListRoles - callWithThrottle throwing an error", async () => {
@@ -880,7 +894,7 @@ describe("AwsSsoIntegrationService", () => {
       },
     };
 
-    await expect(new Promise((resolve, reject) => (awsIntegrationService as any).recursiveListRoles([], null, null, reject))).rejects.toEqual(
+    await expect(new Promise((resolve, reject) => (awsIntegrationService as any).recursiveListRoles([], {}, null, reject))).rejects.toEqual(
       new Error("fake error")
     );
   });

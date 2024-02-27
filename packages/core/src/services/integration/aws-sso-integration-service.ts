@@ -313,18 +313,19 @@ export class AwsSsoIntegrationService implements IIntegrationService {
 
   private setupSsoPortalClient(region: string): void {
     if (!this.ssoPortal || this.ssoPortal.config.region !== region) {
+      const nextBackoffDelayComputationLambda = (attempt: number) => Math.floor(Math.random() * attempt * 1000);
       this.ssoPortal = new SSO({
         region,
         maxAttempts: 30,
-        retryStrategy: new ConfiguredRetryStrategy(30, (attempt: number) => Math.floor(Math.random() * attempt * 1000)),
+        retryStrategy: new ConfiguredRetryStrategy(30, nextBackoffDelayComputationLambda),
       });
       this.listAccountRolesCall = new ThrottleService(
         (...params) =>
           this.ssoPortal.listAccountRoles({
-            accessToken: params.accessToken,
-            accountId: params.accountId,
-            maxResults: params.maxResults,
-            nextToken: params.nextToken,
+            accessToken: params[0],
+            accountId: params[1],
+            maxResults: params[2],
+            nextToken: params[3],
           }),
         constants.maxSsoTps
       );
@@ -344,7 +345,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     this.ssoPortal.listAccounts(listAccountsRequest).then((response) => {
       accountList.push(...response.accountList);
 
-      if (response.nextToken !== null) {
+      if (response.nextToken !== null && response.nextToken !== undefined) {
         listAccountsRequest.nextToken = response.nextToken;
         this.recursiveListAccounts(accountList, listAccountsRequest, promiseCallback);
       } else {
@@ -393,11 +394,16 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     reject: (error: Error) => void
   ) {
     this.listAccountRolesCall
-      .callWithThrottle(listAccountRolesRequest)
+      .callWithThrottle([
+        listAccountRolesRequest.accessToken,
+        listAccountRolesRequest.accountId,
+        listAccountRolesRequest.maxResults,
+        listAccountRolesRequest.nextToken,
+      ])
       .then((response) => {
         accountRoles.push(...response.roleList);
 
-        if (response.nextToken !== null) {
+        if (response.nextToken !== null && response.nextToken !== undefined) {
           listAccountRolesRequest.nextToken = response.nextToken;
           this.recursiveListRoles(accountRoles, listAccountRolesRequest, resolve, reject);
         } else {

@@ -35,6 +35,9 @@ describe("SsmService", () => {
     (service as any).coreSsmService = appProviderService.ssmService;
     (service as any).logService = appProviderService.logService;
     (service as any).executeService = appProviderService.executeService;
+    (service as any).analyticsService = {
+      captureEvent: jasmine.createSpy().and.returnValue(new Promise((resolve) => resolve({}))),
+    };
   });
 
   it("should be created", () => {

@@ -180,7 +180,7 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     // Make a logout request to Sso
     const logoutRequest: LogoutRequest = { accessToken: savedAccessToken };
 
-    try {
+    /*try {
       await this.ssoPortal.logout(logoutRequest);
     } catch (_) {
       // logout request has to be handled in reject Promise by design
@@ -191,7 +191,16 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       // Delete access token and remove sso integration info from workspace
       await this.keyChainService.deleteSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
       this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
-    }
+    }*/
+
+    await this.ssoPortal.logout(logoutRequest);
+
+    // Clean clients
+    this.ssoPortal = null;
+
+    // Delete access token and remove sso integration info from workspace
+    await this.keyChainService.deleteSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
+    this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
 
     await this.setOnline(integration, false);
     this.behaviouralNotifier.setIntegrations([...this.repository.listAwsSsoIntegrations(), ...this.repository.listAzureIntegrations()]);

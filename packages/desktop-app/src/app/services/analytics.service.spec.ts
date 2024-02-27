@@ -23,7 +23,7 @@ describe("AnalyticsService", () => {
       email: "email@email.com",
       firstName: "fn",
       lastName: "ln",
-    };
+    } as any;
   });
 
   afterEach(() => {

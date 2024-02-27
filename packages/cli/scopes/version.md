@@ -9,7 +9,7 @@ Displays the Cli and Core versions
 
 Displays the Cli and Core versions
 
-```console
+```
 USAGE
   $ leapp version
 

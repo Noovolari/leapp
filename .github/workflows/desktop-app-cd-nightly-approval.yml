@@ -1,6 +1,8 @@
 name: Leapp Desktop App CD - nightly - approval
+
 on:
   workflow_dispatch:
+
 env:
   CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
   CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
@@ -15,6 +17,7 @@ env:
   TEAM_REPOSITORY: ${{ secrets.TEAM_REPOSITORY }}
   APPLE_ID: ${{ secrets.APPLE_ID }}
   APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+
 jobs:
   generate-build-identifier:
     outputs:

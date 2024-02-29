@@ -21,7 +21,7 @@ import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { UpdaterService } from "../../services/updater.service";
-import { LeappNotification, LeappNotificationType } from "@noovolari/leapp-core/models/notification";
+import { LeappNotification } from "@noovolari/leapp-core/models/notification";
 import { InfoDialogComponent } from "../dialogs/info-dialog/info-dialog.component";
 import { NotificationService } from "@noovolari/leapp-core/services/notification-service";
 
@@ -74,12 +74,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
   notificationService: NotificationService;
 
-  leappTeamNotificationDescription = `<img src="assets/images/leapp-team-early-access.png" alt="survey-banner" width="100%"><br>
-        <span class="centered-text">🚀 <b>We are in early access!:</b> Our first company solution is now in early access and <b>available for FREE.</b></span>
-        <span>🙌 <b>Your Role is Crucial:</b> Join us in this new chapter! Your support during the free early access phase is vital. Your feedback and active participation will help shape Leapp Team’s future.</span>
-        <span>🌟 <b>Support Us on Product Hunt:</b> Visit our <a href="https://www.producthunt.com/products/leapp-2">Product Hunt page</a>. Sign up, click ‘Notify’, and engage with upvotes and comments. Your involvement is essential in making Leapp Team the top product of the day, ensuring our project’s continued success.</span>
-        <span>🤝 <b>Be Part of Our Journey:</b> Your enthusiasm and support are the driving forces behind Leapp. Let’s make this launch a remarkable success together! This launch is a crucial step to ensure the future and sustainability of <b>our open-source project.</b></span>`;
-
   private subscription0;
   private subscription1;
   private subscription2;
@@ -119,21 +113,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.notificationService = this.appProviderService.notificationService;
 
     const notifications = this.notificationService.getNotifications();
-    if (!notifications.find((n) => n.uuid === "leapp-team-1")) {
-      notifications.push(
-        new LeappNotification(
-          "leapp-team-1",
-          LeappNotificationType.info,
-          "Leapp Team is Out Now!",
-          "Get started for FREE",
-          this.leappTeamNotificationDescription,
-          false,
-          "https://www.leapp.cloud/solutions/team",
-          "medal",
-          true
-        )
-      );
-    }
     this.notificationService.setNotifications(notifications);
 
     const firstNotReadPopupNotification = notifications.find((n) => n.popup && !n.read);

@@ -9,7 +9,7 @@ Show the current workspace
 
 Show the current workspace
 
-```
+```console
 USAGE
   $ leapp workspace
 
@@ -20,4 +20,4 @@ EXAMPLES
   $leapp workspace
 ```
 
-_See code: [dist/commands/workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.61-nightly.202402271717/dist/commands/workspace.ts)_
+_See code: [dist/commands/workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.62/dist/commands/workspace.ts)_

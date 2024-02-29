@@ -14,7 +14,7 @@ $ npm install -g @noovolari/leapp-cli
 $ leapp COMMAND
 running command...
 $ leapp (--version)
-@noovolari/leapp-cli/0.1.61 darwin-x64 node-v16.14.0
+@noovolari/leapp-cli/0.1.62 darwin-x64 node-v18.19.0
 $ leapp --help [COMMAND]
 USAGE
   $ leapp COMMAND

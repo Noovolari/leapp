@@ -423,7 +423,7 @@ describe("AwsIamUserService", () => {
       let service: AwsIamUserService;
 
       beforeAll(() => {
-        awsIamUserSession.sessionTokenExpiration = new Date(1999, 1, 1, 0, 0, 0, 0).toISOString();
+        awsIamUserSession.sessionTokenExpiration = "1999-01-31T23:00:00.000Z";
         repository = {
           getSessions: jest.fn((_sessionId) => [awsIamUserSession]),
         };

@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.25.0](https://github.com/Noovolari/leapp/compare/v0.24.6...v0.25.0) (2024-02-29)
+
+### Features
+* migrated AWS SDK dependency from v2 to v3.
+
 ### [0.24.6](https://github.com/Noovolari/leapp/compare/v0.24.5...v0.24.6) (2024-02-06)
 
 ### Bug Fixes

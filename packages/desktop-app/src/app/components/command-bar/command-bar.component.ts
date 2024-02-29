@@ -73,13 +73,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   eConstants = constants;
 
   notificationService: NotificationService;
-  surveyDescription = `<img src="assets/images/survey-infographic.png" alt="survey-banner" width="100%"><br>
-        <span class="centered-text">📣 Attention desktop users! 🖥️</span>
-        <span>Join us in the Leapp survey today and participate in our journey towards an enhanced user experience.</span>
-        <span>Your feedback is crucial in understanding your needs and preferences. Participating in this survey allows you to voice your opinions, share your insights, and contribute to developing a better Cloud Workflow.</span>
-        <span><b>The first 200 participants will receive $25 in AWS credits</b> as a thank-you!</span>
-        <span>Don't miss this opportunity to make a difference. Take <a href="https://www.leapp.cloud/survey">the survey</a> today and help us create a fantastic desktop experience!</span>
-        <span>Thank you for your support.</span>`;
 
   leappTeamNotificationDescription = `<img src="assets/images/leapp-team-early-access.png" alt="survey-banner" width="100%"><br>
         <span class="centered-text">🚀 <b>We are in early access!:</b> Our first company solution is now in early access and <b>available for FREE.</b></span>
@@ -136,21 +129,6 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
           this.leappTeamNotificationDescription,
           false,
           "https://www.leapp.cloud/solutions/team",
-          "medal",
-          true
-        )
-      );
-    }
-    if (!notifications.find((n) => n.uuid === "uuid")) {
-      notifications.push(
-        new LeappNotification(
-          "uuid",
-          LeappNotificationType.info,
-          "Take the Survey, get AWS credits",
-          "Take the Survey",
-          this.surveyDescription,
-          false,
-          "https://www.leapp.cloud/survey",
           "medal",
           true
         )

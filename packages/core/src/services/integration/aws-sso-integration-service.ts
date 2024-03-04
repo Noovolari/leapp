@@ -193,7 +193,9 @@ export class AwsSsoIntegrationService implements IIntegrationService {
       this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
     }*/
 
-    await this.ssoPortal.logout(logoutRequest);
+    if (savedAccessToken !== null) {
+      await this.ssoPortal.logout(logoutRequest);
+    }
 
     // Clean clients
     this.ssoPortal = null;

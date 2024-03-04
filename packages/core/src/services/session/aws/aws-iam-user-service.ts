@@ -1,7 +1,4 @@
-// import * as AWS from "aws-sdk";
-// import { GetSessionTokenResponse } from "aws-sdk/clients/sts";
 import { STSClient, Credentials, GetSessionTokenResponse, GetCallerIdentityCommand, GetSessionTokenCommand } from "@aws-sdk/client-sts";
-
 import { IMfaCodePrompter } from "../../../interfaces/i-mfa-code-prompter";
 import { IBehaviouralNotifier } from "../../../interfaces/i-behavioural-notifier";
 import { AwsIamUserSession } from "../../../models/aws/aws-iam-user-session";

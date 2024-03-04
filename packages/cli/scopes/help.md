@@ -9,7 +9,7 @@ Display help for leapp.
 
 Display help for leapp.
 
-```console
+```
 USAGE
   $ leapp help [COMMANDS] [-n]
 

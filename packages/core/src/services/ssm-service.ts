@@ -4,20 +4,19 @@ import { LoggedEntry, LoggedException, LogLevel, LogService } from "./log-servic
 import { constants } from "../models/constants";
 import { INativeService } from "../interfaces/i-native-service";
 import { FileService } from "./file-service";
+import { DescribeInstanceInformationCommand, SSMClient } from "@aws-sdk/client-ssm";
+import { DescribeInstancesCommand, EC2Client } from "@aws-sdk/client-ec2";
 
 export class SsmService {
-  aws;
-  ssmClient;
-  ec2Client;
+  ssmClient: SSMClient;
+  ec2Client: EC2Client;
 
   constructor(
     private logService: LogService,
     private executeService: ExecuteService,
     private nativeService: INativeService,
     private fileService: FileService
-  ) {
-    this.aws = require("aws-sdk");
-  }
+  ) {}
 
   /**
    * Set the config for the SSM client
@@ -44,9 +43,22 @@ export class SsmService {
    */
   async getSsmInstances(credentials: CredentialsInfo, region: string, setFilteringForEc2CallsCallback?: any): Promise<any> {
     // Set your SSM client and EC2 client
-    this.aws.config.update(SsmService.setConfig(credentials, region));
-    this.ssmClient = new this.aws.SSM();
-    this.ec2Client = new this.aws.EC2();
+    this.ssmClient = new SSMClient({
+      region,
+      credentials: {
+        accessKeyId: credentials.sessionToken.aws_access_key_id,
+        secretAccessKey: credentials.sessionToken.aws_secret_access_key,
+        sessionToken: credentials.sessionToken.aws_session_token,
+      },
+    });
+    this.ec2Client = new EC2Client({
+      region,
+      credentials: {
+        accessKeyId: credentials.sessionToken.aws_access_key_id,
+        secretAccessKey: credentials.sessionToken.aws_secret_access_key,
+        sessionToken: credentials.sessionToken.aws_session_token,
+      },
+    });
 
     // Fix for Ec2 clients from electron app
     // TODO: find a way to inject the origin header without using setFilteringForEc2Calls
@@ -111,9 +123,10 @@ export class SsmService {
     try {
       do {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const params = { MaxResults: 50, NextToken: nextToken };
+        const input = { MaxResults: 50, NextToken: nextToken };
+        const command = new DescribeInstanceInformationCommand(input);
 
-        const describeInstanceInformationResponse = await this.ssmClient.describeInstanceInformation(params).promise();
+        const describeInstanceInformationResponse = await this.ssmClient.send(command);
         // eslint-disable-next-line max-len
         if (
           describeInstanceInformationResponse["InstanceInformationList"] &&
@@ -153,9 +166,10 @@ export class SsmService {
     try {
       do {
         // eslint-disable-next-line @typescript-eslint/naming-convention
-        const params = { MaxResults: 100, NextToken: nextToken };
+        const input = { MaxResults: 100, NextToken: nextToken };
+        const command = new DescribeInstancesCommand(input);
+        const describeInstanceResponse = await this.ec2Client.send(command);
 
-        const describeInstanceResponse = await this.ec2Client.describeInstances(params).promise();
         reservations = reservations.concat(describeInstanceResponse.Reservations);
         nextToken = describeInstanceResponse.NextToken;
       } while (nextToken);

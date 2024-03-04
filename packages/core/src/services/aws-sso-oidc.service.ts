@@ -8,8 +8,8 @@ import {
 } from "./session/aws/aws-sso-role-service";
 import { IAwsSsoOidcVerificationWindowService } from "../interfaces/i-aws-sso-oidc-verification-window-service";
 import { BrowserWindowClosing } from "../interfaces/i-browser-window-closing";
-import SSOOIDC, { CreateTokenRequest, RegisterClientRequest, StartDeviceAuthorizationRequest } from "aws-sdk/clients/ssooidc";
 import { LoggedException, LogLevel } from "./log-service";
+import { CreateTokenRequest, RegisterClientRequest, SSOOIDC, StartDeviceAuthorizationRequest } from "@aws-sdk/client-sso-oidc";
 
 export class AwsSsoOidcService {
   public readonly listeners: BrowserWindowClosing[];
@@ -125,7 +125,7 @@ export class AwsSsoOidcService {
 
   private async registerSsoOidcClient(): Promise<RegisterClientResponse> {
     const registerClientRequest: RegisterClientRequest = { clientName: "leapp", clientType: "public" };
-    return await this.getAwsSsoOidcClient().registerClient(registerClientRequest).promise();
+    return await this.getAwsSsoOidcClient().registerClient(registerClientRequest);
   }
 
   private async startDeviceAuthorization(
@@ -138,7 +138,7 @@ export class AwsSsoOidcService {
       startUrl: portalUrl,
     };
 
-    return await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest).promise();
+    return await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest);
   }
 
   private async createToken(configurationId: string | number, verificationResponse: VerificationResponse): Promise<GenerateSSOTokenResponse> {
@@ -154,7 +154,7 @@ export class AwsSsoOidcService {
     // login page using the Browser instead of the Electron BrowserWindow, regardless the value specified in Leapp
     // configuration's browserOpening parameter.
     if (!this.disableInAppBrowser && this.repository.getAwsSsoIntegration(configurationId).browserOpening === constants.inApp) {
-      createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest).promise();
+      createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest);
     } else {
       createTokenResponse = await this.waitForToken(createTokenRequest);
     }
@@ -170,7 +170,6 @@ export class AwsSsoOidcService {
       this.mainIntervalId = setInterval(() => {
         this.getAwsSsoOidcClient()
           .createToken(createTokenRequest)
-          .promise()
           .then((createTokenResponse) => {
             clearInterval(this.mainIntervalId);
             resolve(createTokenResponse);

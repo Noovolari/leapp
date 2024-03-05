@@ -5,7 +5,7 @@ import { Session } from "../../models/session";
 import { SessionType } from "../../models/session-type";
 import { constants } from "../../models/constants";
 import { ThrottleService } from "../throttle-service";
-import { ListAccountRolesCommandInput, ListAccountRolesRequest } from "@aws-sdk/client-sso";
+import { AccountInfo, ListAccountRolesCommandInput, ListAccountRolesRequest, RoleInfo } from "@aws-sdk/client-sso";
 
 describe("AwsSsoIntegrationService", () => {
   afterEach(() => {
@@ -771,13 +771,13 @@ describe("AwsSsoIntegrationService", () => {
       },
     ];
 
-    const accountInfo: SSO.AccountInfo = {
+    const accountInfo: AccountInfo = {
       accountId: "testAccountId",
       accountName: "testAccountName",
       emailAddress: "test@gmail.com",
     };
 
-    const accountRole: SSO.RoleInfo = {
+    const accountRole: RoleInfo = {
       roleName: "roleTest",
       accountId: "testAccountId",
     };

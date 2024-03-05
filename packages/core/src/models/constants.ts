@@ -19,7 +19,7 @@ export const constants = {
   timeout: 10000,
   credentialsDestination: ".aws/credentials",
   defaultRegion: "us-east-1",
-  maxSsoTps: 10, // Transaction per second for AWS SSO endpoint
+  maxSsoTps: 5, // Transaction per second for AWS SSO endpoint
 
   //Azure
   azureMsalCacheFile: ".azure/msal_token_cache.json",

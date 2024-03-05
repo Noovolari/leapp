@@ -180,21 +180,14 @@ export class AwsSsoIntegrationService implements IIntegrationService {
     // Make a logout request to Sso
     const logoutRequest: LogoutRequest = { accessToken: savedAccessToken };
 
-    /*try {
-      await this.ssoPortal.logout(logoutRequest);
-    } catch (_) {
-      // logout request has to be handled in reject Promise by design
-
-      // Clean clients
-      this.ssoPortal = null;
-
-      // Delete access token and remove sso integration info from workspace
-      await this.keyChainService.deleteSecret(constants.appName, this.getIntegrationAccessTokenKey(integrationId));
-      this.repository.unsetAwsSsoIntegrationExpiration(integrationId);
-    }*/
-
     if (savedAccessToken !== null) {
-      await this.ssoPortal.logout(logoutRequest);
+      try {
+        await this.ssoPortal.logout(logoutRequest);
+      } catch (error) {
+        if (!(error.message === "Session token not found or invalid")) {
+          throw error;
+        }
+      }
     }
 
     // Clean clients

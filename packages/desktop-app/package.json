@@ -162,7 +162,7 @@
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
     "@noovolari/dpapi-addon": "0.1.2",
-    "@noovolari/leapp-core": "file:../core",
+    "@noovolari/leapp-core": "0.1.163",
     "assert": "2.0.0",
     "axios": "1.6.2",
     "bindings": "^1.5.0",

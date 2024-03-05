@@ -12,7 +12,6 @@ import { mockClient } from "aws-sdk-client-mock";
 
 jest.mock("uuid");
 jest.mock("console");
-jest.mock("aws-sdk");
 
 describe("AwsIamUserService", () => {
   const mockedDateString = "2022-02-24T10:00:00";

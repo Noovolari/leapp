@@ -2,12 +2,10 @@ import { afterEach, describe, expect, jest, test } from "@jest/globals";
 import { AwsSsoIntegrationService } from "./aws-sso-integration-service";
 import { IntegrationType } from "../../models/integration-type";
 import { Session } from "../../models/session";
-import { SSO } from "aws-sdk";
 import { SessionType } from "../../models/session-type";
-import { ListAccountRolesRequest } from "aws-sdk/clients/sso";
 import { constants } from "../../models/constants";
 import { ThrottleService } from "../throttle-service";
-import { ListAccountRolesCommandInput } from "@aws-sdk/client-sso";
+import { ListAccountRolesCommandInput, ListAccountRolesRequest } from "@aws-sdk/client-sso";
 
 describe("AwsSsoIntegrationService", () => {
   afterEach(() => {
@@ -433,7 +431,7 @@ describe("AwsSsoIntegrationService", () => {
     expect(region).toBe(fakeRegion);
     expect(maxAttempts).toBe(30);
     expect(awsIntegrationService.listAccountRolesCall).toBeInstanceOf(ThrottleService);
-    expect(awsIntegrationService.listAccountRolesCall.minDelay).toBe(100);
+    expect(awsIntegrationService.listAccountRolesCall.minDelay).toBe(200);
 
     let actualRetryTime = retryStrategy.computeNextBackoffDelay(30);
     expect(actualRetryTime).toBeLessThanOrEqual(30000);

@@ -11,7 +11,6 @@ import { LocalstackSession } from "../../../models/localstack/localstack-session
 
 jest.mock("uuid");
 jest.mock("console");
-jest.mock("aws-sdk");
 
 describe("LocalstackSessionService", () => {
   const mockedProfileId = "mocked-profile-id";

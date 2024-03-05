@@ -7,7 +7,6 @@ import * as uuid from "uuid";
 import { SessionStatus } from "../../../models/session-status";
 import { LoggedException, LogLevel } from "../../log-service";
 jest.mock("uuid");
-jest.mock("aws-sdk");
 
 describe("AwsIamRoleFederatedService", () => {
   beforeEach(() => {});

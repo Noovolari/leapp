@@ -13,7 +13,7 @@ describe("SsmService", () => {
   let executeService: ExecuteService;
   let credentialInfo: CredentialsInfo;
   let mockedCallback: any;
-  let setConfig;
+  //let setConfig;
   let nativeService: INativeService;
 
   beforeEach(() => {
@@ -29,7 +29,7 @@ describe("SsmService", () => {
     };
 
     mockedCallback = jest.fn(() => {});
-    setConfig = jest.spyOn(SsmService, "setConfig");
+    //setConfig = jest.spyOn(SsmService, "setConfig");
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -48,15 +48,6 @@ describe("SsmService", () => {
     } as any;
 
     ssmService = new SsmService(null, executeService, nativeService, null);
-    ssmService.aws = {
-      config: {
-        update: jest.fn((_: any) => {}),
-      },
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      SSM: jest.fn(() => {}),
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      EC2: jest.fn(() => {}),
-    };
   });
 
   test("getSsmInstances - should retrieve a list of ssm sessions given a valid region", (done) => {
@@ -66,20 +57,7 @@ describe("SsmService", () => {
     ssmService.getSsmInstances(credentialInfo, "eu-west-1", mockedCallback);
 
     setTimeout(() => {
-      expect(setConfig).toHaveBeenCalled();
-
-      expect(ssmService.aws.config.update).toBeCalledWith({
-        region: "eu-west-1",
-        accessKeyId: "123",
-        secretAccessKey: "345",
-        sessionToken: "678",
-      });
-
-      expect(ssmService.aws.SSM).toHaveBeenCalled();
-      expect(ssmService.aws.EC2).toHaveBeenCalled();
-
       expect(mockedCallback).toHaveBeenCalled();
-
       expect((ssmService as any).applyEc2MetadataInformation).toHaveBeenCalled();
       done();
     }, 100);
@@ -177,15 +155,6 @@ describe("SsmService", () => {
     } as any;
 
     ssmService = new SsmService(null, executeService, nativeService, fileService);
-    ssmService.aws = {
-      config: {
-        update: jest.fn((_: any) => {}),
-      },
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      SSM: jest.fn(() => {}),
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      EC2: jest.fn(() => {}),
-    };
 
     const instanceId = "mocked-id";
     const region = "eu-west-1";
@@ -257,13 +226,6 @@ describe("SsmService", () => {
   });
 
   test("requestSsmInstances, plus error checking", async () => {
-    ssmService.aws = {
-      config: {
-        update: jest.fn((_: any) => {}),
-      },
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      SSM: jest.fn(() => {}),
-    } as any;
     const logService: any = {
       log: jest.fn(),
     };
@@ -274,32 +236,31 @@ describe("SsmService", () => {
 
     let index = 0;
     (ssmService as any).ssmClient = {
-      describeInstanceInformation: jest.fn(() => ({
-        promise: () =>
-          Promise.resolve({
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            InstanceInformationList: [
-              {
-                fakeInstanceId: "fake-id-1",
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                PingStatus: "Offline",
-              },
-              {
-                fakeInstanceId: "fake-id-2",
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                PingStatus: "Online",
-              },
-            ],
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            NextToken: index++ < 3 ? "fake-next-token" : undefined,
-          }),
-      })),
+      send: jest.fn(async () =>
+        Promise.resolve({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          InstanceInformationList: [
+            {
+              fakeInstanceId: "fake-id-1",
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              PingStatus: "Offline",
+            },
+            {
+              fakeInstanceId: "fake-id-2",
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              PingStatus: "Online",
+            },
+          ],
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          NextToken: index++ < 3 ? "fake-next-token" : undefined,
+        })
+      ),
     };
 
     jest.spyOn(ssmService as any, "requestSsmInstances");
     const result = await (ssmService as any).requestSsmInstances(credentialInfo, instanceId, region);
     expect(logService.log).toHaveBeenCalledWith(new LoggedEntry("Obtained smm info from aws for SSM", ssmService, LogLevel.info));
-    expect((ssmService as any).ssmClient.describeInstanceInformation).toHaveBeenCalledTimes(4);
+    expect((ssmService as any).ssmClient.send).toHaveBeenCalledTimes(4);
 
     const resultObject = {
       // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -313,34 +274,33 @@ describe("SsmService", () => {
     expect(result).toStrictEqual([resultObject, resultObject, resultObject, resultObject]);
 
     (ssmService as any).ssmClient = {
-      describeInstanceInformation: jest.fn(() => ({
-        promise: () =>
-          Promise.resolve({
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            InstanceInformationList: [
-              {
-                fakeInstanceId: "fake-id-1",
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                PingStatus: "Offline",
-              },
-              {
-                fakeInstanceId: "fake-id-2",
-                // eslint-disable-next-line @typescript-eslint/naming-convention
-                PingStatus: "Offline",
-              },
-            ],
-          }),
-      })),
+      send: jest.fn(async () =>
+        Promise.resolve({
+          // eslint-disable-next-line @typescript-eslint/naming-convention
+          InstanceInformationList: [
+            {
+              fakeInstanceId: "fake-id-1",
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              PingStatus: "Offline",
+            },
+            {
+              fakeInstanceId: "fake-id-2",
+              // eslint-disable-next-line @typescript-eslint/naming-convention
+              PingStatus: "Offline",
+            },
+          ],
+        })
+      ),
     };
+
     await expect(async () => {
       await (ssmService as any).requestSsmInstances(credentialInfo, instanceId, region);
     }).rejects.toThrow(new Error("No instances are accessible by this Role."));
 
     (ssmService as any).ssmClient = {
-      describeInstanceInformation: jest.fn(() => ({
-        promise: () => Promise.resolve({}),
-      })),
+      send: jest.fn(async () => Promise.resolve({})),
     };
+
     await expect(async () => {
       await (ssmService as any).requestSsmInstances(credentialInfo, instanceId, region);
     }).rejects.toThrow(new Error("No instances are accessible by this Role."));
@@ -370,8 +330,9 @@ describe("SsmService", () => {
         },
       ],
     };
+
     let ec2Client = {
-      describeInstances: jest.fn(() => ({ promise: jest.fn((_params) => Promise.resolve(reservations)) })),
+      send: jest.fn(async () => Promise.resolve(reservations)),
     };
 
     const logService: any = {
@@ -401,7 +362,7 @@ describe("SsmService", () => {
       ],
     };
     ec2Client = {
-      describeInstances: jest.fn(() => ({ promise: jest.fn((_params) => Promise.resolve(reservations)) })),
+      send: jest.fn(async () => Promise.resolve(reservations)),
     };
     (ssmService as any).ec2Client = ec2Client;
     result = await (ssmService as any).applyEc2MetadataInformation(mockedInstances);
@@ -425,14 +386,14 @@ describe("SsmService", () => {
       ],
     };
     ec2Client = {
-      describeInstances: jest.fn(() => ({ promise: jest.fn((_params) => Promise.resolve(reservations)) })),
+      send: jest.fn(async () => Promise.resolve(reservations)),
     };
     (ssmService as any).ec2Client = ec2Client;
     result = await (ssmService as any).applyEc2MetadataInformation(mockedInstances);
     expect(result).toStrictEqual(mockedInstances);
     expect(mockedInstances[1].Name).not.toStrictEqual("Not Mocked Name");
 
-    ec2Client.describeInstances = jest.fn(() => ({ promise: jest.fn((_params) => Promise.reject({ message: "Error" })) }));
+    ec2Client.send = jest.fn(async () => Promise.reject({ message: "Error" }));
 
     await expect(async () => {
       await (ssmService as any).applyEc2MetadataInformation(mockedInstances);
@@ -470,8 +431,9 @@ describe("SsmService", () => {
 
     ssmService = new SsmService(logService, executeService, nativeService, null);
     (ssmService as any).ec2Client = {
-      describeInstances: jest.fn(() => ({ promise: jest.fn((_params) => Promise.resolve(reservations)) })),
+      send: jest.fn(async () => Promise.resolve(reservations)),
     };
+
     const result = await (ssmService as any).applyEc2MetadataInformation(mockedInstances);
     expect(result).toStrictEqual(mockedInstances);
 

@@ -2,7 +2,7 @@ import { constants } from "../models/constants";
 import { Session } from "../models/session";
 import { INativeService } from "../interfaces/i-native-service";
 import { LogService } from "./log-service";
-import { FetchHttpHandler } from "@smithy/fetch-http-handler";
+import { HttpHandler } from "@smithy/protocol-http";
 //import { Credentials } from "@aws-sdk/client-sts";
 
 // TODO: rename it. This naming is ambiguous.
@@ -40,7 +40,7 @@ export class AwsCoreService {
     ["us-west-2", "https://sts.us-west-2.amazonaws.com"],
   ]);
 
-  constructor(private nativeService: INativeService, private logService: LogService) {}
+  constructor(private httpHandler: HttpHandler, private nativeService: INativeService, private logService: LogService) {}
 
   awsCredentialPath(): string {
     return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "credentials");
@@ -60,14 +60,11 @@ export class AwsCoreService {
 
   stsOptions(session: Session, isV3 = false, credentials: any = undefined): any {
     let options: any = {};
-    console.log(credentials);
     if (isV3 && credentials) {
       options = {
         credentials,
         maxAttempts: 0,
-        requestHandler: new FetchHttpHandler({
-          requestTimeout: constants.timeout,
-        }),
+        requestHandler: this.httpHandler,
       };
       if (session.region) {
         options = {

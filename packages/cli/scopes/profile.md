@@ -12,7 +12,7 @@ Leapp AWS Multi-profile management
 
 Create a new AWS named profile
 
-```console
+```
 USAGE
   $ leapp profile create [--profileName <value>]
 
@@ -32,7 +32,7 @@ EXAMPLES
 
 Delete an AWS named profile
 
-```console
+```
 USAGE
   $ leapp profile delete [--profileId <value>] [-f]
 
@@ -55,7 +55,7 @@ EXAMPLES
 
 Rename an AWS named profile
 
-```console
+```
 USAGE
   $ leapp profile edit [--profileId <value>] [--profileName <value>]
 
@@ -76,7 +76,7 @@ EXAMPLES
 
 Show profile list
 
-```console
+```
 USAGE
   $ leapp profile list [--columns <value> | -x] [--sort <value>] [--filter <value>] [--output csv|json|yaml |  |
     [--csv | --no-truncate]] [--no-header | ]

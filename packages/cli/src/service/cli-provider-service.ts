@@ -49,6 +49,7 @@ import { WorkspaceConsistencyService } from "@noovolari/leapp-core/services/work
 import * as crypto from "crypto";
 import { TeamService } from "./team-service";
 import { LocalstackSessionService } from "@noovolari/leapp-core/services/session/localstack/localstack-session-service";
+import { NodeHttpHandler } from "@smithy/node-http-handler";
 
 /* eslint-disable */
 export class CliProviderService {
@@ -405,7 +406,7 @@ export class CliProviderService {
 
   get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.cliNativeService, this.logService);
+      this.awsCoreServiceInstance = new AwsCoreService(new NodeHttpHandler({ connectionTimeout: constants.timeout }), this.cliNativeService, this.logService);
     }
     return this.awsCoreServiceInstance;
   }

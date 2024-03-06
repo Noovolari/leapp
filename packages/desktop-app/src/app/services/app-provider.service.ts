@@ -49,6 +49,7 @@ import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
 import { NotificationService } from "@noovolari/leapp-core/services/notification-service";
 import { TeamService } from "./team-service";
 import { LocalstackSessionService } from "@noovolari/leapp-core/services/session/localstack/localstack-session-service";
+import { FetchHttpHandler } from "@smithy/fetch-http-handler";
 
 @Injectable({
   providedIn: "root",
@@ -259,7 +260,13 @@ export class AppProviderService {
 
   public get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
-      this.awsCoreServiceInstance = new AwsCoreService(this.appNativeService, this.logService);
+      this.awsCoreServiceInstance = new AwsCoreService(
+        new FetchHttpHandler({
+          requestTimeout: constants.timeout,
+        }),
+        this.appNativeService,
+        this.logService
+      );
     }
     return this.awsCoreServiceInstance;
   }

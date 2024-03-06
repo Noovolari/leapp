@@ -15,9 +15,10 @@
     "@aws-sdk/client-sso-oidc": "3.525.0",
     "@azure/msal-node": "^1.9.0",
     "@babel/plugin-proposal-decorators": "^7.16.5",
-    "@noovolari/leapp-core": "0.1.163",
+    "@noovolari/leapp-core": "file:../core",
     "@oclif/core": "2.1.4",
     "@oclif/plugin-help": "^5.1.12",
+    "@smithy/node-http-handler": "2.4.1",
     "@types/inquirer": "8.2.0",
     "@types/node": "20.10.0",
     "@types/node-ipc": "9.2.0",
@@ -145,7 +146,7 @@
     "release-npm": "gushio gushio/target-npm-release.js",
     "run-plugin": "./bin/run session run-aws-credential-plugin",
     "nightly": "gushio gushio/target-nightly.js",
-    "debug-session-list": "./bin/run session list"
+    "debug-session-list": "./bin/run session start"
   },
   "types": "dist/index.d.ts"
 }

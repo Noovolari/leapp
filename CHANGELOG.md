@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.25.2](https://github.com/Noovolari/leapp/compare/v0.25.1...v0.25.2) (2024-03-07)
+
+### Bug Fixes
+* fixed CLI `leapp session start` "stream.pipe" error .
+
 ### [0.25.1](https://github.com/Noovolari/leapp/compare/v0.25.0...v0.25.1) (2024-03-05)
 
 ### Bug Fixes

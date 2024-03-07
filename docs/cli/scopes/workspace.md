@@ -20,4 +20,4 @@ EXAMPLES
   $leapp workspace
 ```
 
-_See code: [dist/commands/workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.63/dist/commands/workspace.ts)_
+_See code: [dist/commands/workspace.ts](https://github.com/noovolari/leapp/blob/v0.1.64/dist/commands/workspace.ts)_

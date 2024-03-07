@@ -15,9 +15,10 @@ describe("AwsCoreService", () => {
       writeFileSync: jest.fn((_file, _data) => {}),
     },
   } as any;
+  const httpHandler = {} as any;
 
   test("getRegions", () => {
-    const awsCoreService = new AwsCoreService(null, null);
+    const awsCoreService = new AwsCoreService(httpHandler, null, null);
 
     expect(awsCoreService.getRegions()).toEqual([
       {
@@ -114,22 +115,22 @@ describe("AwsCoreService", () => {
   });
 
   test("awsCredentialPath", () => {
-    const awsCoreService = new AwsCoreService(nativeService, null);
+    const awsCoreService = new AwsCoreService(httpHandler, nativeService, null);
     expect(awsCoreService.awsCredentialPath()).toBe(nativeService.path.join(`${homedir}`, `.aws`, `credentials`));
   });
 
   test("awsBkpCredentialPath", () => {
-    const awsCoreService = new AwsCoreService(nativeService, null);
+    const awsCoreService = new AwsCoreService(httpHandler, nativeService, null);
     expect(awsCoreService.awsBkpCredentialPath()).toBe(nativeService.path.join(`${homedir}`, `.aws`, `credentials.bkp`));
   });
 
   test("awsConfigPath", () => {
-    const awsCoreService = new AwsCoreService(nativeService, null);
+    const awsCoreService = new AwsCoreService(httpHandler, nativeService, null);
     expect(awsCoreService.awsConfigPath()).toBe(nativeService.path.join(`${homedir}`, `.aws`, `config`));
   });
 
   test("awsBkpConfigPath", () => {
-    const awsCoreService = new AwsCoreService(nativeService, null);
+    const awsCoreService = new AwsCoreService(httpHandler, nativeService, null);
     expect(awsCoreService.awsBkpConfigPath()).toBe(nativeService.path.join(`${homedir}`, `.aws`, `config.bkp`));
   });
 
@@ -142,7 +143,7 @@ describe("AwsCoreService", () => {
     const session2 = {
       region: undefined,
     } as any;
-    const awsCoreService = new AwsCoreService(nativeService, null);
+    const awsCoreService = new AwsCoreService(httpHandler, nativeService, null);
     const result = awsCoreService.stsOptions(session);
     expect(result).toStrictEqual({
       maxRetries: 0,

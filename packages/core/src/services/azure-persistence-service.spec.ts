@@ -1,7 +1,7 @@
 import { expect, describe, test, jest } from "@jest/globals";
 import { AzurePersistenceService, DataProtectionScope } from "./azure-persistence-service";
 import * as fs from "fs";
-import * as zlib from "zlib";
+import * as zlib from "node:zlib";
 import * as path from "path";
 import { constants } from "../models/constants";
 

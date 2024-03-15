@@ -188,7 +188,7 @@
     "extract-zip": "~2.0.1",
     "fix-path": "~3.0.0",
     "folder-hash": "^4.0.2",
-    "follow-redirects": "1.15.4",
+    "follow-redirects": "1.15.6",
     "fs-extra": "~9.1.0",
     "fs-web": "1.0.1",
     "github-url-to-object": "^4.0.6",

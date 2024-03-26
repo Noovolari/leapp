@@ -60,19 +60,21 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
 
     return new Promise((resolve, reject) => {
       // When the code is verified and the user has been logged in, the window can be closed
-      verificationWindow.webContents.session.webRequest.onBeforeRequest(
+      verificationWindow.webContents.session.webRequest.onCompleted(
         {
-          urls: ["https://*.awsapps.com/start/user-consent/login-success.html"],
+          urls: ["https://oidc.eu-west-1.amazonaws.com/device_authorization/associate_token"],
         },
         (details, callback) => {
-          verificationWindow.close();
+          if (details.method === "POST" && details.statusCode === 200) {
+            verificationWindow.close();
 
-          const verificationResponse: VerificationResponse = {
-            clientId: registerClientResponse.clientId,
-            clientSecret: registerClientResponse.clientSecret,
-            deviceCode: startDeviceAuthorizationResponse.deviceCode,
-          };
-          resolve(verificationResponse);
+            const verificationResponse: VerificationResponse = {
+              clientId: registerClientResponse.clientId,
+              clientSecret: registerClientResponse.clientSecret,
+              deviceCode: startDeviceAuthorizationResponse.deviceCode,
+            };
+            resolve(verificationResponse);
+          }
 
           callback({
             requestHeaders: details.requestHeaders,

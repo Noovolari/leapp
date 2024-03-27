@@ -8,10 +8,11 @@ import {
 import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { WindowService } from "./window.service";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
+import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
 
 @Injectable({ providedIn: "root" })
 export class AppVerificationWindowService implements IAwsSsoOidcVerificationWindowService {
-  constructor(private windowService: WindowService, private toasterService: MessageToasterService) {}
+  constructor(private windowService: WindowService, private toasterService: MessageToasterService, private awsCoreService: AwsCoreService) {}
 
   async openVerificationWindow(
     registerClientResponse: RegisterClientResponse,
@@ -62,7 +63,7 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
       // When the code is verified and the user has been logged in, the window can be closed
       verificationWindow.webContents.session.webRequest.onCompleted(
         {
-          urls: ["https://oidc.eu-west-1.amazonaws.com/device_authorization/associate_token"],
+          urls: this.getAssociateTokenUrls(),
         },
         (details, callback) => {
           if (details.method === "POST" && details.statusCode === 200) {
@@ -97,6 +98,10 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
         }
       });
     });
+  }
+
+  private getAssociateTokenUrls() {
+    return this.awsCoreService.getRegions().map((region) => `https://oidc.${region.region}.amazonaws.com/device_authorization/associate_token`);
   }
 
   private async openExternalVerificationBrowserWindow(

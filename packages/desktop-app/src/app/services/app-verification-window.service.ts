@@ -8,11 +8,11 @@ import {
 import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { WindowService } from "./window.service";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
-import { AwsCoreService } from "@noovolari/leapp-core/services/aws-core-service";
+import { AppProviderService } from "./app-provider.service";
 
 @Injectable({ providedIn: "root" })
 export class AppVerificationWindowService implements IAwsSsoOidcVerificationWindowService {
-  constructor(private windowService: WindowService, private toasterService: MessageToasterService, private awsCoreService: AwsCoreService) {}
+  constructor(private windowService: WindowService, private toasterService: MessageToasterService, private appProviderService: AppProviderService) {}
 
   async openVerificationWindow(
     registerClientResponse: RegisterClientResponse,
@@ -101,7 +101,9 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
   }
 
   private getAssociateTokenUrls() {
-    return this.awsCoreService.getRegions().map((region) => `https://oidc.${region.region}.amazonaws.com/device_authorization/associate_token`);
+    return this.appProviderService.awsCoreService
+      .getRegions()
+      .map((region) => `https://oidc.${region.region}.amazonaws.com/device_authorization/associate_token`);
   }
 
   private async openExternalVerificationBrowserWindow(

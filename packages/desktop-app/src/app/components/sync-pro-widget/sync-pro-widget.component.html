@@ -2,9 +2,9 @@
 <section>
   <span *ngIf="!isLoggedAsProOrTeam" class="unsync">
     <span><img src="assets/images/unsync.svg" alt="" title=""> Not active</span>
-    <button class="btn btn-primary" (click)="callToAction();" *ngIf="!alreadyUpgraded">
+    <!--<button class="btn btn-primary" (click)="callToAction();" *ngIf="!alreadyUpgraded">
       {{buttonText}}
-    </button>
+    </button>-->
   </span>
   <span *ngIf="isLoggedAsProOrTeam && isFailed" class="sync-failed">
     <div class="floating-message">

@@ -496,17 +496,6 @@ body.dark-theme {
       color: $dark-region-label-color-active!important;
     }
   }
-  .button-equalizer {
-    border-top: 1px solid $dark-session-card-border!important;
-    .disabled {
-      background-color: grey !important;
-      color: #373737;
-      border-radius: 5px;
-    }
-    .enabled {
-      background-color: $dark-button-color!important;
-    }
-  }
 
   .plugin-table thead th {
     background-color: $dark-modal-background!important;

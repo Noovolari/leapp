@@ -1,0 +1,38 @@
+<div class="mat-tab-labels updater-header">
+  <div class="modal-title">
+    <div class="modal-title-message">
+      <img style="width: 250px; height: 35px; margin-right: 25px;" src="{{ optionsService.colorTheme === eConstants.darkTheme ? 'assets/images/noovolari-logo.png' : 'assets/images/noovolari-logo.png' }}">
+      <div style="background-color: #999999; width: 1px; height: 59px"></div>
+      <img style="width: 183px; height: 59px; margin-left: 25px;" src="{{ optionsService.colorTheme === eConstants.darkTheme ? 'assets/images/leapp-logo-dark.png' : 'assets/images/leapp-logo-dark.png' }}">
+    </div>
+    <div class="modal-title-close">
+      <a class="close pull-right" aria-label="Close" (click)="close();">
+        <span aria-hidden="true"><i class="moon-Close"></i></span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="modal-body text-center updater">
+
+  <br>
+  <div class="html-content" (click)="$event.preventDefault();manageLinkEvents($event)">
+    <br>
+    <span style="font-weight: 500; font-size: 30px; color: black">Noovolari has officially come to an end.</span>
+    <br><br>
+    <span style="color: #666666">We have decided to close down Noovolari.</span>
+    <br><br>
+    <span style="color: #666666">This decision, taken after careful evaluation and reflection, marks the end of a journey embarked upon with ambition and passion to evolve into a self-sustaining Startup. </span>
+    <br><br>
+    <span style="color: #666666"><strong>Regarding the open-source project Leapp</strong>, we assure you that <strong>it will continue to exist</strong>, with a scaled-down level of support and updates. </span>
+    <br><br>
+    <span style="color: #666666"><strong>The Pro and Team versions will remain online until 30 April</strong> to facilitate the transition to other solutions. We remain available to assist you with specific needs.
+Don't hesitate to get in touch with us at <strong>info@noovolari.com</strong></span>
+  </div>
+  <br>
+
+  <div class="button-equalizer">
+    <button type="button" (click)="closeAndOpenLink();" class="enabled">{{buttonName ?? 'Ok'}}</button>
+  </div>
+
+</div>

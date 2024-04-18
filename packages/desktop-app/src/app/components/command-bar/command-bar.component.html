@@ -78,7 +78,7 @@
           <div *ngIf="notifications.length > 0" class="divider"></div>
 
           <ng-container *ngFor="let notification of notifications">
-            <button class="notification-menu-item" mat-menu-item (click)="openInfoModal(notification);" [disabled]="!isIssueButtonEnabled">
+            <button class="notification-menu-item" mat-menu-item (click)="notification.uuid === 'noovolari-1000' ? openNoovolariModal(notification) : openInfoModal(notification);" [disabled]="!isIssueButtonEnabled">
               <img
                 class="icon-not-menu {{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? 'invert' : ''}}"
                 src="assets/images/{{notification.read ? 'read-notification' : notification.icon ?? 'unread-notification'}}.svg"

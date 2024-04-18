@@ -100,6 +100,14 @@
     }
     .html-content {
       padding-right: 20px;
+      .communication-title {
+        font-weight: 500;
+        font-size: 30px;
+        color: black
+      }
+      .communication-span {
+        color: #666666;
+      }
     }
     .centered-text {
       font-weight: 400;
@@ -154,6 +162,24 @@
       font-size: 14px;
       color: $changelog-date-color;
       letter-spacing: -.5px;
+    }
+
+    img:nth-child(1) {
+      width: 250px;
+      height: 35px;
+      margin-right: 25px;
+    }
+
+    img:nth-child(3) {
+      width: 183px;
+      height: 59px;
+      margin-left: 25px;
+    }
+
+    .vertical-divider {
+      background-color: #999999;
+      width: 1px;
+      height: 59px;
     }
   }
 

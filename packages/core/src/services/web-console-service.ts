@@ -42,7 +42,7 @@ export class WebConsoleService {
       sessionToken: credentialsInfo.sessionToken.aws_session_token,
     };
 
-    const queryParametersSigninToken = `?Action=getSigninToken&sessionDuration=${sessionDuration}&Session=${encodeURIComponent(
+    const queryParametersSigninToken = `?Action=getSigninToken&SessionDuration=${sessionDuration}&Session=${encodeURIComponent(
       JSON.stringify(sessionStringJSON)
     )}`;
 

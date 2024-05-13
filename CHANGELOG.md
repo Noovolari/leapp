@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.26.0](https://github.com/Noovolari/leapp/compare/v0.25.3...v0.26.0) (2024-05-13)
+
+### Features
+* added **Noovolari important communication** to command bar
+
 ### [0.25.3](https://github.com/Noovolari/leapp/compare/v0.25.2...v0.25.3) (2024-03-29)
 
 ### Bug Fixes

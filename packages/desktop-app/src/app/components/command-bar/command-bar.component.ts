@@ -123,7 +123,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
           "Read more",
           "",
           false,
-          "https://www.leapp.cloud",
+          "https://blog.leapp.cloud/noovolari-has-officially-come-to-an-end",
           "medal",
           true
         ),

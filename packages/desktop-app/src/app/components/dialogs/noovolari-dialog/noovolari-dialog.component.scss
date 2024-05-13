@@ -1,0 +1,228 @@
+@import "../../../../assets/scss/modals";
+@import "../../../../assets/scss/mixins/palette";
+
+::ng-deep {
+  .modal-content {
+    max-height: 600px!important;
+  }
+  .confirm-modal {
+    max-width: 520px;
+    width: 100%;
+  }
+  h3 {
+    text-align: left;
+    font-size: 17px;
+    color: $text-color;
+    font-weight: bold;
+
+    span {
+      font-size: 1.3rem; color: $silver-dark; font-weight: normal;
+    }
+  }
+  div.updater > div.html-content {
+    color: $text-color;
+    overflow-y: scroll;
+    text-align: left;
+    height: 480px;
+    margin: -39px -5px 22px 3px;
+
+    h1 {
+      font-size: 19px;
+      padding-top: 20px;
+      font-weight: 600;
+      letter-spacing: -.5px;
+      margin-left: 2px;
+      margin-right: 6px;
+    }
+
+    h2 {
+      text-align: center!important;
+      color: $text-color;
+      font-size: 19px!important;
+      font-weight: bold!important;
+      margin-top: 10px;
+      margin-right: 6px;
+    }
+    h3 {
+      text-align: left!important;
+      color: $text-color;
+      font-size: 17px!important;
+      font-weight: bold!important;
+      margin-left: 2px;
+      margin-right: 6px;
+    }
+
+    p {
+      font-size: 14px;
+      padding-bottom: 10px;
+      margin-bottom: 0;
+      margin-left: 2px;
+      color: $changelog-date-color;
+      margin-right: 6px;
+    }
+
+    a {
+      color: $main-color-light;
+      text-decoration: none;
+      background-color: transparent;
+      display: inline;
+      cursor: pointer;
+    }
+
+    li {
+      font-size: 14px;
+      white-space:pre-wrap;
+      color: $changelog-date-color;
+      margin-right: 6px;
+    }
+
+    span {
+      display: inline-block;
+      color: $silver-dark;
+      font-weight: normal;
+      margin-bottom: 7px;
+    }
+
+    span.centered-text {
+      display: block;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    img {
+      margin-bottom: 7px;
+    }
+  }
+  .noovolari-modal {
+    max-width: 600px;
+    .modal-content {
+      padding: 20px 5px 20px 20px;
+    }
+    .html-content {
+      padding-right: 20px;
+      .communication-title {
+        font-weight: 500;
+        font-size: 30px;
+        color: black
+      }
+      .communication-span {
+        color: #666666;
+      }
+    }
+    .centered-text {
+      font-weight: 400;
+    }
+    b {
+      font-weight: 800;
+    }
+  }
+}
+
+.updater-header {
+  margin-right: -5px;
+  margin-left: -20px;
+  border-bottom: 1px solid #E0E0E0;
+}
+
+.modal-title {
+  margin-top: -10px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  width: 560px;
+  position: relative;
+  margin-bottom: 10px;
+
+  .modal-title-icon {
+    position: inherit;
+    i {
+      background-color: $main-color-light;
+      color: $primary-text-color;
+      border-radius: 5px;
+      padding: 8px;
+      font-size: 24px;
+    }
+  }
+
+  .modal-title-message {
+    position: inherit;
+    flex-grow: 1;
+    margin-left: 20px;
+    display: flex;
+    align-items: center;
+
+    span {
+      letter-spacing: -.5px;
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    div {
+      font-weight: 400;
+      font-size: 14px;
+      color: $changelog-date-color;
+      letter-spacing: -.5px;
+    }
+
+    img:nth-child(1) {
+      width: 250px;
+      height: 35px;
+      margin-right: 25px;
+    }
+
+    img:nth-child(3) {
+      width: 183px;
+      height: 59px;
+      margin-left: 25px;
+    }
+
+    .vertical-divider {
+      background-color: #999999;
+      width: 1px;
+      height: 59px;
+    }
+  }
+
+  .modal-title-close {
+    position: relative;
+    i {
+      position: relative;
+      bottom: 2px;
+    }
+  }
+}
+
+.button-equalizer {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  margin: -36px;
+  margin-right: 30px;
+  top: -50px;
+  padding-top: 15px;
+
+  button {
+    border: none;
+    margin: 0 10px;
+    padding: 8px 16px;
+    font-weight: 500;
+    letter-spacing: -.5px;
+
+    &.enabled {
+      border-radius: 5px;
+      color: $primary-text-color;
+      background-color: #454082;
+    }
+
+    &.disabled {
+      color: $changelog-date-color;
+      background-color: unset;
+      margin-left: 0;
+    }
+  }
+}
+
+.modal-body {
+  padding-right: 0;
+  padding-left: 0;
+}

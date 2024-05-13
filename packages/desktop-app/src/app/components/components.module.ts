@@ -60,6 +60,7 @@ import { OverlayModule } from "@angular/cdk/overlay";
 import { LockPageComponent } from "./lock-page/lock-page.component";
 import { CheckIconSvgComponent } from "./check-icon-svg/check-icon-svg.component";
 import { AuthorizationDialogComponent } from "./dialogs/authorization-dialog/authorization-dialog.component";
+import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-dialog.component";
 
 @NgModule({
   declarations: [
@@ -97,6 +98,7 @@ import { AuthorizationDialogComponent } from "./dialogs/authorization-dialog/aut
     SyncProWidgetComponent,
     LockPageComponent,
     CheckIconSvgComponent,
+    NoovolariDialogComponent,
   ],
   imports: [
     CommonModule,

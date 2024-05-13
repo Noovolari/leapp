@@ -119,7 +119,7 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
         new LeappNotification(
           "noovolari-1000",
           LeappNotificationType.info,
-          "Noovolari important communication.",
+          "Noovolari important communication",
           "Read more",
           "",
           false,

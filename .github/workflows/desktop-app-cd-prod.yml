@@ -404,6 +404,7 @@ jobs:
 
   publish-changelog:
     runs-on: ubuntu-latest
+    environment: prod
     needs: [ publish-draft ]
     if: needs.tag-validation.outputs.validator == 1
     steps:
@@ -424,6 +425,7 @@ jobs:
 
   invalidate-distribution:
     runs-on: ubuntu-latest
+    environment: prod
     needs: [ publish-changelog ]
     if: needs.tag-validation.outputs.validator == 1
     steps:
@@ -443,6 +445,7 @@ jobs:
 
   publish-github-release:
     runs-on: ubuntu-latest
+    environment: prod
     needs: [ invalidate-distribution, tag-validation ]
     if: needs.tag-validation.outputs.validator == 1
     steps:

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.26.1](https://github.com/Noovolari/leapp/compare/v0.26.0...v0.26.1) (2024-06-05)
+
+### Bug Fixes
+* fixed Leapp Pro workspace export functionality: 
+now it is able to keep IAM Users Access Keys in the system keychain during the transition to the local workspace.
+Thanks to [Nuru](https://github.com/Nuru) for the support!
+
 ### [0.26.0](https://github.com/Noovolari/leapp/compare/v0.25.3...v0.26.0) (2024-05-13)
 
 ### Features

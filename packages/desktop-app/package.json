@@ -137,7 +137,6 @@
       "signingHashAlgorithms": [
         "sha256"
       ],
-      "sign": "scripts/windows-sign.js",
       "target": [
         "nsis"
       ]

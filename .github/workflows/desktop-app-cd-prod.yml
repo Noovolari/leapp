@@ -102,10 +102,6 @@ jobs:
         shell: bash
         run: |
           cd packages/desktop-app
-          curl https://asset.noovolari.com/signing-tool/CodeSignTool-v1.2.7-windows.zip --output CodeSignTool-v1.2.7-windows.zip -s
-          unzip CodeSignTool-v1.2.7-windows.zip
-          CONFIG_FILE=code_sign_tool.properties
-          cat "./CodeSignTool-v1.2.7-windows/conf/$CONFIG_FILE"
           npm install
           npm run release-win
           rm -Rf ./release/win-unpacked

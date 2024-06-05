@@ -30,6 +30,12 @@ export interface WorkspaceState {
 export class TeamService {
   constructor(_l: any, _e: any, _a: any, _p: any, _t: any, _m: any, _s: any, _r: any, _v: any, _i: any, _c: any, _n: any, _o: any, _y: any) {}
 
+  get skipKeychainSecretsDeletion(): boolean {
+    return false;
+  }
+
+  set skipKeychainSecretsDeletion(value: boolean) {}
+
   get isLeappTeamStubbed(): boolean {
     return true;
   }

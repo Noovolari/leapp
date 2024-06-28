@@ -29,6 +29,7 @@ export class AwsCoreService {
     ["eu-west-1", "https://sts.eu-west-1.amazonaws.com"],
     ["eu-west-2", "https://sts.eu-west-2.amazonaws.com"],
     ["eu-west-3", "https://sts.eu-west-3.amazonaws.com"],
+    ["il-central-1", "https://sts.il-central-1.amazonaws.com"],
     ["me-central-1", "https://sts.me-central-1.amazonaws.com"],
     ["me-south-1", "https://sts.me-south-1.amazonaws.com"],
     ["sa-east-1", "https://sts.sa-east-1.amazonaws.com"],

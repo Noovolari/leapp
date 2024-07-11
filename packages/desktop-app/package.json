@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.25.3",
+  "version": "0.26.1",
   "private": true,
   "author": {
     "name": "Noovolari",
@@ -137,7 +137,6 @@
       "signingHashAlgorithms": [
         "sha256"
       ],
-      "sign": "scripts/windows-sign.js",
       "target": [
         "nsis"
       ]

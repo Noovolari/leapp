@@ -58,15 +58,7 @@ nav:
       - 'Developer Reference': 'plugins/plugins-development.md'
   - 'General Options': 'built-in-features/general-options.md'
   - 'Leapp PRO':
-      - 'Getting Started':
-          - 'Getting Started': 'leapp-pro/getting-started/index.md'
-          - 'Sign-up': 'leapp-pro/getting-started/sign-up.md'
-          - 'Sign-in': 'leapp-pro/getting-started/sign-in.md'
-          - 'Lock your Workspace': 'leapp-pro/getting-started/lock.md'
-      - 'Synchronization': 'leapp-pro/synchronization.md'
-      - 'Security and password': 'leapp-pro/security-and-password.md'
       - 'Export PRO Workspace': 'leapp-pro/export-pro-workspace.md'
-  - 'Roadmap': https://roadmap.leapp.cloud/tabs/4-in-progress
   - Contributing:
       - 'Get involved': 'contributing/get-involved.md'
       - 'Useful Scripts': 'usefull-scripts/export-profile.md'
@@ -125,8 +117,8 @@ extra:
 
 markdown_extensions:
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - admonition
   - pymdownx.details
   - pymdownx.highlight

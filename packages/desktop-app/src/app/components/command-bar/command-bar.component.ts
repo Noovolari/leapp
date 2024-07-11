@@ -21,9 +21,10 @@ import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { UpdaterService } from "../../services/updater.service";
-import { LeappNotification } from "@noovolari/leapp-core/models/notification";
+import { LeappNotification, LeappNotificationType } from "@noovolari/leapp-core/models/notification";
 import { InfoDialogComponent } from "../dialogs/info-dialog/info-dialog.component";
 import { NotificationService } from "@noovolari/leapp-core/services/notification-service";
+import { NoovolariDialogComponent } from "../dialogs/noovolari-dialog/noovolari-dialog.component";
 
 export const compactMode = new BehaviorSubject<boolean>(false);
 export const globalFilteredSessions = new BehaviorSubject<Session[]>([]);
@@ -112,14 +113,29 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
 
     this.notificationService = this.appProviderService.notificationService;
 
-    const notifications = this.notificationService.getNotifications();
+    let notifications = this.notificationService.getNotifications().filter((n) => n.uuid === "noovolari-1000");
+    if (!notifications.find((n) => n.uuid === "noovolari-1000")) {
+      notifications = [
+        new LeappNotification(
+          "noovolari-1000",
+          LeappNotificationType.info,
+          "Noovolari important communication",
+          "Read more",
+          "",
+          false,
+          "https://blog.leapp.cloud/noovolari-has-officially-come-to-an-end",
+          "medal",
+          true
+        ),
+      ];
+    }
     this.notificationService.setNotifications(notifications);
 
     const firstNotReadPopupNotification = notifications.find((n) => n.popup && !n.read);
     if (firstNotReadPopupNotification) {
       const timeout = setTimeout(() => {
         clearTimeout(timeout);
-        this.openInfoModal(firstNotReadPopupNotification);
+        this.openNoovolariModal(firstNotReadPopupNotification);
       }, 5000);
     }
   }
@@ -337,6 +353,20 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     this.bsModalService.show(InfoDialogComponent, {
       animated: false,
       class: "leapp-team-early-access-modal",
+      initialState: {
+        title: notification.title,
+        description: notification.description,
+        link: notification?.link,
+        buttonName: notification.buttonActionName,
+      },
+    });
+  }
+
+  openNoovolariModal(notification: LeappNotification): void {
+    this.notificationService.setNotificationAsRead(notification.uuid);
+    this.bsModalService.show(NoovolariDialogComponent, {
+      animated: false,
+      class: "noovolari-modal",
       initialState: {
         title: notification.title,
         description: notification.description,

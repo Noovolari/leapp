@@ -16,7 +16,7 @@ jobs:
     env:
       SKIP_INTEGRATION_TESTS: "true"
       S3_BUCKET: s3://noovolari-leapp-website-distribution
-      TEAM_REPOSITORY: ${{ secrets.TEAM_REPOSITORY }}
+      TEAM_REPOSITORY: '' # ${{ secrets.TEAM_REPOSITORY }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Prepare GIT

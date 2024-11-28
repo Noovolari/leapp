@@ -10,7 +10,7 @@ Leapp regions management
 
 Displays the default region
 
-```console
+```
 USAGE
   $ leapp region get-default
 
@@ -25,7 +25,7 @@ EXAMPLES
 
 Change the default region
 
-```console
+```
 USAGE
   $ leapp region set-default [--region <value>]
 

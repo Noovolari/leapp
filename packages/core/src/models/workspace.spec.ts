@@ -309,14 +309,14 @@ describe("Workspace Model", () => {
 
   test("get notifications", () => {
     const workspace = new Workspace();
-    const fakeNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "descr", false)];
+    const fakeNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "action-name", "descr", false)];
     (workspace as any)._notifications = fakeNotifications;
     expect(workspace.notifications).toEqual(fakeNotifications);
   });
 
   test("set notifications", () => {
     const workspace = new Workspace();
-    const fakeNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "descr", false)];
+    const fakeNotifications = [new LeappNotification("fake-uuid", LeappNotificationType.info, "title", "action-name", "descr", false)];
     const notificationSpy = jest.spyOn(workspace, "notifications", "set");
     workspace.notifications = fakeNotifications;
     expect(notificationSpy).toHaveBeenCalledTimes(1);

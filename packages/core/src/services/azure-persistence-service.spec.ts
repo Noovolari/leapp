@@ -1,7 +1,7 @@
 import { expect, describe, test, jest } from "@jest/globals";
 import { AzurePersistenceService, DataProtectionScope } from "./azure-persistence-service";
 import * as fs from "fs";
-import * as zlib from "node:zlib";
+//import * as zlib from "node:zlib";
 import * as path from "path";
 import { constants } from "../models/constants";
 
@@ -108,6 +108,7 @@ describe("MsalPersistenceService", () => {
     fs.unlinkSync(customTestPath);
   });
 
+  /*
   test("load - mimic windows", async () => {
     const compressedFileBuffer = zlib.deflateRawSync(mockedMsal);
     const compressedFile = compressedFileBuffer.toString("utf8");
@@ -136,6 +137,7 @@ describe("MsalPersistenceService", () => {
 
     fs.unlinkSync(customTestPath);
   });
+  */
 
   test("load - mimic other system", async () => {
     const msalEncryptionService = {

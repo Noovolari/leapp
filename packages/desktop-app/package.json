@@ -117,13 +117,13 @@
         {
           "target": "zip",
           "arch": [
-            "x64"
+            "arm64"
           ]
         },
         {
           "target": "dmg",
           "arch": [
-            "x64"
+            "arm64"
           ]
         }
       ]
@@ -161,7 +161,7 @@
     "@ngx-translate/core": "~13.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
     "@noovolari/dpapi-addon": "0.1.2",
-    "@noovolari/leapp-core": "0.1.165",
+    "@noovolari/leapp-core": "file:../core",
     "@smithy/fetch-http-handler": "2.4.2",
     "assert": "2.0.0",
     "axios": "1.6.2",
@@ -230,7 +230,6 @@
     "v8-compile-cache": "~2.3.0",
     "wait-on": "7.2.0",
     "ws": "^8.9.0",
-    "zlib": "~1.0.5",
     "zone.js": "~0.11.4"
   },
   "devDependencies": {

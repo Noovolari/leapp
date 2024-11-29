@@ -99,10 +99,6 @@ export class AwsIamRoleChainedService extends AwsSessionService {
     return await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile);
   }
 
-  generateCredentialsProxy(sessionId: string): Promise<CredentialsInfo> {
-    return this.generateCredentials(sessionId);
-  }
-
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Retrieve Session
     const session = this.repository.getSessionById(sessionId);

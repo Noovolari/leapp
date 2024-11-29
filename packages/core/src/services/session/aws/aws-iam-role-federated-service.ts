@@ -90,10 +90,6 @@ export class AwsIamRoleFederatedService extends AwsSessionService {
     return await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile);
   }
 
-  generateCredentialsProxy(sessionId: string): Promise<CredentialsInfo> {
-    return this.generateCredentials(sessionId);
-  }
-
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {
     // Get the session in question
     const session = this.repository.getSessionById(sessionId);

@@ -128,19 +128,14 @@ export class AwsIamUserService extends AwsSessionService {
     return await this.fileService.replaceWriteSync(this.awsCoreService.awsCredentialPath(), credentialsFile);
   }
 
-  generateCredentialsProxy(sessionId: string): Promise<CredentialsInfo> {
-    return new Promise<CredentialsInfo>((resolve, reject) => {
+  async generateCredentialsProxy(sessionId: string): Promise<CredentialsInfo> {
+    try {
       this.mfaCodePrompterProxy = this.remoteMfaCodePrompter;
-      this.generateCredentials(sessionId)
-        .then((credentialsInfo: CredentialsInfo) => {
-          this.mfaCodePrompterProxy = this.localMfaCodePrompter;
-          resolve(credentialsInfo);
-        })
-        .catch((err) => {
-          this.mfaCodePrompterProxy = this.localMfaCodePrompter;
-          reject(err);
-        });
-    });
+      const credentialsInfo = await this.generateCredentials(sessionId)
+      return credentialsInfo;
+    } finally {
+      this.mfaCodePrompterProxy = this.localMfaCodePrompter;
+    }
   }
 
   async generateCredentials(sessionId: string): Promise<CredentialsInfo> {

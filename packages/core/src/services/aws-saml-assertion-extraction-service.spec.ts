@@ -46,6 +46,7 @@ describe("AwsSamlAssertionExtractionService", () => {
     expect(service.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml")).toBe(true);
     expect(service.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.aws.amazon.com/saml?XX")).toBe(true);
     expect(service.isSamlAssertionUrl(CloudProviderType.aws, "http://signin.aws.amazon.com/saml")).toBe(false);
+    expect(service.isSamlAssertionUrl(CloudProviderType.aws, "https://signin.amazonaws.cn/saml")).toBe(true);
   });
 
   test("extractAwsSamlResponse", () => {

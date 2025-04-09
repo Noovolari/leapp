@@ -33,7 +33,7 @@ jobs:
   build-and-release-core-and-cli:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Build and release core (nightly)
         run: |
           cd packages/core
@@ -57,8 +57,8 @@ jobs:
         run: |
           git config --global core.autocrlf false
           git config --global core.eol lf
-      - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
@@ -104,8 +104,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [ build-and-release-core-and-cli, generate-build-identifier ]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}
@@ -151,8 +151,8 @@ jobs:
     runs-on: macos-latest
     needs: [ build-and-release-core-and-cli, generate-build-identifier ]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}

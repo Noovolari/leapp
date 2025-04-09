@@ -32,7 +32,7 @@ module.exports = {
 
       shellJs.cd(path.join(__dirname, '..'));
 
-      packageJson["build"]["mac"]["forceCodeSigning"] = true;
+      packageJson["build"]["mac"]["forceCodeSigning"] = false;
       delete packageJson["build"]["win"]["signingHashAlgorithms"];
       delete packageJson["build"]["win"]["sign"];
       await writePackageJsonFunction(path, "desktop-app", packageJson);

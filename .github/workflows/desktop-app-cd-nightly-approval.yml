@@ -230,8 +230,8 @@ jobs:
     runs-on: macos-latest
     needs: [ build-and-release-core-and-cli, generate-build-identifier, build-macos-x64]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         if: ${{ env.TEAM_REPOSITORY != '' }}
         with:
           repository: ${{ env.TEAM_REPOSITORY }}

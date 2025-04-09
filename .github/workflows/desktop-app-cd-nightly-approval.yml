@@ -169,7 +169,7 @@ jobs:
           cd ../leapp-team/packages/leapp-team-service
           npm run enable-team-features-dev
       - name: Build macOS x64 desktop app (nightly)
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
         with:
@@ -248,7 +248,7 @@ jobs:
           cd ../leapp-team/packages/leapp-team-service
           npm run enable-team-features-dev
       - name: Build macOS arm64 desktop app (nightly)
-        uses: nick-fields/retry@v2
+        uses: nick-fields/retry@v3
         env:
           APPLE_NOTARISATION_PASSWORD: ${{ secrets.APPLE_NOTARISATION_PASSWORD }}
         with:

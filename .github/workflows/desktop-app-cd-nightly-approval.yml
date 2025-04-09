@@ -221,7 +221,7 @@ jobs:
           TAG_VERSION=$(cat nightly-version)
           echo "::set-output name=TAG_VERSION::$TAG_VERSION"
       - name: Upload artifacts
-        uses: 
+        uses: actions/upload-artifact@v4
         with:
           name: Leapp-${{ steps.release.outputs.TAG_VERSION }}.dmg
           path: packages/desktop-app/release/Leapp-${{ steps.release.outputs.TAG_VERSION }}.dmg

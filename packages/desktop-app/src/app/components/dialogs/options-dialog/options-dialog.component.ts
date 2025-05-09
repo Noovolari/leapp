@@ -166,7 +166,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.form.controls["proxyPort"].setValue(this.proxyPort);
     this.form.controls["proxyUsername"].setValue(this.proxyUsername);
     this.form.controls["proxyPassword"].setValue(this.proxyPassword);
-    this.form.controls["sessionDuration"].setValue(this.webConsoleSessionDuration);
+    this.form.controls["sessionDuration"].setValue(`${this.webConsoleSessionDuration}`);
 
     const isProxyUrl = this.optionsService.proxyConfiguration.proxyUrl && this.optionsService.proxyConfiguration.proxyUrl !== "undefined";
     this.proxyUrl = isProxyUrl ? this.optionsService.proxyConfiguration.proxyUrl : "";
@@ -241,7 +241,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
       this.optionsService.defaultRegion = this.selectedRegion;
       this.optionsService.defaultLocation = this.selectedLocation;
       this.optionsService.macOsTerminal = this.selectedTerminal;
-      this.optionsService.samlRoleSessionDuration = this.form.controls["sessionDuration"].value;
+      this.optionsService.samlRoleSessionDuration = parseInt(this.form.controls["sessionDuration"].value, 10);
 
       const previousRequirePassword = this.optionsService.requirePassword;
       if (previousRequirePassword !== this.selectedRequirePassword) {
@@ -258,7 +258,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
       }
 
       this.optionsService.requirePassword = this.selectedRequirePassword;
-      this.optionsService.touchIdEnabled = this.form.controls["touchIdEnableSelect"].value;
+      this.optionsService.touchIdEnabled = this.form.controls["touchIdEnableSelect"].value.toLowerCase() === "true";
 
       this.optionsService.ssmRegionBehaviour = this.selectedSsmRegionBehaviour;
 

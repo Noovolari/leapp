@@ -258,7 +258,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
       }
 
       this.optionsService.requirePassword = this.selectedRequirePassword;
-      this.optionsService.touchIdEnabled = this.form.controls["touchIdEnableSelect"].value.toLowerCase() === "true";
+      this.optionsService.touchIdEnabled = (this.form.controls["touchIdEnableSelect"].value as any) === true;
 
       this.optionsService.ssmRegionBehaviour = this.selectedSsmRegionBehaviour;
 

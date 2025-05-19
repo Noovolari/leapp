@@ -14,7 +14,8 @@ import { NgxJsonViewerModule } from "ngx-json-viewer";
 import { MatLegacyTabsModule } from "@angular/material/legacy-tabs";
 import { MatIconModule } from "@angular/material/icon";
 import { MatCheckboxModule } from "@angular/material/checkbox";
-import { MatButtonModule } from "@angular/material/button";
+//import { MatButtonModule } from "@angular/material/button";
+import { MatLegacyButtonModule } from "@angular/material/legacy-button";
 import { SessionsComponent } from "./sessions/sessions.component";
 import { SessionCardComponent } from "./sessions/session-card/session-card.component";
 import { FilteringPipe } from "./sessions/pipes/filtering.pipe";
@@ -115,7 +116,7 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     //MatTabsModule,
     MatIconModule,
     MatCheckboxModule,
-    MatButtonModule,
+    //MatButtonModule,
     //MatMenuModule,
     //MatListModule,
     MatSlideToggleModule,
@@ -128,7 +129,7 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     ReactiveFormsModule,
     BrowserAnimationsModule,
     MatFormFieldModule,
-    MatButtonModule,
+    //MatButtonModule,
     MatSelectModule,
     MatCardModule,
     MatInputModule,
@@ -139,6 +140,7 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     MatLegacyListModule,
     MatLegacyMenuModule,
     MatLegacyTabsModule,
+    MatLegacyButtonModule,
   ],
   exports: [
     ConfirmationDialogComponent,

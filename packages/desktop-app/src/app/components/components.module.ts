@@ -10,7 +10,8 @@ import { SnackbarComponent } from "./snackbar/snackbar.component";
 import { UpdateDialogComponent } from "./dialogs/update-dialog/update-dialog.component";
 import { ModalModule } from "ngx-bootstrap/modal";
 import { NgxJsonViewerModule } from "ngx-json-viewer";
-import { MatTabsModule } from "@angular/material/tabs";
+//import { MatTabsModule } from "@angular/material/tabs";
+import { MatLegacyTabsModule } from "@angular/material/legacy-tabs";
 import { MatIconModule } from "@angular/material/icon";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 import { MatButtonModule } from "@angular/material/button";
@@ -25,8 +26,10 @@ import { SideBarComponent } from "./side-bar/side-bar.component";
 import { OptionsDialogComponent } from "./dialogs/options-dialog/options-dialog.component";
 import { CreateDialogComponent } from "./dialogs/create-dialog/create-dialog.component";
 import { EditDialogComponent } from "./dialogs/edit-dialog/edit-dialog.component";
-import { MatMenuModule } from "@angular/material/menu";
-import { MatListModule } from "@angular/material/list";
+//import { MatMenuModule } from "@angular/material/menu";
+import { MatLegacyMenuModule } from "@angular/material/legacy-menu";
+//import { MatListModule } from "@angular/material/list";
+import { MatLegacyListModule } from "@angular/material/legacy-list";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
@@ -109,12 +112,12 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     BsDropdownModule.forRoot(),
     ModalModule.forRoot(),
     NgxJsonViewerModule,
-    MatTabsModule,
+    //MatTabsModule,
     MatIconModule,
     MatCheckboxModule,
     MatButtonModule,
-    MatMenuModule,
-    MatListModule,
+    //MatMenuModule,
+    //MatListModule,
     MatSlideToggleModule,
     MatExpansionModule,
     MatButtonToggleModule,
@@ -133,6 +136,9 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     MatProgressSpinnerModule,
     NgSelectModule,
     OverlayModule,
+    MatLegacyListModule,
+    MatLegacyMenuModule,
+    MatLegacyTabsModule,
   ],
   exports: [
     ConfirmationDialogComponent,

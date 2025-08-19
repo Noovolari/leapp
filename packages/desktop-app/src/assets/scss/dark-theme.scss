@@ -5,6 +5,22 @@ body.dark-theme {
   border: none!important;
   background-color: $dark-main-background;
 
+  // Global ng-dropdown-panel overrides - must be at the top for specificity
+  .ng-dropdown-panel,
+  .ng-dropdown-panel.ng-select-bottom {
+    background-color: $dark-select-component!important;
+    border: 1px solid $dark-input-form-border !important;
+  }
+  
+  .ng-dropdown-panel .ng-dropdown-panel-items {
+    background-color: $dark-select-component!important;
+  }
+  
+  .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+    background-color: $dark-select-component!important;
+    color: $dark-main-text-color!important;
+  }
+
   .selected-segment {
     background-color: $dark-selected-sidebar;
   }
@@ -317,13 +333,24 @@ body.dark-theme {
   }
 
   ::ng-deep {
-    .ng-dropdown-panel {
+    // More specific ng-dropdown-panel styles to override ng-select.scss
+    .ng-dropdown-panel,
+    .ng-dropdown-panel.ng-select-bottom {
       background-color: $dark-select-component!important;
-      border: none !important;
+      border: 1px solid $dark-input-form-border !important;
     }
     .ng-dropdown-panel-items {
       background-color: $dark-select-component!important;
     }
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option {
+      background-color: $dark-select-component!important;
+      color: $dark-main-text-color!important;
+    }
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
+    .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
+      background-color: $dark-ng-selected!important;
+    }
+    
     .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
       background-color: rgba(82, 168, 220, 0.45)!important;
     }

@@ -460,6 +460,21 @@ body.dark-theme {
     border-color: $dark-input-form-border;
   }
 
+  // MDC checkbox styles for Angular Material 15 - more specific selectors
+  .mat-mdc-checkbox {
+    .mdc-checkbox .mdc-checkbox__native-control:enabled:not(:checked):not(:indeterminate):not([data-indeterminate=true]) ~ .mdc-checkbox__background {
+      border-color: $dark-main-text-color !important;
+    }
+    
+    .mat-mdc-checkbox-frame {
+      border-color: $dark-main-text-color !important;
+    }
+  }
+  
+  .mdc-checkbox .mdc-checkbox__background {
+    border-color: $dark-main-text-color !important;
+  }
+
   .filter-menu::-webkit-scrollbar-track-piece {
     background-color: $dark-modal-background!important;
   }

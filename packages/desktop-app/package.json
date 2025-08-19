@@ -251,7 +251,7 @@
     "dotenv": "^10.0.0",
     "electron": "22.3.25",
     "electron-builder": "26.0.12",
-    "electron-builder-squirrel-windows": "24.6.4",
+    "electron-builder-squirrel-windows": "24.13.3",
     "electron-packager": "^17.1.1",
     "electron-rebuild": "3.2.9",
     "gushio": "0.7.2",

@@ -27,24 +27,3 @@ img.moon-stop-outline {
   font-size: 10px;
   text-transform: uppercase;
 }
-
-// Force dark theme styles for menu items
-::ng-deep .mat-menu-panel {
-  .mat-menu-item {
-    background-color: transparent !important;
-    
-    &:hover,
-    &.mat-menu-item-highlighted {
-      background-color: rgba(255, 255, 255, 0.1) !important;
-    }
-  }
-  
-  .mat-legacy-menu-item {
-    background-color: transparent !important;
-    
-    &:hover,
-    &.mat-legacy-menu-item-highlighted {
-      background-color: rgba(255, 255, 255, 0.1) !important;
-    }
-  }
-}

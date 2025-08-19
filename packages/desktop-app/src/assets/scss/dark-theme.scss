@@ -93,6 +93,10 @@ body.dark-theme {
     border: 1px solid $dark-mat-menu;
     background-color: $dark-modal-background !important;
 
+    .mat-menu-content {
+      background-color: $dark-modal-background !important;
+    }
+
     i, span, .mat-menu-submenu-item, polygon {
       color: $dark-main-text-color;
     }
@@ -101,44 +105,17 @@ body.dark-theme {
       background-color: $dark-session-card-border;
     }
 
-    .mat-menu-item-highlighted:not([disabled]) {
-      background-color: $dark-modal-background !important;
-    }
-
-    .mat-menu-item:hover {
-      background-color: $dark-modal-background !important;
-    }
-
-    .mat-menu-item {
-      background-color: $dark-modal-background !important;
-      color: $dark-main-text-color !important;
-    }
-
-    // Legacy menu items (Angular Material Legacy)
+    .mat-menu-item,
     .mat-legacy-menu-item {
       background-color: $dark-modal-background !important;
       color: $dark-main-text-color !important;
       
-      &:hover {
+      &:hover,
+      &.mat-menu-item-highlighted,
+      &.mat-legacy-menu-item-highlighted,
+      &:focus {
         background-color: $dark-modal-background !important;
-      }
-      
-      &.mat-legacy-menu-item-highlighted {
-        background-color: $dark-modal-background !important;
-      }
-    }
-
-    // MDC-based menu items (Angular Material 15)
-    .mat-mdc-menu-item {
-      background-color: $dark-modal-background !important;
-      color: $dark-main-text-color !important;
-      
-      &:hover {
-        background-color: $dark-modal-background !important;
-      }
-      
-      &.mat-mdc-menu-item-highlighted {
-        background-color: $dark-modal-background !important;
+        color: $dark-main-text-color !important;
       }
     }
 

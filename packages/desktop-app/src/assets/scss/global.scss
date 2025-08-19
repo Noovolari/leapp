@@ -63,6 +63,23 @@ html, body {
   .mat-menu-panel {
     box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%);
     border-radius: $border-radius;
+    background-color: white !important;
+    
+    .mat-menu-content {
+      background-color: white !important;
+    }
+    
+    .mat-menu-item,
+    .mat-legacy-menu-item {
+      background-color: white !important;
+      
+      &:hover,
+      &.mat-menu-item-highlighted,
+      &.mat-legacy-menu-item-highlighted,
+      &:focus {
+        background-color: white !important;
+      }
+    }
   }
 
   .ng-dropdown-footer {
@@ -150,6 +167,7 @@ body {
 
 img {
   -webkit-user-select: none;
+  user-select: none;
   -webkit-user-drag: none;
   -webkit-app-region: no-drag;
 }
@@ -678,7 +696,7 @@ i.fal.fa-plus-circle {
 .bs-tooltip-auto[x-placement^=top] .arrow::before,
 .bs-tooltip-top .arrow::before,
 .bs-tooltip-auto[x-placement^=bottom] .arrow::before,
-.bs-tooltip-bottom .arrow::before, {
+.bs-tooltip-bottom .arrow::before {
   border-top-color: transparent;
   border-bottom-color: transparent;
   border-right-color: transparent;

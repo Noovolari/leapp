@@ -13,7 +13,25 @@
   align-items: center;
 }
 
+// Remove MDC snackbar black overlay
 ::ng-deep {
+  // Target all possible MDC snackbar containers and wrappers
+  // .mat-mdc-snack-bar-container,
+  // .mat-mdc-snack-bar-container *,
+  // .cdk-overlay-pane {
+  //   background: transparent !important;
+  //   background-color: transparent !important;
+  //   box-shadow: none !important;
+  //   border: none !important;
+  // }
+
+  .mat-mdc-snack-bar-container * {
+    background: transparent !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
   .add-error-link-cursor {
     div .link {
       cursor: pointer!important;

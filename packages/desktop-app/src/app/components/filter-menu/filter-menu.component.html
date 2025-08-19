@@ -1,4 +1,4 @@
-<button class="toggle-button filter-button" [matMenuTriggerFor]="matMenu"><i class="{{icon}}"></i> {{dataLabel()}}<a class="cancel-tag" *ngIf="dataActive();" (click)="resetData($event, form);"><i class="moon-Close"></i></a></button>
+<button class="toggle-button filter-button" #matMenuTrigger="matMenuTrigger" [matMenuTriggerFor]="matMenu"><i class="{{icon}}"></i> {{dataLabel()}}<a class="cancel-tag" *ngIf="dataActive();" (click)="resetData($event, form);"><i class="moon-Close"></i></a></button>
 <mat-menu #matMenu="matMenu">
   <div class="search-bar" (click)="$event.preventDefault(); $event.stopPropagation();" *ngIf="searchable">
     <div class="icon"><i class="moon-Search"></i></div>
@@ -28,7 +28,7 @@
   </div>
   <hr (click)="$event.preventDefault(); $event.stopPropagation();">
   <div class="menu-buttons" (click)="$event.preventDefault(); $event.stopPropagation();">
-    <button class="btn-control" (click)="trigger.closeMenu(); applyCallback($event, data, form);">Apply</button>
-    <a (click)="trigger.closeMenu();">Cancel</a>
+    <button class="btn-control" (click)="trigger?.closeMenu(); applyCallback($event, data, form);">Apply</button>
+    <a (click)="trigger?.closeMenu();">Cancel</a>
   </div>
 </mat-menu>

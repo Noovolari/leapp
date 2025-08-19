@@ -8,8 +8,8 @@ import { FormGroup } from "@angular/forms";
   styleUrls: ["./filter-menu.component.scss"],
 })
 export class FilterMenuComponent implements OnInit {
-  @ViewChild(MatMenuTrigger)
-  trigger: MatMenuTrigger;
+  @ViewChild("matMenuTrigger", { static: false })
+  trigger!: MatMenuTrigger;
 
   @Input()
   callback: any;

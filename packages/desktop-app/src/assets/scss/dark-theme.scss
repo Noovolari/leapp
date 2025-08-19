@@ -181,6 +181,15 @@ body.dark-theme {
     background-color: $dark-table-background;
   }
 
+  // Azure Location dropdown scrollbar styling
+  .ng-dropdown-panel .ng-dropdown-panel-items ::-webkit-scrollbar-track-piece {
+    background-color: $dark-select-component !important;
+  }
+  
+  .ng-dropdown-panel .ng-dropdown-panel-items ::-webkit-scrollbar-track {
+    background-color: $dark-select-component !important;
+  }
+
   ///* SideBar Style *///
   .mat-list-base .mat-list-item:hover, .mat-list-item.selected-integration {
     background-color: $dark-hover-sidebar!important;
@@ -349,6 +358,15 @@ body.dark-theme {
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option:hover,
     .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
       background-color: $dark-ng-selected!important;
+    }
+    
+    // Azure Location dropdown scrollbar styling in ::ng-deep
+    .ng-dropdown-panel .ng-dropdown-panel-items ::-webkit-scrollbar-track-piece {
+      background-color: $dark-select-component !important;
+    }
+    
+    .ng-dropdown-panel .ng-dropdown-panel-items ::-webkit-scrollbar-track {
+      background-color: $dark-select-component !important;
     }
     
     .mat-slide-toggle.mat-checked .mat-slide-toggle-bar {
@@ -671,4 +689,13 @@ body.dark-theme {
       color: #DEDCDD!important;
     }
   }
+}
+
+// Force scrollbar styling for all elements in dark theme
+body.dark-theme ::-webkit-scrollbar-track-piece {
+  background-color: $dark-select-component !important;
+}
+
+body.dark-theme ::-webkit-scrollbar-track {
+  background-color: $dark-select-component !important;
 }

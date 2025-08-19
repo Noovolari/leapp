@@ -4,7 +4,7 @@ import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { BehaviorSubject } from "rxjs";
-import { MatMenuTrigger } from "@angular/material/menu";
+import { MatLegacyMenuTrigger } from "@angular/material/legacy-menu";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppService } from "../../services/app.service";
@@ -39,8 +39,8 @@ export const integrationHighlight = new BehaviorSubject<number>(-1);
   styleUrls: ["./integration-bar.component.scss"],
 })
 export class IntegrationBarComponent implements OnInit, OnDestroy {
-  @ViewChildren(MatMenuTrigger)
-  triggers: QueryList<MatMenuTrigger>;
+  @ViewChildren(MatLegacyMenuTrigger)
+  triggers: QueryList<MatLegacyMenuTrigger>;
 
   @ViewChild("ssoModalTemplate", { static: false })
   ssoModalTemplate: TemplateRef<any>;

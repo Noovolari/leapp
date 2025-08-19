@@ -1,5 +1,5 @@
 <ng-container *ngIf="selectedSession">
-  <div [matMenuTriggerFor]="menu" [style.position]="'fixed'" [style.left.px]="menuX" [style.top.px]="menuY"></div>
+  <div #menuTrigger="matMenuTrigger" [matMenuTriggerFor]="menu" [style.position]="'fixed'" [style.left.px]="menuX" [style.top.px]="menuY"></div>
   <mat-menu #menu [hasBackdrop]="false" role="menu">
     <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
 

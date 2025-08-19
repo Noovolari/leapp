@@ -91,7 +91,7 @@ body.dark-theme {
 
   .mat-menu-panel {
     border: 1px solid $dark-mat-menu;
-    background-color: $dark-modal-background;
+    background-color: $dark-modal-background !important;
 
     i, span, .mat-menu-submenu-item, polygon {
       color: $dark-main-text-color;
@@ -102,11 +102,44 @@ body.dark-theme {
     }
 
     .mat-menu-item-highlighted:not([disabled]) {
-      background-color: $dark-modal-background;
+      background-color: $dark-modal-background !important;
     }
 
     .mat-menu-item:hover {
-      background-color: $dark-modal-background;
+      background-color: $dark-modal-background !important;
+    }
+
+    .mat-menu-item {
+      background-color: $dark-modal-background !important;
+      color: $dark-main-text-color !important;
+    }
+
+    // Legacy menu items (Angular Material Legacy)
+    .mat-legacy-menu-item {
+      background-color: $dark-modal-background !important;
+      color: $dark-main-text-color !important;
+      
+      &:hover {
+        background-color: $dark-modal-background !important;
+      }
+      
+      &.mat-legacy-menu-item-highlighted {
+        background-color: $dark-modal-background !important;
+      }
+    }
+
+    // MDC-based menu items (Angular Material 15)
+    .mat-mdc-menu-item {
+      background-color: $dark-modal-background !important;
+      color: $dark-main-text-color !important;
+      
+      &:hover {
+        background-color: $dark-modal-background !important;
+      }
+      
+      &.mat-mdc-menu-item-highlighted {
+        background-color: $dark-modal-background !important;
+      }
     }
 
     .mat-checkbox-frame {
@@ -489,7 +522,7 @@ body.dark-theme {
     }
   }
   .html-content {
-    h1, h2, h3, p, ul, li, div, span,  {
+    h1, h2, h3, p, ul, li, div, span {
       color: $dark-main-text-color!important;
     }
     a {

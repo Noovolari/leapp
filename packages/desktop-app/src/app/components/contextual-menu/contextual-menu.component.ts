@@ -22,8 +22,8 @@ import { Role } from "../../services/team-service";
   styleUrls: ["./contextual-menu.component.scss"],
 })
 export class ContextualMenuComponent implements OnInit, OnDestroy {
-  @ViewChild(MatMenuTrigger)
-  public trigger: MatMenuTrigger;
+  @ViewChild("menuTrigger", { static: false })
+  public trigger!: MatMenuTrigger;
 
   public eConstants = constants;
   public eSessionStatus = SessionStatus;
@@ -69,8 +69,10 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
 
         if (sessionSelections[0].isContextualMenuOpen) {
           setTimeout(() => {
-            this.trigger.openMenu();
-            this.appService.setMenuTrigger(this.trigger);
+            if (this.trigger) {
+              this.trigger.openMenu();
+              this.appService.setMenuTrigger(this.trigger);
+            }
           }, 100);
         }
       }
@@ -81,7 +83,7 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.sessionSelectionsSubscription?.unsubscribe();
     this.fetchingSubscription?.unsubscribe();
   }

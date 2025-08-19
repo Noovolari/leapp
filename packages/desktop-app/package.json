@@ -220,7 +220,7 @@
     "stream-browserify": "3.0.0",
     "strip-ansi": "^6.0.1",
     "sudo-prompt": "~9.2.1",
-    "tar": "^6.1.11",
+    "tar": "6.2.1",
     "tslib": "^2.3.1",
     "update-electron-app": "~2.0.1",
     "uuid": "~8.3.2",

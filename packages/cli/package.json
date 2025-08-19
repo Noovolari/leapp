@@ -63,7 +63,7 @@
     "semver": "7.5.3",
     "standard-version": "^9.3.0",
     "sudo-prompt": "~9.2.1",
-    "tar": "^6.1.11",
+    "tar": "6.2.1",
     "tslib": "^2.3.1",
     "uuid": "~8.3.2",
     "wait-on": "7.2.0"

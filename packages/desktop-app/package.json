@@ -254,7 +254,7 @@
     "electron-builder-squirrel-windows": "24.13.3",
     "electron-packager": "^17.1.1",
     "electron-rebuild": "3.2.9",
-    "gushio": "0.7.2",
+    "gushio": "0.7.4",
     "husky": "^7.0.0",
     "jasmine": "^3.7.0",
     "jasmine-core": "~3.7.1",

@@ -78,7 +78,7 @@
     "eslint-config-oclif": "^4",
     "eslint-config-oclif-typescript": "^1.0.2",
     "globby": "^11",
-    "gushio": "0.7.2",
+    "gushio": "0.7.4",
     "jest": "^27.4.5",
     "prebuildify": "^5.0.0",
     "puppeteer": "~13.2.0",

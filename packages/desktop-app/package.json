@@ -182,7 +182,6 @@
     "electron-updater": "^4.3.8",
     "emoji-regex": "^8.0.0",
     "extract-zip": "~2.0.1",
-    "fix-path": "~3.0.0",
     "folder-hash": "^4.0.2",
     "follow-redirects": "1.15.6",
     "fs-extra": "~9.1.0",

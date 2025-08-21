@@ -10,6 +10,8 @@ export class ErrorService implements ErrorHandler {
   constructor(private injector: Injector) {}
 
   handleError(error: Error): void {
+    console.log("ERROREEE:", error);
+
     error = (error as any).rejection ? (error as any).rejection : error;
     const logService = this.injector.get(AppProviderService).logService;
 

@@ -24,7 +24,6 @@ export class CliNativeService implements INativeService {
   requireModule: any;
   hashElement: any;
   crypto: any;
-  fixPath: any;
   tar: any;
   fetch: any;
   systemPreferences: any;
@@ -51,7 +50,6 @@ export class CliNativeService implements INativeService {
     this.requireModule = require("require-module");
     this.hashElement = require("folder-hash");
     this.crypto = require("crypto");
-    this.fixPath = require("fix-path");
     this.tar = require("tar");
     this.fetch = require("node-fetch");
     this.systemPreferences = null as any;

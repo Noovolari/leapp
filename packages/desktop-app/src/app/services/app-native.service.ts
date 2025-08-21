@@ -40,7 +40,6 @@ export class AppNativeService implements INativeService {
   hashElement: any;
   requireModule: any;
   crypto: any;
-  fixPath: any;
   tar: any;
   fetch: any;
   ws: any;
@@ -82,7 +81,6 @@ export class AppNativeService implements INativeService {
       this.requireModule = window.require("require-module");
       this.hashElement = window.require("folder-hash");
       this.crypto = window.require("crypto");
-      this.fixPath = window.require("fix-path");
       this.tar = window.require("tar");
       this.fetch = window.fetch.bind(window);
       this.ws = window.require("ws");

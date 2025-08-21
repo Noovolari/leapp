@@ -26,7 +26,7 @@
     "eslint-plugin-jsdoc": "latest",
     "eslint-plugin-prefer-arrow": "latest",
     "eslint-plugin-prettier": "^4.0.0",
-    "gushio": "^0.7.2",
+    "gushio": "0.7.4",
     "husky": "^7.0.0",
     "lint-staged": "15.5.2",
     "prettier": "^2.5.1",

@@ -4,10 +4,10 @@ import {
   StartDeviceAuthorizationResponse,
   VerificationResponse,
 } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
-import puppeteer from "puppeteer";
+const puppeteer = require("puppeteer");
 
 export class CliAwsSsoOidcVerificationWindowService implements IAwsSsoOidcVerificationWindowService {
-  private browser: puppeteer.Browser;
+  private browser: any;
 
   async openVerificationWindow(
     registerClientResponse: RegisterClientResponse,
@@ -37,7 +37,7 @@ export class CliAwsSsoOidcVerificationWindowService implements IAwsSsoOidcVerifi
     await this.browser.close();
   }
 
-  private async getNavigationPage(): Promise<puppeteer.Page> {
+  private async getNavigationPage(): Promise<any> {
     this.browser = await puppeteer.launch({ headless: false, devtools: false });
     const pages = await this.browser.pages();
     const page = pages.length > 0 ? pages[0] : await this.browser.newPage();

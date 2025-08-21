@@ -1,11 +1,11 @@
-import puppeteer from "puppeteer";
+const puppeteer = require("puppeteer");
 import { IAwsSamlAuthenticationService } from "@noovolari/leapp-core/interfaces/i-aws-saml-authentication-service";
 import { AwsSamlAssertionExtractionService } from "@noovolari/leapp-core/services/aws-saml-assertion-extraction-service";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import { LoggedException, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 export class CliAwsSamlAuthenticationService implements IAwsSamlAuthenticationService {
-  private browser: puppeteer.Browser;
+  private browser: any;
 
   constructor(private awsSamlAssertionExtractionService: AwsSamlAssertionExtractionService) {}
 
@@ -14,7 +14,7 @@ export class CliAwsSamlAuthenticationService implements IAwsSamlAuthenticationSe
     return new Promise(async (resolve, reject) => {
       const page = await this.getNavigationPage(true);
 
-      page.on("request", async (request) => {
+      page.on("request", async (request: any) => {
         if (request.isInterceptResolutionHandled()) {
           reject("request unexpectedly already handled");
           return;
@@ -41,7 +41,7 @@ export class CliAwsSamlAuthenticationService implements IAwsSamlAuthenticationSe
     return new Promise(async (resolve, reject) => {
       const page = await this.getNavigationPage(!needToAuthenticate);
 
-      page.on("request", async (request) => {
+      page.on("request", async (request: any) => {
         if (request.isInterceptResolutionHandled()) {
           reject("request unexpectedly already handled");
           return;
@@ -78,7 +78,7 @@ export class CliAwsSamlAuthenticationService implements IAwsSamlAuthenticationSe
     }
   }
 
-  async getNavigationPage(headlessMode: boolean): Promise<puppeteer.Page> {
+  async getNavigationPage(headlessMode: boolean): Promise<any> {
     this.browser = await puppeteer.launch({ headless: headlessMode, devtools: false });
     const pages = await this.browser.pages();
     const page = pages.length > 0 ? pages[0] : await this.browser.newPage();

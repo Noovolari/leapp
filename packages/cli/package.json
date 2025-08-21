@@ -24,7 +24,7 @@
     "@types/node-ipc": "9.2.0",
     "@types/uuid": "^8.3.0",
     "assert": "2.0.0",
-    "axios": "1.6.2",
+    "axios": "1.11.0",
     "chdir": "0.0.0",
     "class-transformer": "^0.4.0",
     "class-validator": "^0.14.0",

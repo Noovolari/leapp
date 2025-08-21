@@ -67,6 +67,12 @@ const buildAutoUpdater = (win: any): void => {
   autoUpdater.allowDowngrade = false;
   autoUpdater.allowPrerelease = false;
   autoUpdater.autoDownload = false;
+  
+  // Force dev update config for testing auto-updater in development
+  if (!environment.production) {
+    autoUpdater.forceDevUpdateConfig = true;
+    console.log("[AUTO-UPDATER] Forcing dev update config for testing");
+  }
 
   const minutes = 10;
 
@@ -77,13 +83,34 @@ const buildAutoUpdater = (win: any): void => {
   };
   autoUpdater.setFeedURL(data);
 
-  autoUpdater.checkForUpdates().then((_) => {});
+  autoUpdater.checkForUpdates().then((_) => {
+    console.log("[AUTO-UPDATER] Initial update check completed");
+  }).catch((error) => {
+    console.log("[AUTO-UPDATER] Initial update check failed:", error);
+  });
   setInterval(() => {
-    autoUpdater.checkForUpdates().then((_) => {});
+    autoUpdater.checkForUpdates().then((_) => {
+      console.log("[AUTO-UPDATER] Periodic update check completed");
+    }).catch((error) => {
+      console.log("[AUTO-UPDATER] Periodic update check failed:", error);
+    });
   }, 1000 * 60 * minutes);
 
   autoUpdater.on("update-available", (info) => {
+    console.log("[AUTO-UPDATER] Update available:", info);
     win.webContents.send("UPDATE_AVAILABLE", info);
+  });
+
+  autoUpdater.on("update-not-available", (info) => {
+    console.log("[AUTO-UPDATER] Update not available:", info);
+  });
+
+  autoUpdater.on("error", (err) => {
+    console.log("[AUTO-UPDATER] Error:", err);
+  });
+
+  autoUpdater.on("checking-for-update", () => {
+    console.log("[AUTO-UPDATER] Checking for updates...");
   });
 };
 

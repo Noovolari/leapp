@@ -50,7 +50,7 @@
     "node-ipc": "9.2.1",
     "node-log-rotate": "~0.1.5",
     "node-machine-id": "~1.1.12",
-    "oclif": "3.6.1",
+    "oclif": "4.22.12",
     "open": "^8.4.0",
     "ps-list": "^8.1.0",
     "ps-node": "^0.1.6",

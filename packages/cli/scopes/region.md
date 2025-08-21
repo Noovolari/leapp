@@ -21,6 +21,8 @@ EXAMPLES
   $leapp region get-default
 ```
 
+_See code: [src/commands/region/get-default.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/region/get-default.ts)_
+
 ## `leapp region set-default`
 
 Change the default region
@@ -40,3 +42,5 @@ EXAMPLES
 
   $leapp region set-default --region AWSREGION
 ```
+
+_See code: [src/commands/region/set-default.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/region/set-default.ts)_

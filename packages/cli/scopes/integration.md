@@ -39,6 +39,8 @@ EXAMPLES
   $leapp integration create --integrationType AZURE --integrationAlias ALIAS --integrationTenantId TENANT --integrationLocation LOCATION
 ```
 
+_See code: [src/commands/integration/create.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/integration/create.ts)_
+
 ## `leapp integration delete`
 
 Delete an integration
@@ -59,6 +61,8 @@ EXAMPLES
   $leapp integration delete --integrationId ID
 ```
 
+_See code: [src/commands/integration/delete.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/integration/delete.ts)_
+
 ## `leapp integration list`
 
 Show integrations list
@@ -69,15 +73,15 @@ USAGE
     [--csv | --no-truncate]] [--no-header | ]
 
 FLAGS
-  -x, --extended     show extra columns
-  --columns=<value>  only show provided columns (comma-separated)
-  --csv              output is csv format [alias: --output=csv]
-  --filter=<value>   filter property by partial string matching, ex: name=foo
-  --no-header        hide table header from output
-  --no-truncate      do not truncate output to fit screen
-  --output=<option>  output in a more machine friendly format
-                     <options: csv|json|yaml>
-  --sort=<value>     property to sort by (prepend '-' for descending)
+  -x, --extended         show extra columns
+      --columns=<value>  only show provided columns (comma-separated)
+      --csv              output is csv format [alias: --output=csv]
+      --filter=<value>   filter property by partial string matching, ex: name=foo
+      --no-header        hide table header from output
+      --no-truncate      do not truncate output to fit screen
+      --output=<option>  output in a more machine friendly format
+                         <options: csv|json|yaml>
+      --sort=<value>     property to sort by (prepend '-' for descending)
 
 DESCRIPTION
   Show integrations list
@@ -85,6 +89,8 @@ DESCRIPTION
 EXAMPLES
   $leapp integration list
 ```
+
+_See code: [src/commands/integration/list.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/integration/list.ts)_
 
 ## `leapp integration login`
 
@@ -106,6 +112,8 @@ EXAMPLES
   $leapp integration login --integrationId ID
 ```
 
+_See code: [src/commands/integration/login.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/integration/login.ts)_
+
 ## `leapp integration logout`
 
 Logout from an integration
@@ -126,6 +134,8 @@ EXAMPLES
   $leapp integration logout --integrationId ID
 ```
 
+_See code: [src/commands/integration/logout.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/integration/logout.ts)_
+
 ## `leapp integration sync`
 
 Synchronize integration sessions
@@ -145,3 +155,5 @@ EXAMPLES
 
   $leapp integration sync --integrationId ID
 ```
+
+_See code: [src/commands/integration/sync.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/integration/sync.ts)_

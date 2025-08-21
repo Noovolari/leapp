@@ -22,6 +22,8 @@ EXAMPLES
   $leapp team login
 ```
 
+_See code: [src/commands/team/login.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/team/login.ts)_
+
 ## `leapp team logout`
 
 Logout from your Team account
@@ -37,6 +39,8 @@ EXAMPLES
   $leapp team logout
 ```
 
+_See code: [src/commands/team/logout.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/team/logout.ts)_
+
 ## `leapp team status`
 
 Get the team login status
@@ -51,3 +55,5 @@ DESCRIPTION
 EXAMPLES
   $leapp team status
 ```
+
+_See code: [src/commands/team/status.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/team/status.ts)_

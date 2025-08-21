@@ -62,6 +62,8 @@ EXAMPLES
   $leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY (--mfaDevice MFADEVICEARN)
 ```
 
+_See code: [src/commands/session/add.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/add.ts)_
+
 ## `leapp session change-profile`
 
 Change a session named-profile
@@ -83,6 +85,8 @@ EXAMPLES
   $leapp session change-profile --profileId PROFILEID --sessionId SESSIONID
 ```
 
+_See code: [src/commands/session/change-profile.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/change-profile.ts)_
+
 ## `leapp session change-region`
 
 Change a session region
@@ -103,6 +107,8 @@ EXAMPLES
 
   $leapp session change-region --sessionId SESSIONID --region REGION
 ```
+
+_See code: [src/commands/session/change-region.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/change-region.ts)_
 
 ## `leapp session current`
 
@@ -129,6 +135,8 @@ EXAMPLES
   $leapp session current --format "alias accountNumber" --inline --provider aws
 ```
 
+_See code: [src/commands/session/current.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/current.ts)_
+
 ## `leapp session delete`
 
 Delete a session
@@ -138,8 +146,8 @@ USAGE
   $ leapp session delete [--sessionId <value>] [-f]
 
 FLAGS
-  -f, --force          force a command without asking for confirmation (-f, --force)
-  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
+  -f, --force              force a command without asking for confirmation (-f, --force)
+      --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
   Delete a session
@@ -151,6 +159,8 @@ EXAMPLES
 
   $leapp session delete --sessionId SESSIONID [--force, -f]
 ```
+
+_See code: [src/commands/session/delete.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/delete.ts)_
 
 ## `leapp session generate SESSIONID`
 
@@ -170,6 +180,8 @@ EXAMPLES
   $leapp session generate 0a1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d
 ```
 
+_See code: [src/commands/session/generate.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/generate.ts)_
+
 ## `leapp session get-id`
 
 Get session id
@@ -185,6 +197,8 @@ EXAMPLES
   $leapp session get-id
 ```
 
+_See code: [src/commands/session/get-id.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/get-id.ts)_
+
 ## `leapp session list`
 
 Show sessions list with all properties; filter query is case sensitive
@@ -195,15 +209,15 @@ USAGE
     [--csv | --no-truncate]] [--no-header | ]
 
 FLAGS
-  -x, --extended     show extra columns
-  --columns=<value>  only show provided columns (comma-separated)
-  --csv              output is csv format [alias: --output=csv]
-  --filter=<value>   filter property by partial string matching, ex: name=foo
-  --no-header        hide table header from output
-  --no-truncate      do not truncate output to fit screen
-  --output=<option>  output in a more machine friendly format
-                     <options: csv|json|yaml>
-  --sort=<value>     property to sort by (prepend '-' for descending)
+  -x, --extended         show extra columns
+      --columns=<value>  only show provided columns (comma-separated)
+      --csv              output is csv format [alias: --output=csv]
+      --filter=<value>   filter property by partial string matching, ex: name=foo
+      --no-header        hide table header from output
+      --no-truncate      do not truncate output to fit screen
+      --output=<option>  output in a more machine friendly format
+                         <options: csv|json|yaml>
+      --sort=<value>     property to sort by (prepend '-' for descending)
 
 DESCRIPTION
   Show sessions list with all properties; filter query is case sensitive
@@ -224,6 +238,8 @@ EXAMPLES
   $leapp session list --filter="Status=Foo"
 ```
 
+_See code: [src/commands/session/list.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/list.ts)_
+
 ## `leapp session open-web-console`
 
 Open an AWS Web Console
@@ -233,8 +249,8 @@ USAGE
   $ leapp session open-web-console [--sessionId <value>] [-p]
 
 FLAGS
-  -p, --print          Print an AWS Web Console login URL in the terminal instead of opening the web browser
-  --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
+  -p, --print              Print an AWS Web Console login URL in the terminal instead of opening the web browser
+      --sessionId=<value>  Session Id to identify the session in Leapp, recover it with $leapp session list -x
 
 DESCRIPTION
   Open an AWS Web Console
@@ -244,6 +260,8 @@ EXAMPLES
 
   $leapp session open-web-console --sessionId SESSIONID [--print, -p]
 ```
+
+_See code: [src/commands/session/open-web-console.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/open-web-console.ts)_
 
 ## `leapp session run-aws-credential-plugin`
 
@@ -265,6 +283,8 @@ EXAMPLES
 
   $leapp session run-plugin --sessionName SESSIONAME --pluginName PLUGINNAME
 ```
+
+_See code: [src/commands/session/run-aws-credential-plugin.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/run-aws-credential-plugin.ts)_
 
 ## `leapp session start [SESSIONNAME]`
 
@@ -298,6 +318,8 @@ EXAMPLES
   $leapp session start --sessionId SESSIONID
 ```
 
+_See code: [src/commands/session/start.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/start.ts)_
+
 ## `leapp session start-ssm-session`
 
 Start an AWS SSM session
@@ -319,6 +341,8 @@ EXAMPLES
 
   $leapp session start-ssm-session --sessionId SESSIONID --region AWSREGION --ssmInstanceId EC2INSTANCEID
 ```
+
+_See code: [src/commands/session/start-ssm-session.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/start-ssm-session.ts)_
 
 ## `leapp session stop [SESSIONNAME]`
 
@@ -351,3 +375,5 @@ EXAMPLES
 
   $leapp session stop --sessionId SESSIONID
 ```
+
+_See code: [src/commands/session/stop.ts](https://github.com/noovolari/leapp/blob/v0.1.65/src/commands/session/stop.ts)_

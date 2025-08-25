@@ -65,7 +65,7 @@
     "tar": "6.2.1",
     "tslib": "^2.3.1",
     "uuid": "~8.3.2",
-    "wait-on": "7.2.0"
+    "wait-on": "8.0.3"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.16.5",

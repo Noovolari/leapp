@@ -53,7 +53,7 @@
     "rimraf": "~3.0.2",
     "rxjs": "~6.6.7",
     "saml-encoder-decoder-js": "~1.0.1",
-    "semver": "7.5.3",
+    "semver": "7.7.2",
     "standard-version": "^9.3.0",
     "sudo-prompt": "~9.2.1",
     "tar": "6.2.1",

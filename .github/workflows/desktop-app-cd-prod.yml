@@ -116,7 +116,7 @@ jobs:
           powershell "Compress-Archive './release/' './release/Leapp-windows-release.zip'"
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Leapp-windows-release.zip
           path: packages/desktop-app/release/Leapp-windows-release.zip

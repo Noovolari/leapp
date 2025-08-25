@@ -95,7 +95,7 @@ jobs:
           TAG_VERSION=$(cat nightly-version)
           echo "::set-output name=TAG_VERSION::$TAG_VERSION"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Leapp-${{ steps.release.outputs.TAG_VERSION }}-win.zip
           path: packages/desktop-app/release/Leapp-${{ steps.release.outputs.TAG_VERSION }}-win.zip
@@ -137,12 +137,12 @@ jobs:
           TAG_VERSION=$(cat nightly-version)
           echo "::set-output name=TAG_VERSION::$TAG_VERSION"
       - name: Upload artifacts (.deb)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Leapp-${{ steps.release.outputs.TAG_VERSION }}_amd64.deb
           path: packages/desktop-app/release/Leapp_${{ steps.release.outputs.TAG_VERSION }}_amd64.deb
       - name: Upload artifacts (.AppImage)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Leapp-${{ steps.release.outputs.TAG_VERSION }}.AppImage
           path: packages/desktop-app/release/Leapp-${{ steps.release.outputs.TAG_VERSION }}.AppImage
@@ -221,7 +221,7 @@ jobs:
           TAG_VERSION=$(cat nightly-version)
           echo "::set-output name=TAG_VERSION::$TAG_VERSION"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Leapp-${{ steps.release.outputs.TAG_VERSION }}.dmg
           path: packages/desktop-app/release/Leapp-${{ steps.release.outputs.TAG_VERSION }}.dmg
@@ -301,7 +301,7 @@ jobs:
           TAG_VERSION=$(cat nightly-version)
           echo "::set-output name=TAG_VERSION::$TAG_VERSION"
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: Leapp-${{ steps.release.outputs.TAG_VERSION }}-arm64.dmg
           path: packages/desktop-app/release/Leapp-${{ steps.release.outputs.TAG_VERSION }}-arm64.dmg

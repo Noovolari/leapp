@@ -23,7 +23,7 @@ const authenticationUrlRegexes = new Map([
 ]);
 
 const samlAssertionRegexes = new Map([
-  [CloudProviderType.aws, [/^https:\/\/signin\.aws\.amazon\.com\/saml/, /^https:\/\/signin\.amazonaws-us-gov\.com\/saml/]],
+  [CloudProviderType.aws, [/^https:\/\/signin\.aws\.amazon\.com\/saml/, /^https:\/\/signin\.amazonaws-us-gov\.com\/saml/, /^https:\/\/signin\.amazonaws\.cn\/saml/]],
 ]);
 
 export class AwsSamlAssertionExtractionService {

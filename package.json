@@ -12,7 +12,7 @@
     "@angular-eslint/builder": "13.1.0",
     "@angular-eslint/eslint-plugin": "13.1.0",
     "@angular-eslint/eslint-plugin-template": "13.1.0",
-    "@angular-eslint/schematics": "13.1.0",
+    "@angular-eslint/schematics": "20.2.0",
     "@angular-eslint/template-parser": "13.1.0",
     "@angular/compiler": "13.2.2",
     "@commitlint/cli": "19.8.1",

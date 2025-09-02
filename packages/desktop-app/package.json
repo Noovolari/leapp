@@ -230,7 +230,7 @@
     "jackspeak": "3.4.3"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "15.2.9",
+    "@angular-devkit/build-angular": "20.2.0",
     "@angular-eslint/builder": "15.2.1",
     "@angular-eslint/eslint-plugin": "15.2.1",
     "@angular-eslint/eslint-plugin-template": "15.2.1",
@@ -266,7 +266,7 @@
     "karma-jasmine": "~4.0.1",
     "karma-jasmine-html-reporter": "~1.5.4",
     "karma-requirejs": "^1.1.0",
-    "ng-packagr": "15.2.2",
+    "ng-packagr": "20.2.0",
     "node-abi": "^2.26.0",
     "nyc": "^15.1.0",
     "protractor": "^7.0.0",

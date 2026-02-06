@@ -8,11 +8,10 @@
   "description": "Leapp dpapi addon.",
   "main": "dpapi-addon/Dpapi.js",
   "homepage": "https://github.com/Noovolari/leapp",
-  "scripts": {
-  },
+  "scripts": {},
   "dependencies": {
     "bindings": "^1.5.0",
-    "nan": "^2.13.2"
+    "nan": "^2.25.0"
   },
   "devDependencies": {
     "electron-rebuild": "3.2.3"

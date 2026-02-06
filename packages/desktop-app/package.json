@@ -1,6 +1,6 @@
 {
   "name": "Leapp",
-  "version": "0.26.1",
+  "version": "0.26.2-alpha.0",
   "private": true,
   "author": {
     "name": "Noovolari",
@@ -108,8 +108,8 @@
     },
     "mac": {
       "icon": "src/assets/images/Leapp.icns",
-      "forceCodeSigning": true,
-      "notarize": true,
+      "forceCodeSigning": false,
+      "notarize": false,
       "hardenedRuntime": true,
       "entitlements": "./build/entitlements.mac.plist",
       "entitlementsInherit": "./build/entitlements.mac.plist",

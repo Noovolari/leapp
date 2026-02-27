@@ -18,6 +18,7 @@ const authenticationUrlRegexes = new Map([
       /^https:\/\/.*[/auth]?\/realms\/.*\/protocol\/saml\/clients\/.*/,
       /^https:\/\/console\.jumpcloud\.com\/login.*/,
       /^https:\/\/accounts\.google\.com\/AccountChooser.*/,
+      /^https:\/\/github\..+\/login\/oauth\/authorize.*/,
     ],
   ],
 ]);

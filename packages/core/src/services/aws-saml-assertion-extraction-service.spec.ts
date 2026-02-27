@@ -38,6 +38,11 @@ describe("AwsSamlAssertionExtractionService", () => {
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://XX/realms/XX/protocol/saml/clients/XX")).toBe(true);
 
     expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://console.jumpcloud.com/login.mocked-suffix")).toBe(true);
+
+    /* Tests for GitHub OAuth Identity Providers */
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://github.XX/login/oauth/authorize")).toBe(true);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://github.XX/login")).toBe(false);
+    expect(service.isAuthenticationUrl(CloudProviderType.aws, "https://github.XX")).toBe(false);
   });
 
   test("isSamlAssertionUrl", () => {

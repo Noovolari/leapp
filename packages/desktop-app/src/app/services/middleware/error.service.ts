@@ -13,12 +13,21 @@ export class ErrorService implements ErrorHandler {
     console.log("ERROREEE:", error);
 
     error = (error as any).rejection ? (error as any).rejection : error;
-    const logService = this.injector.get(AppProviderService).logService;
 
-    if (error instanceof LoggedException) {
-      logService.log(error);
-    } else {
-      logService.log(new LoggedEntry(error.message, this, LogLevel.error, true, error.stack));
+    try {
+      const logService = this.injector.get(AppProviderService)?.logService;
+      if (!logService || typeof logService.log !== "function") {
+        console.error("[Leapp] ErrorService: logService unavailable; original error:", error);
+        return;
+      }
+
+      if (error instanceof LoggedException) {
+        logService.log(error);
+      } else {
+        logService.log(new LoggedEntry(error.message, this, LogLevel.error, true, error.stack));
+      }
+    } catch (secondaryError) {
+      console.error("[Leapp] ErrorService.handleError failed; original error:", error, secondaryError);
     }
   }
 }

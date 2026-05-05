@@ -37,7 +37,7 @@ export class Workspace {
   private _segments: Segment[];
 
   private _colorTheme: string;
-  private _extensionEnabled: boolean;
+  private _multiSessionHintShown: boolean;
 
   private _requirePassword: number;
   private _touchIdEnabled: boolean;
@@ -69,8 +69,6 @@ export class Workspace {
     this._profiles = [{ id: uuid.v4(), name: constants.defaultAwsProfileName }];
     this._remoteWorkspacesSettingsMap = {};
     this._pluginsStatus = [];
-    this._extensionEnabled = false;
-
     this._awsSsoIntegrations = [];
     this._azureIntegrations = [];
 
@@ -234,12 +232,12 @@ export class Workspace {
     this._ssmRegionBehaviour = ssmRegionBehaviour;
   }
 
-  get extensionEnabled(): boolean {
-    return this._extensionEnabled;
+  get multiSessionHintShown(): boolean {
+    return this._multiSessionHintShown;
   }
 
-  set extensionEnabled(extensionEnabled: boolean) {
-    this._extensionEnabled = extensionEnabled;
+  set multiSessionHintShown(value: boolean) {
+    this._multiSessionHintShown = value;
   }
 
   get samlRoleSessionDuration(): number {

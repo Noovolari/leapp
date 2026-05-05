@@ -10,7 +10,6 @@ import { constants } from "@noovolari/leapp-core/models/constants";
 import { OptionsService } from "../../services/options.service";
 import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-credentials-plugin";
 import { SelectedSessionActionsService } from "../../services/selected-session-actions.service";
-import { ExtensionWebsocketService, FetchingState } from "../../services/extension-websocket.service";
 import { Subscription } from "rxjs";
 import { AnalyticsService } from "../../services/analytics.service";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
@@ -31,16 +30,13 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
   public selectedSession: Session;
   public menuX: number;
   public menuY: number;
-  public isWebConsoleFetching: boolean;
   private sessionSelectionsSubscription: Subscription;
-  private fetchingSubscription: Subscription;
 
   constructor(
     public appService: AppService,
     public optionsService: OptionsService,
     public appProviderService: AppProviderService,
     private selectedSessionActionsService: SelectedSessionActionsService,
-    private extensionWebsocketService: ExtensionWebsocketService,
     private readonly analyticsService: AnalyticsService
   ) {}
 
@@ -77,15 +73,10 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
         }
       }
     );
-
-    this.fetchingSubscription = this.extensionWebsocketService.fetching$.subscribe((value) => {
-      this.isWebConsoleFetching = value !== FetchingState.notFetching;
-    });
   }
 
   ngOnDestroy(): void {
     this.sessionSelectionsSubscription?.unsubscribe();
-    this.fetchingSubscription?.unsubscribe();
   }
 
   async startSession(): Promise<void> {
@@ -120,14 +111,9 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
   }
 
   async openAwsWebConsole(): Promise<void> {
-    if (this.optionsService.extensionEnabled) {
-      await this.extensionWebsocketService.openWebConsoleWithExtension(this.selectedSession);
-    } else {
-      await this.selectedSessionActionsService.openAwsWebConsole(this.selectedSession);
-    }
+    await this.selectedSessionActionsService.openAwsWebConsole(this.selectedSession);
 
     await this.analyticsService.captureEvent("Web Console opened", {
-      withExtension: this.optionsService.extensionEnabled,
       sessionType: this.selectedSession.type,
       sessionId: this.selectedSession.sessionId,
       startedAt: new Date().toISOString(),

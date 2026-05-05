@@ -28,7 +28,6 @@ import { IntegrationIsOnlineStateRefreshService } from "@noovolari/leapp-core/se
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
 import { AzureCoreService } from "@noovolari/leapp-core/services/azure-core-service";
 import { PluginManagerService } from "@noovolari/leapp-core/plugin-sdk/plugin-manager-service";
-import { ExtensionWebsocketService } from "./services/extension-websocket.service";
 import { TeamService, Role } from "./services/team-service";
 import { AnalyticsService } from "./services/analytics.service";
 
@@ -70,7 +69,6 @@ export class AppComponent implements OnInit {
     private updaterService: UpdaterService,
     private windowService: WindowService,
     private appNativeService: AppNativeService,
-    private extensionWebsocketService: ExtensionWebsocketService,
     private analyticsService: AnalyticsService
   ) {
     appProviderService.mfaCodePrompter = mfaCodePrompter;
@@ -217,9 +215,6 @@ export class AppComponent implements OnInit {
       this.analyticsService.init(this.teamService.signedInUserState.getValue());
       await this.router.navigate(["/dashboard"]);
     }
-
-    // Start the websocket server for the Leapp Browser Extension
-    this.extensionWebsocketService.bootstrap();
 
     (async (): Promise<void> => this.remoteProceduresServer.startServer())();
   }

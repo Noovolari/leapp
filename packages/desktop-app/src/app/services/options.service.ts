@@ -127,15 +127,15 @@ export class OptionsService {
     this.workspaceService.persistWorkspace(workspace);
   }
 
-  set extensionEnabled(value: boolean) {
+  get multiSessionHintShown(): boolean {
     const workspace = this.workspaceService.getWorkspace();
-    workspace.extensionEnabled = value;
-    this.workspaceService.persistWorkspace(workspace);
+    return workspace.multiSessionHintShown;
   }
 
-  get extensionEnabled(): boolean {
+  set multiSessionHintShown(value: boolean) {
     const workspace = this.workspaceService.getWorkspace();
-    return workspace.extensionEnabled;
+    workspace.multiSessionHintShown = value;
+    this.workspaceService.persistWorkspace(workspace);
   }
 
   get samlRoleSessionDuration(): number {

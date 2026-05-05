@@ -28,7 +28,6 @@ export class WebConsoleService {
     }
 
     const federationUrl = `${signInUrl}/federation`;
-    const oAuthUrl = `${signInUrl}/oauth`;
 
     if (sessionRegion.startsWith("cn-")) {
       throw new Error("Unsupported Region");
@@ -49,17 +48,13 @@ export class WebConsoleService {
     const res = await this.nativeService.fetch(`${federationUrl}${queryParametersSigninToken}`);
     const response = await res.json();
 
-    const redirectUrl = new URL(federationUrl);
-    redirectUrl.searchParams.append("Action", "login");
-    redirectUrl.searchParams.append("Issuer", "Leapp");
-    redirectUrl.searchParams.append("Destination", consoleHomeUrl);
-    redirectUrl.searchParams.append("SigninToken", (response as any).SigninToken);
+    const loginUrl = new URL(federationUrl);
+    loginUrl.searchParams.append("Action", "login");
+    loginUrl.searchParams.append("Issuer", "Leapp");
+    loginUrl.searchParams.append("Destination", consoleHomeUrl);
+    loginUrl.searchParams.append("SigninToken", (response as any).SigninToken);
 
-    const webConsoleUrl = new URL(oAuthUrl);
-    webConsoleUrl.searchParams.append("Action", "logout");
-    webConsoleUrl.searchParams.append("redirect_uri", redirectUrl.toString());
-
-    return webConsoleUrl.toString();
+    return loginUrl.toString();
   }
 
   async openWebConsole(

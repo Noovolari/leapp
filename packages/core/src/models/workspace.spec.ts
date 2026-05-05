@@ -16,7 +16,7 @@ describe("Workspace Model", () => {
         '{"_sessions":[],"_awsSsoIntegrations":[],"_azureIntegrations":[],"_defaultRegion":"us-east-1",' +
           '"_defaultLocation":"eastus","_macOsTerminal":"Terminal","_idpUrls":[],"_profiles":[{"name":"default"}],' +
           '"_remoteWorkspacesSettingsMap":{},' +
-          '"_notifications":[],"_pluginsStatus":[],"_pinned":[],"_folders":[],"_segments":[],"_extensionEnabled":false,' +
+          '"_notifications":[],"_pluginsStatus":[],"_pinned":[],"_folders":[],"_segments":[],' +
           '"_proxyConfiguration":{"proxyProtocol":"https","proxyPort":"8080"},' +
           '"_credentialMethod":"credential-file-method","_samlRoleSessionDuration":3600,"_ssmRegionBehaviour":"No"}'
       );
@@ -293,18 +293,6 @@ describe("Workspace Model", () => {
     const mock = "any";
     workspace.ssmRegionBehaviour = mock;
     expect(mock).toStrictEqual((workspace as any)._ssmRegionBehaviour);
-  });
-
-  test("extensionEnabled", () => {
-    const workspace = new Workspace();
-    expect(workspace.extensionEnabled).toStrictEqual((workspace as any)._extensionEnabled);
-  });
-
-  test("set extensionEnabled", () => {
-    const workspace = new Workspace();
-    const mock = false;
-    workspace.extensionEnabled = mock;
-    expect(mock).toStrictEqual((workspace as any)._extensionEnabled);
   });
 
   test("get notifications", () => {

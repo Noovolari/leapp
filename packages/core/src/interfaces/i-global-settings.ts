@@ -11,8 +11,8 @@ export interface GlobalSettings {
   pinned: string[];
   segments: Segment[];
   colorTheme: string;
-  extensionEnabled: boolean;
   credentialMethod: string;
+  multiSessionHintShown: boolean;
   samlRoleSessionDuration: number;
   ssmRegionBehaviour: string;
   notifications: LeappNotification[];

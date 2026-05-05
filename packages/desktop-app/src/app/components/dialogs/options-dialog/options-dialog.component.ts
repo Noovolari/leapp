@@ -102,8 +102,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   selectedCredentialMethod: string;
   webConsoleSessionDuration: number;
 
-  extensionEnabled: boolean;
-
   eEnabledLeappPlanStatus = LeappPlanStatus;
   leappStatusSubscription: Subscription;
   leappPlanStatus;
@@ -137,8 +135,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.selectedRequirePassword = this.optionsService.requirePassword || constants.requirePasswordEveryTwoWeeks.value;
 
     this.selectedTouchIdEnabled = this.optionsService.touchIdEnabled ?? constants.touchIdEnabled;
-
-    this.extensionEnabled = this.optionsService.extensionEnabled || false;
 
     this.exporting = false;
 
@@ -577,11 +573,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   openPluginFolder(): void {
     this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
     this.appNativeService.shell.showItemInFolder(this.appNativeService.path.join(this.appNativeService.os.homedir(), ".Leapp", "plugins"));
-  }
-
-  toggleExtension(): void {
-    this.extensionEnabled = !this.extensionEnabled;
-    this.optionsService.extensionEnabled = this.extensionEnabled;
   }
 
   openLeappProPreCheckoutDialog(): void {

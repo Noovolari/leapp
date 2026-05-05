@@ -464,9 +464,9 @@ export class Repository {
     return {
       colorTheme: workspace.colorTheme,
       credentialMethod: workspace.credentialMethod,
+      multiSessionHintShown: workspace.multiSessionHintShown,
       defaultLocation: workspace.defaultLocation,
       defaultRegion: workspace.defaultRegion,
-      extensionEnabled: workspace.extensionEnabled,
       macOsTerminal: workspace.macOsTerminal,
       pluginsStatus: workspace.pluginsStatus,
       samlRoleSessionDuration: workspace.samlRoleSessionDuration,
@@ -484,9 +484,9 @@ export class Repository {
     const workspace = this.getWorkspace();
     workspace.colorTheme = globalSettingsInput.colorTheme;
     workspace.credentialMethod = globalSettingsInput.credentialMethod;
+    workspace.multiSessionHintShown = globalSettingsInput.multiSessionHintShown;
     workspace.defaultLocation = globalSettingsInput.defaultLocation;
     workspace.defaultRegion = globalSettingsInput.defaultRegion;
-    workspace.extensionEnabled = globalSettingsInput.extensionEnabled;
     workspace.macOsTerminal = globalSettingsInput.macOsTerminal;
     workspace.pluginsStatus = globalSettingsInput.pluginsStatus;
     workspace.samlRoleSessionDuration = globalSettingsInput.samlRoleSessionDuration;

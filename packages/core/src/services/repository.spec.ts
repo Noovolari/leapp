@@ -1316,9 +1316,9 @@ describe("Repository", () => {
   test("globalSettings, getter", () => {
     mockedWorkspace.colorTheme = "mock-theme";
     mockedWorkspace.credentialMethod = "mock-credential-method";
+    mockedWorkspace.multiSessionHintShown = "mock-multi-session-hint-shown";
     mockedWorkspace.defaultLocation = "mock-default-location";
     mockedWorkspace.defaultRegion = "mock-default-region";
-    mockedWorkspace.extensionEnabled = "mock-extension-enabled";
     mockedWorkspace.macOsTerminal = "mock-terminal";
     mockedWorkspace.pluginsStatus = "mock-plugin-status";
     mockedWorkspace.samlRoleSessionDuration = "mock-saml-role-session-duration";
@@ -1332,9 +1332,9 @@ describe("Repository", () => {
     expect(result).toEqual({
       colorTheme: "mock-theme",
       credentialMethod: "mock-credential-method",
+      multiSessionHintShown: "mock-multi-session-hint-shown",
       defaultLocation: "mock-default-location",
       defaultRegion: "mock-default-region",
-      extensionEnabled: "mock-extension-enabled",
       macOsTerminal: "mock-terminal",
       notifications: mockedNotifications,
       pluginsStatus: "mock-plugin-status",
@@ -1352,9 +1352,9 @@ describe("Repository", () => {
     const mockedGlobalSettings = {
       colorTheme: "mock-theme",
       credentialMethod: "mock-credential-method",
+      multiSessionHintShown: "mock-multi-session-hint-shown",
       defaultLocation: "mock-default-location",
       defaultRegion: "mock-default-region",
-      extensionEnabled: "mock-extension-enabled",
       macOsTerminal: "mock-terminal",
       pluginsStatus: "mock-plugin-status",
       samlRoleSessionDuration: "mock-saml-role-session-duration",
@@ -1370,9 +1370,9 @@ describe("Repository", () => {
     expect(repository.getWorkspace).toHaveBeenCalled();
     expect(mockedWorkspace.colorTheme).toEqual("mock-theme");
     expect(mockedWorkspace.credentialMethod).toEqual("mock-credential-method");
+    expect(mockedWorkspace.multiSessionHintShown).toEqual("mock-multi-session-hint-shown");
     expect(mockedWorkspace.defaultLocation).toEqual("mock-default-location");
     expect(mockedWorkspace.defaultRegion).toEqual("mock-default-region");
-    expect(mockedWorkspace.extensionEnabled).toEqual("mock-extension-enabled");
     expect(mockedWorkspace.macOsTerminal).toEqual("mock-terminal");
     expect(mockedWorkspace.pluginsStatus).toEqual("mock-plugin-status");
     expect(mockedWorkspace.samlRoleSessionDuration).toEqual("mock-saml-role-session-duration");

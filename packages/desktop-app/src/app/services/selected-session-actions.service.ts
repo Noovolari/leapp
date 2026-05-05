@@ -84,6 +84,7 @@ export class SelectedSessionActionsService {
     const sessionRegion = session.region;
     const sessionDuration = this.appProviderService.workspaceService.getWorkspace().samlRoleSessionDuration;
     await this.appProviderService.webConsoleService.openWebConsole(credentials, sessionRegion, sessionDuration);
+    this.showMultiSessionHintIfNeeded();
   }
 
   async changeRegionModalOpen(session: Session): Promise<void> {
@@ -286,6 +287,20 @@ export class SelectedSessionActionsService {
         false,
         JSON.stringify({ timestamp: new Date().toISOString(), id: session.sessionId, account: session.sessionName, type: session.type }, null, 3)
       )
+    );
+  }
+
+  private showMultiSessionHintIfNeeded(): void {
+    if (this.optionService.multiSessionHintShown) {
+      return;
+    }
+    this.optionService.multiSessionHintShown = true;
+    this.messageToasterService.toast(
+      "Open up to 5 AWS accounts at once — enable <strong>multi-session</strong> in the AWS console account menu. Click to open.",
+      ToastLevel.info,
+      undefined,
+      "https://console.aws.amazon.com/",
+      8000
     );
   }
 }

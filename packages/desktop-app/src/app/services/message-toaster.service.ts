@@ -25,16 +25,16 @@ export class MessageToasterService {
    * @param title - [optional]
    * @param link - [optional]
    */
-  toast(message: string, type: ToastLevel, title?: string, link?: string): void {
+  toast(message: string, type: ToastLevel, title?: string, link?: string, duration?: number): void {
     switch (type) {
       case ToastLevel.success:
-        this.openSnackBar(message, title, "toast-success");
+        this.openSnackBar(message, title, "toast-success", undefined, duration);
         break;
       case ToastLevel.info:
-        this.openSnackBar(message, title, "toast-info");
+        this.openSnackBar(message, title, "toast-info", link, duration);
         break;
       case ToastLevel.warn:
-        this.openSnackBar(message, title, "toast-warning");
+        this.openSnackBar(message, title, "toast-warning", undefined, duration);
         break;
       // eslint-disable-next-line max-len
       case ToastLevel.error:
@@ -46,14 +46,15 @@ export class MessageToasterService {
     }
   }
 
-  private openSnackBar(message: string, _: string, className: string, link?: string) {
+  private openSnackBar(message: string, _: string, className: string, link?: string, duration?: number) {
     if (this.snackbarRef) {
       this.snackbarRef.dismiss();
     }
 
+    const defaultDuration = className === "toast-error" ? 0 : 3000;
     this.snackbarRef = this.matSnackBar.openFromComponent(SnackbarComponent, {
       data: { html: message, className, link },
-      duration: className === "toast-error" ? 0 : 3000,
+      duration: duration ?? defaultDuration,
       panelClass: [className],
       horizontalPosition: this.horizontalPosition,
       verticalPosition: this.verticalPosition,

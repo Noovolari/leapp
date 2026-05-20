@@ -96,3 +96,4 @@ nightly-version
 packages/desktop-app/projects
 
 packages/desktop-app/.sentry-token
+dpapi-addon/build

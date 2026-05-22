@@ -20,6 +20,18 @@ import { AnalyticsService } from "../../../services/analytics.service";
   styleUrls: ["./session-card.component.scss"],
 })
 export class SessionCardComponent implements OnInit {
+  private static readonly colorMap: Record<string, string> = {
+    toolbar: "#7c7c7d",
+    red: "#ff0039",
+    pink: "#ff84a3",
+    orange: "#ff9f00",
+    yellow: "#ffcb00",
+    green: "#51cd00",
+    turquoise: "#00c79a",
+    blue: "#37adff",
+    purple: "#af51f5",
+  };
+
   @Input()
   session!: Session;
 
@@ -56,6 +68,10 @@ export class SessionCardComponent implements OnInit {
   ngOnInit(): void {
     // Retrieve the singleton service for the concrete implementation of SessionService
     this.sessionService = this.selectedSessionActionService.getSelectedSessionService(this.session);
+  }
+
+  getSessionColorHex(): string | null {
+    return SessionCardComponent.colorMap[this.session?.color] ?? null;
   }
 
   /**

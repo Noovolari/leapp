@@ -158,6 +158,10 @@ export class ContextualMenuComponent implements OnInit, OnDestroy {
     await this.selectedSessionActionsService.changeProfileModalOpen(this.selectedSession);
   }
 
+  async changeColorModalOpen(): Promise<void> {
+    await this.selectedSessionActionsService.changeColorModalOpen(this.selectedSession);
+  }
+
   async copyCredentials(type: number): Promise<void> {
     await this.selectedSessionActionsService.copyCredentials(this.selectedSession, type);
   }

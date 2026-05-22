@@ -43,6 +43,7 @@ import { MatTooltipModule } from "@angular/material/tooltip";
 import { CredentialProcessDialogComponent } from "./dialogs/credential-process-dialog/credential-process-dialog.component";
 import { ChangeRegionDialogComponent } from "./dialogs/change-region-dialog/change-region-dialog.component";
 import { ChangeNamedProfileDialogComponent } from "./dialogs/change-named-profile-dialog/change-named-profile-dialog.component";
+import { ChangeColorDialogComponent } from "./dialogs/change-color-dialog/change-color-dialog.component";
 import { SsmModalDialogComponent } from "./dialogs/ssm-modal-dialog/ssm-modal-dialog.component";
 import { ContextualMenuComponent } from "./contextual-menu/contextual-menu.component";
 import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
@@ -92,6 +93,7 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     CredentialProcessDialogComponent,
     ChangeRegionDialogComponent,
     ChangeNamedProfileDialogComponent,
+    ChangeColorDialogComponent,
     SsmModalDialogComponent,
     ContextualMenuComponent,
     BottomBarComponent,

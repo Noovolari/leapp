@@ -1,0 +1,63 @@
+.color-form {
+  margin-top: 20px;
+
+  p {
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  a {
+    display: inline-block;
+    margin-left: 10px;
+  }
+}
+
+.color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.color-swatch-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  gap: 4px;
+  background: none !important;
+  border: none;
+  padding: 0;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+
+  &:focus-visible .color-swatch {
+    box-shadow: 0 0 0 3px white, 0 0 0 5px rgba(0, 0, 0, 0.4);
+  }
+
+  &:hover .color-swatch {
+    transform: scale(1.15);
+  }
+
+  &.selected .color-swatch {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 3px white, 0 0 0 5px rgba(0, 0, 0, 0.4);
+  }
+
+  &.selected .color-label {
+    font-weight: bold;
+  }
+}
+
+.color-swatch {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.color-label {
+  font-size: 9px;
+  text-transform: capitalize;
+  opacity: 0.75;
+}

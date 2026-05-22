@@ -94,9 +94,9 @@
       "desktop": {
         "desktopActions": {
           "NewWindow": {
-             "Exec": "leapp %U"
+            "Exec": "leapp %U"
           }
-       }
+        }
       },
       "target": [
         "deb",
@@ -157,7 +157,6 @@
     "@ng-select/ng-select": "10.0.4",
     "@ngx-translate/core": "14.0.0",
     "@ngx-translate/http-loader": "~6.0.0",
-    "@noovolari/dpapi-addon": "0.1.2",
     "@noovolari/leapp-core": "file:../core",
     "@smithy/fetch-http-handler": "2.4.2",
     "assert": "2.0.0",
@@ -273,5 +272,8 @@
     "ts-node": "^9.1.1",
     "typescript": "^4.9.0",
     "util": "^0.12.4"
+  },
+  "optionalDependencies": {
+    "@noovolari/dpapi-addon": "0.1.2"
   }
 }

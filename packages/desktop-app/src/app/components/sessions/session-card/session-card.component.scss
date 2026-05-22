@@ -266,6 +266,15 @@ td:nth-child(4) {
   left: -65px !important;
 }
 
+.session-color-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-left: 6px;
+  flex-shrink: 0;
+}
+
 .session-name-td {
   height: inherit;
   overflow: hidden;

@@ -100,6 +100,7 @@ export class ExtensionWebsocketService {
           sessionRole: (session as any).roleArn.split("/")[1],
           sessionRegion: session.region,
           sessionType: session.type.toString().startsWith("aws") ? "aws" : session.type.toString(),
+          sessionColor: session.color,
           createdAt: new Date().getTime(),
         },
         leappSessionId: session.sessionId,

@@ -1,0 +1,23 @@
+<a class="close-modal" (click)="closeModal();"><i class="moon-Close"></i></a>
+<h4>{{session.sessionName}}</h4>
+<h5>{{session | detail }}</h5>
+
+<div class="color-form">
+  <p>Select a color</p>
+  <div class="color-swatches">
+    <button
+      *ngFor="let color of colors"
+      type="button"
+      class="color-swatch-wrapper"
+      [class.selected]="selectedColor === color.name"
+      (click)="selectColor(color.name)">
+      <div class="color-swatch" [style.background-color]="color.hex"></div>
+      <span class="color-label">{{color.name}}</span>
+    </button>
+  </div>
+  <br>
+  <button type="button" (click)="saveColor();" [disabled]="!selectedColor"
+          [ngClass]="(!selectedColor) ? 'btn-control mat-button-disabled': 'btn-control'">Save Color
+  </button>
+  <a (click)="closeModal();">Cancel</a>
+</div>

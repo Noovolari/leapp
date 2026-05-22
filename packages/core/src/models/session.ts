@@ -15,6 +15,7 @@ export class Session {
   startDateTime?: string;
   type: SessionType;
   sessionTokenExpiration: string;
+  color?: string;
 
   constructor(public sessionName: string, public region: string) {
     this.sessionId = uuid.v4();

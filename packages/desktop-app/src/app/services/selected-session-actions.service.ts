@@ -8,6 +8,7 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { ChangeRegionDialogComponent } from "../components/dialogs/change-region-dialog/change-region-dialog.component";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { ChangeNamedProfileDialogComponent } from "../components/dialogs/change-named-profile-dialog/change-named-profile-dialog.component";
+import { ChangeColorDialogComponent } from "../components/dialogs/change-color-dialog/change-color-dialog.component";
 import { SsmModalDialogComponent } from "../components/dialogs/ssm-modal-dialog/ssm-modal-dialog.component";
 import { EditDialogComponent } from "../components/dialogs/edit-dialog/edit-dialog.component";
 import { constants } from "@noovolari/leapp-core/models/constants";
@@ -98,6 +99,15 @@ export class SelectedSessionActionsService {
   async changeProfileModalOpen(session: Session): Promise<void> {
     this.behaviouralSubjectService.unselectSessions();
     this.modalService.show(ChangeNamedProfileDialogComponent, {
+      animated: false,
+      class: "ssm-modal",
+      initialState: { session },
+    });
+  }
+
+  async changeColorModalOpen(session: Session): Promise<void> {
+    this.behaviouralSubjectService.unselectSessions();
+    this.modalService.show(ChangeColorDialogComponent, {
       animated: false,
       class: "ssm-modal",
       initialState: { session },

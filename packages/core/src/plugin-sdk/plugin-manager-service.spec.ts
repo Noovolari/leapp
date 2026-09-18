@@ -339,7 +339,7 @@ describe("PluginManagerService", () => {
   });
 
   test("availableAwsCredentialsPlugins", () => {
-    const sessionFactory = new SessionFactory(null, null, null, null, null);
+    const sessionFactory = new SessionFactory(null, null, null, null, null, null);
     jest.spyOn(sessionFactory, "getCompatibleTypes");
     const nativeService = {
       requireModule: null,

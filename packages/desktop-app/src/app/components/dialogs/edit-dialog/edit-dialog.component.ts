@@ -194,6 +194,14 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
       });
     }
 
+    if (this.accountType === SessionType.awsConsoleLogin) {
+      this.form.controls["name"].setValue(this.selectedSession.sessionName);
+      this.namedProfileSelect.selectValue({
+        value: this.selectedSession.profileId,
+        label: this.leappCoreService.namedProfileService.getProfileName(this.selectedSession.profileId),
+      });
+    }
+
     /*if (this.accountType === SessionType.azure) {
       this.form.controls["name"].setValue((this.selectedSession as AzureSession).sessionName);
       this.form.controls["tenantId"].setValue((this.selectedSession as AzureSession).tenantId);
@@ -330,6 +338,10 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
           )
           .then((_) => {});
         break;
+      case SessionType.awsConsoleLogin:
+        this.selectedSession.sessionName = this.form.controls["name"].value.trim();
+        this.selectedSession.region = this.selectedRegion;
+        break;
       case SessionType.awsIamRoleChained:
         (this.selectedSession as AwsIamRoleChainedSession).sessionName = this.form.controls["name"].value;
         (this.selectedSession as AwsIamRoleChainedSession).region = this.selectedRegion;
@@ -381,6 +393,9 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
           this.form.get("mfaDevice").valid &&
           this.form.get("accessKey").valid &&
           this.form.get("secretKey").valid;
+        break;
+      case SessionType.awsConsoleLogin:
+        result = this.form.get("name").valid && this.selectedProfile && this.form.get("awsRegion").valid && this.form.get("awsRegion").value !== null;
         break;
       /*case SessionType.azure:
         result =

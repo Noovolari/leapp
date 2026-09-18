@@ -217,6 +217,30 @@ describe("CloudProviderService", () => {
         sessionType: "awsIamRoleChained",
         creatable: true,
       },
+      {
+        accessMethodFields: [
+          {
+            creationRequestField: "sessionName",
+            message: "Insert session alias",
+            type: "input",
+          },
+          {
+            choices: expectedRegionChoices,
+            creationRequestField: "region",
+            message: "Select region",
+            type: "list",
+          },
+          {
+            choices: expectedNamedProfilesChoices,
+            creationRequestField: "profileId",
+            message: "Select the Named Profile",
+            type: "list",
+          },
+        ],
+        label: "AWS Console Login",
+        sessionType: "awsConsoleLogin",
+        creatable: true,
+      },
     ]);
 
     const awsFederatedAccessMethod = accessMethods.filter((accessMethod) => accessMethod.sessionType === SessionType.awsIamRoleFederated)[0];
@@ -340,6 +364,7 @@ describe("CloudProviderService", () => {
     expect(service.availableRegions(SessionType.awsIamRoleChained)).toEqual(awsChoices);
     expect(service.availableRegions(SessionType.awsIamRoleFederated)).toEqual(awsChoices);
     expect(service.availableRegions(SessionType.awsSsoRole)).toEqual(awsChoices);
+    expect(service.availableRegions(SessionType.awsConsoleLogin)).toEqual(awsChoices);
 
     const azureChoices = [
       { fieldName: "location1", fieldValue: "location1" },

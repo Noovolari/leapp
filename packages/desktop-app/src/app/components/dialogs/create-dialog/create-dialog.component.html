@@ -37,7 +37,7 @@
                        [bindValue]="'value'"
                        (change)="setAccessStrategy(provider);"
                        [clearable]="false"
-                       [items]="[{value: eSessionType.awsIamRoleFederated, label: 'AWS IAM Role Federated'}, {value: eSessionType.awsIamUser, label: 'AWS IAM User'}, {value: eSessionType.awsIamRoleChained, label: 'AWS IAM Role Chained'}]"
+                       [items]="[{value: eSessionType.awsIamRoleFederated, label: 'AWS IAM Role Federated'}, {value: eSessionType.awsIamUser, label: 'AWS IAM User'}, {value: eSessionType.awsIamRoleChained, label: 'AWS IAM Role Chained'}, {value: eSessionType.awsConsoleLogin, label: 'AWS Console Login'}]"
                        placeholder="Select Session Strategy"
                        [addTag]="false"
             ></ng-select>
@@ -76,7 +76,7 @@
       <!-- ================================================================== -->
       <div class="form-field">
         <label>Session Alias</label>
-        <input spellcheck="false" formControlName="name" type="text" class="form-control" placeholder="Session Alias *">
+        <input spellcheck="false" formControlName="name" type="text" class="form-control" placeholder="Session Alias *" aria-label="Session Alias">
         <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert a Session Alias</small>
       </div>
 
@@ -98,7 +98,7 @@
         <ng-container *ngIf="sessionType === eSessionType.awsIamRoleFederated || sessionType === eSessionType.awsIamRoleChained">
           <div class="form-field">
             <label>Role ARN</label>
-            <input spellcheck="false" formControlName="roleArn" type="text" class="form-control" placeholder="Role ARN" />
+            <input spellcheck="false" formControlName="roleArn" type="text" class="form-control" placeholder="Role ARN" aria-label="Role ARN" />
             <small class="text-error" *ngIf="(form.controls['roleArn'].dirty || form.controls['roleArn'].touched) && form.controls['roleArn'].errors">Insert the Role ARN</small>
           </div>
         </ng-container>
@@ -125,7 +125,7 @@
 
           <div class="form-field">
             <label>Identity Provider</label>
-            <input spellcheck="false" formControlName="idpArn" type="text" class="form-control" placeholder="Identity Provider ARN *">
+            <input spellcheck="false" formControlName="idpArn" type="text" class="form-control" placeholder="Identity Provider ARN *" aria-label="Identity Provider ARN">
             <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the AWS Identity Provider ARN</small>
           </div>
         </ng-container>
@@ -135,7 +135,7 @@
         <!-- ================================================================== -->
         <div class="form-field" *ngIf="sessionType === eSessionType.awsIamUser">
           <label>Mfa Device</label>
-          <input spellcheck="false" formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA ARN or SN (optional)" />
+          <input spellcheck="false" formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA ARN or SN (optional)" aria-label="MFA Device ARN or serial number (optional)" />
         </div>
 
         <!-- ================================================================== -->
@@ -144,12 +144,12 @@
         <ng-container *ngIf="sessionType === eSessionType.awsIamUser">
           <div class="form-field">
             <label>Access Key ID</label>
-            <input formControlName="accessKey" type="password" class="form-control" placeholder="Access Key ID *">
+            <input formControlName="accessKey" type="password" class="form-control" placeholder="Access Key ID *" aria-label="Access Key ID">
             <small class="text-error" *ngIf="(form.controls['accessKey'].dirty || form.controls['accessKey'].touched) && form.controls['accessKey'].errors">Insert the AWS Access Key ID</small>
           </div>
           <div class="form-field">
             <label>Secret Access Key</label>
-            <input formControlName="secretKey" type="password" class="form-control" placeholder="Secret Access Key *">
+            <input formControlName="secretKey" type="password" class="form-control" placeholder="Secret Access Key *" aria-label="Secret Access Key">
             <small class="text-error" *ngIf="(form.controls['secretKey'].dirty || form.controls['secretKey'].touched) && form.controls['secretKey'].errors">Insert the AWS Secret Access Key</small>
           </div>
         </ng-container>
@@ -160,7 +160,7 @@
         <ng-container *ngIf="sessionType === eSessionType.awsIamRoleChained">
           <div class="form-field">
             <label>Role Session Name</label>
-            <input spellcheck="false" formControlName="roleSessionName" type="text" class="form-control" placeholder="Role Session Name" />
+            <input spellcheck="false" formControlName="roleSessionName" type="text" class="form-control" placeholder="Role Session Name" aria-label="Role Session Name" />
             <small class="text-error" *ngIf="(form.controls['roleSessionName'].dirty || form.controls['roleSessionName'].touched) && form.controls['roleSessionName'].errors">Invalid Role Session Name</small>
           </div>
           <div class="form-field">
@@ -176,13 +176,13 @@
       <ng-container *ngIf="sessionType === eSessionType.azure">
         <div class="form-field">
           <label>Subscription Id</label>
-          <input formControlName="subscriptionId" type="password" class="form-control" placeholder="Subscription Id *">
+          <input formControlName="subscriptionId" type="password" class="form-control" placeholder="Subscription Id *" aria-label="Subscription Id">
           <small class="text-error" *ngIf="(form.controls['subscriptionId'].dirty || form.controls['subscriptionId'].touched) && form.controls['subscriptionId'].errors">Insert the Subscription Id</small>
         </div>
 
         <div class="form-field">
           <label>Tenant Id</label>
-          <input formControlName="tenantId" type="password" class="form-control" placeholder="Tenant Id *">
+          <input formControlName="tenantId" type="password" class="form-control" placeholder="Tenant Id *" aria-label="Tenant Id">
           <small class="text-error" *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert the Tenant Id</small>
         </div>
 

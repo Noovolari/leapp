@@ -28,10 +28,11 @@ export default class AddSession extends LeappCommand {
 
   static examples = [
     "$leapp session add",
-    "$leapp session add --providerType [aws] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser] --region [AWSREGION] --sessionName NAME ...[combination of flags relative to the session]",
+    "$leapp session add --providerType [aws] --sessionType [awsIamRoleFederated, awsIamRoleChained, awsIamUser, awsConsoleLogin] --region [AWSREGION] --sessionName NAME ...[combination of flags relative to the session]",
     "$leapp session add --providerType aws --sessionType awsIamRoleFederated --sessionName NAME --region AWSREGION --idpArn IDPARN --idpUrl IDPURL --profileId PROFILEID --roleArn ROLEARN",
     "$leapp session add --providerType aws --sessionType awsIamRoleChained --sessionName NAME --region AWSREGION --profileId PROFILEID --roleArn ROLEARN --parentSessionId ID (--roleSessionName ROLESESSIONNAME)",
     "$leapp session add --providerType aws --sessionType awsIamUser --sessionName NAME --region AWSREGION --profileId PROFILEID --accessKey ACCESSKEY --secretKey SECRETKEY (--mfaDevice MFADEVICEARN)",
+    "$leapp session add --providerType aws --sessionType awsConsoleLogin --sessionName NAME --region AWSREGION (--profileId PROFILEID)",
   ];
 
   static flags = {
@@ -200,8 +201,17 @@ export default class AddSession extends LeappCommand {
           );
         }
         break;
+      case SessionType.awsConsoleLogin:
+        if (flags.sessionName === undefined || flags.region === undefined) {
+          throw new Error(
+            `missing values for flags: ${[flags.sessionName ? "" : "--sessionName", flags.region ? "" : "--region"]
+              .filter((el) => el !== "")
+              .join(", ")}`
+          );
+        }
+        break;
       default:
-        throw new Error("invalid session type value. Valid values are: awsIamRoleFederated, awsIamRoleChained, awsIamUser");
+        throw new Error("invalid session type value. Valid values are: awsIamRoleFederated, awsIamRoleChained, awsIamUser, awsConsoleLogin");
     }
 
     const firstStep =
@@ -243,7 +253,9 @@ export default class AddSession extends LeappCommand {
         flags.secretKey &&
         flags.secretKey !== "" &&
         flags.accessKey &&
-        flags.accessKey !== "");
+        flags.accessKey !== "") ||
+      // AWS CONSOLE LOGIN
+      (flags.providerType === SessionType.aws.toString() && flags.sessionType === SessionType.awsConsoleLogin.toString());
     // Special condition
     /* if (
       (firstStep && flags.sessionType.indexOf(SessionType.aws.toString()) > -1 && flags.providerType === SessionType.azure.toString()) ||

@@ -1,4 +1,5 @@
 import { SessionType } from "../models/session-type";
+import { AwsConsoleLoginService } from "./session/aws/aws-console-login-service";
 import { AwsIamRoleChainedService } from "./session/aws/aws-iam-role-chained-service";
 import { AwsIamRoleFederatedService } from "./session/aws/aws-iam-role-federated-service";
 import { AwsIamUserService } from "./session/aws/aws-iam-user-service";
@@ -14,6 +15,7 @@ export class SessionFactory {
     private readonly awsIamRoleFederatedService: AwsIamRoleFederatedService,
     private readonly awsIamRoleChainedService: AwsIamRoleChainedService,
     private readonly awsSsoRoleService: AwsSsoRoleService,
+    private readonly awsConsoleLoginService: AwsConsoleLoginService,
     private readonly azureSessionService: AzureSessionService,
     private readonly localstackSessionService: LocalstackSessionService
   ) {}
@@ -28,6 +30,8 @@ export class SessionFactory {
         return this.awsIamRoleChainedService;
       case SessionType.awsSsoRole:
         return this.awsSsoRoleService;
+      case SessionType.awsConsoleLogin:
+        return this.awsConsoleLoginService;
       case SessionType.azure:
         return this.azureSessionService;
       case SessionType.localstack:
@@ -44,7 +48,13 @@ export class SessionFactory {
 
   getCompatibleTypes(sessionType: SessionType): SessionType[] {
     if (sessionType === SessionType.aws) {
-      return [SessionType.awsIamUser, SessionType.awsIamRoleFederated, SessionType.awsIamRoleChained, SessionType.awsSsoRole];
+      return [
+        SessionType.awsIamUser,
+        SessionType.awsIamRoleFederated,
+        SessionType.awsIamRoleChained,
+        SessionType.awsSsoRole,
+        SessionType.awsConsoleLogin,
+      ];
     } else if (sessionType === SessionType.anytype) {
       return [SessionType.azure, SessionType.alibaba, ...this.getCompatibleTypes(SessionType.aws)];
     } else if (this.getCompatibleTypes(SessionType.anytype).includes(sessionType)) {

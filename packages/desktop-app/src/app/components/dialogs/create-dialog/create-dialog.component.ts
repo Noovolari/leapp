@@ -17,6 +17,8 @@ import { WindowService } from "../../../services/window.service";
 import { AwsIamRoleFederatedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-federated-session-request";
 import { AwsIamUserSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-session-request";
 import { AwsIamRoleChainedSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-session-request";
+import { AwsConsoleLoginService } from "@noovolari/leapp-core/services/session/aws/aws-console-login-service";
+import { AwsConsoleLoginSessionRequest } from "@noovolari/leapp-core/services/session/aws/aws-console-login-session-request";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
 import { LeappParseError } from "@noovolari/leapp-core/errors/leapp-parse-error";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
@@ -97,6 +99,7 @@ export class CreateDialogComponent implements OnInit {
   private behaviouralSubjectService: BehaviouralSubjectService;
   private awsIamRoleFederatedService: AwsIamRoleFederatedService;
   private awsIamUserService: AwsIamUserService;
+  private awsConsoleLoginService: AwsConsoleLoginService;
   private awsIamRoleChainedService: AwsIamRoleChainedService;
   private localstackSessionService: LocalstackSessionService;
   private azureSessionService: AzureSessionService;
@@ -117,6 +120,7 @@ export class CreateDialogComponent implements OnInit {
     this.awsIamRoleFederatedService = leappCoreService.awsIamRoleFederatedService;
     this.awsIamUserService = leappCoreService.awsIamUserService;
     this.awsIamRoleChainedService = leappCoreService.awsIamRoleChainedService;
+    this.awsConsoleLoginService = leappCoreService.awsConsoleLoginService;
     this.azureSessionService = leappCoreService.azureSessionService;
     this.localstackSessionService = leappCoreService.localstackSessionService;
     this.loggingService = leappCoreService.logService;
@@ -247,6 +251,9 @@ export class CreateDialogComponent implements OnInit {
           this.form.get("accessKey").valid &&
           this.form.get("secretKey").valid;
         break;
+      case SessionType.awsConsoleLogin:
+        result = this.form.get("name").valid && this.selectedProfile && this.form.get("awsRegion").valid && this.form.get("awsRegion").value !== null;
+        break;
       case SessionType.azure:
         result =
           this.form.get("name").valid &&
@@ -298,6 +305,8 @@ export class CreateDialogComponent implements OnInit {
       url = "https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-role-chained/";
     } else if (this.provider === SessionType.awsIamUser) {
       url = "https://docs.leapp.cloud/latest/configuring-session/configure-aws-iam-user/";
+    } else if (this.provider === SessionType.awsConsoleLogin) {
+      url = "https://docs.aws.amazon.com/signin/latest/userguide/command-line-sign-in.html";
     }
     this.windowService.openExternalUrl(url);
   }
@@ -407,6 +416,14 @@ export class CreateDialogComponent implements OnInit {
             profileId: this.selectedProfile.value,
           };
           await this.awsIamRoleChainedService.create(awsIamRoleChainedAccountRequest);
+          break;
+        case SessionType.awsConsoleLogin:
+          const awsConsoleLoginSessionRequest: AwsConsoleLoginSessionRequest = {
+            sessionName: this.form.value.name.trim(),
+            region: this.selectedRegion,
+            profileId: this.selectedProfile.value,
+          };
+          await this.awsConsoleLoginService.create(awsConsoleLoginSessionRequest);
           break;
         case SessionType.localstack:
           console.log("creating localstack session...");

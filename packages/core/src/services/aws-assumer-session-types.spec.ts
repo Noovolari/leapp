@@ -4,6 +4,11 @@ import { SessionType } from "../models/session-type";
 
 describe("Aws Assumer Session Types", () => {
   test("Check that enum is as expected", () => {
-    expect(AWS_ASSUMER_SESSION_TYPES).toStrictEqual([SessionType.awsIamUser, SessionType.awsIamRoleFederated, SessionType.awsSsoRole]);
+    expect(AWS_ASSUMER_SESSION_TYPES).toStrictEqual([
+      SessionType.awsIamUser,
+      SessionType.awsIamRoleFederated,
+      SessionType.awsSsoRole,
+      SessionType.awsConsoleLogin,
+    ]);
   });
 });

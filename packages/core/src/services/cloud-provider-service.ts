@@ -116,6 +116,16 @@ export class CloudProviderService {
             true
           ),
           new AccessMethod(SessionType.awsSsoRole, "AWS Single Sign-On", [], false),
+          new AccessMethod(
+            SessionType.awsConsoleLogin,
+            "AWS Console Login",
+            [
+              new AccessMethodField("sessionName", "Insert session alias", AccessMethodFieldType.input),
+              new AccessMethodField("region", "Select region", AccessMethodFieldType.list, awsRegionChoices),
+              new AccessMethodField("profileId", "Select the Named Profile", AccessMethodFieldType.list, awsNamedProfileChoices),
+            ],
+            true
+          ),
         ],
       ],
       [
@@ -162,6 +172,7 @@ export class CloudProviderService {
       [SessionType.awsSsoRole, awsRegionChoices],
       [SessionType.awsIamRoleFederated, awsRegionChoices],
       [SessionType.awsIamRoleChained, awsRegionChoices],
+      [SessionType.awsConsoleLogin, awsRegionChoices],
       [SessionType.azure, azureLocationChoices],
     ]);
   }

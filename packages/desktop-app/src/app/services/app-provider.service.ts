@@ -17,6 +17,8 @@ import { AwsParentSessionFactory } from "@noovolari/leapp-core/services/session/
 import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session/aws/aws-iam-role-chained-service";
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+import { AwsConsoleLoginService } from "@noovolari/leapp-core/services/session/aws/aws-console-login-service";
+import { AwsSigninOauthService } from "@noovolari/leapp-core/services/aws-signin-oauth.service";
 import { AwsSsoOidcService } from "@noovolari/leapp-core/services/aws-sso-oidc.service";
 import { AppVerificationWindowService } from "./app-verification-window.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
@@ -68,6 +70,8 @@ export class AppProviderService {
   private awsSsoRoleServiceInstance: AwsSsoRoleService;
   private awsSsoIntegrationServiceInstance: AwsSsoIntegrationService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
+  private awsConsoleLoginServiceInstance: AwsConsoleLoginService;
+  private awsSigninOauthServiceInstance: AwsSigninOauthService;
   private awsCoreServiceInstance: AwsCoreService;
   private azureServiceInstance: AzureSessionService;
   private azureIntegrationServiceInstance: AzureIntegrationService;
@@ -258,6 +262,29 @@ export class AppProviderService {
     return this.awsSsoOidcServiceInstance;
   }
 
+  public get awsSigninOauthService(): AwsSigninOauthService {
+    if (!this.awsSigninOauthServiceInstance) {
+      this.awsSigninOauthServiceInstance = new AwsSigninOauthService(this.appNativeService);
+    }
+    return this.awsSigninOauthServiceInstance;
+  }
+
+  public get awsConsoleLoginService(): AwsConsoleLoginService {
+    if (!this.awsConsoleLoginServiceInstance) {
+      this.awsConsoleLoginServiceInstance = new AwsConsoleLoginService(
+        this.behaviouralSubjectService,
+        this.repository,
+        this.fileService,
+        this.keychainService,
+        this.awsCoreService,
+        this.appNativeService,
+        this.windowService,
+        this.awsSigninOauthService
+      );
+    }
+    return this.awsConsoleLoginServiceInstance;
+  }
+
   public get awsCoreService(): AwsCoreService {
     if (!this.awsCoreServiceInstance) {
       this.awsCoreServiceInstance = new AwsCoreService(
@@ -337,6 +364,7 @@ export class AppProviderService {
         this.awsIamRoleFederatedService,
         this.awsIamRoleChainedService,
         this.awsSsoRoleService,
+        this.awsConsoleLoginService,
         this.azureSessionService,
         this.localstackSessionService
       );
@@ -356,7 +384,8 @@ export class AppProviderService {
       this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(
         this.awsIamUserService,
         this.awsIamRoleFederatedService,
-        this.awsSsoRoleService
+        this.awsSsoRoleService,
+        this.awsConsoleLoginService
       );
     }
     return this.awsParentSessionFactoryInstance;

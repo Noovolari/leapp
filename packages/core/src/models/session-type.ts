@@ -5,6 +5,7 @@ export enum SessionType {
   awsIamUser = "awsIamUser",
   awsIamRoleChained = "awsIamRoleChained",
   awsSsoRole = "awsSsoRole",
+  awsConsoleLogin = "awsConsoleLogin",
   azure = "azure",
   google = "google",
   alibaba = "alibaba",

@@ -13,6 +13,8 @@ import { AwsIamRoleChainedService } from "@noovolari/leapp-core/services/session
 import { Repository } from "@noovolari/leapp-core/services/repository";
 import { RegionsService } from "@noovolari/leapp-core/services/regions-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
+import { AwsConsoleLoginService } from "@noovolari/leapp-core/services/session/aws/aws-console-login-service";
+import { AwsSigninOauthService } from "@noovolari/leapp-core/services/aws-signin-oauth.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
 import { RotationService } from "@noovolari/leapp-core/services/rotation-service";
@@ -65,6 +67,8 @@ export class CliProviderService {
   private awsIamRoleFederatedServiceInstance: AwsIamRoleFederatedService;
   private awsIamRoleChainedServiceInstance: AwsIamRoleChainedService;
   private awsSsoRoleServiceInstance: AwsSsoRoleService;
+  private awsConsoleLoginServiceInstance: AwsConsoleLoginService;
+  private awsSigninOauthServiceInstance: AwsSigninOauthService;
   private awsSsoOidcServiceInstance: AwsSsoOidcService;
   private azureServiceInstance: AzureSessionService;
   private sessionFactoryInstance: SessionFactory;
@@ -255,6 +259,29 @@ export class CliProviderService {
     return this.awsSsoOidcServiceInstance;
   }
 
+  get awsSigninOauthService(): AwsSigninOauthService {
+    if (!this.awsSigninOauthServiceInstance) {
+      this.awsSigninOauthServiceInstance = new AwsSigninOauthService(this.cliNativeService);
+    }
+    return this.awsSigninOauthServiceInstance;
+  }
+
+  get awsConsoleLoginService(): AwsConsoleLoginService {
+    if (!this.awsConsoleLoginServiceInstance) {
+      this.awsConsoleLoginServiceInstance = new AwsConsoleLoginService(
+        this.behaviouralSubjectService,
+        this.repository,
+        this.fileService,
+        this.keyChainService,
+        this.awsCoreService,
+        this.cliNativeService,
+        this.cliOpenWebConsoleService,
+        this.awsSigninOauthService
+      );
+    }
+    return this.awsConsoleLoginServiceInstance;
+  }
+
   public get localstackSessionService(): LocalstackSessionService {
     if (!this.localstackSessionServiceInstance) {
       this.localstackSessionServiceInstance = new LocalstackSessionService(this.behaviouralSubjectService, this.repository, this.awsCoreService,
@@ -289,7 +316,7 @@ export class CliProviderService {
   get sessionFactory(): SessionFactory {
     if (!this.sessionFactoryInstance) {
       this.sessionFactoryInstance = new SessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
-        this.awsIamRoleChainedService, this.awsSsoRoleService, this.azureSessionService, this.localstackSessionService);
+        this.awsIamRoleChainedService, this.awsSsoRoleService, this.awsConsoleLoginService, this.azureSessionService, this.localstackSessionService);
     }
     return this.sessionFactoryInstance;
   }
@@ -297,7 +324,7 @@ export class CliProviderService {
   get awsParentSessionFactory(): AwsParentSessionFactory {
     if (!this.awsParentSessionFactoryInstance) {
       this.awsParentSessionFactoryInstance = new AwsParentSessionFactory(this.awsIamUserService, this.awsIamRoleFederatedService,
-        this.awsSsoRoleService);
+        this.awsSsoRoleService, this.awsConsoleLoginService);
     }
     return this.awsParentSessionFactoryInstance;
   }

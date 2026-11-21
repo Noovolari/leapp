@@ -12,10 +12,10 @@ import { IMsalEncryptionService } from "@noovolari/leapp-core/interfaces/i-msal-
  * The `node-fetch` fallback is only loaded when no global `fetch` exists (Node.js < 18),
  * where the `punycode` deprecation warning does not exist either.
  */
-export function resolveFetch(globalObject: any = typeof global !== "undefined" ? global : {}): any {
+export const resolveFetch = (globalObject: any = typeof global !== "undefined" ? global : {}): any => {
   const globalFetch = globalObject ? globalObject.fetch : undefined;
   return typeof globalFetch === "function" ? (input: any, init?: any) => globalFetch.call(globalObject, input, init) : require("node-fetch");
-}
+};
 
 export class CliNativeService implements INativeService {
   url: any;

@@ -1,6 +1,22 @@
 import { INativeService } from "@noovolari/leapp-core/interfaces/i-native-service";
 import { IMsalEncryptionService } from "@noovolari/leapp-core/interfaces/i-msal-encryption-service";
 
+/**
+ * Resolves the `fetch` implementation used by the CLI.
+ *
+ * Node.js >= 18 exposes the WHATWG `fetch` API on the global object, so it is always
+ * preferred: the `node-fetch` v2 fallback transitively requires `whatwg-url` -> `tr46`
+ * -> the core `punycode` module, which is deprecated (DEP0040) since Node.js 21 and
+ * prints a DeprecationWarning on every leapp command.
+ *
+ * The `node-fetch` fallback is only loaded when no global `fetch` exists (Node.js < 18),
+ * where the `punycode` deprecation warning does not exist either.
+ */
+export function resolveFetch(globalObject: any = typeof global !== "undefined" ? global : {}): any {
+  const globalFetch = globalObject ? globalObject.fetch : undefined;
+  return typeof globalFetch === "function" ? (input: any, init?: any) => globalFetch.call(globalObject, input, init) : require("node-fetch");
+}
+
 export class CliNativeService implements INativeService {
   url: any;
   fs: any;
@@ -51,7 +67,7 @@ export class CliNativeService implements INativeService {
     this.hashElement = require("folder-hash");
     this.crypto = require("crypto");
     this.tar = require("tar");
-    this.fetch = require("node-fetch");
+    this.fetch = resolveFetch();
     this.systemPreferences = null as any;
     this.msalEncryptionService = null as any;
   }

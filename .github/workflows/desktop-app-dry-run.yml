@@ -1,0 +1,229 @@
+name: Leapp Desktop App - dry run
+
+# Builds, signs (macOS only) and tests the desktop app on every platform, the way a
+# release does, and reports only OK / KO. It publishes nothing: no artifacts, no
+# caches, no S3, no GitHub release, no tag. Windows is built unsigned.
+#
+# Runs only on request:
+# - from the Actions tab (Run workflow, any branch) once this file is on master;
+# - until then, by pushing the commit to test to the dry-run/desktop branch:
+#     git push --force origin <commit>:refs/heads/dry-run/desktop
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'dry-run/desktop'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-app-dry-run-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-latest
+            release: release-linux
+          - name: Windows (unsigned)
+            os: windows-2022
+            release: release-win
+          - name: macOS x64
+            os: macos-latest
+            release: release-mac
+            arch: x64
+          - name: macOS arm64
+            os: macos-latest
+            release: release-mac
+            arch: arm64
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Prepare git
+        if: runner.os == 'Windows'
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        if: runner.os != 'Linux'
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: packages/desktop-app/.nvmrc
+
+      - name: Install libsecret (keytar needs it on Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libsecret-1-dev
+
+      # The release installs @noovolari/leapp-core from npm (set-pro-environment).
+      # Until package.json points there, the repository's core is built and packed
+      # with npm pack, then installed from the tarball: the same files npm would
+      # serve, installed the same way (no symlink, peer dependencies from the app).
+      - name: Build and pack Leapp Core
+        id: core
+        run: |
+          SPEC=$(node -p "require('./packages/desktop-app/package.json').dependencies['@noovolari/leapp-core']")
+          if [ "${SPEC#file:}" = "$SPEC" ]; then
+            echo "Core from npm: @noovolari/leapp-core@$SPEC"
+            exit 0
+          fi
+          cd packages/core
+          npm ci
+          npm run build
+          TARBALL=$(npm pack --pack-destination "$RUNNER_TEMP" | tail -n 1)
+          echo "Core packed: $TARBALL"
+          echo "tarball=$RUNNER_TEMP/$TARBALL" >> "$GITHUB_OUTPUT"
+
+      - name: Install desktop app dependencies
+        id: install
+        if: steps.core.outcome == 'success'
+        env:
+          CORE_TARBALL: ${{ steps.core.outputs.tarball }}
+        run: |
+          cd packages/desktop-app
+          npm ci
+          if [ -n "$CORE_TARBALL" ]; then npm install --no-save "$CORE_TARBALL"; fi
+          CORE_DIR=node_modules/@noovolari/leapp-core
+          if [ -L "$CORE_DIR" ]; then echo "leapp-core is still a symlink"; exit 1; fi
+          node -p "'Installed leapp-core ' + require('./$CORE_DIR/package.json').version"
+
+      - name: Import the macOS signing certificates
+        id: keychain
+        if: runner.os == 'macOS' && steps.install.outcome == 'success'
+        env:
+          CERTIFICATE_OSX_P12: ${{ secrets.CERTIFICATE_OSX_P12 }}
+          CERTIFICATE_APPLICATION_OSX_P12: ${{ secrets.CERTIFICATE_APPLICATION_OSX_P12 }}
+          DECODE_PASSWORD: ${{ secrets.DECODE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          KEY_CHAIN="$RUNNER_TEMP/build.keychain-db"
+          echo "$CERTIFICATE_OSX_P12" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+          echo "$CERTIFICATE_APPLICATION_OSX_P12" | base64 --decode > "$RUNNER_TEMP/certificate-application.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEY_CHAIN"
+          security set-keychain-settings -lut 21600 "$KEY_CHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEY_CHAIN"
+          security list-keychains -d user -s "$KEY_CHAIN" login.keychain
+          security default-keychain -s "$KEY_CHAIN"
+          security import "$RUNNER_TEMP/certificate.p12" -k "$KEY_CHAIN" -P "$DECODE_PASSWORD" -T /usr/bin/codesign
+          security import "$RUNNER_TEMP/certificate-application.p12" -k "$KEY_CHAIN" -P "$DECODE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEY_CHAIN" > /dev/null
+          rm -f "$RUNNER_TEMP"/*.p12
+          security find-identity -v -p codesigning "$KEY_CHAIN"
+
+      - name: Set the macOS architecture
+        if: runner.os == 'macOS' && steps.install.outcome == 'success'
+        run: |
+          cd packages/desktop-app
+          npm run set-target-${{ matrix.arch }}
+
+      - name: Build and package (signed and notarized on macOS)
+        id: build
+        if: steps.install.outcome == 'success' && (runner.os != 'macOS' || steps.keychain.outcome == 'success')
+        env:
+          # macOS notarization (electron-builder). Nothing else is passed: no GH_TOKEN,
+          # no AWS keys, no Windows signing secrets, so nothing can be published.
+          APPLE_ID: ${{ runner.os == 'macOS' && secrets.APPLE_ID || '' }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ runner.os == 'macOS' && secrets.APPLE_APP_SPECIFIC_PASSWORD || '' }}
+          APPLE_TEAM_ID: ${{ runner.os == 'macOS' && secrets.APPLE_TEAM_ID || '' }}
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ runner.os == 'macOS' && 'true' || 'false' }}
+        # Notarization sometimes runs past Apple's time: like the release workflow, macOS
+        # gets 5 attempts of 20 minutes. Linux and Windows build once.
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: ${{ runner.os == 'macOS' && 20 || 45 }}
+          max_attempts: ${{ runner.os == 'macOS' && 5 || 1 }}
+          shell: bash
+          on_retry_command: rm -rf packages/desktop-app/release
+          command: |
+            cd packages/desktop-app
+            npm run ${{ matrix.release }}
+
+      - name: Verify the macOS signature and notarization
+        id: sign
+        if: runner.os == 'macOS' && steps.build.outcome == 'success'
+        run: |
+          cd packages/desktop-app/release
+          APP=$(find . -maxdepth 2 -name 'Leapp.app' -type d | head -n 1)
+          test -n "$APP"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+          xcrun stapler validate "$APP"
+          spctl --assess --type execute --verbose=2 "$APP"
+          ARCH='${{ matrix.arch }}'; [ "$ARCH" = x64 ] && ARCH=x86_64
+          lipo -archs "$APP/Contents/MacOS/Leapp" | grep -qw "$ARCH"
+
+      - name: Allow Chrome's sandbox on Ubuntu
+        if: runner.os == 'Linux' && !cancelled()
+        run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - name: Test the desktop app
+        id: test
+        if: steps.install.outcome == 'success' && !cancelled()
+        run: |
+          cd packages/desktop-app
+          [ -f src/app/services/team-service.ts ] || cp src/app/services/team-service-stub.ts src/app/services/team-service.ts
+          npx ng test --watch=false --browsers=ChromeHeadless --progress=false
+
+      - name: Remove the keychain and the build output
+        if: always()
+        run: |
+          if [ "$RUNNER_OS" = "macOS" ]; then security delete-keychain "$RUNNER_TEMP/build.keychain-db" || true; fi
+          rm -rf packages/desktop-app/release
+
+      - name: Result
+        if: always()
+        env:
+          CORE: ${{ steps.core.outcome }}
+          INSTALL: ${{ steps.install.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+          SIGN: ${{ steps.sign.outcome }}
+          TEST: ${{ steps.test.outcome }}
+          IS_MAC: ${{ runner.os == 'macOS' }}
+        run: |
+          verdict() { case "$1" in success) echo OK ;; skipped|'') echo '-' ;; *) echo KO ;; esac; }
+          BUILD_RESULT=$( [ "$CORE" = success ] && [ "$INSTALL" = success ] && verdict "$BUILD" || echo KO )
+          SIGN_RESULT=$( [ "$IS_MAC" = true ] && { [ "$BUILD" = success ] && verdict "$SIGN" || echo KO; } || echo 'n/a' )
+          TEST_RESULT=$(verdict "$TEST"); [ "$TEST_RESULT" = '-' ] && TEST_RESULT=KO
+          {
+            echo "| Platform | Build | Signing | Tests |"
+            echo "|---|---|---|---|"
+            echo "| ${{ matrix.name }} | $BUILD_RESULT | $SIGN_RESULT | $TEST_RESULT |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ matrix.name }}: build $BUILD_RESULT, signing $SIGN_RESULT, tests $TEST_RESULT"
+          for r in "$BUILD_RESULT" "$SIGN_RESULT" "$TEST_RESULT"; do [ "$r" = KO ] && exit 1; done
+          exit 0
+
+  result:
+    name: OK / KO
+    needs: build-and-test
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Overall result
+        env:
+          RESULT: ${{ needs.build-and-test.result }}
+        run: |
+          if [ "$RESULT" = success ]; then V=OK; else V=KO; fi
+          {
+            echo "## Desktop app dry run: $V"
+            echo
+            echo "Per platform (build / signing / tests) in each job's summary below. Nothing was published."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Desktop app dry run: $V"
+          [ "$V" = OK ]

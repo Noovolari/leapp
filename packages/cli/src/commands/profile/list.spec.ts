@@ -1,10 +1,11 @@
-import { ux } from "@oclif/core";
+import * as tableModule from "../../ux/table";
 import { describe, expect, jest, test } from "@jest/globals";
 import ListProfiles from "./list";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("ListProfiles", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ListProfiles => {
-    const command = new ListProfiles(argv, {} as any);
+    const command = new ListProfiles(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
@@ -55,7 +56,7 @@ describe("ListProfiles", () => {
     };
 
     const command = getTestCommand(cliProviderService);
-    const tableSpy = jest.spyOn(ux, "table").mockImplementation(() => null);
+    const tableSpy = jest.spyOn(tableModule, "table").mockImplementation(() => null);
 
     await command.showProfiles();
 

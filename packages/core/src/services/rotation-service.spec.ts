@@ -28,10 +28,10 @@ describe("RotationService", () => {
     const rotationService = new RotationService(sessionFactory, repository);
     rotationService.rotate();
 
-    expect(sessionActive.expired).toBeCalledTimes(1);
-    expect(sessionFactory.getSessionService).toBeCalledTimes(1);
+    expect(sessionActive.expired).toHaveBeenCalledTimes(1);
+    expect(sessionFactory.getSessionService).toHaveBeenCalledTimes(1);
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith(sessionActive.type);
-    expect(awsIamUserService.rotate).toBeCalledTimes(1);
+    expect(awsIamUserService.rotate).toHaveBeenCalledTimes(1);
   });
 
   test("rotate - should not rotate when a session is not expired", () => {
@@ -56,8 +56,8 @@ describe("RotationService", () => {
     const rotationService = new RotationService(sessionFactory, repository);
     rotationService.rotate();
 
-    expect(sessionActive.expired).toBeCalledTimes(1);
-    expect(sessionFactory.getSessionService).toBeCalledTimes(0);
-    expect(awsIamUserService.rotate).toBeCalledTimes(0);
+    expect(sessionActive.expired).toHaveBeenCalledTimes(1);
+    expect(sessionFactory.getSessionService).toHaveBeenCalledTimes(0);
+    expect(awsIamUserService.rotate).toHaveBeenCalledTimes(0);
   });
 });

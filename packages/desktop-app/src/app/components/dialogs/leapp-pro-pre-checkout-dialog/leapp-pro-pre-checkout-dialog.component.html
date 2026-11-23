@@ -1,59 +1,73 @@
 <div class="content">
-  <div *ngIf="!isFetchingPrices" class="left-side">
+  @if (!isFetchingPrices) {
+  <div class="left-side">
     <h2>Upgrade to Pro</h2>
-    <br>
+    <br />
     <small><strong>Billing period</strong></small>
-    <br>
+    <br />
     <div>
       <div>
-      <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.yearly ? 'selected' : ''}}"
-            (click)="setBillingPeriod(eBillingPeriod.yearly)">Yearly <small>17% off</small></span>
-        <span class="toggle-btn-stripe {{selectedPeriod === eBillingPeriod.monthly ? 'selected' : ''}}"
-              (click)="setBillingPeriod(eBillingPeriod.monthly)">Monthly</span>
+        <span
+          class="toggle-btn-stripe {{ selectedPeriod === eBillingPeriod.yearly ? 'selected' : '' }}"
+          (click)="setBillingPeriod(eBillingPeriod.yearly)"
+          >Yearly <small>17% off</small></span
+        >
+        <span
+          class="toggle-btn-stripe {{ selectedPeriod === eBillingPeriod.monthly ? 'selected' : '' }}"
+          (click)="setBillingPeriod(eBillingPeriod.monthly)"
+          >Monthly</span
+        >
       </div>
     </div>
-    <br>
+    <br />
     <form [formGroup]="form" class="form center-vertical text-left">
       <small><strong>Billed to</strong></small>
-      <br>
+      <br />
       <div class="form-field">
         <!-- <label>Email address*</label> -->
-        <input spellcheck="false" formControlName="email" type="email" class="form-control" placeholder="email@domain.com"
-               (keyup)="checkAndConfirm();">
-        <small class="text-error" *ngIf="(emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors">Insert a valid email address</small>
+        <input
+          spellcheck="false"
+          formControlName="email"
+          type="email"
+          class="form-control"
+          placeholder="email@domain.com"
+          (keyup)="checkAndConfirm()"
+        />
+        @if ((emailFormControl.dirty || emailFormControl.touched) && emailFormControl.errors) {
+        <small class="text-error">Insert a valid email address</small>
+        }
       </div>
-<!--      <small><strong>Fiscal Code (only for italian customers)</strong></small>-->
-<!--      <br>-->
-<!--      <div class="form-field">-->
-<!--        &lt;!&ndash; <label>Email address*</label> &ndash;&gt;-->
-<!--        <input spellcheck="false" formControlName="fiscalCode" type="text" class="form-control" placeholder="fiscal code, only for italian customers"-->
-<!--               (keyup)="checkAndConfirm();">-->
-<!--        <small class="text-error" *ngIf="(fiscalCodeFormControl.dirty || fiscalCodeFormControl.touched) && fiscalCodeFormControl.errors">Insert a valid fiscal code</small>-->
-<!--      </div>-->
+      <!--      <small><strong>Fiscal Code (only for italian customers)</strong></small>-->
+      <!--      <br>-->
+      <!--      <div class="form-field">-->
+      <!--        &lt;!&ndash; <label>Email address*</label> &ndash;&gt;-->
+      <!--        <input spellcheck="false" formControlName="fiscalCode" type="text" class="form-control" placeholder="fiscal code, only for italian customers"-->
+      <!--               (keyup)="checkAndConfirm();">-->
+      <!--        <small class="text-error" *ngIf="(fiscalCodeFormControl.dirty || fiscalCodeFormControl.touched) && fiscalCodeFormControl.errors">Insert a valid fiscal code</small>-->
+      <!--      </div>-->
     </form>
-    <br>
-    <br>
+    <br />
+    <br />
   </div>
-
-  <div *ngIf="!isFetchingPrices" class="right-side">
-
+  } @if (!isFetchingPrices) {
+  <div class="right-side">
     <h2>Order summary</h2>
     <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
-
     <div class="plan-summary">
-
       <div class="small-text margin-top-low">
-        <span class="black">{{selectedPeriod}} plan</span>
-        <span class="black">${{price?.priceAmount}}</span>
+        <span class="black">{{ selectedPeriod }} plan</span>
+        <span class="black">${{ price?.priceAmount }}</span>
       </div>
-      <div class="small-text"><span>${{price?.monthlyPrice}} / member / month × 1 member</span></div>
-      <div class="small-text"><span>Billed {{eBillingPeriod[selectedPeriod]}}</span></div>
-
-      <hr class="margin-top-high">
-
+      <div class="small-text">
+        <span>${{ price?.monthlyPrice }} / member / month × 1 member</span>
+      </div>
+      <div class="small-text">
+        <span>Billed {{ eBillingPeriod[selectedPeriod] }}</span>
+      </div>
+      <hr class="margin-top-high" />
       <div class="small-text margin-top-low">
         <span>Subtotal</span>
-        <span>${{price?.priceAmount}}</span>
+        <span>${{ price?.priceAmount }}</span>
       </div>
       <div class="small-text">
         <span>Tax if applicable</span>
@@ -61,22 +75,31 @@
       </div>
       <div class="large-text margin-top-high">
         <span class="black">Total for today</span>
-        <span><strong class="black">${{price?.priceAmount}}</strong></span>
+        <span
+          ><strong class="black">${{ price?.priceAmount }}</strong></span
+        >
       </div>
     </div>
-
-    <button (click)="upgradeToLeappPro();" class="margin-top-high btn-center btn-control btn-right-margin {{isEmailValid ? '': 'disabled'}}"
-            [disabled]="!isEmailValid">
-      Upgrade now
-      <i *ngIf="isRedirectingToCheckout" class="fa fa-spin fa-spinner"></i>
+    <button
+      (click)="upgradeToLeappPro()"
+      class="margin-top-high btn-center btn-control btn-right-margin {{ isEmailValid ? '' : 'disabled' }}"
+      [disabled]="!isEmailValid"
+    >
+      Upgrade now @if (isRedirectingToCheckout) {
+      <i class="fa fa-spin fa-spinner"></i>
+      }
     </button>
-
-    <div class="tc margin-top-high terms-disclaimer"><span>By clicking “Upgrade now” you agree to the Leapp <a (click)="openTermsAndConditions()">Terms and Conditions</a> and <a
-      (click)="openPrivacyPolicy()">Privacy Policy</a>.</span></div>
+    <div class="tc margin-top-high terms-disclaimer">
+      <span
+        >By clicking “Upgrade now” you agree to the Leapp <a (click)="openTermsAndConditions()">Terms and Conditions</a> and
+        <a (click)="openPrivacyPolicy()">Privacy Policy</a>.</span
+      >
+    </div>
   </div>
-
-  <div class="loader" *ngIf="isFetchingPrices">
+  } @if (isFetchingPrices) {
+  <div class="loader">
     <a class="close-modal" (click)="close()"><i class="moon-Close"></i></a>
     <i class="fa fa-spinner fa-spin"></i>
   </div>
+  }
 </div>

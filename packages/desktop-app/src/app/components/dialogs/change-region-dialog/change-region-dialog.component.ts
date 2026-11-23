@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AppService } from "../../../services/app.service";
 import { AppProviderService } from "../../../services/app-provider.service";
@@ -12,6 +12,8 @@ import { MessageToasterService, ToastLevel } from "../../../services/message-toa
   selector: "app-change-region-dialog",
   templateUrl: "./change-region-dialog.component.html",
   styleUrls: ["./change-region-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class ChangeRegionDialogComponent implements OnInit {
   @Input()

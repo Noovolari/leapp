@@ -1,5 +1,4 @@
-import { ux } from "@oclif/core";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { LeappCommand } from "../../leapp-command";
 import { Session } from "@noovolari/leapp-core/models/session";
@@ -8,6 +7,7 @@ import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role-session";
 import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-chained-session";
+import { table, tableFlags } from "../../ux/table";
 
 export default class ListSessions extends LeappCommand {
   static description = "Show sessions list with all properties; filter query is case sensitive";
@@ -22,7 +22,7 @@ export default class ListSessions extends LeappCommand {
   ];
 
   static flags = {
-    ...ux.table.flags(),
+    ...tableFlags(),
   };
 
   constructor(argv: string[], config: Config) {
@@ -61,7 +61,7 @@ export default class ListSessions extends LeappCommand {
       status: { header: "Status" },
     };
 
-    ux.table(data, columns, { ...flags });
+    table(data, columns, { ...flags });
   }
 
   private getRole(session: Session): string {

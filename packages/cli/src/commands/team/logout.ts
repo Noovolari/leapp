@@ -1,5 +1,5 @@
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 
 export default class TeamLogout extends LeappCommand {
   static description = "Logout from your Team account";

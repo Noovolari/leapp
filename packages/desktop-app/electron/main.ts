@@ -1,10 +1,11 @@
 import { contextMenu } from "./context-menu";
 import * as path from "path";
 import { environment } from "../src/environments/environment";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { startAutoUpdater } from "./auto-updater";
 
 const { app, BrowserWindow, ipcMain, Tray, Menu } = require("electron");
 const electronLocalshortcut = require('electron-localshortcut');
-const { autoUpdater } = require("electron-updater");
 
 const url = require("url");
 const fs = require("fs");
@@ -14,14 +15,25 @@ const ipc = ipcMain;
 const remote = require("@electron/remote/main");
 remote.initialize();
 
+// The build flavor comes from package.json (leappFlavor) unless LEAPP_FLAVOR is set; the renderer
+// inherits the variable. Set before anything reads the profile: the app name decides userData, the
+// single-instance lock and the log folder, so a dev Leapp never touches an installed prod one.
+if (!process.env.LEAPP_FLAVOR) {
+  const leappFlavor = JSON.parse(fs.readFileSync(path.join(app.getAppPath(), "package.json"), "utf8")).leappFlavor;
+  if (leappFlavor) {
+    process.env.LEAPP_FLAVOR = leappFlavor;
+  }
+}
+app.setName(constants.appName);
+app.setPath("userData", path.join(app.getPath("appData"), constants.appName));
+const deepLinkPrefix = `${constants.urlScheme}://`;
+
 contextMenu({
   showInspectElement: false,
   showLookUpSelection: false,
   showSearchWithGoogle: false
 });
 
-// Fix for warning at startup
-app.allowRendererProcessReuse = true;
 app.disableHardwareAcceleration();
 
 if (process.platform === "linux") {
@@ -29,7 +41,7 @@ if (process.platform === "linux") {
   app.commandLine.appendSwitch("in-process-gpu");
 }
 
-app.setAsDefaultProtocolClient('leapp');
+app.setAsDefaultProtocolClient(constants.urlScheme);
 
 
 // Main Window configuration: set here the options to make it works with your app
@@ -46,73 +58,23 @@ const windowDefaultConfig = {
     webPreferences: {
       devTools: !environment.production,
       contextIsolation: false,
-      enableRemoteModule: true,
       nodeIntegration: true
     },
   },
 };
-if (process.platform !== "win32") {
+// Linux keeps the OS window frame with Leapp inside: Electron 22 ignored a hidden title
+// bar there, Electron 45 applies it. No titleBarOverlay anywhere: on macOS its controls area (the whole
+// 54px top strip) swallows clicks on the command bar.
+if (process.platform !== "linux") {
   windowDefaultConfig.browserWindow["titleBarStyle"] = "hidden";
-  windowDefaultConfig.browserWindow["titleBarOverlay"] = true;
-} else {
-  windowDefaultConfig.browserWindow["titleBarStyle"] = "hidden";
+}
+if (process.platform === "win32") {
   Menu.setApplicationMenu(null);
 }
 
 if (process.platform === "darwin") {
   windowDefaultConfig.browserWindow["trafficLightPosition"] = { x: 20, y: 20 };
 }
-
-const buildAutoUpdater = (win: any): void => {
-  autoUpdater.allowDowngrade = false;
-  autoUpdater.allowPrerelease = false;
-  autoUpdater.autoDownload = false;
-  
-  // Force dev update config for testing auto-updater in development
-  if (!environment.production) {
-    autoUpdater.forceDevUpdateConfig = true;
-    console.log("[AUTO-UPDATER] Forcing dev update config for testing");
-  }
-
-  const minutes = 10;
-
-  const data = {
-    provider: "generic",
-    url: "https://asset.noovolari.com/latest",
-    channel: "latest",
-  };
-  autoUpdater.setFeedURL(data);
-
-  autoUpdater.checkForUpdates().then((_) => {
-    console.log("[AUTO-UPDATER] Initial update check completed");
-  }).catch((error) => {
-    console.log("[AUTO-UPDATER] Initial update check failed:", error);
-  });
-  setInterval(() => {
-    autoUpdater.checkForUpdates().then((_) => {
-      console.log("[AUTO-UPDATER] Periodic update check completed");
-    }).catch((error) => {
-      console.log("[AUTO-UPDATER] Periodic update check failed:", error);
-    });
-  }, 1000 * 60 * minutes);
-
-  autoUpdater.on("update-available", (info) => {
-    console.log("[AUTO-UPDATER] Update available:", info);
-    win.webContents.send("UPDATE_AVAILABLE", info);
-  });
-
-  autoUpdater.on("update-not-available", (info) => {
-    console.log("[AUTO-UPDATER] Update not available:", info);
-  });
-
-  autoUpdater.on("error", (err) => {
-    console.log("[AUTO-UPDATER] Error:", err);
-  });
-
-  autoUpdater.on("checking-for-update", () => {
-    console.log("[AUTO-UPDATER] Checking for updates...");
-  });
-};
 
 // Generate the main Electron window
 const generateMainWindow = () => {
@@ -129,6 +91,15 @@ const generateMainWindow = () => {
   const createWindow = () => {
     // Generate the App Window
     win = new BrowserWindow({ ...windowDefaultConfig.browserWindow });
+    // This window runs with Node: it must never show anything but the app itself. In-app
+    // routes don't navigate; a reload stays under the app folder; links and window.open to anything else are refused.
+    const appRoot = url.pathToFileURL(windowDefaultConfig.dir).href + "/";
+    win.webContents.on("will-navigate", (event, target) => {
+      if (!target.startsWith(appRoot)) {
+        event.preventDefault();
+      }
+    });
+    win.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
     win.setMenuBarVisibility(false); // Hide Window Menu to make it compliant with MacOSX
     win.removeMenu(); // Remove Window Menu inside App, to make it compliant with Linux
     win.setMenu(null);
@@ -159,7 +130,8 @@ const generateMainWindow = () => {
     });
 
     ipc.on("resize-window", (evt, data) => {
-      if (evt.sender.getOwnerBrowserWindow().id === win.id) {
+      // webContents.getOwnerBrowserWindow() was removed in Electron 45
+      if (BrowserWindow.fromWebContents(evt.sender)?.id === win.id) {
         if (data.compactMode) {
           // Double setSize/setMinimumSize here is to address a strange behavior between mac and windows,
           // where the first is used by windows and the last by mac. If we don't put either the first or the last
@@ -209,9 +181,9 @@ const generateMainWindow = () => {
     // Protocol handler for win32 and linux for deep linking when the app is already launched.
     // The url is passed in the args so we read and write to a temp file before the frontend is
     // launched, this way the frontend can read the temp file and load the plugin
-    if (process.platform !== 'darwin' && process.argv[1] && process.argv[1].split("leapp://")[1]) {
+    if (process.platform !== 'darwin' && process.argv[1] && process.argv[1].split(deepLinkPrefix)[1]) {
       // Keep only command line / deep linked arguments
-      fs.writeFileSync(path.join(os.homedir(),environment.deeplinkFile), process.argv[1].split("leapp://")[1]);
+      fs.writeFileSync(path.join(os.homedir(), constants.deeplinkFile), process.argv[1].split(deepLinkPrefix)[1]);
     }
   };
 
@@ -253,7 +225,7 @@ const generateMainWindow = () => {
   const createTray = () => {
     if (!taskbar) {
       taskbar = new Tray(windowDefaultConfig.dir + `/assets/images/LeappTemplate.png`);
-      taskbar.setToolTip("Leapp");
+      taskbar.setToolTip(constants.productName);
       taskbar.on("click", () => {
         trayOpen = !trayOpen;
         if (trayOpen) {
@@ -274,7 +246,6 @@ const generateMainWindow = () => {
   app.on("activate", () => {
     if (win === undefined) {
       createWindow();
-      require("electron-disable-file-drop");
     } else {
       win.show();
     }
@@ -286,8 +257,9 @@ const generateMainWindow = () => {
 
   app.on("ready", () => {
     createWindow();
+    // Update check (prod flavor; dev and qa only with LEAPP_UPDATE_FEED_URL)
+    startAutoUpdater(() => win);
     // createTray();
-    buildAutoUpdater(win);
 
   });
 
@@ -297,7 +269,7 @@ const generateMainWindow = () => {
     app.on('open-url', (event, url) => {
       event.preventDefault();
       try {
-        fs.writeFileSync(path.join(os.homedir(),environment.deeplinkFile), url);
+        fs.writeFileSync(path.join(os.homedir(), constants.deeplinkFile), url);
       } catch(err) {
         console.log(err);
       }
@@ -317,8 +289,8 @@ const generateMainWindow = () => {
         if (win) {
           // Win32 and Linux on app already open
           if(argv.length > 0) {
-            if(argv[argv.length-1] && argv[argv.length-1]?.split("leapp://")[1]) {
-              win.webContents.send("PLUGIN_URL", argv[argv.length-1]?.split("leapp://")[1]);
+            if(argv[argv.length-1] && argv[argv.length-1]?.split(deepLinkPrefix)[1]) {
+              win.webContents.send("PLUGIN_URL", argv[argv.length-1]?.split(deepLinkPrefix)[1]);
             }
           }
           win.focus();
@@ -335,7 +307,7 @@ const generateMainWindow = () => {
     });
   }
   if (process.platform === "win32") {
-    app.setAppUserModelId("Leapp");
+    app.setAppUserModelId(constants.appName);
   }
 };
 // =============================== //

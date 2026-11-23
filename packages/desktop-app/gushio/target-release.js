@@ -15,9 +15,11 @@ module.exports = {
     const currentPath = shellJs.pwd()
 
     try {
-      await gushio.run(path.join(__dirname, './target-build.js'), args)
+      // target-build.js takes only the build target; gushio 0.7.5 rejects extra arguments
+      await gushio.run(path.join(__dirname, './target-build.js'), [args[0]])
 
       console.log('Packaging leapp... ')
+      // Package.json says leappFlavor dev; a release is always prod
       const platformVersion = args[1] === 'mac'
         ? ''
         : args[1] === 'win'
@@ -27,7 +29,7 @@ module.exports = {
             : '--mac --win --linux'
 
       shellJs.cd(path.join(__dirname, '..'))
-      const result = shellJs.exec(`electron-builder build ${platformVersion}`)
+      const result = shellJs.exec(`electron-builder build ${platformVersion} --publish never -c.extraMetadata.leappFlavor=prod`)
       if (result.code !== 0) {
         throw new Error(result.stderr)
       }

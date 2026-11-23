@@ -2,10 +2,11 @@ import { describe, expect, jest, test } from "@jest/globals";
 import ChangeDefaultRegion from "./set-default";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { CliProviderService } from "../../service/cli-provider-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("ChangeDefaultRegion", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ChangeDefaultRegion => {
-    const command = new ChangeDefaultRegion(argv, {} as any);
+    const command = new ChangeDefaultRegion(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

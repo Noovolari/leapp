@@ -1,9 +1,41 @@
+import { byFlavor } from "./flavor";
+
 export const constants = {
   //General
-  appName: "Leapp",
-  rsaBinFileDestination: ".Leapp/rsa.bin",
-  lockFileDestination: ".Leapp/Leapp-lock.json",
-  lockFileBackupPath: ".Leapp/Leapp-lock.backup.bin",
+  // Values that depend on the build flavor are getters, read when used
+  get appName(): string {
+    return byFlavor({ prod: "Leapp", dev: "Leapp-dev", qa: "Leapp-qa" });
+  },
+  get leappDir(): string {
+    return byFlavor({ prod: ".Leapp", dev: ".Leapp-dev", qa: ".Leapp-qa" });
+  },
+  get rsaBinFileDestination(): string {
+    return `${this.leappDir}/rsa.bin`;
+  },
+  get lockFileDestination(): string {
+    return `${this.leappDir}/Leapp-lock.json`;
+  },
+  get lockFileBackupPath(): string {
+    return `${this.leappDir}/Leapp-lock.backup.bin`;
+  },
+  get deeplinkFile(): string {
+    return `${this.leappDir}/deeplink`;
+  },
+  get ipcClientId(): string {
+    return byFlavor({ prod: "leapp_cli", dev: "leapp_cli-dev", qa: "leapp_cli-qa" });
+  },
+  get extensionWebSocketPort(): number {
+    return byFlavor({ prod: 8095, dev: 8096, qa: 8097 });
+  },
+  get productName(): string {
+    return byFlavor({ prod: "Leapp", dev: "Leapp Dev", qa: "Leapp QA" });
+  },
+  get urlScheme(): string {
+    return byFlavor({ prod: "leapp", dev: "leapp-dev", qa: "leapp-qa" });
+  },
+  get cliBinaryName(): string {
+    return byFlavor({ prod: "leapp", dev: "leapp-dev", qa: "leapp-qa" });
+  },
   latestUrl: "https://leapp.cloud/releases.html",
   workspaceLastVersion: 7,
   slackUrl: "https://join.slack.com/t/noovolari/shared_invite/zt-opn8q98k-HDZfpJ2_2U3RdTnN~u_B~Q",
@@ -48,7 +80,9 @@ export const constants = {
   cliStartAwsFederatedSessionChannel: "aws-federated-session-start-channel",
   cliLogoutAwsFederatedSessionChannel: "aws-federated-session-logout-channel",
   cliRefreshSessionsChannel: "refresh-sessions-channel",
-  ipcServerId: "leapp_da",
+  get ipcServerId(): string {
+    return byFlavor({ prod: "leapp_da", dev: "leapp_da-dev", qa: "leapp_da-qa" });
+  },
 
   roleSessionName: "assumed-from-leapp",
   // Credential Process
@@ -60,8 +94,12 @@ export const constants = {
   ssmRegionDefault: "Use default region",
 
   // Contains Env for SSM on macOS
-  ssmSourceFileDestination: ".Leapp/ssm-env",
-  pluginEnvFileDestination: ".Leapp/plugin-env",
+  get ssmSourceFileDestination(): string {
+    return `${this.leappDir}/ssm-env`;
+  },
+  get pluginEnvFileDestination(): string {
+    return `${this.leappDir}/plugin-env`;
+  },
 
   npmRequiredPluginKeyword: "leapp-plugin",
   skipPluginValidation: true,

@@ -2,10 +2,11 @@ import { describe, expect, jest, test } from "@jest/globals";
 import RunAwsCredentialPlugin from "./run-aws-credential-plugin";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("RunAwsCredentialPlugin", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): RunAwsCredentialPlugin => {
-    const command = new RunAwsCredentialPlugin(argv, {} as any);
+    const command = new RunAwsCredentialPlugin(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

@@ -20,16 +20,16 @@
 }
 
 ::ng-deep {
-  .mat-list.mat-list-base {
+  .mat-mdc-list.mat-mdc-list-base {
     user-select: none;
 
-    .mat-list-item.workspace-menu {
+    .mat-mdc-list-item.workspace-menu {
       height: 55px !important;
     }
   }
 
-  .mat-menu-content {
-    .mat-menu-item.workspace-select-item {
+  .mat-mdc-menu-content {
+    .mat-mdc-menu-item.workspace-select-item {
       display: flex;
       height: 50px !important;
       padding: 0 10px;
@@ -37,6 +37,13 @@
       margin-left: 5px;
       margin-top: 5px;
       align-items: center;
+
+      // MDC wraps the item content: lay out icon, name and check mark in a row as before
+      .mat-mdc-menu-item-text {
+        display: flex;
+        align-items: center;
+        width: 100%;
+      }
     }
   }
 
@@ -52,8 +59,7 @@
       opacity: 0.7;
     }
   }
-
-  .mat-list-item-content {
+  .mdc-list-item__content {
     cursor: pointer;
     margin-top: 2px;
     margin-bottom: 2px;
@@ -80,8 +86,7 @@
   .moon-Row {
     top: -2px !important;
   }
-
-  .mat-list-item-content:hover i.moon-Close {
+  .mdc-list-item__content:hover i.moon-Close {
     display: inline-block !important;
     color: $text-color;
     font-size: 18px;
@@ -97,7 +102,7 @@
 }
 
 ::ng-deep {
-  .mat-list-text div span:not(.workspace-name-initial) {
+  .mdc-list-item__primary-text div span:not(.workspace-name-initial) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -121,8 +126,8 @@
     font-size: 14px !important;
     font-weight: 500 !important;
   }
-
-  .selected-segment .mat-list-item-content .mat-list-text {
+  // offsets the item's 10px inset; on MDC the text element would wrap, so the content box moves
+  .selected-segment .mdc-list-item__content {
     margin-left: -10px;
   }
 }
@@ -148,11 +153,10 @@ div.space-between-mat-lists {
     margin-top: -4px;
   }
 
-  .mat-list-item.selected-segment:hover {
+  .mat-mdc-list-item.selected-segment:hover {
     background-color: $silver-25 !important;
   }
-
-  .mat-list-item.selected-segment:hover .mat-list-item-content .mat-list-text .mat-line {
+  .mat-mdc-list-item.selected-segment:hover .mdc-list-item__content .mdc-list-item__primary-text .mat-line {
     transition: unset;
     opacity: 1;
   }
@@ -170,16 +174,21 @@ i.moon-Caret-down {
 ::ng-deep {
   .mat-expansion-panel-header:not([aria-disabled=true]) {
     width: 250px;
+
+    // MDC clips the header content 24px before the edge, cutting the caret's right arm
+    .mat-content {
+      overflow: visible;
+    }
   }
 
-  .mat-expanded .mat-content mat-panel-title .mat-subheader i.moon-Caret-down {
+  .mat-expanded .mat-content mat-panel-title .mat-mdc-subheader i.moon-Caret-down {
     display: inline-block;
     transform: rotate(180deg);
     transition: all 0.3s ease;
   }
 }
 
-.mat-list-base .mat-list-item .workspace-menu:hover {
+.mat-mdc-list-base .mat-mdc-list-item .workspace-menu:hover {
   background: #f9f9f9;
   border-radius: 6px;
   margin-left: 10px !important;
@@ -273,15 +282,18 @@ i.moon-Caret-down {
 }
 
 ::ng-deep {
-  .mat-list .workspace-menu {
-    .mat-list-item-content {
+  .mat-mdc-list .workspace-menu {
+    // MDC pads the item itself as well; the legacy item padded only its content
+    padding-left: 0;
+
+    .mdc-list-item__content {
       padding-left: 10px !important;
       padding-bottom: 15px !important;
     }
   }
 
-  .mat-menu-panel .mat-menu-content {
-    .mat-menu-item {
+  .mat-mdc-menu-panel .mat-mdc-menu-content {
+    .mat-mdc-menu-item {
       img {
         width: 20px;
         margin-right: 7px;
@@ -291,11 +303,17 @@ i.moon-Caret-down {
   }
 }
 
-.mat-list-base .mat-list-item.workspace-menu:hover {
+.mat-mdc-list-base .mat-mdc-list-item.workspace-menu:hover {
   background: none !important;
   width: unset !important;
 }
 
 app-sync-pro-widget {
   width: 100%;
+}
+
+// MDC renders the "Saved segments" header 10px lower than the legacy one; the expansion header clips
+// Its content, so close the gap above the accordion instead of moving the text
+app-integration-bar + div.space-between-mat-lists {
+  height: 3px;
 }

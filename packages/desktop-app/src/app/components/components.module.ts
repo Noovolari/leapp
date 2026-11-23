@@ -7,15 +7,14 @@ import { BsDropdownModule } from "ngx-bootstrap/dropdown";
 import { ConfirmationDialogComponent } from "./dialogs/confirmation-dialog/confirmation-dialog.component";
 import { InputDialogComponent } from "./dialogs/input-dialog/input-dialog.component";
 import { SnackbarComponent } from "./snackbar/snackbar.component";
-import { UpdateDialogComponent } from "./dialogs/update-dialog/update-dialog.component";
 import { ModalModule } from "ngx-bootstrap/modal";
 import { NgxJsonViewerModule } from "ngx-json-viewer";
 //import { MatTabsModule } from "@angular/material/tabs";
-import { MatLegacyTabsModule } from "@angular/material/legacy-tabs";
+import { MatTabsModule } from "@angular/material/tabs";
 import { MatIconModule } from "@angular/material/icon";
 import { MatCheckboxModule } from "@angular/material/checkbox";
 //import { MatButtonModule } from "@angular/material/button";
-import { MatLegacyButtonModule } from "@angular/material/legacy-button";
+import { MatButtonModule } from "@angular/material/button";
 import { SessionsComponent } from "./sessions/sessions.component";
 import { SessionCardComponent } from "./sessions/session-card/session-card.component";
 import { FilteringPipe } from "./sessions/pipes/filtering.pipe";
@@ -28,9 +27,9 @@ import { OptionsDialogComponent } from "./dialogs/options-dialog/options-dialog.
 import { CreateDialogComponent } from "./dialogs/create-dialog/create-dialog.component";
 import { EditDialogComponent } from "./dialogs/edit-dialog/edit-dialog.component";
 //import { MatMenuModule } from "@angular/material/menu";
-import { MatLegacyMenuModule } from "@angular/material/legacy-menu";
+import { MatMenuModule } from "@angular/material/menu";
 //import { MatListModule } from "@angular/material/list";
-import { MatLegacyListModule } from "@angular/material/legacy-list";
+import { MatListModule } from "@angular/material/list";
 import { MatSlideToggleModule } from "@angular/material/slide-toggle";
 import { MatExpansionModule } from "@angular/material/expansion";
 import { MatButtonToggleModule } from "@angular/material/button-toggle";
@@ -49,7 +48,7 @@ import { BottomBarComponent } from "./bottom-bar/bottom-bar.component";
 import { ScrollingModule } from "@angular/cdk/scrolling";
 import { LoginWorkspaceDialogComponent } from "./dialogs/login-team-dialog/login-workspace-dialog.component";
 import { BrowserModule } from "@angular/platform-browser";
-import { HttpClientModule } from "@angular/common/http";
+import { provideHttpClient, withInterceptorsFromDi, withXhr } from "@angular/common/http";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatCardModule } from "@angular/material/card";
@@ -58,6 +57,7 @@ import { MatInputModule } from "@angular/material/input";
 import { MatProgressSpinnerModule } from "@angular/material/progress-spinner";
 import { ManageTeamWorkspacesDialogComponent } from "./dialogs/manage-team-workspaces-dialog/manage-team-workspaces-dialog.component";
 import { InfoDialogComponent } from "./dialogs/info-dialog/info-dialog.component";
+import { UpdateDialogComponent } from "./dialogs/update-dialog/update-dialog.component";
 import { LeappProPreCheckoutDialogComponent } from "./dialogs/leapp-pro-pre-checkout-dialog/leapp-pro-pre-checkout-dialog.component";
 import { SyncProWidgetComponent } from "./sync-pro-widget/sync-pro-widget.component";
 import { OverlayModule } from "@angular/cdk/overlay";
@@ -77,7 +77,6 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     ConfirmationDialogComponent,
     AuthorizationDialogComponent,
     InputDialogComponent,
-    UpdateDialogComponent,
     SnackbarComponent,
     CommandBarComponent,
     SideBarComponent,
@@ -96,6 +95,7 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     ContextualMenuComponent,
     BottomBarComponent,
     InfoDialogComponent,
+    UpdateDialogComponent,
     LoginWorkspaceDialogComponent,
     ManageTeamWorkspacesDialogComponent,
     LeappProPreCheckoutDialogComponent,
@@ -104,14 +104,22 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     CheckIconSvgComponent,
     NoovolariDialogComponent,
   ],
+  exports: [
+    ConfirmationDialogComponent,
+    AuthorizationDialogComponent,
+    InputDialogComponent,
+    CommandBarComponent,
+    SideBarComponent,
+    SessionsComponent,
+  ],
   imports: [
     CommonModule,
     FormsModule,
     NgSelectModule,
-    TooltipModule.forRoot(),
+    TooltipModule,
     ReactiveFormsModule,
-    BsDropdownModule.forRoot(),
-    ModalModule.forRoot(),
+    BsDropdownModule,
+    ModalModule,
     NgxJsonViewerModule,
     //MatTabsModule,
     MatIconModule,
@@ -125,7 +133,6 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     MatTooltipModule,
     ScrollingModule,
     BrowserModule,
-    HttpClientModule,
     ReactiveFormsModule,
     BrowserAnimationsModule,
     MatFormFieldModule,
@@ -137,18 +144,11 @@ import { NoovolariDialogComponent } from "./dialogs/noovolari-dialog/noovolari-d
     MatProgressSpinnerModule,
     NgSelectModule,
     OverlayModule,
-    MatLegacyListModule,
-    MatLegacyMenuModule,
-    MatLegacyTabsModule,
-    MatLegacyButtonModule,
+    MatListModule,
+    MatMenuModule,
+    MatTabsModule,
+    MatButtonModule,
   ],
-  exports: [
-    ConfirmationDialogComponent,
-    AuthorizationDialogComponent,
-    InputDialogComponent,
-    CommandBarComponent,
-    SideBarComponent,
-    SessionsComponent,
-  ],
+  providers: [provideHttpClient(withXhr(), withInterceptorsFromDi())],
 })
 export class ComponentsModule {}

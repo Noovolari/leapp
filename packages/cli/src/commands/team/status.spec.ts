@@ -1,9 +1,10 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import TeamStatus from "./status";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("Workspace", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): TeamStatus => {
-    const command = new TeamStatus(argv, {} as any);
+    const command = new TeamStatus(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

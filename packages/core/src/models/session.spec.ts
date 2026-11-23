@@ -16,7 +16,7 @@ describe("Session Model", () => {
     jest.spyOn(mockedSession, "expired");
     expect(mockedSession.startDateTime).toBeUndefined();
     mockedSession.expired();
-    expect(mockedSession.expired).toReturnWith(false);
+    expect(mockedSession.expired).toHaveReturnedWith(false);
   });
 
   test("expired(), with startDateTime", () => {
@@ -27,11 +27,11 @@ describe("Session Model", () => {
     expect(mockedSession.startDateTime).not.toBeUndefined();
     mockedSession.expired();
     // not yet expired, should return expired false
-    expect(mockedSession.expired).toReturnWith(false);
+    expect(mockedSession.expired).toHaveReturnedWith(false);
 
     // session started >21 minutes prior, should return expired true
     (mockedSession.startDateTime as any) = new Date().getTime() - 21 * 60 * 1000;
     mockedSession.expired();
-    expect(mockedSession.expired).toReturnWith(true);
+    expect(mockedSession.expired).toHaveReturnedWith(true);
   });
 });

@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { NoovolariDialogComponent } from "./noovolari-dialog.component";
+import { mustInjected } from "../../../../base-injectables";
+import { OptionsService } from "../../../services/options.service";
 
 describe("NoovolariDialogComponent", () => {
   let component: NoovolariDialogComponent;
@@ -9,6 +11,7 @@ describe("NoovolariDialogComponent", () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [NoovolariDialogComponent],
+      providers: mustInjected().concat([{ provide: OptionsService, useValue: { colorTheme: "dark-theme" } }]),
     }).compileComponents();
   });
 

@@ -1,10 +1,11 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import LoginIntegration from "./login";
 import { CliProviderService } from "../../service/cli-provider-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("LoginIntegration", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): LoginIntegration => {
-    const command = new LoginIntegration(argv, {} as any);
+    const command = new LoginIntegration(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

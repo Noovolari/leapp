@@ -1,13 +1,13 @@
-import { ux } from "@oclif/core";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { LeappCommand } from "../../leapp-command";
+import { table, tableFlags } from "../../ux/table";
 
 export default class ListIntegrations extends LeappCommand {
   static description = "Show integrations list";
   static examples = ["$leapp integration list"];
 
   static flags = {
-    ...ux.table.flags(),
+    ...tableFlags(),
   };
 
   constructor(argv: string[], config: Config) {
@@ -50,6 +50,6 @@ export default class ListIntegrations extends LeappCommand {
       expirationInHours: { header: "Expiration" },
     };
 
-    ux.table(data, columns, { ...flags });
+    table(data, columns, { ...flags });
   }
 }

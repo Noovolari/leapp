@@ -1,40 +1,52 @@
 <div class="draggable-area"></div>
 <div class="full-container">
   <div class="logo-column">
-    <img src="assets/images/Leapp-rounded.png" alt="" title="">
+    <img src="assets/images/Leapp-rounded.png" alt="" title="" />
   </div>
 
   <div class="form-column-container">
     <div class="personal-data">
-      <div class="letter-avatar"><span>{{initials}}</span></div>
-      <div class="email-and-name">
-        <div class="name">{{name}}</div>
-        <div class="email">{{email?.value}}</div>
+      <div class="letter-avatar">
+        <span>{{ initials }}</span>
       </div>
-      <div class="team-name">{{teamName}}</div>
+      <div class="email-and-name">
+        <div class="name">{{ name }}</div>
+        <div class="email">{{ email?.value }}</div>
+      </div>
+      <div class="team-name">{{ teamName }}</div>
     </div>
 
     <div class="form-psw-container">
       <form [formGroup]="signinForm" (ngSubmit)="signIn()" spellcheck="false">
         <fieldset class="form-container" [disabled]="submitting">
-          <input class="form-control" type="hidden" placeholder="Company email" [formControl]="email" required>
+          <input class="form-control" type="hidden" placeholder="Company email" [formControl]="email" required />
           <div class="form-field">
-            <input class="form-control" id="password-field" [type]="hidePassword ? 'password' : 'text'" placeholder="Enter your workspace password"
-                   [formControl]="password" (keyup.enter)="signIn()" required>
-            <button class="input-inner-button" type="button" (click)="hidePassword = !hidePassword"
-                    [attr.aria-pressed]="hidePassword">
-              <i class="fa {{hidePassword ? 'fa-eye-slash' : 'fa-eye'}}"></i>
+            <input
+              class="form-control"
+              id="password-field"
+              [type]="hidePassword ? 'password' : 'text'"
+              placeholder="Enter your workspace password"
+              [formControl]="password"
+              (keyup.enter)="signIn()"
+              required
+            />
+            <button class="input-inner-button" type="button" (click)="hidePassword = !hidePassword" [attr.aria-pressed]="hidePassword">
+              <i class="fa {{ hidePassword ? 'fa-eye-slash' : 'fa-eye' }}"></i>
             </button>
           </div>
         </fieldset>
       </form>
-      <div *ngIf="this.showTouchId; else disabledTouchIdButton" class="touch-id" (click)="!submitting ? launchTouchId() : ''" [ngClass]="submitting ? 'disabled' : ''">
-        <div *ngIf="submitting" class="sign-in-loader"><i class="fa fa-spinner fa-spin"></i></div>
-        <img *ngIf="!submitting" src="assets/images/fingerprint.png" alt="">
+      @if (this.showTouchId) {
+      <div class="touch-id" (click)="!submitting ? launchTouchId() : ''" [ngClass]="submitting ? 'disabled' : ''">
+        @if (submitting) {
+        <div class="sign-in-loader"><i class="fa fa-spinner fa-spin"></i></div>
+        } @if (!submitting) {
+        <img src="assets/images/fingerprint.png" alt="" />
+        }
       </div>
-      <ng-template #disabledTouchIdButton>
-        <div *ngIf="submitting" class="sign-in-loader-no-touch-id"><i class="fa fa-spinner fa-spin"></i></div>
-      </ng-template>
+      } @else { @if (submitting) {
+      <div class="sign-in-loader-no-touch-id"><i class="fa fa-spinner fa-spin"></i></div>
+      } }
     </div>
   </div>
 
@@ -43,8 +55,13 @@
   </div>
 
   <div class="local-workspace">
-    <p><span>Sign out definitively from this device and </span><span class="link-to-local" (click)="switchToLocalWorkspace();">start with a local workspace</span></p>
+    <p>
+      <span>Sign out definitively from this device and </span
+      ><span class="link-to-local" (click)="switchToLocalWorkspace()">start with a local workspace</span>
+    </p>
   </div>
 </div>
 
-<div class="submitting-overlay" *ngIf="submitting"></div>
+@if (submitting) {
+<div class="submitting-overlay"></div>
+}

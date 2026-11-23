@@ -3,10 +3,11 @@ import { Session } from "@noovolari/leapp-core/models/session";
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import GenerateSession from "./generate";
 import { LocalstackSessionService } from "@noovolari/leapp-core/services/session/localstack/localstack-session-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("GenerateSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): GenerateSession => {
-    const command = new GenerateSession(argv, {} as any);
+    const command = new GenerateSession(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

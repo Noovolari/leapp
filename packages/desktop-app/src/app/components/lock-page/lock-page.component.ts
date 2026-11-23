@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { AbstractControl, FormControl, FormGroup, Validators } from "@angular/forms";
 import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { ApiErrorCodes, FormErrorCodes, TeamService } from "../../services/team-service";
@@ -16,6 +16,8 @@ import { AnalyticsService } from "../../services/analytics.service";
   selector: "app-lock-page",
   templateUrl: "./lock-page.component.html",
   styleUrls: ["./lock-page.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class LockPageComponent implements OnInit {
   email: FormControl;
@@ -98,7 +100,7 @@ export class LockPageComponent implements OnInit {
 
         const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
         const planStatus = teamOrPro.type === "team" ? LeappPlanStatus.enterprise : LeappPlanStatus.proEnabled;
-        await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", planStatus);
+        await this.appProviderService.keychainService.saveSecret(constants.appName, "leapp-enabled-plan", planStatus);
         globalLeappProPlanStatus.next(planStatus);
 
         if (doesWorkspaceExist) {
@@ -143,7 +145,7 @@ export class LockPageComponent implements OnInit {
     await this.appProviderService.teamService.signOut();
     this.appService.closeAllMenuTriggers();
     globalLeappProPlanStatus.next(LeappPlanStatus.free);
-    await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
+    await this.appProviderService.keychainService.saveSecret(constants.appName, "leapp-enabled-plan", LeappPlanStatus.free);
     await this.router.navigate(["/dashboard"]);
   }
 

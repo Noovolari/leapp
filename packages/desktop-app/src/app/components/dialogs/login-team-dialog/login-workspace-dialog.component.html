@@ -1,4 +1,4 @@
-<a class="close-modal" (click)="closeModal();"><i class="moon-Close"></i></a>
+<a class="close-modal" (click)="closeModal()"><i class="moon-Close"></i></a>
 <div class="form-container">
   <form [formGroup]="signinForm" (ngSubmit)="signIn()" spellcheck="false">
     <fieldset class="form-container" [disabled]="submitting">
@@ -6,29 +6,40 @@
 
       <div class="form-field">
         <label>Email address</label>
-        <input class="form-control" type="text" placeholder="Company email" [formControl]="email" required>
-        <small class="text-error" *ngIf="email.invalid && email.touched">{{getFormError(email)}}</small>
+        <input class="form-control" type="text" placeholder="Company email" [formControl]="email" required />
+        @if (email.invalid && email.touched) {
+        <small class="text-error">{{ getFormError(email) }}</small>
+        }
       </div>
 
       <div class="form-field">
         <label for="password-field">Password</label>
-        <input class="form-control" id="password-field" [type]="hidePassword ? 'password' : 'text'" placeholder="Enter your workspace password"
-               [formControl]="password" required>
-        <button class="input-inner-button" type="button" (click)="hidePassword = !hidePassword"
-                [attr.aria-pressed]="hidePassword">
-          <i class="fa {{hidePassword ? 'fa-eye-slash' : 'fa-eye'}}"></i>
+        <input
+          class="form-control"
+          id="password-field"
+          [type]="hidePassword ? 'password' : 'text'"
+          placeholder="Enter your workspace password"
+          [formControl]="password"
+          required
+        />
+        <button class="input-inner-button" type="button" (click)="hidePassword = !hidePassword" [attr.aria-pressed]="hidePassword">
+          <i class="fa {{ hidePassword ? 'fa-eye-slash' : 'fa-eye' }}"></i>
         </button>
-        <small class="text-error" *ngIf="password.invalid && password.touched">{{getFormError(password)}}</small>
+        @if (password.invalid && password.touched) {
+        <small class="text-error">{{ getFormError(password) }}</small>
+        }
       </div>
 
       <!-- TODO: add a link to the Get Help page -->
       <!-- <div class="form-help"><img src="assets/images/question-fill.svg" alt="get-help"><a>Get Help</a></div> -->
-
     </fieldset>
     <div class="signin-modal-bottom">
-      <button type="submit">Add workspace<i class="fa fa-spinner fa-spin" *ngIf="submitting"></i></button>
+      <button type="submit">
+        Add workspace@if (submitting) {
+        <i class="fa fa-spinner fa-spin"></i>
+        }
+      </button>
       <a (click)="closeModal()">Cancel</a>
     </div>
   </form>
 </div>
-

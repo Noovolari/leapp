@@ -6,7 +6,7 @@ import { SessionStatus } from "../../../models/session-status";
 import { LoggedEntry, LoggedException, LogLevel } from "../../log-service";
 import { AzureSecrets, AzureSubscription } from "../../azure-persistence-service";
 import { AzureIntegration } from "../../../models/azure/azure-integration";
-import { JsonCache } from "@azure/msal-node";
+import type { JsonCache } from "@azure/msal-node";
 import { constants } from "../../../models/constants";
 
 describe("AzureSessionService", () => {
@@ -254,7 +254,7 @@ describe("AzureSessionService", () => {
 
     await azureSessionService.stop(azureSession.sessionId);
 
-    expect(azurePersistenceService.saveProfile).toBeCalledTimes(1);
+    expect(azurePersistenceService.saveProfile).toHaveBeenCalledTimes(1);
     expect(azurePersistenceService.saveProfile).toHaveBeenCalledWith(expectedProfiles);
   });
 
@@ -289,7 +289,7 @@ describe("AzureSessionService", () => {
     const repository = {
       getSessionById: () => azureSession,
       updateAzureIntegration: jest.fn(() => {
-        expect(executeService.execute).toBeCalledTimes(1);
+        expect(executeService.execute).toHaveBeenCalledTimes(1);
         expect(executeService.execute).toHaveBeenCalledWith("az logout");
       }),
       getAzureIntegration: () => azureIntegration,
@@ -307,7 +307,7 @@ describe("AzureSessionService", () => {
 
     await azureSessionService.stop(azureSession.sessionId);
 
-    expect(repository.updateAzureIntegration).toBeCalledTimes(1);
+    expect(repository.updateAzureIntegration).toHaveBeenCalledTimes(1);
     expect(repository.updateAzureIntegration).toHaveBeenCalledWith(
       azureIntegration.id,
       azureIntegration.alias,
@@ -352,7 +352,7 @@ describe("AzureSessionService", () => {
     const spySessionDeactivated = jest.spyOn(azureSessionService, "sessionDeactivated");
     await azureSessionService.stop(azureSession.sessionId);
 
-    expect(spySessionDeactivated).toBeCalledTimes(1);
+    expect(spySessionDeactivated).toHaveBeenCalledTimes(1);
     expect(spySessionDeactivated).toHaveBeenCalledWith(azureSession.sessionId);
     expect(azureSession.status).toEqual(SessionStatus.inactive);
   });

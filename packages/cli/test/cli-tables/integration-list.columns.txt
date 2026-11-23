@@ -1,0 +1,4 @@
+ Integration Name Status  
+ ──────────────── ─────── 
+ company-sso      Online  
+ company-azure    Offline 

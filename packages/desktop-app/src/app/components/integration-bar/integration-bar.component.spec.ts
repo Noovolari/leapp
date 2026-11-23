@@ -1,4 +1,5 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { of } from "rxjs";
+import { waitForAsync, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { IntegrationBarComponent } from "./integration-bar.component";
 import { MAT_SNACK_BAR_DATA, MatSnackBarRef } from "@angular/material/snack-bar";
@@ -12,7 +13,7 @@ describe("IntegrationBarComponent", () => {
   let component: IntegrationBarComponent;
   let fixture: ComponentFixture<IntegrationBarComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     const spyRepositoryService = jasmine.createSpyObj("Repository", {
       getProfiles: [],
       getSessions: [],
@@ -23,7 +24,8 @@ describe("IntegrationBarComponent", () => {
     });
     const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       integrations: [],
-      integrations$: { subscribe: () => {} },
+      // like the real BehaviorSubject, emit at once so ngOnInit fills selectedIntegrations
+      integrations$: of([]),
       setIntegrations: (_awsSsoIntegrations: AwsSsoIntegration[]) => void {},
       getIntegrations: () => [],
     });

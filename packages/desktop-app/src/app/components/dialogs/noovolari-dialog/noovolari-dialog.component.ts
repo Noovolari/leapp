@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { WindowService } from "../../../services/window.service";
 import { OptionsService } from "../../../services/options.service";
@@ -8,6 +8,8 @@ import { constants } from "@noovolari/leapp-core/models/constants";
   selector: "app-noovolari-dialog",
   templateUrl: "./noovolari-dialog.component.html",
   styleUrls: ["./noovolari-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class NoovolariDialogComponent implements OnInit {
   @Input()

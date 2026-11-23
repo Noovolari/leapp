@@ -1,4 +1,4 @@
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { sessionId, pluginName } from "../../flags";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { OperatingSystem, osMap } from "@noovolari/leapp-core/models/operating-system";

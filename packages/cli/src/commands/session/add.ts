@@ -1,7 +1,7 @@
 import { AccessMethod } from "@noovolari/leapp-core/models/access-method";
 import { CloudProviderType } from "@noovolari/leapp-core/models/cloud-provider-type";
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { IdpUrlAccessMethodField } from "@noovolari/leapp-core/models/idp-url-access-method-field";
 import CreateIdpUrl from "../idp-url/create";
 import {

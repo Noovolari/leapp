@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { AppService } from "../../../services/app.service";
 import { IGlobalColumns } from "../../command-bar/command-bar.component";
 import { Session } from "@noovolari/leapp-core/models/session";
@@ -18,6 +18,8 @@ import { AnalyticsService } from "../../../services/analytics.service";
   selector: "tr[app-session-card]",
   templateUrl: "./session-card.component.html",
   styleUrls: ["./session-card.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class SessionCardComponent implements OnInit {
   @Input()

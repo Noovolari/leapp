@@ -1,6 +1,6 @@
 import { Session } from "@noovolari/leapp-core/models/session";
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { force, sessionId } from "../../flags";
 
 export default class DeleteSession extends LeappCommand {

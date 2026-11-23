@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { compactMode } from "../../components/command-bar/command-bar.component";
 import { AppNativeService } from "../../services/app-native.service";
 import { AppProviderService } from "../../services/app-provider.service";
@@ -8,6 +8,8 @@ import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavi
   selector: "app-main-layout",
   templateUrl: "./main-layout.component.html",
   styleUrls: ["./main-layout.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class MainLayoutComponent implements OnInit, OnDestroy {
   compactMode: boolean;

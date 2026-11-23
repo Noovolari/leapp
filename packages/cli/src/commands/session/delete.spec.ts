@@ -2,10 +2,11 @@ import { describe, expect, jest, test } from "@jest/globals";
 import DeleteSession from "./delete";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { CliProviderService } from "../../service/cli-provider-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("DeleteSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): DeleteSession => {
-    const command = new DeleteSession(argv, {} as any);
+    const command = new DeleteSession(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

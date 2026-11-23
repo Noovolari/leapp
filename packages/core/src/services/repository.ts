@@ -66,7 +66,7 @@ export class Repository {
 
   createWorkspace(): void {
     if (!this.fileService.existsSync(this.nativeService.os.homedir() + "/" + this.workspaceFileName)) {
-      this.fileService.newDir(this.nativeService.os.homedir() + "/.Leapp", { recursive: true });
+      this.fileService.newDir(this.nativeService.os.homedir() + "/" + constants.leappDir, { recursive: true });
       this._workspace = this.workspaceConsistencyService.createNewWorkspace();
       this.persistWorkspace(this._workspace);
     }

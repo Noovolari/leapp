@@ -1,6 +1,6 @@
 import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aws-session-service";
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { profileId, sessionId } from "../../flags";
 

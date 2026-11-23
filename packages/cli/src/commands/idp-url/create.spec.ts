@@ -1,10 +1,11 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import CreateIdpUrl from "./create";
 import { CliProviderService } from "../../service/cli-provider-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("CreateIdpUrl", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): CreateIdpUrl => {
-    const command = new CreateIdpUrl(argv, {} as any);
+    const command = new CreateIdpUrl(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

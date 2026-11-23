@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { RemoteProceduresServer } from "@noovolari/leapp-core/services/remote-procedures-server";
 import { environment } from "../environments/environment";
 import { AppService } from "./services/app.service";
@@ -6,8 +6,6 @@ import { Router } from "@angular/router";
 import { setTheme } from "ngx-bootstrap/utils";
 import { AppMfaCodePromptService } from "./services/app-mfa-code-prompt.service";
 import { AppAwsAuthenticationService } from "./services/app-aws-authentication.service";
-import { UpdaterService } from "./services/updater.service";
-import compareVersions from "compare-versions";
 import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { TimerService } from "@noovolari/leapp-core/services/timer-service";
@@ -21,6 +19,7 @@ import { RotationService } from "@noovolari/leapp-core/services/rotation-service
 import { AppVerificationWindowService } from "./services/app-verification-window.service";
 import { WindowService } from "./services/window.service";
 import { AppNativeService } from "./services/app-native.service";
+import { UpdaterService } from "./services/updater.service";
 import { AwsSsoIntegrationService } from "@noovolari/leapp-core/services/integration/aws-sso-integration-service";
 import { AwsSsoRoleService } from "@noovolari/leapp-core/services/session/aws/aws-sso-role-service";
 import { OptionsService } from "./services/options.service";
@@ -36,6 +35,8 @@ import { AnalyticsService } from "./services/analytics.service";
   selector: "app-root",
   templateUrl: "./app.component.html",
   styleUrls: ["./app.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class AppComponent implements OnInit {
   isSyncingWorkspace: boolean;
@@ -67,11 +68,11 @@ export class AppComponent implements OnInit {
     public appService: AppService,
     public router: Router,
     private optionsService: OptionsService,
-    private updaterService: UpdaterService,
     private windowService: WindowService,
     private appNativeService: AppNativeService,
     private extensionWebsocketService: ExtensionWebsocketService,
-    private analyticsService: AnalyticsService
+    private analyticsService: AnalyticsService,
+    private updaterService: UpdaterService
   ) {
     appProviderService.mfaCodePrompter = mfaCodePrompter;
     appProviderService.awsAuthenticationService = awsAuthenticationService;
@@ -118,6 +119,9 @@ export class AppComponent implements OnInit {
     // Use ngx bootstrap 4
     setTheme("bs4");
 
+    // "Leapp Dev" in the dev flavor, so it can't be mistaken for the installed Leapp
+    document.title = constants.productName;
+
     if (environment.production) {
       // Clear both info and warn message in production
       // mode without removing them from code actually
@@ -130,7 +134,7 @@ export class AppComponent implements OnInit {
     this.windowService.blockDevToolInProductionMode();
 
     // Create folders and files if missing
-    this.updaterService.createFoldersIfMissing();
+    this.createFoldersIfMissing();
 
     // Before retrieving an actual copy of the workspace we
     // check and in case apply, our retro compatibility service
@@ -150,8 +154,10 @@ export class AppComponent implements OnInit {
     // Start Global Timer
     this.timerService.start(() => this.timerFunction(this.rotationService, this.integrationIsOnlineStateRefreshService));
 
-    // Launch Auto Updater Routines
-    this.manageAutoUpdate();
+    this.listenForDeepLinks();
+
+    // Update check (the main process sends UPDATE_AVAILABLE)
+    this.updaterService.start();
 
     if (!constants.disablePluginSystem) {
       this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
@@ -167,9 +173,9 @@ export class AppComponent implements OnInit {
     let teamMemberTeamName;
 
     // Deep link with app closed
-    if (this.fileService.existsSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile))) {
+    if (this.fileService.existsSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), constants.deeplinkFile))) {
       try {
-        const deepLink = this.fileService.readFileSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile));
+        const deepLink = this.fileService.readFileSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), constants.deeplinkFile));
         if (this.isOpenLeappDeepLink(deepLink)) {
           const afterQuestionMark = deepLink.split("?")[1];
           const splitByAmpersand = afterQuestionMark.split("&");
@@ -184,7 +190,7 @@ export class AppComponent implements OnInit {
       } catch (err) {
         this.loggingService.log(new LoggedEntry(`Error in install plugin from file: ${err.toString()}`, this, LogLevel.info));
       } finally {
-        this.appNativeService.fs.removeSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), environment.deeplinkFile));
+        this.appNativeService.fs.removeSync(this.appNativeService.path.join(this.appNativeService.os.homedir(), constants.deeplinkFile));
       }
     }
 
@@ -257,7 +263,8 @@ export class AppComponent implements OnInit {
    */
   private showCredentialBackupMessageIfNeeded() {
     // TODO: move this logic inside a service
-    const oldAwsCredentialsPath = this.fileService.homeDir() + "/" + constants.credentialsDestination;
+    // The credentials file Leapp writes, so the backup never touches a file of another flavor or tool
+    const oldAwsCredentialsPath = this.awsCoreService.awsCredentialPath();
     const newAwsCredentialsPath = oldAwsCredentialsPath + ".leapp.bkp";
     const check =
       this.behaviouralSubjectService.sessions.length === 0 &&
@@ -280,40 +287,20 @@ export class AppComponent implements OnInit {
     }
   }
 
-  /**
-   * Launch Updater process
-   *
-   * @private
-   */
-  private manageAutoUpdate(): void {
-    let savedVersion;
-
+  private createFoldersIfMissing(): void {
     try {
-      savedVersion = this.updaterService.getSavedAppVersion();
-    } catch (error) {
-      savedVersion = this.updaterService.getCurrentAppVersion();
-    }
-
-    try {
-      if (compareVersions(savedVersion, this.updaterService.getCurrentAppVersion()) <= 0) {
-        // We always need to maintain this order: fresh <= saved <= online
-        this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion());
+      const leappDir = this.appNativeService.path.join(this.appNativeService.os.homedir(), constants.leappDir);
+      const awsDir = this.appNativeService.path.dirname(this.awsCoreService.awsCredentialPath());
+      for (const dir of [leappDir, awsDir]) {
+        if (!this.appNativeService.fs.existsSync(dir)) {
+          this.appNativeService.fs.mkdirSync(dir);
+        }
       }
-    } catch (error) {
-      this.updaterService.updateVersionJson(this.updaterService.getCurrentAppVersion());
-    }
+    } catch (_) {}
+  }
 
+  private listenForDeepLinks(): void {
     const ipc = this.appNativeService.ipcRenderer;
-    ipc.on("UPDATE_AVAILABLE", async (_, info) => {
-      const releaseNote = await this.updaterService.getReleaseNote();
-      this.updaterService.setUpdateInfo(info.version, info.releaseName, info.releaseDate, releaseNote);
-      if (this.updaterService.isUpdateNeeded()) {
-        this.updaterService.updateDialog();
-        this.behaviouralSubjectService.sessions = [...this.behaviouralSubjectService.sessions];
-        this.appProviderService.sessionManagementService.updateSessions(this.behaviouralSubjectService.sessions);
-      }
-    });
-
     ipc.on("PLUGIN_URL", (_, url) => {
       if (this.isOpenLeappDeepLink(url)) {
         const afterQuestionMark = url.split("?")[1];

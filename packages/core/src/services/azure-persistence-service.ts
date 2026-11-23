@@ -1,7 +1,6 @@
-import { JsonCache, SerializedRefreshTokenEntity } from "@azure/msal-node";
+import type { JsonCache, SerializedAccountEntity, SerializedRefreshTokenEntity } from "@azure/msal-node";
 import { INativeService } from "../interfaces/i-native-service";
 import { constants } from "../models/constants";
-import { SerializedAccountEntity } from "@azure/msal-node/dist/cache/serializer/SerializerTypes";
 import { IKeychainService } from "../interfaces/i-keychain-service";
 
 export interface AzureSubscription {

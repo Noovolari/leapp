@@ -809,7 +809,7 @@ describe("PluginManagerService", () => {
 
     const packageJson1 = {};
     let expectedMissingValues = ["version", "name", "author", "description", "keywords", "leappPlugin"];
-    expect(() => service.extractMetadata(packageJson1)).toThrowError(expectedMissingValues.join(", "));
+    expect(() => service.extractMetadata(packageJson1)).toThrow(expectedMissingValues.join(", "));
 
     const packageJson2 = {
       version: "0.1.0",
@@ -818,11 +818,11 @@ describe("PluginManagerService", () => {
       leappPlugin: {},
     };
     expectedMissingValues = ["author", "keywords"];
-    expect(() => service.extractMetadata(packageJson2)).toThrowError(expectedMissingValues.join(", "));
+    expect(() => service.extractMetadata(packageJson2)).toThrow(expectedMissingValues.join(", "));
 
     packageJson2["keywords"] = ["test-keyword"];
     packageJson2["author"] = "author";
-    expect(() => service.extractMetadata(packageJson2)).toThrowError(constants.npmRequiredPluginKeyword);
+    expect(() => service.extractMetadata(packageJson2)).toThrow(constants.npmRequiredPluginKeyword);
   });
 
   test("extractMetadata, throws an error about wrong/unspported session or operanting system", () => {
@@ -847,7 +847,7 @@ describe("PluginManagerService", () => {
     };
     const expectedErrors = ["leappPlugin.supportedSessions: wrong-session is unsupported", "leappPlugin.supportedOS: wrong-os is unsupported"];
     const service = new PluginManagerService(null, nativeService, null, null, sessionFactory, null) as any;
-    expect(() => service.extractMetadata(packageJson)).toThrowError(expectedErrors.join(", "));
+    expect(() => service.extractMetadata(packageJson)).toThrow(expectedErrors.join(", "));
   });
 
   test("rsaVerifySignatureFromBase64", () => {

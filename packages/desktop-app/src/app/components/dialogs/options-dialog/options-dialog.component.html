@@ -1,6 +1,6 @@
 <form spellcheck="false" [formGroup]="form" class="form center-vertical text-left" (submit)="saveOptions();">
 
-  <mat-tab-group [animationDuration]="'0ms'" #tabs>
+  <mat-tab-group [animationDuration]="'0ms'" mat-stretch-tabs="false" mat-align-tabs="center" #tabs>
 
     <mat-tab>
       <ng-template mat-tab-label>
@@ -17,7 +17,7 @@
             <div class="form-group">
               <div class="form-field">
                 <label>Unlock with Touch ID</label>
-                <mat-checkbox class="touch-id-enable-checkbox" formControlName="touchIdEnableSelect" [(ngModel)]="selectedTouchIdEnabled"></mat-checkbox>
+                <mat-checkbox class="touch-id-enable-checkbox" formControlName="touchIdEnableSelect"></mat-checkbox>
               </div>
             </div>
           </div>
@@ -32,8 +32,7 @@
                              eConstants.requirePasswordEveryTwoWeeks,
                              eConstants.requirePasswordEveryMonth,
                              eConstants.requirePasswordNever
-                           ]"
-                           [(ngModel)]="selectedRequirePassword" [appendTo]="'body'"></ng-select>
+                           ]" [appendTo]="'body'"></ng-select>
               </div>
             </div>
           </div>
@@ -55,16 +54,14 @@
           <div class="form-group">
             <div class="form-field">
               <label>AWS Region</label>
-              <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions"
-                         [(ngModel)]="selectedRegion" [appendTo]="'body'"></ng-select>
+              <ng-select formControlName="regionsSelect" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions" [appendTo]="'body'"></ng-select>
             </div>
           </div>
 
           <div class="form-group">
             <div class="form-field">
               <label>Azure Location</label>
-              <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [clearable]="false" [items]="locations"
-                         [(ngModel)]="selectedLocation" [appendTo]="'body'"></ng-select>
+              <ng-select formControlName="locationsSelect" bindLabel="location" bindValue="location" [clearable]="false" [items]="locations" [appendTo]="'body'"></ng-select>
             </div>
           </div>
         </div>
@@ -76,7 +73,7 @@
               <div class="form-field">
                 <label>MacOS Terminal</label>
                 <ng-select formControlName="terminalSelect" bindLabel="terminal" bindValue="terminal" [clearable]="false" [searchable]="false"
-                           [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}, {terminal: eConstants.macOsWarp}]" [(ngModel)]="selectedTerminal"
+                           [items]="[{terminal: eConstants.macOsTerminal}, {terminal: eConstants.macOsIterm2}, {terminal: eConstants.macOsWarp}]"
                            [appendTo]="'body'"></ng-select>
               </div>
             </div>
@@ -93,7 +90,6 @@
                          [clearable]="false"
                          [searchable]="false"
                          [items]="[{colorTheme: eConstants.darkTheme}, {colorTheme: eConstants.lightTheme},{colorTheme: eConstants.systemDefaultTheme}]"
-                         [(ngModel)]="selectedColorTheme"
                          (change)="setColorTheme(selectedColorTheme)"
                          [appendTo]="'body'">
               </ng-select>
@@ -114,7 +110,6 @@
                            [clearable]="false"
                            [searchable]="false"
                            [items]="[{credentialMethod: eConstants.credentialFile}, {credentialMethod: eConstants.credentialProcess}]"
-                           [(ngModel)]="selectedCredentialMethod"
                            (change)="showWarningModalForCredentialProcess()"
                            [appendTo]="'body'">
                 </ng-select>
@@ -145,7 +140,7 @@
 
           <div class="form-group">
             <div class="form-field">
-              <ng-select formControlName="proxyProtocol" [items]="['HTTP', 'HTTPS']" [(ngModel)]="proxyProtocol" [appendTo]="'body'"
+              <ng-select formControlName="proxyProtocol" [items]="['HTTP', 'HTTPS']" [appendTo]="'body'"
                          class="proxy-length-1"></ng-select>
 
               <span class="proxy-length-2">://</span>
@@ -162,7 +157,7 @@
 
           <div class="form-group">
             <div class="form-field">
-              <mat-checkbox formControlName="showAuthCheckbox" [(ngModel)]="showProxyAuthentication"></mat-checkbox>
+              <mat-checkbox formControlName="showAuthCheckbox"></mat-checkbox>
               Use authentication
             </div>
           </div>
@@ -282,7 +277,6 @@
                          [clearable]="false"
                          [searchable]="false"
                          [items]="[{ssmRegionBehaviour: eConstants.ssmRegionNo}, {ssmRegionBehaviour: eConstants.ssmRegionDefault}]"
-                         [(ngModel)]="selectedSsmRegionBehaviour"
                          [appendTo]="'body'">
               </ng-select>
             </div>

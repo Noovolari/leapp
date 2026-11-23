@@ -1,5 +1,5 @@
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 
 export default class TeamStatus extends LeappCommand {
   static description = "Get the team login status";

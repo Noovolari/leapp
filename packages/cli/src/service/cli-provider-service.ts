@@ -461,7 +461,7 @@ export class CliProviderService {
     return this.teamServiceInstance;
   }
 
-  get inquirer(): CliInquirer.Inquirer {
+  get inquirer(): typeof CliInquirer {
     return CliInquirer;
   }
 }

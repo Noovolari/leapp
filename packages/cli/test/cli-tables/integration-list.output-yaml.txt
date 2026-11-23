@@ -1,0 +1,13 @@
+- integrationType: AWS-SSO
+  integrationName: company-sso
+  urlOrTenant: 'https://example.awsapps.com/start'
+  region: eu-west-1
+  status: Online
+  expirationInHours: Expiring in 7 hours
+- integrationType: AZURE
+  integrationName: company-azure
+  urlOrTenant: 99999999-8888-7777-6666-555555555555
+  region: westeurope
+  status: Offline
+  expirationInHours: '-'
+

@@ -1,13 +1,13 @@
-import { ux } from "@oclif/core";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { LeappCommand } from "../../leapp-command";
+import { table, tableFlags } from "../../ux/table";
 
 export default class ListIdpUrls extends LeappCommand {
   static description = "Show identity providers list";
   static examples = ["$leapp idp-url list"];
 
   static flags = {
-    ...ux.table.flags(),
+    ...tableFlags(),
   };
 
   constructor(argv: string[], config: Config) {
@@ -34,6 +34,6 @@ export default class ListIdpUrls extends LeappCommand {
       url: { header: "Identity Provider URL" },
     };
 
-    ux.table(data, columns, { ...flags });
+    table(data, columns, { ...flags });
   }
 }

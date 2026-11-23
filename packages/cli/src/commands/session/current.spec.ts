@@ -3,13 +3,14 @@ import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import CurrentSession from "./current";
 import { AzureSessionService } from "@noovolari/leapp-core/services/session/azure/azure-session-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 const awsProvider = "aws";
 const azureProvider = "azure";
 
 describe("CurrentSession", () => {
   const getTestCommand = (cliProviderService: any = null): CurrentSession => {
-    const command = new CurrentSession([], {} as any);
+    const command = new CurrentSession([], oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

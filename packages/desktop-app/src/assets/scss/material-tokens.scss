@@ -1,0 +1,56 @@
+// Material MDC components take their font and tracking from typography tokens (Roboto,
+// positive tracking). Leapp's legacy components inherited the body text instead: the system font stack
+// with the body's -0.5px tracking. Imported once, from styles.scss, so overlays (menus, selects,
+// dialogs) inherit it from html.
+
+$app-font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+$app-tracking: -0.5px;
+
+$app-typography-tokens: (
+  list-list-item-label-text,
+  list-list-item-supporting-text,
+  menu-item-label-text,
+  option-label-text,
+  optgroup-label-text,
+  select-trigger-text,
+  expansion-header-text,
+  expansion-container-text,
+  checkbox-label-text,
+  slide-toggle-label-text,
+  dialog-subhead,
+  dialog-supporting-text,
+  form-field-container-text,
+  form-field-subscript-text,
+  button-text-label-text,
+  button-filled-label-text,
+  button-protected-label-text,
+  button-outlined-label-text
+);
+
+html {
+  @each $token in $app-typography-tokens {
+    --mat-#{$token}-font: #{$app-font-stack};
+    --mat-#{$token}-tracking: #{$app-tracking};
+  }
+
+  // the options dialog tab labels had no tracking (global.scss .mat-tab-label-text)
+  --mat-tab-label-text-font: #{$app-font-stack};
+  --mat-tab-label-text-tracking: normal;
+}
+
+// Checkboxes and slide toggles use the app's blue in both themes, not the indigo-pink accent.
+// The toggle tokens are set per colour class by the theme, so match that specificity.
+html,
+html .mat-mdc-slide-toggle,
+html .mat-mdc-slide-toggle.mat-accent {
+  @each $state in ("", "hover-", "focus-", "pressed-") {
+    --mat-checkbox-selected-#{$state}icon-color: #{$dark-button-color};
+    --mat-slide-toggle-selected-#{$state}handle-color: #{$dark-button-color};
+    --mat-slide-toggle-selected-#{$state}track-color: #{rgba($dark-button-color, 0.45)};
+  }
+  @each $state in ("hover-", "focus-", "pressed-") {
+    --mat-checkbox-selected-#{$state}state-layer-color: #{$dark-button-color};
+    --mat-slide-toggle-selected-#{$state}state-layer-color: #{$dark-button-color};
+  }
+  --mat-checkbox-selected-checkmark-color: #ffffff;
+}

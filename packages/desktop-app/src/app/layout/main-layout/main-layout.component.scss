@@ -6,7 +6,20 @@
   height: $commandbar-height;
   -webkit-user-select: auto;
   -webkit-user-drag: auto;
-  -webkit-app-region: drag;
+  position: relative;
+  isolation: isolate;
+
+  // The window drags by an empty layer behind the bar. Since Electron 23 app-region is inherited and
+  // overlapping regions resolve by order, so a drag on the bar itself made every container in it
+  // draggable and swallowed clicks on its no-drag buttons and search field (macOS).
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    -webkit-app-region: drag;
+  }
 
   &.compact {
     width: $compact-fixed-width!important;

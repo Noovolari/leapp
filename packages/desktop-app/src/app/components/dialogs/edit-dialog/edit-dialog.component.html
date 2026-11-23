@@ -1,9 +1,8 @@
-<a class="close-modal" (click)="goBack();"><i class="moon-Close"></i></a>
+<a class="close-modal" (click)="goBack()"><i class="moon-Close"></i></a>
 
 <form [formGroup]="form" class="edit-form form center-vertical text-left">
-
-  <h4><img src="./assets/images/{{getIconForProvider(accountType)}}" alt="" title="" class="title-img" /> {{form.controls['name'].value}}</h4>
-  <br>
+  <h4><img src="./assets/images/{{ getIconForProvider(accountType) }}" alt="" title="" class="title-img" /> {{ form.controls["name"].value }}</h4>
+  <br />
 
   <!-- =============================== -->
   <!-- aws IAM USER ACCOUNT PROPERTIES -->
@@ -11,159 +10,178 @@
   <div class="form-group">
     <div class="form-field">
       <label>Session Alias</label>
-      <input spellcheck="false" formControlName="name" type="text" class="form-control" placeholder="Session Alias *">
-      <small class="text-error" *ngIf="(form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors">Insert a Session Alias</small>
+      <input spellcheck="false" formControlName="name" type="text" class="form-control" placeholder="Session Alias *" />
+      @if ((form.controls['name'].dirty || form.controls['name'].touched) && form.controls['name'].errors) {
+      <small class="text-error">Insert a Session Alias</small>
+      }
     </div>
   </div>
 
   <!-- ================================================================== -->
   <!-- ==                      PROFILE ID SELECTION                    == -->
   <!-- ================================================================== -->
-  <ng-container *ngIf="accountType.toString().indexOf('aws') > -1">
-    <div class="form-group">
-      <div class="form-field">
-        <label>Named profile</label>
-        <app-leapp-select #namedProfileSelect
-                          [controlName]="'awsProfile'"
-                          [form]="form"
-                          [placeholder]="'add a new named profile'"
-                          [items]="profiles"
-                          [dropdownPosition]="'down'"
-                          [whatToAddName]="'Named Profile'"
-                          [defaultNewValue]="addNewUUID"
-                          [bindLabel]="'label'"
-                          [bindValue]="'value'"
-                          [uppercased]="false"
-                          (selected)="profiles = $event.items; selectedProfile = $event.item;"></app-leapp-select>
-        <small class="text-error" *ngIf="(form.controls['awsProfile'].dirty || form.controls['awsProfile'].touched) && form.get('awsProfile')?.value === undefined">Insert the Named Profile</small>
-      </div>
+  @if (accountType.toString().indexOf('aws') > -1) {
+  <div class="form-group">
+    <div class="form-field">
+      <label>Named profile</label>
+      <app-leapp-select
+        #namedProfileSelect
+        [controlName]="'awsProfile'"
+        [form]="form"
+        [placeholder]="'add a new named profile'"
+        [items]="profiles"
+        [dropdownPosition]="'down'"
+        [whatToAddName]="'Named Profile'"
+        [defaultNewValue]="addNewUUID"
+        [bindLabel]="'label'"
+        [bindValue]="'value'"
+        [uppercased]="false"
+        (selected)="profiles = $event.items; selectedProfile = $event.item"
+      ></app-leapp-select>
+      @if ((form.controls['awsProfile'].dirty || form.controls['awsProfile'].touched) && $safeNavigationMigration(form.get('awsProfile')?.value) ===
+      undefined) {
+      <small class="text-error">Insert the Named Profile</small>
+      }
     </div>
-
-    <div class="form-group">
-      <div class="form-field">
-        <label>Aws Region</label>
-        <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions" [(ngModel)]="selectedRegion"></ng-select>
-      </div>
+  </div>
+  <div class="form-group">
+    <div class="form-field">
+      <label>Aws Region</label>
+      <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [items]="regions"></ng-select>
     </div>
-
-    <!-- ================================================================== -->
-    <!-- ==         ARN IAM ROLE FEDERATED & IAM ROLE CHAINED            == -->
-    <!-- ================================================================== -->
-    <ng-container *ngIf="accountType === eSessionType.awsIamRoleFederated || accountType === eSessionType.awsIamRoleChained">
-      <div class="form-group">
-        <div class="form-field">
-          <label>Role ARN</label>
-          <input spellcheck="false" formControlName="roleArn" type="text" class="form-control" placeholder="Role ARN" />
-          <small class="text-error" *ngIf="(form.controls['roleArn'].dirty || form.controls['roleArn'].touched) && form.controls['roleArn'].errors">Insert the Role ARN</small>
-        </div>
-      </div>
-    </ng-container>
-
-    <ng-container *ngIf="accountType === eSessionType.awsIamRoleFederated">
-      <!-- ================================================================== -->
-      <!-- ==             SAML & IDP ARN FOR IAM ROLE FEDERATED            == -->
-      <!-- ================================================================== -->
-      <div class="form-group">
-        <div class="form-field">
-          <label>SAML 2.0 Url</label>
-          <app-leapp-select #idpUrlSelect
-                            [controlName]="'federationUrl'"
-                            [form]="form"
-                            [placeholder]="'SAML 2.0 Url*'"
-                            [items]="idpUrls"
-                            [dropdownPosition]="'up'"
-                            [whatToAddName]="'SAML 2.0 Url'"
-                            [defaultNewValue]="addNewUUID"
-                            [bindLabel]="'label'"
-                            [bindValue]="'value'"
-                            [uppercased]="false"
-                            (selected)="selectedIdpUrlEvent($event);"></app-leapp-select>
-
-          <small class="text-error" *ngIf="(form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) && form.get('federationUrl')?.value === undefined">Insert the SAML 2.0 Url</small>
-        </div>
-
-        <div class="form-field">
-          <label>Identity Provider</label>
-          <input spellcheck="false" formControlName="idpArn" type="text" class="form-control" placeholder="Identity Provider ARN *">
-          <small class="text-error" *ngIf="(form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors">Insert the AWS Identity Provider ARN</small>
-        </div>
-      </div>
-    </ng-container>
-
-    <ng-container *ngIf="accountType === eSessionType.awsIamUser">
-
-      <div class="form-group">
-        <div class="form-field">
-        <label>Mfa Device</label>
-        <input spellcheck="false" formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="form-field">
-        <label>Access Key ID</label>
-        <input formControlName="accessKey" type="password" class="form-control" placeholder="Access Key *">
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="form-field">
-        <label>Secret Access Key</label>
-        <input formControlName="secretKey" type="password" class="form-control" placeholder="Secret Key *">
-        </div>
-      </div>
-
-    </ng-container>
-
-    <!-- ================================================================== -->
-    <!-- ==                       ASSUMER SESSIONS                       == -->
-    <!-- ================================================================== -->
-    <ng-container *ngIf="accountType === eSessionType.awsIamRoleChained">
-    <div class="form-group">
-      <div class="form-field">
-        <label>Role Session Name</label>
-        <input spellcheck="false" formControlName="roleSessionName" type="text" class="form-control" placeholder="Role Session Name" />
-        <small class="text-error" *ngIf="(form.controls['roleSessionName'].dirty || form.controls['roleSessionName'].touched) && form.controls['roleSessionName'].errors">Invalid Role Session Name</small>
-      </div>
-      <div class="form-field">
-        <label>Assumer Session</label>
-        <ng-select formControlName="assumerSession" bindLabel="sessionName" bindValue="session" dropdownPosition="top" [items]="assumerAwsSessions" [(ngModel)]="selectedParentSession" [disabled]="true" [compareWith]="compareAssumerSessions"></ng-select>
-      </div>
+  </div>
+  <!-- ================================================================== -->
+  <!-- ==         ARN IAM ROLE FEDERATED & IAM ROLE CHAINED            == -->
+  <!-- ================================================================== -->
+  @if (accountType === eSessionType.awsIamRoleFederated || accountType === eSessionType.awsIamRoleChained) {
+  <div class="form-group">
+    <div class="form-field">
+      <label>Role ARN</label>
+      <input spellcheck="false" formControlName="roleArn" type="text" class="form-control" placeholder="Role ARN" />
+      @if ((form.controls['roleArn'].dirty || form.controls['roleArn'].touched) && form.controls['roleArn'].errors) {
+      <small class="text-error">Insert the Role ARN</small>
+      }
     </div>
-    </ng-container>
-  </ng-container>
+  </div>
+  } @if (accountType === eSessionType.awsIamRoleFederated) {
+  <!-- ================================================================== -->
+  <!-- ==             SAML & IDP ARN FOR IAM ROLE FEDERATED            == -->
+  <!-- ================================================================== -->
+  <div class="form-group">
+    <div class="form-field">
+      <label>SAML 2.0 Url</label>
+      <app-leapp-select
+        #idpUrlSelect
+        [controlName]="'federationUrl'"
+        [form]="form"
+        [placeholder]="'SAML 2.0 Url*'"
+        [items]="idpUrls"
+        [dropdownPosition]="'up'"
+        [whatToAddName]="'SAML 2.0 Url'"
+        [defaultNewValue]="addNewUUID"
+        [bindLabel]="'label'"
+        [bindValue]="'value'"
+        [uppercased]="false"
+        (selected)="selectedIdpUrlEvent($event)"
+      ></app-leapp-select>
+      @if ((form.controls['federationUrl'].dirty || form.controls['federationUrl'].touched) &&
+      $safeNavigationMigration(form.get('federationUrl')?.value) === undefined) {
+      <small class="text-error">Insert the SAML 2.0 Url</small>
+      }
+    </div>
+    <div class="form-field">
+      <label>Identity Provider</label>
+      <input spellcheck="false" formControlName="idpArn" type="text" class="form-control" placeholder="Identity Provider ARN *" />
+      @if ((form.controls['idpArn'].dirty || form.controls['idpArn'].touched) && form.controls['idpArn'].errors) {
+      <small class="text-error">Insert the AWS Identity Provider ARN</small>
+      }
+    </div>
+  </div>
+  } @if (accountType === eSessionType.awsIamUser) {
+  <div class="form-group">
+    <div class="form-field">
+      <label>Mfa Device</label>
+      <input spellcheck="false" formControlName="mfaDevice" type="text" class="form-control" placeholder="MFA arn or SN (optional)" />
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="form-field">
+      <label>Access Key ID</label>
+      <input formControlName="accessKey" type="password" class="form-control" placeholder="Access Key *" />
+    </div>
+  </div>
+  <div class="form-group">
+    <div class="form-field">
+      <label>Secret Access Key</label>
+      <input formControlName="secretKey" type="password" class="form-control" placeholder="Secret Key *" />
+    </div>
+  </div>
+  }
+  <!-- ================================================================== -->
+  <!-- ==                       ASSUMER SESSIONS                       == -->
+  <!-- ================================================================== -->
+  @if (accountType === eSessionType.awsIamRoleChained) {
+  <div class="form-group">
+    <div class="form-field">
+      <label>Role Session Name</label>
+      <input spellcheck="false" formControlName="roleSessionName" type="text" class="form-control" placeholder="Role Session Name" />
+      @if ((form.controls['roleSessionName'].dirty || form.controls['roleSessionName'].touched) && form.controls['roleSessionName'].errors) {
+      <small class="text-error">Invalid Role Session Name</small>
+      }
+    </div>
+    <div class="form-field">
+      <label>Assumer Session</label>
+      <ng-select
+        formControlName="assumerSession"
+        bindLabel="sessionName"
+        bindValue="session"
+        dropdownPosition="top"
+        [items]="assumerAwsSessions"
+        [compareWith]="compareAssumerSessions"
+      ></ng-select>
+    </div>
+  </div>
+  } }
 
   <!-- ================================================================= -->
   <!-- ==                  azure SESSION PROPERTIES                   == -->
   <!-- ================================================================= -->
   <!--
-  <ng-container *ngIf="accountType === eSessionType.azure">
-    <div class="form-group">
-      <div class="form-field">
-        <label>Subscription Id</label>
-        <input formControlName="subscriptionId" type="text" class="form-control" placeholder="Subscription Id *">
-        <small class="text-error" *ngIf="(form.controls['subscriptionId'].dirty || form.controls['subscriptionId'].touched) && form.controls['subscriptionId'].errors">Insert the Subscription Id</small>
-      </div>
+    <ng-container *ngIf="accountType === eSessionType.azure">
+      <div class="form-group">
+        <div class="form-field">
+          <label>Subscription Id</label>
+          <input formControlName="subscriptionId" type="text" class="form-control" placeholder="Subscription Id *">
+          <small class="text-error" *ngIf="(form.controls['subscriptionId'].dirty || form.controls['subscriptionId'].touched) && form.controls['subscriptionId'].errors">Insert the Subscription Id</small>
+        </div>
 
-      <div class="form-field">
-        <label>Tenant Id</label>
-        <input formControlName="tenantId" type="text" class="form-control" placeholder="Tenant Id *">
-        <small class="text-error" *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert the Tenant Id</small>
-      </div>
+        <div class="form-field">
+          <label>Tenant Id</label>
+          <input formControlName="tenantId" type="text" class="form-control" placeholder="Tenant Id *">
+          <small class="text-error" *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert the Tenant Id</small>
+        </div>
 
-      <div class="form-field">
-        <label>Location</label>
-        <ng-select formControlName="azureLocation" bindLabel="location" bindValue="location" [clearable]="false" [items]="locations" [(ngModel)]="selectedLocation" dropdownPosition="top"></ng-select>
+        <div class="form-field">
+          <label>Location</label>
+          <ng-select formControlName="azureLocation" bindLabel="location" bindValue="location" [clearable]="false" [items]="locations" dropdownPosition="top"></ng-select>
+        </div>
       </div>
-    </div>
-  </ng-container>
-  -->
+    </ng-container>
+    -->
   <div class="form-group">
     <div class="form-field text-right">
-      <a (click)="tryProperties();" class="check-validity btn-link" *ngIf="accountType">Test credential generation</a>
+      @if (accountType) {
+      <a (click)="tryProperties()" class="check-validity btn-link">Test credential generation</a>
+      }
     </div>
   </div>
-  <br>
-  <button type="button" (click)="saveAccount();" [disabled]="!formValid() || submitting" [ngClass]="!formValid() ? 'mat-button-disabled': ''" *ngIf="accountType">Edit session <i *ngIf="submitting" class="fa fa-spinner fa-spin"></i></button>
+  <br />
+  @if (accountType) {
+  <button type="button" (click)="saveAccount()" [disabled]="!formValid() || submitting" [ngClass]="!formValid() ? 'mat-button-disabled' : ''">
+    Edit session @if (submitting) {
+    <i class="fa fa-spinner fa-spin"></i>
+    }
+  </button>
+  }
   <a (click)="closeModal()" class="cancel">Cancel</a>
 </form>

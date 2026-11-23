@@ -1,3 +1,4 @@
+import { constants } from "@noovolari/leapp-core/models/constants";
 import { Injectable } from "@angular/core";
 import { AppNativeService } from "./app-native.service";
 import { AppProviderService } from "./app-provider.service";
@@ -6,6 +7,8 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { BehaviorSubject } from "rxjs";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
 import { WindowService } from "./window.service";
+import { OptionsService } from "./options.service";
+import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 
 export enum FetchingState {
   notFetching,
@@ -17,9 +20,8 @@ export enum FetchingState {
   providedIn: "root",
 })
 export class ExtensionWebsocketService {
-  public wsServer: any;
-  public port: string;
-  public wsClient: any;
+  // One server per loopback address (the extension connects to ws://localhost, IPv4 or IPv6)
+  public wsServers: any[] = [];
   public fetching$: BehaviorSubject<FetchingState>;
   private fetchingTimeout: any;
   private consoleUrl: string;
@@ -28,7 +30,8 @@ export class ExtensionWebsocketService {
     private appNativeService: AppNativeService,
     private appProviderService: AppProviderService,
     private toastService: MessageToasterService,
-    private windowService: WindowService
+    private windowService: WindowService,
+    private optionsService: OptionsService
   ) {
     this.fetching$ = new BehaviorSubject(FetchingState.notFetching);
     this.fetching$.subscribe(async (value) => {
@@ -54,29 +57,66 @@ export class ExtensionWebsocketService {
     });
   }
 
+  /** At startup: the server runs only while the Multi-Console option is on. */
   bootstrap(): void {
+    if (this.optionsService.extensionEnabled) {
+      this.start();
+    }
+  }
+
+  /** The Multi-Console option of Options: saves it and starts or stops the server. */
+  setEnabled(enabled: boolean): void {
+    this.optionsService.extensionEnabled = enabled;
+    if (enabled) {
+      this.start();
+    } else {
+      this.stop();
+    }
+  }
+
+  /**
+   * Listens on loopback only: 127.0.0.1 and ::1, never every interface, so other hosts on the network
+   * Can't connect. The port is the flavor's (8095 prod, the published extension; 8096 dev; 8097 qa).
+   */
+  start(): void {
+    if (this.wsServers.length > 0) {
+      return;
+    }
     const ws = this.appNativeService.ws;
-    this.wsServer = new ws.WebSocketServer({
-      //TODO add configurable port option
-      port: 8095,
-    });
-    this.wsServer.on("connection", (wsClient) => {
-      this.wsClient = wsClient;
-      this.wsClient.on("message", (data) => {
-        const parsedData = JSON.parse(data.toString("utf8"));
-        if (parsedData.type === "send-fetching-state") {
-          this.fetching$.next(parsedData.fetching ? FetchingState.fetching : FetchingState.notFetching);
-        }
+    const port = constants.extensionWebSocketPort;
+    for (const host of ["127.0.0.1", "::1"]) {
+      const server = new ws.WebSocketServer({ host, port });
+      server.on("error", (error: any) => this.onListenError(server, host, port, error));
+      server.on("connection", (wsClient) => {
+        wsClient.on("message", (data) => {
+          const parsedData = JSON.parse(data.toString("utf8"));
+          if (parsedData.type === "send-fetching-state") {
+            this.fetching$.next(parsedData.fetching ? FetchingState.fetching : FetchingState.notFetching);
+          }
+        });
       });
-    });
+      this.wsServers.push(server);
+    }
+  }
+
+  /** Closes every client (1001, going away) and the servers; nothing listens afterwards. */
+  stop(): void {
+    for (const server of this.wsServers) {
+      server.clients.forEach((client) => client.close(1001));
+      server.close();
+    }
+    this.wsServers = [];
+    this.fetching$.next(FetchingState.notFetching);
   }
 
   sendMessage(payload: any): void {
-    this.wsServer.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(payload);
-      }
-    });
+    for (const server of this.wsServers) {
+      server.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(payload);
+        }
+      });
+    }
   }
 
   async openWebConsoleWithExtension(session: Session): Promise<void> {
@@ -107,6 +147,18 @@ export class ExtensionWebsocketService {
     );
     this.fetching$.next(FetchingState.fetching);
     this.toastService.toast("Opening Web Console with the Leapp Extension...", ToastLevel.info);
+  }
+
+  private onListenError(server: any, host: string, port: number, error: any): void {
+    this.wsServers = this.wsServers.filter((running) => running !== server);
+    const noIpv6Loopback = host === "::1" && ["EADDRNOTAVAIL", "EAFNOSUPPORT"].includes(error?.code);
+    const message = noIpv6Loopback
+      ? `Multi-Console: no IPv6 loopback, listening on 127.0.0.1:${port} only`
+      : `Multi-Console extension unavailable: port ${port} is already in use or blocked. Web Consoles open with the standard method.`;
+    this.appProviderService.logService.log(new LoggedEntry(`${message} (${host}: ${error?.code ?? error?.message})`, this, LogLevel.info));
+    if (!noIpv6Loopback && host === "127.0.0.1") {
+      this.toastService.toast(message, ToastLevel.warn);
+    }
   }
 
   private pause(): Promise<void> {

@@ -16,7 +16,6 @@ export class AppNativeService implements INativeService {
   dialog: any;
   exec: any;
   session: any;
-  unzip: any;
   copydir: any;
   browserWindow: any;
   sudo: any;
@@ -47,15 +46,16 @@ export class AppNativeService implements INativeService {
 
   constructor() {
     if (this.isElectron) {
-      this.log = window.require("electron-log");
+      // electron-log 5: the node entry writes the file from this renderer, as 4.x did (4.x fails on Electron 45)
+      this.log = window.require("electron-log/node");
       this.fs = window.require("fs-extra");
-      this.rimraf = window.require("rimraf");
+      // rimraf 4+ exports functions instead of being one
+      this.rimraf = window.require("rimraf").rimraf;
       this.os = window.require("os");
       this.ini = window.require("js-ini");
       this.path = window.require("path");
       this.exec = window.require("child_process").exec;
       this.url = window.require("url");
-      this.unzip = window.require("extract-zip");
       this.copydir = window.require("copy-dir");
       this.sudo = window.require("sudo-prompt");
       this.semver = window.require("semver");

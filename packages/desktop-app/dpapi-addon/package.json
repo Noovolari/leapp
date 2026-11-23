@@ -1,0 +1,19 @@
+{
+  "name": "@noovolari/dpapi-addon",
+  "version": "0.1.2",
+  "private": true,
+  "author": {
+    "name": "Noovolari",
+    "email": "info@noovolari.com"
+  },
+  "description": "Leapp dpapi addon.",
+  "main": "dpapi-addon/Dpapi.js",
+  "homepage": "https://github.com/Noovolari/leapp",
+  "scripts": {
+    "install": "node-gyp rebuild"
+  },
+  "dependencies": {
+    "bindings": "^1.5.0",
+    "nan": "^2.13.2"
+  }
+}

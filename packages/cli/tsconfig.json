@@ -2,9 +2,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "rootDir": "src",
-    "downlevelIteration": true,
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "node20",
+    "moduleResolution": "nodenext",
     "importHelpers": true,
     "declaration": true,
     "strict": true,
@@ -32,13 +31,7 @@
       "DOM"
     ],
     "outDir": "dist",
-    "baseUrl": ".",
     "skipLibCheck": true,
-    "paths": {
-      "*": [
-        "node_modules/*"
-      ]
-    },
   },
   "include": [
     "src/**/*"

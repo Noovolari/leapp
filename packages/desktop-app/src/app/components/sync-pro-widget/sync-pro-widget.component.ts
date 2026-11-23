@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { Subscription } from "rxjs";
 import { AppProviderService } from "../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
@@ -11,6 +12,8 @@ import { LoginWorkspaceDialogComponent } from "../dialogs/login-team-dialog/logi
   selector: "app-sync-pro-widget",
   templateUrl: "./sync-pro-widget.component.html",
   styleUrls: ["./sync-pro-widget.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class SyncProWidgetComponent implements OnInit, OnDestroy {
   isLoggedAsProOrTeam = false;
@@ -41,7 +44,7 @@ export class SyncProWidgetComponent implements OnInit, OnDestroy {
     });
 
     this.subscription2 = globalLeappProPlanStatus.subscribe(async (_) => {
-      const currentState = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan");
+      const currentState = await this.appProviderService.keychainService.getSecret(constants.appName, "leapp-enabled-plan");
       if (currentState === LeappPlanStatus.proEnabled || currentState === LeappPlanStatus.proPending) {
         this.buttonText = "SIGN IN";
       } else {

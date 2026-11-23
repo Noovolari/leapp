@@ -1,0 +1,7 @@
+ Session Name                                                               Status   
+ ────────────────────────────────────────────────────────────────────────── ──────── 
+ dev-user                                                                   active   
+ a-session-name-long-enough-to-be-truncated-by-a-narrow-terminal-0123456789 inactive 
+ chained                                                                    pending  
+ sso-prod                                                                   inactive 
+ azure-sub                                                                  inactive 

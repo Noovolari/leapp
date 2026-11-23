@@ -115,7 +115,7 @@ describe("NamedProfilesService", () => {
 
     expect(sessionIsRunning).toBe(true);
     expect(namedProfileService.getSessionsWithNamedProfile).toHaveBeenCalledWith("profileId");
-    expect(sessionFactory.getSessionService).toBeCalledTimes(2);
+    expect(sessionFactory.getSessionService).toHaveBeenCalledTimes(2);
     expect(sessionFactory.getSessionService).toHaveBeenCalledWith("type3");
     expect(repository.updateProfile).toHaveBeenCalledWith("profileId", "newName");
     expect(sessionService.stop).toHaveBeenCalledWith("3");

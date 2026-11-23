@@ -27,6 +27,7 @@ describe("CreateDialogComponent", () => {
       awsCoreService: { getRegions: () => [] },
       azureCoreService: { getLocations: () => [] },
       sessionFactory: { getSessionService: () => {} },
+      sessionManagementService: { getAssumableSessions: () => [] },
       workspaceOptionService: { colorTheme: "" },
     });
 

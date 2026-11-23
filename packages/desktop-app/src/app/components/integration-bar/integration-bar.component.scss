@@ -52,7 +52,7 @@ b.moon-More {
   top: 8px;
 }
 
-.mat-list-item:hover {
+.mat-mdc-list-item:hover {
   b.moon-More {
     display: inline-block;
     color: $text-color;
@@ -64,7 +64,7 @@ b.moon-More {
   }
 }
 
-.mat-list-item.disabled {
+.mat-mdc-list-item.disabled {
   opacity: 0.7;
 }
 
@@ -152,19 +152,26 @@ img {
 }
 
 ::ng-deep {
-  .mat-list-item.selected-integration:hover {
+  .mat-mdc-list-item.selected-integration:hover {
     background-color: $silver-25 !important;
   }
-
-  .selected-integration .mat-list-item-content {
+  // MDC pads the item itself as well; the legacy item padded only its content
+  .mat-mdc-list-item.selected-integration {
+    padding-left: 0;
+    padding-right: 0;
+  }
+  .selected-integration .mdc-list-item__content {
     padding: 0 6px 0 !important;
   }
-
-  .selected-integration:hover .mat-list-item-content {
+  .selected-integration:hover .mdc-list-item__content {
     padding: 0 6px 0 !important;
   }
-
-  .selected-integration:hover .mat-list-item-content .mat-list-text .mat-line {
+  // a selected item is already inset by 10px: the hover rule's -10px content offset (global.scss)
+  // Would move its icon and name left
+  .mat-mdc-list-base .mat-mdc-list-item.selected-integration:hover .mdc-list-item__content {
+    margin-left: 0;
+  }
+  .selected-integration:hover .mdc-list-item__content .mdc-list-item__primary-text .mat-line {
     section.status {
       left: 18px !important;
     }

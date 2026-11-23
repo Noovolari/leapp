@@ -2,10 +2,11 @@ import { describe, expect, jest, test } from "@jest/globals";
 import { CredentialsInfo } from "@noovolari/leapp-core/models/credentials-info";
 import OpenWebConsole from "./open-web-console";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("OpenWebConsole", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): OpenWebConsole => {
-    const command = new OpenWebConsole(argv, {} as any);
+    const command = new OpenWebConsole(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
@@ -172,7 +173,7 @@ describe("OpenWebConsole", () => {
     const result = await (command as any).selectSession();
 
     expect(sessionManagementService.getSessions).toHaveBeenCalledTimes(1);
-    expect(sessionManagementService.getSessions).toReturnWith([session, session2]);
+    expect(sessionManagementService.getSessions).toHaveReturnedWith([session, session2]);
     expect(sessionManagementService.getSessions().filter((s) => s.status === SessionStatus.inactive)).toStrictEqual([session]);
     expect(inquirer.prompt).toHaveBeenCalledTimes(1);
     expect(inquirer.prompt).toHaveBeenCalledWith([

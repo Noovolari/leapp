@@ -1,173 +1,214 @@
 <ng-template #ssoModalTemplate>
-
-  <ng-container *ngIf="loadingInBrowser">
-    <a class="close-modal" (click)="closeLoadingScreen();"><i class="moon-Close"></i></a>
-
-    <div class="loading-content">
-      <img src="assets/images/in-browser.png" alt="" class="loading-pc"/>
-      <br>
-      <span class="loading-text">Don't see the secure AWS Single Sign-On Browser Page? </span><a (click)="gotoWebForm(selectedConfiguration.id)"
-                                                                                                 class="loading-link">Re-launch the window</a>
-    </div>
-  </ng-container>
-  <ng-container *ngIf="!loadingInBrowser">
-    <a class="close-modal" (click)="modalRef.hide();"><i class="moon-Close"></i></a>
-    <h4>{{modifying === 1 ? 'Add New Integration' : 'Edit ' + selectedConfiguration.alias}}</h4>
-
-    <form [formGroup]="form">
-      <div class="form-container">
-
-        <div class="form-group">
-          <div class="form-field">
-            <div class="form-group">
-              <label>Integration type</label>
-              <ng-select formControlName="integrationType" bindLabel="label" bindValue="value" [clearable]="false" [items]="integrations"
-                         [(ngModel)]="selectedIntegration" *ngIf="modifying === 1"></ng-select>
-              <input spellcheck="false" class="form-control" type="text" value="{{getIntegrationLabel()}}" readonly="true" *ngIf="modifying === 2"/>
-            </div>
+  @if (loadingInBrowser) {
+  <a class="close-modal" (click)="closeLoadingScreen()"><i class="moon-Close"></i></a>
+  <div class="loading-content">
+    <img src="assets/images/in-browser.png" alt="" class="loading-pc" />
+    <br />
+    <span class="loading-text">Don't see the secure AWS Single Sign-On Browser Page? </span
+    ><a (click)="gotoWebForm(selectedConfiguration.id)" class="loading-link">Re-launch the window</a>
+  </div>
+  } @if (!loadingInBrowser) {
+  <a class="close-modal" (click)="modalRef.hide()"><i class="moon-Close"></i></a>
+  <h4>{{ modifying === 1 ? "Add New Integration" : "Edit " + selectedConfiguration.alias }}</h4>
+  <form [formGroup]="form">
+    <div class="form-container">
+      <div class="form-group">
+        <div class="form-field">
+          <div class="form-group">
+            <label>Integration type</label>
+            @if (modifying === 1) {
+            <ng-select
+              formControlName="integrationType"
+              bindLabel="label"
+              bindValue="value"
+              [clearable]="false"
+              [items]="integrations"
+            ></ng-select>
+            } @if (modifying === 2) {
+            <input spellcheck="false" class="form-control" type="text" value="{{ getIntegrationLabel() }}" readonly="true" />
+            }
           </div>
         </div>
-
-        <div class="form-group">
-          <div class="form-field">
-            <div class="form-group">
-              <label>Alias*</label>
-              <input spellcheck="false" formControlName="alias" type="url" class="form-control"
-                     placeholder="Custom name to identify the configuration" value="{{selectedConfiguration.alias}}">
-              <small class="text-error" *ngIf="(form.controls['alias'].dirty || form.controls['alias'].touched) && form.controls['alias'].errors">Insert
-                a custom alias</small>
-            </div>
-          </div>
-        </div>
-
-        <ng-container *ngIf="selectedIntegration !== eIntegrationType.azure">
-          <div class="form-group">
-            <div class="form-field">
-              <div class="form-group">
-                <label>Portal Url*</label>
-                <input spellcheck="false" formControlName="portalUrl" type="url" class="form-control"
-                       placeholder="AWS SSO URL (e.g. https://d-xxxxxxxxxx.awsapps.com/start) *" value="{{selectedConfiguration.portalUrl}}">
-                <small class="text-error"
-                       *ngIf="(form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors">Insert a
-                  valid SSO portal URL</small>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="form-field">
-              <div class="form-group">
-                <label>Aws Region</label>
-                <ng-select formControlName="awsRegion" bindLabel="region" bindValue="region" [clearable]="false" [items]="regions"
-                           [(ngModel)]="selectedConfiguration.region"></ng-select>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <div class="form-field">
-              <div class="form-group">
-                <label>Auth. method</label>
-                <ng-select placeholder="Choose an Authentication method" formControlName="defaultBrowserOpening" bindLabel="type" bindValue="type"
-                           [clearable]="false" [items]="[{type: eConstants.inApp }, {type: eConstants.inBrowser }]"
-                           [(ngModel)]="selectedConfiguration.browserOpening"></ng-select>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-        <ng-container *ngIf="selectedIntegration === eIntegrationType.azure">
-          <div class="form-group">
-            <div class="form-field">
-              <div class="form-group">
-                <label>Tenant ID</label>
-                <input spellcheck="false" formControlName="tenantId" type="text" class="form-control" placeholder="Tenant ID *"
-                       value="{{selectedConfiguration.tenantId}}">
-                <small class="text-error"
-                       *ngIf="(form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors">Insert a
-                  valid Azure Tenant ID</small>
-              </div>
-            </div>
-          </div>
-          <div class="form-group">
-            <div class="form-field">
-              <div class="form-group">
-                <label><i class="fa fa-info-circle"
-                          matTooltip="Location is obtained from 'default Location' in general settings"></i>&nbsp;Location</label>
-                <input class="form-control disabled" value="{{defaultLocation}}" readonly>
-              </div>
-            </div>
-          </div>
-        </ng-container>
-
-        <button class="btn-right-margin {{formValid() ? '': 'mat-button-disabled'}}" [disabled]="!formValid() || submitting" (click)="save();">
-          <ng-container *ngIf="modifying === 1">Add integration </ng-container>
-          <ng-container *ngIf="modifying === 2">Edit integration </ng-container>
-          <i *ngIf="submitting" class="fa fa-spinner fa-spin"></i>
-        </button>
-        <a (click)="modalRef.hide()">Cancel</a>
-
       </div>
-    </form>
-  </ng-container>
+      <div class="form-group">
+        <div class="form-field">
+          <div class="form-group">
+            <label>Alias*</label>
+            <input
+              spellcheck="false"
+              formControlName="alias"
+              type="url"
+              class="form-control"
+              placeholder="Custom name to identify the configuration"
+              value="{{ selectedConfiguration.alias }}"
+            />
+            @if ((form.controls['alias'].dirty || form.controls['alias'].touched) && form.controls['alias'].errors) {
+            <small class="text-error">Insert a custom alias</small>
+            }
+          </div>
+        </div>
+      </div>
+      @if (selectedIntegration !== eIntegrationType.azure) {
+      <div class="form-group">
+        <div class="form-field">
+          <div class="form-group">
+            <label>Portal Url*</label>
+            <input
+              spellcheck="false"
+              formControlName="portalUrl"
+              type="url"
+              class="form-control"
+              placeholder="AWS SSO URL (e.g. https://d-xxxxxxxxxx.awsapps.com/start) *"
+              value="{{ selectedConfiguration.portalUrl }}"
+            />
+            @if ((form.controls['portalUrl'].dirty || form.controls['portalUrl'].touched) && form.controls['portalUrl'].errors) {
+            <small class="text-error">Insert a valid SSO portal URL</small>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-field">
+          <div class="form-group">
+            <label>Aws Region</label>
+            <ng-select
+              formControlName="awsRegion"
+              bindLabel="region"
+              bindValue="region"
+              [clearable]="false"
+              [items]="regions"
+            ></ng-select>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-field">
+          <div class="form-group">
+            <label>Auth. method</label>
+            <ng-select
+              placeholder="Choose an Authentication method"
+              formControlName="defaultBrowserOpening"
+              bindLabel="type"
+              bindValue="type"
+              [clearable]="false"
+              [items]="[{ type: eConstants.inApp }, { type: eConstants.inBrowser }]"
+            ></ng-select>
+          </div>
+        </div>
+      </div>
+      } @if (selectedIntegration === eIntegrationType.azure) {
+      <div class="form-group">
+        <div class="form-field">
+          <div class="form-group">
+            <label>Tenant ID</label>
+            <input
+              spellcheck="false"
+              formControlName="tenantId"
+              type="text"
+              class="form-control"
+              placeholder="Tenant ID *"
+              value="{{ selectedConfiguration.tenantId }}"
+            />
+            @if ((form.controls['tenantId'].dirty || form.controls['tenantId'].touched) && form.controls['tenantId'].errors) {
+            <small class="text-error">Insert a valid Azure Tenant ID</small>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-field">
+          <div class="form-group">
+            <label
+              ><i class="fa fa-info-circle" matTooltip="Location is obtained from 'default Location' in general settings"></i>&nbsp;Location</label
+            >
+            <input class="form-control disabled" value="{{ defaultLocation }}" readonly />
+          </div>
+        </div>
+      </div>
+      }
+      <button class="btn-right-margin {{ formValid() ? '' : 'mat-button-disabled' }}" [disabled]="!formValid() || submitting" (click)="save()">
+        @if (modifying === 1) { Add integration } @if (modifying === 2) { Edit integration } @if (submitting) {
+        <i class="fa fa-spinner fa-spin"></i>
+        }
+      </button>
+      <a (click)="modalRef.hide()">Cancel</a>
+    </div>
+  </form>
+  }
 </ng-template>
 
 <mat-list>
-  <div mat-subheader class="panel-header"><span>Integrations</span><i class="moon-Add" [ngClass]="isTeamWorkspace ? 'disabled' : ''"
-                                                                      (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedConfiguration);"></i>
+  <div mat-subheader class="panel-header">
+    <span>Integrations</span
+    ><i
+      class="moon-Add"
+      [ngClass]="isTeamWorkspace ? 'disabled' : ''"
+      (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedConfiguration)"
+    ></i>
   </div>
 
+  @for (intConfiguration of behaviouralSubjectService.integrations$ | async; track intConfiguration; let i = $index) {
   <mat-list-item
-    *ngFor="let intConfiguration of behaviouralSubjectService.integrations$ | async; let i = index;"
+    data-testid="integration-item"
     [disableRipple]="true"
     [ngClass]="selectedSsoConfigurationCheck(intConfiguration)"
-    (contextmenu)="applyContextMenu(i, intConfiguration, $event);"
-    (click)="applySegmentFilter(intConfiguration, $event);"
-    (dblclick)="forceSync(intConfiguration.id)">
-
+    (contextmenu)="applyContextMenu(i, intConfiguration, $event)"
+    (click)="applySegmentFilter(intConfiguration, $event)"
+    (dblclick)="forceSync(intConfiguration.id)"
+  >
     <div mat-line>
       <img
-        src="assets/images/{{intConfiguration.type === eIntegrationType.azure ? 'azure' : 'aws'}}{{optionsService.colorTheme === eConstants.darkTheme || (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode()) ? '-dark' : ''}}.png"/>
-      <section class="status" matTooltip="{{(intConfiguration?.isOnline) ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline'}}">
-        <ng-container *ngIf="intConfiguration.isOnline">
-          <b class="green-dot"></b>
-        </ng-container>
-        <ng-container *ngIf="(intConfiguration.isOnline) === false">
-          <b class="red-dot"></b>
-        </ng-container>
+        src="assets/images/{{ intConfiguration.type === eIntegrationType.azure ? 'azure' : 'aws' }}{{
+          optionsService.colorTheme === eConstants.darkTheme ||
+          (optionsService.colorTheme === eConstants.systemDefaultTheme && appService.isDarkMode())
+            ? '-dark'
+            : ''
+        }}.png"
+      />
+      <section class="status" data-testid="integration-status" matTooltip="{{ intConfiguration?.isOnline ? 'Expiring ' + remainingHours(intConfiguration) : 'Offline' }}">
+        @if (intConfiguration.isOnline) {
+        <b class="green-dot"></b>
+        } @if ((intConfiguration.isOnline) === false) {
+        <b class="red-dot"></b>
+        }
       </section>
-      <span>{{intConfiguration.alias}}</span>
-      <b class="moon-More" (click)="applyContextMenu(i, intConfiguration, $event);"></b>
+      <span>{{ intConfiguration.alias }}</span>
+      <b class="moon-More" (click)="applyContextMenu(i, intConfiguration, $event)"></b>
     </div>
-    <div [matMenuTriggerFor]="integrationMenu" [matMenuTriggerData]="{ configuration: intConfiguration }" [style.position]="'absolute'"
-         [style.left.px]="menuX" [style.top.px]="menuY"></div>
+    <div
+      [matMenuTriggerFor]="integrationMenu"
+      [matMenuTriggerData]="{ configuration: intConfiguration }"
+      [style.position]="'absolute'"
+      [style.left.px]="menuX"
+      [style.top.px]="menuY"
+    ></div>
   </mat-list-item>
-
-  <mat-list-item *ngIf="!isTeamWorkspace" (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedConfiguration);">
-    <div mat-line class="gray-line">
-      <i class="moon-Add"></i><span>Add Integration</span>
-    </div>
+  } @if (!isTeamWorkspace) {
+  <mat-list-item data-testid="integration-add" (click)="$event.preventDefault(); $event.stopPropagation(); gotoForm(1, selectedConfiguration)">
+    <div mat-line class="gray-line"><i class="moon-Add"></i><span>Add Integration</span></div>
   </mat-list-item>
+  }
 </mat-list>
 
 <mat-menu #integrationMenu [hasBackdrop]="false">
   <ng-template matMenuContent let-configuration="configuration">
     <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
-    <button mat-menu-item (click)="gotoForm(2, configuration)" *ngIf="!loadingInBrowser">
+    @if (!loadingInBrowser) {
+    <button mat-menu-item (click)="gotoForm(2, configuration)">
       <i class="moon-Edit"></i>
       <span> Edit</span>
     </button>
-
-    <ng-container *ngIf="!logoutLoadings[configuration.id]">
-      <button mat-menu-item (click)="logout(configuration.id)" *ngIf="configuration.isOnline">
-        <i class="moon-Close"></i>
-        <span> Logout</span>
-      </button>
-    </ng-container>
-
-    <button mat-menu-item (click)="forceSync(configuration.id)" *ngIf="!loadingInBrowser">
-      <ng-container *ngIf="configuration.isOnline"><i class="moon-Refresh"></i> Sync</ng-container>
-      <ng-container *ngIf="(configuration.isOnline) === false"><i class="moon-Lock"></i> Login</ng-container>
+    } @if (!logoutLoadings[configuration.id]) { @if (configuration.isOnline) {
+    <button mat-menu-item (click)="logout(configuration.id)">
+      <i class="moon-Close"></i>
+      <span> Logout</span>
     </button>
+    } } @if (!loadingInBrowser) {
+    <button mat-menu-item (click)="forceSync(configuration.id)">
+      @if (configuration.isOnline) {
+      <i class="moon-Refresh"></i> Sync } @if ((configuration.isOnline) === false) { <i class="moon-Lock"></i> Login }
+    </button>
+    }
 
     <button mat-menu-item (click)="delete(configuration)"><i class="moon-Delete"></i> Delete</button>
   </ng-template>

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AppService } from "../../../services/app.service";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -26,6 +26,8 @@ import { IKeychainService } from "@noovolari/leapp-core/interfaces/i-keychain-se
   selector: "app-edit-dialog",
   templateUrl: "./edit-dialog.component.html",
   styleUrls: ["./edit-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class EditDialogComponent implements OnInit, AfterViewInit {
   @ViewChild("roleInput", { static: false })
@@ -43,10 +45,8 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   public accountType = SessionType.aws;
   public provider = SessionType.awsIamRoleFederated;
   public selectedSession: any;
-  public selectedParentSession: any;
   public selectedAccountNumber = "";
   public selectedIdpUrl;
-  public selectedRegion;
   public regions = [];
   public workspace: Workspace;
   public eSessionType = SessionType;
@@ -66,11 +66,11 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
     federationUrl: new FormControl("", [Validators.required, Validators.pattern("https?://.+")]),
     secretKey: new FormControl("", [Validators.required]),
     accessKey: new FormControl("", [Validators.required]),
-    awsRegion: new FormControl(""),
+    awsRegion: new FormControl<any>(""),
     mfaDevice: new FormControl(""),
     awsProfile: new FormControl("", [Validators.required]),
-    azureLocation: new FormControl("", [Validators.required]),
-    assumerSession: new FormControl("", [Validators.required]),
+    azureLocation: new FormControl<any>("", [Validators.required]),
+    assumerSession: new FormControl<any>("", [Validators.required]),
   });
 
   public idpUrls: { value: string; label: string }[] = [];
@@ -82,13 +82,37 @@ export class EditDialogComponent implements OnInit, AfterViewInit {
   public assumerAwsSessions: { session: Session; sessionName: string }[];
 
   public locations = [];
-  public selectedLocation;
 
   public submitting = false;
 
   private behaviouralSubjectService: BehaviouralSubjectService;
   private keychainService: IKeychainService;
   private sessionService: SessionService;
+
+  // Each field is its form control's value (one binding per control, no ngModel)
+  get selectedRegion(): any {
+    return this.form.get("awsRegion").value;
+  }
+
+  set selectedRegion(value: any) {
+    this.form.get("awsRegion").setValue(value);
+  }
+
+  get selectedParentSession(): any {
+    return this.form.get("assumerSession").value;
+  }
+
+  set selectedParentSession(value: any) {
+    this.form.get("assumerSession").setValue(value);
+  }
+
+  get selectedLocation(): any {
+    return this.form.get("azureLocation").value;
+  }
+
+  set selectedLocation(value: any) {
+    this.form.get("azureLocation").setValue(value);
+  }
 
   constructor(
     private optionsService: OptionsService,

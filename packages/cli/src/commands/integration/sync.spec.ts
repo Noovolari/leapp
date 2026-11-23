@@ -1,10 +1,11 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import SyncIntegration from "./sync";
 import { CliProviderService } from "../../service/cli-provider-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("SyncIntegration", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): SyncIntegration => {
-    const command = new SyncIntegration(argv, {} as any);
+    const command = new SyncIntegration(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

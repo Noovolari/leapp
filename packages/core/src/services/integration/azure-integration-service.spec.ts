@@ -69,20 +69,20 @@ describe("AzureIntegrationService", () => {
     const expectedCliOutput = `azure-cli                         2.29.0`;
     const executeService = { execute: async () => expectedCliOutput } as any;
     const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
-    await expect(service.checkCliVersion()).rejects.toThrowError("Unsupported Azure CLI version (< 2.30). Please update Azure CLI.");
+    await expect(service.checkCliVersion()).rejects.toThrow("Unsupported Azure CLI version (< 2.30). Please update Azure CLI.");
   });
 
   test("checkCliVersion, cli with unknown version", async () => {
     const executeService = { execute: async () => Promise.reject() } as any;
     const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
-    await expect(service.checkCliVersion()).rejects.toThrowError("Azure CLI is not installed.");
+    await expect(service.checkCliVersion()).rejects.toThrow("Azure CLI is not installed.");
   });
 
   test("checkCliVersion, cli not installed", async () => {
     const expectedCliOutput = `azure-cli version-2.31.0`;
     const executeService = { execute: async () => expectedCliOutput } as any;
     const service = new AzureIntegrationService(null, null, null, null, executeService, null, null);
-    await expect(service.checkCliVersion()).rejects.toThrowError("Unknown Azure CLI version.");
+    await expect(service.checkCliVersion()).rejects.toThrow("Unknown Azure CLI version.");
   });
 
   test("createIntegration", async () => {

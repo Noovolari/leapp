@@ -1,10 +1,11 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import DeleteIntegration from "./delete";
 import { CliProviderService } from "../../service/cli-provider-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("DeleteIntegration", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): DeleteIntegration => {
-    const command = new DeleteIntegration(argv, {} as any);
+    const command = new DeleteIntegration(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

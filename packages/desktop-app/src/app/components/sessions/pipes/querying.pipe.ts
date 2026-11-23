@@ -7,6 +7,7 @@ import { AwsSsoRoleSession } from "@noovolari/leapp-core/models/aws/aws-sso-role
 
 @Pipe({
   name: "querying",
+  standalone: false,
 })
 export class QueryingPipe implements PipeTransform {
   transform(sessions: Session[], query: string, workspace: Workspace): Session[] {

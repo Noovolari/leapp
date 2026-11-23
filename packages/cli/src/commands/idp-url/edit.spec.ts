@@ -1,9 +1,10 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import EditIdpUrl from "./edit";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("EditIdpUrl", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): EditIdpUrl => {
-    const command = new EditIdpUrl(argv, {} as any);
+    const command = new EditIdpUrl(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     (command as any).validateMyFlags = jest.fn((_: any) => {
       if (argv[1] === "") {

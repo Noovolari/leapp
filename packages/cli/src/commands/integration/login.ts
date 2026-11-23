@@ -1,5 +1,5 @@
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { integrationId } from "../../flags";
 import { Integration } from "@noovolari/leapp-core/models/integration";
 

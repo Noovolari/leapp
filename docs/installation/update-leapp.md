@@ -11,23 +11,27 @@ In this modal, a user can do the following:
 
 === "Remind me later"
     
-    Leapp will close the modal and notify the user that a new update
-    is available by adding a notification dot
-    <img width="55" alt="Screenshot_2021-05-04_at_10 28 21 (1)" src="https://user-images.githubusercontent.com/9497292/152328456-9fa51c95-d675-4b71-bd95-85c56b290843.png"> 
-    to the Dock Bar icon. Users will not be bothered anymore until the next release is available. 
+    Leapp closes the dialog and won't offer this version again. Nothing else reminds you
+    of it: no notification dot stays on the bell or on the Dock icon. When a newer version
+    is released, Leapp offers that one.
     This option is **convenient for users that want to stick to a specific version**. 
     Note that you can do this for every version and maintain the one you prefer.
 
 
 === "Download update"
 
-    Leapp will open the Release URL in your *default* browser to let the User 
-    *manually* download the release for their specific OS and install it.
+    Leapp opens the releases page in your *default* browser to let you
+    *manually* download the release for your OS and install it. Leapp offers
+    the same version again until you install it or click "Remind me later".
 
 
 === "Click on X"
     
-    Leapp will close the modal and another one will appear in **10 minutes**.
+    Same as "Remind me later": Leapp closes the dialog and won't offer this version again.
+
+While a new version is waiting for an answer, the bell in the top bar shows a notification dot,
+the tray menu has a "Check for Updates..." entry that reopens the dialog and, on macOS, the
+Dock icon shows a small dot. "What's new" in the bell menu shows the changelog at any time.
 
 ### macOS (Homebrew), Linux (Linuxbrew) and Windows (via WSL)
 

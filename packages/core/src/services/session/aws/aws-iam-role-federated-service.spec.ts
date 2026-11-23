@@ -189,7 +189,7 @@ describe("AwsIamRoleFederatedService", () => {
     expect(repository.getProfileName).toHaveBeenCalledWith(profileId);
     expect(fileService.iniParseSync).toHaveBeenCalledWith(credentialPath);
     expect(credentialsFile).toStrictEqual({ anotherProfileName: {} });
-    expect(credentialsFile).not.toContain({ [profileName]: {} });
+    expect(credentialsFile).not.toHaveProperty(profileName);
     expect(fileService.replaceWriteSync).toHaveBeenCalledWith(credentialPath, credentialsFile);
   });
 

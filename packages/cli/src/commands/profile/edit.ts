@@ -1,5 +1,5 @@
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { AwsNamedProfile } from "@noovolari/leapp-core/models/aws/aws-named-profile";
 import { profileId, profileName } from "../../flags";
 
@@ -53,7 +53,7 @@ export default class EditNamedProfile extends LeappCommand {
       {
         name: "namedProfileName",
         message: `choose a new name for the profile`,
-        validate: (profileNameString) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileNameString),
+        validate: (profileNameString: string) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileNameString),
         type: "input",
       },
     ]);

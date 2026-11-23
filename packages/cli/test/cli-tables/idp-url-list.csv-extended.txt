@@ -1,0 +1,3 @@
+ID,Identity Provider URL
+u-1,https://idp.example.com/saml/login
+u-2,https://idp.example.com/very/long/path/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx

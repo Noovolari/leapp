@@ -1,34 +1,44 @@
-<a class="close-modal" (click)="closeModal();"><i class="moon-Close"></i></a>
+<a class="close-modal" (click)="closeModal()"><i class="moon-Close"></i></a>
 <h4>Manage Workspaces</h4>
 
 <div class="workspaces-container">
-
-  <div *ngFor="let workspaceState of workspacesState" class="workspace-menu-line">
-    <div *ngIf="workspaceState.type === 'local'" class="workspace-icon-container local">
+  @for (workspaceState of workspacesState; track workspaceState) {
+  <div class="workspace-menu-line">
+    @if (workspaceState.type === 'local') {
+    <div class="workspace-icon-container local">
       <i class="moon-Home"></i>
     </div>
-    <div *ngIf="workspaceState.type !== 'local'" class="workspace-icon-container remote">
-      <span>{{workspaceState.name[0].toUpperCase()}}</span>
+    } @if (workspaceState.type !== 'local') {
+    <div class="workspace-icon-container remote">
+      <span>{{ workspaceState.name[0].toUpperCase() }}</span>
     </div>
+    }
     <div class="workspace-name-container">
-      <span>{{workspaceState.name}}</span>
-      <span>{{workspaceState.description}}</span>
+      <span>{{ workspaceState.name }}</span>
+      <span>{{ workspaceState.description }}</span>
     </div>
-    <div *ngIf="workspaceState.type !== 'local'" class="manage-workspaces-actions-container">
-      <img class="workspace-menu-icon" src="assets/images/dots-three-outline-vertical-fill.svg" alt="actions"
-           [matMenuTriggerFor]="manageWorkspacesActionsMenu">
+    @if (workspaceState.type !== 'local') {
+    <div class="manage-workspaces-actions-container">
+      <img
+        class="workspace-menu-icon"
+        src="assets/images/dots-three-outline-vertical-fill.svg"
+        alt="actions"
+        [matMenuTriggerFor]="manageWorkspacesActionsMenu"
+      />
     </div>
+    }
   </div>
+  }
 </div>
 
 <mat-menu #manageWorkspacesActionsMenu="matMenu" [hasBackdrop]="true" role="menu">
   <span mat-menu-item class="not-displayed">dummy fix for github issue 3352</span>
   <div mat-menu-item (click)="syncWorkspace()">
-    <img class="workspace-menu-icon" src="assets/images/arrows-clockwise-fill.svg" alt="sync">
+    <img class="workspace-menu-icon" src="assets/images/arrows-clockwise-fill.svg" alt="sync" />
     <span>Sync Workspace</span>
   </div>
   <div mat-menu-item (click)="signOutFromWorkspace()">
-    <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out">
+    <img class="workspace-menu-icon" src="assets/images/sign-out.svg" alt="sign-out" />
     <span>Sign-out Workspace</span>
   </div>
 </mat-menu>

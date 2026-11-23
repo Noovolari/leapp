@@ -4,6 +4,7 @@ import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 
 @Pipe({
   name: "filtering",
+  standalone: false,
 })
 export class FilteringPipe implements PipeTransform {
   transform(sessions: Session[], activeOrPending: boolean): Session[] {

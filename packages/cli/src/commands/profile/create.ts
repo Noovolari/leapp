@@ -1,5 +1,5 @@
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { profileName } from "../../flags";
 
 export default class CreateNamedProfile extends LeappCommand {
@@ -39,7 +39,7 @@ export default class CreateNamedProfile extends LeappCommand {
       {
         name: "namedProfileName",
         message: `choose a name for the profile`,
-        validate: (profileNameString) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileNameString),
+        validate: (profileNameString: string) => this.cliProviderService.namedProfilesService.validateNewProfileName(profileNameString),
         type: "input",
       },
     ]);

@@ -1,5 +1,5 @@
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
 import { idpUrl, idpUrlId } from "../../flags";
 
@@ -54,7 +54,7 @@ export default class EditIdpUrl extends LeappCommand {
       {
         name: "newIdpUrl",
         message: "choose a new URL",
-        validate: (url) => this.cliProviderService.idpUrlsService.validateIdpUrl(url),
+        validate: (url: string) => this.cliProviderService.idpUrlsService.validateIdpUrl(url),
         type: "input",
       },
     ]);

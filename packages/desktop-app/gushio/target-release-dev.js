@@ -19,9 +19,11 @@ module.exports = {
     try {
       const packageJson = await readPackageJsonFunction(path, "desktop-app");
       originalPackage = JSON.parse(JSON.stringify(packageJson));
-      await gushio.run(path.join(__dirname, './target-build.js'), args)
+      // target-build.js takes only the build target; gushio 0.7.5 rejects extra arguments
+      await gushio.run(path.join(__dirname, './target-build.js'), [args[0]])
 
       console.log('Packaging leapp... ')
+      // Package.json says leappFlavor dev; a release is always prod
       const platformVersion = args[1] === 'mac'
         ? ''
         : args[1] === 'win'
@@ -39,9 +41,9 @@ module.exports = {
 
       let command;
       if (args[1] === 'mac') {
-        command = `export CSC_IDENTITY_AUTO_DISCOVERY=true && electron-builder build ${platformVersion}`;
+        command = `export CSC_IDENTITY_AUTO_DISCOVERY=true && electron-builder build ${platformVersion} --publish never -c.extraMetadata.leappFlavor=prod`;
       } else {
-        command = `electron-builder build ${platformVersion}`;
+        command = `electron-builder build ${platformVersion} --publish never -c.extraMetadata.leappFlavor=prod`;
       }
       const result = shellJs.exec(command);
       if (result.code !== 0) {

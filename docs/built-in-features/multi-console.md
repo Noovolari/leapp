@@ -22,6 +22,17 @@ the AWS Web Console in the same browser window** and helps you in managing them.
   <a href="https://d3o59asa8udcq9.cloudfront.net/extension/leapp-extension-chromium-latest.zip" class="md-button md-button--primary installation-button">Get it on Chrome ⇩</a>
 </div>
 
+### Where Leapp listens for the extension
+
+The extension talks to Leapp through a local connection on port `8095`. Leapp opens it
+**only while Multi-Console is enabled** in the Leapp options, and **only on this computer**
+(`localhost`): other computers on your network can't reach it. When you disable Multi-Console,
+Leapp closes the connection and nothing listens on the port.
+
+If another program already uses port `8095`, Leapp shows the warning
+"Multi-Console extension unavailable: port 8095 is already in use or blocked. Web Consoles open
+with the standard method." and opens Web Consoles in your default browser instead.
+
 ### List of Supported Browsers
 
 | Browser                    | Supported

@@ -9,26 +9,20 @@
       "ES2019",
       "DOM"
     ],
-    "module": "CommonJS",
-    "moduleResolution": "Node",
+    "module": "node20",
+    "moduleResolution": "nodenext",
+    "strict": false,
     "sourceMap": true,
     "target": "ES2019",
     "typeRoots": [
       "./node_modules/@types"
     ],
-    "paths": {
-      "stream": [
-        "./node_modules/stream-browserify"
-      ],
-      "assert": [
-        "./node_modules/assert"
-      ],
-      "fs": [
-        "./node_modules/fs-web"
-      ]
-    },
+    "types": [
+      "node"
+    ],
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    "rootDir": "./src",
     "outDir": "./dist"
   },
   "include": [

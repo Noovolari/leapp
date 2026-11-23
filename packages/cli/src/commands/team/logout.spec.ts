@@ -1,9 +1,10 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import TeamLogout from "./logout";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("TeamLogout", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): TeamLogout => {
-    const command = new TeamLogout(argv, {} as any);
+    const command = new TeamLogout(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

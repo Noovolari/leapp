@@ -43,14 +43,18 @@ export class AppService {
     // Global Configure logger
     if (this.appNativeService.log) {
       const logPaths = {
-        [OperatingSystem.mac]: `${this.appNativeService.process.env.HOME}/Library/Logs/Leapp/log.electronService.log`,
-        [OperatingSystem.linux]: `${this.appNativeService.process.env.HOME}/.config/Leapp/logs/log.electronService.log`,
-        [OperatingSystem.windows]: `${this.appNativeService.process.env.USERPROFILE}\\AppData\\Roaming\\Leapp\\log.electronService.log`,
+        [OperatingSystem.mac]: `${this.appNativeService.process.env.HOME}/Library/Logs/${constants.appName}/log.electronService.log`,
+        [OperatingSystem.linux]: `${this.appNativeService.process.env.HOME}/.config/${constants.appName}/logs/log.electronService.log`,
+        [OperatingSystem.windows]: `${this.appNativeService.process.env.USERPROFILE}\\AppData\\Roaming\\${constants.appName}\\log.electronService.log`,
       };
 
       this.appNativeService.log.transports.console.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{processType}] {text}";
       this.appNativeService.log.transports.file.format = "[{y}-{m}-{d} {h}:{i}:{s}.{ms}] [{level}] [{processType}] {text}";
-      this.appNativeService.log.transports.file.resolvePath = () => logPaths[this.detectOs()];
+      // the node entry reads the app name from the nearest package.json, which a dev run may not have
+      this.appNativeService.log.transports.file.setAppName(constants.appName);
+      this.appNativeService.log.transports.file.resolvePathFn = () => logPaths[this.detectOs()];
+      // the node entry would print [node]; keep the [renderer] tag the log has always had
+      this.appNativeService.log.variables.processType = "renderer";
     }
 
     this.getMetadata();
@@ -123,7 +127,8 @@ export class AppService {
     try {
       // Clear all extra data
       const getAppPath = this.appNativeService.path.join(this.appNativeService.app.getPath("appData"), constants.appName);
-      this.appNativeService.rimraf.sync(getAppPath + "/Partitions/leapp*");
+      // rimraf 4+ expands wildcards only with glob: true
+      this.appNativeService.rimraf.sync(getAppPath + "/Partitions/leapp*", { glob: true });
 
       // Cleaning Library Electron Cache
       await this.appNativeService.session.defaultSession.clearStorageData();

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { AppService } from "../../../services/app.service";
 import { AppProviderService } from "../../../services/app-provider.service";
@@ -14,6 +14,8 @@ import { AnalyticsService } from "../../../services/analytics.service";
   selector: "app-ssm-modal-dialog",
   templateUrl: "./ssm-modal-dialog.component.html",
   styleUrls: ["./ssm-modal-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class SsmModalDialogComponent implements OnInit {
   @Input()

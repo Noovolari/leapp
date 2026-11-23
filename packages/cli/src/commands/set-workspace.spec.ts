@@ -1,10 +1,11 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import SetWorkspace from "./set-workspace";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { oclifTestConfig } from "../../test/oclif-test-config";
 
 describe("SetWorkspace", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): any => {
-    const command = new SetWorkspace(argv, {} as any);
+    const command = new SetWorkspace(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

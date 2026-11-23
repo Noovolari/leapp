@@ -96,3 +96,7 @@ nightly-version
 packages/desktop-app/projects
 
 packages/desktop-app/.sentry-token
+
+# native addon build output and electron-builder output
+packages/desktop-app/dpapi-addon/build/
+packages/desktop-app/release/

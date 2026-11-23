@@ -1,20 +1,21 @@
 {
   "compileOnSave": true,
   "compilerOptions": {
-    "baseUrl": "./",
     "declaration": false,
     "experimentalDecorators": true,
     "lib": [
       "es2018",
       "dom"
     ],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "node20",
+    "moduleResolution": "nodenext",
+    "rootDir": "..",
+    "strict": false,
     "outDir": "./dist",
     "sourceMap": true,
-    "target": "es5",
+    "target": "ES2022",
     "typeRoots": [
-      "node_modules/@types"
+      "../node_modules/@types"
     ],
     "types": [
       "node"

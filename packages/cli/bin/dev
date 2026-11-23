@@ -1,17 +1,23 @@
 #!/usr/bin/env node
 
-const oclif = require('@oclif/core')
+// The build flavor comes from package.json (leappFlavor: dev in the repository, prod in release
+// builds) unless LEAPP_FLAVOR is already set. Core reads it, so a dev CLI talks only to a dev desktop app.
+if (!process.env.LEAPP_FLAVOR) {
+  const leappFlavor = require("../package.json").leappFlavor;
+  if (leappFlavor) {
+    process.env.LEAPP_FLAVOR = leappFlavor;
+  }
+}
 
-const path = require('path')
-const project = path.join(__dirname, '..', 'tsconfig.json')
+const oclif = require("@oclif/core");
+
+const path = require("path");
+const project = path.join(__dirname, "..", "tsconfig.json");
 
 // In dev mode -> use ts-node and dev plugins
-process.env.NODE_ENV = 'development'
+process.env.NODE_ENV = "development";
 
-require('ts-node').register({project})
+require("ts-node").register({ project });
 
-// In dev mode, always show stack traces
-oclif.settings.debug = true;
-
-// Start the CLI
-oclif.run().then(oclif.flush).catch(oclif.Errors.handle)
+// Start the CLI; development mode always shows stack traces
+oclif.execute({ development: true, dir: __dirname });

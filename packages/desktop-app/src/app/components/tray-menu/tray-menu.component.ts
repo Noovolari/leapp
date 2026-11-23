@@ -1,7 +1,6 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { AppService } from "../../services/app.service";
 import { environment } from "../../../environments/environment";
-import { UpdaterService } from "../../services/updater.service";
 import { AppProviderService } from "../../services/app-provider.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
 import { SessionFactory } from "@noovolari/leapp-core/services/session-factory";
@@ -17,11 +16,14 @@ import { MessageToasterService } from "../../services/message-toaster.service";
 import { LoggedEntry, LogLevel, LogService } from "@noovolari/leapp-core/services/log-service";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
 import { constants } from "@noovolari/leapp-core/models/constants";
+import { UpdaterService } from "../../services/updater.service";
 
 @Component({
   selector: "app-tray-menu",
   templateUrl: "./tray-menu.component.html",
   styleUrls: ["./tray-menu.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class TrayMenuComponent implements OnInit, OnDestroy {
   // Used to define the only tray we want as active especially in linux context
@@ -40,10 +42,10 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
   constructor(
     private appService: AppService,
     private electronService: AppNativeService,
-    private updaterService: UpdaterService,
     private windowService: WindowService,
     private messageToasterService: MessageToasterService,
-    private appProviderService: AppProviderService
+    private appProviderService: AppProviderService,
+    private updaterService: UpdaterService
   ) {
     this.awsCoreService = appProviderService.awsCoreService;
     this.loggingService = appProviderService.logService;
@@ -134,7 +136,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     // Remove unused voices from contextual menu
     const template = [
       {
-        label: "Leapp",
+        label: constants.productName,
         submenu: [
           { label: "About", role: "about" },
           { type: "separator" },
@@ -164,18 +166,16 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
     }
     if (!this.currentTray) {
       this.currentTray = new this.electronService.tray(__dirname + `/assets/images/${normalIcon}.png`);
-      if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
-        this.appService.getApp().dock.setBadge("");
-      }
     }
-    if (this.updaterService.isReady() && this.updaterService.isUpdateNeeded()) {
+    // A pending update adds "Check for Updates..." and, on macOS, the Dock badge "·"
+    const updatePending = this.updaterService.isUpdateNeeded();
+    if (updatePending) {
       this.voices.push({ type: "separator" });
       this.voices.push({ label: "Check for Updates...", type: "normal", click: () => this.updaterService.updateDialog() });
-      if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
-        this.appService.getApp().dock.setBadge("·");
-      }
     }
-
+    if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
+      this.appService.getApp().dock.setBadge(updatePending ? "·" : "");
+    }
     this.voices = this.voices.concat([
       ...this.sessions,
       ...(this.moreSessions.length > 0 ? [{ type: "separator" }, { label: "More Sessions...", submenu: this.moreSessions }] : []),
@@ -184,7 +184,7 @@ export class TrayMenuComponent implements OnInit, OnDestroy {
 
     const contextMenu = this.appService.getMenu().buildFromTemplate(this.voices);
     if (this.appService.detectOs() !== OperatingSystem.windows && this.appService.detectOs() !== OperatingSystem.linux) {
-      this.currentTray.setToolTip("Leapp");
+      this.currentTray.setToolTip(constants.productName);
     }
     this.currentTray.setContextMenu(contextMenu);
   }

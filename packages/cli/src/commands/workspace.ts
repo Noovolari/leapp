@@ -1,5 +1,5 @@
 import { LeappCommand } from "../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { constants } from "@noovolari/leapp-core/models/constants";
 
 export default class Workspace extends LeappCommand {

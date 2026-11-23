@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { WindowService } from "../../../services/window.service";
@@ -7,6 +7,8 @@ import { WindowService } from "../../../services/window.service";
   selector: "app-credential-process-dialog",
   templateUrl: "./credential-process-dialog.component.html",
   styleUrls: ["./credential-process-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class CredentialProcessDialogComponent implements OnInit {
   @Input()

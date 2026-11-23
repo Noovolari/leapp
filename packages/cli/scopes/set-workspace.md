@@ -14,7 +14,7 @@ USAGE
   $ leapp set-workspace [WORKSPACENAME]
 
 ARGUMENTS
-  WORKSPACENAME  name of the Leapp Team remote workspace or local
+  [WORKSPACENAME]  name of the Leapp Team remote workspace or local
 
 DESCRIPTION
   Set the current Leapp workspace

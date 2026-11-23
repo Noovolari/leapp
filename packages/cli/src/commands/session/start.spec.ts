@@ -2,10 +2,11 @@ import { describe, expect, jest, test } from "@jest/globals";
 import StartSession from "./start";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("StartSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): StartSession => {
-    const command = new StartSession(argv, {} as any);
+    const command = new StartSession(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

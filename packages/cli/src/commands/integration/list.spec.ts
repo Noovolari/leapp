@@ -1,11 +1,12 @@
 import ListIntegrations from "./list";
-import { ux } from "@oclif/core";
+import * as tableModule from "../../ux/table";
 import { describe, expect, jest, test } from "@jest/globals";
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("ListIntegrations", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): ListIntegrations => {
-    const command = new ListIntegrations(argv, {} as any);
+    const command = new ListIntegrations(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
@@ -72,7 +73,7 @@ describe("ListIntegrations", () => {
     };
 
     const command = getTestCommand(cliProviderService);
-    const tableSpy = jest.spyOn(ux, "table").mockImplementation(() => null);
+    const tableSpy = jest.spyOn(tableModule, "table").mockImplementation(() => null);
 
     await command.showIntegrations();
 

@@ -43,20 +43,21 @@ export class AwsCoreService {
 
   constructor(private httpHandler: HttpHandler, private nativeService: INativeService, private logService: LogService) {}
 
+  // The AWS standard variables win over ~/.aws, in every flavor, so Leapp writes where the AWS CLI reads
   awsCredentialPath(): string {
-    return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "credentials");
+    return this.awsEnvPath("AWS_SHARED_CREDENTIALS_FILE") ?? this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "credentials");
   }
 
   awsBkpCredentialPath(): string {
-    return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "credentials.bkp");
+    return `${this.awsCredentialPath()}.bkp`;
   }
 
   awsConfigPath(): string {
-    return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "config");
+    return this.awsEnvPath("AWS_CONFIG_FILE") ?? this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "config");
   }
 
   awsBkpConfigPath(): string {
-    return this.nativeService.path.join(this.nativeService.os.homedir(), ".aws", "config.bkp");
+    return `${this.awsConfigPath()}.bkp`;
   }
 
   stsOptions(session: Session, isV3 = false, credentials: any = undefined): any {
@@ -93,5 +94,10 @@ export class AwsCoreService {
   getRegions(): { region: string }[] {
     const regionKeys = [...AwsCoreService.stsEndpointsPerRegion.keys()];
     return regionKeys.map((key) => ({ region: key }));
+  }
+
+  private awsEnvPath(variable: string): string | undefined {
+    const value = this.nativeService.process?.env?.[variable];
+    return value ? value : undefined;
   }
 }

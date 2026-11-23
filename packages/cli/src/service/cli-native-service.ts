@@ -8,7 +8,6 @@ export class CliNativeService implements INativeService {
   os: any;
   ini: any;
   exec: any;
-  unzip: any;
   copydir: any;
   sudo: any;
   path: any;
@@ -30,7 +29,8 @@ export class CliNativeService implements INativeService {
 
   constructor() {
     this.fs = require("fs-extra");
-    this.rimraf = require("rimraf");
+    // rimraf 4+ exports functions instead of being one; core calls it as rimraf(path, options, callback)
+    this.rimraf = require("rimraf").rimraf;
     this.os = require("os");
     this.ini = require("js-ini");
     this.path = require("path");
@@ -38,7 +38,6 @@ export class CliNativeService implements INativeService {
     this.process = global.process;
     this.nodeIpc = require("node-ipc");
     this.url = require("url");
-    this.unzip = require("extract-zip");
     this.copydir = require("copy-dir");
     this.sudo = require("sudo-prompt");
     this.semver = require("semver");

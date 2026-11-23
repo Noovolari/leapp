@@ -20,6 +20,10 @@ jobs:
         with:
           python-version: 3.11
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: packages/cli/.nvmrc
+
       - name: install-dependencies
         run: |
           pip install mkdocs-material

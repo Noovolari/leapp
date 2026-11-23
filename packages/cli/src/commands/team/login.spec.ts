@@ -1,9 +1,10 @@
 import { describe, expect, jest, test } from "@jest/globals";
 import TeamLogin from "./login";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("TeamLogin", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): TeamLogin => {
-    const command = new TeamLogin(argv, {} as any);
+    const command = new TeamLogin(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
@@ -26,7 +27,7 @@ describe("TeamLogin", () => {
     };
     const command = getTestCommand(cliProviderService, []);
     const answer = await (command as any).insertUserEmail();
-    expect(cliProviderService.inquirer.prompt).toBeCalledTimes(1);
+    expect(cliProviderService.inquirer.prompt).toHaveBeenCalledTimes(1);
     expect(cliProviderService.inquirer.prompt).toHaveBeenCalledWith(expectedPromptPayload);
     expect(answer as any).toEqual(expectedAnswer.userEmail);
   });
@@ -49,7 +50,7 @@ describe("TeamLogin", () => {
     };
     const command = getTestCommand(cliProviderService, []);
     const answer = await (command as any).insertUserPassword();
-    expect(cliProviderService.inquirer.prompt).toBeCalledTimes(1);
+    expect(cliProviderService.inquirer.prompt).toHaveBeenCalledTimes(1);
     expect(cliProviderService.inquirer.prompt).toHaveBeenCalledWith(expectedPromptPayload);
     expect(answer as any).toEqual(expectedAnswer.userPassword);
   });

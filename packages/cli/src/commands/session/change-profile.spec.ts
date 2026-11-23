@@ -1,10 +1,11 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import { AwsIamUserService } from "@noovolari/leapp-core/services/session/aws/aws-iam-user-service";
 import ChangeSessionProfile from "./change-profile";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("ChangeProfile", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): ChangeSessionProfile => {
-    const command = new ChangeSessionProfile(argv, {} as any);
+    const command = new ChangeSessionProfile(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

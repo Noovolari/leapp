@@ -86,7 +86,7 @@ form {
   .form-field {
     margin-bottom: 7px;
     position: relative;
-    label:not(.mat-checkbox-layout) {
+    label:not(.mdc-form-field) {
       display: inline-flex;
       font-weight: 500;
       font-size: 13px;
@@ -184,7 +184,7 @@ form {
     height: 18px!important;
   }
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     width: 300px;
     min-width: 300px;
     max-width: 500px;
@@ -192,7 +192,7 @@ form {
     border: 1px solid $silver-75;
     border-radius: $context-menu-border-radius;
 
-    .mat-menu-item {
+    .mat-mdc-menu-item {
       line-height: 36px;
       height: 36px;
       padding: 0 20px;

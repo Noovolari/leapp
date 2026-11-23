@@ -1,9 +1,10 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import DeleteNamedProfile from "./delete";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("DeleteNamedProfile", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): DeleteNamedProfile => {
-    const command = new DeleteNamedProfile(argv, {} as any);
+    const command = new DeleteNamedProfile(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

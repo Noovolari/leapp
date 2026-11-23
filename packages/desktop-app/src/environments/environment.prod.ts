@@ -7,10 +7,8 @@ const environment = {
   sessionDuration: 1200,
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
-  lockFileDestination: "",
   production: true,
   credentialsDestination: ".aws/credentials",
-  deeplinkFile: ".Leapp/deeplink",
   azureMsalCacheFile: ".azure/msal_token_cache.json",
   defaultRegion: "us-east-1",
   defaultLocation: "eastus",
@@ -21,5 +19,4 @@ const environment = {
   apiEndpoint: "http://localhost:3000",
 };
 
-environment.lockFileDestination = `.Leapp/Leapp-lock.json`;
 export { environment };

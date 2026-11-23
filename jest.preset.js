@@ -6,8 +6,8 @@ module.exports = {
     "!dist/",
     "!node_modules/"
   ],
+  // @noovolari/leapp-core/* resolves to dist/ through core's package.json "exports" (Jest 30 reads it)
   moduleNameMapper: {
-    "^@noovolari/leapp-core/(.*)$": "@noovolari/leapp-core/dist/$1",
     "axios": "axios/dist/node/axios.cjs"
   }
 }

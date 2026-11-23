@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
+import { Component, ElementRef, Input, OnInit, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { AppService } from "../../../services/app.service";
 import { ActivatedRoute, Router } from "@angular/router";
@@ -28,9 +28,10 @@ import { LocalstackSessionService } from "@noovolari/leapp-core/services/session
   selector: "app-create-dialog",
   templateUrl: "./create-dialog.component.html",
   styleUrls: ["./create-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class CreateDialogComponent implements OnInit {
-  @Input() selectedSession;
   @Input() selectedAccountNumber = "";
   @Input() selectedRole = "";
   @Input() selectedSamlUrl = "";
@@ -52,7 +53,6 @@ export class CreateDialogComponent implements OnInit {
   hasSsoUrl = false;
 
   sessionType;
-  provider;
 
   idpUrls: { value: string; label: string }[] = [];
   selectedIdpUrl: { value: string; label: string };
@@ -63,9 +63,7 @@ export class CreateDialogComponent implements OnInit {
   assumerAwsSessions = [];
 
   regions = [];
-  selectedRegion;
   locations = [];
-  selectedLocation;
 
   eSessionType = SessionType;
   eConstants = constants;
@@ -86,12 +84,12 @@ export class CreateDialogComponent implements OnInit {
     federationUrl: new FormControl("", [Validators.required, Validators.pattern("https?://.+")]),
     secretKey: new FormControl("", [Validators.required]),
     accessKey: new FormControl("", [Validators.required]),
-    awsRegion: new FormControl(""),
+    awsRegion: new FormControl<any>(""),
     mfaDevice: new FormControl(""),
     awsProfile: new FormControl("", [Validators.required]),
-    azureLocation: new FormControl("", [Validators.required]),
-    assumerSession: new FormControl("", [Validators.required]),
-    selectAccessStrategy: new FormControl(SessionType.awsIamRoleFederated, [Validators.required]),
+    azureLocation: new FormControl<any>("", [Validators.required]),
+    assumerSession: new FormControl<any>("", [Validators.required]),
+    selectAccessStrategy: new FormControl<any>(SessionType.awsIamRoleFederated, [Validators.required]),
   });
 
   private behaviouralSubjectService: BehaviouralSubjectService;
@@ -103,6 +101,39 @@ export class CreateDialogComponent implements OnInit {
   private loggingService: LogService;
 
   /* Setup the first account for the application */
+  // Each field is its form control's value (one binding per control, no ngModel)
+  get provider(): any {
+    return this.form.get("selectAccessStrategy").value;
+  }
+
+  set provider(value: any) {
+    this.form.get("selectAccessStrategy").setValue(value);
+  }
+
+  get selectedRegion(): any {
+    return this.form.get("awsRegion").value;
+  }
+
+  set selectedRegion(value: any) {
+    this.form.get("awsRegion").setValue(value);
+  }
+
+  get selectedLocation(): any {
+    return this.form.get("azureLocation").value;
+  }
+
+  set selectedLocation(value: any) {
+    this.form.get("azureLocation").setValue(value);
+  }
+
+  get selectedSession(): any {
+    return this.form.get("assumerSession").value;
+  }
+
+  @Input() set selectedSession(value: any) {
+    this.form.get("assumerSession").setValue(value);
+  }
+
   constructor(
     public optionsService: OptionsService,
     public appService: AppService,

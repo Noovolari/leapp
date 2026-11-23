@@ -2,7 +2,9 @@
   "$schema": "../node_modules/@angular/cli/lib/config/schema.json",
   "cli": {
     "analytics": "a9497ed5-4b2f-482f-8e51-1f9817d1bec2",
-    "defaultCollection": "@angular-eslint/schematics"
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   },
   "version": 1,
   "newProjectRoot": "projects",
@@ -42,8 +44,14 @@
             "namedChunks": false,
             "extractLicenses": true,
             "vendorChunk": false,
-
-            "allowedCommonJsDependencies": ["stream", "assert", "fs", "@noovolari/leapp-core", "@aws-crypto/sha256-browser", "core-team"]
+            "allowedCommonJsDependencies": [
+              "stream",
+              "assert",
+              "fs",
+              "@noovolari/leapp-core",
+              "@aws-crypto/sha256-browser",
+              "core-team"
+            ]
           },
           "configurations": {
             "staging": {
@@ -88,21 +96,21 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "leapp-client:build"
+            "buildTarget": "leapp-client:build"
           },
           "configurations": {
             "staging": {
-              "browserTarget": "leapp-client:build:staging"
+              "buildTarget": "leapp-client:build:staging"
             },
             "production": {
-              "browserTarget": "leapp-client:build:production"
+              "buildTarget": "leapp-client:build:production"
             }
           }
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "leapp-client:build"
+            "buildTarget": "leapp-client:build"
           }
         },
         "test": {
@@ -120,39 +128,39 @@
               "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
               "src/styles.scss"
             ],
-            "scripts": []
-          }
-        },
-        "lint": {
-          "builder": "@angular-devkit/build-angular:tslint",
-          "options": {
-            "tsConfig": [
-              "tsconfig.json",
-              "tsconfig.spec.json",
-              "e2e/tsconfig.json"
-            ],
-            "exclude": [
-              "**/node_modules/**"
+            "scripts": [],
+            "include": [
+              "src/**/*.spec.ts"
             ]
-          }
-        },
-        "e2e": {
-          "builder": "@angular-devkit/build-angular:protractor",
-          "options": {
-            "protractorConfig": "e2e/protractor.conf.js",
-            "devServerTarget": "leapp-client:serve"
-          },
-          "configurations": {
-            "staging": {
-              "devServerTarget": "leapp-client:serve:staging"
-            },
-            "production": {
-              "devServerTarget": "leapp-client:serve:production"
-            }
           }
         }
       }
     }
   },
-  "defaultProject": "leapp-client"
+  "schematics": {
+    "@schematics/angular:component": {
+      "type": "component"
+    },
+    "@schematics/angular:directive": {
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
+    }
+  }
 }

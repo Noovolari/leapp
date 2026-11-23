@@ -1,7 +1,6 @@
 import { PositioningService } from "ngx-bootstrap/positioning";
 import { ComponentLoaderFactory } from "ngx-bootstrap/component-loader";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
-import "jasmine";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { serialize } from "class-transformer";
 import { AppService } from "./app/services/app.service";

@@ -16,6 +16,10 @@ social_relative_image_path: "configure-named-profile.png"
 
 Named Profiles are used by AWS to maintain more than one set of active credentials for you to use with AWS-CLI, SDK, or other third-party tools. Named profiles are stored in *~/.aws/credentials* file in the **ini** file format.
 
+!!! Info
+
+    Leapp follows the standard AWS variables: when `AWS_SHARED_CREDENTIALS_FILE` or `AWS_CONFIG_FILE` are set in the environment Leapp (desktop app or CLI) is started from, it writes the profiles to those files instead of `~/.aws/credentials` and `~/.aws/config`, the same files the AWS CLI reads. A desktop app started from the OS launcher usually doesn't see variables exported in a shell.
+
 Named Profiles have a default profile which is the one you get from [aws configure](https://docs.aws.amazon.com/cli/latest/reference/configure/){: target='_blank'} command.
 
 With Leapp you can group and activate more than one credential set at a time through [Named Profiles](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-profiles.html){: target='_blank'}.

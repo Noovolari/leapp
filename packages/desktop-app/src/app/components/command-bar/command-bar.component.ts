@@ -1,4 +1,4 @@
-import { AfterContentChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { AfterContentChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { OptionsDialogComponent } from "../dialogs/options-dialog/options-dialog.component";
 import { CreateDialogComponent } from "../dialogs/create-dialog/create-dialog.component";
@@ -20,9 +20,9 @@ import { WindowService } from "../../services/window.service";
 import { OptionsService } from "../../services/options.service";
 import { AzureSession } from "@noovolari/leapp-core/models/azure/azure-session";
 import { OperatingSystem } from "@noovolari/leapp-core/models/operating-system";
-import { UpdaterService } from "../../services/updater.service";
 import { LeappNotification, LeappNotificationType } from "@noovolari/leapp-core/models/notification";
 import { InfoDialogComponent } from "../dialogs/info-dialog/info-dialog.component";
+import { UpdaterService } from "../../services/updater.service";
 import { NotificationService } from "@noovolari/leapp-core/services/notification-service";
 import { NoovolariDialogComponent } from "../dialogs/noovolari-dialog/noovolari-dialog.component";
 
@@ -47,6 +47,8 @@ export const globalColumnsCount = new BehaviorSubject<number>(null);
   selector: "app-command-bar",
   templateUrl: "./command-bar.component.html",
   styleUrls: ["./command-bar.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class CommandBarComponent implements OnInit, OnDestroy, AfterContentChecked {
   @ViewChild("parent") parent: ElementRef;
@@ -89,8 +91,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   constructor(
     public optionsService: OptionsService,
     private bsModalService: BsModalService,
+    private updaterService: UpdaterService,
     public appService: AppService,
-    public updaterService: UpdaterService,
     public appNativeService: AppNativeService,
     private appProviderService: AppProviderService,
     private windowService: WindowService
@@ -153,10 +155,8 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
   }
 
   get isNotificationPending(): boolean {
-    return (
-      this.appProviderService.notificationService.getNotifications(true).length > 0 ||
-      (this.updaterService.isReady() && this.updaterService.isUpdateNeeded())
-    );
+    // An update not yet acknowledged also lights the dot
+    return this.appProviderService.notificationService.getNotifications(true).length > 0 || this.updaterService.isUpdateNeeded();
   }
 
   ngOnInit(): void {
@@ -315,17 +315,10 @@ export class CommandBarComponent implements OnInit, OnDestroy, AfterContentCheck
     }
   }
 
+  // The release notes in the info dialog (empty when they can't be downloaded)
   async goToWhatsNew(): Promise<void> {
-    const title = "What's new";
-    const releaseNotes = await this.updaterService.getReleaseNote();
-
-    this.bsModalService.show(InfoDialogComponent, {
-      animated: false,
-      initialState: {
-        title,
-        description: releaseNotes,
-      },
-    });
+    const description = await this.updaterService.getReleaseNotes();
+    this.bsModalService.show(InfoDialogComponent, { animated: false, initialState: { title: "What's new", description } });
   }
 
   goToGettingStarted(): void {

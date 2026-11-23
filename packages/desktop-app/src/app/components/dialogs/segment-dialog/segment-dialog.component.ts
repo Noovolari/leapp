@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { AppService } from "../../../services/app.service";
 import { FormControl, FormGroup } from "@angular/forms";
 import { globalFilterGroup } from "../../command-bar/command-bar.component";
@@ -11,22 +11,32 @@ import { AppProviderService } from "../../../services/app-provider.service";
   selector: "app-segment-dialog",
   templateUrl: "./segment-dialog.component.html",
   styleUrls: ["./segment-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class SegmentDialogComponent implements OnInit, OnDestroy {
   @ViewChild("ngSelectComponent")
   ngSelectComponent: NgSelectComponent;
 
   form = new FormGroup({
-    segmentName: new FormControl(""),
+    segmentName: new FormControl<any>(""),
   });
 
-  selectedSegment;
   segments: Segment[];
 
   currentFilterGroup;
   temporaryName;
 
   private subscription;
+
+  // Each field is its form control's value (one binding per control, no ngModel)
+  get selectedSegment(): any {
+    return this.form.get("segmentName").value;
+  }
+
+  set selectedSegment(value: any) {
+    this.form.get("segmentName").setValue(value);
+  }
 
   constructor(private appService: AppService, private appProviderService: AppProviderService) {
     this.temporaryName = "";

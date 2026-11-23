@@ -1,10 +1,10 @@
-import { Component, Input, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from "@angular/core";
+import { Component, Input, NgZone, OnDestroy, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren, ChangeDetectionStrategy } from "@angular/core";
 import { globalFilterGroup } from "../command-bar/command-bar.component";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { Router } from "@angular/router";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { BehaviorSubject } from "rxjs";
-import { MatLegacyMenuTrigger } from "@angular/material/legacy-menu";
+import { MatMenuTrigger } from "@angular/material/menu";
 import { AwsSsoIntegration } from "@noovolari/leapp-core/models/aws/aws-sso-integration";
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { AppService } from "../../services/app.service";
@@ -37,10 +37,12 @@ export const integrationHighlight = new BehaviorSubject<number>(-1);
   selector: "app-integration-bar",
   templateUrl: "./integration-bar.component.html",
   styleUrls: ["./integration-bar.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class IntegrationBarComponent implements OnInit, OnDestroy {
-  @ViewChildren(MatLegacyMenuTrigger)
-  triggers: QueryList<MatLegacyMenuTrigger>;
+  @ViewChildren(MatMenuTrigger)
+  triggers: QueryList<MatMenuTrigger>;
 
   @ViewChild("ssoModalTemplate", { static: false })
   ssoModalTemplate: TemplateRef<any>;
@@ -60,6 +62,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   subscription;
   subscription2;
   subscription3;
+  subscription4;
 
   eIntegrationType = IntegrationType;
 
@@ -67,14 +70,13 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     { label: "AWS Single Sign-On", value: IntegrationType.awsSso },
     { label: "Azure", value: IntegrationType.azure },
   ];
-  selectedIntegration: string;
 
   form = new FormGroup({
     alias: new FormControl("", [Validators.required]),
     portalUrl: new FormControl("", [Validators.required, Validators.pattern("https?://.+")]),
     awsRegion: new FormControl("", [Validators.required]),
     defaultBrowserOpening: new FormControl("", [Validators.required]),
-    integrationType: new FormControl("", [Validators.required]),
+    integrationType: new FormControl<any>("", [Validators.required]),
     tenantId: new FormControl("", [Validators.required]),
   });
 
@@ -91,6 +93,15 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
   private awsSsoOidcService: AwsSsoOidcService;
   private loggingService: LogService;
   private segmentService: SegmentService;
+
+  // Each field is its form control's value (one binding per control, no ngModel)
+  get selectedIntegration(): string {
+    return this.form.get("integrationType").value;
+  }
+
+  set selectedIntegration(value: string) {
+    this.form.get("integrationType").setValue(value);
+  }
 
   constructor(
     public optionsService: OptionsService,
@@ -150,7 +161,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
       }
     });
 
-    integrationHighlight.subscribe(() => {
+    this.subscription4 = integrationHighlight.subscribe(() => {
       //set highlighted row for integration
       this.selectedIntegrations.forEach((i) => (i.selected = false));
     });
@@ -165,6 +176,7 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
     this.subscription2.unsubscribe();
     this.subscription3.unsubscribe();
+    this.subscription4.unsubscribe();
   }
 
   selectedSsoConfigurationCheck(configuration: Integration): string {

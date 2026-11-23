@@ -9,6 +9,7 @@
         <div class="form-group">
           <label>Select a Region</label>
           <ng-select
+            data-testid="change-region-select"
             [clearable]="false"
             bindLabel="{{session.type === eSessionType.azure ? 'location' : 'region'}}"
             bindValue="{{session.type === eSessionType.azure ? 'location' : 'region'}}"

@@ -23,6 +23,7 @@ import { AwsCredentialsPlugin } from "@noovolari/leapp-core/plugin-sdk/aws-crede
 import { AnalyticsService } from "./analytics.service";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 
+import { escapeHtml } from "./escape-html";
 @Injectable({
   providedIn: "root",
 })
@@ -264,7 +265,7 @@ export class SelectedSessionActionsService {
 
     let dependendSessionsHtml = "";
     dependentSessions.forEach((sess) => {
-      dependendSessionsHtml += `<li><div class="removed-sessions"><b>${sess.sessionName}</b></div></li>`;
+      dependendSessionsHtml += `<li><div class="removed-sessions"><b>${escapeHtml(sess.sessionName)}</b></div></li>`;
     });
     if (dependendSessionsHtml !== "") {
       return (
@@ -273,7 +274,7 @@ export class SelectedSessionActionsService {
         "</ul><br>Removing the session will also remove the dependent sessions associated with it. Do you want to proceed?"
       );
     } else {
-      return `Do you really want to delete the session '${session.sessionName}'?`;
+      return `Do you really want to delete the session '${escapeHtml(session.sessionName)}'?`;
     }
   }
 

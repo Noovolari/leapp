@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { AppService } from "../../../services/app.service";
 import { AppProviderService } from "../../../services/app-provider.service";
 import { BehaviouralSubjectService } from "@noovolari/leapp-core/services/behavioural-subject-service";
@@ -15,6 +16,8 @@ import { AnalyticsService } from "../../../services/analytics.service";
   selector: "app-manage-team-workspaces-dialog",
   templateUrl: "./manage-team-workspaces-dialog.component.html",
   styleUrls: ["./manage-team-workspaces-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
   workspacesState: WorkspaceState[];
@@ -67,7 +70,7 @@ export class ManageTeamWorkspacesDialogComponent implements OnInit, OnDestroy {
       await this.appProviderService.teamService.signOut();
       this.appService.closeAllMenuTriggers();
       globalLeappProPlanStatus.next(LeappPlanStatus.free);
-      await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.free);
+      await this.appProviderService.keychainService.saveSecret(constants.appName, "leapp-enabled-plan", LeappPlanStatus.free);
     } catch (error) {
       this.appProviderService.logService.log(new LoggedEntry(error.message, this, LogLevel.error, true));
     }

@@ -7,10 +7,8 @@ const environment = {
   sessionDuration: 1200, // 20 min
   sessionTokenDuration: 36000, // 10h
   timeout: 10000,
-  lockFileDestination: ".Leapp/Leapp-lock.json",
   production: false,
   credentialsDestination: ".aws/credentials",
-  deeplinkFile: ".Leapp/deeplink",
   azureMsalCacheFile: ".azure/msal_token_cache.json",
   defaultRegion: "us-east-1",
   defaultLocation: "eastus",

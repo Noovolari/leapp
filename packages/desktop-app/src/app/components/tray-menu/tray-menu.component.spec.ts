@@ -1,4 +1,4 @@
-import { async, ComponentFixture, TestBed } from "@angular/core/testing";
+import { waitForAsync, ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { TrayMenuComponent } from "./tray-menu.component";
 import { mustInjected } from "../../../base-injectables";
@@ -8,7 +8,7 @@ describe("TrayMenuComponent", () => {
   let component: TrayMenuComponent;
   let fixture: ComponentFixture<TrayMenuComponent>;
 
-  beforeEach(async(() => {
+  beforeEach(waitForAsync(() => {
     const spyBehaviouralSubjectService = jasmine.createSpyObj("BehaviouralSubjectService", [], {
       sessions: [],
       sessions$: { subscribe: () => {} },

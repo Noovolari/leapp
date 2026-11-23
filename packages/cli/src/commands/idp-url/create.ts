@@ -1,5 +1,5 @@
 import { LeappCommand } from "../../leapp-command";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { IdpUrl } from "@noovolari/leapp-core/models/idp-url";
 import { idpUrl } from "../../flags";
 
@@ -44,7 +44,7 @@ export default class CreateIdpUrl extends LeappCommand {
       {
         name: "idpUrl",
         message: `enter the identity provider URL`,
-        validate: (url) => this.cliProviderService.idpUrlsService.validateIdpUrl(url),
+        validate: (url: string) => this.cliProviderService.idpUrlsService.validateIdpUrl(url),
         type: "input",
       },
     ]);

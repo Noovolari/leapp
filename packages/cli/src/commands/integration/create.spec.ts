@@ -7,10 +7,11 @@ import { IntegrationMethod } from "@noovolari/leapp-core/models/integration-meth
 import { IntegrationType } from "@noovolari/leapp-core/models/integration-type";
 import { AccessMethodField } from "@noovolari/leapp-core/models/access-method-field";
 import { AccessMethodFieldType } from "@noovolari/leapp-core/models/access-method-field-type";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("CreateSsoIntegration", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): CreateSsoIntegration => {
-    const command = new CreateSsoIntegration(argv, {} as any);
+    const command = new CreateSsoIntegration(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
@@ -83,9 +84,9 @@ describe("CreateSsoIntegration", () => {
     command3.createIntegration = mock2;
     (command3 as any).askConfigurationParameters = mock1;
 
-    await expect(command1.run()).rejects.toThrowError("missing values for flags: --integrationPortalUrl, --integrationRegion");
-    await expect(command2.run()).rejects.toThrowError("missing values for flags: --integrationRegion");
-    await expect(command3.run()).rejects.toThrowError("--integrationType must always be specified");
+    await expect(command1.run()).rejects.toThrow("missing values for flags: --integrationPortalUrl, --integrationRegion");
+    await expect(command2.run()).rejects.toThrow("missing values for flags: --integrationRegion");
+    await expect(command3.run()).rejects.toThrow("--integrationType must always be specified");
 
     const command5 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -98,7 +99,7 @@ describe("CreateSsoIntegration", () => {
       "",
     ]);
     command5.createIntegration = mock2;
-    await expect(command5.run()).rejects.toThrowError("Invalid portal URL");
+    await expect(command5.run()).rejects.toThrow("Invalid portal URL");
 
     const command6 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -111,7 +112,7 @@ describe("CreateSsoIntegration", () => {
       "",
     ]);
     command6.createIntegration = mock2;
-    await expect(command6.run()).rejects.toThrowError("Invalid portal URL");
+    await expect(command6.run()).rejects.toThrow("Invalid portal URL");
 
     const command7 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -124,7 +125,7 @@ describe("CreateSsoIntegration", () => {
       "ciao",
     ]);
     command7.createIntegration = mock2;
-    await expect(command7.run()).rejects.toThrowError("Provided region is not a valid AWS region");
+    await expect(command7.run()).rejects.toThrow("Provided region is not a valid AWS region");
 
     const command8 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -137,7 +138,7 @@ describe("CreateSsoIntegration", () => {
       "eu-west-1",
     ]);
     command8.createIntegration = mock2;
-    await expect(command8.run()).rejects.toThrowError("Empty alias");
+    await expect(command8.run()).rejects.toThrow("Empty alias");
 
     const command9 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -150,7 +151,7 @@ describe("CreateSsoIntegration", () => {
       "",
     ]);
     command9.createIntegration = mock2;
-    await expect(command9.run()).rejects.toThrowError("AWS Region must not be empty");
+    await expect(command9.run()).rejects.toThrow("AWS Region must not be empty");
 
     const command10 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -209,9 +210,9 @@ describe("CreateSsoIntegration", () => {
     command3.createIntegration = mock2;
     (command3 as any).askConfigurationParameters = mock1;
 
-    await expect(command1.run()).rejects.toThrowError("missing values for flags: --integrationTenantId, --integrationLocation");
-    await expect(command2.run()).rejects.toThrowError("missing values for flags: --integrationLocation");
-    await expect(command3.run()).rejects.toThrowError("--integrationType must always be specified");
+    await expect(command1.run()).rejects.toThrow("missing values for flags: --integrationTenantId, --integrationLocation");
+    await expect(command2.run()).rejects.toThrow("missing values for flags: --integrationLocation");
+    await expect(command3.run()).rejects.toThrow("--integrationType must always be specified");
 
     const command5 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -224,7 +225,7 @@ describe("CreateSsoIntegration", () => {
       "",
     ]);
     command5.createIntegration = mock2;
-    await expect(command5.run()).rejects.toThrowError("Empty tenant id");
+    await expect(command5.run()).rejects.toThrow("Empty tenant id");
 
     const command6 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -237,7 +238,7 @@ describe("CreateSsoIntegration", () => {
       "",
     ]);
     command6.createIntegration = mock2;
-    await expect(command6.run()).rejects.toThrowError("Azure Location must not be empty");
+    await expect(command6.run()).rejects.toThrow("Azure Location must not be empty");
 
     const command7 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -250,7 +251,7 @@ describe("CreateSsoIntegration", () => {
       "wrong-location",
     ]);
     command7.createIntegration = mock2;
-    await expect(command7.run()).rejects.toThrowError("Provided location is not a valid Azure location");
+    await expect(command7.run()).rejects.toThrow("Provided location is not a valid Azure location");
 
     const command8 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -263,7 +264,7 @@ describe("CreateSsoIntegration", () => {
       "wrong-location",
     ]);
     command8.createIntegration = mock2;
-    await expect(command8.run()).rejects.toThrowError("Empty alias");
+    await expect(command8.run()).rejects.toThrow("Empty alias");
 
     const command9 = getTestCommand(new CliProviderService(), [
       "--integrationType",
@@ -425,7 +426,7 @@ describe("CreateSsoIntegration", () => {
     };
     await command.createIntegration("AWS-SSO" as any, creationParam);
 
-    expect(cliProviderService.integrationFactory.create).toBeCalledWith("AWS-SSO" as any, creationParam);
+    expect(cliProviderService.integrationFactory.create).toHaveBeenCalledWith("AWS-SSO" as any, creationParam);
     expect(command.log).toHaveBeenCalledWith("integration created");
     expect(cliProviderService.remoteProceduresClient.refreshIntegrations).toHaveBeenCalled();
   });

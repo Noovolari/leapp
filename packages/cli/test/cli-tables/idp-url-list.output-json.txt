@@ -1,0 +1,8 @@
+[
+  {
+    "url": "https://idp.example.com/saml/login"
+  },
+  {
+    "url": "https://idp.example.com/very/long/path/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+  }
+]

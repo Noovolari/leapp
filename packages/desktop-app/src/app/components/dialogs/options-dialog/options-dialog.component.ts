@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from "@angular/core";
+import { AfterViewInit, Component, Input, OnDestroy, OnInit, ViewChild, ViewEncapsulation, ChangeDetectionStrategy } from "@angular/core";
 import { FormControl, FormGroup } from "@angular/forms";
 import { AppService } from "../../../services/app.service";
 import { Router } from "@angular/router";
@@ -11,6 +11,7 @@ import { AppProviderService } from "../../../services/app-provider.service";
 import { BsModalService } from "ngx-bootstrap/modal";
 import { CredentialProcessDialogComponent } from "../credential-process-dialog/credential-process-dialog.component";
 import { OptionsService } from "../../../services/options.service";
+import { ExtensionWebsocketService } from "../../../services/extension-websocket.service";
 import { AwsIamRoleFederatedSession } from "@noovolari/leapp-core/models/aws/aws-iam-role-federated-session";
 import { SessionService } from "@noovolari/leapp-core/services/session/session-service";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
@@ -30,11 +31,14 @@ export enum LeappPlanStatus {
 
 export const globalLeappProPlanStatus = new BehaviorSubject<LeappPlanStatus>(LeappPlanStatus.free);
 
+import { escapeHtml } from "../../../services/escape-html";
 @Component({
   selector: "app-options-dialog",
   templateUrl: "./options-dialog.component.html",
   styleUrls: ["./options-dialog.component.scss"],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
@@ -52,8 +56,6 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   editingIdpUrl: boolean;
   editingAwsProfile: boolean;
 
-  showProxyAuthentication = false;
-  proxyProtocol = "https"; // Default
   proxyUrl;
   proxyPort = "8080"; // Default
   proxyUsername;
@@ -61,45 +63,37 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
 
   locations: { location: string }[];
   regions: { region: string }[];
-  selectedLocation: string;
-  selectedRegion: string;
-  selectedRequirePassword: number;
-  selectedTouchIdEnabled: boolean;
   selectedBrowserOpening = constants.inApp.toString();
-  selectedTerminal;
 
   colorTheme: string;
-  selectedColorTheme: string;
 
   pluginList: PluginContainer[];
   fetchingPlugins: boolean;
 
-  selectedSsmRegionBehaviour: string;
   selectedPeriod: BillingPeriod = BillingPeriod.yearly;
 
   form = new FormGroup({
     idpUrl: new FormControl(""),
     awsProfile: new FormControl(""),
     proxyUrl: new FormControl(""),
-    proxyProtocol: new FormControl(""),
+    proxyProtocol: new FormControl<any>("https"),
     proxyPort: new FormControl(""),
     proxyUsername: new FormControl(""),
     proxyPassword: new FormControl(""),
-    showAuthCheckbox: new FormControl(""),
-    regionsSelect: new FormControl(""),
-    locationsSelect: new FormControl(""),
+    showAuthCheckbox: new FormControl<any>(false),
+    regionsSelect: new FormControl<any>(""),
+    locationsSelect: new FormControl<any>(""),
     defaultBrowserOpening: new FormControl(""),
-    terminalSelect: new FormControl(""),
-    colorThemeSelect: new FormControl(""),
-    credentialMethodSelect: new FormControl(""),
+    terminalSelect: new FormControl<any>(""),
+    colorThemeSelect: new FormControl<any>(""),
+    credentialMethodSelect: new FormControl<any>(""),
     sessionDuration: new FormControl(""),
     pluginDeepLink: new FormControl(""),
-    ssmRegionBehaviourSelect: new FormControl(""),
-    requirePasswordSelect: new FormControl(""),
-    touchIdEnableSelect: new FormControl(""),
+    ssmRegionBehaviourSelect: new FormControl<any>(""),
+    requirePasswordSelect: new FormControl<any>(""),
+    touchIdEnableSelect: new FormControl<any>(""),
   });
 
-  selectedCredentialMethod: string;
   webConsoleSessionDuration: number;
 
   extensionEnabled: boolean;
@@ -115,6 +109,87 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   /* Simple profile page: shows the Idp Url and the workspace json */
   private sessionService: SessionService;
 
+  // Each field is its form control's value (one binding per control, no ngModel)
+  get showProxyAuthentication(): boolean {
+    return this.form.get("showAuthCheckbox").value;
+  }
+
+  set showProxyAuthentication(value: boolean) {
+    this.form.get("showAuthCheckbox").setValue(value);
+  }
+
+  get proxyProtocol(): string {
+    return this.form.get("proxyProtocol").value;
+  }
+
+  set proxyProtocol(value: string) {
+    this.form.get("proxyProtocol").setValue(value);
+  }
+
+  get selectedLocation(): string {
+    return this.form.get("locationsSelect").value;
+  }
+
+  set selectedLocation(value: string) {
+    this.form.get("locationsSelect").setValue(value);
+  }
+
+  get selectedRegion(): string {
+    return this.form.get("regionsSelect").value;
+  }
+
+  set selectedRegion(value: string) {
+    this.form.get("regionsSelect").setValue(value);
+  }
+
+  get selectedRequirePassword(): number {
+    return this.form.get("requirePasswordSelect").value;
+  }
+
+  set selectedRequirePassword(value: number) {
+    this.form.get("requirePasswordSelect").setValue(value);
+  }
+
+  get selectedTouchIdEnabled(): boolean {
+    return this.form.get("touchIdEnableSelect").value;
+  }
+
+  set selectedTouchIdEnabled(value: boolean) {
+    this.form.get("touchIdEnableSelect").setValue(value);
+  }
+
+  get selectedTerminal(): string {
+    return this.form.get("terminalSelect").value;
+  }
+
+  set selectedTerminal(value: string) {
+    this.form.get("terminalSelect").setValue(value);
+  }
+
+  get selectedColorTheme(): string {
+    return this.form.get("colorThemeSelect").value;
+  }
+
+  set selectedColorTheme(value: string) {
+    this.form.get("colorThemeSelect").setValue(value);
+  }
+
+  get selectedSsmRegionBehaviour(): string {
+    return this.form.get("ssmRegionBehaviourSelect").value;
+  }
+
+  set selectedSsmRegionBehaviour(value: string) {
+    this.form.get("ssmRegionBehaviourSelect").setValue(value);
+  }
+
+  get selectedCredentialMethod(): string {
+    return this.form.get("credentialMethodSelect").value;
+  }
+
+  set selectedCredentialMethod(value: string) {
+    this.form.get("credentialMethodSelect").setValue(value);
+  }
+
   constructor(
     public appProviderService: AppProviderService,
     public appService: AppService,
@@ -123,7 +198,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     private windowService: WindowService,
     private toasterService: MessageToasterService,
     private modalService: BsModalService,
-    private router: Router
+    private router: Router,
+    private extensionWebsocketService: ExtensionWebsocketService
   ) {
     this.selectedTerminal = this.optionsService.macOsTerminal || constants.macOsTerminal;
 
@@ -189,7 +265,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     this.leappStatusSubscription = globalLeappProPlanStatus.subscribe((value) => (this.leappPlanStatus = value));
 
     try {
-      const plan = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan");
+      const plan = await this.appProviderService.keychainService.getSecret(constants.appName, "leapp-enabled-plan");
       if (plan) {
         globalLeappProPlanStatus.next(plan as unknown as LeappPlanStatus);
       } else {
@@ -340,7 +416,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
       (s) =>
         `<li>
             <div class="removed-sessions">
-            <b>${s.sessionName}</b> - <small>${(s as AwsIamRoleFederatedSession).roleArn.split("/")[1]}</small>
+            <b>${escapeHtml(s.sessionName)}</b> - <small>${escapeHtml((s as AwsIamRoleFederatedSession).roleArn.split("/")[1])}</small>
             </div>
       </li>`
     );
@@ -415,8 +491,8 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
     // Get only names for display
     let sessionsNames = sessions.map(
       (s) =>
-        `<li><div class="removed-sessions"><b>${s.sessionName}</b> - <small>${
-          (s as AwsIamRoleFederatedSession).roleArn ? (s as AwsIamRoleFederatedSession).roleArn.split("/")[1] : ""
+        `<li><div class="removed-sessions"><b>${escapeHtml(s.sessionName)}</b> - <small>${
+          (s as AwsIamRoleFederatedSession).roleArn ? escapeHtml((s as AwsIamRoleFederatedSession).roleArn.split("/")[1]) : ""
         }</small></div></li>`
     );
     if (sessionsNames.length === 0) {
@@ -576,12 +652,13 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
 
   openPluginFolder(): void {
     this.appProviderService.pluginManagerService.verifyAndGeneratePluginFolderIfMissing();
-    this.appNativeService.shell.showItemInFolder(this.appNativeService.path.join(this.appNativeService.os.homedir(), ".Leapp", "plugins"));
+    this.appNativeService.shell.showItemInFolder(this.appNativeService.path.join(this.appNativeService.os.homedir(), constants.leappDir, "plugins"));
   }
 
   toggleExtension(): void {
     this.extensionEnabled = !this.extensionEnabled;
-    this.optionsService.extensionEnabled = this.extensionEnabled;
+    // Saves the option and starts or stops the loopback server
+    this.extensionWebsocketService.setEnabled(this.extensionEnabled);
   }
 
   openLeappProPreCheckoutDialog(): void {
@@ -593,7 +670,7 @@ export class OptionsDialogComponent implements OnInit, AfterViewInit, OnDestroy 
   }
 
   async contactSupport(): Promise<void> {
-    const email = await this.appProviderService.keychainService.getSecret("Leapp", "leapp-enabled-plan-email");
+    const email = await this.appProviderService.keychainService.getSecret(constants.appName, "leapp-enabled-plan-email");
     this.windowService.openExternalUrl(`mailto:support@noovolari.com?subject=Leapp%20Sign-up%20support%20request%20${email}`);
   }
 

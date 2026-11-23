@@ -10,7 +10,8 @@
           <div class="form-group">
             <label>Select a named profile</label>
 
-            <app-leapp-select [controlName]="'awsProfile'"
+            <app-leapp-select data-testid="change-profile-select"
+                              [controlName]="'awsProfile'"
                               [form]="form"
                               [placeholder]="'add a new named profile'"
                               [items]="profiles"

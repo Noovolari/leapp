@@ -3,6 +3,7 @@ import { Session } from "@noovolari/leapp-core/models/session";
 
 @Pipe({
   name: "ordering",
+  standalone: false,
 })
 export class OrderingPipe implements PipeTransform {
   transform(sessions: Session[], asc?: boolean): Session[] {

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
+import { Component, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { BsModalService } from "ngx-bootstrap/modal";
 import {
   compactMode,
@@ -37,6 +37,8 @@ export interface ArrowSettings {
   selector: "app-session",
   templateUrl: "./sessions.component.html",
   styleUrls: ["./sessions.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class SessionsComponent implements OnInit, OnDestroy {
   @ViewChild(SessionCardComponent) sessionCard;

@@ -8,7 +8,8 @@ export interface INativeService {
   os: any;
   ini: any;
   exec: any;
-  unzip: any;
+  // no core code uses it; the cli stopped injecting extract-zip (abandoned, unfixed advisory)
+  unzip?: any;
   copydir: any;
   sudo: any;
   path: any;

@@ -2,40 +2,23 @@
   "compileOnSave": false,
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
+    "strictInjectionParameters": true,
+    "strictTemplates": false
   },
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "./",
     "declaration": false,
     "experimentalDecorators": true,
-    "lib": [
-      "ES2019",
-      "DOM"
-    ],
     "module": "ES2020",
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "sourceMap": true,
     "target": "ES2019",
-    "typeRoots": [
-      "../node_modules/@types"
-    ],
-    "paths": {
-      "stream": [
-        "../node_modules/stream-browserify"
-      ],
-      "assert": [
-        "../node_modules/assert"
-      ],
-      "fs": [
-        "../node_modules/fs-web"
-      ]
-    },
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "types": [
       "node"
-    ]
+    ],
+    "strict": false
   },
   "include": [
     "src/**/*.ts"
@@ -44,6 +27,7 @@
     "./gushio/**",
     "src/test.ts",
     "src/**/*.spec.ts",
+    "src/app/testing/**",
     "src/base-injectables.ts",
     "src/environments/environment.prod.ts",
     "src/environments/environment.stag.ts"

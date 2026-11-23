@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from "@angular/core";
+import { Component, Input, OnInit, ViewChild, ChangeDetectionStrategy } from "@angular/core";
 import { MatMenuTrigger } from "@angular/material/menu";
 import { FormGroup } from "@angular/forms";
 
@@ -6,6 +6,8 @@ import { FormGroup } from "@angular/forms";
   selector: "app-filter-menu",
   templateUrl: "./filter-menu.component.html",
   styleUrls: ["./filter-menu.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class FilterMenuComponent implements OnInit {
   @ViewChild("matMenuTrigger", { static: false })

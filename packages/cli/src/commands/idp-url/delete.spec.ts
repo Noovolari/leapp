@@ -1,10 +1,11 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import DeleteIdpUrl from "./delete";
 import { CliProviderService } from "../../service/cli-provider-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("DeleteIdpUrl", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): DeleteIdpUrl => {
-    const command = new DeleteIdpUrl(argv, {} as any);
+    const command = new DeleteIdpUrl(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

@@ -4,10 +4,11 @@ import { AwsSessionService } from "@noovolari/leapp-core/services/session/aws/aw
 import { constants } from "@noovolari/leapp-core/models/constants";
 import { CliProviderService } from "../../service/cli-provider-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("StartSsmSession", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): StartSsmSession => {
-    const command = new StartSsmSession(argv, {} as any);
+    const command = new StartSsmSession(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

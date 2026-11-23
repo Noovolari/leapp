@@ -1,14 +1,19 @@
-import { Component, Input, OnInit, ViewEncapsulation } from "@angular/core";
+import { Component, Input, ChangeDetectionStrategy, ViewEncapsulation } from "@angular/core";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { constants } from "@noovolari/leapp-core/models/constants";
 
+// The update dialog. The notes arrive already rendered by UpdaterService (Markdown without
+// raw HTML) and still go through Angular's sanitiser ([innerHTML]). No view encapsulation, as in 0.26.1: the styles
+// reach the rendered notes.
 @Component({
   selector: "app-update-dialog",
   templateUrl: "./update-dialog.component.html",
   styleUrls: ["./update-dialog.component.scss"],
   encapsulation: ViewEncapsulation.None,
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
-export class UpdateDialogComponent implements OnInit {
+export class UpdateDialogComponent {
   @Input()
   version: string;
   @Input()
@@ -16,27 +21,25 @@ export class UpdateDialogComponent implements OnInit {
   @Input()
   releaseNotes: string;
   @Input()
-  callback: any;
+  callback: (event: string) => void;
 
-  /* Just a restyled modal to show a confirmation for delete actions */
-  constructor(private bsModalRef: BsModalRef) {}
-
-  ngOnInit(): void {}
+  constructor(private readonly bsModalRef: BsModalRef) {}
 
   close(): void {
     this.remindMeLater();
   }
 
   remindMeLater(): void {
-    if (this.callback) {
-      this.callback(constants.confirmClosedAndIgnoreUpdate);
-    }
-    this.bsModalRef.hide();
+    this.answer(constants.confirmClosedAndIgnoreUpdate);
   }
 
   goToDownloadPage(): void {
+    this.answer(constants.confirmCloseAndDownloadUpdate);
+  }
+
+  private answer(event: string): void {
     if (this.callback) {
-      this.callback(constants.confirmCloseAndDownloadUpdate);
+      this.callback(event);
     }
     this.bsModalRef.hide();
   }

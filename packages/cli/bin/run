@@ -1,5 +1,14 @@
 #!/usr/bin/env node
 
-const oclif = require('@oclif/core')
+// The build flavor comes from package.json (leappFlavor: dev in the repository, prod in release
+// builds) unless LEAPP_FLAVOR is already set. Core reads it, so a dev CLI talks only to a dev desktop app.
+if (!process.env.LEAPP_FLAVOR) {
+  const leappFlavor = require("../package.json").leappFlavor;
+  if (leappFlavor) {
+    process.env.LEAPP_FLAVOR = leappFlavor;
+  }
+}
 
-oclif.run().then(require('@oclif/core/flush')).catch(require('@oclif/core/handle'))
+const oclif = require("@oclif/core");
+
+oclif.execute({ dir: __dirname });

@@ -8,7 +8,7 @@ import { SessionService } from "../session-service";
 import { AzureSessionRequest } from "./azure-session-request";
 import { LoggedEntry, LoggedException, LogLevel, LogService } from "../../log-service";
 import { INativeService } from "../../../interfaces/i-native-service";
-import { JsonCache } from "@azure/msal-node";
+import type { JsonCache } from "@azure/msal-node";
 import { AzurePersistenceService } from "../../azure-persistence-service";
 import { SessionStatus } from "../../../models/session-status";
 import { constants } from "../../../models/constants";

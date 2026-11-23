@@ -295,7 +295,7 @@ USAGE
   $ leapp session start [SESSIONNAME] [--sessionId <value>] [--sessionRole <value>] [--noInteractive]
 
 ARGUMENTS
-  SESSIONNAME  Name of the Leapp session
+  [SESSIONNAME]  Name of the Leapp session
 
 FLAGS
   --noInteractive        If the specified session is not unique or doesn't exist, throw an error without starting the
@@ -353,7 +353,7 @@ USAGE
   $ leapp session stop [SESSIONNAME] [--sessionId <value>] [--sessionRole <value>] [--noInteractive]
 
 ARGUMENTS
-  SESSIONNAME  Name of the Leapp session
+  [SESSIONNAME]  Name of the Leapp session
 
 FLAGS
   --noInteractive        If the specified session is not unique or doesn't exist, throw an error without starting the

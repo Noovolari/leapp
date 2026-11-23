@@ -192,7 +192,7 @@ describe("SessionService", () => {
     const error = "fake-error";
     const sessionService: any = new (SessionService as any)(null, null);
     (sessionService as any).sessionDeactivated = jest.fn();
-    expect(() => sessionService.sessionError(sessionId, error)).toThrowError(error);
+    expect(() => sessionService.sessionError(sessionId, error)).toThrow(error);
     expect(sessionService.sessionDeactivated).toHaveBeenCalledWith(sessionId);
   });
 });

@@ -115,7 +115,7 @@ export abstract class AwsSessionService extends SessionService {
   async applyConfigProfileCommand(sessionId: string): Promise<void> {
     try {
       const session = this.repository.getSessionById(sessionId) as any;
-      const command = `leapp session generate ${sessionId}`;
+      const command = `${constants.cliBinaryName} session generate ${sessionId}`;
       const profileName = this.repository.getProfileName(session.profileId);
       const profile = `profile ${profileName}`;
       const credentialProcess: { [key: string]: any } = {};

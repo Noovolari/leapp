@@ -60,22 +60,19 @@ html, body {
     box-shadow: none;
   }
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     box-shadow: 0 2px 4px -1px rgb(0 0 0 / 20%), 0px 4px 5px 0px rgb(0 0 0 / 14%), 0px 1px 10px 0px rgb(0 0 0 / 12%);
     border-radius: $border-radius;
     background-color: white !important;
     
-    .mat-menu-content {
+    .mat-mdc-menu-content {
       background-color: white !important;
     }
     
-    .mat-menu-item,
-    .mat-legacy-menu-item {
+    .mat-mdc-menu-item {
       background-color: white !important;
-      
       &:hover,
-      &.mat-menu-item-highlighted,
-      &.mat-legacy-menu-item-highlighted,
+      &.mat-mdc-menu-item-highlighted,
       &:focus {
         background-color: white !important;
       }
@@ -86,20 +83,20 @@ html, body {
     border-top: none !important;
   }
 
-  .mat-menu-item i {
+  .mat-mdc-menu-item i {
     font-size: 20px;
     position: relative;
     top: 2px;
   }
 
-  .mat-menu-item[disabled] {
+  .mat-mdc-menu-item[disabled] {
     opacity: 0.5;
   }
 
-  .mat-menu-item:hover:not([disabled]),
+  .mat-mdc-menu-item:hover:not([disabled]),
   .mat-menu-item.cdk-program-focused:not([disabled]),
   .mat-menu-item.cdk-keyboard-focused:not([disabled]),
-  .mat-menu-item-highlighted:not([disabled]) {
+  .mat-mdc-menu-item-highlighted:not([disabled]) {
     background: $white-text-color;
 
     &::after {
@@ -114,8 +111,7 @@ html, body {
       cursor: pointer;
     }
   }
-
-  .mat-tab-body-wrapper {
+  .mat-mdc-tab-body-wrapper {
     padding: 0 19px;
     min-height: 386px;
   }
@@ -126,7 +122,7 @@ html, body {
     }
   }
 
-  .mat-tab-group {
+  .mat-mdc-tab-group {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     /* Better Font Rendering =========== */
     -webkit-font-smoothing: antialiased;
@@ -432,18 +428,18 @@ small.text-error {
   border: none;
 }
 
-.mat-tab-labels {
+.mat-mdc-tab-labels {
   display: flex;
   justify-content: center;
 }
 
-.mat-tab-header {
+.mat-mdc-tab-header {
   background: transparent;
   margin: 0;
 }
 
-/* Styles for tab labels */
-.mat-tab-label {
+/* Styles for tab labels (MDC: .mat-mdc-tab; the group prefix outranks Material's own tab styles) */
+.mat-mdc-tab-group .mat-mdc-tab {
   min-width: 25px !important;
   background-color: #ffffff;
   text-align: center !important;
@@ -455,26 +451,25 @@ small.text-error {
 }
 
 /* Styles for the active tab label */
-.mat-tab-label.mat-tab-label-active {
+.mat-mdc-tab-group .mat-mdc-tab.mdc-tab--active {
   min-width: 25px !important;
   text-align: center !important;
   font-weight: normal;
   text-transform: capitalize;
   color: $black;
   opacity: 1;
-
-  .mat-tab-label-content {
+  .mdc-tab__text-label {
     background-color: $silver-30;
     border-radius: $border-radius;
   }
 }
 
-/* Styles for the ink bar */
-.mat-tab-group.mat-primary .mat-ink-bar, .mat-tab-nav-bar.mat-primary .mat-ink-bar {
-  height: 0;
+/* No ink bar: the active tab is marked by its background */
+.mat-mdc-tab-group .mdc-tab-indicator {
+  display: none;
 }
 
-.mat-tab-label, .mat-tab-label-content {
+.mat-mdc-tab-group .mat-mdc-tab, .mat-mdc-tab-group .mdc-tab__text-label {
   display: inline-flex !important;
   flex-direction: column !important;
   text-align: center;
@@ -491,24 +486,31 @@ small.text-error {
 
 .mat-tab-label-text {
   font-size: 12px;
+  letter-spacing: normal;
 }
 
 .mat-ripple-element {
   display: none !important;
 }
 
-.mat-list-base .mat-subheader {
+// the legacy subheader was a 48px box on a 16px line; MDC adds 12px margins around a 24px line
+// Instead. Padding and alignment come from the .mat-mdc-subheader rule below.
+.mat-mdc-list-base .mat-mdc-subheader {
   font-size: 14px !important;
   color: $table-text;
   font: unset !important;
+  height: 48px;
+  margin: 0;
+  line-height: 16px;
 }
 
-.mat-list-base .mat-subheader:first-child {
+.mat-mdc-list-base .mat-mdc-subheader:first-child {
+  margin-top: -8px;
   padding-top: 10px;
   margin-left: -10px;
 }
 
-.mat-list-base .mat-list-item,
+.mat-mdc-list-base .mat-mdc-list-item,
 .mat-list-base .mat-list-item.mat-list-item-with-avatar,
 .mat-list-base .mat-list-option.mat-list-item-with-avatar,
 .mat-list-base .mat-list-item.mat-list-item-with-avatar,
@@ -522,8 +524,8 @@ small.text-error {
     border-radius: 6px;
     margin-left: 10px !important;
     width: 218px !important;
-
-    .mat-list-item-content .mat-list-text {
+    // offsets the 10px inset above; on MDC the text element would wrap, so the content box moves
+    .mdc-list-item__content {
       margin-left: -10px;
     }
   }
@@ -549,7 +551,7 @@ small.text-error {
   box-shadow: none !important;
 }
 
-.mat-subheader {
+.mat-mdc-subheader {
   display: flex;
   box-sizing: border-box;
   padding: 12px 16px !important;
@@ -577,8 +579,7 @@ small.text-error {
   margin-left: 10px !important;
   width: 218px !important;
   transition: all 0.2s ease;
-
-  .mat-list-item-content {
+  .mdc-list-item__content {
     padding: 0 6px !important;
 
     .status {
@@ -587,7 +588,7 @@ small.text-error {
   }
 
   &:hover {
-    .mat-list-item-content {
+    .mdc-list-item__content {
       left: 1px;
 
       .status {
@@ -865,7 +866,7 @@ button, a, input, i {
     border-color: #666;
   }
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     min-height: initial !important;
   }
 }
@@ -895,5 +896,23 @@ tr:hover .moon-hover-session {
   .mat-slide-toggle-content {
     font-weight: bold;
     font-size: 17px !important;
+  }
+}
+
+// MDC menus wrap each item's content in .mat-mdc-menu-item-text, which component styles can't reach.
+// Keep notification items on one line with an ellipsis, as the legacy menu did. The panel class outranks
+// Material's own .mat-mdc-menu-item .mat-mdc-menu-item-text and the component's scoped span rule.
+.mat-mdc-menu-panel .notification-menu-item .mat-mdc-menu-item-text {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+
+  > span:last-child {
+    display: block;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }

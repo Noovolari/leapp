@@ -25,7 +25,7 @@ import { IIntegrationService } from "../../interfaces/i-integration-service";
 import { AwsSsoIntegrationCreationParams } from "../../models/aws/aws-sso-integration-creation-params";
 import { ThrottleService } from "../throttle-service";
 import { IKeychainService } from "../../interfaces/i-keychain-service";
-import { ConfiguredRetryStrategy } from "@aws-sdk/util-retry";
+import { ConfiguredRetryStrategy } from "@smithy/util-retry";
 
 const portalUrlValidationRegex = /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_+.~#?&/=]*)/;
 

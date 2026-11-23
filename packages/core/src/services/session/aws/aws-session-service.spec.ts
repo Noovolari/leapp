@@ -5,7 +5,8 @@ import { AwsSessionService } from "./aws-session-service";
 import { CredentialsInfo } from "../../../models/credentials-info";
 import { SessionStatus } from "../../../models/session-status";
 import { constants } from "../../../models/constants";
-import { LoggedException, LogLevel } from "../../log-service";
+import { LogLevel } from "../../log-service";
+import { LeappBaseError } from "../../../errors/leapp-base-error";
 
 describe("AwsSessionService", () => {
   test("should be created", () => {
@@ -48,7 +49,7 @@ describe("AwsSessionService", () => {
     const awsSessionService = new (AwsSessionService as any)(sessionNotifier, repository);
     (awsSessionService as any).isThereAnotherPendingSessionWithSameNamedProfile = isThereAnotherPendingSessionWithSameNameProfile;
     await expect(awsSessionService.start("sessionId")).rejects.toThrow(
-      new LoggedException("Pending session with same named profile", this, LogLevel.info)
+      new LeappBaseError("Pending session with same named profile", this, LogLevel.info, "Pending session with same named profile")
     );
   });
 

@@ -49,10 +49,11 @@ describe("AppComponent", () => {
     (app as any).isOpenLeappDeepLink = jasmine.createSpy().and.returnValue(true);
     (app as any).awsSsoRoleService = { setAwsIntegrationDelegate: () => {} };
     (app as any).windowService = { blockDevToolInProductionMode: () => {} };
-    (app as any).updaterService = { createFoldersIfMissing: () => {} };
+    (app as any).createFoldersIfMissing = () => {};
     (app as any).retroCompatibilityService = { applyWorkspaceMigrations: () => {} };
     (app as any).showCredentialBackupMessageIfNeeded = () => {};
-    (app as any).manageAutoUpdate = () => {};
+    (app as any).listenForDeepLinks = () => {};
+    (app as any).updaterService = { start: () => {} };
     (app as any).timerService = { start: () => {} };
     (app as any).loggingService = { log: () => {} };
     (app as any).teamService = {
@@ -92,45 +93,15 @@ describe("AppComponent", () => {
 
   it("Should listen for deep links", () => {
     const fixture = TestBed.createComponent(AppComponent);
-    let app = fixture.debugElement.componentInstance;
+    const app = fixture.debugElement.componentInstance;
 
-    (app as any).updaterService.getSavedAppVersion = jasmine.createSpy().and.throwError("error");
-    (app as any).updaterService.getCurrentAppVersion = jasmine.createSpy().and.returnValue("0.0.0");
-
-    // First try error
-    expect(() => (app as any).manageAutoUpdate()).toThrowError("this.electronService.fs.writeFileSync is not a function");
-    expect((app as any).updaterService.getCurrentAppVersion).toHaveBeenCalled();
-
-    app = fixture.debugElement.componentInstance;
     (app as any).behaviouralSubjectService = { sessions: [] };
     (app as any).isOpenLeappDeepLink = jasmine.createSpy().and.returnValue(true);
     (app as any).router.navigate = jasmine.createSpy().and.callFake(() => {});
     (app as any).pluginManagerService = { installPlugin: jasmine.createSpy().and.returnValue("") };
-
-    (app as any).appProviderService = {};
-    (app as any).appProviderService.sessionManagementService = {};
-    (app as any).updaterService = {};
     (app as any).appNativeService = {};
 
-    (app as any).appProviderService.sessionManagementService.updateSessions = jasmine.createSpy().and.returnValue("");
-    (app as any).updaterService.getSavedAppVersion = jasmine.createSpy().and.returnValue("0.0.1");
-    (app as any).updaterService.getCurrentAppVersion = jasmine.createSpy().and.returnValue("0.0.0");
-    (app as any).updaterService.getReleaseNote = jasmine.createSpy().and.returnValue("release-note");
-    (app as any).updaterService.setUpdateInfo = jasmine.createSpy().and.returnValue("");
-    (app as any).updaterService.updateVersionJson = jasmine.createSpy().and.returnValue("");
-    (app as any).updaterService.isUpdateNeeded = jasmine.createSpy().and.returnValue(true);
-    (app as any).updaterService.updateDialog = jasmine.createSpy().and.returnValue("");
-
-    const mockedCallback1 = () => {
-      const releaseNote = (app as any).updaterService.getReleaseNote();
-      (app as any).updaterService.setUpdateInfo("1", "2", "3", releaseNote);
-      if ((app as any).updaterService.isUpdateNeeded()) {
-        (app as any).updaterService.updateDialog();
-        (app as any).behaviouralSubjectService.sessions = [...(app as any).behaviouralSubjectService.sessions];
-        (app as any).appProviderService.sessionManagementService.updateSessions((app as any).behaviouralSubjectService.sessions);
-      }
-    };
-    const mockedCallback2 = (url) => {
+    const mockedCallback = (url) => {
       if ((app as any).isOpenLeappDeepLink(url)) {
         const afterQuestionMark = url.split("?")[1];
         const splitByAmpersand = afterQuestionMark?.split("&");
@@ -148,25 +119,13 @@ describe("AppComponent", () => {
 
     (app as any).appNativeService.ipcRenderer = {
       on: (_string, _callback) => {
-        if (_string === "UPDATE_AVAILABLE") {
-          mockedCallback1();
-        } else {
-          mockedCallback2("https://fake-url?email=a");
-        }
+        mockedCallback("https://fake-url?email=a");
       },
     };
 
-    (app as any).manageAutoUpdate();
-    expect((app as any).updaterService.getCurrentAppVersion).toHaveBeenCalled();
+    (app as any).listenForDeepLinks();
 
     const ipcRenderer = (app as any).appNativeService.ipcRenderer;
-    ipcRenderer.on("UPDATE_AVAILABLE", null);
-    expect((app as any).updaterService.getReleaseNote).toHaveBeenCalled();
-    expect((app as any).updaterService.setUpdateInfo).toHaveBeenCalled();
-    expect((app as any).updaterService.isUpdateNeeded).toHaveBeenCalled();
-    expect((app as any).updaterService.updateDialog).toHaveBeenCalled();
-    expect((app as any).appProviderService.sessionManagementService.updateSessions).toHaveBeenCalled();
-
     ipcRenderer.on("PLUGIN_URL", null);
     expect((app as any).isOpenLeappDeepLink).toHaveBeenCalled();
     expect((app as any).router.navigate).toHaveBeenCalled();

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { AppService } from "../../../services/app.service";
 import { FormControl, FormGroup } from "@angular/forms";
@@ -8,6 +8,8 @@ import { compactMode, globalColumns, IGlobalColumns } from "../../command-bar/co
   selector: "app-column-dialog",
   templateUrl: "./column-dialog.component.html",
   styleUrls: ["./column-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class ColumnDialogComponent implements OnInit, OnDestroy {
   eGlobalColumns: IGlobalColumns;

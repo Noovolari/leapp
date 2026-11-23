@@ -5,10 +5,11 @@ import { IdpUrlAccessMethodField } from "@noovolari/leapp-core/models/idp-url-ac
 import { AccessMethodFieldType } from "@noovolari/leapp-core/models/access-method-field-type";
 import { CliProviderService } from "../../service/cli-provider-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("AddSession", () => {
   const getTestCommand = (cliProviderService: any = null, createIdpUrlCommand: any = null, argv = []): AddSession => {
-    const command = new AddSession(argv, {} as any, createIdpUrlCommand);
+    const command = new AddSession(argv, oclifTestConfig, createIdpUrlCommand);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };
@@ -35,7 +36,8 @@ describe("AddSession", () => {
     };
     let command = getTestCommand(cliProviderService, null, ["--providerType"]);
     command.log = jest.fn();
-    await expect(command.run()).rejects.toThrow("Flag --providerType expects a value");
+    // Oclif 5 lists the allowed values (oclif 2: "Flag --providerType expects a value")
+    await expect(command.run()).rejects.toThrow("Flag --providerType expects one of these values: aws");
 
     command = getTestCommand(cliProviderService, null, ["--providerType", "fake"]);
     command.log = jest.fn();

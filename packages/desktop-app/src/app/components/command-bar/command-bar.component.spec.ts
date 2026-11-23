@@ -15,16 +15,17 @@ describe("CommandBarComponent", () => {
       sessions: [],
       sessions$: { subscribe: () => {} },
     });
+    // createSpyObj's object form takes return values, not implementations
     const spyRepositoryService = jasmine.createSpyObj("Repository", {
       getProfiles: [],
-      getColorTheme: () => constants.darkTheme,
-      setNotifications: () => {},
-      getNotifications: () => [],
+      getColorTheme: constants.darkTheme,
+      setNotifications: undefined,
+      getNotifications: [],
     });
     const spyNotificationsService = jasmine.createSpyObj("NotificationService", {
-      setNotifications: () => {},
-      getNotifications: () => [],
-      getNotificationByUuid: () => {},
+      setNotifications: undefined,
+      getNotifications: [],
+      getNotificationByUuid: undefined,
     });
     const spyLeappCoreService = jasmine.createSpyObj("LeappCoreService", [], {
       behaviouralSubjectService: spyBehaviouralSubjectService,
@@ -88,5 +89,9 @@ describe("CommandBarComponent", () => {
     spy.and.returnValue([]);
 
     fixture.detectChanges();
+  });
+
+  it("should create", () => {
+    expect(component).toBeTruthy();
   });
 });

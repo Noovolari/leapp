@@ -1,9 +1,10 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import CreateNamedProfile from "./create";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("CreateNamedProfile", () => {
   const getTestCommand = (cliProviderService: any = null, argv: string[] = []): CreateNamedProfile => {
-    const command = new CreateNamedProfile(argv, {} as any);
+    const command = new CreateNamedProfile(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

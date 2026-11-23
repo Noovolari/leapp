@@ -120,25 +120,29 @@ export class AppAwsAuthenticationService implements IAwsSamlAuthenticationServic
 
       const getAppPath = this.electronService.path.join(this.electronService.app.getPath("appData"), constants.appName);
 
-      this.electronService.rimraf(getAppPath + `/Partitions/leapp-${btoa(sanitizedField)}`, async () => {
-        if (session) {
-          const sessionService = this.leappCoreService.sessionFactory.getSessionService(session.type);
-          await sessionService.stop(session.sessionId);
-          if (callback) {
-            callback();
+      // rimraf 4+ returns a promise instead of calling back; the callback ran even after an error
+      this.electronService
+        .rimraf(getAppPath + `/Partitions/leapp-${btoa(sanitizedField)}`)
+        .catch(() => undefined)
+        .then(async () => {
+          if (session) {
+            const sessionService = this.leappCoreService.sessionFactory.getSessionService(session.type);
+            await sessionService.stop(session.sessionId);
+            if (callback) {
+              callback();
+            }
           }
-        }
 
-        this.leappCoreService.logService.log(
-          new LoggedEntry("Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.", this, LogLevel.info, true)
-        );
+          this.leappCoreService.logService.log(
+            new LoggedEntry("Cache and configuration file cleaned. Stopping session and restarting Leapp to take effect.", this, LogLevel.info, true)
+          );
 
-        // Restart
-        setTimeout(() => {
-          // a bit of timeout to make everything reset as expected and give time to read message
-          this.appService.restart();
-        }, 3000);
-      });
+          // Restart
+          setTimeout(() => {
+            // a bit of timeout to make everything reset as expected and give time to read message
+            this.appService.restart();
+          }, 3000);
+        });
       this.electronService.session.defaultSession.clearStorageData([], (_data) => {});
     } catch (err) {
       this.leappCoreService.logService.log(

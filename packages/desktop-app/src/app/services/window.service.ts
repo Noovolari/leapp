@@ -7,6 +7,7 @@ import { IOpenExternalUrlService } from "@noovolari/leapp-core/interfaces/i-open
 import { AppProviderService } from "./app-provider.service";
 import { LoggedEntry, LogLevel } from "@noovolari/leapp-core/services/log-service";
 import { AuthorizationDialogComponent } from "../components/dialogs/authorization-dialog/authorization-dialog.component";
+import { assertExternalUrl } from "@noovolari/leapp-core/services/external-url";
 
 @Injectable({
   providedIn: "root",
@@ -34,9 +35,12 @@ export class WindowService implements IOpenExternalUrlService {
       resizable: true,
       show,
       title,
+      // Remote pages (IdP, SSO verification, checkout) run without Node, isolated and sandboxed.
       webPreferences: {
         devTools: !environment.production,
-        worldSafeExecuteJavaScript: true,
+        nodeIntegration: false,
+        contextIsolation: true,
+        sandbox: true,
         partition: `persist:leapp-${btoa(url)}`,
       },
     };
@@ -113,6 +117,7 @@ export class WindowService implements IOpenExternalUrlService {
    * @param url - url to open
    */
   openExternalUrl(url: string): void {
+    assertExternalUrl(url, this);
     this.electronService.shell.openExternal(url);
   }
 

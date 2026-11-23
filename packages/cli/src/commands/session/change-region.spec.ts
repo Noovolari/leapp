@@ -1,10 +1,11 @@
 import { jest, describe, test, expect } from "@jest/globals";
 import ChangeSessionRegion from "./change-region";
 import { CliProviderService } from "../../service/cli-provider-service";
+import { oclifTestConfig } from "../../../test/oclif-test-config";
 
 describe("ChangeRegion", () => {
   const getTestCommand = (cliProviderService: any = null, argv = []): ChangeSessionRegion => {
-    const command = new ChangeSessionRegion(argv, {} as any);
+    const command = new ChangeSessionRegion(argv, oclifTestConfig);
     (command as any).cliProviderService = cliProviderService;
     return command;
   };

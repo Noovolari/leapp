@@ -37,12 +37,16 @@ body.dark-theme {
     padding-top: 12px!important;
   }
 
-  .mat-list-item:hover {
+  .mat-mdc-list-item:hover {
       background-color: $dark-hover-sidebar;
   }
 
-  .mat-list-base .mat-list-item {
+  .mat-mdc-list-base .mat-mdc-list-item {
     color: $dark-main-text-color;
+    // MDC colours the item label through these tokens instead of inheriting the item's color
+    --mat-list-list-item-label-text-color: #{$dark-main-text-color};
+    --mat-list-list-item-hover-label-text-color: #{$dark-main-text-color};
+    --mat-list-list-item-focus-label-text-color: #{$dark-main-text-color};
   }
 
   .fa-circle.fas.offline {
@@ -105,15 +109,14 @@ body.dark-theme {
 
   ///* Contextual Menu *///
 
-  .mat-menu-panel {
+  .mat-mdc-menu-panel {
     border: 1px solid $dark-mat-menu;
     background-color: $dark-modal-background !important;
 
-    .mat-menu-content {
+    .mat-mdc-menu-content {
       background-color: $dark-modal-background !important;
     }
-
-    i, span, .mat-menu-submenu-item, polygon {
+    i, span, .mat-mdc-menu-item-submenu-trigger, polygon {
       color: $dark-main-text-color;
     }
 
@@ -121,14 +124,11 @@ body.dark-theme {
       background-color: $dark-session-card-border;
     }
 
-    .mat-menu-item,
-    .mat-legacy-menu-item {
+    .mat-mdc-menu-item {
       background-color: $dark-modal-background !important;
       color: $dark-main-text-color !important;
-      
       &:hover,
-      &.mat-menu-item-highlighted,
-      &.mat-legacy-menu-item-highlighted,
+      &.mat-mdc-menu-item-highlighted,
       &:focus {
         background-color: $dark-modal-background !important;
         color: $dark-main-text-color !important;
@@ -191,7 +191,7 @@ body.dark-theme {
   }
 
   ///* SideBar Style *///
-  .mat-list-base .mat-list-item:hover, .mat-list-item.selected-integration {
+  .mat-mdc-list-base .mat-mdc-list-item:hover, .mat-mdc-list-item.selected-integration {
     background-color: $dark-hover-sidebar!important;
     .moon-More, .moon-Close {
       color: $dark-main-text-color!important;
@@ -271,13 +271,13 @@ body.dark-theme {
     div.authorization-code {
       color: $dark-main-text-color!important;
     }
-    .mat-tab-header {
+    .mat-mdc-tab-header {
       border-bottom: 0.3px solid $dark-session-card-border;
       border-top: none;
       border-right: none;
       border-left: none;
     }
-    div.mat-tab-label {
+    div.mat-mdc-tab {
       background-color: $dark-modal-background;
       color: $dark-main-text-color;
     }
@@ -436,11 +436,11 @@ body.dark-theme {
     color: $dark-main-text-color;
   }
 
-  .mat-menu-panel .mat-menu-item {
+  .mat-mdc-menu-panel .mat-mdc-menu-item {
     color: $dark-main-text-color;
   }
 
-  .mat-menu-item:hover:not([disabled])::after {
+  .mat-mdc-menu-item:hover:not([disabled])::after {
     background: rgba(255, 255, 255, 0.1);
   }
 
@@ -493,16 +493,6 @@ body.dark-theme {
 
   .form-control-input-button button i.moon-Edit {
     color: $dark-main-text-color;
-  }
-
-  .mat-checkbox-checked .mat-checkbox-checkmark {
-    opacity: 1!important;
-    background: $dark-button-color!important;
-    border-radius: 2px;
-  }
-
-  .mat-checkbox-frame {
-    border-color: $dark-input-form-border;
   }
 
   // MDC checkbox styles for Angular Material 15 - more specific selectors
@@ -698,4 +688,19 @@ body.dark-theme ::-webkit-scrollbar-track-piece {
 
 body.dark-theme ::-webkit-scrollbar-track {
   background-color: $dark-select-component !important;
+}
+
+// Material MDC colours tabs through design tokens, not through the color properties the legacy
+// rules above set: give them the dark palette. Checkboxes keep the theme accent, as in 0.26.1.
+body.dark-theme {
+  .mat-mdc-tab-group {
+    --mat-tab-inactive-label-text-color: #{$dark-main-text-color};
+    --mat-tab-active-label-text-color: #{$dark-main-text-color};
+    --mat-tab-inactive-hover-label-text-color: #{$dark-main-text-color};
+    --mat-tab-active-hover-label-text-color: #{$dark-main-text-color};
+    --mat-tab-inactive-focus-label-text-color: #{$dark-main-text-color};
+    --mat-tab-active-focus-label-text-color: #{$dark-main-text-color};
+    --mat-tab-inactive-ripple-color: #{$dark-main-text-color};
+    --mat-tab-active-ripple-color: #{$dark-main-text-color};
+  }
 }

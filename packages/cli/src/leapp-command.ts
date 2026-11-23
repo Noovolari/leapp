@@ -1,5 +1,5 @@
 import { Command } from "@oclif/core";
-import { Config } from "@oclif/core/lib/config/config";
+import { Config } from "@oclif/core";
 import { CliProviderService } from "./service/cli-provider-service";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { Session } from "@noovolari/leapp-core/models/session";

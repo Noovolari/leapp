@@ -151,7 +151,7 @@ export class RemoteProceduresClient {
     onCallback?: (data: RpcResponse, resolve: (value: unknown) => void, reject: (reason?: any) => void) => void
   ): Promise<any> {
     const ipc = this.nativeService.nodeIpc;
-    ipc.config.id = "leapp_cli";
+    ipc.config.id = constants.ipcClientId;
     ipc.config.maxRetries = 2;
     ipc.config.silent = true;
     ipc.config.encoding = "utf8";

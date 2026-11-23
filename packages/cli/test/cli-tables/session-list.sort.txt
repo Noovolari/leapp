@@ -1,0 +1,7 @@
+ Session Name                                                               Type               Named Profile Region/Location Status   
+ ────────────────────────────────────────────────────────────────────────── ────────────────── ───────────── ─────────────── ──────── 
+ a-session-name-long-enough-to-be-truncated-by-a-narrow-terminal-0123456789 IAM Role Federated other-profile us-east-1       inactive 
+ azure-sub                                                                  Azure              -             westeurope      inactive 
+ chained                                                                    IAM Role Chained   default       eu-central-1    pending  
+ dev-user                                                                   IAM User           default       eu-west-1       active   
+ sso-prod                                                                   AWS Single Sign-On other-profile eu-west-1       inactive 

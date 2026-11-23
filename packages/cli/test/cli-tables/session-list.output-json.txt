@@ -1,0 +1,37 @@
+[
+  {
+    "sessionName": "dev-user",
+    "type": "IAM User",
+    "profileId": "default",
+    "region": "eu-west-1",
+    "status": "active"
+  },
+  {
+    "sessionName": "a-session-name-long-enough-to-be-truncated-by-a-narrow-terminal-0123456789",
+    "type": "IAM Role Federated",
+    "profileId": "other-profile",
+    "region": "us-east-1",
+    "status": "inactive"
+  },
+  {
+    "sessionName": "chained",
+    "type": "IAM Role Chained",
+    "profileId": "default",
+    "region": "eu-central-1",
+    "status": "pending"
+  },
+  {
+    "sessionName": "sso-prod",
+    "type": "AWS Single Sign-On",
+    "profileId": "other-profile",
+    "region": "eu-west-1",
+    "status": "inactive"
+  },
+  {
+    "sessionName": "azure-sub",
+    "type": "Azure",
+    "profileId": "-",
+    "region": "westeurope",
+    "status": "inactive"
+  }
+]

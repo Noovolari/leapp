@@ -191,7 +191,7 @@ describe("Repository", () => {
     repository.workspace = workspace;
     repository.persistWorkspace(workspace);
 
-    expect(() => repository.getSessionById("notExistingId")).toThrowError("session with id notExistingId not found.");
+    expect(() => repository.getSessionById("notExistingId")).toThrow("session with id notExistingId not found.");
   });
 
   test("addSession() - add a new session to the array of sessions", () => {

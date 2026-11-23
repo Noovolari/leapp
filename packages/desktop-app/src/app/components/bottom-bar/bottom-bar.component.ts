@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, Input, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { SessionType } from "@noovolari/leapp-core/models/session-type";
 import { Session } from "@noovolari/leapp-core/models/session";
 import { SessionStatus } from "@noovolari/leapp-core/models/session-status";
@@ -14,6 +14,8 @@ import { constants } from "@noovolari/leapp-core/models/constants";
   selector: "app-bottom-bar",
   templateUrl: "./bottom-bar.component.html",
   styleUrls: ["./bottom-bar.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class BottomBarComponent implements OnInit {
   @Input()

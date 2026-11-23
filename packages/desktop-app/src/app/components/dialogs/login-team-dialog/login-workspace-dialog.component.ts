@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { AppService } from "../../../services/app.service";
 import { OptionsService } from "../../../services/options.service";
 import { AppProviderService } from "../../../services/app-provider.service";
@@ -13,6 +14,8 @@ import { AnalyticsService } from "../../../services/analytics.service";
   selector: "app-login-team-dialog",
   templateUrl: "./login-workspace-dialog.component.html",
   styleUrls: ["./login-workspace-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class LoginWorkspaceDialogComponent implements OnInit {
   email: FormControl;
@@ -62,7 +65,7 @@ export class LoginWorkspaceDialogComponent implements OnInit {
 
         const teamOrPro = this.teamService.workspacesState.getValue().find((wState) => wState.type === "pro" || wState.type === "team");
         const planStatus = teamOrPro.type === "team" ? LeappPlanStatus.enterprise : LeappPlanStatus.proEnabled;
-        await this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", planStatus);
+        await this.appProviderService.keychainService.saveSecret(constants.appName, "leapp-enabled-plan", planStatus);
         globalLeappProPlanStatus.next(planStatus);
         this.closeModal();
         if (doesWorkspaceExist) {

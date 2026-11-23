@@ -92,8 +92,9 @@ describe("LeappProPreCheckoutDialogComponent", () => {
   });
 
   it("ngOnInit - should retrieve informations about prices online and enrich data and set the prices values", async () => {
+    // The assertions are on the computed prices. A second detectChanges() after calling ngOnInit() by hand
+    // trips Angular 22's dev-mode NG0100 check on the @if blocks; the app runs ngOnInit() once.
     await component.ngOnInit();
-    fixture.detectChanges();
     expect((component as any).prices[0]).toEqual({
       stripePriceAmount: "12000",
       stripePriceNickname: "Monthly subscription",
@@ -142,7 +143,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     expect((component as any).isEmailValid).toEqual(true);
   });
 
-  it("upgradeToLeappPro", async (done) => {
+  it("upgradeToLeappPro", async () => {
     const fakeBackendCallData = { details: {}, callback: (..._args) => {} };
     const fakeWindow = {
       webContents: {
@@ -180,18 +181,17 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
     expect(spyOnLoadUrl).toHaveBeenCalledWith("fakeUrl");
-    setTimeout(() => {
-      expect(spyOnRequest).toHaveBeenCalled();
-      expect(spyOnSaveSecret).toHaveBeenCalledWith("Leapp", "leapp-enabled-plan", LeappPlanStatus.proPending.toString());
-      expect(spyOnClose).toHaveBeenCalled();
-      expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.proPending);
-      expect((component as any).toasterService.toast).toHaveBeenCalledWith("Checkout completed", ToastLevel.success);
-      expect(spyOnCallback).toHaveBeenCalledWith({ requestHeaders: "fake-details", url: "https://www.leapp.cloud/success" });
-      done();
-    }, 200);
+    // Jasmine 5 rejects async tests that also take done(): wait for the 100 ms fake request here
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    expect(spyOnRequest).toHaveBeenCalled();
+    expect(spyOnSaveSecret).toHaveBeenCalledWith("Leapp", "leapp-enabled-plan", LeappPlanStatus.proPending.toString());
+    expect(spyOnClose).toHaveBeenCalled();
+    expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.proPending);
+    expect((component as any).toasterService.toast).toHaveBeenCalledWith("Checkout completed", ToastLevel.success);
+    expect(spyOnCallback).toHaveBeenCalledWith({ requestHeaders: "fake-details", url: "https://www.leapp.cloud/success" });
   });
 
-  it("upgradeToLeappPro - callback in cancel mode", async (done) => {
+  it("upgradeToLeappPro - callback in cancel mode", async () => {
     const fakeBackendCallData = { details: {}, callback: (..._args) => {} };
     const fakeWindow = {
       webContents: {
@@ -225,16 +225,14 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
     expect(spyOnLoadUrl).toHaveBeenCalledWith("fakeUrl");
-
-    setTimeout(() => {
-      expect(spyOnRequest).toHaveBeenCalled();
-      expect(spyOnSaveSecret).not.toHaveBeenCalled();
-      expect(spyOnClose).toHaveBeenCalled();
-      expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.free);
-      expect((component as any).toasterService.toast).not.toHaveBeenCalled();
-      expect(spyOnCallback).toHaveBeenCalledWith({ requestHeaders: "fake-details", url: "https://www.leapp.cloud/cancel" });
-      done();
-    }, 200);
+    // Jasmine 5 rejects async tests that also take done(): wait for the 100 ms fake request here
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    expect(spyOnRequest).toHaveBeenCalled();
+    expect(spyOnSaveSecret).not.toHaveBeenCalled();
+    expect(spyOnClose).toHaveBeenCalled();
+    expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.free);
+    expect((component as any).toasterService.toast).not.toHaveBeenCalled();
+    expect(spyOnCallback).toHaveBeenCalledWith({ requestHeaders: "fake-details", url: "https://www.leapp.cloud/cancel" });
   });
 
   it("upgradeToLeappPro - error in checkout session", async () => {
@@ -283,7 +281,7 @@ describe("LeappProPreCheckoutDialogComponent", () => {
     expect((component as any).toasterService.toast).toHaveBeenCalledWith("Something went wrong during pre-checkout", ToastLevel.error);
   });
 
-  it("upgradeToLeappPro - error after pre-checkout", async (done) => {
+  it("upgradeToLeappPro - error after pre-checkout", async () => {
     const spyOnNewWindow = spyOn((component as any).appProviderService.windowService, "newWindow").and.throwError(new Error());
     const spyOnCheckout = spyOn((component as any).appProviderService.teamService, "createCheckoutSession").and.callThrough();
 
@@ -296,11 +294,9 @@ describe("LeappProPreCheckoutDialogComponent", () => {
 
     expect(spyOnCheckout).toHaveBeenCalledWith("alex@fake.it", (component as any).price);
     expect(spyOnNewWindow).toHaveBeenCalledWith("fakeUrl", true, "", 200, 50);
-
-    setTimeout(() => {
-      expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.free);
-      expect((component as any).toasterService.toast).toHaveBeenCalledWith("Something went wrong during checkout", ToastLevel.error);
-      done();
-    }, 200);
+    // Jasmine 5 rejects async tests that also take done(): wait for the 100 ms fake request here
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    expect(globalLeappProPlanStatus.getValue()).toEqual(LeappPlanStatus.free);
+    expect((component as any).toasterService.toast).toHaveBeenCalledWith("Something went wrong during checkout", ToastLevel.error);
   });
 });

@@ -8,6 +8,7 @@ import { AwsIamRoleChainedSession } from "@noovolari/leapp-core/models/aws/aws-i
 
 @Pipe({
   name: "detail",
+  standalone: false,
 })
 export class DetailPipe implements PipeTransform {
   transform(session: Session): string {

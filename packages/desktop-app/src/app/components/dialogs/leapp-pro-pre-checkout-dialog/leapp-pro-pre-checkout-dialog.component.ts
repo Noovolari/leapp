@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { constants } from "@noovolari/leapp-core/models/constants";
+import { Component, OnInit, ChangeDetectionStrategy } from "@angular/core";
 import { FormControl, FormGroup, Validators } from "@angular/forms";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { MessageToasterService, ToastLevel } from "../../../services/message-toaster.service";
@@ -16,6 +17,8 @@ export enum BillingPeriod {
   selector: "app-leapp-pro-pre-checkout-dialog",
   templateUrl: "./leapp-pro-pre-checkout-dialog.component.html",
   styleUrls: ["./leapp-pro-pre-checkout-dialog.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  standalone: false,
 })
 export class LeappProPreCheckoutDialogComponent implements OnInit {
   public eBillingPeriod = BillingPeriod;
@@ -105,8 +108,8 @@ export class LeappProPreCheckoutDialogComponent implements OnInit {
           console.log("Intercepted HTTP redirect call:", details.url);
 
           if (details.url === "https://www.leapp.cloud/success") {
-            this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan", LeappPlanStatus.proPending.toString());
-            this.appProviderService.keychainService.saveSecret("Leapp", "leapp-enabled-plan-email", this.emailFormControl.value);
+            this.appProviderService.keychainService.saveSecret(constants.appName, "leapp-enabled-plan", LeappPlanStatus.proPending.toString());
+            this.appProviderService.keychainService.saveSecret(constants.appName, "leapp-enabled-plan-email", this.emailFormControl.value);
             globalLeappProPlanStatus.next(LeappPlanStatus.proPending);
             checkoutWindow.close();
             checkoutWindow = null;

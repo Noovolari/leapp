@@ -123,7 +123,8 @@ export class RemoteProceduresServer {
 
   private openVerificationWindow(emitFunction: EmitFunction, socket: Socket, data: RpcRequest): void {
     this.verificationWindowService
-      .openVerificationWindow(data.params.registerClientResponse, data.params.startDeviceAuthorizationResponse, data.params.windowModality, () =>
+      // A CLI login always uses the default browser: a desktop window could only be closed by the desktop.
+      .openVerificationWindow(data.params.registerClientResponse, data.params.startDeviceAuthorizationResponse, constants.inBrowser, () =>
         emitFunction(socket, "message", { callbackId: "onWindowClose" })
       )
       .then((result: any) => emitFunction(socket, "message", { result }))

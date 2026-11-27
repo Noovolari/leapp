@@ -189,31 +189,34 @@ describe("RemoteProcedures", () => {
     await expect(client.openVerificationWindow(null, null, null, null)).rejects.toEqual("unable to connect with desktop app");
   });
 
-  test("openVerificationWindow, returns", async () => {
+  test("openVerificationWindow from the CLI always opens the default browser, whatever modality it sends", async () => {
     const fakeVerificationResponse = "fakeVerificationResponse";
     const fakeRegisterClientResponse: any = "fakeRegisterClientResponse";
     const fakeStartDeviceAuthorizationResponse: any = "fakeStartDeviceAuthorizationResponse";
-    const fakeWindowModality = "fakeWindowModality";
+    const receivedModalities: string[] = [];
 
     const verificationWindowService = {
-      openVerificationWindow: jest.fn(async (registerClientResponse, startDeviceAuthorizationResponse, windowModality, onWindowClose: () => void) => {
-        expect(registerClientResponse).toBe(fakeRegisterClientResponse);
-        expect(startDeviceAuthorizationResponse).toBe(fakeStartDeviceAuthorizationResponse);
-        expect(windowModality).toBe(fakeWindowModality);
-        onWindowClose();
-        return fakeVerificationResponse;
-      }),
+      openVerificationWindow: jest.fn(
+        async (registerClientResponse, startDeviceAuthorizationResponse, windowModality: string, onWindowClose: () => void) => {
+          expect(registerClientResponse).toBe(fakeRegisterClientResponse);
+          expect(startDeviceAuthorizationResponse).toBe(fakeStartDeviceAuthorizationResponse);
+          receivedModalities.push(windowModality);
+          onWindowClose();
+          return fakeVerificationResponse;
+        }
+      ),
     };
     startServer();
     (server as any).verificationWindowService = verificationWindowService;
 
     await retry(async () => {
+      receivedModalities.length = 0;
       const callbackMock = jest.fn();
-      expect(
-        await client.openVerificationWindow(fakeRegisterClientResponse, fakeStartDeviceAuthorizationResponse, fakeWindowModality, callbackMock)
-      ).toBe(fakeVerificationResponse);
+      expect(await client.openVerificationWindow(fakeRegisterClientResponse, fakeStartDeviceAuthorizationResponse, "In-app", callbackMock)).toBe(
+        fakeVerificationResponse
+      );
       expect(callbackMock).toHaveBeenCalled();
-      expect(verificationWindowService.openVerificationWindow).toHaveBeenCalled();
+      expect(receivedModalities).toEqual(["In-browser"]);
     });
   });
 

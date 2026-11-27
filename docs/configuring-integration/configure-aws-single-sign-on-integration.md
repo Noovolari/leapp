@@ -43,6 +43,10 @@ After logging in the first time, Leapp will map all your roles and users into Se
 
 ![](../../images/screens/newuxui/aws-sso.png?style=center-img 'Add AWS SSO Screen')
 
+## Signing in
+
+When you sync the integration, Leapp shows the AWS user code and opens the AWS sign-in page. With the **In-app** auth method the page opens in a Leapp window, which closes by itself a few seconds after you approve the request; with **In-browser** it opens in your default browser. A sync started from the CLI always opens the page in your default browser. Closing the Leapp window before you approve cancels the sign-in.
+
 ## Video tutorial
 
 <video width="100%" muted autoplay loop> <source src="../../videos/newuxui/aws-sso.mp4" type="video/mp4"> </video>

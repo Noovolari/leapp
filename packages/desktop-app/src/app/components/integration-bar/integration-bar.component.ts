@@ -264,6 +264,10 @@ export class IntegrationBarComponent implements OnInit, OnDestroy {
         }
       });
     } catch (err) {
+      if (err?.message === "AWS SSO Interrupted.") {
+        // The user closed the login window: a cancel, not an error.
+        return;
+      }
       this.awsSsoOidcService.interrupt();
       await this.logout(integrationId);
       const errorMessage = `Error during SSO Login: ${err.toString()}`;

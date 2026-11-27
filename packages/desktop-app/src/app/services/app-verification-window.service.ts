@@ -8,17 +8,24 @@ import {
 import { IAwsSsoOidcVerificationWindowService } from "@noovolari/leapp-core/interfaces/i-aws-sso-oidc-verification-window-service";
 import { WindowService } from "./window.service";
 import { MessageToasterService, ToastLevel } from "./message-toaster.service";
-import { AppProviderService } from "./app-provider.service";
 
 @Injectable({ providedIn: "root" })
 export class AppVerificationWindowService implements IAwsSsoOidcVerificationWindowService {
-  constructor(private windowService: WindowService, private toasterService: MessageToasterService, private appProviderService: AppProviderService) {}
+  private closeOpenWindow: () => void;
+
+  constructor(private windowService: WindowService, private toasterService: MessageToasterService) {
+    this.closeOpenWindow = () => {};
+  }
+
+  closeVerificationWindow(): void {
+    this.closeOpenWindow();
+  }
 
   async openVerificationWindow(
     registerClientResponse: RegisterClientResponse,
     startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse,
     windowModality: string,
-    onWindowClose: () => void
+    onWindowClose: (error?: string) => void
   ): Promise<VerificationResponse> {
     if (startDeviceAuthorizationResponse.verificationUriComplete.indexOf("?user_code=") > -1) {
       const code = startDeviceAuthorizationResponse.verificationUriComplete.split("?user_code=")[1];
@@ -42,7 +49,7 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
   private async openVerificationBrowserWindow(
     registerClientResponse: RegisterClientResponse,
     startDeviceAuthorizationResponse: StartDeviceAuthorizationResponse,
-    onWindowClose: () => void
+    onWindowClose: (error?: string) => void
   ): Promise<VerificationResponse> {
     const parentWindowPosition = this.windowService.getCurrentWindow().getPosition();
     const verificationWindow = this.windowService.newWindow(
@@ -54,56 +61,41 @@ export class AppVerificationWindowService implements IAwsSsoOidcVerificationWind
     );
 
     verificationWindow.loadURL(startDeviceAuthorizationResponse.verificationUriComplete);
-    verificationWindow.on("close", (e) => {
-      e.preventDefault();
-      onWindowClose();
+
+    // Core polls CreateToken and calls closeVerificationWindow when the login is over. Only a close
+    // by the user, or after a page load error (with its text), reaches onWindowClose.
+    let closedByLeapp = false;
+    let loadError: string;
+    this.closeOpenWindow = () => {
+      if (!verificationWindow.isDestroyed()) {
+        closedByLeapp = true;
+        verificationWindow.close();
+      }
+    };
+    verificationWindow.on("close", () => {
+      if (!closedByLeapp) {
+        onWindowClose(loadError);
+      }
     });
 
-    return new Promise((resolve, reject) => {
-      // When the code is verified and the user has been logged in, the window can be closed
-      verificationWindow.webContents.session.webRequest.onCompleted(
-        {
-          urls: this.getAssociateTokenUrls(),
-        },
-        (details, callback) => {
-          if (details.method === "POST" && details.statusCode === 200) {
-            verificationWindow.close();
-
-            const verificationResponse: VerificationResponse = {
-              clientId: registerClientResponse.clientId,
-              clientSecret: registerClientResponse.clientSecret,
-              deviceCode: startDeviceAuthorizationResponse.deviceCode,
-            };
-            resolve(verificationResponse);
-          }
-
-          callback({
-            requestHeaders: details.requestHeaders,
-            url: details.url,
-          });
-        }
-      );
-
-      verificationWindow.webContents.session.webRequest.onErrorOccurred((details) => {
-        if (
-          details.error.indexOf("net::ERR_ABORTED") < 0 &&
-          details.error.indexOf("net::ERR_FAILED") < 0 &&
-          details.error.indexOf("net::ERR_CACHE_MISS") < 0 &&
-          details.error.indexOf("net::ERR_CONNECTION_REFUSED") < 0
-        ) {
-          if (verificationWindow) {
-            verificationWindow.close();
-          }
-          reject(details.error.toString());
-        }
-      });
+    verificationWindow.webContents.session.webRequest.onErrorOccurred((details) => {
+      if (
+        details.error.indexOf("net::ERR_ABORTED") < 0 &&
+        details.error.indexOf("net::ERR_FAILED") < 0 &&
+        details.error.indexOf("net::ERR_CACHE_MISS") < 0 &&
+        details.error.indexOf("net::ERR_CONNECTION_REFUSED") < 0 &&
+        !verificationWindow.isDestroyed()
+      ) {
+        loadError = details.error.toString();
+        verificationWindow.close();
+      }
     });
-  }
 
-  private getAssociateTokenUrls() {
-    return this.appProviderService.awsCoreService
-      .getRegions()
-      .map((region) => `https://oidc.${region.region}.amazonaws.com/device_authorization/associate_token`);
+    return {
+      clientId: registerClientResponse.clientId,
+      clientSecret: registerClientResponse.clientSecret,
+      deviceCode: startDeviceAuthorizationResponse.deviceCode,
+    };
   }
 
   private async openExternalVerificationBrowserWindow(

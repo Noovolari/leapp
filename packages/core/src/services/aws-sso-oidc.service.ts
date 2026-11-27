@@ -1,4 +1,3 @@
-import { constants } from "../models/constants";
 import { Repository } from "./repository";
 import {
   GenerateSSOTokenResponse,
@@ -20,12 +19,9 @@ export class AwsSsoOidcService {
   private loginMutex: boolean;
   private timeoutOccurred: boolean;
   private interruptOccurred: boolean;
+  private stopPolling: (error: Error) => void;
 
-  constructor(
-    private verificationWindowService: IAwsSsoOidcVerificationWindowService,
-    private repository: Repository,
-    private disableInAppBrowser: boolean = false
-  ) {
+  constructor(private verificationWindowService: IAwsSsoOidcVerificationWindowService, private repository: Repository) {
     this.listeners = [];
     this.ssoOidc = null;
     this.generateSSOTokenResponse = null;
@@ -56,17 +52,20 @@ export class AwsSsoOidcService {
       const registerClientResponse = await this.registerSsoOidcClient();
       const startDeviceAuthorizationResponse = await this.startDeviceAuthorization(registerClientResponse, portalUrl);
       const windowModality = this.repository.getAwsSsoIntegration(configurationId).browserOpening;
-      const verificationResponse = await this.verificationWindowService.openVerificationWindow(
-        registerClientResponse,
-        startDeviceAuthorizationResponse,
-        windowModality,
-        () => this.closeVerificationWindow()
-      );
       try {
-        this.generateSSOTokenResponse = await this.createToken(configurationId, verificationResponse);
+        const verificationResponse = await this.verificationWindowService.openVerificationWindow(
+          registerClientResponse,
+          startDeviceAuthorizationResponse,
+          windowModality,
+          (error?: string) => this.closeVerificationWindow(error)
+        );
+        this.generateSSOTokenResponse = await this.createToken(verificationResponse);
       } catch (err) {
         this.loginMutex = false;
         throw err;
+      } finally {
+        // The login is over: Leapp closes the window it opened (In-app); a no-op for a page in the user's browser.
+        this.verificationWindowService.closeVerificationWindow?.();
       }
 
       this.loginMutex = false;
@@ -105,8 +104,12 @@ export class AwsSsoOidcService {
     }
   }
 
-  closeVerificationWindow(): void {
+  /** The verification window closed before the login ended: closed by the user, or `error` when the page failed to load. */
+  closeVerificationWindow(error?: string): void {
     this.loginMutex = false;
+    clearInterval(this.mainIntervalId);
+    this.interruptOccurred = true;
+    this.stopPolling?.(error ? new LoggedException(error, this, LogLevel.error) : new LoggedException("AWS SSO Interrupted.", this, LogLevel.info));
 
     this.getListeners().forEach((listener) => {
       listener.catchClosingBrowserWindow();
@@ -141,7 +144,7 @@ export class AwsSsoOidcService {
     return await this.getAwsSsoOidcClient().startDeviceAuthorization(startDeviceAuthorizationRequest);
   }
 
-  private async createToken(configurationId: string | number, verificationResponse: VerificationResponse): Promise<GenerateSSOTokenResponse> {
+  private async createToken(verificationResponse: VerificationResponse): Promise<GenerateSSOTokenResponse> {
     const createTokenRequest: CreateTokenRequest = {
       clientId: verificationResponse.clientId,
       clientSecret: verificationResponse.clientSecret,
@@ -149,15 +152,8 @@ export class AwsSsoOidcService {
       deviceCode: verificationResponse.deviceCode,
     };
 
-    let createTokenResponse;
-    // disableInAppBrowser is a client-specific parameter. If disableInAppBrowser is true, the client will open aws sso
-    // login page using the Browser instead of the Electron BrowserWindow, regardless the value specified in Leapp
-    // configuration's browserOpening parameter.
-    if (!this.disableInAppBrowser && this.repository.getAwsSsoIntegration(configurationId).browserOpening === constants.inApp) {
-      createTokenResponse = await this.getAwsSsoOidcClient().createToken(createTokenRequest);
-    } else {
-      createTokenResponse = await this.waitForToken(createTokenRequest);
-    }
+    // Every modality polls CreateToken: the In-app window no longer watches the AWS page's own requests.
+    const createTokenResponse = await this.waitForToken(createTokenRequest);
 
     const expirationTime: Date = new Date(Date.now() + createTokenResponse.expiresIn * 1000);
     return { accessToken: createTokenResponse.accessToken, expirationTime };
@@ -166,6 +162,7 @@ export class AwsSsoOidcService {
   private async waitForToken(createTokenRequest: CreateTokenRequest): Promise<any> {
     return new Promise((resolve, reject) => {
       const intervalInMilliseconds = 5000;
+      this.stopPolling = reject;
 
       this.mainIntervalId = setInterval(() => {
         this.getAwsSsoOidcClient()

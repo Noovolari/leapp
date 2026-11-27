@@ -145,10 +145,24 @@ jobs:
       - name: Bootstrap
         run: |
           npm run bootstrap
+      - name: Set the prod flavor
+        # The repository says leappFlavor dev (Leapp Dev, ~/.Leapp-dev, its own socket and
+        # keychain). bin/run reads it, so the published CLI must say prod to reach Leapp.
+        run: |
+          cd packages/cli
+          npm pkg set leappFlavor=prod
       - name: Build CLI
         run: |
           cd packages/cli
           npm run prepack
+      - name: Check that the packed CLI is prod
+        run: |
+          cd packages/cli
+          TARBALL=$(npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP" | tail -n 1)
+          FLAVOR=$(tar -xzOf "$RUNNER_TEMP/$TARBALL" package/package.json | node -p "JSON.parse(require('fs').readFileSync(0, 'utf8')).leappFlavor")
+          rm -f "$RUNNER_TEMP/$TARBALL"
+          echo "Packed leapp-cli flavor: $FLAVOR"
+          [ "$FLAVOR" = prod ]
       - name: Release npm
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

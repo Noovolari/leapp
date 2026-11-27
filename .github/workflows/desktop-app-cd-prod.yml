@@ -13,13 +13,6 @@ env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
   S3_BUCKET: s3://noovolari-leapp-website-distribution
-  WIN_CERTIFICATE: ${{ secrets.WIN_CERTIFICATE }}
-  WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-  ESIGNER_WIN_USERNAME: ${{ secrets.ESIGNER_WIN_USERNAME }}
-  ESIGNER_WIN_PASSWORD: ${{ secrets.ESIGNER_WIN_PASSWORD }}
-  ESIGNER_WIN_CREDENTIAL_ID: ${{ secrets.ESIGNER_WIN_CREDENTIAL_ID }}
-  ESIGNER_WIN_TOTP: ${{ secrets.ESIGNER_WIN_TOTP }}
-  ESIGNER_WIN_CLIENT_ID: ${{ secrets.ESIGNER_WIN_CLIENT_ID }}
   TEAM_REPOSITORY: '' # ${{ secrets.TEAM_REPOSITORY }}
   APPLE_ID: ${{ secrets.APPLE_ID }}
   APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
@@ -65,6 +58,13 @@ jobs:
     runs-on: windows-2022
     needs: [ tag-validation ]
     if: needs.tag-validation.outputs.validator == 1
+    # Windows is signed with Azure Artifact Signing. Only jobs in this environment can
+    # sign: the Azure federated credential trusts
+    # repo:Noovolari/leapp:environment:windows-signing (GitHub OIDC, no client secret).
+    environment: windows-signing
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Prepare GIT
         shell: bash
@@ -107,6 +107,39 @@ jobs:
           npm install
           npm run test
           npm run enable-team-features-prod
+
+      - name: Configure Azure Artifact Signing
+        shell: bash
+        env:
+          AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          AZURE_SIGNING_PROFILE: ${{ vars.AZURE_SIGNING_PROFILE }}
+        run: |
+          : "${AZURE_SIGNING_ENDPOINT:?missing in the windows-signing environment}"
+          : "${AZURE_SIGNING_ACCOUNT:?missing in the windows-signing environment}"
+          : "${AZURE_SIGNING_PROFILE:?missing in the windows-signing environment}"
+          cd packages/desktop-app
+          npm pkg set \
+            "build.win.azureSignOptions.publisherName=BESHARP SPA" \
+            "build.win.azureSignOptions.endpoint=$AZURE_SIGNING_ENDPOINT" \
+            "build.win.azureSignOptions.codeSigningAccountName=$AZURE_SIGNING_ACCOUNT" \
+            "build.win.azureSignOptions.certificateProfileName=$AZURE_SIGNING_PROFILE" \
+            "build.win.azureSignOptions.fileDigest=SHA256" \
+            "build.win.azureSignOptions.timestampDigest=SHA256" \
+            "build.win.azureSignOptions.timestampRfc3161=http://timestamp.acs.microsoft.com"
+
+      - name: Sign in to Azure (GitHub OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # Fetched while the GitHub OIDC assertion is fresh; the Azure CLI serves it from
+      # its cache when electron-builder signs through Invoke-TrustedSigning.
+      - name: Get the code signing token
+        shell: bash
+        run: az account get-access-token --resource https://codesigning.azure.net --output none
 
       - name: Build Win desktop app
         shell: bash

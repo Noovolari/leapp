@@ -1,8 +1,10 @@
 name: Leapp Desktop App - dry run
 
-# Builds, signs (macOS only) and tests the desktop app on every platform, the way a
-# release does, and reports only OK / KO. It publishes nothing: no artifacts, no
-# caches, no S3, no GitHub release, no tag. Windows is built unsigned.
+# Builds, signs and tests the desktop app on every platform, the way a release does,
+# and reports only OK / KO. It publishes nothing: no artifacts, no caches, no S3, no
+# GitHub release, no tag. macOS is signed and notarized with the Apple certificates;
+# Windows is signed with Azure Artifact Signing through the windows-signing
+# environment (GitHub OIDC, no client secret).
 #
 # Runs only on request:
 # - from the Actions tab (Run workflow, any branch) once this file is on master;
@@ -34,9 +36,6 @@ jobs:
           - name: Linux
             os: ubuntu-latest
             release: release-linux
-          - name: Windows (unsigned)
-            os: windows-2022
-            release: release-win
           - name: macOS x64
             os: macos-latest
             release: release-mac
@@ -49,12 +48,6 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Prepare git
-        if: runner.os == 'Windows'
-        run: |
-          git config --global core.autocrlf false
-          git config --global core.eol lf
-
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
@@ -138,13 +131,13 @@ jobs:
         if: steps.install.outcome == 'success' && (runner.os != 'macOS' || steps.keychain.outcome == 'success')
         env:
           # macOS notarization (electron-builder). Nothing else is passed: no GH_TOKEN,
-          # no AWS keys, no Windows signing secrets, so nothing can be published.
+          # no AWS keys, so nothing can be published.
           APPLE_ID: ${{ runner.os == 'macOS' && secrets.APPLE_ID || '' }}
           APPLE_APP_SPECIFIC_PASSWORD: ${{ runner.os == 'macOS' && secrets.APPLE_APP_SPECIFIC_PASSWORD || '' }}
           APPLE_TEAM_ID: ${{ runner.os == 'macOS' && secrets.APPLE_TEAM_ID || '' }}
           CSC_IDENTITY_AUTO_DISCOVERY: ${{ runner.os == 'macOS' && 'true' || 'false' }}
         # Notarization sometimes runs past Apple's time: like the release workflow, macOS
-        # gets 5 attempts of 20 minutes. Linux and Windows build once.
+        # gets 5 attempts of 20 minutes. Linux builds once.
         uses: nick-fields/retry@v3
         with:
           timeout_minutes: ${{ runner.os == 'macOS' && 20 || 45 }}
@@ -209,17 +202,185 @@ jobs:
           for r in "$BUILD_RESULT" "$SIGN_RESULT" "$TEST_RESULT"; do [ "$r" = KO ] && exit 1; done
           exit 0
 
+  windows:
+    name: Windows
+    runs-on: windows-2022
+    timeout-minutes: 90
+    # Only jobs in this environment can sign: the Azure federated credential trusts
+    # repo:Noovolari/leapp:environment:windows-signing.
+    environment: windows-signing
+    permissions:
+      contents: read
+      id-token: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Prepare git
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: packages/desktop-app/.nvmrc
+
+      - name: Build and pack Leapp Core
+        id: core
+        run: |
+          SPEC=$(node -p "require('./packages/desktop-app/package.json').dependencies['@noovolari/leapp-core']")
+          if [ "${SPEC#file:}" = "$SPEC" ]; then
+            echo "Core from npm: @noovolari/leapp-core@$SPEC"
+            exit 0
+          fi
+          cd packages/core
+          npm ci
+          npm run build
+          TARBALL=$(npm pack --pack-destination "$RUNNER_TEMP" | tail -n 1)
+          echo "Core packed: $TARBALL"
+          echo "tarball=$RUNNER_TEMP/$TARBALL" >> "$GITHUB_OUTPUT"
+
+      - name: Install desktop app dependencies
+        id: install
+        if: steps.core.outcome == 'success'
+        env:
+          CORE_TARBALL: ${{ steps.core.outputs.tarball }}
+        run: |
+          cd packages/desktop-app
+          npm ci
+          if [ -n "$CORE_TARBALL" ]; then npm install --no-save "$CORE_TARBALL"; fi
+          CORE_DIR=node_modules/@noovolari/leapp-core
+          if [ -L "$CORE_DIR" ]; then echo "leapp-core is still a symlink"; exit 1; fi
+          node -p "'Installed leapp-core ' + require('./$CORE_DIR/package.json').version"
+
+      # The signing settings live in the windows-signing environment, not in
+      # package.json; they are written into it on the runner only.
+      - name: Configure Azure Artifact Signing
+        id: azure-config
+        if: steps.install.outcome == 'success'
+        env:
+          AZURE_SIGNING_ENDPOINT: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          AZURE_SIGNING_ACCOUNT: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          AZURE_SIGNING_PROFILE: ${{ vars.AZURE_SIGNING_PROFILE }}
+        run: |
+          : "${AZURE_SIGNING_ENDPOINT:?missing in the windows-signing environment}"
+          : "${AZURE_SIGNING_ACCOUNT:?missing in the windows-signing environment}"
+          : "${AZURE_SIGNING_PROFILE:?missing in the windows-signing environment}"
+          cd packages/desktop-app
+          npm pkg set \
+            "build.win.azureSignOptions.publisherName=BESHARP SPA" \
+            "build.win.azureSignOptions.endpoint=$AZURE_SIGNING_ENDPOINT" \
+            "build.win.azureSignOptions.codeSigningAccountName=$AZURE_SIGNING_ACCOUNT" \
+            "build.win.azureSignOptions.certificateProfileName=$AZURE_SIGNING_PROFILE" \
+            "build.win.azureSignOptions.fileDigest=SHA256" \
+            "build.win.azureSignOptions.timestampDigest=SHA256" \
+            "build.win.azureSignOptions.timestampRfc3161=http://timestamp.acs.microsoft.com"
+
+      - name: Sign in to Azure (GitHub OIDC)
+        id: azure-login
+        if: steps.azure-config.outcome == 'success'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      # electron-builder signs through Invoke-TrustedSigning, which picks up the Azure
+      # CLI login. The token is fetched now, while the GitHub OIDC assertion is fresh,
+      # and the CLI serves it from its cache during the build.
+      - name: Get the code signing token
+        if: steps.azure-login.outcome == 'success'
+        run: az account get-access-token --resource https://codesigning.azure.net --output none
+
+      - name: Build, package and sign
+        id: build
+        if: steps.azure-login.outcome == 'success'
+        run: |
+          cd packages/desktop-app
+          npm run release-win
+
+      - name: Verify the Windows signatures
+        id: sign
+        if: steps.build.outcome == 'success'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $release = Join-Path $PWD 'packages/desktop-app/release'
+          $setup = Get-ChildItem $release -Filter 'Leapp Setup *.exe' | Select-Object -First 1
+          if (-not $setup) { throw 'Leapp Setup *.exe not found' }
+          # The uninstaller is checked as it ships: install silently, then read it.
+          Start-Process -FilePath $setup.FullName -ArgumentList '/S' -Wait
+          $uninstaller = Get-ChildItem "$env:LOCALAPPDATA\Programs" -Recurse -Filter 'Uninstall Leapp.exe' | Select-Object -First 1
+          if (-not $uninstaller) { throw 'Uninstall Leapp.exe not found after a silent install' }
+          $files = @($setup.FullName, (Join-Path $release 'win-unpacked/Leapp.exe'), $uninstaller.FullName)
+          $bad = 0
+          foreach ($file in $files) {
+            $sig = Get-AuthenticodeSignature -FilePath $file
+            $subject = if ($sig.SignerCertificate) { $sig.SignerCertificate.Subject } else { 'no signer' }
+            $timestamped = [bool]$sig.TimeStamperCertificate
+            Write-Host "$(Split-Path $file -Leaf): $($sig.Status) | $subject | timestamped: $timestamped"
+            if ($sig.Status -ne 'Valid' -or $subject -notmatch '(^|,\s*)CN=BESHARP SPA(,|$)' -or -not $timestamped) { $bad++ }
+          }
+          if ($bad) { throw "$bad file(s) not signed by CN=BESHARP SPA" }
+
+      - name: Test the desktop app
+        id: test
+        if: steps.install.outcome == 'success' && !cancelled()
+        run: |
+          cd packages/desktop-app
+          [ -f src/app/services/team-service.ts ] || cp src/app/services/team-service-stub.ts src/app/services/team-service.ts
+          npx ng test --watch=false --browsers=ChromeHeadless --progress=false
+
+      - name: Sign out of Azure and remove the build output
+        if: always()
+        run: |
+          az logout || true
+          az account clear || true
+          rm -rf packages/desktop-app/release
+
+      - name: Result
+        if: always()
+        env:
+          CORE: ${{ steps.core.outcome }}
+          INSTALL: ${{ steps.install.outcome }}
+          LOGIN: ${{ steps.azure-login.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+          SIGN: ${{ steps.sign.outcome }}
+          TEST: ${{ steps.test.outcome }}
+        run: |
+          ok() { [ "$1" = success ] && echo OK || echo KO; }
+          BUILD_RESULT=$( [ "$CORE" = success ] && [ "$INSTALL" = success ] && [ "$LOGIN" = success ] && ok "$BUILD" || echo KO )
+          SIGN_RESULT=$(ok "$SIGN")
+          TEST_RESULT=$(ok "$TEST")
+          {
+            echo "| Platform | Build | Signing | Tests |"
+            echo "|---|---|---|---|"
+            echo "| Windows | $BUILD_RESULT | $SIGN_RESULT | $TEST_RESULT |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Windows: build $BUILD_RESULT, signing $SIGN_RESULT, tests $TEST_RESULT"
+          for r in "$BUILD_RESULT" "$SIGN_RESULT" "$TEST_RESULT"; do [ "$r" = KO ] && exit 1; done
+          exit 0
+
   result:
     name: OK / KO
-    needs: build-and-test
+    needs: [build-and-test, windows]
     if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Overall result
         env:
           RESULT: ${{ needs.build-and-test.result }}
+          WINDOWS: ${{ needs.windows.result }}
         run: |
-          if [ "$RESULT" = success ]; then V=OK; else V=KO; fi
+          if [ "$RESULT" = success ] && [ "$WINDOWS" = success ]; then V=OK; else V=KO; fi
           {
             echo "## Desktop app dry run: $V"
             echo
